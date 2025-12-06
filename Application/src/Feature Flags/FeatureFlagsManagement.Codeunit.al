@@ -117,6 +117,7 @@ codeunit 6151495 "NPR Feature Flags Management"
         NPRJobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
         NPRJobQueueManagement.SetRerunDelay(10);
         NPRJobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        NPRJobQueueManagement.SetProtected(true);
         if not NPRJobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Get Feature Flags JQ", '', DescriptionLbl, StartDateTime, 1, '', JobQueueEntry) then
             exit;
 

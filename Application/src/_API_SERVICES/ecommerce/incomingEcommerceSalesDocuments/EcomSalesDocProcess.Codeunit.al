@@ -100,6 +100,7 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
     begin
         JobQueueMgt.SetJobTimeout(4, 0);
         JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 Codeunit::"NPR EcomSalesOrderProcJQ",
@@ -124,6 +125,7 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
     begin
         JobQueueMgt.SetJobTimeout(4, 0);
         JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 Codeunit::"NPR EcomSalesRetOrderProcJQ",
@@ -225,21 +227,6 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
         if not IncEcomSalesDocSetup.Get() then
             IncEcomSalesDocSetup.Init();
         HandleSalesReturnOrderProcessJQSchedule(IncEcomSalesDocSetup."Auto Proc Sales Ret Order");
-    end;
-
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR EcomSalesRetOrderProcJQ")
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
 
     var

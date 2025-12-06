@@ -443,6 +443,7 @@
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly Job");
         if JobQueueEntry.FindFirst() then
             exit;
+        JobQueueMgt.SetProtected(true);
 
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
@@ -472,6 +473,7 @@
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly DSFINVK Job");
         if JobQueueEntry.FindFirst() then
             exit;
+        JobQueueMgt.SetProtected(true);
 
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,

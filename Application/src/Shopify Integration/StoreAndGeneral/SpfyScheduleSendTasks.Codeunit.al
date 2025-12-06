@@ -37,6 +37,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     begin
         if Enable then begin
             JobQueueMgt.SetStoreCode(ShopifyStoreCode);
+            JobQueueMgt.SetProtected(true);
             JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, GetShopifyTaskProcessorCode(true), true, '', 1);
         end else begin
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);

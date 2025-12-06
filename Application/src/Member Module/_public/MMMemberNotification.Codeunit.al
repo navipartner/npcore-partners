@@ -2061,6 +2061,7 @@
         JobQueueDescriptionLbl: Label 'Member Notifications - AutoCreated';
     begin
         if Create then begin
+            JobQueueMgt.SetProtected(true);
             JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(), '', JobQueueDescriptionLbl, CurrentDateTime(), 1, '', JobQueueEntry);
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
@@ -2076,19 +2077,6 @@
         if MMMemberNotificSetup.IsEmpty() then
             exit;
         SetJobQueueEntry(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = CurrCodeunitId())
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
 
     [IntegrationEvent(false, false)]

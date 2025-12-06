@@ -219,22 +219,6 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     begin
         ScheduleSubscriptionProcessingJobQueueEntries();
     end;
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-#else 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
-#endif
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" in [Codeunit::"NPR MM Subscr. Renew Req. JQ", Codeunit::"NPR MM Subscr. Pay Req Proc JQ", Codeunit::"NPR MM Subscr. Renew Proc. JQ", Codeunit::"NPR MM Subscr Termination JQ"])
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
-    end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"NPR MM Membership", 'OnAfterModifyEvent', '', false, false)]

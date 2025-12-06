@@ -385,6 +385,7 @@ codeunit 6184796 "NPR Adyen Management"
         JobQueueMgt.SetJobTimeout(4, 0);  // 4 hours
         if AutoRescheduleDelaySec > 0 then
             JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, AutoRescheduleDelaySec, '');
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 CodeunitID,
@@ -410,6 +411,7 @@ codeunit 6184796 "NPR Adyen Management"
         JobQueueMgt.SetJobTimeout(4, 0);  // 4 hours
         if AutoRescheduleDelaySec > 0 then
             JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, AutoRescheduleDelaySec, '');
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             CodeunitID,
@@ -433,29 +435,6 @@ codeunit 6184796 "NPR Adyen Management"
         ScheduleRefundStatusJQ();
         ScheduleRecurringContractJQ();
         SchedulePayByLinkCancelJQ();
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
-#endif
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" in
-               [Codeunit::"NPR Adyen Post Payment Lines",
-                Codeunit::"NPR Adyen Refund Status JQ",
-                Codeunit::"NPR Adyen PayByLink Status JQ",
-                Codeunit::"NPR Adyen Recurring ContractJQ",
-                Codeunit::"NPR Adyen PayByLink Cancel JQ"
-               ])
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
 
     local procedure RefreshPostPaymentLinesJQ()

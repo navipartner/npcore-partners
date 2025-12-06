@@ -34,6 +34,12 @@ tableextension 6014472 "NPR Job Queue Entry" extends "Job Queue Entry"
             Caption = 'Time Zone';
             DataClassification = CustomerContent;
         }
+        field(6014413; "NPR NP Protected Job"; Boolean)
+        {
+            Caption = 'NP Protected Job';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
         //DO NOT CREATE FIELDS WITH IDS: 6014404..6014408|6014410|6014411 (The IDs are reserved in table 6151148 "NPR Monitored Job Queue Entry")
     }
 

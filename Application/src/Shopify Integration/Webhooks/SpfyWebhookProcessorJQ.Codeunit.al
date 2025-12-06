@@ -32,7 +32,8 @@ codeunit 6184953 "NPR Spfy Webhook Processor JQ"
             if not SpfyWebhookSubscription.IsEmpty() then
                 exit;
             JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
-        end else
+        end else begin
+            JobQueueMgt.SetProtected(true);
             if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 CurrCodeunitId(),
@@ -44,6 +45,7 @@ codeunit 6184953 "NPR Spfy Webhook Processor JQ"
                 JobQueueEntry)
             then
                 JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+        end;
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -64,23 +66,6 @@ codeunit 6184953 "NPR Spfy Webhook Processor JQ"
         If ShopifySetup.IsEmpty() then
             exit;
         RegisterShopifyWebhookNotificationProcessingJQ(not SpfyWebhookSubscription.IsEmpty());
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
-#endif
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = CurrCodeunitId())
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
 }
 #endif

@@ -51,7 +51,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         xMonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        RefreshJobQueueEntry: Codeunit "NPR Refresh Job Queue Entry";
+        NewMonitoredJob: Boolean;
     begin
         SelectLatestVersion();
         if not IsNullGuid(JobQueueEntry.ID) then
@@ -66,9 +66,11 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
             if MonitoredJQEntry.IsEmpty() then
                 MonitoredJQEntry.SetRange("Job Queue Category Code");
         end;
-        if MonitoredJQEntry.FindFirst() then begin
-            if RefreshJobQueueEntry.IsNprCustomizableJob(MonitoredJQEntry) then
-                exit;
+        NewMonitoredJob := not MonitoredJQEntry.FindFirst();
+        if not NewMonitoredJob then begin
+            if JobQueueMgt.JobQueueIsNPProtected(JobQueueEntry) then
+                if JobQueueMgt.IsNprCustomizableJob(JobQueueEntry) then
+                    exit;
             xMonitoredJQEntry := MonitoredJQEntry;
         end else begin
             Clear(xMonitoredJQEntry);
@@ -81,6 +83,13 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         MonitoredJQEntry.TransferFields(JobQueueEntry, false);
         if not IsNullGuid(JobQueueEntry.ID) then
             MonitoredJQEntry."Job Queue Entry ID" := JobQueueEntry.ID;
+
+        if not NewMonitoredJob then begin
+            MonitoredJQEntry.Description := xMonitoredJQEntry.Description;
+            MonitoredJQEntry."Notif. Profile on Error" := xMonitoredJQEntry."Notif. Profile on Error";
+            MonitoredJQEntry."NPR Auto-Resched. after Error" := xMonitoredJQEntry."NPR Auto-Resched. after Error";
+            MonitoredJQEntry."NPR Auto-Resched. Delay (sec.)" := xMonitoredJQEntry."NPR Auto-Resched. Delay (sec.)";
+        end;
         JobQueueMgt.OnBeforeRenewMonitoredJobQueueEntry(xMonitoredJQEntry, MonitoredJQEntry);
         if Format(xMonitoredJQEntry) <> Format(MonitoredJQEntry) then
             MonitoredJQEntry.Modify(true);
@@ -108,7 +117,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         if not ManagedByAppJobQueue.IsEmpty() then
             repeat
                 if JobQueueEntry.Get(ManagedByAppJobQueue.ID) then begin
-                    if not JobQueueManagement.SkipUpdateNPManagedMonitoredJobs() and JobQueueManagement.IsNPRecurringJob(JobQueueEntry) then
+                    if JobQueueManagement.JobQueueIsNPProtected(JobQueueEntry) then
                         ManagedByAppJobQueue.Delete()
                     else
                         if ManagedByAppJobQueue."Managed by App" then
@@ -171,7 +180,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
 #endif
         repeat
             CounterSelected += 1;
-            if JobQueueManagement.SkipUpdateNPManagedMonitoredJobs() or not JobQueueManagement.IsNPRecurringJob(JobQueueEntry) then begin
+            if not JobQueueManagement.JobQueueIsNPProtected(JobQueueEntry) then begin
 #if not (BC17 or BC18 or BC19)
                 ErrorMessageMgt.PushContext(ErrorContextElement, JobQueueEntry.RecordId(), 0, StrSubstNo(ProcessingMsg, JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run", JobQueueManagement.GetObjCaption(JobQueueEntry)));
 #endif
@@ -208,11 +217,11 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         end;
     end;
 
-    internal procedure AssignJobQueueEntryToManagedAndMonitored(NotProtectedJob: Boolean; ManagedByApp: Boolean; JobQueueEntry: Record "Job Queue Entry")
+    internal procedure AssignJobQueueEntryToManagedAndMonitored(ProtectedJob: Boolean; ManagedByApp: Boolean; JobQueueEntry: Record "Job Queue Entry")
     var
         ManagedByAppJobQueue: Record "NPR Managed By App Job Queue";
     begin
-        if NotProtectedJob then begin
+        if not ProtectedJob then begin
             if not ManagedByAppJobQueue.Get(JobQueueEntry.ID) then begin
                 ManagedByAppJobQueue.Init();
                 ManagedByAppJobQueue.ID := JobQueueEntry.ID;
@@ -232,25 +241,19 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         TempJQEntry: Record "Job Queue Entry" temporary;
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
         RefreshJobQueueEntry: Codeunit "NPR Refresh Job Queue Entry";
-        NotProtectedJob: Boolean;
     begin
         JQRefreshSetup.GetSetup();
         TempJQEntry.Init();
         TempJQEntry.Status := TempJQEntry.Status::"On Hold";
         TempJQEntry.Insert(true);
         if Page.RunModal(Page::"NPR Monitored JQ Entry Card", TempJQEntry) = Action::LookupOK then begin
-            JobQueueMgt.JobQueueIsManagedByApp(TempJQEntry, NotProtectedJob);
-            if not NotProtectedJob then
-                Error(_IsNPJobErr, TempJQEntry."Object Type to Run", TempJQEntry."Object ID to Run", JobQueueMgt.GetObjCaption(TempJQEntry));
-
             MonitoredJQEntry.Init();
             MonitoredJQEntry."Entry No." := 0;
             MonitoredJQEntry.TransferFields(TempJQEntry);
             MonitoredJQEntry.Insert();
 
-            RefreshJobQueueEntry.RefreshJobQueueEntry(MonitoredJQEntry, NotProtectedJob);
+            RefreshJobQueueEntry.RefreshJobQueueEntry(MonitoredJQEntry, false);
             MonitoredJQEntry.Modify();
         end;
     end;
@@ -272,13 +275,6 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
                 MonitoredJQEntry.Modify();
             end;
         end;
-    end;
-
-    internal procedure IsNPProtectedJob(JobQueueEntry: Record "Job Queue Entry"): Boolean
-    var
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-    begin
-        exit(not JobQueueMgt.SkipUpdateNPManagedMonitoredJobs() and JobQueueMgt.IsNPRecurringJob(JobQueueEntry));
     end;
 
     internal procedure CheckJobBeforeAddingToMonitored(JobQueueEntry: Record "Job Queue Entry")
@@ -333,7 +329,8 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         if not Confirm(RunDayShiftQst, true) then
             Error('');
     end;
-
+#if not (BC17 or BC18 or BC19)
     var
         _IsNPJobErr: Label 'Job Queue Entry ''%1 %2 %3'' is a NaviPartner protected job and cannot be added manually. It will be automatically added to the list of monitored jobs the next time the job queue refresher runs.';
+#endif
 }

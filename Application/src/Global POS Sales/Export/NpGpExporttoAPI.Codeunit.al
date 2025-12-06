@@ -70,6 +70,7 @@ codeunit 6248268 "NPR NpGp Export to API"
         JobQueueManagement.SetMaxNoOfAttemptsToRun(10);
         JobQueueManagement.SetRerunDelay(10);
         JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        JobQueueManagement.SetProtected(true);
         exit(
             JobQueueManagement.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
@@ -499,20 +500,5 @@ codeunit 6248268 "NPR NpGp Export to API"
         if CreateExportProcessingJobQueueEntry(JobQueueEntry) then
             JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR NpGp Export to API")
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
-    end;
-
 }
 #endif

@@ -55,6 +55,7 @@
             Commit();
         end;
         JobQueueMgt.SetShowAutoCreatedClause(Autocreated);
+        JobQueueMgt.SetProtected(true);
         JobQueueMgt.ScheduleNcTaskCountResetJob(JobQueueEntry, NcTaskProcessor.Code, '');
     end;
 
@@ -63,6 +64,7 @@
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         JobQueueMgt.SetShowAutoCreatedClause(Autocreated);
+        JobQueueMgt.SetProtected(true);
         JobQueueMgt.ScheduleNcImportListProcessing('', '');
     end;
 

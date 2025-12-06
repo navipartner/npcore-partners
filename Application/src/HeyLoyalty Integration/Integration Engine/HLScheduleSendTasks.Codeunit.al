@@ -28,6 +28,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
 
         NoOfMinutesBetweenRuns := 1;
 
+        JobQueueMgt.SetProtected(true);
         JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTask."Task Processor Code", true, '', NoOfMinutesBetweenRuns);
     end;
 

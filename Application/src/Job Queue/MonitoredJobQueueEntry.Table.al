@@ -280,6 +280,12 @@ table 6151148 "NPR Monitored Job Queue Entry"
             Caption = 'Time Zone';
             DataClassification = CustomerContent;
         }
+        field(6014413; "NP Protected Job"; Boolean)
+        {
+            Caption = 'NP Protected Job';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
     keys
     {

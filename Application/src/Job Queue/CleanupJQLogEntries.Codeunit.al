@@ -61,19 +61,6 @@
         AddJQLogCleanupJob(JobQueueEntry, true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = CurrCodeunitId())
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
-    end;
-
     procedure AddJQLogCleanupJob(var JobQueueEntry: Record "Job Queue Entry"; Silent: Boolean): Boolean
     var
         ConfirmJobCreationQst: Label 'This function will add a new periodic job (Job Queue Entry), responsible for purging outdated (older than 30 days) Joq Queue Log entries.\Are you sure you want to continue?';
@@ -97,6 +84,7 @@
         Evaluate(NextRunDateFormula, '<1D>');
         JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
         JobQueueCategory.InsertRec(JQCategoryCode(), JobCategoryDescrLbl);
+        JobQueueMgt.SetProtected(true);
 
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,

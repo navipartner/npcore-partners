@@ -167,6 +167,7 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
 
         NotBeforeDateTime := CurrentDateTime();
         Evaluate(NextRunDateFormula, '<1D>');
+        JobQueueManagement.SetProtected(true);
         if JobQueueManagement.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             CurrCodeunitID(),
@@ -203,18 +204,5 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
     local procedure RefreshJobQueueEntry()
     begin
         CreateJobQueueEntry();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = CurrCodeunitID())
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
 }

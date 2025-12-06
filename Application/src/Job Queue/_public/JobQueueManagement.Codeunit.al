@@ -18,6 +18,7 @@
         MaxNoOfAttemptsToRun: Integer;
         RerunDelaySec: Integer;
         AutoRescheduleOnError: Boolean;
+        IsNPProtected: Boolean;
         JQRefreshSetupRetrieved: Boolean;
         ShowAutoCreatedClause: Boolean;
         ParamNameAndValueLbl: Label '%1=%2', Locked = true;
@@ -26,11 +27,13 @@
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
+        SetProtected(true);
         ScheduleNcTaskProcessing(JobQueueEntry, TaskProcessorCode, EnableTaskListUpdate, JobQueueCatagoryCode, 0);
     end;
 
     procedure ScheduleNcTaskProcessing(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; EnableTaskListUpdate: Boolean; JobQueueCatagoryCode: Code[10])
     begin
+        SetProtected(true);
         ScheduleNcTaskProcessing(JobQueueEntry, TaskProcessorCode, EnableTaskListUpdate, JobQueueCatagoryCode, 0);
     end;
 
@@ -254,6 +257,7 @@
         if JobTimeout <> 0 then
             Parameters."Job Timeout" := JobTimeout;
 #ENDIF
+        Parameters."NPR NP Protected Job" := IsNPProtected;
         Parameters."NPR Auto-Resched. after Error" := AutoRescheduleOnError;
         Parameters."NPR Auto-Resched. Delay (sec.)" := AutoRescheduleOnErrorDelaySec;
         Parameters."NPR Notif. Profile on Error" := NotifProfileCodeOnError;
@@ -379,6 +383,7 @@
         JobQueueEntry."NPR Auto-Resched. after Error" := Parameters."NPR Auto-Resched. after Error";
         JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := Parameters."NPR Auto-Resched. Delay (sec.)";
         JobQueueEntry."NPR Heartbeat URL" := Parameters."NPR Heartbeat URL";
+        JobQueueEntry."NPR NP Protected Job" := Parameters."NPR NP Protected Job";
         JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
     end;
 
@@ -586,6 +591,7 @@
         JobQueueDescrLbl: Label 'POS Item posting', MaxLength = 250;
     begin
         SetJobTimeout(4, 0);  //4 hours
+        SetProtected(true);
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
@@ -609,6 +615,7 @@
         Evaluate(NextRunDateFormula, '<1D>');
         SetJobTimeout(4, 0);  //4 hours
         SetAutoRescheduleAndNotifyOnError(true, 2700, '');  //Reschedule to run again in 45 minutes on error
+        SetProtected(true);
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::codeunit,
@@ -631,6 +638,7 @@
         JobQueueDescrLbl: Label 'POS Sale Document posting', MaxLength = 250;
     begin
         SetJobTimeout(4, 0);  //4 hours
+        SetProtected(true);
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
@@ -652,6 +660,7 @@
         JobQueueDescrLbl: Label 'Transfer Billing Events', MaxLength = 250;
     begin
         SetJobTimeout(0, 15);
+        SetProtected(true);
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
@@ -703,6 +712,7 @@
         SetJobTimeout(6, 0); // 6hr timeout
         SetAutoRescheduleAndNotifyOnError(true, 60, '');
         SetMaxNoOfAttemptsToRun(1000);
+        SetProtected(true);
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             3997,  //Codeunit::"Retention Policy JQ"
@@ -886,6 +896,11 @@
     procedure SetJobTimeout(NewTimeout: Duration)
     begin
         JobTimeout := NewTimeout;
+    end;
+
+    procedure SetProtected(Protected: Boolean)
+    begin
+        IsNPProtected := Protected;
     end;
 
     procedure SetAutoRescheduleAndNotifyOnError(AutoReschedule: Boolean; AutoRescheduleDelaySec: Integer; NotifProfileCode: Code[20])
@@ -1080,15 +1095,6 @@
     end;
 #endif
 
-    internal procedure IsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"): Boolean
-    var
-        IsNpJob: Boolean;
-        Handled: Boolean;
-    begin
-        OnCheckIfIsNPRecurringJob(JobQueueEntry, IsNpJob, Handled);
-        exit(IsNpJob);
-    end;
-
     local procedure IsStale(JobQueueEntry: Record "Job Queue Entry"): Boolean
     begin
         exit(not TaskScheduler.TaskExists(JobQueueEntry."System Task ID"));
@@ -1099,26 +1105,38 @@
         StoreCode := NewStoreCode;
     end;
 
-    internal procedure JobQueueIsManagedByApp(JobQueueEntry: Record "Job Queue Entry"; var RefreshingCanBeToggled: Boolean) Managed: Boolean
+    internal procedure JobQueueIsMonitored(JobQueueEntry: Record "Job Queue Entry") Monitored: Boolean
     var
         ManagedByAppJQ: Record "NPR Managed By App Job Queue";
         Handled: Boolean;
     begin
-        OnBeforeJobQueueIsManagedByApp(JobQueueEntry, Managed, Handled);
+        OnBeforeJobQueueIsManagedByApp(JobQueueEntry, Monitored, Handled);
         if Handled then begin
-            RefreshingCanBeToggled := false;
-            exit;
+            exit(Monitored);
         end;
 
-        if not SkipUpdateNPManagedMonitoredJobs() then begin
-            OnCheckIfIsNPRecurringJob(JobQueueEntry, Managed, Handled);
-            RefreshingCanBeToggled := not Handled;
-            if Handled then
-                exit;
-        end;
+        if JobQueueIsNPProtected(JobQueueEntry) then
+            exit(true);
 
-        RefreshingCanBeToggled := true;
-        Managed := ManagedByAppJQ.Get(JobQueueEntry.ID) and ManagedByAppJQ."Managed by App";
+        Monitored := ManagedByAppJQ.Get(JobQueueEntry.ID) and ManagedByAppJQ."Managed by App";
+    end;
+
+    internal procedure JobQueueIsNPProtected(JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        IsNpJob: Boolean;
+        Handled: Boolean;
+    begin
+        OnCheckIfIsNPRecurringJob(JobQueueEntry, IsNpJob, Handled);
+        if not (JobQueueEntry."NPR NP Protected Job" or IsNpJob) then
+            exit(false);
+        exit(not SkipUpdateNPManagedMonitoredJobs());
+    end;
+
+    internal procedure JobQueueIsNPProtected(JQMonitorEntry: Record "NPR Monitored Job Queue Entry"): Boolean
+    begin
+        if not JQMonitorEntry."NP Protected Job" then
+            exit(false);
+        exit(not SkipUpdateNPManagedMonitoredJobs());
     end;
 
     internal procedure GetObjCaption(JobQueueEntry: Record "Job Queue Entry"): Text
@@ -1164,13 +1182,20 @@
         JobQueueEntry."NPR Time Zone" := UserPersonalization."Time Zone";
     end;
 
+    internal procedure IsNprCustomizableJob(JobQueueEntry: Record "Job Queue Entry") NprCustomizableJob: Boolean
+    var
+        Handled: Boolean;
+    begin
+        OnCheckIfIsNprCustomizableJob(JobQueueEntry, NprCustomizableJob, Handled);
+    end;
+
 #if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnBeforeCalcNextRunTimeForRecurringJob', '', true, false)]
     local procedure NPCalcNextRunDateTimeForRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime; var NewRunDateTime: DateTime; var IsHandled: Boolean)
     begin
         if IsHandled then
             exit;
-        If not IsNPRecurringJob(JobQueueEntry) then
+        If not JobQueueIsNPProtected(JobQueueEntry) then
             exit;
         IsHandled := true;
         NewRunDateTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, StartingDateTime, false);
@@ -1181,7 +1206,7 @@
     begin
         if IsHandled then
             exit;
-        If not IsNPRecurringJob(JobQueueEntry) then
+        If not JobQueueIsNPProtected(JobQueueEntry) then
             exit;
         IsHandled := true;
         EarliestPossibleRunTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, EarliestPossibleRunTime, true);
@@ -1192,7 +1217,7 @@
     begin
         if not JobQueueEntry."Recurring Job" then
             exit;
-        If not IsNPRecurringJob(JobQueueEntry) then
+        If not JobQueueIsNPProtected(JobQueueEntry) then
             exit;
         JobQueueEntry."Earliest Start Date/Time" := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time", true);
     end;
@@ -1303,31 +1328,6 @@
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
-#endif
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" in
-               [Codeunit::"NPR POS Post Item Entries JQ",
-                Codeunit::"NPR POS Post GL Entries JQ",
-                Codeunit::"NPR Post Sales Documents JQ",
-#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-                Codeunit::"NPR Billing Data Sender JQ",
-#endif
-                Codeunit::"NPR Get Feature Flags JQ"
-               ])
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
 #else
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", OnCompanyInitialize, '', true, false)]
@@ -1392,6 +1392,27 @@
             Rec.Validate("Starting Time", 000000T);
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNprCustomizableJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNprCustomizableJob, '', false, false)]
+#endif
+    local procedure SetAsNprCustomizableJob(JobQueueEntry: Record "Job Queue Entry"; var NprCustomizableJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        //3997 - Codeunit::"Retention Policy JQ"
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and (JobQueueEntry."Object ID to Run" in [3997]) then begin
+            NprCustomizableJob := true;
+            Handled := true;
+        end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckIfIsNprCustomizableJob(JobQueueEntry: Record "Job Queue Entry"; var NprCustomizableJob: Boolean; var Handled: Boolean)
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeScheduleNcTaskProcessing(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; var EnableTaskListUpdate: Boolean; var JobQueueCatagoryCode: Code[10]; var Handled: Boolean)
     begin
@@ -1436,6 +1457,7 @@
     begin
     end;
 
+    [Obsolete('The method of determining NP protected jobs has changed. Subscribing to this event is no longer necessary.', '2025-12-04')]
     [IntegrationEvent(false, false)]
     local procedure OnCheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
     begin

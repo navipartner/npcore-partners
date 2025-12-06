@@ -281,6 +281,7 @@ codeunit 6014641 "NPR BTF Service API"
         JQParamStrMgt.AddToParamDict(NcImportListProcessing.ParamProcessImport());
 
         CreateJobQueueCategory(JobQueueCategory, ServiceEndPoint);
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR Nc Import List Processing",

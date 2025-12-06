@@ -639,20 +639,6 @@ codeunit 6060035 "NPR SMS Implementation"
             SMSSetup.Modify(true);
         end;
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Send SMS Job Handler")
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
-    end;
-
     #endregion Subscribers
     #region Job functions
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
@@ -676,7 +662,7 @@ codeunit 6060035 "NPR SMS Implementation"
         if JobCategory = '' then
             JobCategory := GetJobQueueCategoryCode();
         NotBeforeDateTime := JobQueueMgt.NowWithDelayInSeconds(60);
-
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR Send SMS Job Handler",

@@ -617,6 +617,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             Evaluate(NextRunDateFormula, '<1D>');
             JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
             JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 2700, '');
+            JobQueueMgt.SetProtected(true);
             if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 Codeunit::"NPR RS Fiscal BG Comm. Batch",
@@ -652,20 +653,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
     local procedure RefreshJobQueueEntry()
     begin
         AddRSAuditBackgroundJobQueue(IsRSFiscalActive(), true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR RS Fiscal BG Comm. Batch")
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
     #endregion
 

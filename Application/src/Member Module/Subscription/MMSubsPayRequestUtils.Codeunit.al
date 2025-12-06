@@ -102,6 +102,7 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
         JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
         JobQueueManagement.SetRerunDelay(10);
         JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        JobQueueManagement.SetProtected(true);
         exit(
             JobQueueManagement.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,

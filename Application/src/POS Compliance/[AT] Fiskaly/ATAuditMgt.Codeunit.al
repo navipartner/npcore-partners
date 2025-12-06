@@ -464,6 +464,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
         if ATFiscalizationEnabled then begin
             JobQueueManagement.SetJobTimeout(4, 0);  // 4 hours
             JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 1800, ''); // reschedule to run again in 30 minutes
+            JobQueueManagement.SetProtected(true);
             if JobQueueManagement.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 Codeunit::"NPR AT Validate Receipts JQ",
@@ -488,6 +489,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
         if ATFiscalizationEnabled then begin
             JobQueueManagement.SetJobTimeout(4, 0);  // 4 hours
             JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 300, ''); // reschedule to run again in 5 minutes
+            JobQueueManagement.SetProtected(true);
             if JobQueueManagement.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 Codeunit::"NPR AT Imp Other Ctrl Rcpt JQ",
@@ -523,20 +525,6 @@ codeunit 6184848 "NPR AT Audit Mgt."
     local procedure RunInitATImportOtherControlReceiptsJobQueue()
     begin
         InitATImportOtherControlReceiptsJobQueue(IsATFiscalizationEnabled());
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure HandleOnCheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" in [Codeunit::"NPR AT Validate Receipts JQ", Codeunit::"NPR AT Imp Other Ctrl Rcpt JQ"])
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
     #endregion
 

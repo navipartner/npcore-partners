@@ -71,6 +71,7 @@ codeunit 6150974 "NPR M2 Integration Area Mgt."
                 M2RecordChangeLog."Type of Change" := M2RecordChangeLog."Type of Change"::ResendStockData;
                 M2RecordChangeLog.Insert();
             until Item.Next() = 0;
+        JobQueueMgt.SetProtected(true);
 
         if (not JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,

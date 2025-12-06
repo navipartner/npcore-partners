@@ -276,6 +276,7 @@ codeunit 6184777 "NPR NPRE Notification Handler"
         if EnableJob then begin
             JobQueueMgt.SetJobTimeout(4, 0);
             JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 600, '');  //Reschedule to run again in 10 minutes on error
+            JobQueueMgt.SetProtected(true);
             if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
                 CodeunitID,
@@ -327,19 +328,6 @@ codeunit 6184777 "NPR NPRE Notification Handler"
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
     begin
         CreateNotificationJobQueues(SetupProxy.KDSActivatedForAnyRestaurant());
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" in [Codeunit::"NPR NPRE Create Notifics JQ", Codeunit::"NPR NPRE Send Notifications JQ"])
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Notification Setup", 'OnAfterInsertEvent', '', false, false)]

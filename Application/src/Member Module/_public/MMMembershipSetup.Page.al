@@ -710,6 +710,7 @@
         Evaluate(NextRunDateFormula, '<1D>');
         JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
         JobQueueCategory.InsertRec(JQCategoryCode(), JobCategoryDescrLbl);
+        JobQueueMgt.SetProtected(true);
 
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,

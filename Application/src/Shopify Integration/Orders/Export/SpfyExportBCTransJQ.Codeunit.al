@@ -101,6 +101,7 @@ codeunit 6248624 "NPR Spfy Export BC Trans. JQ"
             Enable:
                 begin
                     JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, ParamStoreFilterName(), ShopifyStoreCode));
+                    JobQueueMgt.SetProtected(true);
                     if JobQueueMgt.InitRecurringJobQueueEntry(
                         JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(),
                         JQParamStrMgt.GetParamListAsCSString(), ExportBCTransToShopifyLbl,
@@ -237,6 +238,21 @@ codeunit 6248624 "NPR Spfy Export BC Trans. JQ"
         If ShopifySetup.IsEmpty() then
             exit;
         SetupBCTransExportJobQueues();
+    end;
+
+#if BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNprCustomizableJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNprCustomizableJob, '', false, false)]
+#endif
+    local procedure SetAsNprCustomizableJob(JobQueueEntry: Record "Job Queue Entry"; var NprCustomizableJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and (JobQueueEntry."Object ID to Run" in [Codeunit::"NPR Spfy Export BC Trans. JQ"]) then begin
+            NprCustomizableJob := true;
+            Handled := true;
+        end
     end;
 }
 #endif

@@ -185,6 +185,7 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         Evaluate(NextRunDateFormula, '<1D>');
         JobQueueMgt.SetJobTimeout(4, 0);  // 4 hours
         JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 600, '');
+        JobQueueMgt.SetProtected(true);
 
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Report,

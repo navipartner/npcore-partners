@@ -138,6 +138,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
         JobQueueManagement.SetRerunDelay(10);
         JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        JobQueueManagement.SetProtected(true);
         exit(
             JobQueueManagement.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
@@ -177,6 +178,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
         JobQueueManagement.SetRerunDelay(10);
         JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        JobQueueManagement.SetProtected(true);
         exit(
             JobQueueManagement.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
@@ -216,6 +218,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
         JobQueueManagement.SetRerunDelay(10);
         JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        JobQueueManagement.SetProtected(true);
         exit(
             JobQueueManagement.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,

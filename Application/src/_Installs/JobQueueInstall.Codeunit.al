@@ -402,7 +402,7 @@
         JobQueueEntry.SetRange("NPR Manually Set On Hold", false);
         if JobQueueEntry.FindSet(true) then
             repeat
-                if JobQueueManagement.IsNPRecurringJob(JobQueueEntry) then begin
+                if JobQueueManagement.JobQueueIsNPProtected(JobQueueEntry) then begin
                     JobQueueEntry2.Get(JobQueueEntry.ID);
                     JobQueueEntry2."NPR Manually Set On Hold" := true;
                     JobQueueEntry2.Modify();

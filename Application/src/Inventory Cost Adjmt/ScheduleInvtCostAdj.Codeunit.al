@@ -35,6 +35,7 @@
     begin
         GetTimingParameters(NotBeforeDateTime, NextRunDateFormula);
         JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntryGlobal."Object Type to Run"::Report,
             Report::"Adjust Cost - Item Entries",
@@ -73,6 +74,7 @@
             until FoundExisting or NoMoreEntries;
         if not FoundExisting then
             JobQueueEntry."Parameter String" := CopyStr(PostInventoryCosttoGL.ParamSaveToReportInbox(), 1, MaxStrLen(JobQueueEntry."Parameter String"));
+        JobQueueMgt.SetProtected(true);
 
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
@@ -224,23 +226,17 @@
         Schedule(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNprCustomizableJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNprCustomizableJob, '', false, false)]
+#endif
+    local procedure SetAsNprCustomizableJob(JobQueueEntry: Record "Job Queue Entry"; var NprCustomizableJob: Boolean; var Handled: Boolean)
     begin
         if Handled then
             exit;
-        if ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Report) and
-            (JobQueueEntry."Object ID to Run" = Report::"Post Inventory Cost to G/L"))
-           or
-           ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-            (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Post Inventory Cost to G/L"))
-#if not BC17
-           or
-           ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-            (JobQueueEntry."Object ID to Run" = Codeunit::"Post Inventory Cost to G/L"))
-#endif
-        then begin
-            IsNpJob := true;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Report) and (JobQueueEntry."Object ID to Run" in [Report::"Adjust Cost - Item Entries"]) then begin
+            NprCustomizableJob := true;
             Handled := true;
         end;
     end;

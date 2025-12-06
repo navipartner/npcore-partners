@@ -735,6 +735,7 @@
     begin
         Evaluate(NextRunDateFormula, '<1D>');
         JobQueueCategory.InsertRec(DefJobCategoryCodeLbl, DefJobCategoryDescLbl);
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR NP GDPR Management",
@@ -781,19 +782,6 @@
         if not CustomerGDPRSetUp.Get() then
             exit;
         EnqueueJobEntries(CustomerGDPRSetUp);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR NP GDPR Management")
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
 
     [IntegrationEvent(false, false)]

@@ -258,6 +258,7 @@
         Evaluate(NextRunDateFormula, '<1D>');
         JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
 
+        JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             CurrCodeunitId(),
@@ -296,19 +297,6 @@
         if not TicketSetup.Get() then
             exit;
         AddTicketDataRetentionJobQueue(JobQueueEntry, true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = CurrCodeunitId())
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
     end;
     #endregion
 

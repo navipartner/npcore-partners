@@ -451,6 +451,7 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         JobQueueDescLbl: Label 'Dequeue and update member information from Azure user input', Locked = true;
     begin
         JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
+        JobQueueMgt.SetProtected(true);
 
         if (JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,

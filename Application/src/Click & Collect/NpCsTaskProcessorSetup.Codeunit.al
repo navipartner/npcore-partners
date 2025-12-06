@@ -108,8 +108,10 @@ codeunit 6150811 "NPR NpCs Task Processor Setup"
             NcTaskSetup."Codeunit ID" := Codeunit::"NPR NpCs Task Processor";
             NcTaskSetup.Insert(true);
         end;
-        if not JobQueueEntryExists(TaskProcessorCode) then
+        if not JobQueueEntryExists(TaskProcessorCode) then begin
+            JobQueueManagement.SetProtected(true);
             JobQueueManagement.ScheduleNcTaskProcessing(JobQueueEntry, TaskProcessorCode, false, 'NPCSUPDATE', 5);
+        end;
     end;
 
     local procedure JobQueueEntryExists(TaskProcessorCode: Code[20]): Boolean

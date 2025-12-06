@@ -107,6 +107,7 @@ page 6151477 "NPR TM DeferRevenueProfileList"
                     Evaluate(NextRunDateFormula, '<1D>');
                     JobQueueManagement.SetJobTimeout(4, 0);
                     JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 2700, '');  //Reschedule to run again in 45 minutes on error
+                    JobQueueManagement.SetProtected(true);
                     if (JobQueueManagement.InitRecurringJobQueueEntry(
                         JobQueueEntry."Object Type to Run"::codeunit,
                         Codeunit::"NPR TM RevenueDeferral",

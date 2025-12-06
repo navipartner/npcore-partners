@@ -191,6 +191,7 @@
                     JobQueueMgt: Codeunit "NPR Job Queue Management";
                 begin
                     CurrPage.SaveRecord();
+                    JobQueueMgt.SetProtected(true);
                     JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, Rec.Code, '');
                     if not IsNullGuid(JobQueueEntry.ID) then
                         Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
