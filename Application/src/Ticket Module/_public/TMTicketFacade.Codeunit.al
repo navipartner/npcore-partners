@@ -39,7 +39,7 @@ codeunit 6248436 "NPR TM Ticket Facade"
     var
         TMTicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-        TMTicketManagement.GetNextPossibleAdmissionScheduleStartTime(ItemNo, VariantCode);
+        exit(TMTicketManagement.GetNextPossibleAdmissionScheduleStartTime(ItemNo, VariantCode));
     end;
 
     procedure RevokeTicket(Ticket: Record "NPR TM Ticket")

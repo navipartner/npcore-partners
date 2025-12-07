@@ -4173,6 +4173,7 @@
         LowestTime := 235959T;
         NextTime := 235959T;
 
+        TMAdmisScheduleLines.SetAutoCalcFields("Scheduled Start Time");
         TMAdmisScheduleLines.SetRange("Admission Code", GetDefaultAdmissionCode(ItemNo, VariantCode));
         TMAdmisScheduleLines.SetRange(Blocked, false);
         if TMAdmisScheduleLines.FindSet() then
