@@ -1,6 +1,7 @@
 query 6014515 "NPR MembershipSubscriptionInfo"
 {
     QueryType = Normal;
+    OrderBy = Descending(SubscriptionRequest_EntryNo);
 
     elements
     {

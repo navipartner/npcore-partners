@@ -4,96 +4,110 @@ query 6014516 "NPR MMSubPayRequestToAccount"
 
     elements
     {
-        dataitem(SubscriptionPaymentRequest; "NPR MM Subscr. Payment Request")
+
+        dataitem(SubscriptionRequest; "NPR MM Subscr. Request")
         {
-
-            column(SubscriptionPaymentRequest_EntryNo; "Entry No.")
+            column(SubscriptionRequest_EntryNo; "Entry No.")
             {
             }
-            column(SubscriptionPaymentRequest_SystemId; SystemId)
+            column(SubscriptionRequest_SystemId; SystemId)
             {
             }
-            column(SubscriptionPaymentRequest_SubscriptionRequestEntryNo; "Subscr. Request Entry No.")
-            {
-            }
-            column(SubscriptionPaymentRequest_Type; Type)
-            {
-            }
-            column(SubscriptionPaymentRequest_Status; Status)
-            {
-            }
-            column(SubscriptionPaymentRequest_ResultCode; "Result Code")
-            {
-            }
-            column(SubscriptionPaymentRequest_RejectedReasonCode; "Rejected Reason Code")
-            {
-            }
-            column(SubscriptionPaymentRequest_RejectedReasonDescription; "Rejected Reason Description")
+            column(SubscriptionRequest_SubscriptionEntryNo; "Subscription Entry No.")
             {
             }
 
-            dataitem(PaymentMethod; "NPR MM Member Payment Method")
+            dataitem(SubscriptionPaymentRequest; "NPR MM Subscr. Payment Request")
             {
-                DataItemLink = "Entry No." = SubscriptionPaymentRequest."Payment Method Entry No.";
+                DataItemLink = "Subscr. Request Entry No." = SubscriptionRequest."Entry No.";
                 SqlJoinType = InnerJoin;
-                column(PaymentMethod_SystemId; SystemId)
+                column(SubscriptionPaymentRequest_EntryNo; "Entry No.")
                 {
                 }
-                column(PaymentMethod_EntryNo; "Entry No.")
+                column(SubscriptionPaymentRequest_SystemId; SystemId)
                 {
                 }
-                column(PaymentMethod_PSP; PSP)
+                column(SubscriptionPaymentRequest_SubscriptionRequestEntryNo; "Subscr. Request Entry No.")
                 {
                 }
-                column(PaymentMethod_Status; Status)
+                column(SubscriptionPaymentRequest_Type; Type)
                 {
                 }
-                column(PaymentMethod_PaymentInstrumentType; "Payment Instrument Type")
+                column(SubscriptionPaymentRequest_Status; Status)
                 {
                 }
-                column(PaymentMethod_PaymentBrand; "Payment Brand")
+                column(SubscriptionPaymentRequest_ResultCode; "Result Code")
                 {
                 }
-                column(PaymentMethod_MaskedPan; "Masked Pan")
+                column(SubscriptionPaymentRequest_RejectedReasonCode; "Rejected Reason Code")
                 {
                 }
-                column(PaymentMethod_ExpiryDate; "Expiry Date")
+                column(SubscriptionPaymentRequest_RejectedReasonDescription; "Rejected Reason Description")
                 {
                 }
-                column(PaymentMethod_PANLast4Digits; "PAN Last 4 Digits")
+
+                dataitem(PaymentMethod; "NPR MM Member Payment Method")
                 {
-                }
-                column(PaymentMethod_Alias; "Payment Method Alias")
-                {
-                }
-                dataitem(UserAccount; "NPR UserAccount")
-                {
-                    DataItemLink = SystemId = PaymentMethod."BC Record System ID";
+                    DataItemLink = "Entry No." = SubscriptionPaymentRequest."Payment Method Entry No.";
                     SqlJoinType = InnerJoin;
-                    column(UserAccount_SystemId; SystemId)
+                    column(PaymentMethod_SystemId; SystemId)
                     {
                     }
-                    column(UserAccount_AccountNo; AccountNo)
+                    column(PaymentMethod_EntryNo; "Entry No.")
                     {
                     }
-                    column(UserAccount_FirstName; FirstName)
+                    column(PaymentMethod_PSP; PSP)
                     {
                     }
-                    column(UserAccount_LastName; LastName)
+                    column(PaymentMethod_Status; Status)
                     {
                     }
-                    column(UserAccount_DisplayName; DisplayName)
+                    column(PaymentMethod_PaymentInstrumentType; "Payment Instrument Type")
                     {
                     }
-                    column(UserAccount_EmailAddress; EmailAddress)
+                    column(PaymentMethod_PaymentBrand; "Payment Brand")
                     {
                     }
-                    column(UserAccount_PhoneNo; PhoneNo)
+                    column(PaymentMethod_MaskedPan; "Masked Pan")
                     {
+                    }
+                    column(PaymentMethod_ExpiryDate; "Expiry Date")
+                    {
+                    }
+                    column(PaymentMethod_PANLast4Digits; "PAN Last 4 Digits")
+                    {
+                    }
+                    column(PaymentMethod_Alias; "Payment Method Alias")
+                    {
+                    }
+                    dataitem(UserAccount; "NPR UserAccount")
+                    {
+                        DataItemLink = SystemId = PaymentMethod."BC Record System ID";
+                        SqlJoinType = InnerJoin;
+                        column(UserAccount_SystemId; SystemId)
+                        {
+                        }
+                        column(UserAccount_AccountNo; AccountNo)
+                        {
+                        }
+                        column(UserAccount_FirstName; FirstName)
+                        {
+                        }
+                        column(UserAccount_LastName; LastName)
+                        {
+                        }
+                        column(UserAccount_DisplayName; DisplayName)
+                        {
+                        }
+                        column(UserAccount_EmailAddress; EmailAddress)
+                        {
+                        }
+                        column(UserAccount_PhoneNo; PhoneNo)
+                        {
+                        }
                     }
                 }
             }
         }
-
     }
 }
