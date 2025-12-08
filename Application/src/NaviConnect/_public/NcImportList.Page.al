@@ -460,9 +460,9 @@
             if not Confirm(ConfirmReimportMsg, true) then
                 exit;
             ImportEntry.ModifyAll(Imported, false);
-            ImportEntry.SetRange(Imported);
             Commit();
         end;
+        ImportEntry.SetRange(Imported);
 
         if ImportEntry.FindSet() then
             repeat
