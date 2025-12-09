@@ -163,6 +163,26 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     ToolTip = 'Specifies the payment reference shown on bank statements to identify this subscription payment.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Masked PAN"; Rec."Masked PAN")
+                {
+                    ToolTip = 'Specifies the value of the Masked PAN field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("PAN Last 4 Digits"; Rec."PAN Last 4 Digits")
+                {
+                    ToolTip = 'Specifies the value of the PAN Last 4 Digits field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Payment E-mail"; Rec."Payment E-mail")
+                {
+                    ToolTip = 'Specifies the value of the Payment E-mail field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Payment Phone No."; Rec."Payment Phone No.")
+                {
+                    ToolTip = 'Specifies the value of the Payment Phone No. field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
         }
     }

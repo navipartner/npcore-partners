@@ -104,6 +104,8 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrReversalPmtRequest."Currency Code" := SubscrReversalRequest."Currency Code";
         SubscrReversalPmtRequest.Description := CopyStr(SubscrReversalRequest.Description, 1, MaxStrLen(SubscrReversalPmtRequest.Description));
         SubscrReversalPmtRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+        SubscrReversalPmtRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";
+        SubscrReversalPmtRequest."Masked PAN" := MemberPaymentMethod."Masked PAN";
         SubsPayReqUtils.TrySetPaymentContactFromUserAcc(SubscrReversalPmtRequest, MemberPaymentMethod);
         SubscrReversalPmtRequest.Insert(true);
 
@@ -174,6 +176,8 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrPmtReversalRequest."External Membership No." := SubscrPaymentRequest."External Membership No.";
         SubscrPmtReversalRequest."Payment E-mail" := SubscrPaymentRequest."Payment E-mail";
         SubscrPmtReversalRequest."Payment Phone No." := SubscrPaymentRequest."Payment Phone No.";
+        SubscrPmtReversalRequest."PAN Last 4 Digits" := SubscrPaymentRequest."PAN Last 4 Digits";
+        SubscrPmtReversalRequest."Masked PAN" := SubscrPaymentRequest."Masked PAN";
     end;
 
     internal procedure InsertReversalRequest(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SubscrReversalRequest: Record "NPR MM Subscr. Request"; var SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request")

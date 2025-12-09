@@ -63,6 +63,16 @@ page 6248207 "NPR MM Subscr.Pmt Request List"
                     ToolTip = 'Specifies the value of the Currency Code field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Masked PAN"; Rec."Masked PAN")
+                {
+                    ToolTip = 'Specifies the value of the Masked PAN field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("PAN Last 4 Digits"; Rec."PAN Last 4 Digits")
+                {
+                    ToolTip = 'Specifies the value of the PAN Last 4 Digits field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("External Transaction ID"; Rec."External Transaction ID")
                 {
                     ToolTip = 'Specifies the value of the External Transaction ID field.';
@@ -238,6 +248,25 @@ page 6248207 "NPR MM Subscr.Pmt Request List"
                 PromotedCategory = Process;
                 RunObject = page "NPR MM Subscr. Requests";
                 RunPageLink = "Entry No." = field("Subscr. Request Entry No.");
+            }
+            action(PaymentMethods)
+            {
+                Caption = 'Payment Methods';
+                ToolTip = 'Opens payment methods for selected membership.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = PaymentHistory;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    Membership: Record "NPR MM Membership";
+                begin
+                    Membership.SetRange("External Membership No.", Rec."External Membership No.");
+                    if Membership.FindFirst() then
+                        Membership.ShowPaymentMethods();
+                end;
             }
 
             action(UserAccount)

@@ -221,6 +221,16 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'Payment Phone No.';
             DataClassification = CustomerContent;
         }
+        field(390; "PAN Last 4 Digits"; Text[4])
+        {
+            Caption = 'PAN Last 4 Digits';
+            DataClassification = CustomerContent;
+        }
+        field(400; "Masked PAN"; Text[30])
+        {
+            Caption = 'Masked PAN';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

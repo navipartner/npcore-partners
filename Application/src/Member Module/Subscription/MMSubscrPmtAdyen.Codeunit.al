@@ -317,8 +317,10 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         if not TryGetPSPReferenceFromResponse(Response, PSPReference) then
             Clear(PSPReference);
 
-        if TryGetCardChanged(Response, TempMMMemberPaymentMethod) then
+        if TryGetCardChanged(Response, TempMMMemberPaymentMethod) then begin
             UpdatePaymentMethod(SubscrPaymentRequest, TempMMMemberPaymentMethod);
+            UpdateSubscrPaymentRequestCardDetails(SubscrPaymentRequest, TempMMMemberPaymentMethod);
+        end;
 
         if not TryProcessResultCode(ResultCode, RejectedReasonCode, RejectedReasonDescription) then begin
             ErrorMessage := GetLastErrorText();
@@ -1285,6 +1287,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             GetMembership(MMSubscrPaymentRequest, Membership);
             GetPaymentMethod(JsonObjectToken, TempMemberPaymentMethod);
             InsertNewMMPaymentMethod(AdyenWebhook, Membership, TempMemberPaymentMethod);
+            UpdateSubscrPaymentRequestCardDetails(MMSubscrPaymentRequest, TempMemberPaymentMethod);
             Status := Status::Captured;
             ProcessingStatus := ProcessingStatus::Success;
         end else
@@ -2454,6 +2457,24 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             TempMemberPaymentMethod."Payment Brand" := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(TempMemberPaymentMethod."Payment Brand"));
             TempMemberPaymentMethod.Modify();
         end
+    end;
+
+    local procedure UpdateSubscrPaymentRequestCardDetails(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary)
+    var
+        CardDetailsChanged: Boolean;
+    begin
+        if SubscrPaymentRequest."PAN Last 4 Digits" <> TempMemberPaymentMethod."PAN Last 4 Digits" then begin
+            SubscrPaymentRequest."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
+            CardDetailsChanged := true;
+        end;
+
+        if SubscrPaymentRequest."Masked PAN" <> TempMemberPaymentMethod."Masked PAN" then begin
+            SubscrPaymentRequest."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
+            CardDetailsChanged := true;
+        end;
+
+        if CardDetailsChanged then
+            SubscrPaymentRequest.Modify();
     end;
 
     internal procedure CreateRefundWebhook(MerchantName: Text[50])

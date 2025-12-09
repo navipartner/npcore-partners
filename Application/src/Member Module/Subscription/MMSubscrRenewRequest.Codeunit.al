@@ -147,6 +147,8 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
         SubscrPaymentRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPaymentRequest."Subscription Payment Reference"));
         SubscrPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+        SubscrPaymentRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";
+        SubscrPaymentRequest."Masked PAN" := MemberPaymentMethod."Masked PAN";
         SubsPayReqUtils.TrySetPaymentContactFromUserAcc(SubscrPaymentRequest, MemberPaymentMethod);
         SubscrPaymentRequest.Insert();
     end;

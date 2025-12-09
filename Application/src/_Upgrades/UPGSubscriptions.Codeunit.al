@@ -22,6 +22,7 @@ codeunit 6185060 "NPR UPG Subscriptions"
         UpdateSubscriptionRenewProcJobStartTime();
         UpgradeTerminationSubsRequest();
         UpgradePaymentSubscriptionRequests();
+        UpgradePaymentSubscriptionRequestCardDetails();
     end;
 
     internal procedure CreateSubscriptions()
@@ -340,5 +341,44 @@ codeunit 6185060 "NPR UPG Subscriptions"
             SubscriptionPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
             Modi := true;
         end;
+    end;
+
+    local procedure UpgradePaymentSubscriptionRequestCardDetails()
+    var
+        SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        UpgradeStep := 'UpgradePaymentSubscrptionRequestCardDetails';
+        if HasUpgradeTag() then
+            exit;
+
+        SubscriptionPaymentRequest.Reset();
+        if SubscriptionPaymentRequest.FindSet() then
+            repeat
+                ProcessSubscriptionPaymentRequestCardDetails(SubscriptionPaymentRequest);
+            until SubscriptionPaymentRequest.Next() = 0;
+
+        SetUpgradeTag();
+    end;
+
+    local procedure ProcessSubscriptionPaymentRequestCardDetails(var SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        Modi: Boolean;
+    begin
+        if not MemberPaymentMethod.Get(SubscriptionPaymentRequest."Payment Method Entry No.") then
+            exit;
+
+        if SubscriptionPaymentRequest."PAN Last 4 Digits" <> MemberPaymentMethod."PAN Last 4 Digits" then begin
+            SubscriptionPaymentRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";
+            Modi := true;
+        end;
+
+        if SubscriptionPaymentRequest."Masked PAN" <> MemberPaymentMethod."Masked PAN" then begin
+            SubscriptionPaymentRequest."Masked PAN" := MemberPaymentMethod."Masked PAN";
+            Modi := true;
+        end;
+
+        if Modi then
+            SubscriptionPaymentRequest.Modify(true);
     end;
 }
