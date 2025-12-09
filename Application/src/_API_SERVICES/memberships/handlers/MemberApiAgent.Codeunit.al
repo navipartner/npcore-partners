@@ -329,7 +329,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         DeserializeMemberRequest(Request, MemberInfoCapture);
         MemberInfoCapture.Insert();
 
-        AttributeAgent.ApplyInboundMemberAttributesToMemberInfoCapture(Request, MemberInfoCapture."Entry No.");
+        AttributeAgent.ApplyInboundMemberAttributesToMemberInfoCapture(Request, MemberInfoCapture);
 
         if (CreateMemberWorker(MemberInfoCapture)) then begin
             Member.Get(MemberInfoCapture."Member Entry No");
@@ -372,7 +372,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         DeserializeMemberRequest(Request, MemberInfoCapture);
         MemberInfoCapture.Insert();
 
-        AttributeAgent.ApplyInboundMemberAttributesToMemberInfoCapture(Request, MemberInfoCapture."Entry No.");
+        AttributeAgent.ApplyInboundMemberAttributesToMemberInfoCapture(Request, MemberInfoCapture);
 
         if (UpdateMemberWorker(MemberInfoCapture)) then begin
             Member.Get(MemberInfoCapture."Member Entry No");

@@ -49,7 +49,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
         DeserializeCreateMembershipRequest(Request, MemberInfoCapture);
         MemberInfoCapture.Insert();
 
-        AttributeAgent.ApplyInboundMembershipAttributesToMemberInfoCapture(Request, MemberInfoCapture."Entry No.");
+        AttributeAgent.ApplyInboundMembershipAttributesToMemberInfoCapture(Request, MemberInfoCapture);
 
         if (CreateMembershipWorker(MemberInfoCapture)) then begin
             Membership.Get(MemberInfoCapture."Membership Entry No.");

@@ -189,7 +189,7 @@ codeunit 6248485 "NPR MembershipAttributesAgent"
     #endregion Member Attributes
 
     #region Member Info Capture
-    internal procedure ApplyInboundMemberAttributesToMemberInfoCapture(var Request: Codeunit "NPR API Request"; MemberInfoCaptureEntryNo: Integer)
+    internal procedure ApplyInboundMemberAttributesToMemberInfoCapture(var Request: Codeunit "NPR API Request"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         Body: JsonObject;
         JToken: JsonToken;
@@ -207,10 +207,10 @@ codeunit 6248485 "NPR MembershipAttributesAgent"
         if (not JToken.IsArray()) then
             exit;
 
-        ApplyInboundAttributes(DATABASE::"NPR MM Member Info Capture", MemberInfoCaptureEntryNo, JToken);
+        ApplyInboundAttributes(MemberInfoCapture, JToken);
     end;
 
-    internal procedure ApplyInboundMembershipAttributesToMemberInfoCapture(var Request: Codeunit "NPR API Request"; MemberInfoCaptureEntryNo: Integer)
+    internal procedure ApplyInboundMembershipAttributesToMemberInfoCapture(var Request: Codeunit "NPR API Request"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         Body: JsonObject;
         JToken: JsonToken;
@@ -219,7 +219,7 @@ codeunit 6248485 "NPR MembershipAttributesAgent"
         if (not Body.Get('attributes', JToken)) then
             exit;
 
-        ApplyInboundAttributes(DATABASE::"NPR MM Member Info Capture", MemberInfoCaptureEntryNo, JToken);
+        ApplyInboundAttributes(MemberInfoCapture, JToken);
     end;
     #endregion Member Info Capture
 
@@ -327,6 +327,38 @@ codeunit 6248485 "NPR MembershipAttributesAgent"
                 AttributeValue := CopyStr(AttributesToken.AsValue().AsText(), 1, MaxStrLen(AttributeValue));
 
                 ApplyAttributesToTableId(TableId, EntryNo_TableIdPrimaryKey, AttributeKey, AttributeValue);
+            end;
+        end;
+        exit(true);
+    end;
+
+    local procedure ApplyInboundAttributes(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AttributesToken: JsonToken): Boolean
+    var
+        MembershipEvents: Codeunit "NPR MM Membership Events";
+        Attributes: JsonArray;
+        Attribute: JsonToken;
+        AttributeKeyValuePair: JsonObject;
+        AttributeKey: Text;
+        AttributeValue: Text;
+        Handled: Boolean;
+    begin
+        if (not AttributesToken.IsArray()) then
+            exit(false);
+
+        Attributes := AttributesToken.AsArray();
+        foreach Attribute in Attributes do begin
+            if (Attribute.IsObject()) then begin
+                AttributeKeyValuePair := Attribute.AsObject();
+
+                AttributeKeyValuePair.Get('code', AttributesToken);
+                AttributeKey := AttributesToken.AsValue().AsText();
+
+                AttributeKeyValuePair.Get('value', AttributesToken);
+                AttributeValue := AttributesToken.AsValue().AsText();
+                Handled := false;
+                MembershipEvents.OnBeforeApplyAttributeToMemberInfoCapture(MemberInfoCapture, AttributeKey, AttributeValue, Handled);
+                if not Handled then
+                    ApplyAttributesToTableId(Database::"NPR MM Member Info Capture", MemberInfoCapture."Entry No.", CopyStr(AttributeKey.ToUpper(), 1, 20), CopyStr(AttributeValue, 1, 250));
             end;
         end;
         exit(true);
