@@ -97,6 +97,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesHeader."Sell-to Contact" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.contact', MaxStrLen(EcomSalesHeader."Sell-to Contact"), true, false);
         EcomSalesHeader."Sell-to Email" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.email', MaxStrLen(EcomSalesHeader."Sell-to Email"), true, true);
         EcomSalesHeader."Sell-to Phone No." := JsonHelper.GetJText(RequestBody, 'sellToCustomer.phone', MaxStrLen(EcomSalesHeader."Sell-to Phone No."), true, false);
+        ValidatePhoneNumber(EcomSalesHeader."Sell-to Phone No.");
         EcomSalesHeader."Sell-to EAN" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.ean', MaxStrLen(EcomSalesHeader."Sell-to EAN"), true, false);
         EcomSalesHeader."Sell-to VAT Registration No." := JsonHelper.GetJText(RequestBody, 'sellToCustomer.vatRegistrationNo', MaxStrLen(EcomSalesHeader."Sell-to VAT Registration No."), true, false);
 
@@ -829,6 +830,17 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             EcomSalesLine."Virtual Item Process Status"::Error:
                 VirtualItemProcessStatus := 'error';
         end;
+    end;
+
+    local procedure ValidatePhoneNumber(PhoneNo: Text)
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InvalidPhoneErr: Label 'Invalid phone number format.';
+    begin
+        if PhoneNo = '' then
+            exit;
+        if not TypeHelper.IsPhoneNumber(PhoneNo) then
+            Error(InvalidPhoneErr);
     end;
 }
 #endif
