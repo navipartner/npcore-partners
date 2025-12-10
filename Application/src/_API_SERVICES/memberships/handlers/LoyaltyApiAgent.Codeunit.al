@@ -226,7 +226,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
                 TempSaleLineBuffer.Init();
                 TempSaleLineBuffer."Entry No." += 1;
                 TempSaleLineBuffer."Item No." := CopyStr(JsonHelper.GetJCode(PointItem, 'itemCode', true), 1, MaxStrLen(TempSaleLineBuffer."Item No."));
-                TempSaleLineBuffer."Total Points" := JsonHelper.GetJInteger(PointItem, 'pointsEarned', true);
+                TempSaleLineBuffer."Total Points" := JsonHelper.GetJInteger(PointItem, 'pointsEarned', true, true);
                 if TempSaleLineBuffer."Total Points" >= 0 then
                     TempSaleLineBuffer.Type := TempSaleLineBuffer.Type::SALES
                 else

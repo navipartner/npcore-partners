@@ -142,10 +142,20 @@ codeunit 6059994 "NPR Json Helper"
 
     procedure GetJInteger(Token: JsonToken; Path: Text; Required: Boolean): Integer
     begin
-        exit(GetJInteger(Token, Path, Required, 0));
+        exit(GetJInteger(Token, Path, Required, 0, false));
     end;
 
     procedure GetJInteger(Token: JsonToken; Path: Text; Required: Boolean; DefaultValue: Integer): Integer
+    begin
+        exit(GetJInteger(Token, Path, Required, DefaultValue, false));
+    end;
+
+    procedure GetJInteger(Token: JsonToken; Path: Text; Required: Boolean; AllowZero: Boolean): Integer
+    begin
+        exit(GetJInteger(Token, Path, Required, 0, AllowZero));
+    end;
+
+    local procedure GetJInteger(Token: JsonToken; Path: Text; Required: Boolean; DefaultValue: Integer; AllowZero: Boolean): Integer
     var
         JValue: JsonValue;
         Value: Integer;
@@ -154,8 +164,13 @@ codeunit 6059994 "NPR Json Helper"
         Found := GetJValue(Token, Path, JValue);
         if Found then
             Value := JValue.AsInteger();
-        if Required and not (Found and (Value <> 0)) then
-            RequiredValueMissingError(Token, Path);
+        if Required then begin
+            if not Found then
+                RequiredValueMissingError(Token, Path);
+            if (Value = 0) and not AllowZero then
+                RequiredValueMissingError(Token, Path);
+        end;
+
         if Value = 0 then
             Value := DefaultValue;
         exit(Value);
