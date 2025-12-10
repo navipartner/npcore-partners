@@ -55,6 +55,12 @@ table 6150692 "NPR SI POS Store Mapping"
                 ValidateValidityDate();
             end;
         }
+        field(10; "Receipt No. Series"; Code[20])
+        {
+            Caption = 'Receipt No. Series';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+        }
     }
 
     keys

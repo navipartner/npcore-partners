@@ -48,6 +48,12 @@ page 6151297 "NPR SI POS Store Mapping"
                     ToolTip = 'Specifies the Validity Date of the registration.';
                     ShowMandatory = true;
                 }
+                field("Receipt No. Series"; Rec."Receipt No. Series")
+                {
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the Receipt No. Series for the related POS Store.';
+                    ShowMandatory = true;
+                }
             }
         }
     }

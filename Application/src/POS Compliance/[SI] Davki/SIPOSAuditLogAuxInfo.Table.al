@@ -58,10 +58,12 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
             Caption = 'Receipt No.';
             DataClassification = CustomerContent;
             trigger OnValidate()
+            var
+                SIPOSStoreMapping: Record "NPR SI POS Store Mapping";
             begin
                 if "Receipt No." <> xRec."Receipt No." then begin
-                    SIFiscalSetup.Get();
-                    NoSeriesMgt.TestManual(SIFiscalSetup."Receipt No. Series");
+                    SIPOSStoreMapping.Get(Rec."POS Store Code");
+                    NoSeriesMgt.TestManual(SIPOSStoreMapping."Receipt No. Series");
                     "No. Series" := '';
                 end;
             end;
@@ -210,17 +212,18 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
 
     trigger OnInsert()
     var
+        SIPOSStoreMapping: Record "NPR SI POS Store Mapping";
     begin
         if "Receipt No." = '' then begin
-            SIFiscalSetup.Get();
-            SIFiscalSetup.TestField("Receipt No. Series");
+            SIPOSStoreMapping.Get(Rec."POS Store Code");
+            SIPOSStoreMapping.TestField("Receipt No. Series");
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
-            "No. Series" := SIFiscalSetup."Receipt No. Series";
-            if NoSeriesMgt.AreRelated(SIFiscalSetup."Receipt No. Series", xRec."No. Series") then
+            "No. Series" := SIPOSStoreMapping."Receipt No. Series";
+            if NoSeriesMgt.AreRelated(SIPOSStoreMapping."Receipt No. Series", xRec."No. Series") then
                 "No. Series" := xRec."No. Series";
             "Receipt No." := NoSeriesMgt.GetNextNo("No. Series");
 #ELSE
-            NoSeriesMgt.InitSeries(SIFiscalSetup."Receipt No. Series", xRec."No. Series", 0D, "Receipt No.", "No. Series");
+            NoSeriesMgt.InitSeries(SIPOSStoreMapping."Receipt No. Series", xRec."No. Series", 0D, "Receipt No.", "No. Series");
 #ENDIF
         end;
     end;
@@ -258,7 +261,6 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
     end;
 
     var
-        SIFiscalSetup: Record "NPR SI Fiscalization Setup";
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         NoSeriesMgt: Codeunit "No. Series";
 #ELSE
