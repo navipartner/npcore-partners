@@ -70,11 +70,21 @@ page 6151214 "NPR CRO Fiscalization Setup"
             group(NoSeries)
             {
                 Caption = 'No. Series Setup';
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-11-30';
+                ObsoleteReason = 'Replaced by No. series per POS Store Mapping.';
+                Visible = false;
+                Enabled = false;
 
                 field("Bill No. Series"; Rec."Bill No. Series")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Fiscal Bill No. Series.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2025-11-30';
+                    ObsoleteReason = 'Replaced by No. series per POS Store Mapping.';
+                    Visible = false;
+                    Enabled = false;
                 }
             }
 

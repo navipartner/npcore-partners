@@ -44,6 +44,9 @@ table 6060058 "NPR CRO Fiscalization Setup"
             Caption = 'Bill No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-30';
+            ObsoleteReason = 'Replaced by No. series per POS Store Mapping.';
         }
         field(20; "Certificate Subject OIB"; Code[11])
         {
