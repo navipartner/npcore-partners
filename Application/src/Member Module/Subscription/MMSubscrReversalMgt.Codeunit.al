@@ -103,6 +103,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrReversalPmtRequest.Amount := RefundPrice;
         SubscrReversalPmtRequest."Currency Code" := SubscrReversalRequest."Currency Code";
         SubscrReversalPmtRequest.Description := CopyStr(SubscrReversalRequest.Description, 1, MaxStrLen(SubscrReversalPmtRequest.Description));
+        SubscrReversalPmtRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrReversalPmtRequest."Subscription Payment Reference"));
         SubscrReversalPmtRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
         SubscrReversalPmtRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";
         SubscrReversalPmtRequest."Masked PAN" := MemberPaymentMethod."Masked PAN";
