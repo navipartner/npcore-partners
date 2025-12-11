@@ -6,6 +6,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
 
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyGifCardRefNoRequirementTxt: Label 'Shopify integrated voucher reference numbers must be 8-20 characters long and contain only unaccented alphabetical letters (a-z) and numbers (0-9).';
 
     procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     begin
@@ -338,15 +339,13 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
     end;
 
     local procedure CheckReferenceNo(Voucher: Record "NPR NpRv Voucher")
-    var
-        IncorrectRefNoFormatErr: Label 'Shopify integrated voucher reference numbers must be 8-20 characers long and contain only unaccented alphabetical letters (a-z) and numbers (0-9).';
     begin
         if Voucher."Reference No." = '' then
             exit;
 
         if IsShopifyIntegratedVoucherType(Voucher."Voucher Type") then
             if not IsValidShopifyVoucherReferenceNo(Voucher."Reference No.") then
-                Error(IncorrectRefNoFormatErr);
+                Error(SpfyGifCardRefNoRequirementTxt);
     end;
 
     local procedure IsValidShopifyVoucherReferenceNo(ReferenceNo: Text[50]): Boolean
@@ -364,14 +363,14 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
     internal procedure CheckShopifyVoucherTypeReferenceNos(VoucherType: Code[20])
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        IncorrectRefNosFormatErr: Label 'Some of the vouchers of this type do not contain a permitted Reference No. Shopify integrated voucher reference numbers must be 8-20 characers long and contain only unaccented alphabetical letters (a-z) and numbers (0-9).';
+        IncorrectRefNosFormatErr: Label 'Some of the vouchers of this type do not contain a permitted Reference No.\%1', Comment = '%1 - text explaining the format requirements';
     begin
         NpRvVoucher.SetLoadFields("Reference No.");
         NpRvVoucher.SetFilter("Voucher Type", VoucherType);
         if NpRvVoucher.FindSet() then
             repeat
                 if not IsValidShopifyVoucherReferenceNo(NpRvVoucher."Reference No.") then
-                    Error(IncorrectRefNosFormatErr);
+                    Error(IncorrectRefNosFormatErr, SpfyGifCardRefNoRequirementTxt);
             until NpRvVoucher.Next() = 0;
     end;
 
