@@ -93,7 +93,6 @@
     begin
         AdmissionScheduleLines.SetCurrentKey("Admission Code", "Process Order");
         AdmissionScheduleLines.SetFilter("Admission Code", '=%1', AdmissionCode);
-        AdmissionScheduleLines.SetLoadFields("Admission Code", "Schedule Code", "Process Order", "Prebook From", "Schedule Generated Until", "Schedule Generated At", "Admission Base Calendar Code");
         if (AdmissionScheduleLines.FindSet()) then begin
             GenerateFromDate := _TodaysDate;
             if ((ReferenceDate > _TodaysDate) and (Regenerate)) then
