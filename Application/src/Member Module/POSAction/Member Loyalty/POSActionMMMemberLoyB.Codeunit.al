@@ -33,6 +33,7 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
 
         POSMemberCard.LookupMode(true);
         POSMemberCard.SetRecord(Member);
+        POSMemberCard.SetMemberCard(MemberCardNumber);
         POSMemberCard.SetMembershipEntryNo(MembershipEntryNo);
         if (POSMemberCard.RunModal() <> ACTION::LookupOK) then
             Error('');

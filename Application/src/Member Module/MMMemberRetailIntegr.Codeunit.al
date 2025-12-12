@@ -190,6 +190,7 @@
                 POSMemberCard.LookupMode(true);
                 POSMemberCard.SetRecord(Member);
                 POSMemberCard.SetMembershipEntryNo(Membership."Entry No.");
+                POSMemberCard.SetMemberCard(FormattedCardNumber);
 
                 if (POSMemberCard.RunModal() <> Action::LookupOK) then
                     Error('');

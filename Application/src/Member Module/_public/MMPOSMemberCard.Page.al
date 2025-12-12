@@ -28,6 +28,7 @@
                 }
                 field("First Name"; Rec."First Name")
                 {
+                    Editable = _FirstNameEditable;
                     ToolTip = 'Specifies the value of the First Name field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -52,6 +53,7 @@
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
+                    Editable = _PhoneNumberEditable;
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnValidate()
@@ -61,6 +63,7 @@
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
+                    Editable = _EmailEditable;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     trigger OnValidate()
@@ -295,15 +298,23 @@
 
                 trigger OnAction()
                 var
-                    MemberWebService: Codeunit "NPR MM Member WebService";
-                    ResponseMessage: Text;
+                    SpeedGate: Codeunit "NPR SG SpeedGate";
+                    NoCardNumber: Label 'Member card number is not specified.';
+                    GateId: Code[10];
+                    AdmitToken: Guid;
+                    ReasonMessage: Text;
                 begin
+                    if (GMemberCardNumber = '') then
+                        Error(NoCardNumber);
 
-                    if (not MemberWebService.MemberRegisterArrival(Rec."External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
-                        Error(ResponseMessage);
+                    GateId := SpeedGate.CreateSystemGate(6060140);
+                    AdmitToken := SpeedGate.CreateAdmitToken(GMemberCardNumber, '', GateId);
+                    Commit();
 
-                    Message(ResponseMessage);
-
+                    if (not SpeedGate.CheckAdmit(AdmitToken, 1, ReasonMessage)) then begin
+                        Commit(); // commit the transactions log entry before showing the error message
+                        Error(ReasonMessage);
+                    end;
                 end;
             }
             action("Activate Membership")
@@ -404,6 +415,29 @@
                     end;
                 end;
             }
+
+            action(ChangeMemberUniqueId)
+            {
+                Caption = 'Change Members Unique Id';
+                Ellipsis = true;
+                Image = Union;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                ToolTip = 'Executes the action to update fields on the member that makes up the unique id according to the community.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    ChangeUniqueIdPage: Page "NPR MemberUpdateUniqueId";
+                begin
+                    ChangeUniqueIdPage.SetMember(Rec);
+                    ChangeUniqueIdPage.RunModal();
+                    CurrPage.Update(false);
+                end;
+            }
         }
         area(navigation)
         {
@@ -411,6 +445,42 @@
             {
                 Caption = 'History';
                 Image = History;
+
+                Action(SpeedGateEntryLog)
+                {
+                    ToolTip = 'Navigate to Speed Gate Entry Log.';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Speed Gate Entry Log';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+
+                    trigger OnAction()
+                    var
+                        EntryLog: Record "NPR SGEntryLog";
+                        TempEntryLog: Record "NPR SGEntryLog" temporary;
+                    begin
+                        if (GMemberCardNumber = '') then begin
+                            Message(NO_ENTRIES, Rec."External Member No.");
+                            exit;
+                        end;
+
+                        EntryLog.SetCurrentKey(ReferenceNo);
+                        EntryLog.SetFilter(ReferenceNo, '=%1', GMemberCardNumber);
+                        if (EntryLog.FindSet()) then begin
+                            repeat
+                                TempEntryLog.TransferFields(EntryLog, true);
+                                TempEntryLog.SystemId := EntryLog.SystemId;
+                                TempEntryLog.Insert();
+                            until (EntryLog.Next() = 0);
+                            Page.Run(Page::"NPR SG EntryLogList", TempEntryLog);
+                        end else
+                            Message(NO_ENTRIES, Rec."External Member No.");
+
+                    end;
+                }
+
                 action("Ledger Entries")
                 {
                     Caption = 'Ledger Entries';
@@ -564,6 +634,7 @@
         MembershipRole: Record "NPR MM Membership Role";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        Community: Record "NPR MM Member Community";
         ValidFrom2: Date;
         ValidUntil2: Date;
         RemainAmt: Decimal;
@@ -632,7 +703,15 @@
             end;
             AccentuateDueAmount := (DueAmount > 0);
             RemainingAmountText := StrSubstNo(PlaceHolderLbl, Format(RemainingAmount, 0, '<Precision,2:2><Integer><Decimals>'), Format(DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
+        end;
 
+        _FirstNameEditable := true;
+        _EmailEditable := true;
+        _PhoneNumberEditable := true;
+        if (MembershipManagement.CheckGetCommunityUniqueIdRules(Rec."Entry No.", Community)) then begin
+            _FirstNameEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME]);
+            _EmailEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME, Community."Member Unique Identity"::EMAIL]);
+            _PhoneNumberEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_PHONE, Community."Member Unique Identity"::EMAIL_OR_PHONE, Community."Member Unique Identity"::PHONENO]);
         end;
 
         _IsBirthdayMandatory := CheckBirthdayMandatory(Rec);
@@ -681,10 +760,13 @@
         IsBirthday: Boolean;
         _IsBirthdayMandatory: Boolean;
         _InitialBirthday: Date;
-
+        _FirstNameEditable: Boolean;
+        _EmailEditable: Boolean;
+        _PhoneNumberEditable: Boolean;
         UntilDateAttentionAccent: Boolean;
         NeedsActivation: Boolean;
         GMembershipEntryNo: Integer;
+        GMemberCardNumber: Text[100];
         RemainingPoints: Integer;
         NO_QUESTIONNAIRE: Label 'The profile questionnair is not available right now.';
         MembershipRoleDisplay: Record "NPR MM Membership Role";
@@ -703,6 +785,11 @@
 
         GMembershipEntryNo := MembershipEntryNo;
         Membership.Get(MembershipEntryNo);
+    end;
+
+    internal procedure SetMemberCard(MemberCardNumber: Text[100])
+    begin
+        GMemberCardNumber := MemberCardNumber;
     end;
 
     local procedure AddMembershipGuardian()
