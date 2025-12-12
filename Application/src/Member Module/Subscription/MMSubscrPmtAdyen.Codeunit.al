@@ -250,7 +250,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end;
 
 
-        if not TryGetPaymentRequestJsonText(SubscrPaymentRequest, ShopperReference, PaymentToken, Request) then begin
+        if not TryGetPaymentRequestJsonText(SubscrPaymentRequest, SubsAdyenPGSetup, ShopperReference, PaymentToken, Request) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
                             SubsPayReqLogEntry,
@@ -1336,12 +1336,13 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     end;
 
     [TryFunction]
-    local procedure TryGetPaymentRequestJsonText(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; ShopperReference: Text[50]; PaymentToken: Text; var RequestJsonText: Text)
+    local procedure TryGetPaymentRequestJsonText(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; ShopperReference: Text[50]; PaymentToken: Text; var RequestJsonText: Text)
     var
         Json: Codeunit "Json Text Reader/Writer";
         CurrencyCode: Code[10];
         Reference: Text;
         MerchantName: Text[50];
+        HolderName: Text[100];
     begin
         if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
             exit;
@@ -1363,6 +1364,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Json.WriteStartObject('paymentMethod');
         Json.WriteStringProperty('type', 'scheme');
         Json.WriteStringProperty('storedPaymentMethodId', PaymentToken);
+        GetHolderNameForTestEnv(SubsAdyenPGSetup, SubscrPaymentRequest."Payment Method Entry No.", HolderName);
+        if HolderName <> '' then
+            Json.WriteStringProperty('holderName', HolderName);
         Json.WriteEndObject();
         // paymentMethod
 
@@ -1492,6 +1496,25 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         SubsAdyenPGSetup.SetLoadFields("Merchant Name");
         SubsAdyenPGSetup.Get(SubsPaymentGateway.Code);
         MerchantName := SubsAdyenPGSetup."Merchant Name";
+    end;
+
+    local procedure GetHolderNameForTestEnv(SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; PaymentMethodEntryNo: Integer; var HolderName: Text[100])
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        UserAccount: Record "NPR UserAccount";
+    begin
+        if SubsAdyenPGSetup.Environment <> SubsAdyenPGSetup.Environment::Test then
+            exit;
+
+        MemberPaymentMethod.SetLoadFields("BC Record ID");
+        if not MemberPaymentMethod.Get(PaymentMethodEntryNo) then
+            exit;
+
+        UserAccount.SetLoadFields(FirstName);
+        if not UserAccount.Get(MemberPaymentMethod."BC Record ID") then
+            exit;
+
+        HolderName := UserAccount.FirstName;
     end;
 
     local procedure ConvertToAdyenPayAmount(Amount: Decimal) AdyenAmount: Text
