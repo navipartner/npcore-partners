@@ -46,11 +46,32 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
                 Membership.SetCurrentKey("Customer No.");
                 Membership.SetRange("Customer No.", Customer."No.");
                 Membership.SetLoadFields("Entry No.");
-                if Membership.FindFirst() then
-                    if FindMemberPaymentMethod(EFTTransactionRequest, MemberPaymentMethod) then
+                if Membership.FindFirst() then begin
+                    if GetPaymentMethodForMembership(SalePOS, Membership, EFTTransactionRequest, MemberPaymentMethod) then
                         SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+                end;
             end;
         until EFTTransactionRequest.Next() = 0;
+    end;
+
+    local procedure GetPaymentMethodForMembership(SalePOS: Record "NPR POS Sale"; Membership: Record "NPR MM Membership"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method"): Boolean
+    var
+        SubscriptionPSP: Enum "NPR MM Subscription PSP";
+        Member: Record "NPR MM Member";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        UserAccount: Record "NPR UserAccount";
+    begin
+        if not MembershipMgt.GetFirstAdminMember(Membership."Entry No.", Member) then
+            exit(false);
+
+        if not MembershipMgt.PayerAccountExists(SalePOS, UserAccount, Member) then
+            if (not MembershipMgt.GetUserAccountFromMember(Member, UserAccount)) then
+                exit(false);
+
+        if not GetSubscriptionPSP(EFTTransactionRequest."Integration Type", SubscriptionPSP) then
+            exit(false);
+
+        exit(FindPaymentMethod(EFTTransactionRequest."Recurring Detail Reference", EFTTransactionRequest."Internal Customer ID", SubscriptionPSP, UserAccount, MemberPaymentMethod));
     end;
 
     internal procedure SetMemberPaymentMethodAsDefault(Membership: Record "NPR MM Membership"; MemberPaymentMethodEntryNo: Integer)
@@ -359,5 +380,20 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
         LastDate := DMY2Date(1, Month, Year);
         LastDate := CalcDate('<+1M-1D>', LastDate);
+    end;
+
+    internal procedure GetSubscriptionPSP(IntegrationType: Code[20]; var SubscriptionPSP: Enum "NPR MM Subscription PSP"): Boolean
+    var
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+    begin
+        case IntegrationType of
+            EFTAdyenIntegration.CloudIntegrationType(),
+            EFTAdyenIntegration.HWCIntegrationType():
+                begin
+                    SubscriptionPSP := SubscriptionPSP::Adyen;
+                    exit(true);
+                end;
+        end;
+        exit(false);
     end;
 }

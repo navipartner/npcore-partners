@@ -6822,4 +6822,17 @@
         MemberInfoCapture.SetRange("Receipt No.", SalePOS."Sales Ticket No.");
         exit(not MemberInfoCapture.IsEmpty());
     end;
+
+    internal procedure PayerAccountExists(SalePOS: Record "NPR POS Sale"; var UserAccount: Record "NPR UserAccount"; Member: Record "NPR MM Member"): Boolean
+    var
+        UserAccountMgtImpl: Codeunit "NPR UserAccountMgtImpl";
+    begin
+        if SalePOS."Membership Payer E-Mail" = Member."E-Mail Address" then
+            exit(false);
+
+        if not UserAccountMgtImpl.FindAccountByEmail(SalePOS."Membership Payer E-Mail", UserAccount) then
+            exit(false);
+
+        exit(true)
+    end;
 }

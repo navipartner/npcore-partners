@@ -527,6 +527,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         EntityType: Option Customer,Contact,Membership;
         MembershipEntryNo: Integer;
+        ShopperReference: Text[50];
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if GetCreateRecurringContract(EFTSetup) = 0 then
@@ -541,12 +542,15 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if not MemberInfoCapture.FindSet() then begin
             MembershipEntryNo := MembershipMgtInternal.GetMembershipEntryNoFromCustomer(SalePOS."Customer No.");
             GetCreateEFTShopperRecognition(Format(MembershipEntryNo), EntityType::Membership, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
+            ShopperReference := EFTShopperRecognition."Shopper Reference";
         end else
             repeat
                 GetCreateEFTShopperRecognition(Format(MemberInfoCapture."Membership Entry No."), EntityType::Membership, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
+                if ShopperReference = '' then
+                    ShopperReference := EFTShopperRecognition."Shopper Reference";
             until MemberInfoCapture.Next() = 0;
 
-        EFTTransactionRequest."Internal Customer ID" := EFTShopperRecognition."Shopper Reference";
+        EFTTransactionRequest."Internal Customer ID" := ShopperReference;
     end;
 
     internal procedure GetCreateEFTShopperRecognition(EntityKey: Code[20]; EntityType: Option Customer,Contact,Membership; IntegrationType: Code[20]; var EFTShopperRecognition: Record "NPR EFT Shopper Recognition")
@@ -993,6 +997,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         UserAccount: Record "NPR UserAccount";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         Member: Record "NPR MM Member";
+        SubscriptionPSP: Enum "NPR MM Subscription PSP";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -1008,21 +1013,27 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if (not MembershipMgt.GetFirstAdminMember(Membership."Entry No.", Member)) then
             exit;
 
-        if (not MembershipMgt.GetUserAccountFromMember(Member, UserAccount)) then
-            MembershipMgt.CreateUserAccountFromMember(Member, UserAccount);
+        // Check if we need to create a separate payer UserAccount
+        if (SalePOS."Membership Payer E-Mail" <> Member."E-Mail Address") and (SalePOS."Membership Payer E-Mail" <> '') then begin
+            if not MembershipMgt.PayerAccountExists(SalePOS, UserAccount, Member) then
+                MembershipMgt.CreatePaymentUserAccountFromEmail(SalePOS."Membership Payer E-Mail", UserAccount);
+        end else
+            if (not MembershipMgt.GetUserAccountFromMember(Member, UserAccount)) then
+                MembershipMgt.CreateUserAccountFromMember(Member, UserAccount);
 
-        if not MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, MemberPaymentMethod) then
-            AddPaymentMethodForMemberOrPayer(SalePOS, UserAccount, EftTransactionRequest, MemberPaymentMethod, MembershipMgt, MMPaymentMethodMgt);
+        if MMPaymentMethodMgt.GetSubscriptionPSP(EftTransactionRequest."Integration Type", SubscriptionPSP) then begin
+            if not MMPaymentMethodMgt.FindPaymentMethod(EftTransactionRequest."Recurring Detail Reference", EftTransactionRequest."Internal Customer ID", SubscriptionPSP, UserAccount, MemberPaymentMethod) then
+                MMPaymentMethodMgt.AddMemberPaymentMethod(UserAccount, EftTransactionRequest, MemberPaymentMethod);
 
-        // NOTE: Previously this would not add it as default, but that should be safe to do now.
-        MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+            // NOTE: Previously this would not add it as default, but that should be safe to do now.
+            MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+        end;
     end;
 
     local procedure AddPaymentMethodForMemberOrPayer(SalePOS: Record "NPR POS Sale"; MemberUserAccount: Record "NPR UserAccount"; EftTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method"; MembershipMgt: Codeunit "NPR MM MembershipMgtInternal"; MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.")
     var
         PaymentUserAccount: Record "NPR UserAccount";
         UserAccountMgtImpl: Codeunit "NPR UserAccountMgtImpl";
-        MemberEmailAddress: Text[80];
     begin
         // Default: use member's UserAccount
         if SalePOS."Membership Payer E-Mail" = '' then begin
@@ -1031,8 +1042,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         end;
 
         // Check if payer email is different from member email
-        MemberEmailAddress := CopyStr(MemberUserAccount.EmailAddress.ToLower().Trim(), 1, MaxStrLen(MemberEmailAddress));
-        if SalePOS."Membership Payer E-Mail" = MemberEmailAddress then begin
+        if SalePOS."Membership Payer E-Mail" = MemberUserAccount.EmailAddress then begin
             MMPaymentMethodMgt.AddMemberPaymentMethod(MemberUserAccount, EftTransactionRequest, MemberPaymentMethod);
             exit;
         end;
@@ -1041,6 +1051,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if not UserAccountMgtImpl.FindAccountByEmail(SalePOS."Membership Payer E-Mail", PaymentUserAccount) then
             MembershipMgt.CreatePaymentUserAccountFromEmail(SalePOS."Membership Payer E-Mail", PaymentUserAccount);
         MMPaymentMethodMgt.AddMemberPaymentMethod(PaymentUserAccount, EftTransactionRequest, MemberPaymentMethod);
+
     end;
 
     local procedure DeleteMemberPaymentMethods(CurrEftTransactionRequest: Record "NPR EFT Transaction Request")
