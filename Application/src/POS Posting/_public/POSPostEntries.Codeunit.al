@@ -2172,12 +2172,13 @@
         end;
     end;
 
-    local procedure CountDefNoOfPeriodsBetweenDates(StartDate: Date; EndDate: Date): Integer
+    internal procedure CountDefNoOfPeriodsBetweenDates(StartDate: Date; EndDate: Date): Integer
     var
         StartYear: Integer;
         StartMonth: Integer;
         EndYear: Integer;
         EndMonth: Integer;
+        Adjustment: Integer;
     begin
         StartYear := Date2DMY(StartDate, 3);
         StartMonth := Date2DMY(StartDate, 2);
@@ -2185,6 +2186,11 @@
         EndYear := Date2DMY(EndDate, 3);
         EndMonth := Date2DMY(EndDate, 2);
 
-        exit(((EndYear - StartYear) * 12) + (EndMonth - StartMonth) + 1);
+        if Date2DMY(EndDate, 1) < Date2DMY(StartDate, 1) then
+            Adjustment := 0
+        else
+            Adjustment := 1;
+
+        exit(((EndYear - StartYear) * 12) + (EndMonth - StartMonth) + Adjustment);
     end;
 }

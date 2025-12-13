@@ -136,6 +136,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
         MembershipSetup: Record "NPR MM Membership Setup";
         OriginalSubscriptionRequest: Record "NPR MM Subscr. Request";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
@@ -166,6 +167,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         Membership.Get(MembershipEntry."Membership Entry No.");
         MembershipSetup.Get(Membership."Membership Code");
 
+        MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, SubscrReversalRequest, 0D);
         MembershipMgt.CarryOutMembershipRegret(MembershipEntry);
         SubscrRenewPost.PostInvoiceToGL(SubscrReversalRequest, Membership, MembershipSetup);
         if SubscrReversalRequest.Posted then
@@ -180,6 +182,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
         Subscription: Record "NPR MM Subscription";
         SubscrRenewPost: Codeunit "NPR MM Subscr. Renew: Post";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
@@ -191,6 +194,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MembershipSetup.Get(Membership."Membership Code");
         MembershipEntry.Get(SubscriptionReversalRequest."Membership Entry To Cancel");
 
+        MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, SubscriptionReversalRequest, SubscriptionReversalRequest."New Valid Until Date");
         MembershipMgt.CarryOutMembershipCancel(Membership, MembershipEntry, SubscriptionReversalRequest."New Valid Until Date");
 
         SubscrRenewPost.PostInvoiceToGL(SubscriptionReversalRequest, Membership, MembershipSetup);

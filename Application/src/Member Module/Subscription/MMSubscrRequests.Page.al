@@ -215,6 +215,24 @@ page 6184833 "NPR MM Subscr. Requests"
                     FindPostedEntries();
                 end;
             }
+            action(DeferralSchedule)
+            {
+                Caption = 'Deferral Schedule';
+                ToolTip = 'Displays the posted deferral schedule for the current subscription request.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = ShowList;
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+#endif
+
+                trigger OnAction()
+                begin
+                    ShowDeferrals();
+                end;
+            }
         }
 
         area(Processing)
@@ -315,7 +333,13 @@ page 6184833 "NPR MM Subscr. Requests"
         {
             actionref(PaymentRequests_Promoted; PaymentRequests) { }
             actionref(LogEntries_Promoted; LogEntries) { }
-            actionref(FindEntries_Promoted; FindEntries) { }
+            group(FindEntriesGroup_Promoted)
+            {
+                Caption = 'Find Entries...';
+                ShowAs = SplitButton;
+                actionref(FindEntries_Promoted; FindEntries) { }
+                actionref(DeferralSchedule_Promoted; DeferralSchedule) { }
+            }
             actionref(Process_Promoted; Process) { }
             actionref(ProcessWithoutTryCountUpdate_Promoted; ProcessWithoutTryCountUpdate) { }
             actionref(Cancel_Promoted; Cancel) { }
@@ -381,5 +405,13 @@ page 6184833 "NPR MM Subscr. Requests"
             CurrPage.Update(false);
             Message(RefundReqestedMsg);
         end;
+    end;
+
+    local procedure ShowDeferrals()
+    var
+        PostedDeferralHeader: Record "Posted Deferral Header";
+    begin
+        if PostedDeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR MM Subscr. Request", Format(Rec."Entry No."), 0) then
+            Page.RunModal(Page::"Deferral Schedule View", PostedDeferralHeader);
     end;
 }

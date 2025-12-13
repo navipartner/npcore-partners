@@ -1,4 +1,4 @@
-﻿table 6060093 "NPR MM Recur. Paym. Setup"
+table 6060093 "NPR MM Recur. Paym. Setup"
 {
     Access = Internal;
     Caption = 'Recurring Payment Setup';
@@ -73,6 +73,11 @@
             Caption = 'Source Code';
             DataClassification = CustomerContent;
             TableRelation = "Source Code".Code;
+
+            trigger OnValidate()
+            begin
+                CheckSourceCodeIsValid();
+            end;
         }
         field(200; "Gen. Journal Template Name"; Code[10])
         {
@@ -129,4 +134,17 @@
         {
         }
     }
+    internal procedure CheckSourceCodeIsValid()
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+        JournalsSourceCodesList: List of [Code[10]];
+        InValidSourceCodeErr: Label 'The source code %1 is already in use for general, sales or purchase journal postings. Please select a different value for the recurring payment source code.';
+    begin
+        SourceCodeSetup.Get();
+        JournalsSourceCodesList.Add(SourceCodeSetup."General Journal");
+        JournalsSourceCodesList.Add(SourceCodeSetup."Purchase Journal");
+        JournalsSourceCodesList.Add(SourceCodeSetup."Sales Journal");
+        if JournalsSourceCodesList.Contains("Source Code") then
+            Error(InValidSourceCodeErr, "Source Code");
+    end;
 }

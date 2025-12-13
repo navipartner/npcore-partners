@@ -176,7 +176,6 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'Renew Schedule Id';
             DataClassification = CustomerContent;
         }
-
         field(250; "Renew Schedule Date Formula"; DateFormula)
         {
             Caption = 'Renew Schedule Date Formula';

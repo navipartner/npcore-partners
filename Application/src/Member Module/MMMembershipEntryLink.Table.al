@@ -80,14 +80,34 @@ table 6151243 "NPR MM Membership Entry Link"
         }
     }
 
+    internal procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; SubscriptionRequest: Record "NPR MM Subscr. Request"; EndDateNew: Date)
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+    begin
+        MemberInfoCapture."Receipt No." := Format(SubscriptionRequest."Entry No.");
+        case SubscriptionRequest.Type of
+            SubscriptionRequest.Type::Renew:
+                MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;
+            SubscriptionRequest.Type::Regret:
+                MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::REGRET;
+            SubscriptionRequest.Type::"Partial Regret":
+                MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::CANCEL;
+        end;
+        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, Database::"NPR MM Subscr. Request");
+    end;
+
     internal procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date)
+    begin
+        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, Database::"NPR POS Entry Sales Line");
+    end;
+
+    local procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date; DocumentType: Integer)
     var
         MembershipEntryLink: Record "NPR MM Membership Entry Link";
         DocumentNo: Code[20];
         DocumentLineNo: Integer;
-        DocumentType: Integer;
     begin
-        if not GetDocumentKeys(DocumentType, DocumentNo, DocumentLineNo, MemberInfoCapture) then
+        if not GetDocumentKeys(DocumentNo, DocumentLineNo, MemberInfoCapture) then
             exit;
         MembershipEntryLink.SetCurrentKey("Document Type", "Document No.", "Document Line No.");
         MembershipEntryLink.SetRange("Document Type", DocumentType);
@@ -119,8 +139,6 @@ table 6151243 "NPR MM Membership Entry Link"
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipEntryLink2: Record "NPR MM Membership Entry Link";
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
-        InitialValidUntilDate: Date;
     begin
         MembershipEntryLink2.SetCurrentKey("Membership Entry No.", Context);
         MembershipEntryLink2.SetRange("Membership Entry No.", MembershipEntryLink."Membership Entry No.");
@@ -134,24 +152,22 @@ table 6151243 "NPR MM Membership Entry Link"
             if MembershipEntryLink2."Context Period Ending Date" <> 0D then
                 MembershipEntryLink."Context Period Ending Date" := MembershipEntryLink2."Context Period Ending Date";
         end else begin
-            MembershipEntry.SetLoadFields("Valid From Date");
+            MembershipEntry.SetLoadFields("Valid From Date", "Valid Until Date");
             if MembershipEntry.Get(MembershipEntryLink."Membership Entry No.") then begin
                 if MembershipEntry."Valid From Date" <> 0D then
                     MembershipEntryLink."Context Period Starting Date" := MembershipEntry."Valid From Date";
-                InitialValidUntilDate := MembershipMgtInternal.GetUpgradeInitialValidUntilDate(MembershipEntry."Entry No.");
-                if InitialValidUntilDate <> 0D then
-                    MembershipEntryLink."Context Period Ending Date" := InitialValidUntilDate;
+                if MembershipEntry."Valid Until Date" <> 0D then
+                    MembershipEntryLink."Context Period Ending Date" := MembershipEntry."Valid Until Date";
             end;
         end;
     end;
 
-    local procedure GetDocumentKeys(var DocumentType: Integer; var DocumentNo: Code[20]; var DocumentLineNo: Integer; MemberInfoCapture: Record "NPR MM Member Info Capture") Success: Boolean
+    local procedure GetDocumentKeys(var DocumentNo: Code[20]; var DocumentLineNo: Integer; MemberInfoCapture: Record "NPR MM Member Info Capture") Success: Boolean
     begin
         Success := MemberInfoCapture."Receipt No." <> '';
         if not Success then
             exit;
 
-        DocumentType := Database::"NPR POS Entry Sales Line";
         DocumentNo := MemberInfoCapture."Receipt No.";
         DocumentLineNo := MemberInfoCapture."Line No.";
     end;
