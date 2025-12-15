@@ -1663,6 +1663,7 @@
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         ExpiredPoints: Integer;
         RedeemedPoints: Integer;
         RefundedPoints: Integer;
@@ -1707,16 +1708,20 @@
 
             GetSpendPeriodForReferenceDate(LoyaltySetup, Today(), PeriodStart, PeriodEnd);
             Membership.SetFilter("Date Filter", '%1..%2', PeriodStart, PeriodEnd);
+            if FeatureFlagsManagement.IsEnabled('loyalty_AsYouGo_InclReservInAvailPoints') then begin
+                Membership.CalcFields("Remaining Points");
+                AvailablePoints := Membership."Remaining Points";
+            end else begin
+                Membership.CalcFields("Redeemed Points (Withdrawl)", "Redeemed Points (Deposit)", "Awarded Points (Refund)", "Awarded Points (Sale)", "Expired Points");
 
-            Membership.CalcFields("Redeemed Points (Withdrawl)", "Redeemed Points (Deposit)", "Awarded Points (Refund)", "Awarded Points (Sale)", "Expired Points");
+                RefundedPoints := Membership."Awarded Points (Refund)";
+                EarnedPoints := Membership."Awarded Points (Sale)";
+                RedeemedPoints := Membership."Redeemed Points (Withdrawl)";
+                ExpiredPoints := Membership."Expired Points";
+                DepositedPoints := Membership."Redeemed Points (Deposit)";
 
-            RefundedPoints := Membership."Awarded Points (Refund)";
-            EarnedPoints := Membership."Awarded Points (Sale)";
-            RedeemedPoints := Membership."Redeemed Points (Withdrawl)";
-            ExpiredPoints := Membership."Expired Points";
-            DepositedPoints := Membership."Redeemed Points (Deposit)";
-
-            AvailablePoints := EarnedPoints + ExpiredPoints + RedeemedPoints + RefundedPoints + DepositedPoints;
+                AvailablePoints := EarnedPoints + ExpiredPoints + RedeemedPoints + RefundedPoints + DepositedPoints;
+            end;
         end;
 
         exit(AvailablePoints);
