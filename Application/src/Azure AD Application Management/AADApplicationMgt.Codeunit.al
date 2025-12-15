@@ -108,7 +108,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
             AppJson.SelectToken('id', BufferToken);
             ApplicationObjectId := BufferToken.AsValue().AsText();
-            _ApplicationObjectId := ApplicationId;
+            _ApplicationObjectId := ApplicationObjectId;
 
             RegisterAzureADApplication(ClientGuid, AppDisplayName, PermissionSets);
 
