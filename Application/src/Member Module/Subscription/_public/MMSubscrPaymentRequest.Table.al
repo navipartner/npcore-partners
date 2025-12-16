@@ -256,9 +256,15 @@ table 6150921 "NPR MM Subscr. Payment Request"
         if not (Rec.Status in [Rec.Status::Cancelled, Rec.Status::Rejected]) then
             exit;
 
-        if xRec.Status in [xRec.Status::Authorized, xRec.Status::Captured] then
+        // Block: Authorized -> Cancelled
+        if (xRec.Status = xRec.Status::Authorized) and (Rec.Status = Rec.Status::Cancelled) then
             Error(StatusErrorLbl, xRec."Entry No.", xRec.Status);
 
+        // Block: Captured -> Cancelled or Rejected
+        if (xRec.Status = xRec.Status::Captured) then
+            Error(StatusErrorLbl, xRec."Entry No.", xRec.Status);
+
+        // Block: Requested -> Cancelled if not PayByLink
         if (xRec.Status = xRec.Status::Requested) and (Rec.Type <> Rec.Type::PayByLink) then
             Error(RequestedStatusErrorLbl, xRec."Entry No.", Rec.Type, xRec.Status);
     end;
