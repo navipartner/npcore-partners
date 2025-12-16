@@ -251,12 +251,16 @@ table 6150921 "NPR MM Subscr. Payment Request"
     internal procedure CheckSubscrPaymentRequestStatusCanBeChanged()
     var
         StatusErrorLbl: Label 'Subscription payment request no. %1 must not be with status %2.', Comment = '%1 - entry no., %2 - status';
+        RequestedStatusErrorLbl: Label 'Subscription payment request no. %1 with type %2 cannot be cancelled from status %3.', Comment = '%1 - entry no., %2 - type, %3 - status';
     begin
         if not (Rec.Status in [Rec.Status::Cancelled, Rec.Status::Rejected]) then
             exit;
 
         if xRec.Status in [xRec.Status::Authorized, xRec.Status::Captured] then
             Error(StatusErrorLbl, xRec."Entry No.", xRec.Status);
+
+        if (xRec.Status = xRec.Status::Requested) and (Rec.Type <> Rec.Type::PayByLink) then
+            Error(RequestedStatusErrorLbl, xRec."Entry No.", Rec.Type, xRec.Status);
     end;
 
     internal procedure MarkReversed(var SubscrPaymentRequest_Marked: Record "NPR MM Subscr. Payment Request")
