@@ -24,6 +24,7 @@
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         ERROR_RESPONSE_TYPE: Label 'Unknown response type %1';
     begin
+        SelectLatestVersion();
         EFTTransactionRequest.Get(_EftTransactionEntryNo);
         case _ResponseType of
             Enum::"NPR EFT Adyen Response Type"::Diagnose:
