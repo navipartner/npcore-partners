@@ -143,23 +143,25 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
             exit(CalcSubscriptionRenewalPriceOnSubsStart(EFTTransactionRequest."Sales ID"));
 
         repeat
-            if (CalcSubscriptionRenewalPrice(MemberInfoCapture, TempRenewalPrice)) then begin
-                SubscriptionAmountIncludingVAT += TempRenewalPrice;
-            end else begin
-                TempProcessedLineBuffer.Reset();
-                TempProcessedLineBuffer.SetRange("Receipt No.", MemberInfoCapture."Receipt No.");
-                TempProcessedLineBuffer.SetRange("Line No.", MemberInfoCapture."Line No.");
-                if TempProcessedLineBuffer.IsEmpty then begin
-                    SalesLinePOS.Reset();
-                    SalesLinePOS.SetRange("Register No.", EFTTransactionRequest."Register No.");
-                    SalesLinePOS.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
-                    SalesLinePOS.SetRange("Line No.", MemberInfoCapture."Line No.");
-                    SalesLinePOS.CalcSums("Amount Including VAT");
-                    SubscriptionAmountIncludingVAT += SalesLinePOS."Amount Including VAT";
+            if ShouldProcessMembershipCapture(MemberInfoCapture) then begin
+                if (CalcSubscriptionRenewalPrice(MemberInfoCapture, TempRenewalPrice)) then begin
+                    SubscriptionAmountIncludingVAT += TempRenewalPrice;
+                end else begin
+                    TempProcessedLineBuffer.Reset();
+                    TempProcessedLineBuffer.SetRange("Receipt No.", MemberInfoCapture."Receipt No.");
+                    TempProcessedLineBuffer.SetRange("Line No.", MemberInfoCapture."Line No.");
+                    if TempProcessedLineBuffer.IsEmpty then begin
+                        SalesLinePOS.Reset();
+                        SalesLinePOS.SetRange("Register No.", EFTTransactionRequest."Register No.");
+                        SalesLinePOS.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+                        SalesLinePOS.SetRange("Line No.", MemberInfoCapture."Line No.");
+                        SalesLinePOS.CalcSums("Amount Including VAT");
+                        SubscriptionAmountIncludingVAT += SalesLinePOS."Amount Including VAT";
 
-                    TempProcessedLineBuffer.Init();
-                    TempProcessedLineBuffer := MemberInfoCapture;
-                    TempProcessedLineBuffer.Insert();
+                        TempProcessedLineBuffer.Init();
+                        TempProcessedLineBuffer := MemberInfoCapture;
+                        TempProcessedLineBuffer.Insert();
+                    end;
                 end;
             end;
         until MemberInfoCapture.Next() = 0;
@@ -284,5 +286,32 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         TempAutoRenewInfoCapture.Description := MembershipAlterationSetup.Description;
 
         RenewalPrice := MembershipMgt.CalculateAutoRenewPrice(TempAutoRenewInfoCapture."Membership Entry No.", MembershipAlterationSetup, TempAutoRenewInfoCapture, MembershipEntry);
+    end;
+
+    local procedure ShouldProcessMembershipCapture(MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        IsGroupMembership: Boolean;
+    begin
+        IsGroupMembership := false;
+        MembershipSetup.SetLoadFields("Membership Type");
+        if MembershipSetup.Get(MemberInfoCapture."Membership Code") then
+            IsGroupMembership := MembershipSetup."Membership Type" = MembershipSetup."Membership Type"::Group;
+ 
+        if not IsGroupMembership then
+            exit(true);
+ 
+        exit(IsFirstCaptureForGroupMembership(MemberInfoCapture));
+    end;
+
+    local procedure IsFirstCaptureForGroupMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    var
+        MemberInfoCaptureCheck: Record "NPR MM Member Info Capture";
+    begin
+        MemberInfoCaptureCheck.Reset();
+        MemberInfoCaptureCheck.SetRange("Receipt No.", MemberInfoCapture."Receipt No.");
+        MemberInfoCaptureCheck.SetRange("Line No.", MemberInfoCapture."Line No.");
+        MemberInfoCaptureCheck.SetFilter("Entry No.", '<%1', MemberInfoCapture."Entry No.");
+        exit(MemberInfoCaptureCheck.IsEmpty);
     end;
 }
