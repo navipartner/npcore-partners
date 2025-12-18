@@ -186,6 +186,32 @@
                 ApplicationArea = NPRRetail;
             }
         }
+        area(Processing)
+        {
+            group(Print)
+            {
+                Caption = 'Print';
+                Image = Print;
+                action("Print Entry")
+                {
+                    Caption = 'Print Entry';
+                    Image = PrintCheck;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = "Report";
+                    PromotedIsBig = true;
+                    ToolTip = 'Prints the selected entry.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        NpGpPOSEntryManagement: Codeunit "NPR NpGp POS Entry Management";
+                    begin
+                        NpGpPOSEntryManagement.PrintEntry(Rec);
+                    end;
+                }
+            }
+        }
     }
 }
 

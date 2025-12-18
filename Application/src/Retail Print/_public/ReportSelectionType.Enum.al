@@ -167,4 +167,8 @@ enum 6014493 "NPR Report Selection Type"
     {
         Caption = 'Bin Transfer';
     }
+    value(41; "Large Sales Receipt (Global POS Entry)")
+    {
+        Caption = 'Large Global Sales Receipt';
+    }
 }

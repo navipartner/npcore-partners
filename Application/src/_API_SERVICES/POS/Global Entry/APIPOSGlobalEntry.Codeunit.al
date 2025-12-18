@@ -68,6 +68,61 @@ codeunit 6248189 "NPR API POS Global Entry"
         exit(Response.RespondOK(SalesEntryToJson(JsonBuilder, NpGpPOSSalesEntry, GlobalReference)));
     end;
 
+    internal procedure GetGlobalEntryByReferencePdf(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";
+        NpGpPOSSalesLine: Record "NPR NpGp POS Sales Line";
+        ReportSelections: Record "NPR Report Selection Retail";
+        UserPersonalization: Record "User Personalization";
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        GlobalReference: Text;
+        InStr: InStream;
+        LanguageId: Integer;
+        OutStr: OutStream;
+        RecRef: RecordRef;
+        PdfDoc: Text;
+    begin
+        if (not Request.QueryParams().ContainsKey('globalReference')) then
+            exit(Response.RespondBadRequest('Missing required query parameter: globalReference'));
+
+        GlobalReference := Request.QueryParams().Get('globalReference');
+        if StrLen(GlobalReference) > MaxStrLen(NpGpPOSSalesLine."Global Reference") then
+            exit(Response.RespondBadRequest(StrSubstNo('The globalReference parameter exceeds the maximum length of %1 characters.', MaxStrLen(NpGpPOSSalesLine."Global Reference"))));
+
+        NpGpPOSSalesLine.ReadIsolation := IsolationLevel::ReadCommitted;
+        NpGpPOSSalesLine.SetRange("Global Reference", GlobalReference);
+        NpGpPOSSalesLine.SetRange(Return, false);
+        if not NpGpPOSSalesLine.FindFirst() then
+            exit(Response.RespondResourceNotFound());
+
+        NpGpPOSSalesEntry.ReadIsolation := IsolationLevel::ReadCommitted;
+        if (not NpGpPOSSalesEntry.Get(NpGpPOSSalesLine."POS Entry No.")) then
+            exit(Response.RespondResourceNotFound());
+
+        ReportSelections.SetFilter("Report Type", '=%1', ReportSelections."Report Type"::"Large Sales Receipt (Global POS Entry)");
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
+
+        if (not ReportSelections.FindFirst()) then
+            ReportSelections."Report ID" := REPORT::"NPR Gp Sal Tick A4 - POS Rdlc";
+
+        NpGpPOSSalesEntry.SetRecFilter();
+        RecRef.GetTable(NpGpPOSSalesEntry);
+
+        UserPersonalization.SetFilter("User ID", '%1', UserId);
+        if (UserPersonalization.FindFirst()) then
+            LanguageId := GlobalLanguage(UserPersonalization."Language ID");
+
+        TempBlob.CreateOutStream(OutStr);
+        Report.SaveAs(ReportSelections."Report ID", '', ReportFormat::Pdf, OutStr, RecRef);
+        TempBlob.CreateInStream(InStr);
+        if (LanguageId <> 0) then
+            GlobalLanguage(LanguageId);
+
+        PdfDoc := Base64Convert.ToBase64(InStr);
+        exit(Response.RespondOK(PdfDoc));
+    end;
+
     internal procedure SearchGlobalEntry(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";
