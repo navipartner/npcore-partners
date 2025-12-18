@@ -364,6 +364,19 @@ page 6184704 "NPR Spfy Store Card"
                         ApplicationArea = NPRShopify;
                         Enabled = _SalesOrderIntegrationIsEnabled;
                     }
+                    field("Update Cust. Phone No. from BC"; Rec."Update Cust. Phone No. from BC")
+                    {
+                        ToolTip = 'Specifies whether customer phone numbers in Shopify should be updated when the corresponding customer phone number is changed in Business Central.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _SalesOrderIntegrationIsEnabled;
+                        trigger OnValidate()
+                        var
+                            EnsurePhoneNumbersAreInCorrectFormatMsg: Label 'Please ensure that the customer phone numbers in Business Central are in the correct format before enabling this option.\Shopify requirements for customer phone numbers:\  - Must start with a plus sign and a country code.\  - E.164 Format.\  - Uniqueness: phone numbers must be unique across customers in Shopify.\ - Separators (spaces, dashes, or parentheses) may be accepted, but aren’t strictly required.';
+                        begin
+                            if Rec."Update Cust. Phone No. from BC" then
+                                Message(EnsurePhoneNumbersAreInCorrectFormatMsg);
+                        end;
+                    }
                     group(CustomerWebhooks)
                     {
                         Caption = 'Customer Webhooks';

@@ -140,7 +140,8 @@ codeunit 6248540 "NPR Spfy Send Customers"
             exit;
         CustomerJson.Add('email', SpfyStoreCustomerLink."E-Mail");
         if SpfyStoreCustomerLink."Phone No." <> '' then
-            CustomerJson.Add('phone', SpfyStoreCustomerLink."Phone No.");
+            if _SpfyIntegrationMgt.IsUpdateCustPhoneNoFromBC(SpfyStoreCustomerLink."Shopify Store Code") then
+                CustomerJson.Add('phone', SpfyStoreCustomerLink."Phone No.");
         if SpfyStoreCustomerLink."First Name" <> '' then
             CustomerJson.Add('firstName', SpfyStoreCustomerLink."First Name");
         CustomerJson.Add('lastName', SpfyStoreCustomerLink."Last Name");

@@ -354,6 +354,11 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Loyalty Points as Metafield';
             DataClassification = CustomerContent;
         }
+        field(230; "Update Cust. Phone No. from BC"; Boolean)
+        {
+            Caption = 'Update Cust. Phone No. from BC';
+            DataClassification = CustomerContent;
+        }
 #if not (BC18 or BC19 or BC20)
         field(300; "BC Customer Transactions"; Boolean)
         {

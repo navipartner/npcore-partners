@@ -311,6 +311,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     end;
 #endif
 
+    procedure IsUpdateCustPhoneNoFromBC(ShopifyStoreCode: Code[20]): Boolean
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Update Cust. Phone No. from BC");
+    end;
+
     procedure SetRereadSetup()
     begin
         Clear(_ShopifySetup);
