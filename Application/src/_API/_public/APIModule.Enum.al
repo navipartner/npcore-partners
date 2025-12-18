@@ -92,5 +92,9 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     {
         Implementation = "NPR API Module Resolver" = "NPR API Retail Print Resolver";
     }
+    value(6248660; sale)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR SaleResolver";
+    }
 }
 #endif

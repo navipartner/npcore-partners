@@ -686,4 +686,3 @@ service:
             documentId: e2cfea9f-385e-4d83-8b50-42256885b03a
           response:
             body: $SalesDocumentDTO.ExampleSalesDocumentDTO
-

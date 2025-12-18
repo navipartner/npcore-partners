@@ -345,13 +345,15 @@ navigation:
           - vouchers.voucherwebhooks:
               title: Webhooks
 
-        - section: Ecommerce
-          summary: ./docs/pages/ecommerce/overview.mdx
+        - section: Sales Documents
+          summary: ./docs/pages/salesdocuments/overview.mdx
           contents:
-          - ecommerce.salesdocuments:
+          - salesdocuments.ecommerce:
+              title: Ecommerce
+              summary: ./docs/pages/salesdocuments/ecommerce.mdx
+          - salesdocuments.salesdocuments:
               title: Sales Documents
-              summary: ./docs/pages/ecommerce/salesdocuments.mdx
-          - ecommerce.ecommercewebhooks:
+          - salesdocuments.webhooks:
               title: Webhooks
 
         - section: Finance
