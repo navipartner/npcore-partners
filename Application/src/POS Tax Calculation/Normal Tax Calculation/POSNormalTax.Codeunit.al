@@ -58,8 +58,10 @@
         POSSaleTaxCalc.FilterLines(POSSaleTax, POSSaleTaxLine);
         if POSSaleTaxLine.FindSet() then begin
             repeat
-                InitPostTaxCalculation(POSEntryTaxLine, POSSaleTaxLine, EntryNo, POSSaleTax);
-                PostTaxCalculationAmounts(POSEntryTaxLine, POSSaleTaxLine, POSSaleTax);
+                if not ((POSSaleTaxLine."Tax Identifier" = '') and (POSSaleTaxLine."Tax Amount" = 0)) then begin
+                    InitPostTaxCalculation(POSEntryTaxLine, POSSaleTaxLine, EntryNo, POSSaleTax);
+                    PostTaxCalculationAmounts(POSEntryTaxLine, POSSaleTaxLine, POSSaleTax);
+                end;
             until POSSaleTaxLine.Next() = 0;
         end;
     end;
@@ -80,8 +82,10 @@
         POSSaleTaxCalc.FilterLines(POSSaleTax, POSSaleTaxLine);
         if POSSaleTaxLine.FindSet() then begin
             repeat
-                InitPostTaxCalculation(POSEntryTaxLine, POSSaleTaxLine, EntryNo, POSSaleTax);
-                PostTaxCalculationAmountsReverseSign(POSEntryTaxLine, POSSaleTaxLine, POSSaleTax, Sign);
+                if not ((POSSaleTaxLine."Tax Identifier" = '') and (POSSaleTaxLine."Tax Amount" = 0)) then begin
+                    InitPostTaxCalculation(POSEntryTaxLine, POSSaleTaxLine, EntryNo, POSSaleTax);
+                    PostTaxCalculationAmountsReverseSign(POSEntryTaxLine, POSSaleTaxLine, POSSaleTax, Sign);
+                end;
             until POSSaleTaxLine.Next() = 0;
         end;
     end;
