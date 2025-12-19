@@ -383,7 +383,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
         JArray.ReadFrom(DotNetStreamReader.ReadToEnd());
     end;
 
-    internal procedure CreateJobForLineArray(MediaSelector: Enum "NPR CloudflareMediaSelector"; JArray: JsonArray): Guid;
+    internal procedure CreateJobForLineArray(MediaSelector: Enum "NPR CloudflareMediaSelector"; BatchId: Guid; JArray: JsonArray): Guid;
     var
         JObject: JsonObject;
         JToken: JsonToken;
@@ -392,6 +392,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
     begin
         Job.JobId := CreateGuid();
         Job.MediaSelector := MediaSelector;
+        Job.BatchId := BatchId;
         Job.Insert();
 
         // Parsing issues throw hard errors
@@ -587,6 +588,8 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
                 Job.NextCursorAfterRowId := JToken.AsValue().AsBigInteger();
             end;
         end;
+
+        GetJobLineSummary(JobId, Job.TotalCount, Job.SuccessCount, Job.FailedCount, Job.EnqueuedCount);
         Job.Modify();
 
         exit(true);
@@ -598,8 +601,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
         JsonToken: JsonToken;
     begin
         Job.Get(JobId);
-        if (JobStatusResponse.Get('enqueued_count', JsonToken)) then
-            Job.EnqueuedCount := JsonToken.AsValue().AsInteger();
+
         if (JobStatusResponse.Get('total_count', JsonToken)) then
             Job.TotalCount := JsonToken.AsValue().AsInteger();
         if (JobStatusResponse.Get('success_count', JsonToken)) then
@@ -608,6 +610,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
             Job.FailedCount := JsonToken.AsValue().AsInteger();
         if (JobStatusResponse.Get('job_cancel', JsonToken)) then
             Job.JobCancelled := (JsonToken.AsValue().AsInteger() <> 0);
+
         Job.Modify();
     end;
 
@@ -671,6 +674,31 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
                 end;
             end;
         end;
+    end;
+
+    local procedure GetJobLineSummary(JobId: Guid; var TotalCount: Integer; var SuccessCount: Integer; var FailedCount: Integer; var QueuedCount: Integer)
+    var
+        JobLine: Record "NPR CloudflareMigrationJobLine";
+    begin
+        TotalCount := 0;
+        SuccessCount := 0;
+        FailedCount := 0;
+        QueuedCount := 0;
+
+        JobLine.SetFilter(JobLine.JobId, '=%1', JobId);
+        if (not JobLine.FindSet()) then
+            exit;
+
+        repeat
+            // Queued and Pending are not counted
+            TotalCount += 1;
+            if (JobLine.Status in [JobLine.Status::SUCCESS, JobLine.Status::FINALIZED]) then
+                SuccessCount += 1;
+            if (JobLine.Status = JobLine.Status::FAILED) then
+                FailedCount += 1;
+            if (JobLine.Status = JobLine.Status::QUEUED) then
+                QueuedCount += 1;
+        until (JobLine.Next() = 0);
     end;
 
     [NonDebuggable]

@@ -57,4 +57,25 @@ page 6185126 "NPR CloudflareMigrationJobLine"
         }
     }
 
+    actions
+    {
+        area(Processing)
+        {
+            action(SetStatusPending)
+            {
+                Caption = 'Set Status to Pending';
+                ToolTip = 'Sets the status of selected job lines to Pending.';
+                Image = Status;
+                ApplicationArea = NPRRetail;
+                Scope = Repeater;
+                trigger OnAction()
+                var
+                    JobLine: Record "NPR CloudflareMigrationJobLine";
+                begin
+                    CurrPage.SetSelectionFilter(JobLine);
+                    JobLine.ModifyAll(Status, JobLine.Status::Pending);
+                end;
+            }
+        }
+    }
 }

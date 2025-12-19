@@ -36,11 +36,6 @@ page 6185125 "NPR CloudflareMigrationJobCard"
                     ToolTip = 'Specifies the value of the Job Cancelled field.';
                     Editable = false;
                 }
-                field(RateLimitPerSecond; Rec.RateLimitPerSecond)
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Rate Limit Per Second field.';
-                }
                 field(LimitFetchCount; Rec.LimitFetchCount)
                 {
                     ApplicationArea = NPRRetail;
@@ -57,6 +52,12 @@ page 6185125 "NPR CloudflareMigrationJobCard"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Next Cursor After Ts field.';
                     Visible = false;
+                }
+                field(BatchId; Rec.BatchId)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Batch Id field.';
+                    Editable = false;
                 }
 
                 group(Metrics)
@@ -111,6 +112,10 @@ page 6185125 "NPR CloudflareMigrationJobCard"
                 Image = ImportDatabase;
                 ToolTip = 'Start Migration will upload job lines to Cloudflare and migration will begin.';
                 ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
                 trigger OnAction()
                 var
                     CloudflareMedia: Codeunit "NPR CloudflareMediaFacade";
@@ -144,6 +149,11 @@ page 6185125 "NPR CloudflareMigrationJobCard"
                 Image = View;
                 ToolTip = 'Checks the status of the ongoing migration.';
                 ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+
                 trigger OnAction()
                 var
                     CloudflareMedia: Codeunit "NPR CloudflareMediaFacade";
@@ -161,6 +171,11 @@ page 6185125 "NPR CloudflareMigrationJobCard"
                 Image = Download;
                 ToolTip = 'Fetches the results of the completed migration.';
                 ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+
                 trigger OnAction()
                 var
                     CloudflareMedia: Codeunit "NPR CloudflareMediaFacade";
@@ -214,7 +229,10 @@ page 6185125 "NPR CloudflareMigrationJobCard"
                 Image = Approve;
                 ToolTip = 'Finalizes the migration process.';
                 ApplicationArea = NPRRetail;
-
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
                 trigger onAction()
                 var
                     CloudflareMedia: Codeunit "NPR CloudflareMediaFacade";

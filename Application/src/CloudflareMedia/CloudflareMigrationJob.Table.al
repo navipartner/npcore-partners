@@ -19,6 +19,12 @@ table 6151245 "NPR CloudflareMigrationJob"
             Caption = 'Media Selector';
         }
 
+        field(3; BatchId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Batch Id';
+        }
+
         field(10; EnqueuedCount; Integer)
         {
             DataClassification = CustomerContent;
@@ -89,9 +95,9 @@ table 6151245 "NPR CloudflareMigrationJob"
             Clustered = true;
         }
 
-        key(Key2; MediaSelector, SystemCreatedAt)
-        {
-        }
+        key(Key2; MediaSelector, SystemCreatedAt) { }
+
+        key(Key3; BatchId) { }
     }
 
 

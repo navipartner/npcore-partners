@@ -215,23 +215,36 @@ codeunit 6248556 "NPR CloudflareMediaFacade"
     var
         MediaImpl: Codeunit "NPR CloudflareMediaImpl";
     begin
-        exit(MediaImpl.CreateJobForLineArray(MediaSelector, MediaImpl.LoadJobLineArray()));
+        exit(MediaImpl.CreateJobForLineArray(MediaSelector, CreateGuid(), MediaImpl.LoadJobLineArray()));
     end;
 
 
     /// <summary>
-    /// Creates a migration job from a JSON file containing an array of job lines.
+    /// Creates a migration job from a JSON array containing job lines.
     /// Each array element should contain an object with "public_id" and "url" field.
     /// </summary>
     /// <param name="MediaSelector">Specifies the type of media being migrated.</param>
-    /// <returns>The GUID of the created migration job.</returns>   
+    /// <returns>The GUID of the created migration job.</returns>
     procedure CreateMigrationJobFromJsonArray(MediaSelector: Enum "NPR CloudflareMediaSelector"; JobJson: JsonArray) JobId: Guid
     var
         MediaImpl: Codeunit "NPR CloudflareMediaImpl";
     begin
-        exit(MediaImpl.CreateJobForLineArray(MediaSelector, JobJson));
+        exit(MediaImpl.CreateJobForLineArray(MediaSelector, CreateGuid(), JobJson));
     end;
 
+    /// <summary>
+    /// Creates a migration job from a JSON array containing job lines.
+    /// Each array element should contain an object with "public_id" and "url" field.
+    /// </summary>
+    /// <param name="MediaSelector">Specifies the type of media being migrated.</param>
+    /// <param name="BatchId">The batch identifier for grouping migration jobs.</param>
+    /// <returns>The GUID of the created migration job.</returns>
+    procedure CreateMigrationJobFromJsonArray(MediaSelector: Enum "NPR CloudflareMediaSelector"; BatchId: Guid; JobJson: JsonArray) JobId: Guid
+    var
+        MediaImpl: Codeunit "NPR CloudflareMediaImpl";
+    begin
+        exit(MediaImpl.CreateJobForLineArray(MediaSelector, BatchId, JobJson));
+    end;
 
     /// <summary>
     /// Uploads a migration job to Cloudflare to migrate external media to Cloudflare Media according to the job lines defined in the job.

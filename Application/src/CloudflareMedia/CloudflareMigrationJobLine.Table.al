@@ -17,7 +17,11 @@ table 6151252 "NPR CloudflareMigrationJobLine"
             DataClassification = CustomerContent;
             Caption = 'Public Id';
         }
-
+        field(3; BatchId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Batch Id';
+        }
         field(10; Status; Option)
         {
             DataClassification = CustomerContent;
@@ -64,6 +68,8 @@ table 6151252 "NPR CloudflareMigrationJobLine"
         {
             Clustered = true;
         }
+
+        key(Key2; BatchId) { }
     }
 
 
