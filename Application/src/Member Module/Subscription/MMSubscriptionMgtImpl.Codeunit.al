@@ -65,11 +65,6 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         MaxValidUntilDate: Date;
     begin
         MembershipLedger.TestField("Membership Entry No.");
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        Subscription.ReadIsolation := IsolationLevel::UpdLock;
-#else
-        Subscription.LockTable();
-#endif
         MembershipManagement.GetMembershipValidDate(Membership."Entry No.", Today, ValidFromDate, ValidUntilDate);
         MembershipManagement.GetMembershipMaxValidUntilDate(Membership."Entry No.", MaxValidUntilDate);
         if MaxValidUntilDate > ValidUntilDate then
