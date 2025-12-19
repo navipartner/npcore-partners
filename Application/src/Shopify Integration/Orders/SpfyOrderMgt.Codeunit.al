@@ -2,7 +2,7 @@
 codeunit 6184814 "NPR Spfy Order Mgt."
 {
     Access = Internal;
-    Permissions = tabledata "NPR Spfy Store" = rm;
+    Permissions = tabledata "NPR Spfy Store" = rm, tabledata "NPR Spfy Data Sync. Pointer" = rim;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
@@ -33,10 +33,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     end;
 
     var
+        GLSetup: Record "General Ledger Setup";
         SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         JsonHelper: Codeunit "NPR Json Helper";
-        TooLongValueErr: Label 'Incoming Shopify %1 "%2" exceeds maximum allowed length of %3 characters', Comment = '%1 - incoming field name, %2 - incoming field value, %3 - number of characters';
+        GLSetupRetrived: Boolean;
 
     local procedure DownloadOrders(ShopifyStore: Record "NPR Spfy Store"; OrderStatus: Option Open,Closed,Cancelled)
     var
@@ -108,7 +109,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         OutStr: OutStream;
     begin
 #if not (BC18 or BC19 or BC20)
-        if not EligibleSourceName(Order) then
+        if not EligibleSourceName(JsonHelper.GetJText(Order, 'source_name', true)) then
             exit;
 #endif
         if not HasReadyState(ShopifyStore, Order, OrderStatus) then
@@ -129,11 +130,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     end;
 
 #if not (BC18 or BC19 or BC20)
-    local procedure EligibleSourceName(Order: JsonToken): Boolean
+    internal procedure EligibleSourceName(SourceName: text): Boolean
     var
         SpfySendBCTransaction: Codeunit "NPR Spfy Send BC Transaction";
     begin
-        exit(JsonHelper.GetJText(Order, 'source_name', true) <> SpfySendBCTransaction.NpRetailPOS_SourceName());
+        exit(SourceName <> SpfySendBCTransaction.NpRetailPOS_SourceName());
     end;
 #endif
 
@@ -282,12 +283,19 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     procedure IsAnonymizedCustomerOrder(var ImportEntry: Record "NPR Nc Import Entry"; Order: JsonToken; AnonymizedCustomerMsg: Text): Boolean
     begin
-        if JsonHelper.GetJText(Order, 'customer.first_name', false) <> 'Anonymous' then
-            exit(false);
-        if JsonHelper.GetJText(Order, 'customer.last_name', false) <> 'Customer' then
+        if not IsAnonymizedCustomerOrder(JsonHelper.GetJText(Order, 'customer.first_name', false), JsonHelper.GetJText(Order, 'customer.last_name', false)) then
             exit(false);
 
         SetImportEntryErrorMsg(ImportEntry, AnonymizedCustomerMsg);
+        exit(true);
+    end;
+
+    internal procedure IsAnonymizedCustomerOrder(FirstName: text; LastName: text): Boolean
+    begin
+        if FirstName <> 'Anonymous' then
+            exit(false);
+        if LastName <> 'Customer' then
+            exit(false);
         exit(true);
     end;
 
@@ -328,7 +336,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if FindSalesOrder(ShopifyStoreCode, GetOrderID(Order), SalesHeader) then
             exit(true);
 
-        FindNpEcStore(ShopifyStoreCode, Order, NpEcStore);
+        FindNpEcStore(ShopifyStoreCode, JsonHelper.GetJText(Order, 'source_name', true), NpEcStore);
         OrderNo := GetOrderNo(Order);
         if OrderNo = '' then
             exit(false);
@@ -360,6 +368,37 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             end;
     end;
 
+    internal procedure SalesOrderExists(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]): Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+    begin
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Header", "NPR Spfy ID Type"::"Entry ID", ShopifyOrderID, ShopifyAssignedID);
+        if not ShopifyAssignedID.FindFirst() then
+            exit(false);
+        exit(RecRef.Get(ShopifyAssignedID."BC Record ID"));
+    end;
+
+    internal procedure PostedDocumentExists(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; Invoice: Boolean): Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+        TableID: Integer;
+    begin
+        if Invoice then
+            TableID := Database::"Sales Invoice Header"
+        else
+            TableID := Database::"Sales Cr.Memo Header";
+
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(TableID, "NPR Spfy ID Type"::"Entry ID", ShopifyOrderID, ShopifyAssignedID);
+        if not ShopifyAssignedID.FindFirst() then
+            exit(false);
+        exit(RecRef.Get(ShopifyAssignedID."BC Record ID"));
+    end;
+
+
     procedure FindSalesInvoices(ShopifyStoreCode: Code[20]; Order: JsonToken; var TempSalesInvHeader: Record "Sales Invoice Header"): Boolean
     var
         NpEcDocument: Record "NPR NpEc Document";
@@ -370,7 +409,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if FindSalesInvoices(ShopifyStoreCode, GetOrderID(Order), TempSalesInvHeader) then
             exit(true);
 
-        FindNpEcStore(ShopifyStoreCode, Order, NpEcStore);
+        FindNpEcStore(ShopifyStoreCode, JsonHelper.GetJText(Order, 'source_name', true), NpEcStore);
         OrderNo := GetOrderNo(Order);
         if OrderNo = '' then
             exit(false);
@@ -463,13 +502,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(Found);
     end;
 
-    local procedure FindNpEcStore(ShopifyStoreCode: Code[20]; Order: JsonToken; var NpEcStoreOut: Record "NPR NpEc Store")
+    internal procedure FindNpEcStore(ShopifyStoreCode: Code[20]; StoreSourceName: Text; var NpEcStoreOut: Record "NPR NpEc Store")
     var
         NpEcStore: Record "NPR NpEc Store";
         DefaultECStoreCode: Code[20];
-        StoreSourceName: Text;
     begin
-        StoreSourceName := JsonHelper.GetJText(Order, 'source_name', true);
         NpEcStore.SetCurrentKey("Shopify Store Code", "Shopify Source Name");
         NpEcStore.SetRange("Shopify Store Code", ShopifyStoreCode);
         NpEcStore.SetRange("Shopify Source Name", CopyStr(StoreSourceName, 1, MaxStrLen(NpEcStore."Shopify Source Name")));
@@ -487,9 +524,16 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         OrderNoLbl: Label 'order number';
     begin
         FullOrderNo := JsonHelper.GetJText(Order, 'order_number', true);
-        if StrLen(FullOrderNo) > MaxStrLen(OrderNo) then
-            Error(TooLongValueErr, OrderNoLbl, FullOrderNo, MaxStrLen(OrderNo));
+        ValidateMaxLength(FullOrderNo, MaxStrLen(OrderNo), OrderNoLbl);
         OrderNo := CopyStr(FullOrderNo, 1, MaxStrLen(OrderNo));
+    end;
+
+    internal procedure ValidateMaxLength(Value: Text; MaxLength: Integer; FieldCaption: Text)
+    var
+        TooLongValueErr: Label '%1 value "%2" exceeds maximum length of %3 characters.', Locked = true;
+    begin
+        if StrLen(Value) > MaxLength then
+            Error(TooLongValueErr, FieldCaption, Value, MaxLength);
     end;
 
     local procedure GetOrderID(Order: JsonToken) OrderId: Text[30]
@@ -498,8 +542,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         OrderIdLbl: Label 'order id';
     begin
         FullOrderId := Format(JsonHelper.GetJBigInteger(Order, 'id', true), 0, 9);
-        if StrLen(FullOrderId) > MaxStrLen(OrderId) then
-            Error(TooLongValueErr, OrderIdLbl, FullOrderId, MaxStrLen(OrderId));
+        ValidateMaxLength(FullOrderId, MaxStrLen(OrderId), OrderIdLbl);
         OrderId := CopyStr(FullOrderId, 1, MaxStrLen(OrderId));
     end;
 
@@ -525,7 +568,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         IsShpmtMappingLocation: Boolean;
         IsShpmtMappingShipAgent: Boolean;
     begin
-        FindNpEcStore(ShopifyStoreCode, Order, NpEcStore);
+        FindNpEcStore(ShopifyStoreCode, JsonHelper.GetJText(Order, 'source_name', true), NpEcStore);
         NpEcStore.TestField("Salesperson/Purchaser Code");
 
         OrderNo := GetOrderNo(Order);
@@ -571,7 +614,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
         SetShipmentMethod(Order, SalesHeader, IsShpmtMappingLocation, IsShpmtMappingShipAgent);
         if not (IsShpmtMappingLocation and IsShpmtMappingShipAgent) then begin
-            FindLocationMapping(Order, NpEcStore, LocationMapping);
+            FindLocationMapping(NpEcStore, LocationMapping, GetCountryCode(NpEcStore, Order, 'shipping_address.country_code', false), JsonHelper.GetJCode(Order, 'shipping_address.zip', MaxStrLen(LocationMapping."From Post Code"), false));
             if (LocationMapping."Location Code" <> '') and not IsShpmtMappingLocation then
                 SalesHeader.Validate("Location Code", LocationMapping."Location Code");
             if (LocationMapping."Shipping Agent Code" <> '') and not IsShpmtMappingShipAgent then begin
@@ -655,7 +698,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     local procedure SetShipmentMethod(Order: JsonToken; var SalesHeader: Record "Sales Header"; var IsShpmtMappingLocation: Boolean; var IsShpmtMappingShipAgent: Boolean)
     var
-        CollectStore: Record "NPR NpCs Store";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
         ShippingLines: JsonToken;
         ShippingLine: JsonToken;
@@ -675,146 +717,60 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                         SalesHeader.Validate("Shipping Agent Service Code", ShipmentMapping."Shipping Agent Service Code");
                     end;
                     IsShpmtMappingLocation := ShipmentMapping."Spfy Location Code" <> '';
-                    if IsShpmtMappingLocation then
-                        SalesHeader.Validate("Location Code", ShipmentMapping."Spfy Location Code")
-                    else
-                        if ShipmentMapping."Spfy Collect Store" <> '' then
-                            if CollectStore.Get(ShipmentMapping."Spfy Collect Store") and (CollectStore."Location Code" <> '') then
-                                SalesHeader.Validate("Location Code", CollectStore."Location Code");
-                    if ShipmentMapping."Spfy Collect Store" <> '' then
-                        SalesHeader.Validate("NPR Spfy Collect Store", ShipmentMapping."Spfy Collect Store");
+                    UpdateLocationFromShippingMapping(ShipmentMapping, SalesHeader);
                     exit;
                 end;
             end;
     end;
 
+    internal procedure UpdateLocationFromShippingMapping(ShipmentMapping: Record "NPR Magento Shipment Mapping"; var SalesHeader: Record "Sales Header")
+    var
+        CollectStore: Record "NPR NpCs Store";
+    begin
+        if ShipmentMapping."Spfy Location Code" <> '' then
+            SalesHeader.Validate("Location Code", ShipmentMapping."Spfy Location Code")
+        else
+            if ShipmentMapping."Spfy Collect Store" <> '' then
+                if CollectStore.Get(ShipmentMapping."Spfy Collect Store") and (CollectStore."Location Code" <> '') then
+                    SalesHeader.Validate("Location Code", CollectStore."Location Code");
+        if ShipmentMapping."Spfy Collect Store" <> '' then
+            SalesHeader.Validate("NPR Spfy Collect Store", ShipmentMapping."Spfy Collect Store");
+    end;
+
     local procedure FindCustomer(NpEcStore: Record "NPR NpEc Store"; Order: JsonToken; var Customer: Record Customer)
     var
-        Customer2: Record Customer;
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
-        NpEcCustomerMapping: Record "NPR NpEc Customer Mapping";
-        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
-        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
         CountryCode: Code[10];
         ShopifyCustomerID: Text[30];
         CustomerName: Text;
+        BillingAdd1: Text;
+        BillingAdd2: text;
+        BillingCity: Text;
         Email: Text;
         Phone: Text;
         PostCode: Text;
-        Found: Boolean;
-        RequestCustomerUpdate: Boolean;
+        FirstName: Text;
+        LastName: Text;
     begin
-        Email := JsonHelper.GetJText(Order, 'customer.email', MaxStrLen(Customer."E-Mail"), false);
-        Phone := JsonHelper.GetJText(Order, 'customer.phone', MaxStrLen(Customer."Phone No."), false);
-        if (Phone = '') then
-            Phone := JsonHelper.GetJText(Order, 'customer.default_address.phone', MaxStrLen(Customer."Phone No."), false);
-        ShopifyCustomerID := CopyStr(JsonHelper.GetJText(Order, 'customer.id', false), 1, MaxStrLen(ShopifyCustomerID));
-        Found := FindCustomerByShopifyID(NpEcStore, ShopifyCustomerID, Email, Phone, false, Customer, SpfyStoreCustomerLink);
-        if not Found and (NpEcStore."Customer Mapping" <> NpEcStore."Customer Mapping"::"Customer No.") then
-            Found := FindCustomerByShopifyID(NpEcStore, ShopifyCustomerID, Email, Phone, true, Customer, SpfyStoreCustomerLink);
-        if Found then begin
+        GetCustomerIdentifiers(Order, Email, Phone, ShopifyCustomerID, 'customer.default_address.phone', false);
 #pragma warning disable AA0139
-            RequestCustomerUpdate := ((SpfyStoreCustomerLink."E-Mail" <> Email) and (Email <> '')) or ((SpfyStoreCustomerLink."Phone No." <> Phone) and (Phone <> ''));
-            if not RequestCustomerUpdate then
-                RequestCustomerUpdate := SpfyStoreCustomerLink."First Name" <> JsonHelper.GetJText(Order, 'customer.first_name', false);
-            if not RequestCustomerUpdate then
-                RequestCustomerUpdate := SpfyStoreCustomerLink."Last Name" <> JsonHelper.GetJText(Order, 'customer.last_name', false);
+        FirstName := JsonHelper.GetJText(Order, 'customer.firstName', false);
+        LastName := JsonHelper.GetJText(Order, 'customer.lastName', false);
 #pragma warning restore AA0139
-            if RequestCustomerUpdate then
-                SpfySendCustomers.RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, false, true, false);
+        if TryFindCustomer(NpEcStore, Order, ShopifyCustomerID, Email, Phone, FirstName, LastName, Customer, SpfyStoreCustomerLink) then
             exit;
-        end;
-        if Customer."No." <> '' then
-            Customer.TestField(Blocked, Customer.Blocked::" ");  //raise error
-
-        if ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"E-mail", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Email <> '')) or
-           ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"Phone No.", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Phone <> '')) or
-           ((NpEcStore."Customer Mapping" = NpEcStore."Customer Mapping"::"E-mail AND Phone No.") and (Email <> '') and (Phone <> ''))
-        then begin
-            case NpEcStore."Customer Mapping" of
-                NpEcStore."Customer Mapping"::"E-mail":
-                    begin
-                        Customer2.SetRange("E-Mail", Email);
-                    end;
-                NpEcStore."Customer Mapping"::"E-mail AND Phone No.":
-                    begin
-                        Customer2.SetRange("E-Mail", Email);
-                        Customer2.SetRange("Phone No.", Phone);
-                    end;
-                NpEcStore."Customer Mapping"::"E-mail OR Phone No.":
-                    begin
-                        if (Email <> '') and (Phone <> '') then begin
-                            Customer2.SetRange("E-Mail", Email);
-                            Customer2.SetRange("Phone No.", Phone);
-                            if CustomerIsInSet(Customer2, NpEcStore."Shopify Store Code", ShopifyCustomerID, false, Customer) then
-                                exit;
-                            Customer2.Reset();
-                        end;
-                        Customer2.FilterGroup(-1);
-                        if Email <> '' then
-                            Customer2.SetRange("E-Mail", Email);
-                        if Phone <> '' then
-                            Customer2.SetRange("Phone No.", Phone);
-                    end;
-                NpEcStore."Customer Mapping"::"Phone No.":
-                    begin
-                        Customer2.SetRange("Phone No.", Phone);
-                    end;
-            end;
-            if CustomerIsInSet(Customer2, NpEcStore."Shopify Store Code", ShopifyCustomerID, true, Customer) then
-                exit;
-        end;
-
+#pragma warning disable AA0139
         CountryCode := GetCountryCode(NpEcStore, Order, 'billing_address.country_code', false);
         PostCode := JsonHelper.GetJCode(Order, 'billing_address.zip', MaxStrLen(Customer."Post Code"), false);
-
-        if NpEcStore."Allow Create Customers" then begin
-            if not (NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, PostCode) and (NpEcCustomerMapping."Config. Template Code" <> '')) then
-                if not NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, '') then
-                    Clear(NpEcCustomerMapping);
-            if NpEcCustomerMapping."Config. Template Code" <> '' then
-                NpEcStore."Customer Config. Template Code" := NpEcCustomerMapping."Config. Template Code";
-
-            NpEcStore.TestField("Customer Config. Template Code");
-            CreateCustomerFromTemplate(Customer, NpEcStore."Customer Config. Template Code");
-            CustomerName := JsonHelper.GetJText(Order, 'customer.first_name', false) + ' ' + JsonHelper.GetJText(Order, 'customer.last_name', false).Trim();
-#pragma warning disable AA0139
-            Customer.Name := CopyStr(CustomerName, 1, MaxStrLen(Customer.Name)).Trim();
-            Customer."Name 2" := CopyStr(CustomerName, MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2")).Trim();
-            Customer."E-Mail" := Email;
-            Customer."Phone No." := Phone;
-            Customer.Address := JsonHelper.GetJText(Order, 'billing_address.address1', MaxStrLen(Customer.Address), false);
-            Customer."Address 2" := JsonHelper.GetJText(Order, 'billing_address.address2', MaxStrLen(Customer."Address 2"), false);
-            Customer.City := JsonHelper.GetJText(Order, 'billing_address.city', MaxStrLen(Customer.City), false);
-            Customer."Post Code" := PostCode;
+        BillingAdd1 := JsonHelper.GetJText(Order, 'billing_address.address1', MaxStrLen(Customer.Address), false);
+        BillingAdd2 := JsonHelper.GetJText(Order, 'billing_address.address2', MaxStrLen(Customer."Address 2"), false);
+        BillingCity := JsonHelper.GetJText(Order, 'billing_address.city', MaxStrLen(Customer.City), false);
+        CustomerName := FirstName + ' ' + LastName.Trim();
 #pragma warning restore AA0139
-            Customer."Country/Region Code" := CountryCode;
-            Customer.Modify();
-            SpfyStoreLinkMgt.UpdateStoreCustomerLinks(Customer);
-            SpfyStoreCustomerLink.Type := SpfyStoreCustomerLink.Type::Customer;
-            SpfyStoreCustomerLink."No." := Customer."No.";
-            SpfyStoreCustomerLink."Shopify Store Code" := NpEcStore."Shopify Store Code";
-            SpfyStoreCustomerLink.Find();
-            SpfySendCustomers.RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, false, true, false);
-            exit;
-        end;
-
-        if NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, PostCode) then begin
-            NpEcCustomerMapping.TestField("Spfy Customer No.");
-            Customer.Get(NpEcCustomerMapping."Spfy Customer No.");
-            exit;
-        end;
-        if NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, '') then begin
-            NpEcCustomerMapping.TestField("Spfy Customer No.");
-            Customer.Get(NpEcCustomerMapping."Spfy Customer No.");
-            exit;
-        end;
-
-        NpEcStore.testfield("Spfy Customer No.");
-        Customer.Get(NpEcStore."Spfy Customer No.");
+        ResolveCustomer(NpEcStore, Email, Phone, BillingCity, BillingAdd1, BillingAdd2, CountryCode, PostCode, ShopifyCustomerID, CustomerName, Customer, SpfyStoreCustomerLink);
     end;
 
-    local procedure FindCustomerByShopifyID(NpEcStore: Record "NPR NpEc Store"; ShopifyCustomerID: Text[30]; Email: Text; Phone: Text; IgnoreEmailPhone: Boolean; var Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link") Found: Boolean
+    internal procedure FindCustomerByShopifyID(NpEcStore: Record "NPR NpEc Store"; ShopifyCustomerID: Text[30]; Email: Text; Phone: Text; IgnoreEmailPhone: Boolean; var Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link") Found: Boolean
     var
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -844,7 +800,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             until (ShopifyAssignedID.Next() = 0) or Found;
     end;
 
-    local procedure CreateCustomerFromTemplate(var Customer: Record Customer; CustomerTemplCode: Code[20])
+    internal procedure CreateCustomerFromTemplate(var Customer: Record Customer; CustomerTemplCode: Code[20])
     var
         CustomerTempl: Record "Customer Templ.";
         CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
@@ -877,7 +833,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     end;
 #endif
 
-    local procedure CustomerIsInSet(var CustomerSet: Record Customer; ShopifyStoreCode: Code[20]; ShopifyCustomerID: Text[30]; RaiseBlockedError: Boolean; var SelectedCustomer: Record Customer): Boolean
+    internal procedure CustomerIsInSet(var CustomerSet: Record Customer; ShopifyStoreCode: Code[20]; ShopifyCustomerID: Text[30]; RaiseBlockedError: Boolean; var SelectedCustomer: Record Customer): Boolean
     var
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -1010,7 +966,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesHeader.Validate("Ship-to Country/Region Code", GetCountryCode(NpEcStore, ShippingAddress, 'country_code', false));
     end;
 
-    local procedure GetCountryCode(NpEcStore: Record "NPR NpEc Store"; Token: JsonToken; Path: Text; MustExistInJson: Boolean) CountryCode: Code[10]
+    internal procedure GetCountryCode(NpEcStore: Record "NPR NpEc Store"; Token: JsonToken; Path: Text; MustExistInJson: Boolean) CountryCode: Code[10]
     begin
 #pragma warning disable AA0139
         CountryCode := JsonHelper.GetJCode(Token, Path, MaxStrLen(CountryCode), MustExistInJson);
@@ -1134,7 +1090,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         UnknownIdErr: Label 'Unknown %1: %2%3';
     begin
         OrderLineID := GetOrderID(OrderLine);
-        GetOrderLineProperties(OrderLine, PropertyDict);
+        GetOrderLineProperties(OrderLine, PropertyDict, 'properties', 'name');
         IsGiftCard := OrderLineIsGiftCard(OrderLine, PropertyDict, IsNPGiftCard);
         if IsGiftCard then
             GetVoucherType(ShopifyStoreCode, PropertyDict, VoucherType)
@@ -1230,7 +1186,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyIntegrationEvents.OnAfterUpsertSalesLine(SalesHeader, SalesLine, not ExistingLineFound, xSalesLine, LastLineNo);
     end;
 
-    local procedure SetOrderLineUnitPriceAndDiscount(SalesHeader: Record "Sales Header"; ShopifyStoreCode: Code[20]; ActualUnitPrice: Decimal; LineDiscountAmount: Decimal; var SalesLine: Record "Sales Line")
+    internal procedure SetOrderLineUnitPriceAndDiscount(SalesHeader: Record "Sales Header"; ShopifyStoreCode: Code[20]; ActualUnitPrice: Decimal; LineDiscountAmount: Decimal; var SalesLine: Record "Sales Line")
     var
         SpfyProductPriceCalc: Codeunit "NPR Spfy Product Price Calc.";
         LineUnitPrice: Decimal;
@@ -1245,12 +1201,184 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         end else
             LineUnitPrice := ActualUnitPrice;
 
-        if SalesLine."Unit Price" <> LineUnitPrice then
+        GetGLSetup();
+        if Round(SalesLine."Unit Price", GLSetup."Unit-Amount Rounding Precision") <> Round(LineUnitPrice, GLSetup."Unit-Amount Rounding Precision") then
             SalesLine.Validate("Unit Price", LineUnitPrice);
 
         if SalesLine."Unit Price" <> 0 then
-            if SalesLine."Line Discount Amount" <> LineDiscountAmount then
+            if Round(SalesLine."Line Discount Amount", GLSetup."Amount Rounding Precision") <> Round(LineDiscountAmount, GLSetup."Amount Rounding Precision") then
                 SalesLine.Validate("Line Discount Amount", LineDiscountAmount);
+    end;
+
+    internal procedure GetCustomerIdentifiers(Order: JsonToken; var Email: Text; var Phone: Text; var ShopifyCustomerID: Text[30]; CustomerDefaultPhonePath: Text; GetNumericId: Boolean)
+    var
+        ShopifyId: Text;
+        ShopifyCustomerIDLbl: Label 'Shopify Customer Id';
+    begin
+        Clear(Email);
+        Clear(Phone);
+        Clear(ShopifyCustomerID);
+        Email := JsonHelper.GetJText(Order, 'email', MaxStrLen(Email), false);
+        Phone := JsonHelper.GetJText(Order, 'phone', MaxStrLen(Phone), false);
+        if Phone = '' then
+            Phone := JsonHelper.GetJText(Order, 'customer.defaultAddress.phone', MaxStrLen(Phone), false);
+        ShopifyId := JsonHelper.GetJText(Order, 'customer.id', false);
+        if GetNumericId then
+            if ShopifyId <> '' then
+                ShopifyId := SpfyIntegrationMgt.RemoveUntil(ShopifyId, '/');
+        ValidateMaxLength(ShopifyId, MaxStrLen(ShopifyCustomerID), ShopifyCustomerIDLbl);
+        ShopifyCustomerID := CopyStr(ShopifyId, 1, MaxStrLen(ShopifyCustomerID));
+    end;
+
+    internal procedure TryFindCustomer(NpEcStore: Record "NPR NpEc Store"; Order: JsonToken; ShopifyCustomerID: Text[30]; Email: Text; Phone: Text; FirstName: Text; LastName: Text; var Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean
+    var
+        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+    begin
+        if TryFindCustomerByShopifyID(NpEcStore, ShopifyCustomerID, Email, Phone, Customer, SpfyStoreCustomerLink) then begin
+            if ShouldUpdateCustomerFromShopify(SpfyStoreCustomerLink, Email, Phone, FirstName, LastName) then
+                SpfySendCustomers.RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, false, true, false);
+            exit(true);
+        end;
+        if Customer."No." <> '' then
+            Customer.TestField(Blocked, Customer.Blocked::" ");
+        if TryFindCustomerByMappingRules(NpEcStore, Email, Phone, ShopifyCustomerID, Customer) then
+            exit(true);
+        exit(false);
+    end;
+
+    local procedure TryFindCustomerByShopifyID(NpEcStore: Record "NPR NpEc Store"; ShopifyCustomerID: Text[30]; Email: Text; Phone: Text; var Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link") Found: Boolean
+    begin
+        Found := FindCustomerByShopifyID(NpEcStore, ShopifyCustomerID, Email, Phone, false, Customer, SpfyStoreCustomerLink);
+        if not Found and (NpEcStore."Customer Mapping" <> NpEcStore."Customer Mapping"::"Customer No.") then
+            Found := FindCustomerByShopifyID(NpEcStore, ShopifyCustomerID, Email, Phone, true, Customer, SpfyStoreCustomerLink);
+    end;
+
+    local procedure TryFindCustomerByMappingRules(NpEcStore: Record "NPR NpEc Store"; Email: Text; Phone: Text; ShopifyCustomerID: Text[30]; var Customer: Record Customer): Boolean
+    var
+        Customer2: Record Customer;
+    begin
+        if ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"E-mail", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Email <> '')) or
+            ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"Phone No.", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Phone <> '')) or
+            ((NpEcStore."Customer Mapping" = NpEcStore."Customer Mapping"::"E-mail AND Phone No.") and (Email <> '') and (Phone <> ''))
+         then begin
+            case NpEcStore."Customer Mapping" of
+                NpEcStore."Customer Mapping"::"E-mail":
+                    begin
+                        Customer2.SetRange("E-Mail", Email);
+                    end;
+                NpEcStore."Customer Mapping"::"E-mail AND Phone No.":
+                    begin
+                        Customer2.SetRange("E-Mail", Email);
+                        Customer2.SetRange("Phone No.", Phone);
+                    end;
+                NpEcStore."Customer Mapping"::"E-mail OR Phone No.":
+                    begin
+                        if (Email <> '') and (Phone <> '') then begin
+                            Customer2.SetRange("E-Mail", Email);
+                            Customer2.SetRange("Phone No.", Phone);
+                            if CustomerIsInSet(Customer2, NpEcStore."Shopify Store Code", ShopifyCustomerID, false, Customer) then
+                                exit(true);
+                            Customer2.Reset();
+                        end;
+                        Customer2.FilterGroup(-1);
+                        if Email <> '' then
+                            Customer2.SetRange("E-Mail", Email);
+                        if Phone <> '' then
+                            Customer2.SetRange("Phone No.", Phone);
+                    end;
+                NpEcStore."Customer Mapping"::"Phone No.":
+                    begin
+                        Customer2.SetRange("Phone No.", Phone);
+                    end;
+            end;
+            if CustomerIsInSet(Customer2, NpEcStore."Shopify Store Code", ShopifyCustomerID, true, Customer) then
+                exit(true);
+        end;
+    end;
+
+    local procedure TryCreateCustomer(NpEcStore: Record "NPR NpEc Store"; Email: text; Phone: text; BillingCity: Text; BillingAdd1: text; BillingAdd2: text; CountryCode: Code[10]; PostCode: Text; var Customer: Record Customer; ShopifyCustomerID: Text[30]; CustomerName: text; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean
+    var
+        NpEcCustomerMapping: Record "NPR NpEc Customer Mapping";
+        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+    begin
+        if not NpEcStore."Allow Create Customers" then
+            exit(false);
+
+        if not (NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, PostCode) and (NpEcCustomerMapping."Config. Template Code" <> '')) then
+            if not NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, '') then
+                Clear(NpEcCustomerMapping);
+        if NpEcCustomerMapping."Config. Template Code" <> '' then
+            NpEcStore."Customer Config. Template Code" := NpEcCustomerMapping."Config. Template Code";
+        NpEcStore.TestField("Customer Config. Template Code");
+        CreateCustomerFromTemplate(Customer, NpEcStore."Customer Config. Template Code");
+#pragma warning disable AA0139
+        Customer.Name := CopyStr(CustomerName, 1, MaxStrLen(Customer.Name)).Trim();
+        Customer."Name 2" := CopyStr(CustomerName, MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2")).Trim();
+        Customer."E-Mail" := Email;
+        Customer."Phone No." := Phone;
+        Customer.Address := BillingAdd1;
+        Customer."Address 2" := BillingAdd2;
+        Customer.City := BillingCity;
+        Customer."Post Code" := PostCode;
+#pragma warning restore AA0139
+        Customer."Country/Region Code" := CountryCode;
+        Customer.Modify();
+        SpfyStoreLinkMgt.UpdateStoreCustomerLinks(Customer);
+        SpfyStoreCustomerLink.Type := SpfyStoreCustomerLink.Type::Customer;
+        SpfyStoreCustomerLink."No." := Customer."No.";
+        SpfyStoreCustomerLink."Shopify Store Code" := NpEcStore."Shopify Store Code";
+        SpfyStoreCustomerLink.Find();
+        SpfySendCustomers.RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, false, true, false);
+        exit(true);
+    end;
+
+    local procedure GetFallbackCustomer(NpEcStore: Record "NPR NpEc Store"; CountryCode: Code[10]; PostCode: Text; var Customer: Record Customer)
+    var
+        NpEcCustomerMapping: Record "NPR NpEc Customer Mapping";
+    begin
+        if NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, PostCode) then begin
+            NpEcCustomerMapping.TestField("Spfy Customer No.");
+            Customer.Get(NpEcCustomerMapping."Spfy Customer No.");
+            exit;
+        end;
+        if NpEcCustomerMapping.Get(NpEcStore.Code, CountryCode, '') then begin
+            NpEcCustomerMapping.TestField("Spfy Customer No.");
+            Customer.Get(NpEcCustomerMapping."Spfy Customer No.");
+            exit;
+        end;
+
+        NpEcStore.Testfield("Spfy Customer No.");
+        Customer.Get(NpEcStore."Spfy Customer No.");
+    end;
+
+    internal procedure ResolveCustomer(var Store: Record "NPR NpEc Store"; Email: Text; Phone: Text; BillingCity: Text; BillingAdd1: Text; BillingAdd2: Text; CountryCode: Code[10]; PostCode: Text; ShopifyCustomerID: Text[30]; CustomerName: Text; var Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    begin
+        if TryCreateCustomer(Store, Email, Phone, BillingCity, BillingAdd1, BillingAdd2, CountryCode, PostCode, Customer, ShopifyCustomerID, CustomerName, SpfyStoreCustomerLink) then
+            exit;
+
+        GetFallbackCustomer(Store, CountryCode, PostCode, Customer);
+    end;
+
+    local procedure ShouldUpdateCustomerFromShopify(Link: Record "NPR Spfy Store-Customer Link"; Email: Text; Phone: text; FirstName: Text; LastName: text): Boolean
+    begin
+        if (Link."E-Mail" <> Email) and (Email <> '') then
+            exit(true);
+        if (Link."Phone No." <> Phone) and (Phone <> '') then
+            exit(true);
+        if Link."First Name" <> FirstName then
+            exit(true);
+        if Link."Last Name" <> LastName then
+            exit(true);
+
+        exit(false);
+    end;
+
+    internal procedure GetGLSetup()
+    begin
+        if not GLSetupRetrived then
+            GLSetup.Get();
+        GLSetupRetrived := true;
     end;
 
     local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")
@@ -1319,7 +1447,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(IsNPGiftCard);
     end;
 
-    local procedure GetOrderLineProperties(OrderLine: JsonToken; var PropertyDict: Dictionary of [Text, Text]): Boolean
+    internal procedure GetOrderLineProperties(OrderLine: JsonToken; var PropertyDict: Dictionary of [Text, Text]; PropertObjName: text; PropertyKey: text): Boolean
     var
         OrderLineProperties: JsonToken;
         OrderLineProperty: JsonToken;
@@ -1327,10 +1455,10 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         PropertyValue: Text;
     begin
         Clear(PropertyDict);
-        if not JsonHelper.GetJsonToken(OrderLine, 'properties', OrderLineProperties) or not OrderLineProperties.IsArray() then
+        if not JsonHelper.GetJsonToken(OrderLine, PropertObjName, OrderLineProperties) or not OrderLineProperties.IsArray() then
             exit(false);
         foreach OrderLineProperty in OrderLineProperties.AsArray() do begin
-            PropertyName := JsonHelper.GetJText(OrderLineProperty, 'name', false).TrimStart('_');
+            PropertyName := JsonHelper.GetJText(OrderLineProperty, PropertyKey, false).TrimStart('_');
             if PropertyName <> '' then begin
                 PropertyValue := JsonHelper.GetJText(OrderLineProperty, 'value', false);
                 AddPropertyToDict(PropertyName, PropertyValue, PropertyDict);
@@ -1377,7 +1505,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         end;
     end;
 
-    local procedure GetVoucherType(ShopifyStoreCode: Code[20]; PropertyDict: Dictionary of [Text, Text]; var VoucherType: Record "NPR NpRv Voucher Type")
+    internal procedure GetVoucherType(ShopifyStoreCode: Code[20]; PropertyDict: Dictionary of [Text, Text]; var VoucherType: Record "NPR NpRv Voucher Type")
     var
         ShopifyStore: Record "NPR Spfy Store";
         PropertyValue: Text;
@@ -1393,7 +1521,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         VoucherType.TestField("Account No.");
     end;
 
-    local procedure UpdateVoucherRecipient(PropertyDict: Dictionary of [Text, Text]; IsNpGiftCard: Boolean; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    internal procedure UpdateVoucherRecipient(PropertyDict: Dictionary of [Text, Text]; IsNpGiftCard: Boolean; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         PropertyKey: Text;
         PropertyValue: Text;
@@ -1537,14 +1665,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             LineDiscountAmount := LineDiscountAmount / OriginalOrderQty * SalesLine.Quantity;
     end;
 
-    local procedure FindLocationMapping(Order: JsonToken; NpEcStore: Record "NPR NpEc Store"; var LocationMapping: Record "NPR Spfy Location Mapping")
-    var
-        CountryCode: Text;
-        PostCode: Text;
+    internal procedure FindLocationMapping(NpEcStore: Record "NPR NpEc Store"; var LocationMapping: Record "NPR Spfy Location Mapping"; CountryCode: Text; PostCode: Text)
     begin
-        CountryCode := GetCountryCode(NpEcStore, Order, 'shipping_address.country_code', false);
-        PostCode := JsonHelper.GetJCode(Order, 'shipping_address.zip', MaxStrLen(LocationMapping."From Post Code"), false);
-
         LocationMapping.SetRange("Store Code", NpEcStore.Code);
         LocationMapping.SetRange("Country/Region Code", CountryCode);
         LocationMapping.SetFilter("From Post Code", '..%1', PostCode);
@@ -1560,7 +1682,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         LocationMapping."Location Code" := CopyStr(NpEcStore."Location Code", 1, MaxStrLen(LocationMapping."Location Code"));
     end;
 
-    local procedure InsertComments(Order: JsonToken; SalesHeader: Record "Sales Header")
+    internal procedure InsertComments(Order: JsonToken; SalesHeader: Record "Sales Header")
     var
         RecordLink: Record "Record Link";
         RecordLinkMgt: Codeunit "Record Link Management";
@@ -1649,7 +1771,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         Commit();
     end;
 
-    local procedure CheckThereAreLinesToPost(SalesHeader: Record "Sales Header"): Boolean
+    internal procedure CheckThereAreLinesToPost(SalesHeader: Record "Sales Header"): Boolean
     var
         SalesLine: Record "Sales Line";
     begin
@@ -1708,6 +1830,60 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(Codeunit::"NPR Spfy Order Mgt.");
     end;
 
+    internal procedure HandleClickCollectOrder(ShopifyStoreCode: Code[20]; SalesHeader: Record "Sales Header")
+    var
+        NpCsWorkflow: Record "NPR NpCs Workflow";
+        NpCsStore: Record "NPR NpCs Store";
+        NpCsDocument: Record "NPR NpCs Document";
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+    begin
+        if CheckIfClickCollectOrder(ShopifyStoreCode, SalesHeader, NpCsStore, NpCsWorkflow) then begin
+            NpCsCollectMgt.InitSendToStoreDocument(SalesHeader, NpCsStore, NpCsWorkflow, NpCsDocument);
+            UpdateNotificationsAndRunWorkflow(SalesHeader, NpCsDocument);
+        end;
+    end;
+
+    local procedure CheckIfClickCollectOrder(ShopifyStoreCode: Code[20]; SalesHeader: Record "Sales Header"; var NpCsStore: Record "NPR NpCs Store"; var NpCsWorkflow: Record "NPR NpCs Workflow"): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        if SalesHeader."NPR Spfy Collect Store" = '' then
+            exit(false);
+        if not NpCsStore.Get(SalesHeader."NPR Spfy Collect Store") then
+            exit(false);
+
+        ShopifyStore.Get(ShopifyStoreCode);
+        ShopifyStore.TestField("Spfy C&C Order Workflow Code");
+        NpCsWorkflow.Get(ShopifyStore."Spfy C&C Order Workflow Code");
+
+        exit(true);
+    end;
+
+    local procedure UpdateNotificationsAndRunWorkflow(SalesHeader: Record "Sales Header"; var NpCsDocument: Record "NPR NpCs Document")
+    var
+        NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+        PaymentLines: Record "NPR Magento Payment Line";
+    begin
+        NpCsDocument."Customer No." := SalesHeader."Sell-to Customer No.";
+        NpCsDocument."Salesperson Code" := SalesHeader."Salesperson Code";
+        NpCsDocument."From Store Code" := NpCsDocument."To Store Code";
+        NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
+        NpCsDocument."Customer E-mail" := SalesHeader."NPR Bill-to E-mail";
+        NpCsDocument."Notify Customer via E-mail" := NpCsDocument."Customer E-mail" <> '';
+        NpCsDocument."Customer Phone No." := SalesHeader."NPR Bill-to Phone No.";
+        NpCsDocument."Notify Customer via Sms" := SalesHeader."NPR Bill-to Phone No." <> '';
+        if not NpCsDocument."Notify Customer via Sms" then
+            NpCsDocument."Notify Customer via E-mail" := true;
+
+        PaymentLines.SetRange("Document No.", SalesHeader."No.");
+        PaymentLines.SetRange("Document Type", PaymentLines."Document Type"::Order);
+        PaymentLines.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLines.CalcSums(Amount);
+        NpCsDocument."Prepaid Amount" := PaymentLines.Amount;
+        NpCsDocument.Modify(true);
+
+        NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+    end;
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterCopyFromItem', '', true, false)]
 #else

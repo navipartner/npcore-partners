@@ -58,6 +58,9 @@ codeunit 6151349 "NPR Enable Application Areas"
     local procedure EnableShopifyApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
     begin
         TempApplicationAreaSetup."NPR Shopify" := IsFeatureEnabled(Feature::Shopify);
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        TempApplicationAreaSetup."NPR Shopify Ecommerce" := IsFeatureEnabled(Feature::"Shopify Ecommerce Order Experience");
+#endif
     end;
 #endif
     local procedure EnableMagentoApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)

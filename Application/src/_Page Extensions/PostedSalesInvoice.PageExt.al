@@ -92,7 +92,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 Editable = false;
                 Visible = ShopifyIntegrationIsEnabled;
                 ApplicationArea = NPRShopify;
-                ToolTip = 'Specifies the Shopify Oder ID assigned to the document.';
+                ToolTip = 'Specifies the Shopify Order ID assigned to the document.';
             }
             field("NPR Shopify Store Code"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"))
             {

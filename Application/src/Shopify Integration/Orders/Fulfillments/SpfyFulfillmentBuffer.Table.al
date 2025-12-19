@@ -55,6 +55,24 @@ table 6150815 "NPR Spfy Fulfillment Buffer"
             DataClassification = CustomerContent;
             Caption = 'Gift Card';
         }
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        field(31; "Initial Amount"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Initial Amount';
+            DecimalPlaces = 0 : 5;
+        }
+        field(32; Email; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Email';
+        }
+        field(33; "Updated At"; DateTime)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Updated At';
+        }
+#endif
     }
     keys
     {
@@ -64,6 +82,7 @@ table 6150815 "NPR Spfy Fulfillment Buffer"
         }
         key(RelationFromBCTables; "Table No.", "BC Record ID") { }
         key(ByFulfillmentOrder; "Fulfillment Order ID", "Fulfillment Order Line ID") { }
+        key(OrderLindId; "Order Line ID") { }
     }
 }
 #endif

@@ -29,6 +29,13 @@ table 6150996 "NPR Spfy Fulfillm. Buf. Detail"
             DataClassification = CustomerContent;
             Caption = 'Gift Card Reference No.';
         }
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        field(12; Claimed; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Claimed';
+        }
+#endif
     }
     keys
     {

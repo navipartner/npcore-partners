@@ -166,5 +166,92 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnSpfyWebhookTopicName(Topic: Enum "NPR Spfy Webhook Topic"; GraphQLName: Boolean; var Result: Text)
     begin
     end;
+
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeFindCustomerInEcommerceDocument(OrderJsonToken: JsonToken; var Customer: Record Customer; var EcomSalesHeader: Record "NPR Ecom Sales Header"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterParseEcommerceSalesLine(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeInsertEcommerceSalesLine(SalesLineJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeInsertEcommerceSalesPaymentLine(PaymentLineJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterParseEcommerceSalesPaymentLine(PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterParseEcommerceSalesHeader(var EcomSalesHeader: Record "NPR Ecom Sales Header"; RequestBody: JsonToken);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeInsertEcommerceSalesPaymentLines(ShopifyStoreCode: Code[20]; OrderJsonToken: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterInsertEcommercePaymentLines(ShopifyStoreCode: Code[20]; OrderJsonToken: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnCheckShouldSkipEcommerceDocumentImport(ShopifyStoreCode: Code[20]; OrderJsonToken: JsonToken; var SkipImport: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeInsertEcommerceSalesHeader(var EcomSalesHeader: Record "NPR Ecom Sales Header"; OrderJsonToken: JsonToken);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterParseEcommerceVoucherPaymentLine(PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterParseEcommercePaymentMethodPaymentLine(PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeUpdateSalesLine(OrderLine: JsonToken; SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpdateSalesLine(OrderLine: JsonToken; SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; NewLine: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpdateSalesLineShipmentFee(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; NewLine: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeUpdatePaymentLines(ShopifyStoreCode: Code[20]; PaymentLinesJsonToken: JsonToken; var SalesHeader: Record "Sales Header"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpdatePaymentLines(ShopifyStoreCode: Code[20]; PaymentLinesJsonToken: JsonToken; var SalesHeader: Record "Sales Header"; var Handled: Boolean)
+    begin
+    end;
+#endif
 }
 #endif

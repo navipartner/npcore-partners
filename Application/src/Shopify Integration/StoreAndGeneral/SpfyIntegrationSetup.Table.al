@@ -26,9 +26,18 @@ table 6150807 "NPR Spfy Integration Setup"
                 SpfyExportBCTransJQ: Codeunit "NPR Spfy Export BC Trans. JQ";
 #endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+                SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+#endif
             begin
                 Modify();
                 SpfyScheduleSend.SetupTaskProcessingJobQueues();
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                if ShopifyEcommOrderExp.IsFeatureEnabled() then
+                    SpfyEcomSalesDocPrcssr.SetupJobQueues()
+                else
+#endif
                 OrderMgt.SetupJobQueues();
 #if not (BC18 or BC19 or BC20)
                 SpfyExportBCTransJQ.SetupBCTransExportJobQueues();
@@ -213,6 +222,14 @@ table 6150807 "NPR Spfy Integration Setup"
                         "Data Processing Handler ID" := xRec."Data Processing Handler ID";
             end;
         }
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        field(150; "Max Doc Process Retry Count"; Integer)
+        {
+            Caption = 'Max. Document Process Retry Count';
+            DataClassification = CustomerContent;
+            InitValue = 5;
+        }
+#endif
     }
 
     keys

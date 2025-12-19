@@ -34,6 +34,9 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         MoveLastOrdersImportedAt();
         UpdateShopifyInventoryLocations();
         RemoveEmptyShopifyStoreItemLinks();
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        PrepareForEcomFlow()
+#endif
     end;
 
     internal procedure UpdateShopifySetup()
@@ -559,7 +562,33 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         SetUpgradeTag();
         LogFinish();
     end;
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure PrepareForEcomFlow()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+    begin
+        _UpgradeStep := 'PrepareForEcomFlow';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
 
+        if ShopifySetup.Get() then
+            if ShopifySetup."Max Doc Process Retry Count" = 0 then begin
+                ShopifySetup."Max Doc Process Retry Count" := 2;
+                ShopifySetup.Modify();
+            end;
+        if SpfyEventLogEntry.FindSet() then
+            repeat
+                SpfyEventLogEntry."Document Type" := SpfyEventLogEntry."Document Type"::Order;
+                SpfyEventLogEntry."Processing Status" := SpfyEventLogEntry."Processing Status"::Processed;
+                SpfyEventLogEntry.Modify();
+            until SpfyEventLogEntry.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+#endif
     local procedure HasUpgradeTag(): Boolean
     begin
         exit(_UpgradeTag.HasUpgradeTag(_UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", _UpgradeStep)));

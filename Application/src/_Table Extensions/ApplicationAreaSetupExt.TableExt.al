@@ -183,5 +183,10 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner Member Images in Cloudflare R2 storage';
             DataClassification = CustomerContent;
         }
+        field(6060140; "NPR Shopify Ecommerce"; Boolean)
+        {
+            Caption = 'NaviPartner Shopify Ecommerce Order Experience';
+            DataClassification = CustomerContent;
+        }
     }
 }

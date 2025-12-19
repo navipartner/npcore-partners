@@ -37,6 +37,9 @@ table 6151175 "NPR Spfy Related Document"
         SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        IncEcomSalesHeader: Record "NPR Ecom Sales Header";
+#endif
         PageManagement: Codeunit "Page Management";
         SalesDocType: Enum "Sales Document Type";
         RecRef: RecordRef;
@@ -83,6 +86,20 @@ table 6151175 "NPR Spfy Related Document"
                     SalesCreditMemoHeader.Get("Document No.");
                     RecRef.GetTable(SalesCreditMemoHeader);
                 end;
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            "Document Type"::"Incoming Ecommerce Order":
+                begin
+                    IncEcomSalesHeader.SetRange("Document Type", IncEcomSalesHeader."Document Type"::Order);
+                    IncEcomSalesHeader.SetRange("External No.", Rec."Document No.");
+                    RecRef.GetTable(IncEcomSalesHeader);
+                end;
+            "Document Type"::"Incoming Ecommerce Return Order":
+                begin
+                    IncEcomSalesHeader.SetRange("Document Type", IncEcomSalesHeader."Document Type"::"Return Order");
+                    IncEcomSalesHeader.SetRange("External No.", Rec."Document No.");
+                    RecRef.GetTable(IncEcomSalesHeader);
+                end;
+#endif
             else
                 Error(NotSupportedErr, "Document Type");
         end;

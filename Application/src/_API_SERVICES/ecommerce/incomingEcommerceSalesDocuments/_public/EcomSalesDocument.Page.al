@@ -27,6 +27,11 @@ page 6248188 "NPR Ecom Sales Document"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Currency Code field.';
                 }
+                field("Ecommerce Store Code"; Rec."Ecommerce Store Code")
+                {
+                    ApplicationArea = NPRShopifyEcommerce;
+                    ToolTip = 'Specifies the value of the Ecommerce Store Code field.';
+                }
                 group(OrderVisibilityGroup)
                 {
                     ShowCaption = false;

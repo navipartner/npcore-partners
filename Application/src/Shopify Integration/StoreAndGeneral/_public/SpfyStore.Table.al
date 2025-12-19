@@ -32,6 +32,10 @@ table 6150810 "NPR Spfy Store"
 #if not (BC18 or BC19 or BC20)
                 SpfyExportBCTransJQ: Codeunit "NPR Spfy Export BC Trans. JQ";
 #endif
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+                SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+#endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
             begin
                 if Enabled then
@@ -41,6 +45,11 @@ table 6150810 "NPR Spfy Store"
                 ShopifyStore.Get("Code");
                 ShopifyStore.SetRecFilter();
                 SpfyScheduleSend.SetupTaskProcessingJobQueues(ShopifyStore);
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                if ShopifyEcommOrderExp.IsFeatureEnabled() then
+                    SpfyEcomSalesDocPrcssr.SetupJobQueues()
+                else
+#endif
                 OrderMgt.SetupJobQueues();
 #if not (BC18 or BC19 or BC20)
                 SpfyExportBCTransJQ.SetupBCTransExportJobQueues(ShopifyStore);
@@ -195,8 +204,17 @@ table 6150810 "NPR Spfy Store"
             var
                 SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
                 OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+                ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+#endif
             begin
                 Modify();
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                if ShopifyEcommOrderExp.IsFeatureEnabled() then
+                    SpfyEcomSalesDocPrcssr.SetupJobQueues()
+                else
+#endif
                 OrderMgt.SetupJobQueues();
                 if "Sales Order Integration" then begin
                     _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Sales Orders");

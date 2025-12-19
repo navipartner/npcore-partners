@@ -9,13 +9,19 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
 
     procedure Capture(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+#endif
         PaymentLine: Record "NPR Magento Payment Line";
         TempNcTask: Record "NPR Nc Task" temporary;
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
     begin
         InitNcTaskFromPmtRequest(Request, PaymentLine, TempNcTask);
-        if not CheckPrerequisites(TempNcTask, Response) then
-            exit;
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        if not EcomSalesHeader.GetBySystemId(PaymentLine."NPR Inc Ecom Sale Id") then //skip for ecommerce flow
+#endif
+            if not CheckPrerequisites(TempNcTask, Response) then
+                exit;
         if not SpfyCapturePayment.CaptureShopifyPayment(PaymentLine, TempNcTask, Response) then
             Error(GetLastErrorText());
     end;
@@ -54,10 +60,19 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
 
     local procedure InitNcTaskFromPmtRequest(Request: Record "NPR PG Payment Request"; var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task")
     var
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+#endif
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesInvHeader: Record "Sales Invoice Header";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+#endif
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+#endif
     begin
         if IsNullGuid(Request."Document System Id") or IsNullGuid(Request."Payment Line System Id") then
             Error('');  //usupported request
@@ -80,6 +95,16 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
                     SalesCrMemoHeader.GetBySystemId(Request."Document System Id");
                     NcTask."Record ID" := SalesCrMemoHeader.RecordId();
                 end;
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            Database::"NPR Ecom Sales Header":
+                begin
+                    EcomSalesHeader.GetBySystemId(Request."Document System Id");
+                    if SpfyEcomSalesDocPrcssr.GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then begin
+                        NcTask."Store Code" := SpfyEventLogEntry."Store Code";
+                        NcTask."Record Value" := EcomSalesHeader."External No.";
+                    end
+                end;
+#endif
             else
                 Error('');  //usupported request
         end;
@@ -90,8 +115,10 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         PaymentLine.LockTable();
 #endif
         PaymentLine.GetBySystemId(Request."Payment Line System Id");
-        NcTask."Store Code" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
-        NcTask."Record Value" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(NcTask."Record Value"));
+        if NcTask."Store Code" = '' then
+            NcTask."Store Code" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
+        if NcTask."Record Value" = '' then
+            NcTask."Record Value" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(NcTask."Record Value"));
         NcTask."Table No." := Database::"NPR Magento Payment Line";
         NcTask."Record ID" := PaymentLine.RecordId();
     end;

@@ -43,7 +43,7 @@ codeunit 6184826 "NPR Spfy Integration Feature" implements "NPR Feature Manageme
         exit(FeatureIdTok);
     end;
 
-    local procedure GetFeatureDescription(): Text[2048]
+    internal procedure GetFeatureDescription(): Text[2048]
     var
         FeatureDescriptionLbl: Label 'Shopify Integration', MaxLength = 2024;
     begin

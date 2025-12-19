@@ -321,6 +321,11 @@
             Caption = 'Recipient Name';
             DataClassification = CustomerContent;
         }
+        field(510; "Spfy Gift Card ID"; Text[30])
+        {
+            Caption = 'Shopify Gift Card ID';
+            DataClassification = CustomerContent;
+        }
 #endif
         field(1000; Id; Guid)
         {

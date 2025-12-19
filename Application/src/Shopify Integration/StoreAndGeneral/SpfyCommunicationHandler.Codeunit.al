@@ -311,8 +311,10 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             end;
         end;
 
-        if WaitTime > 0 then
+        if WaitTime > 0 then begin
+            EmitError(Status);
             Sleep(WaitTime);
+        end;
         exit(true);
     end;
 
@@ -465,6 +467,32 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         PatternLbl: Label '^(https)\:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]*\.myshopify\.com[\/]*$', Locked = true;
     begin
         exit(Regex.IsMatch(ShopUrl, PatternLbl))
+    end;
+
+    local procedure EmitError(StatusCode: Integer)
+    var
+        ActiveSession: Record "Active Session";
+        CustomDimensions: Dictionary of [Text, Text];
+        InputMessage: text;
+        InternalErr: Label 'Shopify is experiencing internal errors and requests are throttled.';
+        ThrottleErr: Label 'GraphQL API rate limit has been exceeded and requests are throttled.';
+    begin
+        if (StatusCode in [500 .. 599]) then
+            InputMessage := InternalErr
+        else
+            InputMessage := ThrottleErr;
+
+        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
+            ActiveSession.Init();
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+
+        Session.LogMessage('Shopify_GraphQlAPI_Throttle', InputMessage, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 }
 #endif

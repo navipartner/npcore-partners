@@ -40,5 +40,15 @@ enum 6059887 "NPR Spfy Document Type"
     {
         Caption = 'Posted Sales Credit Memo';
     }
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    value(9; "Incoming Ecommerce Order")
+    {
+        Caption = 'Incoming Ecommerce Order';
+    }
+    value(10; "Incoming Ecommerce Return Order")
+    {
+        Caption = 'Incoming Ecommerce Return Order';
+    }
+#endif
 }
 #endif

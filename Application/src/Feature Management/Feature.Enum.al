@@ -63,6 +63,13 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Implementation = "NPR Feature Management" = "NPR Spfy Integration Feature";
     }
 #endif
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    value(91; "Shopify Ecommerce Order Experience")
+    {
+        Caption = 'Shopify Ecommerce Order Experience', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR Spfy Ecommerce Order Exp";
+    }
+#endif
     value(100; "POS Scenarios Obsoleted")
     {
         Caption = 'POS Scenarios Obsoleted', Locked = true, MaxLength = 50;
@@ -128,4 +135,5 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Attraction Print Experience';
         Implementation = "NPR Feature Management" = "NPR New Attraction Print Exp";
     }
+
 }

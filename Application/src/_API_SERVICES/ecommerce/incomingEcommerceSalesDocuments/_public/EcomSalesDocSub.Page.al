@@ -71,6 +71,11 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the VAT % field.';
                 }
+                field("Line Discount Amount"; Rec."Line Discount Amount")
+                {
+                    ApplicationArea = NPRShopifyEcommerce;
+                    ToolTip = 'Specifies the value of the Line Disocount Amount field.';
+                }
                 field("Invoiced Qty."; Rec."Invoiced Qty.")
                 {
                     ApplicationArea = NPRRetail;

@@ -140,7 +140,24 @@ table 6151259 "NPR Ecom Sales Line"
             Caption = 'Virtual Item Process Retry Count';
             BlankZero = true;
         }
-
+#if not BC17
+        field(5020; "Line Discount Amount"; Decimal)
+        {
+            Caption = 'Line Discount Amount';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
+        field(5030; "Description 2"; Text[150])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Description 2';
+        }
+        field(30; "Shopify ID"; Text[30])
+        {
+            Caption = 'Shopify ID';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
 
     keys

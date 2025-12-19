@@ -9,7 +9,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
     begin
         EcomSalesHeader.SetLoadFields("Creation Status");
         EcomSalesHeader.Get(EcommSalesLine."Document Entry No.");
-
+        IsShopifyDocument := SpfyEcomSalesDocPrcssr.IsShopifyDocument(EcomSalesHeader);
         //lock table
         EcommSalesLine.ReadIsolation := EcommSalesLine.ReadIsolation::UpdLock;
         EcommSalesLine.Get(EcommSalesLine.RecordId);
@@ -170,6 +170,9 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         EcommSalesLine."No." := NpRvVoucher."No.";
         EcommSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
         EcommSalesLine.Modify(true);
+
+        if NpRvSalesLine."Spfy Gift Card ID" <> '' then
+            SpfyEcomSalesDocPrcssr.AssignShopifyIDToVoucher(NpRvVoucher, NpRvSalesLine);
     end;
 
     local procedure CheckVoucherLinkedWithSalesDocument(var NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -183,8 +186,13 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
     local procedure InsertVoucher(var NpRvVoucher: Record "NPR NpRv Voucher"; NpRvVoucherType: Record "NPR NpRv Voucher Type"; NpRvSalesLine: Record "NPR NpRv Sales Line");
     var
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        SpfySuspendVouchRefVal: Codeunit "NPR Spfy Suspend Vouch.Ref.Val";
     begin
+        if IsShopifyDocument then
+            BindSubscription(SpfySuspendVouchRefVal);
         NpRvVoucherMgt.InitVoucher(NpRvVoucherType, NpRvSalesLine."Voucher No.", NpRvSalesLine."Reference No.", 0DT, true, NpRvVoucher);
+        if IsShopifyDocument then
+            UnbindSubscription(SpfySuspendVouchRefVal);
         NpRvSalesLineToVoucher(NpRvVoucher, NpRvSalesLine);
         NpRvVoucher.Modify();
     end;
@@ -205,6 +213,13 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         NpRvVoucher."Send via Print" := NpRvSalesLine."Send via Print";
         NpRvVoucher."Send via E-mail" := NpRvSalesLine."Send via E-mail";
         NpRvVoucher."Send via SMS" := NpRvSalesLine."Send via SMS";
+#if not BC17
+        NpRvVoucher."Spfy Send from Shopify" := NpRvSalesLine."Spfy Send from Shopify";
+        NpRvVoucher."Spfy Send on" := NpRvSalesLine."Spfy Send on";
+        NpRvVoucher."Spfy Liquid Template Suffix" := NpRvSalesLine."Spfy Liquid Template Suffix";
+        NpRvVoucher."Spfy Recipient Name" := NpRvSalesLine."Spfy Recipient Name";
+        NpRvVoucher."Spfy Recipient E-mail" := NpRvSalesLine."Spfy Recipient E-mail";
+#endif
     end;
 
 
@@ -316,5 +331,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
     var
         EcomVirtualItemEvents: codeunit "NPR EcomVirtualItemEvents";
+        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+        IsShopifyDocument: Boolean;
 }
 #endif

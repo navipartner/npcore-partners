@@ -374,6 +374,13 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Virtual Items Processing Status';
         }
+#if not BC17
+        field(4090; "Ecommerce Store Code"; Code[20])
+        {
+            Caption = 'Ecommerce Store Code';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
 
     keys

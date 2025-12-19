@@ -35,6 +35,17 @@ page 6184553 "NPR Spfy Integration Setup"
                     ApplicationArea = NPRShopify;
                 }
             }
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            group(Processing)
+            {
+                Caption = 'Document Processing';
+                field("Max Doc Process Retry Count"; Rec."Max Doc Process Retry Count")
+                {
+                    ToolTip = 'Specifies the maximum number of times the system will attempt to process a sales order document from Shopify if an error occurs during processing. When this limit is reached, no further retries will be made, and the document will be marked as failed.';
+                    ApplicationArea = NPRShopifyEcommerce;
+                }
+            }
+#endif
             part(ShopifyStores; "NPR Spfy Stores Subpage")
             {
                 ApplicationArea = NPRShopify;

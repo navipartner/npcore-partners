@@ -72,7 +72,6 @@ codeunit 6248516 "NPR EcomVirtualItemEvents"
     begin
 
     end;
-
 }
 
 #endif

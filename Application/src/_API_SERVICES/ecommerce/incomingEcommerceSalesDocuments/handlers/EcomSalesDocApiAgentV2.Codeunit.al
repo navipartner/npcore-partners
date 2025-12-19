@@ -771,7 +771,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         end;
     end;
 
-    local procedure AssignBucketId(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    internal procedure AssignBucketId(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
@@ -779,7 +779,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesHeader.Modify();
     end;
 
-    local procedure PreProcessDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    internal procedure PreProcessDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin

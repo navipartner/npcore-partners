@@ -4,6 +4,10 @@ codeunit 6248646 "NPR EcomCaptureImpl"
     Access = Internal;
     TableNo = "NPR Ecom Sales Header";
 
+    var
+        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+        IsShopifyDocument: Boolean;
+
     internal procedure Process(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var Success: Boolean; var ErrorText: Text)
     var
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
@@ -24,6 +28,8 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         AmountToCaptureForPaymentLineCreation := AmountToCapture;
         if EcomSalesHeader."Capture Processing Status" = EcomSalesHeader."Capture Processing Status"::Processed then
             Error(VirtualItemsAlreadyCapturedLbl, EcomSalesHeader.RecordId);
+
+        IsShopifyDocument := SpfyEcomSalesDocPrcssr.IsShopifyDocument(EcomSalesHeader);
 
         MagentoPaymentLine.Reset();
         MagentoPaymentLine.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
@@ -143,6 +149,8 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
         if PaymentMapping."Captured Externally" then
             PaymentLine."Date Captured" := EcomSalesHeader."Received Date";
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLinePaymentMethodFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
 
         EcomVirtualItemEvents.OnBeforeInsertPaymentLinePaymentMethod(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
         PaymentLine.Insert(true);
@@ -246,6 +254,8 @@ codeunit 6248646 "NPR EcomCaptureImpl"
                 PaymentLine.Amount := TotalAmountToCapture;
             PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
             PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+            if IsShopifyDocument then
+                SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine, AvailableAmountToCapture);
             EcomVirtualItemEvents.OnBeforeInsertPaymentLineVoucher(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
             PaymentLine.Insert();
 
@@ -253,6 +263,8 @@ codeunit 6248646 "NPR EcomCaptureImpl"
             NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
             NpRvSalesLine.Amount := PaymentLine.Amount;
             NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
+            if IsShopifyDocument then
+                SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherSalesLineFields(NpRvSalesLine);
             EcomVirtualItemEvents.OnBeforeModifyVoucherReference(NpRvSalesLine, PaymentLine);
             NpRvSalesLine.Modify(true);
 

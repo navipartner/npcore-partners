@@ -4,6 +4,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
     Access = Internal;
 
     var
+        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+        IsShopifyDocument: Boolean;
         CustomerModeCreationErrorLbl: Label 'Customer Create is not allowed when Customer Update Mode is %1';
 
     procedure Process(var EcomSalesHeader: Record "NPR Ecom Sales Header") Success: Boolean
@@ -15,6 +17,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         //lock table
         EcomSalesHeader.ReadIsolation := EcomSalesHeader.ReadIsolation::UpdLock;
         EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+
+        IsShopifyDocument := SpfyEcomSalesDocPrcssr.IsShopifyDocument(EcomSalesHeader);
 
         CheckIfDocumentCanBeProcessed(EcomSalesHeader);
         EcomSalesHeader."Creation Status" := EcomSalesHeader."Creation Status"::Created;
@@ -55,6 +59,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then
             UpdateExtCouponReservations(EcomSalesHeader, SalesHeader);
 
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.FinalizeSalesOrder(SalesHeader, EcomSalesHeader);
         //this event is here just for backwards compatiblity it should not be used.
         IncEcomSalesDocImplEvents.OnProcessBeforeRelease(IncEcomSalesHeader, SalesHeader);
         EcomSalesDocImplEvents.OnProcessBeforeRelease(EcomSalesHeader, SalesHeader);
@@ -62,7 +68,11 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if (IncEcomSalesDocSetup."Release Sale Ord After Prc" and (SalesHeader."Document Type" = SalesHeader."Document Type"::Order)) or
            (IncEcomSalesDocSetup."Release Sale Ret Ord After Prc" and (SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order"))
         then
-            ReleaseSalesDoc.PerformManualRelease(SalesHeader);
+            if not IsShopifyDocument then
+                ReleaseSalesDoc.PerformManualRelease(SalesHeader)
+            else
+                if SpfyEcomSalesDocPrcssr.CheckIfShouldReleaseOrder(EcomSalesHeader) then
+                    ReleaseSalesDoc.PerformManualRelease(SalesHeader);
 
         Success := true;
 
@@ -81,7 +91,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         RecordRef: RecordRef;
         PaymentMethodCodeUpdated: Boolean;
     begin
-        InsertCustomer(EcomSalesHeader, Customer);
+        if not IsShopifyDocument then
+            InsertCustomer(EcomSalesHeader, Customer)
+        else
+            Customer.Get(EcomSalesHeader."Sell-to Customer No.");
 
         SalesHeader.Init();
         case EcomSalesHeader."Document Type" of
@@ -189,6 +202,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             SalesHeader."NPR Delivery Location" := EcomSalesHeader."Shipment Service";
         end;
 
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.RefreshShopifySalesHeaderShipmentAndLocationFields(SalesHeader, EcomSalesHeader, ShipmentMapping);
         if SalesHeader."Payment Method Code" = '' then begin
             Clear(PaymentMethodCodeUpdated);
 
@@ -212,6 +227,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                 until (EcomSalesPmtLine.Next() = 0) or PaymentMethodCodeUpdated;
 
         end;
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.RefreshShopifySalesHeaderPostingDate(SalesHeader, EcomSalesHeader);
 
         SalesHeader.Validate("Currency Code", EcomSalesHeader."Currency Code");
         if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then
@@ -219,6 +236,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                 if EcomSalesHeader."Currency Exchange Rate" > 0 then
                     SalesHeader.Validate("Currency Factor", EcomSalesHeader."Currency Exchange Rate");
             end;
+
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.AssignShopifyIDAndRefreshShopifySalesHeaderDimensions(SalesHeader, EcomSalesHeader);
+
         SalesHeader."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
         EcomSalesDocImplEvents.OnInsertSalesHeaderBeforeFinalizeSalesHeader(EcomSalesHeader, SalesHeader);
         SalesHeader.Modify(true);
@@ -460,10 +481,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                     InsertSalesLineShipmentFee(EcomSalesHeader, SalesHeader, EcomSalesLine, SaleLine);
                 EcomSalesLine.Type::Voucher:
                     InsertSalesLineVoucher(EcomSalesHeader, SalesHeader, EcomSalesLine, SaleLine);
-
             end;
+            if IsShopifyDocument then
+                SpfyEcomSalesDocPrcssr.AssignShopifyIdToSalesLine(SaleLine, EcomSalesLine);
         until EcomSalesLine.Next() = 0;
-
     end;
 
     local procedure InsertSalesLineItem(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var SalesLine: Record "Sales Line")
@@ -827,6 +848,9 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if PaymentMapping."Captured Externally" then
             PaymentLine."Date Captured" := GetDate(SalesHeader."Order Date", SalesHeader."Posting Date");
 
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLinePaymentMethodFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
+
         EcomSalesDocCrtImplEvents.OnInsertPaymentLinePaymentMethodBeforeFinalizeLine(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine);
         PaymentLine.Insert(true);
     end;
@@ -835,6 +859,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
     var
         PaymentLine: Record "NPR Magento Payment Line";
         NewPaymentLine: Record "NPR Magento Payment Line";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         PaymentLine.Reset();
         PaymentLine.SetRange("Document Table No.", Database::"NPR Ecom Sales Header");
@@ -851,6 +876,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             NewPaymentLine."Document Type" := SalesHeader."Document Type";
             NewPaymentLine."Document No." := SalesHeader."No.";
             NewPaymentLine.SystemId := PaymentLine.SystemId;
+            If IsShopifyDocument then
+                SpfyAssignedIDMgt.CopyAssignedShopifyID(PaymentLine.RecordId(), NewPaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             PaymentLine.Delete();
             NewPaymentLine.Insert(false, true);
         until PaymentLine.Next() = 0;
@@ -1041,6 +1068,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         PaymentLine.Amount := EcomSalesPmtLine.Amount - EcomSalesPmtLine."Captured Amount";
         PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
         PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine, EcomSalesPmtLine.Amount);
         PaymentLine.Insert();
 
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
@@ -1049,6 +1078,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
         NpRvSalesLine.Amount := PaymentLine.Amount;
         NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherSalesLineFields(NpRvSalesLine);
         NpRvSalesLine.Modify(true);
 
         if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, PaymentLine.Amount, AvailableAmount) then
@@ -1238,6 +1269,9 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         SalesCrMemoHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
         if not SalesCrMemoHeader.IsEmpty then
             Error(CreatedDocumentErrorLbl, SalesCrMemoHeader.RecordId, EcomSalesHeader.RecordId);
+
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.IsSalesDocumentCreated(EcomSalesHeader);
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");

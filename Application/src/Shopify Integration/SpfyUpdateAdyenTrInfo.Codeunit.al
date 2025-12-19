@@ -13,7 +13,18 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
             exit;
         UpdateTransactionDetails(SpfyTransactionSync, PaymentLine);
     end;
-
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    internal procedure UpdatePaymentLineWithDataFromAdyen(var EcommPaymentLine: Record "NPR Ecom Sales Pmt. Line")
+    var
+        SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details";
+    begin
+        if not EcommPaymentLine."External Payment Gateway".Contains('Adyen') then
+            exit;
+        if not TransactionExistsByMerchantRefAndPSP(SpfyTransactionSync, EcommPaymentLine) then
+            exit;
+        UpdateTransactionDetails(SpfyTransactionSync, EcommPaymentLine);
+    end;
+#endif
     local procedure TryDeleteSpfyTransactionSync(SpfyTransactionSyncSystemId: Guid)
     var
         PaymentLine: Record "NPR Magento Payment Line";
@@ -94,7 +105,14 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
         SpfyTransactionSync.SetFilter("Merchant Reference", StrSubstNo('*-%1', PaymentLine."Transaction ID"));
         exit(SpfyTransactionSync.FindFirst());
     end;
-
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure TransactionExistsByMerchantRefAndPSP(var SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details"; PaymentLine: Record "NPR Ecom Sales Pmt. Line"): Boolean
+    begin
+        SpfyTransactionSync.SetRange("Transaction PSP", SpfyTransactionSync."Transaction PSP"::Adyen);
+        SpfyTransactionSync.SetFilter("Merchant Reference", StrSubstNo('*-%1', PaymentLine."Payment Reference"));
+        exit(SpfyTransactionSync.FindFirst());
+    end;
+#endif
     local procedure UpdateTransactionDetails(SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if SpfyTransactionSync."PSP Reference" <> '' then
@@ -106,7 +124,19 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
         if SpfyTransactionSync."Expiry Date" <> '' then
             PaymentLine."Expiry Date Text" := SpfyTransactionSync."Expiry Date";
     end;
-
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure UpdateTransactionDetails(SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details"; var EcommPaymentLine: Record "NPR Ecom Sales Pmt. Line")
+    begin
+        if SpfyTransactionSync."PSP Reference" <> '' then
+            EcommPaymentLine."Payment Reference" := SpfyTransactionSync."PSP Reference";
+        if SpfyTransactionSync."Card Summary" <> '' then
+            EcommPaymentLine."Masked Card Number" := SpfyTransactionSync."Card Summary";
+        if SpfyTransactionSync."Payment Method" <> '' then
+            EcommPaymentLine."External Payment Method Code" := SpfyTransactionSync."Payment Method";
+        if SpfyTransactionSync."Expiry Date" <> '' then
+            EcommPaymentLine."Card Expiry Date" := SpfyTransactionSync."Expiry Date";
+    end;
+#endif
     local procedure GetWebhookData(var AdyenWebhook: Record "NPR Adyen Webhook"; var WebhookDataToken: JsonToken): Boolean
     var
         TypeHelper: Codeunit "Type Helper";
@@ -210,7 +240,14 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
 
     local procedure UpdateTransactionDetailsFromSpfyTransactionSync(var PaymentLine: Record "NPR Magento Payment Line"; SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details")
     var
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+#endif
         PaymentLine2: Record "NPR Magento Payment Line";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        Updated: Boolean;
+#endif
     begin
         repeat
             PaymentLine2 := PaymentLine;
@@ -219,8 +256,27 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
 
             if PaymentLinesForSpfySyncAreNotEqual(PaymentLine, PaymentLine2) then begin
                 PaymentLine2.Modify();
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                EcomSalesPmtLine.ReadIsolation := IsolationLevel::UpdLock;
+                if EcomSalesPmtLine.GetBySystemId(PaymentLine2."NPR Inc Ecom Sales Pmt Line Id") then begin
+                    EcomSalesHeader.ReadIsolation := IsolationLevel::ReadCommitted;
+                    EcomSalesHeader.SetRange("Document Type", EcomSalesPmtLine."Document Type");
+                    EcomSalesHeader.SetRange("External No.", EcomSalesPmtLine."External Document No.");
+                    if EcomSalesHeader.FindFirst() and (EcomSalesHeader."Capture Processing Status" = EcomSalesHeader."Capture Processing Status"::Error) then begin
+                        UpdateTransactionDetails(SpfyTransactionSync, EcomSalesPmtLine);
+                        EcomSalesPmtLine.Modify();
+                        Updated := true;
+                    end;
+                end;
+#endif
             end;
         until PaymentLine.Next() = 0;
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        if Updated then begin
+            EcomSalesHeader."Capture Retry Count" := 0;
+            EcomSalesHeader.Modify();
+        end;
+#endif
     end;
 
 #if BC18 or BC19 or BC20 or BC21

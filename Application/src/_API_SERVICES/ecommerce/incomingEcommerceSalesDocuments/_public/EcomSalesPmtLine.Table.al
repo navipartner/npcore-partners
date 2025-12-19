@@ -112,6 +112,40 @@ table 6151260 "NPR Ecom Sales Pmt. Line"
             CalcFormula = sum("NPR Magento Payment Line".Amount where("NPR Inc Ecom Sales Pmt Line Id" = field(SystemId)));
             Editable = false;
         }
+#if not BC17
+        field(150; "Store Currency Code"; Code[10])
+        {
+            Caption = 'Store Currency Code';
+            DataClassification = CustomerContent;
+        }
+        field(160; "Amount (Store Currency)"; Decimal)
+        {
+            Caption = 'Amount (Store Currency)';
+            DataClassification = CustomerContent;
+            AutoFormatExpression = "Store Currency Code";
+            AutoFormatType = 1;
+        }
+        field(170; "External Payment Gateway"; Text[100])
+        {
+            Caption = 'External Payment Gateway';
+            DataClassification = CustomerContent;
+        }
+        field(180; "Expires At"; DateTime)
+        {
+            Caption = 'Expires At';
+            DataClassification = CustomerContent;
+        }
+        field(190; "Date Authorized"; Date)
+        {
+            Caption = 'Date Authorized';
+            DataClassification = CustomerContent;
+        }
+        field(200; "Shopify ID"; Text[30])
+        {
+            Caption = 'Shopify ID';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
 
 

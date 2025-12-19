@@ -446,7 +446,13 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     begin
         exit(ConfirmQst);
     end;
-
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    internal procedure GetMaxDocRetryCount(): Integer
+    begin
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Max Doc Process Retry Count");
+    end;
+#endif
     procedure FunctionCallOnNonTempVarErr(ObjectAndProcedureName: Text)
     var
         NotTempErr: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.', Comment = '%1 - object and procedure names';

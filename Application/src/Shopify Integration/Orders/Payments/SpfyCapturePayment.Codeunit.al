@@ -288,6 +288,9 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     local procedure PrepareShopifyPaymentCaptureRequest(var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task") SendToShopify: Boolean
     var
         SpfyPaymentGateway: Record "NPR Spfy Payment Gateway";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
+#endif
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         Request: JsonObject;
         Variables: JsonObject;
@@ -304,13 +307,18 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         TransactionID := SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if TransactionID = '' then
             Error(IsNotShopifyPmtLineErr, PaymentLine.RecordId());
-
         if PaymentLine."Date Captured" <> 0D then begin
             SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(AlreadyMarkedAsCapturedErr, PaymentLine.FieldCaption("Date Captured")));
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
+#endif
             exit;
         end;
         if TransactionAlreadyCaptured(NcTask, TransactionID, PaymentLine) then begin
             SpfyIntegrationMgt.SetResponse(NcTask, AlreadyCapturedErr);
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
+#endif
             exit;
         end;
         PaymentLine.TestField(Amount);
@@ -403,15 +411,9 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     var
         TempSpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        OStream: OutStream;
         ShopifyResponse: JsonToken;
         Transaction: JsonToken;
         Transactions: JsonToken;
-        ParentTransactionID: Text[30];
-        TransactionID: Text[30];
-        ShopifyTransactionKind: Text;
-        AmountFactor: Integer;
-        NewBufferEntry: Boolean;
     begin
         if NcTask."Store Code" = '' then
             NcTask."Store Code" :=
@@ -429,50 +431,61 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         ShopifyResponse.SelectToken('data.order.transactions', Transactions);
         if not Transactions.IsArray() then
             exit;
-        foreach Transaction in Transactions.AsArray() do begin
-            ShopifyTransactionKind := JsonHelper.GetJText(Transaction, 'kind', MaxStrLen(TempSpfyTransactionBuffer.Kind), false).ToUpper();
-            if IsAuthorizationTransaction(ShopifyTransactionKind) or IsSaleTransaction(ShopifyTransactionKind) or IsRefundTransaction(ShopifyTransactionKind) then
-                if JsonHelper.GetJText(Transaction, 'status', false).ToUpper() = 'SUCCESS' then begin
-#pragma warning disable AA0139
-                    TransactionID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'id', true), '/');
-                    ParentTransactionID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'parentTransaction.id', false), '/');
-#pragma warning restore AA0139
-                    if IsRefundTransaction(ShopifyTransactionKind) then
-                        AmountFactor := -1
-                    else
-                        AmountFactor := 1;
-
-                    TempSpfyTransactionBuffer.Init();
-                    if ParentTransactionID <> '' then
-                        TempSpfyTransactionBuffer."Transaction ID" := ParentTransactionID
-                    else
-                        TempSpfyTransactionBuffer."Transaction ID" := TransactionID;
-                    NewBufferEntry := not TempSpfyTransactionBuffer.Find();
-                    if not IsRefundTransaction(ShopifyTransactionKind) or NewBufferEntry then begin
-#pragma warning disable AA0139
-                        TempSpfyTransactionBuffer.Kind := ShopifyTransactionKind;
-#pragma warning restore AA0139
-                        Clear(TempSpfyTransactionBuffer."Transaction Json");
-                        TempSpfyTransactionBuffer."Transaction Json".CreateOutStream(OStream, TextEncoding::UTF8);
-                        Transaction.WriteTo(OStream);
-                    end;
-                    if NewBufferEntry then begin
-                        TempSpfyTransactionBuffer."Presentment Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.presentmentMoney.currencyCode', false));
-                        TempSpfyTransactionBuffer."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.shopMoney.currencyCode', false));
-                        TempSpfyTransactionBuffer.Insert();
-                    end else begin
-                        TempSpfyTransactionBuffer.TestField("Presentment Currency Code", SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.presentmentMoney.currencyCode', false)));
-                        TempSpfyTransactionBuffer.TestField("Store Currency Code", SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.shopMoney.currencyCode', false)));
-                    end;
-                    TempSpfyTransactionBuffer."Amount (PCY)" += JsonHelper.GetJDecimal(Transaction, 'amountSet.presentmentMoney.amount', false) * AmountFactor;
-                    TempSpfyTransactionBuffer."Amount (SCY)" += JsonHelper.GetJDecimal(Transaction, 'amountSet.shopMoney.amount', true) * AmountFactor;
-                    TempSpfyTransactionBuffer.Modify();
-                end;
-        end;
+        foreach Transaction in Transactions.AsArray() do
+            ProcessTransaction(Transaction, NcTask, TempSpfyTransactionBuffer);
         UpdatePmtLinesAndScheduleCapture(NcTask, Transactions.AsArray(), TempSpfyTransactionBuffer, ScheduleCapture);
     end;
 
-    local procedure UpdatePmtLinesAndScheduleCapture(NcTask: Record "NPR Nc Task"; OrderTransactions: JsonArray; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer"; ScheduleCapture: Boolean)
+    internal procedure ProcessTransaction(Transaction: JsonToken; var NcTask: Record "NPR Nc Task"; var TempSpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer" temporary) Success: Boolean
+    var
+        ParentTransactionID: Text[30];
+        TransactionID: Text[30];
+        ShopifyTransactionKind: Text;
+        OStream: OutStream;
+        AmountFactor: Integer;
+        NewBufferEntry: Boolean;
+    begin
+        ShopifyTransactionKind := JsonHelper.GetJText(Transaction, 'kind', MaxStrLen(TempSpfyTransactionBuffer.Kind), false).ToUpper();
+        if IsAuthorizationTransaction(ShopifyTransactionKind) or IsSaleTransaction(ShopifyTransactionKind) or IsRefundTransaction(ShopifyTransactionKind) then
+            if JsonHelper.GetJText(Transaction, 'status', false).ToUpper() = 'SUCCESS' then begin
+#pragma warning disable AA0139
+                TransactionID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'id', true), '/');
+                ParentTransactionID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'parentTransaction.id', false), '/');
+#pragma warning restore AA0139
+                if IsRefundTransaction(ShopifyTransactionKind) then
+                    AmountFactor := -1
+                else
+                    AmountFactor := 1;
+
+                TempSpfyTransactionBuffer.Init();
+                if ParentTransactionID <> '' then
+                    TempSpfyTransactionBuffer."Transaction ID" := ParentTransactionID
+                else
+                    TempSpfyTransactionBuffer."Transaction ID" := TransactionID;
+                NewBufferEntry := not TempSpfyTransactionBuffer.Find();
+                if not IsRefundTransaction(ShopifyTransactionKind) or NewBufferEntry then begin
+#pragma warning disable AA0139
+                    TempSpfyTransactionBuffer.Kind := ShopifyTransactionKind;
+#pragma warning restore AA0139
+                    Clear(TempSpfyTransactionBuffer."Transaction Json");
+                    TempSpfyTransactionBuffer."Transaction Json".CreateOutStream(OStream, TextEncoding::UTF8);
+                    Transaction.WriteTo(OStream);
+                end;
+                if NewBufferEntry then begin
+                    TempSpfyTransactionBuffer."Presentment Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.presentmentMoney.currencyCode', false));
+                    TempSpfyTransactionBuffer."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.shopMoney.currencyCode', false));
+                    TempSpfyTransactionBuffer.Insert();
+                end else begin
+                    TempSpfyTransactionBuffer.TestField("Presentment Currency Code", SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.presentmentMoney.currencyCode', false)));
+                    TempSpfyTransactionBuffer.TestField("Store Currency Code", SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.shopMoney.currencyCode', false)));
+                end;
+                TempSpfyTransactionBuffer."Amount (PCY)" += JsonHelper.GetJDecimal(Transaction, 'amountSet.presentmentMoney.amount', false) * AmountFactor;
+                TempSpfyTransactionBuffer."Amount (SCY)" += JsonHelper.GetJDecimal(Transaction, 'amountSet.shopMoney.amount', true) * AmountFactor;
+                TempSpfyTransactionBuffer.Modify();
+            end;
+    end;
+
+    internal procedure UpdatePmtLinesAndScheduleCapture(NcTask: Record "NPR Nc Task"; OrderTransactions: JsonArray; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer"; ScheduleCapture: Boolean)
     var
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentLine2: Record "NPR Magento Payment Line";
@@ -610,7 +623,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         SpfyIntegrationEvents.OnAfterInitCreditCardPaymentLine(PaymentLine, PaymentMapping, Transaction);
     end;
 
-    local procedure GetPaymentMapping(Transaction: JsonToken; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
+    internal procedure GetPaymentMapping(Transaction: JsonToken; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
     var
         ExternalPaymentTypeID: Record "NPR External Payment Type ID";
         CreditCardCompany: Text;
@@ -813,7 +826,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), OrderID, TaskType, CurrentDateTime(), NotBeforeDateTime, Enum::"NPR Spfy Reuse Delayed NC Task"::Later, NcTask);
     end;
 
-    local procedure ShopifyPaymentGateway(StoreCurrencyCode: Text): Code[10]
+    internal procedure ShopifyPaymentGateway(StoreCurrencyCode: Text): Code[10]
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
         SpfyPaymentGateway: Record "NPR Spfy Payment Gateway";
@@ -883,12 +896,12 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         CurrencyRetrieved := true;
     end;
 
-    local procedure IsAuthorizationTransaction(TransactionKind: Text): Boolean
+    internal procedure IsAuthorizationTransaction(TransactionKind: Text): Boolean
     begin
         exit(TransactionKind = 'AUTHORIZATION');
     end;
 
-    local procedure IsSaleTransaction(TransactionKind: Text): Boolean
+    internal procedure IsSaleTransaction(TransactionKind: Text): Boolean
     begin
         exit(TransactionKind = 'SALE');
     end;
