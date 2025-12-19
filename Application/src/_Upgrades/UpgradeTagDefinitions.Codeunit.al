@@ -1175,6 +1175,12 @@
                     'init-customer-no-on-cro-pos-audit-log':
                         exit('NPR-init-customer-no-on-cro-pos-audit-log-20251207');
                 end;
+            Codeunit::"NPR UPG MixDiscountLine":
+                case UpgradeStep of
+                    'MixDiscCustAndMinQty':
+                        exit('NPR-SetMinQtyAndSingleCustomerFilterOnMixDiscLine');
+                end;
+
         end;
     end;
 }
