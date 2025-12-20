@@ -1800,7 +1800,7 @@
         POSPostingLog.SetCurrentKey("Posting Per Entry No.", "Posting Per", "Posting Type", "With Error");
         POSPostingLog.SetLoadFields("Posting Timestamp");
         POSPostingLog.FindLast();
-        exit(CurrentDateTime < POSPostingLog."Posting Timestamp" + Power(2, PostingErrorCount) * 60000)
+        exit(CurrentDateTime < (POSPostingLog."Posting Timestamp" + CalculateNextRetry(PostingErrorCount)));
     end;
 
     [IntegrationEvent(false, false)]
@@ -2192,5 +2192,13 @@
             Adjustment := 1;
 
         exit(((EndYear - StartYear) * 12) + (EndMonth - StartMonth) + Adjustment);
+    end;
+
+    local procedure CalculateNextRetry(PostingErrorCount: Integer): Integer
+    begin
+        if PostingErrorCount <= 10 then
+            exit(Power(2, PostingErrorCount) * 60000)
+        else
+            exit(86400000); // 1day
     end;
 }
