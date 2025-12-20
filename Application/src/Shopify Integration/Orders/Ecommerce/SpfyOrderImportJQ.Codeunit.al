@@ -367,16 +367,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
             JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
-    local procedure RefreshJobQueueEntry()
-    var
-        ShopifySetup: Record "NPR Spfy Integration Setup";
-    begin
-        if ShopifySetup.IsEmpty() then
-            exit;
-        SetupJobQueues();
-    end;
-
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR Spfy Order Import JQ");

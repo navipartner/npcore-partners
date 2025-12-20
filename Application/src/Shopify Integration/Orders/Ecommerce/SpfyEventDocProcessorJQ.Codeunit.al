@@ -121,10 +121,12 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
     local procedure RefreshJobQueueEntry()
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
     begin
         If ShopifySetup.IsEmpty() then
             exit;
-        SetupJobQueues();
+        if ShopifyEcommOrderExp.IsFeatureEnabled() then
+            SetupJobQueues();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]

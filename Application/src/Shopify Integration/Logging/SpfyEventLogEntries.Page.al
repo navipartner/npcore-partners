@@ -152,7 +152,7 @@ page 6184903 "NPR Spfy Event Log Entries"
                     SpfyStore: Record "NPR Spfy Store";
                 begin
                     SpfyStore.SetRange(Code, Rec."Store Code");
-                    Page.Run(0, SpfyStore);
+                    Page.Run(Page::"NPR Spfy Store Card", SpfyStore);
                 end;
             }
 #endif

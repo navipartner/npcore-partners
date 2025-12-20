@@ -248,9 +248,19 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     local procedure RefreshJobQueueEntry()
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+        SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
+#endif
     begin
         If ShopifySetup.IsEmpty() then
             exit;
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        if ShopifyEcommOrderExp.IsFeatureEnabled() then begin
+            SpfyOrderImportJQ.SetupJobQueues();
+            exit;
+        end;
+#endif
         SetupJobQueues();
     end;
 
