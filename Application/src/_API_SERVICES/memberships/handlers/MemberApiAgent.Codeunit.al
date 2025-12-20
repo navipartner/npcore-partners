@@ -510,7 +510,8 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         if (MemberJson.Get('birthday', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture.Birthday := JToken.AsValue().AsDate();
+                if not Evaluate(MemberInfoCapture.Birthday, JToken.AsValue().AsText(), 9) then
+                    MemberInfoCapture.Birthday := JToken.AsValue().AsDate(); //To throw a json conversion error
 
         if (MemberJson.Get('city', JToken)) then
             if (not JToken.AsValue().IsNull()) then
@@ -766,22 +767,12 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('newsletter', Encode.NewsLetterAsText(Member."E-Mail News Letter"))
             .AddProperty('email', Member."E-Mail Address")
             .AddProperty('phoneNo', Member."Phone No.")
-            .AddObject(AddRequiredProperty(ResponseJson, 'birthday', Member.Birthday))
+            .AddProperty('birthday', Format(Member.Birthday, 0, 9))
             .AddProperty('hasPicture', MemberHasPicture(Member))
             .AddProperty('hasNotes', Member.HasLinks())
             .AddProperty('preferredLanguage', Member.PreferredLanguageCode)
             .AddProperty('storeCode', Member."Store Code")
             .AddArray(MemberAttributes.MemberAttributesDTO(ResponseJson, Member."Entry No."));
-        exit(ResponseJson);
-    end;
-
-    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"
-    begin
-        if (PropertyValue <> 0D) then
-            ResponseJson.AddProperty(PropertyName, PropertyValue)
-        else
-            ResponseJson.AddProperty(PropertyName);
-
         exit(ResponseJson);
     end;
 
