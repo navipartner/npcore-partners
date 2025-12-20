@@ -1381,6 +1381,7 @@
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         UserAccountMgt: Codeunit "NPR UserAccountMgtImpl";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         UserAccount: Record "NPR UserAccount";
         Membership: Record "NPR MM Membership";
         NameParts: List of [Text];
@@ -1421,6 +1422,7 @@
                 repeat
                     Membership.Get(TempMembership."Entry No.");
                     PaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+                    MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
                 until TempMembership.Next() = 0;
             until TempPaymentLine.Next() = 0;
     end;

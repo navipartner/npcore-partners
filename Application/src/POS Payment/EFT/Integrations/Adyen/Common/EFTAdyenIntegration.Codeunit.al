@@ -970,9 +970,10 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if (not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount)) then
             MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
 
-        if MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, MemberPaymentMethod) then
-            MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod)
-        else begin
+        if MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, MemberPaymentMethod) then begin
+            MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+            MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+        end else begin
 
             POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
@@ -980,6 +981,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             AddPaymentMethodForMemberOrPayer(SalePOS, UserAccount, EftTransactionRequest, MemberPaymentMethod, MembershipMgtInternal, MMPaymentMethodMgt);
 
             MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+            MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
 
             MMMemberInfoCapture."Enable Auto-Renew" := true;
             MMMemberInfoCapture."Member Payment Method" := MemberPaymentMethod."Entry No.";
@@ -1027,6 +1029,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
             // NOTE: Previously this would not add it as default, but that should be safe to do now.
             MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+            MembershipMgt.EnableMembershipInternalAutoRenewal(Membership, true, false);
         end;
     end;
 

@@ -24,6 +24,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Customer: Record Customer;
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
         if SalePOS."Header Type" = SalePOS."Header Type"::Cancelled then
             exit;
@@ -47,8 +48,10 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
                 Membership.SetRange("Customer No.", Customer."No.");
                 Membership.SetLoadFields("Entry No.");
                 if Membership.FindFirst() then begin
-                    if GetPaymentMethodForMembership(SalePOS, Membership, EFTTransactionRequest, MemberPaymentMethod) then
+                    if GetPaymentMethodForMembership(SalePOS, Membership, EFTTransactionRequest, MemberPaymentMethod) then begin
                         SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+                        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+                    end;
                 end;
             end;
         until EFTTransactionRequest.Next() = 0;
@@ -77,14 +80,15 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
     internal procedure SetMemberPaymentMethodAsDefault(Membership: Record "NPR MM Membership"; MemberPaymentMethodEntryNo: Integer)
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MemberPaymentMethod.Get(MemberPaymentMethodEntryNo);
         SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
     end;
 
     internal procedure SetMemberPaymentMethodAsDefault(var Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
     begin
         if (not MembershipPmtMethodMap.Get(MemberPaymentMethod.SystemId, Membership.SystemId)) then begin
@@ -103,8 +107,6 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
             MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
             MemberPaymentMethod.Modify(true);
         end;
-
-        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
     end;
 
     internal procedure FindMemberPaymentMethod(EftTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
