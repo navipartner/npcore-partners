@@ -51,6 +51,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
         SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
         PaymentLinkUrl: Text[2048];
+        IsLastRenewSchedPeriod: Boolean;
     begin
         Subscription.Get(SubscriptionRequest."Subscription Entry No.");
         Subscription."Termination Reason" := Subscription."Termination Reason"::FORCED_TERMINATION;
@@ -60,7 +61,9 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MembershipSetup.Get(Membership."Membership Code");
         RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code");
 
-        if SubscrRequestUtils.LastRenewSchedPeriod(SubscriptionRequest, RecurPaymSetup) then begin
+        IsLastRenewSchedPeriod := SubscrRequestUtils.LastRenewSchedPeriod(SubscriptionRequest, RecurPaymSetup);
+
+        if IsLastRenewSchedPeriod then begin
             Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
             Membership.Modify(true);
         end;
@@ -78,8 +81,10 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.Modify(true);
 
-        PaymentLinkUrl := FindPayByLink(SubscrPaymentRequest);
-        MemberNotification.AddMembershipRenewalFailureNotification(Subscription."Membership Entry No.", Subscription."Membership Code", SubscrPaymentRequest."Rejected Reason Code", SubscrPaymentRequest."Rejected Reason Description", PaymentLinkUrl);
+        if IsLastRenewSchedPeriod then begin
+            PaymentLinkUrl := FindPayByLink(SubscrPaymentRequest);
+            MemberNotification.AddMembershipRenewalFailureNotification(Subscription."Membership Entry No.", Subscription."Membership Code", SubscrPaymentRequest."Rejected Reason Code", SubscrPaymentRequest."Rejected Reason Description", PaymentLinkUrl);
+        end;
     end;
 
     local procedure ProcessConfirmedStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
