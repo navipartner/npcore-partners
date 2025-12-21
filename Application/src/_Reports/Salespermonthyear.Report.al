@@ -104,8 +104,11 @@ report 6014429 "NPR Sales per month year"
                 WeekTotal := WeekTotal + SalesAllPersons;
                 MonthTotal := MonthTotal + SalesAllPersons;
 
-                if (SalesAllPersons = 0) and (ShowEmptyLines = false) then
+                if (SalesAllPersons = 0) and (ShowEmptyLines = false) then begin
+                    if CurrentDate = EndDate then
+                        GrandTotal += WeekTotal;
                     CurrReport.Skip();
+                end;
 
                 // Month last year
                 LastWeekText := '';
