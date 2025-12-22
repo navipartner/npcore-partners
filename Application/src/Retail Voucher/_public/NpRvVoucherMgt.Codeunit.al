@@ -397,6 +397,7 @@
         Voucher."Send via E-mail" := NpRvSalesLine."Send via E-mail";
         Voucher."Send via SMS" := NpRvSalesLine."Send via SMS";
         Voucher."Voucher Message" := NpRvSalesLine."Voucher Message";
+        Voucher."Language Code" := NpRvSalesLine."Language Code";
 #if not BC17
         Voucher."Spfy Send from Shopify" := NpRvSalesLine."Spfy Send from Shopify";
         Voucher."Spfy Send on" := NpRvSalesLine."Spfy Send on";
