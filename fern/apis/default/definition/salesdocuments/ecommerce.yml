@@ -457,8 +457,8 @@ types:
       
   SalesDocumentCustomFieldsRequest:
     properties:
-      myCustomField1: string
-      myCustomField2: string
+      myCustomField1: optional<string>
+      myCustomField2: optional<string>
     examples:
       - name: ExampleSalesDocumentCustomFieldsRequest
         value:
@@ -521,8 +521,8 @@ types:
 
   SalesDocumentPaymentsCustomFieldsRequest:
     properties:
-      myCustomField1: string
-      myCustomField2: string
+      myCustomField1: optional<string>
+      myCustomField2: optional<string>
     examples:
       - name: ExampleSalesDocumentPaymentsCustomFieldsRequest
         value:
@@ -585,8 +585,8 @@ types:
 
   SalesDocumentLinesCustomFieldsRequest:
     properties:
-      myCustomField1: string
-      myCustomField2: string
+      myCustomField1: optional<string>
+      myCustomField2: optional<string>
     examples:
       - name: ExampleSalesDocumentLinesCustomFieldsRequest
         value:
