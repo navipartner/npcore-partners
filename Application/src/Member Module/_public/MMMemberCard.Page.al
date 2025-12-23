@@ -499,6 +499,33 @@
                         MemberRetailIntegration.PrintMemberAccountCard(Rec."External Member No.");
                 end;
             }
+            action(Subscription)
+            {
+                Caption = 'Subscription';
+                ToolTip = 'Opens membership subscription details.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = DueDate;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    Subscription: Record "NPR MM Subscription";
+                    Membership: Record "NPR MM Membership";
+                    MembershipRole: Record "NPR MM Membership Role";
+                    SubscriptionNotFoundLbl: Label 'No active subscription found for member %1.';
+                begin
+                    MembershipRole.SetRange("Member Entry No.", Rec."Entry No.");
+                    MembershipRole.SetRange(Blocked, false);
+                    if MembershipRole.FindFirst() then begin
+                        if Membership.Get(MembershipRole."Membership Entry No.") then begin
+                            Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+                            Page.Run(Page::"NPR MM Subscription Details", Subscription);
+                        end else
+                            Error(SubscriptionNotFoundLbl, Rec."External Member No.");
+                    end;
+                end;
+            }
             Action(PrintCard)
             {
                 Caption = 'Print Member Card';
