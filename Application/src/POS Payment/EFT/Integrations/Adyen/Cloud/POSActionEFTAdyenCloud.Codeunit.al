@@ -403,7 +403,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
         AbortReqEntryNo := EFTAdyenAbortMgmt.CreateAbortTransactionRequest(EFTTransactionRequest);
         Parameters.Add('EntryNo', Format(AbortReqEntryNo));
-        POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 30)
+        Sleep(2000);
+        POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 30);
     end;
 
     local procedure CancelAcquisition(EntryNo: Integer)
