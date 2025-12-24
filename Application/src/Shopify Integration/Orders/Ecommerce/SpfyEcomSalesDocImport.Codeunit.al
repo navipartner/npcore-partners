@@ -1152,7 +1152,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         EcomSalesHeader."External No." := LogEntry."Shopify ID";
 #pragma warning restore AA0139
         EcomSalesHeader."Ecommerce Store Code" := FindNpEcStore(LogEntry."Store Code", OrderToken);
-        EcomSalesHeader."External Document No." := CopyStr((EcomSalesHeader."Ecommerce Store Code" + '-' + _SpfyAPIOrderHelper.GetOrderNo(OrderToken)), 1, MaxStrLen(EcomSalesHeader."External Document No."));
+        EcomSalesHeader."External Document No." := CopyStr((LogEntry."Store Code" + '-' + _SpfyAPIOrderHelper.GetOrderNo(OrderToken)), 1, MaxStrLen(EcomSalesHeader."External Document No."));
         SpfyAPIEventLogMgt.CalculateCurrencyFactor(EcomSalesHeader."Currency Exchange Rate", LogEntry);
         EcomSalesHeader."Currency Code" := LogEntry."Presentment Currency Code";
         if LogEntry."Closed Date-Time" < LogEntry."Event Date-Time" then begin
@@ -1226,26 +1226,26 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         NpEcStore: Record "NPR NpEc Store";
         LocationMapping: Record "NPR Spfy Location Mapping";
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        HeaderToken: JsonToken;
         IsShpmtMappingLocation: Boolean;
         IsShpmtMappingShipAgent: Boolean;
     begin
+        OrderJsonToken.SelectToken('data.order', HeaderToken);
         GetEcStore(NpEcStore, EcomSalesHeader);
-        GetCustomerAndPostingDate(NpEcStore, EcomSalesHeader, OrderJsonToken);
-        SetShipmentMethod(OrderJsonToken, EcomSalesHeader, IsShpmtMappingLocation, IsShpmtMappingShipAgent);
+        GetCustomerAndPostingDate(NpEcStore, EcomSalesHeader, HeaderToken);
+        SetShipmentMethod(HeaderToken, EcomSalesHeader, IsShpmtMappingLocation, IsShpmtMappingShipAgent);
         if not (IsShpmtMappingLocation and IsShpmtMappingShipAgent) then begin
-            SpfyOrderMgt.FindLocationMapping(NpEcStore, LocationMapping, OrderMgt.GetCountryCode(NpEcStore, OrderJsonToken, 'shippingAddress.countryCodeV2', false), JsonHelper.GetJCode(OrderJsonToken, 'shippingAddress.zip', MaxStrLen(LocationMapping."From Post Code"), false));
+            SpfyOrderMgt.FindLocationMapping(NpEcStore, LocationMapping, OrderMgt.GetCountryCode(NpEcStore, HeaderToken, 'shippingAddress.countryCodeV2', false), JsonHelper.GetJCode(HeaderToken, 'shippingAddress.zip', MaxStrLen(LocationMapping."From Post Code"), false));
             if (LocationMapping."Location Code" <> '') and not IsShpmtMappingLocation then
                 EcomSalesHeader."Location Code" := LocationMapping."Location Code";
         end;
-        SpfyIntegrationEvents.OnAfterParseEcommerceSalesHeader(EcomSalesHeader, OrderJsonToken);
+        SpfyIntegrationEvents.OnAfterParseEcommerceSalesHeader(EcomSalesHeader, HeaderToken);
     end;
 
-    local procedure GetCustomerAndPostingDate(NpEcStore: Record "NPR NpEc Store"; var EcomSalesHeader: Record "NPR Ecom Sales Header"; Response: JsonToken)
+    local procedure GetCustomerAndPostingDate(NpEcStore: Record "NPR NpEc Store"; var EcomSalesHeader: Record "NPR Ecom Sales Header"; HeaderToken: JsonToken)
     var
-        HeaderToken: JsonToken;
         ClosedAt: Date;
     begin
-        Response.SelectToken('data.order', HeaderToken);
         SetSellToCustomer(NpEcStore, HeaderToken, EcomSalesHeader);
         SetShipToCustomer(NpEcStore, HeaderToken, EcomSalesHeader);
         ClosedAt := DT2Date(JsonHelper.GetJDT(HeaderToken, 'closedAt', false));
@@ -1257,6 +1257,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     var
         CollectStore: Record "NPR NpCs Store";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
+        ShippingNodeLine: JsonToken;
         ShippingLine: JsonToken;
         ShippingLines: JsonToken;
         DeliveryLocationId: Code[50];
@@ -1264,9 +1265,10 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     begin
         if Order.SelectToken('shippingLines', ShippingLines) and ShippingLines.IsArray() then
             foreach ShippingLine in ShippingLines.AsArray() do begin
-                FoundShipmentMapping := OrderMgt.FindShipmentMapping(ShippingLine, ShipmentMapping, DeliveryLocationId);
+                ShippingLine.SelectToken('node', ShippingNodeLine);
+                FoundShipmentMapping := OrderMgt.FindShipmentMapping(ShippingNodeLine, ShipmentMapping, DeliveryLocationId);
                 if FoundShipmentMapping then begin
-                    EcomSalesHeader."Shipment Method Code" := ShipmentMapping."Shipment Method Code";
+                    EcomSalesHeader."Shipment Method Code" := ShipmentMapping."External Shipment Method Code";
                     if DeliveryLocationId <> '' then
                         EcomSalesHeader."Shipment Service" := DeliveryLocationId;
                     IsShpmtMappingShipAgent := ShipmentMapping."Shipping Agent Code" <> '';

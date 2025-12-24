@@ -573,6 +573,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         LocationMapping: Record "NPR Spfy Location Mapping";
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+#endif
         ClosedAt: Date;
         OrderNo: Text[50];
         IsShpmtMappingLocation: Boolean;
@@ -604,7 +607,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyEventLogEntry."Store Code" := ShopifyStoreCode;
         SpfyEventLogEntry."Shopify ID" := GetOrderID(Order);
         SpfyEventLogEntry."Event Date-Time" := JsonHelper.GetJDT(Order, 'created_at', true);
-
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        SpfyEventLogMgt.MarkEntryCreatedOutSideEcommerceFlow(SpfyEventLogEntry, Order);
+#endif
         SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID", SpfyEventLogEntry."Shopify ID", false);
         SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code", ShopifyStoreCode, false);
 

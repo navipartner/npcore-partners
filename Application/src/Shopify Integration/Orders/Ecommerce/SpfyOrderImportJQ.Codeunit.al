@@ -264,7 +264,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         SpfyAPIEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
     begin
         if not ShopifySetup.Get() then
-            exit;
+            exit(false);
         if DocName = '' then
             exit(false);
         // check if already processed

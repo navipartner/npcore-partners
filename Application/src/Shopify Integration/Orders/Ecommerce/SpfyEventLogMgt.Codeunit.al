@@ -190,6 +190,15 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
     end;
 
+    internal procedure MarkEntryCreatedOutSideEcommerceFlow(var LogEntry: Record "NPR Spfy Event Log Entry"; OrderTkn: JsonToken)
+    var
+        LogEntryCreatedOutSideLbl: Label 'Log Entry is created outside Ecommerce flow.';
+    begin
+        LogEntry."Document Name" := CopyStr(JsonHelper.GetJText(OrderTkn, 'name', false), 1, MaxStrLen(LogEntry."Document Name"));
+        LogEntry."Processing Status" := LogEntry."Processing Status"::Processed;
+        LogEntry."Last Error Message" := LogEntryCreatedOutSideLbl;
+    end;
+
     var
         JsonHelper: Codeunit "NPR Json Helper";
 }
