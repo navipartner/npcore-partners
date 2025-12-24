@@ -7,8 +7,8 @@ codeunit 6150801 "NPR POS Action: Cust.Info-I" implements "NPR IPOS Workflow"
         ActionDescription: Label 'This is a built-in action for displaying customer related transactions.';
         ParameterShow_NameCaptionLbl: Label 'Show';
         ParameterShow_NameDescriptionLbl: Label 'Specifies the type of customer related data you want to display.';
-        ParameterShow_OptionsLbl: Label 'CustLedgerEntries,ItemLedgerEntries,CustomerCard', Locked = true;
-        ParameterShow_OptionCaptionsLbl: Label 'Customer Ledger Entries,Customer Item Ledger Entries,Customer Card';
+        ParameterShow_OptionsLbl: Label 'CustLedgerEntries,ItemLedgerEntries,CustomerCard,PostedSalesInvoiceLines', Locked = true;
+        ParameterShow_OptionCaptionsLbl: Label 'Customer Ledger Entries,Customer Item Ledger Entries,Customer Card,Customer Posted Sales Invoice Lines';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -35,7 +35,7 @@ codeunit 6150801 "NPR POS Action: Cust.Info-I" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         BusinessLogic: Codeunit "NPR POS Action: Cust.Info-I B";
-        ParameterShow: Option CustLedgerEntries,ItemLedgerEntries,CustomerCard;
+        ParameterShow: Option CustLedgerEntries,ItemLedgerEntries,CustomerCard,PostedSalesInvoiceLines;
         CustomerNo: Code[20];
     begin
         BusinessLogic.GetCustomerNo(Sale, CustomerNo);
@@ -48,8 +48,9 @@ codeunit 6150801 "NPR POS Action: Cust.Info-I" implements "NPR IPOS Workflow"
                 BusinessLogic.ShowILE(CustomerNo);
             ParameterShow::CustomerCard:
                 BusinessLogic.ShowCustomerCard(CustomerNo);
+            ParameterShow::PostedSalesInvoiceLines:
+                BusinessLogic.ShowPostedSalesInvoiceLines(CustomerNo);
         end;
-
     end;
 
     local procedure ParameterShow_Name(): Text[30]
