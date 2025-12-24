@@ -28,38 +28,34 @@ codeunit 6248664 "NPR Static Signature Receipt"
         Contact: Record Contact;
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         ItemVariant: Record "Item Variant";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSReceiptProfile: Record "NPR POS Receipt Profile";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSTicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         POSUnitRcptTxtProfile: Record "NPR POS Unit Rcpt.Txt Profile";
-        Membership: Record "NPR MM Membership";
+        EntryTaxLineAdded: Boolean;
         LogoFontLbl: Label 'Logo', Locked = true;
         ReceiptLogoLbl: Label 'RECEIPT', Locked = true;
         A11FontLbl: Label 'A11', Locked = true;
         B21FontLbl: Label 'B21', Locked = true;
         Code128FontLbl: Label 'CODE128', Locked = true;
         QRFontLbl: Label 'QR', Locked = true;
-        PhoneNoLbl: Label 'Phone No.: ';
-        VATRegistrationNoLbl: Label 'VAT Registration No. : ';
+        PhoneNoLbl: Label 'Phone No.';
+        VATRegistrationNoLbl: Label 'VAT Registration No.';
         EMailLbl: Label 'E-Mail: ';
+        HomePageLbl: Label 'Home Page: ';
         CopyLbl: Label '*** COPY ***';
-        RemainingPointsLbl: Label 'Remaining Points: ';
-        DescriptionLbl: Label 'Description';
-        UnitPriceLbl: Label 'Unit Price';
+        DescritptionLbl: Label 'Description';
+        QuantityLbl: Label 'Quantity';
         AmountLbl: Label 'Amount';
-        VatLbl: Label 'VAT';
+        LineDiscountLbl: Label 'Line Discount';
+        IncludingVATLbl: Label 'Including VAT';
         TotalLbl: Label 'Total';
-        SettlementLbl: Label 'Settlement';
         CustomerSignatureLbl: Label 'Customer Signature';
-        SalespersonCodeLbl: Label 'Salesperson Code: ';
     begin
-        // Receipt should be printed only if there are returns on sale
-        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
-        POSEntrySalesLine.SetFilter(Quantity, '<%1', 0);
-        if POSEntrySalesLine.IsEmpty() then
+        if not ShouldPrintSignatureReceipt(POSEntry) then
             exit;
 
         Printer.SetFont(A11FontLbl);
@@ -78,11 +74,12 @@ codeunit 6248664 "NPR Static Signature Receipt"
 
         // POS Store information
         if POSStore.Get(POSEntry."POS Store Code") then begin
-            if POSStore.Name <> '' then
+            if POSStore.Name <> '' then begin
+                Printer.SetBold(true);
+                Printer.SetPadChar(' ');
                 Printer.AddLine(POSStore.Name, 1);
-
-            if POSStore."Name 2" <> '' then
-                Printer.AddLine(POSStore."Name 2", 1);
+                Printer.SetBold(false);
+            end;
 
             if POSStore.Address <> '' then
                 Printer.AddLine(POSStore.Address, 1);
@@ -103,20 +100,16 @@ codeunit 6248664 "NPR Static Signature Receipt"
                 Printer.AddLine(EMailLbl + POSStore."E-Mail", 1);
 
             if POSStore."Home Page" <> '' then
-                Printer.AddLine(POSStore."Home Page", 1);
+                Printer.AddLine(HomePageLbl + POSStore."Home Page", 1);
         end;
-
-        Printer.AddLine('', 0);
 
         // Copy receipt label
         POSEntryOutputLog.SetRange("POS Entry No.", POSEntry."Entry No.");
         //POS Entry Output Log is inserted after printing receipt, therefore this check
         if not POSEntryOutputLog.IsEmpty() then begin
-            Printer.SetBold(true);
             Printer.SetFont(B21FontLbl);
             Printer.AddLine(CopyLbl, 1);
             Printer.SetFont(A11FontLbl);
-            Printer.SetBold(false);
         end;
 
         // Customer information
@@ -124,11 +117,8 @@ codeunit 6248664 "NPR Static Signature Receipt"
             if Customer."Customer Price Group" <> '' then
                 Printer.AddLine(Customer."Customer Price Group", 0);
 
-            if Customer.Name <> '' then begin
-                Printer.SetBold(true);
+            if Customer.Name <> '' then
                 Printer.AddLine(Customer.Name, 0);
-                Printer.SetBold(false);
-            end;
 
             if Customer.Address <> '' then
                 Printer.AddLine(Customer.Address, 0);
@@ -149,33 +139,21 @@ codeunit 6248664 "NPR Static Signature Receipt"
                 Printer.AddLine(Contact."Post Code" + Contact.City, 0);
         end;
 
-        Membership.SetRange("Customer No.", POSEntry."Customer No.");
-        if Membership.FindFirst() then begin
-            Printer.SetBold(true);
-            Printer.AddTextField(1, 0, RemainingPointsLbl);
-            Printer.AddTextField(2, 0, Format(Membership."Remaining Points"));
-            Printer.AddTextField(3, 0, '');
-            Printer.SetBold(false);
-        end;
-
-        Printer.SetPadChar('_');
-        Printer.AddLine('', 0);
+        Printer.SetPadChar('-');
         Printer.AddLine('', 0);
 
-        // Bold descritpion, unit price and amount labels
+        // Bold descritpion, qty. and amount labels
         Printer.SetBold(true);
-        Printer.AddTextField(1, 0, DescriptionLbl);
-        Printer.AddTextField(2, 2, UnitPriceLbl);
+        Printer.AddTextField(1, 0, DescritptionLbl);
+        Printer.AddTextField(2, 0, QuantityLbl);
         Printer.AddTextField(3, 2, AmountLbl);
         Printer.SetBold(false);
 
-        Printer.SetPadChar('_');
-        Printer.AddLine('', 0);
+        Printer.SetPadChar('-');
         Printer.AddLine('', 0);
 
         // Sale Lines
-        POSEntrySalesLine.Reset();
-        POSEntrySalesLine.SetLoadFields("No.", Description, "Variant Code", Type, Quantity, "Unit Price", "Amount Incl. VAT", "Line Discount Amount Incl. VAT", "Line Discount %");
+        POSEntrySalesLine.SetLoadFields("No.", Description, Type, "Variant Code", Quantity, "Unit Price", "Amount Incl. VAT", "Line Discount Amount Incl. VAT", "Line Discount %");
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSEntrySalesLine.FindSet() then
             repeat
@@ -184,13 +162,19 @@ codeunit 6248664 "NPR Static Signature Receipt"
                         begin
                             Printer.AddLine(POSEntrySalesLine.Description, 0);
 
-                            Printer.AddTextField(1, 0, ' ' + POSEntrySalesLine."No.");
-                            Printer.AddTextField(2, 2, Format(POSEntrySalesLine.Quantity) + ' * ' + Format(POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity, 0, '<Precision,2:2><Standard Format,2>'));
-                            Printer.AddTextField(3, 2, Format(POSEntrySalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
-
                             if POSEntrySalesLine."Variant Code" <> '' then
                                 if ItemVariant.Get(POSEntrySalesLine."No.", POSEntrySalesLine."Variant Code") then
-                                    Printer.AddLine(ItemVariant.Description, 0);
+                                    Printer.AddLine(ItemVariant."Description 2", 0);
+
+                            Printer.AddTextField(1, 0, ' ' + POSEntrySalesLine."No.");
+                            Printer.AddTextField(2, 0, Format(POSEntrySalesLine.Quantity) + 'x' + Format(POSEntrySalesLine."Unit Price", 0, '<Precision,2:2><Standard Format,2>'));
+                            Printer.AddTextField(3, 2, Format(POSEntrySalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
+
+                            if POSEntrySalesLine."Line Discount Amount Incl. VAT" <> 0 then begin
+                                Printer.AddTextField(1, 0, ' ' + LineDiscountLbl);
+                                Printer.AddTextField(2, 0, Format(-POSEntrySalesLine."Line Discount Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
+                                Printer.AddTextField(3, 0, '');
+                            end;
                         end;
                     POSEntrySalesLine.Type::Comment:
                         Printer.AddLine(POSEntrySalesLine.Description, 0);
@@ -199,49 +183,59 @@ codeunit 6248664 "NPR Static Signature Receipt"
                     POSEntrySalesLine.Type::Payout:
                         begin
                             Printer.AddTextField(1, 0, POSEntrySalesLine.Description);
-                            Printer.AddTextField(2, 2, '');
+                            Printer.AddTextField(2, 0, '');
                             Printer.AddTextField(3, 2, Format(POSEntrySalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
                         end;
                     POSEntrySalesLine.Type::Voucher:
                         begin
-                            Printer.AddLine(POSEntrySalesLine.Description, 0);
-                            Printer.AddTextField(1, 0, Format(POSEntrySalesLine.Quantity) + 'x');
-                            Printer.AddTextField(2, 2, Format(POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity, 0, '<Precision,2:2><Standard Format,2>'));
+                            Printer.AddTextField(1, 0, POSEntrySalesLine.Description);
+                            Printer.AddTextField(2, 0, Format(POSEntrySalesLine.Quantity) + 'x' + Format(POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity, 0, '<Precision,2:2><Standard Format,2>'));
                             Printer.AddTextField(3, 2, Format(POSEntrySalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
                         end;
                 end;
             until POSEntrySalesLine.Next() = 0;
 
-        Printer.SetPadChar('_');
-        Printer.AddLine('', 0);
+        Printer.SetPadChar('-');
         Printer.AddLine('', 0);
 
-        // Total line and tax line
+        // Tax lines
+        POSEntryTaxLine.SetLoadFields("VAT Identifier", "Tax Amount");
+        POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSEntryTaxLine.FindSet() then
+            repeat
+                if POSEntryTaxLine."Tax Amount" <> 0 then begin
+                    if POSEntryTaxLine."VAT Identifier" <> '' then
+                        Printer.AddTextField(1, 0, POSEntryTaxLine."VAT Identifier")
+                    else
+                        Printer.AddTextField(1, 0, IncludingVATLbl);
+                    Printer.AddTextField(2, 0, '');
+                    Printer.AddTextField(3, 2, Format(POSEntryTaxLine."Tax Amount", 0, '<Precision,2:2><Standard Format,2>'));
+                    EntryTaxLineAdded := true;
+                end;
+            until POSEntryTaxLine.Next() = 0;
+
+        if EntryTaxLineAdded then begin
+            Printer.SetPadChar('-');
+            Printer.AddLine('', 0);
+        end;
+
+        // Total line
         if GeneralLedgerSetup.Get() then;
         Printer.SetBold(true);
         Printer.AddTextField(1, 0, TotalLbl + ' ' + GeneralLedgerSetup."LCY Code");
         Printer.AddTextField(2, 0, '');
         Printer.AddTextField(3, 2, Format(POSEntry."Amount Incl. Tax", 0, '<Precision,2:2><Standard Format,2>'));
         Printer.SetBold(false);
-        Printer.AddTextField(1, 0, VatLbl);
-        Printer.AddTextField(2, 0, '');
-        Printer.AddTextField(3, 2, Format(POSEntry."Tax Amount", 0, '<Precision,2:2><Standard Format,2>'));
-
-        Printer.AddLine('', 0);
 
         // Payment lines
         POSEntryPaymentLine.SetLoadFields(Description, "Payment Amount");
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSEntryPaymentLine.FindSet() then begin
-            Printer.SetBold(true);
-            Printer.AddLine(SettlementLbl, 0);
-            Printer.SetBold(false);
+        if POSEntryPaymentLine.FindSet() then
             repeat
                 Printer.AddTextField(1, 0, POSEntryPaymentLine.Description);
                 Printer.AddTextField(2, 0, '');
                 Printer.AddTextField(3, 2, Format(POSEntryPaymentLine."Payment Amount", 0, '<Precision,2:2><Standard Format,2>'));
             until POSEntryPaymentLine.Next() = 0;
-        end;
 
         //Rounding lines
         POSEntrySalesLine.Reset();
@@ -254,8 +248,6 @@ codeunit 6248664 "NPR Static Signature Receipt"
                 Printer.AddTextField(2, 0, '');
                 Printer.AddTextField(3, 2, Format(POSEntrySalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
             until POSEntrySalesLine.Next() = 0;
-
-        Printer.AddLine('', 0);
 
         // Barcode line
         if POSUnit.Get(POSEntry."POS Unit No.") and POSReceiptProfile.Get(POSUnit."POS Receipt Profile") and POSReceiptProfile."Show Barcode as QR Code" then begin
@@ -291,18 +283,62 @@ codeunit 6248664 "NPR Static Signature Receipt"
         Printer.SetPadChar('');
         Printer.AddLine('', 0);
         Printer.AddLine('', 0);
+        Printer.AddLine('', 0);
+        Printer.AddLine('', 0);
         Printer.SetPadChar('_');
         Printer.AddLine('', 0);
         Printer.AddLine(CustomerSignatureLbl, 1);
         Printer.AddLine('', 0);
 
-        // Receipt date/time info and document + pos unit number
-        Printer.AddLine(Format(POSEntry."Entry Date") + ' - ' + Format(POSEntry."Document Date") + '/' + POSEntry."POS Unit No." + ' - ' + Format(POSEntry."Ending Time"), 1);
+        // Receipt date and time info
+        Printer.AddLine(Format(POSEntry."Entry Date") + ' ' + Format(POSEntry."Ending Time") + ' - ' + POSEntry."Document No." + ' / ' + POSEntry."POS Unit No.", 1);
+
         // Salesperson info
         if SalespersonPurchaser.Get(POSEntry."Salesperson Code") then
-            Printer.AddLine(SalespersonCodeLbl + SalespersonPurchaser.Name, 1);
+            Printer.AddLine(SalespersonPurchaser.Code + ' / ' + SalespersonPurchaser.Name, 1);
 
         Printer.SetFont('COMMAND');
         Printer.AddLine('PAPERCUT', 0);
+    end;
+
+    local procedure ShouldPrintSignatureReceipt(POSEntry: Record "NPR POS Entry"): Boolean
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        // Check for return line
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetFilter(Quantity, '<%1', 0);
+        if not POSEntrySalesLine.IsEmpty() then
+            exit(true);
+
+        // Check for Payout
+        POSEntrySalesLine.Reset();
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Payout);
+        if not POSEntrySalesLine.IsEmpty() then
+            exit(true);
+
+        // Check for Customer
+        POSEntrySalesLine.Reset();
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Customer);
+        if not POSEntrySalesLine.IsEmpty() then
+            exit(true);
+
+        // Check if any G/L Accounts are not an EFT Surcharge Account on any POS Payment Method
+        POSEntrySalesLine.Reset();
+        POSEntrySalesLine.SetLoadFields("No.");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::"G/L Account");
+        if POSEntrySalesLine.FindSet() then
+            repeat
+                POSPaymentMethod.SetRange("EFT Surcharge Account No.", POSEntrySalesLine."No.");
+                if POSPaymentMethod.IsEmpty() then
+                    exit(true);
+            until POSEntrySalesLine.Next() = 0;
+
+        exit(false);
     end;
 }
