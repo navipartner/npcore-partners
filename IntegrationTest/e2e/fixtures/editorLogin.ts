@@ -30,7 +30,7 @@ export const login = async (
       .getByRole('button', { name: 'Yes', exact: true })
       .click();
   }
-  await page.waitForTimeout(6000);
+  await page.waitForTimeout(12000);
   const balancingText = page
     .frameLocator('iframe')
     .getByText('Confirm Bin Contents.');

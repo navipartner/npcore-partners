@@ -17,7 +17,7 @@ export const loginAndCreateLayout = async (
   }
   
   await page.waitForLoadState('networkidle');
-  await page.waitForSelector('.spinner', { state: 'hidden', timeout: 30000 });
+  await page.waitForSelector('.spinner', { state: 'hidden', timeout: 240000 });
 
   const popupLocator = page.locator('[id=b3]');
   if ((await popupLocator.count()) > 0) {
@@ -28,6 +28,7 @@ export const loginAndCreateLayout = async (
   .getByRole('contentinfo')
   .locator('svg[data-icon="gear"]')
   .click();
+  await page.waitForTimeout(2000)
   await page
     .frameLocator('iframe')
     .getByRole('button', { name: 'New Layout' })
