@@ -85,7 +85,12 @@
         }
         key(Key3; "Log Date", "Table ID")
         {
+            ObsoleteState = Removed;
+            ObsoleteTag = '2025-12-27';
+            ObsoleteReason = 'Use one of the retention keys instead';
         }
+        key(Retention; "Table ID", "Log Date") { }
+        key(Retention2; "Log Date") { }
     }
 
     fieldgroups

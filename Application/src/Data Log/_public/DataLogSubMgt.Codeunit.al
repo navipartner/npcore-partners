@@ -6,8 +6,16 @@
                   TableData "NPR Data Log Record" = rimd;
 
     trigger OnRun()
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+    var
+        CleanupErr: Label 'The Data Log Cleanup is now managed by NaviPartner retention policy engine.';
+#endif
     begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+        Error(CleanupErr);
+#else
         CleanDataLog();
+#endif
     end;
 
 
@@ -74,53 +82,54 @@
 
     internal procedure CleanDataLog()
     var
-        DataLogField: Record "NPR Data Log Field";
         DataLogSetup: Record "NPR Data Log Setup (Table)";
-        DataLogRecord: Record "NPR Data Log Record";
-        DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
-        TimeStamp: DateTime;
     begin
-        Clear(DataLogSetup);
-        DataLogRecord.SetCurrentKey("Log Date", "Table ID");
-        Clear(DataLogField);
-        DataLogField.SetCurrentKey("Log Date", "Table ID");
         if DataLogSetup.FindSet() then
             repeat
-                TimeStamp := CurrentDateTime - DataLogSetup."Keep Log for";
-
-                DataLogProcessingEntry.SetRange("Table Number", DataLogSetup."Table ID");
-                DataLogProcessingEntry.SetFilter("Inserted at", '<%1', TimeStamp);
-                if DataLogProcessingEntry.FindFirst() then begin
-                    DataLogProcessingEntry.DeleteAll();
-                    Commit();
-                end;
-
-                DataLogField.SetRange("Table ID", DataLogSetup."Table ID");
-                DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
-                DataLogField.DeleteAll();
-
-                DataLogRecord.SetRange("Table ID", DataLogSetup."Table ID");
-                DataLogRecord.SetFilter("Log Date", '<%1', TimeStamp);
-                DataLogRecord.DeleteAll();
-                Commit();
+                CleanDataLog(DataLogSetup);
             until DataLogSetup.Next() = 0;
 
-        TimeStamp := CreateDateTime(CalcDate('<-3M>', Today), 0T);
+        // Clear all data log entries without setup definition or older than 90 days
+        Clear(DataLogSetup);
+        CleanDataLog(DataLogSetup);
+    end;
 
-        DataLogProcessingEntry.SetRange("Table Number", DataLogSetup."Table ID");
-        DataLogProcessingEntry.SetFilter("Inserted at", '<%1', TimeStamp);
-        if DataLogProcessingEntry.FindFirst() then begin
-            DataLogProcessingEntry.DeleteAll();
-            Commit();
+    internal procedure CleanDataLog(DataLogSetup: Record "NPR Data Log Setup (Table)")
+    var
+        DataLogField: Record "NPR Data Log Field";
+        DataLogRecord: Record "NPR Data Log Record";
+        DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+        TimeStamp: DateTime;
+    begin
+        if DataLogSetup."Table ID" <> 0 then
+            if DataLogSetup."Keep Log for" > JobQueueManagement.DaysToDuration(90) then
+                exit;  //will be handled on the next iteration
+
+        if DataLogSetup."Keep Log for" > 0 then
+            TimeStamp := CurrentDateTime() - DataLogSetup."Keep Log for"
+        else
+            TimeStamp := CurrentDateTime() - JobQueueManagement.DaysToDuration(90);
+
+        if DataLogSetup."Table ID" <> 0 then begin
+            DataLogProcessingEntry.SetRange("Table Number", DataLogSetup."Table ID");
+            DataLogField.SetRange("Table ID", DataLogSetup."Table ID");
+            DataLogRecord.SetRange("Table ID", DataLogSetup."Table ID");
         end;
 
-        DataLogField.SetRange("Table ID");
-        DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
-        DataLogField.DeleteAll();
+        DataLogProcessingEntry.SetFilter(SystemCreatedAt, '<%1', TimeStamp);
+        if not DataLogProcessingEntry.IsEmpty() then
+            DataLogProcessingEntry.DeleteAll();
 
-        DataLogRecord.SetRange("Table ID");
-        DataLogRecord.SetFilter("Log Date", '<%1', TimeStamp);
-        DataLogRecord.DeleteAll();
+        DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
+        if not DataLogField.IsEmpty() then
+            DataLogField.DeleteAll();
+
+        DataLogRecord.SetFilter(SystemCreatedAt, '<%1', TimeStamp);
+        if not DataLogRecord.IsEmpty() then
+            DataLogRecord.DeleteAll();
+
+        Commit();
     end;
 
     internal procedure GetNewRecords(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; var MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
@@ -203,7 +212,7 @@
         MaxNoOfRecordsReached := false;
 
         DataLogRecord.FindSet();
-        while not (NoMoreRecords or MaxNoOfRecordsReached or ((IncludeBefore <> 0DT) and (DataLogRecord."Log Date" > IncludeBefore))) do begin
+        while not (NoMoreRecords or MaxNoOfRecordsReached or ((IncludeBefore <> 0DT) and (DataLogRecord.SystemCreatedAt > IncludeBefore))) do begin
             Counter += 1;
             TempDataLogRecord := DataLogRecord;
             TempDataLogRecord.Insert();
@@ -225,7 +234,6 @@
 
         DataLogProcessingEntry.Init();
         DataLogProcessingEntry."Entry No." := 0;
-        DataLogProcessingEntry."Inserted at" := CurrentDateTime();
         DataLogProcessingEntry."Subscriber Code" := DataLogSubscriber.Code;
         DataLogProcessingEntry."Table Number" := DataLogSubscriber."Table ID";
         DataLogProcessingEntry."Data Log Entry No." := DataLogRecord."Entry No.";
@@ -243,7 +251,7 @@
         else
             TaskScheduler.CreateTask(
               Codeunit::"NPR Data Log Processing Mgt.", Codeunit::"NPR Data Log Proces. Err. Mgt.", true, CompanyName(),
-              DataLogRecord."Log Date" + (DataLogSubscriber."Delayed Data Processing (sec)" * 1000), DataLogProcessingEntry.RecordId);
+              DataLogRecord.SystemCreatedAt + (DataLogSubscriber."Delayed Data Processing (sec)" * 1000), DataLogProcessingEntry.RecordId);
     end;
 
     procedure RestoreRecordToRecRef(RecordEntryNo: BigInteger; Previous: Boolean; var RecRef: RecordRef): Boolean

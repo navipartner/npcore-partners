@@ -106,6 +106,13 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForAllWithStartingTime'));
         end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddNPRRetentionPolicyJobQueue')) then begin
+            AddNPRRetentionPolicyJobQueue();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddNPRRetentionPolicyJobQueue'));
+        end;
+#endif
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -202,6 +209,15 @@
             SMSSetup.Validate("Job Queue Category Code", SMSMgt.GetJobQueueCategoryCode());
         SMSSetup.Modify();
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+    local procedure AddNPRRetentionPolicyJobQueue()
+    var
+        RetentionPolicyMgmt: Codeunit "NPR Retention Policy Mgmt.";
+    begin
+        RetentionPolicyMgmt.SetupRetentionPolicyJobQueue();
+    end;
+#endif
 
     procedure InsertSMSSetup(var SMSSetup: Record "NPR SMS Setup")
     begin

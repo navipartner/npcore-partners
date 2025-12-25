@@ -15,8 +15,9 @@
         {
             repeater(Group)
             {
-                field("Inserted at"; Rec."Inserted at")
+                field("Inserted at"; Rec.SystemCreatedAt)
                 {
+                    Caption = 'Inserted at';
                     ToolTip = 'Specifies the value of the Inserted at field';
                     ApplicationArea = NPRNaviConnect;
                 }

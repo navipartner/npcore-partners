@@ -15,8 +15,9 @@
         {
             repeater(Group)
             {
-                field("Log Date"; Rec."Log Date")
+                field("Log Date"; Rec.SystemCreatedAt)
                 {
+                    Caption = 'Log Date';
                     ToolTip = 'Specifies the value of the Log Date field';
                     ApplicationArea = NPRRetail;
                 }

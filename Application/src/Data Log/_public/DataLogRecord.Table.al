@@ -32,6 +32,9 @@
         {
             Caption = 'Log Date';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-12-27';
+            ObsoleteReason = 'Use the SystemCreatedAt field instead';
         }
         field(21; "Type of Change"; Option)
         {
@@ -73,7 +76,12 @@
         }
         key(Key3; "Log Date", "Table ID")
         {
+            ObsoleteState = Removed;
+            ObsoleteTag = '2025-12-27';
+            ObsoleteReason = 'Use one of the retention keys instead';
         }
+        key(Retention; "Table ID", SystemCreatedAt) { }
+        key(Retention2; SystemCreatedAt) { }
     }
 
     fieldgroups

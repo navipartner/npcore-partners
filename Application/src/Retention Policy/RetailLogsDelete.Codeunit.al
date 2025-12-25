@@ -3,8 +3,10 @@ codeunit 6059926 "NPR Retail Logs Delete"
     // based on codeunit 3913 "Retention Policy Logs Delete" from Base App
     Access = Internal;
     Permissions =
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         tabledata "NPR Data Log Record" = rd,
         tabledata "NPR Data Log Field" = rd,
+#endif
         tabledata "NPR Tax Free Voucher" = rd,
         tabledata "NPR POS Saved Sale Entry" = rd,
         tabledata "NPR POS Saved Sale Line" = rd,
@@ -46,8 +48,10 @@ codeunit 6059926 "NPR Retail Logs Delete"
         // check if we can handle the table
         // if you add a new table here, also update this CU permissions
         if not (RecRef.Number in [
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
             Database::"NPR Data Log Record",
             Database::"NPR Data Log Field",
+#endif
             Database::"NPR Tax Free Voucher",
             Database::"NPR POS Saved Sale Entry",
             Database::"NPR POS Saved Sale Line",

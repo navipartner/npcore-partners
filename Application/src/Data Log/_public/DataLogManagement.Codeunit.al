@@ -96,7 +96,6 @@
         if RecRef.IsTemporary then
             exit;
 
-        TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
             LoadMonTables();
@@ -126,7 +125,6 @@
         if RecRef.IsTemporary then
             exit;
 
-        TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
             LoadMonTables();
@@ -160,7 +158,6 @@
         if RecRef.IsTemporary then
             exit;
 
-        TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
             LoadMonTables();
@@ -191,7 +188,6 @@
         if RecRef.IsTemporary then
             exit;
 
-        TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
             LoadMonTables();
@@ -364,7 +360,7 @@
         end;
     end;
 
-    local procedure InsertDataRecord(var RecRef: RecordRef; LastModified: DateTime; TypeOfChange: Option Insert,Modify,Rename,Delete): BigInteger
+    local procedure InsertDataRecord(var RecRef: RecordRef; var LastModified: DateTime; TypeOfChange: Option Insert,Modify,Rename,Delete): BigInteger
     var
         DataLogRecord: Record "NPR Data Log Record";
     begin
@@ -372,10 +368,10 @@
         DataLogRecord."Entry No." := 0;
         DataLogRecord."Record ID" := RecRef.RecordId;
         DataLogRecord."Table ID" := RecRef.Number;
-        DataLogRecord."Log Date" := LastModified;
         DataLogRecord."Type of Change" := TypeOfChange;
         DataLogRecord."User ID" := CopyStr(UserId, 1, MaxStrLen(DataLogRecord."User ID"));
         DataLogRecord.Insert();
+        LastModified := DataLogRecord.SystemCreatedAt;
 
         exit(DataLogRecord."Entry No.");
     end;
@@ -389,9 +385,9 @@
         DataLogRecord."Record ID" := RecRef.RecordId;
         DataLogRecord."Old Record ID" := XRecRef.RecordId;
         DataLogRecord."Table ID" := RecRef.Number;
-        DataLogRecord."Log Date" := LastModified;
         DataLogRecord."Type of Change" := TypeOfChange;
         DataLogRecord."User ID" := CopyStr(UserId, 1, MaxStrLen(DataLogRecord."User ID"));
+        DataLogRecord.SystemCreatedAt := LastModified;
         DataLogRecord.Insert();
 
         exit(DataLogRecord."Entry No.");

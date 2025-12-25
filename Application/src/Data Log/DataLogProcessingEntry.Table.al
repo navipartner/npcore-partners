@@ -17,6 +17,9 @@
         {
             Caption = 'Inserted at';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-12-27';
+            ObsoleteReason = 'Use the SystemCreatedAt field instead';
         }
         field(10; "Subscriber Code"; Code[30])
         {
@@ -67,6 +70,8 @@
         key(Key3; "Data Log Entry No.")
         {
         }
+        key(Retention; "Table Number", SystemCreatedAt) { }
+        key(Retention2; SystemCreatedAt) { }
     }
 
     procedure GetErrorMessage() ErrorMessage: Text

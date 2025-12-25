@@ -176,9 +176,7 @@
     }
 
     var
-        Text001: Label 'All old Data Log Records will be deleted\Continue?';
         Text002: Label '%1 record quantity withing the filter:  %2\Do you wish to add the records to Data Log?';
-        DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         Text003: Label 'Data Log Filters - %1', Comment = '%1 = Table Name';
         Text004: Label 'Adding records to Data Log: @1@@@@@@@@@@@@@@@@@@@@@@@';
 
@@ -212,9 +210,31 @@
     end;
 
     internal procedure CleanDataLog()
+    var
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+        RetentionPolicy: Record "NPR Retention Policy";
+        RetentionPolicyMgmt: Codeunit "NPR Retention Policy Mgmt.";
+        ManualPolicyApplicationQst: Label 'Expired Data Log record deletion is managed by NPR Retention Policy. Would you like to manually apply the policy now?';
+        ManualPolicyApplicationMsg: Label 'Data Log retention policy has been applied.';
+#else
+        DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
+        DataLogDeletionQst: Label 'All old Data Log Records will be deleted.\Continue?';
+#endif
     begin
-        if Confirm(Text001, false) then
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+        if Confirm(ManualPolicyApplicationQst, false) then begin
+            RetentionPolicy.SetRange("Table Id", Database::"NPR Data Log Record");
+            Page.Run(Page::"NPR Retention Policy", RetentionPolicy);
+            if RetentionPolicy.FindFirst() then
+                if RetentionPolicy.Enabled then begin
+                    RetentionPolicyMgmt.ApplyOneRetentionPolicyManually(RetentionPolicy);
+                    Message(ManualPolicyApplicationMsg);
+                end;
+        end;
+#else
+        if Confirm(DataLogDeletionQst, false) then
             DataLogSubscriberMgt.CleanDataLog();
+#endif
         CurrPage.Update(false);
     end;
 

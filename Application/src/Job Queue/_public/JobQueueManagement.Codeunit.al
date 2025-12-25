@@ -559,8 +559,11 @@
     end;
 
     procedure DaysToDuration(NoOfDays: Integer): Duration
+    var
+        MillisecsInOneDay: BigInteger;
     begin
-        exit(NoOfDays * 86400000);
+        MillisecsInOneDay := 86400000;  // Without this, the multiplication would overflow for number of days larger than 24
+        exit(NoOfDays * MillisecsInOneDay);
     end;
 
     internal procedure HoursToDuration(NoOfHours: Integer): Duration

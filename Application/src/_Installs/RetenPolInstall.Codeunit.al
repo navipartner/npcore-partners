@@ -54,6 +54,12 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         AddNpGpExportLogPolicy(IsUpgrade);
 #endif
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+        if IsUpgrade then
+            TransferNPRRetentionPolicies();
+#endif
+
         if IsUpgrade then
             LogMessageStopwatch.LogFinish();
     end;
@@ -65,8 +71,10 @@
             if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install") then
                 exit;
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         AddAllowedTable(Database::"NPR Data Log Record", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
         AddAllowedTable(Database::"NPR Data Log Field", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
+#endif
 
         AddAllowedTable(Database::"NPR POS Entry Output Log", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
         AddAllowedTable(Database::"NPR Nc Import Entry", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
@@ -98,6 +106,23 @@
         if IsUpgrade then
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install");
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+    local procedure TransferNPRRetentionPolicies()
+    var
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+    begin
+        if not HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog') then begin
+            if RetenPolAllowedTables.IsAllowedTable(Database::"NPR Data Log Record") then
+                RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR Data Log Record");
+
+            if RetenPolAllowedTables.IsAllowedTable(Database::"NPR Data Log Field") then
+                RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR Data Log Field");
+
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog');
+        end;
+    end;
+#endif
 
     local procedure AddNcTaskRetentionPolicy(IsUpgrade: Boolean)
     begin

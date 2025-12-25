@@ -49,6 +49,10 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NcTask'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'Shopify'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NpGpExportLog'));
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)        
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddNPRRetentionPolicyJobQueue'));
+#endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
@@ -415,6 +419,8 @@
                         exit('Shopify-20250204');
                     'NpGpExportLog':
                         exit('NpGpExportLog-20250210');
+                    'NPRRetPolicy_DataLog':
+                        exit('NPRRetPolicy_DataLog-20251227');
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of
@@ -444,6 +450,8 @@
                         exit('SetEndingTimeForAllWithStartingTime-20231010');
                     'SetManuallySetOnHold':
                         exit('SetManuallySetOnHold-20230818');
+                    'AddNPRRetentionPolicyJobQueue':
+                        exit('AddNPRRetentionPolicyJobQueue-20251227');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');

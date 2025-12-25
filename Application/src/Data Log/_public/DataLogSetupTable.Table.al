@@ -44,6 +44,20 @@
         {
             Caption = 'Keep Log For';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                JobQueueManagement: Codeunit "NPR Job Queue Management";
+                MustNotBeNegativeErr: Label 'must be equal to or greater than 0';
+                MustNotExceed90DErr: Label 'cannot exceed 90 days';
+            begin
+                if "Keep Log for" < 0 then
+                    FieldError("Keep Log for", MustNotBeNegativeErr);
+                if "Keep Log for" = 0 then
+                    exit;
+                if "Keep Log for" > JobQueueManagement.DaysToDuration(90) then
+                    FieldError("Keep Log for", MustNotExceed90DErr);
+            end;
         }
         field(20; "Ignored Fields"; Integer)
         {
