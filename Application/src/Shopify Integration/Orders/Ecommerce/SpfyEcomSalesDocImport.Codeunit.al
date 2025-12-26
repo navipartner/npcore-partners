@@ -659,15 +659,16 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if _SpfyFulfillmentCache.GetLineFromCache(_SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'id', true)), TempSpfyFulfillmentBuffer) then begin
             SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Line", "NPR Spfy ID Type"::"Entry ID", TempSpfyFulfillmentBuffer."Order Line ID", ShopifyAssignedID);
             if not ShopifyAssignedID.FindFirst() then begin
-                if TempSpfyFulfillmentBuffer."Gift Card" then
+                if _SpfyAPIOrderHelper.OrderLineIsGiftCard(SalesLineJsonToken) then
                     Error(GiftCardExtraErr);
                 if AddNewSaleLine(SalesLine, SalesLineJsonToken, SalesHeader, LogEntry, TempSpfyFulfillmentBuffer) then
                     exit;
             end;
             SalesLine.Get(ShopifyAssignedID."BC Record ID");
-            if TempSpfyFulfillmentBuffer."Gift Card" and IsGiftCardLineChanged(TempSpfyFulfillmentBuffer, SalesLine, SalesLineJsonToken) then
-                Error(GiftCardExtraErr)
-            else
+            if _SpfyAPIOrderHelper.OrderLineIsGiftCard(SalesLineJsonToken) then begin
+                if IsGiftCardLineChanged(TempSpfyFulfillmentBuffer, SalesLine, SalesLineJsonToken) then
+                    Error(GiftCardExtraErr);
+            end else
                 UpdateSalesLineFromShopify(SalesLine, TempSpfyFulfillmentBuffer, SalesLineJsonToken, SalesHeader, LogEntry);
         end else begin
             SalesLine.Validate("Qty. to Ship", 0);
