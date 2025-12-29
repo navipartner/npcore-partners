@@ -1150,7 +1150,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             if InitiatedFromEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.") then
                 AmountInput := InitiatedFromEFTTransactionRequest."Amount Input";
         end;
-
         Parameters.Add('RegisterNo', EFTTransactionRequest."Register No.");
         Parameters.Add('OriginalPOSPaymentTypeCode', EFTTransactionRequest."Original POS Payment Type Code");
         Parameters.Add('ReferenceNumberInput', EFTTransactionRequest."Reference Number Input");
@@ -1161,5 +1160,18 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         Parameters.Add('InitiatedFromEntryNo', Format(EFTTransactionRequest."Initiated from Entry No."));
         Parameters.Add('AmountInput', Format(AmountInput, 0, 9));
         Parameters.Add('Mode', Format(EFTTransactionRequest.Mode));
+    end;
+
+
+    internal procedure AddSubscriptionConfirmParametersToDictionary(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    begin
+        Parameters.Add('RegisterNo', EFTTransactionRequest."Register No.");
+        Parameters.Add('OriginalPOSPaymentTypeCode', EFTTransactionRequest."Original POS Payment Type Code");
+        Parameters.Add('ReferenceNumberInput', EFTTransactionRequest."Reference Number Input");
+        Parameters.Add('HardwareID', EFTTransactionRequest."Hardware ID");
+        Parameters.Add('IntegrationVersionCode', EFTTransactionRequest."Integration Version Code");
+        Parameters.Add('Mode', Format(EFTTransactionRequest.Mode));
+        Parameters.Add('SalesTicketNo', EFTTransactionRequest."Sales Ticket No.");
+        Parameters.Add('SalesID', Format(EFTTransactionRequest."Sales ID"));
     end;
 }

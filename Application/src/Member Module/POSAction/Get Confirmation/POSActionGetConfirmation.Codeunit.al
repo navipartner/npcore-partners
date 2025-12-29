@@ -71,7 +71,11 @@ codeunit 6185024 "NPR POSAction: GetConfirmation" implements "NPR IPOS Workflow"
 
         EFTAdyenConfInputReq.SetTitle(TerminalInputTitle);
         EFTAdyenConfInputReq.SetTextQst(TerminalInputQst);
-        Request := EFTAdyenConfInputReq.GetRequestJson(EFTTransactionRequest, EFTSetup);
+        Request := EFTAdyenConfInputReq.GetRequestJson(
+            EFTTransactionRequest."Reference Number Input",
+            EFTTransactionRequest."Register No.",
+            EFTTransactionRequest."Hardware ID",
+            EFTTransactionRequest."Integration Version Code");
         URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
 
         EFTAdyenCloudProtocol.InvokeAPI(Request, EFTAdyenCloudIntegrat.GetAPIKey(EFTSetup), URL, 1000 * 60 * 5, Response, StatusCode);
