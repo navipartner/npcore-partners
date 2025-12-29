@@ -157,6 +157,13 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
 
     internal procedure RequestTermination(var Membership: Record "NPR MM Membership"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason"): Boolean
     var
+        TerminationRequest: Record "NPR MM Subscr. Request";
+    begin
+        exit(RequestTermination(Membership, RequestedDate, Reason, TerminationRequest));
+    end;
+
+    internal procedure RequestTermination(var Membership: Record "NPR MM Membership"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason"; var TerminationRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
         Subscription: Record "NPR MM Subscription";
     begin
         if (not GetSubscriptionFromMembership(Membership."Entry No.", Subscription)) then
@@ -166,7 +173,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
 
         CheckTerminationPeriod(Membership, Subscription, RequestedDate);
 
-        CreateTerminationSubsRequest(Subscription, RequestedDate, Reason);
+        CreateTerminationSubsRequest(Subscription, RequestedDate, Reason, TerminationRequest);
         Subscription."Auto-Renew" := Subscription."Auto-Renew"::TERMINATION_REQUESTED;
         Subscription.Modify(true);
 
@@ -284,6 +291,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     local procedure UpdateSubscriptionAutoRenewStatus(Membership: Record "NPR MM Membership")
     var
         Subscription: Record "NPR MM Subscription";
+        TerminationRequest: Record "NPR MM Subscr. Request";
     begin
         Subscription.SetCurrentKey("Membership Entry No.");
         Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
@@ -305,7 +313,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
                 end;
             "NPR MM MembershipAutoRenew"::TERMINATION_REQUESTED:
                 // This is a catch all if somebody sets it directly on the membership. We make some assumptions here.
-                CreateTerminationSubsRequest(Subscription, Today(), "NPR MM Subs Termination Reason"::CUSTOMER_INITIATED);
+                CreateTerminationSubsRequest(Subscription, Today(), "NPR MM Subs Termination Reason"::CUSTOMER_INITIATED, TerminationRequest);
 
         end;
 
@@ -333,22 +341,21 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         Subscription."Committed Until" := CommittedUntil;
     end;
 
-    local procedure CreateTerminationSubsRequest(Subscription: Record "NPR MM Subscription"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason")
+    local procedure CreateTerminationSubsRequest(Subscription: Record "NPR MM Subscription"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason"; var TerminationRequest: Record "NPR MM Subscr. Request")
     var
-        SubscriptionRequest: Record "NPR MM Subscr. Request";
         TerminationRequestLbl: Label 'Termination request';
     begin
-        SubscriptionRequest.Init();
-        SubscriptionRequest.Type := SubscriptionRequest.Type::Terminate;
-        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
-        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
-        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
-        SubscriptionRequest.Description := TerminationRequestLbl;
-        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
-        SubscriptionRequest."Terminate At" := RequestedDate;
-        SubscriptionRequest."Termination Reason" := Reason;
-        SubscriptionRequest."Termination Requested At" := CurrentDateTime();
-        SubscriptionRequest.Insert(true);
+        TerminationRequest.Init();
+        TerminationRequest.Type := TerminationRequest.Type::Terminate;
+        TerminationRequest.Status := TerminationRequest.Status::Confirmed;
+        TerminationRequest."Processing Status" := TerminationRequest."Processing Status"::Pending;
+        TerminationRequest."Subscription Entry No." := Subscription."Entry No.";
+        TerminationRequest.Description := TerminationRequestLbl;
+        TerminationRequest."Membership Code" := Subscription."Membership Code";
+        TerminationRequest."Terminate At" := RequestedDate;
+        TerminationRequest."Termination Reason" := Reason;
+        TerminationRequest."Termination Requested At" := CurrentDateTime();
+        TerminationRequest.Insert(true);
     end;
 
     local procedure CheckTerminationPeriod(Membership: Record "NPR MM Membership"; Subscription: Record "NPR MM Subscription"; RequestedDate: Date)

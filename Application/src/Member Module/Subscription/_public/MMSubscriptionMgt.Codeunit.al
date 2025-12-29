@@ -115,6 +115,7 @@ codeunit 6185029 "NPR MM Subscription Mgt."
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
         Subscription: Record "NPR MM Subscription";
+        TerminationRequest: Record "NPR MM Subscr. Request";
         RefundItemNoMissingErr: Label 'Refund item number is required when Refund is set to true.';
     begin
         // Validate refund parameters
@@ -122,7 +123,7 @@ codeunit 6185029 "NPR MM Subscription Mgt."
             Error(RefundItemNoMissingErr);
 
         // Request termination first
-        if not SubscriptionMgtImpl.RequestTermination(Membership, RequestedDate, Reason) then
+        if not SubscriptionMgtImpl.RequestTermination(Membership, RequestedDate, Reason, TerminationRequest) then
             exit(false);
 
         // If refund is requested, process the partial refund
@@ -131,8 +132,7 @@ codeunit 6185029 "NPR MM Subscription Mgt."
             if not SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription) then
                 exit(false);
 
-            // Request the partial refund with the provided price
-            SubscrReversalMgt.RequestPartialRefund(Subscription, Membership, RefundItemNo, RequestedDate, RefundPrice);
+            SubscrReversalMgt.RequestPartialRefund(Subscription, Membership, RefundItemNo, RequestedDate, RefundPrice, TerminationRequest);
         end;
 
         exit(true);

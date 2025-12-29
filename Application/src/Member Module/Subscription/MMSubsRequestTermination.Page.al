@@ -233,12 +233,13 @@ page 6185077 "NPR MM SubsRequestTermination"
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         SubscriptionReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
         Subscription: Record "NPR MM Subscription";
+        TerminationRequest: Record "NPR MM Subscr. Request";
     begin
-        SubscriptionMgtImpl.RequestTermination(Membership, RequestedDate, Reason);
+        SubscriptionMgtImpl.RequestTermination(Membership, RequestedDate, Reason, TerminationRequest);
 
         if (_RefundRemaining) then begin
             Subscription.Get(_Subscription."Entry No.");
-            SubscriptionReversalMgt.RequestPartialRefund(Subscription, Membership, RefundItemNo, RequestedDate, RefundPrice);
+            SubscriptionReversalMgt.RequestPartialRefund(Subscription, Membership, RefundItemNo, RequestedDate, RefundPrice, TerminationRequest);
         end;
     end;
 

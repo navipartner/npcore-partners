@@ -69,6 +69,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
             exit;
 
         SetSubscriptionRequestStatusCancelled(SubscrRequest, SkipTryCountUpdate);
+        EnableAutoRenewalOnTerminationCancellation(SubscrRequest);
     end;
 
     local procedure CheckSuccessfulPaymentRequestsExist(SubscrRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") Found: Boolean
@@ -254,6 +255,36 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
     begin
         SubscrRequest."Process Try Count" := 0;
         SubscrRequest.Modify(true)
+    end;
+
+    local procedure EnableAutoRenewalOnTerminationCancellation(var SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        Subscription: Record "NPR MM Subscription";
+        Membership: Record "NPR MM Membership";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        RelatedPartialRefundRequest: Record "NPR MM Subscr. Request";
+    begin
+        if SubscrRequest.Type <> SubscrRequest.Type::Terminate then
+            exit;
+
+        // Cancel any related partial refund request
+        RelatedPartialRefundRequest.SetRange("Related Termination Req. No.", SubscrRequest."Entry No.");
+        RelatedPartialRefundRequest.SetRange(Type, RelatedPartialRefundRequest.Type::"Partial Regret");
+        if RelatedPartialRefundRequest.FindFirst() then
+            SetSubscriptionRequestStatusCancelled(RelatedPartialRefundRequest, true);
+
+        Subscription.SetLoadFields("Membership Entry No.");
+        if not Subscription.Get(SubscrRequest."Subscription Entry No.") then
+            exit;
+
+        Membership.SetLoadFields("Entry No.", "Auto-Renew", "Membership Code");
+        if not Membership.Get(Subscription."Membership Entry No.") then
+            exit;
+
+        if Membership."Auto-Renew" = Membership."Auto-Renew"::YES_INTERNAL then
+            exit;
+
+        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, false, false);
     end;
 
     internal procedure ResetProcessTryCountWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request")

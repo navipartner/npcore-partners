@@ -197,6 +197,12 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'Termination Requested At';
             DataClassification = CustomerContent;
         }
+        field(254; "Related Termination Req. No."; BigInteger)
+        {
+            Caption = 'Related Termination Request No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Subscr. Request"."Entry No." where(Type = const(Terminate));
+        }
     }
 
     keys

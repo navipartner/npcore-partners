@@ -6641,6 +6641,26 @@
         MemberNotification.AddMembershipAutoRenewalEnableNotification(Membership."Entry No.", Membership."Membership Code");
     end;
 
+    internal procedure CheckIfCanEnableAutoRenewal(Membership: Record "NPR MM Membership")
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionMgtIml: Codeunit "NPR MM Subscription Mgt. Impl.";
+        TerminationRequestExistsErr: Label 'Cannot enable auto-renewal for membership %1 because there is a pending termination request for its subscription.', Comment = '%1 - External Membership No.';
+    begin
+        if not SubscriptionMgtIml.GetSubscriptionFromMembership(Membership."Entry No.", Subscription) then
+            exit;
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange("Processing Status", SubscriptionRequest."Processing Status"::Pending);
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        if SubscriptionRequest.IsEmpty() then
+            exit;
+
+        Error(TerminationRequestExistsErr, Membership."External Membership No.");
+
+    end;
+
     internal procedure EnableMembershipExternalAutoRenewal(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
     var
         MemberNotification: Codeunit "NPR MM Member Notification";

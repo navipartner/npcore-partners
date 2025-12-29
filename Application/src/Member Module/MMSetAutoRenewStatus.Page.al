@@ -92,6 +92,7 @@ page 6184909 "NPR MM Set Auto-Renew Status"
                 begin
                     if not PaymentMethodMgt.GetMemberPaymentMethod(Membership."Entry No.", MemberPaymentMethod) then
                         Error(MembershipAutoRenewalWithoutPaymentMethodErr);
+                    MembershipMgtInternal.CheckIfCanEnableAutoRenewal(Membership);
                     MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, CreateMemberNotification, true);
                 end;
         end;

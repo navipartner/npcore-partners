@@ -31,7 +31,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         InsertReversalRequest(SubscriptionRequest, SubscrPaymentRequest, SubscrReversalRequest, SubscrPmtReversalRequest);
     end;
 
-    internal procedure RequestPartialRefund(Subscription: Record "NPR MM Subscription"; Membership: Record "NPR MM Membership"; RefundWithItemNo: Code[20]; RefundAtDate: Date; RefundPrice: Decimal)
+    internal procedure RequestPartialRefund(Subscription: Record "NPR MM Subscription"; Membership: Record "NPR MM Membership"; RefundWithItemNo: Code[20]; RefundAtDate: Date; RefundPrice: Decimal; TerminationRequest: Record "NPR MM Subscr. Request")
     var
         SubscriptionRequestFound: Boolean;
         SubscriptionRequest, SubscrReversalRequest : Record "NPR MM Subscr. Request";
@@ -90,6 +90,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrReversalRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrReversalRequest."Item No." := RefundWithItemNo;
         SubscrReversalRequest."Membership Entry To Cancel" := MembershipEntry."Entry No.";
+        SubscrReversalRequest."Related Termination Req. No." := TerminationRequest."Entry No.";
         SubscrReversalRequest.Insert(true);
 
         SubscrReversalPmtRequest.Init();
