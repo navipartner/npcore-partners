@@ -2,10 +2,9 @@ codeunit 6184592 "NPR EFT Adyen CardAcquire Req"
 {
     Access = Internal;
 
-    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
+    procedure GetRequestJson(ReferenceNumberInput: Code[20]; RegisterNo: Code[10]; HardwareID: Text[250]; IntegrationVersionCode: Code[10]; SalesTicketNo: Code[20]; AuxiliaryOperationID: Integer; InitiatedFromEntryNo: Integer; AmountInput: Decimal): Text
     var
         Json: Codeunit "Json Text Reader/Writer";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         JsonText: Text;
     begin
@@ -15,30 +14,29 @@ codeunit 6184592 "NPR EFT Adyen CardAcquire Req"
         Json.WriteStringProperty('MessageType', 'Request');
         Json.WriteStringProperty('MessageCategory', 'CardAcquisition');
         Json.WriteStringProperty('MessageClass', 'Service');
-        Json.WriteStringProperty('ServiceID', EFTTransactionRequest."Reference Number Input");
-        Json.WriteStringProperty('SaleID', EFTTransactionRequest."Register No.");
-        Json.WriteStringProperty('POIID', EFTTransactionRequest."Hardware ID");
-        Json.WriteStringProperty('ProtocolVersion', EFTTransactionRequest."Integration Version Code");
+        Json.WriteStringProperty('ServiceID', ReferenceNumberInput);
+        Json.WriteStringProperty('SaleID', RegisterNo);
+        Json.WriteStringProperty('POIID', HardwareID);
+        Json.WriteStringProperty('ProtocolVersion', IntegrationVersionCode);
         Json.WriteEndObject(); // MessageHeader
         Json.WriteStartObject('CardAcquisitionRequest');
         Json.WriteStartObject('SaleData');
         Json.WriteStartObject('SaleTransactionID');
         Json.WriteStringProperty('TimeStamp', Format(CurrentDateTime(), 0, 9));
-        Json.WriteStringProperty('TransactionID', EFTTransactionRequest."Sales Ticket No.");
+        Json.WriteStringProperty('TransactionID', SalesTicketNo);
         Json.WriteEndObject(); // SaleTransactionID
         Json.WriteEndObject(); // SaleData
         Json.WriteStartObject('CardAcquisitionTransaction');
         if (
-            (EFTTransactionRequest."Auxiliary Operation ID" = "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger()) and
-            (EFTTransactionRequest."Initiated from Entry No." > 0)
+            (AuxiliaryOperationID = "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger()) and
+            (InitiatedFromEntryNo > 0)
         ) then begin
-            OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
-            Json.WriteStringProperty('TotalAmount', Format(OriginalEFTTransactionRequest."Amount Input", 0, '<Precision,2:3><Standard Format,9>'));
+            Json.WriteStringProperty('TotalAmount', Format(AmountInput, 0, '<Precision,2:3><Standard Format,9>'));
         end;
         Json.WriteEndObject(); // CardAcquisitionTransaction
         Json.WriteEndObject(); // CardAcquisitionRequest
         Json.WriteEndObject(); // SaleToPOIRequest
-        Json.WriteEndObject(); // Root        
+        Json.WriteEndObject(); // Root
 
         JsonText := EFTAdyenIntegration.RewriteAmountFromStringToNumberWithoutRounding(Json.GetJSonAsText(), 'TotalAmount');
 

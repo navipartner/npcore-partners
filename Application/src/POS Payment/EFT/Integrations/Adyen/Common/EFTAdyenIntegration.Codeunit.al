@@ -912,6 +912,14 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         WriteLogEntry(EFTSetup, IsError, EFTTransactionRequest."Entry No.", Description, LogContents);
     end;
 
+    internal procedure WriteLogEntry(RegisterNo: Code[10]; OriginalPOSPaymentTypeCode: Code[10]; EntryNo: Integer; IsError: Boolean; Description: Text; LogContents: Text)
+    var
+        EFTSetup: Record "NPR EFT Setup";
+    begin
+        EFTSetup.FindSetup(RegisterNo, OriginalPOSPaymentTypeCode);
+        WriteLogEntry(EFTSetup, IsError, EntryNo, Description, LogContents);
+    end;
+
     local procedure WriteLogEntry(EFTSetup: Record "NPR EFT Setup"; IsError: Boolean; EntryNo: Integer; Description: Text; LogContents: Text)
     var
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
@@ -1131,5 +1139,27 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         ValueEndIndex := Json.IndexOf('"', ValueStartIndex + 1);
 
         exit(Json.Remove(ValueStartIndex, 1).Remove(ValueEndIndex - 1, 1));
+    end;
+
+    internal procedure AddAcquireCardParametersToDictionary(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    var
+        InitiatedFromEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        AmountInput: Decimal;
+    begin
+        if EFTTransactionRequest."Initiated from Entry No." > 0 then begin
+            if InitiatedFromEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.") then
+                AmountInput := InitiatedFromEFTTransactionRequest."Amount Input";
+        end;
+
+        Parameters.Add('RegisterNo', EFTTransactionRequest."Register No.");
+        Parameters.Add('OriginalPOSPaymentTypeCode', EFTTransactionRequest."Original POS Payment Type Code");
+        Parameters.Add('ReferenceNumberInput', EFTTransactionRequest."Reference Number Input");
+        Parameters.Add('HardwareID', EFTTransactionRequest."Hardware ID");
+        Parameters.Add('IntegrationVersionCode', EFTTransactionRequest."Integration Version Code");
+        Parameters.Add('SalesTicketNo', EFTTransactionRequest."Sales Ticket No.");
+        Parameters.Add('AuxiliaryOperationID', Format(EFTTransactionRequest."Auxiliary Operation ID"));
+        Parameters.Add('InitiatedFromEntryNo', Format(EFTTransactionRequest."Initiated from Entry No."));
+        Parameters.Add('AmountInput', Format(AmountInput, 0, 9));
+        Parameters.Add('Mode', Format(EFTTransactionRequest.Mode));
     end;
 }
