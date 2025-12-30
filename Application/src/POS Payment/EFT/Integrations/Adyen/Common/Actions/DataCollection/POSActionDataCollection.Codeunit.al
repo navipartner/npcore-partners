@@ -565,7 +565,8 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
         else
             AbortEFTTransactionRequest.Mode := AbortEFTTransactionRequest.Mode::"TEST Remote";
         AbortEFTTransactionRequest.Modify();
-        Parameters.Add('EntryNo', Format(AbortReqEntryNo));
+
+        EFTAdyenIntegration.SetAbortTaskParameters(AbortReqEntryNo, AbortEFTTransactionRequest, EFTTransactionRequest, Parameters);
         Parameters.Add('CalledFromActionWF', 'DATA_COLLECTION');
         Sleep(2000);
         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 10);

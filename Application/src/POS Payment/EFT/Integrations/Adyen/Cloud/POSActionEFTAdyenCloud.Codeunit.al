@@ -380,6 +380,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
     local procedure RequestTrxAbort(EntryNo: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        AbortRequest: Record "NPR EFT Transaction Request";
         AbortReqEntryNo: Integer;
         eftSetup: Record "NPR EFT Setup";
         Parameters: Dictionary of [Text, Text];
@@ -404,9 +405,11 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'Requesting abort of transaction', '');
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
         AbortReqEntryNo := EFTAdyenAbortMgmt.CreateAbortTransactionRequest(EFTTransactionRequest);
-        Parameters.Add('EntryNo', Format(AbortReqEntryNo));
+
+        AbortRequest.Get(AbortReqEntryNo);
+        EFTAdyenIntegration.SetAbortTaskParameters(AbortReqEntryNo, AbortRequest, EFTTransactionRequest, Parameters);
         Sleep(2000);
-        POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 30);
+        POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 30)
     end;
 
     local procedure CancelAcquisition(EntryNo: Integer)

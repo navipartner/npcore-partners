@@ -2,7 +2,7 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
 {
     Access = Internal;
 
-    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    procedure GetRequestJson(ProcessedEntryNo: Integer; ReferenceNumberInput: Text[50]; RegisterNo: Code[10]; HardwareID: Text[250]; IntegrationVersionCode: Code[10]; ProcessingType: Text; AuxiliaryOperationID: Integer): Text
     var
         Json: Codeunit "Json Text Reader/Writer";
     begin
@@ -11,19 +11,19 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
         Json.WriteStartObject('AbortRequest');
         Json.WriteStringProperty('AbortReason', 'MerchantAbort');
         Json.WriteStartObject('MessageReference');
-        Json.WriteStringProperty('ServiceID', EFTTransactionRequest."Processed Entry No.");
-        Json.WriteStringProperty('MessageCategory', GetMessageCategory(EFTTransactionRequest));
-        Json.WriteStringProperty('SaleID', EFTTransactionRequest."Register No.");
+        Json.WriteStringProperty('ServiceID', Format(ProcessedEntryNo));
+        Json.WriteStringProperty('MessageCategory', GetMessageCategory(ProcessingType, AuxiliaryOperationID));
+        Json.WriteStringProperty('SaleID', RegisterNo);
         Json.WriteEndObject(); // MessageReference
         Json.WriteEndObject(); // AbortRequest
         Json.WriteStartObject('MessageHeader');
         Json.WriteStringProperty('MessageType', 'Request');
         Json.WriteStringProperty('MessageCategory', 'Abort');
         Json.WriteStringProperty('MessageClass', 'Service');
-        Json.WriteStringProperty('ServiceID', EFTTransactionRequest."Reference Number Input");
-        Json.WriteStringProperty('SaleID', EFTTransactionRequest."Register No.");
-        Json.WriteStringProperty('POIID', EFTTransactionRequest."Hardware ID");
-        Json.WriteStringProperty('ProtocolVersion', EFTTransactionRequest."Integration Version Code");
+        Json.WriteStringProperty('ServiceID', ReferenceNumberInput);
+        Json.WriteStringProperty('SaleID', RegisterNo);
+        Json.WriteStringProperty('POIID', HardwareID);
+        Json.WriteStringProperty('ProtocolVersion', IntegrationVersionCode);
         Json.WriteEndObject(); // MessageHeader
         Json.WriteEndObject(); // SaleToPOIRequest
         Json.WriteEndObject(); // Root
@@ -31,25 +31,19 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
         exit(Json.GetJSonAsText());
     end;
 
-    local procedure GetMessageCategory(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
-    var
-        ProcessedEFTTransactionRequest: Record "NPR EFT Transaction Request";
+    local procedure GetMessageCategory(ProcessingType: Text; AuxiliaryOperationID: Integer): Text
     begin
-        ProcessedEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
-        case ProcessedEFTTransactionRequest."Processing Type" of
-            ProcessedEFTTransactionRequest."Processing Type"::PAYMENT,
-            ProcessedEFTTransactionRequest."Processing Type"::REFUND:
-                exit('Payment');
+        if ProcessingType = 'Payment' then
+            exit(ProcessingType);
+
+        case AuxiliaryOperationID of
+            "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger(),
+            "NPR EFT Adyen Aux Operation"::ACQUIRE_SIGNATURE.AsInteger(),
+            "NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger(),
+            "NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger():
+                exit('Input');
             else
-                case ProcessedEFTTransactionRequest."Auxiliary Operation ID" of
-                    "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger(),
-                    "NPR EFT Adyen Aux Operation"::ACQUIRE_SIGNATURE.AsInteger(),
-                    "NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger(),
-                    "NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger():
-                        exit('Input');
-                    else
-                        exit('CardAcquisition');
-                end;
+                exit('CardAcquisition');
         end;
     end;
 }

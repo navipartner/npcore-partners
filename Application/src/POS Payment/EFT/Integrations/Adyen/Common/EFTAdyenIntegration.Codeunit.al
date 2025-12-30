@@ -905,11 +905,8 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     #endregion
 
     procedure WriteLogEntry(EFTTransactionRequest: Record "NPR EFT Transaction Request"; IsError: Boolean; Description: Text; LogContents: Text)
-    var
-        EFTSetup: Record "NPR EFT Setup";
     begin
-        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-        WriteLogEntry(EFTSetup, IsError, EFTTransactionRequest."Entry No.", Description, LogContents);
+        WriteLogEntry(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code", EFTTransactionRequest."Entry No.", IsError, Description, LogContents);
     end;
 
     internal procedure WriteLogEntry(RegisterNo: Code[10]; OriginalPOSPaymentTypeCode: Code[10]; EntryNo: Integer; IsError: Boolean; Description: Text; LogContents: Text)
@@ -1139,6 +1136,20 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         ValueEndIndex := Json.IndexOf('"', ValueStartIndex + 1);
 
         exit(Json.Remove(ValueStartIndex, 1).Remove(ValueEndIndex - 1, 1));
+    end;
+
+    internal procedure SetAbortTaskParameters(AbortReqEntryNo: Integer; AbortRequest: Record "NPR EFT Transaction Request"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    begin
+        Parameters.Add('EntryNo', Format(AbortReqEntryNo));
+        Parameters.Add('RegisterNo', AbortRequest."Register No.");
+        Parameters.Add('OriginalPOSPaymentTypeCode', AbortRequest."Original POS Payment Type Code");
+        Parameters.Add('ProcessedEntryNo', Format(AbortRequest."Processed Entry No."));
+        Parameters.Add('ReferenceNumberInput', AbortRequest."Reference Number Input");
+        Parameters.Add('HardwareID', AbortRequest."Hardware ID");
+        Parameters.Add('IntegrationVersionCode', AbortRequest."Integration Version Code");
+        Parameters.Add('Mode', Format(AbortRequest.Mode));
+        Parameters.Add('ProcessingType', Format(EFTTransactionRequest."Processing Type"));
+        Parameters.Add('AuxiliaryOperationID', Format(EFTTransactionRequest."Auxiliary Operation ID"));
     end;
 
     internal procedure AddAcquireCardParametersToDictionary(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
