@@ -1929,6 +1929,31 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             exit;
         end;
 
+        if not IsPayByLinkStatusExpired(Response, ErrorMessage) then begin
+            ProcessResponse(SubscrPaymentRequest,
+                             SubsPayReqLogEntry,
+                             '',
+                             '',
+                             ErrorMessage,
+                             SubscrPaymentRequest.Status::Error,
+                             SubsPayReqLogEntry."Processing Status"::Error,
+                             RecurPaymSetup."Max. Pay. Process Try Count",
+                             SubscrPaymentRequest."Rejected Reason Code",
+                             SubscrPaymentRequest."Rejected Reason Description",
+                             SubscrPaymentRequest."Result Code",
+                             SubsAdyenPGSetup.Code,
+                             SkipTryCountUpdate,
+                             SubscrPaymentRequest."PSP Reference",
+                             SubscrPaymentRequest."Payment PSP Reference",
+                             SubscrPaymentRequest."Pay by Link ID",
+                             SubscrPaymentRequest."Pay by Link URL",
+                             SubscrPaymentRequest."Pay By Link Expires At",
+                             0);
+            exit;
+        end;
+
+
+
         ErrorMessage := '';
         ProcessResponse(SubscrPaymentRequest,
                         SubsPayReqLogEntry,
@@ -2498,6 +2523,32 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
         if CardDetailsChanged then
             SubscrPaymentRequest.Modify();
+    end;
+
+    [TryFunction]
+    local procedure IsPayByLinkStatusExpired(ResponseText: Text; var ErrorMessage: Text)
+    var
+        JsonObject: JsonObject;
+        JsonToken: JsonToken;
+        StatusValue: Text;
+        PayByLinkCannotBeCancelledErr: Label 'Pay By Link is in status %1. It cannot be cancelled.', Comment = '%1 - Pay By Link status';
+    begin
+        if ResponseText = '' then
+            exit;
+
+        if not JsonObject.ReadFrom(ResponseText) then
+            exit;
+
+        if not JsonObject.Get('status', JsonToken) then
+            exit;
+
+        StatusValue := JsonToken.AsValue().AsText();
+
+        if StatusValue = 'expired' then
+            exit;
+
+        ErrorMessage := CopyStr(StrSubstNo(PayByLinkCannotBeCancelledErr, StatusValue), 1, MaxStrLen(ErrorMessage));
+        Error(ErrorMessage);
     end;
 
     internal procedure CreateRefundWebhook(MerchantName: Text[50])
