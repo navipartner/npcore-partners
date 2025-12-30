@@ -136,6 +136,31 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
             Caption = 'Customer City';
             DataClassification = CustomerContent;
         }
+        field(80; "Return Receipt Timestamp"; Text[30])
+        {
+            Caption = 'Return Receipt Timestamp';
+            DataClassification = CustomerContent;
+        }
+        field(81; "Return FP Memory No."; Text[8])
+        {
+            Caption = 'Return Fiscal Printer Memory No.';
+            DataClassification = CustomerContent;
+        }
+        field(82; "Return FP Device No."; Text[8])
+        {
+            Caption = 'Return Fiscal Printer Device No.';
+            DataClassification = CustomerContent;
+        }
+        field(83; "Return Ext. Receipt Counter"; Code[20])
+        {
+            Caption = 'Extended Receipt Counter';
+            DataClassification = CustomerContent;
+        }
+        field(84; "Return Grand Receipt No."; Text[10])
+        {
+            Caption = 'Return Grand Receipt No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

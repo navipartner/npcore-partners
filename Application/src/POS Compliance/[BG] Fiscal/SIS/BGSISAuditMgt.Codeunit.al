@@ -100,10 +100,10 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
 
         POSEntry.Get(POSAuditLog."Record ID");
         if not (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Not To Be Posted"]) then
-            InsertBGSISPOSAuditLogAux(POSEntry, POSStore, POSUnit);
+            InsertBGSISPOSAuditLogAux(POSEntry, POSStore, POSUnit, POSAuditLog."Active POS Sale SystemId");
     end;
 
-    local procedure InsertBGSISPOSAuditLogAux(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
+    local procedure InsertBGSISPOSAuditLogAux(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit"; POSSaleSystemId: Guid)
     var
         BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
     begin
@@ -119,6 +119,9 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
 
         SetTransactionTypeOnBGSISPOSAuditLogAux(POSEntry."Entry No.", BGSISPOSAuditLogAux);
 
+        if BGSISPOSAuditLogAux."Transaction Type" = BGSISPOSAuditLogAux."Transaction Type"::Refund then
+            SetRefundInfoOnBGSISPOSAuditLogAux(POSSaleSystemId, BGSISPOSAuditLogAux);
+
         BGSISPOSAuditLogAux.Insert();
     end;
 
@@ -127,6 +130,8 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         BGSISPOSAuditLogAuxToRefund: Record "NPR BG SIS POS Audit Log Aux.";
         OriginalPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        OriginalSaleFound: Boolean;
+        RefundAuditFound: Boolean;
     begin
         case true of
             BGSISPOSAuditLogAux."Amount Incl. Tax" > 0:
@@ -135,18 +140,76 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
                 BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
             BGSISPOSAuditLogAux."Amount Incl. Tax" = 0:
                 begin
+                    BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale;
+
                     POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
                     POSEntrySalesLine.FindFirst();
 
-                    if not OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId") then
-                        BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale
+                    OriginalSaleFound := OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId");
+
+                    RefundAuditFound := OriginalSaleFound and BGSISPOSAuditLogAuxToRefund.FindAuditLog(OriginalPOSEntrySalesLine."POS Entry No.");
+
+                    if RefundAuditFound then
+                        BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund
                     else
-                        if not BGSISPOSAuditLogAuxToRefund.FindAuditLog(OriginalPOSEntrySalesLine."POS Entry No.") then
-                            BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale
-                        else
+                        if IsRefundQuestion() then
                             BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
                 end;
         end;
+    end;
+
+    local procedure SetRefundInfoOnBGSISPOSAuditLogAux(POSSaleSystemId: Guid; var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.")
+    var
+        BGSISPOSAuditLogAuxToRefund: Record "NPR BG SIS POS Audit Log Aux.";
+        OriginalPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", BGSISPOSAuditLogAux."POS Entry No.");
+        POSEntrySalesLine.FindFirst();
+
+        if not OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId") then begin
+            SetReturnInfoOnBGSISPOSAuditLogAuxFromPOSSale(POSSaleSystemId, BGSISPOSAuditLogAux);
+            exit;
+        end;
+
+        if not BGSISPOSAuditLogAuxToRefund.FindAuditLog(OriginalPOSEntrySalesLine."POS Entry No.") then begin
+            SetReturnInfoOnBGSISPOSAuditLogAuxFromPOSSale(POSSaleSystemId, BGSISPOSAuditLogAux);
+            exit;
+        end;
+
+        BGSISPOSAuditLogAux."Return Receipt Timestamp" := BGSISPOSAuditLogAuxToRefund."Receipt Timestamp";
+        BGSISPOSAuditLogAux."Return FP Memory No." := BGSISPOSAuditLogAuxToRefund."Fiscal Printer Memory No.";
+        BGSISPOSAuditLogAux."Return Grand Receipt No." := BGSISPOSAuditLogAuxToRefund."Grand Receipt No.";
+        BGSISPOSAuditLogAux."Return FP Device No." := BGSISPOSAuditLogAuxToRefund."Fiscal Printer Device No.";
+        BGSISPOSAuditLogAux."Return Ext. Receipt Counter" := BGSISPOSAuditLogAuxToRefund."Extended Receipt Counter";
+    end;
+
+    local procedure SetReturnInfoOnBGSISPOSAuditLogAuxFromPOSSale(POSSaleSystemId: Guid; var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.")
+    var
+        BGSISPOSSale: Record "NPR BG SIS POS Sale";
+        MustInputReturnSaleInfoErr: Label 'You must input return sale info manually.';
+    begin
+        if not BGSISPOSSale.Get(POSSaleSystemId) then
+            Error(MustInputReturnSaleInfoErr);
+        BGSISPOSSale.TestField("Return Receipt Timestamp");
+        BGSISPOSSale.TestField("Return FP Memory No.");
+        BGSISPOSSale.TestField("Return Grand Receipt No.");
+
+        BGSISPOSAuditLogAux."Return Receipt Timestamp" := BGSISPOSSale."Return Receipt Timestamp";
+        BGSISPOSAuditLogAux."Return FP Memory No." := BGSISPOSSale."Return FP Memory No.";
+        BGSISPOSAuditLogAux."Return Grand Receipt No." := BGSISPOSSale."Return Grand Receipt No.";
+        if BGSISPOSSale."Return Ext. Receipt Counter" <> '' then begin
+            BGSISPOSAuditLogAux."Return FP Device No." := BGSISPOSSale."Return FP Device No.";
+            BGSISPOSAuditLogAux."Return Ext. Receipt Counter" := BGSISPOSSale."Return Ext. Receipt Counter";
+        end;
+    end;
+
+    local procedure IsRefundQuestion(): Boolean
+    var
+        RefundTransactionQst: Label 'Is this transaction a refund?';
+        ConfirmManagement: Codeunit "Confirm Management";
+    begin
+        exit(ConfirmManagement.GetResponseOrDefault(RefundTransactionQst, false));
     end;
     #endregion
 
@@ -656,6 +719,24 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
             exit;
         if VATPostGroupMapper.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group") then
             VATPostGroupMapper.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure POSSale_OnAfterDeleteEvent(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
+    var
+        POSUnit: Record "NPR POS Unit";
+        BGSISPOSSale: Record "NPR BG SIS POS Sale";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not POSUnit.Get(Rec."Register No.") then
+            exit;
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+        if BGSISPOSSale.Get(Rec.SystemId) then
+            BGSISPOSSale.Delete(true);
     end;
 
     local procedure GetFirstSaleLinePOSOfTypeItemOrVoucher(var POSSaleLine2: Record "NPR POS Sale Line"; POSSaleLine: Record "NPR POS Sale Line"): Boolean

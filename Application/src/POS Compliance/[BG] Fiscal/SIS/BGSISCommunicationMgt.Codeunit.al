@@ -155,7 +155,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         AddReceiptItemsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
         AddReceiptPaymentsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
         if Refund then
-            AddStornoInputJSONObjectForRefund(JsonTextReaderWriter, ExtendedReceipt, POSEntry."Entry No.")
+            AddStornoInputJSONObjectForRefund(JsonTextReaderWriter, BGSISPOSAuditLogAux, ExtendedReceipt)
         else
             AddTextAfterPaymentJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry);
 
@@ -499,32 +499,27 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteEndArray();
     end;
 
-    local procedure AddStornoInputJSONObjectForRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; ExtendedReceipt: Boolean; POSEntryNo: Integer)
+    local procedure AddStornoInputJSONObjectForRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; ExtendedReceipt: Boolean)
     var
-        BGSISPOSAuditLogAuxToRefund: Record "NPR BG SIS POS Audit Log Aux.";
-        BGSISReturnReasonMap: Record "NPR BG SIS Return Reason Map";
-        OriginalPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        BGSISReturnReasonMap: Record "NPR BG SIS Return Reason Map";
     begin
-        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesLine.SetRange("POS Entry No.", BGSISPOSAuditLogAux."POS Entry No.");
         POSEntrySalesLine.FindFirst();
 
-        OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId");
-        BGSISPOSAuditLogAuxToRefund.FindAuditLog(OriginalPOSEntrySalesLine."POS Entry No.");
-
         JsonTextReaderWriter.WriteStartObject('stornoInput');
-        JsonTextReaderWriter.WriteStringProperty('documentDate', BGSISPOSAuditLogAuxToRefund."Receipt Timestamp");
+        JsonTextReaderWriter.WriteStringProperty('documentDate', BGSISPOSAuditLogAux."Return Receipt Timestamp");
         BGSISReturnReasonMap.Get(POSEntrySalesLine."Return Reason Code");
         BGSISReturnReasonMap.CheckIsBGSISReturnReasonPopulated();
         JsonTextReaderWriter.WriteRawProperty('enumStornoType', BGSISReturnReasonMap."BG SIS Return Reason".AsInteger());
-        JsonTextReaderWriter.WriteStringProperty('fiscMemNumber', BGSISPOSAuditLogAuxToRefund."Fiscal Printer Memory No.");
+        JsonTextReaderWriter.WriteStringProperty('fiscMemNumber', BGSISPOSAuditLogAux."Return FP Memory No.");
 
         if ExtendedReceipt then begin
-            JsonTextReaderWriter.WriteStringProperty('fiscDevNumber', BGSISPOSAuditLogAuxToRefund."Fiscal Printer Device No.");
-            JsonTextReaderWriter.WriteStringProperty('invoiceNumber', BGSISPOSAuditLogAuxToRefund."Extended Receipt Counter");
+            JsonTextReaderWriter.WriteStringProperty('fiscDevNumber', BGSISPOSAuditLogAux."Return FP Device No.");
+            JsonTextReaderWriter.WriteStringProperty('invoiceNumber', BGSISPOSAuditLogAux."Return Ext. Receipt Counter");
         end;
 
-        JsonTextReaderWriter.WriteStringProperty('receiptNumber', BGSISPOSAuditLogAuxToRefund."Grand Receipt No.".PadLeft(10, '0'));
+        JsonTextReaderWriter.WriteStringProperty('receiptNumber', BGSISPOSAuditLogAux."Return Grand Receipt No.".PadLeft(10, '0'));
 
         JsonTextReaderWriter.WriteEndObject();
     end;
