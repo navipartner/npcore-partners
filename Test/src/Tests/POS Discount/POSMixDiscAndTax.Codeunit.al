@@ -10263,6 +10263,66 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLineSecond."Discount %", 0, 'Discount Percent not calculated according to scenario.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyCombinationMixedDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSaleLineSecond: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        DiscountPct: Decimal;
+    begin
+        // [SCENARIO] Apply combination mixed discount to specific item
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        SecondItem."Unit Price" := 2000;
+        SecondItem.Modify();
+
+        // [GIVEN] Combination Mixed Discount
+        DiscountPct := 20;
+        CreateCombinationMixedDiscount(Item, DiscountPct);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", 1);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLineSecond);
+
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreEqual(DiscountPct, POSSaleLine."Discount %", 'LineDiscPct <> POSSaleLine."Discount %"');
+
+        Assert.IsTrue(POSSaleLineSecond."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsFalse(POSSaleLineSecond."Discount Type" = POSSaleLineSecond."Discount Type"::Mix, 'Mixed Discount not applied');
+        Assert.AreEqual(POSSaleLineSecond."Discount %", 0, 'LineDiscPct <> POSSaleLine."Discount %"');
+    end;
+
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -10584,6 +10644,30 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LineAmtInclTax := LineAmtInclTax - LineDiscAmt;
         LineAmtExclTax := Round(LineAmtInclTax / (1 + VATPct / 100), GeneralLedgerSetup."Amount Rounding Precision");
         LineAmtInclTax := Round(LineAmtInclTax, GeneralLedgerSetup."Amount Rounding Precision");
+    end;
+
+    local procedure CreateCombinationMixedDiscount(Item: Record Item; DiscountPct: Decimal)
+    var
+        PartDiscount: Record "NPR Mixed Discount";
+        CombinationHeader: Record "NPR Mixed Discount";
+        CombinationLine: Record "NPR Mixed Discount Line";
+    begin
+        LibraryPOSDiscount.CreateTotalDiscountPctHeader(PartDiscount, DiscountPct, false);
+        LibraryPOSDiscount.CreateDiscountLine(PartDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        LibraryPOSDiscount.CreateTotalDiscountPctHeader(CombinationHeader, 0, false);
+        CombinationHeader."Mix Type" := CombinationHeader."Mix Type"::Combination;
+        CombinationHeader.Modify();
+
+        CombinationLine.Init();
+        CombinationLine.Code := CombinationHeader.Code;
+        CombinationLine."Disc. Grouping Type" := CombinationLine."Disc. Grouping Type"::"Mix Discount";
+        CombinationLine."No." := PartDiscount.Code;
+        CombinationLine."Variant Code" := '';
+        CombinationLine.Status := CombinationHeader.Status;
+        CombinationLine."Starting date" := CombinationHeader."Starting date";
+        CombinationLine."Ending Date" := CombinationHeader."Ending date";
+        CombinationLine.Insert();
     end;
 
 }

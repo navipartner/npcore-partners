@@ -1703,6 +1703,7 @@
     local procedure CopyMixedDiscountLines(TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempMixedDiscountLineCopy: Record "NPR Mixed Discount Line" temporary)
     var
         TempMixedDiscountLine2: Record "NPR Mixed Discount Line" temporary;
+        MixedDiscount: Record "NPR Mixed Discount";
     begin
         TempMixedDiscountLine2 := TempMixedDiscountLine;
         TempMixedDiscountLine2.CopyFilters(TempMixedDiscountLine);
@@ -1718,6 +1719,9 @@
                 TempMixedDiscountLineCopy.Init();
                 TempMixedDiscountLineCopy := TempMixedDiscountLine;
                 TempMixedDiscountLineCopy.Insert();
+                if TempMixedDiscountLine."Disc. Grouping Type" = TempMixedDiscountLine."Disc. Grouping Type"::"Mix Discount" then
+                    if MixedDiscount.Get(TempMixedDiscountLine."No.") then
+                        InsertCombinationPartLines(MixedDiscount, TempMixedDiscountLineCopy);
             until TempMixedDiscountLine.Next() = 0;
 
         TempMixedDiscountLine.Reset();
@@ -2228,5 +2232,25 @@
         exit(POSSaleLine.Quantity);
     end;
 
+    local procedure InsertCombinationPartLines(CombinationPartDiscount: Record "NPR Mixed Discount"; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary)
+    var
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+    begin
+        if CombinationPartDiscount."Mix Type" <> CombinationPartDiscount."Mix Type"::"Combination Part" then
+            exit;
+
+        MixedDiscountLine.SetRange(Code, CombinationPartDiscount.Code);
+        MixedDiscountLine.SetRange(Status, MixedDiscountLine.Status::Active);
+        if not MixedDiscountLine.FindSet() then
+            exit;
+
+        repeat
+            if not TempMixedDiscountLine.Get(MixedDiscountLine.RecordId) then begin
+                TempMixedDiscountLine.Init();
+                TempMixedDiscountLine := MixedDiscountLine;
+                TempMixedDiscountLine.Insert(false);
+            end;
+        until MixedDiscountLine.Next() = 0;
+    end;
 
 }
