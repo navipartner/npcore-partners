@@ -38,6 +38,13 @@ codeunit 6184805 "NPR Spfy Integration Public"
         Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, CheckIntegrationIsEnabled, ShopifyResponse);
     end;
 
+    procedure GetShopifyOrderFulfillmentOrders(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; var ShopifyResponse: JsonToken)
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+    begin
+        SpfyCommunicationHandler.GetShopifyOrderFulfillmentOrders(ShopifyStoreCode, ShopifyOrderID, ShopifyResponse);
+    end;
+
     procedure SetAllowBackorder(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]; Allow: Boolean; DisableDataLog: Boolean)
     var
         SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
