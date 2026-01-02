@@ -255,8 +255,8 @@
         ReservationEntry."Created By" := CopyStr(UserId, 1, MaxStrLen(ReservationEntry."Created By"));
         ReservationEntry."Qty. per Unit of Measure" := ItemJournalLine."Qty. per Unit of Measure";
         ReservationEntry.Quantity := -ItemJournalLine.Quantity;
-        ReservationEntry."Qty. to Handle (Base)" := -ItemJournalLine.Quantity;
-        ReservationEntry."Qty. to Invoice (Base)" := -ItemJournalLine.Quantity;
+        ReservationEntry."Qty. to Handle (Base)" := -ItemJournalLine."Quantity (Base)";
+        ReservationEntry."Qty. to Invoice (Base)" := -ItemJournalLine."Quantity (Base)";
         ReservationEntry.Insert();
     end;
 
