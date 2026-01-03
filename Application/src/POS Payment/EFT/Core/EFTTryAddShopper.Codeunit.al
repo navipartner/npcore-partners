@@ -25,6 +25,12 @@
                     CustomerNo := MembershipMgtInternal.GetCustomerNoFromMembershipEntryNo(MembershipEntryNo);
                     SalePOS.Validate("Customer No.", CustomerNo);
                 end;
+            Rec."Entity Type"::UserAccount:
+                begin
+                    CustomerNo := MembershipMgtInternal.GetCustomerNoFromUserAccount(Rec."Entity Key");
+                    if CustomerNo <> '' then
+                        SalePOS.Validate("Customer No.", CustomerNo);
+                end;
         end;
         SalePOS.Modify(true);
         POSSale.Refresh(SalePOS);

@@ -529,6 +529,8 @@
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         PrevRec: Text;
         MembershipEntryNo: Integer;
+        UserAccount: Record "NPR UserAccount";
+        Member: Record "NPR MM Member";
     begin
         if not IsAdyenPaymentLine(PaymentLine) then
             exit;
@@ -544,19 +546,25 @@
         if not MembershipMgtInternal.TryGetMembershipEntryNoFromCustomer(SalesHeader."Sell-to Customer No.", MembershipEntryNo) then
             exit;
 
+        if not MembershipMgtInternal.GetFirstAdminMember(MembershipEntryNo, Member) then
+            exit;
+
+        if (not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount)) then
+            MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+
         if not EFTShopperRecognition.Get(EFTAdyenCloudIntegration.IntegrationType(), PaymentLine."Payment Gateway Shopper Ref.") then begin
             EFTShopperRecognition.Init();
             EFTShopperRecognition."Integration Type" := CopyStr(EFTAdyenCloudIntegration.IntegrationType(), 1, MaxStrLen(EFTShopperRecognition."Integration Type"));
             EFTShopperRecognition."Shopper Reference" := PaymentLine."Payment Gateway Shopper Ref.";
-            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Membership;
-            EFTShopperRecognition."Entity Key" := Format(MembershipEntryNo);
+            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::UserAccount;
+            EFTShopperRecognition."Entity Key" := Format(UserAccount.AccountNo);
             EFTShopperRecognition.Insert(true);
         end;
 
         PrevRec := Format(EFTShopperRecognition);
 
-        EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Membership;
-        EFTShopperRecognition."Entity Key" := Format(MembershipEntryNo);
+        EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::UserAccount;
+        EFTShopperRecognition."Entity Key" := Format(UserAccount.AccountNo);
 
         if PrevRec <> Format(EFTShopperRecognition) then
             EFTShopperRecognition.Modify(true);

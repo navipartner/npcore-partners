@@ -32,8 +32,8 @@
         {
             Caption = 'Entity Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Customer,Contact,Membership';
-            OptionMembers = Customer,Contact,Membership;
+            OptionCaption = 'Customer,Contact,Membership,User Account';
+            OptionMembers = Customer,Contact,Membership,UserAccount;
         }
         field(11; "Entity Key"; Code[20])
         {
@@ -43,7 +43,9 @@
             ELSE
             IF ("Entity Type" = CONST(Contact)) Contact."No."
             else
-            if ("Entity Type" = CONST(Membership)) "NPR MM Membership";
+            if ("Entity Type" = CONST(Membership)) "NPR MM Membership"
+            else
+            if ("Entity Type" = CONST(UserAccount)) "NPR UserAccount".AccountNo;
         }
     }
 

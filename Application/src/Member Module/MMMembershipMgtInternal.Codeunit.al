@@ -6855,4 +6855,34 @@
 
         exit(true)
     end;
+
+    internal procedure GetCustomerNoFromUserAccount(UserAccountNo: Code[20]): Code[20]
+    var
+        UserAccount: Record "NPR UserAccount";
+        Member: Record "NPR MM Member";
+        MembershipRole: Record "NPR MM Membership Role";
+        Membership: Record "NPR MM Membership";
+    begin
+        UserAccount.SetLoadFields(EmailAddress);
+        if not UserAccount.Get(UserAccountNo) then
+            exit('');
+
+        Member.SetCurrentKey("E-Mail Address");
+        Member.SetRange("E-Mail Address", UserAccount.EmailAddress);
+        Member.SetLoadFields("Entry No.");
+        if not Member.FindFirst() then
+            exit('');
+
+        MembershipRole.SetCurrentKey("Member Entry No.");
+        MembershipRole.SetLoadFields("Membership Entry No.");
+        MembershipRole.SetRange("Member Entry No.", Member."Entry No.");
+        if not MembershipRole.FindFirst() then
+            exit('');
+
+        Membership.SetLoadFields("Customer No.");
+        if not Membership.Get(MembershipRole."Membership Entry No.") then
+            exit('');
+
+        exit(Membership."Customer No.");
+    end;
 }

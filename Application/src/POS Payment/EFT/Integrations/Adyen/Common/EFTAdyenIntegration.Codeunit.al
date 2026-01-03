@@ -520,13 +520,10 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         SalePOS: Record "NPR POS Sale";
-        EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         EFTSetup: Record "NPR EFT Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        EntityType: Option Customer,Contact,Membership;
-        MembershipEntryNo: Integer;
+        EntityType: Option Customer,Contact,Membership,UserAccount;
         ShopperReference: Text[50];
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
@@ -539,21 +536,75 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetRange("Receipt No.", SalePOS."Sales Ticket No.");
-        if not MemberInfoCapture.FindSet() then begin
-            MembershipEntryNo := MembershipMgtInternal.GetMembershipEntryNoFromCustomer(SalePOS."Customer No.");
-            GetCreateEFTShopperRecognition(Format(MembershipEntryNo), EntityType::Membership, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
-            ShopperReference := EFTShopperRecognition."Shopper Reference";
-        end else
-            repeat
-                GetCreateEFTShopperRecognition(Format(MemberInfoCapture."Membership Entry No."), EntityType::Membership, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
-                if ShopperReference = '' then
-                    ShopperReference := EFTShopperRecognition."Shopper Reference";
-            until MemberInfoCapture.Next() = 0;
+
+        if not MemberInfoCapture.FindSet() then
+            ShopperReference := ProcessExistingMembership(SalePOS, EFTTransactionRequest, EntityType)
+        else
+            ShopperReference := ProcessMemberInfoCaptures(SalePOS, MemberInfoCapture, EFTTransactionRequest, EntityType);
 
         EFTTransactionRequest."Internal Customer ID" := ShopperReference;
     end;
 
-    internal procedure GetCreateEFTShopperRecognition(EntityKey: Code[20]; EntityType: Option Customer,Contact,Membership; IntegrationType: Code[20]; var EFTShopperRecognition: Record "NPR EFT Shopper Recognition")
+    local procedure ProcessExistingMembership(SalePOS: Record "NPR POS Sale"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; EntityType: Option Customer,Contact,Membership,UserAccount): Text[50]
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Member: Record "NPR MM Member";
+        UserAccount: Record "NPR UserAccount";
+        EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
+        MembershipEntryNo: Integer;
+    begin
+        MembershipEntryNo := MembershipMgtInternal.GetMembershipEntryNoFromCustomer(SalePOS."Customer No.");
+        if not MembershipMgtInternal.GetFirstAdminMember(MembershipEntryNo, Member) then
+            exit;
+
+        GetOrCreateUserAccountForPayment(SalePOS, Member, MembershipMgtInternal, UserAccount);
+
+        GetCreateEFTShopperRecognition(Format(UserAccount.AccountNo), EntityType::UserAccount, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
+
+        exit(EFTShopperRecognition."Shopper Reference");
+    end;
+
+    local procedure ProcessMemberInfoCaptures(SalePOS: Record "NPR POS Sale"; var MemberInfoCapture: Record "NPR MM Member Info Capture"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; EntityType: Option Customer,Contact,Membership,UserAccount): Text[50]
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Member: Record "NPR MM Member";
+        UserAccount: Record "NPR UserAccount";
+        EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
+        ShopperReference: Text[50];
+    begin
+        repeat
+            if not Member.Get(MemberInfoCapture."Member Entry No") then
+                exit;
+
+            GetOrCreateUserAccountForPayment(SalePOS, Member, MembershipMgtInternal, UserAccount);
+
+            GetCreateEFTShopperRecognition(Format(UserAccount.AccountNo), EntityType::UserAccount, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
+
+            if ShopperReference = '' then
+                ShopperReference := EFTShopperRecognition."Shopper Reference";
+        until MemberInfoCapture.Next() = 0;
+
+        exit(ShopperReference);
+    end;
+
+    local procedure GetOrCreateUserAccountForPayment(SalePOS: Record "NPR POS Sale"; Member: Record "NPR MM Member"; MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal"; var UserAccount: Record "NPR UserAccount")
+    var
+        HasPayerEmail: Boolean;
+        IsPayerEmailDifferent: Boolean;
+    begin
+        HasPayerEmail := SalePOS."Membership Payer E-Mail" <> '';
+        IsPayerEmailDifferent := Member."E-Mail Address" <> SalePOS."Membership Payer E-Mail";
+
+        if HasPayerEmail and IsPayerEmailDifferent then begin
+            if not MembershipMgtInternal.PayerAccountExists(SalePOS, UserAccount, Member) then
+                MembershipMgtInternal.CreatePaymentUserAccountFromEmail(SalePOS."Membership Payer E-Mail", UserAccount);
+        end else begin
+            if not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount) then
+                MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+        end;
+    end;
+
+    internal procedure GetCreateEFTShopperRecognition(EntityKey: Code[20]; EntityType: Option Customer,Contact,Membership,UserAccount; IntegrationType: Code[20]; var EFTShopperRecognition: Record "NPR EFT Shopper Recognition")
     begin
         EFTShopperRecognition.Reset();
         EFTShopperRecognition.SetFilter("Integration Type", '%1|%2', CloudIntegrationType(), HWCIntegrationType());

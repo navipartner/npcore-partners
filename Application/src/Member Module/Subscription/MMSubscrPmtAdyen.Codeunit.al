@@ -1463,8 +1463,11 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Subscription: Record "NPR MM Subscription";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
-        EntityType: Option Customer,Contact,Membership;
+        EntityType: Option Customer,Contact,Membership,UserAccount;
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
+        UserAccount: Record "NPR UserAccount";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Member: Record "NPR MM Member";
     begin
         SubscrRequest.SetLoadFields("Subscription Entry No.", Type);
         SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
@@ -1475,10 +1478,13 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         MMPaymentMethodMgt.GetMemberPaymentMethod(Subscription."Membership Entry No.", MemberPaymentMethod);
         ShopperReference := MemberPaymentMethod."Shopper Reference";
 
-        //first Membership Payment Method
         If SubscrRequest.Type = SubscrRequest.Type::"Payment Method Collection" then
             if ShopperReference = '' then begin
-                EFTAdyenIntegration.GetCreateEFTShopperRecognition(Format(Subscription."Membership Entry No."), EntityType::Membership, EFTAdyenIntegration.CloudIntegrationType(), EFTShopperRecognition);
+                if not MembershipMgtInternal.GetFirstAdminMember(Subscription."Membership Entry No.", Member) then
+                    exit;
+                if not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount) then
+                    MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+                EFTAdyenIntegration.GetCreateEFTShopperRecognition(Format(UserAccount.AccountNo), EntityType::UserAccount, EFTAdyenIntegration.CloudIntegrationType(), EFTShopperRecognition);
                 ShopperReference := EFTShopperRecognition."Shopper Reference";
             end;
     end;
