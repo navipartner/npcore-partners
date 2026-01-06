@@ -174,6 +174,9 @@ codeunit 6185122 "NPR MembershipApiHandler"
             _ApiFunction::GET_MEMBERSHIP_TIME_ENTRIES:
                 _Response := MembershipPhasesApiAgent.GetMembershipTimeEntries(_Request);
 
+            _ApiFunction::GET_MEMBERSHIP_RECEIPT_LIST:
+                _Response := MembershipPhasesApiAgent.GetMembershipReceiptList(_Request);
+
             _ApiFunction::ACTIVATE_MEMBERSHIP:
                 _Response := MembershipPhasesApiAgent.ActivateMembership(_Request);
 

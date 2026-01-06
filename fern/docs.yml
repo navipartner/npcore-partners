@@ -258,6 +258,7 @@ navigation:
                   # - endpoint: memberships.service-points.finalizePoints
                   - endpoint: memberships.service-points.cancelAuthorizationPoints
                   - endpoint: memberships.service-points.registerSale
+                  - endpoint: memberships.service-points.getReceiptList
                   # - endpoint: memberships.service-points.getPointsHistory
             
             - memberships.webhooks:

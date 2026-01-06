@@ -13,6 +13,11 @@
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
+        field(9; "Document Type"; Enum "NPR MM Memb. Points Doc. Type")
+        {
+            Caption = 'Document Type';
+            DataClassification = CustomerContent;
+        }
         field(10; "Entry Type"; Option)
         {
             Caption = 'Entry Type';

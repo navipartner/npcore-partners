@@ -316,3 +316,42 @@ types:
           pointsEarned: 12
           pointsCaptured: 200
           newBalance: 1312
+
+  DocumentTypeEnum:
+    docs: The type of the document that the entry belongs to.
+    enum:
+      - name: NA
+        value: " "
+      - name: SALES_INVOICE
+        value: "Sales Invoice"
+      - name: POS_ENTRY
+        value: "POS Entry"
+      - name: SALES_CR_MEMO
+        value: "Sales Cr.Memo" 
+
+  PointsSaleHistoryResponse:
+    docs: A response for a successful GET of a sale with points
+    properties:
+      postingDate: 
+        type: date
+        docs: The date the transaction was posted
+      documentNumber: 
+        type: string
+        docs: Number of sale document
+      documentType:
+        type: DocumentTypeEnum
+        docs: The type of the document that the entry belongs to.
+      posStoreCode: 
+        type: string
+        docs: The POS store code
+      points: 
+        type: integer
+        docs: Amount of points for given document
+    examples:
+      - name: ExampleSalePointsHistory
+        value:
+          postingDate: "2025-10-29"
+          documentNumber: "5542707"
+          documentType: "Sales Invoice"
+          posStoreCode: "200589"
+          points: 55

@@ -58,6 +58,11 @@
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Document Type"; Rec."Document Type")
+                {
+                    ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Document No."; Rec."Document No.")
                 {
 

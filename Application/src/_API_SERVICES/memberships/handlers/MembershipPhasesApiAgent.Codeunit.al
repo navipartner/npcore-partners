@@ -118,6 +118,16 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
         exit(Response.RespondOK(StartMembershipTimeEntriesDTO(Membership).Build()));
     end;
 
+    internal procedure GetMembershipReceiptList(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
+    begin
+        if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
+            exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
+
+        exit(Response.RespondOK(StartMembershipReceiptListDTO(Membership).Build()));
+    end;
 
     // ************************************************************
 
@@ -203,6 +213,60 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
         exit(Response.RespondOK(StartMembershipTimeEntriesDTO(Membership).Build()));
     end;
 
+    local procedure StartMembershipReceiptListDTO(Membership: Record "NPR MM Membership"): Codeunit "NPR Json Builder"
+    var
+        MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
+        ResponseJson: Codeunit "NPR Json Builder";
+    begin
+        ResponseJson.StartObject()
+            .StartObject('membership')
+            .AddObject(MembershipApiAgent.MembershipDTO(ResponseJson, Membership))
+            .AddArray(StartPointEntriesDTO(ResponseJson, Membership))
+            .EndObject()
+            .EndObject();
+        exit(ResponseJson);
+    end;
+
+    local procedure StartPointEntriesDTO(ResponseJson: Codeunit "NPR Json Builder"; Membership: Record "NPR MM Membership"): Codeunit "NPR Json Builder"
+    var
+        MembershipPointsEntry: Record "NPR MM Members. Points Entry";
+        TempMembershipPointsEntryBuffer: Record "NPR MM Members. Points Entry" temporary;
+        DocumentType: Text;
+    begin
+        ResponseJson.StartArray('entries');
+
+        MembershipPointsEntry.SetLoadFields("Membership Entry No.", "Entry Type", "Posting Date", "Document No.", "Document Type", "POS Store Code", Points);
+        MembershipPointsEntry.SetRange("Entry Type", MembershipPointsEntry."Entry Type"::SALE);
+        MembershipPointsEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipPointsEntry.SetFilter("Document No.", '<>%1', '');
+        if MembershipPointsEntry.FindSet() then
+            repeat
+                TempMembershipPointsEntryBuffer.SetRange("Document No.", MembershipPointsEntry."Document No.");
+                if not TempMembershipPointsEntryBuffer.FindFirst() then begin
+                    TempMembershipPointsEntryBuffer.Init();
+                    TempMembershipPointsEntryBuffer.TransferFields(MembershipPointsEntry);
+                    TempMembershipPointsEntryBuffer.Insert();
+                end else begin
+                    TempMembershipPointsEntryBuffer.Points += MembershipPointsEntry.Points;
+                    TempMembershipPointsEntryBuffer.Modify();
+                end;
+            until (MembershipPointsEntry.Next() = 0);
+
+        TempMembershipPointsEntryBuffer.Reset();
+        if TempMembershipPointsEntryBuffer.FindSet() then
+            repeat
+                DocumentType := TempMembershipPointsEntryBuffer."Document Type".Names.Get(TempMembershipPointsEntryBuffer."Document Type".Ordinals.IndexOf(TempMembershipPointsEntryBuffer."Document Type".AsInteger()));
+                ResponseJson.StartObject()
+                .AddProperty('postingDate', TempMembershipPointsEntryBuffer."Posting Date")
+                .AddProperty('documentNumber', TempMembershipPointsEntryBuffer."Document No.")
+                .AddProperty('documentType', DocumentType)
+                .AddProperty('posStoreCode', TempMembershipPointsEntryBuffer."POS Store Code")
+                .AddProperty('points', TempMembershipPointsEntryBuffer.Points)
+                .EndObject();
+            until TempMembershipPointsEntryBuffer.Next() = 0;
+
+        ResponseJson.EndArray();
+    end;
 
     local procedure GetOptions(AlterationType: Option; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
@@ -320,7 +384,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
                     .AddProperty('amountInclVat', MembershipEntry."Amount Incl VAT")
                     .AddProperty('activateOnFirstUse', MembershipEntry."Activate On First Use")
 
-                    .EndObject();
+                            .EndObject();
             until (MembershipEntry.Next() = 0);
             ResponseJson.EndArray();
         end;

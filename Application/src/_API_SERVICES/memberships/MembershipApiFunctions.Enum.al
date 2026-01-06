@@ -208,6 +208,10 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Regret membership';
     }
+    value(415; GET_MEMBERSHIP_RECEIPT_LIST)
+    {
+        Caption = 'Receipt list';
+    }
 
     value(450; RESOLVE_IDENTIFIER)
     {

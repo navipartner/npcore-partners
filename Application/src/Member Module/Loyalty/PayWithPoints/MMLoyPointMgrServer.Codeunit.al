@@ -721,12 +721,20 @@
                     MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::SALE;
                     MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points");
                     MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount");
+                    if MembershipPointsEntry."POS Unit Code" <> '' then
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+                    else
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_INVOICE;
                 end;
             TmpBuffer.Type::RETURN:
                 begin
                     MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::REFUND;
                     MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points") * -1;
                     MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
+                    if MembershipPointsEntry."POS Unit Code" <> '' then
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+                    else
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_CR_MEMO;
                 end;
         end;
 
@@ -774,11 +782,19 @@
                 begin
                     MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points") * -1;
                     MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
+                    if MembershipPointsEntry."POS Unit Code" <> '' then
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+                    else
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_INVOICE;
                 end;
             TmpBuffer.Type::REFUND:
                 begin
                     MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points");
                     MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount");
+                    if MembershipPointsEntry."POS Unit Code" <> '' then
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+                    else
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_CR_MEMO;
                 end;
         end;
 
@@ -825,11 +841,19 @@
                 begin
                     MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points") * -1;
                     MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount") * -1;
+                    if MembershipPointsEntry."POS Unit Code" <> '' then
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+                    else
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_INVOICE
                 end;
             TmpBuffer.Type::REFUND:
                 begin
                     MembershipPointsEntry.Points := Abs(TmpBuffer."Total Points");
                     MembershipPointsEntry."Amount (LCY)" := Abs(TmpBuffer."Total Amount");
+                    if MembershipPointsEntry."POS Unit Code" <> '' then
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+                    else
+                        MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_CR_MEMO;
                 end;
         end;
 
@@ -915,6 +939,10 @@
         CapturePointsEntry.TransferFields(ReservePointsEntry, false);
         CapturePointsEntry."Entry No." := 0;
         CapturePointsEntry."Entry Type" := ReservePointsEntry."Entry Type"::CAPTURE;
+        if CapturePointsEntry."POS Unit Code" <> '' then
+            CapturePointsEntry."Document Type" := CapturePointsEntry."Document Type"::POS_ENTRY
+        else
+            CapturePointsEntry."Document Type" := CapturePointsEntry."Document Type"::SALES_INVOICE;
         CapturePointsEntry."Redeemed Points" := CapturePointsEntry.Points;
         CapturePointsEntry."Awarded Amount (LCY)" := CapturePointsEntry."Amount (LCY)";
         _MembershipEvents.OnBeforeInsertPointEntry(CapturePointsEntry);
@@ -963,6 +991,14 @@
 
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Description := 'Amount not eligible for points';
+
+        if MembershipPointsEntry."POS Unit Code" <> '' then
+            MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+        else
+            if MembershipPointsEntry."Amount (LCY)" >= 0 then
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_CR_MEMO
+            else
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_INVOICE;
 
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();

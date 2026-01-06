@@ -412,6 +412,17 @@
             MembershipPointsEntry."POS Store Code" := POSUnit."POS Store Code";
         end;
 
+        if MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::REFUND then
+            if MembershipPointsEntry."POS Unit Code" <> '' then
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+            else
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_CR_MEMO;
+        if MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::SALE then
+            if MembershipPointsEntry."POS Unit Code" <> '' then
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+            else
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_INVOICE;
+
         MembershipPointsEntry."Amount (LCY)" := CalculateBaseAmount(ValueEntry, LoyaltyPostingSource, (LoyaltySetup."Amount Base" = LoyaltySetup."Amount Base"::INCL_VAT));
         MembershipPointsEntry.Quantity := ValueEntry."Valued Quantity" * -1;
 
@@ -1274,6 +1285,17 @@
         if ((MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::SALE) or
             (MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::REFUND)) then
             MembershipPointsEntry."Awarded Points" := Points;
+
+        if MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::SALE then
+            if MembershipPointsEntry."POS Unit Code" <> '' then
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+            else
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_INVOICE;
+        if MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::REFUND then
+            if MembershipPointsEntry."POS Unit Code" <> '' then
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::POS_ENTRY
+            else
+                MembershipPointsEntry."Document Type" := MembershipPointsEntry."Document Type"::SALES_CR_MEMO;
 
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Description := Description;

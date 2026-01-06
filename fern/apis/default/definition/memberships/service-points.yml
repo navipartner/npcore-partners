@@ -107,6 +107,23 @@ service:
           response: 
             body: $pointTypes.RegisterSaleResponse.ExampleRegisterSaleResponse
 
+    getReceiptList:
+      display-name: Get Points Sale History
+      docs: Retrieves the transaction history for a membership's loyalty points.
+      method: GET
+      path: /receiptList
+      response: pointTypes.PointsSaleHistoryResponse
+      availability: in-development
+      examples:
+        - name: "Get points sale history"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $pointTypes.PointsSaleHistoryResponse.ExampleSalePointsHistory
+
     # getPointsHistory:
     #   display-name: Get Points History
     #   docs: Retrieves the transaction history for a membership's loyalty points.
