@@ -284,6 +284,27 @@
                 ToolTip = 'Executes the Member Card action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            action(Subscription)
+            {
+                Caption = 'Subscription';
+                ToolTip = 'Opens membership subscription details.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = DueDate;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    Subscription: Record "NPR MM Subscription";
+                    SubscriptionNotFoundLbl: Label 'No active subscription found for member %1.';
+                begin
+                    Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+                    if Subscription.IsEmpty() then
+                        Error(SubscriptionNotFoundLbl, Rec."External Member No.")
+                    else
+                        Page.Run(Page::"NPR MM Subscription Details", Subscription);
+                end;
+            }
             action("Register Arrival")
             {
                 Caption = 'Register Arrival';
