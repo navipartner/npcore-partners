@@ -86,6 +86,12 @@ table 6150756 "NPR TM ImportTicketLine"
             DataClassification = CustomerContent;
             Caption = 'Amount Incl. VAT (LCY)';
         }
+
+        field(150; GroupTicketQuantity; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Group Ticket Quantity';
+        }
         field(500; JobId; Code[40])
         {
             DataClassification = CustomerContent;

@@ -120,6 +120,8 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
+        TicketType: Record "NPR TM Ticket Type";
+        Item: Record Item;
         Admission: Record "NPR TM Admission";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ResolvingTable: Integer;
@@ -141,6 +143,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest."External Order No." := TempTicketImportLine.OrderId;
         TicketRequest.PreAssignedTicketNumber := TempTicketImportLine.PreAssignedTicketNumber;
         TicketRequest.Quantity := 1;
+
         TicketRequest."External Member No." := TempTicketImportLine.MemberNumber;
         TicketRequest."Notification Address" := TempTicketImportLine.TicketHolderEMail;
         TicketRequest.TicketHolderName := TempTicketImportLine.TicketHolderName;
@@ -148,6 +151,14 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
 
         if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
             Error(INVALID_ITEM_REFERENCE, TicketRequest."External Item Code");
+
+        if (TempTicketImportLine.GroupTicketQuantity > 0) then begin
+            TicketRequest.Quantity := TempTicketImportLine.GroupTicketQuantity;
+            Item.Get(TicketRequest."Item No.");
+            Item.TestField("NPR Ticket Type");
+            TicketType.Get(Item."NPR Ticket Type");
+            TicketType.TestField("Admission Registration", TicketType."Admission Registration"::GROUP);
+        end;
 
         TicketBOM.SetFilter("Item No.", '=%1', TicketRequest."Item No.");
         TicketBOM.SetFilter("Variant Code", '=%1', TicketRequest."Variant Code");
@@ -172,23 +183,23 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest."External Adm. Sch. Entry No." := GetAdmissionTimeSlot(TicketRequest."Admission Code", Admission."Default Schedule", TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
         TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
 
-
+        // System calculates prices based on unit amounts and quantities
         TicketRequestManager.SetListPriceForRequestEntry(TicketRequest);
-
-        // Quantity is one - so same as unit amount
         TicketRequest.TicketListPriceExclVat := TicketRequest.UnitAmount;
         TicketRequest.TicketListPriceInclVat := TicketRequest.UnitAmountInclVat;
 
+        // Prices as specified in import
         // Quantity is for import - so same as unit amount
         TicketRequest.Amount := TempTicketImportLine.Amount;
         TicketRequest.AmountInclVat := TempTicketImportLine.AmountInclVat;
 
-        TicketRequest.UnitAmount := TempTicketImportLine.Amount;
-        TicketRequest.UnitAmountInclVat := TempTicketImportLine.AmountInclVat;
+        // Only group tickets have quantity > 1
+        TicketRequest.UnitAmount := Round(TempTicketImportLine.Amount / TicketRequest.Quantity, 0.01);
+        TicketRequest.UnitAmountInclVat := Round(TempTicketImportLine.AmountInclVat / TicketRequest.Quantity, 0.01);
 
         // Printed Amount. This is the amount that will be printed on the ticket.
-        TicketRequest.TicketUnitAmountExclVat := TempTicketImportLine.Amount;
-        TicketRequest.TicketUnitAmountInclVat := TempTicketImportLine.AmountInclVat;
+        TicketRequest.TicketUnitAmountExclVat := Round(TempTicketImportLine.Amount / TicketRequest.Quantity, 0.01);
+        TicketRequest.TicketUnitAmountInclVat := Round(TempTicketImportLine.AmountInclVat / TicketRequest.Quantity, 0.01);
 
         TicketRequest.Insert();
 

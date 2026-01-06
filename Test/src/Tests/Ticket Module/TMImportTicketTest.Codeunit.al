@@ -607,10 +607,10 @@ codeunit 85174 "NPR TM ImportTicketTest"
             Assert.AreEqual(TempTicketImportLine.TicketHolderName, TicketImportLine.TicketHolderName, TicketImportLine.FieldCaption(TicketHolderName));
             Assert.AreEqual(TempTicketImportLine.MemberNumber, TicketImportLine.MemberNumber, TicketImportLine.FieldCaption(MemberNumber));
             Assert.AreEqual(TempTicketImportLine.MembershipNumber, TicketImportLine.MembershipNumber, TicketImportLine.FieldCaption(MembershipNumber));
-            Assert.AreEqual(TempTicketImportLine.Amount, TicketImportLine.Amount, TicketImportLine.FieldCaption(Amount));
-            Assert.AreEqual(TempTicketImportLine.AmountInclVat, TicketImportLine.AmountInclVat, TicketImportLine.FieldCaption(AmountInclVat));
-            Assert.AreEqual(TempTicketImportLine.AmountLcyInclVat, TicketImportLine.AmountLcyInclVat, TicketImportLine.FieldCaption(AmountLcyInclVat));
-            Assert.AreEqual(TempTicketImportLine.DiscountAmountInclVat, TicketImportLine.DiscountAmountInclVat, TicketImportLine.FieldCaption(DiscountAmountInclVat));
+            Assert.AreNearlyEqual(TempTicketImportLine.Amount, TicketImportLine.Amount, 0.01, TicketImportLine.FieldCaption(Amount));
+            Assert.AreNearlyEqual(TempTicketImportLine.AmountInclVat, TicketImportLine.AmountInclVat, 0.01, TicketImportLine.FieldCaption(AmountInclVat));
+            Assert.AreNearlyEqual(TempTicketImportLine.AmountLcyInclVat, TicketImportLine.AmountLcyInclVat, 0.01, TicketImportLine.FieldCaption(AmountLcyInclVat));
+            Assert.AreNearlyEqual(TempTicketImportLine.DiscountAmountInclVat, TicketImportLine.DiscountAmountInclVat, 0.01, TicketImportLine.FieldCaption(DiscountAmountInclVat));
             Assert.AreEqual(TempTicketImportLine.CurrencyCode, TicketImportLine.CurrencyCode, TicketImportLine.FieldCaption(CurrencyCode));
 
             if (TempTicketImportLine.TicketRequestTokenLine <> 0) then
@@ -631,8 +631,8 @@ codeunit 85174 "NPR TM ImportTicketTest"
         repeat
             Ticket.SetFilter("External Ticket No.", '=%1', TicketImportLine.PreAssignedTicketNumber);
             Ticket.FindFirst();
-            Assert.AreEqual(TicketImportLine.Amount, Ticket.AmountExclVat, Ticket.FieldCaption(AmountExclVat));
-            Assert.AreEqual(TicketImportLine.AmountInclVat, Ticket.AmountInclVat, Ticket.FieldCaption(AmountInclVat));
+            Assert.AreNearlyEqual(TicketImportLine.Amount, Ticket.AmountExclVat, 0.01, Ticket.FieldCaption(AmountExclVat));
+            Assert.AreNearlyEqual(TicketImportLine.AmountInclVat, Ticket.AmountInclVat, 0.01, Ticket.FieldCaption(AmountInclVat));
 
             TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
             Assert.AreEqual(TicketImportLine.TicketRequestToken, TicketRequest."Session Token ID", TicketRequest.FieldCaption("Session Token ID"));

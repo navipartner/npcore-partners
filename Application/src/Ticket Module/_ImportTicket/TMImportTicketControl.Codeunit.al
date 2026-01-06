@@ -192,6 +192,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
                 TempTicketImportLine.Description := Format(GetAsText(Ticket, 'description', MaxStrLen(TempTicketImportLine.Description), false));
                 TempTicketImportLine.ExpectedVisitDate := GetAsDate(Ticket, 'expectedVisitDate', true);
                 TempTicketImportLine.ExpectedVisitTime := GetAsTime(Ticket, 'expectedVisitTime', true);
+                TempTicketImportLine.GroupTicketQuantity := GetAsInteger(Ticket, 'groupTicketQuantity', false);
 
                 TempTicketImportLine.Amount := GetAsDecimal(Ticket, 'amount', true);
                 TempTicketImportLine.AmountInclVat := GetAsDecimal(Ticket, 'amountInclVat', true);
