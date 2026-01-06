@@ -6,7 +6,7 @@ codeunit 6185058 "NPR EFT Adyen ConfInput Req"
         Title: Text;
         TextQst: Text;
 
-    procedure GetRequestJson(ReferenceNumberInput: Text[50]; RegisterNo: Code[10]; HardwareID: Text[250]; IntegrationVersionCode: Code[10]): Text
+    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
     var
         Json: Codeunit "Json Text Reader/Writer";
         AgreeLbl: Label 'Agree';
@@ -18,10 +18,10 @@ codeunit 6185058 "NPR EFT Adyen ConfInput Req"
         Json.WriteStringProperty('MessageType', 'Request');
         Json.WriteStringProperty('MessageCategory', 'Input');
         Json.WriteStringProperty('MessageClass', 'Device');
-        Json.WriteStringProperty('ServiceID', ReferenceNumberInput);
-        Json.WriteStringProperty('SaleID', RegisterNo);
-        Json.WriteStringProperty('POIID', HardwareID);
-        Json.WriteStringProperty('ProtocolVersion', IntegrationVersionCode);
+        Json.WriteStringProperty('ServiceID', EFTTransactionRequest."Reference Number Input");
+        Json.WriteStringProperty('SaleID', EFTTransactionRequest."Register No.");
+        Json.WriteStringProperty('POIID', EFTTransactionRequest."Hardware ID");
+        Json.WriteStringProperty('ProtocolVersion', EFTTransactionRequest."Integration Version Code");
         Json.WriteEndObject(); // MessageHeader
         Json.WriteStartObject('InputRequest');
         Json.WriteStartObject('DisplayOutput');
@@ -31,7 +31,7 @@ codeunit 6185058 "NPR EFT Adyen ConfInput Req"
         Json.WriteStringProperty('OutputFormat', 'Text');
         Json.WriteStartObject('PredefinedContent');
         Json.WriteStringProperty('ReferenceID', 'GetConfirmation');
-        Json.WriteEndObject(); // PredefinedContent
+        Json.WriteEndObject(); // PredefinedContent        
         Json.WriteStartArray('OutputText');
         Json.WriteStartObject('');
         Json.WriteStringProperty('Text', Title);

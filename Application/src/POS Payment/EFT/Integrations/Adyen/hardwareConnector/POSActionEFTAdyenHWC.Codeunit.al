@@ -173,14 +173,7 @@ codeunit 6248280 "NPR POS Action EFT Adyen HWC" implements "NPR IPOS Workflow"
         Commit();
         AbortTransactionRequest.Get(AbortRequestEntryNo);
 
-        Response.Add('hwcRequest', EFTAdyenHWCIntegrat.BuildHwcRequest(EntryNo, EFTsetup, EFTAdyenAbortTrxReq.GetRequestJson(
-            AbortTransactionRequest."Processed Entry No.",
-            AbortTransactionRequest."Reference Number Input",
-            AbortTransactionRequest."Register No.",
-            AbortTransactionRequest."Hardware ID",
-            AbortTransactionRequest."Integration Version Code",
-            Format(EFTTransactionRequest."Processing Type"),
-            EFTTransactionRequest."Auxiliary Operation ID")));
+        Response.Add('hwcRequest', EFTAdyenHWCIntegrat.BuildHwcRequest(EntryNo, EFTsetup, EFTAdyenAbortTrxReq.GetRequestJson(AbortTransactionRequest)));
         exit(Response);
     end;
 

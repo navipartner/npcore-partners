@@ -4,14 +4,8 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
 
     procedure ExecuteBackgroundTask(TaskId: Integer; Parameters: Dictionary of [Text, Text]; var Result: Dictionary of [Text, Text]);
     var
-        RegisterNo: Code[10];
-        OriginalPOSPaymentTypeCode: Code[10];
-        ReferenceNumberInput: Code[20];
-        HardwareID: Text[250];
-        IntegrationVersionCode: Code[10];
-        Mode: Option Production,"TEST Local","TEST Remote";
-        SalesTicketNo: Code[20];
-        SalesID: Guid;
+        EntryNo: Integer;
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
         GLSetup: Record "General Ledger Setup";
         SalePOS: Record "NPR POS Sale";
@@ -33,37 +27,30 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         Started: Boolean;
         Completed: Boolean;
     begin
-        RegisterNo := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(RegisterNo));
-        OriginalPOSPaymentTypeCode := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(OriginalPOSPaymentTypeCode));
-        ReferenceNumberInput := CopyStr(Parameters.Get('ReferenceNumberInput'), 1, MaxStrLen(ReferenceNumberInput));
-        HardwareID := CopyStr(Parameters.Get('HardwareID'), 1, MaxStrLen(HardwareID));
-        IntegrationVersionCode := CopyStr(Parameters.Get('IntegrationVersionCode'), 1, MaxStrLen(IntegrationVersionCode));
-        Evaluate(Mode, Parameters.Get('Mode'));
-        SalesTicketNo := CopyStr(Parameters.Get('SalesTicketNo'), 1, MaxStrLen(SalesTicketNo));
-        Evaluate(SalesID, Parameters.Get('SalesID'));
-
-        EFTSetup.FindSetup(RegisterNo, OriginalPOSPaymentTypeCode);
+        Evaluate(EntryNo, Parameters.Get('EntryNo'));
+        EFTTransactionRequest.Get(EntryNo);
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
         if not GLSetup.Get() then
             Clear(GLSetup);
 
-        SubscriptionAmountIncludingVAT := CalcSubscriptionAmountIncludingVAT(RegisterNo, SalesTicketNo, SalesID);
+        SubscriptionAmountIncludingVAT := CalcSubscriptionAmountIncludingVAT(EFTTransactionRequest);
         ConfirmationDialogText := StrSubstNo(ConfirmationDialogTextLbl, SubscriptionAmountIncludingVAT, GLSetup."LCY Code");
 
         EFTAdyenTaskEvents.OnBeforeEFTAdyenSubsConfirmationDialogTextSet(ConfirmationDialogText, SubscriptionAmountIncludingVAT, GLSetup."LCY Code");
 
         EFTAdyenConfInputReq.SetTitle(ConfirmationDialogTitleLbl);
-        SalePOS.Get(RegisterNo, SalesTicketNo);
+        SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
         if MMMembershipMgtInternal.CheckMembershipAutoRenewStatusYesInternal(SalePOS."Customer No.") then
             EFTAdyenConfInputReq.SetTextQst(AutoRenewYesInternalConfirmationDialogTextLbl)
         else
             EFTAdyenConfInputReq.SetTextQst(ConfirmationDialogText);
 
-        Request := EFTAdyenConfInputReq.GetRequestJson(ReferenceNumberInput, RegisterNo, HardwareID, IntegrationVersionCode);
-        URL := EFTAdyenCloudProtocol.GetTerminalURL(Mode);
+        Request := EFTAdyenConfInputReq.GetRequestJson(EFTTransactionRequest, EFTSetup);
+        URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
 
         Completed := EFTAdyenCloudProtocol.InvokeAPI(Request, EFTAdyenCloudIntegrat.GetAPIKey(EFTSetup), URL, 1000 * 60 * 5, Response, StatusCode);
-        Started := StatusCode in [0, 200]; //if we got 403 or other 4xx transaction didn't even start
+        Started := StatusCode in [0, 200]; //if we got 403 or other 4xx transaction didn't even start 
         Logs := EFTAdyenCloudProtocol.GetLogBuffer();
 
         Result.Add('Started', Format(Started, 0, 9));
@@ -78,8 +65,7 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
 
     procedure BackgroundTaskSuccessContinuation(TaskId: Integer; Parameters: Dictionary of [Text, Text]; Results: Dictionary of [Text, Text]);
     var
-        RegisterNo: Code[10];
-        OriginalPOSPaymentTypeCode: Code[10];
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Completed: Boolean;
         Response: Text;
         Error: Text;
@@ -89,64 +75,59 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        //Trx done, either complete (success/failure) or handled error
+        //Trx done, either complete (success/failure) or handled error 
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        RegisterNo := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(RegisterNo));
-        OriginalPOSPaymentTypeCode := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(OriginalPOSPaymentTypeCode));
+        EFTTransactionRequest.Get(EntryNo);
         Evaluate(Completed, Results.Get('Completed'), 9);
 
         if Completed then begin
             Response := Results.Get('Response');
             Logs := Results.Get('Logs');
-            EFTAdyenIntegration.WriteLogEntry(RegisterNo, OriginalPOSPaymentTypeCode, EntryNo, false, 'TaskSubsConfirmDone (Complete)', Logs);
+            EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'TaskSubsConfirmDone (Complete)', Logs);
             Commit();
 
-            POSActionEFTAdyenCloud.SetTrxResponse(EntryNo, Response, true, true, '');
-            POSActionEFTAdyenCloud.SetTrxStatus(EntryNo, Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
+            POSActionEFTAdyenCloud.SetTrxResponse(EFTTransactionRequest."Entry No.", Response, true, true, '');
+            POSActionEFTAdyenCloud.SetTrxStatus(EFTTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
         end else begin
             Error := Results.Get('Error');
             ErrorCallstack := Results.Get('ErrorCallstack');
-            EFTAdyenIntegration.WriteLogEntry(RegisterNo, OriginalPOSPaymentTypeCode, EntryNo, false, 'TaskSubsConfirmDone (Error)', StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
-            POSActionEFTAdyenCloud.SetTrxResponse(EntryNo, Response, false, true, StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
-            POSActionEFTAdyenCloud.SetTrxStatus(EntryNo, Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
+            EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'TaskSubsConfirmDone (Error)', StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
+            POSActionEFTAdyenCloud.SetTrxResponse(EFTTransactionRequest."Entry No.", Response, false, true, StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
+            POSActionEFTAdyenCloud.SetTrxStatus(EFTTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
         end;
     end;
 
     procedure BackgroundTaskErrorContinuation(TaskId: Integer; Parameters: Dictionary of [Text, Text]; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text);
     var
-        RegisterNo: Code[10];
-        OriginalPOSPaymentTypeCode: Code[10];
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EntryNo: Integer;
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        //Trx result unknown - log error and start lookup
+        //Trx result unknown - log error and start lookup        
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        RegisterNo := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(RegisterNo));
-        OriginalPOSPaymentTypeCode := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(OriginalPOSPaymentTypeCode));
-        EFTAdyenIntegration.WriteLogEntry(RegisterNo, OriginalPOSPaymentTypeCode, EntryNo, false, 'TaskSubsConfirmError', '');
-        POSActionEFTAdyenCloud.SetTrxResponse(EntryNo, '', false, true, StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack));
-        POSActionEFTAdyenCloud.SetTrxStatus(EntryNo, Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
+        EFTTransactionRequest.Get(EntryNo);
+        EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'TaskSubsConfirmError', '');
+        POSActionEFTAdyenCloud.SetTrxResponse(EFTTransactionRequest."Entry No.", '', false, true, StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack));
+        POSActionEFTAdyenCloud.SetTrxStatus(EFTTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
     end;
 
     procedure BackgroundTaskCancelled(TaskId: Integer; Parameters: Dictionary of [Text, Text]);
     var
-        RegisterNo: Code[10];
-        OriginalPOSPaymentTypeCode: Code[10];
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EntryNo: Integer;
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        //Trx result unknown - log error and start lookup
+        //Trx result unknown - log error and start lookup        
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        RegisterNo := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(RegisterNo));
-        OriginalPOSPaymentTypeCode := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(OriginalPOSPaymentTypeCode));
-        EFTAdyenIntegration.WriteLogEntry(RegisterNo, OriginalPOSPaymentTypeCode, EntryNo, false, 'TaskSubsConfirmCancelled', '');
-        POSActionEFTAdyenCloud.SetTrxResponse(EntryNo, '', false, true, StrSubstNo('Error: %1 \\Callstack: %2'));
-        POSActionEFTAdyenCloud.SetTrxStatus(EntryNo, Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
+        EFTTransactionRequest.Get(EntryNo);
+        EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'TaskSubsConfirmCancelled', '');
+        POSActionEFTAdyenCloud.SetTrxResponse(EFTTransactionRequest."Entry No.", '', false, true, StrSubstNo('Error: %1 \\Callstack: %2'));
+        POSActionEFTAdyenCloud.SetTrxStatus(EFTTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseReceived);
     end;
 
-    local procedure CalcSubscriptionAmountIncludingVAT(RegisterNo: Code[10]; SalesTicketNo: Code[20]; SalesID: Guid) SubscriptionAmountIncludingVAT: Decimal;
+    local procedure CalcSubscriptionAmountIncludingVAT(EFTTransactionRequest: Record "NPR EFT Transaction Request") SubscriptionAmountIncludingVAT: Decimal;
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         TempProcessedLineBuffer: Record "NPR MM Member Info Capture" temporary;
@@ -155,11 +136,11 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
     begin
         MemberInfoCapture.Reset();
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
-        MemberInfoCapture.SetRange("Receipt No.", SalesTicketNo);
+        MemberInfoCapture.SetRange("Receipt No.", EFTTransactionRequest."Sales Ticket No.");
         if not MemberInfoCapture.FindSet() then
             // If we were asked to start a subscription, but don't have any member info capture,
             // it's likely somebody starting subscription on an existing membership.
-            exit(CalcSubscriptionRenewalPriceOnSubsStart(SalesID));
+            exit(CalcSubscriptionRenewalPriceOnSubsStart(EFTTransactionRequest."Sales ID"));
 
         repeat
             if ShouldProcessMembershipCapture(MemberInfoCapture) then begin
@@ -171,8 +152,8 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
                     TempProcessedLineBuffer.SetRange("Line No.", MemberInfoCapture."Line No.");
                     if TempProcessedLineBuffer.IsEmpty then begin
                         SalesLinePOS.Reset();
-                        SalesLinePOS.SetRange("Register No.", RegisterNo);
-                        SalesLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
+                        SalesLinePOS.SetRange("Register No.", EFTTransactionRequest."Register No.");
+                        SalesLinePOS.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
                         SalesLinePOS.SetRange("Line No.", MemberInfoCapture."Line No.");
                         SalesLinePOS.CalcSums("Amount Including VAT");
                         SubscriptionAmountIncludingVAT += SalesLinePOS."Amount Including VAT";
@@ -316,10 +297,10 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         MembershipSetup.SetLoadFields("Membership Type");
         if MembershipSetup.Get(MemberInfoCapture."Membership Code") then
             IsGroupMembership := MembershipSetup."Membership Type" = MembershipSetup."Membership Type"::Group;
-
+ 
         if not IsGroupMembership then
             exit(true);
-
+ 
         exit(IsFirstCaptureForGroupMembership(MemberInfoCapture));
     end;
 
