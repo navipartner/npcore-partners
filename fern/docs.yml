@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://schema.buildwithfern.dev/docs-yml.json
+
 instances:
   - url: https://navipartner.docs.buildwithfern.com
     custom-domain: api.navipartner.com
@@ -82,6 +84,9 @@ navigation:
           - systemservices.helloworld:
               title: Hello World
               summary: ./docs/pages/systemservices/helloworld.mdx
+          - systemservices.nodes:
+              title: Nodes
+              summary: ./docs/pages/systemservices/nodes.mdx
           - systemservices.webhooks:
               title: Webhooks
         - section: Accounts
