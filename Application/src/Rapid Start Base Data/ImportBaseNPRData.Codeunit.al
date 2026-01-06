@@ -1,6 +1,11 @@
 ﻿codeunit 6014602 "NPR Import Base NPR Data"
 {
     Access = Internal;
+
+    var
+        MissingPackageNameParamErr: Label 'Package Name is required (parameter index 1)';
+        MissingSecretParamErr: Label 'NP Retail Base Data Secret is required (parameter index 2)';
+
     trigger OnRun()
     var
         AllObj: Record AllObj;
@@ -20,29 +25,63 @@
     [NonDebuggable]
     procedure ImportRapidPackageFromFeed(package: Text)
     var
-        autoRapidstartImportLog: Record "NPR Auto Rapidstart Import Log";
+        AutoRapidstartImportLog: Record "NPR Auto Rapidstart Import Log";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        rapidStartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
-        BaseUri: Text;
-        packageName: Text;
+        CleanPackageName: Text;
         Secret: Text;
     begin
-        packageName := package.Replace('.rapidstart', '');
+        CleanPackageName := package.Replace('.rapidstart', '');
 
-        //Can be invoked in crane environment to auto import test data. Prevent multiple invocations on container re-creation.        
-        if autoRapidstartImportLog.Get(packageName) then
+        if AutoRapidstartImportLog.Get(CleanPackageName) then
             exit;
 
-        BaseUri := 'https://npretailbasedata.blob.core.windows.net';
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
-
-        BindSubscription(rapidStartBaseDataMgt);
-        rapidStartBaseDataMgt.ImportPackage(
-                        BaseUri + '/pos-test-data/' + package + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName, false);
-
-        autoRapidstartImportLog."Package Name" := CopyStr(packageName, 1, MaxStrLen(autoRapidstartImportLog."Package Name"));
-        autoRapidstartImportLog.Insert();
+        DoImportRapidPackage(package, Secret);
     end;
 
+    [NonDebuggable]
+    procedure ImportRapidPackageFromFeedWithMultipleParams(commaSeparatedParams: Text)
+    var
+        AutoRapidstartImportLog: Record "NPR Auto Rapidstart Import Log";
+        ParamList: List of [Text];
+        PackageParam: Text;
+        CleanPackageName: Text;
+        NpRetailBaseDataSecret: Text;
+    begin
+        ParamList := commaSeparatedParams.Split(',');
 
+        if (not ParamList.Get(1, PackageParam)) then
+            Error(MissingPackageNameParamErr);
+
+        CleanPackageName := PackageParam.Replace('.rapidstart', '');
+
+        if AutoRapidstartImportLog.Get(CleanPackageName) then
+            exit;
+
+        if (not ParamList.Get(2, NpRetailBaseDataSecret)) then
+            Error(MissingSecretParamErr);
+
+        DoImportRapidPackage(PackageParam, NpRetailBaseDataSecret);
+    end;
+
+    [NonDebuggable]
+    local procedure DoImportRapidPackage(PackageName: Text; Secret: Text)
+    var
+        AutoRapidstartImportLog: Record "NPR Auto Rapidstart Import Log";
+        RapidStartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
+        BaseUri: Text;
+        CleanPackageName: Text;
+    begin
+        CleanPackageName := PackageName.Replace('.rapidstart', '');
+        BaseUri := 'https://npretailbasedata.blob.core.windows.net';
+
+        BindSubscription(RapidStartBaseDataMgt);
+        RapidStartBaseDataMgt.ImportPackage(
+            BaseUri + '/pos-test-data/' + PackageName + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret,
+            CleanPackageName,
+            false);
+
+        AutoRapidstartImportLog."Package Name" := CopyStr(CleanPackageName, 1, MaxStrLen(AutoRapidstartImportLog."Package Name"));
+        AutoRapidstartImportLog.Insert();
+    end;
 }
