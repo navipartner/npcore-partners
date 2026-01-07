@@ -614,22 +614,25 @@
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         TicketAccessEntry.SetLoadFields("Admission Code", "Entry No.");
         if (TicketAccessEntry.FindSet()) then begin
+            AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+            DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
+
             repeat
                 if (TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then begin
                     DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
                     DetTicketAccessEntry.SetFilter(Type, '=%1 | =%2', DetTicketAccessEntry.Type::INITIAL_ENTRY, DetTicketAccessEntry.Type::RESERVATION);
                     DetTicketAccessEntry.FindLast();
 
-                    AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
                     AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
-                    AdmissionScheduleEntry.FindFirst();
+                    AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                    if (AdmissionScheduleEntry.FindFirst()) then begin
 
-                    if (AdmissionScheduleEntry."Admission Start Date" < LowDate) then
-                        LowDate := AdmissionScheduleEntry."Admission Start Date";
+                        if (AdmissionScheduleEntry."Admission Start Date" < LowDate) then
+                            LowDate := AdmissionScheduleEntry."Admission Start Date";
 
-                    if (AdmissionScheduleEntry."Admission End Date" > HighDate) then
-                        HighDate := AdmissionScheduleEntry."Admission End Date";
-
+                        if (AdmissionScheduleEntry."Admission End Date" > HighDate) then
+                            HighDate := AdmissionScheduleEntry."Admission End Date";
+                    end;
                 end;
             until (TicketAccessEntry.Next() = 0);
         end;
