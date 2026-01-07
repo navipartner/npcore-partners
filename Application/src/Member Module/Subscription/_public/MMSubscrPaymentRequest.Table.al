@@ -265,7 +265,7 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Error(StatusErrorLbl, xRec."Entry No.", xRec.Status);
 
         // Block: Requested -> Cancelled if not PayByLink
-        if (xRec.Status = xRec.Status::Requested) and (Rec.Type <> Rec.Type::PayByLink) then
+        if (xRec.Status = xRec.Status::Requested) and (Rec.Status = Rec.Status::Cancelled) and (Rec.Type <> Rec.Type::PayByLink) then
             Error(RequestedStatusErrorLbl, xRec."Entry No.", Rec.Type, xRec.Status);
     end;
 
