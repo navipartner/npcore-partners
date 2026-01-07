@@ -66,20 +66,13 @@ codeunit 6184600 "NPR EFT Adyen Cloud Protocol"
 
     procedure GetTerminalURL(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
     begin
-        exit(GetTerminalURL(EFTTransactionRequest.Mode));
-    end;
-
-    internal procedure GetTerminalURL(Mode: Option Production,"TEST Local","TEST Remote"): Text
-    var
-        InvalidModeErr: Label 'Mode must not be TEST Local.';
-    begin
-        case Mode of
-            Mode::Production:
+        case EFTTransactionRequest.Mode of
+            EFTTransactionRequest.Mode::Production:
                 exit('https://terminal-api-live.adyen.com/sync');
-            Mode::"TEST Remote":
+            EFTTransactionRequest.Mode::"TEST Remote":
                 exit('https://terminal-api-test.adyen.com/sync');
-            Mode::"TEST Local":
-                Error(InvalidModeErr);
+            EFTTransactionRequest.Mode::"TEST Local":
+                EFTTransactionRequest.FieldError(Mode);
         end;
     end;
 
