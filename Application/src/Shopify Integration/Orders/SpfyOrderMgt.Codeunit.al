@@ -767,10 +767,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         FirstName: Text;
         LastName: Text;
     begin
-        GetCustomerIdentifiers(Order, Email, Phone, ShopifyCustomerID, 'customer.default_address.phone', false);
+        //REST JSON Format
+        GetCustomerIdentifiers(Order, Email, Phone, ShopifyCustomerID, 'customer.phone', false);
 #pragma warning disable AA0139
-        FirstName := JsonHelper.GetJText(Order, 'customer.firstName', false);
-        LastName := JsonHelper.GetJText(Order, 'customer.lastName', false);
+        FirstName := JsonHelper.GetJText(Order, 'customer.first_name', false);
+        LastName := JsonHelper.GetJText(Order, 'customer.last_name', false);
 #pragma warning restore AA0139
         if TryFindCustomer(NpEcStore, Order, ShopifyCustomerID, Email, Phone, FirstName, LastName, Customer, SpfyStoreCustomerLink) then
             exit;
@@ -1234,9 +1235,15 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         Clear(Phone);
         Clear(ShopifyCustomerID);
         Email := JsonHelper.GetJText(Order, 'email', MaxStrLen(Email), false);
+        if Email = '' then //fallback to REST JSON Format
+            Email := JsonHelper.GetJText(Order, 'customer.email', MaxStrLen(Email), false);
         Phone := JsonHelper.GetJText(Order, 'phone', MaxStrLen(Phone), false);
         if Phone = '' then
-            Phone := JsonHelper.GetJText(Order, 'customer.defaultAddress.phone', MaxStrLen(Phone), false);
+            Phone := JsonHelper.GetJText(Order, CustomerDefaultPhonePath, MaxStrLen(Phone), false);
+        if Phone = '' then //fallback to REST JSON Format
+            Phone := JsonHelper.GetJText(Order, 'customer.default_address.phone', MaxStrLen(Phone), false);
+
+
         ShopifyId := JsonHelper.GetJText(Order, 'customer.id', false);
         if GetNumericId then
             if ShopifyId <> '' then
