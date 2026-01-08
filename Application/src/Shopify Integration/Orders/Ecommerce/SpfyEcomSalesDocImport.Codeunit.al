@@ -1194,6 +1194,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         PostCode: Text;
         Phone: Text;
     begin
+        //GraphQL JSON Format
         OrderMgt.GetCustomerIdentifiers(Order, Email, Phone, ShopifyCustomerID, 'customer.defaultAddress.phone', true);
 #pragma warning disable AA0139
         FirstName := JsonHelper.GetJText(Order, 'customer.firstName', false);
