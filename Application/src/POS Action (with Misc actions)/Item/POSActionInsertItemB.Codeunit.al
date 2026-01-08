@@ -648,15 +648,34 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
         WalletTemplate: Record "NPR NpIa Item AddOn";
         AttractionWallet: Codeunit "NPR AttractionWallet";
+
+        ReferenceDate: Date;
+        ReferenceTime: Time;
+        ErpUnitPrice: Decimal;
+        ErpDiscountPct: Decimal;
+        ErpUnitPriceIncludesVat: Boolean;
+        ErpUnitPriceVatPercentage: Decimal;
+        CustomerNo: Code[20];
+        Quantity: Integer; // Can only sell whole wallets/tickets
     begin
+        ReferenceDate := Today();
+        ReferenceTime := Time();
+        Quantity := 1;
+
         if (Item."NPR Item AddOn No." <> '') then
             if (WalletTemplate.Get(Item."NPR Item AddOn No.") and (WalletTemplate.WalletTemplate)) then
-                if (AttractionWallet.CalculateWalletPrice(WalletTemplate, WalletPrice)) then
-                    exit(WalletPrice);
+                if (AttractionWallet.CalculateWalletListPrice(WalletTemplate, CustomerNo, ReferenceDate, ReferenceTime, WalletPrice)) then
+                    if (WalletPrice <> 0) then
+                        exit(WalletPrice * Quantity);
 
-        if (Item."NPR Ticket Type" <> '') then
-            if (TicketDynamicPrice.CalculateRequiredTicketUnitPrice(Item."No.", ItemReference."Variant Code", TicketPrice)) then
-                exit(TicketPrice);
+        if (Item."NPR Ticket Type" <> '') then begin
+            TicketPrice := TicketDynamicPrice.CalculatePrice(Item."No.", ItemReference."Variant Code", CustomerNo, ReferenceDate, ReferenceTime, Quantity, ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
+            if (TicketPrice = 0) then
+                TicketPrice := ErpUnitPrice;
+
+            if (TicketPrice <> 0) then
+                exit(TicketPrice * Quantity);
+        end;
 
         VATBusPostingGroup := Item."VAT Bus. Posting Gr. (Price)";
         if (VATBusPostingGroup = '') then begin
@@ -664,6 +683,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             VATBusPostingGroup := POSSale."VAT Bus. Posting Group";
         end;
         VATPostingSetup.Get(VATBusPostingGroup, Item."VAT Prod. Posting Group");
-        exit(Item.CalcUnitPriceExclVAT() * ((100 + VATPostingSetup."VAT %") / 100));
+
+        exit(Item.CalcUnitPriceExclVAT() * ((100 + VATPostingSetup."VAT %") / 100) * Quantity);
     end;
 }

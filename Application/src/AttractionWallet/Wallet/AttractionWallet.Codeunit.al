@@ -983,12 +983,22 @@ codeunit 6185062 "NPR AttractionWallet"
 
     end;
 
-    internal procedure CalculateWalletPrice(WalletTemplate: Record "NPR NpIa Item AddOn"; var WalletPrice: Decimal) PriceCalculated: Boolean
+    internal procedure CalculateWalletListPrice(
+        WalletTemplate: Record "NPR NpIa Item AddOn";
+        CustomerNo: Code[20];
+        ReferenceDate: Date;
+        ReferenceTime: Time;
+        var WalletPrice: Decimal) PriceCalculated: Boolean
     var
         WalletTemplateLine: Record "NPR NpIa Item AddOn Line";
         Item: Record Item;
         TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
         TicketPrice: Decimal;
+
+        ErpUnitPrice: Decimal;
+        ErpDiscountPct: Decimal;
+        ErpUnitPriceIncludesVat: Boolean;
+        ErpUnitPriceVatPercentage: Decimal;
     begin
         Clear(WalletPrice);
 
@@ -998,29 +1008,29 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletTemplateLine.SetRange("AddOn No.", WalletTemplate."No.");
         if (WalletTemplateLine.FindSet()) then
             repeat
-                if (not WalletTemplateLine.Mandatory) then
-                    exit(false);
 
-                if (
-                    (WalletTemplateLine."Use Unit Price" = WalletTemplateLine."Use Unit Price"::Always) or
-                    (WalletTemplateLine."Unit Price" <> 0)
-                ) then begin
+                if ((WalletTemplateLine."Use Unit Price" = WalletTemplateLine."Use Unit Price"::Always) or
+                    (WalletTemplateLine."Unit Price" <> 0)) then begin
                     // Use price from wallet template
                     WalletPrice += AdjustForDiscount(WalletTemplateLine, WalletTemplateLine."Unit Price" * WalletTemplateLine.Quantity);
+
                 end else begin
                     // Use price from item card
                     Item.SetLoadFields("NPR Ticket Type", "Unit Price");
                     Item.Get(WalletTemplateLine."Item No.");
                     if (Item."NPR Ticket Type" <> '') then begin
-                        if (TicketDynamicPrice.CalculateRequiredTicketUnitPrice(Item."No.", WalletTemplateLine."Variant Code", TicketPrice)) then
-                            WalletPrice += AdjustForDiscount(WalletTemplateLine, TicketPrice * WalletTemplateLine.Quantity)
-                        else
-                            WalletPrice += AdjustForDiscount(WalletTemplateLine, Item."Unit Price" * WalletTemplateLine.Quantity);
+                        TicketPrice := TicketDynamicPrice.CalculatePrice(Item."No.", '', CustomerNo, ReferenceDate, ReferenceTime, WalletTemplateLine.Quantity, ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
+                        if (TicketPrice = 0) then
+                            TicketPrice := ErpUnitPrice;
+
+                        WalletPrice += AdjustForDiscount(WalletTemplateLine, TicketPrice * WalletTemplateLine.Quantity);
+
                     end else begin
                         WalletPrice += AdjustForDiscount(WalletTemplateLine, Item."Unit Price" * WalletTemplateLine.Quantity);
                     end;
                 end;
-            until WalletTemplateLine.Next() = 0;
+
+            until (WalletTemplateLine.Next() = 0);
 
         exit(true);
     end;
@@ -1030,7 +1040,7 @@ codeunit 6185062 "NPR AttractionWallet"
         if (WalletTemplateLine."Discount %" = 0) then
             NewPrice := PriceIn - WalletTemplateLine.DiscountAmount
         else
-            NewPrice := PriceIn / (1 + WalletTemplateLine."Discount %" / 100);
+            NewPrice := Round(PriceIn * (1 - (WalletTemplateLine."Discount %" / 100)), 0.01);
     end;
 
     #region facade implementation

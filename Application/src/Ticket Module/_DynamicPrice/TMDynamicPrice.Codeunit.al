@@ -1,6 +1,22 @@
 codeunit 6014559 "NPR TM Dynamic Price"
 {
     Access = Internal;
+    internal procedure CalculatePrice(
+        ItemNo: Code[20];
+        VariantCode: Code[10];
+        CustomerNo: Code[20];
+        ReferenceDate: Date;
+        ReferenceTime: Time;
+        Quantity: Integer;
+        var ErpUnitPrice: Decimal;
+        var ErpDiscountPct: Decimal;
+        var ErpUnitPriceIncludesVat: Boolean;
+        var ErpUnitPriceVatPercentage: Decimal) TicketUnitPrice: Decimal
+    var
+    begin
+        if (CalculateErpUnitPrice(ItemNo, VariantCode, CustomerNo, ReferenceDate, Quantity, ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage)) then
+            TicketUnitPrice := CalculateTicketBomListPrice(ItemNo, VariantCode, ErpUnitPrice, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage, ReferenceDate, ReferenceTime);
+    end;
 
     internal procedure CalculatedTicketPriceAfterErpPrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
@@ -173,6 +189,59 @@ codeunit 6014559 "NPR TM Dynamic Price"
         end;
         exit(TicketUnitPrice);
     end;
+
+    procedure CalculateTicketBomListPrice(ItemNo: Code[20]; VariantCode: Code[10]; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; ReferenceDate: Date; ReferenceTime: Time) TicketUnitPrice: Decimal
+    var
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        BasePrice: Decimal;
+        AddonPrice: Decimal;
+    begin
+        AdmissionScheduleEntry.Reset();
+        AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
+
+        TicketBom.Reset();
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBom.SetFilter("Variant Code", '=%1', VariantCode);
+        if (TicketBom.FindSet()) then begin
+            repeat
+                BasePrice := 0;
+                AddonPrice := 0;
+                AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TicketBom."Admission Code");
+                AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
+                AdmissionScheduleEntry.SetFilter("Admission Start Time", '<=%1', ReferenceTime);
+                AdmissionScheduleEntry.SetFilter("Admission End Time", '>%1', ReferenceTime);
+                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                if (AdmissionScheduleEntry.FindFirst()) then
+                    CalculateScheduleEntryPrice(
+                        TicketBom."Item No.",
+                        TicketBom."Variant Code",
+                        TicketBom."Admission Code",
+                        AdmissionScheduleEntry."External Schedule Entry No.",
+                        OriginalUnitPrice,
+                        PriceIncludesVAT,
+                        VatPercentage,
+                        ReferenceDate,
+                        ReferenceTime,
+                        BasePrice,
+                        AddonPrice
+                    )
+                else begin
+                    if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
+                        TicketUnitPrice += OriginalUnitPrice;
+                end;
+
+                if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
+                    TicketUnitPrice += BasePrice + AddonPrice;
+
+                if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::SELECTED) then
+                    TicketUnitPrice += AddonPrice;
+
+            until (TicketBom.Next() = 0);
+        end;
+        exit(TicketUnitPrice);
+    end;
+
 
     internal procedure SetTicketAdmissionDynamicUnitPrice(
         var ReservationRequest: Record "NPR TM Ticket Reservation Req.";
