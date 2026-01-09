@@ -68,10 +68,13 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         Json: Codeunit "NPR Json Builder";
         JsonHelper: Codeunit "NPR Json Helper";
         PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         RequestBody: JsonToken;
         MembershipID: Text;
         PSPAsString: Text;
         Default, IsModified : Boolean;
+        EntityType: Option Customer,Contact,Membership,UserAccount;
     begin
         MembershipID := Request.Paths().Get(2);
         if MembershipID = '' then
@@ -161,6 +164,9 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
             MembershipPmtMethodMap.Validate(Default, Default);
             MembershipPmtMethodMap.Insert();
         end;
+
+        if (MemberPaymentMethod."Shopper Reference" <> '') and (MemberPaymentMethod.PSP = MemberPaymentMethod.PSP::Adyen) then
+            EFTAdyenIntegration.GetCreateEFTShopperRecognition(Format(UserAccount.AccountNo), EntityType::UserAccount, EFTAdyenIntegration.CloudIntegrationType(), EFTShopperRecognition);
 
         Json.StartObject('');
         PaymentMethodAsJson(MemberPaymentMethod, 'paymentMethod', true, MembershipPmtMethodMap.Default, Json);
