@@ -334,6 +334,7 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
     begin
         TableList.Add(Database::"NPR MM Member Info Capture");
         TableList.Add(Database::"NPR MM Member");
+        TableList.Add(Database::"NPR CloudflareMediaLink");
         TableList.Add(Database::"NPR MM Member Card");
         TableList.Add(Database::"NPR MM Membership");
         TableList.Add(Database::"NPR MM Membership Entry");
