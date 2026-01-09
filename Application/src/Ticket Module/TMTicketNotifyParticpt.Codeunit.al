@@ -1056,6 +1056,7 @@
 
         NotificationEntry."Quantity To Admit" := TicketReservationRequest.Quantity;
         NotificationEntry."Ticket Holder E-Mail" := TicketReservationRequest."Notification Address";
+        NotificationEntry."Ticket Holder Name" := TicketReservationRequest."TicketHolderName";
         NotificationEntry."External Order No." := TicketReservationRequest."External Order No.";
         NotificationEntry."Ticket Token" := TicketReservationRequest."Session Token ID";
         NotificationEntry."Authorization Code" := TicketReservationRequest."Authorization Code";
