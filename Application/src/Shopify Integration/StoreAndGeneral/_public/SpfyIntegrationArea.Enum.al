@@ -36,6 +36,10 @@ enum 6014656 "NPR Spfy Integration Area"
     {
         Caption = 'Close Order Requests';
     }
+    value(24; "Order Ready for Pickup")
+    {
+        Caption = 'Order Ready for Pickup';
+    }
     value(30; "Retail Vouchers")
     {
         Caption = 'Retail Vouchers';

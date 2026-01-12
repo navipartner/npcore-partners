@@ -538,6 +538,11 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Invent.Level Update Batch Size';
             DataClassification = CustomerContent;
         }
+        field(650; "Send Order Ready for Pickup"; Boolean)
+        {
+            Caption = 'Send C&C Order Ready for Pickup';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

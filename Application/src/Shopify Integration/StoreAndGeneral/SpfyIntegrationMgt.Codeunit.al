@@ -88,6 +88,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             IntegrationArea::"BC Customer Transactions":
                 exit(ShopifyStore."BC Customer Transactions");
 #endif
+            IntegrationArea::"Order Ready for Pickup":
+                exit(ShopifyStore."Send Order Ready for Pickup");
             else begin
                 AreaIsEnabled := false;
                 SpfyIntegrationEvents.OnCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea, ShopifyStore.Code, AreaIsEnabled, Handled);

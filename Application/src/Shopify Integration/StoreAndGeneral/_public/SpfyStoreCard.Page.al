@@ -355,6 +355,12 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     ToolTip = 'Specifies the workflow code to be used for Click&Collect orders from this store.';
                 }
+
+                field("Send C&C Order Ready for Pickup"; Rec."Send Order Ready for Pickup")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies whether confirming a Click&Collect order updates its status in Shopify to Ready for Pickup.';
+                }
                 group(CustomerIntegration)
                 {
                     Caption = 'Customer Integration';

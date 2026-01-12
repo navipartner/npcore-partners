@@ -85,6 +85,9 @@
     var
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
         NpCsExpirationMgt: Codeunit "NPR NpCs Expiration Mgt.";
+#if not BC17
+        SpfyOrdReadyForPickup: Codeunit "NPR Spfy Ord Ready For Pickup";
+#endif
     begin
         UpdateProcessingStatus(NpCsDocument, NpCsDocument."Processing Status"::Confirmed);
         UpdateDeliveryStatus(NpCsDocument, NpCsDocument."Delivery Status"::Ready, 0, '');
@@ -98,6 +101,9 @@
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
         if NpCsDocument."Delivery expires at" > 0DT then
             NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument, NpCsDocument."Delivery expires at");
+#if not BC17
+        SpfyOrdReadyForPickup.ScheduleOrderReadyForPickup(NpCsDocument);
+#endif
     end;
 
     procedure ConfirmAndPrintOrder(var NpCsDocument: Record "NPR NpCs Document")
