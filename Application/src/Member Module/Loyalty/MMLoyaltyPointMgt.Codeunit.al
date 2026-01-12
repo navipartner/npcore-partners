@@ -207,6 +207,8 @@
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSUnit: Record "NPR POS Unit";
         POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -216,6 +218,8 @@
 
         if not POSLoyaltyProfile."Assign Loyalty On Sale" then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.endsale.points.assign');
 
         // Calculate points and assign.
         PosEntry.SetCurrentKey("Document No.");
@@ -242,6 +246,8 @@
                 until (PosEntrySalesLine.Next() = 0);
             end;
         end;
+
+        Span.Finish();
     end;
 
     [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]

@@ -86,34 +86,27 @@
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
         POSSession: Codeunit "NPR POS Session";
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryTransaction: Codeunit "NPR Sentry Transaction";
+        Sentry: Codeunit "NPR Sentry";
         SentrySpan: Codeunit "NPR Sentry Span";
-        SentryTraceId: Text;
-        SentryTraceSpanId: Text;
     begin
         FrontEnd.SetWorkflowID(WorkflowId);
         POSSession.SetCursor(Context);
         JSON.InitializeJObjectParser(Context);
 
-        SentryScope.TryGetActiveTransaction(SentryTransaction);
-        if JSON.GetString('sentryTraceId', SentryTraceId) and JSON.GetString('sentrySpanId', SentryTraceSpanId) then begin
-            SentryTransaction.SetExternalTraceValues(SentryTraceId, SentryTraceSpanId);
-        end;
-        SentryTransaction.StartChildSpan('bc.workflow.invoke:' + ActionCode + ',' + WorkflowStep, 'bc.workflow.invoke', SentrySpan);
-        SentryScope.SetActiveSpan(SentrySpan);
+        Sentry.StartSpan(SentrySpan, 'bc.workflow.invoke:' + ActionCode + ',' + WorkflowStep);
 
         Success := InvokeOnActionThroughOnRun(ActionCode, WorkflowStep, JSON, FrontEnd, Self);
-
-        SentrySpan.Finish();
 
         if Success then begin
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
+            Sentry.AddLastErrorIfProgrammingBug();
             POSSession.RequestFullRefresh(); //In case an action committed before error
             EmitError(ActionCode, WorkflowStep, JSON, GetLastErrorText());
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
         end;
+
+        SentrySpan.Finish();
 
         Signal.SetEngine20(JSON.GetContextObject());
 

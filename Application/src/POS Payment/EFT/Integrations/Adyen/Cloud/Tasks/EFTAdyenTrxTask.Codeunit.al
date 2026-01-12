@@ -18,6 +18,8 @@ codeunit 6184588 "NPR EFT Adyen Trx Task" implements "NPR POS Background Task"
         StatusCode: Integer;
         Started: Boolean;
         EFTAdyenVoidReq: Codeunit "NPR EFT Adyen Void Req";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         EFTTransactionRequest.Get(EntryNo);
@@ -35,7 +37,9 @@ codeunit 6184588 "NPR EFT Adyen Trx Task" implements "NPR POS Background Task"
 
         URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
 
+        Sentry.StartSpan(Span, 'bc.pos.adyen.cloud.http_request');
         Completed := EFTAdyenCloudProtocol.InvokeAPI(Request, EFTAdyenCloudIntegrat.GetAPIKey(EFTSetup), URL, 1000 * 60 * 5, Response, StatusCode);
+        Span.Finish();
         Started := StatusCode in [0, 200]; //if we got 403 or other 4xx, transaction didn't even start 
         Logs := EFTAdyenCloudProtocol.GetLogBuffer();
 

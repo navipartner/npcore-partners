@@ -28,10 +28,14 @@ codeunit 6014559 "NPR TM Dynamic Price"
         ForceItemAddOnUnitPrice: Boolean;
         DiscountAmount: Decimal;
         DiscountPercent: Decimal;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
 
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.ticket.calc_dynamic_price');
 
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
             if (SaleLinePOS.Indentation > 0) then begin
@@ -73,6 +77,8 @@ codeunit 6014559 "NPR TM Dynamic Price"
             end;
 
         end;
+
+        Span.Finish();
     end;
 
     [TryFunction]

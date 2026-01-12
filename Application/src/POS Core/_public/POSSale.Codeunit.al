@@ -455,15 +455,13 @@
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        Sentry: Codeunit "NPR Sentry";
         SentryEndSaleSpan: Codeunit "NPR Sentry Span";
         SentryPreEndSaleSpan: Codeunit "NPR Sentry Span";
         SentryPostEndSaleSpan: Codeunit "NPR Sentry Span";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
     begin
-        SentryScope.TryGetActiveSpan(SentryActiveSpan);
-        SentryActiveSpan.StartChildSpan('bc.end_sale.pre_processing', 'bc.end_sale.pre_processing', SentryPreEndSaleSpan);
+        Sentry.StartSpan(SentryPreEndSaleSpan, 'bc.end_sale.pre_processing');
 
         CheckItemAvailability();
         _PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -475,7 +473,7 @@
         SalePOS := _Rec;
 
         SentryPreEndSaleSpan.Finish();
-        SentryActiveSpan.StartChildSpan('bc.end_sale.pos_entry_write', 'bc.end_sale.pos_entry_write', SentryEndSaleSpan);
+        Sentry.StartSpan(SentryEndSaleSpan, 'bc.end_sale.pos_entry_write');
 
         ValidateSaleBeforeEnd(_Rec);
 
@@ -485,7 +483,7 @@
         _Ended := true;
 
         SentryEndSaleSpan.Finish();
-        SentryActiveSpan.StartChildSpan('bc.end_sale.post_processing', 'bc.end_sale.post_processing', SentryPostEndSaleSpan);
+        Sentry.StartSpan(SentryPostEndSaleSpan, 'bc.end_sale.post_processing');
 
         RunAfterEndSale(SalePOS); //Any error here would leave the front end with inconsistent state as view switch to new sale or login screen has not happened yet.
 

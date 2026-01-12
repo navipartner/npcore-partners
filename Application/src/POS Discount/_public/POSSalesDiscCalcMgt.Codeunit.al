@@ -209,7 +209,11 @@
     end;
 
     internal procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total; RecalculateAllLines: Boolean)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.discount.apply');
 
         tmpDiscountPriority.SetCurrentKey(Priority);
         if tmpDiscountPriority.FindSet() then begin
@@ -220,6 +224,8 @@
 
             UpdateDiscOnSalesLine(TempSaleLinePOS, RecalculateAllLines);
         end;
+
+        Span.Finish();
     end;
 
     local procedure ApplyDiscountsTotal(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total; RecalculateAllLines: Boolean)
@@ -327,14 +333,19 @@
     local procedure FindRelevantSaleLineDiscounts(SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; LineOperation: Option Insert,Modify,Delete,Total): Boolean
     var
         DiscountPriority: Record "NPR Discount Priority";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if DiscountPriority.IsEmpty then
             InitDiscountPriority(DiscountPriority);
 
+        Sentry.StartSpan(Span, 'bc.pos.discount.find_active');
         tmpDiscountPriority.Reset();
         tmpDiscountPriority.DeleteAll();
 
         OnFindActiveSaleLineDiscounts(tmpDiscountPriority, SalePOS, Rec, xRec, LineOperation);
+
+        Span.Finish();
         exit(not tmpDiscountPriority.IsEmpty());
     end;
 

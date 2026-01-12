@@ -34,6 +34,8 @@
         POSEntry: Record "NPR POS Entry";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -53,9 +55,11 @@
             then
                 exit;
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.receipt_print');
         RecRef.GetTable(POSEntry);
         RetailReportSelectionMgt.SetRegisterNo(POSEntry."POS Unit No.");
         RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Receipt (POS Entry)".AsInteger());
+        Span.Finish();
     end;
 }
 

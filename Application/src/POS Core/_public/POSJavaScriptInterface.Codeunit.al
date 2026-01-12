@@ -80,11 +80,15 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSRefreshData: Codeunit "NPR POS Refresh Data";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
     begin
         POSSession.GetFrontEnd(FrontEnd, false);
 
         POSRefreshData.StartDataCollection();
         POSSession.SetPOSRefreshData(POSRefreshData);
+
+        Sentry.StartSpan(SentrySpan, 'bc.workflow.js.invoke:' + Method);
 
         case Method of
             'OnAction20':
@@ -114,6 +118,10 @@ codeunit 6150701 "NPR POS JavaScript Interface"
 
         if not (Method in ['Require', 'SecureMethod']) then
             POSRefreshData.Refresh();
+
+        if GetLastErrorText() <> '' then
+            Sentry.AddLastErrorIfProgrammingBug();
+        SentrySpan.Finish();
     end;
 
     local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")

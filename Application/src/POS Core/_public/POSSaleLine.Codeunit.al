@@ -160,12 +160,10 @@
     procedure InsertLine(var Line: Record "NPR POS Sale Line"; IncludeDiscountFields: Boolean) Return: Boolean
     var
         Item: Record Item;
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        Sentry: Codeunit "NPR Sentry";
         SentryInsertLineSpan: Codeunit "NPR Sentry Span";
     begin
-        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
-            SentryActiveSpan.StartChildSpan('bc.insert_sale_line', 'bc.insert_sale_line', SentryInsertLineSpan);
+        Sentry.StartSpan(SentryInsertLineSpan, 'bc.insert_sale_line');
 
         if UsePresetLineNo then
             Rec."Line No." := Line."Line No.";
@@ -256,6 +254,8 @@
         Return := InsertLineInternal(Rec, true);
         Line := Rec;
 
+        if not Return then
+            Sentry.AddLastErrorIfProgrammingBug();
         SentryInsertLineSpan.Finish();
     end;
 
@@ -558,21 +558,20 @@
     procedure FillVariantThroughLookUp(ItemNo: Code[20]; LocationCode: Code[10]): Code[10]
     var
         ItemVariantBuffer: Record "NPR Item Variant Buffer";
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        Sentry: Codeunit "NPR Sentry";
         SentryVariantLookupSpan: Codeunit "NPR Sentry Span";
     begin
         FillVariantBuffer(ItemNo, ItemVariantBuffer);
         if ItemVariantBuffer.IsEmpty() then
             exit('');
 
-        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
-            SentryActiveSpan.StartChildSpan('bc.item_variant_lookup', 'bc.item_variant_lookup', SentryVariantLookupSpan);
+        Sentry.StartSpan(SentryVariantLookupSpan, 'bc.item_variant_lookup');
         ItemVariantBuffer.SetRange("Location Filter", LocationCode);
         if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
             SentryVariantLookupSpan.Finish();
             exit(ItemVariantBuffer.Code);
         end else begin
+            SentryVariantLookupSpan.Finish();
             Error(ITEM_REQUIRES_VARIANT, ItemNo);
         end;
     end;
@@ -580,21 +579,20 @@
     procedure FillVariantLotNoThroughLookUp(ItemNo: Code[20]; LocationCode: Code[10]; LotNo: Code[50]): Code[10]
     var
         ItemVariantBuffer: Record "NPR Item Variant Buffer";
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        Sentry: Codeunit "NPR Sentry";
         SentryVariantLookupSpan: Codeunit "NPR Sentry Span";
     begin
         FillVariantLotNoBuffer(ItemNo, ItemVariantBuffer, LotNo);
         if ItemVariantBuffer.IsEmpty() then
             exit('');
 
-        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
-            SentryActiveSpan.StartChildSpan('bc.item_variant_lookup', 'bc.item_variant_lookup', SentryVariantLookupSpan);
+        Sentry.StartSpan(SentryVariantLookupSpan, 'ui.bc.item_variant_lookup');
         ItemVariantBuffer.SetRange("Location Filter", LocationCode);
         if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
             SentryVariantLookupSpan.Finish();
             exit(ItemVariantBuffer.Code);
         end else begin
+            SentryVariantLookupSpan.Finish();
             Error(ITEM_REQUIRES_VARIANT, ItemNo);
         end;
     end;
@@ -688,6 +686,8 @@
         TicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
         POSActMemberMgt: codeunit "NPR POS Action Member Mgt WF3";
         WalletCreate: Codeunit "NPR AttractionWalletCreate";
+        Sentry: Codeunit "NPR Sentry";
+        PostProcessingSpan: Codeunit "NPR Sentry Span";
     begin
         Rec := Line;
 
@@ -702,6 +702,8 @@
             Rec.Insert(true);
             ReturnValue := true;
         end;
+
+        Sentry.StartSpan(PostProcessingSpan, 'bc.pos.line.insert.post_processing');
 
         Rec.UpdateAmounts(Rec);
         if (not (Rec.GetSkipCalcDiscount())) then
@@ -728,6 +730,8 @@
         POSSale.RefreshCurrent();
 
         Line := Rec;
+
+        PostProcessingSpan.Finish();
     end;
 
     //--- Publishers ---

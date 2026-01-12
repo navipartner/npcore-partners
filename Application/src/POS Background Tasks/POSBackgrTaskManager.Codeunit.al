@@ -36,15 +36,24 @@ codeunit 6059869 "NPR POS Backgr. Task Manager"
         TaskImplementation: Interface "NPR POS Background Task";
         TaskEnumKey: Integer;
         TaskId: Integer;
+        Sentry: Codeunit "NPR Sentry";
+        ExecutionSpan: Codeunit "NPR Sentry Span";
     begin
         Parameters := Page.GetBackgroundParameters();
 
         Evaluate(TaskEnumKey, Parameters.Get('__POSBackgroundTaskEnumKey'));
         Evaluate(TaskId, Parameters.Get('__POSBackgroundTaskId'));
         TaskImplementation := Enum::"NPR POS Background Task".FromInteger(TaskEnumKey);
+
+        Sentry.InitScopeAndTransaction(StrSubstNo('POS Background Task: %1', Format(TaskImplementation)), 'bc.pos.background_task.execute');
+        Sentry.StartSpan(ExecutionSpan, StrSubstNo('bc.pos.background_task.execute:%1', Format(TaskImplementation)));
+
         Parameters.Remove('__POSBackgroundTaskEnumKey');
         Parameters.Remove('__POSBackgroundTaskId');
         TaskImplementation.ExecuteBackgroundTask(TaskId, Parameters, Result);
+
+        ExecutionSpan.Finish();
+        Sentry.FinalizeScope();
 
         Page.SetBackgroundTaskResult(Result);
     end;
@@ -52,9 +61,13 @@ codeunit 6059869 "NPR POS Backgr. Task Manager"
     procedure EnqueuePOSBackgroundTask(var WrapperTaskIdOut: Integer; TaskImplementation: Enum "NPR POS Background Task"; var Parameters: Dictionary of [Text, Text]; Timeout: Integer)
     var
         POSPageStackCheck: Codeunit "NPR POS Page Stack Check";
+        Sentry: Codeunit "NPR Sentry";
+        EnqueueSpan: Codeunit "NPR Sentry Span";
     begin
         if not POSPageStackCheck.CurrentStackWasStartedByPOSTrigger() then
             Error('POS Background Tasks can only be queued and executed in AL callstacks that originate from a POS Page trigger. This is a programming bug.');
+
+        Sentry.StartSpan(EnqueueSpan, StrSubstNo('bc.pos.background_task.enqueue:%1', Format(TaskImplementation)));
 
         WrapperTaskIdOut := _LastUsedId + 1;
         _LastUsedId := WrapperTaskIdOut;
@@ -64,6 +77,8 @@ codeunit 6059869 "NPR POS Backgr. Task Manager"
         _TaskParameters.Add(WrapperTaskIdOut, Parameters);
         _TaskTimeouts.Add(WrapperTaskIdOut, Timeout);
         _TaskImplementations.Add(WrapperTaskIdOut, TaskImplementation.AsInteger());
+
+        EnqueueSpan.Finish();
     end;
 
     procedure CancelPOSBackgroundTask(WrapperTaskId: Integer)
@@ -123,13 +138,19 @@ codeunit 6059869 "NPR POS Backgr. Task Manager"
         WrapperTaskId: Integer;
         TaskImplementation: Interface "NPR POS Background Task";
         Parameters: Dictionary of [Text, Text];
+        Sentry: Codeunit "NPR Sentry";
+        CompletionSpan: Codeunit "NPR Sentry Span";
     begin
         WrapperTaskId := _PBTIdToWrapperIdMap.Get(PBTTaskId);
         TaskImplementation := Enum::"NPR POS Background Task".FromInteger(_TaskImplementations.Get(WrapperTaskId));
         _TaskParameters.Get(WrapperTaskId, Parameters);
 
+        Sentry.StartSpan(CompletionSpan, StrSubstNo('bc.pos.background_task.complete:%1', Format(TaskImplementation)));
+
         CleanupTaskStateBeforeContinuation(PBTTaskId);
         TaskImplementation.BackgroundTaskSuccessContinuation(WrapperTaskId, Parameters, Results);
+
+        CompletionSpan.Finish();
     end;
 
     procedure BackgroundTaskError(PBTTaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
@@ -137,13 +158,21 @@ codeunit 6059869 "NPR POS Backgr. Task Manager"
         WrapperTaskId: Integer;
         TaskImplementation: Interface "NPR POS Background Task";
         Parameters: Dictionary of [Text, Text];
+        Sentry: Codeunit "NPR Sentry";
+        ErrorSpan: Codeunit "NPR Sentry Span";
     begin
         WrapperTaskId := _PBTIdToWrapperIdMap.Get(PBTTaskId);
         TaskImplementation := Enum::"NPR POS Background Task".FromInteger(_TaskImplementations.Get(WrapperTaskId));
         _TaskParameters.Get(WrapperTaskId, Parameters);
 
+        Sentry.StartSpan(ErrorSpan, StrSubstNo('bc.pos.background_task.error:%1', Format(TaskImplementation)));
+        Sentry.AddError(ErrorText, ErrorCallStack);
+
         CleanupTaskStateBeforeContinuation(PBTTaskId);
         TaskImplementation.BackgroundTaskErrorContinuation(WrapperTaskId, Parameters, ErrorCode, ErrorText, ErrorCallStack);
+
+        ErrorSpan.Finish();
+
         IsHandled := true;
     end;
 
@@ -152,13 +181,19 @@ codeunit 6059869 "NPR POS Backgr. Task Manager"
         WrapperTaskId: Integer;
         TaskImplementation: Interface "NPR POS Background Task";
         Parameters: Dictionary of [Text, Text];
+        Sentry: Codeunit "NPR Sentry";
+        CancelSpan: Codeunit "NPR Sentry Span";
     begin
         WrapperTaskId := _PBTIdToWrapperIdMap.Get(PBTTaskId);
         TaskImplementation := Enum::"NPR POS Background Task".FromInteger(_TaskImplementations.Get(WrapperTaskId));
         _TaskParameters.Get(WrapperTaskId, Parameters);
 
+        Sentry.StartSpan(CancelSpan, StrSubstNo('bc.pos.background_task.cancel:%1', Format(TaskImplementation)));
+
         CleanupTaskStateBeforeContinuation(PBTTaskId);
         TaskImplementation.BackgroundTaskCancelled(WrapperTaskId, Parameters);
+
+        CancelSpan.Finish();
     end;
 
     local procedure CleanupTaskStateBeforeContinuation(PBTTaskId: Integer)

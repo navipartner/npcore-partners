@@ -40,14 +40,13 @@
         StartTime: Time;
         EndTime: Time;
         DurationMs: Integer;
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        Sentry: Codeunit "NPR Sentry";
         SentryPrintSpan: Codeunit "NPR Sentry Span";
     begin
-        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
-            SentryActiveSpan.StartChildSpan('bc.print_template', 'bc.print_template', SentryPrintSpan);
+        Sentry.StartSpan(SentryPrintSpan, 'bc.print_template');
 
         RPTemplateHeader.Get(TemplateCode);
+
         case RPTemplateHeader."Printer Type" of
             RPTemplateHeader."Printer Type"::Line:
                 begin
@@ -63,6 +62,7 @@
                     EndTime := Time();
                 end;
         end;
+
         SentryPrintSpan.Finish();
 
         DurationMs := EndTime - StartTime;

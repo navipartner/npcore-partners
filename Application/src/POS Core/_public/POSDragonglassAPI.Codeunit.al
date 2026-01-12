@@ -24,7 +24,14 @@ codeunit 6060078 "NPR POS Dragonglass API"
         SalesTicketNo: Text;
         Response: JsonObject;
         POSAPIStackCheck: Codeunit "NPR POS API Stack Check";
+        Sentry: Codeunit "NPR Sentry";
+        InvokeSpan: Codeunit "NPR Sentry Span";
     begin
+        if not Sentry.HasActiveTransaction() then
+            Sentry.InitScopeAndTransaction(StrSubstNo('Dragonglass API: %1', method), 'bc.odata.dragonglass');
+
+        Sentry.StartSpan(InvokeSpan, StrSubstNo('invoke_method_%1', method));
+
         if ((lastServerId = '') or (lastServerId <> Format(ServiceInstanceId()))) then begin
             SelectLatestVersion(); //Unlike control addin requests, inbound webservice requests can be load balanced across multiple NSTs meaning the cache sync delay can lead to invisible records.
         end;
@@ -32,16 +39,23 @@ codeunit 6060078 "NPR POS Dragonglass API"
         if method = 'KeepAlive' then begin //every couple of minutes to prevent NST from shutting down idle POS sessions, is irrelevant here because we are using webservices.
             Response.Add('ServerID', Format(ServiceInstanceId()));
             Response.WriteTo(JsonResponse);
+            InvokeSpan.Finish();
+            Sentry.FinalizeScope();
             exit;
         end;
 
         if method = 'FrameworkReady' then begin //once when POS frontend has loaded
             POSSession.ConstructFromWebserviceSession(true, '', '');
             if POSSession.GetErrorOnInitialize() then begin
+                Sentry.AddLastErrorInEnglish();
+                InvokeSpan.Finish();
+                Sentry.FinalizeScope();
                 Error(GetLastErrorText());
             end;
             Response.Add('ServerID', Format(ServiceInstanceId()));
             Response.WriteTo(JsonResponse);
+            InvokeSpan.Finish();
+            Sentry.FinalizeScope();
             exit;
         end;
 
@@ -57,6 +71,11 @@ codeunit 6060078 "NPR POS Dragonglass API"
         Response.Add('ServerID', Format(ServiceInstanceId()));
         Response.Add('Responses', POSSession.PopResponseQueue());
         Response.WriteTo(JsonResponse);
+
+        if GetLastErrorText() <> '' then
+            Sentry.AddLastErrorIfProgrammingBug();
+        InvokeSpan.Finish();
+        Sentry.FinalizeScope();
     end;
 
     local procedure GetSaleKey(Context: JsonObject; var POSUnitNoOut: Text; var SalesTicketNoOut: Text)

@@ -1960,15 +1960,22 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'ApplyDiscount', '', true, true)]
     local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.discount.mix.apply');
 
         if (Rec.Quantity = xRec.Quantity) and (Rec."Unit of Measure Code" <> xRec."Unit of Measure Code") then begin
             UpdateAppliedLinesFromTriggeredLine(TempSaleLinePOS, Rec);
         end;
 
         ApplyMixedDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today);
+
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]
@@ -1977,6 +1984,8 @@
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         IsActive: Boolean;
         DiscountPriority: Record "NPR Discount Priority";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not DiscountPriority.Get(DiscSourceTableId()) then
             exit;
@@ -1984,6 +1993,8 @@
             exit;
         if not IsValidLineOperation() then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.discount.mix.find_active');
 
         MixedDiscountLine.SetCurrentKey("Disc. Grouping Type", "No.", "Variant Code", "Starting Date", "Ending Date", "Starting Time", "Ending Time", Status);
         MixedDiscountLine.SetRange(Status, MixedDiscountLine.Status::Active);
@@ -2019,6 +2030,8 @@
             tmpDiscountPriority := DiscountPriority;
             tmpDiscountPriority.Insert();
         end;
+
+        Span.Finish();
     end;
 
     local procedure IsValidLineOperation(): Boolean

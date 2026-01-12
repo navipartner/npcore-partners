@@ -44,6 +44,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
     var
         TrxStatus: Enum "NPR EFT Adyen Task Status";
         Response: JsonObject;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         TrxStatus := Enum::"NPR EFT Adyen Task Status".FromInteger(_trxStatus.Get(EntryNo));
 
@@ -58,7 +60,10 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                 end;
             TrxStatus::ResultReceived:
                 begin
-                    exit(ProcessResult(EntryNo));
+                    Sentry.StartSpan(Span, 'bc.pos.adyen.cloud.process_result');
+                    Response := ProcessResult(EntryNo);
+                    Span.Finish();
+                    exit(Response);
                 end;
             TrxStatus::LookupNeeded:
                 begin
@@ -84,7 +89,11 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         AcquireCardEntryNo: Integer;
         ShopperSubscriptionConfirmation: Integer;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.adyen.cloud.start_transaction');
+
         ClearGlobalState();
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
         EftTransactionRequest.Get(EntryNo);
@@ -150,6 +159,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
 
         Response.Add('taskId', TaskId);
         Response.Add('selfService', EftTransactionRequest."Self Service");
+        Span.Finish();
         exit(Response);
     end;
 

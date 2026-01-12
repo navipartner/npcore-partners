@@ -74,6 +74,8 @@
     var
         EanBoxSetupEvent: Record "NPR Ean Box Setup Event";
         InScope: Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         EanBoxSetupEvent.SetRange("Setup Code", EanBoxSetup.Code);
         EanBoxSetupEvent.SetRange(Enabled, true);
@@ -82,7 +84,9 @@
 
         repeat
             InScope := false;
+            Sentry.StartSpan(Span, StrSubstNo('bc.pos.inputbox.check_scope:%1_%2', EanBoxSetupEvent."Event Code", EanBoxSetupEvent."Action Code"));
             SetEanBoxEventInScope(EanBoxSetupEvent, EanBoxValue, InScope);
+            Span.Finish();
             if InScope then begin
                 TempEanBoxSetupEvent.Init();
                 TempEanBoxSetupEvent := EanBoxSetupEvent;

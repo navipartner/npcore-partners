@@ -444,6 +444,8 @@
         POSEntry: Record "NPR POS Entry";
         EmailManagement: Codeunit "NPR E-mail Management";
         RecRef: RecordRef;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         POSEntry.SetCurrentKey("Document No.");
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
@@ -456,7 +458,10 @@
         RecRef.GetTable(POSEntry);
         if EmailManagement.GetEmailAddressFromRecRef(RecRef) = '' then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.endsale.email');
         SendReport(POSEntry, true);
+        Span.Finish();
     end;
 }
 

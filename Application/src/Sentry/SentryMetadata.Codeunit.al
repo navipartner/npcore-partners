@@ -1,6 +1,12 @@
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
 codeunit 6150966 "NPR Sentry Metadata"
 {
     Access = Internal;
+    SingleInstance = true;
+
+    var
+        _installedAppsLoaded: Boolean;
+        _installedApp: Dictionary of [Text, Text];
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', true, true)]
@@ -17,14 +23,14 @@ codeunit 6150966 "NPR Sentry Metadata"
         Json.WriteStartObject('');
         Json.WriteStringProperty('sentryKey', AzureKeyVaultMgt.GetAzureKeyVaultSecret('SentryIODragonglassEU'));
         Json.WriteStringProperty('sessionRecordAll', true);
-        WriteMetadataJson(Json);
+        WriteFrontendMetadataJson(Json);
         Json.WriteEndObject();
         Response.ReadFrom(Json.GetJSonAsText());
 
         Frontend.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
-    internal procedure WriteMetadataJson(Json: Codeunit "Json Text Reader/Writer")
+    internal procedure WriteFrontendMetadataJson(Json: Codeunit "Json Text Reader/Writer")
     var
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
@@ -70,4 +76,90 @@ codeunit 6150966 "NPR Sentry Metadata"
         end;
         Json.WriteStringProperty('POSType', Format(POSUnit."POS Type", 0, 9));
     end;
+
+    internal procedure WriteTagsForBackendEvent(var Json: Codeunit "NPR Json Builder")
+    var
+        TenantInformation: Codeunit "Tenant Information";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        ActiveSession: Record "Active Session";
+        InstalledApp: Record "NAV App Installed App";
+        UserSetup: Record "User Setup";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if UserSetup.Get(UserId) then begin
+            if POSUnit.Get(UserSetup."NPR POS Unit No.") then;
+        end;
+
+        if EnvironmentInformation.IsSaaSInfrastructure() then
+            Json.AddProperty('aadTenantId', AzureADTenant.GetAadTenantId())
+        else
+            Json.AddProperty('aadTenantId', '_');
+
+        Json.AddProperty('tenantId', TenantInformation.GetTenantId());
+        if TenantInformation.GetTenantDisplayName() <> '' then begin
+            Json.AddProperty('tenantDisplayName', TenantInformation.GetTenantDisplayName());
+        end else begin
+            Json.AddProperty('tenantDisplayName', '_');
+        end;
+        Json.AddProperty('POSUnit', POSUnit."No.");
+        Json.AddProperty('POSStore', POSUnit."POS Store Code");
+        if InstalledApp.Get('992c2309-cca4-43cb-9e41-911f482ec088') then begin
+            Json.AddProperty('retailAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
+        end;
+        if InstalledApp.Get('437dbf0e-84ff-417a-965d-ed2bb9650972') then begin
+            Json.AddProperty('baseAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
+        end;
+        Json.AddProperty('company', CompanyName());
+        Json.AddProperty('BCServiceInstanceId', ServiceInstanceId());
+        Json.AddProperty('BCSessionId', SessionId());
+        Json.AddProperty('BCClientType', Format(CurrentClientType()));
+        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then begin
+            Json.AddProperty('BCSessionUniqueId', Format(ActiveSession."Session Unique ID", 0, 4).ToLower());
+            if ActiveSession."Server Instance Name" <> '' then
+                Json.AddProperty('BCServerInstanceName', ActiveSession."Server Instance Name")
+            else
+                Json.AddProperty('BCServerInstanceName', '_');
+        end;
+        Json.AddProperty('POSType', Format(POSUnit."POS Type", 0, 9));
+    end;
+
+    internal procedure GetEnvironment(): Text
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        case true of
+            EnvironmentInformation.IsSaaS():
+                Exit('SaaS');
+            EnvironmentInformation.IsSandbox():
+                Exit('Sandbox');
+            GetUrl(ClientType::Web).Contains('dynamics-retail.net'):
+                Exit('crane');
+            else
+                Exit('OnPrem');
+        end;
+    end;
+
+    internal procedure WriteModulesJson(Json: Codeunit "NPR Json Builder")
+    var
+        NAVAppInstalledApp: Record "NAV App Installed App";
+        App: Text;
+    begin
+        if not _installedAppsLoaded then begin
+            NAVAppInstalledApp.SetFilter(Publisher, '<>%1', 'Microsoft');
+            if NAVAppInstalledApp.FindSet() then begin
+                repeat
+                    _installedApp.Add(NAVAppInstalledApp.Name, StrSubstNo('%1.%2.%3.%4', NAVAppInstalledApp."Version Major", NAVAppInstalledApp."Version Minor", NAVAppInstalledApp."Version Build", NAVAppInstalledApp."Version Revision"));
+                until NAVAppInstalledApp.Next() = 0;
+            end;
+            _installedAppsLoaded := true;
+        end;
+
+        Json.StartObject('modules');
+        foreach App in _installedApp.Keys() do begin
+            Json.AddProperty(App, _installedApp.Get(App));
+        end;
+        Json.EndObject();
+    end;
 }
+#endif

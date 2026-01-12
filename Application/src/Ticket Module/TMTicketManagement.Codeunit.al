@@ -92,9 +92,13 @@
         TicketAction: Codeunit "NPR POS Action - Ticket Mgt B.";
         ListPriceInclVat: Decimal;
         ListPriceExclVat: Decimal;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if (not TicketAction.GetRequestToken(POSEntry."Document No.", POSSalesLine."Line No.", Token, TokenLineNumber)) then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.endsale.ticket.confirm');
 
         if (POSEntry."Prices Including VAT") then begin
             ListPriceInclVat := POSSalesLine."Unit Price";
@@ -106,6 +110,8 @@
         ConfirmAndAdmitTicketsFromToken(Token, TokenLineNumber, POSEntry."Document No.", POSSalesLine."Line No.", POSEntry."POS Unit No.",
             POSSalesLine."Amount Incl. VAT (LCY)" / POSSalesLine.Quantity, POSSalesLine."Amount Excl. VAT (LCY)" / POSSalesLine.Quantity,
             ListPriceInclVat, ListPriceExclVat);
+
+        Span.Finish();
     end;
 
     procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10]; UnitAmountInclVat: Decimal; UnitAmountExclVat: Decimal; UnitPriceInclVat: Decimal; UnitPriceExclVat: Decimal)
@@ -314,8 +320,10 @@
         ResponseMessage: Text;
         PrintTicket: Boolean;
         PublishError: Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-
+        Sentry.StartSpan(Span, 'bc.pos.ticket.print');
         PrintTicket := true;
 
         if (TicketRequestManager.IsETicket(Ticket."No.")) then begin
@@ -365,7 +373,7 @@
                 Commit();
             end
         end;
-
+        Span.Finish();
     end;
 
     internal procedure IncrementPrintCount(TicketNo: Code[20])

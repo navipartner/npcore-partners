@@ -222,8 +222,7 @@ codeunit 6248217 "NPR Event Billing Client"
     #region === Sending to Billing DB via HTTP ===
     local procedure ProcessData(ReqJsonToken: JsonToken) RetVal: Boolean
     var
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        Sentry: Codeunit "NPR Sentry";
         SentryRegisterBillingEventSpan: Codeunit "NPR Sentry Span";
         Response: Codeunit "Http Response Message";
         LogCustDims: Dictionary of [Text, Text];
@@ -233,8 +232,7 @@ codeunit 6248217 "NPR Event Billing Client"
         ErrorMessage: Text;
         ReqTokenTextErrorMaxLen: Integer;
     begin
-        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
-            SentryActiveSpan.StartChildSpan('bc.np-billing-register-event', 'bc.np-billing-register-event', SentryRegisterBillingEventSpan);
+        Sentry.StartSpan(SentryRegisterBillingEventSpan, 'bc.np-billing-register-event');
 
         LogCustDims := SessionVarsToCustDims();
 
@@ -264,6 +262,7 @@ codeunit 6248217 "NPR Event Billing Client"
                 Session.LogMessage('NPR_API_NpBilling', StrSubstNo('HTTP Error %1 sending', HttpErrorCode), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, LogCustDims);
 
                 ErrorMessage := StrSubstNo('Failed to send HTTP request to the billing API. Http error %1, details: %2', HttpErrorCode, HttpErrorMessage);
+                Sentry.AddError(ErrorMessage, '');
             end;
         end else begin
             ErrorMessage := StrSubstNo('Failed to send HTTP request to the billing API. Error: %1', GetLastErrorText());
@@ -273,6 +272,7 @@ codeunit 6248217 "NPR Event Billing Client"
             LogCustDims.Set(CustDimErrorReasonTextTok, ErrorMessage);
 
             Session.LogMessage('NPR_API_NpBilling', 'SendData TryFunction failed.', Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, LogCustDims);
+            Sentry.AddError(ErrorMessage, GetLastErrorCallStack());
         end;
 
         SentryRegisterBillingEventSpan.Finish();

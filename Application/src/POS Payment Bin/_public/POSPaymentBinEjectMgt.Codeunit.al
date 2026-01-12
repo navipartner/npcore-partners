@@ -137,11 +137,17 @@
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
         OpenDrawer: Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        CheckSpan: Codeunit "NPR Sentry Span";
+        OpenSpan: Codeunit "NPR Sentry Span";
     begin
         OpenDrawer := Force;
         if not OpenDrawer then begin
+            Sentry.StartSpan(CheckSpan, 'bc.pos.endsale.drawer.check');
             //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
             OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS);
+            CheckSpan.Finish();
+
             if not OpenDrawer then
                 exit;
         end;
@@ -149,7 +155,9 @@
         if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSUnit."Default POS Payment Bin"))) then
             POSPaymentBin."Eject Method" := 'PRINTER';
 
+        Sentry.StartSpan(OpenSpan, 'bc.pos.endsale.drawer.open');
         EjectDrawer(POSPaymentBin, SalePOS, false);
+        OpenSpan.Finish();
     end;
 
     local procedure GetDrawerActionType(Manual: Boolean): Option

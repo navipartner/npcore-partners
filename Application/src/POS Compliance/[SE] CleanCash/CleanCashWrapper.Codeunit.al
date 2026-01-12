@@ -86,6 +86,8 @@
     var
         PosEntry: Record "NPR POS Entry";
         ResponseText: Text;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if (not IsCleanCashXCCSPComplianceEnabled(SalePOS."Register No.")) then
             exit;
@@ -101,7 +103,9 @@
         if (not IsCleanCashSetupValid(PosEntry."POS Unit No.", ResponseText)) then
             Message(ResponseText);
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.cleancash');
         HandleCleanCashXCCSPReceipt(PosEntry);
+        Span.Finish();
     end;
 
 

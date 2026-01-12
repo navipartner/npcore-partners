@@ -62,7 +62,10 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         ForceAmount: Boolean;
         CollectReturnInformation: Boolean;
         MembershipEmail: Text;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.payment.prepare');
         SwitchToPaymentView(Context);
 #pragma warning disable AA0139
         PaymentMethodCode := Context.GetStringParameter('paymentNo');
@@ -85,6 +88,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         Response.Add('collectReturnInformation', CollectReturnInformation);
         Response.Add('EnableMemberSubscPayerEmail', Payments.CheckMembershipSubscription(SalePOS, POSPaymentMethod, MembershipEmail));
         Response.Add('membershipEmail', MembershipEmail);
+        Span.Finish();
         exit(Response);
     end;
 

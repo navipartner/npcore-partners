@@ -587,6 +587,8 @@
         POSEntry: Record "NPR POS Entry";
         TaxFreeProfile: Record "NPR POS Tax Free Profile";
         POSUnit: Record "NPR POS Unit";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not SalePOS."Issue Tax Free Voucher" then
             exit;
@@ -604,7 +606,9 @@
 
         Commit();
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.taxfree_voucher');
         VoucherIssueFromPOSSale(SalePOS."Sales Ticket No.");
+        Span.Finish();
     end;
     #endregion
 

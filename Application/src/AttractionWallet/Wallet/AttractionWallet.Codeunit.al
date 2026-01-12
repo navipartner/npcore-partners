@@ -72,9 +72,13 @@ codeunit 6185062 "NPR AttractionWallet"
         AssetLine: Record "NPR WalletAssetLine";
         AssetHeader: Record "NPR WalletAssetHeader";
         WalletEntryNoList: List of [Integer];
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if (not IsWalletEnabled()) then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.wallet.print');
 
         // Assets Owned by receipt number
         WalletAssetHeaderRef.SetCurrentKey(LinkToReference, SupersededBy);
@@ -101,6 +105,8 @@ codeunit 6185062 "NPR AttractionWallet"
 
         if (WalletEntryNoList.Count() > 0) then
             PrintWalletsInternal(WalletEntryNoList, PrintContext);
+
+        Span.Finish();
     end;
 
     internal procedure PrintWallets(WalletEntryNoList: List of [Integer]; PrintContext: Enum "NPR WalletPrintType")

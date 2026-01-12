@@ -13,18 +13,23 @@ codeunit 6185052 "NPR API Request Processor"
         requestJson: JsonObject;
         responseJson: JsonObject;
         responseString: Text;
+        StartTime: DateTime;
+        Sentry: Codeunit "NPR Sentry";
     begin
-        _SessionMetadata.SetStartTime(CurrentDateTime());
+        StartTime := CurrentDateTime();
+        _SessionMetadata.SetStartTime(StartTime);
+
         _SessionMetadata.SetStartRowsRead(SessionInformation.SqlRowsRead());
         _SessionMetadata.SetStartStatementsExecuted(SessionInformation.SqlStatementsExecuted());
 
         requestJson.ReadFrom(message);
-        responseJson := ProcessRequest(requestJson);
+        responseJson := ProcessRequest(requestJson, StartTime);
         responseString := Format(responseJson);
+        Sentry.FinalizeScope();
         exit(responseString);
     end;
 
-    local procedure ProcessRequest(requestJson: JsonObject): JsonObject
+    local procedure ProcessRequest(requestJson: JsonObject; StartTime: DateTime): JsonObject
     var
         apiModuleResolver: Interface "NPR API Module Resolver";
         apiModule: Enum "NPR API Module";
@@ -43,8 +48,11 @@ codeunit 6185052 "NPR API Request Processor"
         requestBodyStr: Text;
         responseCodeunit: Codeunit "NPR API Response";
         jsonParser: Codeunit "NPR JSON Parser";
-        SentryTraceHeader: Text;
-        SentryTraceHeaderValues: List of [Text];
+        SentryHttp: Codeunit "NPR Sentry Http";
+        Sentry: Codeunit "NPR Sentry";
+        ExternalTraceId: Text;
+        ExternalSpanId: Text;
+        ExternalSampled: Boolean;
     begin
         jsonParser.Load(requestJson);
         jsonParser
@@ -64,12 +72,13 @@ codeunit 6185052 "NPR API Request Processor"
             Error(EmptyPathErr);
         end;
 
-        if (requestHeaders.ContainsKey(SentryTracerHeaderNameTok)) then begin
-            Evaluate(SentryTraceHeader, requestHeaders.Get(SentryTracerHeaderNameTok));
-            SentryTraceHeaderValues := SentryTraceHeader.Split('-');
+        if requestHeaders.ContainsKey(SentryTracerHeaderNameTok) then begin
+            if SentryHttp.TryParseSentryTraceHeader(requestHeaders.Get(SentryTracerHeaderNameTok), ExternalTraceId, ExternalSpanId, ExternalSampled) then
+                Sentry.InitScopeAndTransaction(StrSubstNo('%1 %2', requestHttpMethodStr, requestPath), StrSubstNo('http.server.bc:%1_%2', requestHttpMethodStr, requestPath), ExternalTraceId, ExternalSpanId, ExternalSampled, StartTime)
+            else
+                Sentry.InitScopeAndTransaction(StrSubstNo('%1 %2', requestHttpMethodStr, requestPath), StrSubstNo('http.server.bc:%1_%2', requestHttpMethodStr, requestPath), StartTime);
         end else begin
-            Clear(SentryTraceHeader);
-            Clear(SentryTraceHeaderValues);
+            Sentry.InitScopeAndTransaction(StrSubstNo('%1 %2', requestHttpMethodStr, requestPath), StrSubstNo('http.server.bc:%1_%2', requestHttpMethodStr, requestPath), StartTime);
         end;
 
         apiModuleName := requestRelativePathSegments.Get(1);

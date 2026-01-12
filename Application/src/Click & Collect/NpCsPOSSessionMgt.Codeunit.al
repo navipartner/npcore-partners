@@ -90,6 +90,8 @@
         NpCsDocument: Record "NPR NpCs Document";
         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
         POSSalesDocumentSetup: Record "NPR POS Sales Document Setup";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not POSSalesDocumentSetup.Get() then
             exit;
@@ -103,10 +105,14 @@
         if NpCsDocument.IsEmpty then
             exit;
 
+        Sentry.StartSpan(Span, 'bc.pos.clickcollect.deliver');
+
         NpCsDocument.FindSet();
         repeat
             NpCsCollectMgt.DeliverDocument(NpCsDocument);
         until NpCsDocument.Next() = 0;
+
+        Span.Finish();
     end;
 }
 

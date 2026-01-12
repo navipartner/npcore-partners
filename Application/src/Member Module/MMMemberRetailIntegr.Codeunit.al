@@ -256,6 +256,8 @@
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberCard: Record "NPR MM Member Card";
         MemberCard2: Record "NPR MM Member Card";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
 
         if (not MembershipEntry.SetCurrentKey("Receipt No.")) then;
@@ -270,6 +272,8 @@
             if (ShouldPrint) then begin
                 Membership.Reset();
                 Membership.SetFilter("Entry No.", '=%1', MembershipEntry."Membership Entry No.");
+
+                Sentry.StartSpan(Span, 'bc.pos.endsale.membership.print');
 
                 case MembershipSetup."POS Print Action" of
                     MembershipSetup."POS Print Action"::DIRECT:
@@ -309,6 +313,7 @@
 
                         end;
                 end;
+                Span.Finish();
             end;
 
         until (MembershipEntry.Next() = 0);

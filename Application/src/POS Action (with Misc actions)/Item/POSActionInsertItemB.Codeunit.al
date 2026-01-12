@@ -20,12 +20,10 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; SimpleItem: Boolean) Success: Boolean
     var
         ItemSearchErrLbl: Label 'Could not find a matching item for input %1';
-        SentryScope: Codeunit "NPR Sentry Scope";
-        SentryActionSpan: Codeunit "NPR Sentry Span";
+        Sentry: Codeunit "NPR Sentry";
         SentryGetItemSpan: Codeunit "NPR Sentry Span";
     begin
-        SentryScope.TryGetActiveSpan(SentryActionSpan);
-        SentryActionSpan.StartChildSpan('bc.workflow.ITEM.get', 'bc.workflow.ITEM.get', SentryGetItemSpan);
+        Sentry.StartSpan(SentryGetItemSpan, 'bc.pos.item_insert.get_item');
 
         if not Item.AreFieldsLoaded(GTIN) then
             Item.AddLoadFields(GTIN);
@@ -41,11 +39,15 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                     ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
                     ItemReference.SetLoadFields("Item No.", "Variant Code", "Unit of Measure", "Reference No.", "Reference Type");
                     if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then begin
-                        if SimpleItem then
+                        if SimpleItem then begin
+                            SentryGetItemSpan.Finish();
                             exit;
+                        end;
 
-                        if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
+                        if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then begin
+                            SentryGetItemSpan.Finish();
                             Error('');
+                        end;
                     end;
                     Item.Get(ItemReference."Item No.");
                 end;
@@ -54,9 +56,12 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                 if GetItemFromItemSearch(SimpleItem, ItemIdentifier) then
                     Item.Get(ItemIdentifier)
                 else begin
-                    if SimpleItem then
+                    if SimpleItem then begin
+                        SentryGetItemSpan.Finish();
                         exit;
+                    end;
 
+                    SentryGetItemSpan.Finish();
                     Error(ItemSearchErrLbl, ItemIdentifier);
                 end;
 
@@ -67,11 +72,15 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                     ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
                     ItemReference.SetLoadFields("Item No.", "Variant Code", "Unit of Measure", "Reference No.", "Reference Type");
                     if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then begin
-                        if SimpleItem then
+                        if SimpleItem then begin
+                            SentryGetItemSpan.Finish();
                             exit;
+                        end;
 
-                        if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
+                        if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then begin
+                            SentryGetItemSpan.Finish();
                             Error('');
+                        end;
                     end;
                     Item.Get(ItemReference."Item No.");
                 end;

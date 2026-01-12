@@ -276,7 +276,11 @@
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
         IsReprint: Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.print_pos_entry');
+
         POSEntryOutputLog.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryOutputLog.SetRange("Output Method", POSEntryOutputLog."Output Method"::Print);
         POSEntryOutputLog.SetFilter("Output Type", '=%1|=%2', POSEntryOutputLog."Output Type"::SalesReceipt, POSEntryOutputLog."Output Type"::LargeSalesReceipt);
@@ -328,6 +332,8 @@
         end;
 
         OnAfterPrintEntry(POSEntry, IsReprint);
+
+        Span.Finish();
     end;
 
 #pragma warning disable AA0139

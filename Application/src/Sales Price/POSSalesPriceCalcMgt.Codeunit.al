@@ -54,19 +54,25 @@
         ItemPriceCodeunitId: Integer;
         Handled: Boolean;
         POSSalesPriceCalcMgtW: Codeunit "NPR POS Sales Price Calc.Mgt.W";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.calc_line_price');
         if POSUnit.Get(SalePOS."Register No.") then;
         PricingProfile.GetItemPriceFunctionIfProfileExist(POSUnit."POS Pricing Profile", ItemPriceCodeunitId, ItemPriceFunction);
 
         if ItemPriceFunction <> '' then begin
             PricingProfile.OnFindItemPrice(ItemPriceCodeunitId, ItemPriceFunction, SalePOS, SaleLinePOS, Handled);
-            if Handled then
+            if Handled then begin
+                Span.Finish();
                 exit;
+            end
         end;
 
         FindSalesLinePrice(SalePOS, SaleLinePOS);
 
         POSSalesPriceCalcMgtW.OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Pricing Profile", 'OnFindItemPrice', '', true, true)]

@@ -1,13 +1,16 @@
 ﻿codeunit 6184509 "NPR EFT Try Print Receipt"
 {
     Access = Internal;
-    // NPR5.49/MMV /20190401 CASE 345188 Created object
-
     TableNo = "NPR EFT Transaction Request";
 
     trigger OnRun()
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.eft.print');
         Rec.PrintReceipts(false);
+        Span.Finish();
     end;
 }
 
