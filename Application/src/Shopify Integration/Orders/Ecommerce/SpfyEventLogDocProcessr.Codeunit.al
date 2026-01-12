@@ -54,16 +54,13 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
     end;
 
     internal procedure ProcessLogEntries(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
-    var
-        PSpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
     begin
-        PSpfyEventLogEntry.CopyFilters(SpfyEventLogEntry);
-        PSpfyEventLogEntry.SetFilter("Processing Status", '<>%1', PSpfyEventLogEntry."Processing Status"::Processed);
-        if not PSpfyEventLogEntry.FindSet() then
+        SpfyEventLogEntry.SetFilter("Processing Status", '<>%1', SpfyEventLogEntry."Processing Status"::Processed);
+        if not SpfyEventLogEntry.FindSet() then
             exit(true);
         repeat
-            ProcessLogEntry(PSpfyEventLogEntry);
-        until PSpfyEventLogEntry.Next() = 0;
+            ProcessLogEntry(SpfyEventLogEntry);
+        until SpfyEventLogEntry.Next() = 0;
 
         exit(CompletedSuccessfully(SpfyEventLogEntry));
     end;
@@ -328,15 +325,15 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
     begin
         SalesHeader.Validate("NPR Delivery Location");
-        if SalesHeader."Shipment Method Code" <> '' then
+        if ShipmentMapping."External Shipment Method Code" <> '' then
             SpfyOrderMgt.UpdateLocationFromShippingMapping(ShipmentMapping, SalesHeader);
         NpEcStore.Get(EcomSalesHeader."Ecommerce Store Code");
-        if not ((ShipmentMapping."Shipping Agent Code" <> '') and (ShipmentMapping."Spfy Location Code" <> '')) then begin // After sh is created check for mapping
+        if not ((ShipmentMapping."Shipping Agent Code" <> '') and (ShipmentMapping."Spfy Location Code" <> '')) then begin
             SpfyOrderMgt.FindLocationMapping(NpEcStore, LocationMapping, EcomSalesHeader."Ship-to Country Code", EcomSalesHeader."Ship-to Post Code");
-            if (LocationMapping."Location Code" <> '') and not (ShipmentMapping."Spfy Location Code" <> '') then begin
+            if (LocationMapping."Location Code" <> '') and (ShipmentMapping."Spfy Location Code" = '') then begin
                 if SalesHeader."Location Code" = '' then
                     SalesHeader.Validate("Location Code", LocationMapping."Location Code");
-                if (LocationMapping."Shipping Agent Code" <> '') and not (ShipmentMapping."Shipping Agent Code" <> '') then begin
+                if (LocationMapping."Shipping Agent Code" <> '') and (ShipmentMapping."Shipping Agent Code" = '') then begin
                     SalesHeader.Validate("Shipping Agent Code", LocationMapping."Shipping Agent Code");
                     SalesHeader.Validate("Shipping Agent Service Code", LocationMapping."Shipping Agent Service Code");
                 end;
