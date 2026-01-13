@@ -20,6 +20,7 @@
         RECREATE_LIST_CONFIRM: Label 'Warning.\The list will be recreated and the current notification status will set to pending.';
         _TodaysDate: Date;
 
+
     // This API is intended for the test framework to use - there is no spamming telemetry
     internal procedure CreateAdmissionScheduleTestFramework(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date)
     var
@@ -60,7 +61,7 @@
         CustomDimensions.Add('NPR_Regenerate', Format(Regenerate, 0, 9));
         CustomDimensions.Add('NPR_ReferenceDate', Format(ReferenceDate, 0, 9));
         CustomDimensions.Add('NPR_SourceTag', SourceTag);
-        CustomDimensions.Add('NPR_SchedularVersion', '2');
+        CustomDimensions.Add('NPR_SchedularVersion', '3');
 
         VerbosityLevel := Verbosity::Normal;
         Session.LogMessage('NPR_CreateAdmissionSchedule', 'CreateAdmissionSchedule Started', VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
@@ -78,6 +79,11 @@
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         DateRecord: Record Date;
         TempTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
+
+        ScheduleGeneratedAt: Dictionary of [Guid, Date];
+        ScheduleGeneratedUntil: Dictionary of [Guid, Date];
+        ScheduleLineSystemId: Guid;
+
         ScheduleStartDate: Date;
         ScheduleEndDate: Date;
         GenerateFromDate: Date;
@@ -88,12 +94,12 @@
         PartialUpdateDict: Dictionary of [Integer, Integer];
         InsertNewList: List of [Integer];
         CancelExistingList: List of [Integer];
-
         CountFullReplace, CountUpdated, CountNew, CountCanceled : Integer;
     begin
         AdmissionScheduleLines.SetCurrentKey("Admission Code", "Process Order");
         AdmissionScheduleLines.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (AdmissionScheduleLines.FindSet()) then begin
+
             GenerateFromDate := _TodaysDate;
             if ((ReferenceDate > _TodaysDate) and (Regenerate)) then
                 GenerateFromDate := ReferenceDate;
@@ -143,10 +149,10 @@
 
                     AdmissionScheduleLines.FindSet();
                     repeat
-                        GenerateScheduleEntry(AdmissionScheduleLines, DateRecord."Period Start", TempTargetAdmissionScheduleEntry);
+                        GenerateScheduleEntryV3(AdmissionScheduleLines, DateRecord."Period Start", TempTargetAdmissionScheduleEntry, ScheduleGeneratedAt, ScheduleGeneratedUntil);
                     until (AdmissionScheduleLines.Next() = 0);
 
-                    CompareScheduleEntriesV2(AdmissionCode,
+                    CompareScheduleEntriesV3(AdmissionCode,
                         DateRecord."Period Start",
                         TempTargetAdmissionScheduleEntry,
                         FullReplaceDict, PartialUpdateDict, InsertNewList, CancelExistingList,
@@ -161,6 +167,23 @@
                     EntryCounter += TempTargetAdmissionScheduleEntry.Count();
 
                 until (DateRecord.Next() = 0);
+
+                // Update the schedule lines with the new generated dates
+                foreach ScheduleLineSystemId in ScheduleGeneratedAt.Keys do begin
+                    AdmissionScheduleLines.GetBySystemId(ScheduleLineSystemId);
+                    if (AdmissionScheduleLines."Schedule Generated At" <> ScheduleGeneratedAt.Get(ScheduleLineSystemId)) then begin
+                        AdmissionScheduleLines."Schedule Generated At" := ScheduleGeneratedAt.Get(ScheduleLineSystemId);
+                        AdmissionScheduleLines.Modify();
+                    end;
+                end;
+
+                foreach ScheduleLineSystemId in ScheduleGeneratedUntil.Keys do begin
+                    AdmissionScheduleLines.GetBySystemId(ScheduleLineSystemId);
+                    if (AdmissionScheduleLines."Schedule Generated Until" <> ScheduleGeneratedUntil.Get(ScheduleLineSystemId)) then begin
+                        AdmissionScheduleLines."Schedule Generated Until" := ScheduleGeneratedUntil.Get(ScheduleLineSystemId);
+                        AdmissionScheduleLines.Modify();
+                    end;
+                end;
             end;
 
             CustomDimensions.Add('NPR_EntriesAffected', Format(EntryCounter, 0, 9));
@@ -199,7 +222,7 @@
 
     end;
 
-    local procedure GenerateScheduleEntry(AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines"; GenerateForDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
+    local procedure GenerateScheduleEntryV3(AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines"; GenerateForDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary; var ScheduleGeneratedAt: Dictionary of [Guid, Date]; var ScheduleGeneratedUntil: Dictionary of [Guid, Date])
     var
         Admission: Record "NPR TM Admission";
         Schedule: Record "NPR TM Admis. Schedule";
@@ -218,10 +241,8 @@
 
         if (not CalculateScheduleDateRange(AdmissionScheduleLines, GenerateForDate, 0D, true, ScheduleStartDate, ScheduleEndDate)) then begin
             // This schedule has expired in some way
-            if (AdmissionScheduleLines."Schedule Generated At" <> _TodaysDate) then begin
-                AdmissionScheduleLines."Schedule Generated At" := _TodaysDate;
-                AdmissionScheduleLines.Modify();
-            end;
+            if (AdmissionScheduleLines."Schedule Generated At" <> _TodaysDate) then
+                PutScheduleGeneratedDate(ScheduleGeneratedAt, AdmissionScheduleLines.SystemId, _TodaysDate);
             exit;
         end;
         Admission.SetLoadFields("Admission Code", "Admission Base Calendar Code");
@@ -282,11 +303,19 @@
                     if (Schedule.Sunday) then
                         AddTimeEntry(GenerateForDate, Admission, Schedule, TmpAdmissionScheduleEntry);
             end;
+
+            PutScheduleGeneratedDate(ScheduleGeneratedUntil, AdmissionScheduleLines.SystemId, GenerateForDate);
         end;
 
-        AdmissionScheduleLines."Schedule Generated Until" := DateRecord."Period Start";
-        AdmissionScheduleLines."Schedule Generated At" := _TodaysDate;
-        AdmissionScheduleLines.Modify();
+        PutScheduleGeneratedDate(ScheduleGeneratedAt, AdmissionScheduleLines.SystemId, _TodaysDate);
+    end;
+
+    local procedure PutScheduleGeneratedDate(var ScheduleGeneratedDict: Dictionary of [Guid, Date]; SystemId: Guid; NewDate: Date)
+    begin
+        if ScheduleGeneratedDict.ContainsKey(SystemId) then
+            ScheduleGeneratedDict.Remove(SystemId);
+
+        ScheduleGeneratedDict.Add(SystemId, NewDate);
     end;
 
     local procedure CalculateScheduleDateRange(AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines"; ReferenceDate: Date; MaxEndDate: Date; IgnoreGenerationDate: Boolean; var GenerateFromDate: Date; var GenerateUntilDate: Date) RefDateIsInRange: Boolean
@@ -447,67 +476,78 @@
         TmpAdmissionScheduleEntry.Modify();
     end;
 
-    local procedure CompareScheduleEntriesV2(AdmissionCode: Code[20];
+    local procedure CompareScheduleEntriesV3(
+        AdmissionCode: Code[20];
         ReferenceDate: Date;
         var TempTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
         var FullReplace: Dictionary of [Integer, Integer];
         var PartialUpdate: Dictionary of [Integer, Integer];
         var InsertNewList: List of [Integer];
         var CancelExistingList: List of [Integer];
-        Regenerate: Boolean
-    )
+        Regenerate: Boolean)
     var
-        AdmissionScheduleLine: Record "NPR TM Admis. Schedule Lines";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TempExistingAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
+        IsDifferent: Boolean;
+        PreviousExternalEntryNo: Integer;
     begin
-        // Get the last existing time slots for each schedule on reference date
-        AdmissionScheduleLine.SetFilter("Admission Code", '=%1', AdmissionCode);
-        if (AdmissionScheduleLine.FindSet()) then begin
-            AdmissionScheduleEntry.SetCurrentKey("Entry No.");
-            AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-            AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
-            AdmissionScheduleEntry.SetLoadFields("Entry No.", "External Schedule Entry No.", "Schedule Code", "Admission Start Date", "Admission End Date", "Admission Start Time", "Admission End Time", "Event Duration", "Regenerate With", Cancelled);
-            repeat
-                AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', AdmissionScheduleLine."Schedule Code");
 
-                // We only need the newest version per schedule/date.
-                // Key is forced to Entry No., so FindLast() returns the single uncancelled slot;
-                // earlier versions are already marked Cancelled and shouldn’t be reprocessed.
-                if (AdmissionScheduleEntry.FindLast()) then begin
-                    TempExistingAdmissionScheduleEntry.TransferFields(AdmissionScheduleEntry, true);
+        // Get the last existing time slots for each schedule on reference date
+        // NOTE: In BC, the primary key ("Entry No.") is appended to any secondary key.
+        // With current key ("Admission Code","Schedule Code","Admission Start Date"), iteration
+        // is deterministic and Entry No is ascending, so the last seen row per group is the newest.
+        // Do not use SetLoadFields here, as we need all fields for comparison.
+        AdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
+        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
+
+        // Single pass to get the latest entry for each admission and schedule code 
+        if (AdmissionScheduleEntry.FindSet()) then begin
+            PreviousExternalEntryNo := -1; // invalid value
+            repeat
+                if (PreviousExternalEntryNo <> AdmissionScheduleEntry."External Schedule Entry No.") and (PreviousExternalEntryNo <> -1) then begin
                     TempExistingAdmissionScheduleEntry.Insert();
                     CancelExistingList.Add(TempExistingAdmissionScheduleEntry."Entry No.");
                 end;
-            until (AdmissionScheduleLine.Next() = 0);
+                PreviousExternalEntryNo := AdmissionScheduleEntry."External Schedule Entry No.";
+                TempExistingAdmissionScheduleEntry.TransferFields(AdmissionScheduleEntry, true);
+
+            until (AdmissionScheduleEntry.Next() = 0);
+            TempExistingAdmissionScheduleEntry.Insert();
+            CancelExistingList.Add(TempExistingAdmissionScheduleEntry."Entry No.");
         end;
 
         // Verify target exists
         TempTargetAdmissionScheduleEntry.Reset();
+
+        TempExistingAdmissionScheduleEntry.Reset();
+        TempExistingAdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
         if (TempTargetAdmissionScheduleEntry.FindSet()) then begin
             repeat
                 InsertNewList.Add(TempTargetAdmissionScheduleEntry."Entry No.");
 
-                TempExistingAdmissionScheduleEntry.Reset();
                 TempExistingAdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TempTargetAdmissionScheduleEntry."Admission Code");
                 TempExistingAdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', TempTargetAdmissionScheduleEntry."Schedule Code");
                 TempExistingAdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
                 if (TempExistingAdmissionScheduleEntry.FindFirst()) then begin
+                    IsDifferent := not AreEqual(TempExistingAdmissionScheduleEntry, TempTargetAdmissionScheduleEntry);
 
                     if (Regenerate) then begin
-                        if (not AreEqual(TempExistingAdmissionScheduleEntry, TempTargetAdmissionScheduleEntry)) then
+                        if (IsDifferent) then
                             FullReplace.Add(TempExistingAdmissionScheduleEntry."Entry No.", TempTargetAdmissionScheduleEntry."Entry No.");
                     end else begin
                         if (TempExistingAdmissionScheduleEntry."Regenerate With" = TempExistingAdmissionScheduleEntry."Regenerate With"::SCHEDULER) then
-                            if (not AreEqual(TempExistingAdmissionScheduleEntry, TempTargetAdmissionScheduleEntry)) then
+                            if (IsDifferent) then
                                 FullReplace.Add(TempExistingAdmissionScheduleEntry."Entry No.", TempTargetAdmissionScheduleEntry."Entry No.");
 
                         if (TempExistingAdmissionScheduleEntry."Regenerate With" = TempExistingAdmissionScheduleEntry."Regenerate With"::MANUAL) then
-                            if (not AreEqual(TempExistingAdmissionScheduleEntry, TempTargetAdmissionScheduleEntry)) then
+                            if (IsDifferent) then
                                 PartialUpdate.Add(TempExistingAdmissionScheduleEntry."Entry No.", TempTargetAdmissionScheduleEntry."Entry No.");
                     end;
+
                     InsertNewList.Remove(TempTargetAdmissionScheduleEntry."Entry No.");
                     CancelExistingList.Remove(TempExistingAdmissionScheduleEntry."Entry No.");
+
                 end;
             until (TempTargetAdmissionScheduleEntry.Next() = 0);
         end;

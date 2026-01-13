@@ -1184,6 +1184,324 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         Assert.AreEqual(Expected, ScheduleEntry.Count(), Message);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExistingSchedulerEntryGetsFullReplaceWhenDifferent()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        Assert: Codeunit Assert;
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 090000T, 0);
+
+        // Simulate target having a different Dynamic Price Profile
+        ScheduleLine.SetRange("Admission Code", AdmissionCode);
+        ScheduleLine.SetRange("Schedule Code", ScheduleCode);
+        ScheduleLine.ModifyAll("Dynamic Price Profile Code", 'SAME');
+        // Generate initial entry (scheduler-owned)
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.SetRange(Cancelled, false);
+        ScheduleEntry.FindFirst();
+        Assert.AreEqual('SAME', ScheduleEntry."Dynamic Price Profile Code", 'Scheduler-owned entry should be replaced when differing.');
+
+        // Simulate target having a different Dynamic Price Profile
+        ScheduleLine.SetRange("Admission Code", AdmissionCode);
+        ScheduleLine.SetRange("Schedule Code", ScheduleCode);
+        ScheduleLine.ModifyAll("Dynamic Price Profile Code", 'DIFF');
+
+        // Soft regenerate should full-replace scheduler-owned entries that differ
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.SetRange(Cancelled, false);
+        ScheduleEntry.FindFirst();
+        Assert.AreEqual('DIFF', ScheduleEntry."Dynamic Price Profile Code", 'Scheduler-owned entry should be replaced when differing.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExistingManualEntryGetsPartialUpdateWhenDifferent()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        Assert: Codeunit Assert;
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 090000T, 0);
+
+        // Simulate target having a different Dynamic Price Profile
+        ScheduleLine.SetRange("Admission Code", AdmissionCode);
+        ScheduleLine.SetRange("Schedule Code", ScheduleCode);
+        ScheduleLine.ModifyAll("Max Capacity Per Sch. Entry", 10);
+
+        // Generate initial entry (scheduler-owned)
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        // Switch to manual and tweak capacity
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.FindFirst();
+        Assert.AreEqual(10, ScheduleEntry."Max Capacity Per Sch. Entry", 'Initial capacity should be as per schedule line.');
+
+        // Switch to manual and tweak times
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.FindFirst();
+        ScheduleEntry."Regenerate With" := ScheduleEntry."Regenerate With"::MANUAL;
+        ScheduleEntry."Max Capacity Per Sch. Entry" := 7;
+        ScheduleEntry.Modify();
+
+        // Target will differ; expect partial update, not full replace
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.SetRange(Cancelled, false);
+        ScheduleEntry.FindFirst();
+        Assert.AreEqual(7, ScheduleEntry."Max Capacity Per Sch. Entry", 'Manual-owned entry should be partially updated and retain manual change.');
+        Assert.AreEqual(ScheduleEntry."Regenerate With"::MANUAL, ScheduleEntry."Regenerate With", 'Manual ownership should be preserved.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CancelledExistingDoesNotBlockInsert()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        Assert: Codeunit Assert;
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 090000T, 0);
+
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        // Cancel the only existing entry
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.FindFirst();
+        ScheduleEntry.Cancelled := true;
+        ScheduleEntry.Modify();
+
+        // Regenerate should insert a fresh active entry, not be blocked by the cancelled one
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.SetRange(Cancelled, false);
+        Assert.AreEqual(1, ScheduleEntry.Count(), 'Cancelled existing entry should not block inserting a new active entry.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExistingEntryNotCanceledWhenReferenceAdvances()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        Assert: Codeunit Assert;
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 090000T, 0);
+
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        // Advance reference so no targets are generated for today
+        SoftRegenerateSchedule(AdmissionCode, CalcDate('<+1D>'));
+
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.SetRange(Cancelled, false);
+        Assert.AreEqual(1, ScheduleEntry.Count(), 'Existing entry should not be canceled when reference advances.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EarlyExitBlockedLineUpdatesGeneratedFields()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        Schedule: Record "NPR TM Admis. Schedule";
+        Assert: Codeunit "Assert";
+        AdmissionCode: Code[20];
+        ScheduleCode1, ScheduleCode2 : Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode1, CalcDate('<-1D>'), 080000T, 090000T, 0);
+        CreateTimeSlot(AdmissionCode, ScheduleCode2, CalcDate('<-1D>'), 090000T, 100000T, 0);
+        SoftRegenerateSchedule(AdmissionCode, CalcDate('<-1D>'), CalcDate('<-1D>'));
+
+        // Invalidate the schedule by exipiring the line
+        Schedule.Get(ScheduleCode2);
+        Schedule."Recurrence Until Pattern" := Schedule."Recurrence Until Pattern"::END_DATE;
+        Schedule."End After Date" := CalcDate('<-1D>');
+        Schedule.Modify();
+        SoftRegenerateSchedule(AdmissionCode, Today(), Today());
+
+        // No entries should be created for the blocked line
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode2);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.SetRange(Cancelled, false);
+        Assert.AreEqual(0, ScheduleEntry.Count(), 'Expired schedule line should not generate entries.');
+
+        // Early-exit should still update generation tracking
+        ScheduleLine.Get(AdmissionCode, ScheduleCode2);
+        Assert.AreEqual(Today(), ScheduleLine."Schedule Generated At", 'Schedule Generated At should be updated on early exit.');
+        Assert.AreEqual(CalcDate('<-1D>'), ScheduleLine."Schedule Generated Until", 'Schedule Generated Until should remain last processed day on early exit.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EarlyExitAlreadyGeneratedTodayVsForce()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        Assert: Codeunit "Assert";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        CountAfterFirst, CountAfterSecond, CountAfterForce : Integer;
+        GeneratedAtBefore: Date;
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 090000T, 0);
+
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", Today());
+        ScheduleEntry.SetRange(Cancelled, false);
+        CountAfterFirst := ScheduleEntry.Count();
+
+        ScheduleLine.Get(AdmissionCode, ScheduleCode);
+        GeneratedAtBefore := ScheduleLine."Schedule Generated At";
+        Assert.AreEqual(Today(), GeneratedAtBefore, 'Schedule Generated At should be today after first soft run.');
+
+        // Second soft generate should early-exit (no changes)
+        SoftRegenerateSchedule(AdmissionCode, Today());
+        CountAfterSecond := ScheduleEntry.Count();
+
+        ScheduleLine.Get(AdmissionCode, ScheduleCode);
+        Assert.AreEqual(CountAfterFirst, CountAfterSecond, 'Second soft run should not create new entries.');
+        Assert.AreEqual(GeneratedAtBefore, ScheduleLine."Schedule Generated At", 'Schedule Generated At should not change on early exit.');
+
+        // Force regenerate ignores the "already generated today" guard
+        ForceRegenerateSchedule(AdmissionCode, Today());
+        CountAfterForce := ScheduleEntry.Count();
+
+        Assert.IsTrue(CountAfterForce >= CountAfterSecond, 'Force regenerate should not early-exit and may add/cancel entries.');
+    end;
+
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Manual_PerformanceRegenerateScheduleEntries()
+    var
+        AdmissionCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        DurationMs: Integer;
+        StartTime, EndTime : Time;
+        i: Integer;
+        SqlRowCount, SqlStatmentCount : Integer;
+        Assert: Codeunit "Assert";
+    begin
+        CreateMinimalSetup();
+        CreateEventWithAdmissionCode(AdmissionCode, TicketTypeCode, ItemNo, AdmissionCode);
+        CreateBackToBackSlots(AdmissionCode);
+        ForceRegenerate();
+
+        SqlRowCount := SessionInformation.SqlRowsRead();
+        SqlStatmentCount := SessionInformation.SqlStatementsExecuted();
+        StartTime := Time();
+
+        for i := 1 to 2 do
+            SoftRegenerateSchedule(AdmissionCode, Today());
+
+        SqlRowCount := SessionInformation.SqlRowsRead() - SqlRowCount;
+        SqlStatmentCount := SessionInformation.SqlStatementsExecuted() - SqlStatmentCount;
+        EndTime := Time();
+        DurationMs := EndTime - StartTime;
+
+        // 2026-01-13: BC26 - Duration: 3077 ms, SQL Rows: 5744, SQL Statements: 4087
+        // Error(StrSubstNo('Duration: %1 ms, SQL Rows: %2, SQL Statements: %3', DurationMs, SqlRowCount, SqlStatmentCount));
+    end;
+
+
+    local procedure CreateBackToBackSlots(AdmissionCode: Code[20])
+    var
+        ScheduleCode: Code[20];
+        i: Integer;
+        StartTime, EndTime : Time;
+        OneHourMs: Integer;
+    begin
+        OneHourMs := 60 * 60 * 1000;
+        StartTime := 080000T;
+
+        for i := 1 to 10 do begin
+            EndTime := StartTime + OneHourMs;
+            CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), StartTime, EndTime, 180);
+            StartTime := EndTime;
+        end;
+    end;
+
+    local procedure CreateEventWithAdmissionCode(AdmissionCodeParam: Code[20]; var TicketTypeCode: Code[10]; var ItemNo: Code[20]; var AdmissionCode: Code[20])
+    var
+        TicketTestLibrary: Codeunit "NPR Library - Ticket Module";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        TicketType: Record "NPR TM Ticket Type";
+        Admission: Record "NPR TM Admission";
+    begin
+        TicketTypeCode := TicketTestLibrary.CreateTicketType(TicketTestLibrary.GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
+        ItemNo := TicketTestLibrary.CreateItem('', TicketTypeCode, Random(200) + 100);
+        AdmissionCode := TicketTestLibrary.CreateAdmissionCode(AdmissionCodeParam, Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY, '', '');
+        TicketTestLibrary.CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+    end;
+
+
 
     procedure Performance()
     var
