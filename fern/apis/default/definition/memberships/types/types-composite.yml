@@ -43,6 +43,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
@@ -241,6 +242,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
@@ -415,6 +417,7 @@ types:
       membershipNumber: simpleTypes.MembershipNumber
       communityCode: simpleTypes.CommunityCode
       membershipCode: simpleTypes.MembershipCode
+      membershipDescription: simpleTypes.MembershipDescription
       issueDate: simpleTypes.IssueDate
       validFromDate: optional<simpleTypes.ValidFromDate>
       validUntilDate: optional<simpleTypes.ValidUntilDate>
@@ -430,6 +433,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
@@ -443,6 +447,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
@@ -634,6 +639,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
@@ -648,6 +654,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.CancelDate
@@ -662,6 +669,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.LifecycleDate.RenewFromDate
           validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
@@ -677,6 +685,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
@@ -692,6 +701,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
@@ -829,6 +839,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.LifecycleDate.RenewFromDate
           validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
@@ -843,6 +854,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
@@ -857,6 +869,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
@@ -871,6 +884,7 @@ types:
           membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          membershipDescription: $simpleTypes.MembershipDescription.GOLD
           issueDate: $simpleTypes.IssueDate.ExampleIssueDate
           validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate

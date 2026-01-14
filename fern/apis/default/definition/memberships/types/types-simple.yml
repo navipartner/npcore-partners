@@ -19,6 +19,15 @@ types:
       - name: PLATINUM
         value: "PLATINUM"
 
+  MembershipDescription:
+    type: string
+    docs: Description of the membership type.
+    examples:
+      - name: SILVER
+        value: "Silver Membership with basic benefits"
+      - name: GOLD
+        value: "Gold Membership with premium benefits"
+
   Description:
     type: string
     docs: Description of the entity.

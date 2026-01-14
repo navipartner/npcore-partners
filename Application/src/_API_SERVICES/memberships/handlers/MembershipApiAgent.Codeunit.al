@@ -231,17 +231,23 @@ codeunit 6185123 "NPR MembershipApiAgent"
 
     internal procedure MembershipDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"): Codeunit "NPR JSON Builder"
     var
+        MembershipSetup: Record "NPR MM Membership Setup";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         AttributeAgent: Codeunit "NPR MembershipAttributesAgent";
         ValidFrom, ValidUntil : Date;
     begin
         MembershipMgt.GetConsecutiveTimeFrame(Membership."Entry No.", Today(), ValidFrom, ValidUntil);
 
+        MembershipSetup.SetLoadFields(Description);
+        if (not (MembershipSetup.Get(Membership."Membership Code"))) then
+            MembershipSetup.Init();
+
         ResponseJson
             .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
             .AddProperty('membershipNumber', Membership."External Membership No.")
             .AddProperty('communityCode', Membership."Community Code")
             .AddProperty('membershipCode', Membership."Membership Code")
+            .AddProperty('membershipDescription', MembershipSetup.Description)
             .AddProperty('issueDate', Membership."Issued Date")
             .AddProperty('blocked', Membership.Blocked)
             .AddObject(AddRequiredProperty(ResponseJson, 'validFromDate', ValidFrom))
