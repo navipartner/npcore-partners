@@ -3,7 +3,6 @@ page 6185074 "NPR APIV1 PBI SubsRequest"
     Extensible = false;
     PageType = API;
     Editable = false;
-    DelayedInsert = true;
     DataAccessIntent = ReadOnly;
     APIPublisher = 'navipartner';
     APIGroup = 'powerBI';
@@ -11,7 +10,9 @@ page 6185074 "NPR APIV1 PBI SubsRequest"
     EntitySetName = 'subscriptionRequests';
     EntityName = 'subscriptionRequest';
     SourceTable = "NPR MM Subscr. Request";
-
+    Caption = 'PowerBI Subscription Request';
+    ODataKeyFields = SystemId;
+    DelayedInsert = true;
     layout
     {
         area(Content)
@@ -81,6 +82,18 @@ page 6185074 "NPR APIV1 PBI SubsRequest"
                 field(createdAt; Rec.SystemCreatedAt)
                 {
                     Caption = 'Created At', Locked = true;
+                }
+                field(terminateAt; Rec."Terminate At")
+                {
+                    Caption = 'Terminate At', Locked = true;
+                }
+                field(terminationRequestedAt; Rec."Termination Requested At")
+                {
+                    Caption = 'Termination Requested At', Locked = true;
+                }
+                field(terminationReason; Rec."Termination Reason")
+                {
+                    Caption = 'Termination Reason', Locked = true;
                 }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
