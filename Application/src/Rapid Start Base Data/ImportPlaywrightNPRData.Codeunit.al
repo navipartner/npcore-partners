@@ -30,6 +30,15 @@
         AllowHttpCalls, BufBoolean : Boolean;
         GetFeatureFlags: Codeunit "NPR Get Feature Flags JQ";
     begin
+        // Enable HTTP calls first, before any other operations
+        CheckAndSetAllowHttpCalls(true, AllowHttpCalls);
+
+        // Init Feature flag setup for OnPrem so it doesn't trigger Azure Key Vault calls
+        InitFeatureFlagSetupAsOnPrem();
+
+        // Fetch feature flags
+        GetFeatureFlags.Run();
+
         // User to PosUnit mapping
         UserPosUnitMapping.Add('OLDRESTUSER', '04');
         UserPosUnitMapping.Add('RESTUSER', '04');
@@ -43,8 +52,7 @@
         // Run mapping
         AssignPosUnitsToUsers(UserPosUnitMapping, '01');
 
-        CheckAndSetAllowHttpCalls(true, AllowHttpCalls);
-        GetFeatureFlags.Run();
+        // Restore original HTTP setting
         CheckAndSetAllowHttpCalls(AllowHttpCalls, BufBoolean);
     end;
 
@@ -209,7 +217,20 @@
             exit;
 
         NAVAppSetting."Allow HttpClient Requests" := NewValue;
-        if not NavAppSetting.Modify(true) then;
+        if not NavAppSetting.Modify() then;
+    end;
+
+    local procedure InitFeatureFlagSetupAsOnPrem()
+    var
+        FeatureFlagSetup: Record "NPR Feature Flags Setup";
+    begin
+        FeatureFlagSetup.Reset();
+        if not FeatureFlagSetup.IsEmpty() then
+            exit;
+
+        FeatureFlagSetup.Init();
+        FeatureFlagSetup.Identifier := CreateGuid();
+        FeatureFlagSetup.Insert();
     end;
 
 }
