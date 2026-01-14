@@ -39,17 +39,8 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             Error(NoOrdersErr, Url);
     end;
 
-    [TryFunction]
-    procedure SendFulfillmentRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
 
-        Url := GetShopifyUrl(NcTask."Store Code") + 'fulfillments.json';
-        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-    end;
-
+    [Obsolete('This procedure is part of the Shopify REST API , which is deprecated. Use the GraphQL query instead.', '2026-01-15')]
     procedure GetShopifyOrderFulfillmentOrders(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; var ShopifyResponse: JsonToken)
     var
         ResponseText: Text;
@@ -129,16 +120,18 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         VariablesJson.Add('afterCursor', CursorValue);
     end;
 
-    internal procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")
+    internal procedure CompleteGraphQLRequest(RequestString: Text; VariablesJson: JsonObject; var NcTask: Record "NPR Nc Task")
     var
-        NoRequestBodyErr: Label 'Each request must have a json formatted content attached';
+        RequestJson: JsonObject;
+        QueryStream: OutStream;
     begin
-        NcTask.TestField("Store Code");
-        NcTask.testfield("Record Value");
-        if not NcTask."Data Output".HasValue then
-            Error(NoRequestBodyErr);
+        RequestJson.Add('query', RequestString);
+        RequestJson.Add('variables', VariablesJson);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        RequestJson.WriteTo(QueryStream);
     end;
 
+    [Obsolete('This procedure is part of the Shopify REST API , which is deprecated. Use the GraphQL query instead.', '2026-01-15')]
     local procedure SendShopifyRequest(ShopifyStoreCode: Code[20]; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text
     var
         NcTask: Record "NPR Nc Task";
@@ -147,6 +140,33 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Clear(NcTask);
         NcTask."Store Code" := ShopifyStoreCode;
         ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
+    end;
+
+    internal procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; Cursor: Text; ShopifyStoreCode: Code[20]; RequestString: Text; OrderGID: Text[100]; IncludeCursor: Boolean)
+    var
+        VariablesJson: JsonObject;
+    begin
+        NcTask."Store Code" := ShopifyStoreCode;
+        VariablesJson.Add('OrderId', OrderGID);
+        if IncludeCursor then // Cursor is added only for paginated GraphQL queries. Header-level queries do not support pagination parameters.
+            AddGraphQLCursor(VariablesJson, Cursor);
+        CompleteGraphQLRequest(RequestString, VariablesJson, NcTask);
+    end;
+
+    internal procedure InitializePagingState(var Cursor: Text; var HasNext: Boolean)
+    begin
+        Cursor := '';
+        HasNext := true;
+    end;
+
+    internal procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")
+    var
+        NoRequestBodyErr: Label 'Each request must have a json formatted content attached';
+    begin
+        NcTask.TestField("Store Code");
+        NcTask.testfield("Record Value");
+        if not NcTask."Data Output".HasValue then
+            Error(NoRequestBodyErr);
     end;
 
     local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text

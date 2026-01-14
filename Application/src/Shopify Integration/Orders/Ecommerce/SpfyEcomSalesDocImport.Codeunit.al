@@ -458,7 +458,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         GiftCardTransaction: Boolean;
     begin
-        EcomSalesPmtLine."Shopify ID" := _SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(PaymentLineJsonToken, 'id', true));
+        EcomSalesPmtLine."Shopify ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(PaymentLineJsonToken, 'id', true));
         EcomSalesPmtLine.Amount := JsonHelper.GetJDecimal(PaymentLineJsonToken, 'amountSet.presentmentMoney.amount', false);
         EcomSalesPmtLine."Amount (Store Currency)" := JsonHelper.GetJDecimal(PaymentLineJsonToken, 'amountSet.shopMoney.amount', true);
         EcomSalesPmtLine."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(PaymentLineJsonToken, 'amountSet.shopMoney.currencyCode', false));
@@ -656,7 +656,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         SpfyIntegrationEvents.OnBeforeUpdateSalesLine(SalesLineJsonToken, SalesHeader, SalesLine, IsHandled);
         if IsHandled then
             exit;
-        if _SpfyFulfillmentCache.GetLineFromCache(_SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'id', true)), TempSpfyFulfillmentBuffer) then begin
+        if _SpfyFulfillmentCache.GetLineFromCache(OrderMgt.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'id', true)), TempSpfyFulfillmentBuffer) then begin
             SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Line", "NPR Spfy ID Type"::"Entry ID", TempSpfyFulfillmentBuffer."Order Line ID", ShopifyAssignedID);
             if not ShopifyAssignedID.FindFirst() then begin
                 if _SpfyAPIOrderHelper.OrderLineIsGiftCard(SalesLineJsonToken) then
@@ -723,7 +723,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         ShipmentFee := JsonHelper.GetJDecimal(ShippingLineJsonToken, 'originalPriceSet.presentmentMoney.amount', false);
         if ShipmentFee = 0 then
             exit;
-        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Line", "NPR Spfy ID Type"::"Entry ID", _SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(ShippingLineJsonToken, 'id', true)), ShopifyAssignedID);
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Line", "NPR Spfy ID Type"::"Entry ID", OrderMgt.GetNumericId(JsonHelper.GetJText(ShippingLineJsonToken, 'id', true)), ShopifyAssignedID);
         if not ShopifyAssignedID.FindFirst() then
             if AddNewShippingLine(SalesLine, ShippingLineJsonToken, SalesHeader) then
                 exit;
@@ -772,7 +772,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             SalesLine."Description 2" := CopyStr(ShipmentFeeTitle, MaxStrLen(SalesLine.Description) + 1, MaxStrLen(SalesLine."Description 2"));
         end;
         SalesLine.Modify(true);
-        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", _SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(ShippingLineJsonToken, 'id', true)), false);
+        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", OrderMgt.GetNumericId(JsonHelper.GetJText(ShippingLineJsonToken, 'id', true)), false);
         SpfyIntegrationEvents.OnAfterUpdateSalesLineShipmentFee(SalesHeader, SalesLine, true);
         exit(true);
     end;
@@ -912,7 +912,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         WrongItemErr: Label 'The selected item %1 is not configured as a membership.', Comment = '%1=Item No.';
         NotFoundItemErr: Label 'Item not found for Shopify Product ID %1', Comment = '%1= ShopifyProductID';
     begin
-        ProductId := _SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'product.id', true));
+        ProductId := OrderMgt.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'product.id', true));
         if not SpfyItemMgt.FindItemByShopifyProductID(LogEntry."Store Code", ProductId, SpfyStoreItemLink) then
             Error(NotFoundItemErr);
         if not IsMembershipItem(SpfyStoreItemLink."Item No.") then
@@ -988,7 +988,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     var
         NotSupportedLineTypeErr: Label '%1 %2 is not suported', Comment = '%1=IncEcomSalesLine.FieldCaption(Type);%2=IncEcomSalesLine.Type';
     begin
-        IncEcomSalesLine."Shopify ID" := _SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'id', true));
+        IncEcomSalesLine."Shopify ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'id', true));
         case IncEcomSalesLine.Type of
             IncEcomSalesLine.Type::Voucher:
                 PopulateVoucherLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);

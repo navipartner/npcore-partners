@@ -305,7 +305,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     begin
         ClearLastError();
 
-        if not SpfyOrderMgt.EligibleSourceName(JsonHelper.GetJText(Order, 'sourceName', true)) then
+        if not OrderMgt.EligibleSourceName(JsonHelper.GetJText(Order, 'sourceName', true)) then
             exit;
 
         if not TryGetOrderProperties(Order, OrderId, DocName) then begin
@@ -320,7 +320,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
             exit;
 
         if OrderStatus = OrderStatus::Open then
-            if SpfyOrderMgt.IsAnonymizedCustomerOrder(JsonHelper.GetJText(Order, 'customer.firstName', false), JsonHelper.GetJText(Order, 'customer.lastName', false)) then
+            if OrderMgt.IsAnonymizedCustomerOrder(JsonHelper.GetJText(Order, 'customer.firstName', false), JsonHelper.GetJText(Order, 'customer.lastName', false)) then
                 exit;
 
         exit(true);
@@ -335,7 +335,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     local procedure TryGetOrderProperties(Order: JsonToken; var OrderId: Text[20]; var DocName: Text[100])
     begin
 #pragma warning disable AA0139
-        OrderId := SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(Order, 'id', true));
+        OrderId := OrderMgt.GetNumericId(JsonHelper.GetJText(Order, 'id', true));
         DocName := JsonHelper.GetJText(Order, 'number', true);
 #pragma warning restore AA0139
     end;
@@ -376,7 +376,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyAPIOrderHelper: Codeunit "NPR Spfy Order ApiHelper";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         LastStoresReload: DateTime;
         ErrorsSinceLastMarker: Dictionary of [Code[20], Boolean];
         InitialFromDT: Dictionary of [Code[20], DateTime];

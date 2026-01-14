@@ -16,12 +16,12 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
     [TryFunction]
     local procedure TryInsertLog(OrderTkn: JsonToken; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
     var
-        SpfyAPIOrderHelper: Codeunit "NPR Spfy Order ApiHelper";
+        OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         AlreadyExistsErr: Label 'A log entry for Order ID %1 with status %2 already exists.', Comment = '%1=Order ID, %2=Order Status';
     begin
         SpfyEventLogEntry.Type := SpfyEventLogEntry.Type::"Incoming Sales Order";
         SpfyEventLogEntry."Entry No." := 0;
-        SpfyEventLogEntry."Shopify ID" := SpfyAPIOrderHelper.GetNumericId(JsonHelper.GetJText(OrderTkn, 'id', true));
+        SpfyEventLogEntry."Shopify ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(OrderTkn, 'id', true));
         SpfyEventLogEntry."Event Date-Time" := JsonHelper.GetJDT(OrderTkn, 'createdAt', true);
         SpfyEventLogEntry."Document Name" := CopyStr(JsonHelper.GetJText(OrderTkn, 'name', false), 1, MaxStrLen(SpfyEventLogEntry."Document Name"));
         SpfyEventLogEntry."Bucket Id" := Random(100);

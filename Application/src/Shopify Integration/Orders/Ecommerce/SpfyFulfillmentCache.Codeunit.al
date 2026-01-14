@@ -115,10 +115,10 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
     internal procedure AddGiftCardDetails(GCOrderLineId: Text[100]; GiftCardGID: Text[100]; LastCharacters: Text)
     var
         TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
-        SpfyAPIOrderHelper: Codeunit "NPR Spfy Order ApiHelper";
+        OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         GiftCardId: Text[30];
     begin
-        GiftCardId := SpfyAPIOrderHelper.GetNumericId(GiftCardGID);
+        GiftCardId := OrderMgt.GetNumericId(GiftCardGID);
         PrepareTempBuffer(TempBuffer);
         TempBuffer.SetRange("Order Line ID", GCOrderLineId);
         if TempBuffer.FindFirst() then begin

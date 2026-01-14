@@ -1226,7 +1226,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 SalesLine.Validate("Line Discount Amount", LineDiscountAmount);
     end;
 
-    internal procedure GetCustomerIdentifiers(Order: JsonToken; var Email: Text; var Phone: Text; var ShopifyCustomerID: Text[30]; CustomerDefaultPhonePath: Text; GetNumericId: Boolean)
+    internal procedure GetCustomerIdentifiers(Order: JsonToken; var Email: Text; var Phone: Text; var ShopifyCustomerID: Text[30]; CustomerDefaultPhonePath: Text; UseNumericId: Boolean)
     var
         ShopifyId: Text;
         ShopifyCustomerIDLbl: Label 'Shopify Customer Id';
@@ -1245,7 +1245,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
 
         ShopifyId := JsonHelper.GetJText(Order, 'customer.id', false);
-        if GetNumericId then
+        if UseNumericId then
             if ShopifyId <> '' then
                 ShopifyId := SpfyIntegrationMgt.RemoveUntil(ShopifyId, '/');
         ValidateMaxLength(ShopifyId, MaxStrLen(ShopifyCustomerID), ShopifyCustomerIDLbl);
@@ -1906,6 +1906,17 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
+
+    internal procedure GetNumericId(GlobalId: Text) ShopifyId: Text[30]
+    var
+        FullShopifyId: Text;
+        ShopifyIdLbl: Label 'Shopify Id';
+    begin
+        FullShopifyId := SpfyIntegrationMgt.RemoveUntil(GlobalId, '/');
+        ValidateMaxLength(FullShopifyId, MaxStrLen(ShopifyId), ShopifyIdLbl);
+        ShopifyId := CopyStr(FullShopifyId, 1, MaxStrLen(ShopifyId));
+    end;
+
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterCopyFromItem', '', true, false)]
 #else

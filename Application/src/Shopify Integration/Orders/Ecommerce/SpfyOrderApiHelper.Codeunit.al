@@ -79,9 +79,9 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     local procedure TryGetOrderDetails(OrderGID: Text[100]; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var LineItemsArr: JsonArray; var HeaderResponse: JsonObject; var FulfilmentsArr: JsonArray; var ShippingLinesArr: JsonArray): Boolean
     var
         TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
-        HeaderRequest: Label 'query GetHeader($idFilter: ID!) { order(id: $idFilter) { id displayFinancialStatus createdAt email phone note sourceName customer{id firstName lastName defaultAddress{phone}} billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 } number note sourceName createdAt closedAt cancelledAt totalPriceSet { presentmentMoney { amount } shopMoney { amount } } currencyCode presentmentCurrencyCode capturable transactions(first: 250) { id kind status amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } authorizationCode authorizationExpiresAt processedAt createdAt gateway multiCapturable parentTransaction { id kind } paymentId processedAt status totalUnsettledSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentDetails { ... on CardPaymentDetails { avsResultCode bin company expirationMonth expirationYear name number paymentMethodName wallet } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } }', Locked = true;
-        ItemLinesRequest: Label 'query GetOrderLines($idFilter: ID!, $afterCursor:String) { order(id: $idFilter) { lineItems(after:$afterCursor, first: 50) { pageInfo { hasNextPage endCursor } edges { node { id sku  taxLines{ratePercentage priceSet{presentmentMoney{amount}}} originalUnitPriceSet { presentmentMoney { amount } } customAttributes {key value} isGiftCard product {id productType} name title variant{price} quantity variantTitle unfulfilledQuantity currentQuantity nonFulfillableQuantity discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } } } } } }', Locked = true;
-        ShippingLinesRequest: Label 'query GetShippingLines($idFilter: ID!, $afterCursor:String) { order(id: $idFilter) { shippingLines(first: 10, after:$afterCursor) { pageInfo { endCursor hasNextPage } edges { node { id code title taxLines{ratePercentage priceSet{presentmentMoney{amount}}} discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } code originalPriceSet { presentmentMoney { amount } } } } } } }', Locked = true;
+        HeaderRequest: Label 'query GetHeader($OrderId: ID!) { order(id: $OrderId) { id displayFinancialStatus createdAt email phone note sourceName customer{id firstName lastName defaultAddress{phone}} billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 } number note sourceName createdAt closedAt cancelledAt totalPriceSet { presentmentMoney { amount } shopMoney { amount } } currencyCode presentmentCurrencyCode capturable transactions(first: 250) { id kind status amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } authorizationCode authorizationExpiresAt processedAt createdAt gateway multiCapturable parentTransaction { id kind } paymentId processedAt status totalUnsettledSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentDetails { ... on CardPaymentDetails { avsResultCode bin company expirationMonth expirationYear name number paymentMethodName wallet } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } }', Locked = true;
+        ItemLinesRequest: Label 'query GetOrderLines($OrderId: ID!, $afterCursor:String) { order(id: $OrderId) { lineItems(after:$afterCursor, first: 50) { pageInfo { hasNextPage endCursor } edges { node { id sku  taxLines{ratePercentage priceSet{presentmentMoney{amount}}} originalUnitPriceSet { presentmentMoney { amount } } customAttributes {key value} isGiftCard product {id productType} name title variant{price} quantity variantTitle unfulfilledQuantity currentQuantity nonFulfillableQuantity discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } } } } } }', Locked = true;
+        ShippingLinesRequest: Label 'query GetShippingLines($OrderId: ID!, $afterCursor:String) { order(id: $OrderId) { shippingLines(first: 10, after:$afterCursor) { pageInfo { endCursor hasNextPage } edges { node { id code title taxLines{ratePercentage priceSet{presentmentMoney{amount}}} discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } code originalPriceSet { presentmentMoney { amount } } } } } } }', Locked = true;
     begin
         if not TryGetOrderLines(OrderGID, SpfyEventLogEntry."Store Code", 'lineItems', ItemLinesRequest, LineItemsArr) then
             exit(false);
@@ -194,7 +194,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         FetchedAll: Boolean;
         NoGiftCardErr: Label 'No gift cards found for order %1', Comment = '%1=Shopify Order Id';
     begin
-        InitializePagingState(Cursor, HasNext);
+        SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         repeat
             Clear(GiftCardsArr);
             if not MakeGiftCardsRequest(GiftCardsArr, HasNext, Cursor, InitialAmt, CreatedAt, StoreCode, CustEmail) then
@@ -263,7 +263,8 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         NcTask: Record "NPR Nc Task";
         HeaderResponse: JsonToken;
     begin
-        CreateRequestWOCursor(NcTask, ShopifyStoreCode, HeaderRequest, OrderGID);
+        Clear(NcTask);
+        SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, '', ShopifyStoreCode, HeaderRequest, OrderGID, false);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, HeaderResponse) then
             Error(GetLastErrorText());
 
@@ -304,11 +305,12 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         Cursor: Text;
         HasNext: Boolean;
     begin
-        InitializePagingState(Cursor, HasNext);
+        SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         ClearLastError();
         Clear(Results);
         repeat
-            CreateRequest(NcTask, Cursor, StoreCode, RequestText, OrderGID);
+            Clear(NcTask);
+            SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, StoreCode, RequestText, OrderGID, true);
             if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ResponseBody) then
                 Error(GetLastErrorText());
             if not Parse(ResponseBody, PropertyName, Results, HasNext, Cursor, true) then
@@ -321,7 +323,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
 
     local procedure TryGetOrderFulfilments(OrderGID: Text[100]; ShopifyStoreCode: Code[20]; var FullResults: JsonArray): Boolean
     var
-        FulfilmentRequest: Label 'query GetFulfilments($idFilter: ID!, $afterCursor: String) { order(id: $idFilter) { fulfillments { createdAt order{id email} updatedAt displayStatus status id fulfillmentLineItems(first: 10, after: $afterCursor) { edges { cursor node { id quantity lineItem { id currentQuantity variant{price} unfulfilledQuantity nonFulfillableQuantity isGiftCard originalUnitPriceSet{presentmentMoney{amount}}} } } pageInfo { endCursor hasNextPage } } } } }', Locked = true;
+        FulfilmentRequest: Label 'query GetFulfilments($OrderId: ID!, $afterCursor: String) { order(id: $OrderId) { fulfillments { createdAt order{id email} updatedAt displayStatus status id fulfillmentLineItems(first: 10, after: $afterCursor) { edges { cursor node { id quantity lineItem { id currentQuantity variant{price} unfulfilledQuantity nonFulfillableQuantity isGiftCard originalUnitPriceSet{presentmentMoney{amount}}} } } pageInfo { endCursor hasNextPage } } } } }', Locked = true;
     begin
         ClearLastError();
         exit(TryGetFulfilments(OrderGID, ShopifyStoreCode, FulfilmentRequest, FullResults));
@@ -340,7 +342,8 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         Cursor: Text;
     begin
         Clear(FullResults);
-        CreateRequest(NcTask, Cursor, ShopifyStoreCode, RequestText, OrderGID);
+        Clear(NcTask);
+        SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, ShopifyStoreCode, RequestText, OrderGID, true);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ResponseBody) then
             Error(GetLastErrorText());
 
@@ -350,11 +353,12 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         foreach FulfilmentJToken in FulfilmentArr do begin
             Clear(Results);
             Clear(FulfillmentLineItemsJO);
-            InitializePagingState(Cursor, HasNext);
+            SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
             AddFulfilmentInfo(FulfillmentLineItemsJO, FulfilmentJToken);
             repeat
                 ClearLastError();
-                CreateRequest(NcTask, Cursor, ShopifyStoreCode, RequestText, OrderGID);
+                Clear(NcTask);
+                SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, ShopifyStoreCode, RequestText, OrderGID, true);
                 if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ResponseBody) then
                     Error(GetLastErrorText());
                 if not Parse(FulfilmentJToken, 'fulfillmentLineItems', Results, HasNext, Cursor, false) then
@@ -449,17 +453,6 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         else
             Path := PropertyName;
         exit(Path);
-    end;
-
-    local procedure CreateRequest(var NcTask: Record "NPR Nc Task"; Cursor: Text; ShopifyStoreCode: Code[20]; RequestString: Text; OrderGID: Text[100])
-    var
-        VariablesJson: JsonObject;
-    begin
-        Clear(NcTask);
-        NcTask."Store Code" := ShopifyStoreCode;
-        VariablesJson.Add('idFilter', OrderGID);
-        SpfyCommunicationHandler.AddGraphQLCursor(VariablesJson, Cursor);
-        CompleteRequest(RequestString, VariablesJson, NcTask);
     end;
 
     [TryFunction]
@@ -602,7 +595,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         NcTask."Store Code" := ShopifyStoreCode;
         VariablesJson.Add('queryFilters', queryFilters);
         SpfyCommunicationHandler.AddGraphQLCursor(VariablesJson, Cursor);
-        CompleteRequest(RequestString, VariablesJson, NcTask);
+        SpfyCommunicationHandler.CompleteGraphQLRequest(RequestString, VariablesJson, NcTask);
     end;
 
     local procedure SingleQuotes(Input: Text): Text
@@ -613,33 +606,6 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     local procedure MapStatusToQueryParam(Status: Enum "NPR SpfyAPIDocumentStatus") Result: Text
     begin
         Status.Names().Get(Status.Ordinals().IndexOf(Status.AsInteger()), Result);
-    end;
-
-    local procedure InitializePagingState(var Cursor: Text; var HasNext: Boolean)
-    begin
-        Cursor := '';
-        HasNext := true;
-    end;
-
-    local procedure CreateRequestWOCursor(var NcTask: Record "NPR Nc Task"; ShopifyStoreCode: Code[20]; RequestString: Text; OrderGID: Text[100])
-    var
-        VariablesJson: JsonObject;
-    begin
-        Clear(NcTask);
-        NcTask."Store Code" := ShopifyStoreCode;
-        VariablesJson.Add('idFilter', OrderGID);
-        CompleteRequest(RequestString, VariablesJson, NcTask);
-    end;
-
-    local procedure CompleteRequest(RequestString: Text; VariablesJson: JsonObject; var NcTask: Record "NPR Nc Task")
-    var
-        RequestJson: JsonObject;
-        QueryStream: OutStream;
-    begin
-        RequestJson.Add('query', RequestString);
-        RequestJson.Add('variables', VariablesJson);
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        RequestJson.WriteTo(QueryStream);
     end;
 
     internal procedure GetOrderNo(Order: JsonToken) OrderNo: Text[50]

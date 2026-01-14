@@ -38,6 +38,7 @@ codeunit 6184805 "NPR Spfy Integration Public"
         Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, CheckIntegrationIsEnabled, ShopifyResponse);
     end;
 
+    [Obsolete('This method uses deprecated Shopify REST fulfillment endpoints. Use CreateGraphQLRequestWithOrderIdFilter and ExecuteShopifyGraphQLRequest instead.', '2026-01-15')]
     procedure GetShopifyOrderFulfillmentOrders(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; var ShopifyResponse: JsonToken)
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
@@ -51,5 +52,24 @@ codeunit 6184805 "NPR Spfy Integration Public"
     begin
         SpfyItemVariantModifMgt.SetAllowBackorder(ItemNo, VariantCode, ShopifyStoreCode, Allow, DisableDataLog);
     end;
+
+    /// <summary>
+    /// Builds a Shopify GraphQL request for queries filtered by a specific Order GID (e.g. gid://shopify/Order/...).
+    /// The generated request payload is written to NcTask."Data Output" and can be executed using the Shopify
+    /// GraphQL communication handler.
+    /// </summary>
+    /// <param name="NcTask">NC task record used to store the generated GraphQL request payload.</param>
+    /// <param name="endCursor">Paging cursor (endCursor) from the previous page; leave empty if this is the first page.</param>
+    /// <param name="ShopifyStoreCode">Shopify store code used to resolve credentials and endpoints.</param>
+    /// <param name="RequestQueryString">GraphQL query text.</param>
+    /// <param name="OrderGID">Shopify GraphQL global ID (e.g. gid://shopify/Order/...).</param>
+    /// <param name="IncludeCursor">Specifies whether the paging cursor should be included in the request as Header-level queries do not support pagination parameters.</param>
+    procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; endCursor: Text; ShopifyStoreCode: Code[20]; RequestQueryString: Text; OrderGID: Text[100]; IncludeCursor: Boolean)
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+    begin
+        SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, endCursor, ShopifyStoreCode, RequestQueryString, OrderGID, IncludeCursor);
+    end;
+
 }
 #endif
