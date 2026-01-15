@@ -33,25 +33,26 @@ test.describe("Hardware connector tests", () => {
       .getByRole("button", { name: "Go to Payment" })
       .click();
 
-    await page.waitForTimeout(2000);
+    page.on("console", async (msg) => {
+      const args = await Promise.all(msg.args().map((arg) => arg.jsonValue()));
+      const message = args.join(" ");
+      if (message.includes('"PrintJob"')) {
+        printJobLog = message;
+      }
+    });
 
-    await page
+    const cashPaymentButton = page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Cash Payment" })
-      .click();
+      .getByRole("button", { name: "Cash Payment" });
+    await cashPaymentButton.waitFor({ state: "visible", timeout: 10000 });
+    await cashPaymentButton.click();
     await page.frameLocator("iframe").locator("#button-dialog-ok div").click();
 
-    page.on("console", async (msg) => {
-  const args = await Promise.all(msg.args().map((arg) => arg.jsonValue()));
-  const message = args.join(" ");
-  if (message.includes('"PrintJob"')) {
-    printJobLog = message;
-  }
-});
-    await page.waitForTimeout(3000);
-
-
-    expect(printJobLog).toBeTruthy();
+    await expect.poll(() => printJobLog, {
+      timeout: 10000,
+      intervals: [250, 500, 1000],
+      message: "Expected receipt PrintJob to be logged after cash payment completed",
+    }).toBeTruthy();
 
     const match = printJobLog!.match(/"PrintJob"\s*:\s*"([^"]+)"/);
     const base64Receipt = match?.[1];
