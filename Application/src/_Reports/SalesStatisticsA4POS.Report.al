@@ -22,6 +22,9 @@ report 6014462 "NPR Sales Statistics A4 POS"
             column(ReportTitleLbl_; ReportTitleLbl)
             {
             }
+            column(EntryDateFilter; "POS Entry".GetFilter("Entry Date"))
+            {
+            }
             column(Saleslbl_; Saleslbl)
             {
             }
@@ -607,7 +610,8 @@ report 6014462 "NPR Sales Statistics A4 POS"
 
                     trigger OnPreDataItem()
                     begin
-                        POSEntry2.SetRange("Entry Date", "POS Entry"."Entry Date");
+                        if "POS Entry".GetFilter("Entry Date") <> '' then
+                            POSEntry2.SetFilter("Entry Date", "POS Entry".GetFilter("Entry Date"));
                         POSEntry2.SetRange("System Entry", false);
                         POSEntry2.SetFilter("POS Unit No.", "POS Entry".GetFilter("POS Unit No."));
                         POSEntry2.SetFilter("Entry Type", '%1|%2|%3|%4|%5',
