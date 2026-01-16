@@ -129,7 +129,7 @@
                 exit(0);
 
         if (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES) then
-            if (not IssueMemberCardWorker(MembershipEntryNo, MemberEntryNo, MemberInfoCapture, false, CardEntryNo, ResponseMessage, false)) then
+            if (not IssueMemberCardWorker(MembershipEntryNo, MemberEntryNo, MemberInfoCapture, false, CardEntryNo, MembershipSalesSetup."Membership Code", ResponseMessage, false)) then
                 exit(0);
 
         MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
@@ -2154,6 +2154,8 @@
         EndDateNew: Date;
         EntryNo: Integer;
         PlaceHolderLbl: Label '%1: %4 -> %5 {%2 .. %3}', Locked = true;
+        MembershipScheduledForUpdate: Boolean;
+        TargetMembershipCode: Code[20];
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
@@ -2250,22 +2252,27 @@
 
         if (WithUpdate) then begin
             MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
+
+            TargetMembershipCode := Membership."Membership Code";
             if (MembershipAlterationSetup."To Membership Code" <> '') then
-                if (MembershipAlterationSetup."From Membership Code" <> MembershipAlterationSetup."To Membership Code") then begin
-                    Membership."Membership Code" := MembershipAlterationSetup."To Membership Code";
-                    Membership.Modify();
-                end;
+                TargetMembershipCode := MembershipAlterationSetup."To Membership Code";
 
             if MemberInfoCapture."Enable Auto-Renew" then
-                EnableMembershipInternalAutoRenewal(Membership, true, false);
+                EnableMembershipInternalAutoRenewal(Membership, TargetMembershipCode, true, false);
 
-
-            MemberInfoCapture."Membership Code" := Membership."Membership Code";
-
-            if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+            if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", TargetMembershipCode, ReasonText)) then
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-            EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
+            MemberInfoCapture."Membership Code" := TargetMembershipCode;
+            EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew, MembershipScheduledForUpdate);
+
+            if (not MembershipScheduledForUpdate) then begin
+                Membership.Get(MemberInfoCapture."Membership Entry No.");
+                if (Membership."Membership Code" <> TargetMembershipCode) then begin
+                    Membership."Membership Code" := TargetMembershipCode;
+                    Membership.Modify();
+                end;
+            end;
 
             OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
         end;
@@ -2345,6 +2352,7 @@
         StartDateLedgerEntryNo: Integer;
         EndDateLedgerEntryNo: Integer;
         PlaceHolderLbl: Label '%1: %4 -> %5 {%2 .. %3}', Locked = true;
+        MembershipScheduledForUpdate: Boolean;
     begin
 
         OutStartDate := 0D;
@@ -2465,7 +2473,7 @@
             if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-            EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
+            EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew, MembershipScheduledForUpdate);
 
             if (EndDateCurrent <> 0D) then begin
                 if (EndDateCurrent <= MembershipEntry."Valid From Date") then begin
@@ -2556,6 +2564,8 @@
         RemainingFraction: Decimal;
         ValidFromDate: Date;
         PlaceHolderLbl: Label '%1: %4 -> %5 {%2 .. %3} {%6 {%7,%8} -> %9}', Locked = true;
+        MembershipScheduledForUpdate: Boolean;
+        TargetMembershipCode: Code[20];
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
@@ -2656,29 +2666,29 @@
 
         if (WithUpdate) then begin
             MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
-            if (MembershipAlterationSetup."From Membership Code" <> MembershipAlterationSetup."To Membership Code") then begin
-                Membership."Membership Code" := MembershipAlterationSetup."To Membership Code";
-                Membership.Modify();
-            end;
 
-            MemberInfoCapture."Membership Code" := Membership."Membership Code";
+            TargetMembershipCode := Membership."Membership Code";
+            if (MembershipAlterationSetup."To Membership Code" <> '') then
+                TargetMembershipCode := MembershipAlterationSetup."To Membership Code";
 
-            if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+            MemberInfoCapture."Membership Code" := TargetMembershipCode;
+
+            if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", TargetMembershipCode, ReasonText)) then
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-            EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
-
-            // TODO - consider same date!
-            if (StartDateNew = MembershipEntry."Valid From Date") then begin
-                //MembershipEntry.Blocked := true;
-                //MembershipEntry."Blocked At" := CurrentDateTime;
-                //XXMembershipEntry."Blocked By" := USERID;
-            end;
+            EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew, MembershipScheduledForUpdate);
 
             MembershipEntry."Valid Until Date" := EndDateCurrent;
             MembershipEntry."Closed By Entry No." := EntryNo;
-
             MembershipEntry.Modify();
+
+            if (not MembershipScheduledForUpdate) then begin
+                Membership.Get(MemberInfoCapture."Membership Entry No.");
+                if (Membership."Membership Code" <> TargetMembershipCode) then begin
+                    Membership."Membership Code" := TargetMembershipCode;
+                    Membership.Modify();
+                end;
+            end;
 
             SubscriptionMgtImpl.UpdateSubscriptionPeriodFromMembership(MembershipEntry."Membership Entry No.");
 
@@ -2790,6 +2800,7 @@
 
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
         MemberInfoCapture."Membership Code" := MembershipAlterationSetup."From Membership Code";
+
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
         MemberInfoCapture."Item No." := RenewWithItemNo;
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
@@ -3062,32 +3073,50 @@
     internal procedure CarryOutMembershipRenewal(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var EntryNo: Integer; var ReasonText: Text): Boolean
     var
         MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
+        MembershipScheduledForUpdate: Boolean;
+        TargetMembershipCode: Code[20];
+        Membership: Record "NPR MM Membership";
     begin
         MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
 
+        Membership.Get(MemberInfoCapture."Membership Entry No.");
+        TargetMembershipCode := MembershipAlterationSetup."From Membership Code";
+        if (MembershipAlterationSetup."To Membership Code" <> '') and (MembershipAlterationSetup."Age Constraint Type" = MembershipAlterationSetup."Age Constraint Type"::NA) then
+            TargetMembershipCode := MembershipAlterationSetup."To Membership Code";
+
+        MemberInfoCapture."Membership Code" := TargetMembershipCode;
+
         if (not MembershipAutoRenew.CreateInvoice(SubscriptionRequest, MemberInfoCapture)) then
             exit(false);
-        if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", SubscriptionRequest."New Valid Until Date", MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+
+        if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", SubscriptionRequest."New Valid Until Date", MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", TargetMembershipCode, ReasonText)) then
             exit(false);
-        EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date");
+
+        EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date", MembershipScheduledForUpdate);
+
+        if (not MembershipScheduledForUpdate) then begin
+            Membership.Get(MemberInfoCapture."Membership Entry No.");
+            if (Membership."Membership Code" <> TargetMembershipCode) then begin
+                Membership."Membership Code" := TargetMembershipCode;
+                Membership.Modify();
+            end;
+        end;
 
         OnMembershipChangeEvent(MemberInfoCapture."Membership Entry No.");
         exit(true);
     end;
 
-    local procedure ExtendMemberCard(MembershipEntryNo: Integer; CardEntryNo: Integer; ExpiredCardOption: Integer; NewTimeFrameEndDate: Date; var MemberCardEntryNoOut: Integer; ResponseMessage: Text): Boolean
+    local procedure ExtendMemberCard(MembershipEntryNo: Integer; CardEntryNo: Integer; ExpiredCardOption: Integer; NewTimeFrameEndDate: Date; var MemberCardEntryNoOut: Integer; TargetMembershipCode: Code[20]; var ResponseMessage: Text): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
         MemberCard: Record "NPR MM Member Card";
-        Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         NewUntilDate: Date;
     begin
 
         MemberCard.Get(CardEntryNo);
-        Membership.Get(MembershipEntryNo);
-        MembershipSetup.Get(Membership."Membership Code");
+        MembershipSetup.Get(TargetMembershipCode);
 
         case MembershipSetup."Card Expire Date Calculation" of
             MembershipSetup."Card Expire Date Calculation"::NA:
@@ -3115,7 +3144,7 @@
             AlterationSetup."Card Expired Action"::NEW:
                 begin
                     MemberInfoCapture."Valid Until" := NewUntilDate;
-                    exit(IssueMemberCardWorker(MembershipEntryNo, MemberCard."Member Entry No.", MemberInfoCapture, false, MemberCardEntryNoOut, ResponseMessage, true));
+                    exit(IssueMemberCardWorker(MembershipEntryNo, MemberCard."Member Entry No.", MemberInfoCapture, false, MemberCardEntryNoOut, TargetMembershipCode, ResponseMessage, true));
 
                 end;
 
@@ -3131,6 +3160,14 @@
     end;
 
     local procedure CheckExtendMemberCards(WithUpdate: Boolean; MembershipEntryNo: Integer; ExpiredCardOption: Integer; NewTimeFrameEndDate: Date; ExternalCardNo: Text[100]; var MemberCardEntryNoOut: Integer; var ResponseMessage: Text): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        Membership.Get(MembershipEntryNo);
+        exit(CheckExtendMemberCards(WithUpdate, MembershipEntryNo, ExpiredCardOption, NewTimeFrameEndDate, ExternalCardNo, MemberCardEntryNoOut, Membership."Membership Code", ResponseMessage));
+    end;
+
+    local procedure CheckExtendMemberCards(WithUpdate: Boolean; MembershipEntryNo: Integer; ExpiredCardOption: Integer; NewTimeFrameEndDate: Date; ExternalCardNo: Text[100]; var MemberCardEntryNoOut: Integer; TargetMembershipCode: Code[20]; var ResponseMessage: Text): Boolean
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
         MemberCard: Record "NPR MM Member Card";
@@ -3175,7 +3212,7 @@
             end;
 
             if ((WithUpdate) and (UpdateRequired)) then begin
-                if (not ExtendMemberCard(MembershipEntryNo, MemberCard."Entry No.", ExpiredCardOption, NewTimeFrameEndDate, NewCardEntryNo, ResponseMessage)) then
+                if (not ExtendMemberCard(MembershipEntryNo, MemberCard."Entry No.", ExpiredCardOption, NewTimeFrameEndDate, NewCardEntryNo, TargetMembershipCode, ResponseMessage)) then
                     exit(false);
 
                 if (ExpiredCardOption = AlterationSetup."Card Expired Action"::NEW) then
@@ -3224,6 +3261,7 @@
         MemberCard: Record "NPR MM Member Card";
         ValidFromDate: Date;
         ValidUntilDate: Date;
+        MembershipScheduledForUpdate: Boolean;
     begin
 
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
@@ -3255,7 +3293,7 @@
                 MemberCard.ModifyAll("Valid Until", ValidUntilDate);
         end;
 
-        LedgerEntryNo := AddMembershipLedgerEntry(MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate);
+        LedgerEntryNo := AddMembershipLedgerEntry(MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate, MembershipScheduledForUpdate);
         OnMembershipChangeEvent(MembershipEntryNo);
 
         exit(LedgerEntryNo);
@@ -4414,7 +4452,7 @@
         exit((Period_Date - Period_Start) / (Period_End - Period_Start));
     end;
 
-    local procedure AddMembershipLedgerEntry(MembershipEntryNo: Integer; MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date): Integer
+    local procedure AddMembershipLedgerEntry(MembershipEntryNo: Integer; MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date; var MembershipScheduledForUpdate: Boolean): Integer
     var
         MembershipLedgerEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -4492,12 +4530,13 @@
         if (not MembershipSetup.Get(MembershipLedgerEntry."Membership Code")) then
             MembershipSetup.Init();
 
+        MembershipScheduledForUpdate := false;
         if (MembershipLedgerEntry.Context in [MembershipLedgerEntry.Context::UPGRADE, MembershipLedgerEntry.Context::RENEW, MembershipLedgerEntry.Context::AUTORENEW]) then begin
             if (Membership."Customer No." <> '') then begin
                 if (MembershipSetup."Customer Config. Template Code" <> '') then begin
                     ConfigTemplateHeader.Get(MembershipSetup."Customer Config. Template Code");
                     if (Customer.Get(Membership."Customer No.")) then
-                        if MembershipSetup."Defer Cust. Update Alterations" and (MembershipLedgerEntry."Valid From Date" > WorkDate()) then begin
+                        if (MembershipSetup."Defer Cust. Update Alterations" and (MembershipLedgerEntry."Valid From Date" > WorkDate())) then begin
                             PendingCustomerUpdate.Init();
                             PendingCustomerUpdate."Entry No." := 0;
                             PendingCustomerUpdate.MembershipEntryNo := MembershipLedgerEntry."Membership Entry No.";
@@ -4506,6 +4545,7 @@
                             PendingCustomerUpdate.MembershipCode := MembershipLedgerEntry."Membership Code";
                             PendingCustomerUpdate."Valid From Date" := MembershipLedgerEntry."Valid From Date";
                             PendingCustomerUpdate.Insert();
+                            MembershipScheduledForUpdate := true;
                         end else begin
                             RecRef.GetTable(Customer);
                             ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
@@ -5468,6 +5508,14 @@
 
     local procedure IssueMemberCardWorker(MembershipEntryNo: Integer; MemberEntryNo: Integer; var MemberInfoCapture: Record "NPR MM Member Info Capture"; AllowBlankNumber: Boolean; var CardEntryNo: Integer; var ReasonMessage: Text; ForceValidUntilDate: Boolean): Boolean
     var
+        Membership: Record "NPR MM Membership";
+    begin
+        Membership.Get(MembershipEntryNo);
+        exit(IssueMemberCardWorker(MembershipEntryNo, MemberEntryNo, MemberInfoCapture, AllowBlankNumber, CardEntryNo, Membership."Membership Code", ReasonMessage, ForceValidUntilDate));
+    end;
+
+    local procedure IssueMemberCardWorker(MembershipEntryNo: Integer; MemberEntryNo: Integer; var MemberInfoCapture: Record "NPR MM Member Info Capture"; AllowBlankNumber: Boolean; var CardEntryNo: Integer; TargetMembershipCode: Code[20]; var ReasonMessage: Text; ForceValidUntilDate: Boolean): Boolean
+    var
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -5482,7 +5530,7 @@
         MemberInfoCapture."External Card No." := UpperCase(MemberInfoCapture."External Card No.");
 
         Membership.Get(MembershipEntryNo);
-        MembershipSetup.Get(Membership."Membership Code");
+        MembershipSetup.Get(TargetMembershipCode);
         if (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::NO) then
             exit(false);
 
@@ -6620,6 +6668,11 @@
     end;
 
     internal procedure EnableMembershipInternalAutoRenewal(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
+    begin
+        EnableMembershipInternalAutoRenewal(Membership, Membership."Membership Code", CreateMemberNotification, ForceMemberNotification);
+    end;
+
+    local procedure EnableMembershipInternalAutoRenewal(var Membership: Record "NPR MM Membership"; TargetMembershipCode: Code[20]; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
     var
         MemberNotification: Codeunit "NPR MM Member Notification";
         EligibleForNotification: Boolean;
@@ -6638,7 +6691,7 @@
         if not EligibleForNotification then
             exit;
 
-        MemberNotification.AddMembershipAutoRenewalEnableNotification(Membership."Entry No.", Membership."Membership Code");
+        MemberNotification.AddMembershipAutoRenewalEnableNotification(Membership."Entry No.", TargetMembershipCode);
     end;
 
     internal procedure CheckIfCanEnableAutoRenewal(Membership: Record "NPR MM Membership")

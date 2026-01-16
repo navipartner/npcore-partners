@@ -52,14 +52,17 @@ codeunit 85014 "NPR Library - Member Module"
         Item.Get(CreateItem('T-320100-CARD', '', 'Additional Membership Card', 17));
         Item.Get(CreateItem('T-320100-REPLACCRD', '', 'Membership Replacement Card', 27));
         Item.Get(CreateItem('T-320100-REGRET', '', 'Regret Membership time frame', 0));
+        Item.Get(CreateItem('T-320100-AUTORENEW', '', 'Auto Renew GOLD Membership', 117));
         Item.Get(CreateItem('T-320100', '', 'GOLD Membership', 157));
-        SetupSimpleMembershipSalesItem(Item."No.", 'T-GOLD');
+
+        SetupSimpleMembershipSalesItem('T-320100', 'T-GOLD', 'T-320100-AUTORENEW');
         SetupRenew_NoGraceNotStackable('T-GOLD', CreateItem('T-320100-RENEW', '', 'Renew GOLD Membership', 157), '', 'Renew GOLD Membership');
         SetupUpgrade('T-GOLD', CreateItem('T-320100-DOWNGRADE', '', 'Downgrade from GOLD to SILVER', 147), 'T-SILVER', '', 'Downgrade from GOLD to SILVER');
         SetupExtend('T-GOLD', CreateItem('T-320100-EXTEND', '', 'Extend GOLD Membership', 34), '', '+9M', 'Extend GOLD Membership');
 
+        Item.Get(CreateItem('T-320101-AUTORENEW', '', 'Auto Renew SILVER Membership', 117));
         Item.Get(CreateItem('T-320101', '', 'SILVER Membership', 147));
-        SetupSimpleMembershipSalesItem(Item."No.", 'T-SILVER');
+        SetupSimpleMembershipSalesItem(Item."No.", 'T-SILVER', 'T-320101-AUTORENEW');
         SetupRenew_NoGraceNotStackable('T-SILVER', CreateItem('T-320101-RENEW', '', 'Renew Silver Membership', 147), '', 'Renew Silver Membership');
         SetupUpgrade('T-SILVER', CreateItem('T-320101-UPGRADE', '', 'Upgrade from SILVER to GOLD', 157), 'T-GOLD', '', 'Upgrade from SILVER to GOLD');
         SetupUpgrade('T-SILVER', CreateItem('T-320101-DOWNGRADE', '', 'Downgrade from SILVER to BRONZE', 137), 'T-SILVER', '', 'Downgrade from SILVER to BRONZE');
@@ -105,7 +108,7 @@ codeunit 85014 "NPR Library - Member Module"
         CreateAchievementAddActivity(GoalCode, 'T-A2', Enum::"NPR MM AchActivity"::MEMBER_ARRIVAL, 3, Constraints);
     end;
 
-    procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Option);
+    procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Option): Guid
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -127,6 +130,9 @@ codeunit 85014 "NPR Library - Member Module"
         Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup.Modify(true);
+
+        AlterationSetup.Get(AlterationSetup."Alteration Type"::CANCEL, FromMembershipCode, SalesItemNo);
+        exit(AlterationSetup.SystemId);
     end;
 
     procedure CreateDemoMemberAttributes();
@@ -158,7 +164,7 @@ codeunit 85014 "NPR Library - Member Module"
         CreateAttributeTableLink(CreateAttribute('MM', 10, 'Membership Only'), DATABASE::"NPR MM Membership", 10);
     end;
 
-    procedure CreateExtendSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateExtendSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean): Guid;
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -183,6 +189,9 @@ codeunit 85014 "NPR Library - Member Module"
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup.Modify(true);
+
+        AlterationSetup.Get(AlterationSetup."Alteration Type"::EXTEND, FromMembershipCode, SalesItemNo);
+        exit(AlterationSetup.SystemId);
     end;
 
     procedure CreateMembershipGuestAdmissionSetup(MembershipCode: Code[20]; AdmissionCode: Code[20]; TicketItemType: Option; TicketItemNo: Code[20]; MaxGuestCount: Integer; Description: Text[50]);
@@ -212,7 +221,7 @@ codeunit 85014 "NPR Library - Member Module"
         exit;
     end;
 
-    procedure CreateMembershipSalesItemSetup(ItemNo: Code[20]; MembershipCode: Code[20]; ValidFromType: Option; SalesCutoffDateformula: Text[30]; ValidFromDateFormula: Text[30]; ValidUntilType: Option; ValidUntilDateFormala: Text[30]);
+    procedure CreateMembershipSalesItemSetup(ItemNo: Code[20]; MembershipCode: Code[20]; ValidFromType: Option; SalesCutoffDateformula: Text[30]; ValidFromDateFormula: Text[30]; ValidUntilType: Option; ValidUntilDateFormala: Text[30]; AutoRenewToItemNo: Code[20]);
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
     begin
@@ -234,10 +243,11 @@ codeunit 85014 "NPR Library - Member Module"
         Evaluate(MembershipSalesSetup."Duration Formula", ValidUntilDateFormala);
 
         MembershipSalesSetup."Membership Code" := MembershipCode;
+        MembershipSalesSetup."Auto-Renew To" := AutoRenewToItemNo;
         MembershipSalesSetup.Modify();
     end;
 
-    procedure CreateRenewSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateRenewSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean): Guid;
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -262,9 +272,43 @@ codeunit 85014 "NPR Library - Member Module"
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup.Modify(true);
+
+        AlterationSetup.Get(AlterationSetup."Alteration Type"::RENEW, FromMembershipCode, SalesItemNo);
+        exit(AlterationSetup.SystemId);
     end;
 
-    procedure CreateUpgradeSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateAutoRenewSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean; AutoRenewToItemNo: Code[20]): Guid;
+    var
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+    begin
+
+        if (not AlterationSetup.Get(AlterationSetup."Alteration Type"::AUTORENEW, FromMembershipCode, SalesItemNo)) then begin
+            AlterationSetup."Alteration Type" := AlterationSetup."Alteration Type"::AUTORENEW;
+            AlterationSetup."From Membership Code" := FromMembershipCode;
+            AlterationSetup."Sales Item No." := SalesItemNo;
+            AlterationSetup.Insert();
+        end;
+
+        AlterationSetup.Init();
+        AlterationSetup.Description := Description;
+        AlterationSetup."To Membership Code" := ToMembershipCode;
+        AlterationSetup."Alteration Activate From" := ActivateFrom;
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        AlterationSetup."Activate Grace Period" := UseGracePeriod;
+        AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Membership Duration", MembershipDuration);
+        AlterationSetup."Price Calculation" := PriceCalculation;
+        AlterationSetup."Stacking Allowed" := AllowStacking;
+        AlterationSetup."Auto-Renew To" := AutoRenewToItemNo;
+        AlterationSetup.Modify(true);
+
+        AlterationSetup.Get(AlterationSetup."Alteration Type"::AUTORENEW, FromMembershipCode, SalesItemNo);
+        exit(AlterationSetup.SystemId);
+    end;
+
+    procedure CreateUpgradeSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean): Guid;
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -289,16 +333,18 @@ codeunit 85014 "NPR Library - Member Module"
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup."Upgrade With New Duration" := (MembershipDuration <> '');
-
         AlterationSetup.Modify(true);
+
+        AlterationSetup.Get(AlterationSetup."Alteration Type"::UPGRADE, FromMembershipCode, SalesItemNo);
+        exit(AlterationSetup.SystemId);
     end;
 
-    procedure SetupCancel_NoGrace(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NEwDescription: Text);
+    procedure SetupCancel_NoGrace(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NEwDescription: Text): Guid;
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        CreateCancelSetup(CurrentMembershipCode, SalesItemNo,
+        exit(CreateCancelSetup(CurrentMembershipCode, SalesItemNo,
             NEwDescription,
             AlterationSetup."Alteration Activate From"::ASAP,
             '',          // AlterationSetup."Alteration Date Formula"
@@ -306,15 +352,15 @@ codeunit 85014 "NPR Library - Member Module"
             AlterationSetup."Grace Period Relates To"::START_DATE,
             '',          // AlterationSetup."Grace Period Before",
             '',          // AlterationSetup."Grace Period After",
-            AlterationSetup."Price Calculation"::UNIT_PRICE);
+            AlterationSetup."Price Calculation"::UNIT_PRICE));
     end;
 
-    procedure SetupExtend(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text);
+    procedure SetupExtend(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text): Guid;
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        CreateExtendSetup(CurrentMembershipCode, SalesItemNo,
+        exit(CreateExtendSetup(CurrentMembershipCode, SalesItemNo,
             NewDescription,
             NewMembershipCode,
             AlterationSetup."Alteration Activate From"::ASAP,
@@ -325,7 +371,7 @@ codeunit 85014 "NPR Library - Member Module"
             '',          // AlterationSetup."Grace Period After",
             NewDuration, // AlterationSetup."Membership Duration"
             AlterationSetup."Price Calculation"::UNIT_PRICE,
-            false);      // AlterationSetup."Stacking Allowed"
+            false));      // AlterationSetup."Stacking Allowed"
     end;
 
     procedure SetupMembership_Simple(CommunityCode: Code[20]; MembershipCode: Code[20]; LoyaltyCode: Code[20]; NewDescription: Text): Code[20];
@@ -348,12 +394,12 @@ codeunit 85014 "NPR Library - Member Module"
             'MC-DEMO01'));
     end;
 
-    procedure SetupRenew_NoGraceNotStackable(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDescription: Text);
+    procedure SetupRenew_NoGraceNotStackable(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDescription: Text): Guid;
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        CreateRenewSetup(CurrentMembershipCode, SalesItemNo,
+        exit(CreateRenewSetup(CurrentMembershipCode, SalesItemNo,
             NewDescription,
             NewMembershipCode,
             AlterationSetup."Alteration Activate From"::ASAP,
@@ -364,10 +410,43 @@ codeunit 85014 "NPR Library - Member Module"
             '',          // AlterationSetup."Grace Period After",
             '<+1Y-1D>',  // AlterationSetup."Membership Duration"
             AlterationSetup."Price Calculation"::UNIT_PRICE,
-            false);      // AlterationSetup."Stacking Allowed"
+            false));      // AlterationSetup."Stacking Allowed"
+    end;
+
+    procedure SetupAutoRenewToSelf(CurrentMembershipCode: Code[20]; AutoRenewToItemNo: Code[20]; NewDescription: Text): Guid;
+    begin
+        exit(SetupAutoRenew(CurrentMembershipCode, AutoRenewToItemNo, '', NewDescription));
+    end;
+
+    procedure SetupAutoRenew(CurrentMembershipCode: Code[20]; AutoRenewToItemNo: Code[20]; TargetMembershipType: Code[20]; NewDescription: Text): Guid;
+    var
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+    begin
+
+        exit(CreateAutoRenewSetup(CurrentMembershipCode, AutoRenewToItemNo,
+            NewDescription,
+            TargetMembershipType,          // ToMembershipCode
+            AlterationSetup."Alteration Activate From"::ASAP,
+            '',          // AlterationSetup."Alteration Date Formula"
+            false,       // AlterationSetup."Activate Grace Period"
+            AlterationSetup."Grace Period Relates To"::START_DATE,
+            '',          // AlterationSetup."Grace Period Before",
+            '',          // AlterationSetup."Grace Period After",
+            '<+1Y-1D>',  // AlterationSetup."Membership Duration"
+            AlterationSetup."Price Calculation"::UNIT_PRICE,
+            true,       // AlterationSetup."Stacking Allowed"
+            AutoRenewToItemNo)); // Auto-Renew To Item No.
     end;
 
     procedure SetupSimpleMembershipSalesItem(ItemNo: Code[20]; MembershipCode: Code[20]): Code[20];
+    var
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+    begin
+        SetupSimpleMembershipSalesItem(ItemNo, MembershipCode, '');
+        exit(ItemNo);
+    end;
+
+    procedure SetupSimpleMembershipSalesItem(ItemNo: Code[20]; MembershipCode: Code[20]; AutoRenewToItemNo: Code[20]): Code[20];
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
     begin
@@ -378,17 +457,18 @@ codeunit 85014 "NPR Library - Member Module"
           '', // Sales Cut-off Date Formule
           '', // Valid from Date Formula
           MembershipSalesSetup."Valid Until Calculation"::DATEFORMULA,
-          '<+1Y-1D>');
+          '<+1Y-1D>',
+          AutoRenewToItemNo); // Auto-Renew To Item No.
 
         exit(ItemNo);
     end;
 
-    procedure SetupUpgrade(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text);
+    procedure SetupUpgrade(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text): Guid;
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
-        CreateUpgradeSetup(CurrentMembershipCode, SalesItemNo,
+        exit(CreateUpgradeSetup(CurrentMembershipCode, SalesItemNo,
             NewDescription,
             NewMembershipCode,
             AlterationSetup."Alteration Activate From"::ASAP,
@@ -399,7 +479,7 @@ codeunit 85014 "NPR Library - Member Module"
             '',          // AlterationSetup."Grace Period After",
             NewDuration, // AlterationSetup."Membership Duration"
             AlterationSetup."Price Calculation"::UNIT_PRICE,
-            false);      // AlterationSetup."Stacking Allowed"
+            false));      // AlterationSetup."Stacking Allowed"
     end;
 
     procedure SetupWalletNotification(NotificationCode: Code[10]; CommunityCode: Code[20]; MembershipCode: Code[20]; TriggerType: option CREATE,UPDATE);
