@@ -15,10 +15,13 @@ codeunit 6150834 "NPR POS Action: Print Template" implements "NPR IPOS Workflow"
         ParamPrintAllLines_DescLbl: Label 'Specifies if user wants to print all lines';
         ParamSingularQuantityPrinting_CaptLbl: Label 'Singular Quantity Printing';
         ParamSingularQuantityPrinting_DescLbl: Label 'Specifies singular quantity printing';
+        ParamUseReportSelection_CaptLbl: Label 'Use Report Selection Print Template';
+        ParamUseReportSelection_DescLbl: Label 'Specifies if template should be selected from Report Selection - Retail based on POS Unit';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
 
+        WorkflowConfig.AddBooleanParameter('UseReportSelPrintTemplate', false, ParamUseReportSelection_CaptLbl, ParamUseReportSelection_DescLbl);
         WorkflowConfig.AddTextParameter('Template', '', ParamTemplate_CaptLbl, ParamTemplate_DescLbl);
         WorkflowConfig.AddOptionParameter('Record',
 #pragma warning disable AA0139
@@ -38,16 +41,18 @@ codeunit 6150834 "NPR POS Action: Print Template" implements "NPR IPOS Workflow"
         Template: Text[20];
         PrintAllLines: Boolean;
         SingularQuantityPrinting: Boolean;
+        UseReportSelPrintTemplate: Boolean;
     begin
+        UseReportSelPrintTemplate := Context.GetBooleanParameter('UseReportSelPrintTemplate');
         Template := CopyStr(Context.GetStringParameter('Template'), 1, MaxStrLen(Template));
         RecordSetting := Context.GetIntegerParameter('Record');
         PrintAllLines := Context.GetBooleanParameter('PrintAllLines');
         SingularQuantityPrinting := Context.GetBooleanParameter('SingularQuantityPrinting');
 
-        PrintTemplate(Sale, SaleLine, RecordSetting, Template, PrintAllLines, SingularQuantityPrinting);
+        PrintTemplate(Sale, SaleLine, RecordSetting, Template, PrintAllLines, SingularQuantityPrinting, UseReportSelPrintTemplate, Setup);
     end;
 
-    local procedure PrintTemplate(var Sale: Codeunit "NPR POS Sale"; var SaleLine: Codeunit "NPR POS Sale Line"; var RecordSetting: Option "Sale Line POS","Sale POS"; Template: Text[20]; PrintAllLines: Boolean; SingularQuantityPrinting: Boolean)
+    local procedure PrintTemplate(var Sale: Codeunit "NPR POS Sale"; var SaleLine: Codeunit "NPR POS Sale Line"; var RecordSetting: Option "Sale Line POS","Sale POS"; Template: Text[20]; PrintAllLines: Boolean; SingularQuantityPrinting: Boolean; UseReportSelPrintTemplate: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -55,7 +60,13 @@ codeunit 6150834 "NPR POS Action: Print Template" implements "NPR IPOS Workflow"
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
         NoOfPrints: Integer;
         i: Integer;
+        TemplateToUse: Code[20];
     begin
+        if UseReportSelPrintTemplate then
+            TemplateToUse := GetTemplateFromReportSelection(Setup)
+        else
+            TemplateToUse := CopyStr(Template, 1, MaxStrLen(TemplateToUse));
+
         case RecordSetting of
             RecordSetting::"Sale Line POS":
                 begin
@@ -74,16 +85,39 @@ codeunit 6150834 "NPR POS Action: Print Template" implements "NPR IPOS Workflow"
                             else
                                 NoOfPrints := 1;
                             for i := 1 to NoOfPrints do
-                                TemplateMgt.PrintTemplate(Template, SaleLinePOS2, 0);
+                                TemplateMgt.PrintTemplate(TemplateToUse, SaleLinePOS2, 0);
                         until SaleLinePOS.Next() = 0;
                 end;
             RecordSetting::"Sale POS":
                 begin
                     Sale.GetCurrentSale(SalePOS);
                     SalePOS.SetRecFilter();
-                    TemplateMgt.PrintTemplate(Template, SalePOS, 0);
+                    TemplateMgt.PrintTemplate(TemplateToUse, SalePOS, 0);
                 end;
         end;
+    end;
+
+    local procedure GetTemplateFromReportSelection(Setup: Codeunit "NPR POS Setup"): Code[20]
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        POSUnit: Record "NPR POS Unit";
+        ReportSelectionType: Enum "NPR Report Selection Type";
+    begin
+        Setup.GetPOSUnit(POSUnit);
+
+        ReportSelectionRetail.SetLoadFields("Report Type", "Print Template", "Register No.");
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionType::"Print Template");
+        ReportSelectionRetail.SetFilter("Print Template", '<>%1', '');
+        if ReportSelectionRetail.IsEmpty() then
+            exit('');
+
+        ReportSelectionRetail.SetRange("Register No.", POSUnit."No.");
+        if ReportSelectionRetail.FindFirst() then
+            exit(ReportSelectionRetail."Print Template");
+
+        ReportSelectionRetail.SetRange("Register No.", '');
+        if ReportSelectionRetail.FindFirst() then
+            exit(ReportSelectionRetail."Print Template");
     end;
 
     local procedure GetActionScript(): Text

@@ -171,4 +171,8 @@ enum 6014493 "NPR Report Selection Type"
     {
         Caption = 'Large Global Sales Receipt';
     }
+    value(42; "Print Template")
+    {
+        Caption = 'Print Template';
+    }
 }
