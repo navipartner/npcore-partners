@@ -245,6 +245,7 @@
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'PrepareForEcomFlow'));
 #endif
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpdateGetPaymentLineOption'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
@@ -950,6 +951,8 @@
                     'PrepareForEcomFlow':
                         exit('NPR-Spfy-PrepareForEcomFlow-20251131');
 #endif
+                    'UpdateGetPaymentLineOption':
+                        exit('NPR-Spfy-UpdateGetPaymentLineOption-20260105');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":

@@ -430,7 +430,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             NcTask."Store Code" := LogEntry."Store Code";
             foreach PaymentLineJsonToken in PaymentLinesJsonToken.AsArray() do
                 SpfyCapturePayment.ProcessTransaction(PaymentLineJsonToken, NcTask, TempSpfyTransactionBuffer);
-            SpfyCapturePayment.UpdatePmtLinesAndScheduleCapture(NcTask, PaymentLinesJsonToken.AsArray(), TempSpfyTransactionBuffer, false);
+            SpfyCapturePayment.UpdatePmtLines(NcTask, PaymentLinesJsonToken.AsArray(), TempSpfyTransactionBuffer);
         end;
         Handled := false;
         SpfyIntegrationEvents.OnAfterUpdatePaymentLines(LogEntry."Store Code", PaymentLinesJsonToken, SalesHeader, Handled);

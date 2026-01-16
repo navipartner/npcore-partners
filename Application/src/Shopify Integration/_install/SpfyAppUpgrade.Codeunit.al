@@ -35,8 +35,9 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpdateShopifyInventoryLocations();
         RemoveEmptyShopifyStoreItemLinks();
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-        PrepareForEcomFlow()
+        PrepareForEcomFlow();
 #endif
+        UpdateGetPaymentLineOption();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -589,6 +590,26 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 #endif
+    local procedure UpdateGetPaymentLineOption()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        _UpgradeStep := 'UpdateGetPaymentLineOption';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+        if ShopifyStore.FindSet() then
+            repeat
+                if ShopifyStore."Get Payment Lines from Shopify" = ShopifyStore."Get Payment Lines from Shopify"::ON_ORDER_IMPORT then begin
+                    ShopifyStore."Get Payment Lines from Shopify" := ShopifyStore."Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE;
+                    ShopifyStore.Modify();
+                end;
+            until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
     local procedure HasUpgradeTag(): Boolean
     begin
         exit(_UpgradeTag.HasUpgradeTag(_UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", _UpgradeStep)));

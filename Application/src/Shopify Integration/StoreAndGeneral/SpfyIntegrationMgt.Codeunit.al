@@ -241,7 +241,15 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     procedure CreatePmtLinesOnOrderImport(ShopifyStoreCode: Code[20]): Boolean
     begin
         GetStore(ShopifyStoreCode);
-        exit(_ShopifyStore."Get Payment Lines from Shopify" = _ShopifyStore."Get Payment Lines from Shopify"::ON_ORDER_IMPORT);
+        exit(_ShopifyStore."Get Payment Lines from Shopify" in
+                 [_ShopifyStore."Get Payment Lines from Shopify"::ON_ORDER_IMPORT, _ShopifyStore."Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE]);
+    end;
+
+    procedure ShouldUpdatePaymentLinesOnCapture(ShopifyStoreCode: Code[20]): Boolean
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Get Payment Lines from Shopify" in
+                [_ShopifyStore."Get Payment Lines from Shopify"::ON_CAPTURE, _ShopifyStore."Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE]);
     end;
 
     procedure IsSendNegativeInventory(ShopifyStoreCode: Code[20]): Boolean

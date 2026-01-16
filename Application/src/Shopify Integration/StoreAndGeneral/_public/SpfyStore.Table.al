@@ -258,13 +258,13 @@ table 6150810 "NPR Spfy Store"
         {
             Caption = 'Get Payment Lines from Shopify';
             DataClassification = CustomerContent;
-            OptionMembers = ON_CAPTURE,ON_ORDER_IMPORT;
-            OptionCaption = 'Before Capture,On Order Import';
-            InitValue = ON_ORDER_IMPORT;
+            OptionMembers = ON_CAPTURE,ON_ORDER_IMPORT,ON_IMPORT_AND_CAPTURE;
+            OptionCaption = 'Before Capture,On Order Import,Both on Import and before Capture';
+            InitValue = ON_IMPORT_AND_CAPTURE;
 
             trigger OnValidate()
             begin
-                if "Get Payment Lines from Shopify" = "Get Payment Lines from Shopify"::ON_CAPTURE then
+                if "Get Payment Lines from Shopify" in ["Get Payment Lines from Shopify"::ON_CAPTURE, "Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE] then
                     TestField("Send Payment Capture Requests");
             end;
         }
@@ -289,7 +289,7 @@ table 6150810 "NPR Spfy Store"
                 if "Send Payment Capture Requests" then
                     TestField("Sales Order Integration")
                 else
-                    if "Get Payment Lines from Shopify" = "Get Payment Lines from Shopify"::ON_CAPTURE then
+                    if "Get Payment Lines from Shopify" in ["Get Payment Lines from Shopify"::ON_CAPTURE, "Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE] then
                         "Get Payment Lines from Shopify" := "Get Payment Lines from Shopify"::ON_ORDER_IMPORT;
             end;
         }

@@ -1661,7 +1661,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 NcTask."Record ID" := SalesHeader.RecordId();
                 NcTask."Record Value" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(NcTask."Record Value"));
                 NcTask."Store Code" := ShopifyStoreCode;
-                SpfyCapturePayment.UpdatePmtLinesAndScheduleCapture(NcTask, false, false);
+                SpfyCapturePayment.GetTransactionsAndUpdatePmtLines(NcTask, true);
             end;
 
         Handled := false;
