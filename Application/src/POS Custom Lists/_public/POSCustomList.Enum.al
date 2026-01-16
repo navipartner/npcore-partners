@@ -36,4 +36,9 @@ enum 6059782 "NPR POS Custom List" implements "NPR POS Custom List IHandler"
         Caption = 'Tickets';
         Implementation = "NPR POS Custom List IHandler" = "NPR POS List: Ticket";
     }
+    value(60; POS_UNIT)
+    {
+        Caption = 'POS Units';
+        Implementation = "NPR POS Custom List IHandler" = "NPR POS List: POS Unit";
+    }
 }
