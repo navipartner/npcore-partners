@@ -620,6 +620,12 @@
         if (MembershipRole.FindFirst()) then begin
             MembershipRole.CalcFields("Member Display Name");
             DisplayName := MembershipRole."Member Display Name";
+        end else begin
+            MembershipRole.SetFilter(Blocked, '=%1', true);
+            if (MembershipRole.FindFirst()) then begin
+                MembershipRole.CalcFields("Member Display Name");
+                DisplayName := MembershipRole."Member Display Name";
+            end;
         end;
 
         GetMasterDataAttributeValue();
