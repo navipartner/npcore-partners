@@ -12,7 +12,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         WebResponse: HttpResponseMessage;
     begin
         NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
-        WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1', ForeignMemberCardNumber), NotValidReason, Request, WebResponse);
+        WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1&withDetails=true', ForeignMemberCardNumber), "NPR MMMembershipRestApiCache"::MemberCardNumberDetails, NotValidReason, Request, WebResponse);
         if WebResponse.HttpStatusCode() in [200, 400] then
             IsValid := MemberCardNumberValidationResponse(Prefix, ForeignMemberCardNumber, WebResponse, NotValidReason, RemoteInfoCapture)
         else
@@ -65,7 +65,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
             exit(false);
         end;
 
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/%1/points', Format(MembershipId, 0, 4)), Request, Response) then
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/%1/points', Format(MembershipId, 0, 4)), "NPR MMMembershipRestApiCache"::LoyaltyPoints, Request, Response) then
             exit(false);
         IsValid := ValidatePointBalanceResponse(Response, PointBalance);
         if IsValid then
@@ -143,8 +143,13 @@ codeunit 6150743 "NPR MMMembershipRestApi"
 
     internal procedure WebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; HttpMethod: Text; Path: Text; var ReasonText: Text; var Request: JsonObject; var WebResponse: HttpResponseMessage): Boolean
     begin
+        exit(WebServiceApi(NPRRemoteEndpointSetup, HttpMethod, Path, "NPR MMMembershipRestApiCache"::NoCache, ReasonText, Request, WebResponse));
+    end;
+
+    internal procedure WebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; HttpMethod: Text; Path: Text; CacheType: Enum "NPR MMMembershipRestApiCache"; var ReasonText: Text; var Request: JsonObject; var WebResponse: HttpResponseMessage): Boolean
+    begin
         ReasonText := '';
-        if (TryWebServiceApi(NPRRemoteEndpointSetup, HttpMethod, Path, ReasonText, Request, WebResponse)) then
+        if (TryWebServiceApi(NPRRemoteEndpointSetup, HttpMethod, Path, CacheType, ReasonText, Request, WebResponse)) then
             exit(true);
 
         if (ReasonText = '') then
@@ -153,19 +158,25 @@ codeunit 6150743 "NPR MMMembershipRestApi"
     end;
 
     internal procedure WebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; HttpMethod: Text; Path: Text; var Request: JsonObject; var Response: JsonObject): Boolean
+    begin
+        exit(WebServiceApi(NPRRemoteEndpointSetup, HttpMethod, Path, "NPR MMMembershipRestApiCache"::NoCache, Request, Response));
+    end;
+
+    internal procedure WebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; HttpMethod: Text; Path: Text; CacheType: Enum "NPR MMMembershipRestApiCache"; var Request: JsonObject; var Response: JsonObject): Boolean
     var
         ResponseMessage: HttpResponseMessage;
         ReasonText: Text;
         Success: Boolean;
     begin
-        Success := TryWebServiceApi(NPRRemoteEndpointSetup, HttpMethod, Path, ReasonText, Request, ResponseMessage);
+        Success := TryWebServiceApi(NPRRemoteEndpointSetup, HttpMethod, Path, CacheType, ReasonText, Request, ResponseMessage);
         GetResponseBody(ResponseMessage, Response);
         exit(Success);
     end;
 
     [TryFunction]
-    internal procedure TryWebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; HttpMethod: Text; Path: Text; var ReasonText: Text; var Request: JsonObject; var WebResponse: HttpResponseMessage)
+    internal procedure TryWebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; HttpMethod: Text; Path: Text; CacheType: Enum "NPR MMMembershipRestApiCache"; var ReasonText: Text; var Request: JsonObject; var WebResponse: HttpResponseMessage)
     var
+        MembershipRestApiCache: Codeunit "NPR MMMembershipRestApiCache";
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         WebRequest: HttpRequestMessage;
@@ -187,19 +198,21 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         WebRequest.Content(RequestContent);
         WebRequest.GetHeaders(Headers);
 
-        SetRequestHeadersAuthorization(NPRRemoteEndpointSetup, Headers);
-
         WebRequest.Method := HttpMethod;
         Uri := NPRRemoteEndpointSetup."Rest Api Endpoint URI".TrimEnd('/') + '/' + Path.TrimStart('/');
         WebRequest.SetRequestUri(Uri);
-        if (NPRRemoteEndpointSetup."Connection Timeout (ms)" < 100) then
-            NPRRemoteEndpointSetup."Connection Timeout (ms)" := 10 * 1000;
-        WebClient.Timeout := NPRRemoteEndpointSetup."Connection Timeout (ms)";
+        if not MembershipRestApiCache.GetResponse(CacheType, WebRequest, WebResponse) then begin
+            SetRequestHeadersAuthorization(NPRRemoteEndpointSetup, Headers);
+            if (NPRRemoteEndpointSetup."Connection Timeout (ms)" < 100) then
+                NPRRemoteEndpointSetup."Connection Timeout (ms)" := 10 * 1000;
+            WebClient.Timeout := NPRRemoteEndpointSetup."Connection Timeout (ms)";
 
-        WebClient.Send(WebRequest, WebResponse);
-
-        if (WebResponse.IsSuccessStatusCode()) then
+            WebClient.Send(WebRequest, WebResponse);
+        end;
+        if (WebResponse.IsSuccessStatusCode()) then begin
+            MembershipRestApiCache.SetResponse(CacheType, WebRequest, WebResponse);
             exit;
+        end;
 
         ReasonText := StrSubstNo('[%1] (%2) %3: %4', NPRRemoteEndpointSetup.Code, WebResponse.HttpStatusCode(), WebResponse.ReasonPhrase(), Uri);
         Error(ReasonText);
@@ -291,7 +304,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         ExternalCardId: Guid;
     begin
         NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1', ForeignMemberCardNumber), Request, Response) then
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1', ForeignMemberCardNumber), "NPR MMMembershipRestApiCache"::MemberCardNumber, Request, Response) then
             exit(ExternalCardId);
         if JsonHelper.GetJBoolean(Response.AsToken(), 'card.blocked', false) then
             exit(ExternalCardId);
@@ -306,7 +319,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         MembershipId: Guid;
     begin
         NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1&withDetails=true', ForeignMemberCardNumber), Request, Response) then
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1&withDetails=true', ForeignMemberCardNumber), "NPR MMMembershipRestApiCache"::MemberCardNumberDetails, Request, Response) then
             exit(MembershipId);
         if Evaluate(MembershipId, JsonHelper.GetJText(Response.AsToken(), 'card.membership.membershipId', false)) then;
         exit(MembershipId);
@@ -342,7 +355,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         Request: JsonObject;
     begin
         NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1&withDetails=true', ForeignMemberCardNumber), Request, Response) then begin
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1&withDetails=true', ForeignMemberCardNumber), "NPR MMMembershipRestApiCache"::MemberCardNumberDetails, Request, Response) then begin
             NotValidReason := EndpointCardValidationError(NPRRemoteEndpointSetup, '/membership/card', ForeignMemberCardNumber);
             exit(false);
         end;
