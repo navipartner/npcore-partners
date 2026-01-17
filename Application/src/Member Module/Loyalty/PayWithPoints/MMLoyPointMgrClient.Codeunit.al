@@ -16,6 +16,8 @@
         POINTS_EARNED: Label 'Points earned';
         POINTS_BURNED: Label 'Points spent';
         NEW_BALANCE: Label 'New balance';
+        RequestFormatType: Option XML,JSON;
+
 
     procedure PrepareServiceRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
@@ -23,22 +25,29 @@
         LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup";
         SoapAction: Text;
         ResponseMessage: Text;
-        XmlRequest: Text;
+        Request: Text;
     begin
 
         GetStoreSetup(EFTTransactionRequest."Register No.", ResponseMessage, LoyaltyStoreSetup);
         LoyaltyEndpointClient.Get(LoyaltyStoreSetup."Store Endpoint Code");
         LoyaltyEndpointClient.TestField(Type, LoyaltyEndpointClient.Type::LoyaltyServices);
 
-        if (TransformToSoapAction(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
+#if not BC17
+        if (TransformToRestApi(EFTTransactionRequest, LoyaltyEndpointClient, Request, ResponseMessage)) then begin
             EFTTransactionRequest.Successful := true;
             EFTTransactionRequest."Result Code" := 119;
             EFTTransactionRequest."Result Description" := 'Pending (Message Prepared)';
-        end else begin
-            EFTTransactionRequest.Successful := false;
-            EFTTransactionRequest."Result Code" := -199;
-            EFTTransactionRequest."Result Description" := 'Unsupported Process Type.';
-        end;
+        end else
+#endif        
+            if (TransformToSoapAction(EFTTransactionRequest, SoapAction, Request, ResponseMessage)) then begin
+                EFTTransactionRequest.Successful := true;
+                EFTTransactionRequest."Result Code" := 119;
+                EFTTransactionRequest."Result Description" := 'Pending (Message Prepared)';
+            end else begin
+                EFTTransactionRequest.Successful := false;
+                EFTTransactionRequest."Result Code" := -199;
+                EFTTransactionRequest."Result Description" := 'Unsupported Process Type.';
+            end;
 
         EFTTransactionRequest.Modify();
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
@@ -49,11 +58,9 @@
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup";
         MMMembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
-        RetryRequest: Codeunit "NPR MM LoyaltyRetryQueueMgr";
-        loyaltyReceiptRegistrationError: Label 'There was a problem registering the loyalty receipt. The transaction will be automatically reattempted.';
         SoapAction: Text;
         ResponseMessage: Text;
-        XmlRequest: Text;
+        Request: Text;
         XmlRequestDoc: XmlDocument;
         XmlResponseDoc: XmlDocument;
         Success: Boolean;
@@ -62,30 +69,43 @@
         GetStoreSetup(EFTTransactionRequest."Register No.", ResponseMessage, LoyaltyStoreSetup);
         LoyaltyEndpointClient.Get(LoyaltyStoreSetup."Store Endpoint Code");
         LoyaltyEndpointClient.TestField(Type, LoyaltyEndpointClient.Type::LoyaltyServices);
-
-        if (TransformToSoapAction(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
-            XmlDocument.ReadFrom(XmlRequest, XmlRequestDoc);
-            Success := MMMembershipSoapApi.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
-            HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
-            if (not Success) then begin
-                if (RetryRequest.AddToQueue(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
-                    if (GuiAllowed()) then
-                        Message(loyaltyReceiptRegistrationError);
-                end else begin
-                    if (GuiAllowed()) then
-                        Message(ResponseMessage);
-                end;
+#if not BC17
+        if (TransformToRestApi(EFTTransactionRequest, LoyaltyEndpointClient, Request, ResponseMessage)) then begin
+            Success := SendAndHandleRestApiRequest(LoyaltyEndpointClient, EFTTransactionRequest, Request, ResponseMessage);
+            if (not Success) and (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) then
+                AddToRetryQueue(EFTTransactionRequest, 'RegisterReceipt', Request, ResponseMessage);
+        end else
+#endif        
+            if (TransformToSoapAction(EFTTransactionRequest, SoapAction, Request, ResponseMessage)) then begin
+                XmlDocument.ReadFrom(Request, XmlRequestDoc);
+                Success := MMMembershipSoapApi.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
+                HandleWebServiceXMLResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
+                if (not Success) then
+                    AddToRetryQueue(EFTTransactionRequest, SoapAction, Request, ResponseMessage);
+            end else begin
+                EFTTransactionRequest.Successful := false;
+                EFTTransactionRequest."Result Code" := -199;
+                EFTTransactionRequest."Result Description" := 'Unsupported Process Type.';
+                EFTTransactionRequest."Result Display Text" := 'Unsupported Process Type.';
+                EFTTransactionRequest.Modify();
             end;
 
+        EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
+    end;
+
+    local procedure AddToRetryQueue(EFTTransactionRequest: Record "NPR EFT Transaction Request"; SoapAction: Text; Request: Text; ResponseMessage: Text)
+    var
+        RetryRequest: Codeunit "NPR MM LoyaltyRetryQueueMgr";
+        loyaltyReceiptRegistrationError: Label 'There was a problem registering the loyalty receipt. The transaction will be automatically reattempted.';
+    begin
+        if (RetryRequest.AddToQueue(EFTTransactionRequest, SoapAction, Request, ResponseMessage)) then begin
+            if (GuiAllowed()) then
+                Message(loyaltyReceiptRegistrationError);
         end else begin
-            EFTTransactionRequest.Successful := false;
-            EFTTransactionRequest."Result Code" := -199;
-            EFTTransactionRequest."Result Description" := 'Unsupported Process Type.';
-            EFTTransactionRequest."Result Display Text" := 'Unsupported Process Type.';
-            EFTTransactionRequest.Modify();
+            if (GuiAllowed()) then
+                Message(ResponseMessage);
         end;
 
-        EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
     end;
 
     local procedure TransformToSoapAction(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text) TransformOk: Boolean
@@ -98,11 +118,11 @@
 
         case EFTTransactionRequest."Processing Type" of
             EFTTransactionRequest."Processing Type"::PAYMENT:
-                TransformOk := TransformToReservePoints(EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+                TransformOk := TransformToReservePoints(EFTTransactionRequest, RequestFormatType::XML, SoapAction, XmlText, ResponseText);
             EFTTransactionRequest."Processing Type"::REFUND:
-                TransformOk := TransformToReservePoints(EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+                TransformOk := TransformToReservePoints(EFTTransactionRequest, RequestFormatType::XML, SoapAction, XmlText, ResponseText);
             EFTTransactionRequest."Processing Type"::VOID:
-                TransformOk := TransformToCancelPoints(EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+                TransformOk := TransformToCancelPoints(EFTTransactionRequest, RequestFormatType::XML, SoapAction, XmlText, ResponseText);
 
             EFTTransactionRequest."Processing Type"::AUXILIARY:
                 case EFTTransactionRequest."Auxiliary Operation ID" of
@@ -115,7 +135,7 @@
                                 SoapAction := 'RegisterReceipt';
                                 TransformOk := true;
                             end else begin
-                                TransformOk := TransformToRegisterReceipt(EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+                                TransformOk := TransformToRegisterReceipt(EFTTransactionRequest, RequestFormatType::XML, SoapAction, XmlText, ResponseText);
                                 if (TransformOk) then begin
                                     EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
                                     OStream.Write(XmlText);
@@ -130,7 +150,7 @@
         exit(TransformOk);
     end;
 
-    internal procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlResponseDoc: XmlDocument)
+    internal procedure HandleWebServiceXMLResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlResponseDoc: XmlDocument)
     var
         OStream: OutStream;
     begin
@@ -162,6 +182,49 @@
                 case EFTTransactionRequest."Auxiliary Operation ID" of
                     1:
                         HandleRegisterSalesResult(EFTTransactionRequest, XmlResponseDoc);
+                end;
+            else
+                ResponseMessage := 'Processing type not supported.';
+        end;
+    end;
+
+    internal procedure HandleWebServiceJSONResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var WebResponse: HttpResponseMessage)
+    var
+        MembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        Response: JsonObject;
+        OStream: OutStream;
+    begin
+        if WebResponse.HttpStatusCode = 400 then  //use error message in response
+            ServiceSuccess := true;
+        if (not ServiceSuccess) then begin
+            EFTTransactionRequest.Successful := false;
+            EFTTransactionRequest."External Result Known" := true;
+            EFTTransactionRequest."Result Code" := -198;
+            EFTTransactionRequest."Result Description" := 'WebService fault.';
+            if MembershipRestApi.GetResponseBody(WebResponse, Response) then begin
+
+                EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
+                if (not Response.WriteTo(OStream)) then;
+
+                EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
+                if (not Response.WriteTo(OStream)) then;
+            end;
+
+            EFTTransactionRequest.Modify();
+            exit;
+        end;
+
+        case EFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::PAYMENT:
+                HandleReservePointsResult(EFTTransactionRequest, WebResponse);
+            EFTTransactionRequest."Processing Type"::REFUND:
+                HandleReservePointsResult(EFTTransactionRequest, WebResponse);
+            EFTTransactionRequest."Processing Type"::VOID:
+                HandleCancelPointsResult(EFTTransactionRequest, WebResponse);
+            EFTTransactionRequest."Processing Type"::AUXILIARY:
+                case EFTTransactionRequest."Auxiliary Operation ID" of
+                    1:
+                        HandleRegisterSalesResult(EFTTransactionRequest, WebResponse);
                 end;
             else
                 ResponseMessage := 'Processing type not supported.';
@@ -223,7 +286,7 @@
         TmpTransactionAuthorization.Insert();
     end;
 
-    local procedure TransformToRegisterReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
+    local procedure TransformToRegisterReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; RequestFormat: Option XML,JSON; var SoapAction: Text; var Request: Text; var ResponseText: Text): Boolean
     var
         TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
@@ -299,13 +362,19 @@
                 TempRegisterPaymentLines.Insert();
             until (EFTTransactionRequest2.Next() = 0);
         end;
-
         SoapAction := 'RegisterReceipt';
-        XmlText := CreateRegisterSaleSoapXml(TempTransactionAuthorization, TempRegisterSalesLines, TempRegisterPaymentLines);
+        case RequestFormat of
+            RequestFormat::XML:
+                Request := CreateRegisterSaleSoapXml(TempTransactionAuthorization, TempRegisterSalesLines, TempRegisterPaymentLines);
+#if not BC17
+            RequestFormat::JSON:
+                Request := CreateRegisterSaleRestJson(TempTransactionAuthorization, TempRegisterSalesLines, TempRegisterPaymentLines);
+#endif                
+        end;
         exit(true);
     end;
 
-    local procedure TransformToReservePoints(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
+    local procedure TransformToReservePoints(EFTTransactionRequest: Record "NPR EFT Transaction Request"; RequestFormat: Option XML,JSON; var SoapAction: Text; var Request: Text; var ResponseText: Text): Boolean
     var
         TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
@@ -334,11 +403,18 @@
         TempRegisterPaymentLines.Insert();
 
         SoapAction := 'reservePoints';
-        XmlText := CreateReservePointsSoapXml(TempTransactionAuthorization, TempRegisterPaymentLines);
+        case RequestFormat of
+            RequestFormat::XML:
+                Request := CreateReservePointsSoapXml(TempTransactionAuthorization, TempRegisterPaymentLines);
+#if not BC17
+            RequestFormat::JSON:
+                Request := CreateReservePointsRestJson(TempTransactionAuthorization, TempRegisterPaymentLines);
+#endif
+        end;
         exit(true);
     end;
 
-    local procedure TransformToCancelPoints(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
+    local procedure TransformToCancelPoints(EFTTransactionRequest: Record "NPR EFT Transaction Request"; RequestFormat: Option XML,JSON; var SoapAction: Text; var Request: Text; var ResponseText: Text): Boolean
     var
         TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
@@ -366,7 +442,14 @@
         TempRegisterPaymentLines.Insert();
 
         SoapAction := 'cancelReservePoints';
-        XmlText := CreateCancelReservePointsSoapXml(TempTransactionAuthorization, TempRegisterPaymentLines);
+        case RequestFormat of
+            RequestFormat::XML:
+                Request := CreateCancelReservePointsSoapXml(TempTransactionAuthorization, TempRegisterPaymentLines);
+#if not BC17
+            RequestFormat::JSON:
+                Request := CreateCancelReservePointsRestJson(TempRegisterPaymentLines);
+#endif                
+        end;
         exit(true);
     end;
 
@@ -413,6 +496,42 @@
 
         EFTTransactionRequest.Successful := (UpperCase(ResponseCode) = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
+        EFTTransactionRequest.Modify();
+        Commit();
+
+        ReceiptText := CreateReservePointsSlip(EFTTransactionRequest, 0);
+        EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
+        OStream.Write(ReceiptText);
+
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::REFUND) then
+            if (EFTTransactionRequest.Successful) then
+                ReceiptText := CreateReservePointsSlip(EFTTransactionRequest, 1);
+
+        EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
+        OStream.Write(ReceiptText);
+
+        EFTTransactionRequest.Modify();
+    end;
+
+    local procedure HandleReservePointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var WebResponse: HttpResponseMessage)
+    var
+        MembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        JsonHelper: Codeunit "NPR Json Helper";
+        Response: JsonObject;
+        ResponseCode: Text;
+        ResponseMessage: Text;
+        AuthorizationCode: Text;
+        ReceiptText: Text;
+        OStream: OutStream;
+    begin
+        if GetJsonResponse(WebResponse, Response, ResponseCode, ResponseMessage) then
+            if WebResponse.IsSuccessStatusCode then begin
+                AuthorizationCode := JsonHelper.GetJText(Response.AsToken(), 'authorizationCode', false);
+                if AuthorizationCode = '' then
+                    ResponseMessage := MembershipRestApi.InvalidJsonResponseError(Response);
+            end;
+        EFTTransactionRequest.Successful := WebResponse.IsSuccessStatusCode() and (AuthorizationCode <> '');
+        FinalizeTransactionRequest(EFTTransactionRequest, ResponseCode, ResponseMessage, AuthorizationCode, '');
         EFTTransactionRequest.Modify();
         Commit();
 
@@ -486,6 +605,31 @@
         EFTTransactionRequest.Modify();
     end;
 
+    local procedure HandleCancelPointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var WebResponse: HttpResponseMessage)
+    var
+        Response: JsonObject;
+        ResponseCode: Text;
+        ResponseMessage: Text;
+        ReceiptText: Text;
+        OStream: OutStream;
+    begin
+        GetJsonResponse(WebResponse, Response, ResponseCode, ResponseMessage);
+
+        EFTTransactionRequest.Successful := WebResponse.IsSuccessStatusCode();
+        FinalizeTransactionRequest(EFTTransactionRequest, ResponseCode, ResponseMessage, '', '');
+        EFTTransactionRequest.Modify();
+        Commit();
+
+        ReceiptText := CreateReservePointsSlip(EFTTransactionRequest, 0);
+        EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
+        OStream.Write(ReceiptText);
+
+        EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
+        OStream.Write(ReceiptText);
+
+        EFTTransactionRequest.Modify();
+    end;
+
     local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -540,6 +684,36 @@
 
         if (not EvaluateToInteger(NewBalance, NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'NewPointBalance', false))) then
             NewBalance := 0;
+
+        ReceiptText := CreateRegisterPointsSlip(EFTTransactionRequest, 0, PointsEarned, PointsSpent, NewBalance);
+        EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
+        OStream.Write(ReceiptText);
+
+        EFTTransactionRequest.Modify();
+        Commit();
+
+    end;
+
+    local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var WebResponse: HttpResponseMessage)
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        Response: JsonObject;
+        ResponseCode: Text;
+        ResponseMessage: Text;
+        NewBalance: Integer;
+        PointsEarned: Integer;
+        PointsSpent: Integer;
+        ReceiptText: Text;
+        OStream: OutStream;
+    begin
+        GetJsonResponse(WebResponse, Response, ResponseCode, ResponseMessage);
+        EFTTransactionRequest.Successful := WebResponse.IsSuccessStatusCode();
+        FinalizeTransactionRequest(EFTTransactionRequest, ResponseCode, ResponseMessage, '', '');
+        EFTTransactionRequest.Modify();
+        Commit();
+        PointsEarned := JsonHelper.GetJInteger(Response.AsToken(), 'pointsEarned', false);
+        PointsSpent := JsonHelper.GetJInteger(Response.AsToken(), 'pointsCaptured', false);
+        NewBalance := JsonHelper.GetJInteger(Response.AsToken(), 'newBalance', false);
 
         ReceiptText := CreateRegisterPointsSlip(EFTTransactionRequest, 0, PointsEarned, PointsSpent, NewBalance);
         EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
@@ -1213,5 +1387,257 @@
         exit(DelChr(InText, '<=>', '"<>&/'));
     end;
 
+    internal procedure UseRestApi(LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup"): Boolean
+    begin
+#if BC17
+        exit(false);
+#else
+        exit(LoyaltyEndpointClient."Rest Api Endpoint URI" <> '');
+#endif        
+    end;
+
+#if not BC17
+    local procedure TransformToRestApi(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup"; var Request: Text; var ResponseText: Text): Boolean
+    var
+        IStream: InStream;
+        OStream: OutStream;
+        DummySoapAction: Text;
+        TransformOk: Boolean;
+    begin
+        if not UseRestApi(LoyaltyEndpointClient) then
+            exit(false);
+        case EFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::PAYMENT:
+                TransformOk := TransformToReservePoints(EFTTransactionRequest, RequestFormatType::JSON, DummySoapAction, Request, ResponseText);
+            EFTTransactionRequest."Processing Type"::REFUND:
+                TransformOk := TransformToReservePoints(EFTTransactionRequest, RequestFormatType::JSON, DummySoapAction, Request, ResponseText);
+            EFTTransactionRequest."Processing Type"::VOID:
+                TransformOk := TransformToCancelPoints(EFTTransactionRequest, RequestFormatType::JSON, DummySoapAction, Request, ResponseText);
+
+            EFTTransactionRequest."Processing Type"::AUXILIARY:
+                case EFTTransactionRequest."Auxiliary Operation ID" of
+                    1:
+                        begin
+                            if ((EFTTransactionRequest."Receipt 2".HasValue()) and (EFTTransactionRequest."Result Code" = 119)) then begin
+                                EFTTransactionRequest.CalcFields("Receipt 2");
+                                EFTTransactionRequest."Receipt 2".CreateInStream(IStream);
+                                IStream.Read(Request);
+                                TransformOk := RequestIsJson(Request);
+                            end else begin
+                                TransformOk := TransformToRegisterReceipt(EFTTransactionRequest, RequestFormatType::JSON, DummySoapAction, Request, ResponseText);
+                                if (TransformOk) then begin
+                                    EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
+                                    OStream.Write(Request);
+                                end;
+                            end;
+                        end;
+                end;
+            else
+                ResponseText := 'Processing type not supported.';
+        end;
+
+        exit(TransformOk);
+    end;
+#endif
+
+#if not BC17
+    internal procedure SendAndHandleRestApiRequest(LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; Request: Text; var ResponseMessage: Text): Boolean
+    var
+        MembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        JsonRequest: JsonObject;
+        WebResponse: HttpResponseMessage;
+        HttpMethod: Text;
+        Path: Text;
+        MembershipId: Guid;
+        Success: Boolean;
+    begin
+        MembershipId := GetMembershipId(LoyaltyEndpointClient, EFTTransactionRequest);
+
+        case EFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND:
+                begin
+                    HttpMethod := 'POST';
+                    Path := StrSubstNo('/membership/%1/points/reserve', Format(MembershipId, 0, 4));
+                end;
+            EFTTransactionRequest."Processing Type"::AUXILIARY:
+                begin
+                    HttpMethod := 'POST';
+                    Path := StrSubstNo('/membership/%1/points', Format(MembershipId, 0, 4));
+                end;
+            EFTTransactionRequest."Processing Type"::VOID:
+                begin
+                    HttpMethod := 'DELETE';
+                    Path := StrSubstNo('/membership/%1/points/reserve', Format(MembershipId, 0, 4));
+                end;
+        end;
+        JsonRequest.ReadFrom(Request);
+        Success := MembershipRestApi.WebServiceApi(LoyaltyEndpointClient, HttpMethod, Path, ResponseMessage, JsonRequest, WebResponse);
+        HandleWebServiceJSONResult(EFTTransactionRequest, Success, ResponseMessage, WebResponse);
+        exit(Success);
+    end;
+#endif
+
+    [TryFunction]
+    internal procedure RequestIsJson(Request: Text)
+    var
+        JObject: JsonObject;
+    begin
+        JObject.ReadFrom(Request);
+    end;
+
+#if not BC17
+    local procedure CreateRegisterSaleRestJson(var TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegisterSalesLine: Record "NPR MM Reg. Sales Buffer" temporary; var TempRegisterPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary): Text
+    var
+        JsonBuilder: Codeunit "NPR Json Builder";
+    begin
+        JsonBuilder.StartObject()
+            .AddProperty('requestId', TempTransactionAuthorization."Foreign Transaction Id")
+            .AddProperty('externalReferenceNo', TempTransactionAuthorization."Reference Number")
+            .AddProperty('externalSystemIdentifier', TempTransactionAuthorization."POS Store Code")
+            .AddProperty('externalSystemUserIdentifier', TempTransactionAuthorization."POS Unit Code")
+            .AddProperty('externalBusinessUnitIdentifier', TempTransactionAuthorization."Company Name");
+        JsonBuilder.StartArray('items');
+        if TempRegisterSalesLine.FindSet() then
+            repeat
+                JsonBuilder.AddObject(SaleLineToJson(JsonBuilder, TempRegisterSalesLine));
+            until TempRegisterSalesLine.Next() = 0;
+        JsonBuilder.EndArray();
+        JsonBuilder.StartArray('reservations');
+        if TempRegisterPaymentLine.FindSet() then
+            repeat
+                JsonBuilder.AddObject(PaymentLineToJson(JsonBuilder, TempRegisterPaymentLine));
+            until TempRegisterPaymentLine.Next() = 0;
+        JsonBuilder.EndArray();
+
+        JsonBuilder.EndObject();
+        exit(JsonBuilder.BuildAsText());
+    end;
+#endif
+#if not BC17
+    local procedure SaleLineToJson(JsonBuilder: Codeunit "NPR Json Builder"; var TempRegisterSalesLine: Record "NPR MM Reg. Sales Buffer" temporary): Codeunit "NPR Json Builder"
+    begin
+        JsonBuilder.StartObject()
+            .addProperty('itemCode', TempRegisterSalesLine."Item No.")
+            .AddProperty('pointsEarned', TempRegisterSalesLine."Total Points")
+            .AddProperty('variantCode', TempRegisterSalesLine."Variant Code")
+            .AddProperty('quantity', TempRegisterSalesLine.Quantity)
+            .AddProperty('description', TempRegisterSalesLine.Description)
+            .AddProperty('amountInclVAT', TempRegisterSalesLine."Total Amount")
+        .EndObject();
+        exit(JsonBuilder);
+    end;
+#endif
+#if not BC17
+    local procedure PaymentLineToJson(JsonBuilder: Codeunit "NPR Json Builder"; var TempRegisterPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary): Codeunit "NPR Json Builder"
+    begin
+        if TempRegisterPaymentLine."Authorization Code" <> '' then
+            JsonBuilder.StartObject()
+                .AddProperty('authorizationCode', TempRegisterPaymentLine."Authorization Code")
+            .EndObject();
+        exit(JsonBuilder);
+    end;
+#endif
+#if not BC17
+    local procedure GetMembershipId(LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup"; EFTTransactionRequest: Record "NPR EFT Transaction Request"): Guid
+    var
+        POSSalesInfo: Record "NPR MM POS Sales Info";
+        Membership: Record "NPR MM Membership";
+        MembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        JsonHelper: Codeunit "NPR Json Helper";
+        NotValidReason: Text;
+        Response: JsonObject;
+        RemoteMembershipId: Guid;
+    begin
+        Membership.SetLoadFields(ExternalMembershipSystemId);
+        POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::HEADER);
+        POSSalesInfo.SetFilter("Receipt No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
+        if (POSSalesInfo.FindFirst()) then
+            if POSSalesInfo."Membership Entry No." <> 0 then
+                if Membership.Get(POSSalesInfo."Membership Entry No.") then
+                    if not IsNullGuid(Membership.ExternalMembershipSystemId) then
+                        exit(Membership.ExternalMembershipSystemId);
+
+        if MembershipRestApi.GetRemoteCardWithDetails(LoyaltyEndpointClient, EFTTransactionRequest."Card Number", NotValidReason, Response) then
+            if Evaluate(RemoteMembershipId, JsonHelper.GetJText(Response.AsToken(), 'card.membership.membershipId', false)) then
+                exit(RemoteMembershipId);
+    end;
+#endif
+#if not BC17
+    local procedure CreateReservePointsRestJson(var TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegisterPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary): Text
+    var
+        JsonBuilder: Codeunit "NPR Json Builder";
+    begin
+        if TempRegisterPaymentLine.Description = '' then
+            TempRegisterPaymentLine.Description := CopyStr(StrSubstNo('%1 %2', TempRegisterPaymentLine.Type, TempTransactionAuthorization."Reference Number"), 1, MaxStrLen(TempRegisterPaymentLine.Description));
+        JsonBuilder.StartObject()
+            .AddProperty('requestId', TempTransactionAuthorization."Foreign Transaction Id")
+            .AddProperty('externalReferenceNo', TempTransactionAuthorization."Reference Number")
+            .AddProperty('externalSystemIdentifier', TempTransactionAuthorization."POS Store Code")
+            .AddProperty('externalSystemUserIdentifier', TempTransactionAuthorization."POS Unit Code")
+            .AddProperty('externalBusinessUnitIdentifier', TempTransactionAuthorization."Company Name")
+            .AddProperty('pointsToReserve', TempRegisterPaymentLine."Total Points")
+            .AddProperty('type', AuthorizationType(TempRegisterPaymentLine))
+            .AddProperty('reason', TempRegisterPaymentLine.Description)
+        .EndObject();
+        exit(JsonBuilder.BuildAsText());
+    end;
+#endif
+#if not BC17
+    local procedure AuthorizationType(RegisterPaymentLine: Record "NPR MM Reg. Sales Buffer"): Text
+    begin
+        case RegisterPaymentLine.Type of
+            RegisterPaymentLine.Type::PAYMENT:
+                exit('WITHDRAW');
+            RegisterPaymentLine.Type::REFUND:
+                exit('DEPOSIT');
+        end;
+    end;
+#endif
+#if not BC17
+    local procedure CreateCancelReservePointsRestJson(var TempRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary): Text
+    var
+        JsonBuilder: Codeunit "NPR Json Builder";
+    begin
+        JsonBuilder.StartObject()
+            .AddProperty('authorizationCode', TempRegisterPaymentLines."Authorization Code")
+        .EndObject();
+        exit(JsonBuilder.BuildAsText());
+    end;
+#endif
+
+    local procedure GetJsonResponse(var WebResponse: HttpResponseMessage; var Response: JsonObject; var ResponseCode: Text; var ResponseMessage: Text): Boolean
+    var
+        MembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
+        if not MembershipRestApi.GetResponseBody(WebResponse, Response) then begin
+            ResponseMessage := MembershipRestApi.InvalidResponseError(WebResponse);
+            ResponseCode := Format(WebResponse.HttpStatusCode);
+            exit(false);
+        end;
+
+        if not WebResponse.IsSuccessStatusCode then begin
+            ResponseMessage := JsonHelper.GetJText(Response.AsToken(), 'message', false);
+            SplitResponse(ResponseMessage, ResponseCode);
+            if ResponseCode = '' then
+                ResponseCode := Format(WebResponse.HttpStatusCode);
+        end;
+        exit(true);
+    end;
+
+    local procedure SplitResponse(var ResponseMessage: Text; var ResponseCode: Text)
+    var
+        Position: Integer;
+        NumericValue: Integer;
+    begin
+        ResponseMessage := ResponseMessage.TrimStart(' ');
+        Position := StrPos(ResponseMessage, ' ');
+        if Position = 0 then
+            exit;
+        if not Evaluate(NumericValue, CopyStr(ResponseMessage, 1, Position - 1)) then
+            exit;
+        ResponseCode := CopyStr(ResponseMessage, 1, Position - 1);
+        ResponseMessage := CopyStr(ResponseMessage, Position + 1);
+    end;
 }
 

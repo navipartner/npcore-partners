@@ -4710,6 +4710,7 @@
         Membership: Record "NPR MM Membership";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         MembershipCreated: Boolean;
+        MembershipModified: Boolean;
         MissingCustomerNoErr: Label 'Each membership must have a link to a customer in order for the system to store the payment token.';
     begin
 
@@ -4738,7 +4739,7 @@
                 Membership."Replicated At" := CurrentDateTime();
             if (MemberInfoCapture."Enable Auto-Renew") then
                 Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-
+            Membership.ExternalMembershipSystemId := MemberInfoCapture.ExternalMembershipSystemId;
             Membership.Insert(true);
             MembershipCreated := true;
         end;
@@ -4765,10 +4766,17 @@
 
                 if (Membership."Auto-Renew" = Membership."Auto-Renew"::YES_INTERNAL) then
                     Membership.TestField("Auto-Renew Payment Method Code");
-
-                Membership."Modified At" := CurrentDateTime();
-                Membership.Modify();
+                MembershipModified := true;
             end;
+        end;
+        if not IsNullGuid(MemberInfoCapture.ExternalMembershipSystemId) then
+            if Membership.ExternalMembershipSystemId <> MemberInfoCapture.ExternalMembershipSystemId then begin
+                Membership.ExternalMembershipSystemId := MemberInfoCapture.ExternalMembershipSystemId;
+                MembershipModified := true;
+            end;
+        if MembershipModified then begin
+            Membership."Modified At" := CurrentDateTime();
+            Membership.Modify();
         end;
         if MemberInfoCapture."Member Payment Method" <> 0 then begin
             if Membership."Customer No." = '' then
@@ -5559,7 +5567,6 @@
 
             if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::FOREIGN) then
                 MemberCard."Card Type" := MemberCard."Card Type"::EXTERNAL;
-
             MemberCard.Insert();
         end;
 
@@ -5614,7 +5621,6 @@
             MemberCard."Valid Until" := CardValidUntil;
 
         MemberCard."Card Is Temporary" := MemberInfoCapture."Temporary Member Card";
-
         MemberCard.Modify();
 
         CardEntryNo := MemberCard."Entry No.";

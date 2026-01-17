@@ -174,6 +174,11 @@
             Caption = 'Auto-Renew External Data';
             DataClassification = CustomerContent;
         }
+        field(40; ExternalMembershipSystemId; Guid)
+        {
+            Caption = 'External Membership Id';
+            DataClassification = SystemMetadata;
+        }
         field(100; "Awarded Points (Sale)"; Integer)
         {
             CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Entry No."),

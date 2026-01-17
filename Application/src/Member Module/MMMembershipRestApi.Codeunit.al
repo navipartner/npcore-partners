@@ -218,7 +218,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         Error(ReasonText);
     end;
 
-    local procedure GetResponseBody(ResponseMessage: HttpResponseMessage; var ResponseBody: JsonObject): Boolean
+    internal procedure GetResponseBody(ResponseMessage: HttpResponseMessage; var ResponseBody: JsonObject): Boolean
     var
         ResponseText: Text;
     begin
@@ -228,6 +228,14 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         exit(false);
     end;
 
+    internal procedure InvalidResponseError(ResponseMessage: HttpResponseMessage): Text
+    var
+        ResponseText: Text;
+        InvalidResponseLbl: Label 'Invalid response received: %1';
+    begin
+        if ResponseMessage.Content.ReadAs(ResponseText) then;
+        exit(StrSubstNo(InvalidResponseLbl, ResponseText));
+    end;
 
     local procedure SetRequestHeadersAuthorization(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var RequestHeaders: HttpHeaders)
     var
@@ -349,7 +357,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         exit(MembershipId);
     end;
 
-    local procedure GetRemoteCardWithDetails(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; ForeignMemberCardNumber: Text[100]; var NotValidReason: Text; var Response: JsonObject): Boolean
+    internal procedure GetRemoteCardWithDetails(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; ForeignMemberCardNumber: Text[100]; var NotValidReason: Text; var Response: JsonObject): Boolean
     var
         JsonHelper: Codeunit "NPR Json Helper";
         Request: JsonObject;
@@ -374,13 +382,12 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         exit(StrSubstNo(MemberCardValidationLbl, NPRRemoteEndpointSetup."Rest Api Endpoint URI".TrimEnd('/') + Path, ForeignMemberCardNumber));
     end;
 
-    local procedure InvalidResponseError(Response: JsonObject): Text
+    internal procedure InvalidJsonResponseError(Response: JsonObject): Text
     var
         ResponseText: Text;
         InvalidResponseLbl: Label 'Invalid response received: %1';
     begin
         if Response.WriteTo(ResponseText) then;
-
         exit(StrSubstNo(InvalidResponseLbl, ResponseText));
     end;
 
@@ -467,7 +474,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         Response: JsonObject;
     begin
         if not GetResponseBody(ResponseMessage, Response) then begin
-            NotValidReason := InvalidResponseError(Response);
+            NotValidReason := InvalidResponseError(ResponseMessage);
             exit(false);
         end;
 
@@ -476,7 +483,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         MembershipInfo."External Membership No." := JsonHelper.GetJCode(Response.AsToken(), 'membership.membershipNumber', false);
 #pragma warning restore AA0139        
         if (MembershipInfo."Membership Code" = '') or (MembershipInfo."External Membership No." = '') then begin
-            NotValidReason := InvalidResponseError(Response);
+            NotValidReason := InvalidJsonResponseError(Response);
             exit(false);
         end;
         if Evaluate(MembershipInfo.ExternalMembershipSystemId, JsonHelper.GetJText(Response.AsToken(), 'membership.membershipId', false)) then;
@@ -529,14 +536,14 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         Response: JsonObject;
     begin
         if not GetResponseBody(ResponseMessage, Response) then begin
-            NotValidReason := InvalidResponseError(Response);
+            NotValidReason := InvalidResponseError(ResponseMessage);
             exit(false);
         end;
 
 #pragma warning disable AA0139
         MembershipInfo."External Member No" := JsonHelper.GetJCode(Response.AsToken(), 'member.memberNumber', false);
         if MembershipInfo."External Member No" = '' then begin
-            NotValidReason := InvalidResponseError(Response);
+            NotValidReason := InvalidJsonResponseError(Response);
             exit(false);
         end;
         MembershipInfo."External Card No." := JsonHelper.GetJCode(Response.AsToken(), 'member.cards[0].cardNumber', false);

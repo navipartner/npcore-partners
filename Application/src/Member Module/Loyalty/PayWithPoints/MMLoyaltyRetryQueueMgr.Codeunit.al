@@ -52,7 +52,7 @@ codeunit 6184975 "NPR MM LoyaltyRetryQueueMgr"
         ResponseMessage: Text;
         Success: Boolean;
         Stream: InStream;
-        XmlRequestText: Text;
+        RequestText: Text;
         XmlRequestDoc: XmlDocument;
         XmlResponseDoc: XmlDocument;
     begin
@@ -65,11 +65,12 @@ codeunit 6184975 "NPR MM LoyaltyRetryQueueMgr"
 
         RetryQueue.CalcFields(RequestXml);
         RetryQueue.RequestXml.CreateInStream(Stream);
-        Stream.Read(XmlRequestText);
-        XmlDocument.ReadFrom(XmlRequestText, XmlRequestDoc);
-
-        Success := MMMembershipSoapApi.WebServiceApi(LoyaltyEndpointClient, RetryQueue.SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
-        LoyaltyClientMgr.HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
+        Stream.Read(RequestText);
+        if not SendRestApiRequest(LoyaltyEndpointClient, EFTTransactionRequest, RequestText, Success, ResponseMessage) then begin
+            XmlDocument.ReadFrom(RequestText, XmlRequestDoc);
+            Success := MMMembershipSoapApi.WebServiceApi(LoyaltyEndpointClient, RetryQueue.SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
+            LoyaltyClientMgr.HandleWebServiceXMLResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
+        end;
 
         if (not Success) then begin
             RetryQueue.FailedDateTime := CurrentDateTime();
@@ -136,6 +137,27 @@ codeunit 6184975 "NPR MM LoyaltyRetryQueueMgr"
     begin
         exit(Codeunit::"NPR MM LoyaltyRetryQueueMgr");
     end;
+
+    local procedure SendRestApiRequest(LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; Request: Text; var Success: Boolean; var ResponseMessage: Text): Boolean
+    var
+        LoyaltyClientMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+    begin
+        if not LoyaltyClientMgr.RequestIsJson(Request) then
+            exit(false);
+        if not LoyaltyClientMgr.UseRestApi(LoyaltyEndpointClient) then
+            exit(false);
+#if BC17
+        EFTTransactionRequest."Authorisation Number" := EFTTransactionRequest."Authorisation Number";  //just to avoid AL0132 compiler error
+        Success := false;
+        ResponseMessage := 'Rest api call not supported in BC17';
+        exit(false);
+#else
+
+        Success := LoyaltyClientMgr.SendAndHandleRestApiRequest(LoyaltyEndpointClient, EFTTransactionRequest, Request, ResponseMessage);
+        exit(true);
+#endif
+    end;
+
 
     [EventSubscriber(ObjectType::Table, Database::"NPR MM NPR Remote Endp. Setup", 'OnAfterInsertEvent', '', false, false)]
     local procedure EnsureJobQueueEntryExistsOnRemoteEndpointInsert(var Rec: Record "NPR MM NPR Remote Endp. Setup")
