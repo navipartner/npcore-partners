@@ -38,8 +38,9 @@
     procedure DispatchToReplicateForeignMemberCard(CommunityCode: Code[20]; ForeignMembercardNumber: Text[100]; IncludeMemberImage: Boolean; var FormatedCardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text) MembershipEntryNo: Integer
     var
         ForeignValidationSetup: Record "NPR MM Foreign Members. Setup";
-        IsHandled: Boolean;
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
+        IsHandled: Boolean;
     begin
 
         MembershipEntryNo := 0;
@@ -64,6 +65,8 @@
                 if (IsValid) then begin
                     FormatForeignCardNumberFromScan(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, FormatedCardNumber);
                     MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(FormatedCardNumber, Today, NotValidReason);
+                    if (MembershipEntryNo <> 0) and (ForeignMembercardNumber = FormatedCardNumber) then
+                        ForeignMembershipMgr.SynchronizeLoyaltyPoints(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", MembershipEntryNo, ForeignMembercardNumber);
                 end;
 
             until ((ForeignValidationSetup.Next() = 0) or (IsValid));
