@@ -150,19 +150,28 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
         EnvironmentInformation: Codeunit "Environment Information";
+        JObjectRequest: JsonObject;
+        RequestText: Text;
         RequestUrl: Text;
         BaseUrl: Label 'https://job-queue-refresher-entra-app-manager%1/?action=%2', Locked = true;
         SandboxEndpoint: Label '-prelive.navipartner-prelive.workers.dev', Locked = true;
         LiveEndpoint: Label '.npretail.app', Locked = true;
-        RequestBodyString: Label '{"TenantID_EnvironmentName_ClientID": "%1|%2|%3", "ClientSecret": "%4"}';
-        RequestText: Text;
     begin
         if EnvironmentInformation.IsProduction() then
             RequestUrl := StrSubstNo(BaseUrl, LiveEndpoint, ExtJQRefresherEnumValueName(action))
         else
             RequestUrl := StrSubstNo(BaseUrl, SandboxEndpoint, ExtJQRefresherEnumValueName(action));
 
-        RequestText := StrSubstNo(RequestBodyString, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), Format(ClientID), ClientSecret);
+        JObjectRequest.Add('TenantID', AzureADTenant.GetAadTenantId());
+        JObjectRequest.Add('EnvironmentName', EnvironmentInformation.GetEnvironmentName());
+
+        if action in [action::create, action::delete, action::resetFailedAttempts] then begin
+            JObjectRequest.Add('ClientID', ClientID);
+            if action = action::create then
+                JObjectRequest.Add('ClientSecret', ClientSecret);
+        end;
+
+        JObjectRequest.WriteTo(RequestText);
 
         CreateCloudflareHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::POST, HttpResponseMessage);
     end;
@@ -353,6 +362,91 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     internal procedure TryThrowIncompatibleBaseVersion()
     begin
         ThrowIncompatibleBaseVersion();
+    end;
+
+    internal procedure UpdateJQRunnerUsersList(var JQRunnerUser: Record "NPR Job Queue Runner User")
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        EnvironmentInformation: Codeunit "Environment Information";
+        JsonHelper: Codeunit "NPR Json Helper";
+        HttpResponseMessage: HttpResponseMessage;
+        ResponseArray: JsonArray;
+        EntraAppToken: JsonToken;
+        ResponseToken: JsonToken;
+        Window: Dialog;
+        NullGuid: Guid;
+        TenantID: Text;
+        EnvironmentName: Text;
+        ResponseText: Text;
+        QueryingDialog: Label 'Querying refresher service...';
+        FailedToRetrieveJQRunnerUsersListLbl: Label 'Failed to retrieve job queue runner users list.\External response:\%1';
+    begin
+        Window.Open(QueryingDialog);
+        ManageJQRefresherUser(NullGuid, '', Enum::"NPR Ext. JQ Refresher Options"::list, HttpResponseMessage);
+        HttpResponseMessage.Content().ReadAs(ResponseText);
+        if not HttpResponseMessage.IsSuccessStatusCode() then
+            Error(FailedToRetrieveJQRunnerUsersListLbl, ResponseText);
+
+        if not ResponseToken.ReadFrom(ResponseText) then
+            Error(FailedToRetrieveJQRunnerUsersListLbl, ResponseText);
+
+        if not ResponseToken.IsArray() then
+            Error(FailedToRetrieveJQRunnerUsersListLbl, ResponseText);
+
+        ResponseArray := ResponseToken.AsArray();
+
+        JQRunnerUser.Reset();
+        JQRunnerUser.DeleteAll();
+        TenantID := AzureADTenant.GetAadTenantId();
+        EnvironmentName := EnvironmentInformation.GetEnvironmentName();
+
+        foreach EntraAppToken in ResponseArray do begin
+            if (TenantID = JsonHelper.GetJText(EntraAppToken, 'TenantID', true)) and (EnvironmentName = JsonHelper.GetJText(EntraAppToken, 'EnvironmentName', true)) then begin
+                JQRunnerUser.Init();
+                JQRunnerUser."Entry No." += 1;
+                Evaluate(JQRunnerUser."Client ID", JsonHelper.GetJText(EntraAppToken, 'ClientID', true));
+                JQRunnerUser."Failed Attempts" := JsonHelper.GetJInteger(EntraAppToken, 'FailedAttempts', false);
+                JQRunnerUser."Last Success Date Time" := JsonHelper.GetJDT(EntraAppToken, 'LastSuccessDateTime', false);
+                JQRunnerUser."Last Error Text" := CopyStr(JsonHelper.GetJText(EntraAppToken, 'LastErrorText', false), 1, MaxStrLen(JQRunnerUser."Last Error Text"));
+                JQRunnerUser.Insert();
+            end;
+        end;
+
+        Window.Close();
+    end;
+
+    internal procedure ResetJQRunnerUserFailedAttempts(var JQRunnerUser: Record "NPR Job Queue Runner User")
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        HttpResponseMessage: HttpResponseMessage;
+        ResponseToken: JsonToken;
+        ChangedToken: JsonToken;
+        Window: Dialog;
+        ResponseText: Text;
+        QueryingDialog: Label 'Querying refresher service...';
+        FailedToResetJQRunnerUserFailedAttemptsLbl: Label 'Failed to reset job queue runner user Failed Attempts value.\External response:\%1';
+    begin
+        Window.Open(QueryingDialog);
+        ManageJQRefresherUser(JQRunnerUser."Client Id", '', Enum::"NPR Ext. JQ Refresher Options"::resetFailedAttempts, HttpResponseMessage);
+        HttpResponseMessage.Content().ReadAs(ResponseText);
+        if not HttpResponseMessage.IsSuccessStatusCode() then
+            Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
+
+        if not ResponseToken.ReadFrom(ResponseText) then
+            Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
+
+        if not ResponseToken.IsObject() then
+            Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
+
+        ChangedToken := JsonHelper.GetJsonToken(ResponseToken, 'changed');
+        if not JsonHelper.GetJBoolean(ResponseToken, 'success', true) then
+            Error(FailedToResetJQRunnerUserFailedAttemptsLbl, JsonHelper.GetJText(ChangedToken, 'reason', true));
+
+        if JsonHelper.GetJInteger(ChangedToken, 'changed', true) < 1 then
+            Error(FailedToResetJQRunnerUserFailedAttemptsLbl, JsonHelper.GetJText(ChangedToken, 'reason', true));
+        JQRunnerUser."Failed Attempts" := 0;
+        JQRunnerUser.Modify();
+        Window.Close();
     end;
 
     local procedure ThrowIncompatibleBaseVersion()

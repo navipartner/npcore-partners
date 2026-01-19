@@ -17,4 +17,12 @@ enum 6059851 "NPR Ext. JQ Refresher Options"
     {
         Caption = 'select';
     }
+    value(3; list)
+    {
+        Caption = 'list';
+    }
+    value(4; resetFailedAttempts)
+    {
+        Caption = 'resetFailedAttempts';
+    }
 }

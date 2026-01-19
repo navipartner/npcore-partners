@@ -190,6 +190,14 @@ page 6150891 "NPR Job Queue Refresh Setup"
                         CurrPage.Update(false);
                     end;
                 }
+                action("Show External JQ Refresher Users")
+                {
+                    Caption = 'Show External JQ Refresher Users';
+                    ToolTip = 'Opens a list of all users registered for the external job queue refresher, along with their information.';
+                    ApplicationArea = NPRRetail;
+                    Image = Navigate;
+                    RunObject = Page "NPR Job Queue Runner Users";
+                }
             }
         }
     }
