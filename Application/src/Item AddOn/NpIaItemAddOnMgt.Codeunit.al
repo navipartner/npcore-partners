@@ -584,6 +584,7 @@
             SaleLinePOSAddOn.Insert(true);
 
             POSSaleLine.SetUsePresetLineNo(true);
+            POSSaleLine.SetSkipPOSInfo(true);
             POSSaleLine.InsertLine(SaleLinePOS);
             POSSaleLine.SetUsePresetLineNo(false);
 

@@ -22,6 +22,7 @@
         UseLinePriceVATParams: Boolean;
         InsertWithAutoSplitKeyForced: Boolean;
         IsAutoSplitKeyRecord: Boolean;
+        SkipPOSInfo: Boolean;
         UsePresetLineNo: Boolean;
 
     procedure Init(RegisterNo: Code[20]; SalesTicketNo: Code[20]; SaleIn: Codeunit "NPR POS Sale"; SetupIn: Codeunit "NPR POS Setup"; FrontEndIn: Codeunit "NPR POS Front End Management")
@@ -168,6 +169,8 @@
         if UsePresetLineNo then
             Rec."Line No." := Line."Line No.";
 
+        Rec.SetSkipPOSInfo(SkipPOSInfo);
+
         InitLine();
 
         Rec."Line Type" := Line."Line Type";
@@ -252,6 +255,8 @@
         Rec.Indentation := Line.Indentation;
 
         Return := InsertLineInternal(Rec, true);
+        SkipPOSInfo := false;
+        Rec.SetSkipPOSInfo(SkipPOSInfo);
         Line := Rec;
 
         if not Return then
@@ -1032,5 +1037,10 @@
     procedure SetUsePresetLineNo(Set: Boolean)
     begin
         UsePresetLineNo := Set;
+    end;
+
+    procedure SetSkipPOSInfo(Skip: Boolean)
+    begin
+        SkipPOSInfo := Skip;
     end;
 }

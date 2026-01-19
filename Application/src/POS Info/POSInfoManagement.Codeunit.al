@@ -3,12 +3,12 @@
     Access = Internal;
 
     var
+        TempGlobalPOSInfoTransaction: Record "NPR POS Info Transaction" temporary;
         ApplicScope: Option " ","Current Line","All Lines","New Lines",Ask;
 
-    procedure InsertPOSInfo(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line"; CurrFieldNo: Integer)
+    procedure CollectPOSInfo(var Rec: Record "NPR POS Sale Line")
     var
         POSInfoLinkTable: Record "NPR POS Info Link Table";
-        POSInfoTransaction: Record "NPR POS Info Transaction";
     begin
         if Rec.IsTemporary then
             exit;
@@ -16,7 +16,20 @@
             POSInfoLinkTable.Reset();
             POSInfoLinkTable.SetRange("Table ID", DATABASE::Item);
             POSInfoLinkTable.SetRange("Primary Key", Rec."No.");
-            ProcessPOSInfoLinkEntries(POSInfoLinkTable, Rec, ApplicScope::"Current Line");
+            // Collect POS info data with RunModal pages (outside transaction)
+            CollectPOSInfoData(POSInfoLinkTable, Rec, ApplicScope::"Current Line");
+        end;
+    end;
+
+    procedure ApplyPOSInfo(var Rec: Record "NPR POS Sale Line")
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        if Rec.IsTemporary then
+            exit;
+        if Rec."Line Type" = Rec."Line Type"::Item then begin
+            // Apply collected data transactionally
+            ApplyCollectedPOSInfoData(Rec, ApplicScope::"Current Line");
         end;
         CopyPOSInfoTransFromHeader(Rec, POSInfoTransaction);
     end;
@@ -53,7 +66,8 @@
         pSaleLinePos.Date := Rec.Date;
         pSaleLinePos."Line No." := 0;
 
-        ProcessPOSInfoLinkEntries(POSInfoLinkTable, pSaleLinePos, ApplicScope::"All Lines");
+        CollectPOSInfoData(POSInfoLinkTable, pSaleLinePos, ApplicScope::"All Lines");
+        ApplyCollectedPOSInfoData(pSaleLinePos, ApplicScope::"All Lines");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', true, true)]
@@ -103,30 +117,38 @@
         DeleteLine(Rec);
     end;
 
-    local procedure ProcessPOSInfoLinkEntries(var POSInfoLinkTable: Record "NPR POS Info Link Table"; pSaleLinePos: Record "NPR POS Sale Line"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask) FrontEndUpdateIsNeeded: Boolean
+    local procedure CollectPOSInfoData(var POSInfoLinkTable: Record "NPR POS Info Link Table"; pSaleLinePos: Record "NPR POS Sale Line"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     var
         POSInfo: Record "NPR POS Info";
-        TempPOSInfoTransaction: Record "NPR POS Info Transaction" temporary;
         UserInputString: Text;
     begin
+        // Clear any previous data
+        TempGlobalPOSInfoTransaction.Reset();
+        TempGlobalPOSInfoTransaction.DeleteAll();
+
+        // Collect POS info data by running modal pages (no commit needed here)
         if POSInfoLinkTable.FindSet() then
             repeat
                 POSInfo.Get(POSInfoLinkTable."POS Info Code");
                 if ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope, true) then begin
-                    TempPOSInfoTransaction.Init();
-                    TempPOSInfoTransaction.CopyFromPOSInfo(POSInfo);
-                    TempPOSInfoTransaction."POS Info" := CopyStr(GetPosInfoOutput(POSInfo, UserInputString), 1, MaxStrLen(TempPOSInfoTransaction."POS Info"));
-                    TempPOSInfoTransaction.Insert();
+                    TempGlobalPOSInfoTransaction.Init();
+                    TempGlobalPOSInfoTransaction.CopyFromPOSInfo(POSInfo);
+                    TempGlobalPOSInfoTransaction."POS Info" := CopyStr(GetPosInfoOutput(POSInfo, UserInputString), 1, MaxStrLen(TempGlobalPOSInfoTransaction."POS Info"));
+                    TempGlobalPOSInfoTransaction.Insert();
                 end;
             until POSInfoLinkTable.Next() = 0;
+    end;
 
+    local procedure ApplyCollectedPOSInfoData(pSaleLinePos: Record "NPR POS Sale Line"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask) FrontEndUpdateIsNeeded: Boolean
+    begin
+        // Apply the collected POS info data transactionally
         FrontEndUpdateIsNeeded := false;
-        if TempPOSInfoTransaction.FindSet() then
+        if TempGlobalPOSInfoTransaction.FindSet() then
             repeat
-                TempPOSInfoTransaction.ShowMessage();
-                if SaleLineApplyPOSInfo(pSaleLinePos, TempPOSInfoTransaction, pApplicScope, false) then
+                TempGlobalPOSInfoTransaction.ShowMessage();
+                if SaleLineApplyPOSInfo(pSaleLinePos, TempGlobalPOSInfoTransaction, pApplicScope, false) then
                     FrontEndUpdateIsNeeded := true;
-            until TempPOSInfoTransaction.Next() = 0;
+            until TempGlobalPOSInfoTransaction.Next() = 0;
     end;
 
     procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "NPR POS Sale Line"; pPOSInfoCode: Code[20]; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean; UserInputString: Text): Boolean

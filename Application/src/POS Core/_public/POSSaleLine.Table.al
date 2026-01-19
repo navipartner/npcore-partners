@@ -71,6 +71,10 @@
                     "Line Type" := "Line Type"::Comment;
                 end;
 
+                // Collect POS info data before any transactions start (RunModal pages need to be called outside transactions)
+                if not SkipPOSInfo then
+                    POSInfoManagement.CollectPOSInfo(Rec);
+
                 case "Line Type" of
                     "Line Type"::"GL Payment",
                     "Line Type"::Rounding,
@@ -106,8 +110,10 @@
                         exit;
                 end;
 
+                // Apply collected POS info data after all transactions are complete
                 if not SkipPOSInfo then
-                    POSInfoManagement.InsertPOSInfo(Rec, xRec, Rec.FieldNo("No."));
+                    POSInfoManagement.ApplyPOSInfo(Rec);
+
                 CreateDimFromDefaultDim(FieldNo("No."));
             end;
         }
