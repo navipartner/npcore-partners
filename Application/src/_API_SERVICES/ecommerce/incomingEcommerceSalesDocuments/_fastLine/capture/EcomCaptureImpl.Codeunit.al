@@ -301,7 +301,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
             exit;
 
         repeat
-            if not EcomSalesHeader."Price Excl. VAT" then
+            if EcomSalesHeader."Price Excl. VAT" then
                 AmountToCapture += EcomSalesLine."Line Amount" * (1 + (EcomSalesLine."VAT %" / 100))
             else
                 AmountToCapture += EcomSalesLine."Line Amount";

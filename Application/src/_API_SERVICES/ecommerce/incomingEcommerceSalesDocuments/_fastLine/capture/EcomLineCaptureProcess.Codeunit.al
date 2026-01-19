@@ -128,7 +128,7 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
         EcomSalesLine.SetLoadFields("Line Amount", "VAT %");
         if EcomSalesLine.FindSet() then
             repeat
-                if not EcomSalesHeader."Price Excl. VAT" then
+                if EcomSalesHeader."Price Excl. VAT" then
                     CapturedSalesAmount += EcomSalesLine."Line Amount" * (1 + (EcomSalesLine."VAT %" / 100))
                 else
                     CapturedSalesAmount += EcomSalesLine."Line Amount";
@@ -144,7 +144,7 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
         EcomSalesLine.ReadIsolation := EcomSalesLine.ReadIsolation::UpdLock;
         if EcomSalesLine.FindSet() then
             repeat
-                if not EcomSalesHeader."Price Excl. VAT" then
+                if EcomSalesHeader."Price Excl. VAT" then
                     SalesAmount := EcomSalesLine."Line Amount" * (1 + (EcomSalesLine."VAT %" / 100))
                 else
                     SalesAmount := EcomSalesLine."Line Amount";
