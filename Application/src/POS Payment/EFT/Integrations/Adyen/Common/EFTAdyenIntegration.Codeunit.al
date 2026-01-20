@@ -1183,4 +1183,17 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         exit(Json.Remove(ValueStartIndex, 1).Remove(ValueEndIndex - 1, 1));
     end;
+
+    internal procedure SetAbortTaskParameters(AbortRequest: Record "NPR EFT Transaction Request"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    begin
+        Parameters.Add('RegisterNo', AbortRequest."Register No.");
+        Parameters.Add('OriginalPOSPaymentTypeCode', AbortRequest."Original POS Payment Type Code");
+        Parameters.Add('ProcessedEntryNo', Format(AbortRequest."Processed Entry No."));
+        Parameters.Add('ReferenceNumberInput', AbortRequest."Reference Number Input");
+        Parameters.Add('HardwareID', AbortRequest."Hardware ID");
+        Parameters.Add('IntegrationVersionCode', AbortRequest."Integration Version Code");
+        Parameters.Add('Mode', Format(AbortRequest.Mode, 0, 9));
+        Parameters.Add('ProcessedTransactionProcessingType', Format(EFTTransactionRequest."Processing Type", 0, 9));
+        Parameters.Add('ProcessedTransactionAuxiliaryOperationID', Format(EFTTransactionRequest."Auxiliary Operation ID"));
+    end;
 }

@@ -9,9 +9,11 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
     var
         EntryNo: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        ProcessedEFTTransactionRequest: Record "NPR EFT Transaction Request";
         Response: Text;
         EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Protocol";
         EFTAdyenCloudIntegrat: Codeunit "NPR EFT Adyen Cloud Integrat.";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         Request: Text;
         EFTSetup: Record "NPR EFT Setup";
         ApiKey: Text;
@@ -26,12 +28,27 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'ExecuteBackgroundTask', EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+            EFTTransactionRequest."Reference Number Input" := CopyStr(Parameters.Get('ReferenceNumberInput'), 1, MaxStrLen(EFTTransactionRequest."Reference Number Input"));
+            EFTTransactionRequest."Hardware ID" := CopyStr(Parameters.Get('HardwareID'), 1, MaxStrLen(EFTTransactionRequest."Hardware ID"));
+            EFTTransactionRequest."Integration Version Code" := CopyStr(Parameters.Get('IntegrationVersionCode'), 1, MaxStrLen(EFTTransactionRequest."Integration Version Code"));
+            Evaluate(EFTTransactionRequest.Mode, Parameters.Get('Mode'));
+            Evaluate(ProcessedEFTTransactionRequest."Processing Type", Parameters.Get('ProcessedTransactionProcessingType'));
+            Evaluate(ProcessedEFTTransactionRequest."Auxiliary Operation ID", Parameters.Get('ProcessedTransactionAuxiliaryOperationID'));
+        end else
+            GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'ExecuteBackgroundTask', EFTTransactionRequest);
 
         if CalledFromActionWF <> DataCollectionLbl then
             EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        Request := EFTAdyenAbortTrxReq.GetRequestJson(EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+            Request := EFTAdyenAbortTrxReq.GetRequestJson(EFTTransactionRequest, ProcessedEFTTransactionRequest)
+        else
+            Request := EFTAdyenAbortTrxReq.GetRequestJson(EFTTransactionRequest);
         URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
 
         if CalledFromActionWF = DataCollectionLbl then
@@ -64,13 +81,20 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        //Trx done, either complete (success/failure) or handled error 
+        //Trx done, either complete (success/failure) or handled error
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskSuccessContinuation', EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+        end else
+            GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskSuccessContinuation', EFTTransactionRequest);
 
         Evaluate(Completed, Results.Get('Completed'), 9);
         Logs := Results.Get('Logs');
@@ -105,13 +129,20 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        //Trx result unknown - log error and start lookup        
+        //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskErrorContinuation', EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+        end else
+            GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskErrorContinuation', EFTTransactionRequest);
 
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskError', StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack))
@@ -133,13 +164,20 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
         CalledFromActionWF: Text;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        //Trx result unknown - log error and start lookup        
+        //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskCancelled', EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+        end else
+            GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskCancelled', EFTTransactionRequest);
 
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskCancelled', '')

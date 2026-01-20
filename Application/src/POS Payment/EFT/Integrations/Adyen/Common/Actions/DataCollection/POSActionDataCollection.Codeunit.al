@@ -541,6 +541,7 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         EFTAdyenAbortMgmt: Codeunit "NPR EFT Adyen Abort Mgmt";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         TaskId: Integer;
         AbortReqEntryNo: Integer;
         AbortTaskActive: Boolean;
@@ -565,7 +566,10 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
         else
             AbortEFTTransactionRequest.Mode := AbortEFTTransactionRequest.Mode::"TEST Remote";
         AbortEFTTransactionRequest.Modify();
+
         Parameters.Add('EntryNo', Format(AbortReqEntryNo));
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+            EFTAdyenIntegration.SetAbortTaskParameters(AbortEFTTransactionRequest, EFTTransactionRequest, Parameters);
         Parameters.Add('CalledFromActionWF', 'DATA_COLLECTION');
         Sleep(2000);
         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 10);

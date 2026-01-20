@@ -3,6 +3,16 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
     Access = Internal;
 
     procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    begin
+        exit(BuildRequestJson(EFTTransactionRequest, GetMessageCategory(EFTTransactionRequest)));
+    end;
+
+    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ProcessedEFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    begin
+        exit(BuildRequestJson(EFTTransactionRequest, GetMessageCategoryFromProcessedRequest(ProcessedEFTTransactionRequest)));
+    end;
+
+    local procedure BuildRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; MessageCategory: Text): Text
     var
         Json: Codeunit "Json Text Reader/Writer";
     begin
@@ -12,7 +22,7 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
         Json.WriteStringProperty('AbortReason', 'MerchantAbort');
         Json.WriteStartObject('MessageReference');
         Json.WriteStringProperty('ServiceID', EFTTransactionRequest."Processed Entry No.");
-        Json.WriteStringProperty('MessageCategory', GetMessageCategory(EFTTransactionRequest));
+        Json.WriteStringProperty('MessageCategory', MessageCategory);
         Json.WriteStringProperty('SaleID', EFTTransactionRequest."Register No.");
         Json.WriteEndObject(); // MessageReference
         Json.WriteEndObject(); // AbortRequest
@@ -36,6 +46,11 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
         ProcessedEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         ProcessedEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
+        exit(GetMessageCategoryFromProcessedRequest(ProcessedEFTTransactionRequest));
+    end;
+
+    local procedure GetMessageCategoryFromProcessedRequest(ProcessedEFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    begin
         case ProcessedEFTTransactionRequest."Processing Type" of
             ProcessedEFTTransactionRequest."Processing Type"::PAYMENT,
             ProcessedEFTTransactionRequest."Processing Type"::REFUND:
