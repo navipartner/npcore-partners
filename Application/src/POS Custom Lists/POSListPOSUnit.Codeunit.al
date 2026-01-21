@@ -38,8 +38,22 @@ codeunit 6150876 "NPR POS List: POS Unit" implements "NPR POS Custom List IHandl
     end;
 
     procedure GetMandatoryFilters() ColumnFilters: JsonArray
+    var
+        Field: Record Field;
+        POSUnit: Record "NPR POS Unit";
+        POSCustomListHelper: Codeunit "NPR POS Custom List Helper";
+        CurrentPOSUnitNo: Code[10];
     begin
-        ColumnFilters.ReadFrom('[]');
+        CurrentPOSUnitNo := POSUnit.GetCurrentPOSUnit();
+
+        if CurrentPOSUnitNo <> '' then begin
+            Field.Get(Database::"NPR POS Unit", POSUnit.FieldNo("No."));
+            POSCustomListHelper.AddMandatoryFilter(
+                Field,
+                '<>' + CurrentPOSUnitNo,
+                ColumnFilters
+            );
+        end;
     end;
 
     procedure CalculateColumnValue(RecRef: RecordRef; FieldID: Text; var CalculatedValue: Variant): Boolean
