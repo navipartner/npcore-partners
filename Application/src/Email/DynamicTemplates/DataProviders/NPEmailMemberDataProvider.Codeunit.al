@@ -51,7 +51,7 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('membership_valid_until', Entry."Membership Valid Until");
         JObject.Add('membership_valid_until_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Valid Until", Entry.PreferredLanguageCode));
         JObject.Add('membership_description', Entry."Membership Description");
-        JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf("NPR MM MembershipAutoRenew"::YES_INTERNAL.AsInteger())));
+        JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf(Entry."Auto-Renew".AsInteger())));
         JObject.Add('membership_remaining_points', Entry."Remaining Points");
         JObject.Add('community_description', Entry."Community Description");
         JObject.Add('subscription_rejected_reason_code', Entry."Rejected Reason Code");
