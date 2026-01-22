@@ -35,16 +35,19 @@ codeunit 85014 "NPR Library - Member Module"
 
         MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'T-GOLD', LoyaltyProgramCode, 'Gold Membership'));
         MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate(GenerateCode10());
+        MembershipSetup."Recurring Payment Code" := CreateRecurringPaymentSetup(GenerateCode10(), 'Gold Membership Recurring Payment');
         MembershipSetup.Modify();
         AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FieldNo("Customer Disc. Group"), CreateDiscountGroup(GenerateCode10(), 'GOLD Discount Grp.'));
 
         MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'T-SILVER', LoyaltyProgramCode, 'Silver Membership'));
         MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate(GenerateCode10());
+        MembershipSetup."Recurring Payment Code" := CreateRecurringPaymentSetup(GenerateCode10(), 'Silver Membership Recurring Payment');
         MembershipSetup.Modify();
         AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FieldNo("Customer Disc. Group"), CreateDiscountGroup(GenerateCode10(), 'SILVER Discount Grp.'));
 
         MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'T-BRONZE', LoyaltyProgramCode, 'Bronze Membership'));
         MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate(GenerateCode10());
+        MembershipSetup."Recurring Payment Code" := CreateRecurringPaymentSetup(GenerateCode10(), 'Bronze Membership Recurring Payment');
         MembershipSetup.Modify();
         AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FieldNo("Customer Disc. Group"), CreateDiscountGroup(GenerateCode10(), 'BRONZE Discount Grp.'));
 
@@ -768,6 +771,24 @@ codeunit 85014 "NPR Library - Member Module"
         MemberCommunity.Modify();
 
         exit(MemberCommunity.Code);
+    end;
+
+    local procedure CreateRecurringPaymentSetup(PaymentCode: Code[10]; Description: Text): Code[10]
+    var
+        LibraryERM: Codeunit "Library - ERM";
+        RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+    begin
+        if (not RecurringPaymentSetup.Get(PaymentCode)) then begin
+            RecurringPaymentSetup.Init();
+            RecurringPaymentSetup.Code := PaymentCode;
+            RecurringPaymentSetup.Insert();
+        end;
+
+        RecurringPaymentSetup.Description := Description;
+        RecurringPaymentSetup."Revenue Account" := LibraryERM.CreateGLAccountWithSalesSetup();
+        RecurringPaymentSetup.Modify();
+
+        exit(RecurringPaymentSetup.Code);
     end;
 
     local procedure CreateDemoCustomerTemplate(TemplateCode: Code[10]): Code[10]
