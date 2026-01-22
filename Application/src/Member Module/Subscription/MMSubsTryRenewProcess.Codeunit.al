@@ -87,7 +87,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         end;
     end;
 
-    local procedure ProcessConfirmedStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
+    internal procedure ProcessConfirmedStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
     begin
         case SubscriptionRequest.Type of
             SubscriptionRequest.Type::Renew:
@@ -126,6 +126,12 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MemberInfoCapture."Unit Price" := SubscriptionRequest.Amount;
         MemberInfoCapture."Amount Incl VAT" := SubscriptionRequest.Amount;
         MemberInfoCapture.Amount := (SubscriptionRequest.Amount / (1 + SubsRenewPost.CalcRevenueVAT(Subscription."Membership Entry No.") / 100));
+
+        MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
+
+        MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
+        if (MembershipAlterationSetup."To Membership Code" <> '') and (MembershipAlterationSetup."Age Constraint Type" = MembershipAlterationSetup."Age Constraint Type"::NA) then
+            MemberInfoCapture."Membership Code" := MembershipAlterationSetup."To Membership Code";
 
         if not MembershipMgt.CarryOutMembershipRenewal(SubscriptionRequest, MemberInfoCapture, MembershipAlterationSetup, NewMembershipLedgerEntryNo, ReasonText) then
             Error(ReasonText);

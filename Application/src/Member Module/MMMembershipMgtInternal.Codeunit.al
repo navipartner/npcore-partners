@@ -2806,6 +2806,7 @@
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
         MemberInfoCapture."Document Date" := Today(); // Active
         MemberInfoCapture.Description := MembershipAlterationSetup.Description;
+        MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
 
         if (not AutoRenewMembershipWorker(MemberInfoCapture, false, Today(), MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price", ReasonText)) then
             exit(0);
@@ -3033,6 +3034,9 @@
             exit(false);
 
         if (WithUpdate) then begin
+            if (MembershipAlterationSetup."To Membership Code" <> '') and (MembershipAlterationSetup."Age Constraint Type" = MembershipAlterationSetup."Age Constraint Type"::NA) then
+                MemberInfoCapture."Membership Code" := MembershipAlterationSetup."To Membership Code";
+
             if not CarryOutMembershipRenewal(MemberInfoCapture, MembershipAlterationSetup, StartDateNew, EndDateNew, EntryNo, ReasonText) then
                 exit(false);
         end;
@@ -3077,14 +3081,11 @@
         TargetMembershipCode: Code[20];
         Membership: Record "NPR MM Membership";
     begin
-        MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
-
-        Membership.Get(MemberInfoCapture."Membership Entry No.");
-        TargetMembershipCode := MembershipAlterationSetup."From Membership Code";
-        if (MembershipAlterationSetup."To Membership Code" <> '') and (MembershipAlterationSetup."Age Constraint Type" = MembershipAlterationSetup."Age Constraint Type"::NA) then
-            TargetMembershipCode := MembershipAlterationSetup."To Membership Code";
-
-        MemberInfoCapture."Membership Code" := TargetMembershipCode;
+        TargetMembershipCode := MemberInfoCapture."Membership Code";
+        if (TargetMembershipCode = '') then begin
+            Membership.Get(MemberInfoCapture."Membership Entry No.");
+            TargetMembershipCode := Membership."Membership Code";
+        end;
 
         if (not MembershipAutoRenew.CreateInvoice(SubscriptionRequest, MemberInfoCapture)) then
             exit(false);
