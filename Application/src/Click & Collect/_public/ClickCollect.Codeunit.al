@@ -155,4 +155,9 @@ codeunit 6059847 "NPR Click & Collect"
     procedure OnBeforeModifySalesHeaderOnCollectOrderImport(var Customer: Record Customer; var SalesHeader: Record "Sales Header"; Element: XmlElement)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnNotifyCustomerViaEmailOnBeforeSendEmailTemplate(RecRef: RecordRef; CustomerEmail: Text[80]; EmailTemplateHeader: Record "NPR E-mail Template Header"; var CustomerNotified: Boolean)
+    begin
+    end;
 }

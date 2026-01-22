@@ -339,9 +339,11 @@
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         EmailMgt: Codeunit "NPR E-mail Management";
+        ClickCollect: Codeunit "NPR Click & Collect";
         RecRef: RecordRef;
         ErrorText: Text;
         NotifSentLbl: Label 'E-mail Notification (%3) sent to Customer %1 (%2)';
+        CustomerNotified: Boolean;
     begin
         if not NpCsDocument."Notify Customer via E-mail" then
             exit(false);
@@ -392,6 +394,10 @@
 
         RecRef.GetTable(NpCsDocument);
         RecRef.SetRecFilter();
+
+        ClickCollect.OnNotifyCustomerViaEmailOnBeforeSendEmailTemplate(RecRef, NpCsDocument."Customer E-mail", EmailTemplateHeader, CustomerNotified);
+        if CustomerNotified then
+            exit(true);
 
         if EmailTemplateHeader."Report ID" = 0 then
             ErrorText := EmailMgt.SendEmailTemplate(RecRef, EmailTemplateHeader, NpCsDocument."Customer E-mail", true)
