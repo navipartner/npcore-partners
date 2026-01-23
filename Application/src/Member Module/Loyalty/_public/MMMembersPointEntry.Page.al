@@ -62,6 +62,7 @@
                 {
                     ToolTip = 'Specifies the value of the Document Type field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = false;
                 }
                 field("Document No."; Rec."Document No.")
                 {
