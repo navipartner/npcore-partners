@@ -84,9 +84,6 @@ navigation:
           - systemservices.helloworld:
               title: Hello World
               summary: ./docs/pages/systemservices/helloworld.mdx
-          - systemservices.nodes:
-              title: Nodes
-              summary: ./docs/pages/systemservices/nodes.mdx
           - systemservices.webhooks:
               title: Webhooks
         - section: Accounts

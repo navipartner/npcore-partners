@@ -1213,7 +1213,11 @@
                     'MixDiscCustAndMinQty':
                         exit('NPR-SetMinQtyAndSingleCustomerFilterOnMixDiscLine');
                 end;
-
+            Codeunit::"NPR UPG API Node Service":
+                case UpgradeStep of
+                    'API_NODE_SERVICE_INF_721':
+                        exit('NPR-RegisterApiNodeService-20260123');
+                end;
         end;
     end;
 }

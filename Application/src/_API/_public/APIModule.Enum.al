@@ -99,6 +99,9 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     value(6248682; system)
     {
         Implementation = "NPR API Module Resolver" = "NPR API System Resolver";
+        ObsoleteState = Pending;
+        ObsoleteTag = '2026-01-23';
+        ObsoleteReason = 'Unsused API as the only service GetNodeId() is handled directly via OData.';
     }
 }
 #endif

@@ -2,6 +2,9 @@
 codeunit 6248682 "NPR API System Resolver" implements "NPR API Module Resolver"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-01-23';
+    ObsoleteReason = 'Unsused API as the only service GetNodeId() is handled directly via OData.';
 
     procedure Resolve(var Request: Codeunit "NPR API Request"): Interface "NPR API Request Handler"
     var

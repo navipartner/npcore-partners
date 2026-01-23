@@ -19,6 +19,7 @@ codeunit 6014471 "NPR Webservice Install"
         InitModernApiWSCodeunits();
         InitDragonglassPOSService();
         InitBcHealtCheckService();
+        InitApiNodeService();
     end;
 
     local procedure InitMPOSWebService()
@@ -125,5 +126,12 @@ codeunit 6014471 "NPR Webservice Install"
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         BCHealthCheckMgt.RegisterService();
 #endif
+    end;
+
+    local procedure InitApiNodeService()
+    var
+        NodeService: Codeunit "NPR API Node Service";
+    begin
+        NodeService.RegisterService();
     end;
 }
