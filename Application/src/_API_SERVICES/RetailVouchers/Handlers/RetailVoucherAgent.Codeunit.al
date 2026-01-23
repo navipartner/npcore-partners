@@ -253,12 +253,13 @@ codeunit 6248253 "NPR RetailVoucherAgent"
     var
         PaymentMethodCode: Code[10];
     begin
-        NpRvVoucher.CalcFields(Amount, "Initial Amount", "Reserved Amount", Open);
+        NpRvVoucher.CalcFields(Amount, "Initial Amount", "Reserved Amount", Open, "Voucher Type Description");
         ResponseJson.StartObject(JsonObjectName)
             .AddProperty('voucherId', Format(NpRvVoucher.systemId, 0, 4).ToLower())
             .AddProperty('referenceNo', NpRvVoucher."Reference No.")
             .AddProperty('voucherType', NpRvVoucher."Voucher Type")
             .AddProperty('description', NpRvVoucher.Description)
+            .AddProperty('voucherTypeDescription', NpRvVoucher."Voucher Type Description")
             .AddProperty('startingDate', NpRvVoucher."Starting Date")
             .AddProperty('endingDate', NpRvVoucher."Ending Date")
             .AddProperty('initialAmount', NpRvVoucher."Initial Amount")

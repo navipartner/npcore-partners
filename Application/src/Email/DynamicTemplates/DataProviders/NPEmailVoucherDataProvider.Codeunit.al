@@ -22,6 +22,7 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('voucher_no', '000000');
         JObject.Add('voucher_type', 'GIFTVOUCHER');
         JObject.Add('description', 'Giftvoucher 0000000');
+        JObject.Add('voucher_type_description', 'Description of the Voucher Type');
         JObject.Add('reference_no', '1234567890123');
         JObject.Add('starting_date', CreateDateTime(20250101D, 0T));
         JObject.Add('starting_date_formatted', Format(CreateDateTime(20250101D, 0T), 0, '<Standard Format,0>'));
@@ -93,10 +94,11 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject: JsonObject;
         DataProviderHelper: Codeunit "NPR DynTemplateDataProvHelper";
     begin
-        Voucher.CalcFields(Open, Amount, "Initial Amount", "Reserved Amount", "In-use Quantity", "Send Voucher Module", "Validate Voucher Module", "Apply Payment Module", "Issue Date", "Issue Register No.", "Issue Document Type", "Issue Document No.", "Issue External Document No.", "Issue User ID", "Issue Partner Code", "Partner Clearing", "No. Send");
+        Voucher.CalcFields(Open, Amount, "Initial Amount", "Reserved Amount", "In-use Quantity", "Send Voucher Module", "Validate Voucher Module", "Apply Payment Module", "Issue Date", "Issue Register No.", "Issue Document Type", "Issue Document No.", "Issue External Document No.", "Issue User ID", "Issue Partner Code", "Partner Clearing", "No. Send", "Voucher Type Description");
         JObject.Add('voucher_no', Voucher."No.");
         JObject.Add('voucher_type', Voucher."Voucher Type");
         JObject.Add('description', Voucher.Description);
+        JObject.Add('voucher_type_description', Voucher."Voucher Type Description");
         JObject.Add('reference_no', Voucher."Reference No.");
         JObject.Add('starting_date', Voucher."Starting Date");
         JObject.Add('starting_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher."Starting Date", Voucher."Language Code"));

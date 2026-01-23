@@ -196,6 +196,13 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(130; "Voucher Type Description"; Text[50])
+        {
+            CalcFormula = Lookup("NPR NpRv Voucher Type".Description WHERE(Code = FIELD("Voucher Type")));
+            Caption = 'Voucher Type Description';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(200; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
