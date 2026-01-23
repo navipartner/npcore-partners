@@ -87,6 +87,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         Response: JsonObject;
         TaskId: Integer;
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         AcquireCardEntryNo: Integer;
         ShopperSubscriptionConfirmation: Integer;
         Sentry: Codeunit "NPR Sentry";
@@ -148,6 +149,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                     "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
                         begin
                             _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseInitiated.AsInteger());
+                            if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                                EFTAdyenIntegration.AddSubscriptionConfirmParametersToDictionary(EftTransactionRequest, Parameters);
                             POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_SUBSCRIPTION_CONFIRM, Parameters, 1000 * 60 * 5);
                         end;
                     else
