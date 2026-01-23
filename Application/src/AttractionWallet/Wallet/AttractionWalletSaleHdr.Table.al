@@ -31,7 +31,11 @@ table 6150967 "NPR AttractionWalletSaleHdr"
             var
                 Wallet: Record "NPR AttractionWallet";
             begin
-                Wallet.Get(ReferenceNumber); // Hard fail on invalid reference number
+                Wallet.SetCurrentKey(ReferenceNumber);
+                Wallet.SetFilter(ReferenceNumber, '=%1', ReferenceNumber);
+                Wallet.FindFirst(); // Hard fail on invalid reference number
+
+                WalletEntryNo := Wallet.EntryNo;
 
                 if (Wallet.Description <> '') then
                     Name := Wallet.Description;
@@ -57,7 +61,5 @@ table 6150967 "NPR AttractionWalletSaleHdr"
     {
         // Add changes to field groups here
     }
-
-
 
 }

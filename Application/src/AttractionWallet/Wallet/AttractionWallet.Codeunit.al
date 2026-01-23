@@ -34,12 +34,45 @@ codeunit 6185062 "NPR AttractionWallet"
         IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', POSSale.SystemId);
         IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLinePOS."Line No.");
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1', IntermediaryWalletLine.ActionType::CREATE);
         if (IntermediaryWalletLine.IsEmpty()) then
             exit;
 
         CreateWallets(POSSale.SystemId, SaleLinePOS."Line No.", SaleLinePOS.Quantity, SaleLinePOS."No.", WalletEntryNoList);
         CreateAssets(WalletEntryNoList, POSSale."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."No.", SaleLinePOS.Quantity);
         AddReferencesToWalletFromPosSale(POSSale, WalletEntryNoList);
+
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure RevokeAssetsFromPosSaleLine(POSSale: Record "NPR POS Sale"; LineNumber: Integer)
+    var
+        IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
+    begin
+        if (not IsWalletEnabled()) then
+            exit;
+
+        IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
+        IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', POSSale.SystemId);
+        IntermediaryWalletLine.SetFilter(LineNumber, '=%1', LineNumber);
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1|=%2', IntermediaryWalletLine.ActionType::REVOKE, IntermediaryWalletLine.ActionType::REVOKE_AND_REMOVE_HOLDER);
+        if (IntermediaryWalletLine.IsEmpty()) then
+            exit;
+
+        IntermediaryWalletLine.FindSet();
+        repeat
+            case IntermediaryWalletLine.AssetTableId of
+                Database::"NPR NpDc Coupon":
+                    RevokeCouponAssets(IntermediaryWalletLine);
+                Database::"NPR TM Ticket":
+                    RevokeTicketAssets(IntermediaryWalletLine);
+                Database::"NPR NpRv Voucher":
+                    RevokeVoucherAssets(IntermediaryWalletLine);
+                Database::"NPR MM Member Card":
+                    RevokeMembershipCardAssets(IntermediaryWalletLine);
+            end;
+
+        until (IntermediaryWalletLine.Next() = 0);
 
     end;
 
@@ -241,12 +274,28 @@ codeunit 6185062 "NPR AttractionWallet"
         end;
     end;
 
+    local procedure RevokeMembershipCardAssets(var AssetLine: Record "NPR AttractionWalletSaleLine")
+    begin
+
+        if (AssetLine.ActionType = AssetLine.ActionType::REVOKE_AND_REMOVE_HOLDER) then
+            RemoveAssetFromHolderWallets(Enum::"NPR WalletLineType"::MEMBERSHIP, AssetLine);
+    end;
+
     internal procedure AddTicketsToWallet(WalletEntryNo: Integer; TicketIds: List of [Guid])
     var
         TicketId: Guid;
     begin
         foreach TicketId in TicketIds do
             AddTicketToWallet(WalletEntryNo, TicketId);
+    end;
+
+    local procedure RevokeTicketAssets(var AssetLine: Record "NPR AttractionWalletSaleLine")
+    begin
+        // Actual ticket revocation (un-allocation) logic handled elsewhere
+
+        if (AssetLine.ActionType = AssetLine.ActionType::REVOKE_AND_REMOVE_HOLDER) then
+            RemoveAssetFromHolderWallets(Enum::"NPR WalletLineType"::TICKET, AssetLine);
+
     end;
 
     internal procedure AddTicketToWallet(WalletEntryNo: Integer; TicketId: Guid)
@@ -346,6 +395,20 @@ codeunit 6185062 "NPR AttractionWallet"
         AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
     end;
 
+    local procedure RevokeCouponAssets(var AssetLine: Record "NPR AttractionWalletSaleLine")
+    var
+        Coupon: Record "NPR NpDc Coupon";
+        CouponManagement: Codeunit "NPR NpDc Coupon Mgt.";
+    begin
+        if (not Coupon.GetBySystemId(AssetLine.AssetSystemId)) then
+            exit;
+
+        CouponManagement.ArchiveCoupon(Coupon);
+
+        if (AssetLine.ActionType = AssetLine.ActionType::REVOKE_AND_REMOVE_HOLDER) then
+            RemoveAssetFromHolderWallets(Enum::"NPR WalletLineType"::COUPON, AssetLine);
+    end;
+
     internal procedure AddVouchersToWallet(WalletEntryNo: Integer; VoucherIds: List of [Guid]; ItemNo: Code[20]; DocumentNumber: Code[20])
     var
         VoucherId: Guid;
@@ -382,6 +445,13 @@ codeunit 6185062 "NPR AttractionWallet"
         AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
     end;
 
+    local procedure RevokeVoucherAssets(var AssetLine: Record "NPR AttractionWalletSaleLine")
+    begin
+        // TODO - Voucher revocation logic to be implemented
+
+        if (AssetLine.ActionType = AssetLine.ActionType::REVOKE_AND_REMOVE_HOLDER) then
+            RemoveAssetFromHolderWallets(Enum::"NPR WalletLineType"::VOUCHER, AssetLine);
+    end;
 
     local procedure AddCouponAssets(WalletEntryNoList: List of [Integer]; CouponType: Code[20]; ItemNo: Code[20]; Description: Text[100]; SalesQuantity: Decimal; DocumentNumber: Code[20])
     var
@@ -648,6 +718,17 @@ codeunit 6185062 "NPR AttractionWallet"
         exit(true);
     end;
 
+    internal procedure ExpireWallet(WalletEntryNo: Integer)
+    var
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        Wallet.Get(WalletEntryNo);
+        Wallet.ExpirationDate := CurrentDateTime();
+        Wallet.Modify();
+
+        BlockAllExternalReferences(WalletEntryNo);
+    end;
+
     internal procedure BlockAllExternalReferences(WalletEntryNo: Integer)
     var
         WalletExternalReference: Record "NPR AttractionWalletExtRef";
@@ -725,6 +806,7 @@ codeunit 6185062 "NPR AttractionWallet"
         IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
         IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLineNumber);
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1', IntermediaryWalletLine.ActionType::CREATE);
         if (IntermediaryWalletLine.FindSet()) then begin
             repeat
                 IntermediaryWallet.Get(IntermediaryWalletLine.SaleHeaderSystemId, IntermediaryWalletLine.WalletNumber);
@@ -869,6 +951,45 @@ codeunit 6185062 "NPR AttractionWallet"
 
         exit(WalletAssetLineRef.EntryNo);
     end;
+
+    local procedure RemoveAssetFromHolderWallets(AssetType: Enum "NPR WalletLineType"; AssetLine: Record "NPR AttractionWalletSaleLine"): Boolean
+    var
+        IntermediaryWalletHeader: Record "NPR AttractionWalletSaleHdr";
+        WalletAssetLine: Record "NPR WalletAssetLine";
+
+    begin
+        if (not IntermediaryWalletHeader.Get(AssetLine.SaleHeaderSystemId, AssetLine.WalletNumber)) then
+            exit(false);
+
+        WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
+        WalletAssetLine.SetFilter(Type, '=%1', AssetType);
+        WalletAssetLine.SetFilter(LineTypeSystemId, '=%1', AssetLine.AssetSystemId);
+        if (not WalletAssetLine.FindFirst()) then
+            exit(false);
+
+        exit(RemoveAssetFromAllHolderWallets(WalletAssetLine.EntryNo, IntermediaryWalletHeader.WalletEntryNo));
+    end;
+
+    local procedure RemoveAssetFromAllHolderWallets(AssetEntryNo: Integer; WalletEntryNo: Integer): Boolean
+    var
+        AttractionWallet: Record "NPR AttractionWallet";
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        WalletAssetLineRef: Record "NPR WalletAssetLineReference"; // active ref in this wallet
+    begin
+        if (not WalletAssetLine.Get(AssetEntryNo)) then
+            exit(false);
+
+        if (not AttractionWallet.Get(WalletEntryNo)) then
+            exit(false);
+
+        // Find holder reference for this asset and delete them
+        WalletAssetLineRef.Reset();
+        WalletAssetLineRef.SetCurrentKey(WalletAssetLineEntryNo, SupersededBy);
+        WalletAssetLineRef.SetFilter(WalletAssetLineEntryNo, '=%1', AssetEntryNo);
+        WalletAssetLineRef.DeleteAll();
+        exit(true);
+    end;
+
 
     local procedure GenerateWalletReference(ReferenceNo: Code[20]): Code[30]
     var

@@ -48,6 +48,23 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
 
     internal procedure RevokeTicketReservation(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50]; UseTicketListPrice: Boolean): Guid
     var
+        ResponseMessage: Text;
+        ResponseCode: Integer;
+        SaleLineSystemId: Guid;
+    begin
+        ResponseCode := RevokeTicketReservation(POSSession, ExternalTicketNumber, UseTicketListPrice, SaleLineSystemId, ResponseMessage);
+
+        if (ResponseCode = -105) then
+            Commit();
+
+        if (ResponseCode < 0) then
+            Error(ResponseMessage);
+
+        exit(SaleLineSystemId);
+    end;
+
+    internal procedure RevokeTicketReservation(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50]; UseTicketListPrice: Boolean; var SaleLineSystemId: Guid; var ResponseMessage: Text) ResponseCode: Integer;
+    var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -60,31 +77,42 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         Token: Text[100];
         UnitPriceToRevoke: Decimal;
         RevokeQuantity: Integer;
-        ResponseMessage: Text;
-        ResponseCode: Integer;
         RequestMutex: Record "NPR TM TicketRequestMutex";
         TICKET_BLOCKED: Label 'Ticket %1 is blocked.';
     begin
-        if (ExternalTicketNumber = '') then
-            Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+        Clear(SaleLineSystemId);
 
-        TicketManagement.ValidateTicketReference("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNumber, '', TicketAccessEntryNo);
+        if (ExternalTicketNumber = '') then begin
+            ResponseMessage := StrSubstNo(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+            exit(-101);
+        end;
+
+        if (not TicketManagement.CheckTicketReference("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNumber, '', TicketAccessEntryNo, ResponseMessage)) then
+            exit(-110);
+
         TicketAccessEntry.Get(TicketAccessEntryNo);
         Ticket.Get(TicketAccessEntry."Ticket No.");
 
-        if (Ticket.Blocked) then
-            Error(TICKET_BLOCKED, ExternalTicketNumber);
+        if (Ticket.Blocked) then begin
+            ResponseMessage := StrSubstNo(TICKET_BLOCKED, ExternalTicketNumber);
+            exit(-102);
+        end;
 
-        if (RequestMutex.IsLocked(Ticket."No.")) then
-            Error(REVOKE_IN_PROGRESS, Ticket."External Ticket No.");
+        if (RequestMutex.IsLocked(Ticket."No.")) then begin
+            ResponseMessage := StrSubstNo(REVOKE_IN_PROGRESS, Ticket."External Ticket No.");
+            exit(-103);
+        end;
+
         RequestMutex.Acquire(Ticket."No.", SessionId());
 
         TicketReservationRequest.SetCurrentKey("External Ticket Number");
         TicketReservationRequest.SetFilter("External Ticket Number", '=%1', Ticket."External Ticket No.");
         TicketReservationRequest.SetFilter("Revoke Ticket Request", '=%1', true);
         TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::CANCELED); // in progress
-        if (TicketReservationRequest.FindFirst()) then
-            Error(REVOKE_IN_PROGRESS, Ticket."External Ticket No.");
+        if (TicketReservationRequest.FindFirst()) then begin
+            ResponseMessage := StrSubstNo(REVOKE_IN_PROGRESS, Ticket."External Ticket No.");
+            exit(-104);
+        end;
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
@@ -98,6 +126,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.InsertLine(SaleLinePOS);
+        SaleLineSystemId := SaleLinePOS.SystemId;
 
         // Default to actual sales price
         UnitPriceToRevoke := SaleLinePOS."Unit Price";
@@ -128,7 +157,6 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         end;
 
         SaleLinePOS.Modify();
-        POSSaleLine.RefreshCurrent();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         // When intent is to automatically rebook, use the list price of the ticket. 
@@ -148,17 +176,17 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
 
         if (ResponseCode <= 0) then begin
             POSSaleLine.DeleteLine();
-            POSSaleLine.RefreshCurrent();
-            Commit();
-            Error(ResponseMessage);
+            exit(-105);
         end;
 
         POSSaleLine.SetQuantity(-1 * Abs(RevokeQuantity));
         POSSaleLine.SetUnitPrice(UnitPriceToRevoke);
         AddAdditionalExperienceRevokeLines(POSSession, Ticket, SaleLinePOS."Sales Ticket No.");
 
-        exit(SaleLinePOS.SystemId);
+        exit(10);
     end;
+
+
 
     internal procedure EditReservation(POSSession: Codeunit "NPR POS Session"; TicketReference: Code[50])
     var

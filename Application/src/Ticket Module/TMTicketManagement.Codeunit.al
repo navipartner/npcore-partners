@@ -1583,14 +1583,29 @@
         TicketDeferral.AbortDeferral(Ticket."No.");
     end;
 
-    procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
-                                                                AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
+
+    internal procedure CheckTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; var Reason: Text) IsValid: Boolean
+    begin
+        Clear(Reason);
+        IsValid := TryValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
+        if (not IsValid) then
+            Reason := GetLastErrorText();
+
+        exit(IsValid);
+    end;
+
+    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
     begin
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
     end;
 
-    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
-                                                                         AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
+    [TryFunction]
+    local procedure TryValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
+    begin
+        ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, SkipPaymentCheck);
+    end;
+
+    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     var
         Ticket: Record "NPR TM Ticket";
     begin
@@ -1599,6 +1614,7 @@
 
         ValidateTicketReference(Ticket, AdmissionCode, TicketAccessEntryNo, SkipPaymentCheck);
     end;
+
 
     local procedure ValidateTicketReference(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     var

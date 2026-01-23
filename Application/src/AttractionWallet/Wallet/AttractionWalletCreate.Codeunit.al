@@ -10,7 +10,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         if (not Wallet.IsWalletEnabled()) then
             exit;
 
-        CreateWalletAssets(Rec);
+        ManageWalletAssets(Rec);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', true, true)]
@@ -21,14 +21,15 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         if (not Wallet.IsWalletEnabled()) then
             exit;
 
-        CreateWalletAssets(SaleHeader);
+        ManageWalletAssets(SaleHeader);
     end;
 
-    local procedure CreateWalletAssets(POSSale: Record "NPR POS Sale")
+    local procedure ManageWalletAssets(POSSale: Record "NPR POS Sale")
     var
         WalletAssetMgt: Codeunit "NPR AttractionWallet";
         POSSaleLine: Record "NPR POS Sale Line";
     begin
+
         POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.");
         POSSaleLine.SetFilter("Register No.", '=%1', POSSale."Register No.");
         POSSaleLine.SetFilter("Sales Ticket No.", '=%1', POSSale."Sales Ticket No.");
@@ -36,6 +37,10 @@ codeunit 6185076 "NPR AttractionWalletCreate"
             repeat
                 if (POSSaleLine.Quantity > 0) then
                     WalletAssetMgt.CreateAssetsFromPosSaleLine(POSSale, POSSaleLine);
+
+                if (POSSaleLine.Quantity < 0) then
+                    WalletAssetMgt.RevokeAssetsFromPosSaleLine(POSSale, POSSaleLine."Line No.");
+
             until (POSSaleLine.Next() = 0);
         end;
     end;
@@ -104,6 +109,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', POSSale.SystemId);
         IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLinePOS."Line No.");
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1', IntermediaryWalletLine.ActionType::CREATE);
         if (IntermediaryWalletLine.IsEmpty()) then
             exit;
 
@@ -147,6 +153,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
         IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLineNumber);
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1', IntermediaryWalletLine.ActionType::CREATE);
         WalletCount := IntermediaryWalletLine.Count();
         if (WalletCount >= MaxQuantity) then
             exit;
@@ -215,6 +222,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         IntermediaryWalletLine.LineNumber := LineNumber;
         IntermediaryWalletLine.SaleLineId := SaleLineId;
         IntermediaryWalletLine.WalletNumber := IntermediaryWallet.WalletNumber;
+        IntermediaryWalletLine.ActionType := IntermediaryWalletLine.ActionType::CREATE;
 
         exit(IntermediaryWalletLine.Insert());
     end;
@@ -244,6 +252,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
         IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLineNumber);
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1', IntermediaryWalletLine.ActionType::CREATE);
         CurrentCount := IntermediaryWalletLine.Count();
         if (CurrentCount >= TargetQuantity) then
             exit;
@@ -292,6 +301,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
         IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLinePOSAddOn."Applies-to Line No.");
         IntermediaryWalletLine.SetFilter(WalletNumber, '=%1', WalletNumber);
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1', IntermediaryWalletLine.ActionType::CREATE);
         exit(not IntermediaryWalletLine.IsEmpty());
     end;
 
@@ -304,6 +314,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber, WalletNumber);
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
         IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLineNumber);
+        IntermediaryWalletLine.SetFilter(ActionType, '=%1', IntermediaryWalletLine.ActionType::CREATE);
         CurrentCount := IntermediaryWalletLine.Count();
         if (CurrentCount <= TargetQuantity) then
             exit;

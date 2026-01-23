@@ -51,6 +51,13 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         WalletEntryNo := WalletManagement.CreateWalletFromFacade(OriginatesFromItemNo, Name, WalletReferenceNumber, ExternalReferenceNumber);
     end;
 
+    procedure ExpireWallet(WalletEntryNo: Integer)
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        WalletManagement.ExpireWallet(WalletEntryNo);
+    end;
+
     procedure AddTicketsToWallet(WalletEntryNo: Integer; TicketIds: List of [Guid])
     var
         WalletManagement: Codeunit "NPR AttractionWallet";

@@ -26,6 +26,26 @@ table 6150968 "NPR AttractionWalletSaleLine"
             Caption = 'Sales Line Id';
         }
 
+        field(10; ActionType; Option)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Action Type';
+            OptionMembers = CREATE,REVOKE,REVOKE_AND_REMOVE_HOLDER;
+            OptionCaption = 'Create,Revoke,Revoke and Remove from Holder';
+        }
+
+        field(11; AssetTableId; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Asset Table Id';
+        }
+
+        field(12; AssetSystemId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Asset System Id';
+        }
+
     }
 
     keys

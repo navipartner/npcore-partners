@@ -166,6 +166,7 @@ page 6184847 "NPR AttractionWalletAssets"
     trigger OnAfterGetRecord()
     var
         Ticket: Record "NPR TM Ticket";
+        Coupon: Record "NPR NpDc Coupon";
         BundledAssets: Record "NPR NpIa POSEntryLineBndlAsset";
         BundleId: Record "NPR NpIa POSEntryLineBundleId";
         Wallet: Record "NPR AttractionWallet";
@@ -198,6 +199,10 @@ page 6184847 "NPR AttractionWalletAssets"
                     if (BundledAssets.FindFirst()) then
                         if (BundleId.Get(BundledAssets.AppliesToSaleLineId, BundledAssets.Bundle)) then
                             _BundleReferenceNumber := BundleId.ReferenceNumber;
+                end;
+            Rec.Type::COUPON:
+                begin
+                    _AssetBlocked := (not Coupon.GetBySystemId(Rec.LineTypeSystemId));
                 end;
             else
                 _AssetBlocked := false;
