@@ -3,7 +3,7 @@ codeunit 6248685 "NPR Ret.Pol.: Undefined" implements "NPR IRetention Policy"
 {
     Access = Internal;
 
-    internal procedure DeleteExpiredRecords(RetentionPolicy: Record "NPR Retention Policy")
+    internal procedure DeleteExpiredRecords(RetentionPolicy: Record "NPR Retention Policy"; ReferenceDateTime: DateTime)
     begin
         ThrowNoHandlerError(RetentionPolicy);
     end;

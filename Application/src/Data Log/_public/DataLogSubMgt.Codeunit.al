@@ -14,7 +14,7 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         Error(CleanupErr);
 #else
-        CleanDataLog();
+        CleanDataLog(CurrentDateTime());
 #endif
     end;
 
@@ -80,21 +80,21 @@
         end;
     end;
 
-    internal procedure CleanDataLog()
+    internal procedure CleanDataLog(ReferenceDateTime: DateTime)
     var
         DataLogSetup: Record "NPR Data Log Setup (Table)";
     begin
         if DataLogSetup.FindSet() then
             repeat
-                CleanDataLog(DataLogSetup);
+                CleanDataLog(DataLogSetup, ReferenceDateTime);
             until DataLogSetup.Next() = 0;
 
         // Clear all data log entries without setup definition or older than 90 days
         Clear(DataLogSetup);
-        CleanDataLog(DataLogSetup);
+        CleanDataLog(DataLogSetup, ReferenceDateTime);
     end;
 
-    internal procedure CleanDataLog(DataLogSetup: Record "NPR Data Log Setup (Table)")
+    internal procedure CleanDataLog(DataLogSetup: Record "NPR Data Log Setup (Table)"; ReferenceDateTime: DateTime)
     var
         DataLogField: Record "NPR Data Log Field";
         DataLogRecord: Record "NPR Data Log Record";
@@ -107,9 +107,9 @@
                 exit;  //will be handled on the next iteration
 
         if DataLogSetup."Keep Log for" > 0 then
-            TimeStamp := CurrentDateTime() - DataLogSetup."Keep Log for"
+            TimeStamp := ReferenceDateTime - DataLogSetup."Keep Log for"
         else
-            TimeStamp := CurrentDateTime() - JobQueueManagement.DaysToDuration(90);
+            TimeStamp := ReferenceDateTime - JobQueueManagement.DaysToDuration(90);
 
         if DataLogSetup."Table ID" <> 0 then begin
             DataLogProcessingEntry.SetRange("Table Number", DataLogSetup."Table ID");

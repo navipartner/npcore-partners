@@ -17,17 +17,33 @@ table 6150914 "NPR IRL Fiscalization Setup"
         {
             Caption = 'Enable IRL Fiscalization';
             DataClassification = CustomerContent;
+
             trigger OnValidate()
             var
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
                 IRLAuditMgt: Codeunit "NPR IRL Audit Mgt.";
-                ConfirmUpdateRetentionPolicyLbl: Label 'To enable Ireland Fiscalization you must update the retention policy to 6 years?\\This action cannot be undone.';
+#endif
+                ConfirmUpdateRetentionPolicyMsg: Label 'To enable Ireland Fiscalization you must extend the retention policy to 6 years.\\This action cannot be undone.';
             begin
                 if Rec."Enable IRL Fiscal" then
-                    if Dialog.Confirm(ConfirmUpdateRetentionPolicyLbl, false) then
-                        IRLAuditMgt.UpdateRetentionPolicyTo6Years()
-                    else
-                        Error('');
+                    if Dialog.Confirm(ConfirmUpdateRetentionPolicyMsg, false) then begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+                        IRLAuditMgt.UpdateRetentionPolicyTo6Years();
+#endif
+                        if not Rec."IRL Ret. Policy Extended" then
+                            Rec."IRL Ret. Policy Extended" := true
+                    end else
+                        Error('')
+
             end;
+        }
+        field(4; "IRL Ret. Policy Extended"; Boolean)
+        {
+            Caption = 'IRL Retention Policy Extended';
+            DataClassification = CustomerContent;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            AllowInCustomizations = Never;
+#endif
         }
     }
     keys

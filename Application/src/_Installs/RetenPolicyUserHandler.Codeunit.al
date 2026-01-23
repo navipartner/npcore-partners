@@ -1,3 +1,4 @@
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
 codeunit 6151317 "NPR Reten. Policy User Handler"
 {
     Access = Internal;
@@ -86,3 +87,4 @@ codeunit 6151317 "NPR Reten. Policy User Handler"
         exit(false);
     end;
 }
+#endif

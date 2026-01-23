@@ -4,8 +4,10 @@ interface "NPR IRetention Policy"
     Access = Internal;
 
     /// <summary>
-    /// Deletes records with a datetime older than specified threshold.
+    /// Deletes all records in a table older than the threshold specified by its respective implementation.
     /// </summary>
-    procedure DeleteExpiredRecords(RetentionPolicy: Record "NPR Retention Policy")
+    /// <param name="RetentionPolicy">Identifies the retention policy record, which specifies the table and its respective implementation.</param>
+    /// <param name="ReferenceDateTime">Specifies the reference DateTime from which the retention period is calculated.</param>
+    procedure DeleteExpiredRecords(RetentionPolicy: Record "NPR Retention Policy"; ReferenceDateTime: DateTime)
 }
 #endif

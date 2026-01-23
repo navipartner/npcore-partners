@@ -13,7 +13,7 @@ codeunit 6248678 "NPR Apply Retention Policy"
         Rec.Get(Rec."Table Id");
 
         IRetentionPolicy := Rec.Implementation;
-        IRetentionPolicy.DeleteExpiredRecords(Rec);
+        IRetentionPolicy.DeleteExpiredRecords(Rec, CurrentDateTime());
     end;
 }
 #endif

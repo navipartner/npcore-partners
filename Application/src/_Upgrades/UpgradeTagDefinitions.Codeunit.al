@@ -52,6 +52,9 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)        
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddNPRRetentionPolicyJobQueue'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_Remainder'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog_Cleanup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_IRLFiscalizationPreservation'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
@@ -424,6 +427,12 @@
                         exit('NpGpExportLog-20250210');
                     'NPRRetPolicy_DataLog':
                         exit('NPRRetPolicy_DataLog-20251227');
+                    'NPRRetPolicy_Remainder':
+                        exit('NPRRetPolicy_Remainder-20260112');
+                    'NPRRetPolicy_DataLog_Cleanup':
+                        exit('NPRRetPolicy_DataLog_Cleanup-20260114');
+                    'NPRRetPolicy_IRLFiscalizationPreservation':
+                        exit('NPRRetPolicy_IRLFiscalizationPreservation-20260120')
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of

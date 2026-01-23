@@ -1,4 +1,4 @@
-#IF NOT BC17 AND NOT BC18
+#if (BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
 codeunit 6184620 "NPR Reten. Pol. Filtering Impl" implements "Reten. Pol. Filtering"
 {
     Access = Internal;
@@ -56,4 +56,4 @@ codeunit 6184620 "NPR Reten. Pol. Filtering Impl" implements "Reten. Pol. Filter
         exit(NumberOfRecords);
     end;
 }
-#ENDIF
+#endif

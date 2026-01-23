@@ -4,10 +4,12 @@
     Access = Internal;
 
     Subtype = Install;
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     Permissions =
         tabledata "Retention Period" = ri,
         tabledata "Retention Policy Setup" = rimd,
         tabledata "Retention Policy Setup Line" = rimd;
+#endif
 
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
@@ -28,6 +30,7 @@
         // if additional filters are needed on record, see codeunit 3999 procedure AddChangeLogEntryToAllowedTables() in Base App
         // if want to use Data Archive when deleting the record, also update codeunit 6059927 "NPR Reten. Pol. Data Archive"
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         AddDefaultRetentionPolicy(IsUpgrade);
 
         AddNcTaskRetentionPolicy(IsUpgrade);
@@ -54,6 +57,7 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         AddNpGpExportLogPolicy(IsUpgrade);
 #endif
+#endif
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         if IsUpgrade then
@@ -64,17 +68,15 @@
             LogMessageStopwatch.LogFinish();
     end;
 
-
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     local procedure AddDefaultRetentionPolicy(IsUpgrade: Boolean)
     begin
         if IsUpgrade then
             if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install") then
                 exit;
 
-#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         AddAllowedTable(Database::"NPR Data Log Record", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
         AddAllowedTable(Database::"NPR Data Log Field", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
-#endif
 
         AddAllowedTable(Database::"NPR POS Entry Output Log", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
         AddAllowedTable(Database::"NPR Nc Import Entry", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
@@ -106,11 +108,13 @@
         if IsUpgrade then
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install");
     end;
+#endif
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     local procedure TransferNPRRetentionPolicies()
     var
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        IRLFiscalizationSetup: Record "NPR IRL Fiscalization Setup";
     begin
         if not HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog') then begin
             if RetenPolAllowedTables.IsAllowedTable(Database::"NPR Data Log Record") then
@@ -121,9 +125,64 @@
 
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog');
         end;
+
+        if not HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog_Cleanup') then begin
+            RemoveRetentionPolicy(Database::"NPR Data Log Record");
+            RemoveRetentionPolicy(Database::"NPR Data Log Field");
+
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog_Cleanup');
+        end;
+
+        if not HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_Remainder') then begin
+            RemoveRetentionPolicy(Database::"NPR EFT Receipt");
+            RemoveRetentionPolicy(Database::"NPR EFT Transaction Log");
+            RemoveRetentionPolicy(Database::"NPR EFT Transaction Request");
+            RemoveRetentionPolicy(Database::"NPR Exchange Label");
+            RemoveRetentionPolicy(Database::"NPR HL Webhook Request");
+            RemoveRetentionPolicy(Database::"NPR M2 Record Change Log");
+            RemoveRetentionPolicy(Database::"NPR MM Admis. Service Entry");
+            RemoveRetentionPolicy(Database::"NPR Nc Import Entry");
+            RemoveRetentionPolicy(Database::"NPR Nc Task");
+            RemoveRetentionPolicy(Database::"NPR NpCs Arch. Document");
+            RemoveRetentionPolicy(Database::"NPR NpGp Export Log");
+            RemoveRetentionPolicy(Database::"NPR NpGp POS Sales Entry");
+            RemoveRetentionPolicy(Database::"NPR NPRE Kitchen Order");
+            RemoveRetentionPolicy(Database::"NPR NPRE Waiter Pad");
+            RemoveRetentionPolicy(Database::"NPR NPRE W.Pad Prnt LogEntry");
+            RemoveRetentionPolicy(Database::"NPR POS Entry");
+            RemoveRetentionPolicy(Database::"NPR POS Balancing Line");
+            RemoveRetentionPolicy(Database::"NPR POS Entry Output Log");
+            RemoveRetentionPolicy(Database::"NPR POS Entry Payment Line");
+            RemoveRetentionPolicy(Database::"NPR POS Entry Sales Line");
+            RemoveRetentionPolicy(Database::"NPR POS Entry Tax Line");
+            RemoveRetentionPolicy(Database::"NPR POS Layout Archive");
+            RemoveRetentionPolicy(Database::"NPR POS Period Register");
+            RemoveRetentionPolicy(Database::"NPR POS Posting Log");
+            RemoveRetentionPolicy(Database::"NPR POS Saved Sale Entry");
+            RemoveRetentionPolicy(Database::"NPR Replication Error Log");
+            RemoveRetentionPolicy(Database::"NPR BTF EndPoint Error Log");
+            RemoveRetentionPolicy(Database::"NPR Sales Price Maint. Log");
+            RemoveRetentionPolicy(Database::"NPR Spfy App Request");
+            RemoveRetentionPolicy(Database::"NPR Spfy Log");
+            RemoveRetentionPolicy(Database::"NPR Spfy Webhook Notification");
+            RemoveRetentionPolicy(Database::"NPR Tax Free Voucher");
+
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_Remainder');
+        end;
+
+        if not HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_IRLFiscalizationPreservation') then begin
+            if IRLFiscalizationSetup.Get() then
+                if IRLFiscalizationSetup."Enable IRL Fiscal" then begin
+                    IRLFiscalizationSetup."IRL Ret. Policy Extended" := true;
+                    IRLFiscalizationSetup.Modify();
+                end;
+
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_IRLFiscalizationPreservation');
+        end;
     end;
 #endif
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     local procedure AddNcTaskRetentionPolicy(IsUpgrade: Boolean)
     begin
         if IsUpgrade then
@@ -596,26 +655,31 @@
         RetenPolAllowedTables.AddAllowedTable(Database::"NPR NPRE Kitchen Order", RecRef.SystemCreatedAtNo(), TableFilters);
         CreateRetentionPolicySetup(Database::"NPR NPRE Kitchen Order", GetRetentionPeriodCode(RtnPeriodEnum), SetupProxy.KDSActivatedForAnyRestaurant(), false);
     end;
+#endif
 
     local procedure HasUpgradeTag(UpgradeCodeunitID: Integer; UpgradeStep: Text): Boolean
     begin
         exit(UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID, UpgradeStep)));
     end;
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     local procedure HasUpgradeTag(UpgradeCodeunitID: Integer): Boolean
     begin
         exit(UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID)));
     end;
+#endif
 
     local procedure SetUpgradeTag(UpgradeCodeunitID: Integer; UpgradeStep: Text)
     begin
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID, UpgradeStep))
     end;
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     local procedure SetUpgradeTag(UpgradeCodeunitID: Integer)
     begin
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID));
     end;
+#endif
 
     local procedure RemoveRetentionPolicy(TableId: Integer)
     var

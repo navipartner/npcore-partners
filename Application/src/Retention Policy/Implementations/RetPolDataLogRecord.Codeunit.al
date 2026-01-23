@@ -3,11 +3,11 @@ codeunit 6248676 "NPR Ret.Pol.: Data Log Record" implements "NPR IRetention Poli
 {
     Access = Internal;
 
-    internal procedure DeleteExpiredRecords(RetentionPolicy: Record "NPR Retention Policy")
+    internal procedure DeleteExpiredRecords(RetentionPolicy: Record "NPR Retention Policy"; ReferenceDateTime: DateTime)
     var
         DataLogSubMgt: Codeunit "NPR Data Log Sub. Mgt.";
     begin
-        DataLogSubMgt.CleanDataLog();
+        DataLogSubMgt.CleanDataLog(ReferenceDateTime);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Retention Policy", OnDiscoverRetentionPolicyTables, '', true, true)]

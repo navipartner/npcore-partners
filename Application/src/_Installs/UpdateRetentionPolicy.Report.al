@@ -8,6 +8,7 @@ report 6014436 "NPR Update Retention Policy"
     Extensible = false;
 #endif
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     Permissions =
         tabledata "Retention Period" = rim,
         tabledata "Retention Policy Setup" = rimd,
@@ -33,6 +34,7 @@ report 6014436 "NPR Update Retention Policy"
         tabledata "NPR Aux. Item Ledger Entry" = rd,
         tabledata "NPR Replication Error Log" = rd,
         tabledata "NPR BTF EndPoint Error Log" = rd;
+#endif
 
     trigger OnPreReport()
     var

@@ -25,6 +25,7 @@ codeunit 6248677 "NPR Retention Policy Mgmt."
         ErrorOccurredDuringApplicationErr: Label 'An error occurred while applying the retention policy for table %1 %2. %3', Comment = '%1 = Table Id, %2 = Table Caption, %3 = Error Message';
     begin
         ClearLastError();
+        RetentionPolicy.SetAutoCalcFields(RetentionPolicy."Table Caption");
         if Codeunit.Run(Codeunit::"NPR Apply Retention Policy", RetentionPolicy) then
             LogInfo(StrSubstNo(SuccessfulApplicationMsg, RetentionPolicy."Table Id", RetentionPolicy."Table Caption"))
         else

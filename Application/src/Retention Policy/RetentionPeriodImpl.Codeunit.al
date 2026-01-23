@@ -1,3 +1,4 @@
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
 codeunit 6014499 "NPR Retention Period Impl." implements "Retention Period"
 {
     // based on codeunit 3900 "Retention Period Impl." from System App
@@ -91,3 +92,4 @@ codeunit 6014499 "NPR Retention Period Impl." implements "Retention Period"
         exit(RetentionPolicyLogCategory::"Retention Policy - Period");
     end;
 }
+#endif

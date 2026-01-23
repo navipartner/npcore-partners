@@ -1,4 +1,4 @@
-#IF NOT BC17 AND NOT BC18
+#if (BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
 codeunit 6059920 "NPR Reten. Pol. Delete. Impl." implements "Reten. Pol. Deleting"
 {
     // based on codeunit 3916 "Reten. Pol. Delete. Impl." from Base App
@@ -86,4 +86,4 @@ codeunit 6059920 "NPR Reten. Pol. Delete. Impl." implements "Reten. Pol. Deletin
         exit(RetentionPolicyLogCategory::"Retention Policy - Apply");
     end;
 }
-#ENDIF
+#endif

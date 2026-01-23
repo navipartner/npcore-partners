@@ -21,7 +21,8 @@ codeunit 6185015 "NPR IRL Audit Mgt."
 
     #endregion
 
-    #region Retention Policy by Law 6 Years insted of NPR 5 Years
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+    #region Retention Policy by Law 6 Years instead of NPR 5 Years
     procedure UpdateRetentionPolicyTo6Years()
     begin
         AddAllowedTable(Database::"NPR Exchange Label", Enum::"Retention Period Enum"::"NPR 6 Years", Enum::"Reten. Pol. Deleting"::Default);
@@ -137,4 +138,5 @@ codeunit 6185015 "NPR IRL Audit Mgt."
         RetentionPolicySetup.Modify(true);
     end;
     #endregion
+#endif
 }

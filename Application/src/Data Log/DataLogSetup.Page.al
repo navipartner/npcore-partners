@@ -233,7 +233,7 @@
         end;
 #else
         if Confirm(DataLogDeletionQst, false) then
-            DataLogSubscriberMgt.CleanDataLog();
+            DataLogSubscriberMgt.CleanDataLog(CurrentDateTime());
 #endif
         CurrPage.Update(false);
     end;

@@ -1,4 +1,4 @@
-#IF NOT BC17 AND NOT BC18
+#if (BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
 enumextension 6014404 "NPR Reten. Pol. Deleting" extends "Reten. Pol. Deleting"
 {
     value(6014400; "NPR Data Archive")
@@ -12,4 +12,4 @@ enumextension 6014404 "NPR Reten. Pol. Deleting" extends "Reten. Pol. Deleting"
         Implementation = "Reten. Pol. Deleting" = "NPR Reten. Pol. Deleting Impl.";
     }
 }
-#ENDIF
+#endif
