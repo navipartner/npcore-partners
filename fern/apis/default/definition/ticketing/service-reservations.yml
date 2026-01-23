@@ -38,6 +38,9 @@ service:
                reserve:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 2
+                  ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ENU
+                  notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+                  memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
                   content:
                     - admissionCode: CASTLE
                       scheduleNumber: 452
@@ -294,6 +297,9 @@ types:
     properties:
       itemNumber: simpleTypes.ItemNumber
       quantity: simpleTypes.NumberOfTickets
+      ticketHolderLanguage: optional<simpleTypes.TicketHolderLanguage>
+      notificationAddress: optional<simpleTypes.NotificationAddress>
+      memberNumber: optional<simpleTypes.MemberNumber>
       content: optional<list<compositeTypes.TicketContentRequest>>
 
  

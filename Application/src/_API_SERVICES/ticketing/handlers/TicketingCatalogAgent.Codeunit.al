@@ -36,7 +36,7 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
         UnitPriceIncludesVat: Boolean;
         UnitPriceVatPercentage: Decimal;
     begin
-        if (not PrepareCatalogItemList(StoreCode, ItemNumber, TempCatalogItems, TicketDescriptionBuffer)) then
+        if (not PrepareCatalogItemList(StoreCode, ItemNumber, TempCatalogItems, TicketDescriptionBuffer, CopyStr(StoreCode, 1, 10))) then
             exit(Response.RespondResourceNotFound('No items found in the catalog.'));
 
         GeneralLedgerSetup.Get();
@@ -141,14 +141,14 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
         exit(ResponseJson);
     end;
 
-    internal procedure GetCatalogItemDescription(StoreCode: Code[32]; ItemNumber: Code[20]; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Boolean
+    internal procedure GetCatalogItemDescription(StoreCode: Code[32]; ItemNumber: Code[20]; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"; LanguageCode: Code[10]): Boolean
     var
         TempCatalogItems: Record "Item Variant" temporary;
     begin
-        exit(PrepareCatalogItemList(StoreCode, ItemNumber, TempCatalogItems, TicketDescriptionBuffer));
+        exit(PrepareCatalogItemList(StoreCode, ItemNumber, TempCatalogItems, TicketDescriptionBuffer, LanguageCode));
     end;
 
-    local procedure PrepareCatalogItemList(StoreCode: Code[32]; ItemNumber: Code[20]; var TempCatalogItems: Record "Item Variant" temporary; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Boolean
+    local procedure PrepareCatalogItemList(StoreCode: Code[32]; ItemNumber: Code[20]; var TempCatalogItems: Record "Item Variant" temporary; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"; LanguageCode: Code[10]): Boolean
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -195,7 +195,7 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
         TempCatalogItems.Reset();
         if (TempCatalogItems.FindSet()) then begin
             repeat
-                TicketDescriptionBuffer.SetKeyAndDescription(TempCatalogItems."Item No.", TempCatalogItems.Code, '', StoreCode);
+                TicketDescriptionBuffer.SetKeyAndDescription(TempCatalogItems."Item No.", TempCatalogItems.Code, '', StoreCode, LanguageCode);
                 TicketDescriptionBuffer.AdmissionCode := '';
                 if (not TicketDescriptionBuffer.Insert()) then; // IgnoreDuplicates
 
@@ -206,11 +206,11 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
         TicketBOM.Reset();
         if (TicketBOM.FindSet()) then begin
             repeat
-                TicketDescriptionBuffer.SetKeyAndDescription(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code", StoreCode);
+                TicketDescriptionBuffer.SetKeyAndDescription(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code", StoreCode, LanguageCode);
 
                 if (Admission.Get(TicketBOM."Admission Code")) then
                     if (Admission."Additional Experience Item No." <> '') then
-                        TicketDescriptionBuffer.SetDescription(Admission."Additional Experience Item No.", '', TicketBOM."Admission Code", StoreCode);
+                        TicketDescriptionBuffer.SetDescription(Admission."Additional Experience Item No.", '', TicketBOM."Admission Code", StoreCode, LanguageCode);
                 if (TicketDescriptionBuffer.Insert()) then; // IgnoreDuplicates
             until (TicketBOM.Next() = 0);
         end;

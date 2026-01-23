@@ -67,6 +67,10 @@ types:
     examples:
       - name: ExampleAmericanEnglish
         value: "ENU"
+      - name: ENU
+        value: ENU
+      - name: DAN
+        value: DAN
 
   NotificationAddress:
     type: string

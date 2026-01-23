@@ -160,6 +160,9 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Line: JsonObject;
         ExternalLineNo: Integer;
         Token: Text[100];
+        MemberNumber: Text[50];
+        NotificationAddress: Text[80];
+        PreferredLanguage: Code[10];
         Success: Boolean;
         ResponseMessage: Text;
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -183,6 +186,9 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Reservations := JValueToken.AsArray();
         foreach ReservationToken in Reservations do begin
             Reservation := ReservationToken.AsObject();
+            Clear(MemberNumber);
+            Clear(NotificationAddress);
+            Clear(PreferredLanguage);
 
             if (not Reservation.Get('itemNumber', JValueToken)) then
                 exit(Response.RespondBadRequest('The itemNumber property is missing in the request body.'));
@@ -192,6 +198,15 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                 exit(Response.RespondBadRequest('The quantity property is missing in the request body.'));
             Quantity := JValueToken.AsValue().AsInteger();
             ExternalLineNo += 1;
+
+            if (Reservation.Get('memberNumber', JValueToken)) then
+                MemberNumber := CopyStr(JValueToken.AsValue().AsText(), 1, MaxStrLen(MemberNumber));
+
+            if (Reservation.Get('notificationAddress', JValueToken)) then
+                NotificationAddress := CopyStr(JValueToken.AsValue().AsText(), 1, MaxStrLen(NotificationAddress));
+
+            if (Reservation.Get('ticketHolderLanguage', JValueToken)) then
+                PreferredLanguage := CopyStr(JValueToken.AsValue().AsText(), 1, MaxStrLen(PreferredLanguage));
 
             if (Reservation.Get('content', JValueToken)) then begin
                 if (not JValueToken.IsArray()) then
@@ -216,8 +231,9 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                     Line.Add('admissionCode', AdmissionCode);
                     Line.Add('scheduleId', ScheduleId);
                     Line.Add('externalLineReference', ExternalLineNo);
-                    Line.Add('memberNumber', '');
-                    Line.Add('notificationAddress', '');
+                    Line.Add('memberNumber', MemberNumber);
+                    Line.Add('notificationAddress', NotificationAddress);
+                    Line.Add('preferredLanguage', PreferredLanguage);
                     Lines.Add(Line);
                 end;
             end else begin
@@ -233,8 +249,9 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                 Line.Add('admissionCode', TicketBOM."Admission Code");
                 Line.Add('scheduleId', -1);
                 Line.Add('externalLineReference', ExternalLineNo);
-                Line.Add('memberNumber', '');
-                Line.Add('notificationAddress', '');
+                Line.Add('memberNumber', MemberNumber);
+                Line.Add('notificationAddress', NotificationAddress);
+                Line.Add('preferredLanguage', PreferredLanguage);
                 Lines.Add(Line);
             end;
         end;
@@ -273,6 +290,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         DetailedEntry: Record "NPR TM Det. Ticket AccessEntry";
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
+        LanguageCode: Code[10];
         LineToken: JsonToken;
         ExternalId: List of [Integer];
         ResolvingTable: Integer;
@@ -302,6 +320,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             TicketRequest."Admission Code" := CopyStr(GetAsText(LineToken.AsObject(), 'admissionCode', ''), 1, MaxStrLen(TicketRequest."Admission Code"));
             TicketRequest."External Adm. Sch. Entry No." := GetAsInteger(LineToken.AsObject(), 'scheduleId', 0);
             TicketRequest."Notification Address" := CopyStr(GetAsText(LineToken.AsObject(), 'notificationAddress', ''), 1, MaxStrLen(TicketRequest."Notification Address"));
+            LanguageCode := CopyStr(GetAsText(LineToken.AsObject(), 'preferredLanguage', ''), 1, MaxStrLen(LanguageCode));
+            TicketRequest.Validate(TicketHolderPreferredLanguage, LanguageCode);
 
             if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
                 Error(INVALID_ITEM_REFERENCE, TicketRequest."External Item Code");
@@ -408,7 +428,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
         ResponseJson.Initialize().StartArray();
         repeat
-            TicketingCatalog.GetCatalogItemDescription(StoreCode, Ticket."Item No.", TicketDescriptionBuffer);
+            TicketingCatalog.GetCatalogItemDescription(StoreCode, Ticket."Item No.", TicketDescriptionBuffer, TicketRequest.TicketHolderPreferredLanguage);
             Ticket.SetCurrentKey("Ticket Reservation Entry No.");
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
             if (Ticket.FindSet()) then begin
@@ -464,14 +484,14 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', LineNo);
         TicketReservationRequest.FindSet();
 
-        TicketingCatalog.GetCatalogItemDescription('', TicketReservationRequest."Item No.", TicketDescriptionBuffer);
-
         ResponseJson.StartObject('reservations')
             .AddProperty('itemNumber', TicketReservationRequest."Item No.")
             .AddProperty('quantity', TicketReservationRequest."Quantity")
             .AddObject(CompactTicketDetailsDTO(ResponseJson, PrimaryEntryNo))
             .StartArray('content');
         repeat
+            TicketingCatalog.GetCatalogItemDescription('', TicketReservationRequest."Item No.", TicketDescriptionBuffer, TicketReservationRequest.TicketHolderPreferredLanguage);
+
             ResponseJson
                 .StartObject()
                 .AddObject(TicketAgent.AdmissionDTO(ResponseJson, 'admissionDetails', TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", false, TicketReservationRequest."Admission Inclusion", TicketDescriptionBuffer))

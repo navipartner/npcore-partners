@@ -1150,10 +1150,10 @@ codeunit 6151543 "NPR TM Client API BL"
                         repeat
 
                             TicketDescription.Init();
-                            TicketDescription.SetKeyAndDescription(Ticket."Item No.", Ticket."Variant Code", AccessEntry."Admission Code", TicketSetup."Store Code");
+                            TicketDescription.SetKeyAndDescription(Ticket."Item No.", Ticket."Variant Code", AccessEntry."Admission Code", TicketSetup."Store Code", TicketRequest.TicketHolderPreferredLanguage);
                             if (Admission.Get(AccessEntry."Admission Code")) then
                                 if (Admission."Additional Experience Item No." <> '') then
-                                    TicketDescription.SetDescription(Admission."Additional Experience Item No.", '', AccessEntry."Admission Code", TicketSetup."Store Code");
+                                    TicketDescription.SetDescription(Admission."Additional Experience Item No.", '', AccessEntry."Admission Code", TicketSetup."Store Code", TicketRequest.TicketHolderPreferredLanguage);
 
                             JBuilder.WriteStartObject('');
                             JBuilder.WriteStringProperty('admissionCode', AccessEntry."Admission Code");

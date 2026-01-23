@@ -492,7 +492,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TmpItemVariant.Reset();
         if (TmpItemVariant.FindSet()) then begin
             repeat
-                _TicketDescription.SetKeyAndDescription(TmpItemVariant."Item No.", TmpItemVariant.Code, '', StoreCode);
+                _TicketDescription.SetKeyAndDescription(TmpItemVariant."Item No.", TmpItemVariant.Code, '', StoreCode, '');
                 _TicketDescription.AdmissionCode := '';
                 Inserted := _TicketDescription.Insert();
             until (TmpItemVariant.Next() = 0);
@@ -501,11 +501,11 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TicketBOM.Reset();
         if (TicketBOM.FindSet()) then begin
             repeat
-                _TicketDescription.SetKeyAndDescription(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code", StoreCode);
+                _TicketDescription.SetKeyAndDescription(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code", StoreCode, '');
 
                 if (Admission.Get(TicketBOM."Admission Code")) then
                     if (Admission."Additional Experience Item No." <> '') then
-                        _TicketDescription.SetDescription(Admission."Additional Experience Item No.", '', TicketBOM."Admission Code", StoreCode);
+                        _TicketDescription.SetDescription(Admission."Additional Experience Item No.", '', TicketBOM."Admission Code", StoreCode, '');
 
                 Inserted := _TicketDescription.Insert();
 

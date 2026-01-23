@@ -22,6 +22,11 @@ table 6059866 "NPR TM TempTicketDescription"
             Caption = 'Admission Code';
             DataClassification = CustomerContent;
         }
+        field(4; LanguageCode; Code[10])
+        {
+            Caption = 'Language Code';
+            DataClassification = CustomerContent;
+        }
         field(10; Title; Text[2048])
         {
             Caption = 'Title';
@@ -57,28 +62,34 @@ table 6059866 "NPR TM TempTicketDescription"
     }
 
     // AA0245 enabled on cloud builds, so lets go hungarian ...
-    internal procedure SetKeyAndDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; StoreCode: Code[32])
+    internal procedure SetKeyAndDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; StoreCode: Code[32]; pLanguageCode: Code[10])
     begin
         Clear(Rec);
         Rec.ItemNo := pItemNo;
         Rec.VariantCode := pVariantCode;
         Rec.AdmissionCode := pAdmissionCode;
 
-        SetDescription(pItemNo, pVariantCode, pAdmissionCode, StoreCode);
+        SetDescription(pItemNo, pVariantCode, pAdmissionCode, StoreCode, pLanguageCode);
     end;
 
-    internal procedure SetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; StoreCode: Code[32])
+    internal procedure SetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; StoreCode: Code[32]; pLanguageCode: Code[10])
     var
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
-        Rec.Title := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Title"), StoreCode), 1, MaxStrLen(Rec.Title));
-        Rec.Subtitle := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Sub Title"), StoreCode), 1, MaxStrLen(Rec.Subtitle));
-        Rec.Name := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Name"), StoreCode), 1, MaxStrLen(Rec.Name));
-        Rec.Description := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Description"), StoreCode), 1, MaxStrLen(Rec.Description));
-        Rec.FullDescription := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Full Description"), StoreCode), 1, MaxStrLen(Rec.FullDescription));
+        if (Rec.LanguageCode <> pLanguageCode) then begin
+            Rec.SetRecFilter();
+            if (not Rec.Delete()) then;
+        end;
+
+        Rec.Title := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Title"), StoreCode, pLanguageCode), 1, MaxStrLen(Rec.Title));
+        Rec.Subtitle := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Sub Title"), StoreCode, pLanguageCode), 1, MaxStrLen(Rec.Subtitle));
+        Rec.Name := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Name"), StoreCode, pLanguageCode), 1, MaxStrLen(Rec.Name));
+        Rec.Description := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Description"), StoreCode, pLanguageCode), 1, MaxStrLen(Rec.Description));
+        Rec.FullDescription := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Full Description"), StoreCode, pLanguageCode), 1, MaxStrLen(Rec.FullDescription));
+        Rec.LanguageCode := pLanguageCode;
     end;
 
-    internal procedure GetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; pFieldNo: Integer; StoreCode: Code[32]) rDescription: Text
+    internal procedure GetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; pFieldNo: Integer; StoreCode: Code[32]; pLanguageCode: Code[10]) rDescription: Text
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -87,6 +98,7 @@ table 6059866 "NPR TM TempTicketDescription"
         Item: Record Item;
         Variant: Record "Item Variant";
         MagentoStoreItem: Record "NPR Magento Store Item";
+        ItemTranslation: Record "Item Translation";
         TempBlob: Codeunit "Temp Blob";
         DescriptionSelector: Option ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK,WEBSHOP_NAME;
         InStr: InStream;
@@ -145,9 +157,15 @@ table 6059866 "NPR TM TempTicketDescription"
 
         case DescriptionSelector of
             DescriptionSelector::ITEM_DESC:
-                exit(Item.Description);
+                if (not ItemTranslation.Get(pItemNo, pVariantCode, pLanguageCode)) then
+                    exit(Item.Description)
+                else
+                    exit(ItemTranslation.Description);
             DescriptionSelector::VARIANT_DESC:
-                exit(Variant.Description);
+                if (not ItemTranslation.Get(pItemNo, pVariantCode, pLanguageCode)) then
+                    exit(Variant.Description)
+                else
+                    exit(ItemTranslation.Description);
             DescriptionSelector::ADM_DESC:
                 exit(Admission.Description);
             DescriptionSelector::BOM_DESC:
