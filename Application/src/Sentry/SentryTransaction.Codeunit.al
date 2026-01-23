@@ -146,7 +146,7 @@ codeunit 6248499 "NPR Sentry Transaction"
         Json.EndObject();
 
         eventDimensions.Add('NPRSentryDsn', _dsn);
-        eventDimensions.Add('NPRSentryJson', Json.BuildAsText());
+        AddJsonChunks(eventDimensions, Json.BuildAsText());
         // Our app.json connectionstring forwards events to a cloudflare worker that parses this JSON and sends it to navipartner-eu.sentry.io.        
         Session.LogMessage('NPRSentryTransaction', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, eventDimensions);
         Clear(Json);
@@ -155,13 +155,41 @@ codeunit 6248499 "NPR Sentry Transaction"
             Json := Error.ToJson();
 
             exceptionDimensions.Add('NPRSentryDsn', _dsn);
-            exceptionDimensions.Add('NPRSentryJson', Json.BuildAsText());
+            AddJsonChunks(exceptionDimensions, Json.BuildAsText());
             exceptionDimensions.Add('NPRSentryTraceId', _traceId);
             exceptionDimensions.Add('NPRSentrySpanId', Error.GetParentId());
             Session.LogMessage('NPRSentryException', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, exceptionDimensions);
             Clear(Json);
             Clear(exceptionDimensions);
         end;
+    end;
+
+    local procedure AddJsonChunks(var Dimensions: Dictionary of [Text, Text]; JsonText: Text)
+    var
+        ChunkSize: Integer;
+        Position: Integer;
+        ChunkIndex: Integer;
+        Chunk: Text;
+        DimensionKey: Text;
+    begin
+        ChunkSize := 7500;
+        Position := 1;
+        ChunkIndex := 0;
+
+        while Position <= StrLen(JsonText) do begin
+            Chunk := CopyStr(JsonText, Position, ChunkSize);
+
+            if ChunkIndex = 0 then
+                DimensionKey := 'NPRSentryJson'
+            else
+                DimensionKey := StrSubstNo('NPRSentryJson_%1', ChunkIndex);
+
+            Dimensions.Add(DimensionKey, Chunk);
+            Position += ChunkSize;
+            ChunkIndex += 1;
+        end;
+
+        Dimensions.Add('NPRSentryJsonChunks', Format(ChunkIndex));
     end;
 }
 #endif
