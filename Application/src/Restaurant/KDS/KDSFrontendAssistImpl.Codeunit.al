@@ -5,6 +5,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     var
         [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoints decoupled from Dragonglass', '2024-06-28')]
         _SkipServerIDCheck: Boolean;
+        _SeatingNoTok: Label 'seatingNos', Locked = true;
 
     internal procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text; lastServerId: Text) Response: JsonObject
     var
@@ -312,6 +313,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 
     local procedure RetrieveCustomerDetails(KitchenRequestNo: BigInteger; var CustomerDetailsDic: Dictionary of [Text, List of [Text]])
     var
+        Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         KitchReqSrcbyDoc: Query "NPR NPRE Kitch.Req.Src. by Doc";
         CustomerEmailTok: Label 'customerEmail', Locked = true;
@@ -326,9 +328,13 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
             case KitchReqSrcbyDoc.Source_Document_Type of
                 KitchReqSrcbyDoc.Source_Document_Type::"Waiter Pad":
                     if WaiterPad.Get(KitchReqSrcbyDoc.Source_Document_No_) then begin
+                        WaiterPad.GetCurrentSeating(Seating);
+                        if Seating."Seating No." = '' then
+                            Seating."Seating No." := Seating.Code;
                         AddCustomerDetailToDict(CustomerNameTok, WaiterPad.Description, CustomerDetailsDic);
                         AddCustomerDetailToDict(CustomerPhoneNoTok, WaiterPad."Customer Phone No.", CustomerDetailsDic);
                         AddCustomerDetailToDict(CustomerEmailTok, WaiterPad."Customer E-Mail", CustomerDetailsDic);
+                        AddCustomerDetailToDict(_SeatingNoTok, Seating."Seating No.", CustomerDetailsDic);
                     end;
             end;
         KitchReqSrcbyDoc.Close();
@@ -362,7 +368,10 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     begin
         foreach CustomerInfoKey in CustomerDetailsDic.Keys() do
             if CustomerDetailsDic.Get(CustomerInfoKey, CustomerInfoValues) then
-                OrderHdr.Add(CustomerInfoKey, ListToText(CustomerInfoValues));
+                if CustomerInfoKey in [_SeatingNoTok] then
+                    OrderHdr.Add(CustomerInfoKey, ListToJsonArray(CustomerInfoValues))
+                else
+                    OrderHdr.Add(CustomerInfoKey, ListToText(CustomerInfoValues));
         OrderHdr.Add('kitchenRequests', KitchenRequests);
         Orders.Add(OrderHdr);
     end;
@@ -379,6 +388,18 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                 CustomerInfoValueString := CustomerInfoValueString + CustomerInfoValue;
             end;
         exit(CustomerInfoValueString);
+    end;
+
+    local procedure ListToJsonArray(CustomerInfoValues: List of [Text]): JsonArray
+    var
+        CustomerInfoValue: Text;
+        CustomerInfoJsonArray: JsonArray;
+    begin
+        CustomerInfoJsonArray.ReadFrom('[]');
+        foreach CustomerInfoValue in CustomerInfoValues do
+            if CustomerInfoValue <> '' then
+                CustomerInfoJsonArray.Add(CustomerInfoValue);
+        exit(CustomerInfoJsonArray);
     end;
 
     local procedure StatusEnumValueName(OrderStatus: Enum "NPR NPRE Kitchen Order Status") Result: Text
