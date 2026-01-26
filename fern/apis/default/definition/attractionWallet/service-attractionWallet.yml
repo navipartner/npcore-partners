@@ -71,6 +71,7 @@ service:
         name: GetWallet
         query-parameters:
           withDetails: optional<simpleTypes.WithDetails>
+          languageCode: optional<simpleTypes.LanguageCode>
       response: compositeTypes.WalletDetails
       examples:
         - name: Get Wallet with details
@@ -81,6 +82,7 @@ service:
             walletId: $simpleTypes.WalletId.ExampleWalletId
           query-parameters:
             withDetails: $simpleTypes.WithDetails.ExampleWithDetailsTrue
+            languageCode: $simpleTypes.LanguageCode.ExampleLanguageCode_ENU
           response:
             body: $compositeTypes.WalletDetails.ExampleWalletDetailsWithDetails
 
@@ -97,6 +99,7 @@ service:
           referenceNumbers: optional<simpleTypes.ExternalWalletReferenceNumbers>
           withAssets: optional<simpleTypes.WithAssets>
           withDetails: optional<simpleTypes.WithDetails>
+          languageCode: optional<simpleTypes.LanguageCode>
       response: list<compositeTypes.WalletDetails>
       examples:
         - name: Find Wallets with Assets including Details
@@ -108,6 +111,7 @@ service:
             referenceNumbers: $simpleTypes.ExternalWalletReferenceNumbers.ExampleExternalWalletReferenceNumbers
             withAssets: $simpleTypes.WithAssets.ExampleWithAssetsTrue
             withDetails: $simpleTypes.WithDetails.ExampleWithDetailsTrue
+            languageCode: $simpleTypes.LanguageCode.ExampleLanguageCode_ENU
           response:
             body: 
               - $compositeTypes.WalletDetails.ExampleWalletDetailsWithDetails

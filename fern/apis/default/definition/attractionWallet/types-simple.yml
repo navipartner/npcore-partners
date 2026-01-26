@@ -223,6 +223,13 @@ types:
       - name: ExampleWithDetailsTrue
         value: true
 
+  LanguageCode:
+    type: string
+    docs: The language code for localization of item description purposes.
+    examples:
+      - name: ExampleLanguageCode_ENU
+        value: "ENU"
+
   WithAssets:
     type: boolean
     docs: Indicates whether the asset should be included in the response.

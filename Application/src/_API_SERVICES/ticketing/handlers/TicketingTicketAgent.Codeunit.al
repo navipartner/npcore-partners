@@ -732,7 +732,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     end;
 
     // one of ticket inquiry use cases
-    internal procedure AdmissionDetailsDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder";
+    internal procedure AdmissionDetailsDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; Ticket: Record "NPR TM Ticket"; LanguageCode: Code[10]): Codeunit "NPR JSON Builder";
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
@@ -743,10 +743,17 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         if (TicketAccessEntry.FindSet()) then begin
-            ReservationRequest.SetLoadFields("TicketHolderPreferredLanguage");
-            if (not ReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
-                ReservationRequest.Init();
+
+            if (LanguageCode <> '') then begin
+                ReservationRequest.TicketHolderPreferredLanguage := LanguageCode
+            end else begin
+                ReservationRequest.SetLoadFields("TicketHolderPreferredLanguage");
+                if (not ReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
+                    ReservationRequest.Init();
+            end;
+
             TicketingCatalog.GetCatalogItemDescription('', Ticket."Item No.", TicketDescriptionBuffer, ReservationRequest.TicketHolderPreferredLanguage);
+
             repeat
                 ResponseJson.StartObject()
                     .AddObject(AdmissionDTO(ResponseJson, 'admissionDetails', Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code", TicketAccessEntry.Status = TicketAccessEntry.Status::BLOCKED, 255, TicketDescriptionBuffer))
