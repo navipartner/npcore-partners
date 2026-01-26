@@ -129,6 +129,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                 end;
             EftTransactionRequest."Processing Type"::LOOK_UP:
                 begin
+                    if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                        EFTAdyenIntegration.AddLookupParametersToDictionary(EftTransactionRequest, Parameters);
                     _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
                     POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_LOOKUP, Parameters, 1000 * 60 * 5);
                 end;
@@ -370,6 +372,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         Parameters: Dictionary of [Text, Text];
         POSSession: Codeunit "NPR POS Session";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         TaskId: Integer;
         EftSetup: Record "NPR EFT Setup";
         EftTransactionRequest: Record "NPR EFT Transaction Request";
@@ -379,6 +383,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         EftSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
         Parameters.Add('EntryNo', Format(EntryNo));
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+            EFTAdyenIntegration.AddLookupParametersToDictionary(EftTransactionRequest, Parameters);
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_LOOKUP, Parameters, 1000 * 60 * 5);
         _trxStatus.Set(EntryNo, Enum::"NPR EFT Adyen Task Status"::LookupInitiated.AsInteger());
