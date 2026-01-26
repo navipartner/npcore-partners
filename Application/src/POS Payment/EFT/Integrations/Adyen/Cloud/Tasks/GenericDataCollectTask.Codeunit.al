@@ -15,6 +15,11 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
     begin
         TempAddInfoRequest.Init();
         Evaluate(TempAddInfoRequest."EFT Transaction No.", Parameters.Get('EntryNo'));
+        TempAddInfoRequest."Integration Version Code" := CopyStr(Parameters.Get('IntegrationVersionCode'), 1, MaxStrLen(TempAddInfoRequest."Integration Version Code"));
+        TempAddInfoRequest."Reference Number Input" := CopyStr(Parameters.Get('ReferenceNumberInput'), 1, MaxStrLen(TempAddInfoRequest."Reference Number Input"));
+        TempAddInfoRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(TempAddInfoRequest."Register No."));
+        TempAddInfoRequest."Hardware ID" := CopyStr(Parameters.Get('HardwareID'), 1, MaxStrLen(TempAddInfoRequest."Hardware ID"));
+        Evaluate(TempAddInfoRequest.Mode, Parameters.Get('Mode'));
         case Parameters.Get('IntegrationType') of
             'Adyen':
                 IAddInfoRequest := Enum::"NPR MM Add. Info. Request"::Adyen;
@@ -54,7 +59,6 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
 
     procedure BackgroundTaskSuccessContinuation(TaskId: Integer; Parameters: Dictionary of [Text, Text]; Results: Dictionary of [Text, Text]);
     var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTAdyenTaskStatus: Enum "NPR EFT DataCollect TaskStatus";
         Completed: Boolean;
         Response: Text;
@@ -65,9 +69,8 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        //Trx done, either complete (success/failure) or handled error 
+        //Trx done, either complete (success/failure) or handled error
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        EFTTransactionRequest.Get(EntryNo);
         Evaluate(Completed, Results.Get('Completed'), 9);
 
         case Parameters.Get('DataCollectionStep') of
@@ -82,31 +85,29 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
         if Completed then begin
             Response := Results.Get('Response');
             Logs := Results.Get('Logs');
-            EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'DataCollectionTaskDone (Complete)', Logs);
+            EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EntryNo, 'DataCollectionTaskDone (Complete)', Logs);
             Commit();
 
-            POSActionDataCollection.SetTrxResponse(EFTTransactionRequest."Entry No.", Response, true, true, '');
-            POSActionDataCollection.SetTrxStatus(EFTTransactionRequest."Entry No.", EFTAdyenTaskStatus);
+            POSActionDataCollection.SetTrxResponse(EntryNo, Response, true, true, '');
+            POSActionDataCollection.SetTrxStatus(EntryNo, EFTAdyenTaskStatus);
         end else begin
             Error := Results.Get('Error');
             ErrorCallstack := Results.Get('ErrorCallstack');
-            EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'DataCollectionTaskDone (Error)', StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
-            POSActionDataCollection.SetTrxResponse(EFTTransactionRequest."Entry No.", Response, false, true, StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
-            POSActionDataCollection.SetTrxStatus(EFTTransactionRequest."Entry No.", EFTAdyenTaskStatus);
+            EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EntryNo, 'DataCollectionTaskDone (Error)', StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
+            POSActionDataCollection.SetTrxResponse(EntryNo, Response, false, true, StrSubstNo('Error: %1 \\Callstack: %2', Error, ErrorCallStack));
+            POSActionDataCollection.SetTrxStatus(EntryNo, EFTAdyenTaskStatus);
         end;
     end;
 
     procedure BackgroundTaskErrorContinuation(TaskId: Integer; Parameters: Dictionary of [Text, Text]; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text);
     var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTAdyenTaskStatus: Enum "NPR EFT DataCollect TaskStatus";
         EntryNo: Integer;
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        //Trx result unknown - log error and start lookup        
+        //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        EFTTransactionRequest.Get(EntryNo);
 
         case Parameters.Get('DataCollectionStep') of
             'Signature':
@@ -117,22 +118,20 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::EmailResponseReceived;
         end;
 
-        EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'TaskDataCollectionError', '');
-        POSActionDataCollection.SetTrxResponse(EFTTransactionRequest."Entry No.", '', false, true, StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack));
-        POSActionDataCollection.SetTrxStatus(EFTTransactionRequest."Entry No.", EFTAdyenTaskStatus);
+        EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EntryNo, 'TaskDataCollectionError', '');
+        POSActionDataCollection.SetTrxResponse(EntryNo, '', false, true, StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack));
+        POSActionDataCollection.SetTrxStatus(EntryNo, EFTAdyenTaskStatus);
     end;
 
     procedure BackgroundTaskCancelled(TaskId: Integer; Parameters: Dictionary of [Text, Text])
     var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTAdyenTaskStatus: Enum "NPR EFT DataCollect TaskStatus";
         EntryNo: Integer;
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        //Trx result unknown - log error and start lookup        
+        //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        EFTTransactionRequest.Get(EntryNo);
 
         case Parameters.Get('DataCollectionStep') of
             'Signature':
@@ -143,8 +142,8 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::EmailResponseReceived;
         end;
 
-        EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'TaskDataCollectionCancelled', '');
-        POSActionDataCollection.SetTrxResponse(EFTTransactionRequest."Entry No.", '', false, true, StrSubstNo('Error: %1 \\Callstack: %2'));
-        POSActionDataCollection.SetTrxStatus(EFTTransactionRequest."Entry No.", EFTAdyenTaskStatus);
+        EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EntryNo, 'TaskDataCollectionCancelled', '');
+        POSActionDataCollection.SetTrxResponse(EntryNo, '', false, true, StrSubstNo('Error: %1 \\Callstack: %2'));
+        POSActionDataCollection.SetTrxStatus(EntryNo, EFTAdyenTaskStatus);
     end;
 }

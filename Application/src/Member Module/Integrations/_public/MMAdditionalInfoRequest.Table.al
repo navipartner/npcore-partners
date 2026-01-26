@@ -46,6 +46,32 @@
             Caption = 'Data Collection Step';
             DataClassification = CustomerContent;
         }
+        field(9; "Integration Version Code"; Code[10])
+        {
+            Caption = 'Integration Version Code';
+            DataClassification = CustomerContent;
+        }
+        field(10; "Reference Number Input"; Text[50])
+        {
+            Caption = 'Reference Number Input';
+            DataClassification = CustomerContent;
+        }
+        field(11; "Register No."; Code[10])
+        {
+            Caption = 'Register No.';
+            DataClassification = CustomerContent;
+        }
+        field(12; "Hardware ID"; Text[200])
+        {
+            Caption = 'Hardware ID';
+            DataClassification = CustomerContent;
+        }
+        field(13; Mode; Option)
+        {
+            Caption = 'Mode';
+            OptionMembers = Production,"TEST Local","TEST Remote";
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

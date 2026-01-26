@@ -4,6 +4,7 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
     SingleInstance = true;
 
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         _trxStatus: Dictionary of [Integer, Integer]; //EntryNo, AdyenCloudTrxStatusEnum
         _trxAbortStatus: Dictionary of [Integer, Boolean]; //EntryNo, BackgroundTaskIsRunning
         _trxResponse: Dictionary of [Integer, List of [Text]];
@@ -111,6 +112,8 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
 
         Parameters.Add('EntryNo', Format(EftTransactionRequest."Entry No."));
         Parameters.Add('IntegrationType', Format(MMMemberInfoIntSetup."Request Return Info"));
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+            AddCommonDataCollectionParameters(EftTransactionRequest, Parameters);
 
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::AUXILIARY:
@@ -215,6 +218,8 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
 
                         Parameters.Add('EntryNo', Format(EftTransactionRequest."Entry No."));
                         Parameters.Add('DataCollectionStep', Format(Enum::"NPR Data Collect Step"::PhoneNo));
+                        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                            AddCommonDataCollectionParameters(EftTransactionRequest, Parameters);
                         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
                         _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT DataCollect TaskStatus"::PhoneNoResponseInitiated.AsInteger());
                         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::GENERIC_DATA_COLLECTION, Parameters, 1000 * 60 * 5);
@@ -232,6 +237,8 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
 
                         Parameters.Add('EntryNo', Format(EftTransactionRequest."Entry No."));
                         Parameters.Add('DataCollectionStep', Format(Enum::"NPR Data Collect Step"::EMail));
+                        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                            AddCommonDataCollectionParameters(EftTransactionRequest, Parameters);
                         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
                         _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT DataCollect TaskStatus"::EmailResponseInitiated.AsInteger());
                         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::GENERIC_DATA_COLLECTION, Parameters, 1000 * 60 * 5);
@@ -309,6 +316,8 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
                         MMMemberInfoIntSetup.Get();
                         Parameters.Add('IntegrationType', Format(MMMemberInfoIntSetup."Request Return Info"));
                         Parameters.Add('DataCollectionStep', Format(Enum::"NPR Data Collect Step"::EMail));
+                        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                            AddCommonDataCollectionParameters(EftTransactionRequest, Parameters);
                         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
                         _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT DataCollect TaskStatus"::EmailResponseInitiated.AsInteger());
                         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::GENERIC_DATA_COLLECTION, Parameters, 1000 * 60 * 5);
@@ -541,7 +550,6 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         EFTAdyenAbortMgmt: Codeunit "NPR EFT Adyen Abort Mgmt";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         TaskId: Integer;
         AbortReqEntryNo: Integer;
         AbortTaskActive: Boolean;
@@ -624,6 +632,15 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
     begin
         clear(_trxStatus);
         clear(_trxAbortStatus);
+    end;
+
+    local procedure AddCommonDataCollectionParameters(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    begin
+        Parameters.Add('IntegrationVersionCode', EftTransactionRequest."Integration Version Code");
+        Parameters.Add('ReferenceNumberInput', EftTransactionRequest."Reference Number Input");
+        Parameters.Add('RegisterNo', EftTransactionRequest."Register No.");
+        Parameters.Add('HardwareID', EftTransactionRequest."Hardware ID");
+        Parameters.Add('Mode', Format(EftTransactionRequest.Mode, 0, 9));
     end;
 
     internal procedure SetTrxStatus(EntryNo: Integer; StatusIn: Enum "NPR EFT DataCollect TaskStatus")

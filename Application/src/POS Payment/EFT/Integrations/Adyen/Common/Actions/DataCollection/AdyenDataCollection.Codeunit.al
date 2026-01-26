@@ -26,8 +26,17 @@ codeunit 6150746 "NPR Adyen Data Collection" implements "NPR MM IAdd. Info. Requ
         OutStr: OutStream;
         JToken: JsonToken;
         ScreenTimeoutLbl: Label 'Screen%20timeout', Locked = true;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        EFTTransactionRequest.Get(TempAddInfoRequest."EFT Transaction No.");
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := TempAddInfoRequest."EFT Transaction No.";
+            EFTTransactionRequest."Integration Version Code" := TempAddInfoRequest."Integration Version Code";
+            EFTTransactionRequest."Reference Number Input" := TempAddInfoRequest."Reference Number Input";
+            EFTTransactionRequest."Register No." := TempAddInfoRequest."Register No.";
+            EFTTransactionRequest."Hardware ID" := TempAddInfoRequest."Hardware ID";
+            EFTTransactionRequest.Mode := TempAddInfoRequest.Mode;
+        end else
+            EFTTransactionRequest.Get(TempAddInfoRequest."EFT Transaction No.");
 
         DataCollectionStep := TempAddInfoRequest."Data Collection Step";
         case DataCollectionStep of
