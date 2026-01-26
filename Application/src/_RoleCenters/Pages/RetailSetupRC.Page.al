@@ -462,9 +462,12 @@ page 6151245 "NPR Retail Setup RC"
                 action("Retention Policy Setup List")
                 {
                     Caption = 'Retention Policy Setup List';
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
                     RunObject = page "Retention Policy Setup List";
-
-                    ToolTip = 'View or edit the Retention Policy Setup List';
+#else
+                    RunObject = page "NPR Retention Policy";
+#endif
+                    ToolTip = 'View or edit the setup for Retention Policies';
                     ApplicationArea = NPRRetail;
                 }
                 action("SMS Setup")

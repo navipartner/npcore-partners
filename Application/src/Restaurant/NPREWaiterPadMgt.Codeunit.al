@@ -870,8 +870,13 @@
 
     procedure EnableWaiterPadRetentionPolicies()
     var
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         RetentionPolicySetup: Record "Retention Policy Setup";
+#else
+        RetentionPolicy: Record "NPR Retention Policy";
+#endif
     begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         if not RetentionPolicySetup.WritePermission() then
             exit;
         if RetentionPolicySetup.Get(Database::"NPR NPRE Waiter Pad") and not RetentionPolicySetup.Enabled then begin
@@ -882,6 +887,20 @@
             RetentionPolicySetup.Validate(Enabled, true);
             RetentionPolicySetup.Modify(true);
         end;
+#else
+        RetentionPolicy.DiscoverRetentionPolicyTables();
+        if RetentionPolicy.Get(Database::"NPR NPRE Waiter Pad") then
+            if not RetentionPolicy.Enabled then begin
+                RetentionPolicy.Enabled := true;
+                RetentionPolicy.Modify();
+            end;
+
+        if RetentionPolicy.Get(Database::"NPR NPRE W.Pad Prnt LogEntry") then
+            if not RetentionPolicy.Enabled then begin
+                RetentionPolicy.Enabled := true;
+                RetentionPolicy.Modify();
+            end;
+#endif
     end;
 
     [IntegrationEvent(true, false)]

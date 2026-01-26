@@ -212,14 +212,27 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
 
     internal procedure EnableShopifyLogRetentionPolicy()
     var
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         RetentionPolicySetup: Record "Retention Policy Setup";
+#else
+        RetentionPolicy: Record "NPR Retention Policy";
+#endif
     begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         if not RetentionPolicySetup.WritePermission() then
             exit;
         if not RetentionPolicySetup.Get(Database::"NPR Spfy Log") or RetentionPolicySetup.Enabled then
             exit;
         RetentionPolicySetup.Validate(Enabled, true);
         RetentionPolicySetup.Modify(true);
+#else
+        RetentionPolicy.DiscoverRetentionPolicyTables();
+        if RetentionPolicy.Get(Database::"NPR Spfy Log") then
+            if not RetentionPolicy.Enabled then begin
+                RetentionPolicy.Enabled := true;
+                RetentionPolicy.Modify();
+            end;
+#endif
     end;
 
     local procedure LogMessage(Message: Text; MessageType: Enum "NPR Spfy Message Type")
