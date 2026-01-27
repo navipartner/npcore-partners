@@ -148,6 +148,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                     "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger():
                         begin
                             _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::AcquireCardInitiated.AsInteger());
+                            if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                                EFTAdyenIntegration.AddAcquireCardParametersToDictionary(EftTransactionRequest, Parameters);
                             POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ACQ_CARD, Parameters, 1000 * 60 * 5);
                         end;
                     "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
