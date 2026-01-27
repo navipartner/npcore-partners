@@ -48,4 +48,20 @@ codeunit 6248436 "NPR TM Ticket Facade"
     begin
         TMTicketManagement.RevokeTicket(Ticket);
     end;
+
+    procedure CalculatePrice(
+        ItemNo: Code[20]; VariantCode: Code[10];
+        CustomerNo: Code[20];
+        ReferenceDate: Date; ReferenceTime: Time; Quantity: Integer;
+        var ErpUnitPrice: Decimal; var ErpDiscountPct: Decimal; var ErpUnitPriceIncludesVat: Boolean; var ErpUnitPriceVatPercentage: Decimal) TicketUnitPrice: Decimal
+    var
+        PriceCalculation: Codeunit "NPR TM Dynamic Price";
+    begin
+        exit(PriceCalculation.CalculatePrice(
+            ItemNo, VariantCode,
+            CustomerNo,
+            ReferenceDate, ReferenceTime, Quantity,
+            ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage));
+    end;
+
 }

@@ -163,4 +163,13 @@ codeunit 6185061 "NPR AttractionWalletFacade"
     begin
         exit(WalletManagement.GetDesignerTemplate(WalletEntryNo, TemplateLabel, TemplateId));
     end;
+
+
+    procedure CalculateWalletListPrice(WalletTemplate: Record "NPR NpIa Item AddOn"; CustomerNo: Code[20]; ReferenceDate: Date; ReferenceTime: Time; var WalletPrice: Decimal) PriceCalculated: Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.CalculateWalletListPrice(WalletTemplate, CustomerNo, ReferenceDate, ReferenceTime, WalletPrice));
+    end;
+
 }
