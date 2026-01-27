@@ -4,6 +4,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
     SingleInstance = true;
 
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         _trxStatus: Dictionary of [Integer, Integer]; //EntryNo, AdyenCloudTrxStatusEnum
         _trxAbortStatus: Dictionary of [Integer, Boolean]; //EntryNo, BackgroundTaskIsRunning
         _trxResponse: Dictionary of [Integer, List of [Text]];
@@ -87,7 +88,6 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         Response: JsonObject;
         TaskId: Integer;
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         AcquireCardEntryNo: Integer;
         ShopperSubscriptionConfirmation: Integer;
         Sentry: Codeunit "NPR Sentry";
@@ -124,6 +124,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
             EftTransactionRequest."Processing Type"::REFUND,
             EftTransactionRequest."Processing Type"::VOID:
                 begin
+                    if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                        EFTAdyenIntegration.AddTrxParametersToDictionary(EftTransactionRequest, Parameters);
                     _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
                     POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_TRX, Parameters, 1000 * 60 * 5);
                 end;
@@ -198,6 +200,10 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
             //Carry the acquire card operation into a payment operation on the terminal.
 
             Parameters.Add('EntryNo', Format(ContinueOnEntryNo));
+            if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+                EFTTransactionRequest.Get(ContinueOnEntryNo);
+                EFTAdyenIntegration.AddTrxParametersToDictionary(EFTTransactionRequest, Parameters);
+            end;
             _trxStatus.Set(ContinueOnEntryNo, Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
 
             POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
@@ -250,6 +256,10 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
             _trxStatus.Set(ContinueOnEntryNo, Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
 
             Parameters.Add('EntryNo', Format(ContinueOnEntryNo));
+            if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+                EFTTransactionRequest.Get(ContinueOnEntryNo);
+                EFTAdyenIntegration.AddTrxParametersToDictionary(EFTTransactionRequest, Parameters);
+            end;
             POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
             POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_TRX, Parameters, 1000 * 60 * 5);
 
@@ -341,6 +351,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         EftSetup: Record "NPR EFT Setup";
         EftTransactionRequest: Record "NPR EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         VoidEFTTransactionRequest: Record "NPR EFT Transaction Request";
         Response: JsonObject;
     begin
@@ -350,6 +361,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, EftSetup, EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EntryNo, false);
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
         Parameters.Add('EntryNo', Format(VoidEFTTransactionRequest."Entry No."));
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+            EFTAdyenIntegration.AddTrxParametersToDictionary(VoidEFTTransactionRequest, Parameters);
         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_TRX, Parameters, 1000 * 60 * 5);
         _trxStatus.Set(VoidEFTTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
 
@@ -377,7 +390,6 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         TaskId: Integer;
         EftSetup: Record "NPR EFT Setup";
         EftTransactionRequest: Record "NPR EFT Transaction Request";
@@ -407,7 +419,6 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         Parameters: Dictionary of [Text, Text];
         POSSession: Codeunit "NPR POS Session";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         TaskId: Integer;
         AbortTaskActive: Boolean;
         EFTAdyenAbortMgmt: Codeunit "NPR EFT Adyen Abort Mgmt";

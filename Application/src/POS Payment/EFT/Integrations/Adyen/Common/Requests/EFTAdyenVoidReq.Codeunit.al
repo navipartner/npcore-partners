@@ -4,9 +4,23 @@ codeunit 6184594 "NPR EFT Adyen Void Req"
 
     procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
     var
-        Json: Codeunit "Json Text Reader/Writer";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         LookupEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        OriginalRefNumberOutput: Text[50];
+        LookupRefNumberOutput: Text[50];
+    begin
+        OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
+        OriginalRefNumberOutput := OriginalEFTTransactionRequest."Reference Number Output";
+        if OriginalEFTTransactionRequest.Recovered then begin
+            LookupEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Recovered by Entry No.");
+            LookupRefNumberOutput := LookupEFTTransactionRequest."Reference Number Output";
+        end;
+        exit(GetRequestJson(EFTTransactionRequest, EFTSetup, OriginalEFTTransactionRequest.Recovered, OriginalRefNumberOutput, LookupRefNumberOutput));
+    end;
+
+    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; OriginalRecovered: Boolean; OriginalRefNumberOutput: Text; LookupRefNumberOutput: Text): Text
+    var
+        Json: Codeunit "Json Text Reader/Writer";
     begin
         Json.WriteStartObject('');
         Json.WriteStartObject('SaleToPOIRequest');
@@ -24,13 +38,10 @@ codeunit 6184594 "NPR EFT Adyen Void Req"
         Json.WriteStartObject('POITransactionID');
         Json.WriteStringProperty('TimeStamp', Format(EFTTransactionRequest.Started, 0, 9));
 
-        OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
-        if OriginalEFTTransactionRequest.Recovered then begin
-            LookupEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Recovered by Entry No.");
-            Json.WriteStringProperty('TransactionID', LookupEFTTransactionRequest."Reference Number Output");
-        end else begin
-            Json.WriteStringProperty('TransactionID', OriginalEFTTransactionRequest."Reference Number Output");
-        end;
+        if OriginalRecovered then
+            Json.WriteStringProperty('TransactionID', LookupRefNumberOutput)
+        else
+            Json.WriteStringProperty('TransactionID', OriginalRefNumberOutput);
 
         Json.WriteEndObject(); // POITransactionID
         Json.WriteEndObject(); // OriginalPOITransaction

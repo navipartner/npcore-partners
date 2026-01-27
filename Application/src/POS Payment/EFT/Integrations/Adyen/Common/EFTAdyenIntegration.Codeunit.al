@@ -1258,4 +1258,57 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         Parameters.Add('AmountInput', Format(AmountInput, 0, 9));
         Parameters.Add('Mode', Format(EFTTransactionRequest.Mode, 0, 9));
     end;
+
+    internal procedure AddTrxParametersToDictionary(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    var
+        AcquireCardRequest: Record "NPR EFT Transaction Request";
+        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        LookupEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTAdyenTrxRequest: Codeunit "NPR EFT Adyen Trx Request";
+    begin
+        Parameters.Add('RegisterNo', EftTransactionRequest."Register No.");
+        Parameters.Add('OriginalPOSPaymentTypeCode', EftTransactionRequest."Original POS Payment Type Code");
+        Parameters.Add('IntegrationVersionCode', EftTransactionRequest."Integration Version Code");
+        Parameters.Add('ReferenceNumberInput', EftTransactionRequest."Reference Number Input");
+        Parameters.Add('HardwareID', EftTransactionRequest."Hardware ID");
+        Parameters.Add('Mode', Format(EftTransactionRequest.Mode, 0, 9));
+        Parameters.Add('SalesTicketNo', EftTransactionRequest."Sales Ticket No.");
+        Parameters.Add('CurrencyCode', EftTransactionRequest."Currency Code");
+        Parameters.Add('AmountInput', Format(EftTransactionRequest."Amount Input", 0, 9));
+        Parameters.Add('CashbackAmount', Format(EftTransactionRequest."Cashback Amount", 0, 9));
+        Parameters.Add('ProcessingType', Format(EftTransactionRequest."Processing Type", 0, 9));
+        Parameters.Add('InternalCustomerID', EftTransactionRequest."Internal Customer ID");
+        Parameters.Add('ManualCapture', Format(EftTransactionRequest."Manual Capture"));
+        Parameters.Add('Token', EftTransactionRequest.Token);
+        Parameters.Add('ProcessedEntryNo', Format(EftTransactionRequest."Processed Entry No."));
+        Parameters.Add('Recovered', Format(EftTransactionRequest.Recovered));
+        Parameters.Add('Started', Format(EftTransactionRequest.Started, 0, 9));
+
+        if EFTAdyenTrxRequest.GetLinkedCardAcquisition(EftTransactionRequest, AcquireCardRequest) then begin
+            Parameters.Add('HasCardAcquisition', 'true');
+            Parameters.Add('CardAcqRefNumberOutput', AcquireCardRequest."Reference Number Output");
+            Parameters.Add('CardAcqTransactionDate', Format(AcquireCardRequest."Transaction Date", 0, 9));
+            Parameters.Add('CardAcqTransactionTime', Format(AcquireCardRequest."Transaction Time", 0, 9));
+        end else begin
+            Parameters.Add('HasCardAcquisition', 'false');
+            Parameters.Add('CardAcqRefNumberOutput', '');
+            Parameters.Add('CardAcqTransactionDate', Format(0D, 0, 9));
+            Parameters.Add('CardAcqTransactionTime', Format(0T, 0, 9));
+        end;
+
+        if EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::VOID then begin
+            OriginalEFTTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+            Parameters.Add('OriginalRecovered', Format(OriginalEFTTransactionRequest.Recovered));
+            Parameters.Add('OriginalRefNumberOutput', OriginalEFTTransactionRequest."Reference Number Output");
+            if OriginalEFTTransactionRequest.Recovered then begin
+                LookupEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Recovered by Entry No.");
+                Parameters.Add('LookupRefNumberOutput', LookupEFTTransactionRequest."Reference Number Output");
+            end else
+                Parameters.Add('LookupRefNumberOutput', '');
+        end else begin
+            Parameters.Add('OriginalRecovered', 'false');
+            Parameters.Add('OriginalRefNumberOutput', '');
+            Parameters.Add('LookupRefNumberOutput', '');
+        end;
+    end;
 }
