@@ -4,33 +4,19 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
 
     var
         POSActSwitchRegB: Codeunit "NPR POS Action: Switch RegistB";
-        NewPOSSwitchRegister: Codeunit "NPR New POS Sw. Regis. Feature";
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Switch to a different register';
-        EnterRegisterPromptLbl: Label 'Enter Register';
-        ParameterDialogType_OptionNameLbl: Label 'TextField,Numpad,List', Locked = true;
-        ParameterDialogType_OptionCaptionsLbl: Label 'TextField,Numpad,List';
-        ParameterDialogType_NameLbl: Label 'DialogType';
         FilterByPosUnitGroupName: Label 'FilterByPosUnitGroup';
         FilterByPosUnitGroupDesc: Label 'Pos Unit list will be filtered by selected Pos Unit Group on Salesperson';
+        SelectPOSUnitTitleLbl: Label 'Select a POS unit';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
 
-        if not NewPOSSwitchRegister.IsFeatureEnabled() then begin
-            WorkflowConfig.AddOptionParameter('DialogType',
-#pragma warning disable AA0139
-                ParameterDialogType_OptionNameLbl,
-                SelectStr(1, ParameterDialogType_OptionNameLbl),
-#pragma warning restore
-                ParameterDialogType_NameLbl,
-                ParameterDialogType_NameLbl,
-                ParameterDialogType_OptionCaptionsLbl);
-        end;
         WorkflowConfig.AddBooleanParameter('FilterByPosUnitGroup', false, FilterByPosUnitGroupName, FilterByPosUnitGroupDesc);
-        WorkflowConfig.AddLabel('registerprompt', EnterRegisterPromptLbl);
+        WorkflowConfig.AddLabel('selectPOSUnitTitle', SelectPOSUnitTitleLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -82,15 +68,9 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
 
     local procedure GetActionScript(): Text
     begin
-        if NewPOSSwitchRegister.IsFeatureEnabled() then
-            EXIT(
-                //###NPR_INJECT_FROM_FILE:POSActionSwitchRegisterCustomList.js###
-                'let main=async({workflow:r,customList:s,toast:n})=>{try{const e=await s.setParameters({topic:"POS_UNIT",maxPageSize:50});if(e){const t=JSON.parse(e).fields?.["1"];if(!t)return" ";await r.respond("EnterRegister",{RegisterNo:t})}else return" "}catch(e){return console.error("[SwitchRegister] Unexpected error:",e),n.error(e?.message||"An unexpected error occurred",{title:"Unable to Complete Action",hideAfter:5})," "}};'
-            );
-
-        EXIT(
+        exit(
             //###NPR_INJECT_FROM_FILE:POSActionSwitchRegister.js###
-            'let main=async({workflow:a,parameters:n,popup:i,captions:r})=>{const t={TextField:0,Numpad:1,List:2};switch(n._parameters.DialogType){case t.TextField:var e=await i.input({caption:r.registerprompt});if(e===null)return" ";await a.respond("EnterRegister",{RegisterNo:e});break;case t.Numpad:var e=await i.numpad({caption:r.registerprompt});if(e===null)return" ";await a.respond("EnterRegister",{RegisterNo:e});break;case t.List:await a.respond();break}};'
+            'let main=async({workflow:r,customList:s,toast:i,captions:n})=>{try{const e=await s.setParameters({topic:"POS_UNIT",maxPageSize:50,title:n.selectPOSUnitTitle});if(e){const t=JSON.parse(e).fields?.["1"];if(!t)return" ";await r.respond("EnterRegister",{RegisterNo:t})}else return" "}catch(e){return console.error("[SwitchRegister] Unexpected error:",e),i.error(e?.message||"An unexpected error occurred",{title:"Unable to Complete Action",hideAfter:5})," "}};'
         );
     end;
 }

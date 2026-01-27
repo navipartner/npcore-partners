@@ -135,9 +135,4 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Attraction Print Experience';
         Implementation = "NPR Feature Management" = "NPR New Attraction Print Exp";
     }
-    value(200; "New POS Switch Register")
-    {
-        Caption = 'New POS Switch Register', Locked = true, MaxLength = 50;
-        Implementation = "NPR Feature Management" = "NPR New POS Sw. Regis. Feature";
-    }
 }

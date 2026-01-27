@@ -116,25 +116,6 @@ codeunit 6150632 "NPR New Feature Handler"
         LogMessageStopwatch.LogFinish();
     end;
 
-    internal procedure HandleNewPOSSwitchRegister()
-    var
-        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
-    begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewPOSSwitchRegisterHandle');
-
-        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewPOSSwitchRegisterHandle')) then begin
-            LogMessageStopwatch.LogFinish();
-            exit;
-        end;
-
-        NewPOSSwitchRegisterHandle();
-
-        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewPOSSwitchRegisterHandle'));
-        LogMessageStopwatch.LogFinish();
-    end;
-
     internal procedure HandlePOSWebserviceSessionsFeature()
     var
         Feature: Record "NPR Feature";
@@ -277,19 +258,6 @@ codeunit 6150632 "NPR New Feature Handler"
         MembershipSetup.SetRange("Receipt Print Object Type", MembershipSetup."Receipt Print Object Type"::TEMPLATE);
         MembershipSetup.ModifyAll("Receipt Print Template Code", '');
         MembershipSetup.ModifyAll("Receipt Print Object Type", MembershipSetup."Receipt Print Object Type"::NO_PRINT);
-    end;
-
-    local procedure NewPOSSwitchRegisterHandle()
-    var
-        Feature: Record "NPR Feature";
-        NewPOSSwitchRegister: Codeunit "NPR New POS Sw. Regis. Feature";
-    begin
-        if not Feature.Get(NewPOSSwitchRegister.GetFeatureId()) then
-            exit;
-        if Feature.Enabled then
-            exit;
-        Feature.Enabled := true;
-        Feature.Modify();
     end;
 
     local procedure CurrCodeunitId(): Integer

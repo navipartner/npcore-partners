@@ -51,6 +51,7 @@ codeunit 6184965 "NPR FE Custom List Assistant"
         BasePosition: Text;
         Direction: Integer;
         MaxPageSize: Integer;
+        Title: Text;
     begin
         Parameters := Context.AsToken();
         _Topic := Enum::"NPR POS Custom List".FromInteger(
@@ -79,6 +80,10 @@ codeunit 6184965 "NPR FE Custom List Assistant"
         Response.Add('scrollDirection', Format(Direction - 1, 0, 9));
         Response.Add('maxPageSize', Format(MaxPageSize, 0, 9));
         Response.Add('dataSet', DataSet);
+
+        Title := _JsonHelper.GetJText(Parameters, 'title', false);
+        if Title <> '' then
+            Response.Add('title', Title);
     end;
 
     local procedure GetColumnsAndApplyCrossColumnSearchString(Parameters: JsonToken; var RecRef: RecordRef; var SearchString: Text; var ColumnsOut: JsonArray; var DatasetNormalFields: List of [Integer])
