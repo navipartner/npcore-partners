@@ -357,6 +357,7 @@ codeunit 6248268 "NPR NpGp Export to API"
             repeat
                 if not POSCrossReference.GetBySystemId(POSSalesLine.SystemId) then
                     POSCrossReference.Init();
+                Clear(ExtensionFieldsData);
                 APIPOSGlobalEntryExt.SetPOSEntrySalesLineExtensionData(POSSalesLine, ExtensionFieldsData);
                 JsonBuilder.StartObject()
                     .AddProperty('lineNo', Format(POSSalesLine."Line No.", 0, 9))
@@ -403,6 +404,7 @@ codeunit 6248268 "NPR NpGp Export to API"
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSPaymentLine.FindSet() then
             repeat
+                Clear(ExtensionFieldsData);
                 APIPOSGlobalEntryExt.SetPOSEntryPaymentLineExtensionData(POSPaymentLine, ExtensionFieldsData);
                 JsonBuilder.StartObject()
                     .AddProperty('lineNo', Format(POSPaymentLine."Line No.", 0, 9))
@@ -430,6 +432,7 @@ codeunit 6248268 "NPR NpGp Export to API"
         POSInfoPOSEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSInfoPOSEntry.FindSet() then
             repeat
+                Clear(ExtensionFieldsData);
                 APIPOSGlobalEntryExt.SetPOSInfoPOSEntryExtensionData(POSInfoPOSEntry, ExtensionFieldsData);
                 JsonBuilder.StartObject()
                     .AddProperty('lineNo', Format(POSInfoPOSEntry."Entry No.", 0, 9))
