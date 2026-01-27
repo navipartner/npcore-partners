@@ -136,6 +136,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                 end;
             EftTransactionRequest."Processing Type"::SETUP:
                 begin
+                    if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+                        EFTAdyenIntegration.AddSetupCheckParametersToDictionary(EftTransactionRequest, Parameters);
                     _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
                     POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_SETUP_CHECK, Parameters, 1000 * 60 * 5);
                 end;

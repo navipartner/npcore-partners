@@ -1001,6 +1001,16 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         Parameters.Add('OriginalReferenceNumberInput', OriginalEFTTransactionRequest."Reference Number Input");
     end;
 
+    internal procedure AddSetupCheckParametersToDictionary(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    begin
+        Parameters.Add('RegisterNo', EFTTransactionRequest."Register No.");
+        Parameters.Add('OriginalPOSPaymentTypeCode', EFTTransactionRequest."Original POS Payment Type Code");
+        Parameters.Add('IntegrationVersionCode', EFTTransactionRequest."Integration Version Code");
+        Parameters.Add('ReferenceNumberInput', EFTTransactionRequest."Reference Number Input");
+        Parameters.Add('HardwareID', EFTTransactionRequest."Hardware ID");
+        Parameters.Add('Mode', Format(EFTTransactionRequest.Mode, 0, 9));
+    end;
+
     internal procedure WriteGenericDataCollectionLogEntry(EntryNo: Integer; Description: Text; Logs: Text)
     var
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
