@@ -43,6 +43,13 @@ types:
       - name: ExampleDescription
         value: "Credit Voucher 000002"
 
+  VoucherTypeDescription:
+    type: string
+    docs: A description of the voucher type
+    examples:
+      - name: ExampleVoucherTypeDescription
+        value: "Credit Voucher"
+
   StartingDate:
     type: datetime
     docs: The datetime as from which the voucher is valid

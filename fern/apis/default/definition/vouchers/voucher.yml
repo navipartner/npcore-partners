@@ -43,8 +43,9 @@ types:
     properties:
       voucherId: simpleTypes.VoucherId
       description: simpleTypes.Description
+      voucherTypeDescription: simpleTypes.VoucherTypeDescription
       startingDate: simpleTypes.StartingDate
-      endingDate: simpleTypes.EndingDate     
+      endingDate: simpleTypes.EndingDate
       initialAmount: simpleTypes.InitialAmount
       allowTopUp: simpleTypes.AllowTopUp
       amount: simpleTypes.Amount
@@ -54,10 +55,11 @@ types:
     examples:
       - name: ExampleFindVouchersDTO
         value:
-          voucherId: $simpleTypes.VoucherId.ExampleVoucherId     
+          voucherId: $simpleTypes.VoucherId.ExampleVoucherId
           referenceNo: $simpleTypes.ReferenceNo.ExampleReferenceNo
           voucherType: $simpleTypes.VoucherType.ExampleVoucherType
           description: $simpleTypes.Description.ExampleDescription
+          voucherTypeDescription: $simpleTypes.VoucherTypeDescription.ExampleVoucherTypeDescription
           startingDate: $simpleTypes.StartingDate.ExampleStartingDate
           endingDate: $simpleTypes.EndingDate.ExampleEndingDate
           initialAmount: $simpleTypes.InitialAmount.ExampleInitialAmount
