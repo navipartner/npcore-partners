@@ -13,7 +13,10 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         AppliesToDocType: Enum "Gen. Journal Document Type";
         AppliesToDocNo: Code[20];
         DeferralCode: Code[10];
+        GlobalDim1Code: Code[20];
+        GlobalDim2Code: Code[20];
         PostingDescription: Text;
+        DimensionSetID: Integer;
     begin
         if SubscriptionRequest.Posted then
             exit(true);
@@ -25,6 +28,17 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         RecurringPaymentSetup.TestField("Revenue Account");
         RecurringPaymentSetup.TestField("Source Code");
         RecurringPaymentSetup.CheckSourceCodeIsValid();
+
+        // Calculate dimension set ID from multiple sources
+        DimensionSetID := GetDimensionSetID(
+            RecurringPaymentSetup,
+            Membership."Customer No.",
+            Enum::"Gen. Journal Account Type"::"G/L Account",
+            RecurringPaymentSetup."Revenue Account",
+            RecurringPaymentSetup."Source Code",
+            GlobalDim1Code,
+            GlobalDim2Code);
+
         if SubscriptionRequest."Posting Document No." = '' then
             SubscriptionRequest."Posting Document No." := GetPostingDocumentNo(RecurringPaymentSetup);
         PostingDescription := StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date");
@@ -42,7 +56,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
             SubscriptionRequest."Posting Document Type", SubscriptionRequest."Posting Document No.", SubscriptionRequest."Posting Date",
             GenJnlLine."Account Type"::"G/L Account", RecurringPaymentSetup."Revenue Account",
             -SubscriptionRequest.Amount, SubscriptionRequest."Currency Code", true,
-            0, RecurringPaymentSetup."Source Code", PostingDescription);
+            DimensionSetID, GlobalDim1Code, GlobalDim2Code, RecurringPaymentSetup."Source Code", PostingDescription);
         AssignAndCalculateDeferralSchedule(SubscriptionRequest, GenJnlLine, DeferralCode);
         SubscriptionRequest."G/L Entry No." := GenJnlPostLine.RunWithCheck(GenJnlLine);
         SubscriptionRequest.Posted := SubscriptionRequest."G/L Entry No." <> 0;
@@ -52,7 +66,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
             SubscriptionRequest."Posting Document Type", SubscriptionRequest."Posting Document No.", SubscriptionRequest."Posting Date",
             GenJnlLine."Account Type"::Customer, Membership."Customer No.",
             SubscriptionRequest.Amount, SubscriptionRequest."Currency Code", false,
-            0, RecurringPaymentSetup."Source Code", PostingDescription);
+            DimensionSetID, GlobalDim1Code, GlobalDim2Code, RecurringPaymentSetup."Source Code", PostingDescription);
         if AppliesToDocNo <> '' then begin
             GenJnlLine."Applies-to Doc. Type" := AppliesToDocType;
             GenJnlLine."Applies-to Doc. No." := AppliesToDocNo;
@@ -112,8 +126,11 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         AppliesToDocType: Enum "Gen. Journal Document Type";
         PaymentAccountType: Enum "Gen. Journal Account Type";
         AppliesToDocNo: Code[20];
+        GlobalDim1Code: Code[20];
+        GlobalDim2Code: Code[20];
         PaymentAccountNo: Code[20];
         PostingDescription: Text;
+        DimensionSetID: Integer;
     begin
         if SubscrPaymentRequest.Posted then
             exit;
@@ -129,18 +146,31 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         //Payment account
         SubscrPaymentIHandler := SubscrPaymentRequest.PSP;
         SubscrPaymentIHandler.GetPaymentPostingAccount(PaymentAccountType, PaymentAccountNo);
+
+        // Calculate dimension set ID from multiple sources
+        DimensionSetID := GetDimensionSetID(
+            RecurringPaymentSetup,
+            Membership."Customer No.",
+            PaymentAccountType,
+            PaymentAccountNo,
+            RecurringPaymentSetup."Source Code",
+            GlobalDim1Code,
+            GlobalDim2Code);
+
         InitGenJnlLine(GenJnlLine,
             SubscrPaymentRequest."Posting Document Type", SubscrPaymentRequest."Posting Document No.", SubscrPaymentRequest."Posting Date",
             PaymentAccountType, PaymentAccountNo,
             SubscrPaymentRequest.Amount, SubscrPaymentRequest."Currency Code", false,
-            0, RecurringPaymentSetup."Source Code", PostingDescription);
+            DimensionSetID, GlobalDim1Code, GlobalDim2Code, RecurringPaymentSetup."Source Code", PostingDescription);
         SubscrPaymentRequest."G/L Entry No." := GenJnlPostLine.RunWithCheck(GenJnlLine);
         SubscrPaymentRequest.Posted := SubscrPaymentRequest."G/L Entry No." <> 0;
 
         //Customer account
-        GenJnlLine."Account Type" := GenJnlLine."Account Type"::Customer;
-        GenJnlLine.Validate("Account No.", Membership."Customer No.");
-        GenJnlLine.Validate(Amount, -GenJnlLine.Amount);
+        InitGenJnlLine(GenJnlLine,
+            SubscrPaymentRequest."Posting Document Type", SubscrPaymentRequest."Posting Document No.", SubscrPaymentRequest."Posting Date",
+            GenJnlLine."Account Type"::Customer, Membership."Customer No.",
+            -SubscrPaymentRequest.Amount, SubscrPaymentRequest."Currency Code", false,
+            DimensionSetID, GlobalDim1Code, GlobalDim2Code, RecurringPaymentSetup."Source Code", PostingDescription);
         GenJnlLine."Applies-to Doc. Type" := AppliesToDocType;
         GenJnlLine."Applies-to Doc. No." := AppliesToDocNo;
         GenJnlPostLine.RunWithCheck(GenJnlLine);
@@ -152,9 +182,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
                                    DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; PostingDate: Date;
                                    AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
                                    Amount: Decimal; CurrencyCode: Code[20]; UseVAT: Boolean;
-                                   DimensionSetID: Integer; SourceCode: Code[10]; Description: Text)
-    var
-        DimMgt: Codeunit DimensionManagement;
+                                   DimensionSetID: Integer; GlobalDim1Code: Code[20]; GlobalDim2Code: Code[20]; SourceCode: Code[10]; Description: Text)
     begin
         GenJnlLine.Init();
         GenJnlLine.SetSuppressCommit(true);
@@ -171,7 +199,8 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         GenJnlLine.Description := CopyStr(Description, 1, MaxStrLen(GenJnlLine.Description));
         if DimensionSetID <> 0 then begin
             GenJnlLine."Dimension Set ID" := DimensionSetID;
-            DimMgt.UpdateGlobalDimFromDimSetID(GenJnlLine."Dimension Set ID", GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code");
+            GenJnlLine."Shortcut Dimension 1 Code" := GlobalDim1Code;
+            GenJnlLine."Shortcut Dimension 2 Code" := GlobalDim2Code;
         end;
         GenJnlLine."Source Code" := SourceCode;
     end;
@@ -501,5 +530,35 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
     begin
         GLAccount.Get(RevenueAccount);
         GLAccount.TestField("Default Deferral Template Code", '');
+    end;
+
+    local procedure GetDimensionSetID(RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup"; CustomerNo: Code[20]; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; SourceCode: Code[10]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20]): Integer
+    var
+        DimMgt: Codeunit DimensionManagement;
+#if not (BC17 or BC18 or BC19)
+        DimSource: List of [Dictionary of [Integer, Code[20]]];
+#else
+        TableID: array[10] of Integer;
+        No: array[10] of Code[20];
+#endif
+    begin
+#if not (BC17 or BC18 or BC19)
+        // BC20+ uses DimSource list pattern
+        DimMgt.AddDimSource(DimSource, Database::"NPR MM Recur. Paym. Setup", RecurringPaymentSetup.Code);
+        DimMgt.AddDimSource(DimSource, Database::Customer, CustomerNo);
+        DimMgt.AddDimSource(DimSource, DimMgt.TypeToTableID1(AccountType.AsInteger()), AccountNo);
+
+        exit(DimMgt.GetDefaultDimID(DimSource, SourceCode, GlobalDim1Code, GlobalDim2Code, 0, Database::Customer));
+#else
+        // BC17-19 uses array pattern
+        TableID[1] := Database::"NPR MM Recur. Paym. Setup";
+        No[1] := RecurringPaymentSetup.Code;
+        TableID[2] := Database::Customer;
+        No[2] := CustomerNo;
+        TableID[3] := DimMgt.TypeToTableID1(AccountType.AsInteger());
+        No[3] := AccountNo;
+
+        exit(DimMgt.GetDefaultDimID(TableID, No, SourceCode, GlobalDim1Code, GlobalDim2Code, 0, Database::Customer));
+#endif
     end;
 }

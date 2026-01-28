@@ -136,6 +136,37 @@
                     ToolTip = 'Specifies the value of the Revenue Account field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
+                {
+                    ToolTip = 'Specifies the default value for Global Dimension 1 on subscription posting transactions.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
+                {
+                    ToolTip = 'Specifies the default value for Global Dimension 2 on subscription posting transactions.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(navigation)
+        {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+#if BC17 or BC18
+                RunPageLink = "Table ID" = const(6060093), "No." = field(Code);
+#else   
+                RunPageLink = "Table ID" = const(Database::"NPR MM Recur. Paym. Setup"), "No." = field(Code);
+#endif
+                ShortCutKey = 'Alt+D';
+                ToolTip = 'View or edit default dimensions for subscription postings. These dimensions will be applied to all G/L entries created during subscription renewals.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }

@@ -126,6 +126,30 @@ table 6060093 "NPR MM Recur. Paym. Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Renewal Sched Hdr".Code;
         }
+        field(130; "Global Dimension 1 Code"; Code[20])
+        {
+            CaptionClass = '1,1,1';
+            Caption = 'Global Dimension 1 Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
+
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+            end;
+        }
+        field(131; "Global Dimension 2 Code"; Code[20])
+        {
+            CaptionClass = '1,1,2';
+            Caption = 'Global Dimension 2 Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
+
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+            end;
+        }
     }
 
     keys
@@ -134,6 +158,21 @@ table 6060093 "NPR MM Recur. Paym. Setup"
         {
         }
     }
+
+    trigger OnInsert()
+    var
+        DimMgt: Codeunit DimensionManagement;
+    begin
+        DimMgt.UpdateDefaultDim(Database::"NPR MM Recur. Paym. Setup", Code, "Global Dimension 1 Code", "Global Dimension 2 Code");
+    end;
+
+    trigger OnDelete()
+    var
+        DimMgt: Codeunit DimensionManagement;
+    begin
+        DimMgt.DeleteDefaultDim(Database::"NPR MM Recur. Paym. Setup", Code);
+    end;
+
     internal procedure CheckSourceCodeIsValid()
     var
         SourceCodeSetup: Record "Source Code Setup";
@@ -146,5 +185,16 @@ table 6060093 "NPR MM Recur. Paym. Setup"
         JournalsSourceCodesList.Add(SourceCodeSetup."Sales Journal");
         if JournalsSourceCodesList.Contains("Source Code") then
             Error(InValidSourceCodeErr, "Source Code");
+    end;
+
+    local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    var
+        DimMgt: Codeunit DimensionManagement;
+    begin
+        DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
+        if not IsTemporary() then begin
+            DimMgt.SaveDefaultDim(Database::"NPR MM Recur. Paym. Setup", Code, FieldNumber, ShortcutDimCode);
+            Modify();
+        end;
     end;
 }
