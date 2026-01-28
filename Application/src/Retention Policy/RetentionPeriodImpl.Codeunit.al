@@ -1,9 +1,10 @@
-#if (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
 codeunit 6014499 "NPR Retention Period Impl." implements "Retention Period"
 {
     // based on codeunit 3900 "Retention Period Impl." from System App
-
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-01-28';
+    ObsoleteReason = 'No longer relevant, as NaviPartner uses its own retention policy handler in BC26+.';
 
     var
         WrongInterfaceImplementationErr: Label 'This implementation of the interface does not support the enum value selected. Contact your Microsoft partner for assistance. The following information can help them address the issue: Value: %1, Interface: Interface Retention Period, Implementation: codeunit 3900 Retention Period Impl.', Comment = '%1 = a value such as 1 Week, 1 Month, 3 Months, or Custom.';
@@ -92,4 +93,3 @@ codeunit 6014499 "NPR Retention Period Impl." implements "Retention Period"
         exit(RetentionPolicyLogCategory::"Retention Policy - Period");
     end;
 }
-#endif

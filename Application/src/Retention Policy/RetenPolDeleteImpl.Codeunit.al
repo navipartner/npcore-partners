@@ -1,8 +1,11 @@
-#if (BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+#if not (BC17 or BC18)
 codeunit 6059920 "NPR Reten. Pol. Delete. Impl." implements "Reten. Pol. Deleting"
 {
     // based on codeunit 3916 "Reten. Pol. Delete. Impl." from Base App
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-01-28';
+    ObsoleteReason = 'No longer relevant, as NaviPartner uses its own retention policy handler in BC26+.';
 
     var
         TooManyRecordsToDeleteLbl: Label 'Reached the maximum number of records that can be deleted at the same time. The maximum number allowed is %1.', Comment = '%1 = integer';
