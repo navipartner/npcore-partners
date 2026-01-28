@@ -1,13 +1,16 @@
-#if (BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+#if not (BC17 or BC18)
 codeunit 6184619 "NPR Retention Policy Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-01-28';
+    ObsoleteReason = 'No longer relevant, as NaviPartner uses its own retention policy handler in BC26+.';
 
     var
         ModifyErrMsgLbl: Label 'The retention policy setup for table %1 %2 has been predefined by NaviPartner, and cannot be changed. However, you can modify the Retention Period for lines that are not locked.', Comment = '%1 - table number, %2 - table caption';
         InvalidRetentionPeriodErrLbl: Label 'Changing Retention period to %1 is not permitted by NaviPartner. You have the option to select retention periods that will guarantee the proper cleanup of data after the specified time.', Comment = '%1 - Retention Period';
 
-#region Setting filters on table
+    #region Setting filters on table
 
     internal procedure FindOrDeleteRecords(var RecRef: RecordRef; var ProcessedCount: Integer; Operation: Option Find,Delete)
     var
@@ -94,9 +97,9 @@ codeunit 6184619 "NPR Retention Policy Mgt."
         until (NcTask.Next() = 0) or RecordLimitExceeded;
     end;
 
-#endregion
+    #endregion
 
-#region Helper functions
+    #region Helper functions
 
     internal procedure CalculateRetentionPeriodDateFormula(RetentionPeriod: Record "Retention Period"): Text
     var
@@ -166,18 +169,18 @@ codeunit 6184619 "NPR Retention Policy Mgt."
             exit(AllObjWithCaption."Object Caption");
     end;
 
-#endregion
+    #endregion
 
-#region Constants 
+    #region Constants 
 
     internal procedure MaxNumberOfRecordsToDelete(): Integer
     begin
         exit(10000);
     end;
 
-#endregion
+    #endregion
 
-#region Subscribers
+    #region Subscribers
 
     [EventSubscriber(ObjectType::Page, Page::"Retention Policy Setup Lines", 'OnModifyRecordEvent', '', false, false)]
     local procedure RetentionPolicySetupLines_OnModifyRecordEvent(var Rec: Record "Retention Policy Setup Line"; var xRec: Record "Retention Policy Setup Line")
@@ -210,6 +213,6 @@ codeunit 6184619 "NPR Retention Policy Mgt."
         Error(ModifyErrMsgLbl, Rec."Table ID", GetTableCaption(Rec."Table ID"));
     end;
 
-#endregion
+    #endregion
 }
 #endif
