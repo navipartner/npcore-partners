@@ -93,7 +93,7 @@
         }
         field(21; "Social Security No."; Text[30])
         {
-            Caption = 'Social Security No.';
+            Caption = 'National Identification Number';
             DataClassification = CustomerContent;
         }
         field(22; Address; Text[100])
@@ -175,6 +175,11 @@
         field(35; "E-Mail Address"; Text[80])
         {
             Caption = 'E-Mail Address';
+            DataClassification = CustomerContent;
+        }
+        field(36; NationalIdentifierType; Enum "NPR NationalIdentifierType")
+        {
+            Caption = 'National Identifier Type';
             DataClassification = CustomerContent;
         }
         field(40; "Notification Method"; Option)

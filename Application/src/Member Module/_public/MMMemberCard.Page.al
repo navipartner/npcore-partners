@@ -68,11 +68,24 @@
                         ValidateMemberPhoneNumber(Rec);
                     end;
                 }
-                field("Social Security No."; Rec."Social Security No.")
+                field("Social Security No."; _NationalIdentifierValue)
                 {
+                    Caption = 'National Identification Number';
                     ToolTip = 'Specifies the value of the Social Security No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    var
+                        NationalIdentifierPage: Page "NPR MemberNationalIdentifier";
+                    begin
+                        NationalIdentifierPage.SetMember(Rec);
+                        NationalIdentifierPage.RunModal();
+                        CurrPage.Update(false);
+                    end;
                 }
+
+
                 field(Address; Rec.Address)
                 {
 
@@ -803,6 +816,25 @@
                 end;
             }
 
+            action(ChangeMemberNationalIdentifier)
+            {
+                Caption = 'Change Members National Identifier';
+                Ellipsis = true;
+                Image = Union;
+                Promoted = false;
+                ToolTip = 'Executes the action to update national identifier.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    SetNationalIdentifierPage: Page "NPR MemberNationalIdentifier";
+                begin
+                    SetNationalIdentifierPage.SetMember(Rec);
+                    SetNationalIdentifierPage.RunModal();
+                    CurrPage.Update(false);
+                end;
+            }
+
         }
         area(navigation)
         {
@@ -1055,6 +1087,8 @@
         if MCF_MemberOfVisible then
             MCF_MemberOf :=
                 HLMultiChoiceFieldMgt.GetAssignedHLMultiChoiceFieldOptionValuesAsString(Rec.RecordId(), HLIntegrationSetup."Member of MCF Code", 1);
+
+        _NationalIdentifierValue := GetMaskedNationalIdentifierValue(Rec);
     end;
 
     trigger OnOpenPage()
@@ -1123,6 +1157,8 @@
         NO_ENTRIES: Label 'No entries found for member %1.';
         _CloudflareMediaVisible: Boolean;
 
+        _NationalIdentifierValue: Text[30];
+
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
 
@@ -1177,6 +1213,18 @@
         MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MemberManagement.ValidateMemberEmail(Member)
+    end;
+
+    local procedure GetMaskedNationalIdentifierValue(Member: Record "NPR MM Member"): Text[30]
+    var
+        NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
+    begin
+        if (Member.NationalIdentifierType.Ordinals.Contains(Member.NationalIdentifierType.AsInteger())) then
+            NationalIdentifierInterface := Member.NationalIdentifierType
+        else
+            NationalIdentifierInterface := Enum::"NPR NationalIdentifierType"::NONE;
+
+        exit(NationalIdentifierInterface.ShowMasked(Member."Social Security No."));
     end;
 
 }

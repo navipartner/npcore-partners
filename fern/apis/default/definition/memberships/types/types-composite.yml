@@ -506,6 +506,7 @@ types:
     properties:
       gdprConsent: optional<simpleTypes.GDPRConsent>
       preassignedContactNumber: optional<simpleTypes.PreassignedContactNumber>
+      nationalIdentifier: optional<NationalIdentifierRequest>
     examples:
       - name : ExampleMember
         value:
@@ -522,6 +523,7 @@ types:
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
           attributes: []
+          nationalIdentifier: $NationalIdentifierRequest.ExampleCpr
 
   MemberEntityResponse:
     docs:
@@ -532,6 +534,7 @@ types:
     properties:
       memberId: simpleTypes.MemberId
       memberNumber: simpleTypes.MemberNumber
+      nationalIdentifier: optional<NationalIdentifierResponse>
       blocked: simpleTypes.Blocked
       hasPicture: optional<simpleTypes.HasPicture>
       hasNotes: optional<simpleTypes.HasNotes>
@@ -548,6 +551,7 @@ types:
           city: $simpleTypes.City.ExampleCity
           country: $simpleTypes.Country.ExampleCountry
           birthday: $simpleTypes.Birthday.ExampleBirthday
+          nationalIdentifier: $NationalIdentifierResponse.ExampleCpr
           gender: $simpleTypes.Gender.ExampleGender
           newsletter: $simpleTypes.Newsletter.ExampleNewsletter
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
@@ -569,6 +573,7 @@ types:
           city: $simpleTypes.City.ExampleCity
           country: $simpleTypes.Country.ExampleCountry
           birthday: $simpleTypes.Birthday.ExampleBirthday
+          nationalIdentifier: $NationalIdentifierResponse.ExampleCpr
           gender: $simpleTypes.Gender.ExampleGender
           newsletter: $simpleTypes.Newsletter.ExampleNewsletter
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
@@ -1257,3 +1262,39 @@ types:
 
 
 ###########################
+
+  NationalIdentifierRequest:
+    docs: 
+      A NationalIdentifier is used to represent a person's national identification number in a structured way.
+      It includes the type of identifier and its value.
+    properties:
+      type: simpleTypes.NationalIdentifierType
+      value: simpleTypes.NationalIdentifierValue
+    examples:
+      - name: ExampleCpr
+        value:
+          type: $simpleTypes.NationalIdentifierType.DK_CPR
+          value: $simpleTypes.NationalIdentifierValue.DK_CPR
+      - name: ExampleSsn
+        value:
+          type: $simpleTypes.NationalIdentifierType.SE_PNR
+          value: $simpleTypes.NationalIdentifierValue.SE_PNR
+
+  NationalIdentifierResponse:
+    docs: 
+      A NationalIdentifier is used to represent a person's national identification number in a structured way.
+      It includes the type of identifier and its value. 
+    properties:
+      type: simpleTypes.NationalIdentifierType  
+      description: simpleTypes.NationalIdentifierDescription
+      canonical: simpleTypes.NationalIdentifierCanonical  
+      unmasked: simpleTypes.NationalIdentifierUnmasked
+      masked: simpleTypes.NationalIdentifierMasked
+    examples:
+      - name: ExampleCpr
+        value:
+          type: $simpleTypes.NationalIdentifierType.DK_CPR
+          description: "DK CPR number"
+          canonical: $simpleTypes.NationalIdentifierCanonical.DK_CPR
+          unmasked: $simpleTypes.NationalIdentifierUnmasked.DK_CPR
+          masked: $simpleTypes.NationalIdentifierMasked.DK_CPR

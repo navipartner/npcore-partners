@@ -3238,6 +3238,7 @@
         MemberInfoCapture."First Name" := Member."First Name";
         MemberInfoCapture."Middle Name" := Member."Middle Name";
         MemberInfoCapture."Last Name" := Member."Last Name";
+        MemberInfoCapture.NationalIdentifierType := Member.NationalIdentifierType;
         MemberInfoCapture."Social Security No." := Member."Social Security No.";
         MemberInfoCapture.Address := Member.Address;
         MemberInfoCapture."Post Code Code" := Member."Post Code Code";
@@ -5188,6 +5189,8 @@
         OutStr: OutStream;
         CountryName: Text;
         PlaceHolderLbl: Label '%1%2', Locked = true;
+        NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
+        ErrorMessage: Text;
     begin
 
         CurrentMember.Copy(Member);
@@ -5238,7 +5241,16 @@
         Member."E-Mail Address" := DeleteCtrlChars(Member."E-Mail Address");
 #pragma warning restore
         Member."Phone No." := MemberInfoCapture."Phone No.";
+
+        Member.NationalIdentifierType := ENUM::"NPR NationalIdentifierType"::NONE;
         Member."Social Security No." := MemberInfoCapture."Social Security No.";
+        if (MemberInfoCapture."Social Security No." <> '') then begin
+            Member.NationalIdentifierType := MemberInfoCapture.NationalIdentifierType;
+            NationalIdentifierInterface := Member.NationalIdentifierType;
+            if (not NationalIdentifierInterface.TryParse(MemberInfoCapture."Social Security No.", Member."Social Security No.", ErrorMessage)) then
+                Error('[-127101] %1', ErrorMessage);
+        end;
+
         Member.Gender := MemberInfoCapture.Gender;
         Member.Birthday := MemberInfoCapture.Birthday;
         Member."E-Mail News Letter" := MemberInfoCapture."News Letter";

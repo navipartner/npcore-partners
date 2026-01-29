@@ -79,8 +79,9 @@
                     ToolTip = 'Specifies the value of the Gender field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
-                field("Social Security No."; Rec."Social Security No.")
+                field("Social Security No."; _NationalIdentificationNumber)
                 {
+                    Caption = 'National Identification Number';
                     ToolTip = 'Specifies the value of the Social Security No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -152,4 +153,18 @@
             }
         }
     }
+
+    var
+        _NationalIdentificationNumber: Text[30];
+
+    trigger OnAfterGetCurrRecord()
+    var
+        NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
+    begin
+        if (not Rec.NationalIdentifierType.Ordinals.Contains(Rec.NationalIdentifierType.AsInteger())) then
+            Rec.NationalIdentifierType := Enum::"NPR NationalIdentifierType"::NONE;
+
+        NationalIdentifierInterface := Rec.NationalIdentifierType;
+        _NationalIdentificationNumber := NationalIdentifierInterface.ShowMasked(Rec."Social Security No.");
+    end;
 }

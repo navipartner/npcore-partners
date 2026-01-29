@@ -322,6 +322,7 @@
         Member."Middle Name" := '-';
         Member."Last Name" := '--------';
         Member."Phone No." := '';
+        Member.NationalIdentifierType := Enum::"NPR NationalIdentifierType"::NONE;
         Member."Social Security No." := '';
         Member.Address := '-------- --';
         Member."Post Code Code" := '';

@@ -268,7 +268,14 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (ErrorMessage.StartsWith('[-127009]')) then
             exit(Enum::"NPR API Error Code"::member_unique_id_violation);
 
+        if (ErrorMessage.StartsWith('[-127100]')) then
+            exit(Enum::"NPR API Error Code"::invalid_national_identifier_type);
+
+        if (ErrorMessage.StartsWith('[-127101]')) then
+            exit(Enum::"NPR API Error Code"::invalid_national_identifier_value);
+
         exit(Enum::"NPR API Error Code"::generic_error);
+
     end;
 
     local procedure LogMessage(Request: Codeunit "NPR API Request";

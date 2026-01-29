@@ -1350,6 +1350,7 @@
         MemberInfoCapture."Phone No." := CopyStr(Member."Phone No.", 1, MaxStrLen(MemberInfoCapture."Phone No."));
         MemberInfoCapture."E-Mail Address" := CopyStr(Member."E-Mail Address", 1, MaxStrLen(MemberInfoCapture."E-Mail Address"));
 
+        MemberInfoCapture.NationalIdentifierType := Member.NationalIdentifierType;
         MemberInfoCapture."Social Security No." := CopyStr(Member."Social Security No.", 1, MaxStrLen(MemberInfoCapture."Social Security No."));
         MemberInfoCapture.Gender := Member.Gender;
         MemberInfoCapture.Birthday := Member.Birthday;

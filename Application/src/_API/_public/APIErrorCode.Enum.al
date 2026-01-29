@@ -164,6 +164,17 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The admit token was marked as failed by API consumer.', Locked = true;
     }
+
+    value(6060131; invalid_national_identifier_value)
+    {
+        Caption = 'The provided national identifier value is not valid.', Locked = true;
+    }
+
+    value(6060132; invalid_national_identifier_type)
+    {
+        Caption = 'The provided national identifier type is invalid.', Locked = true;
+    }
+
     value(6060133; member_blocked)
     {
         Caption = 'Member is blocked.', Locked = true;

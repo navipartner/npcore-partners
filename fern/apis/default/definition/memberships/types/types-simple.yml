@@ -929,3 +929,73 @@ types:
     examples:
       - name: ExampleHasNotes
         value: true
+
+  NationalIdentifierType:
+    type  : string
+    docs  : |      
+      Type of national ID. Available values are implementation dependent. Common values are
+        - *none* : No national ID provided / free text, without validation is always allowed
+        - *dk_cpr* : (example) Danish CPR number [dk_cpr, dk_cvr, dk_vat] requires customization.
+        - *se_pnr* : (example) Swedish PNR number [se_pnr, se_cnr, se_onr, se_vat] requires customization.
+    examples:
+      - name: NONE
+        value: "none"
+      - name: DK_CPR
+        value: "dk_cpr"
+      - name: SE_PNR
+        value: "se_pnr"
+
+  NationalIdentifierDescription:
+    type: string
+    docs: Description of the national ID
+    examples:
+      - name: NONE
+        value: "No national ID"
+      - name: DK_CPR
+        value: "DK CPR number"
+      - name: SE_PNR
+        value: "SE PNR number"  
+
+  NationalIdentifierCanonical:
+    type: string
+    docs: Canonical form of the national ID
+    examples:
+      - name: NONE
+        value: "abcdefghijkl" 
+      - name: DK_CPR
+        value: "1111111118"
+      - name: SE_PNR
+        value: "YYYYMMDDXXXX"
+
+  NationalIdentifierUnmasked:
+    type: string
+    docs: Unmasked form of the national ID
+    examples:
+      - name: NONE
+        value: "abcdefghijkl"
+      - name: DK_CPR
+        value: "111111-1118"
+      - name: SE_PNR
+        value: "YYYYMMDD-XXXX"
+
+  NationalIdentifierMasked:
+    type: string
+    docs: Masked form of the national ID
+    examples:
+      - name: NONE
+        value: "abcdefghijkl"
+      - name: DK_CPR
+        value: "111111-****"
+      - name: SE_PNR
+        value: "YYYYMMDD-****"
+  
+  NationalIdentifierValue:
+    type: string
+    docs: User provided form of the national ID, it will be validated according to the type
+    examples:
+      - name: NONE
+        value: "abcdefghijkl"
+      - name: DK_CPR
+        value: "111111-1118"
+      - name: SE_PNR
+        value: "YYYYMMDD-XXXX"

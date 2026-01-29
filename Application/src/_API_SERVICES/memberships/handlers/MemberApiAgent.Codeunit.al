@@ -482,6 +482,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
         MemberInfoCapture."Phone No." := Member."Phone No.";
         MemberInfoCapture."Social Security No." := Member."Social Security No.";
+        MemberInfoCapture.NationalIdentifierType := Member.NationalIdentifierType;
 
         MemberInfoCapture.Gender := Member.Gender;
         MemberInfoCapture.Birthday := Member.Birthday;
@@ -496,8 +497,11 @@ codeunit 6248220 "NPR MemberApiAgent"
     local procedure DeserializeMemberRequest(var Request: Codeunit "NPR API Request"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         Body, MemberJson, CardJson : JsonObject;
-        JToken: JsonToken;
+        JToken, JToken2 : JsonToken;
         Language: Record "NPR MM Language";
+        NationalIdentifierValue: Text;
+        NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
+        ErrorMessage: Text;
     begin
 
         Body := Request.BodyJson().AsObject();
@@ -603,6 +607,20 @@ codeunit 6248220 "NPR MemberApiAgent"
         if (MemberJson.Get('storeCode', JToken)) then
             if (not JToken.AsValue().IsNull()) then
                 MemberInfoCapture."Store Code" := JToken.AsValue().AsText();
+
+        if (MemberJson.Get('nationalIdentifier', JToken)) then
+            if (JToken.AsObject().Get('value', JToken2)) then
+                if (not JToken2.AsValue().IsNull()) then begin
+                    MemberInfoCapture."Social Security No." := CopyStr(JToken2.AsValue().AsText(), 1, MaxStrLen(MemberInfoCapture."Social Security No."));
+
+                    JToken.AsObject().Get('type', JToken2); // Required if value is provided
+                    if (not Evaluate(MemberInfoCapture.NationalIdentifierType, JToken2.AsValue().AsText())) then
+                        Error('[-127100] Invalid national identifier type.');
+
+                    NationalIdentifierInterface := MemberInfoCapture.NationalIdentifierType;
+                    if (not NationalIdentifierInterface.TryParse(MemberInfoCapture."Social Security No.", NationalIdentifierValue, ErrorMessage)) then
+                        Error('[-127101] %1', ErrorMessage);
+                end;
 
         if (Request.QueryParams().ContainsKey('allowMergeOnConflict')) then
             MemberInfoCapture.AllowMergeOnConflict := (Request.QueryParams().Get('allowMergeOnConflict').ToLower() in ['true', '1']);
@@ -768,11 +786,34 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('email', Member."E-Mail Address")
             .AddProperty('phoneNo', Member."Phone No.")
             .AddProperty('birthday', Format(Member.Birthday, 0, 9))
+            .AddObject(IncludeNationalIdentification(ResponseJson, Member))
             .AddProperty('hasPicture', MemberHasPicture(Member))
             .AddProperty('hasNotes', Member.HasLinks())
             .AddProperty('preferredLanguage', Member.PreferredLanguageCode)
             .AddProperty('storeCode', Member."Store Code")
             .AddArray(MemberAttributes.MemberAttributesDTO(ResponseJson, Member."Entry No."));
+        exit(ResponseJson);
+    end;
+
+    local procedure IncludeNationalIdentification(ResponseJson: Codeunit "NPR JSON Builder"; Member: Record "NPR MM Member"): Codeunit "NPR JSON Builder"
+    var
+        NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
+    begin
+        if (Member."Social Security No." = '') then
+            exit(ResponseJson);
+
+        if (not Member.NationalIdentifierType.Ordinals.Contains(Member.NationalIdentifierType.AsInteger())) then
+            Member.NationalIdentifierType := Enum::"NPR NationalIdentifierType"::NONE;
+
+        NationalIdentifierInterface := Member.NationalIdentifierType;
+
+        ResponseJson.StartObject('nationalIdentifier')
+            .AddProperty('type', Member.NationalIdentifierType.Names().Get(Member.NationalIdentifierType.Ordinals.IndexOf(Member.NationalIdentifierType.AsInteger())).ToLower())
+            .AddProperty('description', NationalIdentifierInterface.DisplayName())
+            .AddProperty('canonical', Member."Social Security No.")
+            .AddProperty('unmasked', NationalIdentifierInterface.ShowUnMasked(Member."Social Security No."))
+            .AddProperty('masked', NationalIdentifierInterface.ShowMasked(Member."Social Security No."))
+            .EndObject();
         exit(ResponseJson);
     end;
 

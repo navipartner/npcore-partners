@@ -348,13 +348,37 @@
                         CurrPage.Update();
                     end;
                 }
-                field("Social Security No."; Rec."Social Security No.")
-                {
 
-                    Importance = Additional;
-                    ShowMandatory = _SSNMandatory;
-                    ToolTip = 'Specifies the value of the Social Security No. field';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                group(NationalIdentifierGroup)
+                {
+                    Caption = 'National Identifier';
+                    field(NationalIdentifierType; Rec.NationalIdentifierType)
+                    {
+                        Caption = 'Type';
+                        Importance = Additional;
+                        ShowMandatory = _SSNMandatory;
+                        ToolTip = 'Specifies the value of the National Identifier Type field';
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                        trigger OnValidate()
+                        begin
+                            ValidateNationalIdentifier();
+                        end;
+                    }
+                    field("Social Security No."; Rec."Social Security No.")
+                    {
+                        Importance = Additional;
+                        ShowMandatory = _SSNMandatory or (Rec.NationalIdentifierType <> Rec.NationalIdentifierType::None);
+                        ToolTip = 'Specifies the value of the Social Security No. field';
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                        Style = Attention;
+                        StyleExpr = NOT _NationalIdentifierValid;
+
+                        trigger OnValidate()
+                        begin
+                            ValidateNationalIdentifier();
+                        end;
+                    }
                 }
                 field(Address; Rec.Address)
                 {
@@ -1014,6 +1038,8 @@
         _PhoneNoMandatory: Boolean;
         _FirstNameMandatory: Boolean;
         _SSNMandatory: Boolean;
+
+        _NationalIdentifierValid: Boolean;
         INVALID_VALUE: Label 'The %1 is invalid.';
         _BirthDateMandatory: Boolean;
         ExternalCardNoMandatory: Boolean;
@@ -1162,6 +1188,7 @@
         InfoCapture."Last Name" := Member."Last Name";
         InfoCapture."E-Mail Address" := Member."E-Mail Address";
         InfoCapture."Phone No." := Member."Phone No.";
+        InfoCapture.NationalIdentifierType := Member.NationalIdentifierType;
         InfoCapture."Social Security No." := Member."Social Security No.";
         InfoCapture."Middle Name" := Member."Middle Name";
         InfoCapture."News Letter" := Member."E-Mail News Letter";
@@ -1465,6 +1492,10 @@
                     end;
                 end;
 
+                if (MemberInfoCapture.NationalIdentifierType <> MemberInfoCapture.NationalIdentifierType::None) then
+                    if (not _NationalIdentifierValid) then
+                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Social Security No."), not _NationalIdentifierValid);
+
             end;
         end else begin
             SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
@@ -1548,6 +1579,9 @@
             _BirthDateMandatory := false;
 
         end;
+
+        ValidateNationalIdentifier();
+
     end;
 
     local procedure SetDefaultValues()
@@ -2243,6 +2277,29 @@
             end;
         end;
         ActivationDate := Rec."Document Date";
+    end;
+
+    local procedure ValidateNationalIdentifier()
+    var
+        NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
+        NationalIdentifierCanonical: Text[30];
+        ExpectedInput: Text;
+        ErrorMessage: Text;
+    begin
+
+        NationalIdentifierInterface := Rec.NationalIdentifierType;
+        ExpectedInput := NationalIdentifierInterface.ExpectedInputExample();
+        ErrorMessage := '';
+
+        _NationalIdentifierValid := (Rec.NationalIdentifierType = Rec.NationalIdentifierType::None);
+        if (Rec."Social Security No." = '') then
+            exit;
+
+        _NationalIdentifierValid := NationalIdentifierInterface.TryParse(Rec."Social Security No.", NationalIdentifierCanonical, ErrorMessage);
+        if (not _NationalIdentifierValid) then
+            exit;
+
+        Rec."Social Security No." := NationalIdentifierInterface.ShowUnMasked(NationalIdentifierCanonical);
     end;
 
     procedure SetPOSUnit(PosUnitNoIn: Code[10])
