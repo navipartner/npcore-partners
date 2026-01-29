@@ -5,8 +5,19 @@ codeunit 6184596 "NPR EFT Adyen AbortAcquire Req"
 
     procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
     var
-        Json: Codeunit "Json Text Reader/Writer";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        AuxiliaryOperationID: Integer;
+    begin
+        if EFTTransactionRequest."Processed Entry No." <> 0 then begin
+            OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
+            AuxiliaryOperationID := OriginalEFTTransactionRequest."Auxiliary Operation ID";
+        end;
+        exit(GetRequestJson(EFTTransactionRequest, EFTSetup, AuxiliaryOperationID));
+    end;
+
+    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; AuxiliaryOperationID: Integer): Text
+    var
+        Json: Codeunit "Json Text Reader/Writer";
         ABORT_ACQUIRE_SWIPE_HEADER: Label 'Card Scanned';
         ABORT_ACQUIRE_SWIPE_LINE: Label 'Please Remove Card';
     begin
@@ -24,8 +35,7 @@ codeunit 6184596 "NPR EFT Adyen AbortAcquire Req"
         Json.WriteStartObject('EnableServiceRequest');
         Json.WriteStringProperty('TransactionAction', 'AbortTransaction');
         if EFTTransactionRequest."Processed Entry No." <> 0 then begin
-            OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
-            if OriginalEFTTransactionRequest."Auxiliary Operation ID" in ["NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger(), "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger()] then begin
+            if AuxiliaryOperationID in ["NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger(), "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger()] then begin
                 Json.WriteStartObject('DisplayOutput');
                 Json.WriteStringProperty('Device', 'CustomerDisplay');
                 Json.WriteStringProperty('InfoQualify', 'Display');

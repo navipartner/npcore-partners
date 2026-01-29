@@ -1311,4 +1311,23 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             Parameters.Add('LookupRefNumberOutput', '');
         end;
     end;
+
+    internal procedure AddAbortAcquireParametersToDictionary(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Parameters: Dictionary of [Text, Text])
+    var
+        ProcessedEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        AuxiliaryOperationID: Integer;
+    begin
+        if EFTTransactionRequest."Processed Entry No." <> 0 then
+            if ProcessedEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.") then
+                AuxiliaryOperationID := ProcessedEFTTransactionRequest."Auxiliary Operation ID";
+
+        Parameters.Add('RegisterNo', EFTTransactionRequest."Register No.");
+        Parameters.Add('OriginalPOSPaymentTypeCode', EFTTransactionRequest."Original POS Payment Type Code");
+        Parameters.Add('ProcessedEntryNo', Format(EFTTransactionRequest."Processed Entry No."));
+        Parameters.Add('ReferenceNumberInput', EFTTransactionRequest."Reference Number Input");
+        Parameters.Add('HardwareID', EFTTransactionRequest."Hardware ID");
+        Parameters.Add('IntegrationVersionCode', EFTTransactionRequest."Integration Version Code");
+        Parameters.Add('Mode', Format(EFTTransactionRequest.Mode, 0, 9));
+        Parameters.Add('ProcessedTransactionAuxiliaryOperationID', Format(AuxiliaryOperationID));
+    end;
 }

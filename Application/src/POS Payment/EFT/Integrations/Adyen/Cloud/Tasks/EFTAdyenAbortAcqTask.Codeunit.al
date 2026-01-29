@@ -15,13 +15,29 @@ codeunit 6184616 "NPR EFT Adyen Abort Acq. Task" implements "NPR POS Background 
         Completed: Boolean;
         Logs: Text;
         StatusCode: Integer;
+        ProcessedTransactionAuxiliaryOperationID: Integer;
         EFTAdyenAbortAcquireReq: Codeunit "NPR EFT Adyen AbortAcquire Req";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        EFTTransactionRequest.Get(EntryNo);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+            EFTTransactionRequest."Reference Number Input" := CopyStr(Parameters.Get('ReferenceNumberInput'), 1, MaxStrLen(EFTTransactionRequest."Reference Number Input"));
+            EFTTransactionRequest."Hardware ID" := CopyStr(Parameters.Get('HardwareID'), 1, MaxStrLen(EFTTransactionRequest."Hardware ID"));
+            EFTTransactionRequest."Integration Version Code" := CopyStr(Parameters.Get('IntegrationVersionCode'), 1, MaxStrLen(EFTTransactionRequest."Integration Version Code"));
+            Evaluate(EFTTransactionRequest.Mode, Parameters.Get('Mode'));
+            Evaluate(ProcessedTransactionAuxiliaryOperationID, Parameters.Get('ProcessedTransactionAuxiliaryOperationID'));
+        end else
+            EFTTransactionRequest.Get(EntryNo);
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        Request := EFTAdyenAbortAcquireReq.GetRequestJson(EFTTransactionRequest, EFTSetup);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then
+            Request := EFTAdyenAbortAcquireReq.GetRequestJson(EFTTransactionRequest, EFTSetup, ProcessedTransactionAuxiliaryOperationID)
+        else
+            Request := EFTAdyenAbortAcquireReq.GetRequestJson(EFTTransactionRequest, EFTSetup);
         URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
 
         Completed := EFTAdyenCloudProtocol.InvokeAPI(Request, EFTAdyenCloudIntegrat.GetAPIKey(EFTSetup), URL, 1000 * 60 * 5, Response, StatusCode);
@@ -47,9 +63,16 @@ codeunit 6184616 "NPR EFT Adyen Abort Acq. Task" implements "NPR POS Background 
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        EFTTransactionRequest.Get(EntryNo);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+        end else
+            EFTTransactionRequest.Get(EntryNo);
         Evaluate(Completed, Results.Get('Completed'), 9);
         Logs := Results.Get('Logs');
 
@@ -72,10 +95,17 @@ codeunit 6184616 "NPR EFT Adyen Abort Acq. Task" implements "NPR POS Background 
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        //Trx result unknown - log error and start lookup        
+        //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        EFTTransactionRequest.Get(EntryNo);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+        end else
+            EFTTransactionRequest.Get(EntryNo);
         EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'AbortAcqTaskError', StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack));
         POSActionEFTAdyenCloud.SetAbortStatus(EFTTransactionRequest."Processed Entry No.", false);
         EFTAdyenResponseHandler.ProcessResponse(EntryNo, '', false, false, '');
@@ -88,10 +118,17 @@ codeunit 6184616 "NPR EFT Adyen Abort Acq. Task" implements "NPR POS Background 
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        //Trx result unknown - log error and start lookup        
+        //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
-        EFTTransactionRequest.Get(EntryNo);
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            EFTTransactionRequest."Entry No." := EntryNo;
+            EFTTransactionRequest."Register No." := CopyStr(Parameters.Get('RegisterNo'), 1, MaxStrLen(EFTTransactionRequest."Register No."));
+            EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(Parameters.Get('OriginalPOSPaymentTypeCode'), 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+            Evaluate(EFTTransactionRequest."Processed Entry No.", Parameters.Get('ProcessedEntryNo'));
+        end else
+            EFTTransactionRequest.Get(EntryNo);
         EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'AbortAcqTaskCancelled', '');
         POSActionEFTAdyenCloud.SetAbortStatus(EFTTransactionRequest."Processed Entry No.", false);
         EFTAdyenResponseHandler.ProcessResponse(EntryNo, '', false, false, '');

@@ -450,6 +450,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
     local procedure CancelAcquisition(EntryNo: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        AbortEFTTransactionRequest: Record "NPR EFT Transaction Request";
         AbortReqEntryNo: Integer;
         eftSetup: Record "NPR EFT Setup";
         Parameters: Dictionary of [Text, Text];
@@ -457,6 +458,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         TaskId: Integer;
         EFTAdyenAbortMgmt: Codeunit "NPR EFT Adyen Abort Mgmt";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
         EFTTransactionRequest.Get(EntryNo);
         EftSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
@@ -465,6 +467,10 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         AbortReqEntryNo := EFTAdyenAbortMgmt.CreateAbortAcquireCardRequest(EFTTransactionRequest);
 
         Parameters.Add('EntryNo', Format(AbortReqEntryNo));
+        if FeatureFlagsManagement.IsEnabled('adyenBackgroundTaskOptimization') then begin
+            AbortEFTTransactionRequest.Get(AbortReqEntryNo);
+            EFTAdyenIntegration.AddAbortAcquireParametersToDictionary(AbortEFTTransactionRequest, Parameters);
+        end;
         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ACQ_ABORT, Parameters, 1000 * 10);
         _trxAbortStatus.Set(EFTTransactionRequest."Entry No.", true);
     end;
