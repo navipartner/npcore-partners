@@ -16,9 +16,7 @@ codeunit 6184758 "NPR Vipps Mp Webhook Setup"
 #pragma warning restore AA0139
         VippsMpWebhook.Modify();
         foreach I in VippsMpWebhookEvents.Ordinals() do begin
-            // Skip QR_CHECKED_IN event: https://linear.app/navipartner/issue/HWD-729/vippsmobilepay-webhook-error-sport24
-            if I <> Enum::"NPR Vipps Mp WebhookEvents"::QR_CHECKED_IN.AsInteger() then
-                EventList.Add(Enum::"NPR Vipps Mp WebhookEvents".FromInteger(I));
+            EventList.Add(Enum::"NPR Vipps Mp WebhookEvents".FromInteger(I));
         end;
         if (not VippsMpWebhookAPI.RegisterWebhook(VippsMpWebhook."Webhook Url", EventList, VippsMpStore, Resp)) then begin
             VippsMpWebhook.Delete();
