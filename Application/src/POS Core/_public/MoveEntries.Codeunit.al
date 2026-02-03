@@ -66,6 +66,7 @@ codeunit 6151479 "NPR Move Entries"
             Error(EntriesInOpenFiscalYearErr, Item.TableCaption(), Item."No.");
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::MoveEntries, 'OnAfterMoveItemEntries', '', false, false)]
     local procedure UpdateItemNoInLedgerEntries(Item: Record Item; var ItemLedgerEntry: Record "Item Ledger Entry")
     var
@@ -119,6 +120,66 @@ codeunit 6151479 "NPR Move Entries"
         if not RegistItemWorkshLine.IsEmpty() then
             RegistItemWorkshLine.ModifyAll("Item No.", NewItemNo);
     end;
+
+#else
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::MoveEntries, OnMoveItemEntriesOnAfterModifyItemLedgerEntries, '', false, false)]
+    local procedure UpdateItemNoInLedgerEntries(Item: Record Item; NewItemNo: Code[20])
+    var
+        ArchSaleLinePOS: Record "NPR Archive Sale Line POS";
+        ExternalPOSSaleLine: Record "NPR External POS Sale Line";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        POSEntrySaleLine: Record "NPR POS Entry Sales Line";
+        POSSaleLine: Record "NPR POS Sale Line";
+        RegisterItemWorksheetLine: Record "NPR Regist. Item Worksh Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+
+        if (Item."No." = '') or (NewItemNo = '') or (Item."No." = NewItemNo) then
+            exit;
+
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetRange("No.", Item."No.");
+        if not POSSaleLine.IsEmpty() then
+            POSSaleLine.ModifyAll("No.", NewItemNo);
+
+        ExternalPOSSaleLine.SetRange("Line Type", ExternalPOSSaleLine."Line Type"::Item);
+        ExternalPOSSaleLine.SetRange("No.", Item."No.");
+        if not ExternalPOSSaleLine.IsEmpty() then
+            ExternalPOSSaleLine.ModifyAll("No.", NewItemNo);
+
+        ArchSaleLinePOS.SetRange("Line Type", ArchSaleLinePOS."Line Type"::Item);
+        ArchSaleLinePOS.SetRange("No.", Item."No.");
+        if not ArchSaleLinePOS.IsEmpty() then
+            ArchSaleLinePOS.ModifyAll("No.", NewItemNo);
+
+        POSEntrySaleLine.SetRange(Type, POSEntrySaleLine.Type::Item);
+        POSEntrySaleLine.SetRange("No.", Item."No.");
+        if not POSEntrySaleLine.IsEmpty() then
+            POSEntrySaleLine.ModifyAll("No.", NewItemNo);
+
+        WaiterPadLine.SetRange("Line Type", WaiterPadLine."Line Type"::Item);
+        WaiterPadLine.SetRange("No.", Item."No.");
+        if not WaiterPadLine.IsEmpty() then
+            WaiterPadLine.ModifyAll("No.", NewItemNo);
+
+        KitchenRequest.SetRange("Line Type", KitchenRequest."Line Type"::Item);
+        KitchenRequest.SetRange("No.", Item."No.");
+        if not KitchenRequest.IsEmpty() then
+            KitchenRequest.ModifyAll("No.", NewItemNo);
+
+        RegisterItemWorksheetLine.SetRange("Existing Item No.", Item."No.");
+        if not RegisterItemWorksheetLine.IsEmpty() then
+            RegisterItemWorksheetLine.ModifyAll("Existing Item No.", NewItemNo);
+
+        RegisterItemWorksheetLine.SetRange("Existing Item No.");
+        RegisterItemWorksheetLine.SetRange("Item No.", Item."No.");
+        if not RegisterItemWorksheetLine.IsEmpty() then
+            RegisterItemWorksheetLine.ModifyAll("Item No.", NewItemNo);
+    end;
+#endif
+
+
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::MoveEntries, 'OnBeforeMoveCustEntries', '', false, false)]
     local procedure CustCheckOpenEntries(Customer: Record Customer)
@@ -206,6 +267,7 @@ codeunit 6151479 "NPR Move Entries"
             Error(EntriesInOpenFiscalYearErr, Customer.TableCaption(), Customer."No.");
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::MoveEntries, 'OnAfterMoveCustEntries', '', false, false)]
     local procedure UpdateCustNoInLedgerEntries(Customer: Record Customer; var CustLedgerEntry: Record "Cust. Ledger Entry")
     var
@@ -259,6 +321,60 @@ codeunit 6151479 "NPR Move Entries"
         if not POSEntrySaleLine.IsEmpty() then
             POSEntrySaleLine.ModifyAll("Customer No.", NewCustNo);
     end;
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::MoveEntries, OnMoveCustEntriesOnAfterModifyCustLedgEntries, '', false, false)]
+    local procedure UpdateCustNoInLedgerEntries(Customer: Record Customer; NewCustNo: Code[20])
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        ArchSalePOS: Record "NPR Archive Sale POS";
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        ExternalPOSSale: Record "NPR External POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySaleLine: Record "NPR POS Entry Sales Line";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        if (Customer."No." = '') or (NewCustNo = '') or (Customer."No." = NewCustNo) then
+            exit;
+
+        ExternalPOSSale.SetRange("Customer No.", Customer."No.");
+        if not ExternalPOSSale.IsEmpty() then
+            ExternalPOSSale.ModifyAll("Customer No.", NewCustNo);
+
+        ArchSalePOS.SetRange("Customer No.", Customer."No.");
+        if not ArchSalePOS.IsEmpty() then
+            ArchSalePOS.ModifyAll("Customer No.", NewCustNo);
+
+        ArchCoupon.SetRange("Customer No.", Customer."No.");
+        if not ArchCoupon.IsEmpty() then
+            ArchCoupon.ModifyAll("Customer No.", NewCustNo);
+
+        ArchVoucher.SetRange("Customer No.", Customer."No.");
+        if not ArchVoucher.IsEmpty() then
+            ArchVoucher.ModifyAll("Customer No.", NewCustNo);
+
+        Ticket.SetRange("Customer No.", Customer."No.");
+        if not Ticket.IsEmpty() then
+            Ticket.ModifyAll("Customer No.", NewCustNo);
+
+        TicketAccessEntry.SetRange("Customer No.", Customer."No.");
+        if not TicketAccessEntry.IsEmpty() then
+            TicketAccessEntry.ModifyAll("Customer No.", NewCustNo);
+
+        WaiterPad.SetRange("Customer No.", Customer."No.");
+        if not WaiterPad.IsEmpty() then
+            WaiterPad.ModifyAll("Customer No.", NewCustNo);
+
+        POSEntry.SetRange("Customer No.", Customer."No.");
+        if not POSEntry.IsEmpty() then
+            POSEntry.ModifyAll("Customer No.", NewCustNo);
+
+        POSEntrySaleLine.SetRange("Customer No.", Customer."No.");
+        if not POSEntrySaleLine.IsEmpty() then
+            POSEntrySaleLine.ModifyAll("Customer No.", NewCustNo);
+    end;
+#endif
 
     local procedure EarliestOpenAccountingPeriodStartingDate(): Date
     var

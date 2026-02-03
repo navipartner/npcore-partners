@@ -4022,6 +4022,7 @@
         end;
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
     local procedure OnAfterNavigateShowRecordsSubscriber(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean)
     var
@@ -4047,6 +4048,33 @@
             end;
         end
     end;
+#else
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterShowRecords, '', true, true)]
+    local procedure OnAfterNavigateShowRecordsSubscriber(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        SalesInvHeader: Record "Sales Invoice Header";
+    begin
+        if (DocumentEntry."Table ID" = Database::"NPR TM Ticket") then begin
+            if (not Ticket.SetCurrentKey("Sales Receipt No.")) then;
+            Ticket.SetFilter("Sales Receipt No.", DocNoFilter);
+            if (Ticket.IsEmpty()) then
+                exit;
+            Page.Run(Page::"NPR TM Ticket List", Ticket);
+        end;
+
+        if (DocumentEntry."Table ID" = Database::"NPR TM Ticket Reservation Req.") then begin
+            if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
+            if (SalesInvHeader.Get(DocNoFilter)) then begin
+                TicketReservationReq.SetFilter("External Order No.", SalesInvHeader."External Document No.");
+                if (TicketReservationReq.IsEmpty()) then
+                    exit;
+                Page.Run(Page::"NPR TM Ticket Request", TicketReservationReq);
+            end;
+        end
+    end;
+#endif
 
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin

@@ -1858,6 +1858,7 @@
 
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
     local procedure OnNavigateShowRecords(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean)
     var
@@ -1867,7 +1868,6 @@
     begin
 
         if (TableID = Database::"NPR POS Entry") then begin
-
             OnNavigateFindRecords(TempDocumentEntry, DocNoFilter, PostingDateFilter);
 
 #if BC17 
@@ -1907,6 +1907,44 @@
 
         end;
     end;
+#else
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterShowRecords, '', true, true)]
+    local procedure OnAfterNavigateShowRecordsSubscriber(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSPeriodRegister: Record "NPR POS Period Register";
+        TempDocumentEntry: Record "Document Entry" temporary;
+    begin
+
+        if (DocumentEntry."Table ID" = Database::"NPR POS Entry") then begin
+            OnNavigateFindRecords(TempDocumentEntry, DocNoFilter, PostingDateFilter);
+
+            if (TempDocumentEntry."Document Type".AsInteger() = 0) then begin
+                if not (POSEntry.SetCurrentKey(POSEntry."Document No.")) then;
+                POSEntry.SetFilter("Document No.", TempDocumentEntry."Document No.");
+            end;
+
+            if (TempDocumentEntry."Document Type".AsInteger() = 1) then begin
+                POSEntry.SetCurrentKey("Fiscal No.");
+                POSEntry.SetFilter("Fiscal No.", TempDocumentEntry."Document No.");
+            end;
+
+            if (TempDocumentEntry."Document Type".AsInteger() = 2) then begin
+                POSPeriodRegister.SetFilter("Document No.", TempDocumentEntry."Document No.");
+                if (POSPeriodRegister.FindFirst()) then begin
+                    POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegister."No.");
+                    POSEntry.SetFilter("System Entry", '=%1', false);
+                end;
+            end;
+
+            if (TempDocumentEntry."No. of Records" = 1) then
+                Page.Run(Page::"NPR POS Entry List", POSEntry)
+            else
+                Page.Run(0, POSEntry);
+
+        end;
+    end;
+#endif
 
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin
@@ -1916,9 +1954,9 @@
         DocumentEntry.Init();
         DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
         DocumentEntry."Table ID" := DocTableID;
-#if BC17         
+#if BC17
         DocumentEntry."Document Type" := DocType;
-#else        
+#else
         DocumentEntry."Document Type" := "Document Entry Document Type".FromInteger(DocType);
 #endif
         DocumentEntry."Document No." := DocNoFilter;

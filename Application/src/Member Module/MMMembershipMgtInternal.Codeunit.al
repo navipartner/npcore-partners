@@ -6425,6 +6425,7 @@
 
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
     local procedure OnAfterNavigateShowRecordsSubscriber(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean)
     var
@@ -6452,7 +6453,34 @@
         end;
 
     end;
+#else
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterShowRecords, '', true, true)]
+    local procedure OnAfterNavigateShowRecordsSubscriberVar(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Membership: Record "NPR MM Membership";
+        MembershipFilter: Text;
+        PlaceHolderLbl: Label '|%1', Locked = true;
+    begin
 
+        if (DocumentEntry."Table ID" = Database::"NPR MM Membership Entry") then begin
+            if (not MembershipEntry.SetCurrentKey("Receipt No.")) then;
+            MembershipEntry.SetFilter("Receipt No.", DocNoFilter);
+            MembershipEntry.FindSet();
+            repeat
+                MembershipFilter += StrSubstNo(PlaceHolderLbl, MembershipEntry."Membership Entry No.");
+            until (MembershipEntry.Next() = 0);
+
+            Membership.SetFilter("Entry No.", CopyStr(MembershipFilter, 2));
+
+            if (Membership.Count() = 1) then begin
+                Page.Run(Page::"NPR MM Membership Card", Membership);
+            end else begin
+                Page.Run(Page::"NPR MM Memberships", Membership);
+            end;
+        end;
+    end;
+#endif
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin
 

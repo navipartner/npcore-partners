@@ -1263,6 +1263,7 @@
         }
         area(factboxes)
         {
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = NPRRetail;
@@ -1270,6 +1271,14 @@
                 SubPageLink = "Table ID" = CONST(167),
                               "No." = FIELD("No.");
             }
+#else
+            part("Attached Documents"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Attachments';
+                SubPageLink = "Table ID" = CONST(167), "No." = FIELD("No.");
+            }
+#endif
             part(Control6014404; "NPR Event Comment Sheet")
             {
                 SubPageLink = "Table Name" = CONST(Job), "No." = FIELD("No.");

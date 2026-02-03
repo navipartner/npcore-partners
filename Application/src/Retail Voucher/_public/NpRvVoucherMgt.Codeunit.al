@@ -145,11 +145,9 @@
         end;
     end;
 
-#if BC17 or BC18 or BC19 or BC20 or BC21
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
+
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
-#else
-    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterNavigateShowRecords, '', true, true)]
-#endif
     local procedure Navigate_ShowRetailVoucherEntries(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text)
     var
         ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
@@ -174,6 +172,35 @@
                 end;
         end;
     end;
+
+#else
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterShowRecords, '', true, true)]
+
+    local procedure Navigate_ShowRetailVoucherEntries(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+    begin
+        if (DocNoFilter = '') and (PostingDateFilter = '') then
+            exit;
+        case DocumentEntry."Table ID" of
+            Database::"NPR NpRv Voucher Entry":
+                begin
+                    if VoucherEntry.SetCurrentKey("Document No.", "Posting Date") then;
+                    VoucherEntry.SetFilter("Document No.", DocNoFilter);
+                    VoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+                    Page.Run(0, VoucherEntry);
+                end;
+            Database::"NPR NpRv Arch. Voucher Entry":
+                begin
+                    if ArchVoucherEntry.SetCurrentKey("Document No.", "Posting Date") then;
+                    ArchVoucherEntry.SetFilter("Document No.", DocNoFilter);
+                    ArchVoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+                    Page.Run(0, ArchVoucherEntry);
+                end;
+        end;
+    end;
+#endif
 
     local procedure SendVoucher(SalePOS: Record "NPR POS Sale")
     var
