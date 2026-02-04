@@ -38,6 +38,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         PrepareForEcomFlow();
 #endif
         UpdateGetPaymentLineOption();
+        DisableSendCloseOrderRequest();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -602,6 +603,27 @@ codeunit 6184802 "NPR Spfy App Upgrade"
             repeat
                 if ShopifyStore."Get Payment Lines from Shopify" = ShopifyStore."Get Payment Lines from Shopify"::ON_ORDER_IMPORT then begin
                     ShopifyStore."Get Payment Lines from Shopify" := ShopifyStore."Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE;
+                    ShopifyStore.Modify();
+                end;
+            until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure DisableSendCloseOrderRequest()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        _UpgradeStep := 'DisableSendCloseOrderRequest';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if ShopifyStore.FindSet() then
+            repeat
+                if ShopifyStore."Send Close Order Requets" then begin
+                    ShopifyStore."Send Close Order Requets" := false;
                     ShopifyStore.Modify();
                 end;
             until ShopifyStore.Next() = 0;

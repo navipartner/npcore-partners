@@ -76,15 +76,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
-    [TryFunction]
-    procedure SendCloseOrderRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/close.json', NcTask."Record Value");
-        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-    end;
-
     procedure UserErrorsExistInGraphQLResponse(ShopifyResponse: JsonToken): Boolean
     var
         ResponseDataItemUserErrors: JsonToken;

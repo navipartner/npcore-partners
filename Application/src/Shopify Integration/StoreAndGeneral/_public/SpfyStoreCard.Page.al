@@ -320,7 +320,7 @@ page 6184704 "NPR Spfy Store Card"
                 }
                 field("Send Close Order Requets"; Rec."Send Close Order Requets")
                 {
-                    ToolTip = 'Specifies whether to send close order requests from Business Central to Shopify. Close order requests are sent for sales orders that have been posted as invoiced.';
+                    ToolTip = 'Specifies whether close order requests are sent to Shopify when Shopify sales orders are manually deleted in Business Central.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;

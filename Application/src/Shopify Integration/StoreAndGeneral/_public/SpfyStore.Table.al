@@ -297,12 +297,6 @@ table 6150810 "NPR Spfy Store"
         {
             Caption = 'Send Close Order Requests';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Send Close Order Requets" then
-                    TestField("Sales Order Integration");
-            end;
         }
         field(120; "Allowed Payment Statuses"; Option)
         {

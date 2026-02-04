@@ -266,6 +266,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 #endif
             Database::"NPR NpCs Document":
                 CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Ord Ready For Pickup");
+            Database::"Sales Header":
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Close Order");
         end;
     end;
 

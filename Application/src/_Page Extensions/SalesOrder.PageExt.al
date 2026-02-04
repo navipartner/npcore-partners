@@ -792,4 +792,16 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
 #endif
     end;
+
+    trigger OnDeleteRecord(): Boolean
+    var
+#if not BC17
+        SpfyCloseOrder: Codeunit "NPR Spfy Close Order";
+#endif
+    begin
+#if not BC17
+        if ShopifyIntegrationIsEnabled then
+            SpfyCloseOrder.InitSendCloseRequestTaskBeforeDeleteSalesHeader(Rec);
+#endif
+    end;
 }
