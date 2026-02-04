@@ -18,14 +18,12 @@
                 Editable = false;
                 field("Activate On First Use"; Rec."Activate On First Use")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Activate On First Use field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Valid From Date"; Rec."Valid From Date")
                 {
-
                     ToolTip = 'Specifies the value of the Valid From Date field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -38,74 +36,48 @@
                 }
                 field("Created At"; Rec."Created At")
                 {
-
                     ToolTip = 'Specifies the value of the Created At field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Context; Rec.Context)
                 {
-
                     ToolTip = 'Specifies the value of the Context field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Receipt No."; Rec."Receipt No.")
                 {
-
                     ToolTip = 'Specifies the value of the Receipt No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-
                     ToolTip = 'Specifies the value of the Document No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-
                     ToolTip = 'Specifies the value of the Item No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Auto-Renew Entry No."; Rec."Auto-Renew Entry No.")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Auto-Renew Entry No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(RemainingAmountLCY; RemainingAmountLCY)
                 {
-
                     Caption = 'Remaining Amount (LCY)';
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = AccentuateAmount;
                     ToolTip = 'Specifies the value of the Remaining Amount (LCY) field';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
-                field(Blocked; Rec.Blocked)
-                {
-
-                    ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
-                field("Blocked At"; Rec."Blocked At")
-                {
-
-                    ToolTip = 'Specifies the value of the Blocked At field';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
-                field("Blocked By"; Rec."Blocked By")
-                {
-
-                    ToolTip = 'Specifies the value of the Blocked By field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(InitialValidUntilDate; _InitialValidUntilDate)
@@ -114,6 +86,50 @@
                     Editable = false;
                     ToolTip = 'Calculates the Initial Valid Until Date using Valid From Date and Duration Dateformula fields';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+
+                field(Blocked; Rec.Blocked)
+                {
+                    ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Blocked At"; Rec."Blocked At")
+                {
+                    ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Blocked By"; Rec."Blocked By")
+                {
+                    ToolTip = 'Specifies the value of the Blocked By field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(Cancelled; Rec.Cancelled)
+                {
+                    ToolTip = 'Specifies the value of the Cancelled field, click for details.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(CancelledAt; Rec.CancelledAt)
+                {
+                    ToolTip = 'Specifies the value of the Cancelled At field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(DocumentLink; _DocumentLink)
+                {
+                    Caption = 'Linked Documents';
+                    Editable = false;
+                    ToolTip = 'Shows the documents that cancelled or regretted this membership entry, if applicable';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnDrillDown()
+                    var
+                        ListLinksPage: Page "NPR MembershipEntryLinkList";
+                        Links: Record "NPR MM Membership Entry Link";
+                    begin
+                        Links.SetCurrentKey("Membership Entry No.");
+                        Links.SetFilter("Membership Entry No.", '=%1', Rec."Entry No."); // Note: "NPR MM Members. Ledger Entries."Entry No." - bad naming!
+                        ListLinksPage.SetTableView(Links);
+                        ListLinksPage.Run();
+                    end;
                 }
             }
         }
@@ -156,6 +172,8 @@
     }
 
     trigger OnAfterGetRecord()
+    var
+        EntryLink: Record "NPR MM Membership Entry Link";
     begin
 
         AccentuateAmount := false;
@@ -163,11 +181,18 @@
             AccentuateAmount := ((RemainingAmountLCY > 0) and (DueDate < Today));
 
         _InitialValidUntilDate := 0D;
-        _Cancelled := false;
-        if (Rec."Valid From Date" <> 0D) and (Format(Rec."Duration Dateformula") <> '') then begin
+        _Cancelled := Rec.Cancelled;
+        if (Rec."Valid From Date" <> 0D) and (Format(Rec."Duration Dateformula") <> '') then
             _InitialValidUntilDate := CalcDate(Rec."Duration Dateformula", Rec."Valid From Date");
-            _Cancelled := (Rec."Valid Until Date" <> 0D) and (Rec."Valid Until Date" <> _InitialValidUntilDate);
+
+        _DocumentLink := '';
+        if (Rec.Cancelled) then begin
+            EntryLink.SetCurrentKey("Membership Entry No."); // Note: "Membership Entry"."Entry No." - bad naming!
+            EntryLink.SetFilter("Membership Entry No.", '=%1', Rec."Entry No.");
+            if (EntryLink.FindLast()) then
+                _DocumentLink := EntryLink."Document No.";
         end;
+
     end;
 
     var
@@ -177,5 +202,6 @@
         AccentuateAmount: Boolean;
         _InitialValidUntilDate: Date;
         _Cancelled: Boolean;
+        _DocumentLink: Code[20];
 }
 

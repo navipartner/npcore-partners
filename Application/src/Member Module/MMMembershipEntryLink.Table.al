@@ -14,7 +14,7 @@ table 6151243 "NPR MM Membership Entry Link"
         }
         field(10; "Membership Entry No."; Integer)
         {
-            Caption = 'Membership Entry No.';
+            Caption = 'Membership Ledger Entry No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Membership Entry"."Entry No.";
         }
@@ -85,6 +85,7 @@ table 6151243 "NPR MM Membership Entry Link"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
         MemberInfoCapture."Receipt No." := Format(SubscriptionRequest."Entry No.");
+
         case SubscriptionRequest.Type of
             SubscriptionRequest.Type::Renew:
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;
@@ -93,12 +94,36 @@ table 6151243 "NPR MM Membership Entry Link"
             SubscriptionRequest.Type::"Partial Regret":
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::CANCEL;
         end;
+
         CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, Database::"NPR MM Subscr. Request");
     end;
 
     internal procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date)
+    var
+        TableNumber: Integer;
     begin
-        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, Database::"NPR POS Entry Sales Line");
+        TableNumber := Database::"NPR POS Entry Sales Line";
+        if (MemberInfoCapture."Receipt No." <> '') then begin
+            CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber);
+            exit;
+        end;
+
+        TableNumber := Database::"Sales Cr.Memo Header";
+        if (MemberInfoCapture."Document No." <> '') then begin
+            MemberInfoCapture."Receipt No." := MemberInfoCapture."Document No."; // Reference to a BC document or external document
+            MemberInfoCapture."Line No." := MemberInfoCapture."Document Line No.";
+            if (MembershipEntry."Document Type" = MembershipEntry."Document Type"::"0") then
+                TableNumber := Database::"NPR MM Member Info Capture"; // No document type set, so assume external document
+
+            CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber);
+            exit;
+        end;
+
+        // No document info, so create link based on Membership Entry info, so we can always trace back
+        TableNumber := Database::"NPR MM Membership Entry";
+        MemberInfoCapture."Receipt No." := CopyStr('INT-' + Format(MembershipEntry."Entry No.", 0, 9).PadLeft(10, '0'), 1, MaxStrLen(MemberInfoCapture."Receipt No.")); // Note: "Entry No." max is 2^31-1 = 2147483647
+        MemberInfoCapture."Line No." := MemberInfoCapture."Entry No.";
+        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber);
     end;
 
     local procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date; DocumentType: Integer)
@@ -109,6 +134,7 @@ table 6151243 "NPR MM Membership Entry Link"
     begin
         if not GetDocumentKeys(DocumentNo, DocumentLineNo, MemberInfoCapture) then
             exit;
+
         MembershipEntryLink.SetCurrentKey("Document Type", "Document No.", "Document Line No.");
         MembershipEntryLink.SetRange("Document Type", DocumentType);
         MembershipEntryLink.SetRange("Document No.", DocumentNo);
@@ -121,6 +147,7 @@ table 6151243 "NPR MM Membership Entry Link"
             MembershipEntryLink."Document Line No." := DocumentLineNo;
             MembershipEntryLink.Insert();
         end;
+
         MembershipEntryLink."Membership Entry No." := MembershipEntry."Entry No.";
         MembershipEntryLink.Context := MemberInfoCapture."Information Context";
         case MembershipEntryLink.Context of

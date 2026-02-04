@@ -2078,6 +2078,8 @@
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
         MembershipEntry."Valid Until Date" := EndDateNew;
+        MembershipEntry.Cancelled := true;
+        MembershipEntry.CancelledAt := CurrentDateTime();
         MembershipEntry.Modify();
 
         DisableMembershipAutoRenewal(Membership, true, false);

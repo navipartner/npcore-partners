@@ -101,5 +101,39 @@ codeunit 6248221 "NPR MembershipApiTranslation"
         end;
     end;
 
+    internal procedure MembershipEntryLinkContextToText(Context: Option): Text
+    var
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
+    begin
+        case Context of
+            MembershipEntryLink.Context::NEW:
+                exit('new');
+            MembershipEntryLink.Context::REGRET:
+                exit('regret');
+            MembershipEntryLink.Context::RENEW:
+                exit('renew');
+            MembershipEntryLink.Context::UPGRADE:
+                exit('upgrade');
+            MembershipEntryLink.Context::EXTEND:
+                exit('extend');
+            MembershipEntryLink.Context::LIST:
+                exit('list');
+            MembershipEntryLink.Context::CANCEL:
+                exit('cancel');
+            MembershipEntryLink.Context::AUTORENEW:
+                exit('autoRenew');
+            MembershipEntryLink.Context::FOREIGN:
+                exit('foreignMembership');
+            MembershipEntryLink.Context::PRINT_CARD:
+                exit('printCard');
+            MembershipEntryLink.Context::PRINT_ACCOUNT:
+                exit('printAccount');
+            MembershipEntryLink.Context::PRINT_MEMBERSHIP:
+                exit('printMembership');
+            else
+                exit('unknownContext');
+        end;
+    end;
+
 }
 #endif

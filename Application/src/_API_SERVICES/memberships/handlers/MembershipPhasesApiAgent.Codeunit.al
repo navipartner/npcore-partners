@@ -86,9 +86,11 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
     internal procedure RegretMembership(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Membership: Record "NPR MM Membership";
-        MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipLedgerEntry: Record "NPR MM Membership Entry";
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
         Body: JsonObject;
         JToken: JsonToken;
         EntryId: Guid;
@@ -99,21 +101,32 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
         Body := Request.BodyJson().AsObject();
         if (not Body.Get('entryId', JToken)) then
             exit(Response.RespondBadRequest('Invalid Request - entryId not provided.'));
-
         Evaluate(EntryId, JToken.AsValue().AsText());
-        MembershipEntry.GetBySystemId(EntryId);
 
-        MembershipEntry.Reset();
-        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
-        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-        if (not MembershipEntry.FindLast()) then
+        if (Body.Get('documentNo', JToken)) then
+            MemberInfoCapture."Document No." := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(MemberInfoCapture."Document No."));
+
+        MembershipLedgerEntry.GetBySystemId(EntryId);
+
+        MembershipLedgerEntry.Reset();
+        MembershipLedgerEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipLedgerEntry.SetFilter(Context, '<>%1', MembershipLedgerEntry.Context::REGRET);
+        MembershipLedgerEntry.SetFilter(Blocked, '=%1', false);
+        if (not MembershipLedgerEntry.FindLast()) then
             exit(Response.RespondBadRequest('Invalid Request - no active time that could be regretted was found.'));
 
-        if (EntryId <> MembershipEntry.SystemId) then
+        if (EntryId <> MembershipLedgerEntry.SystemId) then
             exit(Response.RespondBadRequest('Invalid Request - only the last active time entry can be regretted.'));
 
-        MembershipManagement.DoRegretTimeframe(MembershipEntry);
+        MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
+        MemberInfoCapture."Document Date" := Today();
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::REGRET;
+        MemberInfoCapture.Insert();
+
+        MembershipEntryLink.CreateMembershipEntryLink(MembershipLedgerEntry, MemberInfoCapture, 0D);
+        MembershipManagement.CarryOutMembershipRegret(MembershipLedgerEntry);
+
+        MemberInfoCapture.Delete();
 
         exit(Response.RespondOK(StartMembershipTimeEntriesDTO(Membership).Build()));
     end;
@@ -162,7 +175,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
         MembershipAlterationSetup.GetBySystemId(OptionId);
 
         if (Body.Get('documentNo', JToken)) then
-            MemberInfoCapture."Document No." := JToken.AsValue().AsText();
+            MemberInfoCapture."Document No." := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(MemberInfoCapture."Document No."));
 
         if (Body.Get('documentDate', JToken)) then begin
             JValue := JToken.AsValue();
@@ -187,7 +200,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
             MembershipAlterationSetup."Alteration Type"::CANCEL:
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::CANCEL;
         end;
-        // MemberInfoCapture.Insert();
+        MemberInfoCapture.Insert(); // Gets me the auto-increment Entry No. for tracking purposes
 
         case MemberInfoCapture."Information Context" of
 
@@ -208,7 +221,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
 
         end;
 
-        //MemberInfoCapture.Delete();
+        MemberInfoCapture.Delete();
 
         exit(Response.RespondOK(StartMembershipTimeEntriesDTO(Membership).Build()));
     end;
@@ -370,6 +383,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
                     .AddProperty('entryId', Format(MembershipEntry.SystemId, 0, 4).ToLower())
                     .AddProperty('itemNumber', MembershipEntry."Item No.")
                     .AddProperty('lifecycleAction', Translation.MembershipEntryContextToText(MembershipEntry.Context))
+                    .AddProperty('originalLifecycleAction', Translation.MembershipEntryContextToText(MembershipEntry."Original Context"))
                     .AddProperty('blocked', MembershipEntry."Blocked")
                     .AddProperty('membershipCode', MembershipEntry."Membership Code")
                     .AddProperty('description', MembershipEntry.Description)
@@ -383,8 +397,9 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
                     .AddProperty('amount', MembershipEntry."Amount")
                     .AddProperty('amountInclVat', MembershipEntry."Amount Incl VAT")
                     .AddProperty('activateOnFirstUse', MembershipEntry."Activate On First Use")
+                    .AddObject(LinkedEntriesDTO(ResponseJson, MembershipEntry))
 
-                            .EndObject();
+                    .EndObject();
             until (MembershipEntry.Next() = 0);
             ResponseJson.EndArray();
         end;
@@ -397,6 +412,32 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
             exit(ResponseJson.AddProperty(PropertyName));
 
         exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
+    end;
+
+
+    local procedure LinkedEntriesDTO(var ResponseJson: Codeunit "NPR Json Builder"; MembershipEntry: Record "NPR MM Membership Entry"): Codeunit "NPR Json Builder"
+    var
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
+        Translation: Codeunit "NPR MembershipApiTranslation";
+    begin
+        MembershipEntryLink.SetCurrentKey("Membership Entry No.");
+        MembershipEntryLink.SetFilter("Membership Entry No.", '=%1', MembershipEntry."Entry No.");
+        if (MembershipEntryLink.FindSet()) then begin
+            ResponseJson.StartArray('linkedEntries');
+            repeat
+                ResponseJson.StartObject()
+                    .AddProperty('entryId', Format(MembershipEntryLink.SystemId, 0, 4).ToLower())
+                    .AddProperty('entryNumber', MembershipEntryLink."Entry No.")
+                    .AddProperty('context', Translation.MembershipEntryLinkContextToText(MembershipEntryLink.Context))
+                    .AddProperty('documentNumber', MembershipEntryLink."Document No.")
+                    .AddObject(AddRequiredProperty(ResponseJson, 'contextPeriodStartingDate', MembershipEntryLink."Context Period Starting Date"))
+                    .AddObject(AddRequiredProperty(ResponseJson, 'contextPeriodEndingDate', MembershipEntryLink."Context Period Ending Date"))
+                    .AddProperty('registrationDate', MembershipEntryLink.SystemCreatedAt)
+                    .EndObject();
+            until (MembershipEntryLink.Next() = 0);
+            ResponseJson.EndArray();
+        end;
+        exit(ResponseJson);
     end;
 
 }

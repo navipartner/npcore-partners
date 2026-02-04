@@ -73,6 +73,17 @@
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
+        field(18; Cancelled; Boolean)
+        {
+            Caption = 'Cancelled';
+            DataClassification = CustomerContent;
+        }
+        field(19; CancelledAt; DateTime)
+        {
+            Caption = 'Cancelled At';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
         field(20; "Item No."; Code[20])
         {
             Caption = 'Item No.';

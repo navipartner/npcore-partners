@@ -196,6 +196,36 @@ page 6059844 "NPR MM Edit Membership Entries"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = ListIsEditable;
                 }
+                field(Cancelled; Rec.Cancelled)
+                {
+                    ToolTip = 'Specifies the value of the Cancelled field, click for details.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = ListIsEditable;
+                }
+                field(CancelledAt; Rec.CancelledAt)
+                {
+                    ToolTip = 'Specifies the value of the Cancelled At field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = ListIsEditable;
+                }
+                field(DocumentLink; _DocumentLink)
+                {
+                    Caption = 'Linked Documents';
+                    Editable = false;
+                    ToolTip = 'Shows the documents that cancelled or regretted this membership entry, if applicable';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnDrillDown()
+                    var
+                        ListLinksPage: Page "NPR MembershipEntryLinkList";
+                        Links: Record "NPR MM Membership Entry Link";
+                    begin
+                        Links.SetCurrentKey("Membership Entry No.");
+                        Links.SetFilter("Membership Entry No.", '=%1', Rec."Entry No."); // Note: "NPR MM Members. Ledger Entries."Entry No." - bad naming!
+                        ListLinksPage.SetTableView(Links);
+                        ListLinksPage.Run();
+                    end;
+                }
                 field("Auto-Renew Entry No."; Rec."Auto-Renew Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Auto-Renew Entry No. field.';
@@ -262,6 +292,7 @@ page 6059844 "NPR MM Edit Membership Entries"
 
     var
         ListIsEditable: Boolean;
+        _DocumentLink: Text[100];
 
     trigger OnInit()
     var
@@ -272,5 +303,18 @@ page 6059844 "NPR MM Edit Membership Entries"
 
         ListIsEditable := UserSetup."NPR MM Allow MS Entry Edit";
 
+    end;
+
+    trigger OnAfterGetRecord()
+    var
+        EntryLink: Record "NPR MM Membership Entry Link";
+    begin
+        _DocumentLink := '';
+        if (Rec.Cancelled) then begin
+            EntryLink.SetCurrentKey("Membership Entry No."); // Note: "Membership Entry"."Entry No." - bad naming!
+            EntryLink.SetRange("Membership Entry No.", Rec."Entry No.");
+            if (EntryLink.FindLast()) then
+                _DocumentLink := EntryLink."Document No.";
+        end;
     end;
 }

@@ -725,6 +725,7 @@ types:
       entryId: simpleTypes.TimeEntryId
       itemNumber: simpleTypes.ItemNumber
       lifecycleAction: simpleTypes.LifecycleAction
+      originalLifecycleAction: optional<simpleTypes.LifecycleAction>
       blocked: simpleTypes.Blocked
       membershipCode: simpleTypes.MembershipCode
       description: simpleTypes.Description
@@ -737,6 +738,7 @@ types:
       unitPrice: simpleTypes.UnitPrice
       amount: simpleTypes.Amount
       amountInclVat: simpleTypes.AmountInclVat
+      linkedEntries: optional<list<MembershipTimeEntryLinkedEntries>>
      
     examples:
       - name: ExampleActivateEntry
@@ -774,6 +776,8 @@ types:
           documentId: $simpleTypes.DocumentId.ExampleDocumentId
           unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
           description: $simpleTypes.Description.ExampleTimeEntry
+          linkedEntries:
+            - $MembershipTimeEntryLinkedEntries.ExampleCancelLinkedEntry
       - name: ExampleRenewEntry
         value:
           entryId: $simpleTypes.TimeEntryId.Renew
@@ -826,6 +830,36 @@ types:
           unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
           description: $simpleTypes.Description.ExampleTimeEntry
 
+  MembershipTimeEntryLinkedEntries:
+    docs:
+      The linkedEntries describes the cancellation and regret entries linked to a Membership time entry.
+    properties:
+      entryId: uuid
+      entryNumber: integer
+      context: string
+      documentNumber: string
+      contextPeriodStartingDate: date
+      contextPeriodEndingDate: date
+      registrationDate: datetime
+    examples:
+      - name: ExampleCancelLinkedEntry
+        value:
+            entryId: "596b6f52-e9fd-f011-a903-cb2b94ec3d40"
+            entryNumber: 18
+            context: cancel
+            documentNumber: "DOC654321"
+            contextPeriodStartingDate: "2024-10-07"
+            contextPeriodEndingDate: "2025-09-16"
+            registrationDate: "2024-10-07T14:38:21.097Z"
+      - name: ExampleRegretLinkedEntry
+        value:
+            entryId: "696b6f52-e9fd-f011-a903-cb2b94ec3d41"
+            entryNumber: 20
+            context: regret
+            documentNumber: "INT-0000010021"
+            contextPeriodStartingDate: "2024-10-17"
+            contextPeriodEndingDate: "2025-09-16"
+            registrationDate: "2026-02-15T10:20:30.500Z"
 
 
   MembershipLifecycleOptionsDTO:

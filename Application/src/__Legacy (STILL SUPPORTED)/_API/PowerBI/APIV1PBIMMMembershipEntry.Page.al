@@ -116,6 +116,39 @@ page 6059932 "NPR APIV1 PBIMMMembershipEntry"
                 {
                     Caption = 'Source Type', Locked = True;
                 }
+                field(activateOnFirstUse; Rec."Activate On First Use")
+                {
+                    Caption = 'Activate On First Use', Locked = true;
+                }
+                field(autoRenewEntryNo; Rec."Auto-Renew Entry No.")
+                {
+                    Caption = 'Auto-Renew Entry No.', Locked = true;
+                }
+                field(blockedAt; Rec."Blocked At")
+                {
+                    Caption = 'Blocked At', Locked = true;
+                }
+                field(blockedBy; Rec."Blocked By")
+                {
+                    Caption = 'Blocked By', Locked = true;
+                }
+                field(cancelled; Rec.Cancelled)
+                {
+                    Caption = 'Cancelled', Locked = true;
+                }
+                field(cancelledAt; Rec.CancelledAt)
+                {
+                    Caption = 'Cancelled At', Locked = true;
+                }
+                field(unitPrice; Rec."Unit Price")
+                {
+                    Caption = 'Unit Price', Locked = true;
+                }
+                field(unitPriceBase; Rec."Unit Price (Base)")
+                {
+                    Caption = 'Unit Price (Base)', Locked = true;
+                }
+
                 field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
                 {
                     Caption = 'Last Modified Date', Locked = true;
