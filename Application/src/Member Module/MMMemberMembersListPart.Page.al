@@ -16,7 +16,6 @@
             {
                 field("External Membership No."; Rec."External Membership No.")
                 {
-
                     DrillDownPageID = "NPR MM Membership Card";
                     LookupPageID = "NPR MM Membership Card";
                     ToolTip = 'Specifies the value of the External Membership No. field';
@@ -24,7 +23,6 @@
                 }
                 field("GDPR Approval"; Rec."GDPR Approval")
                 {
-
                     ToolTip = 'Specifies the value of the GDPR Approval field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
@@ -44,7 +42,6 @@
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-
                     DrillDownPageID = "NPR MM Membership Setup";
                     LookupPageID = "NPR MM Membership Setup";
                     TableRelation = "NPR MM Membership Setup".Code;
@@ -53,31 +50,36 @@
                 }
                 field("User Logon ID"; Rec."User Logon ID")
                 {
-
                     ToolTip = 'Specifies the value of the User Logon ID field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = false;
                 }
                 field("Password Hash"; Rec."Password Hash")
                 {
-
                     ToolTip = 'Specifies the value of the Password field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = false;
                 }
+                field(CurrentPeriodField; _CurrentPeriod)
+                {
+                    Caption = 'Current Period';
+                    ToolTip = 'Shows the current valid period of the membership';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+                }
+
                 field(Blocked; Rec.Blocked)
                 {
-
                     ToolTip = 'Specifies the value of the Blocked field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-
                     ToolTip = 'Specifies the value of the Blocked At field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("GDPR Agreement No."; Rec."GDPR Agreement No.")
                 {
-
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the GDPR Agreement No. field';
@@ -85,7 +87,6 @@
                 }
                 field("GDPR Data Subject Id"; Rec."GDPR Data Subject Id")
                 {
-
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the GDPR Data Subject Id field';
@@ -177,6 +178,41 @@
             }
         }
     }
+
+    var
+        _CurrentPeriod: Text[100];
+        NOT_ACTIVATED: Label 'Not Activated', Locked = true;
+        MEMBERSHIP_EXPIRED: Label 'Membership Expired', Locked = true;
+
+    trigger OnAfterGetRecord()
+    begin
+        _CurrentPeriod := CopyStr(SetCurrentPeriodText(Rec."Membership Entry No."), 1, MaxStrLen(_CurrentPeriod));
+    end;
+
+    local procedure SetCurrentPeriodText(MembershipEntryNo: Integer) CurrentPeriod: Text;
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        ValidFromDate: Date;
+        ValidUntilDate: Date;
+        MaxValidUntilDate: Date;
+        PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
+        PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
+        NeedsActivation: Boolean;
+    begin
+        NeedsActivation := MembershipManagement.MembershipNeedsActivation(MembershipEntryNo);
+        CurrentPeriod := NOT_ACTIVATED;
+        if (not NeedsActivation) then begin
+            MembershipManagement.GetMembershipValidDate(MembershipEntryNo, Today, ValidFromDate, ValidUntilDate);
+            CurrentPeriod := StrSubstNo(PlaceHolder2Lbl, ValidFromDate, ValidUntilDate);
+
+            MembershipManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, MaxValidUntilDate);
+            if (ValidUntilDate <> MaxValidUntilDate) then
+                CurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MaxValidUntilDate);
+
+            if (ValidUntilDate < Today) then
+                CurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
+        end;
+    end;
 
     internal procedure GetSelectedMembershipEntryNo(): Integer
     begin

@@ -1016,6 +1016,7 @@
         if (not Rec.Find()) then
             exit;
 
+
         MembershipManagement.GetMemberCount(Rec."Entry No.", AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
         ShowMemberCountAs := StrSubstNo(PlaceHolder1Lbl, AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
 
