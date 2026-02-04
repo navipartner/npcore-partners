@@ -188,5 +188,15 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner Shopify Ecommerce Order Experience';
             DataClassification = CustomerContent;
         }
+        field(6060150; "NPR Old Restaurant Print Exp"; Boolean)
+        {
+            Caption = 'NaviPartner Old Restaurant Print Experience';
+            DataClassification = CustomerContent;
+        }
+        field(6060160; "NPR New Restaurant Print Exp"; Boolean)
+        {
+            Caption = 'NaviPartner New Restaurant Print Experience';
+            DataClassification = CustomerContent;
+        }
     }
 }

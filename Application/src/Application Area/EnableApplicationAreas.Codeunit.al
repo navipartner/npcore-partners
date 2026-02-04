@@ -22,6 +22,8 @@ codeunit 6151349 "NPR Enable Application Areas"
         EnableOnlyNewPOSEditorAndHideOldRelatedPages(TempApplicationAreaSetup);
         EnableNPEmail(TempApplicationAreaSetup);
         EnableMagentoApplicationAreas(TempApplicationAreaSetup);
+        DisableOldRestaurantPrintExp(TempApplicationAreaSetup);
+        EnableNewRestaurantPrintExp(TempApplicationAreaSetup);
     end;
 
     local procedure EnableRetailApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
@@ -120,6 +122,16 @@ codeunit 6151349 "NPR Enable Application Areas"
 #else
         TempApplicationAreaSetup."NPR Legacy Email" := true;
 #endif
+    end;
+
+    local procedure DisableOldRestaurantPrintExp(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    begin
+        TempApplicationAreaSetup."NPR Old Restaurant Print Exp" := not IsFeatureEnabled(Feature::"New Restaurant Print Experience");
+    end;
+
+    local procedure EnableNewRestaurantPrintExp(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    begin
+        TempApplicationAreaSetup."NPR New Restaurant Print Exp" := IsFeatureEnabled(Feature::"New Restaurant Print Experience");
     end;
 
     local procedure IsFeatureEnabled(FeatureToCheck: Enum "NPR Feature"): Boolean

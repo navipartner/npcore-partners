@@ -72,6 +72,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"Shopify Ecommerce Order Experience");
 #endif
         AddFeature(Feature::"New Attraction Print Exerience");
+        AddFeature(Feature::"New Restaurant Print Experience");
         if ExistingFeature.FindSet() then
             repeat
                 TempExistingFeature.SetRange(Feature, ExistingFeature.Feature);
@@ -101,6 +102,7 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleNewPOSLicenseBillingFeature();
 #endif
         NewFeatureHandler.HandleNewAttractionPrintExperience();
+        NewFeatureHandler.HandleNewRestaurantPrintExperience();
         RefreshExperienceTierCurrentCompany();
     end;
 

@@ -285,7 +285,12 @@
             part(PrintTemplates; "NPR NPRE Print Templ. Subpage")
             {
                 Caption = 'Print Templates';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPROldRestaurantPrintExp;
+            }
+            part(PrintTemplatesNew; "NPR NPRE Print Template SubP.")
+            {
+                Caption = 'Print Templates';
+                ApplicationArea = NPRNewRestaurantPrintExp;
             }
         }
     }

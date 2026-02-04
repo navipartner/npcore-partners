@@ -135,4 +135,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Attraction Print Experience';
         Implementation = "NPR Feature Management" = "NPR New Attraction Print Exp";
     }
+    value(200; "New Restaurant Print Experience")
+    {
+        Caption = 'New Restaurant Print Experience';
+        Implementation = "NPR Feature Management" = "NPR New Restaurant Print Exp.";
+    }
 }

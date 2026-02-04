@@ -116,6 +116,25 @@ codeunit 6150632 "NPR New Feature Handler"
         LogMessageStopwatch.LogFinish();
     end;
 
+    internal procedure HandleNewRestaurantPrintExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewRestaurantPrintExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewRestaurantPrintExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewRestaurantPrintExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewRestaurantPrintExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
     internal procedure HandlePOSWebserviceSessionsFeature()
     var
         Feature: Record "NPR Feature";
@@ -258,6 +277,19 @@ codeunit 6150632 "NPR New Feature Handler"
         MembershipSetup.SetRange("Receipt Print Object Type", MembershipSetup."Receipt Print Object Type"::TEMPLATE);
         MembershipSetup.ModifyAll("Receipt Print Template Code", '');
         MembershipSetup.ModifyAll("Receipt Print Object Type", MembershipSetup."Receipt Print Object Type"::NO_PRINT);
+    end;
+
+    local procedure NewRestaurantPrintExperienceHandle()
+    var
+        Feature: Record "NPR Feature";
+        NewRestaurantPrintExp: Codeunit "NPR New Restaurant Print Exp.";
+    begin
+        if not Feature.Get(NewRestaurantPrintExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
     end;
 
     local procedure CurrCodeunitId(): Integer

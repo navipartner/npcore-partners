@@ -37,6 +37,7 @@ permissionset 6014405 "NPR KDS WebService"
         tabledata "NPR NPRE Waiter Pad" = RM,
         tabledata "NPR NPRE Waiter Pad Line" = RMD,
         tabledata "NPR NPRE W.Pad.Line Outp.Buf." = RIMD,
+        tabledata "NPR NPRE W.Pad.Line Out.Buffer" = RIMD,
         tabledata "NPR NPRE W.Pad Prnt LogEntry" = RIM,
         tabledata "NPR POS Info NPRE Waiter Pad" = RMD,
         query "NPR NPRE Kitchen Req. Stations" = X,
