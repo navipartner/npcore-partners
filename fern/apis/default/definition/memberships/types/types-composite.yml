@@ -424,6 +424,7 @@ types:
       customerNumber: optional<simpleTypes.CustomerNumber>
       documentId: optional<simpleTypes.DocumentId>
       blocked: simpleTypes.Blocked
+      blockedAt: optional<simpleTypes.BlockedAt>
       autoRenewalActivated: simpleTypes.AutoRenewalActivated
       attributes: optional<list<attributeTypes.AttributeValueListResponse>>
     examples:
@@ -453,6 +454,7 @@ types:
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlockedTrue
+          blockedAt: $simpleTypes.BlockedAt.ExampleBlockedAt
           autoRenewalActivated: false
           attributes: []
 
@@ -536,6 +538,7 @@ types:
       memberNumber: simpleTypes.MemberNumber
       nationalIdentifier: optional<NationalIdentifierResponse>
       blocked: simpleTypes.Blocked
+      blockedAt: optional<simpleTypes.BlockedAt>
       hasPicture: optional<simpleTypes.HasPicture>
       hasNotes: optional<simpleTypes.HasNotes>
     examples:
@@ -579,6 +582,7 @@ types:
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlockedTrue
+          blockedAt: $simpleTypes.BlockedAt.ExampleBlockedAt
           hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
           hasNotes: $simpleTypes.HasNotes.ExampleHasNotes
           preferredLanguage: $simpleTypes.PreferredLanguage.ExamplePreferredLanguage
@@ -594,6 +598,7 @@ types:
       expiryDate: simpleTypes.ExpiryDate
       temporary: simpleTypes.TemporaryCard
       blocked: optional<simpleTypes.Blocked>
+      blockedAt: optional<simpleTypes.BlockedAt>
       pinCode: optional<simpleTypes.PinCode>
       createdAt: simpleTypes.CreatedAt
       modifiedAt: simpleTypes.ModifiedAt
@@ -615,6 +620,7 @@ types:
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
           blocked: true
+          blockedAt: $simpleTypes.BlockedAt.ExampleBlockedAt
           pinCode: $simpleTypes.PinCode.ExamplePinCode
           createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
           modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt

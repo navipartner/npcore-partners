@@ -774,6 +774,7 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('memberId', Format(Member.SystemId, 0, 4).ToLower())
             .AddProperty('memberNumber', Member."External Member No.")
             .AddProperty('blocked', Member.Blocked)
+            .AddObject(AddPropertyOrNull(ResponseJson, Member.Blocked, 'blockedAt', Member."Blocked At"))
             .AddProperty('firstName', Member."First Name")
             .AddProperty('middleName', Member."Middle Name")
             .AddProperty('lastName', Member."Last Name")
@@ -793,6 +794,14 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('storeCode', Member."Store Code")
             .AddArray(MemberAttributes.MemberAttributesDTO(ResponseJson, Member."Entry No."));
         exit(ResponseJson);
+    end;
+
+    local procedure AddPropertyOrNull(var ResponseJson: Codeunit "NPR JSON Builder"; AddOnCondition: Boolean; PropertyName: Text; PropertyValue: DateTime): Codeunit "NPR JSON Builder"
+    begin
+        if (not AddOnCondition) then
+            exit(ResponseJson);
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
     local procedure IncludeNationalIdentification(ResponseJson: Codeunit "NPR JSON Builder"; Member: Record "NPR MM Member"): Codeunit "NPR JSON Builder"
@@ -884,6 +893,7 @@ codeunit 6248220 "NPR MemberApiAgent"
                     .AddProperty('pinCode', MemberCard."Pin Code")
                     .AddProperty('temporary', MemberCard."Card Is Temporary")
                     .AddProperty('blocked', MemberCard.Blocked)
+                    .AddObject(AddPropertyOrNull(ResponseJson, MemberCard.Blocked, 'blockedAt', MemberCard."Blocked At"))
                     .AddProperty('createdAt', MemberCard.SystemCreatedAt)
                     .AddProperty('modifiedAt', MemberCard.SystemModifiedAt)
                     .EndObject();

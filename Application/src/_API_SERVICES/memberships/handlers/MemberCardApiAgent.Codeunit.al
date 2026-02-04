@@ -292,6 +292,7 @@ codeunit 6248223 "NPR MemberCardApiAgent"
             .AddProperty('expiryDate', MemberCard."Valid Until")
             .AddProperty('temporary', MemberCard."Card Is Temporary")
             .AddProperty('blocked', MemberCard.Blocked)
+            .AddObject(AddPropertyOrNull(ResponseJson, MemberCard.Blocked, 'blockedAt', MemberCard."Blocked At"))
             .AddProperty('pinCode', MemberCard."Pin Code")
             .AddProperty('createdAt', MemberCard.SystemCreatedAt)
             .AddProperty('modifiedAt', MemberCard.SystemModifiedAt)
@@ -299,6 +300,14 @@ codeunit 6248223 "NPR MemberCardApiAgent"
             .AddObject(StartMembershipDTO(ResponseJson, MemberCard."Membership Entry No.", IncludeMembership))
             .EndObject();
         exit(ResponseJson);
+    end;
+
+    local procedure AddPropertyOrNull(var ResponseJson: Codeunit "NPR JSON Builder"; AddOnCondition: Boolean; PropertyName: Text; PropertyValue: DateTime): Codeunit "NPR JSON Builder"
+    begin
+        if (not AddOnCondition) then
+            exit(ResponseJson);
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
     local procedure StartMemberDTO(ResponseJson: Codeunit "NPR JSON Builder"; MemberEntryNo: Integer; IncludeMember: Boolean): Codeunit "NPR JSON Builder"

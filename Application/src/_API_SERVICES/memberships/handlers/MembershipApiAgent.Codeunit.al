@@ -250,12 +250,21 @@ codeunit 6185123 "NPR MembershipApiAgent"
             .AddProperty('membershipDescription', MembershipSetup.Description)
             .AddProperty('issueDate', Membership."Issued Date")
             .AddProperty('blocked', Membership.Blocked)
+            .AddObject(AddPropertyOrNull(ResponseJson, Membership.Blocked, 'blockedAt', Membership."Blocked At"))
             .AddObject(AddRequiredProperty(ResponseJson, 'validFromDate', ValidFrom))
             .AddObject(AddRequiredProperty(ResponseJson, 'validUntilDate', ValidUntil))
             .AddProperty('customerNumber', Membership."Customer No.")
             .AddProperty('autoRenewalActivated', Membership."Auto-Renew" <> Membership."Auto-Renew"::NO)
             .AddArray(AttributeAgent.MembershipAttributesDTO(ResponseJson, Membership."Entry No."));
         exit(ResponseJson);
+    end;
+
+    local procedure AddPropertyOrNull(var ResponseJson: Codeunit "NPR JSON Builder"; AddOnCondition: Boolean; PropertyName: Text; PropertyValue: DateTime): Codeunit "NPR JSON Builder"
+    begin
+        if (not AddOnCondition) then
+            exit(ResponseJson);
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
     local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"

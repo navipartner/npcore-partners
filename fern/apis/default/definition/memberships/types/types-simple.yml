@@ -740,6 +740,13 @@ types:
       - name: ExampleBlockedTrue
         value: true
 
+  BlockedAt:
+    type: datetime
+    docs: Date and time when the entity was blocked.
+    examples:
+      - name: ExampleBlockedAt
+        value: "2024-09-20T00:00:00"
+
   ActivateOnFirstUse:
     type: boolean
     docs: Specifies if the membership will activate upon first use.
