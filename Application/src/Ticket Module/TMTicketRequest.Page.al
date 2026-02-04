@@ -239,8 +239,14 @@
                         if (TicketReservationRequest.FindSet()) then
                             repeat
                                 Ticket.Reset();
-                                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-                                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                                if (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::REVOKE) then begin
+                                    Ticket.SetCurrentKey("External Ticket No.");
+                                    Ticket.SetFilter("External Ticket No.", '=%1', TicketReservationRequest."External Ticket Number");
+                                end else begin
+                                    Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                                end;
+
                                 if (Ticket.FindSet()) then
                                     repeat
                                         TempTickets.TransferFields(Ticket, true);
@@ -267,12 +273,51 @@
                         TicketList: Page "NPR TM Ticket List";
                         Ticket: Record "NPR TM Ticket";
                         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+                        SalesInvHeader: Record "Sales Invoice Header";
+                        PosEntry: Record "NPR Pos Entry";
+
+                        NotFound: Label 'No sales transaction found for ticket revoke request with token %1.';
                     begin
-                        TicketReservationReq.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
-                        TicketReservationReq.FindFirst();
-                        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationReq."Entry No.");
-                        if (Ticket.FindFirst()) then
-                            TicketList.ShowTicketSalesTransaction(Ticket);
+                        case Rec."Request Status" of
+                            Rec."Request Status"::CONFIRMED:
+                                begin
+                                    TicketReservationReq.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
+                                    TicketReservationReq.FindFirst();
+                                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationReq."Entry No.");
+                                    if (Ticket.FindFirst()) then
+                                        TicketList.ShowTicketSalesTransaction(Ticket);
+                                end;
+                            Rec."Request Status"::CANCELED:
+                                begin
+                                    TicketReservationReq.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
+                                    TicketReservationReq.FindFirst();
+
+                                    if (TicketReservationReq."External Order No." <> '') then begin
+                                        if (not SalesInvHeader.SetCurrentKey("NPR External Order No.")) then;
+                                        SalesInvHeader.SetFilter("NPR External Order No.", '=%1', TicketReservationReq."External Order No.");
+                                        if (SalesInvHeader.FindFirst()) then begin
+                                            Page.Run(Page::"Posted Sales Invoice", SalesInvHeader);
+                                            exit;
+                                        end;
+
+                                        SalesInvHeader.Reset();
+                                        SalesInvHeader.SetFilter("External Document No.", '=%1', TicketReservationReq."External Order No.");
+                                        if (SalesInvHeader.FindFirst()) then begin
+                                            Page.Run(Page::"Posted Sales Invoice", SalesInvHeader);
+                                            exit;
+                                        end;
+                                    end;
+                                    if (TicketReservationReq."Receipt No." <> '') then begin
+                                        PosEntry.SetFilter("Document No.", '=%1', TicketReservationReq."Receipt No.");
+                                        if (PosEntry.FindFirst()) then begin
+                                            Page.Run(Page::"NPR POS Entry Card", PosEntry);
+                                            exit;
+                                        end;
+                                    end;
+
+                                    Message(NotFound, Rec."Session Token ID");
+                                end;
+                        end;
                     end;
                 }
                 action(Deferral)

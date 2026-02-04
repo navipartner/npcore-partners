@@ -4007,6 +4007,8 @@
             Ticket.SetFilter("Sales Receipt No.", '%1', DocNoFilter);
             InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket", 0, CopyStr(DocNoFilter, 1, 20), Ticket.TableCaption(), Ticket.Count());
 
+            CancelledTicket_InsertIntoDocEntry(DocumentEntry, DocNoFilter);
+
             if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
             SalesInvHeader.SetFilter("No.", '%1', DocNoFilter);
             if (SalesInvHeader.FindFirst()) then begin
@@ -4058,23 +4060,71 @@
     begin
         if (DocumentEntry."Table ID" = Database::"NPR TM Ticket") then begin
             if (not Ticket.SetCurrentKey("Sales Receipt No.")) then;
-            Ticket.SetFilter("Sales Receipt No.", DocNoFilter);
+            Ticket.SetFilter("Sales Receipt No.", '%1', DocNoFilter);
             if (Ticket.IsEmpty()) then
                 exit;
             Page.Run(Page::"NPR TM Ticket List", Ticket);
         end;
 
         if (DocumentEntry."Table ID" = Database::"NPR TM Ticket Reservation Req.") then begin
-            if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
             if (SalesInvHeader.Get(DocNoFilter)) then begin
-                TicketReservationReq.SetFilter("External Order No.", SalesInvHeader."External Document No.");
-                if (TicketReservationReq.IsEmpty()) then
+                if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
+                TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."External Document No.");
+                if (not TicketReservationReq.IsEmpty()) then begin
+                    Page.Run(Page::"NPR TM Ticket Request", TicketReservationReq);
                     exit;
+                end
+            end;
+
+            TicketReservationReq.Reset();
+            if (not TicketReservationReq.SetCurrentKey("Receipt No.")) then;
+            TicketReservationReq.SetFilter("Receipt No.", '%1', DocNoFilter);
+            if (not TicketReservationReq.IsEmpty()) then begin
                 Page.Run(Page::"NPR TM Ticket Request", TicketReservationReq);
+                exit;
             end;
         end
     end;
 #endif
+
+    local procedure CancelledTicket_InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocNoFilter: Text): Integer
+    var
+        DocTableID: Integer;
+        DocTableName: Text;
+        DocNoOfRecords: Integer;
+        DocType: Integer;
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        Cancelled: Label '(Cancelled)';
+    begin
+
+        TicketReservationReq.SetCurrentKey("Receipt No.");
+        TicketReservationReq.SetFilter("Receipt No.", '%1', DocNoFilter);
+        TicketReservationReq.SetFilter("Request Status", '=%1', TicketReservationReq."Request Status"::CANCELED);
+        DocNoOfRecords := TicketReservationReq.Count();
+
+        if (DocNoOfRecords = 0) then
+            exit(DocNoOfRecords);
+
+        DocTableID := Database::"NPR TM Ticket Reservation Req.";
+        DocTableName := Ticket.TableCaption();
+
+        DocumentEntry.Init();
+        DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
+        DocumentEntry."Table ID" := DocTableID;
+        DocType := 0;
+#if BC17
+        DocumentEntry."Document Type" := DocType;
+#else
+        DocumentEntry."Document Type" := Enum::"Document Entry Document Type".FromInteger(DocType);
+#endif
+        DocumentEntry."Document No." := CopyStr(DocNoFilter, 1, MaxStrLen(DocumentEntry."Document No."));
+        DocumentEntry."Table Name" := CopyStr(StrSubstNo('%1 %2', DocTableName, Cancelled), 1, MaxStrLen(DocumentEntry."Table Name"));
+        DocumentEntry."No. of Records" := DocNoOfRecords;
+        if (not DocumentEntry.Insert()) then;
+
+        exit(DocNoOfRecords);
+    end;
 
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin
