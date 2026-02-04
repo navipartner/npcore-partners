@@ -606,6 +606,142 @@ codeunit 6014559 "NPR TM Dynamic Price"
             exit(Round(Amount, Precision, '<'));
     end;
 
+
+    internal procedure FindPriceProfiles(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; var TempPriceRules: Record "NPR TM DynamicPriceItemList" temporary): Boolean
+    var
+        DynamicPriceList: Record "NPR TM DynamicPriceItemList";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        AdmissionScheduleLine: Record "NPR TM Admis. Schedule Lines";
+    begin
+        if (not TempPriceRules.IsTemporary) then
+            Error('This function must only be called on a temporary record.');
+
+        // Current item price profiles
+        DynamicPriceList.SetFilter(ItemNo, '=%1', ItemNo);
+        if (DynamicPriceList.FindSet()) then begin
+            repeat
+                TempPriceRules.TransferFields(DynamicPriceList, true);
+                TempPriceRules.SystemId := DynamicPriceList.SystemId;
+                if (not TempPriceRules.Insert()) then;
+            until (DynamicPriceList.Next() = 0);
+        end;
+
+        // All item price profiles
+        TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
+        if (VariantCode <> '') then
+            TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
+        if (AdmissionCode <> '') then
+            TicketBOM.SetFilter("Admission Code", '=%1', AdmissionCode);
+
+        if (TicketBOM.FindSet()) then begin
+            repeat
+                AdmissionScheduleLine.SetCurrentKey("Admission Code", "Schedule Code");
+                AdmissionScheduleLine.SetFilter("Admission Code", '=%1', TicketBOM."Admission Code");
+                if (AdmissionScheduleLine.FindSet()) then begin
+                    repeat
+                        TempPriceRules.Init();
+                        TempPriceRules.ItemNo := ItemNo;
+                        TempPriceRules.VariantCode := TicketBOM."Variant Code";
+                        TempPriceRules.AdmissionCode := TicketBOM."Admission Code";
+                        TempPriceRules.ScheduleCode := AdmissionScheduleLine."Schedule Code";
+                        if (not TempPriceRules.Insert()) then;
+                    until (AdmissionScheduleLine.Next() = 0);
+                end;
+            until (TicketBOM.Next() = 0);
+        end;
+
+        exit(not TempPriceRules.IsEmpty());
+    end;
+
+    internal procedure FindPriceProfiles(AdmissionCode: Code[20]; ScheduleCode: Code[20]; var TempPriceRules: Record "NPR TM DynamicPriceItemList" temporary): Boolean
+    var
+        DynamicPriceList: Record "NPR TM DynamicPriceItemList";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        AdmissionScheduleLine: Record "NPR TM Admis. Schedule Lines";
+    begin
+        if (not TempPriceRules.IsTemporary) then
+            Error('This function must only be called on a temporary record.');
+
+        // Current item price profiles
+        DynamicPriceList.SetFilter(AdmissionCode, '=%1', AdmissionCode);
+        if (ScheduleCode <> '') then
+            DynamicPriceList.SetFilter(ScheduleCode, '=%1', ScheduleCode);
+        if (DynamicPriceList.FindSet()) then begin
+            repeat
+                TempPriceRules.TransferFields(DynamicPriceList, true);
+                TempPriceRules.SystemId := DynamicPriceList.SystemId;
+                if (not TempPriceRules.Insert()) then;
+            until (DynamicPriceList.Next() = 0);
+        end;
+
+        TicketBOM.SetCurrentKey("Admission Code");
+        TicketBOM.SetFilter("Admission Code", '=%1', AdmissionCode);
+        if (TicketBOM.FindSet()) then begin
+            repeat
+                AdmissionScheduleLine.SetCurrentKey("Admission Code", "Schedule Code");
+                AdmissionScheduleLine.SetFilter("Admission Code", '=%1', AdmissionCode);
+                if (ScheduleCode <> '') then
+                    AdmissionScheduleLine.SetFilter("Schedule Code", '=%1', ScheduleCode);
+                if (AdmissionScheduleLine.FindSet()) then begin
+                    repeat
+                        TempPriceRules.Init();
+                        TempPriceRules.ItemNo := TicketBOM."Item No.";
+                        TempPriceRules.VariantCode := TicketBOM."Variant Code";
+                        TempPriceRules.AdmissionCode := TicketBOM."Admission Code";
+                        TempPriceRules.ScheduleCode := AdmissionScheduleLine."Schedule Code";
+                        if (not TempPriceRules.Insert()) then;
+                    until (AdmissionScheduleLine.Next() = 0);
+                end;
+            until (TicketBOM.Next() = 0);
+        end;
+
+        exit(not TempPriceRules.IsEmpty());
+    end;
+
+    internal procedure FindPriceProfiles(ProfileCode: Code[20]; var TempPriceRules: Record "NPR TM DynamicPriceItemList" temporary): Boolean
+    var
+        DynamicPriceList: Record "NPR TM DynamicPriceItemList";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        AdmissionScheduleLine: Record "NPR TM Admis. Schedule Lines";
+    begin
+        if (not TempPriceRules.IsTemporary) then
+            Error('This function must only be called on a temporary record.');
+
+        // Current item price profiles
+        DynamicPriceList.SetFilter(ItemPriceCode, '=%1', ProfileCode);
+        if (DynamicPriceList.FindSet()) then begin
+            repeat
+                TempPriceRules.TransferFields(DynamicPriceList, true);
+                TempPriceRules.SystemId := DynamicPriceList.SystemId;
+                if (not TempPriceRules.Insert()) then;
+            until (DynamicPriceList.Next() = 0);
+        end;
+
+        AdmissionScheduleLine.SetFilter("Dynamic Price Profile Code", '=%1', ProfileCode);
+        if (AdmissionScheduleLine.FindSet()) then begin
+            repeat
+                TicketBOM.SetCurrentKey("Admission Code");
+                TicketBOM.SetFilter("Admission Code", '=%1', AdmissionScheduleLine."Admission Code");
+                if (TicketBOM.FindSet()) then begin
+                    repeat
+                        TempPriceRules.Init();
+                        TempPriceRules.ItemNo := TicketBOM."Item No.";
+                        TempPriceRules.VariantCode := TicketBOM."Variant Code";
+                        TempPriceRules.AdmissionCode := TicketBOM."Admission Code";
+                        TempPriceRules.ScheduleCode := AdmissionScheduleLine."Schedule Code";
+                        if (DynamicPriceList.Get(TempPriceRules.ItemNo, TempPriceRules.VariantCode, TempPriceRules.AdmissionCode, TempPriceRules.ScheduleCode)) then begin
+                            TempPriceRules.TransferFields(DynamicPriceList, true);
+                            TempPriceRules.SystemId := DynamicPriceList.SystemId;
+                        end;
+                        if (not TempPriceRules.Insert()) then;
+                    until (TicketBOM.Next() = 0);
+                end;
+            until (AdmissionScheduleLine.Next() = 0);
+        end;
+
+        exit(not TempPriceRules.IsEmpty());
+    end;
+
     local procedure RemoveVat(Amount: Decimal; VATPercentage: Decimal) NewAmount: Decimal
     begin
         NewAmount := Amount / ((100 + VATPercentage) / 100);

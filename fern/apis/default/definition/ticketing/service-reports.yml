@@ -1,0 +1,253 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Reports
+  auth: true
+  base-path: /ticket
+
+  endpoints:
+
+    ############################################
+    dynamicPriceProfileList:
+      docs: 
+        Returns a detailed list of all dynamic price profiles used by the time-based pricing model. 
+        The response includes each profile with all available details.
+      path: /reports/dynamicPriceProfileList
+      method: GET
+      request: 
+        name: dynamicPriceProfileList
+      response: 
+        docs: Returns a list of all dynamic price profiles including their details.
+        type: list<FlatPriceProfileList>
+      examples:
+        - name: Get all dynamic price profiles
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body:
+              - id: "C6156081-0B3A-F011-B3A1-81CF16E9F0D8"
+                profileCode: "DP-STD"
+                lineNo: 10000
+                amount: 0.0
+                amountIncludesVAT: true
+                blocked: false
+                bookingDateFrom: null
+                bookingDateUntil: null
+                description: "0 days out, 0 cheaper."
+                eventDateFrom: null
+                eventDateUntil: null
+                percentage: 0.0
+                pricingOption: 2
+                relativeBookingDateFormula: ""
+                relativeEventDateFormula: ""
+                relativeUntilEventDate: "+0D"
+                roundingDirection: 0
+                roundingPrecision: 0.01
+              - id: "C7156081-0B3A-F011-B3A1-81CF16E9F0D8"
+                profileCode: "DP-STD"
+                lineNo: 20000
+                amount: -1.0
+                amountIncludesVAT: true
+                blocked: false
+                bookingDateFrom: null
+                bookingDateUntil: null
+                description: "1 days out, 1 cheaper."
+                eventDateFrom: null
+                eventDateUntil: null
+                percentage: 0.0
+                pricingOption: 2
+                relativeBookingDateFormula: ""
+                relativeEventDateFormula: ""
+                relativeUntilEventDate: "+1D"
+                roundingDirection: 0
+                roundingPrecision: 0.01
+
+    ############################################
+    dynamicPriceRuleList:
+      docs: 
+        Returns a list of ticket items and their assigned dynamic price profiles, including the pricing rules. 
+        The result can be filtered using the optional query parameters itemNumber, admissionCode, and profileCode (if profileCode is provided, it ignores admissionCode).
+      path: /reports/dynamicPriceRuleList
+      method: GET
+      request: 
+        name: dynamicPriceRuleList
+        query-parameters:
+          itemNumber: 
+            type: optional<string>
+            docs: Filter result to the item number.
+          admissionCode: 
+            type: optional<string>  
+            docs: Filter result to the admission code.
+          profileCode: 
+            type: optional<string>  
+            docs: Filter result to the profile code. (ignores admissionCode if both are provided).
+      response: 
+        docs: Returns a list of ticket items and the assigned dynamic price profiles, including their rules.
+        type: AssignedProfileRules
+      examples:
+        - name: Get dynamic price rules for a specific ticket item
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            itemNumber: "TICKET-001"
+          response:
+            body: 
+              priceProfileAssignments: 
+                - itemNo: "TICKET-001"
+                  variantCode: "VAR-01"
+                  admissionCode: "AD-01"
+                  scheduleCode: "SCH-01"
+                  priceProfileCode: "DP-STD"
+              priceProfiles:
+                - profileCode: "DP-STD"
+                  lines:
+                  - id: "C6156081-0B3A-F011-B3A1-81CF16E9F0D8"
+                    lineNo: 10000
+                    amount: 0.0
+                    amountIncludesVAT: true
+                    blocked: false
+                    bookingDateFrom: null
+                    bookingDateUntil: null
+                    description: "0 days out, 0 cheaper."
+                    eventDateFrom: null
+                    eventDateUntil: null
+                    percentage: 0.0
+                    pricingOption: 2
+                    relativeBookingDateFormula: ""
+                    relativeEventDateFormula: ""
+                    relativeUntilEventDate: "+0D"
+                    roundingDirection: 0
+                    roundingPrecision: 0.01
+                  - id: "C7156081-0B3A-F011-B3A1-81CF16E9F0D8"
+                    lineNo: 20000
+                    amount: -1.0
+                    amountIncludesVAT: true
+                    blocked: false
+                    bookingDateFrom: null
+                    bookingDateUntil: null
+                    description: "1 days out, 1 cheaper."
+                    eventDateFrom: null
+                    eventDateUntil: null
+                    percentage: 0.0
+                    pricingOption: 2
+                    relativeBookingDateFormula: ""
+                    relativeEventDateFormula: ""
+                    relativeUntilEventDate: "+1D"
+                    roundingDirection: 0
+                    roundingPrecision: 0.01
+
+
+types:
+  FlatPriceProfileList:
+    docs: 
+      A flat list representation of dynamic price profiles.
+    extends: PriceProfileLine
+    properties:
+      profileCode:
+        type: string
+        docs: Code of the price profile.
+
+  PriceProfileDetail:
+    docs: 
+      A detailed representation of a dynamic price profile.
+    properties:
+      profileCode:
+        type: string
+        docs: Code of the price profile.
+      lines:
+        type: list<PriceProfileLine>
+        docs: List of price profile lines associated with this profile.
+
+  AssignedPriceProfile:
+    docs: 
+      A representation of which price profiles are assigned to a specific ticket item along with their rules.
+    properties:
+      itemNo:
+        type: string
+        docs: Ticket item number.
+      variantCode:
+        type: string
+        docs: Variant code of the ticket item.
+      admissionCode:
+        type: string  
+        docs: Admission code of the ticket item.
+      scheduleCode:
+        type: string
+        docs: Schedule code of the ticket item.
+      priceProfileCode:
+        type: string
+        docs: Assigned price profile code.  
+      
+  AssignedProfileRules:
+    docs: 
+      A detailed representation of assigned price profiles and their rules for a specific ticket item.
+    properties:
+      priceProfileAssignments:
+        type: list<AssignedPriceProfile>
+        docs: List of assigned price profiles to the ticket item.
+      priceProfiles:
+        type: list<PriceProfileDetail>
+        docs: Detailed list of price profile details associated with the assigned profiles. 
+
+  PriceProfileLine:
+    docs: 
+      A flat representation of a dynamic price profile with all relevant details.
+    properties:
+      id:
+        type: uuid
+        docs: Unique identifier of the price profile line.
+      lineNo:
+        type: integer
+        docs: Line number within the price profile.
+      amount:
+        type: double
+        docs: Fixed amount for the price profile line.
+      amountIncludesVAT:
+        type: boolean
+        docs: Indicates if the amount includes VAT.
+      blocked:
+        type: boolean
+        docs: Indicates if the price profile line is blocked.
+      bookingDateFrom:
+        type: optional<date>
+        docs: Start date for booking eligibility.
+      bookingDateUntil:
+        type: optional<date>
+        docs: End date for booking eligibility.
+      description:
+        type: string
+        docs: Description of the price profile line.
+      eventDateFrom:
+        type: optional<date>
+        docs: Start date for event eligibility.
+      eventDateUntil:
+        type: optional<date>
+        docs: End date for event eligibility.
+      percentage:
+        type: double
+        docs: Percentage value for the price profile line.
+      pricingOption:
+        type: integer
+        docs: Pricing option identifier.
+      relativeBookingDateFormula:
+        type: string
+        docs: Formula for relative booking date calculation.
+      relativeEventDateFormula:
+        type: string
+        docs: Formula for relative event date calculation.
+      relativeUntilEventDate:
+        type: string
+        docs: Formula for relative until event date calculation.
+      roundingDirection:
+        type: integer
+        docs: Rounding direction for the price profile line.
+      roundingPrecision:
+        type: double
+        docs: Rounding precision for the price profile line.

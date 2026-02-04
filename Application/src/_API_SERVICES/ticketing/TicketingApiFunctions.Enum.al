@@ -116,6 +116,10 @@ enum 6059815 "NPR TicketingApiFunctions"
     {
         Caption = 'Get dynamic price profile list';
     }
+    value(901; DYNAMIC_PRICE_RULE_LIST)
+    {
+        Caption = 'Get dynamic price rule list';
+    }
     #endregion
 
 

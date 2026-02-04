@@ -132,7 +132,6 @@ navigation:
                   - endpoint: ticketing.service-ticket.clearConfirmPrint
                   - endpoint: ticketing.service-import.importTickets
                     hidden: true
-
             - ticketing.service-reservations:
                 title: Reservations
                 summary: ./docs/pages/ticketing/reservation-summary.mdx
@@ -149,6 +148,12 @@ navigation:
                 summary: ./docs/pages/ticketing/schedule-summary.mdx
                 contents:
                   - endpoint: ticketing.service-schedule.getSchedule
+            - ticketing.service-reports:
+                hidden: true
+                title: Reports
+                contents:
+                  - endpoint: ticketing.service-reports.dynamicPriceProfileList
+                  - endpoint: ticketing.service-reports.dynamicPriceRuleList
 
         - section: Memberships
           summary: ./docs/pages/memberships/overview.mdx

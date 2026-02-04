@@ -94,6 +94,9 @@ codeunit 6185082 "NPR TicketingApiHandler"
             _ApiFunction::DYNAMIC_PRICE_PROFILE_LIST:
                 _Response := Reports.GetDynamicPriceProfileList(_Request);
 
+            _ApiFunction::DYNAMIC_PRICE_RULE_LIST:
+                _Response := Reports.GetDynamicPriceProfileWhereUsed(_Request);
+
 
         end;
     end;
