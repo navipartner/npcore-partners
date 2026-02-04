@@ -169,7 +169,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
         //TODO: When PROFORMA tests are introduced
-        // IsHandled := false; 
+        // IsHandled := false;
         // OnBeforeSendHttpRequestForNormalSaleDocument(RequestMessage, ResponseText, SalesInvoiceHeader, StartTime, IsHandled);
         // if IsHandled then
         //     exit;
@@ -549,7 +549,6 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Item: Record Item;
         NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         POSEntry: Record "NPR POS Entry";
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
         RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
@@ -557,6 +556,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         HasArchVoucherEntry: Boolean;
+        IsZeroTotalSale: Boolean;
+        SetZeroAmountOnLines: Boolean;
         Certification: Dictionary of [Text, Text];
         JArray: JsonArray;
         JArray2: JsonArray;
@@ -584,12 +585,13 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
         NpRvArchVoucherEntry.SetRange("Document No.", RSPOSAuditLogAuxInfo."Source Document No.");
         HasArchVoucherEntry := NpRvArchVoucherEntry.FindFirst();
-        CalculatePaymentMethods(RSPOSAuditLogAuxInfo, POSEntryPaymentLine, JArray, JObjectLines);
+        AddSalePaymentObjToJsonArray(POSEntry, JArray);
+        IsZeroTotalSale := POSEntry."Amount Incl. Tax" = 0;
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
             Clear(JArray);
             Clear(JObjectLines);
-            if POSEntry."Amount Incl. Tax" = 0 then
-                POSEntry."Amount Incl. Tax" += 0.01;
+            if IsZeroTotalSale then
+                POSEntry."Amount Incl. Tax" += 1;
             JObjectLines.Add('amount', Round(POSEntry."Amount Incl. Tax", 0.01));
             JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"::WireTransfer));
             JArray.Add(JObjectLines);
@@ -642,8 +644,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                             end;
                     end;
                     JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
-                    if POSEntrySalesLine."Amount Incl. VAT" = 0 then
-                        POSEntrySalesLine."Amount Incl. VAT" += 0.01;
+                    if (POSEntrySalesLine."Amount Incl. VAT" = 0) and (IsZeroTotalSale) and (not SetZeroAmountOnLines) then begin
+                        SetZeroAmountOnLines := true;
+                        POSEntrySalesLine."Amount Incl. VAT" += 1;
+                    end;
                     JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
                     RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
                     RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -676,6 +680,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectLines: JsonObject;
         ItemName: Text;
         JsonBodyTxt: Text;
+        IsZeroTotalSale: Boolean;
+        SetZeroAmountOnLines: Boolean;
     begin
         RSFiscalizationSetup.Get();
         JObjectHeader.Add('cashier', SalesHeader."Salesperson Code");
@@ -700,6 +706,9 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectLines.Add('amount', '0.00')
         else begin
             SalesHeader.CalcFields("Amount Including VAT");
+            IsZeroTotalSale := SalesHeader."Amount Including VAT" = 0;
+            if IsZeroTotalSale then
+                SalesHeader."Amount Including VAT" += 1;
             JObjectLines.Add('amount', SalesHeader."Amount Including VAT")
         end;
         if not IsCopy and (SalesHeader."Payment Method Code" <> '') then begin
@@ -745,6 +754,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 if Item.GTIN <> '' then
                     JObjectLines.Add('GTIN', Item.GTIN);
                 JObjectLines.Add('quantity', Abs(SalesLine.Quantity));
+                if (SalesLine."Amount Including VAT" = 0) and (IsZeroTotalSale) and (not SetZeroAmountOnLines) then begin
+                    SetZeroAmountOnLines := true;
+                    SalesLine."Amount Including VAT" += 1;
+                end;
                 JObjectLines.Add('unitPrice', Abs(Round((SalesLine."Amount Including VAT" / SalesLine.Quantity), 0.01)));
                 RSVATPostSetupMapping.Get(SalesLine."VAT Bus. Posting Group", SalesLine."VAT Prod. Posting Group");
                 RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -778,6 +791,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectLines: JsonObject;
         ItemName: Text;
         JsonBodyTxt: Text;
+        IsZeroTotalSale: Boolean;
+        SetZeroAmountOnLines: Boolean;
     begin
         RSFiscalizationSetup.Get();
         JObjectHeader.Add('cashier', SalesInvoiceHeader."Salesperson Code");
@@ -796,6 +811,9 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectHeader.Add('transactionType', GetEnumValueName(Enum::"NPR RS Transaction Type"::SALE));
         Clear(JObjectLines);
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
+        IsZeroTotalSale := SalesInvoiceHeader."Amount Including VAT" = 0;
+        if IsZeroTotalSale then
+            SalesInvoiceHeader."Amount Including VAT" += 1;
         JObjectLines.Add('amount', Round(SalesInvoiceHeader."Amount Including VAT", 0.01));
         if RSPaymentMethodMapping.Get(SalesInvoiceHeader."Payment Method Code") then
             JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"))
@@ -857,6 +875,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 if Item.GTIN <> '' then
                     JObjectLines.Add('GTIN', Item.GTIN);
                 JObjectLines.Add('quantity', Abs(SalesInvoiceLine.Quantity));
+                if (SalesInvoiceLine."Amount Including VAT" = 0) and (IsZeroTotalSale) and (not SetZeroAmountOnLines) then begin
+                    SetZeroAmountOnLines := true;
+                    SalesInvoiceLine."Amount Including VAT" += 1;
+                end;
                 JObjectLines.Add('unitPrice', Abs(Round((SalesInvoiceLine."Amount Including VAT" / SalesInvoiceLine.Quantity), 0.01)));
                 RSVATPostSetupMapping.Get(SalesInvoiceLine."VAT Bus. Posting Group", SalesInvoiceLine."VAT Prod. Posting Group");
                 RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -993,6 +1015,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectLines: JsonObject;
         ItemName: Text;
         JsonBodyTxt: Text;
+        IsZeroTotalSale: Boolean;
+        SetZeroAmountOnLines: Boolean;
     begin
         RSFiscalizationSetup.Get();
         if RSPaymentMethodMapping.Get(SalesInvoiceHeader."Payment Method Code") then
@@ -1015,14 +1039,18 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
             Clear(JObjectLines);
             POSEntry.Get(RSPOSAuditLogAuxInfo."POS Entry No.");
-            if POSEntry."Amount Incl. Tax" = 0 then
-                POSEntry."Amount Incl. Tax" += 0.01;
+            IsZeroTotalSale := POSEntry."Amount Incl. Tax" = 0;
+            if IsZeroTotalSale then
+                POSEntry."Amount Incl. Tax" += 1;
             JObjectLines.Add('amount', Round(POSEntry."Amount Incl. Tax", 0.01));
             JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"::WireTransfer));
             JArray.Add(JObjectLines);
         end else begin
             Clear(JObjectLines);
             SalesInvoiceHeader.CalcFields("Amount Including VAT");
+            IsZeroTotalSale := SalesInvoiceHeader."Amount Including VAT" = 0;
+            if IsZeroTotalSale then
+                SalesInvoiceHeader."Amount Including VAT" += 1;
             JObjectLines.Add('amount', Round(SalesInvoiceHeader."Amount Including VAT", 0.01));
             if RSPaymentMethodMapping.Get(SalesInvoiceHeader."Payment Method Code") then begin
                 JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"));
@@ -1072,6 +1100,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
                 JObjectLines.Add('name', ItemName);
                 JObjectLines.Add('quantity', Abs(SalesInvoiceLine.Quantity));
+                if (SalesInvoiceLine."Amount Including VAT" = 0) and (IsZeroTotalSale) and (not SetZeroAmountOnLines) then begin
+                    SetZeroAmountOnLines := true;
+                    SalesInvoiceLine."Amount Including VAT" += 1;
+                end;
                 JObjectLines.Add('unitPrice', Abs(Round((SalesInvoiceLine."Amount Including VAT" / SalesInvoiceLine.Quantity), 0.01)));
                 RSVATPostSetupMapping.Get(SalesInvoiceLine."VAT Bus. Posting Group", SalesInvoiceLine."VAT Prod. Posting Group");
                 RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -1090,7 +1122,6 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Item: Record Item;
         NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         POSEntry: Record "NPR POS Entry";
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
         RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
@@ -1099,6 +1130,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         HasArchVoucherEntry: Boolean;
+        IsZeroTotalSale: Boolean;
+        SetZeroAmountOnLines: Boolean;
         Certification: Dictionary of [Text, Text];
         OrigPOSEntry: Guid;
         JArray: JsonArray;
@@ -1124,13 +1157,12 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
         NpRvArchVoucherEntry.SetRange("Document No.", RSPOSAuditLogAuxInfo."Source Document No.");
         HasArchVoucherEntry := NpRvArchVoucherEntry.FindFirst();
-        if HasArchVoucherEntry then
-            POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
-        CalculatePaymentMethods(RSPOSAuditLogAuxInfo, POSEntryPaymentLine, JArray, JObjectLines);
+        AddRefundPaymentObjToJsonArray(RSPOSAuditLogAuxInfo, HasArchVoucherEntry, JArray);
+        IsZeroTotalSale := POSEntry."Amount Incl. Tax" = 0;
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
             Clear(JObjectLines);
-            if POSEntry."Amount Incl. Tax" = 0 then
-                POSEntry."Amount Incl. Tax" += 0.01;
+            if IsZeroTotalSale then
+                POSEntry."Amount Incl. Tax" += 1;
             JObjectLines.Add('amount', Round(POSEntry."Amount Incl. Tax", 0.01));
             JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"::WireTransfer));
             JArray.Add(JObjectLines);
@@ -1192,8 +1224,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                             end;
                     end;
                     JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
-                    if POSEntrySalesLine."Amount Incl. VAT" = 0 then
-                        POSEntrySalesLine."Amount Incl. VAT" += 0.01;
+                    if (POSEntrySalesLine."Amount Incl. VAT" = 0) and (IsZeroTotalSale) and (not SetZeroAmountOnLines) then begin
+                        SetZeroAmountOnLines := true;
+                        POSEntrySalesLine."Amount Incl. VAT" += 1;
+                    end;
                     JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
                     RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
                     RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -1240,6 +1274,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::PROFORMA));
         JObjectHeader.Add('transactionType', GetEnumValueName(Enum::"NPR RS Transaction Type"::REFUND));
         Clear(JObjectLines);
+        SalesHeader.CalcFields("Amount Including VAT");
         JObjectLines.Add('amount', '0.00');
         if not RSFiscalizationSetup.Training and (SalesHeader."Payment Method Code" <> '') then begin
             if RSPaymentMethodMapping.Get(SalesHeader."Payment Method Code") then
@@ -1317,6 +1352,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectLines: JsonObject;
         ItemName: Text;
         JsonBodyTxt: Text;
+        IsZeroTotalSale: Boolean;
+        SetZeroAmountOnLines: Boolean;
     begin
         RSFiscalizationSetup.Get();
         JObjectHeader.Add('cashier', SalesCrMemoHeader."Salesperson Code");
@@ -1335,6 +1372,9 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectHeader.Add('transactionType', GetEnumValueName(Enum::"NPR RS Transaction Type"::REFUND));
         Clear(JObjectLines);
         SalesCrMemoHeader.CalcFields("Amount Including VAT");
+        IsZeroTotalSale := SalesCrMemoHeader."Amount Including VAT" = 0;
+        if IsZeroTotalSale then
+            SalesCrMemoHeader."Amount Including VAT" += 1;
         JObjectLines.Add('amount', SalesCrMemoHeader."Amount Including VAT");
         if RSPaymentMethodMapping.Get(SalesCrMemoHeader."Payment Method Code") then
             JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"))
@@ -1388,6 +1428,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 if Item.GTIN <> '' then
                     JObjectLines.Add('GTIN', Item.GTIN);
                 JObjectLines.Add('quantity', Abs(SalesCrMemoLine.Quantity));
+                if (SalesCrMemoLine."Amount Including VAT" = 0) and (IsZeroTotalSale) and (not SetZeroAmountOnLines) then begin
+                    SetZeroAmountOnLines := true;
+                    SalesCrMemoLine."Amount Including VAT" += 1;
+                end;
                 JObjectLines.Add('unitPrice', Abs(Round((SalesCrMemoLine."Amount Including VAT" / SalesCrMemoLine.Quantity), 0.01)));
                 RSVATPostSetupMapping.Get(SalesCrMemoLine."VAT Bus. Posting Group", SalesCrMemoLine."VAT Prod. Posting Group");
                 RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -1461,7 +1505,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                     end;
                     JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
                     if POSEntrySalesLine."Amount Incl. VAT" = 0 then
-                        POSEntrySalesLine."Amount Incl. VAT" += 0.01;
+                        POSEntrySalesLine."Amount Incl. VAT" += 1;
                     JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
                     RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
                     RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -2447,63 +2491,107 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         exit(ValueName);
     end;
 
-    local procedure CalculatePaymentMethods(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; POSEntryPaymentLine: Record "NPR POS Entry Payment Line"; var JArray: JsonArray; var JObjectLines: JsonObject)
+    local procedure AddSalePaymentObjToJsonArray(POSEntry: Record "NPR POS Entry"; var JArray: JsonArray)
     var
-        POSEntryPaymentLine2: Record "NPR POS Entry Payment Line";
-        TempPOSEntryPaymentLine: Record "NPR POS Entry Payment Line" temporary;
-        RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
-        RSPOSPaymMethMapping2: Record "NPR RS POS Paym. Meth. Mapping";
-        PaymentAmount: Decimal;
-        PaymentMethodFilter: Text;
+        POSPaymentLinesDict: Dictionary of [Enum "NPR RS Payment Method", Decimal];
+        POSPaymentChangeLinesDict: Dictionary of [Enum "NPR RS Payment Method", Decimal];
+        POSPaymentMethodDictKey: Enum "NPR RS Payment Method";
     begin
-        POSEntryPaymentLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntryPaymentLine2.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+        CreateNormalSalePaymentLinesDict(POSPaymentLinesDict, POSEntry);
+        CreateNormalSalePaymentChangeLinesDict(POSPaymentChangeLinesDict, POSEntry);
+
+        if (POSPaymentLinesDict.Count() + POSPaymentChangeLinesDict.Count()) = 0 then begin
+            AddPaymentObjToJsonArray(JArray, Enum::"NPR RS Payment Method"::Cash, 1);
+            exit;
+        end;
+
+        foreach POSPaymentMethodDictKey in POSPaymentLinesDict.Keys() do begin
+            AddPaymentObjToJsonArray(JArray, POSPaymentMethodDictKey, POSPaymentLinesDict.Get(POSPaymentMethodDictKey));
+        end;
+
+        foreach POSPaymentMethodDictKey in POSPaymentChangeLinesDict.Keys() do begin
+            AddPaymentObjToJsonArray(JArray, POSPaymentMethodDictKey, POSPaymentChangeLinesDict.Get(POSPaymentMethodDictKey));
+        end;
+    end;
+
+    local procedure CreateNormalSalePaymentLinesDict(var POSEntryPaymentLineDict: Dictionary of [Enum "NPR RS Payment Method", Decimal]; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
+        RSPaymentMethodDictKey: Enum "NPR RS Payment Method";
+    begin
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '>%1', 0);
         if POSEntryPaymentLine.FindSet() then
             repeat
-                Clear(PaymentMethodFilter);
-                Clear(PaymentAmount);
-                if RSPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code") then begin
-                    RSPOSPaymMethMapping2.SetRange("RS Payment Method", RSPOSPaymMethMapping."RS Payment Method");
-                    if RSPOSPaymMethMapping2.FindSet() then
-                        repeat
-                            if PaymentMethodFilter <> '' then
-                                PaymentMethodFilter += '|';
-                            PaymentMethodFilter += RSPOSPaymMethMapping2."POS Payment Method Code";
-                        until RSPOSPaymMethMapping2.Next() = 0;
-                    POSEntryPaymentLine2.SetFilter("POS Payment Method Code", PaymentMethodFilter);
-                    if POSEntryPaymentLine2.FindSet() then
-                        repeat
-                            PaymentAmount += POSEntryPaymentLine2.Amount;
-                        until POSEntryPaymentLine2.Next() = 0;
-                    TempPOSEntryPaymentLine.SetFilter("POS Payment Method Code", PaymentMethodFilter);
-                    if not TempPOSEntryPaymentLine.FindFirst() then begin
-                        TempPOSEntryPaymentLine.Init();
-                        TempPOSEntryPaymentLine.Copy(POSEntryPaymentLine);
-                        TempPOSEntryPaymentLine.Amount := PaymentAmount;
-                        TempPOSEntryPaymentLine.Insert();
-                    end;
-                end;
+                if RSPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code") then
+                    RSPaymentMethodDictKey := RSPOSPaymMethMapping."RS Payment Method"
+                else
+                    RSPaymentMethodDictKey := RSPaymentMethodDictKey::Other;
+                AddOrSetPaymentLinesDictionary(POSEntryPaymentLineDict, RSPaymentMethodDictKey, POSEntryPaymentLine.Amount);
+            until POSEntryPaymentLine.Next() = 0;
+    end;
+
+    local procedure CreateNormalSalePaymentChangeLinesDict(var POSEntryPaymentLineDict: Dictionary of [Enum "NPR RS Payment Method", Decimal]; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
+        RSPaymentMethodDictKey: Enum "NPR RS Payment Method";
+    begin
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                if RSPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code") then
+                    RSPaymentMethodDictKey := RSPOSPaymMethMapping."RS Payment Method"
+                else
+                    RSPaymentMethodDictKey := RSPaymentMethodDictKey::Other;
+                AddOrSetPaymentLinesDictionary(POSEntryPaymentLineDict, RSPaymentMethodDictKey, POSEntryPaymentLine.Amount);
+            until POSEntryPaymentLine.Next() = 0;
+    end;
+
+    local procedure AddRefundPaymentObjToJsonArray(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; HasArchVoucherEntry: Boolean; var JArray: JsonArray)
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
+        POSEntryPaymentLineDict: Dictionary of [Enum "NPR RS Payment Method", Decimal];
+        POSEntryPaymentLineDictKey: Enum "NPR RS Payment Method";
+    begin
+        if HasArchVoucherEntry then
+            POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
+        POSEntryPaymentLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                if RSPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code") then
+                    POSEntryPaymentLineDictKey := RSPOSPaymMethMapping."RS Payment Method"
+                else
+                    POSEntryPaymentLineDictKey := RSPOSPaymMethMapping."RS Payment Method"::Other;
+                AddOrSetPaymentLinesDictionary(POSEntryPaymentLineDict, POSEntryPaymentLineDictKey, POSEntryPaymentLine.Amount);
             until POSEntryPaymentLine.Next() = 0;
 
-        TempPOSEntryPaymentLine.Reset();
-        if TempPOSEntryPaymentLine.FindSet() then begin
-            repeat
-                Clear(JObjectLines);
-                JObjectLines.Add('amount', Abs(TempPOSEntryPaymentLine.Amount));
-                if RSPOSPaymMethMapping.Get(TempPOSEntryPaymentLine."POS Payment Method Code") then
-                    JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"))
-                else
-                    JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"::Other));
-                JArray.Add(JObjectLines);
-            until TempPOSEntryPaymentLine.Next() = 0;
-
-            TempPOSEntryPaymentLine.DeleteAll();
-        end else begin
-            Clear(JObjectLines);
-            JObjectLines.Add('amount', Abs(0.01));
-            JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"::Cash));
-            JArray.Add(JObjectLines);
+        if POSEntryPaymentLineDict.Count = 0 then begin
+            AddPaymentObjToJsonArray(JArray, Enum::"NPR RS Payment Method"::Cash, 1);
+            exit;
         end;
+
+        foreach POSEntryPaymentLineDictKey in POSEntryPaymentLineDict.Keys() do begin
+            AddPaymentObjToJsonArray(JArray, POSEntryPaymentLineDictKey, POSEntryPaymentLineDict.Get(POSEntryPaymentLineDictKey));
+        end;
+    end;
+
+    local procedure AddOrSetPaymentLinesDictionary(var POSEntryPaymentLineDict: Dictionary of [Enum "NPR RS Payment Method", Decimal]; DictKey: Enum "NPR RS Payment Method"; DictValue: Decimal)
+    begin
+        if not POSEntryPaymentLineDict.Add(DictKey, DictValue) then
+            POSEntryPaymentLineDict.Set(DictKey, POSEntryPaymentLineDict.Get(DictKey) + DictValue);
+    end;
+
+    local procedure AddPaymentObjToJsonArray(var JArray: JsonArray; PaymentMethod: Enum "NPR RS Payment Method"; Amount: Decimal)
+    var
+        JObjectLines: JsonObject;
+    begin
+        JObjectLines.Add('amount', Abs(Amount));
+        JObjectLines.Add('paymentType', GetEnumValueName(PaymentMethod));
+        JArray.Add(JObjectLines);
     end;
 
     #endregion

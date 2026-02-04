@@ -83,15 +83,12 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         end;
 
-        case POSEntry."Amount Incl. Tax" >= 0 of
-            true:
-                RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo);
-            false:
-                begin
-                    RSTaxCommunicationMgt.CreateNormalRefund(RSPOSAuditLogAuxInfo);
-                    if (POSCheckIfPaymentMethodCashAndDirectSale(POSEntry."Entry No.") or not (RSPOSAuditLogAuxInfo."Audit Entry Type" in [RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry"])) then
-                        RSTaxCommunicationMgt.CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
-                end;
+        if RSPOSAuditLogAuxInfo."RS Transaction Type" = RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE then
+            RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo)
+        else begin
+            RSTaxCommunicationMgt.CreateNormalRefund(RSPOSAuditLogAuxInfo);
+            if (POSCheckIfPaymentMethodCashAndDirectSale(POSEntry."Entry No.") or not (RSPOSAuditLogAuxInfo."Audit Entry Type" in [RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry"])) then
+                RSTaxCommunicationMgt.CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
         end;
         Commit();
         RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
@@ -115,14 +112,11 @@ codeunit 6059942 "NPR RS Audit Mgt."
         if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
             exit;
 
-        case POSEntry."Amount Incl. Tax" >= 0 of
-            true:
-                RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo);
-            false:
-                begin
-                    RSTaxCommunicationMgt.CreateNormalRefund(RSPOSAuditLogAuxInfo);
-                    RSTaxCommunicationMgt.CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
-                end;
+        if RSPOSAuditLogAuxInfo."RS Transaction Type" = RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE then
+            RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo)
+        else begin
+            RSTaxCommunicationMgt.CreateNormalRefund(RSPOSAuditLogAuxInfo);
+            RSTaxCommunicationMgt.CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
         end;
 
         RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
@@ -1052,12 +1046,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL;
         end;
 
-        case POSEntry."Amount Incl. Tax" >= 0 of
-            true:
-                RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE;
-            false:
-                RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND;
-        end;
+        SetTransactionTypeOnPOSAuditLogAuxInfo(RSPOSAuditLogAuxInfo, POSEntry);
 
         if POSEntry."Customer No." <> '' then begin
             Customer.Get(POSEntry."Customer No.");
@@ -1234,6 +1223,38 @@ codeunit 6059942 "NPR RS Audit Mgt."
                 end;
         until SalesLines.Next() = 0;
         exit(RetailLocationExistsOnSalesLines);
+    end;
+
+    local procedure SetTransactionTypeOnPOSAuditLogAuxInfo(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; POSEntry: Record "NPR POS Entry")
+    begin
+        if POSEntry."Amount Incl. Tax" > 0 then
+            RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE
+        else if POSEntry."Amount Incl. Tax" < 0 then
+            RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND
+        else begin
+            if RSPOSAuditLogAuxInfo."Return Reference No." <> '' then begin
+                RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND;
+                exit;
+            end;
+            if ReturnPOSEntryExists(POSEntry) then begin
+                RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND;
+                exit;
+            end;
+            RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE;
+        end;
+    end;
+
+    local procedure ReturnPOSEntryExists(POSEntry: Record "NPR POS Entry"): Boolean
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        OrigPOSEntrySalesLineSystemId: Guid;
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.FindFirst();
+        OrigPOSEntrySalesLineSystemId := POSEntrySalesLine."Orig.POS Entry S.Line SystemId";
+        POSEntrySalesLine.Reset();
+        POSEntrySalesLine.SetRange(SystemId, OrigPOSEntrySalesLineSystemId);
+        exit(not POSEntrySalesLine.IsEmpty());
     end;
 
     local procedure InsertEanBoxEvent()

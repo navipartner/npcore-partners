@@ -95,7 +95,8 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             NivelationLines.Validate("Item No.", TempNivSalesCrMemoLines."No.");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
             NivelationLines.Quantity := -Abs(TempNivSalesCrMemoLines.Quantity);
-            NivelationLines.Validate("New Price", RSRLocalizationMgt.RoundAmountToCurrencyRounding(TempNivSalesCrMemoLines.GetLineAmountInclVAT() / TempNivSalesCrMemoLines.Quantity, SalesCrMemoHeader."Currency Code"));
+            NivelationLines.Validate("New Price", RSRLocalizationMgt.RoundAmountToCurrencyRounding((TempNivSalesCrMemoLines.GetLineAmountInclVAT() - TempNivSalesCrMemoLines."Inv. Discount Amount")
+                                                                                                    / TempNivSalesCrMemoLines.Quantity, SalesCrMemoHeader."Currency Code"));
             NivelationLines.Insert(true);
             LineNo += 10000;
         until TempNivSalesCrMemoLines.Next() = 0;
@@ -105,14 +106,12 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
     local procedure CheckIfNivelationNeeded(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
-        case SalesCrMemoHeader."Prices Including VAT" of
-            true:
-                if TempSalesCrMemoLine."Line Amount" = (PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) then
-                    exit;
-            false:
-                if (Round(TempSalesCrMemoLine."Line Amount" * (1 + TempSalesCrMemoLine."VAT %" / 100), 1, '=') / TempSalesCrMemoLine.Quantity) = PriceListLine."Unit Price" then
-                    exit;
-        end;
+        if SalesCrMemoHeader."Prices Including VAT" then begin
+            if TempSalesCrMemoLine.GetLineAmountInclVAT() - TempSalesCrMemoLine."Inv. Discount Amount" = (PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) then
+                exit;
+        end else
+            if (TempSalesCrMemoLine.GetLineAmountExclVAT() - TempSalesCrMemoLine."Inv. Discount Amount") = (PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) then
+                exit;
         TempNivSalesCrMemoLines.Init();
         TempNivSalesCrMemoLines.Copy(TempSalesCrMemoLine);
         TempNivSalesCrMemoLines.Insert();
@@ -136,7 +135,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
-        ValidateGenJnlLineNegativeAmounts(GenJournalLine, SalesCrMemoHeader, RSRetailCalculationType, CalculationValueEntry);
+        ValidateNegativeGenJnlLineAmounts(GenJournalLine, RSRetailCalculationType, SalesCrMemoHeader, CalculationValueEntry);
 
         if GenJournalLine.Amount = 0 then
             exit;
@@ -153,44 +152,11 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
                     GenJournalLine."Bill-to/Pay-to No." := GenJournalLine."Bal. Account No.";
             end;
 
-        if (RSRetailCalculationType in [RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Standard Correction"]) then begin
-            GenJournalLine."Credit Amount" := -Abs(GenJournalLine.Amount);
-            GenJournalLine."Debit Amount" := 0;
-        end;
+        CalculateNegativeGenJnlLineAmounts(GenJournalLine, RSRetailCalculationType, SalesCrMemoHeader, CalculationValueEntry);
 
         PostGLAcc(GenJournalLine, GLEntry);
 
         RSRLocalizationMgt.InsertGLItemLedgerRelation(GenJnlPostLine, GLEntry."Entry No.", CalculationValueEntry."Entry No.");
-    end;
-
-    local procedure ValidateGenJnlLineNegativeAmounts(var GenJournalLine: Record "Gen. Journal Line"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
-    begin
-        case RSRetailCalculationType of
-            RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Standard Correction":
-                if CalculationValueEntry."Cost Amount (Actual)" <> 0 then begin
-                    GenJournalLine.Validate("Credit Amount", -Abs(CalculationValueEntry."Cost Amount (Actual)"));
-                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
-                    exit;
-                end;
-            RSRetailCalculationType::"Counter COGS Correction":
-                begin
-                    GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
-                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
-                    exit;
-                end;
-            RSRetailCalculationType::"Counter Std Correction":
-                GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Cost Posted to G/L"));
-            RSRetailCalculationType::"COGS Correction":
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Posted to G/L");
-            RSRetailCalculationType::VAT:
-                GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Sales Amount (Actual)"));
-            RSRetailCalculationType::Margin:
-                if CalculationValueEntry."Cost Posted to G/L" <> 0 then
-                    GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"))
-                else
-                    GenJournalLine.Validate("Debit Amount", CalculateRSGLMarginNoVATAmount(SalesCrMemoHeader));
-        end;
-        GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
     end;
 
     local procedure InitAmounts(var GenJournalLine: Record "Gen. Journal Line")
@@ -591,13 +557,13 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         RSRLocalizationMgt.ResetValueEntryAmounts(RetailValueEntry);
         RetailValueEntry.Description := CalculationValueEntryDescLbl;
 
-        DiscountPerUnit := Abs(TempSalesCrMemoLine."Line Discount Amount" / TempSalesCrMemoLine.Quantity);
+        DiscountPerUnit := Abs((TempSalesCrMemoLine."Line Discount Amount" / TempSalesCrMemoLine.Quantity) + (TempSalesCrMemoLine."Inv. Discount Amount" / TempSalesCrMemoLine.Quantity));
         SumOfStdCostPerUnit := StdValueEntry."Cost per Unit" + StdCorrectionValueEntry."Cost per Unit" + SumOfCOGSCostPerUnit;
         RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - SumOfStdCostPerUnit - DiscountPerUnit;
         RetailValueEntry."Cost per Unit" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(RetailValueEntry."Cost per Unit", SalesCrMemoHeader."Currency Code");
 
         if PriceListLine."Unit Price" * Abs(StdValueEntry."Invoiced Quantity") <> (StdValueEntry."Cost Amount (Actual)" + StdCorrectionValueEntry."Cost Amount (Actual)" + SumOfCOGSCostAmtAct) then begin
-            RetailValueEntry."Cost Amount (Actual)" := Abs((PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) - SumOfCOGSCostAmtAct - Abs(TempSalesCrMemoLine."Line Discount Amount"));
+            RetailValueEntry."Cost Amount (Actual)" := RetailValueEntry."Cost per Unit" * StdValueEntry."Item Ledger Entry Quantity";
             RetailValueEntry."Cost Amount (Actual)" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(RetailValueEntry."Cost Amount (Actual)", SalesCrMemoHeader."Currency Code");
         end;
 
@@ -641,6 +607,78 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         end;
     end;
 
+    local procedure ValidateNegativeGenJnlLineAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; CalculationValueEntry: Record "Value Entry")
+    begin
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"Margin with VAT":
+                GenJournalLine.Validate("Credit Amount", -CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::Margin:
+                begin
+                    if CalculationValueEntry."Cost Posted to G/L" <> 0 then
+                        GenJournalLine.Validate("Debit Amount", -((CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)")))
+                    else
+                        GenJournalLine.Validate("Debit Amount", -CalculateRSGLMarginNoVATAmount(SalesCrMemoHeader));
+                end;
+            RSRetailCalculationType::VAT:
+                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Sales Amount (Actual)");
+            RSRetailCalculationType::"Standard Correction":
+                begin
+                    GenJournalLine.Validate("Credit Amount", -Abs(CalculationValueEntry."Cost Posted to G/L"));
+                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
+                end;
+            RSRetailCalculationType::"Counter COGS Correction":
+                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::"COGS Correction":
+                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::"Counter Std Correction":
+                begin
+                    GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Cost Posted to G/L"));
+                    GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
+                end;
+        end;
+    end;
+
+    local procedure CalculateNegativeGenJnlLineAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; CalculationValueEntry: Record "Value Entry")
+    begin
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"Margin with VAT":
+                begin
+                    GenJournalLine."Credit Amount" := -CalculationValueEntry."Cost Posted to G/L";
+                    GenJournalLine.Amount := CalculationValueEntry."Cost Posted to G/L";
+                end;
+            RSRetailCalculationType::Margin:
+                begin
+                    if CalculationValueEntry."Cost Posted to G/L" <> 0 then
+                        GenJournalLine."Debit Amount" := -((CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"))
+                    else
+                        GenJournalLine."Debit Amount" := -CalculateRSGLMarginNoVATAmount(SalesCrMemoHeader);
+
+                    GenJournalLine.Amount := GenJournalLine."Debit Amount";
+                end;
+            RSRetailCalculationType::VAT:
+                begin
+                    GenJournalLine."Debit Amount" := CalculationValueEntry."Sales Amount (Actual)";
+                    GenJournalLine.Amount := GenJournalLine."Debit Amount";
+                end;
+            RSRetailCalculationType::"Standard Correction":
+                begin
+                    GenJournalLine."Credit Amount" := -Abs(CalculationValueEntry."Cost Posted to G/L");
+                    GenJournalLine.Amount := Abs(GenJournalLine.Amount);
+                    GenJournalLine."Debit Amount" := 0;
+                end;
+            RSRetailCalculationType::"Counter COGS Correction":
+                GenJournalLine."Debit Amount" := CalculationValueEntry."Cost Posted to G/L";
+            RSRetailCalculationType::"COGS Correction":
+                GenJournalLine."Credit Amount" := CalculationValueEntry."Cost Posted to G/L";
+            RSRetailCalculationType::"Counter Std Correction":
+                begin
+                    GenJournalLine."Debit Amount" := -Abs(CalculationValueEntry."Cost Posted to G/L");
+                    GenJournalLine.Amount := -Abs(GenJournalLine.Amount);
+                    GenJournalLine."Credit Amount" := 0;
+                end;
+        end;
+    end;
+
     local procedure CalculateSumOfAppliedRetailCostAmounts(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -675,7 +713,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     var
         CalculatedLineAmount: Decimal;
     begin
-        CalculatedLineAmount := (PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) - TempSalesCrMemoLine."Line Discount Amount";
+        CalculatedLineAmount := TempSalesCrMemoLine.GetLineAmountInclVAT() - TempSalesCrMemoLine."Inv. Discount Amount";
         exit(CalculatedLineAmount * RSRLocalizationMgt.CalculateVATBreakDown(TempSalesCrMemoLine."VAT Bus. Posting Group", TempSalesCrMemoLine."VAT Prod. Posting Group"));
     end;
 

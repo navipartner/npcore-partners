@@ -47,16 +47,10 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
-        if PostedNivelationLines."Value Difference" < 0 then
-            if RSGLEntryType = RSGLEntryType::Margin then
-                GenJournalLine.Validate("Credit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType))
-            else
-                GenJournalLine.Validate("Debit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType))
-        else
-            if RSGLEntryType = RSGLEntryType::Margin then
-                GenJournalLine.Validate("Debit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType))
-            else
-                GenJournalLine.Validate("Credit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType));
+        ValidateGenJournalLineAmounts(GenJournalLine, PostedNivelationHeader, PostedNivelationLines, RSGLEntryType);
+
+        if GenJournalLine.Amount = 0 then
+            exit;
 
         GenJnlCheckLine.RunCheck(GenJournalLine);
         InitAmounts(GenJournalLine);
@@ -196,12 +190,10 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         GenJournalLine."Document Date" := PostedNivelationLines."Posting Date";
         GenJournalLine."Due Date" := PostedNivelationLines."Posting Date";
     end;
-
     #endregion
 
 
     #region Retail Price Calculation
-
     local procedure GetRSAccountNoFromSetup(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT): Code[20]
     var
         LocalizationSetup: Record "NPR RS R Localization Setup";
@@ -223,82 +215,104 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         end;
     end;
 
-    local procedure CalculateRSAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT): Decimal
+    local procedure ValidateGenJournalLineAmounts(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
+    begin
+        case PostedNivelationHeader."Source Type" of
+            PostedNivelationHeader."Source Type"::"POS Entry":
+                ValidateGenJournalLinePOSEntryAmounts(GenJournalLine, PostedNivelationLines, RSGLEntryType);
+            PostedNivelationHeader."Source Type"::"Posted Sales Invoice":
+                ValidateGenJournalLineSalesInvoiceAmounts(GenJournalLine, PostedNivelationLines, RSGLEntryType);
+            PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
+                ValidateGenJournalLineSalesCrMemoAmounts(GenJournalLine, PostedNivelationLines, RSGLEntryType);
+            PostedNivelationHeader."Source Type"::"Sales Price List":
+                ValidateGenJournalLineSalesPriceListAmounts(GenJournalLine, PostedNivelationLines, RSGLEntryType);
+        end;
+    end;
+
+    local procedure ValidateGenJournalLinePOSEntryAmounts(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
+    begin
+        if PostedNivelationLines.Quantity > 0 then begin
+            case RSGLEntryType of
+                RSGLEntryType::Margin:
+                    GenJournalLine.Validate("Credit Amount", Abs(PostedNivelationLines."Value Difference"));
+                RSGLEntryType::MarginNoVAT:
+                    GenJournalLine.Validate("Debit Amount", RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Value Difference"), '') -
+                                                            RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Calculated VAT"), ''));
+                RSGLEntryType::VAT:
+                    GenJournalLine.Validate("Debit Amount", Abs(PostedNivelationLines."Calculated VAT"));
+            end;
+        end else begin
+            case RSGLEntryType of
+                RSGLEntryType::Margin:
+                    GenJournalLine.Validate("Credit Amount", -PostedNivelationLines."Value Difference");
+                RSGLEntryType::MarginNoVAT:
+                    GenJournalLine.Validate("Debit Amount", -(RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Value Difference"), '') -
+                                                                RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Calculated VAT"), '')));
+                RSGLEntryType::VAT:
+                    GenJournalLine.Validate("Debit Amount", -(PostedNivelationLines."Calculated VAT"));
+            end;
+        end;
+    end;
+
+    local procedure ValidateGenJournalLineSalesInvoiceAmounts(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
     begin
         case RSGLEntryType of
-            RSGLEntryType::VAT:
-                exit(CalculateRSGLVATAmount(PostedNivelationHeader, PostedNivelationLines));
             RSGLEntryType::Margin:
-                exit(CalculateRSGLMarginAmount(PostedNivelationHeader, PostedNivelationLines));
+                GenJournalLine.Validate("Credit Amount", Abs(PostedNivelationLines."Value Difference"));
             RSGLEntryType::MarginNoVAT:
-                exit(CalculateRSGLMarginNoVATAmount(PostedNivelationHeader, PostedNivelationLines));
+                GenJournalLine.Validate("Debit Amount", RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Value Difference"), '') -
+                                                        RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Calculated VAT"), ''));
+            RSGLEntryType::VAT:
+                GenJournalLine.Validate("Debit Amount", Abs(PostedNivelationLines."Calculated VAT"));
         end;
     end;
 
-    local procedure CalculateRSGLVATAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
+    local procedure ValidateGenJournalLineSalesCrMemoAmounts(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
     begin
-        case PostedNivelationHeader."Source Type" of
-            PostedNivelationHeader."Source Type"::"POS Entry":
-                exit(CalculatePOSEntryVATAmount(PostedNivelationLines));
-            PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
-                exit(-(Abs(PostedNivelationLines."Calculated VAT")));
-            else
-                exit(Abs(PostedNivelationLines."Calculated VAT"));
+        case RSGLEntryType of
+            RSGLEntryType::Margin:
+                GenJournalLine.Validate("Credit Amount", -PostedNivelationLines."Value Difference");
+            RSGLEntryType::MarginNoVAT:
+                GenJournalLine.Validate("Debit Amount", -(RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Value Difference"), '') -
+                                                            RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(PostedNivelationLines."Calculated VAT"), '')));
+            RSGLEntryType::VAT:
+                GenJournalLine.Validate("Debit Amount", -(PostedNivelationLines."Calculated VAT"));
         end;
     end;
 
-    local procedure CalculateRSGLMarginAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
+    local procedure ValidateGenJournalLineSalesPriceListAmounts(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
     begin
-        case PostedNivelationHeader."Source Type" of
-            PostedNivelationHeader."Source Type"::"POS Entry":
-                exit(CalculatePOSEntryMarginAmount(PostedNivelationLines));
-            PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
-                exit(-(Abs(PostedNivelationLines."Value Difference")));
-            else
-                exit(Abs(PostedNivelationLines."Value Difference"));
-        end;
+        if PostedNivelationLines."Value Difference" < 0 then
+            ValidateNegativeValueDifferenceSalesPriceListAmounts(GenJournalLine, PostedNivelationLines, RSGLEntryType)
+        else
+            ValidatePositiveValueDifferenceSalesPriceListAmounts(GenJournalLine, PostedNivelationLines, RSGLEntryType);
     end;
 
-    local procedure CalculateRSGLMarginNoVATAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
+    local procedure ValidateNegativeValueDifferenceSalesPriceListAmounts(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
     begin
-        case PostedNivelationHeader."Source Type" of
-            PostedNivelationHeader."Source Type"::"POS Entry":
-                exit(CalculatePOSEntryMarginNoVATAmount(PostedNivelationLines));
-            PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
-                exit(-(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
-                            RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", ''))));
-            else
-                exit(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
+        case RSGLEntryType of
+            RSGLEntryType::Margin:
+                GenJournalLine.Validate("Credit Amount", Abs(PostedNivelationLines."Value Difference"));
+            RSGLEntryType::VAT:
+                GenJournalLine.Validate("Debit Amount", Abs(PostedNivelationLines."Calculated VAT"));
+            RSGLEntryType::MarginNoVAT:
+                GenJournalLine.Validate("Debit Amount", Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
                             RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", '')));
         end;
     end;
 
-    local procedure CalculatePOSEntryVATAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
+    local procedure ValidatePositiveValueDifferenceSalesPriceListAmounts(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
     begin
-        if PostedNivelationLines.Quantity > 0 then
-            exit(Abs(PostedNivelationLines."Calculated VAT"))
-        else
-            exit(-(Abs(PostedNivelationLines."Calculated VAT")));
+        case RSGLEntryType of
+            RSGLEntryType::Margin:
+                GenJournalLine.Validate("Debit Amount", Abs(PostedNivelationLines."Value Difference"));
+            RSGLEntryType::VAT:
+                GenJournalLine.Validate("Credit Amount", Abs(PostedNivelationLines."Calculated VAT"));
+            RSGLEntryType::MarginNoVAT:
+                GenJournalLine.Validate("Credit Amount", Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
+                            RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", '')));
+        end;
     end;
-
-    local procedure CalculatePOSEntryMarginAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
-    begin
-        if PostedNivelationLines.Quantity > 0 then
-            exit(Abs(PostedNivelationLines."Value Difference"))
-        else
-            exit(-(Abs(PostedNivelationLines."Value Difference")));
-    end;
-
-    local procedure CalculatePOSEntryMarginNoVATAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
-    begin
-        if PostedNivelationLines.Quantity > 0 then
-            exit(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
-                     RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", '')))
-        else
-            exit(-(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
-                        RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", ''))));
-    end;
-
     #endregion
 
     #region Posting Value and Item Ledger Entries

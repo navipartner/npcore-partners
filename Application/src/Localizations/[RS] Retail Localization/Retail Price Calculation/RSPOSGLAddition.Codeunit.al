@@ -61,10 +61,10 @@ codeunit 6151363 "NPR RS POS GL Addition"
             CheckIfNivelationNeeded();
         until TempPOSEntrySalesLines.Next() = 0;
 
+        RSRLocalizationMgt.ValidateGLEntriesBalanced(POSEntry."Document No.");
+
         if not TempNivelationSalesLines.IsEmpty() then
             CreateAndPostNivelationDocument(POSEntry, ShowNivelationPostingMessage);
-
-        RSRLocalizationMgt.ValidateGLEntriesBalanced(POSEntry."Document No.");
 
         if not POSStore.Get(POSEntry."POS Store Code") then
             exit;
@@ -118,7 +118,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
     begin
         if TempPOSEntrySalesLines."Line Discount %" = 0 then
             exit;
-        if (TempPOSEntrySalesLines."Unit Price" - TempPOSEntrySalesLines."Line Discount Amount Incl. VAT") = PriceListLine."Unit Price" then
+        if TempPOSEntrySalesLines."Amount Incl. VAT" = (PriceListLine."Unit Price" * TempPOSEntrySalesLines.Quantity) then
             exit;
         TempNivelationSalesLines.Init();
         TempNivelationSalesLines.Copy(TempPOSEntrySalesLines);
@@ -143,12 +143,10 @@ codeunit 6151363 "NPR RS POS GL Addition"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
-        case true of
-            TempPOSEntrySalesLines."Line Amount" > 0:
-                ValidateGenJnlLinePositiveAmounts(GenJournalLine, RSRetailCalculationType, CalculationValueEntry);
-            else
-                ValidateGenJnlLineNegativeAmounts(GenJournalLine, RSRetailCalculationType, CalculationValueEntry);
-        end;
+        if TempPOSEntrySalesLines.Quantity > 0 then
+            ValidatePositiveGenJnlLineAmounts(GenJournalLine, RSRetailCalculationType, CalculationValueEntry)
+        else
+            ValidateNegativeGenJnlLineAmounts(GenJournalLine, RSRetailCalculationType, CalculationValueEntry);
 
         if GenJournalLine.Amount = 0 then
             exit;
@@ -165,74 +163,14 @@ codeunit 6151363 "NPR RS POS GL Addition"
                     GenJournalLine."Bill-to/Pay-to No." := GenJournalLine."Bal. Account No.";
             end;
 
-        ValidateNegativeDebitCredit(GenJournalLine, RSRetailCalculationType);
+        if TempPOSEntrySalesLines.Quantity > 0 then
+            CalculatePositiveGenJnlLineAmounts(GenJournalLine, RSRetailCalculationType, CalculationValueEntry)
+        else
+            CalculateNegativeGenJnlLineAmounts(GenJournalLine, RSRetailCalculationType, CalculationValueEntry);
 
         PostGLAcc(GenJournalLine, GLEntry);
 
         RSRLocalizationMgt.InsertGLItemLedgerRelation(GenJnlPostLine, GLEntry."Entry No.", CalculationValueEntry."Entry No.");
-    end;
-
-    local procedure ValidateNegativeDebitCredit(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
-    begin
-        if TempPOSEntrySalesLines."Line Amount" > 0 then
-            exit;
-
-        case RSRetailCalculationType of
-            RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Standard Correction":
-                begin
-                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
-                    GenJournalLine."Credit Amount" := -GenJournalLine.Amount;
-                    GenJournalLine."Debit Amount" := 0;
-                end;
-            RSRetailCalculationType::Margin, RSRetailCalculationType::VAT:
-                begin
-                    GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
-                    GenJournalLine."Debit Amount" := -Abs(GenJournalLine.Amount);
-                    GenJournalLine."Credit Amount" := 0;
-                end;
-        end;
-    end;
-
-    local procedure ValidateGenJnlLinePositiveAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
-    begin
-        case RSRetailCalculationType of
-            RSRetailCalculationType::"Margin with VAT":
-                GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
-            RSRetailCalculationType::"Counter COGS Correction", RSRetailCalculationType::"Counter Std Correction":
-                GenJournalLine.Validate("Credit Amount", -CalculationValueEntry."Cost Posted to G/L");
-            RSRetailCalculationType::"COGS Correction", RSRetailCalculationType::"Standard Correction":
-                GenJournalLine.Validate("Debit Amount", -CalculationValueEntry."Cost Posted to G/L");
-            RSRetailCalculationType::VAT:
-                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Sales Amount (Actual)"));
-            RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"));
-        end;
-    end;
-
-    local procedure ValidateGenJnlLineNegativeAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
-    begin
-        case RSRetailCalculationType of
-            RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Standard Correction":
-                begin
-                    GenJournalLine.Validate("Credit Amount", -Abs(CalculationValueEntry."Cost Amount (Actual)"));
-                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
-                end;
-            RSRetailCalculationType::"Counter COGS Correction":
-                begin
-                    GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
-                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
-                    exit;
-                end;
-            RSRetailCalculationType::"COGS Correction":
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Posted to G/L");
-            RSRetailCalculationType::"Counter Std Correction":
-                GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Cost Amount (Actual)"));
-            RSRetailCalculationType::VAT:
-                GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Sales Amount (Actual)"));
-            RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"));
-        end;
-        GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
     end;
 
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line")
@@ -808,6 +746,119 @@ codeunit 6151363 "NPR RS POS GL Addition"
                 end;
             RSRetailCalculationType::"COGS Correction", RSRetailCalculationType::"Standard Correction":
                 exit(GetCOGSAccountFromGenPostingSetup());
+        end;
+    end;
+
+    local procedure ValidatePositiveGenJnlLineAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
+    begin
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"COGS Correction":
+                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
+            RSRetailCalculationType::"Standard Correction":
+                GenJournalLine.Validate("Debit Amount", -CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::Margin:
+                GenJournalLine.Validate("Debit Amount", -(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"));
+            RSRetailCalculationType::VAT:
+                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Sales Amount (Actual)"));
+            RSRetailCalculationType::"Margin with VAT":
+                GenJournalLine.Validate("Credit Amount", -(CalculationValueEntry."Cost Posted to G/L"));
+            RSRetailCalculationType::"Counter COGS Correction":
+                GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
+            RSRetailCalculationType::"Counter Std Correction":
+                GenJournalLine.Validate("Credit Amount", -Abs(CalculationValueEntry."Cost Posted to G/L"));
+        end;
+    end;
+
+    local procedure ValidateNegativeGenJnlLineAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
+    begin
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"Margin with VAT":
+                GenJournalLine.Validate("Credit Amount", -CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::Margin:
+                GenJournalLine.Validate("Debit Amount", -((CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)")));
+            RSRetailCalculationType::VAT:
+                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Sales Amount (Actual)");
+            RSRetailCalculationType::"Standard Correction":
+                begin
+                    GenJournalLine.Validate("Credit Amount", -Abs(CalculationValueEntry."Cost Posted to G/L"));
+                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
+                end;
+            RSRetailCalculationType::"Counter COGS Correction":
+                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::"COGS Correction":
+                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::"Counter Std Correction":
+                begin
+                    GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Cost Posted to G/L"));
+                    GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
+                end;
+        end;
+    end;
+
+    local procedure CalculatePositiveGenJnlLineAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
+    begin
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"COGS Correction":
+                GenJournalLine."Debit Amount" := Abs(CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::"Standard Correction":
+                GenJournalLine."Debit Amount" := -CalculationValueEntry."Cost Posted to G/L";
+            RSRetailCalculationType::Margin:
+                GenJournalLine."Debit Amount" := -(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)");
+            RSRetailCalculationType::VAT:
+                GenJournalLine."Debit Amount" := Abs(CalculationValueEntry."Sales Amount (Actual)");
+            RSRetailCalculationType::"Margin with VAT":
+                GenJournalLine."Credit Amount" := -(CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::"Counter COGS Correction":
+                GenJournalLine."Credit Amount" := Abs(CalculationValueEntry."Cost Posted to G/L");
+            RSRetailCalculationType::"Counter Std Correction":
+                GenJournalLine."Credit Amount" := -Abs(CalculationValueEntry."Cost Posted to G/L");
+        end;
+
+        if GenJournalLine."Credit Amount" <> 0 then begin
+            GenJournalLine.Amount := -GenJournalLine."Credit Amount";
+            GenJournalLine."Debit Amount" := 0;
+        end;
+
+        if GenJournalLine."Debit Amount" <> 0 then begin
+            GenJournalLine.Amount := GenJournalLine."Debit Amount";
+            GenJournalLine."Credit Amount" := 0;
+        end;
+    end;
+
+    local procedure CalculateNegativeGenJnlLineAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
+    begin
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"Margin with VAT":
+                begin
+                    GenJournalLine."Credit Amount" := -CalculationValueEntry."Cost Posted to G/L";
+                    GenJournalLine.Amount := CalculationValueEntry."Cost Posted to G/L";
+                end;
+            RSRetailCalculationType::Margin:
+                begin
+                    GenJournalLine."Debit Amount" := -((CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"));
+                    GenJournalLine.Amount := GenJournalLine."Debit Amount";
+                end;
+            RSRetailCalculationType::VAT:
+                begin
+                    GenJournalLine."Debit Amount" := CalculationValueEntry."Sales Amount (Actual)";
+                    GenJournalLine.Amount := GenJournalLine."Debit Amount";
+                end;
+            RSRetailCalculationType::"Standard Correction":
+                begin
+                    GenJournalLine."Credit Amount" := -Abs(CalculationValueEntry."Cost Posted to G/L");
+                    GenJournalLine.Amount := Abs(GenJournalLine.Amount);
+                    GenJournalLine."Debit Amount" := 0;
+                end;
+            RSRetailCalculationType::"Counter COGS Correction":
+                GenJournalLine."Debit Amount" := CalculationValueEntry."Cost Posted to G/L";
+            RSRetailCalculationType::"COGS Correction":
+                GenJournalLine."Credit Amount" := CalculationValueEntry."Cost Posted to G/L";
+            RSRetailCalculationType::"Counter Std Correction":
+                begin
+                    GenJournalLine."Debit Amount" := -Abs(CalculationValueEntry."Cost Posted to G/L");
+                    GenJournalLine.Amount := -Abs(GenJournalLine.Amount);
+                    GenJournalLine."Credit Amount" := 0;
+                end;
         end;
     end;
 

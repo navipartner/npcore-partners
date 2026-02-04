@@ -263,8 +263,6 @@ table 6060000 "NPR RS Nivelation Lines"
         if (Quantity = 0) then
             exit;
         "Old Value" := "Old Price" * Quantity;
-        if ("New Price" = 0) then
-            exit;
         "New Value" := "New Price" * Quantity;
         "Price Difference" := "New Price" - "Old Price";
         "Value Difference" := "Price Difference" * Quantity;
