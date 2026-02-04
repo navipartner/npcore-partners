@@ -1863,7 +1863,7 @@
 
             // Get suggested admission schedule entry
             if (AdmissionScheduleEntryNo > 0) then begin
-                AdmissionSchEntry.SetFilter("External Schedule Entry No.", '=%1', AdmissionScheduleEntryNo);
+                AdmissionSchEntry.SetFilter("Entry No.", '=%1', AdmissionScheduleEntryNo);
                 AdmissionSchEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
                 AdmissionSchEntry.SetFilter(Cancelled, '=%1', false);
                 AdmissionSchEntry.SetFilter("Admission Is", '=%1', AdmissionSchEntry."Admission Is"::Open);
