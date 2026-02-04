@@ -50,9 +50,6 @@ navigation:
     - page: Replication
       icon: fa-solid fa-sync-alt
       path: docs/pages/replication.mdx
-    - page: Performance
-      icon: fa-solid fa-gauge-high
-      path: docs/pages/performance.mdx
     - page: Rate Limits
       icon: fa-solid fa-clock
       path: docs/pages/limits.mdx
