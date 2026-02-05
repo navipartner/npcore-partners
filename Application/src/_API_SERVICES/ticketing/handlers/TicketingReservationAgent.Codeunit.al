@@ -487,7 +487,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         ResponseJson.StartObject('reservations')
             .AddProperty('itemNumber', TicketReservationRequest."Item No.")
             .AddProperty('quantity', TicketReservationRequest."Quantity")
-            .AddObject(CompactTicketDetailsDTO(ResponseJson, PrimaryEntryNo))
+            .AddObject(CompactTicketDetailsDTO(ResponseJson, PrimaryEntryNo, TicketReservationRequest."Quantity"))
             .StartArray('content');
         repeat
             TicketingCatalog.GetCatalogItemDescription('', TicketReservationRequest."Item No.", TicketDescriptionBuffer, TicketReservationRequest.TicketHolderPreferredLanguage);
@@ -504,11 +504,14 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         exit(ResponseJson);
     end;
 
-    local procedure CompactTicketDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer): Codeunit "NPR Json Builder";
+    local procedure CompactTicketDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer; OrderedQuantity: Integer): Codeunit "NPR Json Builder";
     var
         Ticket: Record "NPR TM Ticket";
         GeneralLedgerSetup: Record "General Ledger Setup";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketAgent: Codeunit "NPR TicketingTicketAgent";
         TimeZoneHelper: Codeunit "NPR TM TimeHelper";
+        EnumEncoder: Codeunit "NPR TicketingApiTranslations";
     begin
         GeneralLedgerSetup.Get();
         Ticket.SetCurrentKey("Ticket Reservation Entry No.");
@@ -516,14 +519,22 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         if (not Ticket.FindFirst()) then
             exit(ResponseJson);
 
+        TicketType.Get(Ticket."Ticket Type Code");
+
         ResponseJson.StartObject('ticket')
+            .AddProperty('ticketKind', EnumEncoder.EncodeTicketTypeAdmissionKind(TicketType."Admission Registration"))
             .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
             .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
             .AddProperty('unitPrice', Ticket.AmountExclVat)
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
             .AddProperty('currencyCode', GeneralLedgerSetup."LCY Code")
-            .AddArray(CompactTicketList(ResponseJson, PrimaryEntryNo, 'ticketNumbers'))
-            .EndObject();
+            .AddArray(CompactTicketList(ResponseJson, PrimaryEntryNo, 'ticketNumbers'));
+
+        if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
+            ResponseJson.AddObject(TicketAgent.GroupEntitlementDTO(ResponseJson, 'admissionEntitlements', Ticket."Item No.", OrderedQuantity));
+
+        ResponseJson.EndObject();
+
         exit(ResponseJson);
     end;
 

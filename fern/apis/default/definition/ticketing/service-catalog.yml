@@ -23,7 +23,7 @@ service:
       response: 
         type: StoreCatalogResponse
       examples:
-        - name: ExampleCatalog1
+        - name: Catalog Example
           docs: Example response for the getCatalog endpoint
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
@@ -35,6 +35,9 @@ service:
               storeCode: $simpleTypes.StoreCode.ExampleStoreCode
               items:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  itemReferences:
+                    - referenceNumber: "EAN1234567890123"
+                      description: "Reference number must be used when the item has a variant and could be used when same base item is used in different contexts / sales channels"
                   recommendedPrice: $RecommendedPrice.ExampleRecommendedPrice
                   ticketType: $TicketType.ExampleTicketTypeWeb
                   description: $compositeTypes.Descriptions.ExampleTicket31001
@@ -56,6 +59,7 @@ types:
     properties:
       itemNumber: simpleTypes.ItemNumber
       variants: optional<list<ItemVariant>>
+      itemReferences: optional<list<ItemReferences>>
       recommendedPrice: RecommendedPrice
       ticketType: TicketType
       description: compositeTypes.Descriptions
@@ -84,6 +88,13 @@ types:
           vatPct: 25.00
           currencyCode: "SEK"
 
+  ItemReferences:
+    docs: 
+      Provides reference information for an item, such as external identifiers or codes used for integration with other systems. Helps link the ticket item to external data sources or inventory systems.
+    properties:
+      referenceNumber: string
+      description: string
+
   TicketType:
     docs: 
       Categorizes the ticket item based on sales channels or functional groupings, such as "WEB" or "POS". Influences how the ticket is sold and processed within the system.
@@ -91,12 +102,14 @@ types:
       code: string
       description: string
       category: string
+      kind: simpleTypes.TicketKind
     examples:
       - name: ExampleTicketTypeWeb
         value:
           code: "WEB"
           description: "Web sales"
           category: "Online"
+          kind: $simpleTypes.TicketKind.ExampleIndividualAdmission
 
   AdmissionCatalog:
     docs: 

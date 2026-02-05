@@ -26,10 +26,16 @@ service:
         query-parameters:
           includeTicketNumbers: optional<QP_IncludeTicketNumbers>
       response: 
+        docs: 
+          Provides the details of the newly created reservation, including the reservation token, 
+          expiration time, current status, and the list of reserved items with their associated ticket details.
         type: GetReservationDetails
+
       examples:
-        # Success response
-          - name: ExampleCreateReservation1
+          - name: "Simple Reservation"
+            docs: 
+              A basic reservation example where a customer reserves two tickets for a specific item, 
+              including details for admission to a castle with a morning schedule.
             path-parameters:
               tenant: $globalApiTypes.tenant.Exampletenant
               environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -53,6 +59,38 @@ service:
                   - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                     quantity: 2
                     ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
+                    content:
+                      - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                        scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
+
+          - name: "Group Reservation"
+            docs: 
+              A group reservation example where a customer reserves two tickets for a specific item, 
+              including details for admission to a castle with a morning schedule. 
+              The reservation is made for a group, which may have different entitlements compared to individual tickets.
+            path-parameters:
+              tenant: $globalApiTypes.tenant.Exampletenant
+              environment: $globalApiTypes.environment.ExampleenvironmentProduction
+              company: $globalApiTypes.Company.ExampleCompanyCronus
+            request:
+               reserve:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 2
+                  ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ENU
+                  notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+                  memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+                  content:
+                    - admissionCode: CASTLE
+                      scheduleNumber: 452
+            response:
+              body:
+                token: $simpleTypes.Token.ExampleToken
+                expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
+                reservationStatus: registered
+                reservations:
+                  - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                    quantity: 2
+                    ticket: $ReservationTicketDetails.ExampleTicketUnconfirmedGroup
                     content:
                       - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
                         scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
@@ -360,6 +398,7 @@ types:
       pricing details, and optional customer information like pinCode and ticketHolder name. 
       Used to inform customers about their tickets and any actions they can perform.
     properties:
+      ticketKind: simpleTypes.TicketKind
       ticketNumbers: optional<list<compositeTypes.TicketNumbers>>
       validFrom: datetime
       validUntil: datetime
@@ -368,9 +407,11 @@ types:
       unitPriceInclVat: double
       currencyCode: string
       ticketHolder: optional<simpleTypes.TicketHolder>
+      admissionEntitlements: optional<list<compositeTypes.AdmissionEntitlement>>
     examples: 
       - name: ExampleTicketConfirmed
         value:
+          ticketKind: $simpleTypes.TicketKind.ExampleIndividualAdmission
           ticketNumbers: 
             - ticketId: $simpleTypes.TicketId.ExampleTicket1
               ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
@@ -385,12 +426,23 @@ types:
           ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
       - name: ExampleTicketUnconfirmed
         value:
+          ticketKind: $simpleTypes.TicketKind.ExampleIndividualAdmission
           validFrom: 2024-10-15T00:00:00Z
           validUntil: 2024-10-15T23:59:59Z
           unitPrice: 80.00
           unitPriceInclVat: 100.00
           currencyCode: DKK
-
+      - name: ExampleTicketUnconfirmedGroup
+        value:
+          ticketKind: $simpleTypes.TicketKind.ExampleGroupAdmission
+          validFrom: 2024-10-15T00:00:00Z
+          validUntil: 2024-10-15T23:59:59Z
+          unitPrice: 80.00
+          unitPriceInclVat: 100.00
+          currencyCode: DKK
+          admissionEntitlements:
+            - code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+              maxGroupSize: 10
 
 
   QP_IncludeTicketNumbers:

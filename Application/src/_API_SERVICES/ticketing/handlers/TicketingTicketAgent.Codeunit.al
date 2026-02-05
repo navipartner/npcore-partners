@@ -593,18 +593,33 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
+        TicketType: Record "NPR TM Ticket Type";
         TimeHelper: Codeunit "NPR TM TimeHelper";
     begin
+        TicketType.Get(Ticket."Ticket Type Code");
         ResponseJson.StartArray(ArrayName);
 
         TicketAccessEntry.SetCurrentKey("Ticket No.");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-        TicketAccessEntry.SetLoadFields("Admission Code", "Access Date", "Access Time", Status, "Entry No.");
+        TicketAccessEntry.SetLoadFields("Admission Code", "Access Date", "Access Time", Status, "Entry No.", Quantity);
         if (TicketAccessEntry.FindSet()) then begin
             repeat
                 ResponseJson.StartObject()
                     .AddProperty('admissionCode', TicketAccessEntry."Admission Code")
                     .AddObject(AddRequiredProperty(ResponseJson, 'firstAdmissionAt', TimeHelper.FormatDateTimeWithAdmissionTimeZone(TicketAccessEntry."Admission Code", TicketAccessEntry."Access Date", TicketAccessEntry."Access Time")));
+
+                if (TicketType."Admission Registration" = TicketType."Admission Registration"::Group) then begin
+                    // Quantity changes from max to confirmed group size once the first admission is registered.
+                    // if access date is 0, it means no one in the group has been admitted yet, and quantity represents the max group size. 
+                    // Once access date is set, quantity represents the confirmed group size, which is the new (max) group size for the remaining ticket duration
+                    if (TicketAccessEntry."Access Date" = 0D) then begin
+                        ResponseJson.AddProperty('maxGroupSize', TicketAccessEntry.Quantity);
+                        ResponseJson.AddProperty('confirmedGroupSize'); // null, not confirmed yet
+                    end else begin
+                        ResponseJson.AddProperty('maxGroupSize', TicketAccessEntry.Quantity);
+                        ResponseJson.AddProperty('confirmedGroupSize', TicketAccessEntry.Quantity);
+                    end;
+                end;
 
                 if (WithEvents) then begin
                     ResponseJson.StartArray('events');
@@ -661,13 +676,23 @@ codeunit 6185080 "NPR TicketingTicketAgent"
                             WithAdmissionDetails: Boolean; WithAccessHistory: Boolean; WithAccessHistoryDetails: Boolean;
                             var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
                             ReservationRequest: Record "NPR TM Ticket Reservation Req."): Codeunit "NPR JSON Builder";
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        EnumEncoder: Codeunit "NPR TicketingApiTranslations";
     begin
+
+        TicketType.Get(Ticket."Ticket Type Code");
+
         ResponseJson.StartObject()
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
+            .AddProperty('ticketKind', EnumEncoder.EncodeTicketTypeAdmissionKind(TicketType."Admission Registration"))
             .AddProperty('itemNumber', Ticket."Item No.")
             .AddProperty('reservationToken', ReservationRequest."Session Token ID")
             .AddObject(TicketValidDateProperties(ResponseJson, Ticket));
+
+        if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
+            ResponseJson.AddObject(GroupEntitlementDTO(ResponseJson, 'admissionEntitlements', Ticket."Item No.", ReservationRequest.Quantity));
 
         if (WithAdmissionDetails) then
             ResponseJson.AddArray(AdmissionDetailsDTO(ResponseJson, 'content', Ticket, TicketDescriptionBuffer));
@@ -695,6 +720,32 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
         ResponseJson.EndObject();
 
+        exit(ResponseJson);
+    end;
+
+    internal procedure GroupEntitlementDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; ItemNo: Code[20]; OrderedQuantity: Integer): Codeunit "NPR JSON Builder";
+    var
+        TicketBom: Record "NPR TM Ticket Admission Bom";
+        Quantity: Integer;
+    begin
+        ResponseJson.StartArray(ArrayName);
+
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        if (TicketBom.FindSet()) then begin
+            repeat
+                if (TicketBom.Quantity <= 0) then
+                    TicketBom.Quantity := 1;
+                Quantity := TicketBom.Quantity * OrderedQuantity;
+
+                ResponseJson.StartObject()
+                    .AddProperty('code', TicketBom."Admission Code")
+                    .AddProperty('maxGroupSize', Quantity)
+                .EndObject();
+
+            until (TicketBom.Next() = 0);
+        end;
+
+        ResponseJson.EndArray();
         exit(ResponseJson);
     end;
 
@@ -788,7 +839,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
     internal procedure AdmissionDTO(
         var ResponseJson: Codeunit "NPR JSON Builder";
-        ObjectName: Text; ItemNo: Code[20]; VariantCode: Code[10];
+        ObjectName: Text;
+        ItemNo: Code[20]; VariantCode: Code[10];
         AdmissionCode: Code[20]; IsBlocked: Boolean; AdmissionInclusion: Option;
         var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Codeunit "NPR JSON Builder"
     var

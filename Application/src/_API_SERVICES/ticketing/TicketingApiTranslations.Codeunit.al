@@ -2,6 +2,19 @@ codeunit 6185046 "NPR TicketingApiTranslations"
 {
     Access = Internal;
 
+    internal procedure EncodeTicketTypeAdmissionKind(TicketAdmissionKind: Option): Text
+    var
+        TicketType: Record "NPR TM Ticket Type";
+    begin
+        case TicketAdmissionKind of
+            TicketType."Admission Registration"::GROUP:
+                exit('groupAdmission');
+            TicketType."Admission Registration"::INDIVIDUAL:
+                exit('individualAdmission');
+        end;
+    end;
+
+
     internal procedure EncodeInclusion(AdmissionInclusion: Option): Text
     var
         TicketBom: Record "NPR TM Ticket Admission Bom";

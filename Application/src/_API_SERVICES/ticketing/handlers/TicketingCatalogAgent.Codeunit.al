@@ -22,16 +22,14 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
     internal procedure GetCatalog(StoreCode: Code[32]; ItemNumber: Code[20]) Response: Codeunit "NPR API Response"
     var
         ResponseJson: Codeunit "NPR JSON Builder";
+        EnumEncoder: Codeunit "NPR TicketingApiTranslations";
+
         TempCatalogItems: Record "Item Variant" temporary;
         TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
-
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        ItemReference: Record "Item Reference";
 
-
-        EanItemNumber: Code[100];
         UnitPrice: Decimal;
         UnitPriceIncludesVat: Boolean;
         UnitPriceVatPercentage: Decimal;
@@ -42,7 +40,9 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
         GeneralLedgerSetup.Get();
 
         TempCatalogItems.Reset();
+        TempCatalogItems.SetCurrentKey("Item No.", Code);
         TempCatalogItems.FindSet();
+
         ResponseJson.AddProperty('storeCode', StoreCode).
             StartArray('items');
 
@@ -56,20 +56,11 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
                 UnitPriceVatPercentage := 0;
             end;
 
-            EanItemNumber := TempCatalogItems."Item No.";
-            ItemReference.SetFilter("Item No.", '=%1', TempCatalogItems."Item No.");
-            ItemReference.SetFilter("Variant Code", '=%1', TempCatalogItems.Code);
-            ItemReference.SetFilter("Unit of Measure", '=%1|=%2|=%3', '', Item."Sales Unit of Measure", Item."Base Unit of Measure");
-            ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
-            ItemReference.SetFilter("Starting Date", '=%1|>=%2', 0D, Today());
-            ItemReference.SetFilter("Ending Date", '=%1|<=%2', 0D, Today());
-            if (ItemReference.FindFirst()) then
-                EanItemNumber := ItemReference."Reference No.";
-
             TicketDescriptionBuffer.Get(TempCatalogItems."Item No.", TempCatalogItems.Code, '');
 
             ResponseJson.StartObject()
-                .AddProperty('itemNumber', EanItemNumber)
+                .AddProperty('itemNumber', TempCatalogItems."Item No.")
+                .AddObject(ItemReferenceDTO(ResponseJson, 'itemReferences', TempCatalogItems."Item No.", TempCatalogItems.Code))
                 .StartObject('recommendedPrice')
                     .AddProperty('unitPrice', UnitPrice)
                     .AddProperty('unitPriceIncludesVat', UnitPriceIncludesVat)
@@ -80,6 +71,7 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
                     .AddProperty('code', Item."NPR Ticket Type")
                     .AddProperty('description', TicketType.Description)
                     .AddProperty('category', TicketType.Category)
+                    .AddProperty('kind', EnumEncoder.EncodeTicketTypeAdmissionKind(TicketType."Admission Registration"))
                 .EndObject()
                 .StartObject('description')
                     .AddObject(AddPropertyNotNull(ResponseJson, 'title', TicketDescriptionBuffer.Title))
@@ -95,6 +87,35 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
 
         ResponseJson.EndArray();
         exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
+    local procedure ItemReferenceDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; ItemNo: Code[20]; VariantCode: Code[10]): Codeunit "NPR JSON Builder";
+    var
+        ItemReference: Record "Item Reference";
+    begin
+
+        if (VariantCode <> '') then
+            ResponseJson.AddProperty('variantCode', VariantCode);
+
+        ItemReference.SetFilter("Item No.", '=%1', ItemNo);
+        if (VariantCode <> '') then
+            ItemReference.SetFilter("Variant Code", '=%1', VariantCode);
+        ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetFilter("Starting Date", '=%1|<=%2', 0D, Today());
+        ItemReference.SetFilter("Ending Date", '=%1|>=%2', 0D, Today());
+
+        if (ItemReference.FindSet()) then begin
+            ResponseJson.StartArray(ArrayName);
+            repeat
+                ResponseJson.StartObject()
+                    .AddProperty('referenceNumber', ItemReference."Reference No.")
+                    .AddProperty('description', ItemReference.Description)
+                    .EndObject();
+            until (ItemReference.Next() = 0);
+            ResponseJson.EndArray();
+        end;
+
+        exit(ResponseJson);
     end;
 
     local procedure AdmissionDetailsDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; ItemNumber: Code[20]; VariantCode: Code[10]; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Codeunit "NPR JSON Builder";

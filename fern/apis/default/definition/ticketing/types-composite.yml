@@ -125,6 +125,7 @@ types:
     properties:
       ticketId: simpleTypes.TicketId
       ticketNumber: simpleTypes.TicketExternalNumber
+      ticketKind: simpleTypes.TicketKind
       reservationToken: simpleTypes.Token
       itemNumber: simpleTypes.ItemNumber
       validFrom: datetime
@@ -148,6 +149,7 @@ types:
         value:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          ticketKind: $simpleTypes.TicketKind.ExampleIndividualAdmission
           reservationToken : $simpleTypes.Token.ExampleToken
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
@@ -178,6 +180,7 @@ types:
         value:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          ticketKind: $simpleTypes.TicketKind.ExampleIndividualAdmission
           reservationToken : $simpleTypes.Token.ExampleToken
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
@@ -270,6 +273,8 @@ types:
     properties:
       admissionCode: simpleTypes.AdmissionCode
       firstAdmissionAt: optional<datetime>
+      confirmedGroupSize: optional<simpleTypes.ConfirmedGroupSize>
+      maxGroupSize: optional<simpleTypes.MaxGroupSize>
       events: optional<list<TicketAccessEvent>>
 
   FindTicketResponse:
@@ -277,6 +282,7 @@ types:
     properties:
       ticketId: simpleTypes.TicketId
       ticketNumber: simpleTypes.TicketExternalNumber
+      ticketKind: simpleTypes.TicketKind
       reservationToken: simpleTypes.Token
       itemNumber: simpleTypes.ItemNumber
       validFrom: datetime
@@ -300,6 +306,7 @@ types:
         value:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          ticketKind: $simpleTypes.TicketKind.ExampleIndividualAdmission
           reservationToken : $simpleTypes.Token.ExampleToken
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
@@ -330,6 +337,7 @@ types:
         value:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          ticketKind: $simpleTypes.TicketKind.ExampleIndividualAdmission
           reservationToken : $simpleTypes.Token.ExampleToken
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
@@ -342,3 +350,10 @@ types:
           content: 
             - $TicketContent.ExampleTicketContent2
           description: $Descriptions.ExampleTicket31001
+
+  AdmissionEntitlement:
+    docs: 
+      Included for Group Tickets, the admission entitlement objects defines the number of admissions included for the group ticket.
+    properties:
+      code: simpleTypes.AdmissionCode
+      maxGroupSize: simpleTypes.MaxGroupSize

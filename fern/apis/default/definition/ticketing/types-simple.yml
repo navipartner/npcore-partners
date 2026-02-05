@@ -47,6 +47,38 @@ types:
     type: integer
     docs: The number of tickets to reserved
 
+  TicketKindEnum:
+    enum:
+      - individualAdmission
+      - groupAdmission
+
+  TicketKind:
+    type: TicketKindEnum
+    docs: The kind of ticket, either individual or group admission.
+    examples:
+      - name: ExampleIndividualAdmission
+        value: individualAdmission
+      - name: ExampleGroupAdmission
+        value: groupAdmission
+
+  MaxGroupSize:
+    type: integer
+    docs: The maximum group size for a group ticket. Calculated as ordered quantity multiplied by a factor defined per admission.
+    examples:
+      - name: ExampleMaxGroupSize10
+        value: 10
+      - name: ExampleMaxGroupSize25
+        value: 25
+
+  ConfirmedGroupSize:
+    type: integer
+    docs: The confirmed group size for a group ticket. This number can be less than or equal to the max group size. 
+    examples:
+      - name: ExampleConfirmedGroupSize8
+        value: 8
+      - name: ExampleConfirmedGroupSize20
+        value: 20
+
   ExpiresAt:
     type: datetime
     docs: The date and time when the token expires and reservation is no longer valid
