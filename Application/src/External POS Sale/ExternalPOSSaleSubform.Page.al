@@ -4,6 +4,7 @@
     Caption = 'External POS Sale Subform';
     PageType = ListPart;
     SourceTable = "NPR External POS Sale Line";
+    InsertAllowed = false;
     UsageCategory = None;
     DeleteAllowed = false;
 
