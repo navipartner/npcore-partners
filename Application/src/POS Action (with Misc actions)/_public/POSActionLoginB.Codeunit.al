@@ -7,7 +7,6 @@ codeunit 6150832 "NPR POS Action - Login-B"
         IsEoD: Label 'The %1 %2 indicates that this %1 is being balanced and it can''t be opened at this time.';
         ManagedPos: Label 'This POS is managed by POS Unit %1 [%2] and it is therefore required that %1 is opened prior to opening this POS.';
 #if not (BC17 or BC18 or BC19)
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         SalespersonBlockedErr: Label 'Salesperson %1 - %2 is blocked.', Comment = '%1 = Salesperson Code, %2 = Salesperson Name';
 #endif
 
@@ -32,9 +31,8 @@ codeunit 6150832 "NPR POS Action - Login-B"
 
         Setup.GetSalespersonRecord(SalespersonPurchaser);
 #if not (BC17 or BC18 or BC19)
-        if FeatureFlagsManagement.IsEnabled('blocksalespersononposviabutton') then
-            if SalespersonPurchaser.Blocked then
-                Error(SalespersonBlockedErr, SalespersonPurchaser.Code, SalespersonPurchaser.Name);
+        if SalespersonPurchaser.Blocked then
+            Error(SalespersonBlockedErr, SalespersonPurchaser.Code, SalespersonPurchaser.Name);
 #endif
         CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");
 
@@ -196,8 +194,6 @@ codeunit 6150832 "NPR POS Action - Login-B"
     var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
-        if not FeatureFlagsManagement.IsEnabled('blocksalespersononposviabutton') then
-            exit;
         SalespersonPurchaser.SetLoadFields(Blocked, Code, Name);
         if not SalespersonPurchaser.Get(SalespersonCode) then
             exit;
