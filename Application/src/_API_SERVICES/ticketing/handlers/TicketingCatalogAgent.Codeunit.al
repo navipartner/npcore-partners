@@ -225,6 +225,9 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
 
         // Extract descriptions for the dynamic ticket items
         TicketBOM.Reset();
+        if (ItemNumber <> '') then
+            TicketBOM.SetFilter("Item No.", '=%1', ItemNumber);
+
         if (TicketBOM.FindSet()) then begin
             repeat
                 TicketDescriptionBuffer.SetKeyAndDescription(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code", StoreCode, LanguageCode);
