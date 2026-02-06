@@ -61,6 +61,7 @@
         BestCode: Code[20];
         BestVariant: Code[10];
         Handled: Boolean;
+        UseCustomerVATBusPostingGroup: Boolean;
     begin
         //SetPeriodeRabat()
         if TempSaleLinePOS."No." = '' then
@@ -96,13 +97,29 @@
 
         if PeriodDiscountLine.Get(BestCode, TempSaleLinePOS."No.", BestVariant) then begin
             PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
-            if Customer.Get(TempSalePOS."Customer No.") and PeriodDiscountLine."Unit Price Incl. VAT" then begin
-                if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
-                if VATPostingSetup2.Get(Customer."VAT Bus. Posting Group", TempSaleLinePOS."VAT Prod. Posting Group") then
-                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup2, Handled);
-                PeriodDiscountLine."Campaign Unit Price" :=
-                    PeriodDiscountLine."Campaign Unit Price" / (100 + VATPostingSetup."VAT %") * (100 + VATPostingSetup2."VAT %");
+
+            if PeriodDiscountLine."Unit Price Incl. VAT" then begin
+                UseCustomerVATBusPostingGroup := ShouldUseCustomerVATPostingGroup(TempSalePOS, Customer);
+
+                if UseCustomerVATBusPostingGroup then begin
+                    if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
+                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+
+                    if VATPostingSetup2.Get(Customer."VAT Bus. Posting Group", TempSaleLinePOS."VAT Prod. Posting Group") then begin
+                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup2, Handled);
+                        PeriodDiscountLine."Campaign Unit Price" :=
+                            PeriodDiscountLine."Campaign Unit Price" / (100 + VATPostingSetup."VAT %") * (100 + VATPostingSetup2."VAT %");
+                    end;
+                end else if ShouldPerformVATConversionWithStoreSetup(TempSalePOS) then begin
+                    if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
+                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+
+                    if VATPostingSetup2.Get(TempSaleLinePOS."VAT Bus. Posting Group", TempSaleLinePOS."VAT Prod. Posting Group") then begin
+                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup2, Handled);
+                        PeriodDiscountLine."Campaign Unit Price" :=
+                            PeriodDiscountLine."Campaign Unit Price" / (100 + VATPostingSetup."VAT %") * (100 + VATPostingSetup2."VAT %");
+                    end;
+                end;
             end;
 
             if TempSaleLinePOS."Price Includes VAT" then begin
@@ -132,6 +149,45 @@
         end;
 
         TempSaleLinePOS."Discount Calculated" := true;
+    end;
+
+    local procedure ShouldUseCustomerVATPostingGroup(TempSalePOS: Record "NPR POS Sale" temporary; var Customer: Record Customer): Boolean
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if not FeatureFlagsManagement.IsEnabled('perioddiscountvatcheckpospostingsetup') then
+            exit(Customer.Get(TempSalePOS."Customer No."));
+
+        if not POSStore.Get(TempSalePOS."POS Store Code") then
+            exit(false);
+
+        if not POSStore.GetProfile(POSPostingProfile) then
+            exit(false);
+
+        if POSPostingProfile."Default POS Posting Setup" <> POSPostingProfile."Default POS Posting Setup"::Customer then
+            exit(false);
+
+        exit(Customer.Get(TempSalePOS."Customer No."));
+    end;
+
+    local procedure ShouldPerformVATConversionWithStoreSetup(TempSalePOS: Record "NPR POS Sale" temporary): Boolean
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if not FeatureFlagsManagement.IsEnabled('perioddiscountvatcheckpospostingsetup') then
+            exit(false);
+
+        if not POSStore.Get(TempSalePOS."POS Store Code") then
+            exit(false);
+
+        if not POSStore.GetProfile(POSPostingProfile) then
+            exit(false);
+
+        exit(POSPostingProfile."Default POS Posting Setup" <> POSPostingProfile."Default POS Posting Setup"::Customer);
     end;
 
     procedure "-- Aux"()
