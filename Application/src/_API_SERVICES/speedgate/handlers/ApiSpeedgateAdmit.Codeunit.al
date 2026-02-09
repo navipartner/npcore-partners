@@ -36,6 +36,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                     .AddProperty('ticketProfileCode', ScannerDefault.DefaultTicketProfileCode)
                     .AddProperty('memberCardProfileCode', ScannerDefault.DefaultMemberCardProfileCode)
                     .AddArray(AddScannerItemsProfileLines(ResponseJson, ScannerDefault.ItemsProfileCode));
+
             Scanner.SetFilter(Enabled, '=%1', true);
             ResponseJson.StartArray('scanners');
             if (Scanner.FindSet()) then
@@ -44,6 +45,15 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                     ResponseJson.AddProperty('id', Format(Scanner.SystemId, 0, 4).ToLower());
                     ResponseJson.AddProperty('scannerId', Scanner.ScannerId);
                     ResponseJson.AddProperty('description', Scanner.Description);
+
+                    ResponseJson.AddProperty('permitTickets', Scanner.PermitTickets)
+                        .AddProperty('permitMemberCards', Scanner.PermitMemberCards)
+                        .AddProperty('permitWallets', Scanner.PermitWallets)
+                        .AddProperty('permitDocLxCityCards', Scanner.PermitDocLxCityCard)
+                        .AddProperty('imageProfileCode', Scanner.ImageProfileCode)
+                        .AddProperty('ticketProfileCode', Scanner.TicketProfileCode)
+                        .AddProperty('memberCardProfileCode', Scanner.MemberCardProfileCode);
+
                     if (Scanner.CategoryCode <> '') and (ScannerCategory.Get(Scanner.CategoryCode)) then
                         AddCategory(ResponseJson, 'category', ScannerCategory);
                     ResponseJson.EndObject();

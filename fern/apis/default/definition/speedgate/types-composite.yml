@@ -317,6 +317,13 @@ types:
       scannerId: simpleTypes.ScannerId
       description: simpleTypes.Description
       category: optional<ScannerCategory>
+      permitTickets: optional<simpleTypes.PermitTickets>
+      permitMemberCards: optional<simpleTypes.PermitMemberCards>
+      permitWallets: optional<simpleTypes.PermitWallets>
+      permitDocLxCityCards: optional<simpleTypes.PermitDocLxCityCards>
+      imageProfileCode: optional<simpleTypes.ImageProfileCode>
+      ticketProfileCode: optional<simpleTypes.TicketProfileCode>
+      memberCardProfileCode: optional<simpleTypes.MemberCardProfileCode>
     examples:
       - name: ExampleScannerIdSetupResponseShort
         value:
