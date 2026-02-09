@@ -9,10 +9,6 @@
       "path": "./Test"
     },
     {
-      "name": "PERFORMANCE TOOLKIT",
-      "path": "./Performance Toolkit"
-    },
-    {
       "name": "FERN",
       "path": "./fern"
     }
