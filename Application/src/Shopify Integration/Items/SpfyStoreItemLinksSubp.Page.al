@@ -215,6 +215,36 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                         SpfyItemVariantModifMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, DoNotTrackInventory, false);
                     end;
                 }
+                field(Weight; WeightValue)
+                {
+                    Caption = 'Weight';
+                    ToolTip = 'Specifies the weight of the item used for shipping calculations in Shopify. If the item has variants, this field must be set separately for each variant.';
+                    ApplicationArea = NPRShopify;
+                    Editable = ItemListIntegrationIsEnabled;
+                    DecimalPlaces = 0 : 5;
+                    MinValue = 0;
+
+                    trigger OnValidate()
+                    begin
+                        CheckWeightIntegrationIsEnabled();
+                        if (WeightValue > 0) and (WeightUnit = Enum::"NPR Spfy Weight Unit"::" ") then
+                            WeightUnit := DefaultWeightUnit;
+                        SpfyItemVariantModifMgt.SetVariantWeight(SpfyStoreItemVariantLink, WeightValue, WeightUnit, false);
+                    end;
+                }
+                field("Weight Unit"; WeightUnit)
+                {
+                    Caption = 'Weight Unit';
+                    ToolTip = 'Specifies the weight unit of the item used for shipping calculations in Shopify. If the item has variants, this field must be set separately for each variant.';
+                    ApplicationArea = NPRShopify;
+                    Editable = ItemListIntegrationIsEnabled;
+
+                    trigger OnValidate()
+                    begin
+                        CheckWeightIntegrationIsEnabled();
+                        SpfyItemVariantModifMgt.SetVariantWeight(SpfyStoreItemVariantLink, WeightValue, WeightUnit, false);
+                    end;
+                }
                 field("Shopify Inventory Item ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID"))
                 {
                     Caption = 'Shopify Inventory Item ID';
@@ -327,6 +357,9 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+        DefaultWeightUnit: Enum "NPR Spfy Weight Unit";
+        WeightUnit: Enum "NPR Spfy Weight Unit";
+        WeightValue: Decimal;
         AllowBackorder: Boolean;
         DoNotTrackInventory: Boolean;
         ItemListIntegrationIsEnabled: Boolean;
@@ -347,8 +380,11 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
             SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
             SpfyStoreItemLink."Variant Code" := '';
         end;
-        AllowBackorder := SpfyItemVariantModifMgt.AllowBackorder(SpfyStoreItemVariantLink);
-        DoNotTrackInventory := SpfyItemVariantModifMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
+        SpfyStoreItemVariantLink.CalcFields("Allow Backorder", "Do Not Track Inventory", "Weight Unit", "Weight Value");
+        AllowBackorder := SpfyStoreItemVariantLink."Allow Backorder";
+        DoNotTrackInventory := SpfyStoreItemVariantLink."Do Not Track Inventory";
+        WeightValue := SpfyStoreItemVariantLink."Weight Value";
+        WeightUnit := SpfyStoreItemVariantLink."Weight Unit";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -361,6 +397,16 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
     begin
         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, Rec."Shopify Store Code") then
             Error(ItemIntegrIsNotEnabledErr);
+    end;
+
+    local procedure CheckWeightIntegrationIsEnabled()
+    var
+        NotEnabledErr: Label 'Weight integration is not enabled for this store. To enable this feature, please specify a default weight unit on the Shopify store card.';
+    begin
+        CheckIntegrationIsEnabled();
+        DefaultWeightUnit := SpfyIntegrationMgt.DefaultWeightUnit(Rec."Shopify Store Code");
+        if DefaultWeightUnit = Enum::"NPR Spfy Weight Unit"::" " then
+            Error(NotEnabledErr);
     end;
 }
 #endif

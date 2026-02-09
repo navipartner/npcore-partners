@@ -220,5 +220,81 @@ codeunit 6248412 "NPR Spfy ItemVariantModif Mgt."
         SpfyStoreItemLink.CalcFields("Do Not Track Inventory");
         exit(SpfyStoreItemLink."Do Not Track Inventory");
     end;
+
+    internal procedure GetVariantWeightWithDefaults(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var WeightValue: Decimal; var WeightUnit: Enum "NPR Spfy Weight Unit"): Boolean
+    var
+        Item: Record Item;
+        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        WeightValue := 0;
+        WeightUnit := WeightUnit::" ";
+
+        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
+           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
+        then
+            exit(false);
+
+        WeightUnit := SpfyIntegrationMgt.DefaultWeightUnit(SpfyStoreItemLink."Shopify Store Code");
+        if WeightUnit = WeightUnit::" " then  // This also serves as a general switch for enabling or disabling the sending of weights to Shopify
+            exit(false);
+
+        if SpfyItemVariantModif.Get(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code", SpfyStoreItemLink."Shopify Store Code") then begin
+            WeightValue := SpfyItemVariantModif."Weight Value";
+            if SpfyItemVariantModif."Weight Unit" <> SpfyItemVariantModif."Weight Unit"::" " then
+                WeightUnit := SpfyItemVariantModif."Weight Unit";
+        end;
+
+        if WeightValue <= 0 then begin
+            // Fall back to item-level Gross Weight
+            if Item.Get(SpfyStoreItemLink."Item No.") then
+                WeightValue := Item."Gross Weight";
+        end;
+
+        exit(WeightValue > 0);
+    end;
+
+    internal procedure SetVariantWeight(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]; WeightValue: Decimal; WeightUnit: Enum "NPR Spfy Weight Unit"; DisableDataLog: Boolean)
+    var
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+    begin
+        SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Variant;
+        SpfyStoreItemLink."Item No." := ItemNo;
+        SpfyStoreItemLink."Variant Code" := VariantCode;
+        SpfyStoreItemLink."Shopify Store Code" := ShopifyStoreCode;
+        SetVariantWeight(SpfyStoreItemLink, WeightValue, WeightUnit, DisableDataLog);
+    end;
+
+    internal procedure SetVariantWeight(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; WeightValue: Decimal; WeightUnit: Enum "NPR Spfy Weight Unit"; DisableDataLog: Boolean)
+    var
+        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
+    begin
+        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
+           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
+        then
+            exit;
+
+        SpfyItemVariantModif."Item No." := SpfyStoreItemLink."Item No.";
+        SpfyItemVariantModif."Variant Code" := SpfyStoreItemLink."Variant Code";
+        SpfyItemVariantModif."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
+        if not SpfyItemVariantModif.Find() then begin
+            // Only create record if we have actual values to store
+            if (WeightValue <= 0) and (WeightUnit = WeightUnit::" ") then
+                exit;
+            SpfyItemVariantModif.Init();
+            SpfyItemVariantModif."Weight Value" := WeightValue;
+            SpfyItemVariantModif."Weight Unit" := WeightUnit;
+            SaveItemVariantModifToDB(SpfyItemVariantModif, DisableDataLog);
+            exit;
+        end;
+
+        // Update existing record
+        if (SpfyItemVariantModif."Weight Value" = WeightValue) and (SpfyItemVariantModif."Weight Unit" = WeightUnit) then
+            exit;
+
+        SpfyItemVariantModif."Weight Value" := WeightValue;
+        SpfyItemVariantModif."Weight Unit" := WeightUnit;
+        SaveItemVariantModifToDB(SpfyItemVariantModif, DisableDataLog);
+    end;
 }
 #endif

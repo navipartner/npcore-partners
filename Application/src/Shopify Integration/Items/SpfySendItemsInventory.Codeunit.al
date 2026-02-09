@@ -1074,6 +1074,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 InventoryItemJObject.Add('countryCodeOfOrigin', Item."Country/Region of Origin Code");
             if Item."Tariff No." <> '' then
                 InventoryItemJObject.Add('harmonizedSystemCode', Item."Tariff No.");
+            AddWeightToInventoryItem(SpfyStoreItemVariantLink, InventoryItemJObject);
             VariantJObject.Add('inventoryItem', InventoryItemJObject);
 
             if ItemVariant."NPR Variety 1 Value" + ItemVariant."NPR Variety 2 Value" + ItemVariant."NPR Variety 3 Value" + ItemVariant."NPR Variety 4 Value" <> '' then begin
@@ -1096,6 +1097,25 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             end;
         end;
         SpfyIntegrationEvents.OnAfterGenerateVariantJObject(ItemVariant, VariantJObject);
+    end;
+
+    local procedure AddWeightToInventoryItem(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var InventoryItemJObject: JsonObject)
+    var
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
+        MeasurementJObject: JsonObject;
+        WeightJObject: JsonObject;
+        WeightValue: Decimal;
+        WeightUnit: Enum "NPR Spfy Weight Unit";
+    begin
+        if not SpfyItemVariantModifMgt.GetVariantWeightWithDefaults(SpfyStoreItemLink, WeightValue, WeightUnit) then
+            exit;
+
+        // Build the JSON structure: measurement { weight { value, unit } }
+        WeightJObject.Add('value', WeightValue);
+        WeightJObject.Add('unit', WeightUnitEnumValueName(WeightUnit));
+        MeasurementJObject.Add('weight', WeightJObject);
+
+        InventoryItemJObject.Add('measurement', MeasurementJObject);
     end;
 
     procedure AddVariety(VarietyNo: Integer; Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[50]; var ShopifyOptionNo: Integer; var VariantOptionValues: JsonArray; var VarietyValueDic: Dictionary of [Integer, List of [Text]])
@@ -1480,6 +1500,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         xShopifyInventoryItemID: Text[30];
         ShopifyVariantID: Text[30];
         xShopifyVariantID: Text[30];
+        WeightUnitText: Text;
+        WeightUnit: Enum "NPR Spfy Weight Unit";
+        WeightValue: Decimal;
         xDoNotTrackInventory: Boolean;
     begin
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
@@ -1491,6 +1514,14 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyItemVariantModifMgt.SetAllowBackorder(SpfyStoreItemVariantLink, _JsonHelper.GetJText(ShopifyVariant, 'inventoryPolicy', false).ToUpper() = 'CONTINUE', true);
         if _JsonHelper.TokenExists(ShopifyVariant, 'inventoryItem.tracked') then
             SpfyItemVariantModifMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, not _JsonHelper.GetJBoolean(ShopifyVariant, 'inventoryItem.tracked', true), true);
+
+        if _JsonHelper.TokenExists(ShopifyVariant, 'inventoryItem.measurement.weight.value') then begin
+            WeightValue := _JsonHelper.GetJDecimal(ShopifyVariant, 'inventoryItem.measurement.weight.value', false);
+            WeightUnitText := _JsonHelper.GetJText(ShopifyVariant, 'inventoryItem.measurement.weight.unit', false);
+            if (WeightValue > 0) and (WeightUnitText <> '') then
+                if Evaluate(WeightUnit, WeightUnitText) then
+                    SpfyItemVariantModifMgt.SetVariantWeight(SpfyStoreItemVariantLink, WeightValue, WeightUnit, true);
+        end;
 
 #pragma warning disable AA0139
         ShopifyVariantID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyVariant, 'id', true), '/');
@@ -1894,6 +1925,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     local procedure ProductStatusEnumValueName(ProductStatus: Enum "NPR Spfy Product Status") Result: Text
     begin
         ProductStatus.Names().Get(ProductStatus.Ordinals().IndexOf(ProductStatus.AsInteger()), Result);
+    end;
+
+    local procedure WeightUnitEnumValueName(WeightUnit: Enum "NPR Spfy Weight Unit") Result: Text
+    begin
+        WeightUnit.Names().Get(WeightUnit.Ordinals().IndexOf(WeightUnit.AsInteger()), Result);
     end;
 
     local procedure GenerateRequestAndSetNcTaskPostponed(var NcTaskIn: Record "NPR Nc Task"; ShopifyProductID: Text[30]; var RequestedVariantBuffer: Record "NPR Spfy ID/Task Buffer"; var Request: JsonObject) Success: Boolean

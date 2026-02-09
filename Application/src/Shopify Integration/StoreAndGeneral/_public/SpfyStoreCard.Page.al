@@ -59,6 +59,12 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     Enabled = _ItemListIntegrationIsEnabled;
                 }
+                field("Default Weight Unit"; Rec."Default Weight Unit")
+                {
+                    ToolTip = 'Specifies the default weight unit to use when sending product weights to Shopify. This also serves as a general switch for enabling or disabling the sending of weights to Shopify: select the empty value to disable this. Please note that even if you disable the sending of weights from BC to Shopify, the weight in the "Shopify integration" section of item variants will still be updated from Shopify.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _ItemListIntegrationIsEnabled;
+                }
                 field("Set Shopify Name/Descr. in BC"; Rec."Set Shopify Name/Descr. in BC")
                 {
                     ToolTip = 'Specifies whether you want to be able to update Shopify item names and descriptions from within Business Central.';

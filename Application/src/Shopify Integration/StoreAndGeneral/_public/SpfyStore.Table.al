@@ -158,6 +158,11 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Item Category as Metafield';
             DataClassification = CustomerContent;
         }
+        field(65; "Default Weight Unit"; Enum "NPR Spfy Weight Unit")
+        {
+            Caption = 'Default Weight Unit';
+            DataClassification = CustomerContent;
+        }
         field(70; "Send Inventory Updates"; Boolean)
         {
             Caption = 'Send Inventory Updates';

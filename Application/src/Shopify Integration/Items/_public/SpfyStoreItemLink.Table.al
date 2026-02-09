@@ -103,6 +103,20 @@ table 6150811 "NPR Spfy Store-Item Link"
             Caption = 'Vendor';
             DataClassification = CustomerContent;
         }
+        field(180; "Weight Value"; Decimal)
+        {
+            Caption = 'Weight Value';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Item Variant Modif."."Weight Value" where("Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Shopify Store Code" = field("Shopify Store Code")));
+        }
+        field(190; "Weight Unit"; Enum "NPR Spfy Weight Unit")
+        {
+            Caption = 'Weight Unit';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Item Variant Modif."."Weight Unit" where("Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Shopify Store Code" = field("Shopify Store Code")));
+        }
     }
     keys
     {

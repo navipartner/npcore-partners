@@ -43,6 +43,18 @@ table 6151028 "NPR Spfy Item Variant Modif."
             Caption = 'Do Not Track Inventory';
             DataClassification = CustomerContent;
         }
+        field(130; "Weight Value"; Decimal)
+        {
+            Caption = 'Weight Value';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+            DecimalPlaces = 0 : 5;
+        }
+        field(140; "Weight Unit"; Enum "NPR Spfy Weight Unit")
+        {
+            Caption = 'Weight Unit';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

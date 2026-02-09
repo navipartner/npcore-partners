@@ -327,6 +327,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifyStore."Update Cust. Phone No. from BC");
     end;
 
+    procedure DefaultWeightUnit(ShopifyStoreCode: Code[20]): Enum "NPR Spfy Weight Unit"
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Default Weight Unit");
+    end;
+
     procedure SetRereadSetup()
     begin
         Clear(_ShopifySetup);
