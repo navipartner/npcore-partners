@@ -556,7 +556,7 @@ codeunit 6248530 "NPR CouponApiAgent"
 
     local procedure CoupontoJson(Coupon: Record "NPR NpDc Coupon"; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
     begin
-        Coupon.CalcFields(Open, "Remaining Quantity");
+        Coupon.CalcFields(Open, "Remaining Quantity", "Issue Date");
         Json.StartObject(JsonObjectName)
             .AddProperty('id', Format(Coupon.SystemId, 0, 4).ToLower())
             .AddProperty('no', Coupon."No.")
