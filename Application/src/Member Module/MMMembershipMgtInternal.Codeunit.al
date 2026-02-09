@@ -55,7 +55,7 @@
         ALLOW_MEMBER_MERGE_NOT_SET_NO: Label '-127008';
         MEMBER_WITH_UID_EXISTS_NO: Label '-127009';
         NO_LEDGER_ENTRY: Label 'The membership %1 is not valid.\\It must be activated, but there is no ledger entry associated with that membership that can be activated.';
-        NOT_ACTIVATED: Label 'The membership is marked as activate on first use, but has not been activated yet. Retry the action after the membership has been activated.';
+        _NOT_ACTIVATED: Label 'The membership is marked as activate on first use, but has not been activated yet. Retry the action after the membership has been activated.';
         NOT_FOUND: Label '%1 not found. %2';
         GRACE_PERIOD: Label 'The %1 is not allowed because of grace period constraint.';
         PREVENT_CARD_EXTEND: Label 'The validity for card %1 must first manually be extend until %2.';
@@ -2115,7 +2115,7 @@
             Error(MEMBERSHIP_ENTRY_NOT_FOUND, ExternalMemberCardNo);
 
         if (MembershipEntry."Activate On First Use") then
-            Error(NOT_ACTIVATED);
+            Error(_NOT_ACTIVATED);
 
         MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
@@ -2173,7 +2173,7 @@
         if (not MembershipEntry.FindLast()) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-        ReasonText := NOT_ACTIVATED;
+        ReasonText := _NOT_ACTIVATED;
         if (MembershipEntry."Activate On First Use") then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
@@ -2373,7 +2373,7 @@
         if (not MembershipEntry.FindLast()) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-        ReasonText := NOT_ACTIVATED;
+        ReasonText := _NOT_ACTIVATED;
         if (MembershipEntry."Activate On First Use") then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
@@ -2582,7 +2582,7 @@
         if (not MembershipEntry.FindLast()) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-        ReasonText := NOT_ACTIVATED;
+        ReasonText := _NOT_ACTIVATED;
         if (MembershipEntry."Activate On First Use") then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
@@ -2989,7 +2989,7 @@
         if (not MembershipEntry.FindLast()) then
             exit(false);
 
-        ReasonText := NOT_ACTIVATED;
+        ReasonText := _NOT_ACTIVATED;
         if (MembershipEntry."Activate On First Use") then
             exit(false);
 
@@ -6986,5 +6986,31 @@
             exit('');
 
         exit(Membership."Customer No.");
+    end;
+
+    internal procedure GetMembershipCurrentPeriodText(MembershipEntryNo: Integer; var NeedsActivation: Boolean) CurrentPeriod: Text;
+    var
+        ValidFromDate: Date;
+        ValidUntilDate: Date;
+        MaxValidUntilDate: Date;
+        PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
+        PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
+
+        NotActivated: Label 'Not Activated', Locked = true;
+        MembershipExpired: Label 'Membership Expired', Locked = true;
+    begin
+        NeedsActivation := MembershipNeedsActivation(MembershipEntryNo);
+        CurrentPeriod := NotActivated;
+        if (not NeedsActivation) then begin
+            GetMembershipValidDate(MembershipEntryNo, Today(), ValidFromDate, ValidUntilDate);
+            CurrentPeriod := StrSubstNo(PlaceHolder2Lbl, ValidFromDate, ValidUntilDate);
+
+            GetMembershipMaxValidUntilDate(MembershipEntryNo, MaxValidUntilDate);
+            if (ValidUntilDate <> MaxValidUntilDate) then
+                CurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MaxValidUntilDate);
+
+            if (ValidUntilDate < Today()) then
+                CurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MembershipExpired);
+        end;
     end;
 }

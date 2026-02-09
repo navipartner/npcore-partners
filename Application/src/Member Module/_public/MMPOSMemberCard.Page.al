@@ -198,6 +198,16 @@
                         ToolTip = 'Specifies the value of the Valid Until Date field';
                         ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
+                    field(CurrentPeriod; _CurrentPeriodText)
+                    {
+                        Caption = 'Current Period';
+                        Editable = false;
+                        Style = Unfavorable;
+                        StyleExpr = _NeedsActivation;
+                        ToolTip = 'Specifies the value of the Current Period field';
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    }
+
                     field("Remaining Amount Text"; RemainingAmountText)
                     {
                         Caption = 'Open / Due Amount.';
@@ -341,7 +351,7 @@
             action("Activate Membership")
             {
                 Caption = 'Activate Membership';
-                Enabled = NeedsActivation;
+                Enabled = _NeedsActivation;
                 Image = Start;
                 Promoted = true;
                 PromotedOnly = true;
@@ -691,7 +701,7 @@
             MembershipManagement.GetMembershipMaxValidUntilDate(MembershipRole."Membership Entry No.", ValidUntilDate);
 
             if (ValidUntilDate <> 0D) then
-                IsAboutToExpire := ((CalcDate('<-1M>', ValidUntilDate) < Today) and (ValidUntilDate > Today));
+                IsAboutToExpire := ((CalcDate('<-1M>', ValidUntilDate) < Today()) and (ValidUntilDate > Today()));
 
             if (IsAboutToExpire) then begin
                 MembershipManagement.GetMembershipValidDate(MembershipRole."Membership Entry No.", CalcDate('<+1D>', ValidUntilDate), ValidFrom2, ValidUntil2);
@@ -703,11 +713,13 @@
 
             end;
 
-            if (ValidUntilDate < Today) then
+            if (ValidUntilDate < Today()) then
                 UntilDateAttentionAccent := true;
 
             if (IsAboutToExpire) then
                 UntilDateAttentionAccent := true;
+
+            _CurrentPeriodText := MembershipManagement.GetMembershipCurrentPeriodText(MembershipRole."Membership Entry No.", _NeedsActivation);
 
             OrigAmt := 0;
             RemainAmt := 0;
@@ -715,7 +727,7 @@
             if (MembershipEntry.FindSet()) then begin
                 repeat
                     if (MembershipManagement.CalculateRemainingAmount(MembershipEntry, OrigAmt, RemainAmt, DueDate)) then begin
-                        if (DueDate < Today) then
+                        if (DueDate < Today()) then
                             DueAmount += RemainAmt
                         else
                             RemainingAmount += RemainAmt;
@@ -724,6 +736,7 @@
             end;
             AccentuateDueAmount := (DueAmount > 0);
             RemainingAmountText := StrSubstNo(PlaceHolderLbl, Format(RemainingAmount, 0, '<Precision,2:2><Integer><Decimals>'), Format(DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
+
         end;
 
         _FirstNameEditable := true;
@@ -741,7 +754,7 @@
             Rec.Birthday := 0D;
 
         if (Rec.Birthday <> 0D) then
-            IsBirthday := ((Date2DMY(Rec.Birthday, 1) = Date2DMY(Today, 1)) and (Date2DMY(Rec.Birthday, 2) = Date2DMY(Today, 2)));
+            IsBirthday := ((Date2DMY(Rec.Birthday, 1) = Date2DMY(Today(), 1)) and (Date2DMY(Rec.Birthday, 2) = Date2DMY(Today(), 2)));
 
         IsInvalid := (Rec.Blocked);
     end;
@@ -785,7 +798,8 @@
         _EmailEditable: Boolean;
         _PhoneNumberEditable: Boolean;
         UntilDateAttentionAccent: Boolean;
-        NeedsActivation: Boolean;
+        _NeedsActivation: Boolean;
+        _CurrentPeriodText: Text;
         GMembershipEntryNo: Integer;
         GMemberCardNumber: Text[100];
         RemainingPoints: Integer;
@@ -862,7 +876,7 @@
 
         end;
 
-        MembershipManagement.ActivateMembershipLedgerEntry(Membership."Entry No.", Today);
+        MembershipManagement.ActivateMembershipLedgerEntry(Membership."Entry No.", Today());
     end;
 
     local procedure ContactQuestionnaire()
@@ -914,7 +928,7 @@
             if (Member.Birthday > Today()) then
                 exit(true); // Allow future DoB, but warn user
 
-            if (not MembershipManagement.IsAgeValidForMember(Member, Today, ReasonText)) then
+            if (not MembershipManagement.IsAgeValidForMember(Member, Today(), ReasonText)) then
                 Error(ReasonText);
         end;
     end;

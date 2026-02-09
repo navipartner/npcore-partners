@@ -181,37 +181,14 @@
 
     var
         _CurrentPeriod: Text[100];
-        NOT_ACTIVATED: Label 'Not Activated', Locked = true;
-        MEMBERSHIP_EXPIRED: Label 'Membership Expired', Locked = true;
+
 
     trigger OnAfterGetRecord()
-    begin
-        _CurrentPeriod := CopyStr(SetCurrentPeriodText(Rec."Membership Entry No."), 1, MaxStrLen(_CurrentPeriod));
-    end;
-
-    local procedure SetCurrentPeriodText(MembershipEntryNo: Integer) CurrentPeriod: Text;
     var
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        ValidFromDate: Date;
-        ValidUntilDate: Date;
-        MaxValidUntilDate: Date;
-        PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
-        PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
         NeedsActivation: Boolean;
     begin
-        NeedsActivation := MembershipManagement.MembershipNeedsActivation(MembershipEntryNo);
-        CurrentPeriod := NOT_ACTIVATED;
-        if (not NeedsActivation) then begin
-            MembershipManagement.GetMembershipValidDate(MembershipEntryNo, Today, ValidFromDate, ValidUntilDate);
-            CurrentPeriod := StrSubstNo(PlaceHolder2Lbl, ValidFromDate, ValidUntilDate);
-
-            MembershipManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, MaxValidUntilDate);
-            if (ValidUntilDate <> MaxValidUntilDate) then
-                CurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MaxValidUntilDate);
-
-            if (ValidUntilDate < Today) then
-                CurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
-        end;
+        _CurrentPeriod := CopyStr(MembershipManagement.GetMembershipCurrentPeriodText(Rec."Membership Entry No.", NeedsActivation), 1, MaxStrLen(_CurrentPeriod));
     end;
 
     internal procedure GetSelectedMembershipEntryNo(): Integer

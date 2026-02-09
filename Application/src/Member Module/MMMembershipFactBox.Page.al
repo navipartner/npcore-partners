@@ -20,12 +20,12 @@
                     ToolTip = 'Specifies the value of the External Membership No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
-                field(ShowCurrentPeriod; ShowCurrentPeriod)
+                field(ShowCurrentPeriod; _ShowCurrentPeriod)
                 {
                     Caption = 'Current Period';
                     Editable = false;
                     Style = Unfavorable;
-                    StyleExpr = NeedsActivation;
+                    StyleExpr = _NeedsActivation;
                     ToolTip = 'Specifies the value of the Current Period field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -119,26 +119,13 @@
     }
 
     var
-        ShowCurrentPeriod: Text[30];
-        NeedsActivation: Boolean;
-        NOT_ACTIVATED: Label 'Not activated';
-        MEMBERSHIP_EXPIRED: Label 'Expired';
+        _ShowCurrentPeriod: Text;
+        _NeedsActivation: Boolean;
 
     trigger OnAfterGetCurrRecord()
     var
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        ValidFromDate: Date;
-        ValidUntilDate: Date;
-        PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
-        PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
     begin
-        NeedsActivation := MembershipManagement.MembershipNeedsActivation(Rec."Entry No.");
-        ShowCurrentPeriod := NOT_ACTIVATED;
-        if (not NeedsActivation) then begin
-            MembershipManagement.GetMembershipValidDate(Rec."Entry No.", Today, ValidFromDate, ValidUntilDate);
-            ShowCurrentPeriod := StrSubstNo(PlaceHolder2Lbl, ValidFromDate, ValidUntilDate);
-            if (ValidUntilDate < Today) then
-                ShowCurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
-        end;
+        _ShowCurrentPeriod := MembershipManagement.GetMembershipCurrentPeriodText(Rec."Entry No.", _NeedsActivation);
     end;
 }

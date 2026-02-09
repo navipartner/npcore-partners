@@ -40,7 +40,6 @@
                 }
                 field(ShowCurrentPeriod; ShowCurrentPeriod)
                 {
-
                     Caption = 'Current Period';
                     Editable = false;
                     Style = Unfavorable;
@@ -1006,33 +1005,14 @@
     trigger OnAfterGetCurrRecord()
     var
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        ValidFromDate: Date;
-        ValidUntilDate: Date;
-        MaxValidUntilDate: Date;
         PlaceHolder1Lbl: Label '%1 / %2 / %3', Locked = true;
-        PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
-        PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
     begin
         if (not Rec.Find()) then
             exit;
 
-
         MembershipManagement.GetMemberCount(Rec."Entry No.", AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
         ShowMemberCountAs := StrSubstNo(PlaceHolder1Lbl, AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
-
-        NeedsActivation := MembershipManagement.MembershipNeedsActivation(Rec."Entry No.");
-        ShowCurrentPeriod := NOT_ACTIVATED;
-        if (not NeedsActivation) then begin
-            MembershipManagement.GetMembershipValidDate(Rec."Entry No.", Today, ValidFromDate, ValidUntilDate);
-            ShowCurrentPeriod := StrSubstNo(PlaceHolder2Lbl, ValidFromDate, ValidUntilDate);
-
-            MembershipManagement.GetMembershipMaxValidUntilDate(Rec."Entry No.", MaxValidUntilDate);
-            if (ValidUntilDate <> MaxValidUntilDate) then
-                ShowCurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MaxValidUntilDate);
-
-            if (ValidUntilDate < Today) then
-                ShowCurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
-        end;
+        ShowCurrentPeriod := MembershipManagement.GetMembershipCurrentPeriodText(Rec."Entry No.", NeedsActivation);
 
         NPRAttrEditable := CurrPage.Editable();
 
@@ -1079,7 +1059,6 @@
         ShowMemberCountAs: Text;
         ShowCurrentPeriod: Text;
         NeedsActivation: Boolean;
-        NOT_ACTIVATED: Label 'Not activated';
         ADD_MEMBER_SETUP: Label 'Could not find %1 with %2 set to option %3 for %4 %5. Additional members can''t be added until setup is completed.';
         NPRAttrTextArray: array[40] of Text;
         NPRAttrManagement: Codeunit "NPR Attribute Management";
@@ -1096,7 +1075,6 @@
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
         RaptorEnabled: Boolean;
-        MEMBERSHIP_EXPIRED: Label 'Expired';
         EXT_NO_CHANGE: Label 'Please note that changing the external number requires re-printing of documents where this number is used. Do you want to continue?';
         HasAutoRenewalPaymentMethod: Option Yes,No;
 
