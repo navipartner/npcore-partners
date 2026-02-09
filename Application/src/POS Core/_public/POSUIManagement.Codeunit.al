@@ -586,6 +586,7 @@
         LayoutPickerAreYouSureLbl: label 'Are you sure? Any changes you made will get lost';
         LayoutPickerChangesLbl: label 'Changes';
         LayoutPickerDeleteLayoutLbl: label 'Delete Layout';
+        LayoutProviderLayoutNoLongerExistsLbl: label 'Selected layout no longer exists';
         LayoutProviderModifiedLayoutSaveWarningLbl: label 'You have modified the selected layout. Are you sure you want to switch layout? Switching will clear the modifications you have made';
         LayoutProviderErrorSavingLayoutLbl: label 'There was an error saving your layout.';
         LayoutProviderCannotDeleteCurrentlyAssignedLayouLbl: label 'You cannot delete the layout currently assigned to this POS unit';
@@ -1158,6 +1159,7 @@
         Captions.Add('Layout_Picker_AreYouSure', LayoutPickerAreYouSureLbl);
         Captions.Add('Layout_Picker_Changes', LayoutPickerChangesLbl);
         Captions.Add('Layout_Picker_DeleteLayout', LayoutPickerDeleteLayoutLbl);
+        Captions.Add('Layout_Provider_LayoutNoLongerExists', LayoutProviderLayoutNoLongerExistsLbl);
         Captions.Add('Layout_Provider_ModifiedLayoutSaveWarning', LayoutProviderModifiedLayoutSaveWarningLbl);
         Captions.Add('Layout_Provider_ErrorSavingLayout', LayoutProviderErrorSavingLayoutLbl);
         Captions.Add('Layout_Provider_CannotDeleteCurrentlyAssignedLayout', LayoutProviderCannotDeleteCurrentlyAssignedLayouLbl);
