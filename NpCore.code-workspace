@@ -20,7 +20,7 @@
   "settings": {
     "al.compilationOptions": {
       "parallel": true,
-      "generateReportLayout": true //If this is disabled we can have layouts being generated on someone elses machine.
+      "generateReportLayout": false //Disabled to prevent layout regeneration on different machines causing noisy diffs
     },
     "al.codeAnalyzers": ["${AppSourceCop}", "${UICop}", "${CodeCop}"],
     "al.enableCodeActions": true,
