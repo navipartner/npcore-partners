@@ -434,6 +434,7 @@
         if (DetTicketAccessEntry."External Adm. Sch. Entry No." <= 0) then
             exit;
 
+        AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not AdmissionScheduleEntry.FindLast()) then

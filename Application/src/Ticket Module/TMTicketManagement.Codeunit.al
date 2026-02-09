@@ -800,17 +800,19 @@
 
         Ticket.Get(TicketNo);
 
+        NewAdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
         NewAdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', NewExtScheduleEntryNo);
         NewAdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not NewAdmissionScheduleEntry.FindFirst()) then
             RaiseError(StrSubstNo(INVALID_REFERENCE, NewAdmissionScheduleEntry.TableCaption(), NewAdmissionScheduleEntry), '-2002');
 
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         TicketAccessEntry.SetFilter("Admission Code", '=%1', NewAdmissionScheduleEntry."Admission Code");
         TicketAccessEntry.FindFirst();
 
-        OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::INITIAL_ENTRY);
         OldDetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
+        OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::INITIAL_ENTRY);
         OldDetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
         OldDetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
         OldDetTicketAccessEntry.FindLast();
@@ -881,11 +883,13 @@
     begin
         Ticket.Get(TicketNo);
 
+        NewAdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
         NewAdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', NewExtScheduleEntryNo);
         NewAdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not NewAdmissionScheduleEntry.FindFirst()) then
             RaiseError(StrSubstNo(INVALID_REFERENCE, NewAdmissionScheduleEntry.TableCaption(), NewAdmissionScheduleEntry), '-2002');
 
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         TicketAccessEntry.SetFilter("Admission Code", '=%1', NewAdmissionScheduleEntry."Admission Code");
         if not TicketAccessEntry.FindFirst() then begin // adding new admission
@@ -894,8 +898,8 @@
             CreateSalesLinePerAdmission(POSSession, SalesTicketNo, NewAdmissionScheduleEntry, EntryNo, Ticket."Item No.");
         end
         else begin
-            OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::INITIAL_ENTRY);
             OldDetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
+            OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::INITIAL_ENTRY);
             OldDetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             OldDetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
             OldDetTicketAccessEntry.FindLast();
@@ -1014,8 +1018,7 @@
         ResponseMessage: Text;
         ResponseCode: Integer;
     begin
-
-
+        Ticket.SetCurrentKey("External Ticket No.");
         Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
         Ticket.SetFilter(Blocked, '=%1', false);
         if (not Ticket.FindFirst()) then
@@ -1027,6 +1030,7 @@
         if ExtAdmSchEntryNo = 0 then
             exit(true);
 
+        AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmSchEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not AdmissionScheduleEntry.FindFirst()) then
@@ -1041,6 +1045,7 @@
                 exit(false);
             TicketAdmissionBOM."Reschedule Policy"::UNTIL_USED: // admitted or expired
                 begin
+                    TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
                     if (not TicketAccessEntry.FindFirst()) then
@@ -1053,6 +1058,7 @@
                 end;
             TicketAdmissionBOM."Reschedule Policy"::CUTOFF_HOUR:
                 begin
+                    TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
                     if (not TicketAccessEntry.FindFirst()) then
@@ -1066,6 +1072,7 @@
                 end;
             TicketAdmissionBOM."Reschedule Policy"::UNTIL_ADMITTED:
                 begin
+                    TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
                     if (not TicketAccessEntry.FindFirst()) then
@@ -1124,25 +1131,18 @@
     var
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        Item: Record Item;
-        TicketType: Record "NPR TM Ticket Type";
-        Admission: Record "NPR TM Admission";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
     begin
-
         AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
         AdmissionBOM.FindSet();
         repeat
-            Item.Get(Ticket."Item No.");
-            TicketType.Get(Item."NPR Ticket Type");
-            Admission.Get(AdmissionBOM."Admission Code");
             TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
             TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
             TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionBOM."Admission Code");
 
             if (TicketAccessEntry.FindFirst()) then begin
-                RegisterPayment_Worker(TicketAccessEntry."Entry No.", PaymentType, PaymentReferenceNo);
+                RegisterPayment_Worker(TicketAccessEntry, PaymentType, PaymentReferenceNo);
 
                 if (CustomerNo <> '') then begin
                     TicketAccessEntry."Customer No." := CustomerNo;
@@ -1158,20 +1158,14 @@
     internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; AdmissionCode: Code[20])
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        Item: Record Item;
-        TicketType: Record "NPR TM Ticket Type";
-        Admission: Record "NPR TM Admission";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
     begin
-        Item.Get(Ticket."Item No.");
-        TicketType.Get(Item."NPR Ticket Type");
-        Admission.Get(AdmissionCode);
         TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
 
         if (TicketAccessEntry.FindFirst()) then begin
-            RegisterPayment_Worker(TicketAccessEntry."Entry No.", PaymentType, PaymentReferenceNo);
+            RegisterPayment_Worker(TicketAccessEntry, PaymentType, PaymentReferenceNo);
 
             if (CustomerNo <> '') then begin
                 TicketAccessEntry."Customer No." := CustomerNo;
@@ -1221,6 +1215,7 @@
 
             TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code");
 
+            DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
             if (DetTicketAccessEntry.FindFirst()) then
@@ -1263,6 +1258,7 @@
                 AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
                 if (TicketBom."POS Sale May Exceed Capacity") then
                     AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_UNKNOWN;
+                AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
                 AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmSchEntryNo);
                 AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
                 AdmissionScheduleEntry.FindFirst();
@@ -1369,6 +1365,7 @@
         if (not TicketRequest.FindSet()) then
             RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketReference), INVALID_REFERENCE_NO);
 
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
         repeat
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
             if (Ticket.FindSet()) then begin
@@ -1684,6 +1681,7 @@
         if (AdmissionCode = '') then
             AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
 
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (not TicketAccessEntry.FindFirst()) then begin
@@ -1718,6 +1716,7 @@
         if (AdmissionCode = '') then
             AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
 
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (not TicketAccessEntry.FindFirst()) then begin
@@ -2530,14 +2529,11 @@
 
     end;
 
-    local procedure RegisterPayment_Worker(TicketAccessEntryNo: Integer; PaymentType: Option; PaymentReferenceNo: Code[20])
+    local procedure RegisterPayment_Worker(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; PaymentType: Option; PaymentReferenceNo: Code[20])
     var
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         PaymentTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         DeferRevenue: Codeunit "NPR TM RevenueDeferral";
     begin
-
-        TicketAccessEntry.Get(TicketAccessEntryNo);
 
         PaymentTicketAccessEntry.Init();
         PaymentTicketAccessEntry."Ticket No." := TicketAccessEntry."Ticket No.";
@@ -2563,7 +2559,7 @@
         PaymentTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         PaymentTicketAccessEntry.Insert(true);
 
-        DeferRevenue.CreateDeferRevenueRequest(TicketAccessEntryNo, Today());
+        DeferRevenue.CreateDeferRevenueRequest(TicketAccessEntry."Entry No.", Today());
 
         CloseInitialEntry(PaymentTicketAccessEntry);
         OnDetailedTicketEvent(PaymentTicketAccessEntry);

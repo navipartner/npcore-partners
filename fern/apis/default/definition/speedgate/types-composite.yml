@@ -437,10 +437,10 @@ types:
     properties:
       id: simpleTypes.ScannerCategoryId
       code: simpleTypes.ScannerCategoryCode
-      description: simpleTypes.ScannerCategoryDescription
+      name: simpleTypes.ScannerCategoryDescription
     examples:
       - name: ExampleEntranceScanners
         value:
           id: $simpleTypes.ScannerCategoryId.ExampleCategoryIdEntrance
           code: $simpleTypes.ScannerCategoryCode.ExampleCategoryCodeEntrance
-          description: $simpleTypes.ScannerCategoryDescription.ExampleCategoryDescriptionEntrance
+          name: $simpleTypes.ScannerCategoryDescription.ExampleCategoryDescriptionEntrance

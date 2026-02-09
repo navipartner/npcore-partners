@@ -363,12 +363,15 @@ codeunit 6248331 "NPR WalletApiAgent"
     local procedure AddTicketDetails(ResponseJson: Codeunit "NPR Json Builder"; Ticket: Record "NPR TM Ticket"; LanguageCode: Code[10]): Codeunit "NPR Json Builder"
     var
         TicketAgent: Codeunit "NPR TicketingTicketAgent";
+        TicketType: Record "NPR TM Ticket Type";
     begin
+        TicketType.Get(Ticket."Ticket Type Code");
+
         ResponseJson
             .StartObject('ticketDetails')
             .AddObject(TicketAgent.TicketValidDateProperties(ResponseJson, Ticket))
             .AddObject(TicketAgent.AdmissionDetailsDTO(ResponseJson, 'content', Ticket, LanguageCode))
-            .AddArray(TicketAgent.TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, false))
+            .AddArray(TicketAgent.TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, TicketType, false))
             .EndObject();
         exit(ResponseJson);
     end;

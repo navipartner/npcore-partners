@@ -414,6 +414,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketHandler: Codeunit "NPR TicketingTicketAgent";
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
         GeneralLedgerSetup: Record "General Ledger Setup";
         TicketingCatalog: Codeunit "NPR TicketingCatalogAgent";
         TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
@@ -432,8 +433,9 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             Ticket.SetCurrentKey("Ticket Reservation Entry No.");
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
             if (Ticket.FindSet()) then begin
+                TicketType.Get(Ticket."Ticket Type Code");
                 repeat
-                    ResponseJson.AddArray(TicketHandler.SingleTicketDTO(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code", true, false, false, TicketDescriptionBuffer, TicketRequest));
+                    ResponseJson.AddArray(TicketHandler.SingleTicketDTO(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code", true, false, false, TicketDescriptionBuffer, TicketType, TicketRequest));
                 until (Ticket.Next() = 0);
             end;
 
