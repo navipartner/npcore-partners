@@ -380,6 +380,12 @@ table 6151258 "NPR Ecom Sales Header"
             Caption = 'Ecommerce Store Code';
             DataClassification = CustomerContent;
         }
+
+        field(5170; "Sell-to Invoice Phone No."; Text[30])
+        {
+            Caption = 'Sell-to Invoice Phone No.';
+            DataClassification = CustomerContent;
+        }
 #endif
     }
 

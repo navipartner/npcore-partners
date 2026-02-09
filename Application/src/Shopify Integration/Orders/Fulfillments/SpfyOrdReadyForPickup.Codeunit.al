@@ -124,7 +124,7 @@ codeunit 6248688 "NPR Spfy Ord Ready For Pickup"
         Cursor := '';
         HasNext := true;
         repeat
-            CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, NcTask."Store Code", RequestString, 'gid://shopify/Order/' + NcTask."Record Value", true);
+            SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, NcTask."Store Code", RequestString, 'gid://shopify/Order/' + NcTask."Record Value", true);
             if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
                 Error(GetLastErrorText());
             if not ParsePageInfo(ShopifyResponse, 'data.order.fulfillmentOrders', HasNext, Cursor) then
@@ -188,28 +188,6 @@ codeunit 6248688 "NPR Spfy Ord Ready For Pickup"
             HasNext := JsonHelper.GetJBoolean(PageInfo, 'hasNextPage', true);
             Cursor := JsonHelper.GetJText(PageInfo, 'endCursor', false);
         end;
-    end;
-
-    local procedure CompleteGraphQLRequest(RequestString: Text; VariablesJson: JsonObject; var NcTask: Record "NPR Nc Task")
-    var
-        RequestJson: JsonObject;
-        QueryStream: OutStream;
-    begin
-        RequestJson.Add('query', RequestString);
-        RequestJson.Add('variables', VariablesJson);
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        RequestJson.WriteTo(QueryStream);
-    end;
-
-    local procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; Cursor: Text; ShopifyStoreCode: Code[20]; RequestString: Text; OrderGID: Text[100]; IncludeCursor: Boolean)
-    var
-        VariablesJson: JsonObject;
-    begin
-        NcTask."Store Code" := ShopifyStoreCode;
-        VariablesJson.Add('OrderId', OrderGID);
-        if IncludeCursor then // Cursor is added only for paginated GraphQL queries. Header-level queries do not support pagination parameters.
-            SpfyCommunicationHandler.AddGraphQLCursor(VariablesJson, Cursor);
-        CompleteGraphQLRequest(RequestString, VariablesJson, NcTask);
     end;
 
     var

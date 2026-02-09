@@ -1307,8 +1307,8 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if EcomSalesHeader."Sell-to Customer No." <> Customer."No." then
             EcomSalesHeader."Sell-to Customer No." := Customer."No.";
 #pragma warning disable AA0139
-        EcomSalesHeader."Sell-to Email" := JsonHelper.GetJText(Order, 'email', MaxStrLen(Customer."E-Mail"), false);
-        EcomSalesHeader."Sell-to Phone No." := JsonHelper.GetJText(Order, 'phone', MaxStrLen(Customer."Phone No."), false);
+        EcomSalesHeader."Sell-to Email" := Customer."E-Mail";
+        EcomSalesHeader."Sell-to Phone No." := Customer."Phone No.";
 #pragma warning restore AA0139
         if Order.SelectToken('billingAddress', BillingAddress) then begin
             SellToName := JsonHelper.GetJText(BillingAddress, 'firstName', false);
@@ -1335,8 +1335,8 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if EcomSalesHeader."Sell-to Contact" = '' then
             EcomSalesHeader."Sell-to Contact" := CopyStr(EcomSalesHeader."Sell-to Name", 1, MaxStrLen(EcomSalesHeader."Sell-to Contact"));
 #pragma warning disable AA0139
-        EcomSalesHeader."Sell-to Email" := JsonHelper.GetJText(Order, 'email', MaxStrLen(Customer."E-Mail"), false);
-        EcomSalesHeader."Sell-to Phone No." := JsonHelper.GetJText(Order, 'phone', MaxStrLen(Customer."Phone No."), false);
+        EcomSalesHeader."Sell-to Invoice Email" := JsonHelper.GetJText(Order, 'email', MaxStrLen(Customer."E-Mail"), false);
+        EcomSalesHeader."Sell-to Invoice Phone No." := JsonHelper.GetJText(Order, 'phone', MaxStrLen(Customer."Phone No."), false);
 #pragma warning restore AA0139
     end;
 

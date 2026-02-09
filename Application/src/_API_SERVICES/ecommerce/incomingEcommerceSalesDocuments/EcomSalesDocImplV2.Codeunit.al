@@ -140,7 +140,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         RecordRef.SetTable(SalesHeader);
 
         SalesHeader."NPR Bill-to E-mail" := EcomSalesHeader."Sell-to Invoice Email";
-
+        SalesHeader."NPR Bill-to Phone No." := EcomSalesHeader."Sell-to Invoice Phone No.";
         SalesHeader."Bill-to Name" := SalesHeader."Sell-to Customer Name";
         SalesHeader."Bill-to Name 2" := SalesHeader."Sell-to Customer Name 2";
         SalesHeader."Bill-to Address" := SalesHeader."Sell-to Address";
