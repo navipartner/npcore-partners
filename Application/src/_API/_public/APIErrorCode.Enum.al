@@ -286,5 +286,12 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The input provided is invalid.', Locked = true;
     }
-
+    value(6060157; membership_no_timeframes)
+    {
+        Caption = 'Membership is not valid because it has no timeframes', Locked = true;
+    }
+    value(6060158; membership_not_valid_for_today)
+    {
+        Caption = 'Membership is not valid for today', Locked = true;
+    }
 }

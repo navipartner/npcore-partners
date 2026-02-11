@@ -1254,10 +1254,13 @@ codeunit 6185130 "NPR SG SpeedGate"
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
         IsPermitted: Boolean;
+        ValidFromDate: Date;
+        ValidUntilDate: Date;
 
         AdmissionLocalTime: DateTime;
         LocalTime: Time;
@@ -1295,6 +1298,15 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (MembershipSetup."Card Expire Date Calculation" <> MembershipSetup."Card Expire Date Calculation"::NA) then
             if (MemberCard."Valid Until" < Today()) then
                 exit(SetApiError(_ApiErrors::member_card_expired));
+
+        if MemberManagement.MembershipNeedsActivation(MemberCard."Membership Entry No.") then
+            MemberManagement.ActivateMembershipLedgerEntry(MemberCard."Membership Entry No.", Today());
+
+        if not MemberManagement.GetMembershipValidDate(MemberCard."Membership Entry No.", Today(), ValidFromDate, ValidUntilDate) then begin
+            if (ValidFromDate = 0D) and (ValidUntilDate = 0D) then
+                exit(SetApiError(_ApiErrors::membership_no_timeframes));
+            exit(SetApiError(_ApiErrors::membership_not_valid_for_today));
+        end;
 
         if (MembershipSetup."Ticket Item Type" = MembershipSetup."Ticket Item Type"::REFERENCE) then begin
             if (MemberRetailIntegration.TranslateBarcodeToItemVariant(MembershipSetup."Ticket Item Barcode", ItemNo, VariantCode, ResolvingTable)) then begin
