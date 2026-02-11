@@ -12,12 +12,13 @@ service:
   endpoints:
 
     createReservation:
-      docs: 
+      docs: >
         Initiates a new reservation for tickets. 
         Clients use this endpoint to provisionally hold tickets by specifying the desired items, 
         quantities, and any specific admissions or schedules. 
         Returns a token representing the reservation, along with its expiration time, 
         allowing clients to manage or confirm the reservation before it expires.
+      display-name: Create Reservation
       method: POST
       path: /reservation
       request:
@@ -149,7 +150,6 @@ service:
         name: cancelReservation
       response: ReservationActionResponse
       examples:
-        # Success response
         - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -176,7 +176,6 @@ service:
           includeTicketNumbers: optional<QP_IncludeTicketNumbers>
       response: ReservationActionResponse
       examples:
-        # Success response
         - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -202,8 +201,7 @@ service:
         body: ConfirmReservationRequest
       response: GetReservationDetails
       examples:
-        # Success response
-        - name: ExampleConfirmReservation1
+        - name: Confirm individual admission ticket
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -222,6 +220,30 @@ service:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 2
                   ticket: $ReservationTicketDetails.ExampleTicketConfirmed
+                  content:
+                  - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                    scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
+        - name: Confirm group admission ticket
+          docs:
+            Example of confirming a group ticket reservation. The response includes admissionEntitlements which specify the admission codes and maximum group sizes for the group ticket.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          request:
+            ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+            ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
+            notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+            paymentReference: PAY123456
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              reservationStatus: confirmed
+              reservations:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 2
+                  ticket: $ReservationTicketDetails.ExampleTicketConfirmedGroup
                   content:
                   - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
                     scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
@@ -276,6 +298,25 @@ service:
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
                       scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
+        - name: Get confirmed group reservation
+          docs:
+            Example of a confirmed group ticket reservation with admissionEntitlements.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              reservationStatus: confirmed
+              reservations:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 2
+                  ticket: $ReservationTicketDetails.ExampleTicketConfirmedGroup
+                  content:
+                    - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                      scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
 
     getTickets:
       docs: 
@@ -292,7 +333,8 @@ service:
           storeCode: optional<simpleTypes.StoreCode>
       response: list<compositeTypes.TicketDetails>
       examples:
-        - path-parameters:
+        - name: Get individual admission tickets
+          path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
@@ -300,8 +342,21 @@ service:
           query-parameters:
             storeCode: $simpleTypes.StoreCode.ExampleStoreCode
           response:
-            body: 
+            body:
             - $compositeTypes.TicketDetails.ExampleTicket1
+        - name: Get group admission tickets
+          docs:
+            Example of retrieving a group ticket with admissionEntitlements.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          query-parameters:
+            storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          response:
+            body:
+            - $compositeTypes.TicketDetails.ExampleTicketGroup
 
 types:
   ## Complex types
@@ -440,6 +495,22 @@ types:
           unitPrice: 80.00
           unitPriceInclVat: 100.00
           currencyCode: DKK
+          admissionEntitlements:
+            - code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+              maxGroupSize: 10
+      - name: ExampleTicketConfirmedGroup
+        value:
+          ticketKind: $simpleTypes.TicketKind.ExampleGroupAdmission
+          ticketNumbers:
+            - ticketId: $simpleTypes.TicketId.ExampleTicket1
+              ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          validFrom: 2024-10-15T00:00:00Z
+          validUntil: 2024-10-15T23:59:59Z
+          pinCode: 12-34
+          unitPrice: 80.00
+          unitPriceInclVat: 100.00
+          currencyCode: DKK
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
           admissionEntitlements:
             - code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
               maxGroupSize: 10

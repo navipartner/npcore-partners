@@ -144,6 +144,7 @@ types:
       content: list<TicketContent>
       description: Descriptions
       accessHistory: optional<list<TicketAccessHistory>>
+      admissionEntitlements: optional<list<AdmissionEntitlement>>
     examples:
       - name: ExampleTicket1
         value:
@@ -190,10 +191,36 @@ types:
           pinCode: 12-34
           ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
           ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
-          content: 
+          content:
             - $TicketContent.ExampleTicketContent2
           description: $Descriptions.ExampleTicket31001
-  
+      - name: ExampleTicketGroup
+        value:
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          ticketKind: $simpleTypes.TicketKind.ExampleGroupAdmission
+          reservationToken : $simpleTypes.Token.ExampleToken
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+          validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
+          validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
+          issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          blocked: false
+          pinCode: 12-34
+          unitPrice: 80.00
+          unitPriceInclVat: 100.00
+          currencyCode: DKK
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+          ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
+          notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+          printCount: 1
+          printedAt: $simpleTypes.ReferenceDateTime.ExamplePrintedAt
+          content:
+            - $TicketContent.ExampleTicketContent1
+          description: $Descriptions.ExampleTicket31001
+          admissionEntitlements:
+            - code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+              maxGroupSize: 10
+
   TicketContent:
     docs: Details of the ticket content
     properties:
@@ -278,7 +305,7 @@ types:
       events: optional<list<TicketAccessEvent>>
 
   FindTicketResponse:
-    docs: Details of the ticket 
+    docs: Details of the ticket
     properties:
       ticketId: simpleTypes.TicketId
       ticketNumber: simpleTypes.TicketExternalNumber
@@ -301,6 +328,7 @@ types:
       content: optional<list<TicketContent>>
       description: optional<Descriptions>
       accessHistory: optional<list<TicketAccessHistory>>
+      admissionEntitlements: optional<list<AdmissionEntitlement>>
     examples:
       - name: ExampleTicket1
         value:
@@ -347,9 +375,35 @@ types:
           pinCode: 12-34
           ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
           ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
-          content: 
+          content:
             - $TicketContent.ExampleTicketContent2
           description: $Descriptions.ExampleTicket31001
+      - name: ExampleTicketGroup
+        value:
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          ticketKind: $simpleTypes.TicketKind.ExampleGroupAdmission
+          reservationToken : $simpleTypes.Token.ExampleToken
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+          validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
+          validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
+          issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          blocked: false
+          pinCode: 12-34
+          unitPrice: 80.00
+          unitPriceInclVat: 100.00
+          currencyCode: DKK
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+          ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
+          notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+          printCount: 1
+          printedAt: $simpleTypes.ReferenceDateTime.ExamplePrintedAt
+          content:
+            - $TicketContent.ExampleTicketContent1
+          description: $Descriptions.ExampleTicket31001
+          admissionEntitlements:
+            - code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+              maxGroupSize: 10
 
   AdmissionEntitlement:
     docs: 

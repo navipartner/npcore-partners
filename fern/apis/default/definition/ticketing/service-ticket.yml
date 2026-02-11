@@ -30,7 +30,7 @@ service:
         ticketId: simpleTypes.TicketId
       response: compositeTypes.TicketDetails
       examples:
-        - name: ExampleGetTicket
+        - name: Get individual admission ticket
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -42,6 +42,20 @@ service:
             withAccessHistoryDetails: true
           response:
             body: $compositeTypes.TicketDetails.ExampleTicket1
+        - name: Get group admission ticket
+          docs:
+            Example of retrieving a group ticket with admissionEntitlements.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
+          query-parameters:
+            storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+            withAccessHistory: false
+            withAccessHistoryDetails: false
+          response:
+            body: $compositeTypes.TicketDetails.ExampleTicketGroup
 
     findTicket:
       docs: >
@@ -84,7 +98,22 @@ service:
           response:
             body:
               - $compositeTypes.FindTicketResponse.ExampleTicket1
-              
+        - name: Find group tickets using external ticket numbers
+          docs:
+            Example of finding a group ticket with admissionEntitlements.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            externalNumbers: $simpleTypes.TicketExternalNumbers.ExampleTicket1
+            withAdmissionContent: true
+            withAccessHistoryDetails: false
+            activeOnly: true
+          response:
+            body:
+              - $compositeTypes.FindTicketResponse.ExampleTicketGroup
+
     requestRevokeTicket:
       docs: 
         Initiates a revoke request for a ticket identified by its ticket id. 
