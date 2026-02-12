@@ -1767,7 +1767,6 @@
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         TryFindPartnerVoucher: Codeunit "NPR Try Find Partner Voucher";
         BlankVoucherNumberErr: Label 'Reference number must not be empty';
-        InvalidReferenceNumberErr: Label 'Voucher with Reference no %1 not found for Voucher type %2';
     begin
         OnBeforeGetVoucher(VoucherNumber);
 
@@ -1804,10 +1803,32 @@
 
         if Voucher.IsEmpty then
             if VoucherReservationByAmountFeatureEnabled() then
-                Error(InvalidReferenceNumberErr, VoucherNumber, VoucherType)
+                ThrowVoucherNotFoundError(VoucherNumber, VoucherType)
             else
                 exit;
         Found := Page.RunModal(0, Voucher) = Action::LookupOK;
+    end;
+
+    local procedure ThrowVoucherNotFoundError(VoucherNumber: Text[50]; VoucherType: Text[20])
+    var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        InvalidReferenceNumberErr: Label 'Voucher with Reference no %1 not found for Voucher type %2';
+        VoucherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, %2 - date';
+    begin
+        if FindArchivedVoucher(VoucherType, VoucherNumber, ArchVoucher) then begin
+            FindLastArchVoucherEntry(ArchVoucher."No.", ArchVoucherEntry);
+            Error(VoucherRedeemedErr, VoucherNumber, ArchVoucherEntry."Posting Date");
+        end;
+
+        Error(InvalidReferenceNumberErr, VoucherNumber, VoucherType);
+    end;
+
+    local procedure FindLastArchVoucherEntry(ArchVoucherNo: Code[20]; var ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry")
+    begin
+        ArchVoucherEntry.SetCurrentKey("Arch. Voucher No.");
+        ArchVoucherEntry.SetRange("Arch. Voucher No.", ArchVoucherNo);
+        if ArchVoucherEntry.FindLast() then;
     end;
 
     procedure CheckVoucherTypeQty(VoucherTypeCode: Code[20])
