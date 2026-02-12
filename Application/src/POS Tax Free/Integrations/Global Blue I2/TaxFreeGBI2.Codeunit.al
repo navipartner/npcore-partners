@@ -1572,15 +1572,19 @@
         TempMatches: Record Matches temporary;
         Regex: Codeunit Regex;
 #endif
-        RegexPattern: Label '&(?!(#\d+;))', Locked = true;
+        RegexPattern: Label '&(?!(\w+;|#\d+;))', Locked = true;
     begin
 #if BC17
         RegEx.Regex(RegexPattern);
         RegEx.Match(GoodDescription, Match);
-        exit(DelStr(GoodDescription, Match.Index() + 1));
+        if Match.Success() then
+            exit(DelStr(GoodDescription, Match.Index() + 1));
+        exit(GoodDescription);
 #else
         Regex.Match(GoodDescription, RegexPattern, 0, TempMatches);
-        exit(DelStr(GoodDescription, TempMatches.Index + 1));
+        if TempMatches.FindFirst() then
+            exit(DelStr(GoodDescription, TempMatches.Index + 1));
+        exit(GoodDescription);
 #endif
     end;
 
