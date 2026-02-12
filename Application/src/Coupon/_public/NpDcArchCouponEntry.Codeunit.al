@@ -66,9 +66,14 @@ codeunit 6150972 "NPR NpDc ArchCouponEntry"
     end;
 
     local procedure PopulateBufferFromRec(var ArchCouponEntryBuff: Record "NPR NpDc ArchCouponEntryBuff"; ArchCouponEntry: Record "NPR NpDc Arch.Coupon Entry")
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
     begin
         ArchCouponEntryBuff.Init();
         ArchCouponEntryBuff.TransferFields(ArchCouponEntry);
+        ArchCoupon.SetLoadFields("Customer No.");
+        if ArchCoupon.Get(ArchCouponEntry."Arch. Coupon No.") then
+            ArchCouponEntryBuff."Customer No." := ArchCoupon."Customer No.";
         ArchCouponEntryBuff.SystemId := ArchCouponEntry.SystemId;
         ArchCouponEntryBuff.Insert(false, false);
     end;

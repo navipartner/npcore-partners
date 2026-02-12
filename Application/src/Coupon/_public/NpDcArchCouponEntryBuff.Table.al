@@ -100,6 +100,11 @@ table 6059891 "NPR NpDc ArchCouponEntryBuff"
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
         }
+        field(85; "Customer No."; Code[20])
+        {
+            Caption = 'Customer No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
