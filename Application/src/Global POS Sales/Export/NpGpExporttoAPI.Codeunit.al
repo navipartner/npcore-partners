@@ -247,7 +247,7 @@ codeunit 6248268 "NPR NpGp Export to API"
             exit;
 
         JsonRequest := InitODataReqBody(POSEntry);
-        APIPOSGlobalEntryext.OnAfterInitRequestBody(POSEntry, JsonRequest);
+        APIPOSGlobalEntryExt.OnAfterInitRequestBody(POSEntry, JsonRequest);
         JsonRequest.WriteTo(JsonText);
         RequestMessage.Content.WriteFrom(JsonText);
 
@@ -315,8 +315,11 @@ codeunit 6248268 "NPR NpGp Export to API"
     var
         APIPOSGlobalEntryExt: Codeunit "NPR API POS Global Entry Ext";
         JsonBuilder: Codeunit "NPR Json Builder";
+        NpGpPOSSalesSyncMgt: Codeunit "NPR NpGp POS Sales Sync Mgt.";
         ExtensionFieldsData: Dictionary of [Integer, Text];
+        MembershipNo: Code[20];
     begin
+        MembershipNo := NpGpPOSSalesSyncMgt.FindMembershipNo(POSEntry);
         APIPOSGlobalEntryExt.SetPOSEntryExtensionData(POSEntry, ExtensionFieldsData);
         JsonBuilder.StartObject()
             .AddProperty('posStore', POSEntry."POS Store Code")
@@ -333,6 +336,7 @@ codeunit 6248268 "NPR NpGp Export to API"
             .AddProperty('totalVATAmount', Format(POSEntry."Tax Amount", 0, 9))
             .AddProperty('company', CompanyName)
             .AddProperty('customerNo', POSEntry."Customer No.")
+            .AddProperty('membershipNo', MembershipNo)
             .AddProperty('salesperson', POSEntry."Salesperson Code")
             .AddProperty('currencyCode', POSEntry."Currency Code")
             .AddProperty('currencyFactor', Format(POSEntry."Currency Factor", 0, 9))
@@ -489,6 +493,7 @@ codeunit 6248268 "NPR NpGp Export to API"
         JobQueueCategory.InsertRec(JobQueueCategoryCodeLbl, JobQueueCategoryDescriptionLbl);
         JobQueueCategoryCode := JobQueueCategoryCodeLbl;
     end;
+
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RefreshJobQueueEntry()

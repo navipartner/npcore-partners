@@ -205,6 +205,7 @@ codeunit 6248189 "NPR API POS Global Entry"
 
         TempNpGpPOSSalesEntry."Original Company" := JsonHelper.GetJText(Body, 'company', false);
         TempNpGpPOSSalesEntry."Customer No." := JsonHelper.GetJText(Body, 'customerNo', false);
+        TempNpGpPOSSalesEntry."Membership No." := JsonHelper.GetJCode(Body, 'membershipNo', false);
         TempNpGpPOSSalesEntry."Salesperson Code" := JsonHelper.GetJText(Body, 'salesperson', false);
         TempNpGpPOSSalesEntry."Currency Code" := JsonHelper.GetJText(Body, 'currencyCode', false);
         TempNpGpPOSSalesEntry."Currency Factor" := JsonHelper.GetJDecimal(Body, 'currencyFactor', false);
@@ -462,6 +463,7 @@ codeunit 6248189 "NPR API POS Global Entry"
             .AddProperty('totalVATAmount', NpGpPOSSalesEntry."Total Tax Amount")
             .AddProperty('company', NpGpPOSSalesEntry."Original Company")
             .AddProperty('customerNo', NpGpPOSSalesEntry."Customer No.")
+            .AddProperty('membershipNo', NpGpPOSSalesEntry."Membership No.")
             .AddProperty('salesperson', NpGpPOSSalesEntry."Salesperson Code")
             .AddProperty('currencyCode', NpGpPOSSalesEntry."Currency Code")
             .AddProperty('currencyFactor', NpGpPOSSalesEntry."Currency Factor");

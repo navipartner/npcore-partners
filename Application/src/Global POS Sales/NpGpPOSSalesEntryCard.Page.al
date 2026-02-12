@@ -56,6 +56,11 @@ page 6150811 "NPR NpGp POS Sales Entry Card"
                     ToolTip = 'Specifies the value of the Customer No.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Membership No."; Rec."Membership No.")
+                {
+                    ToolTip = 'Specifies the value of the Membership No.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ToolTip = 'Specifies the salesperson code.';

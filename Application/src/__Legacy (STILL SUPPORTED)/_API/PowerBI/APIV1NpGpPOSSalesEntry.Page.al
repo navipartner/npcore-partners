@@ -41,6 +41,7 @@ page 6150865 "NPR APIV1 NpGp POS Sales Entry"
                 field(totalTaxAmount; Rec."Total Tax Amount") { }
                 field(originalCompany; Rec."Original Company") { }
                 field(customerNo; Rec."Customer No.") { }
+                field(membershipNo; Rec."Membership No.") { }
                 field(salesQuantity; Rec."Sales Quantity") { }
 
 #IF NOT (BC17 or BC18 or BC19 or BC20)

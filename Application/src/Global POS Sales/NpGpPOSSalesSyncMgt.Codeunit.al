@@ -99,7 +99,9 @@
         POSCrossReference: Record "NPR POS Cross Reference";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSSalesWS: Codeunit "NPR NpGp POS Sales WS";
+        MembershipNo: Code[20];
     begin
+        MembershipNo := FindMembershipNo(POSEntry);
         Xml :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:glob="urn:microsoft-dynamics-schemas/codeunit/' + ServiceName + '" xmlns:glob1="urn:microsoft-dynamics-nav/xmlports/global_pos_sales">' +
              '<soapenv:Body>' +
@@ -113,6 +115,7 @@
                      '<glob1:entry_time>' + Format(CreateDateTime(POSEntry."Entry Date", POSEntry."Ending Time"), 0, 9) + '</glob1:entry_time>' +
                      '<glob1:entry_type>' + Format(POSEntry."Entry Type", 0, 2) + '</glob1:entry_type>' +
                      '<glob1:customer_no>' + Format(POSEntry."Customer No.") + '</glob1:customer_no>' +
+                     '<glob1:membership_no>' + Format(MembershipNo) + '</glob1:membership_no>' +
                      '<glob1:retail_id>' + Format(POSEntry.SystemId) + '</glob1:retail_id>' +
                      '<glob1:posting_date>' + Format(POSEntry."Posting Date", 0, 9) + '</glob1:posting_date>' +
                      '<glob1:fiscal_no>' + POSEntry."Fiscal No." + '</glob1:fiscal_no>' +
@@ -281,6 +284,52 @@
     begin
         Output := TypeHelper.HtmlEncode(Input);
         exit(Output);
+    end;
+
+    procedure FindMembershipNo(POSEntry: Record "NPR POS Entry") ExternalMembershipNo: Code[20]
+    var
+        MMPOSSalesInfo: Record "NPR MM POS Sales Info";
+        MMMembership: Record "NPR MM Membership";
+        MMForeignMembersSetup: Record "NPR MM Foreign Members. Setup";
+    begin
+        if not MMPOSSalesInfo.Get(MMPOSSalesInfo."Association Type"::HEADER, POSEntry."Document No.", 0) then
+            exit;
+        if (MMPOSSalesInfo."Membership Entry No." <= 0) then
+            exit;
+
+        if not MMMembership.Get(MMPOSSalesInfo."Membership Entry No.") then
+            exit;
+        ExternalMembershipNo := MMMembership."External Membership No.";
+
+        MMForeignMembersSetup.SetFilter("Community Code", '=%1', MMMembership."Community Code");
+        MMForeignMembersSetup.SetFilter(Disabled, '=%1', false);
+        if (not MMForeignMembersSetup.FindSet()) then
+            exit;
+
+        repeat
+            if (MMForeignMembersSetup."Append Local Prefix" <> '') then
+                if (CopyStr(MMMembership."External Membership No.", 1, StrLen(MMForeignMembersSetup."Append Local Prefix")) = MMForeignMembersSetup."Append Local Prefix") then begin
+                    ExternalMembershipNo := RemoveLocalPrefix(MMForeignMembersSetup."Append Local Prefix", MMMembership."External Membership No.");
+                end;
+        until (MMForeignMembersSetup.Next() = 0);
+
+    end;
+
+    local procedure RemoveLocalPrefix(Prefix: Code[10]; String: Code[20]) NewString: Code[20]
+    begin
+        NewString := String;
+
+        if (StrLen(Prefix) = 0) then
+            exit(NewString);
+
+        if (StrLen(Prefix) > StrLen(String)) then
+            exit(NewString);
+#pragma warning disable AA0139
+        if (CopyStr(String, 1, StrLen(Prefix)) = Prefix) then
+            NewString := CopyStr(String, StrLen(Prefix) + 1);
+#pragma warning restore
+
+        exit(NewString);
     end;
 
     [Obsolete('Pending removal use OnInitRequestBody instead', '2023-06-28')]

@@ -39,6 +39,10 @@ xmlport 6151167 "NPR NpGp POS Entries"
                 {
 
                 }
+                fieldelement(membership_no; TempNpGpPOSSalesEntry."Membership No.")
+                {
+
+                }
                 fieldelement(retail_id; TempNpGpPOSSalesEntry.SystemId)
                 {
                 }

@@ -40,6 +40,11 @@
                     ToolTip = 'Specifies the value of the Customer No.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Membership No."; Rec."Membership No.")
+                {
+                    ToolTip = 'Specifies the value of the Membership No.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Posting Date"; Rec."Posting Date")
                 {
 

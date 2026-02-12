@@ -132,6 +132,11 @@
             Caption = 'Total Amount Incl. Tax';
             DataClassification = CustomerContent;
         }
+        field(250; "Membership No."; Code[20])
+        {
+            Caption = 'Membership No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
