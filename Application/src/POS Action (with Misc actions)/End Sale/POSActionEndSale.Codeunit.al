@@ -96,11 +96,17 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         DrawerStatus: Codeunit "NPR POS Action: Drawer Status";
         TicketAdmitAfterEoS: Codeunit "NPR POSAction TicketAdmitOnEoS";
         MemberAdmitAfterEOS: Codeunit "NPR POSAction MemberAdmitOnEoS";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        SendReceiptEmail: Codeunit "NPR POS Action: NpEmailPOSRcpt";
+#endif
     begin
         if EndSaleSuccess then begin
             TicketAdmitAfterEoS.AddPostEndOfSaleWorkflow(Sale, PostWorkflows);
             MemberAdmitAfterEOS.AddPostEndOfSaleWorkflow(Sale, PostWorkflows);
             AddDigitalReceiptWorkflow(Sale, PostWorkflows);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            SendReceiptEmail.AddPostEndOfSaleWorkflow(Sale, PostWorkflows);
+#endif
             DrawerStatus.AddCashDrawerStatusWorkflow(PostWorkflows, Setup);
         end;
         EndSaleEvents.OnAddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, EndSaleSuccess, PostWorkflows);
@@ -166,7 +172,7 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionEndSale.js###
-'const main=async({workflow:a})=>{let e,o;({preWorkflows:o,postWorkflows:e}=await a.respond("endSaleWithPreWorkflows")),o&&(await processWorkflows(o),{postWorkflows:e}=await a.respond("endSaleWithoutPreWorkflows")),await processWorkflows(e)};async function processWorkflows(a){if(a)for(const[e,{mainParameters:o,customParameters:r}]of Object.entries(a))await workflow.run(e,{context:{customParameters:r},parameters:o})}'
+'const main=async({workflow:a})=>{let e,o;({preWorkflows:o,postWorkflows:e}=await a.respond("endSaleWithPreWorkflows")),o&&(await processWorkflows(o),{postWorkflows:e}=await a.respond("endSaleWithoutPreWorkflows")),await processWorkflows(e)};async function processWorkflows(a){if(!!a)for(const[e,{mainParameters:o,customParameters:r}]of Object.entries(a))await workflow.run(e,{context:{customParameters:r},parameters:o})}'
         )
     end;
 }

@@ -3,6 +3,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
     ObsoleteState = Pending;
     ObsoleteTag = '2026-01-29';
     ObsoleteReason = 'This module is no longer being maintained';
+
     var
         EmailMgt: Codeunit "NPR E-mail Management";
         EMailSalesReceiptLbl: Label 'E-mail Sales Receipt';
@@ -429,7 +430,16 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
     var
         POSUnit: Record "NPR POS Unit";
         POSReceiptProfile: Record "NPR POS Receipt Profile";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
     begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        // Skip if new email feature is enabled - new workflow handles it
+        if NewEmailExperienceFeature.IsFeatureEnabled() then
+            exit;
+#endif
+
         If not POSUnit.Get(SalePOS."Register No.") then
             exit;
 

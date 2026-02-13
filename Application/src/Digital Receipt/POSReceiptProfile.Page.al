@@ -30,7 +30,15 @@ page 6150757 "NPR POS Receipt Profile"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if e-mail with receipt will be sent after Sale';
                 }
-                field("Show Barcode as QR Code "; Rec."Show Barcode as QR Code")
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                field("E-mail Template Id"; Rec."E-mail Template Id")
+                {
+                    ApplicationArea = NPRRetail;
+                    Visible = NewEmailExperience;
+                    ToolTip = 'Specifies the SendGrid template ID to use for email receipts when NP Email feature is enabled';
+                }
+#endif
+                field("Show Barcode as QR Code"; Rec."Show Barcode as QR Code")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if barcode will be shown as QR Code';
@@ -92,4 +100,16 @@ page 6150757 "NPR POS Receipt Profile"
             }
         }
     }
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    trigger OnOpenPage()
+    var
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+    begin
+        NewEmailExperience := NewEmailExperienceFeature.IsFeatureEnabled();
+    end;
+
+    var
+        NewEmailExperience: Boolean;
+#endif
 }

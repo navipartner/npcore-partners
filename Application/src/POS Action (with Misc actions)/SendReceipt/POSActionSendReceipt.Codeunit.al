@@ -89,13 +89,15 @@ codeunit 6150653 "NPR POS Action: Send Receipt" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionSendRcpt.js###
-'let main=async({workflow:t,popup:i,parameters:e,captions:l,context:n})=>{if(!e.EmailTemplate){i.error("Please set an E-mail Template before sending.");return}if(e.SelectionDialogType==e.SelectionDialogType.TextField&&(e.Setting==e.Setting["Choose Receipt"]||e.Setting==e.Setting["Choose Receipt Large"])){var a=await i.input({title:l.Title,caption:l.EnterReceiptNoLbl,value:""});if(a==null)return" "}await t.respond("setReceipt",{ManualReceiptNo:a}),t.context.receiptAddress=await i.input({caption:l.EmailCpt,title:l.EmailTitle,value:n.defaultEmail}),!(t.context.receiptAddress===null||t.context.receiptAddress==="")&&(await t.respond("sendReceiptNo"),n.status?i.error(n.status):i.message("E-mail has been successfully sent."))};'
+'let main=async({workflow:t,popup:i,parameters:e,captions:l,context:n})=>{const{newEmailExperienceEnabled:d,sendGridTemplateId:a}=await t.respond("getContext");var c=e.EmailTemplate&&e.EmailTemplate!=="",r=a&&a!=="";if(d){if(!r){i.error("Please set an E-mail Template on the POS Receipt Profile before sending.");return}}else if(!c){i.error("Please set an E-mail Template before sending.");return}if(e.SelectionDialogType==e.SelectionDialogType.TextField&&(e.Setting==e.Setting["Choose Receipt"]||e.Setting==e.Setting["Choose Receipt Large"])){var s=await i.input({title:l.Title,caption:l.EnterReceiptNoLbl,value:""});if(s==null)return" "}await t.respond("setReceipt",{ManualReceiptNo:s}),t.context.receiptAddress=await i.input({caption:l.EmailCpt,title:l.EmailTitle,value:n.defaultEmail}),!(t.context.receiptAddress===null||t.context.receiptAddress==="")&&(await t.respond("sendReceiptNo"),n.status?i.error(n.status):i.message("E-mail has been successfully sent."))};'
         );
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
         case Step of
+            'getContext':
+                FrontEnd.WorkflowResponse(GetContext(Setup));
             'setReceipt':
                 FrontEnd.WorkflowResponse(GetReceipt(Context));
             'sendReceiptNo':
@@ -122,6 +124,36 @@ codeunit 6150653 "NPR POS Action: Send Receipt" implements "NPR IPOS Workflow"
 #pragma warning restore 
         SelectReceiptToSendParam := Context.GetIntegerParameter('SelectReceiptToSend');
         Context.SetContext('status', NPOSActionSendRcptB.SendReceipt(EmailTemplateCode, ReceiptEmail, EntryNo, SelectReceiptToSendParam));
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+#pragma warning disable AA0137
+#endif
+    local procedure GetContext(Setup: Codeunit "NPR POS Setup"): JsonObject
+#if BC17 or BC18 or BC19 or BC20 or BC21
+#pragma warning restore
+#endif
+    var
+        Response: JsonObject;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        POSUnit: Record "NPR POS Unit";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+#endif
+    begin
+#if BC17 or BC18 or BC19 or BC20 or BC21
+        // For older BC versions, Setup parameter is unused (SendGrid not available)
+        Response.Add('newEmailExperienceEnabled', false);
+        Response.Add('sendGridTemplateId', '');
+#else
+        Response.Add('newEmailExperienceEnabled', NewEmailExperienceFeature.IsFeatureEnabled());
+        Setup.GetPOSUnit(POSUnit);
+        if POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
+            Response.Add('sendGridTemplateId', POSReceiptProfile."E-mail Template Id")
+        else
+            Response.Add('sendGridTemplateId', '');
+#endif
+        exit(Response);
     end;
 
     local procedure GetReceipt(Context: Codeunit "NPR POS JSON Helper"): JsonObject

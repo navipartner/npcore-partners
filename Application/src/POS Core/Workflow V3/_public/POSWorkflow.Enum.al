@@ -1131,6 +1131,13 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'DE_DATA_EXPORT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: DE Data Export";
     }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    value(380; EMAIL_RCPT_ON_SALE)
+    {
+        Caption = 'EMAIL_RCPT_ON_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: NpEmailPOSRcpt";
+    }
+#endif
     value(6150899; WALLET_ASSET_REFUND)
     {
         Caption = 'WALLET_ASSET_REFUND', Locked = true, MaxLength = 20;

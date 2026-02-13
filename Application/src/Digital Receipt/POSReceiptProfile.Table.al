@@ -50,6 +50,14 @@ table 6150742 "NPR POS Receipt Profile"
             Caption = 'Show Barcode as QR Code';
             DataClassification = CustomerContent;
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        field(80; "E-mail Template Id"; Code[20])
+        {
+            Caption = 'E-mail Template Id (SendGrid)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate" where(DataProvider = const("NPR DynTemplateDataProvider"::POS_RECEIPT_EMAIL));
+        }
+#endif
     }
 
     keys

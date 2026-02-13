@@ -14,6 +14,13 @@ codeunit 6150654 "NPR POS Action: Send Rcpt.-B"
         DigitalReceiptLink: Text;
         FooterText: Text;
     begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        // Try to send via SendGrid if new feature is enabled
+        if TrySendViaSendGrid(POSEntryNo, ReceiptEmail, MailErrorMessage) then
+            exit(MailErrorMessage);  // SendGrid attempted: '' = success, non-empty = error
+#endif
+
+        // Fall back to old email system
         case SelectReceiptToSend of
             0:
                 begin
@@ -44,6 +51,54 @@ codeunit 6150654 "NPR POS Action: Send Rcpt.-B"
 
         exit(MailErrorMessage);
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure TrySendViaSendGrid(POSEntryNo: Integer; ReceiptEmail: Text[80]; var ErrorMessage: Text): Boolean
+    var
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        NPEmail: Codeunit "NPR NP Email";
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+        Customer: Record Customer;
+        LanguageCode: Code[10];
+    begin
+        // Returns true if SendGrid send was attempted (check ErrorMessage for result)
+        // Returns false if SendGrid not enabled/configured (caller should use fallback)
+
+        if not NewEmailExperienceFeature.IsFeatureEnabled() then
+            exit(false);
+
+        if not POSEntry.Get(POSEntryNo) then
+            exit(false);
+
+        if not POSUnit.Get(POSEntry."POS Unit No.") then
+            exit(false);
+
+        if not POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
+            exit(false);
+
+        if POSReceiptProfile."E-mail Template Id" = '' then
+            exit(false);
+
+        LanguageCode := '';
+        if Customer.Get(POSEntry."Customer No.") then
+            LanguageCode := Customer."Language Code";
+
+        // Attempt to send via SendGrid
+        if NPEmail.TrySendEmail(
+            POSReceiptProfile."E-mail Template Id",
+            POSEntry,
+            ReceiptEmail,
+            LanguageCode
+        ) then
+            ErrorMessage := ''  // Success
+        else
+            ErrorMessage := GetLastErrorText();  // Failure
+
+        exit(true);  // Send was attempted
+    end;
+#endif
 
     procedure SetReceipt(var POSEntry: Record "NPR POS Entry"; SettingOption: Option "Last Receipt","Choose Receipt"; ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson;
                         PresetTableView: Text; SelectionDialogType: Option TextField,List; ManualReceiptNo: Code[20]; ObfuscationMethod: Option None,MI)
