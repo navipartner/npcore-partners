@@ -4,9 +4,30 @@ codeunit 6184897 "NPR Sentry Error Handling"
     Access = Internal;
 
     internal procedure SplitErrorStacktrace(ErrorStacktrace: Text; var SplitErrorStacktraceList: List of [Text])
+    var
+        RawFrames: List of [Text];
+        Frame: Text;
     begin
-        SplitErrorStacktraceList := ErrorStacktrace.Split('\');
-        SplitErrorStacktraceList.Reverse();
+        RawFrames := ErrorStacktrace.Split('\');
+        RawFrames.Reverse();
+        foreach Frame in RawFrames do
+            SplitErrorStacktraceList.Add(CleanStackFrame(Frame));
+    end;
+
+    local procedure CleanStackFrame(Frame: Text): Text
+    var
+        DashPos: Integer;
+        Suffix: Text;
+    begin
+        DashPos := Frame.LastIndexOf(' - ');
+        if DashPos <= 0 then
+            exit(Frame);
+
+        Suffix := CopyStr(Frame, DashPos + 3);
+        if Suffix.Contains(' by ') and Suffix.Contains(' version ') then
+            exit(CopyStr(Frame, 1, DashPos - 1));
+
+        exit(Frame);
     end;
 
     internal procedure IsLastErrorAProgrammingBug(): Boolean

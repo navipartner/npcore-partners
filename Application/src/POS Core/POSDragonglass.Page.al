@@ -23,20 +23,21 @@ page 6150750 "NPR POS (Dragonglass)"
                     POSSession: Codeunit "NPR POS Session"; //Single instance
                     POSDragonglassRunMethod: Codeunit "NPR POS Dragonglass Run Method";
                     Sentry: Codeunit "NPR Sentry";
-                    BackgroundTaskSpan: Codeunit "NPR Sentry Span";
                     KeepAliveSpan: Codeunit "NPR Sentry Span";
                     FrameworkReadySpan: Codeunit "NPR Sentry Span";
                     MethodSpan: Codeunit "NPR Sentry Span";
                     SentryTraceHeader: Text;
+                    SentryTransactionName: Text;
                     StartTime: DateTime;
                 begin
                     StartTime := CurrentDateTime();
 
+                    SentryTransactionName := GetSentryTransactionName(method, parameters);
                     SentryTraceHeader := GetSentryTraceHeader(parameters);
                     if SentryTraceHeader <> '' then
-                        Sentry.InitScopeAndTransaction(method, 'bc.pos', SentryTraceHeader, StartTime)
+                        Sentry.InitScopeAndTransaction(SentryTransactionName, 'bc.pos', SentryTraceHeader, StartTime)
                     else
-                        Sentry.InitScopeAndTransaction(method, 'bc.pos', StartTime);
+                        Sentry.InitScopeAndTransaction(SentryTransactionName, 'bc.pos', StartTime);
 
                     if method = 'KeepAlive' then begin //every couple of minutes to prevent NST from shutting down idle POS sessions
                         Sentry.StartSpan(KeepAliveSpan, 'bc.pos.keepalive');
@@ -57,7 +58,7 @@ page 6150750 "NPR POS (Dragonglass)"
                         CheckUserLocked();
                         CheckUserExpired();
                         if POSSession.GetErrorOnInitialize() then begin
-                            Sentry.AddLastErrorInEnglish();
+                            Sentry.AddLastErrorIfProgrammingBug();
                             FrameworkReadySpan.Finish();
                             Sentry.FinalizeScope();
                             CurrPage.Close();
@@ -79,7 +80,7 @@ page 6150750 "NPR POS (Dragonglass)"
 
                     BindSubscription(POSPageStackCheck);
 
-                    Sentry.StartSpan(MethodSpan, 'bc.pos.method:' + method);
+                    Sentry.StartSpan(MethodSpan, 'bc.pos.method:' + SentryTransactionName);
 
                     ClearLastError();
                     POSDragonglassRunMethod.SetMethodParameters(method, parameters);
@@ -98,14 +99,12 @@ page 6150750 "NPR POS (Dragonglass)"
                     MethodSpan.Finish();
 
                     if not Success then begin
-                        Sentry.AddLastErrorInEnglish();
+                        Sentry.AddLastErrorIfProgrammingBug();
                         Sentry.FinalizeScope();
                         Error(GetLastErrorText());
                     end;
 
-                    Sentry.StartSpan(BackgroundTaskSpan, 'bc.pos.process_background_tasks');
                     ProcessBackgroundTaskQueues();
-                    BackgroundTaskSpan.Finish();
 
                     Sentry.FinalizeScope();
                 end;
@@ -138,20 +137,24 @@ page 6150750 "NPR POS (Dragonglass)"
         Timeout: Integer;
         PBTTaskId: Integer;
         QueuedCancellations: List of [Integer];
+        Sentry: Codeunit "NPR Sentry";
+        BackgroundTaskSpan: Codeunit "NPR Sentry Span";
     begin
-        //Process enqueue tasks
         _POSBackgroundTaskManager.GetQueue(QueuedTasks);
-        if QueuedTasks.Count() <> 0 then begin
-            foreach WrapperTaskId in QueuedTasks do begin
-                Clear(PBTTaskId);
-                _POSBackgroundTaskManager.GetQueuedTask(WrapperTaskId, Parameters, Timeout);
-                CurrPage.EnqueueBackgroundTask(PBTTaskId, Codeunit::"NPR POS Backgr. Task Manager", Parameters, Timeout);
-                _POSBackgroundTaskManager.AddMappedId(PBTTaskId, WrapperTaskId);
-            end;
+        _POSBackgroundTaskManager.GetCancellationQueue(QueuedCancellations);
+
+        if (QueuedTasks.Count() = 0) and (QueuedCancellations.Count() = 0) then
+            exit;
+
+        Sentry.StartSpan(BackgroundTaskSpan, 'bc.pos.process_background_tasks');
+
+        foreach WrapperTaskId in QueuedTasks do begin
+            Clear(PBTTaskId);
+            _POSBackgroundTaskManager.GetQueuedTask(WrapperTaskId, Parameters, Timeout);
+            CurrPage.EnqueueBackgroundTask(PBTTaskId, Codeunit::"NPR POS Backgr. Task Manager", Parameters, Timeout);
+            _POSBackgroundTaskManager.AddMappedId(PBTTaskId, WrapperTaskId);
         end;
 
-        //Process cancellation requests
-        _POSBackgroundTaskManager.GetCancellationQueue(QueuedCancellations);
         foreach WrapperTaskId in QueuedCancellations do begin
             if _POSBackgroundTaskManager.TryGetPBTTaskId(WrapperTaskId, PBTTaskId) then begin
                 if CurrPage.CancelBackgroundTask(PBTTaskId) then begin
@@ -159,6 +162,8 @@ page 6150750 "NPR POS (Dragonglass)"
                 end;
             end;
         end;
+
+        BackgroundTaskSpan.Finish();
     end;
 
     local procedure CheckUserExpired()
@@ -210,6 +215,25 @@ page 6150750 "NPR POS (Dragonglass)"
             exit('');
 
         exit(SentryTraceHeaderToken.AsValue().AsText());
+    end;
+
+    local procedure GetSentryTransactionName(Method: Text; Parameters: JsonObject): Text
+    var
+        JToken: JsonToken;
+        ActionName: Text;
+        WorkflowStep: Text;
+    begin
+        if Parameters.Get('name', JToken) then
+            ActionName := JToken.AsValue().AsText();
+        if Parameters.Get('step', JToken) then
+            WorkflowStep := JToken.AsValue().AsText();
+
+        if ActionName = '' then
+            exit(Method);
+        if WorkflowStep = '' then
+            exit(Method + ':' + ActionName);
+
+        exit(Method + ':' + ActionName + ',' + WorkflowStep);
     end;
 
     var

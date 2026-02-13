@@ -55,7 +55,7 @@ codeunit 6184892 "NPR POS Action Sentry Example" implements "NPR IPOS Workflow"
         Message('%1', StatusCode);
 
         if not FunctionWithError() then
-            Sentry.AddLastErrorInEnglish();
+            Sentry.AddLastErrorIfProgrammingBug();
 
         Error('bubble error to workflow error handler. This is a programming bug.')
     end;

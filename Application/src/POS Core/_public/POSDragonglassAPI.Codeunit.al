@@ -47,7 +47,7 @@ codeunit 6060078 "NPR POS Dragonglass API"
         if method = 'FrameworkReady' then begin //once when POS frontend has loaded
             POSSession.ConstructFromWebserviceSession(true, '', '');
             if POSSession.GetErrorOnInitialize() then begin
-                Sentry.AddLastErrorInEnglish();
+                Sentry.AddLastErrorIfProgrammingBug();
                 InvokeSpan.Finish();
                 Sentry.FinalizeScope();
                 Error(GetLastErrorText());

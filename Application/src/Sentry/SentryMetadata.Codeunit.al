@@ -94,8 +94,17 @@ codeunit 6150966 "NPR Sentry Metadata"
         end else begin
             Json.AddProperty('tenantDisplayName', '_');
         end;
-        Json.AddProperty('POSUnit', POSUnit."No.");
-        Json.AddProperty('POSStore', POSUnit."POS Store Code");
+
+        if POSUnit."No." <> '' then
+            Json.AddProperty('POSUnit', POSUnit."No.")
+        else
+            Json.AddProperty('POSUnit', '_');
+
+        if POSUnit."POS Store Code" <> '' then
+            Json.AddProperty('POSStore', POSUnit."POS Store Code")
+        else
+            Json.AddProperty('POSStore', '_');
+
         if InstalledApp.Get('992c2309-cca4-43cb-9e41-911f482ec088') then begin
             Json.AddProperty('retailAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
         end;

@@ -43,7 +43,7 @@ codeunit 6150812 "NPR NpCs Task Processor"
             NpCsTaskProcessorSetup."Expiration Code":
                 NpCsExpirationMgt.Run(NpCsDocument);
             else begin
-                Sentry.AddLastErrorInEnglish();
+                Sentry.AddLastErrorIfProgrammingBug();
                 ProcessSpan.Finish();
                 Error(UnhandledTaskProcessorErr, NcTask."Task Processor Code");
             end;
