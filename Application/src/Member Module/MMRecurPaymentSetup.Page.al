@@ -159,7 +159,7 @@
                 Caption = 'Dimensions';
                 Image = Dimensions;
                 RunObject = Page "Default Dimensions";
-#if BC17 or BC18
+#if BC17 or BC18 or BC19 or BC20 or BC21
                 RunPageLink = "Table ID" = const(6060093), "No." = field(Code);
 #else   
                 RunPageLink = "Table ID" = const(Database::"NPR MM Recur. Paym. Setup"), "No." = field(Code);
