@@ -236,6 +236,113 @@ types:
           history:
             - $PointTransaction.ExampleSaleTransaction
 
+  PointsEntryType:
+    docs: The type of the point entry in the transaction ledger.
+    enum:
+      - name: SALE
+        value: "Sale"
+      - name: REFUND
+        value: "Refund"
+      - name: WITHDRAWAL
+        value: "Withdrawal"
+      - name: DEPOSIT
+        value: "Deposit"
+      - name: EXPIRED
+        value: "Expired"
+      - name: SYNCHRONIZATION
+        value: "Synchronization"
+      - name: RESERVE
+        value: "Reserve"
+      - name: CAPTURE
+        value: "Capture"
+      - name: CANCELLED
+        value: "Cancelled"
+
+  PointsTransactionEntry:
+    docs: Represents a single entry in the points transaction ledger for a membership.
+    properties:
+      entryType:
+        type: PointsEntryType
+        docs: The type of the point entry.
+      date:
+        type: date
+        docs: The posting date of the entry.
+      loyaltyCode:
+        type: string
+        docs: The loyalty program code.
+      externalReferenceNo:
+        type: string
+        docs: The document reference number (e.g., receipt number).
+      externalSystemIdentifier:
+        type: string
+        docs: The identifier of the system that created the entry (e.g., POS Store Code).
+      externalSystemUserIdentifier:
+        type: string
+        docs: The user identifier in the system that created the entry (e.g., POS Unit Code).
+      points:
+        type: integer
+        docs: Net points change for this entry.
+      awardedPoints:
+        type: integer
+        docs: Points awarded in this entry.
+      redeemedPoints:
+        type: integer
+        docs: Points redeemed in this entry.
+      amountInclVAT:
+        type: double
+        docs: The transaction amount including VAT in system currency.
+      item:
+        type: string
+        docs: The item number associated with this entry.
+      variantCode:
+        type: string
+        docs: The variant code of the item.
+      description:
+        type: string
+        docs: A description of the entry.
+      id:
+        type: uuid
+        docs: The unique system identifier of the entry.
+    examples:
+      - name: ExamplePointsTransactionEntry
+        value:
+          entryType: "Sale"
+          date: "2025-06-23"
+          loyaltyCode: "LOYALTY01"
+          externalReferenceNo: "POS-585298329"
+          externalSystemIdentifier: "STORE01"
+          externalSystemUserIdentifier: "POS01"
+          points: 150
+          awardedPoints: 150
+          redeemedPoints: 0
+          amountInclVAT: 1200.50
+          item: "I52892"
+          variantCode: "V9529"
+          description: "Purchase of items in a POS sale"
+          id: "68e3ce0f-a5ec-f011-b3a5-ab8f942b8604"
+
+  PaginatedPointsTransactions:
+    docs: A paginated response containing points transaction entries for a membership.
+    properties:
+      morePages:
+        type: boolean
+        docs: Indicates whether there are additional pages of results available.
+      nextPageKey:
+        type: string
+        docs: A pagination token to use in subsequent requests to retrieve the next page.
+      nextPageURL:
+        type: string
+        docs: A complete URL to retrieve the next page of results.
+      data: list<PointsTransactionEntry>
+    examples:
+      - name: ExamplePaginatedPointsTransactions
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/membership/550e8400-e29b-41d4-a716-446655440000/pointstransactions?pageKey=c29tZSBiYXNlNjQgc3RyaW5n"
+          data:
+            - $PointsTransactionEntry.ExamplePointsTransactionEntry
+
   RegisterSaleRequest:
     docs: A sale transaction for a membership.
     properties:

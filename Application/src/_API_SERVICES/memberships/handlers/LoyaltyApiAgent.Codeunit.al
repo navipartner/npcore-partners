@@ -97,6 +97,38 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         exit(ProcessRegisterSaleRequest(Membership.SystemId, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer));
     end;
 
+    internal procedure GetMembershipTransactions(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Membership: Record "NPR MM Membership";
+        MembersPointsEntry: Record "NPR MM Members. Points Entry";
+        MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
+        Fields: Dictionary of [Integer, Text];
+    begin
+        if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
+            exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
+
+        MembersPointsEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        if Request.QueryParams().ContainsKey('entryType') then
+            MembersPointsEntry.SetFilter("Entry Type", Request.QueryParams().Get('entryType'));
+        if Request.QueryParams().ContainsKey('date') then
+            MembersPointsEntry.SetFilter("Posting Date", Request.QueryParams().Get('date'));
+
+        Fields.Add(MembersPointsEntry.FieldNo("Entry Type"), 'entryType');
+        Fields.Add(MembersPointsEntry.FieldNo("Posting Date"), 'date');
+        Fields.Add(MembersPointsEntry.FieldNo("Loyalty Code"), 'loyaltyCode');
+        Fields.Add(MembersPointsEntry.FieldNo("Document No."), 'externalReferenceNo');
+        Fields.Add(MembersPointsEntry.FieldNo("POS Store Code"), 'externalSystemIdentifier');
+        Fields.Add(MembersPointsEntry.FieldNo("POS Unit Code"), 'externalSystemUserIdentifier');
+        Fields.Add(MembersPointsEntry.FieldNo(Points), 'points');
+        Fields.Add(MembersPointsEntry.FieldNo("Awarded Points"), 'awardedPoints');
+        Fields.Add(MembersPointsEntry.FieldNo("Redeemed Points"), 'redeemedPoints');
+        Fields.Add(MembersPointsEntry.FieldNo("Amount (LCY)"), 'amountInclVAT');
+        Fields.Add(MembersPointsEntry.FieldNo("Item No."), 'item');
+        Fields.Add(MembersPointsEntry.FieldNo("Variant Code"), 'variantCode');
+        Fields.Add(MembersPointsEntry.FieldNo(Description), 'description');
+        Response.RespondOK(Request.GetData(MembersPointsEntry, Fields));
+    end;
+
     local procedure GetReservationEntryFromAuthorization(var ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)"; AuthorizationCode: Text): Boolean
     var
     begin

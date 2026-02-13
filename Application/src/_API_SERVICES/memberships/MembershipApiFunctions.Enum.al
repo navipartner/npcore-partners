@@ -280,6 +280,10 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Register a sale with points';
     }
+    value(604; GET_POINTS_TRANSACTIONS)
+    {
+        Caption = 'Get Membership Points transactions';
+    }
 
 }
 #endif

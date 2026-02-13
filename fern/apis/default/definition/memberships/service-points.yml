@@ -107,6 +107,37 @@ service:
           response: 
             body: $pointTypes.RegisterSaleResponse.ExampleRegisterSaleResponse
 
+    getPointsTransactions:
+      display-name: Get Points Transactions
+      docs: Retrieves the points transaction ledger entries for a membership with pagination. Supports filtering by entry type and date.
+      method: GET
+      path: /transactions
+      request:
+        name: getPointsTransactionsRequest
+        query-parameters:
+          entryType:
+            type: optional<string>
+            docs: Filter by entry type (e.g., "Sale", "Refund", "Withdrawal", "Deposit").
+          date:
+            type: optional<string>
+            docs: Filter by posting date. Supports BC filter syntax (e.g., "2025-01-01..2025-12-31").
+          pageSize: optional<integer>
+          pageKey: optional<string>
+      response: pointTypes.PaginatedPointsTransactions
+      availability: in-development
+      examples:
+        - name: "Get points transactions"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+          query-parameters:
+            entryType: "Sale"
+            pageSize: 50
+          response:
+            body: $pointTypes.PaginatedPointsTransactions.ExamplePaginatedPointsTransactions
+
     getReceiptList:
       display-name: Get Points Sale History
       docs: Retrieves the transaction history for a membership's loyalty points.

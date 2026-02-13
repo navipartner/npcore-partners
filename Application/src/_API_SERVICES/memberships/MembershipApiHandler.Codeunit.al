@@ -217,6 +217,8 @@ codeunit 6185122 "NPR MembershipApiHandler"
                 _Response := LoyaltyApiAgent.CancelReservationTransaction(_Request);
             _ApiFunction::POINTS_REGISTER_SALE:
                 _Response := LoyaltyApiAgent.RegisterSaleTransaction(_Request);
+            _ApiFunction::GET_POINTS_TRANSACTIONS:
+                _Response := LoyaltyApiAgent.GetMembershipTransactions(_Request);
         end;
     end;
 
