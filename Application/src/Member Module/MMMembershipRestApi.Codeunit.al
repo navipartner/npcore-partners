@@ -79,10 +79,15 @@ codeunit 6150743 "NPR MMMembershipRestApi"
     var
         Request: JsonObject;
         ResponseMessage: HttpResponseMessage;
+        ErrorText: Text;
     begin
         Request := CreateMembershipRequest(MembershipInfo);
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'POST', '/membership', NotValidReason, Request, ResponseMessage) then
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'POST', '/membership', NotValidReason, Request, ResponseMessage) then begin
+            ErrorText := GetErrorResponseMessage(ResponseMessage);
+            if ErrorText <> '' then
+                NotValidReason := StrSubstNo('%1\\%2', ErrorText, NotValidReason);
             exit(false);
+        end;
         exit(ValidateCreateMembershipResponse(ResponseMessage, MembershipInfo, NotValidReason));
     end;
 
@@ -90,6 +95,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
     var
         Request: JsonObject;
         ResponseMessage: HttpResponseMessage;
+        ErrorText: Text;
     begin
         if IsNullGuid(MembershipInfo.ExternalMembershipSystemId) then
             MembershipInfo.ExternalMembershipSystemId := GetExternalMembershipIdFromExternalMembershipNumber(NPRRemoteEndpointSetup, MembershipInfo."External Membership No.");
@@ -97,8 +103,12 @@ codeunit 6150743 "NPR MMMembershipRestApi"
             exit(false);
 
         Request := CreateMembershipMemberRequest(MembershipInfo);
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'POST', StrSubstNo('/membership/%1/addMember', Format(MembershipInfo.ExternalMembershipSystemId, 0, 4)), NotValidReason, Request, ResponseMessage) then
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'POST', StrSubstNo('/membership/%1/addMember', Format(MembershipInfo.ExternalMembershipSystemId, 0, 4)), NotValidReason, Request, ResponseMessage) then begin
+            ErrorText := GetErrorResponseMessage(ResponseMessage);
+            if ErrorText <> '' then
+                NotValidReason := StrSubstNo('%1\\%2', ErrorText, NotValidReason);
             exit(false);
+        end;
         exit(ValidateCreateMembershipMemberResponse(ResponseMessage, MembershipInfo, NotValidReason));
     end;
 
@@ -782,6 +792,14 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         if Code = 'generic_error' then
             exit(Message);
         exit(StrSubstNo('%1: %2', Code, Message));
+    end;
+
+    local procedure GetErrorResponseMessage(ResponseMessage: HttpResponseMessage): Text
+    var
+        ResponseJson: JsonObject;
+    begin
+        if GetResponseBody(ResponseMessage, ResponseJson) then
+            exit(GetErrorMessage(ResponseJson));
     end;
 
     local procedure UrlEncode(Input: Text): Text
