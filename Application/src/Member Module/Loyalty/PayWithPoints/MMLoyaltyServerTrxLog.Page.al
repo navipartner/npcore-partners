@@ -127,6 +127,8 @@
                         Navigate.Run();
                     end else begin
                         MembershipPointEntry.SetFilter("Document No.", '=%1', Rec."Reference Number");
+                        if Rec."Membership Entry No." <> 0 then
+                            MembershipPointEntry.SetRange("Membership Entry No.", Rec."Membership Entry No.");
                         MembershipPointEntryPage.SetTableView(MembershipPointEntry);
                         MembershipPointEntryPage.Run();
                     end;
@@ -155,24 +157,46 @@
                     TempCancelLinesIn: Record "NPR MM Reg. Sales Buffer" temporary;
                     TempPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
                     ResponseMessage, ResponseMessageId : Text;
+                    MembershipID: Guid;
                 begin
                     Rec.TestField("Entry Type", Rec."Entry Type"::RESERVE);
 
-                    StoreSetup.Get(Rec."Company Name", Rec."POS Store Code", Rec."POS Unit Code");
+                    if not StoreSetup.Get(Rec."Company Name", Rec."POS Store Code", Rec."POS Unit Code") then
+                        StoreSetup.Get('', Rec."POS Store Code", '');
                     TempLoyaltyStoreLedger.TransferFields(Rec, true);
                     TempLoyaltyStoreLedger."Authorization Code" := StoreSetup."Authorization Code";
                     TempLoyaltyStoreLedger.Insert();
-
+                    if Rec."Card Number" = '' then
+                        MembershipID := FindMembershipID(Rec);
                     TempCancelLinesIn."Entry No." := 0;
                     TempCancelLinesIn.Type := TempCancelLinesIn.Type::CANCEL_RESERVATION;
                     TempCancelLinesIn."Authorization Code" := Rec."Authorization Code";
                     TempCancelLinesIn.Insert();
-
-                    if (not CancelReservePoints.CancelReservation(TempLoyaltyStoreLedger, TempCancelLinesIn, TempPointsOut, ResponseMessage, ResponseMessageId)) then
+                    if (not CancelReservePoints.CancelReservation(TempLoyaltyStoreLedger, TempCancelLinesIn, TempPointsOut, ResponseMessage, ResponseMessageId, MembershipID, 0)) then
                         Message(ResponseMessage);
                 end;
             }
         }
     }
+
+    local procedure FindMembershipID(LoyLedgerEntrySrvr: Record "NPR MM Loy. LedgerEntry (Srvr)"): Guid
+    var
+        MembershipPointEntry: Record "NPR MM Members. Points Entry";
+        Membership: Record "NPR MM Membership";
+        MembershipEntryNo: Integer;
+    begin
+        MembershipEntryNo := LoyLedgerEntrySrvr."Membership Entry No.";
+        if MembershipEntryNo = 0 then begin
+            MembershipPointEntry.SetRange("Authorization Code", LoyLedgerEntrySrvr."Authorization Code");
+            MembershipPointEntry.SetRange("Entry Type", MembershipPointEntry."Entry Type"::RESERVE);
+            MembershipPointEntry.SetLoadFields("Membership Entry No.");
+            if MembershipPointEntry.FindFirst() then
+                MembershipEntryNo := MembershipPointEntry."Membership Entry No.";
+        end;
+        Membership.SetLoadFields(SystemId);
+        if MembershipEntryNo <> 0 then
+            if Membership.Get(MembershipEntryNo) then
+                exit(Membership.SystemId);
+    end;
 }
 

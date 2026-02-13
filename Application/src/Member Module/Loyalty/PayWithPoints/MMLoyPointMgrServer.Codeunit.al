@@ -98,6 +98,7 @@
 
         // finalize store ledger and response
         Membership.CalcFields("Remaining Points");
+        LoyaltyStoreLedger."Membership Entry No." := Membership."Entry No.";
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert();
 
@@ -156,6 +157,7 @@
 
         // finalize store ledger and response
         Membership.CalcFields("Remaining Points");
+        LoyaltyStoreLedger."Membership Entry No." := Membership."Entry No.";
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert();
 
@@ -238,7 +240,7 @@
 
         // finalize store ledger and response
         Membership.CalcFields("Remaining Points");
-
+        LoyaltyStoreLedger."Membership Entry No." := Membership."Entry No.";
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert();
 
@@ -318,7 +320,7 @@
 
         // finalize store ledger and response
         Membership.CalcFields("Remaining Points");
-
+        LoyaltyStoreLedger."Membership Entry No." := Membership."Entry No.";
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert();
 

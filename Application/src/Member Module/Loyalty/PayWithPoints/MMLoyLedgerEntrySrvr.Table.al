@@ -30,6 +30,12 @@
             Caption = 'POS Unit Code';
             DataClassification = CustomerContent;
         }
+        field(14; "Membership Entry No."; Integer)
+        {
+            Caption = 'Membership Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Membership";
+        }
         field(20; "Card Number"; Text[50])
         {
             Caption = 'Card Number';
