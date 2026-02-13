@@ -36,7 +36,6 @@ codeunit 6150966 "NPR Sentry Metadata"
         POSUnit: Record "NPR POS Unit";
         CompanyInformation: Record "Company Information";
         InstalledApp: Record "NAV App Installed App";
-        EnvironmentInformation: Codeunit "Environment Information";
         TenantInformation: Codeunit "Tenant Information";
         ActiveSession: Record "Active Session";
         POSSession: Codeunit "NPR POS Session";
@@ -59,14 +58,7 @@ codeunit 6150966 "NPR Sentry Metadata"
             Json.WriteStringProperty('baseAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
         end;
         Json.WriteStringProperty('companyName', CompanyName());
-        case true of
-            EnvironmentInformation.IsSandbox():
-                Json.WriteStringProperty('environment', 'Sandbox');
-            EnvironmentInformation.IsSaaS():
-                Json.WriteStringProperty('environment', 'SaaS');
-            else
-                Json.WriteStringProperty('environment', 'OnPrem');
-        end;
+        Json.WriteStringProperty('environment', GetEnvironment());
         Json.WriteStringProperty('serviceInstanceId', ServiceInstanceId());
         Json.WriteStringProperty('sessionId', SessionId());
         Json.WriteStringProperty('clientType', Format(CurrentClientType()));
@@ -111,6 +103,7 @@ codeunit 6150966 "NPR Sentry Metadata"
             Json.AddProperty('baseAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
         end;
         Json.AddProperty('company', CompanyName());
+        Json.AddProperty('environment', GetEnvironment());
         Json.AddProperty('BCServiceInstanceId', ServiceInstanceId());
         Json.AddProperty('BCSessionId', SessionId());
         Json.AddProperty('BCClientType', Format(CurrentClientType()));
@@ -129,12 +122,12 @@ codeunit 6150966 "NPR Sentry Metadata"
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         case true of
-            EnvironmentInformation.IsSaaS():
-                Exit('SaaS');
+            GetUrl(ClientType::Web).Contains('dynamics-retail.net'):
+                Exit('Crane');
             EnvironmentInformation.IsSandbox():
                 Exit('Sandbox');
-            GetUrl(ClientType::Web).Contains('dynamics-retail.net'):
-                Exit('crane');
+            EnvironmentInformation.IsSaaSInfrastructure():
+                Exit('SaaS');
             else
                 Exit('OnPrem');
         end;
