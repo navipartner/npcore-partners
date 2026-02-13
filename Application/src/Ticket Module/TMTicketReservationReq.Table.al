@@ -341,6 +341,9 @@
             IncludedFields = "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion", "Request Status", "Expires Date Time", "Primary Request Line", "Admission Created";
 #endif
         }
+        key(Key10; "External Member No.")
+        {
+        }
 
     }
 
