@@ -202,6 +202,7 @@
                 }
                 group(ReplaceCardInfo)
                 {
+                    Caption = 'Replace Card';
                     field(MembershipCode; Rec."Membership Code")
                     {
                         Editable = false;
@@ -264,6 +265,8 @@
             group(General)
             {
                 Visible = _ShowNewMemberSection;
+                Caption = 'General';
+
                 field("Company Name"; Rec."Company Name")
                 {
                     Editable = not _PreSelectedCustomerContact;
@@ -478,6 +481,7 @@
             group(CRM)
             {
                 Visible = _ShowNewMemberSection;
+                Caption = 'CRM';
 
                 field(Gender; Rec.Gender)
                 {
@@ -656,6 +660,8 @@
             group(Card)
             {
                 Visible = _ShowNewCardSection;
+                Caption = 'Card';
+
                 field("External Card No."; Rec."External Card No.")
                 {
 

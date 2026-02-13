@@ -38,6 +38,7 @@
                 }
                 group(EntryId)
                 {
+                    Caption = '';
                     field("Session Token ID"; Rec."Session Token ID")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

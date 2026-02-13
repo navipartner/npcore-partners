@@ -112,6 +112,7 @@
             }
             group(Split)
             {
+                Caption = '';
                 field(SplitOption; SplitOption)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
