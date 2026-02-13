@@ -462,7 +462,10 @@ codeunit 6060147 "NPR MM NPR Membership"
         MemberRemoteSearch: Page "NPR MM MemberRemoteSearch";
         PageAction: Action;
         TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'ui.bc.membership.searchforeignmember');
         MemberRemoteSearch.SetCommunity(CommunityCode);
         MemberRemoteSearch.LookupMode(true);
         PageAction := MemberRemoteSearch.RunModal();
@@ -470,7 +473,7 @@ codeunit 6060147 "NPR MM NPR Membership"
             MemberRemoteSearch.GetSelectedRecord(TempMemberInfoCapture);
             ExternalCardNumber := TempMemberInfoCapture."External Card No.";
         end;
-
+        Span.Finish();
         exit(ExternalCardNumber <> '');
     end;
 

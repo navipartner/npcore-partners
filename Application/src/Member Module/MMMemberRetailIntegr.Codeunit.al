@@ -62,6 +62,8 @@
         POSMemberCard: Page "NPR MM POS Member Card";
         MemberUpdateRequestPage: Page "NPR MM Remote Member Update";
         ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         ForeignCardIsValid: Boolean;
         ForeignMembershipEntryNo: Integer;
         FormattedCardNumber: Text[100];
@@ -102,7 +104,7 @@
                 Error('');
             exit(false);
         end;
-
+        Sentry.StartSpan(Span, 'bc.membership.validatemembercard');
         // Check card number if it exists locally
         if (StrLen(ExternalMemberCardNo) <= 50) then begin
             MembershipEntryNo := MemberManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, NotFoundReasonText);
@@ -114,7 +116,7 @@
             MembershipEntryNo := ForeignMembershipEntryNo;
             FormattedCardNumber := FormattedForeignCardNumber;
         end;
-
+        Span.Finish();
         if (MembershipEntryNo = 0) then begin
             if (FailWithError) then
                 if (NotFoundReasonText <> '') then

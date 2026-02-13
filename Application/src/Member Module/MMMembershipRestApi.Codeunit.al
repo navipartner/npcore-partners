@@ -187,6 +187,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
     internal procedure TryWebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; HttpMethod: Text; Path: Text; CacheType: Enum "NPR MMMembershipRestApiCache"; var ReasonText: Text; var Request: JsonObject; var WebResponse: HttpResponseMessage)
     var
         MembershipRestApiCache: Codeunit "NPR MMMembershipRestApiCache";
+        Sentry: Codeunit "NPR Sentry";
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         WebRequest: HttpRequestMessage;
@@ -216,8 +217,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
             if (NPRRemoteEndpointSetup."Connection Timeout (ms)" < 100) then
                 NPRRemoteEndpointSetup."Connection Timeout (ms)" := 10 * 1000;
             WebClient.Timeout := NPRRemoteEndpointSetup."Connection Timeout (ms)";
-
-            WebClient.Send(WebRequest, WebResponse);
+            Sentry.HttpInvoke(WebClient, WebRequest, WebResponse, false, true);
         end;
         if (WebResponse.IsSuccessStatusCode()) then begin
             MembershipRestApiCache.SetResponse(CacheType, WebRequest, WebResponse);

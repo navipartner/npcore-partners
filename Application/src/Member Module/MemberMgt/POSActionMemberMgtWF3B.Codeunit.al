@@ -134,7 +134,6 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
             if (not ChooseMemberCard(ExternalMemberCardNo, ForeignCommunityCode)) then
                 Error('');
         end;
-
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, WithActivate, ExternalMemberCardNo);
 
         if (Membership.Get(MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, FailReasonText))) then begin
@@ -152,11 +151,13 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         Membership: Record "NPR MM Membership";
         POSSalesInfo: Record "NPR MM POS Sales Info";
         MembershipSetup: Record "NPR MM Membership Setup";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
 
         if (not Membership.Get(MembershipEntryNo)) then
             exit(false);
-
+        Sentry.StartSpan(Span, 'bc.pos.membermgtwf3.assignmembershiptopos');
         if (Membership."Customer No." <> '') then begin
             SalePOS."Customer No." := '';
             SalePOS.Validate("Customer No.", Membership."Customer No.");
@@ -181,7 +182,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         POSSalesInfo."Membership Entry No." := MembershipEntryNo;
         POSSalesInfo."Scanned Card Data" := ExternalMemberCardNo;
         POSSalesInfo.Modify();
-
+        Span.Finish();
         exit(true);
 
     end;
@@ -335,9 +336,12 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         Member: Record "NPR MM Member";
         ExtMemberNo: Code[20];
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        Sentry: Codeunit "NPR Sentry";
+        SelectMembershipSpan, GetMembershipSpan : Codeunit "NPR Sentry Span";
         POSMemberCardEdit: Page "NPR MM Member Card";
         SelectingMemberError: Label 'There was an error selecting member %1:\\%2';
     begin
+        Sentry.StartSpan(SelectMembershipSpan, 'bc.pos.membermgtwf3.selectmembership');
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find();
@@ -371,15 +375,17 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
             until (MembershipSelected);
 
         end else begin
+            Sentry.StartSpan(GetMembershipSpan, 'bc.pos.membermgtwf3.getmembershipfromcard');
             GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, MembershipOut, MemberCardOut, true, ForeignCommunityCode);
-
+            GetMembershipSpan.Finish();
             if (AssignMembershipToPOSWorker(SalePOS, MembershipOut."Entry No.", ExternalMemberCardNo)) then begin
                 POSSale.Refresh(SalePOS);
                 POSSale.Modify(false, false);
             end;
-
+            SelectMembershipSpan.Finish();
             exit(MemberCardOut."Entry No.");
         end;
+        SelectMembershipSpan.Finish();
     end;
 
     local procedure AssignPOSMember(var SalePOS: Record "NPR POS Sale"; var ExternalMemberNo: Code[20]; var MemberCard: Record "NPR MM Member Card"): Boolean
