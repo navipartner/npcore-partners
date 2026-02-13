@@ -692,14 +692,12 @@
             NpRvModuleMgt.OnRunCalcAvailableVoucherAmount("Reference No.", "Voucher Type", AvailableAmount, Handled);
             if Handled then
                 exit(AvailableAmount);
-        end;
 
-        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
             CalcFields(Amount, "Reserved Amount");
             exit(Amount - "Reserved Amount");
-        end else begin
-            CalcFields(Amount);
-            exit(Amount);
         end;
+
+        CalcFields(Amount);
+        exit(Amount);
     end;
 }

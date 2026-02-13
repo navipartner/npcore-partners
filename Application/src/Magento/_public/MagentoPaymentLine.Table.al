@@ -326,6 +326,8 @@
     }
 
     var
+        GLSetup: Record "General Ledger Setup";
+        GLSetupRetrieved: Boolean;
         InvoiceLbl: Label 'Invoice';
         CreditMemoLbl: Label 'Credit Memo';
         DocumentNoLbl: Label 'Document No. %1', Comment = '%1 = document no';
@@ -390,43 +392,61 @@
 
     internal procedure TransactionCurrencyCode(BlankForLCY: Boolean): Code[10]
     var
+        CurrencyCode: Code[10];
+        CurrencyFactor: Decimal;
+    begin
+        TransactionCurrencyCodeAndFactor(BlankForLCY, CurrencyCode, CurrencyFactor);
+        exit(CurrencyCode);
+    end;
+
+    internal procedure TransactionCurrencyCodeAndFactor(BlankForLCY: Boolean; var CurrencyCode: Code[10]; var CurrencyFactor: Decimal)
+    var
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        GLSetup: Record "General Ledger Setup";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        CurrencyCode: Code[10];
         DocumentFound: Boolean;
     begin
+        CurrencyCode := '';
+        CurrencyFactor := 0;
+
         case "Document Table No." of
             Database::"Sales Header":
                 begin
-                    SalesHeader.SetLoadFields("Currency Code");
+                    SalesHeader.SetLoadFields("Currency Code", "Currency Factor");
                     DocumentFound := SalesHeader.Get("Document Type", "Document No.");
-                    if DocumentFound then
+                    if DocumentFound then begin
                         CurrencyCode := SalesHeader."Currency Code";
+                        CurrencyFactor := SalesHeader."Currency Factor";
+                    end;
                 end;
             Database::"Sales Invoice Header":
                 begin
-                    SalesInvHeader.SetLoadFields("Currency Code");
+                    SalesInvHeader.SetLoadFields("Currency Code", "Currency Factor");
                     DocumentFound := SalesInvHeader.Get("Document No.");
-                    if DocumentFound then
+                    if DocumentFound then begin
                         CurrencyCode := SalesInvHeader."Currency Code";
+                        CurrencyFactor := SalesInvHeader."Currency Factor";
+                    end;
                 end;
             Database::"Sales Cr.Memo Header":
                 begin
-                    SalesCrMemoHeader.SetLoadFields("Currency Code");
+                    SalesCrMemoHeader.SetLoadFields("Currency Code", "Currency Factor");
                     DocumentFound := SalesCrMemoHeader.Get("Document No.");
-                    if DocumentFound then
+                    if DocumentFound then begin
                         CurrencyCode := SalesCrMemoHeader."Currency Code";
+                        CurrencyFactor := SalesCrMemoHeader."Currency Factor";
+                    end;
                 end;
             Database::"NPR Ecom Sales Header":
                 begin
-                    EcomSalesHeader.SetLoadFields("Currency Code");
+                    EcomSalesHeader.SetLoadFields("Currency Code", "Currency Exchange Rate");
                     DocumentFound := EcomSalesHeader.GetBySystemId(Rec."NPR Inc Ecom Sale Id");
-                    if DocumentFound then
+                    if DocumentFound then begin
                         CurrencyCode := EcomSalesHeader."Currency Code";
+                        CurrencyFactor := EcomSalesHeader."Currency Exchange Rate";
+                    end;
                 end;
         end;
 
@@ -440,14 +460,71 @@
             end;
             CustLedgerEntry.SetRange("Document No.", "Document No.");
             CustLedgerEntry.SetLoadFields("Currency Code");
-            if CustLedgerEntry.FindFirst() then
+            CustLedgerEntry.SetAutoCalcFields(Amount, "Amount (LCY)");
+            if CustLedgerEntry.FindFirst() then begin
                 CurrencyCode := CustLedgerEntry."Currency Code";
+                if CurrencyCode <> '' then
+                    if (CustLedgerEntry."Amount (LCY)" in [0, CustLedgerEntry.Amount]) then
+                        CurrencyFactor := 1
+                    else
+                        CurrencyFactor := CustLedgerEntry.Amount / CustLedgerEntry."Amount (LCY)";
+            end;
         end;
 
-        if (CurrencyCode = '') and not BlankForLCY then
-            if GLSetup.Get() then
-                CurrencyCode := GLSetup."LCY Code";
+        if (CurrencyCode = '') and not BlankForLCY then begin
+            GetGLSetup();
+            CurrencyCode := GLSetup."LCY Code";
+        end;
+    end;
 
-        exit(CurrencyCode);
+    internal procedure AmountLCY(DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal): Decimal
+    var
+        Precalculated: Boolean;
+    begin
+        exit(AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor, Precalculated));
+    end;
+
+    internal procedure AmountLCY(DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal; var Precalculated: Boolean): Decimal
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        Precalculated := true;
+        if Amount = 0 then
+            exit(0);
+
+        if IsLCY(DocumentCurrencyCode) then
+            exit(Amount);
+
+#if not BC17
+        if "Amount (Store Currency)" <> 0 then
+            if IsLCY("Store Currency Code") then
+                exit("Amount (Store Currency)");
+
+#endif
+        Precalculated := false;
+        exit(
+            Round(
+                CurrencyExchangeRate.ExchangeAmtFCYToLCY("Posting Date", DocumentCurrencyCode, Amount, DocumentCurrencyFactor),
+                GLSetup."Amount Rounding Precision"));
+    end;
+
+    local procedure IsLCY(CurrencyCode: Code[10]): Boolean
+    begin
+        if CurrencyCode = '' then
+            exit(true);
+
+        GetGLSetup();
+        exit(CurrencyCode = GLSetup."LCY Code");
+    end;
+
+    local procedure GetGLSetup()
+    begin
+        if GLSetupRetrieved then
+            exit;
+        GLSetup.Get();
+        GLSetup.TestField("LCY Code");
+        if GLSetup."Amount Rounding Precision" <= 0 then
+            GLSetup."Amount Rounding Precision" := 0.01;
+        GLSetupRetrieved := true;
     end;
 }

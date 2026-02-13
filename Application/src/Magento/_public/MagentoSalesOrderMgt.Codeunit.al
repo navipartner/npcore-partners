@@ -25,7 +25,6 @@
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
-        Text003: Label 'Voucher Payment Amount %1 exceeds available Voucher Amount %2';
 
     internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
@@ -411,6 +410,8 @@
         ExternalReferenceNo: Text;
         Amount: Decimal;
         AvailableAmount: Decimal;
+        AvailableAmountLCY: Decimal;
+        VoucherPaymentAmountError: Label 'Voucher payment amount %1 %2 exceeds available voucher amount %3.', Comment = '%1 - Payment amount, %2 - Payment currency code, %3 - Voucher available amount in payment currency';
     begin
         ExternalReferenceNo := NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(NpRvVoucher."Reference No."), true);
         Evaluate(Amount, NpXmlDomMgt.GetXmlText(XmlElement, 'payment_amount', 0, true), 9);
@@ -468,8 +469,10 @@
         NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
         NpRvSalesLine.Modify(true);
 
-        if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, Amount, AvailableAmount) then
-            Error(Text003, Amount, AvailableAmount);
+        if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date"), AvailableAmountLCY) then begin
+            AvailableAmount := NpRvSalesDocMgt.ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
+            Error(VoucherPaymentAmountError, Amount, NpRvSalesDocMgt.AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
+        end;
 
         NpRvSalesDocMgt.ApplyPayment(SalesHeader, NpRvSalesLine);
 

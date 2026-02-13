@@ -1,13 +1,11 @@
 ﻿codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
 {
     var
-        Text002: Label 'Retail Voucher Payment Amount %1 is higher than Remaining Amount %2 on Retail Voucher %3';
-        Text003: Label 'Order Amount %1 is lower than Payment Amount %2.\Issue Return Voucher on remaining amount.';
-        Text004: Label 'Voucher %1 issued on new Sales Line';
-        Text005: Label 'Voucher Payment Amount %1 exceeds available Voucher Amount %2';
-        Text006: Label 'Voucher %1 is already in use';
+        GLSetup: Record "General Ledger Setup";
+        GLSetupRetrieved: Boolean;
+        VoucherInUseErr: Label 'Voucher %1 is already in use.';
         VoucherNotFoundErr: Label 'A voucher with reference no. "%1" could not be found', Comment = '%1 = Retail voucher number';
-        VoucherInUseErr: Label 'The voucher is already in use.';
+        VouchPmtAmtExceedsAvailAmtErr: Label 'Voucher payment amount %1 %2 exceeds available voucher amount %3.', Comment = '%1 - Payment amount, %2 - Payment currency code, %3 - Voucher available amount in payment currency';
 
     internal procedure SelectVoucherType(var NpRvVoucherType: Record "NPR NpRv Voucher Type"): Boolean
     var
@@ -60,15 +58,19 @@
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvVoucherMngt: codeunit "NPR NpRv Voucher Mgt.";
         AvailableAmount: Decimal;
+        AvailableAmountLCY: Decimal;
         LineNo: Integer;
     begin
         if NpRvVoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
-            if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, Amount, AvailableAmount) then
-                Error(Text005, Amount, AvailableAmount);
+            if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, ConvertTransactionCurrencyAmtToLCY(Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date"), AvailableAmountLCY) then begin
+                AvailableAmount := ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
+                Error(VouchPmtAmtExceedsAvailAmtErr, Amount, AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
+            end;
         end else begin
             NpRvVoucher.CalcFields(Amount);
-            if NpRvVoucher.Amount < Amount then
-                Error(Text005, Amount, NpRvVoucher.Amount);
+            AvailableAmount := ConvertLCYAmtToTransactionCurrency(NpRvVoucher.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor");
+            if AvailableAmount < Amount then
+                Error(VouchPmtAmtExceedsAvailAmtErr, Amount, AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
         end;
 
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
@@ -79,7 +81,7 @@
         if not NpRvSalesLine.FindFirst() then begin
             if not NpRvVoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
                 if NpRvVoucher.CalcInUseQty() > 0 then
-                    Error(Text006, NpRvVoucher."Reference No.");
+                    Error(VoucherInUseErr, NpRvVoucher."Reference No.");
             end;
 
             NpRvSalesLine.Init();
@@ -258,7 +260,7 @@
         NpRvModulePaymentDefault.InsertVoucherPaymentReturnSalesDoc(NpRvVoucherType, SalesHeader, NpRvSalesLine);
     end;
 
-    local procedure FindArchivedVoucher(VoucherNo: Code[20]; ReferenceNo: Text; var ArchVoucher: Record "NPR NpRv Arch. Voucher"): Boolean
+    local procedure FindArchivedVoucher(VoucherNo: Code[20]; ReferenceNo: Text[50]; var ArchVoucher: Record "NPR NpRv Arch. Voucher"): Boolean
     begin
         ArchVoucher.Reset();
         ArchVoucher.SetCurrentKey("Arch. No.");
@@ -337,19 +339,15 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterCheckSalesDoc', '', true, false)]
     local procedure CheckVoucherAmounts(var SalesHeader: Record "Sales Header")
     var
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
-        NpRvVoucher: Record "NPR NpRv Voucher";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        AvailableAmount: Decimal;
         TotalAmtInclVat: Decimal;
         VoucherQty: Decimal;
         VoucherUnitPrice: Decimal;
         SalesHeaderMagentoPaymentAmount: Decimal;
-        AlreadyArchivedErr: Label 'Retail voucher %1 has already been redeemed and archived.\You must cancel all the redeem transactions for the voucher prior to posting this document.', Comment = '%1 = Retail voucher number';
-        InsufficientVouchAmtErr: Label 'Retail voucher %1 available amount %2 is not sufficient to post the corrective amount %3.', Comment = '%1 = Retail voucher number, %2 = voucher remaining amount, %3 = document amount';
+        OrderAmtLowerThanPmtAmtErr: Label 'Order Amount %1 is lower than Payment Amount %2.\Issue Return Voucher on remaining amount.';
     begin
         if not SalesHeader.Invoice then
             exit;
@@ -362,27 +360,15 @@
             MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
             MagentoPaymentLine.SetRange(Posted, false);
             MagentoPaymentLine.SetFilter(Amount, '<%1', 0);
-            if MagentoPaymentLine.FindSet() then begin
-                CheckHeader(SalesHeader);
+            if MagentoPaymentLine.FindSet() then
                 repeat
-                    if not NpRvVoucher.Get(MagentoPaymentLine."Source No.") then begin
-                        if FindArchivedVoucher(MagentoPaymentLine."Source No.", MagentoPaymentLine."No.", NpRvArchVoucher) then
-                            Error(AlreadyArchivedErr, MagentoPaymentLine."Source No.")
-                        else
-                            Error(VoucherNotFoundErr, MagentoPaymentLine."Source No.");
-                    end;
-                    NpRvVoucher.TestField("Reference No.", MagentoPaymentLine."No.");
-
-                    if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
-                        if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, -MagentoPaymentLine.Amount, AvailableAmount) then
-                            Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", AvailableAmount, MagentoPaymentLine.Amount);
-                    end else begin
-                        NpRvVoucher.CalcFields(Amount);
-                        if NpRvVoucher.Amount < -MagentoPaymentLine.Amount then
-                            Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", NpRvVoucher.Amount, MagentoPaymentLine.Amount);
-                    end;
+                    if MagentoPaymentLine."Posting Date" = 0D then
+                        MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
+                    CheckVoucherActiveAndAvailableAmountIsSufficient(
+                        MagentoPaymentLine."Source No.", MagentoPaymentLine."No.",
+                        -MagentoPaymentLine.Amount, SalesHeader."Currency Code",
+                        -MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor"));
                 until MagentoPaymentLine.Next() = 0;
-            end;
         end;
 
         NpRvSalesLine.SetCurrentKey("Document Source", "Document Type", "Document No.", "Document Line No.");
@@ -391,9 +377,7 @@
         NpRvSalesLine.SetRange(Posted, false);
         if SalesHeader.IsCreditDocType() then begin
             NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
-            if NpRvSalesLine.FindSet() then begin
-                CheckHeader(SalesHeader);
-
+            if NpRvSalesLine.FindSet() then
                 repeat
                     if NpRvSalesLine.Type in [NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher"] then begin
                         NpRvVoucherMgt.GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine, VoucherQty, VoucherUnitPrice);
@@ -407,27 +391,17 @@
                         end;
                         repeat
                             if NpRvSalesLineReference."Voucher No." <> '' then begin
-                                if not NpRvVoucher.Get(NpRvSalesLineReference."Voucher No.") then begin
-                                    if FindArchivedVoucher(NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.", NpRvArchVoucher) then
-                                        Error(AlreadyArchivedErr, NpRvSalesLineReference."Voucher No.")
-                                    else
-                                        Error(VoucherNotFoundErr, NpRvSalesLineReference."Voucher No.");
-                                end;
-                                NpRvVoucher.TestField("Reference No.", NpRvSalesLineReference."Reference No.");
-                                if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
-                                    if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, VoucherUnitPrice, AvailableAmount) then
-                                        Error(InsufficientVouchAmtErr, NpRvSalesLineReference."Reference No.", AvailableAmount, VoucherUnitPrice);
-                                end else begin
-                                    NpRvVoucher.CalcFields(Amount);
-                                    if NpRvVoucher.Amount < VoucherUnitPrice then
-                                        Error(InsufficientVouchAmtErr, NpRvSalesLineReference."Reference No.", NpRvVoucher.Amount, VoucherUnitPrice);
-                                end;
-
+                                MagentoPaymentLine.Init();
+                                MagentoPaymentLine.Amount := VoucherUnitPrice;
+                                MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
+                                CheckVoucherActiveAndAvailableAmountIsSufficient(
+                                    NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.",
+                                    VoucherUnitPrice, SalesHeader."Currency Code",
+                                    MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor"));
                             end;
                         until NpRvSalesLineReference.Next() = 0;
                     end;
                 until NpRvSalesLine.Next() = 0;
-            end;
         end;
 
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
@@ -445,22 +419,66 @@
 
         OnBeforeReleaseSalesDoc(SalesHeader);
 
-        if not NpRvSalesLine.FindSet() then
+        if NpRvSalesLine.IsEmpty() then
             exit;
-
-        CheckHeader(SalesHeader);
-        repeat
-            MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
-            NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
-            NpRvVoucher.TestField("Reference No.", NpRvSalesLine."Reference No.");
-
-            if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, MagentoPaymentLine.Amount, AvailableAmount) then
-                Error(Text002, MagentoPaymentLine.Amount, AvailableAmount, NpRvVoucher."Reference No.");
-        until NpRvSalesLine.Next() = 0;
+        CheckVoucherAvailableAmounts(NpRvSalesLine, SalesHeader);
 
         TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
         if TotalAmtInclVat < SalesHeaderMagentoPaymentAmount then
-            Error(Text003, TotalAmtInclVat, SalesHeaderMagentoPaymentAmount);
+            Error(OrderAmtLowerThanPmtAmtErr, TotalAmtInclVat, SalesHeaderMagentoPaymentAmount);
+    end;
+
+    local procedure CheckVoucherActiveAndAvailableAmountIsSufficient(VoucherNo: Code[20]; VoucherReferenceNo: Text[50]; TransactionAmount: Decimal; TransactionCurrencyCode: Code[10]; TransactionAmountLCY: Decimal)
+    var
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        AvailableAmountLCY: Decimal;
+        AlreadyArchivedErr: Label 'Retail voucher %1 has already been redeemed and archived.\You must cancel all the redeem transactions for the voucher prior to posting this document.', Comment = '%1 = Retail voucher number';
+        InsufficientVouchAmtCurrErr: Label 'Retail voucher %1 available amount %2 %3 is not sufficient to post the corrective amount %4 %5 (%6 %3).', Comment = '%1 - Voucher reference number, %2 - Voucher remaining amount in voucher currency, %3 - Voucher currency code (LCY), %4 - Transaction amount, %5 - Transaction currency code, %6 - Transaction amount in voucher currency';
+        InsufficientVouchAmtErr: Label 'Retail voucher %1 available amount %2 is not sufficient to post the corrective amount %3.', Comment = '%1 - Voucher reference number, %2 - Voucher remaining amount, %3 - Document amount';
+    begin
+        if not NpRvVoucher.Get(VoucherNo) then begin
+            if FindArchivedVoucher(VoucherNo, VoucherReferenceNo, NpRvArchVoucher) then
+                Error(AlreadyArchivedErr, VoucherNo)
+            else
+                Error(VoucherNotFoundErr, VoucherNo);
+        end;
+        NpRvVoucher.TestField("Reference No.", VoucherReferenceNo);
+
+        if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, TransactionAmountLCY, AvailableAmountLCY) then
+            if IsLCY(TransactionCurrencyCode) then
+                Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", AvailableAmountLCY, TransactionAmount)
+            else
+                Error(InsufficientVouchAmtCurrErr, NpRvVoucher."Reference No.", AvailableAmountLCY, AdjustCurrencyCode(''), TransactionAmount, AdjustCurrencyCode(TransactionCurrencyCode), TransactionAmountLCY);
+    end;
+
+    local procedure CheckVoucherAvailableAmounts(var NpRvSalesLine: Record "NPR NpRv Sales Line"; SalesHeader: Record "Sales Header")
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        AvailableAmountLCY: Decimal;
+        PaymentAmountLCY: Decimal;
+        PmtAmtHigherThanRemAmtErr: Label 'Retail voucher payment amount %1 is higher than remaining amount %2 on retail voucher %3.', Comment = '%1 - Payment amount, %2 - Voucher remaining amount, %3 = Voucher reference number';
+        PmtAmtHigherThanRemAmtCurrErr: Label 'Retail voucher payment amount %1 %2 (%3 %5) is higher than remaining amount %4 %5 on retail voucher %6.', Comment = '%1 - Payment amount, %2 - Payment currency code, %3 - Payment amount in voucher currency, %4 - Voucher remaining amount in voucher currency, %5 - Voucher currency code (LCY), %6 = Voucher reference number';
+    begin
+        NpRvSalesLine.FindSet();
+        repeat
+            NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
+            NpRvVoucher.TestField("Reference No.", NpRvSalesLine."Reference No.");
+
+            MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
+            if MagentoPaymentLine."Posting Date" = 0D then
+                MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
+            PaymentAmountLCY := MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor");
+
+            if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY) then
+                if IsLCY(SalesHeader."Currency Code") then
+                    Error(PmtAmtHigherThanRemAmtErr, MagentoPaymentLine.Amount, AvailableAmountLCY, NpRvVoucher."Reference No.")
+                else
+                    Error(PmtAmtHigherThanRemAmtCurrErr, MagentoPaymentLine.Amount, AdjustCurrencyCode(SalesHeader."Currency Code"), PaymentAmountLCY, AvailableAmountLCY, AdjustCurrencyCode(''), NpRvVoucher."Reference No.");
+        until NpRvSalesLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostLines', '', true, false)]
@@ -684,7 +702,7 @@
         NpRvSalesLine.SetRange(Posted, false);
         if NpRvSalesLine.FindSet() then
             repeat
-                NpRvVoucherMgt.IssueVouchers(NpRvSalesLine);
+                NpRvVoucherMgt.IssueVouchers(NpRvSalesLine, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date");
             until NpRvSalesLine.Next() = 0;
     end;
 
@@ -701,7 +719,7 @@
         NpRvSalesLine.SetRange(Posted, false);
         if NpRvSalesLine.FindSet() then
             repeat
-                NpRvVoucherMgt.PostPayment(NpRvSalesLine);
+                NpRvVoucherMgt.PostPayment(NpRvSalesLine, SalesHeader."Currency Code", SalesHeader."Currency Factor");
             until NpRvSalesLine.Next() = 0;
     end;
 
@@ -709,13 +727,14 @@
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         VoucherNo: Text;
+        VouchIssuedOnNewSalesLineMsg: Label 'Voucher %1 issued on new Sales Line';
     begin
-        CheckHeader(SalesHeader);
+        CheckVoucherTransactionCurrency(SalesHeader."Currency Code");
         if not SelectVoucherType(NpRvVoucherType) then
             exit;
 
         VoucherNo := IssueVoucher(SalesHeader, NpRvVoucherType);
-        Message(Text004, VoucherNo);
+        Message(VouchIssuedOnNewSalesLineMsg, VoucherNo);
     end;
 
     internal procedure RedeemVoucherAction(SalesHeader: Record "Sales Header")
@@ -725,7 +744,7 @@
         Voucher: Record "NPR NpRv Voucher";
         VoucherRedeemedLbl: Label 'Voucher with reference no. "%1" has been redeem on the Sales Header';
     begin
-        CheckHeader(SalesHeader);
+        CheckVoucherTransactionCurrency(SalesHeader."Currency Code");
 
         DialogBox.SetInput(1, ReferenceNo, Voucher.FieldCaption("Reference No."));
         if DialogBox.RunModal() <> Action::OK then
@@ -766,7 +785,7 @@
         if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
             Voucher.CalcFields("In-use Quantity");
             if Voucher."In-use Quantity" > 0 then
-                Error(VoucherInUseErr);
+                Error(VoucherInUseErr, Voucher."Reference No.");
         end;
 
         if not VoucherType.Get(Voucher."Voucher Type") then
@@ -795,7 +814,7 @@
         if Amount = 0 then
             Error(AmountNotGtZero);
 
-        AvailableAmount := Voucher.CalcAvailableAmount();
+        AvailableAmount := ConvertLCYAmtToTransactionCurrency(Voucher.CalcAvailableAmount(), SalesHeader."Currency Code", SalesHeader."Currency Factor");
         if AvailableAmount = 0 then
             Error(AvailableAmountZeroErr);
 
@@ -1519,9 +1538,7 @@
 
     end;
 
-    internal procedure RedeemVoucher(SalesHeader: Record "Sales Header"; var
-                                                                             NpRvSalesLine: Record "NPR NpRv Sales Line";
-                                                                             Amount: Decimal)
+    internal procedure RedeemVoucher(SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; Amount: Decimal)
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         Voucher: Record "NPR NpRv Voucher";
@@ -1706,17 +1723,74 @@
             until NpRvVoucherType.Next() = 0;
     end;
 
-    local procedure CheckHeader(SalesHeader: Record "Sales Header")
+    local procedure CheckVoucherTransactionCurrency(CurrencyCode: Code[10])
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        NotSupportedErr: Label 'Voucher operations in foreign currency are not supported.';
+        VouchersOnlyInLCYMsg: Label 'The currency of the document is %1. As retail voucher amounts must be in the local currency, please note that the voucher-related amounts on this document will be converted and processed in LCY.';
     begin
-        If SalesHeader."Currency Code" = '' then
+        if not GuiAllowed() then
             exit;
+        if not IsLCY(CurrencyCode) then
+            Message(VouchersOnlyInLCYMsg, CurrencyCode);
+    end;
 
-        GeneralLedgerSetup.Get();
-        if SalesHeader."Currency Code" <> GeneralLedgerSetup."LCY Code" then
-            Error(NotSupportedErr);
+    local procedure IsLCY(CurrencyCode: Code[10]): Boolean
+    begin
+        if CurrencyCode = '' then
+            exit(true);
+
+        GetGLSetup();
+        exit(CurrencyCode = GLSetup."LCY Code");
+    end;
+
+    internal procedure AdjustCurrencyCode(CurrencyCode: Code[10]): Code[10]
+    begin
+        if CurrencyCode <> '' then
+            exit(CurrencyCode);
+        GetGLSetup();
+        exit(GLSetup."LCY Code");
+    end;
+
+    local procedure GetGLSetup()
+    begin
+        if GLSetupRetrieved then
+            exit;
+        GLSetup.Get();
+        GLSetup.TestField("LCY Code");
+        if GLSetup."Amount Rounding Precision" <= 0 then
+            GLSetup."Amount Rounding Precision" := 0.01;
+        GLSetupRetrieved := true;
+    end;
+
+    internal procedure ConvertLCYAmtToTransactionCurrency(AmountLCY: Decimal; CurrencyCode: Code[10]; CurrencyFactor: Decimal): Decimal
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        if AmountLCY = 0 then
+            exit(0);
+
+        if IsLCY(CurrencyCode) then
+            exit(AmountLCY);
+
+        exit(
+            Round(
+                CurrencyExchangeRate.ExchangeAmtLCYToFCYOnlyFactor(AmountLCY, CurrencyFactor),
+                GLSetup."Amount Rounding Precision"));
+    end;
+
+    internal procedure ConvertTransactionCurrencyAmtToLCY(AmountTCY: Decimal; CurrencyCode: Code[10]; CurrencyFactor: Decimal; PostingDate: Date): Decimal
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        if AmountTCY = 0 then
+            exit(0);
+
+        if IsLCY(CurrencyCode) then
+            exit(AmountTCY);
+
+        exit(
+            Round(
+                CurrencyExchangeRate.ExchangeAmtFCYToLCY(PostingDate, CurrencyCode, AmountTCY, CurrencyFactor),
+                GLSetup."Amount Rounding Precision"));
     end;
 
     local procedure InputVoucherReferenceNumber(NpRvVoucherType: Record "NPR NpRv Voucher Type"; var ReferenceNumber: Code[50])

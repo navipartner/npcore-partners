@@ -225,13 +225,43 @@
         until VoucherEntry.Next() = 0;
     end;
 
+    [Obsolete('Use the overload that takes the additional parameters DocumentCurrencyCode, DocumentCurrencyFactor and DocumentPostingDate.', '2026-01-30')]
     procedure IssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        SalesHeader: Record "Sales Header";
+        CurrencyCode: Code[10];
+        CurrencyFactor: Decimal;
+        PostingDate: Date;
+    begin
+        case NpRvSalesLine."Document Source" of
+            NpRvSalesLine."Document Source"::"Sales Document":
+                begin
+                    if not SalesHeader.Get(NpRvSalesLine."Document Type", NpRvSalesLine."Document No.") then
+                        exit;
+                    CurrencyCode := SalesHeader."Currency Code";
+                    CurrencyFactor := SalesHeader."Currency Factor";
+                    PostingDate := SalesHeader."Posting Date";
+                end;
+            NpRvSalesLine."Document Source"::"Payment Line":
+                begin
+                    if not FindMagentoPaymentLine(NpRvSalesLine, MagentoPaymentLine) then
+                        exit;
+                    MagentoPaymentLine.TransactionCurrencyCodeAndFactor(true, CurrencyCode, CurrencyFactor);
+                    PostingDate := MagentoPaymentLine."Posting Date";
+                end;
+        end;
+        IssueVouchers(NpRvSalesLine, CurrencyCode, CurrencyFactor, PostingDate);
+    end;
+
+    procedure IssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line"; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal; DocumentPostingDate: Date)
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         VoucherType: Record "NPR NpRv Voucher Type";
         SignFactor: Integer;
         VoucherAmount: Decimal;
         VoucherQty: Decimal;
+        UnsupportedDocSourceErr: Label 'Unsupported document source %1 for voucher issuance in %2.', Comment = '%1 - Document Source, %2 - NPR NpRv Sales Line record ID';
     begin
         SignFactor := 1;
         VoucherType.Get(NpRvSalesLine."Voucher Type");
@@ -240,6 +270,11 @@
                 begin
                     if not GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine, VoucherQty, VoucherAmount) then
                         exit;
+                    MagentoPaymentLine.Init();
+                    MagentoPaymentLine.Amount := VoucherAmount;
+                    MagentoPaymentLine."Posting Date" := DocumentPostingDate;
+                    VoucherAmount := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor);
+
                     if NpRvSalesLine.IsCreditDocType() then
                         SignFactor := -1;
                 end;
@@ -257,8 +292,12 @@
                         exit;
 
                     VoucherQty := 1;
-                    VoucherAmount := -MagentoPaymentLine.Amount;
+                    if MagentoPaymentLine."Posting Date" = 0D then
+                        MagentoPaymentLine."Posting Date" := DocumentPostingDate;
+                    VoucherAmount := -MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor);
                 end;
+            else
+                Error(UnsupportedDocSourceErr, NpRvSalesLine."Document Source", NpRvSalesLine.RecordId());
         end;
 
         IssueVoucher(NpRvSalesLine, VoucherType, SignFactor, VoucherAmount, VoucherQty);
@@ -445,10 +484,7 @@
         if MagentoPaymentLine.FindFirst() then
             exit(true);
 
-        if MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
-            exit(true);
-
-        exit(false);
+        exit(MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No."));
     end;
 
     local procedure MarkRetailVoucherSalesLineAsPosted(NpRvSalesLineId: Guid)
@@ -679,19 +715,40 @@
         NpRvModulePaymentDefault.ApplyPayment(FrontEnd, POSSession, VoucherType, NpRvSalesLine, EndSale);
     end;
 
+    [Obsolete('Use one of the overloads that takes the additional parameters DocumentCurrencyCode and DocumentCurrencyFactor, representing the currency of the document to which the voucher payment that is being posted is attached (e.g., SalesHeader."Currency Code" and SalesHeader."Currency Factor").', '2026-01-30')]
     internal procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        CurrencyCode: Code[10];
+        CurrencyFactor: Decimal;
+    begin
+        if not FindMagentoPaymentLine(NpRvSalesLine, MagentoPaymentLine) then
+            exit;
+        MagentoPaymentLine.TransactionCurrencyCodeAndFactor(true, CurrencyCode, CurrencyFactor);
+        PostPayment(NpRvSalesLine, MagentoPaymentLine, CurrencyCode, CurrencyFactor);
+    end;
+
+    internal procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line"; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal)
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        if not FindMagentoPaymentLine(NpRvSalesLine, MagentoPaymentLine) then
+            exit;
+        PostPayment(NpRvSalesLine, MagentoPaymentLine, DocumentCurrencyCode, DocumentCurrencyFactor);
+    end;
+
+    internal procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line"; MagentoPaymentLine: Record "NPR Magento Payment Line"; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal)
+    var
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
         VoucherWebhook: Codeunit "NPR Retail Voucher Webhooks";
 #endif
+        AvailableAmountLCY: Decimal;
+        VoucherPaymentAmountLCY: Decimal;
+        Precalculated: Boolean;
     begin
-        if not FindMagentoPaymentLine(NpRvSalesLine, MagentoPaymentLine) then
-            exit;
-
         Voucher.Get(NpRvSalesLine."Voucher No.");
 
         InitVoucherEntry(Voucher, VoucherEntry);
@@ -707,10 +764,18 @@
         else
             VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
         VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
+
+        VoucherPaymentAmountLCY := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor, Precalculated);
+        if not Precalculated then begin
+            ValidateAmount(Voucher, MagentoPaymentLine.SystemId, VoucherPaymentAmountLCY, AvailableAmountLCY);
+            if Abs(AvailableAmountLCY - VoucherPaymentAmountLCY) <= 0.02 then
+                VoucherPaymentAmountLCY := AvailableAmountLCY; // In case of rounding differences, take the available amount as the payment amount to avoid leaving small open amounts on the voucher
+        end;
         if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
-            VoucherEntry.Amount := MagentoPaymentLine.Amount
+            VoucherEntry.Amount := VoucherPaymentAmountLCY
         else
-            VoucherEntry.Amount := -MagentoPaymentLine.Amount;
+            VoucherEntry.Amount := -VoucherPaymentAmountLCY;
+
         if POSUnit.Get(NpRvSalesLine."Register No.") then
             VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
         VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
@@ -1328,17 +1393,17 @@
         TempNpRvGlobalVoucherBuffer.Company := CopyStr(CompanyName(), 1, MaxStrlen(TempNpRvGlobalVoucherBuffer.Company));
     end;
 
-    procedure ValidateAmount(NpRvVoucher: Record "NPR NpRv Voucher"; AmountToValidate: Decimal; var AvailableAmount: Decimal): Boolean
+    procedure ValidateAmount(NpRvVoucher: Record "NPR NpRv Voucher"; AmountToValidateLCY: Decimal; var AvailableAmountLCY: Decimal): Boolean
     begin
-        AvailableAmount := NpRvVoucher.CalcAvailableAmount();
-        exit(AvailableAmount >= AmountToValidate);
+        AvailableAmountLCY := NpRvVoucher.CalcAvailableAmount();
+        exit(AvailableAmountLCY >= AmountToValidateLCY);
     end;
 
-    procedure ValidateAmount(NpRvVoucher: Record "NPR NpRv Voucher"; ReservationLineid: Guid; AmountToValidate: Decimal; var AvailableAmount: Decimal): Boolean
+    procedure ValidateAmount(NpRvVoucher: Record "NPR NpRv Voucher"; ReservationLineid: Guid; AmountToValidateLCY: Decimal; var AvailableAmountLCY: Decimal): Boolean
     begin
         NpRvVoucher.SetFilter("Reservation Line Id Filter", '<>%1', ReservationLineid);
-        AvailableAmount := NpRvVoucher.CalcAvailableAmount();
-        exit(AvailableAmount >= AmountToValidate);
+        AvailableAmountLCY := NpRvVoucher.CalcAvailableAmount();
+        exit(AvailableAmountLCY >= AmountToValidateLCY);
     end;
 
     local procedure SetSalesLineFilter(SaleLinePOS: Record "NPR POS Sale Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")

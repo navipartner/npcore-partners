@@ -78,6 +78,7 @@
         PmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         AvailableAmount: Decimal;
+        AvailableAmountLCY: Decimal;
         ReturnAmount: Decimal;
         SalesAmount: Decimal;
         PaidAmount: Decimal;
@@ -93,12 +94,20 @@
         MagentoPaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
         NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
 
-        if NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, MagentoPaymentLine.Amount, AvailableAmount) then begin
-            MagentoPaymentLine.Amount := AvailableAmount;
-            MagentoPaymentLine.Modify(true);
-
-            NpRvSalesLine.Amount := MagentoPaymentLine.Amount;
-            NpRvSalesLine.Modify();
+        if NpRvVoucherMgt.ValidateAmount(
+                NpRvVoucher, MagentoPaymentLine.SystemId,
+                NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(MagentoPaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date"),
+                AvailableAmountLCY)
+        then begin
+            AvailableAmount := NpRvSalesDocMgt.ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
+            if Abs(MagentoPaymentLine.Amount - AvailableAmount) > 0.01 then begin
+                MagentoPaymentLine.Amount := AvailableAmount;
+                MagentoPaymentLine.Modify(true);
+            end;
+            if NpRvSalesLine.Amount <> MagentoPaymentLine.Amount then begin
+                NpRvSalesLine.Amount := MagentoPaymentLine.Amount;
+                NpRvSalesLine.Modify();
+            end;
         end;
 
         SalesHeader.CalcFields("NPR Magento Payment Amount");

@@ -4,6 +4,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
     Subtype = Test;
 
     var
+        _GLSetup: Record "General Ledger Setup";
         _Item: Record "Item";
         _Item2: Record Item;
         _POSPaymentMethodCash: Record "NPR POS Payment Method";
@@ -1071,8 +1072,109 @@ codeunit 85024 "NPR Retail Voucher Tests"
         Assert.AreEqual(false, Found, 'Find Voucher before disabling for web not according to test scenario.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherOnForeignCurrencySalesOrder()
+    // [SCENARIO] Issue a retail voucher on a sales order with foreign currency - verify amount is stored in LCY
+    var
+        Currency: Record Currency;
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        CurrencyExchangeRate: Decimal;
+        VoucherAmountFCY: Decimal;
+        VoucherAmountLCY: Decimal;
+        VoucherNo: Code[20];
+    begin
+        // [GIVEN] A sales order in foreign currency with exchange rate 0.13
+        Initialize();
+        CurrencyExchangeRate := 0.13;
+        CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
+        VoucherAmountFCY := 100;
+        VoucherAmountLCY := Round(VoucherAmountFCY / CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 769.23 in LCY
 
+        // [WHEN] Issue a voucher worth 100 FCY on the sales order and post it
+        VoucherNo := CreateAndPostSalesOrderWithNewVoucher(SalesHeader, Currency.Code, VoucherAmountFCY, _VoucherTypePartial.Code);
 
+        // [THEN] Voucher amount should be stored in LCY on both voucher and voucher entry
+        NpRvVoucher.Get(VoucherNo);
+        NpRvVoucher.CalcFields(Amount);
+        Assert.AreNearlyEqual(VoucherAmountLCY, NpRvVoucher.Amount, 0.01, 'Voucher amount should be converted to LCY');
+
+        NpRvVoucherEntry.SetRange("Voucher No.", NpRvVoucher."No.");
+        NpRvVoucherEntry.FindFirst();
+        Assert.AreNearlyEqual(VoucherAmountLCY, NpRvVoucherEntry.Amount, 0.01, 'Voucher entry amount should be in LCY');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemPartialVoucherOnForeignCurrencySalesOrder()
+    // [SCENARIO] Partially redeem a retail voucher on a sales order with foreign currency
+    var
+        Currency: Record Currency;
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        CurrencyExchangeRate: Decimal;
+        OrderAmountFCY: Decimal;
+        RedemptionAmountLCY: Decimal;
+        VoucherAmountLCY: Decimal;
+    begin
+        // [GIVEN] A voucher with 1000 LCY available
+        Initialize();
+        VoucherAmountLCY := 1000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmountLCY, _VoucherTypePartial.Code);
+
+        // [GIVEN] A sales order in foreign currency with exchange rate 0.13
+        CurrencyExchangeRate := 0.13;
+        CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
+        OrderAmountFCY := 100;
+        RedemptionAmountLCY := Round(OrderAmountFCY / CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 769.23 in LCY
+
+        // [WHEN] Use the voucher to pay 100 on the FCY sales order and post it
+        CreateAndPostSalesOrderWithVoucherRedemption(SalesHeader, NpRvVoucher, Currency.Code, OrderAmountFCY);
+
+        // [THEN] Voucher should have correct LCY remaining amount
+        NpRvVoucher.Find();
+        NpRvVoucher.CalcFields(Amount);
+        Assert.AreNearlyEqual(VoucherAmountLCY - RedemptionAmountLCY, NpRvVoucher.Amount, 0.01, StrSubstNo('Remaining voucher amount should be %1 LCY after redemption', VoucherAmountLCY - RedemptionAmountLCY));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemFullVoucherOnForeignCurrencySalesOrder()
+    // [SCENARIO] Fully redeem a retail voucher on a sales order with foreign currency
+    var
+        Currency: Record Currency;
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        CurrencyExchangeRate: Decimal;
+        OrderAmountFCY: Decimal;
+        VoucherAmountLCY: Decimal;
+    begin
+        // [GIVEN] A voucher with 500 LCY available
+        Initialize();
+        VoucherAmountLCY := 500;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmountLCY, _VoucherTypePartial.Code);
+
+        // [GIVEN] A sales order in foreign currency with exchange rate 0.132345
+        CurrencyExchangeRate := 0.132345;
+        CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
+        OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 500 LCY, which equals 66.17 FCY
+
+        // [WHEN] Use the voucher to pay the full amount and post
+        CreateAndPostSalesOrderWithVoucherRedemption(SalesHeader, NpRvVoucher, Currency.Code, OrderAmountFCY);
+
+        // [THEN] Voucher should be archived
+        Assert.IsFalse(NpRvVoucher.Find(), 'Voucher should no longer exist after full redemption');
+        NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
+        Assert.IsTrue(NpRvArchVoucher.FindFirst(), 'Archived voucher should exist');
+    end;
 
     procedure Initialize()
     var
@@ -1084,6 +1186,16 @@ codeunit 85024 "NPR Retail Voucher Tests"
         Clear(_POSSession);
 
         if not _Initialized then begin
+            if not _GLSetup.Get() then begin
+                _GLSetup.Init();
+                _GLSetup.Insert();
+            end;
+            if _GLSetup."LCY Code" = '' then
+                _GLSetup."LCY Code" := 'LCY';
+            _GLSetup."Amount Rounding Precision" := 0.01;
+            _GLSetup."Unit-Amount Rounding Precision" := 0.00001;
+            _GLSetup.Modify();
+
             NPRLibraryPOSMasterData.CreatePartialVoucherType(_VoucherTypePartial, false);
             NPRLibraryPOSMasterData.CreateDefaultVoucherType(_VoucherTypeDefault, false);
             NPRLibraryPOSMasterData.CreateReturnVoucherType(_VoucherTypePartial.Code, _VoucherTypeDefault.Code);
@@ -1494,7 +1606,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -1530,9 +1641,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -1551,7 +1660,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -1597,9 +1705,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -1678,7 +1784,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -1714,9 +1819,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -1735,7 +1838,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -1781,9 +1883,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -1862,7 +1962,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -1898,9 +1997,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -1919,7 +2016,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -1965,9 +2061,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2046,7 +2140,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -2082,9 +2175,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2103,7 +2194,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -2149,9 +2239,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2230,7 +2318,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -2268,9 +2355,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2289,7 +2374,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -2337,9 +2421,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2420,7 +2502,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -2458,9 +2539,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2479,7 +2558,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -2527,9 +2605,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2610,7 +2686,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -2643,9 +2718,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2664,7 +2737,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -2707,9 +2779,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2785,7 +2855,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -2818,9 +2887,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2839,7 +2906,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -2882,9 +2948,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -2960,7 +3024,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -2993,9 +3056,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3014,7 +3075,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -3057,9 +3117,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3135,7 +3193,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -3168,9 +3225,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3189,7 +3244,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -3232,9 +3286,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3310,7 +3362,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -3345,9 +3396,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3366,7 +3415,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -3411,9 +3459,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3491,7 +3537,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -3526,9 +3571,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3547,7 +3590,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSViewProfile: Record "NPR POS View Profile";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
         Assert: Codeunit "Assert";
@@ -3592,9 +3634,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3724,7 +3764,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -3768,9 +3807,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -3901,7 +3938,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -3945,9 +3981,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -4078,7 +4112,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -4122,9 +4155,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -4255,7 +4286,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -4299,9 +4329,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -4434,7 +4462,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -4480,9 +4507,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -4617,7 +4642,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -4663,9 +4687,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -4795,7 +4817,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -4836,9 +4857,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -4963,7 +4982,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -5004,9 +5022,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -5131,7 +5147,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -5172,9 +5187,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
@@ -5299,7 +5312,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -5340,9 +5352,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -5469,7 +5479,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -5512,9 +5521,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -5643,7 +5650,6 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSViewProfile: Record "NPR POS View Profile";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit "Assert";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -5686,9 +5692,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not GeneralLedgerSetup.Get() then
-            Clear(GeneralLedgerSetup);
-        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", _GLSetup."Amount Rounding Precision");
 
         // [THEN] Check if voucher price and amount including VAT is calculated correctly
         Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
@@ -6866,6 +6870,85 @@ codeunit 85024 "NPR Retail Voucher Tests"
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, _Item."No.", 1);
         if TwoItemsInSalesOrder then
             LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, _Item2."No.", 1);
+    end;
+
+    local procedure CreateCurrencyWithExchangeRate(var Currency: Record Currency; ExchangeRate: Decimal)
+    var
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        repeat
+            LibraryERM.CreateCurrency(Currency);
+        until Currency.Code <> _GLSetup."LCY Code"; // Ensure that the created currency is different than LCY
+        Currency.InitRoundingPrecision();
+        Currency.Modify();
+
+        LibraryERM.CreateExchangeRate(Currency.Code, WorkDate(), ExchangeRate, ExchangeRate);
+    end;
+
+    local procedure CreateAndPostSalesOrderWithNewVoucher(var SalesHeader: Record "Sales Header"; CurrencyCode: Code[10]; VoucherAmountFCY: Decimal; VoucherTypeCode: Code[20]) VoucherNo: Code[20]
+    var
+        Customer: Record Customer;
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        SalesLine: Record "Sales Line";
+        LibrarySales: Codeunit "Library - Sales";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        VoucherQty: Decimal;
+    begin
+        // Create customer
+        LibrarySales.CreateCustomer(Customer);
+
+        // Create sales order with currency
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        SalesHeader.Validate("Currency Code", CurrencyCode);
+        SalesHeader.Validate("Prices Including VAT", true);
+        SalesHeader.Modify(true);
+
+        // Issue voucher on sales order
+        NpRvVoucherType.Get(VoucherTypeCode);
+#pragma warning disable AA0139
+        VoucherNo := NpRvSalesDocMgt.IssueVoucher(SalesHeader, NpRvVoucherType);
+#pragma warning restore AA0139
+
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.FindLast();
+        SalesLine.Validate("Unit Price", VoucherAmountFCY);
+        SalesLine.Modify(true);
+
+        // Post the sales order
+        LibrarySales.PostSalesDocument(SalesHeader, true, true);
+    end;
+
+    local procedure CreateAndPostSalesOrderWithVoucherRedemption(var SalesHeader: Record "Sales Header"; var NpRvVoucher: Record "NPR NpRv Voucher"; CurrencyCode: Code[10]; OrderAmountFCY: Decimal)
+    var
+        Customer: Record Customer;
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        SalesLine: Record "Sales Line";
+        LibrarySales: Codeunit "Library - Sales";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+    begin
+        // Create customer
+        LibrarySales.CreateCustomer(Customer);
+
+        // Create sales order with currency
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        SalesHeader.Validate("Currency Code", CurrencyCode);
+        SalesHeader.Validate("Prices Including VAT", true);
+        SalesHeader.Modify(true);
+
+        // Create item line
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, _Item."No.", 1);
+        SalesLine.Validate("Unit Price", OrderAmountFCY);
+        SalesLine.Modify(true);
+
+        // Redeem voucher
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+
+        // Post the sales order
+        LibrarySales.PostSalesDocument(SalesHeader, true, true);
     end;
 
     local procedure DeleteVoucherItemsDefaultVoucher(POSPaymentMethodCode: Code[10])

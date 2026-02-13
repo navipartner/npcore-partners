@@ -1013,11 +1013,13 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMngt: Codeunit "NPR NpRv Voucher Mgt.";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         AvailableAmount: Decimal;
-        VoucherPaymentAmountError: Label 'Voucher Payment Amount %1 exceeds available Voucher Amount %2';
+        AvailableAmountLCY: Decimal;
+        VoucherPaymentAmountError: Label 'Voucher payment amount %1 %2 exceeds available voucher amount %3.', Comment = '%1 - Payment amount, %2 - Payment currency code, %3 - Voucher available amount in payment currency';
     begin
         if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
             exit;
@@ -1082,8 +1084,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherSalesLineFields(NpRvSalesLine);
         NpRvSalesLine.Modify(true);
 
-        if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, PaymentLine.Amount, AvailableAmount) then
-            Error(VoucherPaymentAmountError, PaymentLine.Amount, AvailableAmount);
+        if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(PaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date"), AvailableAmountLCY) then begin
+            AvailableAmount := NpRvSalesDocMgt.ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
+            Error(VoucherPaymentAmountError, PaymentLine.Amount, NpRvSalesDocMgt.AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
+        end;
 
         EcomSalesDocImplEvents.OnAfterInsertPaymentLineVoucher(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine, NpRvSalesLine);
     end;
