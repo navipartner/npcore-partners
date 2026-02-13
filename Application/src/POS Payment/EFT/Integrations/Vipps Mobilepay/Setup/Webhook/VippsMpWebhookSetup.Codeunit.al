@@ -98,12 +98,13 @@ codeunit 6184758 "NPR Vipps Mp Webhook Setup"
         WebhookBaseurl: Label 'https://npvippsmobilepay.azurewebsites.net/api', Locked = true;
         KeyLbl: Label 'NPVippsMobilepayAFCode', Locked = True;
     begin
+        // HWD-726: Use Base64 for CompanyName because vipps/mobilepay does partial decoding on their end, so EscapeDataString doesn't work
         if (not EnvironmentInformation.IsOnPrem()) then
             exit(StrSubstNo('%1/MpVippsCloud/%2/%3/%4/%5?code=%6',
             WebhookBaseurl,
             AzureADTenant.GetAadTenantId(),
             EnvironmentInformation.GetEnvironmentName(),
-            CompanyName(),
+            ToBase64Url(CompanyName()),
             WhRec."Webhook Reference",
             AzureKeyVaultMgt.GetAzureKeyVaultSecret(KeyLbl)))
         else
@@ -113,5 +114,12 @@ codeunit 6184758 "NPR Vipps Mp Webhook Setup"
             WhRec."OnPrem AF Credential Key",
             WhRec."Webhook Reference",
             AzureKeyVaultMgt.GetAzureKeyVaultSecret(KeyLbl)));
+    end;
+
+    local procedure ToBase64Url(String: Text): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+    begin
+        exit(Base64Convert.ToBase64(String).Replace('+', '-').Replace('/', '_').TrimEnd('='));
     end;
 }
