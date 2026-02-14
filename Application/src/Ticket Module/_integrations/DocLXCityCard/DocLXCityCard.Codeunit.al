@@ -171,7 +171,10 @@ codeunit 6184830 "NPR DocLXCityCard"
         ResponseMessage: Text;
         TicketNo: Code[20];
         ItemNo: Code[20];
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.doclxcitycard.create-ticket');
         LogEntry.Get(EntryNo);
 
         if (not Coupon.Get(CouponNo)) then
@@ -193,6 +196,8 @@ codeunit 6184830 "NPR DocLXCityCard"
         TicketId := Ticket.SystemId;
         LogEntry.TicketNo := TicketNo;
         LogEntry.Modify();
+
+        Span.Finish();
         exit(true);
     end;
 
@@ -472,8 +477,12 @@ codeunit 6184830 "NPR DocLXCityCard"
         CipherKey: Text;
         ValidationPath: Text;
         PayloadText: Text;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.doclxcitycard.validate-card-get-setup');
         GetValidationEndpointAndKeys(CityCode, ProxyUrl, CityCardHostName, ValidationPath, CipherKey);
+        Span.Finish();
 
         MessageBody.Add('function', 'validateCard');
         MessageBody.Add('cardId', CardNumber);
@@ -483,7 +492,9 @@ codeunit 6184830 "NPR DocLXCityCard"
         MessageBody.Add('path', ValidationPath);
         MessageBody.WriteTo(PayloadText);
 
+        Sentry.StartSpan(Span, 'bc.doclxcitycard.validate-card-send-request');
         SendProxyRequest(ProxyUrl, PayloadText, Result);
+        Span.Finish();
     end;
 
 
@@ -497,8 +508,13 @@ codeunit 6184830 "NPR DocLXCityCard"
         CipherKey: Text;
         RedeemPath: Text;
         PayloadText: Text;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+
+        Sentry.StartSpan(Span, 'bc.doclxcitycard.redeem-card-get-setup');
         GetRedemptionEndpointAndKeys(CityCode, ProxyUrl, CityCardHostName, RedeemPath, CipherKey);
+        Span.Finish();
 
         MessageBody.Add('function', 'redeemCard');
         MessageBody.Add('cardId', CardNumber);
@@ -510,7 +526,9 @@ codeunit 6184830 "NPR DocLXCityCard"
         MessageBody.Add('path', RedeemPath);
         MessageBody.WriteTo(PayloadText);
 
+        Sentry.StartSpan(Span, 'bc.doclxcitycard.redeem-card-send-request');
         SendProxyRequest(ProxyUrl, PayloadText, Result);
+        Span.Finish();
     end;
 
     internal procedure CheckServiceHealth(CityCode: Code[10]; var StateCode: Code[10]; var StateMessage: Text)

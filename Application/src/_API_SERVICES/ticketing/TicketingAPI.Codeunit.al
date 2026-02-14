@@ -101,8 +101,11 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         CallStack: Text;
         ApiError: Enum "NPR API Error Code";
         ApiName: Text;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         StartTime := Time();
+        Sentry.StartSpan(Span, 'bc.ticket_api.handler');
         Commit();
         ClearLastError();
 
@@ -112,9 +115,9 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         TicketingApiHandler.SetRequest(ApiFunction, Request);
         if (TicketingApiHandler.Run()) then begin
             Response := TicketingApiHandler.GetResponse();
-            Response.AddSentryTag('bc.ticket_api.function_name', ApiName);
 
             LogMessage(Request, ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, '');
+            Span.Finish();
             exit(Response);
         end;
 
@@ -124,9 +127,9 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         ApiError := ErrorToEnum();
 
         Response.CreateErrorResponse(ApiError, ResponseMessage);
-        Response.AddSentryTag('bc.ticket_api.function_name', ApiName);
 
         LogMessage(Request, ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, CallStack);
+        Span.Finish();
         exit(Response);
     end;
 

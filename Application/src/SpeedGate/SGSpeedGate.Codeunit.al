@@ -106,7 +106,11 @@ codeunit 6185130 "NPR SG SpeedGate"
         ValidationRequest: Record "NPR SGEntryLog";
         TicketId: Guid;
         ReasonMessage: Text;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.admit-internal');
+
         ValidationRequest.SetCurrentKey(Token);
         ValidationRequest.SetFilter(Token, '=%1', Token);
         ValidationRequest.SetFilter(EntryStatus, '=%1', ValidationRequest.EntryStatus::PERMITTED_BY_GATE);
@@ -136,6 +140,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         until (ValidationRequest.Next() = 0);
 
+        Span.Finish();
     end;
 
     internal procedure CheckAdmit(Token: Guid; Quantity: Integer; var ResponseMessage: Text): Boolean
@@ -278,7 +283,11 @@ codeunit 6185130 "NPR SG SpeedGate"
         TimeHelper: Codeunit "NPR TM TimeHelper";
         Ticket: Record "NPR TM Ticket";
         ResponseMessage: Label 'Invalid Validation Request';
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.do-admit-ticket');
+
         case ValidationRequest.ReferenceNumberType of
 
             ValidationRequest.ReferenceNumberType::TICKET:
@@ -307,6 +316,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         ValidationRequest.AdmittedAt := CurrentDateTime();
         ValidationRequest.Modify();
 
+        Span.Finish();
         exit(Ticket.SystemId);
     end;
 
@@ -349,7 +359,10 @@ codeunit 6185130 "NPR SG SpeedGate"
         NoTimeFramesError: Label 'Membership is not valid, it has no timeframes. Please contact the support team for assistance.';
         NotValidForTodayError: Label 'Membership is not valid for today, it is valid from %1 until %2.';
         GuestCardinalityError: Label 'The number of guests requested (%1) exceeds the maximum number of guests in setup (%2)';
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.do-admit-member-card');
 
         if (Quantity < 1) then
             Quantity := 1;
@@ -450,6 +463,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (not Ticket.FindFirst()) then
             Ticket.Init();
 
+        Span.Finish();
         exit(Ticket.SystemId);
     end;
 
@@ -730,7 +744,11 @@ codeunit 6185130 "NPR SG SpeedGate"
         MemberCard: Record "NPR MM Member Card";
         Ticket: Record "NPR TM Ticket";
         ReferenceNumberIsTicket, ReferenceNumberIsMemberCard : Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.wallet_validation');
+
         Number := ValidationRequest.ReferenceNo;
         SuggestedAdmissionCode := ValidationRequest.AdmissionCode;
 
@@ -771,6 +789,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         end;
 
         EntityId := Wallet.SystemId;
+        Span.Finish();
         exit(true);
     end;
 
@@ -863,7 +882,18 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(true);
     end;
 
-    local procedure CheckForTicketRequest(TicketProfileCode: Code[10]; ValidationRequest: Record "NPR SGEntryLog"; var NumberIdentified: Boolean): Boolean
+    local procedure CheckForTicketRequest(TicketProfileCode: Code[10]; ValidationRequest: Record "NPR SGEntryLog"; var NumberIdentified: Boolean) IsValid: Boolean
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+    begin
+        Sentry.StartSpan(Span, 'bc.speedgate.ticket_request-validation');
+        IsValid := IsTicketRequestValidForAdmit(TicketProfileCode, ValidationRequest, NumberIdentified);
+        Span.Finish();
+        exit(IsValid);
+    end;
+
+    local procedure IsTicketRequestValidForAdmit(TicketProfileCode: Code[10]; ValidationRequest: Record "NPR SGEntryLog"; var NumberIdentified: Boolean): Boolean
     var
         TicketProfile: Record "NPR SG TicketProfile";
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
@@ -996,15 +1026,21 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(CheckForTicket(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity));
     end;
 
-    local procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean; var SuggestedQuantity: Integer): Boolean
+    local procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean; var SuggestedQuantity: Integer) IsValid: Boolean
     var
         TicketProfile: Record "NPR SG TicketProfile";
         TicketProfileLine: Record "NPR SG TicketProfileLine";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         NumberIdentified := false;
 
-        if (TicketProfileCode = '') then
-            exit(IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity));
+        if (TicketProfileCode = '') then begin
+            Sentry.StartSpan(Span, 'bc.speedgate.ticket-validation-without-profile');
+            IsValid := IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity);
+            Span.Finish();
+            exit(IsValid);
+        end;
 
         if (not TicketProfile.Get(TicketProfileCode)) then
             exit(false); // Ticket profile is invalid - all tickets are denied
@@ -1014,7 +1050,10 @@ codeunit 6185130 "NPR SG SpeedGate"
             if (TicketProfileLine.IsEmpty()) then
                 exit(false); // Ticket profile is empty - all tickets are denied
 
-        exit(IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity));
+        Sentry.StartSpan(Span, 'bc.speedgate.ticket-validation-with-profile');
+        IsValid := IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity);
+        Span.Finish();
+        exit(IsValid);
     end;
 
     local procedure HandleEndOfSaleTryAdmitTicket(Number: Text[100]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var NumberIdentified: Boolean; var SuggestedQuantity: Integer): Boolean
@@ -1223,15 +1262,21 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(true);
     end;
 
-    local procedure CheckForMemberCard(MemberCardProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var MemberCardId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
+    local procedure CheckForMemberCard(MemberCardProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var MemberCardId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean) IsValid: Boolean
     var
         MemberCardProfile: Record "NPR SG MemberCardProfile";
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         NumberIdentified := false;
 
-        if (MemberCardProfileCode = '') then
-            exit(IsMemberCardValidForAdmit(MemberCardProfileCode, Number, SuggestedAdmissionCode, MemberCardId, AdmitToCodes, ProfileLineId, NumberIdentified));
+        if (MemberCardProfileCode = '') then begin
+            Sentry.StartSpan(Span, 'bc.speedgate.member-card-validation-without-profile');
+            IsValid := IsMemberCardValidForAdmit(MemberCardProfileCode, Number, SuggestedAdmissionCode, MemberCardId, AdmitToCodes, ProfileLineId, NumberIdentified);
+            Span.Finish();
+            exit(IsValid);
+        end;
 
         if (not MemberCardProfile.Get(MemberCardProfileCode)) then
             exit(false); // MemberCard profile is invalid - all cards are denied
@@ -1241,7 +1286,10 @@ codeunit 6185130 "NPR SG SpeedGate"
             if (MemberCardProfileLine.IsEmpty()) then
                 exit(false); // MemberCard profile is empty - all cards are denied
 
-        exit(IsMemberCardValidForAdmit(MemberCardProfileCode, Number, SuggestedAdmissionCode, MemberCardId, AdmitToCodes, ProfileLineId, NumberIdentified));
+        Sentry.StartSpan(Span, 'bc.speedgate.member-card-validation-with-profile');
+        IsValid := IsMemberCardValidForAdmit(MemberCardProfileCode, Number, SuggestedAdmissionCode, MemberCardId, AdmitToCodes, ProfileLineId, NumberIdentified);
+        Span.Finish();
+        exit(IsValid);
     end;
 
     local procedure IsMemberCardValidForAdmit(MemberCardProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var MemberCardId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean

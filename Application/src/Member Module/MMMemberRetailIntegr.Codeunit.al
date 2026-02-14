@@ -534,7 +534,10 @@
         NotificationAddress: Text[100];
         NotificationMethod: Code[10];
         NotificationEngine: Option;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.ticket.issue.from-member-card-scan');
 
         Item.Get(ItemNo);
         if (not TicketType.Get(Item."NPR Ticket Type")) then begin
@@ -565,6 +568,7 @@
         if (not TicketRequestManager.GetTokenTicket(Token, TicketNo)) then
             Error(TICKET_NOT_FOUND);
 
+        Span.Finish();
         exit(0);
     end;
 

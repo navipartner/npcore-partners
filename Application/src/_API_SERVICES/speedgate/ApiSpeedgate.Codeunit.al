@@ -134,9 +134,12 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
         SpeedgateHandler: Codeunit "NPR ApiSpeedgateHandler";
         ResponseMessage: Text;
         ApiError: Enum "NPR API Error Code";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         StartTime: Time;
     begin
         StartTime := Time();
+        Sentry.StartSpan(Span, 'bc.speedgate_api.handler');
         Commit();
         ClearLastError();
 
@@ -145,7 +148,9 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
 
         if (SpeedgateHandler.Run()) then begin
             Response := SpeedgateHandler.GetResponse();
+
             LogMessage(Request, Function, (Time() - StartTime), Response.GetStatusCode(), Response);
+            Span.Finish();
             exit(Response);
         end;
 
@@ -160,6 +165,7 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
 
         Response.CreateErrorResponse(ApiError, ResponseMessage);
         LogMessage(Request, Function, (Time() - StartTime), Response.GetStatusCode(), Response);
+        Span.Finish();
         exit(Response);
     end;
 

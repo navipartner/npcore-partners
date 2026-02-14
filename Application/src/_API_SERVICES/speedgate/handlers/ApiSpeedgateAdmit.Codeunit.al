@@ -231,7 +231,11 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         ValidationRequest: Record "NPR SGEntryLog";
         TicketId: Guid;
         Quantity: Integer;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.admit');
+
         ValidationRequest.SetCurrentKey(Token);
         ValidationRequest.SetFilter(Token, '=%1', Token);
         ValidationRequest.SetFilter(EntryStatus, '=%1', ValidationRequest.EntryStatus::PERMITTED_BY_GATE);
@@ -267,10 +271,14 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             until (ValidationRequest.Next() = 0);
         end;
 
+        Span.Finish();
         exit(ResponseJson);
     end;
 
     local procedure AdmitWallet(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if (ValidationRequest.ExtraEntityTableId = 0) then
             Error('The tryAdmit request was not able to preselect a product for admission.');
@@ -278,18 +286,25 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         if (not (ValidationRequest.ExtraEntityTableId in [Database::"NPR TM Ticket", Database::"NPR MM Member Card"])) then
             Error('The admit request contains an unhandled Entity: %1', ValidationRequest.ExtraEntityTableId);
 
+        Sentry.StartSpan(Span, 'bc.speedgate.admit-wallet');
+
         if (ValidationRequest.ExtraEntityTableId = Database::"NPR TM Ticket") then
             AdmitTicket(ValidationRequest, ResponseJson, Quantity);
 
         if (ValidationRequest.ExtraEntityTableId = Database::"NPR MM Member Card") then
             AdmitMemberCard(ValidationRequest, ResponseJson, 1);
+
+        Span.Finish();
     end;
 
     local procedure AdmitTicket(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer)
     var
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket: Record "NPR TM Ticket";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.admit-ticket');
         Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitTicket(ValidationRequest, Quantity));
 
         ResponseJson
@@ -304,13 +319,17 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .AddProperty('ticketNumber', ValidationRequest.AdmittedReferenceNo)
             .EndObject();
+        Span.Finish();
     end;
 
     local procedure AdmitTicketRequest(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
     var
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket: Record "NPR TM Ticket";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.admit-ticket-request');
         Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitTicket(ValidationRequest));
 
         ResponseJson
@@ -325,6 +344,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .AddProperty('ticketNumber', ValidationRequest.AdmittedReferenceNo)
             .EndObject();
+        Span.Finish();
     end;
 
     local procedure AdmitMemberCard(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer): Guid
@@ -332,7 +352,10 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket, GuestTicket : Record "NPR TM Ticket";
         ValidationRequestResponse: Record "NPR SGEntryLog";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.admit-membercard');
         Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitMemberCard(ValidationRequest, Quantity));
 
         if (Quantity = 1) then
@@ -373,6 +396,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 until (ValidationRequestResponse.Next() = 0);
             end;
         end;
+        Span.Finish();
 
         exit(Ticket.SystemId);
     end;
@@ -381,7 +405,10 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     var
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket: Record "NPR TM Ticket";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.speedgate.admit-doclxcitycard');
         Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitDocLXCityCard(ValidationRequest));
 
         ResponseJson
@@ -396,6 +423,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .AddProperty('ticketNumber', ValidationRequest.AdmittedReferenceNo)
             .EndObject();
+        Span.Finish();
     end;
 
     internal procedure MarkAsDenied(var Request: Codeunit "NPR API Request"; ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text) Response: Codeunit "NPR API Response"
@@ -460,10 +488,13 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         ValidationRequest: Record "NPR SGEntryLog";
         ApiError: Enum "NPR API Error Code";
         ResponseJson: Codeunit "NPR JSON Builder";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-
+        Sentry.StartSpan(Span, 'bc.speedgate.try-admit.check-number');
         SpeedGateMgr.CheckNumberAtGate(LogEntryNo);
         ValidationRequest.Get(LogEntryNo);
+        Span.Finish();
 
         if (not (ValidationRequest.EntryStatus = ValidationRequest.EntryStatus::PERMITTED_BY_GATE)) then begin
             ApiError := Enum::"NPR API Error Code".FromInteger(ValidationRequest.ApiErrorNumber);
