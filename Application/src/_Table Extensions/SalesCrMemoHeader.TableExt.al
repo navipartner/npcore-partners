@@ -125,8 +125,14 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             Caption = 'Incoming Ecommerce Sale Id';
             DataClassification = CustomerContent;
         }
-    }
 
+    }
+    keys
+    {
+        key(EcommSaleId; "NPR Inc Ecom Sale Id")
+        {
+        }
+    }
     internal procedure OpenMagentPaymentLines() LookUpOk: Boolean
     var
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";

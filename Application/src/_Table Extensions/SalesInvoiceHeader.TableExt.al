@@ -198,5 +198,11 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             DataClassification = CustomerContent;
         }
     }
+    keys
+    {
+        key(EcommSaleId; "NPR Inc Ecom Sale Id")
+        {
+        }
+    }
 }
 
