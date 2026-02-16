@@ -21,6 +21,7 @@ codeunit 6014606 "NPR Graph API Management"
         Scope: Text;
         EncodedScope: Text;
         State: Integer;
+        ExpiresIn: Integer;
 #ENDIF
         AccessToken, RefreshToken, AuthCodeError : Text;
         AccesTokenMsg: Label 'Access token acquired.';
@@ -40,7 +41,7 @@ codeunit 6014606 "NPR Graph API Management"
         AuthCode := NPROAuthControlAddIn.GetAuthCode();
         AuthCodeError := NPROAuthControlAddIn.GetAuthError();
         NPROAuthControlAddIn.SetTenant('common');
-        NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, _GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", AccessToken, RefreshToken);
+        NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, _GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", AccessToken, RefreshToken, ExpiresIn);
 #ENDIF
         if (AccessToken = '') or (AuthCodeError <> '') then
             Error(FailErr, AuthCodeError);

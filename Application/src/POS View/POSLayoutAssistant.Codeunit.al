@@ -23,7 +23,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
              'UserCulture',
              'CallRefreshData',
              'LegacyPOSMenus',
-             'GetUserImpersonationOAuthToken']
+             'GetUserImpersonationOAuthToken',
+             'RefreshUserImpersonationOAuthToken']
         then
             Handled := true;
 
@@ -52,6 +53,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 GetPOSMenus(Context, FrontEnd);
             'GetUserImpersonationOAuthToken':
                 GetUserImpersonationOAuthToken(Context, FrontEnd);
+            'RefreshUserImpersonationOAuthToken':
+                RefreshUserImpersonationOAuthToken(Context, FrontEnd);
         end;
     end;
 
@@ -463,6 +466,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
         Response: JsonObject;
         Success: Boolean;
         AccessToken: Text;
+        RefreshToken: Text;
+        ExpiresIn: Integer;
         FeatureEnabled: Boolean;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
         AuthCodeErr: Text;
@@ -489,7 +494,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
             if NaviPartnerFeature.IsFeatureEnabled() then begin
                 State := Random(10000);
                 RedirectURLText := RedirectURL;
-                Scope := 'https://api.businesscentral.dynamics.com/user_impersonation https://api.businesscentral.dynamics.com/Financials.ReadWrite.All';
+                Scope := 'https://api.businesscentral.dynamics.com/user_impersonation https://api.businesscentral.dynamics.com/Financials.ReadWrite.All offline_access';
                 EncodedScope := TypeHelper.UrlEncode(Scope);
                 URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5', AzureADTenant.GetAadTenantId(), ClientId, TypeHelper.UrlEncode(RedirectURLText), State, EncodedScope);
                 NPROAuthControlAddIn.SetRequestProps(URLText);
@@ -497,7 +502,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 AuthCode := NPROAuthControlAddIn.GetAuthCode();
                 AuthCodeErr := NPROAuthControlAddIn.GetAuthError();
                 NPROAuthControlAddIn.SetTenant(AzureADTenant.GetAadTenantId());
-                NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, ClientId, ClientSecret, AccessToken);
+                NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, ClientId, ClientSecret, AccessToken, RefreshToken, ExpiresIn);
                 if (AccessToken <> '') and (AuthCodeErr = '') then
                     Success := true;
             end;
@@ -505,6 +510,47 @@ codeunit 6059925 "NPR POS Layout Assistant"
 #endif
         Response.Add('success', Success);
         Response.Add('token', AccessToken);
+        Response.Add('refreshToken', RefreshToken);
+        Response.Add('expiresIn', ExpiresIn);
+        Response.Add('featureEnabled', FeatureEnabled);
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+    end;
+
+    local procedure RefreshUserImpersonationOAuthToken(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        Response: JsonObject;
+        Success: Boolean;
+        AccessToken: Text;
+        NewRefreshToken: Text;
+        ExpiresIn: Integer;
+        FeatureEnabled: Boolean;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        NaviPartnerFeature: Interface "NPR Feature Management";
+        OldRefreshToken: Text;
+        ClientId: Label '68cf603a-ec34-4946-afe6-c43930b274c7', Locked = true;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        NPROAuthControlAddIn: Page "NPR OAuth ControlAddIn";
+        ClientSecret: Text;
+#endif
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        OldRefreshToken := _JsonHelper.GetJText(Context.AsToken(), 'refreshToken', false);
+        FeatureEnabled := AzureKeyVaultMgt.TryGetAzureKeyVaultSecret('DragonglassAppRegistrationClientSecret', ClientSecret);
+        if FeatureEnabled then begin
+            NaviPartnerFeature := Enum::"NPR Feature"::"POS Webservice Sessions";
+            if NaviPartnerFeature.IsFeatureEnabled() and (OldRefreshToken <> '') then begin
+                NPROAuthControlAddIn.SetTenant(AzureADTenant.GetAadTenantId());
+                NPROAuthControlAddIn.HandleRefreshToken(OldRefreshToken, ClientId, ClientSecret, AccessToken, NewRefreshToken, ExpiresIn);
+                if AccessToken <> '' then
+                    Success := true;
+            end;
+        end;
+#endif
+        Response.Add('success', Success);
+        Response.Add('token', AccessToken);
+        Response.Add('refreshToken', NewRefreshToken);
+        Response.Add('expiresIn', ExpiresIn);
         Response.Add('featureEnabled', FeatureEnabled);
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;

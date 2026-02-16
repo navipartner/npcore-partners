@@ -93,11 +93,12 @@ page 6059982 "NPR OAuth ControlAddIn"
     internal procedure RequestToken(AuthCode: Text; RedirectUrl: Text; ClientId: Text; ClientSecret: Text; var AccessToken: Text)
     var
         RefreshToken: Text;
+        ExpiresIn: Integer;
     begin
-        RequestToken(AuthCode, RedirectUrl, ClientId, ClientSecret, AccessToken, RefreshToken);
+        RequestToken(AuthCode, RedirectUrl, ClientId, ClientSecret, AccessToken, RefreshToken, ExpiresIn);
     end;
 
-    internal procedure RequestToken(AuthCode: Text; RedirectUrl: Text; ClientId: Text; ClientSecret: Text; var AccessToken: Text; var RefreshToken: Text)
+    internal procedure RequestToken(AuthCode: Text; RedirectUrl: Text; ClientId: Text; ClientSecret: Text; var AccessToken: Text; var RefreshToken: Text; var ExpiresIn: Integer)
     var
         TypeHelper: Codeunit "Type Helper";
         Client: HttpClient;
@@ -129,6 +130,43 @@ page 6059982 "NPR OAuth ControlAddIn"
             AccessToken := TempToken.AsValue().AsText();
         if ResponseJson.SelectToken('refresh_token', TempToken) then
             RefreshToken := TempToken.AsValue().AsText();
+        if ResponseJson.SelectToken('expires_in', TempToken) then
+            ExpiresIn := TempToken.AsValue().AsInteger();
+    end;
+
+    internal procedure HandleRefreshToken(OldRefreshToken: Text; ClientId: Text; ClientSecret: Text; var AccessToken: Text; var NewRefreshToken: Text; var ExpiresIn: Integer)
+    var
+        TypeHelper: Codeunit "Type Helper";
+        Client: HttpClient;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
+        RequestText: Text;
+        ResponseMsg: HttpResponseMessage;
+        ResponseJson: JsonToken;
+        TempToken: JsonToken;
+    begin
+        RequestText := StrSubstNo(
+            'client_id=%1&client_secret=%2&grant_type=refresh_token&refresh_token=%3',
+            ClientId,
+            ClientSecret,
+            TypeHelper.UrlEncode(OldRefreshToken)
+        );
+
+        Content.WriteFrom(RequestText);
+        Content.GetHeaders(ContentHeaders);
+        SetHeader(ContentHeaders, 'Content-Type', 'application/x-www-form-urlencoded');
+
+        if _TenantId = '' then
+            _TenantId := 'common';
+        Client.Post(StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/token', _TenantId), Content, ResponseMsg);
+
+        ResponseJson := ParseResponseAsJson(ResponseMsg);
+        if ResponseJson.SelectToken('access_token', TempToken) then
+            AccessToken := TempToken.AsValue().AsText();
+        if ResponseJson.SelectToken('refresh_token', TempToken) then
+            NewRefreshToken := TempToken.AsValue().AsText();
+        if ResponseJson.SelectToken('expires_in', TempToken) then
+            ExpiresIn := TempToken.AsValue().AsInteger();
     end;
 
     local procedure SetHeader(var Headers: HttpHeaders; Name: Text; Value: Text)
