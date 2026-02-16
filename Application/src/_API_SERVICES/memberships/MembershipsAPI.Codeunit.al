@@ -22,6 +22,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('GET', '/membership/list')) then
             exit(Handle(_ApiFunction::LIST_MEMBERSHIPS, Request));
 
+        if Request.Match('GET', '/membership/loyaltytags') then
+            exit(Handle(_ApiFunction::GET_LOYALTY_TAGS, Request));
+
         if (Request.Match('GET', '/membership/member')) then
             exit(Handle(_ApiFunction::FIND_MEMBER, Request));
 
@@ -173,6 +176,8 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if Request.Match('POST', '/membership/:membershipId/points') then
             exit(Handle(_ApiFunction::POINTS_REGISTER_SALE, Request));
 
+        if Request.Match('POST', '/membership/loyaltytags') then
+            exit(Handle(_ApiFunction::CREATE_LOYALTY_TAGS, Request));
 
         if (Request.Match('POST', '/membership/:membershipId/subscription/start')) then
             exit(Handle(_ApiFunction::ENTER_SUBSCRIPTION, Request));

@@ -56,6 +56,29 @@ types:
       - name: ExternalExternalBusinessUnitIdentifier
         value: "My businesss unit"
 
+  Tag:
+    docs: A key-value pair for storing additional metadata about a transaction.
+    properties:
+      key:
+        type: string
+        docs: The tag identifier (e.g., SALES-CHANNEL, REF-NO, CAMPAIGN)
+      value:
+        type: string
+        docs: The tag value
+    examples:
+      - name: ExampleTagSalesChannel
+        value:
+          key: "SALES-CHANNEL"
+          value: "WEB"
+      - name: ExampleTagRefNo
+        value:
+          key: "REF-NO"
+          value: "W23456782"
+      - name: ExampleTagCampaign
+        value:
+          key: "CAMPAIGN"
+          value: "BLACK FRIDAY"
+
   PointTransactionState:
     enum:
       - AUTHORIZED
@@ -89,6 +112,9 @@ types:
       externalSystemIdentifier: ExternalSystemIdentifier
       externalSystemUserIdentifier: ExternalSystemUserIdentifier
       externalBusinessUnitIdentifier: ExternalBusinessUnitIdentifier
+      tags:
+        type: optional<list<Tag>>
+        docs: Optional metadata tags to store additional context about the transaction (e.g., sales channel, campaign, reference numbers)
     examples:
       - name: ExampleAuthorizePointsRequest
         value:
@@ -101,6 +127,13 @@ types:
           externalSystemIdentifier: "BCTenant-POSStore"
           externalSystemUserIdentifier: "SalespersonCode"
           externalBusinessUnitIdentifier: $ExternalBusinessUnitIdentifier.ExternalExternalBusinessUnitIdentifier
+          tags:
+            - key: "SALES-CHANNEL"
+              value: "WEB"
+            - key: "REF-NO"
+              value: "W23456782"
+            - key: "CAMPAIGN"
+              value: "BLACK FRIDAY"
       - name: ExampleAuthorizePointsAssignmentRequest
         value:
           requestId: "11aa22bb-33cc-44dd-55ee-66ff77aa88bb"
@@ -355,6 +388,9 @@ types:
       externalBusinessUnitIdentifier: ExternalBusinessUnitIdentifier
       items: optional<list<RegisterSalesItem>>
       reservations: optional<list<RegisterSalesReservation>>
+      tags:
+        type: optional<list<Tag>>
+        docs: Optional metadata tags to store additional context about the sale (e.g., sales channel, campaign, reference numbers)
     examples:
       - name: ExampleRegisterSale
         value:
@@ -363,10 +399,17 @@ types:
           externalSystemIdentifier: "BCTenant-POSStore"
           externalSystemUserIdentifier: "SalespersonCode"
           externalBusinessUnitIdentifier: $ExternalBusinessUnitIdentifier.ExternalExternalBusinessUnitIdentifier
-          items: 
-          - $RegisterSalesItem.ExampleRegisterSalesItems 
-          reservations: 
+          items:
+          - $RegisterSalesItem.ExampleRegisterSalesItems
+          reservations:
           - $RegisterSalesReservation.ExampleRegisterSalesReservation
+          tags:
+            - key: "SALES-CHANNEL"
+              value: "WEB"
+            - key: "REF-NO"
+              value: "WEB-8969718092"
+            - key: "CAMPAIGN"
+              value: "SUMMER SALE"
 
 
   RegisterSalesItem:

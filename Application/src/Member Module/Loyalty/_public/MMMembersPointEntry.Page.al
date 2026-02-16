@@ -136,6 +136,29 @@
                     ToolTip = 'Specifies the value of the Variant Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("No. of Tags"; Rec."No. of Tags")
+                {
+                    ToolTip = 'Specifies the number of tags associated with this member point entry.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnDrillDown()
+                    var
+                        MemberPointEntryTag: Record "NPR MM Member Point Entry Tag";
+                        MemberPointEntryTagList: Page "NPR MM Memb. Point Entry Tags";
+                    begin
+                        MemberPointEntryTag.SetRange("Member Point Entry No.", Rec."Entry No.");
+                        MemberPointEntryTagList.SetTableView(MemberPointEntryTag);
+                        MemberPointEntryTagList.Run();
+                    end;
+                }
+            }
+        }
+        area(factboxes)
+        {
+            part(Tags; "NPR MM MembPntEntryTagsFactbox")
+            {
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                SubPageLink = "Member Point Entry No." = field("Entry No.");
             }
         }
     }

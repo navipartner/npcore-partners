@@ -39,12 +39,14 @@
         _MembershipEvents: Codeunit "NPR MM Membership Events";
 
     procedure RegisterSales(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSaleLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    var
+        TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
     begin
-        exit(RegisterSales(TmpAuthorizationIn, TmpSaleLinesIn, TmpPaymentLinesIn, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
+        exit(RegisterSales(TmpAuthorizationIn, TmpSaleLinesIn, TmpPaymentLinesIn, TempMembershipEntryTagBuffer, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    procedure RegisterSales(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSaleLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
+    procedure RegisterSales(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSaleLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
@@ -78,7 +80,7 @@
         TmpSaleLinesIn.Reset();
         if (TmpSaleLinesIn.FindSet()) then begin
             repeat
-                CreateSalesEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TmpSaleLinesIn, TotalEarnAmount);
+                CreateSalesEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TmpSaleLinesIn, TempMembershipEntryTagBuffer, TotalEarnAmount);
 
             until (TmpSaleLinesIn.Next() = 0);
         end;
@@ -87,14 +89,14 @@
         if (TmpPaymentLinesIn.FindSet()) then begin
             repeat
                 if (TmpPaymentLinesIn."Total Points" <> 0) then
-                    CreateCaptureEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TmpPaymentLinesIn, TotalBurnAmount);
+                    CreateCaptureEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TmpPaymentLinesIn, TempMembershipEntryTagBuffer, TotalBurnAmount);
 
             until (TmpPaymentLinesIn.Next() = 0);
         end;
 
         // Create compensation for amount not eligible for earn
         if (TotalBurnAmount <> 0) then
-            CreateNotEligibleEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TotalEarnAmount, TotalBurnAmount);
+            CreateNotEligibleEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TempMembershipEntryTagBuffer, TotalEarnAmount, TotalBurnAmount);
 
         // finalize store ledger and response
         Membership.CalcFields("Remaining Points");
@@ -111,12 +113,14 @@
     end;
 
     procedure ReservePoints(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpReserveLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    var
+        TempDummyMembershipEntryTagsBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
     begin
-        exit(ReservePoints(TmpAuthorizationIn, TmpReserveLinesIn, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
+        exit(ReservePoints(TmpAuthorizationIn, TmpReserveLinesIn, TempDummyMembershipEntryTagsBuffer, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    procedure ReservePoints(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpReserveLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
+    procedure ReservePoints(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpReserveLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         Membership: Record "NPR MM Membership";
@@ -150,7 +154,7 @@
         if (TmpReserveLinesIn.FindSet()) then begin
             repeat
                 if (TmpReserveLinesIn."Total Points" <> 0) then
-                    CreateReserveEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TmpReserveLinesIn);
+                    CreateReserveEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TmpReserveLinesIn, TempMembershipEntryTagBuffer);
 
             until (TmpReserveLinesIn.Next() = 0);
         end;
@@ -690,7 +694,7 @@
         exit(true);
     end;
 
-    local procedure CreateSalesEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TotalEarnAmount: Decimal)
+    local procedure CreateSalesEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; var TotalEarnAmount: Decimal)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -749,11 +753,13 @@
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
 
+        InsertTagsFromBuffer(MembershipPointsEntry."Entry No.", TempMembershipEntryTagBuffer);
+
         LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
         TotalEarnAmount += MembershipPointsEntry."Amount (LCY)";
     end;
 
-    local procedure CreateCaptureEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TotalBurnAmount: Decimal)
+    local procedure CreateCaptureEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; var TotalBurnAmount: Decimal)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -809,12 +815,14 @@
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
 
+        InsertTagsFromBuffer(MembershipPointsEntry."Entry No.", TempMembershipEntryTagBuffer);
+
         // Payment points are negative
         LoyaltyStoreLedger."Burned Points" += MembershipPointsEntry.Points;
         TotalBurnAmount += MembershipPointsEntry."Amount (LCY)";
     end;
 
-    local procedure CreateReserveEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
+    local procedure CreateReserveEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -867,6 +875,8 @@
 
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
+
+        InsertTagsFromBuffer(MembershipPointsEntry."Entry No.", TempMembershipEntryTagBuffer);
     end;
 
     local procedure IsReservationCancelled(AuthorizationCode: Text[40]): Boolean
@@ -904,25 +914,29 @@
 
     local procedure CreateCancelReserveEntry(AuthorizationCodeToCancel: Text[40]; var ReversedPoints: Integer): Boolean
     var
-        MembershipPointsEntry: Record "NPR MM Members. Points Entry";
+        ReservePointsEntry: Record "NPR MM Members. Points Entry";
+        CancelledPointsEntry: Record "NPR MM Members. Points Entry";
     begin
         ReversedPoints := 0;
-        MembershipPointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
-        MembershipPointsEntry.SetFilter("Authorization Code", '=%1', AuthorizationCodeToCancel);
-        MembershipPointsEntry.SetFilter("Entry Type", '=%1', MembershipPointsEntry."Entry Type"::RESERVE);
-        if (not MembershipPointsEntry.FindLast()) then
+        ReservePointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
+        ReservePointsEntry.SetFilter("Authorization Code", '=%1', AuthorizationCodeToCancel);
+        ReservePointsEntry.SetFilter("Entry Type", '=%1', ReservePointsEntry."Entry Type"::RESERVE);
+        if (not ReservePointsEntry.FindLast()) then
             exit(false);
 
-        MembershipPointsEntry."Entry No." := 0;
-        MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::RESERVE_CANCELLED;
-        MembershipPointsEntry.Points *= -1;
-        MembershipPointsEntry."Awarded Points" *= -1;
-        MembershipPointsEntry."Amount (LCY)" *= -1;
-        MembershipPointsEntry."Awarded Amount (LCY)" *= -1;
-        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
-        MembershipPointsEntry.Insert();
+        CancelledPointsEntry.TransferFields(ReservePointsEntry, false);
+        CancelledPointsEntry."Entry No." := 0;
+        CancelledPointsEntry."Entry Type" := CancelledPointsEntry."Entry Type"::RESERVE_CANCELLED;
+        CancelledPointsEntry.Points *= -1;
+        CancelledPointsEntry."Awarded Points" *= -1;
+        CancelledPointsEntry."Amount (LCY)" *= -1;
+        CancelledPointsEntry."Awarded Amount (LCY)" *= -1;
+        _MembershipEvents.OnBeforeInsertPointEntry(CancelledPointsEntry);
+        CancelledPointsEntry.Insert();
 
-        ReversedPoints := MembershipPointsEntry.Points;
+        CopyPointEntryTags(ReservePointsEntry."Entry No.", CancelledPointsEntry."Entry No.");
+
+        ReversedPoints := CancelledPointsEntry.Points;
         exit(true);
     end;
 
@@ -950,6 +964,8 @@
         _MembershipEvents.OnBeforeInsertPointEntry(CapturePointsEntry);
         CapturePointsEntry.Insert();
 
+        CopyPointEntryTags(ReservePointsEntry."Entry No.", CapturePointsEntry."Entry No.");
+
         ReservePointsEntry.Points := 0;
         ReservePointsEntry."Awarded Points" := 0;
         ReservePointsEntry."Awarded Amount (LCY)" := 0;
@@ -959,13 +975,12 @@
         exit(true);
     end;
 
-    local procedure CreateNotEligibleEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TotalEarnAmount: Decimal; TotalBurnAmount: Decimal)
+    local procedure CreateNotEligibleEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; TotalEarnAmount: Decimal; TotalBurnAmount: Decimal)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         EarnRatio: Decimal;
     begin
-
         MembershipPointsEntry.Init();
         MembershipPointsEntry."Entry No." := 0;
         MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::CAPTURE;
@@ -1005,7 +1020,43 @@
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
 
+        InsertTagsFromBuffer(MembershipPointsEntry."Entry No.", TempMembershipEntryTagBuffer);
+
         LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
+    end;
+
+    local procedure InsertTagsFromBuffer(MemberPointEntryNo: Integer; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
+    var
+        MemberPointEntryTag: Record "NPR MM Member Point Entry Tag";
+    begin
+        if TempMembershipEntryTagBuffer.IsEmpty() then
+            exit;
+
+        TempMembershipEntryTagBuffer.Reset();
+        if TempMembershipEntryTagBuffer.FindSet() then
+            repeat
+                MemberPointEntryTag.Init();
+                MemberPointEntryTag."Member Point Entry No." := MemberPointEntryNo;
+                MemberPointEntryTag."Tag Key" := TempMembershipEntryTagBuffer."Tag Key";
+                MemberPointEntryTag."Tag Value" := TempMembershipEntryTagBuffer."Tag Value";
+                MemberPointEntryTag.Insert();
+            until TempMembershipEntryTagBuffer.Next() = 0;
+    end;
+
+    local procedure CopyPointEntryTags(FromPointEntryNo: Integer; ToPointEntryNo: Integer)
+    var
+        SourceTag: Record "NPR MM Member Point Entry Tag";
+        DestinationTag: Record "NPR MM Member Point Entry Tag";
+    begin
+        SourceTag.SetRange("Member Point Entry No.", FromPointEntryNo);
+        if SourceTag.FindSet() then
+            repeat
+                DestinationTag.Init();
+                DestinationTag."Member Point Entry No." := ToPointEntryNo;
+                DestinationTag."Tag Key" := SourceTag."Tag Key";
+                DestinationTag."Tag Value" := SourceTag."Tag Value";
+                DestinationTag.Insert();
+            until SourceTag.Next() = 0;
     end;
 
     procedure InvoiceAllStorePoints()

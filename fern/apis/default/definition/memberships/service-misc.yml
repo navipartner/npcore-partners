@@ -4,6 +4,7 @@ imports:
   globalApiTypes: ./../global-api-types.yml
   simpleTypes: ./types/types-simple.yml
   compositeTypes: ./types/types-composite.yml
+  pointTypes: ./types/types-points.yml
 
 service:
   display-name: Miscellaneous
@@ -12,6 +13,37 @@ service:
 
   endpoints:
 
+    getLoyaltyTags:
+      docs: Retrieves all loyalty tag definitions available in the system
+      display-name: Get Loyalty Tags
+      method: GET
+      path: /loyaltytags
+      response: GetLoyaltyTagsResponse
+      examples:
+        - name: Get all loyalty tags
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: $GetLoyaltyTagsResponse.ExampleGetLoyaltyTags
+
+    createLoyaltyTags:
+      docs: Creates one or more loyalty tag definitions that can be used to tag point entries
+      display-name: Create Loyalty Tags
+      method: POST
+      path: /loyaltytags
+      request: CreateLoyaltyTagsRequest
+      response: CreateLoyaltyTagsResponse
+      examples:
+        - name: Create multiple loyalty tags
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $CreateLoyaltyTagsRequest.ExampleCreateLoyaltyTags
+          response:
+            body: $CreateLoyaltyTagsResponse.ExampleCreateLoyaltyTags
 
     resolveIdentifier:
       docs: Resolves number as a specific membership, member, or card
@@ -154,6 +186,80 @@ service:
 
 
 types:
+
+  LoyaltyTagDefinition:
+    docs: Defines a loyalty tag that can be attached to point entries
+    properties:
+      key:
+        type: string
+        docs: Unique identifier for the tag (e.g., "SALES-CHANNEL", "REF-NO")
+      description:
+        type: string
+        docs: Human-readable description of what this tag represents
+    examples:
+      - name: ExampleSalesChannelTag
+        value:
+          key: "SALES-CHANNEL"
+          description: "Identifies the sales channel where the transaction occurred"
+      - name: ExampleRefNoTag
+        value:
+          key: "REF-NO"
+          description: "External reference number for tracking"
+      - name: ExampleCampaignTag
+        value:
+          key: "CAMPAIGN"
+          description: "Campaign identifier for promotional tracking"
+
+  GetLoyaltyTagsResponse:
+    docs: Response containing all available loyalty tag definitions
+    properties:
+      tags:
+        type: list<LoyaltyTagDefinition>
+        docs: List of all loyalty tag definitions in the system
+    examples:
+      - name: ExampleGetLoyaltyTags
+        value:
+          tags:
+            - key: "SALES-CHANNEL"
+              description: "Identifies the sales channel where the transaction occurred"
+            - key: "REF-NO"
+              description: "External reference number for tracking"
+            - key: "CAMPAIGN"
+              description: "Campaign identifier for promotional tracking"
+
+  CreateLoyaltyTagsRequest:
+    docs: Request to create one or more loyalty tag definitions
+    properties:
+      tags:
+        type: list<LoyaltyTagDefinition>
+        docs: List of loyalty tags to create. Each tag key must be unique.
+    examples:
+      - name: ExampleCreateLoyaltyTags
+        value:
+          tags:
+            - key: "SALES-CHANNEL"
+              description: "Identifies the sales channel where the transaction occurred"
+            - key: "REF-NO"
+              description: "External reference number for tracking"
+
+  CreateLoyaltyTagsResponse:
+    docs: Response after creating loyalty tags
+    properties:
+      tags:
+        type: list<LoyaltyTagDefinition>
+        docs: List of successfully created loyalty tags
+      createdCount:
+        type: integer
+        docs: Number of tags that were created
+    examples:
+      - name: ExampleCreateLoyaltyTags
+        value:
+          tags:
+            - key: "SALES-CHANNEL"
+              description: "Identifies the sales channel where the transaction occurred"
+            - key: "REF-NO"
+              description: "External reference number for tracking"
+          createdCount: 2
 
   IdentifierTypeEnum:
     enum:

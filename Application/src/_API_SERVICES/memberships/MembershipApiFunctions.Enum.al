@@ -284,6 +284,14 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Get Membership Points transactions';
     }
+    value(605; GET_LOYALTY_TAGS)
+    {
+        Caption = 'Get loyalty tags';
+    }
+    value(606; CREATE_LOYALTY_TAGS)
+    {
+        Caption = 'Create loyalty tags';
+    }
 
 }
 #endif

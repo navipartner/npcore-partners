@@ -168,6 +168,13 @@
             Caption = 'Retail Id Line';
             DataClassification = CustomerContent;
         }
+        field(180; "No. of Tags"; Integer)
+        {
+            Caption = 'No. of Tags';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Member Point Entry Tag" where("Member Point Entry No." = field("Entry No.")));
+            Editable = false;
+        }
 
     }
 
@@ -191,4 +198,12 @@
         key(Key7; "Document No.", "Posting Date") { }
         key(Key8; "Redeem Reference No.", "Redeem Ref. Type", "Entry Type", Adjustment) { }
     }
+
+    trigger OnDelete()
+    var
+        MemberPointEntryTag: Record "NPR MM Member Point Entry Tag";
+    begin
+        MemberPointEntryTag.SetRange("Member Point Entry No.", Rec."Entry No.");
+        MemberPointEntryTag.DeleteAll();
+    end;
 }

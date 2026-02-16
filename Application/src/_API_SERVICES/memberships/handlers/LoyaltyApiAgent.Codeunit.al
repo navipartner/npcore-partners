@@ -5,6 +5,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
 
     var
         ReservationNotFoundLbl: Label 'The authorization code %1 is not valid.', Locked = true;
+        TagAlreadyExistsLbl: Label 'Loyalty tag with key "%1" already exists.', Comment = '%1 - Tag Key';
 
     internal procedure GetMembershipPoints(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
@@ -38,14 +39,15 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         Membership: Record "NPR MM Membership";
         TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempRegSalesBuffer: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
     begin
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
 
-        ValidateReservePointsRequest(Membership.SystemId, Request, TempAuthorization, TempRegSalesBuffer);
+        ValidateReservePointsRequest(Membership.SystemId, Request, TempAuthorization, TempRegSalesBuffer, TempMembershipEntryTagBuffer);
         TempAuthorization.Modify(false);
-        exit(ProcessReservePointsRequest(Membership.SystemId, TempAuthorization, TempRegSalesBuffer));
+        exit(ProcessReservePointsRequest(Membership.SystemId, TempAuthorization, TempRegSalesBuffer, TempMembershipEntryTagBuffer));
     end;
 
     internal procedure CancelReservationTransaction(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -86,15 +88,16 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempSaleLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
 
     begin
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
 
-        ValidateRegisterSaleRequest(Membership.SystemId, Request, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer);
+        ValidateRegisterSaleRequest(Membership.SystemId, Request, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer, TempMembershipEntryTagBuffer);
         TempAuthorization.Modify(false);
-        exit(ProcessRegisterSaleRequest(Membership.SystemId, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer));
+        exit(ProcessRegisterSaleRequest(Membership.SystemId, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer, TempMembershipEntryTagBuffer));
     end;
 
     internal procedure GetMembershipTransactions(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -175,11 +178,13 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         exit(JsonBuilder);
     end;
 
-    local procedure ValidateReservePointsRequest(MembershipSystemId: Guid; var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegSalesBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
+    local procedure ValidateReservePointsRequest(MembershipSystemId: Guid; var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegSalesBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         JsonHelper: Codeunit "NPR Json Helper";
         Body: JsonToken;
+        Tags: JsonToken;
+        Tag: JsonToken;
         ExpiresAtMinutes: Integer;
         RequestType: Option WITHDRAW,DEPOSIT;
     begin
@@ -222,9 +227,17 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         TempRegSalesBuffer."Currency Code" := GeneralLedgerSetup."LCY Code";
         TempRegSalesBuffer.Insert();
 
+        // Parse tags if present in the request
+        if JsonHelper.GetJsonToken(Body, 'tags', Tags) then
+            foreach Tag in Tags.AsArray() do begin
+                TempMembershipEntryTagBuffer.Init();
+                TempMembershipEntryTagBuffer."Tag Key" := CopyStr(JsonHelper.GetJText(Tag, 'key', true), 1, MaxStrLen(TempMembershipEntryTagBuffer."Tag Key"));
+                TempMembershipEntryTagBuffer."Tag Value" := CopyStr(JsonHelper.GetJText(Tag, 'value', true), 1, MaxStrLen(TempMembershipEntryTagBuffer."Tag Value"));
+                TempMembershipEntryTagBuffer.Insert();
+            end;
     end;
 
-    local procedure ValidateRegisterSaleRequest(MembershipSystemId: Guid; var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSaleLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
+    local procedure ValidateRegisterSaleRequest(MembershipSystemId: Guid; var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSaleLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -234,6 +247,8 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         PointItem: JsonToken;
         Reservations: JsonToken;
         Reservation: JsonToken;
+        Tags: JsonToken;
+        Tag: JsonToken;
         AuthorizationCode: Text;
     begin
         Body := Request.BodyJson();
@@ -293,9 +308,17 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
                 TempPaymentLineBuffer.Insert();
             end;
 
+        // Parse tags if present in the request
+        if JsonHelper.GetJsonToken(Body, 'tags', Tags) then
+            foreach Tag in Tags.AsArray() do begin
+                TempMembershipEntryTagBuffer.Init();
+                TempMembershipEntryTagBuffer."Tag Key" := CopyStr(JsonHelper.GetJText(Tag, 'key', true), 1, MaxStrLen(TempMembershipEntryTagBuffer."Tag Key"));
+                TempMembershipEntryTagBuffer."Tag Value" := CopyStr(JsonHelper.GetJText(Tag, 'value', true), 1, MaxStrLen(TempMembershipEntryTagBuffer."Tag Value"));
+                TempMembershipEntryTagBuffer.Insert();
+            end;
     end;
 
-    local procedure ProcessRegisterSaleRequest(MembershipSystemId: Guid; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSalesLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary) Response: Codeunit "NPR API Response"
+    local procedure ProcessRegisterSaleRequest(MembershipSystemId: Guid; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSalesLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary) Response: Codeunit "NPR API Response"
     var
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
@@ -306,21 +329,21 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         if TempSalesLineBuffer.IsEmpty then
             Success := LoyaltyPointsMgrServer.CaptureReservation(TempAuthorization, TempPaymentLineBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1)
         else
-            Success := LoyaltyPointsMgrServer.RegisterSales(TempAuthorization, TempSalesLineBuffer, TempPaymentLineBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1);
+            Success := LoyaltyPointsMgrServer.RegisterSales(TempAuthorization, TempSalesLineBuffer, TempPaymentLineBuffer, TempMembershipEntryTagBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1);
         if Success then
             exit(Response.RespondOK(RegisterSaleResponse(TempPointsResponse."Earned Points", -TempPointsResponse."Burned Points", TempPointsResponse.Balance)))
         else
             exit(Response.RespondBadRequest(StrSubstNo('%1 %2', ResponseMessageId, ResponseMessage)));
     end;
 
-    local procedure ProcessReservePointsRequest(MembershipSystemId: Guid; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegSalesBuffer: Record "NPR MM Reg. Sales Buffer" temporary) Response: Codeunit "NPR API Response"
+    local procedure ProcessReservePointsRequest(MembershipSystemId: Guid; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegSalesBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary) Response: Codeunit "NPR API Response"
     var
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
     begin
-        if (LoyaltyPointsMgrServer.ReservePoints(TempAuthorization, TempRegSalesBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1)) then
+        if (LoyaltyPointsMgrServer.ReservePoints(TempAuthorization, TempRegSalesBuffer, TempMembershipEntryTagBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1)) then
             exit(Response.RespondOK(AuthorizeResponse(TempPointsResponse."Authorization Code", TempPointsResponse."Expires At")))
         else
             exit(Response.RespondBadRequest(StrSubstNo('%1 %2', ResponseMessageId, ResponseMessage)));
@@ -395,6 +418,71 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         LoyaltySetup.SetRange(Code, MembershipSetup."Loyalty Code");
         LoyaltySetup.SetRange("Collection Period", LoyaltySetup."Collection Period"::AS_YOU_GO);
         exit(not LoyaltySetup.IsEmpty());
+    end;
+
+    internal procedure GetLoyaltyTags(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        LoyaltyTag: Record "NPR MM Loyalty Tag";
+        JsonBuilder: Codeunit "NPR Json Builder";
+    begin
+        JsonBuilder.StartObject()
+            .StartArray('tags');
+
+        if LoyaltyTag.FindSet() then
+            repeat
+                JsonBuilder.StartObject()
+                    .AddProperty('key', LoyaltyTag."Key")
+                    .AddProperty('description', LoyaltyTag.Description)
+                    .EndObject();
+            until LoyaltyTag.Next() = 0;
+
+        JsonBuilder.EndArray();
+        JsonBuilder.EndObject();
+        exit(Response.RespondOK(JsonBuilder));
+    end;
+
+    internal procedure CreateLoyaltyTags(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        LoyaltyTag: Record "NPR MM Loyalty Tag";
+        JsonHelper: Codeunit "NPR Json Helper";
+        JsonBuilder: Codeunit "NPR Json Builder";
+        TagsArray: JsonArray;
+        TagToken: JsonToken;
+        TagKey: Code[20];
+        TagDescription: Text[50];
+        CreatedCount: Integer;
+    begin
+        TagsArray := JsonHelper.GetJsonToken(Request.BodyJson(), 'tags').AsArray();
+        if TagsArray.Count() = 0 then
+            exit(Response.RespondBadRequest('Tags array cannot be empty'));
+
+        JsonBuilder.StartObject()
+            .StartArray('tags');
+
+        foreach TagToken in TagsArray do begin
+            TagKey := CopyStr(JsonHelper.GetJCode(TagToken, 'key', true), 1, MaxStrLen(LoyaltyTag."Key"));
+            TagDescription := CopyStr(JsonHelper.GetJText(TagToken, 'description', false), 1, MaxStrLen(LoyaltyTag.Description));
+
+            if LoyaltyTag.Get(TagKey) then
+                Error(TagAlreadyExistsLbl, TagKey);
+
+            LoyaltyTag.Init();
+            LoyaltyTag."Key" := TagKey;
+            LoyaltyTag.Description := TagDescription;
+            LoyaltyTag.Insert(true);
+
+            JsonBuilder.AddObject(JsonBuilder.StartObject()
+                .AddProperty('key', LoyaltyTag."Key")
+                .AddProperty('description', LoyaltyTag.Description)
+                .EndObject());
+            CreatedCount += 1;
+        end;
+
+        JsonBuilder.EndArray();
+        JsonBuilder.AddProperty('createdCount', CreatedCount);
+        JsonBuilder.EndObject();
+
+        exit(Response.RespondOK(JsonBuilder));
     end;
 
 }

@@ -134,24 +134,25 @@
           );
     end;
 
-    internal procedure RegisterPoints(PostingDate: Date; MembershipEntryNo: Integer; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; Adjustment: Boolean; SalesChannel: Code[20]) EntryCreated: Boolean
+    local procedure RegisterPoints(PostingDate: Date; MembershipEntryNo: Integer; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; Adjustment: Boolean; SalesChannel: Code[20]): Integer
     var
         Membership: Record "NPR MM Membership";
         ValueEntry: Record "Value Entry";
         Item: Record "Item";
+        PointEntryNo: Integer;
     begin
 
         if (ItemNo = '') then
-            exit;
+            exit(0);
 
         if (not Membership.Get(MembershipEntryNo)) then
-            exit;
+            exit(0);
 
         if (Membership."Customer No." = '') then
-            exit;
+            exit(0);
 
         if (not Item.Get(ItemNo)) then
-            exit;
+            exit(0);
 
         ValueEntry.Init();
         ValueEntry."Posting Date" := PostingDate;
@@ -165,7 +166,10 @@
         ValueEntry.Adjustment := Adjustment;
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
-        EntryCreated := CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY, PosUnitNo, SalesChannel);
+        if CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY, PosUnitNo, SalesChannel, PointEntryNo) then
+            exit(PointEntryNo);
+
+        exit(0);
     end;
 
     internal procedure CalculatePointsForTransactions(MembershipEntryNo: Integer; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal; AmountBase: Decimal; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var AwardedAmount: Decimal; var AwardedPoints: Integer; var PointsEarned: Integer; RuleReference: Integer) RuleTypeOut: Integer
@@ -325,6 +329,13 @@
 
     local procedure CreatePointEntryFromValueEntry(ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option; POSUnitNo: Code[10]; SalesChannel: Code[20]): Boolean
     var
+        DummyPointEntryNo: Integer;
+    begin
+        exit(CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSource, POSUnitNo, SalesChannel, DummyPointEntryNo));
+    end;
+
+    local procedure CreatePointEntryFromValueEntry(ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option; POSUnitNo: Code[10]; SalesChannel: Code[20]; var PointEntryNo: Integer): Boolean
+    var
         Membership: Record "NPR MM Membership";
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         MemberCommunity: Record "NPR MM Member Community";
@@ -338,6 +349,7 @@
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         CreatePointEntry: Boolean;
     begin
+        PointEntryNo := 0;
 
         CreatePointEntry := true;
         _MembershipEvents.OnBeforeCreatePointEntry(ValueEntry, LoyaltyPostingSource, POSUnitNo, CreatePointEntry);
@@ -459,6 +471,7 @@
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         if (MembershipPointsEntry.Insert()) then;
 
+        PointEntryNo := MembershipPointsEntry."Entry No.";
         AfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
         _MembershipEvents.OnAfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
 
@@ -1369,7 +1382,7 @@
 
     end;
 
-    internal procedure ManualRedeemPointsWithdraw(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; TransactionDate: Date; PostingDate: Date; Description: Text[50]) EntryNo: Integer
+    local procedure ManualRedeemPointsWithdraw(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; TransactionDate: Date; PostingDate: Date; Description: Text[50]): Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
@@ -1395,7 +1408,7 @@
 
     end;
 
-    procedure ManualRedeemPointsDeposit2(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; TransactionDate: Date; PostingDate: Date; Description: Text[50]) EntryNo: Integer
+    local procedure ManualRedeemPointsDeposit2(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; TransactionDate: Date; PostingDate: Date; Description: Text[50]): Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
@@ -2157,5 +2170,50 @@
 
         until (MembershipPointsEntry.Next() = 0);
 
+    end;
+
+    local procedure InsertTagsForPointEntry(MemberPointEntryNo: Integer; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
+    var
+        MemberPointEntryTag: Record "NPR MM Member Point Entry Tag";
+    begin
+        if TempMembershipEntryTagBuffer.IsEmpty() then
+            exit;
+
+        TempMembershipEntryTagBuffer.Reset();
+        if TempMembershipEntryTagBuffer.FindSet() then
+            repeat
+                MemberPointEntryTag.Init();
+                MemberPointEntryTag."Member Point Entry No." := MemberPointEntryNo;
+                MemberPointEntryTag."Tag Key" := TempMembershipEntryTagBuffer."Tag Key";
+                MemberPointEntryTag."Tag Value" := TempMembershipEntryTagBuffer."Tag Value";
+                MemberPointEntryTag.Insert();
+            until TempMembershipEntryTagBuffer.Next() = 0;
+    end;
+
+    internal procedure RegisterPoints(PostingDate: Date; MembershipEntryNo: Integer; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; Adjustment: Boolean; SalesChannel: Code[20]; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary) EntryCreated: Boolean
+    var
+        PointEntryNo: Integer;
+    begin
+        PointEntryNo := RegisterPoints(PostingDate, MembershipEntryNo, PosUnitNo, ItemNo, Quantity, DocumentNo, Amount, DiscountAmount, Adjustment, SalesChannel);
+        EntryCreated := PointEntryNo <> 0;
+
+        if EntryCreated then
+            InsertTagsForPointEntry(PointEntryNo, TempMembershipEntryTagBuffer);
+    end;
+
+    internal procedure ManualRedeemPointsWithdraw(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; TransactionDate: Date; PostingDate: Date; Description: Text[50]; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary) EntryNo: Integer
+    begin
+        EntryNo := ManualRedeemPointsWithdraw(MembershipEntryNo, ReceiptNo, Points, "Amount (LCY)", TransactionDate, PostingDate, Description);
+
+        if EntryNo <> 0 then
+            InsertTagsForPointEntry(EntryNo, TempMembershipEntryTagBuffer);
+    end;
+
+    internal procedure ManualRedeemPointsDeposit2(MembershipEntryNo: Integer; ReceiptNo: Code[20]; Points: Integer; "Amount (LCY)": Decimal; TransactionDate: Date; PostingDate: Date; Description: Text[50]; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary) EntryNo: Integer
+    begin
+        EntryNo := ManualRedeemPointsDeposit2(MembershipEntryNo, ReceiptNo, Points, "Amount (LCY)", TransactionDate, PostingDate, Description);
+
+        if EntryNo <> 0 then
+            InsertTagsForPointEntry(EntryNo, TempMembershipEntryTagBuffer);
     end;
 }

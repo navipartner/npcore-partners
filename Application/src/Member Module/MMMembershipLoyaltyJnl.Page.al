@@ -194,6 +194,13 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
                     ToolTip = 'Specifies the value of the Sales Channel field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(HasTags; HasTagsForLine())
+                {
+                    Caption = 'Has Tags';
+                    ToolTip = 'Indicates whether this journal line has loyalty tags assigned.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+                }
                 field(JournalName; Rec.JournalName)
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -262,6 +269,28 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
                     PointEntryList.Run();
                 end;
             }
+            action(LoyaltyJournalTags)
+            {
+                Caption = 'Tags';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                ToolTip = 'Open the Loyalty Journal Tags page to define tags for this journal line';
+                Image = RelatedInformation;
+
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                Scope = Repeater;
+
+                trigger OnAction();
+                var
+                    LoyaltyJnlLineTags: Page "NPR MM Loyalty Jnl Line Tags";
+                begin
+                    LoyaltyJnlLineTags.SetJournalLineEntryNo(Rec.EntryNo);
+                    LoyaltyJnlLineTags.RunModal();
+                    CurrPage.Update(false);
+                end;
+            }
         }
     }
 
@@ -285,6 +314,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
     var
         MembershipLoyaltyJnl: Record "NPR MM MembershipLoyaltyJnl";
         TempMembershipLoyaltyJnl: Record "NPR MM MembershipLoyaltyJnl" temporary;
+        TempEntryNoBuffer: Record "Integer" temporary;
     begin
         // Process in sets of membership and document
         if (JournalToPost <> '') then
@@ -309,7 +339,11 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
             MembershipLoyaltyJnl.SetFilter(DocumentNo, '=%1', TempMembershipLoyaltyJnl.DocumentNo);
             MembershipLoyaltyJnl.FindSet();
             repeat
-                CASE (MembershipLoyaltyJnl.Type) OF
+                // Collect EntryNo for tag deletion
+                TempEntryNoBuffer.Number := MembershipLoyaltyJnl.EntryNo;
+                if TempEntryNoBuffer.Insert() then;
+
+                case (MembershipLoyaltyJnl.Type) of
                     MembershipLoyaltyJnl.Type::EARN:
                         RegisterEarnPoints(MembershipLoyaltyJnl);
                     MembershipLoyaltyJnl.Type::WITHDRAW:
@@ -318,6 +352,10 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
                         DepositPoints(MembershipLoyaltyJnl);
                 end;
             until (MembershipLoyaltyJnl.Next() = 0);
+
+            // Delete all tags for processed journal lines
+            DeleteTagsForEntryNos(TempEntryNoBuffer);
+            TempEntryNoBuffer.DeleteAll();
 
             MembershipLoyaltyJnl.DeleteAll();
             Commit();
@@ -328,6 +366,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
     local procedure RegisterEarnPoints(MembershipLoyaltyJnl: Record "NPR MM MembershipLoyaltyJnl")
     var
         Membership: Record "NPR MM Membership";
+        TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         AmountExclVat: Decimal;
         DiscAmtExclVat: Decimal;
@@ -337,29 +376,37 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         Membership.TestField("Customer No.");
         AmountExclVat := ExcludeVat(MembershipLoyaltyJnl.AmountInclVat, MembershipLoyaltyJnl.ItemNo);
         DiscAmtExclVat := ExcludeVat(MembershipLoyaltyJnl.AmountInclVat - MembershipLoyaltyJnl.UnitPrice * MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.ItemNo);
-        LoyaltyPointManagement.RegisterPoints(MembershipLoyaltyJnl.DocumentDate, Membership."Entry No.", MembershipLoyaltyJnl.POSUnitNo, MembershipLoyaltyJnl.ItemNo, MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.DocumentNo, AmountExclVat, DiscAmtExclVat, true, MembershipLoyaltyJnl."Sales Channel");
+
+        LoadTagsForJournalLine(MembershipLoyaltyJnl.EntryNo, TempMembershipEntryTagBuffer);
+        LoyaltyPointManagement.RegisterPoints(MembershipLoyaltyJnl.DocumentDate, Membership."Entry No.", MembershipLoyaltyJnl.POSUnitNo, MembershipLoyaltyJnl.ItemNo, MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.DocumentNo, AmountExclVat, DiscAmtExclVat, true, MembershipLoyaltyJnl."Sales Channel", TempMembershipEntryTagBuffer);
     end;
 
     local procedure WithdrawPoints(MembershipLoyaltyJnl: Record "NPR MM MembershipLoyaltyJnl")
     var
         Membership: Record "NPR MM Membership";
+        TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin
         Membership.SetFilter("External Membership No.", '=%1', MembershipLoyaltyJnl.ExternalMembershipNo);
         Membership.FindFirst();
         Membership.TestField("Customer No.");
-        LoyaltyPointManagement.ManualRedeemPointsWithdraw(Membership."Entry No.", MembershipLoyaltyJnl.DocumentNo, MembershipLoyaltyJnl.PointsToDepositOrWithdraw, 0, Today(), MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.Description);
+
+        LoadTagsForJournalLine(MembershipLoyaltyJnl.EntryNo, TempMembershipEntryTagBuffer);
+        LoyaltyPointManagement.ManualRedeemPointsWithdraw(Membership."Entry No.", MembershipLoyaltyJnl.DocumentNo, MembershipLoyaltyJnl.PointsToDepositOrWithdraw, 0, Today(), MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.Description, TempMembershipEntryTagBuffer);
     end;
 
     local procedure DepositPoints(MembershipLoyaltyJnl: Record "NPR MM MembershipLoyaltyJnl")
     var
         Membership: Record "NPR MM Membership";
+        TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin
         Membership.SetFilter("External Membership No.", '=%1', MembershipLoyaltyJnl.ExternalMembershipNo);
         Membership.FindFirst();
         Membership.TestField("Customer No.");
-        LoyaltyPointManagement.ManualRedeemPointsDeposit2(Membership."Entry No.", MembershipLoyaltyJnl.DocumentNo, MembershipLoyaltyJnl.PointsToDepositOrWithdraw, 0, Today(), MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.Description);
+
+        LoadTagsForJournalLine(MembershipLoyaltyJnl.EntryNo, TempMembershipEntryTagBuffer);
+        LoyaltyPointManagement.ManualRedeemPointsDeposit2(Membership."Entry No.", MembershipLoyaltyJnl.DocumentNo, MembershipLoyaltyJnl.PointsToDepositOrWithdraw, 0, Today(), MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.Description, TempMembershipEntryTagBuffer);
     end;
 
     local procedure CalculateEarnPoints(MembershipLoyaltyJnl: Record "NPR MM MembershipLoyaltyJnl"; var PointsEarned: Integer)
@@ -391,6 +438,36 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         end;
 
         LoyaltyPointManagement.CalculatePointsForTransactions(Membership."Entry No.", MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.ItemNo, '', MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.AmountInclVAT, false, MembershipLoyaltyJnl."Sales Channel", AwardedAmount, AwardedPoints, PointsEarned, RuleReference);
+    end;
+
+    local procedure LoadTagsForJournalLine(JournalLineEntryNo: Integer; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
+    var
+        LoyaltyJnlLineTag: Record "NPR MM Loyalty Jnl Line Tag";
+    begin
+        LoyaltyJnlLineTag.SetRange("Journal Line Entry No.", JournalLineEntryNo);
+        if LoyaltyJnlLineTag.FindSet() then
+            repeat
+                TempMembershipEntryTagBuffer.Init();
+                TempMembershipEntryTagBuffer."Tag Key" := LoyaltyJnlLineTag."Tag Key";
+                TempMembershipEntryTagBuffer."Tag Value" := LoyaltyJnlLineTag."Tag Value";
+                if TempMembershipEntryTagBuffer.Insert() then;
+            until LoyaltyJnlLineTag.Next() = 0;
+    end;
+
+    local procedure DeleteTagsForEntryNos(var TempEntryNoBuffer: Record "Integer" temporary)
+    var
+        LoyaltyJnlLineTag: Record "NPR MM Loyalty Jnl Line Tag";
+    begin
+        if TempEntryNoBuffer.IsEmpty() then
+            exit;
+
+        TempEntryNoBuffer.Reset();
+        if TempEntryNoBuffer.FindSet() then
+            repeat
+                LoyaltyJnlLineTag.SetRange("Journal Line Entry No.", TempEntryNoBuffer.Number);
+                if not LoyaltyJnlLineTag.IsEmpty() then
+                    LoyaltyJnlLineTag.DeleteAll();
+            until TempEntryNoBuffer.Next() = 0;
     end;
 
     local procedure ExcludeVat(ParamAmountInclVat: Decimal; ParamItemNo: Code[20]) AmountBase: Decimal
@@ -438,5 +515,13 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         MembershipListPage.GetRecord(Membership);
         ParamExternalMembershipNo := Membership."External Membership No.";
         exit(true);
+    end;
+
+    local procedure HasTagsForLine(): Boolean
+    var
+        LoyaltyJnlLineTag: Record "NPR MM Loyalty Jnl Line Tag";
+    begin
+        LoyaltyJnlLineTag.SetRange("Journal Line Entry No.", Rec.EntryNo);
+        exit(not LoyaltyJnlLineTag.IsEmpty());
     end;
 }
