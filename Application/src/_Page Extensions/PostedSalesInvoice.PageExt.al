@@ -247,6 +247,23 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                     SMSMgt.EditAndSendSMS(Rec);
                 end;
             }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            action("NPR SendDigitalNotification")
+            {
+                Caption = 'Send Digital Notification';
+                Image = SendMail;
+                ToolTip = 'Send a digital notification email with attached assets (tickets, vouchers, etc.) to the customer.';
+                ApplicationArea = NPRRetail;
+                Visible = IsDigitalNotifSetupValid;
+
+                trigger OnAction()
+                var
+                    DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+                begin
+                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec);
+                end;
+            }
+#endif
         }
         addlast(processing)
         {
@@ -399,6 +416,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         ShopifyIntegrationIsEnabled: Boolean;
 #endif
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        IsDigitalNotifSetupValid: Boolean;
         IsRSEInvoiceSent: Boolean;
         IsModelFilled: Boolean;
         IsDocForSendingToSEF: Boolean;
@@ -410,10 +428,17 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
 #if not BC17
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
 #endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+        ErrorMessage: Text;
+#endif
     begin
         OIOUBLInstalled := OIOUBLSetup.IsOIOUBLInstalled();
 #if not BC17
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
+#endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        IsDigitalNotifSetupValid := DigitalOrderNotifMgt.ValidateDigitalNotifSetup(ErrorMessage);
 #endif
     end;
 

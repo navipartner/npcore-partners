@@ -252,6 +252,23 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                     PrepaymentSalesCrMemo.RunModal();
                 end;
             }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            action("NPR SendDigitalNotification")
+            {
+                Caption = 'Send Digital Notification';
+                Image = SendMail;
+                ToolTip = 'Send a digital notification email with attached assets to the customer.';
+                ApplicationArea = NPRRetail;
+                Visible = IsDigitalNotifSetupValid;
+
+                trigger OnAction()
+                var
+                    DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+                begin
+                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec);
+                end;
+            }
+#endif
         }
         addlast(navigation)
         {
@@ -310,14 +327,22 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
         IsRSEInvoiceSent: Boolean;
         IsModelFilled: Boolean;
         IsDocForSendingToSEF: Boolean;
+        IsDigitalNotifSetupValid: Boolean;
 #endif
         OIOUBLInstalled: Boolean;
 
     trigger OnOpenPage()
     var
         OIOUBLSetup: Record "NPR OIOUBL Setup";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+        ErrorMessage: Text;
+#endif
     begin
         OIOUBLInstalled := OIOUBLSetup.IsOIOUBLInstalled();
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        IsDigitalNotifSetupValid := DigitalOrderNotifMgt.ValidateDigitalNotifSetup(ErrorMessage);
+#endif
     end;
 
     trigger OnAfterGetCurrRecord()

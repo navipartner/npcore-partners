@@ -145,5 +145,9 @@ enum 6059962 "NPR Retention Policy" implements "NPR IRetention Policy"
     {
         Implementation = "NPR IRetention Policy" = "NPR Ret.Pol.: SpfyWebhookNotif";
     }
+    value(35; "NPR Digital Notification Entry")
+    {
+        Implementation = "NPR IRetention Policy" = "NPR Ret.Pol.: Dig.Notif.Ent";
+    }
 }
 #endif

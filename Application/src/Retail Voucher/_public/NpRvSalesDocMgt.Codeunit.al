@@ -556,6 +556,10 @@
         SalesInvHeader: Record "Sales Invoice Header";
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        DigitalNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+#endif
     begin
         if not SalesHeader.Invoice then
             exit;
@@ -584,8 +588,17 @@
             exit;
 
         repeat
-            if NpRvVoucher.Get(NpRvVoucherEntry."Voucher No.") then
+            if NpRvVoucher.Get(NpRvVoucherEntry."Voucher No.") then begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                // Disable "Send via E-mail" in memory if digital notification will handle this voucher (no database modification)
+                if DigitalNotifMgt.ValidateDigitalNotifSetup() then begin
+                    NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
+                    if NpRvVoucherType.Get(NpRvVoucher."Voucher Type") and (NpRvVoucherType.PDFDesignerTemplateId <> '') then
+                        NpRvVoucher."Send via E-mail" := false;
+                end;
+#endif
                 SendVoucher(NpRvVoucher);
+            end;
         until NpRvVoucherEntry.Next() = 0;
     end;
 
