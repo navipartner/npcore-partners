@@ -537,7 +537,7 @@
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(Span, 'bc.pos.ticket.issue.from-member-card-scan');
+        Sentry.StartSpan(Span, 'bc.membership.issue-ticket-from-member-card-scan');
 
         Item.Get(ItemNo);
         if (not TicketType.Get(Item."NPR Ticket Type")) then begin
@@ -559,7 +559,7 @@
 #endif
 
         Token := TicketRequestManager.CreateReservationRequest(ItemNo, VariantCode, 1, Member."External Member No.");
-        TicketRequestManager.SetReservationRequestExtraInfo(Token, NotificationAddress, Member."External Member No.", Member."Display Name", Member.PreferredLanguageCode);
+        TicketRequestManager.SetReservationRequestExtraInfoSkipPriceCalculation(Token, NotificationAddress, Member."External Member No.", Member."Display Name", Member.PreferredLanguageCode);
         ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, FailWithError, ResponseMessage);
         if (ResponseCode <> 0) then
             exit(ResponseCode);

@@ -116,8 +116,9 @@
         TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
         TicketNotification: Record "NPR TM Ticket Notif. Entry";
         ExpireDateTime: DateTime;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-
         TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUncommitted;
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -129,6 +130,8 @@
         TicketReservationRequest.SetFilter("Request Status", '<>%1 & <>%2', TicketReservationRequest."Request Status"::RESERVED, TicketReservationRequest."Request Status"::WAITINGLIST);
         if (not TicketReservationRequest.FindSet()) then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.ticket.request-manager.delete-reservation-request');
 
         // If the entries we are about to delete has been included in statistics, we need to reverse the statistics
         // (when the detailed entries entry number is less than or equal to the highest access entry number in the statistics)
@@ -203,6 +206,7 @@
 
         until (TicketReservationRequest.Next() = 0);
 
+        Span.Finish();
     end;
 
     local procedure DetailedTicketAccessEntryDelete(TicketNo: Code[20])
@@ -462,7 +466,11 @@
     var
         Ticket: Record "NPR TM Ticket";
         AdmissionAllowOverAllocationConfirmed: Enum "NPR TM Ternary";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+
+        Sentry.StartSpan(Span, 'bc.ticket.request-manager.issue-ticket-for-reservation-line');
 
         if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then begin
             if (not TicketReservationRequest."Admission Created") then
@@ -481,6 +489,8 @@
 
             end;
         end;
+
+        Span.Finish();
     end;
 #endif
 
@@ -1002,7 +1012,11 @@
         Now: DateTime;
         RequestMutex: Record "NPR TM TicketRequestMutex";
         MutexKey: Text[100];
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.ticket.request-manager.confirm-reservation-request-line');
+
         Now := CurrentDateTime();
         FinalizeReservation := true;
         ResponseMessage := '';
@@ -1040,6 +1054,7 @@
             if (not TicketReservationRequestRead.FindFirst()) then begin
                 ResponseMessage := StrSubstNo(TOKEN_ALREADY_CONFIRMED_1206, Token);
                 ResponseCode := '-1206';
+                Span.Finish();
                 exit(true);
             end;
         end;
@@ -1132,6 +1147,7 @@
         if (not FinalizeReservation) then
             EmitMessageToTelemetry(ResponseMessage);
 
+        Span.Finish();
         exit(FinalizeReservation);
     end;
 #endif
@@ -1296,7 +1312,11 @@
         ExpiredTokens, DeletedTokens : List of [Text[100]];
         Token: Text[100];
         MySessionId: Integer;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.ticket.request-manager.expired-reservations');
+
         if (MaxNumberOfTokensPerSession <= 0) then
             MaxNumberOfTokensPerSession := 30;
 
@@ -1360,6 +1380,7 @@
                 EmitExpiryMessageToTelemetry(StrSubstNo('Reservation Request Expiry: expired: %1, deleted: %2.', ExpiredTokens.Count(), DeletedTokens.Count()), Verbosity::Normal);
         end;
 
+        Span.Finish();
         exit(ExpiredTokens.Count() + DeletedTokens.Count());
     end;
 
@@ -1778,6 +1799,16 @@
     end;
 
     procedure SetReservationRequestExtraInfo(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]; TicketHolderName: Text[100]; TicketHolderLanguage: Code[10]): Boolean
+    begin
+        exit(SetReservationRequestExtraInfoWorker(Token, NotificationAddress, ExternalOrderNo, TicketHolderName, TicketHolderLanguage, false));
+    end;
+
+    procedure SetReservationRequestExtraInfoSkipPriceCalculation(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]; TicketHolderName: Text[100]; TicketHolderLanguage: Code[10]): Boolean
+    begin
+        exit(SetReservationRequestExtraInfoWorker(Token, NotificationAddress, ExternalOrderNo, TicketHolderName, TicketHolderLanguage, true));
+    end;
+
+    local procedure SetReservationRequestExtraInfoWorker(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]; TicketHolderName: Text[100]; TicketHolderLanguage: Code[10]; SkipPriceCalculation: Boolean): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -1788,7 +1819,7 @@
 #endif
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetLoadFields("Request Status", "Receipt No.", "Notification Method", "Notification Address", "Payment Option", "External Order No.", "TicketHolderName", TicketHolderPreferredLanguage);
+        TicketReservationRequest.SetLoadFields("Request Status", "Receipt No.", "Notification Method", "Notification Address", "Payment Option", "External Order No.", "TicketHolderName", TicketHolderPreferredLanguage, AmountSource);
         if (not TicketReservationRequest.FindSet()) then
             exit(false);
 
@@ -1816,6 +1847,9 @@
 
             if (TicketHolderLanguage <> '') then
                 TicketReservationRequest.Validate(TicketHolderPreferredLanguage, TicketHolderLanguage);
+
+            if (SkipPriceCalculation) then
+                TicketReservationRequest.AmountSource := TicketReservationRequest.AmountSource::API; // Price will be provided by API caller, skip price calculation in the reservation request workflow
 
             TicketReservationRequest.Modify();
         until (TicketReservationRequest.Next() = 0);

@@ -66,7 +66,10 @@
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         DoReuseLogEntry: Boolean;
         TimeHelper: Codeunit "NPR TM TimeHelper";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.membership.arrival.log');
 
         DoReuseLogEntry := (ReUseLogEntryNo > 0);
         if (DoReuseLogEntry) then DoReuseLogEntry := MemberArrivalLogEntry.Get(ReUseLogEntryNo);
@@ -111,6 +114,7 @@
         MemberArrivalLogEntry.Modify();
         ReUseLogEntryNo := MemberArrivalLogEntry."Entry No.";
 
+        Span.Finish();
     end;
 
     local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
@@ -171,8 +175,10 @@
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         NewResponseMessage: Text;
         NewResponseCode: Integer;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-
+        Sentry.StartSpan(Span, 'bc.membership.arrival.check_limitations');
         // Get first rule that is violated
         RuleNo := CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, NewResponseMessage, NewResponseCode);
 
@@ -208,9 +214,9 @@
             ResponseCode := NewResponseCode;
             ResponseMessage := NewResponseMessage;
         end;
+        Span.Finish();
 
         InternalLogArrival(ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode, RuleNo);
-
         exit(RuleNo);
     end;
 

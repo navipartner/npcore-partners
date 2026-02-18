@@ -44,6 +44,8 @@
         ActiveSession: Record "Active Session";
         VerbosityLevel: Verbosity;
         StartTime: Time;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
 
         if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
@@ -68,7 +70,12 @@
 
         StartTime := Time();
         _TodaysDate := Today();
+
+        // This is a daily maintenance task, but the function is called on demand as well. 
+        // If this takes time, it means JQ is not running this task daily as it should.
+        Sentry.StartSpan(Span, 'bc.ticket.scheduler.daily-maintenance');
         CreateAdmissionScheduleWorker(AdmissionCode, Regenerate, ReferenceDate, CustomDimensions);
+        Span.Finish();
 
         CustomDimensions.Add('NPR_DurationMs', format((Time() - StartTime), 0, 9));
         Session.LogMessage('NPR_CreateAdmissionSchedule', 'CreateAdmissionSchedule Completed', VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);

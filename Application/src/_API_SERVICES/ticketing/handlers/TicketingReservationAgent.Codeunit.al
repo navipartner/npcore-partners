@@ -295,7 +295,12 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         ExternalId: List of [Integer];
         ResolvingTable: Integer;
         INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
+
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+
     begin
+        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.initialization');
         TicketRequestManager.ExpireReservationRequestsV2();
         Commit();
 
@@ -304,6 +309,9 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
         if (Token = '') then
             Token := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(Token));
+
+        Span.Finish();
+        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.insert-request');
 
         foreach LineToken in Lines do begin
 
@@ -346,11 +354,17 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                 ExternalId.Add(TicketRequest."Ext. Line Reference No.");
         end;
 
+        Span.Finish();
+        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.finalize');
+
         Success := TicketWebRequestManager.FinalizeTicketReservation(Token, ExternalId);
         if (not Success) then begin
             ResponseMessage := GetLastErrorText();
             exit(false);
         end;
+
+        Span.Finish();
+        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.decorate-response');
 
         TicketRequest.Reset();
         TicketRequest.ReadIsolation := TicketRequest.ReadIsolation::UpdLock;
@@ -406,6 +420,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Success := TicketResponse.Status;
         ResponseMessage := TicketResponse."Response Message";
 
+        Span.Finish();
         exit(Success);
     end;
 

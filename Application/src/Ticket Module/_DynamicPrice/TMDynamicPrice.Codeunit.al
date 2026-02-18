@@ -35,7 +35,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
-        Sentry.StartSpan(Span, 'bc.ticket.calc_dynamic_price');
+        Sentry.StartSpan(Span, 'bc.ticket.calc-dynamic-price');
 
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
             if (SaleLinePOS.Indentation > 0) then begin

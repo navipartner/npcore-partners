@@ -105,12 +105,14 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         Span: Codeunit "NPR Sentry Span";
     begin
         StartTime := Time();
-        Sentry.StartSpan(Span, 'bc.ticket_api.handler');
         Commit();
         ClearLastError();
 
-        Request.SkipCacheIfNonStickyRequest(TicketTransactionTables());
         ApiName := ApiFunction.Names.Get(ApiFunction.Ordinals.IndexOf(ApiFunction.AsInteger())).ToLower();
+        Sentry.StartSpan(Span, StrSubstNo('bc.ticket_api.handler.%1', ApiName));
+
+        Request.SkipCacheIfNonStickyRequest(TicketTransactionTables());
+
 
         TicketingApiHandler.SetRequest(ApiFunction, Request);
         if (TicketingApiHandler.Run()) then begin

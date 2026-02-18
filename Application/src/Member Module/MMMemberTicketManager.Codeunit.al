@@ -437,7 +437,10 @@
         ErrorReason: Text;
         ExternalItemNo: Code[50];
         Ticket: Record "NPR TM Ticket";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.membership.fast-check-in-no-print.find-reusable-ticket');
 
         Membership.Get(MembershipEntryNo);
         Member.Get(MemberEntryNo);
@@ -446,15 +449,18 @@
         TicketIsReused := SelectReusableTicket(Member."Entry No.", ExternalItemNo, AdmissionCode, PosUnitNo, Qty, TicketTokenToIgnore, Ticket);
         if ((not TicketIsReused) and (ExternalItemNo = '')) then
             Error(MemberTicketNotSetup, Member."External Member No.", AdmissionCode, PosUnitNo);
+        Span.Finish();
 
         // Create new ticket - only possible when ExternalItemNo <> ''
         if (not TicketIsReused) then begin
+            Sentry.StartSpan(Span, 'bc.membership.fast-check-in-no-print.issue-ticket');
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
                 Error(MISSING_CROSSREF, ExternalItemNo);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
             Ticket.Get(TicketNo);
+            Span.Finish();
         end;
 
         ExternalTicketNo := Ticket."External Ticket No.";

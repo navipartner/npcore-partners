@@ -35,7 +35,11 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         ResponseMessage: Text;
         RequestSuccess: Boolean;
         SalesDatetime: DateTime;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.ticket.import');
+
         if (not TicketSetup.Get()) then
             TicketSetup.Init();
 
@@ -76,6 +80,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         if (not RequestSuccess) then
             Error(ResponseMessage);
 
+        Span.Finish();
     end;
 
     internal procedure CleanUpFailedImport(JobId: Code[40])

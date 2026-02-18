@@ -137,11 +137,14 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
         StartTime: Time;
+        ApiName: Text;
     begin
         StartTime := Time();
-        Sentry.StartSpan(Span, 'bc.speedgate_api.handler');
         Commit();
         ClearLastError();
+
+        ApiName := Function.Names.Get(Function.Ordinals.IndexOf(Function.AsInteger())).ToLower();
+        Sentry.StartSpan(Span, StrSubstNo('bc.speedgate_api.handler.%1', ApiName));
 
         Request.SkipCacheIfNonStickyRequest(SpeedGateTransactionTables());
         SpeedgateHandler.SetRequest(Function, Request);

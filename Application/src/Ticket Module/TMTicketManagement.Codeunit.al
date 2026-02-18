@@ -478,7 +478,10 @@
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
         AdmissionEntryNo: Integer;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.ticket.validate-arrival');
 
         if (AdmissionCode = '') then
             AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
@@ -507,6 +510,7 @@
 
         OnAfterRegisterArrival(Ticket, AdmissionCode, AdmissionEntryNo);
 
+        Span.Finish();
     end;
 
     procedure ValidateTicketForDeparture(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];

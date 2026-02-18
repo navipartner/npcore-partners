@@ -226,11 +226,14 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         ApiError: Enum "NPR API Error Code";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        ApiName: Text;
     begin
         StartTime := Time();
-        Sentry.StartSpan(Span, 'bc.memberships_api.handler');
         Commit();
         ClearLastError();
+
+        ApiName := ApiFunction.Names.Get(ApiFunction.Ordinals.IndexOf(ApiFunction.AsInteger())).ToLower();
+        Sentry.StartSpan(Span, StrSubstNo('bc.membership_api.handler.%1', ApiName));
 
         Request.SkipCacheIfNonStickyRequest(MembershipTransactionTables());
 
