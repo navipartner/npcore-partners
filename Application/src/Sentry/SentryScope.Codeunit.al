@@ -105,6 +105,7 @@ codeunit 6150994 "NPR Sentry Scope"
         SentryHttpHeader: Codeunit "NPR Sentry Http";
         HttpHeaders: HttpHeaders;
         Span: Codeunit "NPR Sentry Span";
+        RequestUri: Text;
     begin
         Span.Create(_activeSpanId, StrSubstNo('HTTP %1 %2', Request.Method, Request.GetRequestUri), 'http.client');
         _spans.Add(Span);
@@ -113,13 +114,14 @@ codeunit 6150994 "NPR Sentry Scope"
             Request.GetHeaders(HttpHeaders);
             SentryHttpHeader.AddSentryTraceHeader(HttpHeaders, _transaction.GetTraceId(), _activeSpanId, _transaction.GetSampled());
         end;
-
+        RequestUri := Request.GetRequestUri;
         if HandleReturnValue then
             Success := Client.Send(Request, Response)
         else begin
             Client.Send(Request, Response);
             Success := true;
         end;
+        Request.SetRequestUri(RequestUri);   //Reset Uri to original value. overwrite the change made by client.Send
 
         Span.SetMetadata(Client, Request, Response, Success);
         Span.Finish();
