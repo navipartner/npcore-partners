@@ -1167,6 +1167,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (not TicketType.Get(Ticket."Ticket Type Code")) then
             TicketType.Init();
 
+        TicketProfileLine.Reset();
         repeat
             AdmissionLocalTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
             LocalTime := DT2Time(AdmissionLocalTime);
@@ -1226,28 +1227,29 @@ codeunit 6185130 "NPR SG SpeedGate"
                 exit(SetApiError(_ApiErrors::ticket_not_allowed));
         end;
 
+        TicketProfileLine.Reset();
         foreach AdmissionCode in AdmitToCodes do begin
-            AdmissionLocalTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
+            AdmissionLocalTime := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
             LocalTime := DT2Time(AdmissionLocalTime);
             LocalDate := DT2Date(AdmissionLocalTime);
 
             TicketProfileLine.SetFilter(Code, '=%1', TicketProfileCode);
             TicketProfileLine.SetFilter(ItemNo, '=%1', Ticket."Item No.");
             TicketProfileLine.SetFilter(RuleType, '=%1', TicketProfileLine.RuleType::REJECT);
-            TicketProfileLine.SetFilter(AdmissionCode, '=%1', AdmissionCode);
-            if (TicketProfileLine.IsEmpty()) then
-                TicketProfileLine.SetFilter(AdmissionCode, '=%1', '');
+            TicketProfileLine.SetFilter(AdmissionCode, '=%1|=%2', AdmissionCode, '');
+            if (TicketProfileLine.FindSet()) then begin
+                repeat
+                    IsRuleValid := true;
+                    if (TicketProfileLine.CalendarCode <> '') then
+                        IsRuleValid := not (CheckAdmissionIsNonWorking(AdmissionCode, TicketProfileLine.CalendarCode, LocalDate));
 
-            if (TicketProfileLine.FindFirst()) then begin
-                IsRuleValid := true;
-                if (TicketProfileLine.CalendarCode <> '') then
-                    IsRuleValid := not (CheckAdmissionIsNonWorking(TicketBom."Admission Code", TicketProfileLine.CalendarCode, LocalDate));
+                    if (TicketProfileLine.PermitFromTime <> 0T) and (TicketProfileLine.PermitUntilTime <> 0T) then
+                        IsRuleValid := IsRuleValid and (LocalTime >= TicketProfileLine.PermitFromTime) and (LocalTime <= TicketProfileLine.PermitUntilTime);
 
-                if (TicketProfileLine.PermitFromTime <> 0T) and (TicketProfileLine.PermitUntilTime <> 0T) then
-                    IsRuleValid := IsRuleValid and (LocalTime >= TicketProfileLine.PermitFromTime) and (LocalTime <= TicketProfileLine.PermitUntilTime);
+                    if (IsRuleValid) then
+                        RejectedAdmitToCodes.Add(AdmissionCode);
 
-                if (IsRuleValid) then
-                    RejectedAdmitToCodes.Add(AdmissionCode);
+                until (TicketProfileLine.Next() = 0);
             end;
         end;
 

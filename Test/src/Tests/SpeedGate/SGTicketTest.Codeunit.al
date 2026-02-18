@@ -1342,6 +1342,214 @@ codeunit 85217 "NPR SG TicketTest"
         Assert.AreEqual(AdmitCount, 2, StrSubstNo('Expected 2 admissions to be admitted, but got %1', AdmitCount));
     end;
 
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_07_Reject_01()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        Ticket: Record "NPR TM Ticket";
+        TicketProfileCode: Code[10];
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        RejectedAdmissionCode: Code[20];
+    begin
+        // Ticket has 2 admissions
+        ExternalTicketNumber := GetOneTicketWithTwoAdmissions();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+
+        WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
+
+        // profile: allow all (blank item/admission), then reject exactly 1 admission from BOM
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', 0T, 0T);
+
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindFirst();
+        RejectedAdmissionCode := TicketBom."Admission Code";
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", RejectedAdmissionCode, '', 0T, 0T);
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
+
+        // Should still be permitted (one admission remains after reject)
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, '', 'GATE01'));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_07_Reject_02()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        Ticket: Record "NPR TM Ticket";
+        TicketProfileCode: Code[10];
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+    begin
+        // Ticket has 2 admissions
+        ExternalTicketNumber := GetOneTicketWithTwoAdmissions();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+
+        WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
+
+        // profile: allow all, then reject both admissions (by iterating BOM)
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', 0T, 0T);
+
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindSet();
+        repeat
+            SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", TicketBom."Admission Code", '', 0T, 0T);
+        until TicketBom.Next() = 0;
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
+
+        // Nothing left after reject
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, '', 'GATE01'));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_07_Reject_03()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        Ticket: Record "NPR TM Ticket";
+        TicketProfileCode: Code[10];
+    begin
+        ExternalTicketNumber := GetOneTicketWithTwoAdmissions();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+
+        WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
+
+        // allow all admissions, then add ONE reject line with AdmissionCode=''
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', 0T, 0T);
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", '', '', 0T, 0T);
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
+
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, '', 'GATE01'));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_07_Reject_04()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        Ticket: Record "NPR TM Ticket";
+        TicketProfileCode: Code[10];
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        AdmissionCode: Code[20];
+    begin
+        ExternalTicketNumber := GetOneTicket();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+
+        WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
+
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        // allow by item
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, Ticket."Item No.", '', '', 0T, 0T);
+
+        // pick some admission from BOM for this ticket item
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindFirst();
+        AdmissionCode := TicketBom."Admission Code";
+
+        // Add a SPECIFIC reject that does NOT match time (future window),
+        // and also add a BLANK reject that would match always.
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", AdmissionCode, '', Time() + 5 * 1000, Time() + 10 * 1000);
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", '', '', 0T, 0T);
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
+
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, AdmissionCode, 'GATE01'));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_07_Reject_05()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        Ticket: Record "NPR TM Ticket";
+        TicketProfileCode: Code[10];
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+    begin
+        ExternalTicketNumber := GetOneTicket();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+
+        WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
+
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        // allow admission explicitly
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, Ticket."Item No.", TicketAccessEntry."Admission Code", '', 0T, 0T);
+
+        // reject only as blank admission (no admission-specific reject exists)
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", '', '', 0T, 0T);
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
+
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_07_Reject_06()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        Ticket: Record "NPR TM Ticket";
+        TicketProfileCode: Code[10];
+    begin
+        // Ticket with 2 admissions
+        ExternalTicketNumber := GetOneTicketWithTwoAdmissions();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+
+        WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
+
+        // Profile: allow all, then a single blank-admission reject that matches always
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', 0T, 0T);
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", '', '', 0T, 0T);
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
+
+        // Blank reject should apply to both admissions => rejected
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, '', 'GATE01'));
+    end;
+
+
+
+
     [Normal]
     procedure ValidatePermitted(AdmitToken: Guid) AdmitCount: Integer
     var
