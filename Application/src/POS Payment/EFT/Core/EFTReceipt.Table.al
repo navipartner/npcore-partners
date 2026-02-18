@@ -29,7 +29,7 @@
             Caption = 'Transaction Time';
             DataClassification = CustomerContent;
         }
-        field(5; "Text"; Text[60])
+        field(5; "Text"; Text[250])
         {
             Caption = 'Text';
             DataClassification = CustomerContent;
