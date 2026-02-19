@@ -597,6 +597,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
 
         TimeHelper: Codeunit "NPR TM TimeHelper";
+        MaxGroupSize: Integer;
     begin
         ResponseJson.StartArray(ArrayName);
 
@@ -613,12 +614,13 @@ codeunit 6185080 "NPR TicketingTicketAgent"
                     // Quantity changes from max to confirmed group size once the first admission is registered.
                     // if access date is 0, it means no one in the group has been admitted yet, and quantity represents the max group size. 
                     // Once access date is set, quantity represents the confirmed group size, which is the new (max) group size for the remaining ticket duration
+                    MaxGroupSize := Round(TicketAccessEntry.Quantity, 1);
                     if (TicketAccessEntry."Access Date" = 0D) then begin
-                        ResponseJson.AddProperty('maxGroupSize', TicketAccessEntry.Quantity);
+                        ResponseJson.AddProperty('maxGroupSize', MaxGroupSize);
                         ResponseJson.AddProperty('confirmedGroupSize'); // null, not confirmed yet
                     end else begin
-                        ResponseJson.AddProperty('maxGroupSize', TicketAccessEntry.Quantity);
-                        ResponseJson.AddProperty('confirmedGroupSize', TicketAccessEntry.Quantity);
+                        ResponseJson.AddProperty('maxGroupSize', MaxGroupSize);
+                        ResponseJson.AddProperty('confirmedGroupSize', MaxGroupSize);
                     end;
                 end;
 
