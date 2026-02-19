@@ -34,6 +34,41 @@ types:
       ticketRequest: optional<TicketRequestDetails>
 
 
+  TryAndAttemptAdmitResponse:
+    docs:
+      Combined response for the tryAndAttemptAdmit endpoint. Contains both the token identification result
+      (identical in structure to TryAdmitResponse) and any tokens that were automatically admitted within
+      the same request.
+      <br><br>
+      <b>Always check admittedTokens to confirm whether admission was completed.</b>
+      A successful HTTP 200 response only guarantees that the reference number was recognised — not that
+      admission was granted. The admittedTokens array is the sole indicator of whether the gate should open.
+      An empty admittedTokens means no admission occurred and the caller must follow up with a call to /admit.
+    properties:
+      token: simpleTypes.Token
+      referenceNumberType: simpleTypes.ReferenceNumberType
+
+      # In case of a member card
+      memberCard: optional<MemberCardDetails>
+
+      # In case of a ticket
+      ticket: optional<TicketDetail>
+
+      # In case of a wallet
+      wallet: optional<WalletDetails>
+
+      # In case of a DocLX City Card
+      docLxCityCard: optional<DocLxCityCardDetails>
+
+      # In case of a ticket request
+      ticketRequest: optional<TicketRequestDetails>
+
+      # Tokens that were automatically admitted during this request.
+      # An empty list means the reference was identified but admission could not proceed without
+      # additional operator input. The caller must call /admit with the token from this response.
+      admittedTokens: list<AdmitResponse>
+
+
   TicketDetail:
     docs:
       When attempting to admit a ticket, some ticket details should be provided.
@@ -262,6 +297,18 @@ types:
           printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
           printCount: 1
           memberCardId: $simpleTypes.MemberCardId.ExampleMemberCardId
+          ticketNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+      - name: ExampleAdmitWalletResponse
+        value:
+          token: $simpleTypes.Token.ExampleAdmitToken
+          referenceNumberType: wallet
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+          ticketId: $simpleTypes.TicketId.ExampleTicketId
+          status: admitted
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
+          printCount: 1
           ticketNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
 
 ############################

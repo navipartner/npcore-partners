@@ -187,8 +187,134 @@ service:
               referenceNumberType: ticketRequest
               ticketRequest: $compositeTypes.TicketRequestDetails.ExampleTicketRequestDetails
 
+    tryAndAttemptAdmit:
+      docs: |
+        This endpoint combines the [tryAdmit](try-admit) and [admitToken](admit-token) steps into a single call, eliminating a network
+        round-trip for straightforward admissions. The server first resolves the reference number, then immediately attempts to admit the
+        resolved token if admission can be determined without operator input.
+
+        <b>⚠ HTTP 200 does NOT mean admission was completed — always inspect `admittedTokens`</b>
+        <br>A successful HTTP 200 response only confirms that the reference number was recognized. Whether admission was actually carried
+        out must be determined by examining the `admittedTokens` array in the response.
+
+        <b>`admittedTokens` is non-empty</b> — Admission was completed automatically. The gate should open.
+
+        <b>`admittedTokens` is empty</b> — The reference number was recognized and one or more follow-up reference numbers may have been
+        issued, but admission could not be completed without additional operator input. The caller MUST follow up with a call to either
+        [`/admit`](admit-token) or [`/tryAndAttemptAdmit`](try-and-attempt-admit), using either the issued token (if available) or a
+        reference number from this response, together with any additional information the UI has gathered from the operator (e.g., which
+        ticket to use or how many attendees to admit).
+
+        <b>When will `admittedTokens` be empty?</b>
+        <br>Automatic admission is skipped whenever the server cannot unambiguously resolve the admission intent. Common scenarios include:
+
+        - <b>Wallet containing multiple valid assets</b> — The wallet holds more than one asset that is eligible for admission at this gate
+          and the system cannot choose one on behalf of the operator. `wallet.validToAdmit` will be false. Present the wallet’s assets to
+          the operator, let them select the correct asset, then call this endpoint again with the selected asset’s reference number from
+          the operator response.
+
+        - <b>Group ticket with unconfirmed attendee count</b> — A group ticket requires the operator to confirm the actual number of
+          attendees before admission can proceed. Call [`/admit`](admit-token) with the token and the confirmed quantity.
+
+        <b>Membership allowing guests</b>
+        <br>If the reference number corresponds to a membership, the member card itself may be admitted automatically (so `admittedTokens`
+        is non-empty). In that case, check the `guests` array for potential complimentary guests. Guests are not admitted automatically
+        because the system needs the operator to confirm which guests to admit. Call [`/admit`](admit-token) with the corresponding admit
+        token and the quantity of guests to admit for the selected category.
+
+      path: /tryAndAttemptAdmit
+      method: POST
+      request:
+        name: tryAndAttemptAdmit
+        body: compositeTypes.TryAdmitRequest
+      response:
+        docs: Returns the try result including type-specific details and any tokens that were automatically admitted.
+        type: compositeTypes.TryAndAttemptAdmitResponse
+
+      examples:
+        - name: "Ticket - Automatically Admitted"
+          docs:
+            The happy path for a simple ticket scan. The ticket was identified and admitted within
+            a single call. admittedTokens contains one entry — the gate should open immediately.
+            No follow-up call to /admit is needed.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleAdmitToken
+              referenceNumberType: ticket
+              ticket: $compositeTypes.TicketDetail.ExampleTicketDetail
+              admittedTokens:
+                - $compositeTypes.AdmitResponse.ExampleAdmitTicketResponse
+
+        - name: "Wallet - Single Valid Ticket, Automatically Admitted"
+          docs:
+            The wallet contains exactly one ticket eligible for admission at this gate.
+            wallet.validToAdmit is true, so the server admitted it automatically.
+            admittedTokens contains one entry — the gate should open. No follow-up call to /admit is needed.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleAdmitToken
+              referenceNumberType: wallet
+              wallet:
+                walletId: $simpleTypes.WalletId.ExampleWalletId
+                referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+                originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
+                printedAt: null
+                printCount: 0
+                validToAdmit: true
+                tickets:
+                  - $compositeTypes.TicketDetail.ExampleTicketDetail
+              admittedTokens:
+                - $compositeTypes.AdmitResponse.ExampleAdmitWalletResponse
+
+        - name: "Wallet - Multiple Valid Tickets, Operator Selection Required"
+          docs:
+            The wallet contains more than one ticket eligible for admission. The server cannot determine
+            which ticket to use without operator input, so admittedTokens is empty.
+            The gate must NOT open. wallet.validToAdmit is false.
+            Present wallet.tickets to the operator, let them select a ticket, then call this endpoint again with
+            the selected ticket from this response to complete the admission.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleAdmitToken
+              referenceNumberType: wallet
+              wallet:
+                walletId: $simpleTypes.WalletId.ExampleWalletId
+                referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+                originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
+                printedAt: null
+                printCount: 0
+                validToAdmit: false
+                tickets:
+                  - $compositeTypes.TicketDetail.ExampleTicketDetail
+                  - $compositeTypes.TicketDetail.ExampleTicketDetail2
+              admittedTokens: []
+
     admitToken:
-      docs: 
+      docs:
         This endpoint processes tokens received from tryAdmit to grant admission. Each token in the request specifies a quantity for admission (useful for guests).
         <br><br><b>Single Token Admission</b> Admit a single ticket by providing its token.
         <br><b>Multiple Token Admission</b> Use multiple tokens to admit a member and their guests, specifying quantities for each guest token (default is 1).
