@@ -4725,7 +4725,7 @@
             MemberInfoCapture."External Membership No." := AssignExternalMembershipNo(MembershipSetup."Community Code");
 
         Membership.SetFilter("External Membership No.", '=%1', MemberInfoCapture."External Membership No.");
-        Membership.SetFilter("Membership Code", '=%1', MembershipCode);
+        Membership.SetRange("Community Code", MembershipSetup."Community Code");
         if (Membership.IsEmpty()) then begin
             if (not CreateWhenMissing) then
                 exit(0);
@@ -4772,6 +4772,10 @@
                     Membership.TestField("Auto-Renew Payment Method Code");
                 MembershipModified := true;
             end;
+        end;
+        if Membership."Membership Code" <> MembershipCode then begin
+            Membership."Membership Code" := MembershipCode;
+            MembershipModified := true;
         end;
         if not IsNullGuid(MemberInfoCapture.ExternalMembershipSystemId) then
             if Membership.ExternalMembershipSystemId <> MemberInfoCapture.ExternalMembershipSystemId then begin
