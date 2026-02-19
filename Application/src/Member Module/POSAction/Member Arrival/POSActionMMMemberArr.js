@@ -1,7 +1,7 @@
 const main = async ({ workflow, popup, captions, parameters }) => {
   let memberCardDetails;
   let result;
-  debugger;
+  
   if (
     parameters.DefaultInputValue.length == 0 &&
     parameters.DialogPrompt == 1
@@ -16,6 +16,10 @@ const main = async ({ workflow, popup, captions, parameters }) => {
       (tempCardNumber === null || tempCardNumber === "")
     ) {
       tempCardNumber = memberCardDetails.MemberScanned.CardNumber;
+    }
+
+    if (parameters.DoNotSuggestTrackedMemberCard) {
+      tempCardNumber = "";
     }
 
     result = await popup.input({
@@ -38,7 +42,7 @@ const main = async ({ workflow, popup, captions, parameters }) => {
     parameters.ToastMessageTimer !== undefined &&
     parameters.ToastMessageTimer !== 0
       ? parameters.ToastMessageTimer
-      : 15;
+      : 5;
   if (memberCardDetails.MemberScanned && hideAfter > 0) {
     toast.memberScanned({
       memberImg: memberCardDetails.MemberScanned.ImageDataUrl,

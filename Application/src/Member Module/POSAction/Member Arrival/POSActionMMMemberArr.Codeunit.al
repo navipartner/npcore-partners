@@ -25,6 +25,8 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         ParamForeignCommunity_DescLbl: Label 'Specifies the Foreign Community Code';
         ToastMessageCaption: Label 'Toast Message Timer';
         ToastMessageDescription: Label 'Specifies the time in seconds the toast message is displayed.';
+        SuggestTrackedMemberCardLabel: Label 'Do Not Suggest Tracked Member Card';
+        SuggestTrackedMemberCardDesc: Label 'If enabled, the system will not suggest the tracked member card number in the dialog prompt.';
 
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -47,9 +49,10 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('AdmissionCode', '', ParamAdmissionCode_CptLbl, ParamAdmissionCode_DescLbl);
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInputValue_CptLbl, ParamDefaultInputValue_DescLbl);
         WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
-        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 15, ToastMessageCaption, ToastMessageDescription);
+        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 5, ToastMessageCaption, ToastMessageDescription);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
         WorkflowConfig.AddLabel('MembershipTitle', MembershipTitle);
+        WorkflowConfig.AddBooleanParameter('DoNotSuggestTrackedMemberCard', false, SuggestTrackedMemberCardLabel, SuggestTrackedMemberCardDesc);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -58,7 +61,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
             'MemberArrival':
                 FrontEnd.WorkflowResponse(SetMemberArrival(Context, Setup));
             'CheckMemberInitialized':
-                FrontEnd.WorkflowResponse(MemberInitialized());
+                FrontEnd.WorkflowResponse(InitializeWorkflow());
         end;
     end;
 
@@ -117,7 +120,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
     end;
 
-    local procedure MemberInitialized() Response: JsonObject
+    local procedure InitializeWorkflow() Response: JsonObject
     var
         POSMemberSession: Codeunit "NPR POS Member Session";
         POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
@@ -199,7 +202,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionMMMemberArr.js###
-'const main=async({workflow:r,popup:d,captions:i,parameters:n})=>{let e,m;debugger;if(n.DefaultInputValue.length==0&&n.DialogPrompt==1){e=await r.respond("CheckMemberInitialized");let a=n.DefaultInputValue;if(e!=null&&e.MemberScanned!=null&&e.MemberScanned.CardNumber!==""&&(a===null||a==="")&&(a=e.MemberScanned.CardNumber),m=await d.input({caption:i.MemberCardPrompt,title:i.MembershipTitle,value:a}),m===null)return" ";e=await r.respond("MemberArrival",{membercard_number:m})}else e=await r.respond("MemberArrival");const t=n.ToastMessageTimer!==null&&n.ToastMessageTimer!==void 0&&n.ToastMessageTimer!==0?n.ToastMessageTimer:15;e.MemberScanned&&t>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:e.MemberScanned.Valid,hideAfter:t,memberExpiry:e.MemberScanned.ExpiryDate,content:[{caption:e.MemberScanned.MembershipCodeCaption,value:e.MemberScanned.MembershipCodeDescription}]})};'
+'const main=async({workflow:r,popup:d,captions:m,parameters:n})=>{let e,i;if(n.DefaultInputValue.length==0&&n.DialogPrompt==1){e=await r.respond("CheckMemberInitialized");let a=n.DefaultInputValue;if(e!=null&&e.MemberScanned!=null&&e.MemberScanned.CardNumber!==""&&(a===null||a==="")&&(a=e.MemberScanned.CardNumber),n.DoNotSuggestTrackedMemberCard&&(a=""),i=await d.input({caption:m.MemberCardPrompt,title:m.MembershipTitle,value:a}),i===null)return" ";e=await r.respond("MemberArrival",{membercard_number:i})}else e=await r.respond("MemberArrival");const t=n.ToastMessageTimer!==null&&n.ToastMessageTimer!==void 0&&n.ToastMessageTimer!==0?n.ToastMessageTimer:5;e.MemberScanned&&t>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:e.MemberScanned.Valid,hideAfter:t,memberExpiry:e.MemberScanned.ExpiryDate,content:[{caption:e.MemberScanned.MembershipCodeCaption,value:e.MemberScanned.MembershipCodeDescription}]})};'
         );
     end;
 }
