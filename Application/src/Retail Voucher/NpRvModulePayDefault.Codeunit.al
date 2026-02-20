@@ -82,25 +82,30 @@
         ReturnAmount: Decimal;
         SalesAmount: Decimal;
         PaidAmount: Decimal;
+        PaymentAmountLCY: Decimal;
         TotalReturnAmount: Decimal;
         TotalSalesAmount: Decimal;
         TotalPaidAmount: Decimal;
         LineNo: Integer;
-        ReturnLineExists: Boolean;
+        AmountValidated: Boolean;
         HasPOSPaymentMethodItemFilter: Boolean;
+        Precalculated: Boolean;
+        ReturnLineExists: Boolean;
     begin
         NpRvSalesLine.Get(NpRvSalesLine.Id);
         NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         MagentoPaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
         NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
 
-        if NpRvVoucherMgt.ValidateAmount(
-                NpRvVoucher, MagentoPaymentLine.SystemId,
-                NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(MagentoPaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date"),
-                AvailableAmountLCY)
-        then begin
+        PaymentAmountLCY := NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(MagentoPaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date", Precalculated);
+        AmountValidated := NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY);
+        if not AmountValidated and not Precalculated then
+            AmountValidated := Abs(AvailableAmountLCY - PaymentAmountLCY) <= NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference(); //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
+        if AmountValidated then begin
             AvailableAmount := NpRvSalesDocMgt.ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
-            if Abs(MagentoPaymentLine.Amount - AvailableAmount) > 0.01 then begin
+            if (Precalculated and (MagentoPaymentLine.Amount <> AvailableAmount)) or
+               (not Precalculated and (Abs(MagentoPaymentLine.Amount - AvailableAmount) > NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference()))
+            then begin
                 MagentoPaymentLine.Amount := AvailableAmount;
                 MagentoPaymentLine.Modify(true);
             end;

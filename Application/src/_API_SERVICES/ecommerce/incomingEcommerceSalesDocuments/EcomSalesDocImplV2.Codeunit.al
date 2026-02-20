@@ -1019,6 +1019,9 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         AvailableAmount: Decimal;
         AvailableAmountLCY: Decimal;
+        PaymentAmountLCY: Decimal;
+        AmountValidated: Boolean;
+        Precalculated: Boolean;
         VoucherPaymentAmountError: Label 'Voucher payment amount %1 %2 exceeds available voucher amount %3.', Comment = '%1 - Payment amount, %2 - Payment currency code, %3 - Voucher available amount in payment currency';
     begin
         if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
@@ -1084,7 +1087,11 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherSalesLineFields(NpRvSalesLine);
         NpRvSalesLine.Modify(true);
 
-        if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(PaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date"), AvailableAmountLCY) then begin
+        PaymentAmountLCY := NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(PaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date", Precalculated);
+        AmountValidated := NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY);
+        if not AmountValidated and not Precalculated then
+            AmountValidated := Abs(AvailableAmountLCY - PaymentAmountLCY) <= NpRvVoucherMngt.AllowedCurrencyConversionRoundingDifference(); //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
+        if not AmountValidated then begin
             AvailableAmount := NpRvSalesDocMgt.ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
             Error(VoucherPaymentAmountError, PaymentLine.Amount, NpRvSalesDocMgt.AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
         end;

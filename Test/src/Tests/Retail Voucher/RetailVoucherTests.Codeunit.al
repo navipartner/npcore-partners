@@ -1145,8 +1145,8 @@ codeunit 85024 "NPR Retail Voucher Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure RedeemFullVoucherOnForeignCurrencySalesOrder()
-    // [SCENARIO] Fully redeem a retail voucher on a sales order with foreign currency
+    procedure RedeemFullVoucherOnForeignCurrencySalesOrderWithRounding1()
+    // [SCENARIO] Fully redeem a retail voucher on a sales order in a foreign currency, where the remaining amount on the voucher is slightly bigger than the order amount due to a rounding difference
     var
         Currency: Record Currency;
         NpRvVoucher: Record "NPR NpRv Voucher";
@@ -1167,7 +1167,8 @@ codeunit 85024 "NPR Retail Voucher Tests"
         CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
         OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 500 LCY, which equals 66.17 FCY
 
-        // [WHEN] Use the voucher to pay the full amount and post
+        // [WHEN] Use the voucher to pay the full amount and post.
+        // The voucher redemption amount will be 498.98 LCY when calculated from 66.17 FCY. So, there will be a rounding difference of 0.02 LCY, but the voucher should still be redeemed in full and archived.
         CreateAndPostSalesOrderWithVoucherRedemption(SalesHeader, NpRvVoucher, Currency.Code, OrderAmountFCY);
 
         // [THEN] Voucher should be archived
@@ -1175,6 +1176,75 @@ codeunit 85024 "NPR Retail Voucher Tests"
         NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
         Assert.IsTrue(NpRvArchVoucher.FindFirst(), 'Archived voucher should exist');
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemFullVoucherOnForeignCurrencySalesOrderWithRounding2()
+    // [SCENARIO] Fully redeem a retail voucher on a sales order in a foreign currency, where the remaining amount on the voucher is slightly less than the order amount due to a rounding difference
+    var
+        Currency: Record Currency;
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        CurrencyExchangeRate: Decimal;
+        OrderAmountFCY: Decimal;
+        VoucherAmountLCY: Decimal;
+    begin
+        // [GIVEN] A voucher with 200 LCY available
+        Initialize();
+        VoucherAmountLCY := 200;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmountLCY, _VoucherTypePartial.Code);
+
+        // [GIVEN] A sales order in foreign currency with exchange rate 0.132345
+        CurrencyExchangeRate := 0.132345;
+        CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
+        OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 200 LCY, which equals 26.47 FCY
+
+        // [WHEN] Use the voucher to pay the full amount and post.
+        // The voucher redemption amount will be 200.01 LCY when calculated from 26.47 FCY. So, there will be a rounding difference of 0.01 LCY, but the voucher should still be redeemed in full and archived.
+        CreateAndPostSalesOrderWithVoucherRedemption(SalesHeader, NpRvVoucher, Currency.Code, OrderAmountFCY);
+
+        // [THEN] Voucher should be archived
+        Assert.IsFalse(NpRvVoucher.Find(), 'Voucher should no longer exist after full redemption');
+        NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
+        Assert.IsTrue(NpRvArchVoucher.FindFirst(), 'Archived voucher should exist');
+    end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemFullVoucherOnEcommerceForeignCurrencySalesOrderWithRounding()
+    // [SCENARIO] Fully redeem a retail voucher on an ecommerce sales order in a foreign currency, where the remaining amount on the voucher is slightly less than the order amount due to a rounding difference
+    var
+        Currency: Record Currency;
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        Assert: Codeunit "Assert";
+        CurrencyExchangeRate: Decimal;
+        OrderAmountFCY: Decimal;
+        VoucherAmountLCY: Decimal;
+    begin
+        // [GIVEN] A voucher with 200 LCY available
+        Initialize();
+        VoucherAmountLCY := 200;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmountLCY, _VoucherTypePartial.Code);
+
+        // [GIVEN] A foreign currency with exchange rate 0.132345
+        CurrencyExchangeRate := 0.132345;
+        CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
+        OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 200 LCY, which equals 26.47 FCY
+
+        // [WHEN] Create and process an ecommerce sales order with voucher redemption
+        // The voucher redemption amount will be 200.01 LCY when calculated from 26.47 FCY. So, there will be a rounding difference of 0.01 LCY, but the voucher should still be redeemed in full and archived.
+        CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher, Currency.Code, OrderAmountFCY);
+
+        // [THEN] Voucher should be archived
+        Assert.IsFalse(NpRvVoucher.Find(), 'Voucher should no longer exist after full redemption');
+        NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
+        Assert.IsTrue(NpRvArchVoucher.FindFirst(), 'Archived voucher should exist');
+    end;
+#endif
 
     procedure Initialize()
     var
@@ -6885,9 +6955,25 @@ codeunit 85024 "NPR Retail Voucher Tests"
         LibraryERM.CreateExchangeRate(Currency.Code, WorkDate(), ExchangeRate, ExchangeRate);
     end;
 
+    local procedure EnsureValidSalesGeneralPostingSetupCreated(GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20])
+    var
+        GeneralPostingSetup: Record "General Posting Setup";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        GeneralPostingSetup."Gen. Bus. Posting Group" := GenBusPostingGroup;
+        GeneralPostingSetup."Gen. Prod. Posting Group" := GenProdPostingGroup;
+        if not GeneralPostingSetup.Find() then begin
+            GeneralPostingSetup.Init();
+            GeneralPostingSetup.Insert();
+        end;
+        LibraryERM.SetGeneralPostingSetupSalesAccounts(GeneralPostingSetup);
+        GeneralPostingSetup.Modify();
+    end;
+
     local procedure CreateAndPostSalesOrderWithNewVoucher(var SalesHeader: Record "Sales Header"; CurrencyCode: Code[10]; VoucherAmountFCY: Decimal; VoucherTypeCode: Code[20]) VoucherNo: Code[20]
     var
         Customer: Record Customer;
+        GLAccount: Record "G/L Account";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         SalesLine: Record "Sales Line";
@@ -6907,6 +6993,9 @@ codeunit 85024 "NPR Retail Voucher Tests"
 
         // Issue voucher on sales order
         NpRvVoucherType.Get(VoucherTypeCode);
+        GLAccount.Get(NpRvVoucherType."Account No.");
+        EnsureValidSalesGeneralPostingSetupCreated(SalesHeader."Gen. Bus. Posting Group", GLAccount."Gen. Prod. Posting Group");
+
 #pragma warning disable AA0139
         VoucherNo := NpRvSalesDocMgt.IssueVoucher(SalesHeader, NpRvVoucherType);
 #pragma warning restore AA0139
@@ -6940,6 +7029,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         SalesHeader.Modify(true);
 
         // Create item line
+        EnsureValidSalesGeneralPostingSetupCreated(SalesHeader."Gen. Bus. Posting Group", _Item."Gen. Prod. Posting Group");
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, _Item."No.", 1);
         SalesLine.Validate("Unit Price", OrderAmountFCY);
         SalesLine.Modify(true);
@@ -6950,6 +7040,94 @@ codeunit 85024 "NPR Retail Voucher Tests"
         // Post the sales order
         LibrarySales.PostSalesDocument(SalesHeader, true, true);
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    local procedure CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher: Record "NPR NpRv Voucher"; CurrencyCode: Code[10]; OrderAmountFCY: Decimal)
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+        SalesHeader: Record "Sales Header";
+        EcomSalesDocImpl: Codeunit "NPR Ecom Sales Doc Impl V2";
+        LibraryRandom: Codeunit "Library - Random";
+        LibrarySales: Codeunit "Library - Sales";
+        SalesPost: Codeunit "Sales-Post";
+    begin
+        if not IncEcomSalesDocSetup.Get() then begin
+            IncEcomSalesDocSetup.Init();
+            IncEcomSalesDocSetup.Insert();
+        end;
+        IncEcomSalesDocSetup."Customer Mapping" := IncEcomSalesDocSetup."Customer Mapping"::"Customer No.";
+        IncEcomSalesDocSetup.Modify();
+
+        // Create customer
+        LibrarySales.CreateCustomer(Customer);
+
+        // Create ecommerce sales header
+        EcomSalesHeader.Init();
+        EcomSalesHeader."Document Type" := EcomSalesHeader."Document Type"::Order;
+        EcomSalesHeader."External No." := StrSubStNo('TEST-VOUCHER-%1', LibraryRandom.RandIntInRange(100000, 999999));
+        EcomSalesheader."Sell-to Customer No." := Customer."No.";
+        EcomSalesHeader."Currency Code" := CurrencyCode;
+        EcomSalesHeader."Price Excl. VAT" := false; // Prices including VAT
+        EcomSalesHeader."Ecommerce Store Code" := CreateMinimalEcomStore();
+        EcomSalesHeader."Location Code" := _POSStore."Location Code";
+        EcomSalesHeader."Sell-to Email" := 'test@example.com';
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader."Received Time" := Time();
+        EcomSalesHeader."Entry No." := 0; // Auto-increment
+        EcomSalesHeader.Insert(true);
+
+        // Create ecommerce sales line (item)
+        EcomSalesLine.Init();
+        EcomSalesLine."Document Entry No." := EcomSalesHeader."Entry No.";
+        EcomSalesLine."Line No." := 10000;
+        EcomSalesLine.Type := EcomSalesLine.Type::Item;
+        EcomSalesLine."No." := _Item."No.";
+        EcomSalesLine.Quantity := 1;
+        EcomSalesLine."Unit Price" := OrderAmountFCY;
+        EcomSalesLine."Line Amount" := OrderAmountFCY;
+        EcomSalesLine.Insert(true);
+        EnsureValidSalesGeneralPostingSetupCreated(Customer."Gen. Bus. Posting Group", _Item."Gen. Prod. Posting Group");
+
+        // Create ecommerce sales payment line (voucher)
+        EcomSalesPmtLine.Init();
+        EcomSalesPmtLine."Document Entry No." := EcomSalesHeader."Entry No.";
+        EcomSalesPmtLine."Line No." := 10000;
+        EcomSalesPmtLine."Payment Method Type" := EcomSalesPmtLine."Payment Method Type"::Voucher;
+        EcomSalesPmtLine."Payment Reference" := NpRvVoucher."Reference No.";
+        EcomSalesPmtLine.Amount := OrderAmountFCY;
+        EcomSalesPmtLine.Insert(true);
+
+        // Process the ecommerce document
+        EcomSalesDocImpl.Process(EcomSalesHeader);
+
+        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+        if not SalesHeader.FindFirst() then
+            exit;
+
+        SalesHeader.Ship := true;
+        SalesHeader.Invoice := true;
+        SalesPost.Run(SalesHeader);
+    end;
+
+    local procedure CreateMinimalEcomStore(): Code[20]
+    var
+        EcomStore: Record "NPR NpEc Store";
+    begin
+        if not EcomStore.Get('TEST') then begin
+            EcomStore.Init();
+            EcomStore.Code := 'TEST';
+            EcomStore.Name := 'Test Ecommerce Store';
+            EcomStore."Location Code" := _POSStore."Location Code";
+            EcomStore.Insert(true);
+        end;
+        exit(EcomStore.Code);
+    end;
+#endif
 
     local procedure DeleteVoucherItemsDefaultVoucher(POSPaymentMethodCode: Code[10])
     var

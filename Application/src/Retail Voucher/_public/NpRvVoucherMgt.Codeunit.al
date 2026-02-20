@@ -768,7 +768,7 @@
         VoucherPaymentAmountLCY := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor, Precalculated);
         if not Precalculated then begin
             ValidateAmount(Voucher, MagentoPaymentLine.SystemId, VoucherPaymentAmountLCY, AvailableAmountLCY);
-            if Abs(AvailableAmountLCY - VoucherPaymentAmountLCY) <= 0.02 then
+            if Abs(AvailableAmountLCY - VoucherPaymentAmountLCY) <= AllowedCurrencyConversionRoundingDifference() then
                 VoucherPaymentAmountLCY := AvailableAmountLCY; // In case of rounding differences, take the available amount as the payment amount to avoid leaving small open amounts on the voucher
         end;
         if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
@@ -1404,6 +1404,12 @@
         NpRvVoucher.SetFilter("Reservation Line Id Filter", '<>%1', ReservationLineid);
         AvailableAmountLCY := NpRvVoucher.CalcAvailableAmount();
         exit(AvailableAmountLCY >= AmountToValidateLCY);
+    end;
+
+    internal procedure AllowedCurrencyConversionRoundingDifference(): Decimal
+    begin
+        // A margin of 0.02 should be sufficient to allow for rounding differences during currency conversion. This is because there may be cases where both the source and target amounts are rounded up or down, resulting in a difference of 0.02.
+        exit(0.02);
     end;
 
     local procedure SetSalesLineFilter(SaleLinePOS: Record "NPR POS Sale Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")

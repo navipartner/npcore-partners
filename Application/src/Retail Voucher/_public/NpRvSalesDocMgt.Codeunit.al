@@ -59,17 +59,28 @@
         NpRvVoucherMngt: codeunit "NPR NpRv Voucher Mgt.";
         AvailableAmount: Decimal;
         AvailableAmountLCY: Decimal;
+        PaymentAmountLCY: Decimal;
         LineNo: Integer;
+        AmountValidated: Boolean;
+        Precalculated: Boolean;
     begin
         if NpRvVoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
-            if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, ConvertTransactionCurrencyAmtToLCY(Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date"), AvailableAmountLCY) then begin
+            PaymentAmountLCY := ConvertTransactionCurrencyAmtToLCY(Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date", Precalculated);
+            AmountValidated := NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentAmountLCY, AvailableAmountLCY);
+            if not AmountValidated and not Precalculated then
+                AmountValidated := Abs(AvailableAmountLCY - PaymentAmountLCY) <= NpRvVoucherMngt.AllowedCurrencyConversionRoundingDifference(); //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
+            if not AmountValidated then begin
                 AvailableAmount := ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
                 Error(VouchPmtAmtExceedsAvailAmtErr, Amount, AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
             end;
         end else begin
             NpRvVoucher.CalcFields(Amount);
             AvailableAmount := ConvertLCYAmtToTransactionCurrency(NpRvVoucher.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor");
-            if AvailableAmount < Amount then
+            AmountValidated := AvailableAmount >= Amount;
+            if not AmountValidated then
+                if not IsLCY(SalesHeader."Currency Code") then
+                    AmountValidated := AvailableAmount + NpRvVoucherMngt.AllowedCurrencyConversionRoundingDifference() >= Amount; //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
+            if not AmountValidated then
                 Error(VouchPmtAmtExceedsAvailAmtErr, Amount, AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
         end;
 
@@ -460,6 +471,8 @@
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         AvailableAmountLCY: Decimal;
         PaymentAmountLCY: Decimal;
+        AmountValidated: Boolean;
+        Precalculated: Boolean;
         PmtAmtHigherThanRemAmtErr: Label 'Retail voucher payment amount %1 is higher than remaining amount %2 on retail voucher %3.', Comment = '%1 - Payment amount, %2 - Voucher remaining amount, %3 = Voucher reference number';
         PmtAmtHigherThanRemAmtCurrErr: Label 'Retail voucher payment amount %1 %2 (%3 %5) is higher than remaining amount %4 %5 on retail voucher %6.', Comment = '%1 - Payment amount, %2 - Payment currency code, %3 - Payment amount in voucher currency, %4 - Voucher remaining amount in voucher currency, %5 - Voucher currency code (LCY), %6 = Voucher reference number';
     begin
@@ -471,9 +484,12 @@
             MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
             if MagentoPaymentLine."Posting Date" = 0D then
                 MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
-            PaymentAmountLCY := MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor");
+            PaymentAmountLCY := MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor", Precalculated);
 
-            if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY) then
+            AmountValidated := NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY);
+            if not AmountValidated and not Precalculated then
+                AmountValidated := Abs(AvailableAmountLCY - PaymentAmountLCY) <= NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference(); //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
+            if not AmountValidated then
                 if IsLCY(SalesHeader."Currency Code") then
                     Error(PmtAmtHigherThanRemAmtErr, MagentoPaymentLine.Amount, AvailableAmountLCY, NpRvVoucher."Reference No.")
                 else
@@ -1790,16 +1806,18 @@
                 GLSetup."Amount Rounding Precision"));
     end;
 
-    internal procedure ConvertTransactionCurrencyAmtToLCY(AmountTCY: Decimal; CurrencyCode: Code[10]; CurrencyFactor: Decimal; PostingDate: Date): Decimal
+    internal procedure ConvertTransactionCurrencyAmtToLCY(AmountTCY: Decimal; CurrencyCode: Code[10]; CurrencyFactor: Decimal; PostingDate: Date; var Precalculated: Boolean): Decimal
     var
         CurrencyExchangeRate: Record "Currency Exchange Rate";
     begin
+        Precalculated := true;
         if AmountTCY = 0 then
             exit(0);
 
         if IsLCY(CurrencyCode) then
             exit(AmountTCY);
 
+        Precalculated := false;
         exit(
             Round(
                 CurrencyExchangeRate.ExchangeAmtFCYToLCY(PostingDate, CurrencyCode, AmountTCY, CurrencyFactor),
