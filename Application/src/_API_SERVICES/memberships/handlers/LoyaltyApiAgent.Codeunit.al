@@ -13,17 +13,23 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         Redeemable: Integer;
         PointsValue: Decimal;
         ReasonText: Text;
     begin
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
+
         if IsLoyaltyAsYouGo(Membership.SystemId) then begin
+            Sentry.StartSpan(Span, 'bc.loyaltyapi.getmembershippoint.asyougo');
             Membership.CalcFields("Remaining Points");
             Redeemable := Membership."Remaining Points";
             PointsValue := Membership."Remaining Points" * LoyaltyBurnRate(Membership.SystemId);
-        end else
+            Span.Finish();
+        end else begin
+            Sentry.StartSpan(Span, 'bc.loyaltyapi.getmembershippoint.coupon');
             if (LoyaltyPointManagement.GetCouponToRedeemWS(Membership."Entry No.", TempLoyaltyPointsSetup, 1000000000, ReasonText)) then begin
                 Redeemable := LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod(Membership."Entry No.");
                 TempLoyaltyPointsSetup.Reset();
@@ -31,6 +37,8 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
                 TempLoyaltyPointsSetup.FindLast();
                 PointsValue := Redeemable * TempLoyaltyPointsSetup."Point Rate";
             end;
+            Span.Finish();
+        end;
         Response.RespondOK(PointBalance(Redeemable, PointsValue));
     end;
 

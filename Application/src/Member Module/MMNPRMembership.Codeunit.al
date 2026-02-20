@@ -365,31 +365,51 @@ codeunit 6060147 "NPR MM NPR Membership"
     var
         MMMembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
         MMMembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+        ReturnValue: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.validateremotecardnumber');
         if NPRRemoteEndpointSetup."Rest Api Endpoint URI" <> '' then
-            exit(MMMembershipRestApi.ValidateRemoteCardNumber(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, RemoteInfoCapture, NotValidReason));
-        exit(MMMembershipSoapApi.ValidateRemoteCardNumber(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, RemoteInfoCapture, NotValidReason));
+            ReturnValue := MMMembershipRestApi.ValidateRemoteCardNumber(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, RemoteInfoCapture, NotValidReason)
+        else
+            ReturnValue := MMMembershipSoapApi.ValidateRemoteCardNumber(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, RemoteInfoCapture, NotValidReason);
+        Span.Finish();
+        exit(ReturnValue);
     end;
 
     local procedure GetRemoteMembership(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; var ForeignMembershipNumber: Code[20]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text): Boolean
     var
         MMMembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
         MMMembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+        ReturnValue: Boolean;
     begin
-
+        Sentry.StartSpan(Span, 'bc.membership.getremotemembership');
         if NPRRemoteEndpointSetup."Rest Api Endpoint URI" <> '' then
-            exit(MMMembershipRestApi.GetRemoteMembership(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, RemoteInfoCapture, NotValidReason));
-        exit(MMMembershipSoapApi.GetRemoteMembership(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, RemoteInfoCapture, NotValidReason));
+            ReturnValue := MMMembershipRestApi.GetRemoteMembership(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, RemoteInfoCapture, NotValidReason)
+        else
+            ReturnValue := MMMembershipSoapApi.GetRemoteMembership(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, RemoteInfoCapture, NotValidReason);
+        Span.Finish();
+        exit(ReturnValue);
     end;
 
     local procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; ForeignMembershipNumber: Code[20]; IncludeMemberImage: Boolean; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary; var NotValidReason: Text): Boolean
     var
         MMMembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
         MMMembershipRestApi: Codeunit "NPR MMMembershipRestApi";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+        ReturnValue: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.getremotemember');
         if NPRRemoteEndpointSetup."Rest Api Endpoint URI" <> '' then
-            exit(MMMembershipRestApi.GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, IncludeMemberImage, RemoteInfoCapture, TempRequestMemberFieldUpdate, NotValidReason));
-        exit(MMMembershipSoapApi.GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, IncludeMemberImage, RemoteInfoCapture, TempRequestMemberFieldUpdate, NotValidReason));
+            ReturnValue := MMMembershipRestApi.GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, IncludeMemberImage, RemoteInfoCapture, TempRequestMemberFieldUpdate, NotValidReason)
+        else
+            ReturnValue := MMMembershipSoapApi.GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, IncludeMemberImage, RemoteInfoCapture, TempRequestMemberFieldUpdate, NotValidReason);
+        Span.Finish();
+        exit(ReturnValue);
     end;
 
     local procedure CreateLocalMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean

@@ -105,10 +105,13 @@
     var
         Community: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MemberEntryNo: Integer;
         CardEntryNo: Integer;
         ResponseMessage: Text;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.createmembershipall');
 
         MembershipSalesSetup.TestField(Blocked, false);
 
@@ -125,16 +128,21 @@
             MemberEntryNo := AddCommunityMember(MembershipEntryNo, 1);
 
         if (MembershipSetup."Member Information" = MembershipSetup."Member Information"::NAMED) then
-            if (not AddNamedMember(MembershipEntryNo, MemberInfoCapture, MemberEntryNo, ResponseMessage)) then
+            if (not AddNamedMember(MembershipEntryNo, MemberInfoCapture, MemberEntryNo, ResponseMessage)) then begin
+                Span.Finish();
                 exit(0);
+            end;
 
         if (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES) then
-            if (not IssueMemberCardWorker(MembershipEntryNo, MemberEntryNo, MemberInfoCapture, false, CardEntryNo, MembershipSalesSetup."Membership Code", ResponseMessage, false)) then
+            if (not IssueMemberCardWorker(MembershipEntryNo, MemberEntryNo, MemberInfoCapture, false, CardEntryNo, MembershipSalesSetup."Membership Code", ResponseMessage, false)) then begin
+                Span.Finish();
                 exit(0);
+            end;
 
         MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
         MemberInfoCapture."Member Entry No" := MemberEntryNo;
         MemberInfoCapture."Card Entry No." := CardEntryNo;
+        Span.Finish();
 
         exit(MembershipEntryNo);
     end;
@@ -346,11 +354,14 @@
         Community: Record "NPR MM Member Community";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        Sentry: Codeunit "NPR Sentry";
+        Span, SpanMembershipToCustomer : Codeunit "NPR Sentry Span";
         ErrorText: Text;
         MemberCount: Integer;
         GuardianMemberEntryNo: Integer;
         ReuseExistingMember: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.addnamedmember');
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         Community.Get(Membership."Community Code");
@@ -364,8 +375,10 @@
             MemberEntryNo := Member."Entry No.";
 
             ReuseExistingMember := (Community."Create Member UI Violation" = Community."Create Member UI Violation");
-            if (not ReuseExistingMember) then
+            if (not ReuseExistingMember) then begin
+                Span.Finish();
                 exit(MemberEntryNo <> 0);
+            end;
         end;
 
         if (not ReuseExistingMember) then begin
@@ -374,8 +387,10 @@
             Member.Insert(true);
         end;
 
-        if (not CreateMemberRole(Member."Entry No.", MembershipEntryNo, MembershipInfoCapture, MemberCount, ReasonText)) then
+        if (not CreateMemberRole(Member."Entry No.", MembershipEntryNo, MembershipInfoCapture, MemberCount, ReasonText)) then begin
+            Span.Finish();
             exit(false);
+        end;
 
         if (not ReuseExistingMember) then
             CreateMemberCommunicationDefaultSetup(Member."Entry No.");
@@ -386,6 +401,7 @@
         end;
 
         if (Community."Membership to Cust. Rel.") then begin
+            Sentry.StartSpan(SpanMembershipToCustomer, 'bc.membership.addnamedmember.customerrelation');
             // First member updates customer address
             MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
             MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
@@ -394,8 +410,10 @@
             if (MembershipRole.IsEmpty()) then begin
 
                 MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
-                if (MembershipRole.IsEmpty()) then
+                if (MembershipRole.IsEmpty()) then begin
+                    SpanMembershipToCustomer.Finish();
                     exit(RaiseError(ReasonText, NO_ADMIN_MEMBER, NO_ADMIN_MEMBER_NO) = 0);
+                end;
             end;
 
             MembershipRole.Reset();
@@ -403,12 +421,11 @@
             MembershipRole.SetFilter("Member Role", '=%1|=%2', MembershipRole."Member Role"::ADMIN, MembershipRole."Member Role"::DEPENDENT);
             MembershipRole.SetFilter(Blocked, '=%1', false);
             MembershipRole.FindFirst();
-
             UpdateCustomerFromMember(Membership, MembershipRole."Member Entry No.");
 
             if (MemberCount > 1) then
                 AddCustomerContact(MembershipEntryNo, Member."Entry No."); // The member just being added.
-
+            SpanMembershipToCustomer.Finish();
         end;
 
         ValidateMemberFields(Membership."Entry No.", Member, ErrorText);
@@ -418,18 +435,23 @@
         TransferInfoCaptureAttributes(MembershipInfoCapture."Entry No.", Database::"NPR MM Member", Member."Entry No.");
 
         if (MembershipSetup."Enable Age Verification") then begin
-            if (not MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipInfoCapture."Item No.")) then
+            if (not MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipInfoCapture."Item No.")) then begin
+                Span.Finish();
                 exit(RaiseError(ReasonText, AGE_VERIFICATION_SETUP, AGE_VERIFICATION_SETUP_NO) = 0);
+            end;
 
             if (not CheckAgeConstraint(GetMembershipAgeConstraintDate(MembershipSalesSetup, MembershipInfoCapture), Member.Birthday, MembershipSetup."Validate Age Against",
-                MembershipSalesSetup."Age Constraint Type", MembershipSalesSetup."Age Constraint (Years)")) then
+                MembershipSalesSetup."Age Constraint Type", MembershipSalesSetup."Age Constraint (Years)")) then begin
+                Span.Finish();
                 exit(RaiseError(ReasonText, StrSubstNo(AGE_VERIFICATION, Member."Display Name", MembershipSalesSetup."Age Constraint (Years)"), AGE_VERIFICATION_NO) = 0);
+            end;
         end;
 
         MembershipEvents.OnAfterMemberCreateEvent(Membership, Member, MembershipInfoCapture);
         AddMemberCreateNotification(MembershipEntryNo, MembershipSetup, Member, MembershipInfoCapture);
 
         MemberEntryNo := Member."Entry No.";
+        Span.Finish();
         exit(MemberEntryNo <> 0);
     end;
 
@@ -3263,10 +3285,13 @@
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberCard: Record "NPR MM Member Card";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         ValidFromDate: Date;
         ValidUntilDate: Date;
         MembershipScheduledForUpdate: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.addmembershipledgerentrynew');
 
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
         MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
@@ -3287,8 +3312,10 @@
         MemberInfoCapture."Membership Code" := MembershipSalesSetup."Membership Code";
 
         if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::FOREIGN) then begin
-            if (IsMembershipActive(MembershipEntryNo, Today, false)) then
+            if (IsMembershipActive(MembershipEntryNo, Today, false)) then begin
+                Span.Finish();
                 exit(0); //Hmm
+            end;
         end;
 
         if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED) then begin
@@ -3299,6 +3326,7 @@
 
         LedgerEntryNo := AddMembershipLedgerEntry(MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate, MembershipScheduledForUpdate);
         OnMembershipChangeEvent(MembershipEntryNo);
+        Span.Finish();
 
         exit(LedgerEntryNo);
 
@@ -3964,10 +3992,13 @@
         MemberNotification: Codeunit "NPR MM Member Notification";
         MembershipNotification: Record "NPR MM Membership Notific.";
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         EntryNoList: List of [Integer];
         EntryNo: Integer;
         AllowWallet: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.addmembercreatenotification');
         AllowWallet := true;
 
         if (MembershipSetup."Create Welcome Notification") then begin
@@ -3985,6 +4016,7 @@
                 EntryNo := MemberNotification.CreateWalletSendNotification(MembershipEntryNo, Member."Entry No.", 0, TODAY);
 
         _MembershipWebhooks.TriggerMemberAddedWebhookCall(MembershipEntryNo, Member."Entry No.", Member.SystemId);
+        Span.Finish();
     end;
 
     local procedure ValidAlterationGracePeriod(MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MembershipEntry: Record "NPR MM Membership Entry"; ReferenceDate: Date): Boolean
@@ -4665,8 +4697,11 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
         Membership: Record "NPR MM Membership";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MembershipCreated: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.getcommunitymembership');
 
         MembershipSetup.Get(MembershipCode);
         Community.Get(MembershipSetup."Community Code");
@@ -4676,8 +4711,10 @@
         Membership.SetFilter("Membership Code", '=%1', MembershipCode);
 
         if (Membership.IsEmpty()) then begin
-            if (not CreateWhenMissing) then
+            if (not CreateWhenMissing) then begin
+                Span.Finish();
                 exit(0);
+            end;
 
             Membership.Init();
             Membership.Description := Community.Description;
@@ -4703,7 +4740,7 @@
 
         if (MembershipCreated) then
             MembershipEvents.OnAfterMembershipCreateEvent(Membership);
-
+        Span.Finish();
         exit(Membership."Entry No.");
     end;
 
@@ -4713,10 +4750,13 @@
         Community: Record "NPR MM Member Community";
         Membership: Record "NPR MM Membership";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MembershipCreated: Boolean;
         MembershipModified: Boolean;
         MissingCustomerNoErr: Label 'Each membership must have a link to a customer in order for the system to store the payment token.';
     begin
+        Sentry.StartSpan(Span, 'bc.membership.getnewmembership');
 
         MembershipSetup.Get(MembershipCode);
         Community.Get(MembershipSetup."Community Code");
@@ -4727,8 +4767,10 @@
         Membership.SetFilter("External Membership No.", '=%1', MemberInfoCapture."External Membership No.");
         Membership.SetRange("Community Code", MembershipSetup."Community Code");
         if (Membership.IsEmpty()) then begin
-            if (not CreateWhenMissing) then
+            if (not CreateWhenMissing) then begin
+                Span.Finish();
                 exit(0);
+            end;
 
             Membership.Init();
             Membership."External Membership No." := MemberInfoCapture."External Membership No.";
@@ -4796,6 +4838,7 @@
 
         if (MembershipCreated) then
             MembershipEvents.OnAfterMembershipCreateEvent(Membership);
+        Span.Finish();
 
         exit(Membership."Entry No.");
     end;
@@ -4876,10 +4919,13 @@
         MarketingSetup: Record "Marketing Setup";
         MagentoSetup: Record "NPR Magento Setup";
         Community: Record "NPR MM Member Community";
+        Sentry: Codeunit "NPR Sentry";
+        Span, SubSpan : Codeunit "NPR Sentry Span";
 #if not BC17
         SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
 #endif
     begin
+        Sentry.StartSpan(Span, 'bc.membership.updatecustomerfrommember');
         Member.Get(MemberEntryNo);
         MembershipRole.Get(Membership."Entry No.", MemberEntryNo);
 
@@ -4888,13 +4934,16 @@
         if (Community.MemberDefaultCountryCode = '') then
             Community.MemberDefaultCountryCode := 'DK';
 
-        if (not Customer.Get(Membership."Customer No.")) then
+        if (not Customer.Get(Membership."Customer No.")) then begin
+            Span.Finish();
             exit;
+        end;
 
         if (MembershipRole."Member Role" in [MembershipRole."Member Role"::ANONYMOUS,
-                                             MembershipRole."Member Role"::MEMBER]) then
+                                             MembershipRole."Member Role"::MEMBER]) then begin
+            Span.Finish();
             exit;
-
+        end;
         if (MembershipRole."Member Role" = MembershipRole."Member Role"::GUARDIAN) then begin
 
             GuardianMembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
@@ -4907,6 +4956,7 @@
                     Customer.Modify();
                 end;
             end;
+            Span.Finish();
             exit;
         end;
 
@@ -4918,7 +4968,6 @@
                 Customer.Validate(Name, Membership."Company Name");
             Customer.Validate("Name 2", CopyStr(Member."Display Name", 1, MaxStrLen(Customer."Name 2")));
         end;
-
         Customer.Validate(Address, CopyStr(Member.Address, 1, MaxStrLen(Customer.Address)));
 
         //** shifted order since BC clears city and postcode when country code is validated
@@ -4939,15 +4988,19 @@
             Customer.Validate(Blocked, Customer.Blocked::" ");
 
         Customer.Modify();
+        Sentry.StartSpan(SubSpan, 'bc.membership.updatecustomerfrommember.spfy');
 #if not BC17
         SpfyCustomerMgt.UpdateMarketingConsentState(Member, Customer."No.");
         SpfyCustomerMgt.AutoEnableCustomerSync(Customer);
 #endif
-
+        SubSpan.Finish();
         MarketingSetup.Get();
-        if (MarketingSetup."Bus. Rel. Code for Customers" = '') then
+        if (MarketingSetup."Bus. Rel. Code for Customers" = '') then begin
+            Span.Finish();
             exit;
+        end;
 
+        Sentry.StartSpan(SubSpan, 'bc.membership.updatecustomerfrommember.contactbusrel');
         UpdateContFromCust.OnModify(Customer);
 
         ContactBusinessRelation.SetCurrentKey("Link to Table", "No.");
@@ -4992,6 +5045,8 @@
                 UpdateContactFromMember(Membership."Entry No.", Member);
             end;
         end;
+        SubSpan.Finish();
+        Span.Finish();
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
@@ -5148,9 +5203,11 @@
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipSetup: Record "NPR MM Membership Setup";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MemberCount: Integer;
     begin
-
+        Sentry.StartSpan(Span, 'bc.membership.addcommunitymember');
         // Community Member setup has unnamed members or
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
@@ -5181,7 +5238,7 @@
             if (MemberCount > MembershipSetup."Membership Member Cardinality") then
                 Error(TO_MANY_MEMBERS, Membership."External Membership No.", Membership."Membership Code", MembershipSetup."Membership Member Cardinality");
         end;
-
+        Span.Finish();
         exit(0);
     end;
 
@@ -5191,6 +5248,8 @@
         CountryRegion: Record "Country/Region";
         PostCode: Record "Post Code";
         TempBlob: Codeunit "Temp Blob";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         InStr: InStream;
         OutStr: OutStream;
         CountryName: Text;
@@ -5198,6 +5257,7 @@
         NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
         ErrorMessage: Text;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.setmemberfields');
 
         CurrentMember.Copy(Member);
         MembershipEvents.OnBeforeSetMemberFields(Member, MemberInfoCapture);
@@ -5282,7 +5342,7 @@
 
         MembershipEvents.OnAfterSetMemberFields(Member, MemberInfoCapture);
         MembershipEvents.OnAfterMemberFieldsAssignmentEvent(CurrentMember, Member);
-
+        Span.Finish();
         exit;
     end;
 
@@ -5306,8 +5366,8 @@
     var
         Membership: Record "NPR MM Membership";
         Community: Record "NPR MM Member Community";
-        UniqIdSet: Boolean;
         MembershipSetup: Record "NPR MM Membership Setup";
+        UniqIdSet: Boolean;
     begin
 
         ResponseMessage := '';
@@ -5337,7 +5397,6 @@
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
         end;
-
         if (not UniqIdSet) then
             exit(RaiseError(ResponseMessage, StrSubstNo(MISSING_VALUE, Community."Member Unique Identity", Member.TableCaption(), Member."External Member No."), '') = 0);
 
@@ -5353,7 +5412,10 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         GDPRManagement: Codeunit "NPR GDPR Management";
         MemberGDPRManagement: Codeunit "NPR MM GDPR Management";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.membership.creatememberrole');
 
         Member.Get(MemberEntryNo);
         Membership.Get(MembershipEntryNo);
@@ -5361,6 +5423,7 @@
         // When community is REUSE and a membership is created with multiple members and they share the same unique identity
         if (MembershipRole.Get(MembershipEntryNo, MemberEntryNo)) then begin
             MemberCount := GetMembershipMemberCount(MembershipEntryNo);
+            Span.Finish();
             exit(true);
         end;
 
@@ -5386,6 +5449,7 @@
             MembershipRole.Init();
             if (MembershipSetup."Membership Type" = MembershipSetup."Membership Type"::INDIVIDUAL) then begin
                 RaiseError(ResponseMessage, StrSubstNo(TO_MANY_MEMBERS, Membership."External Membership No.", MembershipSetup.Code, 1), TO_MANY_MEMBERS_NO);
+                Span.Finish();
                 exit(false);
             end;
 
@@ -5394,6 +5458,7 @@
             if (MembershipSetup."Membership Member Cardinality" > 0) then begin
                 if (MemberCount >= MembershipSetup."Membership Member Cardinality") then begin
                     RaiseError(ResponseMessage, StrSubstNo(TO_MANY_MEMBERS, Membership."External Membership No.", MembershipSetup.Code, MembershipSetup."Membership Member Cardinality"), TO_MANY_MEMBERS_NO);
+                    Span.Finish();
                     exit(false);
                 end;
             end;
@@ -5421,6 +5486,7 @@
         if (MemberInfoCapture."Contact No." <> '') then begin
             if (not ValidateUseContactNo(Membership."Customer No.", MemberInfoCapture."Contact No.")) then begin
                 RaiseError(ResponseMessage, StrSubstNo(INVALID_CONTACT, MemberInfoCapture."Contact No.", Membership."Customer No."), INVALID_CONTACT_NO);
+                Span.Finish();
                 exit(false);
             end;
             MembershipRole."Contact No." := MemberInfoCapture."Contact No.";
@@ -5440,6 +5506,7 @@
         end;
 
         MemberCount := GetMembershipMemberCount(MembershipEntryNo);
+        Span.Finish();
 
         exit(true);
     end;
@@ -5549,17 +5616,22 @@
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
         MemberCard2: Record "NPR MM Member Card";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         CardValidUntil: Date;
         CardFound: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.membership.issuemembercardworker');
 
         CardEntryNo := 0;
         MemberInfoCapture."External Card No." := UpperCase(MemberInfoCapture."External Card No.");
 
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(TargetMembershipCode);
-        if (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::NO) then
+        if (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::NO) then begin
+            Span.Finish();
             exit(false);
+        end;
 
         if (MembershipSetup."Member Information" = MembershipSetup."Member Information"::NAMED) then
             Member.Get(MemberEntryNo);
@@ -5598,6 +5670,7 @@
 
         if (not AllowBlankNumber) and (MemberInfoCapture."External Card No." = '') then begin
             RaiseError(ReasonMessage, MEMBERCARD_BLANK, MEMBERCARD_BLANK_NO);
+            Span.Finish();
             exit(false);
         end;
 
@@ -5608,6 +5681,7 @@
             MemberCard2.SetFilter(Blocked, '=%1', false);
             if (MemberCard2.FindFirst()) then begin
                 RaiseError(ReasonMessage, StrSubstNo(MEMBER_CARD_EXIST, MemberCard2."External Card No."), MEMBER_CARD_EXIST_NO);
+                Span.Finish();
                 exit(false);
             end;
         end;
@@ -5643,6 +5717,7 @@
         MemberCard.Modify();
 
         CardEntryNo := MemberCard."Entry No.";
+        Span.Finish();
         exit(CardEntryNo <> 0);
 
     end;
@@ -6116,9 +6191,11 @@
 
     internal procedure GetMembershipFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text) MembershipEntryNo: Integer
     var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         CardEntryNo: Integer;
     begin
-
+        Sentry.StartSpan(Span, 'bc.membership.getmembershipfromextcardno');
         // local check to find cardnumber
         if (StrLen(ExternalCardNo) <= 50) then
             MembershipEntryNo := GetMembershipFromExtCardNoWorker(ExternalCardNo, ReferenceDate, ReasonNotFound, CardEntryNo);
@@ -6126,7 +6203,7 @@
         // Foreign cards might have more information then just a raw card number.
         if (MembershipEntryNo = 0) then
             MembershipEntryNo := GetMembershipFromForeignCardNo(ExternalCardNo, ReferenceDate, CardEntryNo);
-
+        Span.Finish();
     end;
 
     local procedure GetMembershipFromForeignCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var CardEntryNo: Integer) MembershipEntryNo: Integer

@@ -40,6 +40,8 @@
         ForeignValidationSetup: Record "NPR MM Foreign Members. Setup";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         IsHandled: Boolean;
     begin
 
@@ -57,17 +59,20 @@
 
         if (ForeignValidationSetup.FindSet()) then begin
             repeat
+                Sentry.StartSpan(Span, 'bc.membership.ondispatchtoreplicateforeignmembercard');
                 OnDispatchToReplicateForeignMemberCard(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, IncludeMemberImage, IsValid, NotValidReason, IsHandled);
 
-                if (not IsHandled) then
+                if (not IsHandled) then begin
+                    Span.Finish();
                     Error(NotHandled, ForeignMembercardNumber, ForeignValidationSetup.FieldCaption("Community Code"), ForeignValidationSetup."Community Code");
-
+                end;
                 if (IsValid) then begin
                     FormatForeignCardNumberFromScan(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, FormatedCardNumber);
                     MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(FormatedCardNumber, Today, NotValidReason);
                     if (MembershipEntryNo <> 0) and (ForeignMembercardNumber = FormatedCardNumber) then
                         ForeignMembershipMgr.SynchronizeLoyaltyPoints(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", MembershipEntryNo, ForeignMembercardNumber);
                 end;
+                Span.Finish();
 
             until ((ForeignValidationSetup.Next() = 0) or (IsValid));
         end;
@@ -75,9 +80,13 @@
     end;
 
     procedure SynchronizeLoyaltyPoints(CommunityCode: Code[20]; ManagerCode: Code[20]; MembershipEntryNo: Integer; ScannedCardNumber: Text[100])
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-
+        Sentry.StartSpan(Span, 'bc.membership.onsynchronizeloyaltypoints');
         OnSynchronizeLoyaltyPoints(CommunityCode, ManagerCode, MembershipEntryNo, ScannedCardNumber);
+        Span.Finish();
     end;
 
     procedure ShowSetup(ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup")
