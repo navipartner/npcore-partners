@@ -3,135 +3,100 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
     Access = Internal;
 
     var
-        Printer: Codeunit "NPR RP Line Print";
-        AmountPaidLbl: Label 'PLAĆENO:', Locked = true;
-        FinalBillLbl: Label 'ZA PLATITI €', Locked = true;
-        ItemDescLbl: Label 'Artikal', Locked = true;
-        LineAmountLbl: Label 'Iznos €', Locked = true;
+        PaidLbl: Label 'PLAĆENO:', Locked = true;
+        ToPayLbl: Label 'ZA PLATITI €', Locked = true;
+        ItemLbl: Label 'Artikal', Locked = true;
+        AmountLbl: Label 'Iznos €', Locked = true;
         PriceLbl: Label 'Cijena', Locked = true;
-        QtyLbl: Label 'Kol', Locked = true;
-        TwoValueFormatLbl: Label '%1 %2', Locked = true;
-        VATAmountLbl: Label 'PDV', Locked = true;
+        QuantityUOMLbl: Label 'Količina JM', Locked = true;
+        DiscountLbl: Label 'Popust', Locked = true;
+        VATRegNoLbl: Label 'OIB: %1', Locked = true;
+        VATLbl: Label 'PDV', Locked = true;
         VATBaseLbl: Label 'Osnovica', Locked = true;
         VATPercLbl: Label 'Porez', Locked = true;
-        VATTotalLbl: Label 'Ukupno', Locked = true;
+        CustomerLbl: Label 'Kupac:', Locked = true;
 
     #region CRO Fiscal Thermal Print - Receipt Print
-
     internal procedure PrintReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        Printer: Codeunit "NPR RP Line Print";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
     begin
+        Printer.SetAutoLineBreak(true);
+        Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
+
         case CROPOSAuditLogAuxInfo."Audit Entry Type" of
             "NPR CRO Audit Entry Type"::"POS Entry":
-                PrintPOSThermalReceipt(CROPOSAuditLogAuxInfo);
+                AddPOSReceiptInformation(Printer, CROPOSAuditLogAuxInfo);
             "NPR CRO Audit Entry Type"::"Sales Invoice":
-                PrintSalesInvThermalReceipt(CROPOSAuditLogAuxInfo);
+                AddSalesInvoiceReceiptInformation(Printer, CROPOSAuditLogAuxInfo);
             "NPR CRO Audit Entry Type"::"Sales Credit Memo":
-                PrintSalesCrMemoThermalReceipt(CROPOSAuditLogAuxInfo);
+                AddSalesCrMemoReceiptInformation(Printer, CROPOSAuditLogAuxInfo);
         end;
+
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'PC852';
+        TempPrinterDeviceSettings.Insert();
+
+        Papercut(Printer);
+
+        Commit(); // Required for mPOS printing (RunModal flow)
+        Printer.ProcessBuffer(Codeunit::"NPR CRO Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
+
+        CROPOSAuditLogAuxInfo."Receipt Printed" := true;
+        CROPOSAuditLogAuxInfo.Modify();
     end;
 
-    local procedure PrintPOSThermalReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure AddPOSReceiptInformation(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     var
         POSEntry: Record "NPR POS Entry";
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
     begin
-        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
-        Printer.SetAutoLineBreak(false);
-
         POSEntry.Get(CROPOSAuditLogAuxInfo."POS Entry No.");
 
-        PrintHeaderSection(CROPOSAuditLogAuxInfo);
+        AddHeaderSection(Printer, CROPOSAuditLogAuxInfo);
 
         if CROPOSAuditLogAuxInfo."Collect in Store" then
-            PrintCollectInStorePOSSaleContentSection(CROPOSAuditLogAuxInfo)
+            AddCollectInStorePOSSaleContentSection(Printer, CROPOSAuditLogAuxInfo, POSEntry)
         else begin
-            PrintPOSSaleContentSection(CROPOSAuditLogAuxInfo);
-            PrintPOSSaleVATSection(CROPOSAuditLogAuxInfo);
+            AddPOSEntrySalesLinesInformation(Printer, CROPOSAuditLogAuxInfo."POS Entry No.");
+            AddPOSTotalInformation(Printer, POSEntry);
+            AddPOSTaxInformation(Printer, CROPOSAuditLogAuxInfo."POS Entry No.");
+            AddPaymentMethodInformation(Printer, CROPOSAuditLogAuxInfo);
+            AddPOSPaymentInformation(Printer, CROPOSAuditLogAuxInfo."POS Entry No.");
         end;
 
-        PrintFooter(CROPOSAuditLogAuxInfo);
+        AddLoyaltyInformation(Printer, CROPOSAuditLogAuxInfo);
 
-        PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
-
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'PC852';
-        PrinterDeviceSettings.Insert();
-
-        Commit(); //fix for printing from mPOS (RunModal() run)
-        Printer.ProcessBuffer(Codeunit::"NPR CRO Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
-
-        CROPOSAuditLogAuxInfo."Receipt Printed" := true;
-        CROPOSAuditLogAuxInfo.Modify();
+        AddFooterSection(Printer, CROPOSAuditLogAuxInfo);
     end;
 
-    local procedure PrintSalesInvThermalReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
-    var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
-        SalesInvoiceHdr: Record "Sales Invoice Header";
+    local procedure AddSalesInvoiceReceiptInformation(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     begin
-        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
-        Printer.SetAutoLineBreak(false);
+        AddHeaderSection(Printer, CROPOSAuditLogAuxInfo);
 
-        SalesInvoiceHdr.Get(CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesInvoiceHdr.CalcFields("Amount Including VAT");
+        AddSalesInvoiceContentSection(Printer, CROPOSAuditLogAuxInfo);
 
-        PrintHeaderSection(CROPOSAuditLogAuxInfo);
+        AddLoyaltyInformation(Printer, CROPOSAuditLogAuxInfo);
 
-        PrintSalesInvContentSection(CROPOSAuditLogAuxInfo, SalesInvoiceHdr);
-
-        PrintFooter(CROPOSAuditLogAuxInfo);
-
-        PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
-
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
-
-        Printer.ProcessBuffer(Codeunit::"NPR CRO Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
-
-        CROPOSAuditLogAuxInfo."Receipt Printed" := true;
-        CROPOSAuditLogAuxInfo.Modify();
+        AddFooterSection(Printer, CROPOSAuditLogAuxInfo);
     end;
 
-    local procedure PrintSalesCrMemoThermalReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
-    var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
-        SalesCrMemoHdr: Record "Sales Cr.Memo Header";
+    local procedure AddSalesCrMemoReceiptInformation(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     begin
-        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
-        Printer.SetAutoLineBreak(false);
+        AddHeaderSection(Printer, CROPOSAuditLogAuxInfo);
 
-        SalesCrMemoHdr.Get(CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesCrMemoHdr.CalcFields("Amount Including VAT");
+        AddSalesCreditMemoContentSection(Printer, CROPOSAuditLogAuxInfo);
 
-        PrintHeaderSection(CROPOSAuditLogAuxInfo);
+        AddLoyaltyInformation(Printer, CROPOSAuditLogAuxInfo);
 
-        PrintSalesCrMemoContentSection(CROPOSAuditLogAuxInfo, SalesCrMemoHdr);
-
-        PrintFooter(CROPOSAuditLogAuxInfo);
-
-        PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
-
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
-
-        Printer.ProcessBuffer(Codeunit::"NPR CRO Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
-
-        CROPOSAuditLogAuxInfo."Receipt Printed" := true;
-        CROPOSAuditLogAuxInfo.Modify();
+        AddFooterSection(Printer, CROPOSAuditLogAuxInfo);
     end;
-
     #endregion
 
     #region CRO Fiscal Thermal Print - POS Sections Printing
-    local procedure PrintCollectInStorePOSSaleContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure AddCollectInStorePOSSaleContentSection(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; POSEntry: Record "NPR POS Entry")
     var
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
@@ -147,29 +112,14 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
         SalesOrders: List of [Code[20]];
         DictKeysList: List of [Decimal];
     begin
-        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
-        PrintDottedLine();
-
-        POSEntrySalesLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
-        if POSEntrySalesLine.FindSet() then
-            repeat
-                PrintTextLine(POSEntrySalesLine.Description, false);
-                PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(Abs(POSEntrySalesLine."Unit Price")), FormatDecimal(POSEntrySalesLine."Amount Incl. VAT"), false);
-            until POSEntrySalesLine.Next() = 0;
-
-        POSEntryTaxLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
-        if POSEntryTaxLine.FindSet() then
-            repeat
-                AddAmountToDecimalDict(TaxableAmountDict, POSEntryTaxLine."Tax %", POSEntryTaxLine."Tax Base Amount");
-                AddAmountToDecimalDict(TaxAmountDict, POSEntryTaxLine."Tax %", POSEntryTaxLine."Tax Amount");
-                AddAmountToDecimalDict(AmountInclTaxDict, POSEntryTaxLine."Tax %", POSEntryTaxLine."Amount Including Tax");
-            until POSEntryTaxLine.Next() = 0;
+        AddPOSEntrySalesLinesInformation(Printer, CROPOSAuditLogAuxInfo."POS Entry No.");
+        AddPOSTotalInformation(Printer, POSEntry);
+        AddPOSTaxInformation(Printer, CROPOSAuditLogAuxInfo."POS Entry No.");
 
         NpCsCollectMgt.FindDocumentsForDeliveredCollectInStoreDocument(CROPOSAuditLogAuxInfo."POS Entry No.", PostedSalesInvoices, SalesOrders);
 
         foreach SalesOrderNo in SalesOrders do begin
-            SalesLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT %", "Amount Including VAT", "VAT Base Amount");
+            SalesLine.SetLoadFields("No.", Description, Quantity, "Unit of Measure Code", "Unit Price", "VAT %", "Amount Including VAT", "VAT Base Amount", "Line Discount Amount");
             SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
             SalesLine.SetRange("Document No.", SalesOrderNo);
             SalesLine.SetRange(Type, SalesLine.Type::Item);
@@ -178,8 +128,16 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
                 SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo);
 
                 repeat
-                    PrintTextLine(SalesLine.Description, false);
-                    PrintFourColumnText(Format(SalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesHeader."Prices Including VAT", SalesLine."Unit Price", SalesLine."VAT %", SalesHeader."Currency Code")), FormatDecimal(SalesLine."Amount Including VAT"), false);
+                    PrintLine(Printer, SalesLine."No." + ' ' + SalesLine.Description, 0, false);
+                    Printer.AddTextField(1, 0, FormatDecimal(SalesLine.Quantity) + ' ' + SalesLine."Unit of Measure Code");
+                    Printer.AddTextField(2, 2, FormatDecimal(GetUnitPriceInclVAT(SalesHeader."Prices Including VAT", SalesLine."Unit Price", SalesLine."VAT %", SalesHeader."Currency Code")));
+                    Printer.AddTextField(3, 2, FormatDecimal(SalesLine."Amount Including VAT"));
+
+                    if SalesLine."Line Discount Amount" <> 0 then begin
+                        Printer.AddTextField(1, 0, DiscountLbl);
+                        Printer.AddTextField(2, 2, FormatDecimal(-SalesLine."Line Discount Amount"));
+                        Printer.AddTextField(3, 0, '');
+                    end;
 
                     AddAmountToDecimalDict(TaxableAmountDict, SalesLine."VAT %", SalesLine."VAT Base Amount");
                     AddAmountToDecimalDict(TaxAmountDict, SalesLine."VAT %", SalesLine."Amount Including VAT" - SalesLine."VAT Base Amount");
@@ -189,7 +147,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
         end;
 
         foreach PostedSalesInvoiceNo in PostedSalesInvoices do begin
-            SalesInvoiceLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT %", "Amount Including VAT", "VAT Base Amount");
+            SalesInvoiceLine.SetLoadFields("No.", Description, Quantity, "Unit of Measure Code", "Unit Price", "VAT %", "Amount Including VAT", "VAT Base Amount", "Line Discount Amount");
             SalesInvoiceLine.SetRange("Document No.", PostedSalesInvoiceNo);
             SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
             if SalesInvoiceLine.FindSet() then begin
@@ -197,8 +155,16 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
                 SalesInvoiceHeader.Get(SalesInvoiceLine."Document No.");
 
                 repeat
-                    PrintTextLine(SalesInvoiceLine.Description, false);
-                    PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code")), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
+                    PrintLine(Printer, SalesInvoiceLine."No." + ' ' + SalesInvoiceLine.Description, 0, false);
+                    Printer.AddTextField(1, 0, FormatDecimal(SalesInvoiceLine.Quantity) + ' ' + SalesInvoiceLine."Unit of Measure Code");
+                    Printer.AddTextField(2, 2, FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code")));
+                    Printer.AddTextField(3, 2, FormatDecimal(SalesInvoiceLine."Amount Including VAT"));
+
+                    if SalesInvoiceLine."Line Discount Amount" <> 0 then begin
+                        Printer.AddTextField(1, 0, DiscountLbl);
+                        Printer.AddTextField(2, 2, FormatDecimal(-SalesInvoiceLine."Line Discount Amount"));
+                        Printer.AddTextField(3, 0, '');
+                    end;
 
                     AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
                     AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
@@ -207,304 +173,623 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
             end;
         end;
 
-        PrintFullLine();
+        PrintFullLine(Printer);
 
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"), true);
-        PrintTextLine('', false);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, ToPayLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"));
+        Printer.SetBold(false);
 
-        PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
-        PrintDottedLine();
+        PrintDottedLine(Printer);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, VATPercLbl);
+        Printer.AddTextField(2, 2, VATBaseLbl);
+        Printer.AddTextField(3, 2, VATLbl);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
 
         DictKeysList := TaxableAmountDict.Keys();
-        foreach DictKey in DictKeysList do
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
+        foreach DictKey in DictKeysList do begin
+            Printer.AddTextField(1, 0, Format(Round(DictKey, 0.1)) + '%');
+            Printer.AddTextField(2, 2, FormatDecimal(TaxableAmountDict.Get(DictKey)));
+            Printer.AddTextField(3, 2, FormatDecimal(TaxAmountDict.Get(DictKey)));
+        end;
 
-        PrintFullLine();
+        PrintFullLine(Printer);
 
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."Payment Method"), '', FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"), true);
-
-        PrintTextLine('', false);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, PaidLbl);
+        Printer.AddTextField(2, 0, Format(CROPOSAuditLogAuxInfo."Payment Method"));
+        Printer.AddTextField(3, 2, FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"));
+        Printer.SetBold(false);
     end;
 
-    local procedure PrintPOSSaleContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure AddPOSEntrySalesLinesInformation(var Printer: Codeunit "NPR RP Line Print"; POSEntryNo: Integer)
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
-        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
-        PrintDottedLine();
+        PrintDottedLine(Printer);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, ItemLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 0, '');
 
-        POSEntrySalesLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        Printer.AddTextField(1, 0, QuantityUOMLbl);
+        Printer.AddTextField(2, 2, PriceLbl);
+        Printer.AddTextField(3, 2, AmountLbl);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
+
+        POSEntrySalesLine.SetLoadFields("No.", Description, Quantity, "Unit of Measure Code", "Unit Price", "Amount Incl. VAT", "Line Discount Amount Incl. VAT");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
         if POSEntrySalesLine.FindSet() then
             repeat
-                PrintTextLine(POSEntrySalesLine.Description, false);
-                PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(Abs(POSEntrySalesLine."Unit Price")), FormatDecimal(POSEntrySalesLine."Amount Incl. VAT"), false);
-            until POSEntrySalesLine.Next() = 0;
-        PrintFullLine();
+                PrintLine(Printer, POSEntrySalesLine."No." + ' ' + POSEntrySalesLine.Description, 0, false);
+                Printer.AddTextField(1, 0, FormatDecimal(POSEntrySalesLine.Quantity) + ' ' + POSEntrySalesLine."Unit of Measure Code");
+                Printer.AddTextField(2, 2, FormatDecimal(Abs(POSEntrySalesLine."Unit Price")));
+                Printer.AddTextField(3, 2, FormatDecimal(POSEntrySalesLine."Amount Incl. VAT"));
 
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"), true);
-        PrintTextLine('', false);
+                if POSEntrySalesLine."Line Discount Amount Incl. VAT" <> 0 then begin
+                    Printer.AddTextField(1, 0, DiscountLbl);
+                    Printer.AddTextField(2, 2, FormatDecimal(-POSEntrySalesLine."Line Discount Amount Incl. VAT"));
+                    Printer.AddTextField(3, 0, '');
+                end;
+            until POSEntrySalesLine.Next() = 0;
+
+        PrintFullLine(Printer);
     end;
 
-    local procedure PrintPOSSaleVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure AddPOSTotalInformation(var Printer: Codeunit "NPR RP Line Print"; POSEntry: Record "NPR POS Entry")
+    begin
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, ToPayLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, FormatDecimal(POSEntry."Amount Incl. Tax"));
+
+        if POSEntry."Discount Amount Incl. VAT" <> 0 then begin
+            Printer.AddTextField(1, 0, DiscountLbl);
+            Printer.AddTextField(2, 0, '');
+            Printer.AddTextField(3, 2, FormatDecimal(POSEntry."Discount Amount Incl. VAT"));
+        end;
+
+        Printer.SetBold(false);
+    end;
+
+    local procedure AddPOSTaxInformation(var Printer: Codeunit "NPR RP Line Print"; POSEntryNo: Integer)
     var
         POSEntryTaxLine: Record "NPR POS Entry Tax Line";
     begin
-        PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
-        PrintDottedLine();
+        PrintDottedLine(Printer);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, VATPercLbl);
+        Printer.AddTextField(2, 2, VATBaseLbl);
+        Printer.AddTextField(3, 2, VATLbl);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
 
-        POSEntryTaxLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
+        POSEntryTaxLine.SetLoadFields("Tax %", "Tax Base Amount", "Tax Amount");
+        POSEntryTaxLine.SetRange("POS Entry No.", POSEntryNo);
         if POSEntryTaxLine.FindSet() then
             repeat
-                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(Abs(POSEntryTaxLine."Tax %"), 0.1)), '%'), FormatDecimal(Abs(POSEntryTaxLine."Tax Base Amount")), FormatDecimal(Abs(POSEntryTaxLine."Tax Amount")), FormatDecimal(Abs(POSEntryTaxLine."Amount Including Tax")), false);
+                Printer.AddTextField(1, 0, FormatDecimal(Abs(POSEntryTaxLine."Tax %")) + '%');
+                Printer.AddTextField(2, 2, FormatDecimal(Abs(POSEntryTaxLine."Tax Base Amount")));
+                Printer.AddTextField(3, 2, FormatDecimal(Abs(POSEntryTaxLine."Tax Amount")));
             until POSEntryTaxLine.Next() = 0;
+    end;
 
-        PrintFullLine();
+    local procedure AddPOSPaymentInformation(var Printer: Codeunit "NPR RP Line Print"; POSEntryNo: Integer)
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        POSEntryPaymentLine.SetLoadFields(Description, Amount);
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                PrintLine(Printer, POSEntryPaymentLine.Description, 0, false);
+                Printer.AddTextField(1, 0, '');
+                Printer.AddTextField(2, 0, '');
+                Printer.AddTextField(3, 2, FormatDecimal(POSEntryPaymentLine.Amount));
+            until POSEntryPaymentLine.Next() = 0;
 
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."Payment Method"), '', FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"), true);
-
-        PrintTextLine('', false);
+        PrintFullLine(Printer);
     end;
     #endregion
 
     #region CRO Fiscal Thermal Print - Sales Invoice Sections Printing
-    local procedure PrintSalesInvContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure AddSalesInvoiceContentSection(var Printer: Codeunit "NPR RP Line Print"; CROPOSAudLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
+        PaymentMethod: Record "Payment Method";
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
-        AmountInclTaxDict: Dictionary of [Decimal, Decimal];
-        DictKeysList: List of [Decimal];
         DictKey: Decimal;
+        TotalLineDiscount: Decimal;
     begin
-        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
-        PrintDottedLine();
+        SalesInvoiceHeader.Get(CROPOSAudLogAuxInfo."Source Document No.");
+        SalesInvoiceHeader.CalcFields("Amount Including VAT");
 
-        SalesInvoiceLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesInvoiceLine.SetRange(Type, "Sales Line Type"::Item);
+        PrintDottedLine(Printer);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, ItemLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 0, '');
+
+        Printer.AddTextField(1, 0, QuantityUOMLbl);
+        Printer.AddTextField(2, 2, PriceLbl);
+        Printer.AddTextField(3, 2, AmountLbl);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
+
+        SalesInvoiceLine.SetLoadFields("No.", Description, Quantity, "Unit of Measure Code", "Unit Price", "VAT %", "Amount Including VAT", "VAT Base Amount", "Line Discount Amount");
+        SalesInvoiceLine.SetRange("Document No.", CROPOSAudLogAuxInfo."Source Document No.");
+        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
         if SalesInvoiceLine.FindSet() then
             repeat
-                PrintTextLine(SalesInvoiceLine.Description, false);
-                PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code")), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
+                PrintLine(Printer, SalesInvoiceLine."No." + ' ' + SalesInvoiceLine.Description, 0, false);
+                Printer.AddTextField(1, 0, FormatDecimal(SalesInvoiceLine.Quantity) + ' ' + SalesInvoiceLine."Unit of Measure Code");
+                Printer.AddTextField(2, 2, FormatDecimal(Abs(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code"))));
+                Printer.AddTextField(3, 2, FormatDecimal(SalesInvoiceLine."Amount Including VAT"));
+
+                if SalesInvoiceLine."Line Discount Amount" <> 0 then begin
+                    Printer.AddTextField(1, 0, DiscountLbl);
+                    Printer.AddTextField(2, 2, FormatDecimal(-SalesInvoiceLine."Line Discount Amount"));
+                    Printer.AddTextField(3, 0, '');
+                    TotalLineDiscount += SalesInvoiceLine."Line Discount Amount";
+                end;
 
                 AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
                 AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
-                AddAmountToDecimalDict(AmountInclTaxDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
             until SalesInvoiceLine.Next() = 0;
-        PrintFullLine();
 
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SalesInvoiceHeader."Amount Including VAT"), true);
-        PrintTextLine('', false);
+        PrintFullLine(Printer);
 
-        PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
-        PrintDottedLine();
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, ToPayLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, FormatDecimal(SalesInvoiceHeader."Amount Including VAT"));
 
-        DictKeysList := TaxableAmountDict.Keys();
-        foreach DictKey in DictKeysList do
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
+        if TotalLineDiscount <> 0 then begin
+            Printer.AddTextField(1, 0, DiscountLbl);
+            Printer.AddTextField(2, 0, '');
+            Printer.AddTextField(3, 2, FormatDecimal(TotalLineDiscount));
+        end;
 
-        PrintFullLine();
+        Printer.SetBold(false);
 
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."Payment Method"), '', FormatDecimal(SalesInvoiceHeader."Amount Including VAT"), true);
+        PrintDottedLine(Printer);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, VATPercLbl);
+        Printer.AddTextField(2, 2, VATBaseLbl);
+        Printer.AddTextField(3, 2, VATLbl);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
 
-        PrintTextLine('', false);
+        foreach DictKey in TaxableAmountDict.Keys() do begin
+            Printer.AddTextField(1, 0, Format(Round(DictKey, 0.1)) + '%');
+            Printer.AddTextField(2, 2, FormatDecimal(TaxableAmountDict.Get(DictKey)));
+            Printer.AddTextField(3, 2, FormatDecimal(TaxAmountDict.Get(DictKey)));
+        end;
+
+        AddPaymentMethodInformation(Printer, CROPOSAudLogAuxInfo);
+
+        if PaymentMethod.Get(SalesInvoiceHeader."Payment Method Code") then begin
+            PrintLine(Printer, PaymentMethod.Description, 0, false);
+            Printer.AddTextField(1, 0, '');
+            Printer.AddTextField(2, 0, '');
+            Printer.AddTextField(3, 2, FormatDecimal(SalesInvoiceHeader."Amount Including VAT"));
+
+            PrintFullLine(Printer);
+        end;
     end;
     #endregion
 
     #region CRO Fiscal Thermal Print - Sales Credit Memo Sections Printing
-    local procedure PrintSalesCrMemoContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    local procedure AddSalesCreditMemoContentSection(var Printer: Codeunit "NPR RP Line Print"; CROPOSAudLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     var
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
-        AmountInclTaxDict: Dictionary of [Decimal, Decimal];
-        DictKeysList: List of [Decimal];
         DictKey: Decimal;
+        TotalLineDiscount: Decimal;
     begin
-        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
-        PrintDottedLine();
+        SalesCrMemoHeader.Get(CROPOSAudLogAuxInfo."Source Document No.");
+        SalesCrMemoHeader.CalcFields("Amount Including VAT");
 
-        SalesCrMemoLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesCrMemoLine.SetRange(Type, "Sales Line Type"::Item);
+        PrintDottedLine(Printer);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, ItemLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 0, '');
+
+        Printer.AddTextField(1, 0, QuantityUOMLbl);
+        Printer.AddTextField(2, 2, PriceLbl);
+        Printer.AddTextField(3, 2, AmountLbl);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
+
+        SalesCrMemoLine.SetLoadFields("No.", Description, Quantity, "Unit of Measure Code", "Unit Price", "VAT %", "Amount Including VAT", "VAT Base Amount", "Line Discount Amount");
+        SalesCrMemoLine.SetRange("Document No.", CROPOSAudLogAuxInfo."Source Document No.");
+        SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
         if SalesCrMemoLine.FindSet() then
             repeat
-                PrintTextLine(SalesCrMemoLine.Description, false);
-                PrintFourColumnText(Format(-Abs(SalesCrMemoLine.Quantity)).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(Abs(GetUnitPriceInclVAT(SalesCrMemoHeader."Prices Including VAT", SalesCrMemoLine."Unit Price", SalesCrMemoLine."VAT %", SalesCrMemoHeader."Currency Code"))), FormatDecimal(-Abs(SalesCrMemoLine."Amount Including VAT")), false);
+                PrintLine(Printer, SalesCrMemoLine."No." + ' ' + SalesCrMemoLine.Description, 0, false);
+                Printer.AddTextField(1, 0, FormatDecimal(-SalesCrMemoLine.Quantity) + ' ' + SalesCrMemoLine."Unit of Measure Code");
+                Printer.AddTextField(2, 2, FormatDecimal(Abs(GetUnitPriceInclVAT(SalesCrMemoHeader."Prices Including VAT", SalesCrMemoLine."Unit Price", SalesCrMemoLine."VAT %", SalesCrMemoHeader."Currency Code"))));
+                Printer.AddTextField(3, 2, FormatDecimal(-SalesCrMemoLine."Amount Including VAT"));
+
+                if SalesCrMemoLine."Line Discount Amount" <> 0 then begin
+                    Printer.AddTextField(1, 0, DiscountLbl);
+                    Printer.AddTextField(2, 2, FormatDecimal(-SalesCrMemoLine."Line Discount Amount"));
+                    Printer.AddTextField(3, 0, '');
+                    TotalLineDiscount += SalesCrMemoLine."Line Discount Amount";
+                end;
 
                 AddAmountToDecimalDict(TaxableAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."VAT Base Amount");
                 AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount");
-                AddAmountToDecimalDict(AmountInclTaxDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT");
             until SalesCrMemoLine.Next() = 0;
-        PrintFullLine();
 
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SalesCrMemoHeader."Amount Including VAT"), true);
-        PrintTextLine('', false);
+        PrintFullLine(Printer);
 
-        PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
-        PrintDottedLine();
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, ToPayLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, FormatDecimal(SalesCrMemoHeader."Amount Including VAT"));
+
+        if TotalLineDiscount <> 0 then begin
+            Printer.AddTextField(1, 0, DiscountLbl);
+            Printer.AddTextField(2, 0, '');
+            Printer.AddTextField(3, 2, FormatDecimal(TotalLineDiscount));
+        end;
 
 
-        DictKeysList := TaxableAmountDict.Keys();
-        foreach DictKey in DictKeysList do
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
 
-        PrintFullLine();
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, VATPercLbl);
+        Printer.AddTextField(2, 2, VATBaseLbl);
+        Printer.AddTextField(3, 2, VATLbl);
 
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."Payment Method"), '', FormatDecimal(-SalesCrMemoHeader."Amount Including VAT"), true);
+        Printer.SetBold(false);
+        PrintDottedLine(Printer);
 
-        PrintTextLine('', false);
+        foreach DictKey in TaxableAmountDict.Keys() do begin
+            Printer.AddTextField(1, 0, Format(Round(DictKey, 0.1)) + '%');
+            Printer.AddTextField(2, 2, FormatDecimal(TaxableAmountDict.Get(DictKey)));
+            Printer.AddTextField(3, 2, FormatDecimal(TaxAmountDict.Get(DictKey)));
+        end;
+
+        AddPaymentMethodInformation(Printer, CROPOSAudLogAuxInfo);
     end;
-
     #endregion
 
     #region CRO Fiscal Thermal Print - Base Section Printing
 
-    local procedure PrintHeaderSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure AddHeaderSection(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     var
-        CompanyInfo: Record "Company Information";
-        CROFiscalSetup: Record "NPR CRO Fiscalization Setup";
+        CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
+        CompanyInformation: Record "Company Information";
+        RetailLogo: Record "NPR Retail Logo";
         POSStore: Record "NPR POS Store";
-        BillNoLbl: Label 'Broj %1', Locked = true;
-        CompanyInfoLbl: Label '%1, %2 %3', Locked = true;
+        Customer: Record Customer;
         FiscalBillCopyLbl: Label 'OVO JE KOPIJA FISKALNOG RACUNA', Locked = true;
-        OibLbl: Label 'OIB: %1', Locked = true;
-        ParagonBillLbl: Label '%1/%2/%3', Locked = true;
-        POSUnitLbl: Label 'Blagajna', Locked = true;
+        FiscalBillNoLbl: Label 'Račun %1/%2/%3', Locked = true;
+        InternalBillNoLbl: Label 'Interni broj računa: %1', Locked = true;
+        FiscalBillDateTimeLbl: Label 'Vrijeme izdavanja: %1 %2', Locked = true;
+        AddressLine: Text;
     begin
-        PrintThermalLine('POSLOGO', 'LOGO', false, 'CENTER', true, false);
+        // Logo section
+        RetailLogo.SetRange("Register No.", CROPOSAuditLogAuxInfo."POS Unit No.");
+        if RetailLogo.IsEmpty() then
+            RetailLogo.SetRange("Register No.", '');
+        RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
+        RetailLogo.SetFilter("End Date", '>=%1|=%2', Today, 0D);
+        if RetailLogo.FindFirst() then
+            PrintLogo(Printer, RetailLogo.Keyword);
 
+        // Company information section
+        CompanyInformation.Get();
+        PrintLine(Printer, CompanyInformation.Name, 0, true);
+        AddressLine := FormatAddress(CompanyInformation.Address, CompanyInformation."Post Code", CompanyInformation.City);
+        if AddressLine <> '' then
+            PrintLine(Printer, AddressLine, 0, false);
+        Clear(AddressLine);
+
+        // POS Store information section
+        POSStore.Get(CROPOSAuditLogAuxInfo."POS Store Code");
+        PrintLine(Printer, POSStore.Name, 0, false);
+        AddressLine := FormatAddress(POSStore.Address, POSStore."Post Code", POSStore.City);
+        if AddressLine <> '' then
+            PrintLine(Printer, AddressLine, 0, false);
+        Clear(AddressLine);
+
+        CROFiscalizationSetup.Get();
+        PrintLine(Printer, StrSubstNo(VATRegNoLbl, CROFiscalizationSetup."Certificate Subject OIB"), 0, false);
+        PrintFullLine(Printer);
+
+        // Fiscal bill copy section
         if CROPOSAuditLogAuxInfo."Receipt Printed" then begin
-            PrintTextLine(FiscalBillCopyLbl, true);
-            PrintFullLine();
+            PrintLine(Printer, FiscalBillCopyLbl, 0, true);
+            PrintFullLine(Printer);
         end;
 
-        CompanyInfo.Get();
-        PrintTextLine(CompanyInfo.Name, true);
-        PrintTextLine(StrSubstNo(CompanyInfoLbl, CompanyInfo.Address, CompanyInfo."Post Code", CompanyInfo.City), false);
+        // Bill information section
+        PrintLine(Printer, StrSubstNo(FiscalBillNoLbl, CROPOSAuditLogAuxInfo."Bill No.", CROPOSAuditLogAuxInfo."POS Store Code", CROPOSAuditLogAuxInfo."POS Unit No."), 0, true);
+        PrintLine(Printer, StrSubstNo(InternalBillNoLbl, CROPOSAuditLogAuxInfo."Source Document No."), 0, true);
+        PrintLine(Printer, StrSubstNo(FiscalBillDateTimeLbl, FormatDate(CROPOSAuditLogAuxInfo."Entry Date"), FormatTime(CROPOSAuditLogAuxInfo."Log Timestamp")), 0, true);
+        AddSalespersonName(Printer, CROPOSAuditLogAuxInfo);
+        PrintFullLine(Printer);
 
-        POSStore.Get(CROPOSAuditLogAuxInfo."POS Store Code");
-        PrintTextLine(POSStore.Name, false);
-        PrintTextLine(StrSubstNo(CompanyInfoLbl, POSStore.Address, POSStore."Post Code", POSStore.City), false);
+        // Customer information section
+        if CROPOSAuditLogAuxInfo."Customer No." <> '' then begin
+            if Customer.Get(CROPOSAuditLogAuxInfo."Customer No.") then begin
+                PrintNewLine(Printer);
+                PrintLine(Printer, CustomerLbl, 0, true);
+                PrintLine(Printer, Customer.Name, 0, false);
+                AddressLine := FormatAddress(Customer.Address, Customer."Post Code", Customer.City);
+                if AddressLine <> '' then
+                    PrintLine(Printer, AddressLine, 0, false);
+                Clear(AddressLine);
 
-        CROFiscalSetup.Get();
-        PrintTextLine(StrSubstNo(OibLbl, CROFiscalSetup."Certificate Subject OIB"), false);
-        PrintFullLine();
-
-        PrintTwoColumnText(StrSubstNo(BillNoLbl, StrSubstNo(ParagonBillLbl, CROPOSAuditLogAuxInfo."Bill No.", CROPOSAuditLogAuxInfo."POS Store Code", CROPOSAuditLogAuxInfo."POS Unit No.")), StrSubstNo(TwoValueFormatLbl, Format(CROPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>'), Format(CROPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')), false);
-
-        PrintTextLine(StrSubstNo(TwoValueFormatLbl, POSUnitLbl, CROPOSAuditLogAuxInfo."POS Unit No."), false);
-        PrintDottedLine();
+                if Customer."VAT Registration No." <> '' then
+                    PrintLine(Printer, StrSubstNo(VATRegNoLbl, Customer."VAT Registration No."), 0, false);
+            end
+        end;
     end;
 
-    local procedure PrintFooter(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure AddSalespersonName(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SalespersonNameLbl: Label 'Izdao: %1', Comment = '%1 = Salesperson Name', Locked = true;
+    begin
+        case CROPOSAuditLogAuxInfo."Audit Entry Type" of
+            "NPR CRO Audit Entry Type"::"POS Entry":
+                begin
+                    POSEntry.Get(CROPOSAuditLogAuxInfo."POS Entry No.");
+                    if SalespersonPurchaser.Get(POSEntry."Salesperson Code") then
+                        PrintLine(Printer, StrSubstNo(SalespersonNameLbl, SalespersonPurchaser.Name), 0, true);
+                end;
+            "NPR CRO Audit Entry Type"::"Sales Invoice":
+                begin
+                    SalesInvoiceHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.");
+                    if SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code") then
+                        PrintLine(Printer, StrSubstNo(SalespersonNameLbl, SalespersonPurchaser.Name), 0, true);
+                end;
+            "NPR CRO Audit Entry Type"::"Sales Credit Memo":
+                begin
+                    SalesCrMemoHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.");
+                    if SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code") then
+                        PrintLine(Printer, StrSubstNo(SalespersonNameLbl, SalespersonPurchaser.Name), 0, true);
+                end;
+        end;
+    end;
+
+    local procedure AddFooterSection(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     var
         JIRCodeLbl: Label 'JIR:', Locked = true;
         ZKICodeLbl: Label 'ZKI:', Locked = true;
     begin
-        PrintFullLine();
-        PrintTextLine('', false);
+        PrintLine(Printer, ZKICodeLbl + ' ' + CROPOSAuditLogAuxInfo."ZKI Code", 0, false);
+        PrintLine(Printer, JIRCodeLbl + ' ' + CROPOSAuditLogAuxInfo."JIR Code", 0, false);
 
-        PrintTextLine(StrSubstNo(TwoValueFormatLbl, ZKICodeLbl, CROPOSAuditLogAuxInfo."ZKI Code"), true);
-        PrintTextLine(StrSubstNo(TwoValueFormatLbl, JIRCodeLbl, CROPOSAuditLogAuxInfo."JIR Code"), true);
-        PrintTextLine('', false);
+        PrintFullLine(Printer);
 
-        PrintQRCode(CROPOSAuditLogAuxInfo."Verification URL");
+        PrintQRCode(Printer, CROPOSAuditLogAuxInfo."Verification URL");
     end;
 
+    local procedure AddPaymentMethodInformation(var Printer: Codeunit "NPR RP Line Print"; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    begin
+        PrintFullLine(Printer);
+        Printer.SetBold(true);
+        Printer.AddTextField(1, 0, PaidLbl);
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, Format(CROPOSAuditLogAuxInfo."Payment Method"));
+        Printer.SetBold(false);
+        PrintFullLine(Printer);
+    end;
+
+    local procedure AddLoyaltyInformation(var Printer: Codeunit "NPR RP Line Print"; CROPOSAudLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        MMMembersPointsEntry: Record "NPR MM Members. Points Entry";
+        MMMembership: Record "NPR MM Membership";
+        MMMembershipRole: Record "NPR MM Membership Role";
+        MMMember: Record "NPR MM Member";
+        MembershipHeadlineLbl: Label 'LOYALTY', Locked = true;
+        PointsBeforeSaleLbl: Label 'Stanje bodova prije:', Locked = true;
+        PointsUsedForSaleLbl: Label 'Iskorišteni bodovi:', Locked = true;
+        GainedPointsOnSaleLbl: Label 'Dobiveni bodovi:', Locked = true;
+        TotalMembershipPointsLbl: Label 'Novo stanje bodova:', Locked = true;
+        PointsBeforeSale: Decimal;
+        UsedPoints: Decimal;
+        GainedPointsOnSale: Decimal;
+        TotalPoints: Decimal;
+    begin
+        if CROPOSAudLogAuxInfo."Customer No." = '' then
+            exit;
+
+        MMMembership.SetRange("Customer No.", CROPOSAudLogAuxInfo."Customer No.");
+        MMMembership.SetLoadFields("Entry No.", "Remaining Points");
+        MMMembership.SetAutoCalcFields("Remaining Points");
+        if not MMMembership.FindFirst() then
+            exit;
+
+        MMMembersPointsEntry.SetCurrentKey("Membership Entry No.", "Entry Type", "Posting Date");
+        MMMembersPointsEntry.SetRange("Membership Entry No.", MMMembership."Entry No.");
+        if CROPOSAudLogAuxInfo."Total Amount" > 0 then
+            MMMembersPointsEntry.SetRange("Entry Type", MMMembersPointsEntry."Entry Type"::SALE)
+        else
+            MMMembersPointsEntry.SetRange("Entry Type", MMMembersPointsEntry."Entry Type"::REFUND);
+        MMMembersPointsEntry.SetRange("Posting Date", CROPOSAudLogAuxInfo."Entry Date");
+        MMMembersPointsEntry.SetRange("Document No.", CROPOSAudLogAuxInfo."Source Document No.");
+        MMMembersPointsEntry.SetRange("Point Constraint", MMMembersPointsEntry."Point Constraint"::INCLUDE);
+        MMMembersPointsEntry.CalcSums(Points);
+
+        if Round(MMMembersPointsEntry.Points, 0.01) <> 0 then
+            GainedPointsOnSale := MMMembersPointsEntry.Points;
+
+        MMMembersPointsEntry.Reset();
+        MMMembersPointsEntry.SetCurrentKey("Membership Entry No.", "Entry Type", "Posting Date");
+        MMMembersPointsEntry.SetRange("Membership Entry No.", MMMembership."Entry No.");
+        MMMembersPointsEntry.SetRange("Entry Type", MMMembersPointsEntry."Entry Type"::POINT_WITHDRAW);
+        MMMembersPointsEntry.SetRange("Posting Date", CROPOSAudLogAuxInfo."Entry Date");
+        MMMembersPointsEntry.SetRange("Document No.", CROPOSAudLogAuxInfo."Source Document No.");
+        MMMembersPointsEntry.SetRange("Point Constraint", MMMembersPointsEntry."Point Constraint"::INCLUDE);
+        MMMembersPointsEntry.CalcSums(Points);
+
+        if Round(MMMembersPointsEntry.Points, 0.01) <> 0 then
+            UsedPoints := Abs(MMMembersPointsEntry.Points);
+
+        MMMembersPointsEntry.Reset();
+        MMMembersPointsEntry.SetCurrentKey("Membership Entry No.", "Entry Type", "Posting Date");
+        MMMembersPointsEntry.SetRange("Membership Entry No.", MMMembership."Entry No.");
+        MMMembersPointsEntry.SetFilter("Posting Date", '<%1', CROPOSAudLogAuxInfo."Entry Date");
+        MMMembersPointsEntry.SetRange("Point Constraint", MMMembersPointsEntry."Point Constraint"::INCLUDE);
+        MMMembersPointsEntry.CalcSums(Points);
+
+        if Round(MMMembersPointsEntry.Points, 0.01) <> 0 then
+            PointsBeforeSale := MMMembersPointsEntry.Points;
+
+        TotalPoints := MMMembership."Remaining Points";
+
+        if (TotalPoints = 0) and (UsedPoints = 0) and (PointsBeforeSale = 0) and (GainedPointsOnSale = 0) then
+            exit;
+
+        PrintNewLine(Printer);
+
+        MMMembershipRole.SetRange("Membership Entry No.", MMMembership."Entry No.");
+        MMMembershipRole.SetRange("Member Role", MMMembershipRole."Member Role"::ADMIN);
+        if MMMembershipRole.IsEmpty() then
+            MMMembershipRole.SetRange("Member Role");
+        if MMMembershipRole.FindFirst() then begin
+            if MMMember.Get(MMMembershipRole."Member Entry No.") then begin
+                PrintLine(Printer, MembershipHeadlineLbl, 0, true);
+                PrintLine(Printer, MMMember."E-Mail Address", 0, true);
+                PrintNewLine(Printer);
+            end;
+        end;
+
+        Printer.SetBold(true);
+
+        PrintLine(Printer, PointsBeforeSaleLbl, 0, true);
+        Printer.AddTextField(1, 0, '');
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, Format(Round(PointsBeforeSale, 0.01)));
+
+        PrintLine(Printer, PointsUsedForSaleLbl, 0, true);
+        Printer.AddTextField(1, 0, '');
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, Format(Round(UsedPoints, 0.01)));
+
+        PrintLine(Printer, GainedPointsOnSaleLbl, 0, true);
+        Printer.AddTextField(1, 0, '');
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, Format(Round(GainedPointsOnSale, 0.01)));
+
+        PrintLine(Printer, TotalMembershipPointsLbl, 0, true);
+        Printer.AddTextField(1, 0, '');
+        Printer.AddTextField(2, 0, '');
+        Printer.AddTextField(3, 2, Format(Round(TotalPoints, 0.01)));
+
+        Printer.SetBold(false);
+
+        PrintFullLine(Printer);
+    end;
     #endregion
 
     #region CRO Fiscal Thermal Print - Printing Procedures
-
-    local procedure PrintThermalLine(Value: Text; Font: Text; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
-    begin
-        case true of
-            (Font in ['A11', 'B21', 'Control']):
-                begin
-                    Printer.SetFont(CopyStr(Font, 1, 30));
-                    Printer.SetBold(Bold);
-                    Printer.SetUnderLine(Underline);
-
-                    case Alignment of
-                        'LEFT':
-                            Printer.AddTextField(1, 0, Value);
-                        'CENTER':
-                            Printer.AddTextField(2, 1, Value);
-                        'RIGHT':
-                            Printer.AddTextField(3, 2, Value);
-                    end;
-                end;
-            (Font in ['QR']):
-                Printer.AddBarcode(CopyStr(Font, 1, 30), Value, 5, true, 5);
-            (Font in ['COMMAND']):
-                begin
-                    Printer.SetFont('COMMAND');
-                    Printer.AddLine('PAPERCUT', 0);
-                end;
-            (Font in ['LOGO']):
-                begin
-                    Printer.SetFont('Logo');
-                    Printer.AddLine(Value, 0);
-                end;
-        end;
-        if CR then
-            Printer.NewLine();
-    end;
-
-    local procedure PrintTextLine(TextToPrint: Text; Bold: Boolean)
-    begin
-        PrintThermalLine(TextToPrint.PadRight(40, ' '), 'A11', Bold, 'CENTER', true, false);
-    end;
-
-    local procedure PrintTwoColumnText(FirstColumnText: Text; SecondColumnText: Text; Bold: Boolean)
+    local procedure PrintLogo(var Printer: Codeunit "NPR RP Line Print"; Value: Text)
     var
-        TwoColumnValuesLbl: Label '%1%2', Locked = true;
+        LogoFontLbl: Label 'Logo', Locked = true;
     begin
-        PrintThermalLine(StrSubstNo(TwoColumnValuesLbl, FirstColumnText.PadRight(20, ' '), SecondColumnText.PadLeft(20, ' ')), 'A11', Bold, 'CENTER', true, false);
+        Printer.SetFont(CopyStr(LogoFontLbl, 1, 30));
+        Printer.AddLine(Value, 0);
     end;
 
-    local procedure PrintFourColumnText(FirstColumnText: Text; SecondColumnText: Text; ThirdColumnText: Text; FourthColumnText: Text; Bold: Boolean)
+    local procedure PrintLine(var Printer: Codeunit "NPR RP Line Print"; Value: Text; Alignment: Integer; Bold: Boolean)
     var
-        FourColumnValuesLbl: Label '%1%2%3%4', Locked = true;
+        A11FontLbl: Label 'A11', Locked = true;
     begin
-        PrintThermalLine(StrSubstNo(FourColumnValuesLbl, FirstColumnText.PadRight(10, ' '), SecondColumnText.PadRight(10, ' '), ThirdColumnText.PadLeft(10, ' '), FourthColumnText.PadLeft(10, ' ')), 'A11', Bold, 'CENTER', true, false);
+        Printer.SetBold(Bold);
+        Printer.SetFont(A11FontLbl);
+        Printer.AddLine(Value, Alignment);
+
+        if Bold then
+            Printer.SetBold(false);
     end;
 
-    local procedure PrintQRCode(QRCodeValue: Text)
-    begin
-        PrintThermalLine(QRCodeValue, 'QR', false, 'CENTER', true, false);
-    end;
-
-    local procedure PrintDottedLine()
+    local procedure PrintQRCode(var Printer: Codeunit "NPR RP Line Print"; Value: Text)
     var
-        DottedLineLbl: Label '---------------------------------------------', Locked = true;
+        QRFontLbl: Label 'QR', Locked = true;
     begin
-        PrintThermalLine(DottedLineLbl, 'A11', true, 'CENTER', true, false);
+        Printer.SetFont(QRFontLbl);
+        Printer.AddBarcode(QRFontLbl, Value, 5, true, 0);
     end;
 
-    local procedure PrintFullLine()
-    var
-        ThermalPrintLineLbl: Label '_____________________________________________', Locked = true;
+    local procedure PrintDottedLine(var Printer: Codeunit "NPR RP Line Print")
     begin
-        PrintThermalLine(ThermalPrintLineLbl, 'A11', true, 'CENTER', true, false);
+        Printer.SetPadChar('-');
+        Printer.AddLine('', 0);
     end;
 
+    local procedure PrintFullLine(var Printer: Codeunit "NPR RP Line Print")
+    begin
+        Printer.SetPadChar('_');
+        Printer.AddLine('', 0);
+    end;
+
+    local procedure PrintNewLine(var Printer: Codeunit "NPR RP Line Print")
+    begin
+        Printer.NewLine();
+    end;
+
+    local procedure Papercut(var Printer: Codeunit "NPR RP Line Print")
+    begin
+        Printer.SetFont('COMMAND');
+        Printer.AddLine('PAPERCUT', 0);
+    end;
     #endregion
 
     #region CRO Fiscal Thermal Print - Formatting
-
     local procedure FormatDecimal(Value: Decimal): Text
     begin
         exit(Format(Value, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'));
     end;
 
+    local procedure FormatDate(Value: Date): Text
+    begin
+        exit(Format(Value, 0, '<Day,2>.<Month,2>.<Year4>.'));
+    end;
+
+    local procedure FormatTime(Value: Time): Text
+    begin
+        exit(Format(Value, 0, '<Hours24>:<Minutes,2>:<Seconds,2>'));
+    end;
+
+    local procedure FormatAddress(Address: Text; PostCode: Text; City: Text) AddressLine: Text
+    begin
+        if Address <> '' then
+            AddressLine := Address;
+        if PostCode <> '' then begin
+            if AddressLine <> '' then
+                AddressLine += ', ';
+            AddressLine += PostCode;
+        end;
+        if City <> '' then begin
+            if AddressLine <> '' then
+                AddressLine += ' ';
+            AddressLine += City;
+        end;
+    end;
     #endregion
 
     #region CRO Fiscal Thermal Print - Helper Procedures
-
     local procedure AddAmountToDecimalDict(var DecimalDict: Dictionary of [Decimal, Decimal]; DictKey: Decimal; DictValue: Decimal)
     var
         BaseAmount: Decimal;
@@ -529,6 +814,5 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
                 Currency.InitRoundingPrecision();
         exit(Round(UnitPrice * (1 + VATPercentage / 100), Currency."Amount Rounding Precision"));
     end;
-
     #endregion
 }
