@@ -376,7 +376,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     if not TryGetPaymentMethod(EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code", PaymentMethod, PaymentMapping) then
                         Error(ExternalPaymentMethodNotSetupErr, EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code");
                     EcomSalesPmtLine.Description := CopyStr(PaymentMethod.Description + ' ' + EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesPmtLine.Description));
-
+                    if IsLoyaltyPointsPaymentLine(PaymentMapping) then
+                        EcomSalesPmtLine."Points Payment" := true;
                 end;
             EcomSalesPmtLine."Payment Method Type"::Voucher:
                 begin
@@ -830,6 +831,19 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             EcomSalesLine."Virtual Item Process Status"::Error:
                 VirtualItemProcessStatus := 'error';
         end;
+    end;
+
+    local procedure IsLoyaltyPointsPaymentLine(PaymentMapping: Record "NPR Magento Payment Mapping"): Boolean
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+    begin
+        if not PaymentGateway.Get(PaymentMapping."Payment Gateway Code") then
+            exit(false);
+
+        if PaymentGateway."Integration Type" <> PaymentGateway."Integration Type"::NPLoyalty_Discount then
+            exit(false);
+
+        exit(true);
     end;
 
     local procedure ValidatePhoneNumber(PhoneNo: Text)

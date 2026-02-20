@@ -65,6 +65,11 @@
             Caption = 'Retail Id';
             DataClassification = CustomerContent;
         }
+        field(180; "Points Payment Line Id"; Guid)
+        {
+            Caption = 'Points Payment Line Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

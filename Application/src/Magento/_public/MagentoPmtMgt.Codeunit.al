@@ -220,6 +220,7 @@
     var
         PaymentLine: Record "NPR Magento Payment Line";
         MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+        NPLoyaltyDiscountHandler: Codeunit "NPR NPLoyalty Discount Handler";
     begin
         if Rec.IsTemporary then
             exit;
@@ -231,7 +232,8 @@
                 PaymentLine.FindSet();
                 repeat
                     MagentoPmtAdyenMgt.CheckUnproccesedWebhook(PaymentLine);
-                    CancelPaymentLine(PaymentLine);
+                    if not NPLoyaltyDiscountHandler.IsLoyaltyPointsPaymentLine(PaymentLine."Payment Gateway Code") then
+                        CancelPaymentLine(PaymentLine);
                     MagentoPmtAdyenMgt.SetShowCancelMsg(false);
                     MagentoPmtAdyenMgt.CancelPayByLink(PaymentLine);
                 until PaymentLine.Next() = 0;
@@ -245,13 +247,21 @@
     local procedure CheckPayment(var SalesHeader: Record "Sales Header")
     var
         PaymentLine: Record "NPR Magento Payment Line";
+        HasPoints: Boolean;
         PaymentAmt: Decimal;
+        PointsPaymentAmount: Decimal;
         TotalAmountInclVAT: Decimal;
     begin
         if HasAllowAdjustAmount(SalesHeader) then
             exit;
 
+        HasPoints := HasMagentoPaymentPoints(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        if HasPoints then
+            PointsPaymentAmount := GetPointsPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
+        if HasPoints then
+            TotalAmountInclVAT += PointsPaymentAmount;
         SalesHeader.CalcFields("NPR Magento Payment Amount");
         PaymentLine.Reset();
         PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
@@ -272,6 +282,7 @@
             Error(Text004, PaymentAmt);
 
         CheckIfTotalPaymentWhenVoucherInUse(SalesHeader, PaymentAmt, TotalAmountInclVAT);
+        CheckIfTotalPaymentWhenPointsInUse(SalesHeader, PaymentAmt, TotalAmountInclVAT);
         CheckIfTotalPaymentWhenMixedPaymentAndRefund(SalesHeader, PaymentAmt, TotalAmountInclVAT);
         OnCheckPayment(SalesHeader);
     end;
@@ -492,13 +503,22 @@
 #ENDIF
         OutstandingAmt: Decimal;
         RefundAmt: Decimal;
+        PointsPaymentAmount: Decimal;
         TotalAmountInclVAT: Decimal;
+        HasPoints: Boolean;
         DocNo: Code[20];
     begin
         if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
             exit;
 
+        HasPoints := HasMagentoPaymentPoints(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        if HasPoints then
+            PointsPaymentAmount := GetPointsPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
+
+        if HasPoints then
+            TotalAmountInclVAT += PointsPaymentAmount;
         DocNo := SalesHeader."Posting No.";
         if DocNo = '' then begin
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
@@ -575,10 +595,12 @@
 #ENDIF
         OutstandingAmt: Decimal;
         PaymentAmt: Decimal;
+        PointsPaymentAmount: Decimal;
         TotalAmountInclVAT: Decimal;
         RefundPaymentsAmount: Decimal;
         DocNo: Code[20];
         HasVouchers: Boolean;
+        HasPoints: Boolean;
         HasPaymentsAndRefunds: Boolean;
     begin
         if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
@@ -586,10 +608,19 @@
 
         HasVouchers := HasMagentoPaymentVouchers(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
         HasPaymentsAndRefunds := HasMagentoPaymentsAndRefunds(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        HasPoints := HasMagentoPaymentPoints(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+
+        if HasPoints then
+            PointsPaymentAmount := GetPointsPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
+
+        if HasPoints then
+            TotalAmountInclVAT += PointsPaymentAmount;
+
         if HasPaymentsAndRefunds then
             RefundPaymentsAmount := GetRefundPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+
         DocNo := SalesHeader."Posting No.";
         if DocNo = '' then begin
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
@@ -750,6 +781,11 @@
     begin
         if PaymentLine.Posted then
             exit;
+
+        if PaymentLine."Points Payment" then begin
+            SetPaymentLineAsPosted(PaymentLine);
+            exit;
+        end;
 
         if PaymentLine.Amount = 0 then begin
             SetPaymentLineAsPosted(PaymentLine);
@@ -1010,6 +1046,10 @@
             exit;
 
         RefundSalesCreditMemo(SalesCrMemoHeader);
+        Commit();
+
+        OnAfterRefundSalesCreditMemo(SalesCrMemoHdrNo);
+        Commit();
     end;
 
     internal procedure RefundSalesCreditMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
@@ -1105,6 +1145,7 @@
             exit;
         if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
             exit;
+
         if PaymentLine.Amount = 0 then begin
             exit;
         end;
@@ -1134,6 +1175,20 @@
             exit;
 
         if MagentoPaymentAmount <= CurrPaymentAmount then
+            exit;
+
+        Error(TotalAmountErrorLbl, CurrPaymentAmount, MagentoPaymentAmount);
+    end;
+
+    local procedure CheckIfTotalPaymentWhenPointsInUse(var SalesHeader: Record "Sales Header"; MagentoPaymentAmount: Decimal; CurrPaymentAmount: Decimal)
+    var
+        HasPoints: Boolean;
+        TotalAmountErrorLbl: Label 'Partial posting is not allowed when points payment are in use. Current payment amount: %1, total payment amount: %2.', Comment = '%1 - the payment amount that is being posted. %2 - total payment amount in the magento lines.';
+    begin
+        HasPoints := HasMagentoPaymentPoints(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        if not HasPoints then
+            exit;
+        if MagentoPaymentAmount <= (CurrPaymentAmount) then
             exit;
 
         Error(TotalAmountErrorLbl, CurrPaymentAmount, MagentoPaymentAmount);
@@ -1262,6 +1317,20 @@
         exit(-MagentoPaymentLine.Amount);
     end;
 
+    internal procedure GetPointsPaymentsAmount(DocumentTableNo: Integer; SalesDocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]): Decimal
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetCurrentKey("Document Table No.", "Document Type", "Document No.", "Points Payment");
+        MagentoPaymentLine.SetRange("Document Table No.", DocumentTableNo);
+        MagentoPaymentLine.SetRange("Document Type", SalesDocumentType);
+        MagentoPaymentLine.SetRange("Document No.", DocumentNo);
+        MagentoPaymentLine.SetRange("Points Payment", true);
+        MagentoPaymentLine.CalcSums(Amount);
+        exit(MagentoPaymentLine.Amount);
+    end;
+
     local procedure HasMagentoPaymentVouchers(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]) HasVouchers: Boolean
     var
         PaymentLine: Record "NPR Magento Payment Line";
@@ -1272,6 +1341,18 @@
         PaymentLine.SetRange("Document No.", DocNo);
         PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
         HasVouchers := not PaymentLine.IsEmpty();
+    end;
+
+    procedure HasMagentoPaymentPoints(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]) HasPoints: Boolean
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", DocTableNo);
+        PaymentLine.SetRange("Document Type", DocType);
+        PaymentLine.SetRange("Document No.", DocNo);
+        PaymentLine.SetRange("Points Payment", true);
+        HasPoints := not PaymentLine.IsEmpty();
     end;
 
     local procedure HasMagentoPaymentsAndRefunds(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]) PaymentsAndRefundsExist: Boolean
@@ -1456,6 +1537,10 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRefundSalesCreditMemo(SalesCrMemoHdrNo: Code[20])
+    begin
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterProcessingPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; PaymentEventType: Option " ",Capture,Refund,Cancel; Response: Record "NPR PG Payment Response")

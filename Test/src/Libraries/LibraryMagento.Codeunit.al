@@ -71,6 +71,20 @@ codeunit 85009 "NPR Library - Magento"
         PaymentMapping.Insert();
     end;
 
+    procedure CreatePaymentMappingBalAccount(PaymentCode: Text[50]; PaymentType: Text[50])
+    var
+        PaymentMapping: Record "NPR Magento Payment Mapping";
+    begin
+        PaymentMapping."External Payment Method Code" := PaymentCode;
+        PaymentMapping."External Payment Type" := PaymentType;
+        PaymentMapping.Init();
+        PaymentMapping."Payment Method Code" := CreatePaymentMethodWithBalAccount();
+        PaymentMapping."Allow Adjust Payment Amount" := true;
+        PaymentMapping.Insert();
+    end;
+
+
+
     procedure CreateShipmentMapping(ExternalShipmentMethodCode: Text[50])
     var
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
@@ -108,6 +122,15 @@ codeunit 85009 "NPR Library - Magento"
         LibraryPaymentExport: Codeunit "Library - Payment Export";
     begin
         LibraryPaymentExport.CreatePaymentMethod(PaymentMethod);
+        exit(PaymentMethod.Code);
+    end;
+
+    local procedure CreatePaymentMethodWithBalAccount(): Code[10]
+    var
+        PaymentMethod: Record "Payment Method";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        LibraryERM.CreatePaymentMethodWithBalAccount(PaymentMethod);
         exit(PaymentMethod.Code);
     end;
 

@@ -146,6 +146,11 @@ table 6151260 "NPR Ecom Sales Pmt. Line"
             DataClassification = CustomerContent;
         }
 #endif
+        field(210; "Points Payment"; Boolean)
+        {
+            Caption = 'Points Payment';
+            DataClassification = CustomerContent;
+        }
     }
 
 
@@ -156,6 +161,9 @@ table 6151260 "NPR Ecom Sales Pmt. Line"
             Clustered = true;
         }
         key(Key2; "External Document No.", "Document Type")
+        {
+        }
+        key(Key3; "Document Entry No.", "Points Payment")
         {
         }
     }

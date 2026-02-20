@@ -197,6 +197,8 @@
         }
         key(Key7; "Document No.", "Posting Date") { }
         key(Key8; "Redeem Reference No.", "Redeem Ref. Type", "Entry Type", Adjustment) { }
+        key(Key9; "Membership Entry No.", "Entry Type", "Document No.")
+        { }
     }
 
     trigger OnDelete()

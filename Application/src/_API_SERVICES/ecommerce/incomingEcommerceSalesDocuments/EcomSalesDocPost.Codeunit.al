@@ -42,6 +42,7 @@ codeunit 6248657 "NPR Ecom Sales Doc Post"
         SalesLine.Reset();
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange("NPR Loyalty Discount", false);
         SalesLine.SetFilter(Quantity, '<>%1', 0);
         if SalesLine.FindSet() then
             repeat

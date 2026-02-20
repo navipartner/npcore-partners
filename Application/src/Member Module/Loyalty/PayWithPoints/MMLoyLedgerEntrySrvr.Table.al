@@ -96,6 +96,11 @@
             Caption = 'Expires At';
             DataClassification = CustomerContent;
         }
+        field(190; "Inc Ecom Sale Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Reservation is Captured"; Boolean)
         {
             CalcFormula = Exist("NPR MM Members. Points Entry" WHERE("Authorization Code" = FIELD("Authorization Code"),
@@ -121,6 +126,8 @@
         {
         }
         key(Key2; "Authorization Code")
+        { }
+        key(Key3; "Inc Ecom Sale Id")
         { }
         key(SoapUniqueness; "POS Store Code", "Company Name", "Reference Number", "POS Unit Code", "Entry Type") { }
         key(RestUniqueness; "POS Store Code", "Company Name", "Foreign Transaction Id", "POS Unit Code", "Entry Type") { }

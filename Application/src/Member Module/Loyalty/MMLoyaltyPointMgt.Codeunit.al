@@ -25,18 +25,16 @@
         POSunit: Record "NPR POS Unit";
         POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
     begin
-
         if (ValueEntry."Document Type" = ValueEntry."Document Type"::" ") then begin
 
             if (not POSunit.Get(CopyStr(ItemJournalLine."NPR Register Number", 1, 10))) then
-                Clear(POSUnit);
+                Clear(POSunit);
 
-            if not POSUnit.GetProfile(POSLoyaltyProfile) then
+            if not POSunit.GetProfile(POSLoyaltyProfile) then
                 Clear(POSLoyaltyProfile);
 
             if POSLoyaltyProfile."Assign Loyalty On Sale" then
                 exit; // Handled by OnFinishSale workflow
-
         end;
 
         CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY, CopyStr(ItemJournalLine."NPR Register Number", 1, 10), ItemJournalLine."NPR Sales Channel");
@@ -298,7 +296,7 @@
         ValueEntry."Discount Amount" := DiscountAmount;
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
-        CreatePointEntryFromValueEntry(ValueEntry, DataSource, POSUnitNo, SalesChannel);
+        CreatePointEntryFromValueEntry(ValueEntry, DataSource, PosUnitNo, SalesChannel);
     end;
 
     procedure SimulatePointEntryForTestFramework(PostingDate: Date; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; CustomerNo: Code[20]; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; DataSource: Option)
@@ -1391,7 +1389,7 @@
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
-        exit(AdjustPointsAbsoluteWorker2(MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_WITHDRAW, -1 * ABS(Points), -1 * ABS("Amount (LCY)"), TransactionDate, PostingDate, ReceiptNo, Description));
+        exit(AdjustPointsAbsoluteWorker2(MembershipEntryNo, MembershipPointsEntry."Entry Type"::POINT_WITHDRAW, -1 * Abs(Points), -1 * Abs("Amount (LCY)"), TransactionDate, PostingDate, ReceiptNo, Description));
 
     end;
 
@@ -2070,7 +2068,7 @@
                 CouponNotification.SetFilter("Notification Trigger", '=%1', CouponNotification."Notification Trigger"::COUPON);
                 CouponNotification.SetFilter("Notification Code", '=%1', TempValidCouponToCreate."Notification Code");
                 CouponNotification.SetFilter("Loyalty Point Setup Id", '=%1', TempValidCouponToCreate.SystemId);
-                CouponNotification.SetFilter("Date To Notify", '=%1', Today() + abs(NotificationSetup."Days Past"));
+                CouponNotification.SetFilter("Date To Notify", '=%1', Today() + Abs(NotificationSetup."Days Past"));
                 if (not CouponNotification.FindFirst()) then begin
                     Clear(CouponNotification);
                     CouponNotification."Membership Entry No." := MembershipEntryNo;
@@ -2079,7 +2077,7 @@
                     CouponNotification."Target Member Role" := NotificationSetup."Target Member Role";
                     CouponNotification."Processing Method" := NotificationSetup."Processing Method";
                     CouponNotification."Notification Method Source" := CouponNotification."Notification Method Source"::MEMBER;
-                    CouponNotification."Date To Notify" := Today() + abs(NotificationSetup."Days Past");
+                    CouponNotification."Date To Notify" := Today() + Abs(NotificationSetup."Days Past");
                     CouponNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
 
                     CouponNotification."Notification Code" := TempValidCouponToCreate."Notification Code";
@@ -2172,6 +2170,94 @@
 
     end;
 
+    #region Ecommerce - Pay with Points
+    procedure EcomCaptureReservation(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpCaptureLines: Record "NPR MM Reg. Sales Buffer" temporary; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; EcomSaleId: Guid; DocumentNo: Code[20]; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
+    var
+        LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
+        ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
+        Membership: Record "NPR MM Membership";
+        MembershipPointsEntry: Record "NPR MM Members. Points Entry";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        LoyaltySetup: Record "NPR MM Loyalty Setup";
+        TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary;
+        LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
+        TotalBurnAmount: Decimal;
+        MembershipEntryNo: Integer;
+        RESERVE_1: Label 'The authorization code %1 is not valid (%2).';
+        CANCEL_2: Label 'The authorization code %1 has been cancelled and can not be captured.';
+        CAPTURE_1: Label 'The authorization code %1 has been captured and can not be captured again.';
+    begin
+        if (not LoyaltyPointsMgrServer.ValidateAuthorization(true, TmpAuthorization, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
+            exit(false);
+
+        TmpCaptureLines.Reset();
+        TmpCaptureLines.FindFirst();
+        if (TmpCaptureLines."Authorization Code" = '') then begin
+            ResponseMessage := StrSubstNo(RESERVE_1, '', 1);
+            ResponseMessageId := '-1400';
+            exit(false);
+        end;
+
+        ReservationLedgerEntry.SetCurrentKey("Authorization Code");
+        ReservationLedgerEntry.SetAutoCalcFields("Reservation is Captured", "Reservation is Cancelled");
+        ReservationLedgerEntry.SetFilter("Authorization Code", '=%1', TmpCaptureLines."Authorization Code");
+        ReservationLedgerEntry.SetFilter("Entry Type", '=%1', ReservationLedgerEntry."Entry Type"::RESERVE);
+        if (ReservationLedgerEntry.FindFirst()) then begin
+            if (ReservationLedgerEntry."Reservation is Captured") then begin
+                ResponseMessage := StrSubstNo(CAPTURE_1, TmpCaptureLines."Authorization Code");
+                ResponseMessageId := '-1401';
+                exit(false);
+            end;
+
+            if (ReservationLedgerEntry."Reservation is Cancelled") then begin
+                ResponseMessage := StrSubstNo(CANCEL_2, TmpCaptureLines."Authorization Code");
+                ResponseMessageId := '-1401';
+                exit(false);
+
+            end;
+        end else begin
+            ResponseMessage := StrSubstNo(RESERVE_1, TmpCaptureLines."Authorization Code", 3);
+            ResponseMessageId := '-1402';
+            exit(false);
+        end;
+
+        Membership.GetBySystemId(MembershipSystemId);
+
+        MembershipSetup.Get(Membership."Membership Code");
+        LoyaltySetup.Get(MembershipSetup."Loyalty Code");
+
+        TmpAuthorization.FindFirst();
+        LoyaltyStoreLedger.SetCurrentKey("Inc Ecom Sale Id");
+        LoyaltyStoreLedger.SetRange("Inc Ecom Sale Id", EcomSaleId);
+        LoyaltyStoreLedger.SetRange("Entry Type", LoyaltyStoreLedger."Entry Type"::RECEIPT);
+        if not LoyaltyStoreLedger.FindFirst() then begin
+            LoyaltyStoreLedger.TransferFields(TmpAuthorization, false);
+            LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RECEIPT;
+            LoyaltyStoreLedger."Authorization Code" := LoyaltyPointsMgrServer.CreateAuthorizationCode();
+            LoyaltyStoreLedger."Retail Id" := TmpAuthorization."Retail Id";
+            LoyaltyStoreLedger."Reference Number" := DocumentNo;
+            LoyaltyStoreLedger."Entry No." := 0;
+            LoyaltyStoreLedger.Insert();
+        end;
+
+        LoyaltyPointsMgrServer.CreateCaptureEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TmpCaptureLines, TempMembershipEntryTagBuffer, TotalBurnAmount);
+
+        // Remove the reserved amount
+        MembershipPointsEntry.Reset();
+        MembershipPointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
+        MembershipPointsEntry.SetFilter("Authorization Code", '=%1', TmpAuthorization."Authorization Code");
+        MembershipPointsEntry.SetFilter("Entry Type", '=%1', MembershipPointsEntry."Entry Type"::RESERVE);
+        if (MembershipPointsEntry.FindLast()) then begin
+            MembershipPointsEntry.Points := 0;
+            MembershipPointsEntry.Modify();
+        end;
+        Membership.CalcFields("Remaining Points");
+        LoyaltyStoreLedger.Balance := Membership."Remaining Points";
+        LoyaltyStoreLedger.Modify();
+
+        exit(true);
+    end;
+    #endregion Ecommerce - Pay with Points
     local procedure InsertTagsForPointEntry(MemberPointEntryNo: Integer; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
     var
         MemberPointEntryTag: Record "NPR MM Member Point Entry Tag";

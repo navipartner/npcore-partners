@@ -290,6 +290,11 @@
             Caption = 'External Payment Gateway';
             DataClassification = CustomerContent;
         }
+        field(490; "Points Payment"; Boolean)
+        {
+            Caption = 'Points Payment';
+            DataClassification = CustomerContent;
+        }
         field(6059982; "NPR Inc Ecom Sales Pmt Line Id"; Guid)
         {
             Caption = 'Incoming Ecommerce Sales Payment Line Id';
@@ -321,6 +326,9 @@
         {
         }
         key(Key3; "Transaction ID", Posted, "Date Captured")
+        {
+        }
+        key(Key4; "Document Table No.", "Document Type", "Document No.", "Points Payment")
         {
         }
     }

@@ -7,5 +7,15 @@ tableextension 6014527 "NPR SalesCrMemoLine" extends "Sales Cr.Memo Line"
             Caption = 'Incoming Ecommerce Sales Line Id';
             DataClassification = CustomerContent;
         }
+        field(6059982; "NPR Loyalty Discount"; Boolean)
+        {
+            Caption = 'Loyalty Discount';
+            DataClassification = CustomerContent;
+        }
+        field(6059983; "NPR CreatedfrmPointsPmntLineId"; Guid)
+        {
+            Caption = 'Created from Points Payment Line Id';
+            DataClassification = CustomerContent;
+        }
     }
 }

@@ -221,6 +221,17 @@ codeunit 85010 "NPR Library - E-Commerce"
             NewPaymentCode := LibraryRandom.RandText(MaxStrLen(PaymentMapping."External Payment Method Code"));
     end;
 
+    procedure GetMagentoPaymentType(var NewPaymentType: Code[50])
+    var
+        PaymentMapping: Record "NPR Magento Payment Mapping";
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        if (NewPaymentType <> '') then
+            exit;
+        if NewPaymentType = '' then
+            NewPaymentType := LibraryRandom.RandText(MaxStrLen(PaymentMapping."External Payment Type"));
+    end;
+
     procedure GetMagentoPaymentTransactionId(var TransactionId: Code[50])
     var
         PaymentLine: Record "NPR Magento Payment Line";
@@ -229,6 +240,16 @@ codeunit 85010 "NPR Library - E-Commerce"
         if (TransactionId <> '') then
             exit;
         TransactionId := LibraryRandom.RandText(MaxStrLen(PaymentLine."No."));
+    end;
+
+    procedure GetMagentoPointsPaymentId(var TransactionId: Code[40])
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        if (TransactionId <> '') then
+            exit;
+        TransactionId := LibraryRandom.RandText(40);
     end;
 
     procedure GetMagentoShipmentMethodCode(var ExternalShipmentMethodCode: Text[50])

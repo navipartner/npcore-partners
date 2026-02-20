@@ -353,7 +353,10 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtMngt: Codeunit "NPR Magento Pmt. Mgt.";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        HasPoints: Boolean;
+        PointsPaymentAmount: Decimal;
         TotalAmtInclVat: Decimal;
         VoucherQty: Decimal;
         VoucherUnitPrice: Decimal;
@@ -435,6 +438,14 @@
         CheckVoucherAvailableAmounts(NpRvSalesLine, SalesHeader);
 
         TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
+
+        HasPoints := MagentoPmtMngt.HasMagentoPaymentPoints(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        if HasPoints then
+            PointsPaymentAmount := MagentoPmtMngt.GetPointsPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+
+        if PointsPaymentAmount <> 0 then
+            TotalAmtInclVat += PointsPaymentAmount;
+
         if TotalAmtInclVat < SalesHeaderMagentoPaymentAmount then
             Error(OrderAmtLowerThanPmtAmtErr, TotalAmtInclVat, SalesHeaderMagentoPaymentAmount);
     end;

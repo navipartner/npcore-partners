@@ -130,4 +130,27 @@ codeunit 85127 "NPR Library - Payment Gateway"
         PaymentLine."Payment Gateway Code" := GatewayCode;
         PaymentLine.Insert(true);
     end;
+
+    procedure CreatePointsPaymentLine(DocumentTableNo: Integer; DocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]; GatewayCode: Code[10]; GLAccountNo: Code[20]; Amount: Decimal; var PaymentLine: Record "NPR Magento Payment Line"; AuthorizationCode: Code[40])
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+        LibERM: Codeunit "Library - ERM";
+        LibRandom: Codeunit "Library - Random";
+    begin
+        PaymentGateway.Get(GatewayCode);
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := DocumentTableNo;
+        PaymentLine."Document Type" := DocumentType;
+        PaymentLine."Document No." := DocumentNo;
+        PaymentLine."No." := LibRandom.RandText(40);
+        PaymentLine.Description := 'Test points payment';
+        PaymentLine.Amount := Amount;
+        PaymentLine."Account Type" := PaymentLine."Account Type"::"G/L Account";
+        PaymentLine."Account No." := GLAccountNo;
+        PaymentLine."Payment Gateway Code" := GatewayCode;
+        PaymentLine."No." := AuthorizationCode;
+        PaymentLine."Transaction ID" := AuthorizationCode;
+        PaymentLine."Points Payment" := true;
+        PaymentLine.Insert(true);
+    end;
 }

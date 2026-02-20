@@ -38,18 +38,34 @@ codeunit 6248646 "NPR EcomCaptureImpl"
 
         if TotalProcessingPaymentAmount < AmountToCapture then begin
             EcomSalesPmtLine.Reset();
+            EcomSalesPmtLine.SetCurrentKey("Document Entry No.", "Points Payment");
             EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-            EcomSalesPmtLine.SetRange("Payment Method Type", EcomSalesPmtLine."Payment Method Type"::Voucher);
+            EcomSalesPmtLine.SetRange("Points Payment", true);
+            EcomSalesPmtLine.SetRange("Payment Method Type", EcomSalesPmtLine."Payment Method Type"::"Payment Method");
             EcomSalesPmtLine.SetFilter(Amount, '>0');
             EcomSalesPmtLine.SetAutoCalcFields("Processing Payment Amount");
-            if EcomSalesPmtLine.FindSet() then
+            if EcomSalesPmtLine.FindSet(true) then
                 repeat
-                    InsertPaymentLineVoucherPmt(EcomSalesHeader, EcomSalesPmtLine, AmountToCaptureForPaymentLineCreation);
-                until (EcomSalesPmtLine.Next() = 0) or (AmountToCaptureForPaymentLineCreation <= 0);
+                    InsertPaymentLinePointsPmt(EcomSalesHeader, EcomSalesPmtLine, AmountToCaptureForPaymentLineCreation);
+                until (EcomSalesPmtLine.Next() = 0);
 
             if AmountToCaptureForPaymentLineCreation > 0 then begin
                 EcomSalesPmtLine.Reset();
                 EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+                EcomSalesPmtLine.SetRange("Payment Method Type", EcomSalesPmtLine."Payment Method Type"::Voucher);
+                EcomSalesPmtLine.SetFilter(Amount, '>0');
+                EcomSalesPmtLine.SetAutoCalcFields("Processing Payment Amount");
+                if EcomSalesPmtLine.FindSet() then
+                    repeat
+                        InsertPaymentLineVoucherPmt(EcomSalesHeader, EcomSalesPmtLine, AmountToCaptureForPaymentLineCreation);
+                    until (EcomSalesPmtLine.Next() = 0) or (AmountToCaptureForPaymentLineCreation <= 0);
+            end;
+
+            if AmountToCaptureForPaymentLineCreation > 0 then begin
+                EcomSalesPmtLine.Reset();
+                EcomSalesPmtLine.SetCurrentKey("Document Entry No.", "Points Payment");
+                EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+                EcomSalesPmtLine.SetRange("Points Payment", false);
                 EcomSalesPmtLine.SetRange("Payment Method Type", EcomSalesPmtLine."Payment Method Type"::"Payment Method");
                 EcomSalesPmtLine.SetFilter(Amount, '>0');
                 EcomSalesPmtLine.SetAutoCalcFields("Processing Payment Amount");
@@ -82,13 +98,15 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         end;
     end;
 
-    local procedure InsertPaymentLinePaymentMethod(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var AmountToCapture: Decimal)
+    local procedure InsertPaymentLinePointsPmt(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var AmountToCapture: Decimal)
     var
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
         PaymentMethod: Record "Payment Method";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomVirtualItemEvents: Codeunit "NPR EcomVirtualItemEvents";
+        NPLoyaltyDiscountHandler: Codeunit "NPR NPLoyalty Discount Handler";
+        SkipPaymentLine: Boolean;
         CardPaymentInstrumentTypeLbl: Label 'Card';
     begin
         if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::"Payment Method" then
@@ -111,6 +129,92 @@ codeunit 6248646 "NPR EcomCaptureImpl"
 
         PaymentMapping.TestField("Payment Method Code");
         PaymentMethod.Get(PaymentMapping."Payment Method Code");
+        EcomVirtualItemEvents.OnBeforeInitPaymentLinePaymentMethod(EcomSalesHeader, EcomSalesPmtLine, PaymentMapping, AmountToCapture, SkipPaymentLine);
+        if SkipPaymentLine then
+            exit;
+
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := DATABASE::"NPR Ecom Sales Header";
+        PaymentLine."Document Type" := EcomSalesPmtLine."Document Type";
+        PaymentLine."Document No." := EcomSalesPmtLine."External Document No.";
+        PaymentLine."Line No." := EcomSalesDocUtils.GetInternalEcomDocumentPaymentLastLineNo(EcomSalesHeader) + 10000;
+        PaymentLine.Description := CopyStr(PaymentMethod.Description + ' ' + EcomSalesPmtLine."External Document No.", 1, MaxStrLen(PaymentLine.Description));
+        PaymentLine."Payment Type" := PaymentLine."Payment Type"::"Payment Method";
+        PaymentLine."Account Type" := PaymentMethod."Bal. Account Type";
+        PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
+        PaymentLine."No." := CopyStr(EcomSalesPmtLine."Payment Reference", 1, MaxStrLen(PaymentLine."No."));
+        PaymentLine."Transaction ID" := EcomSalesPmtLine."Payment Reference";
+        PaymentLine."Posting Date" := EcomSalesHeader."Received Date";
+        PaymentLine."Source Table No." := DATABASE::"Payment Method";
+        PaymentLine."Source No." := PaymentMethod.Code;
+        PaymentLine.Amount := EcomSalesPmtLine.Amount;
+        PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
+        PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
+        PaymentLine."Payment Gateway Shopper Ref." := EcomSalesPmtLine."PAR Token";
+        PaymentLine."Payment Token" := EcomSalesPmtLine."PSP Token";
+        PaymentLine."Expiry Date Text" := EcomSalesPmtLine."Card Expiry Date";
+        PaymentLine.Brand := EcomSalesPmtLine."Card Brand";
+        PaymentLine."Payment Instrument Type" := CopyStr(CardPaymentInstrumentTypeLbl, 1, MaxStrLen(PaymentLine."Payment Instrument Type"));
+        PaymentLine."Masked PAN" := EcomSalesPmtLine."Masked Card Number";
+#pragma warning disable AA0139
+        if Strlen(PaymentLine."Masked PAN") >= 4 then
+            PaymentLine."Card Summary" := CopyStr(PaymentLine."Masked PAN", Strlen(PaymentLine."Masked PAN") - 3)
+        else
+            PaymentLine."Card Summary" := PaymentLine."Masked PAN";
+#pragma warning restore AA0139
+        PaymentLine."Card Alias Token" := EcomSalesPmtLine."Card Alias Token";
+        PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+        PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        if PaymentMapping."Captured Externally" then
+            PaymentLine."Date Captured" := EcomSalesHeader."Received Date";
+        if IsShopifyDocument then
+            SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLinePaymentMethodFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
+
+        if NPLoyaltyDiscountHandler.IsLoyaltyPointsPaymentLine(PaymentLine."Payment Gateway Code") then begin
+            PaymentLine."Points Payment" := true;
+            PaymentLine.Amount := EcomSalesPmtLine.Amount;
+        end;
+
+        EcomVirtualItemEvents.OnBeforeInsertPaymentLinePaymentMethod(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
+        PaymentLine.Insert(true);
+
+        AmountToCapture -= PaymentLine.Amount;
+    end;
+
+    local procedure InsertPaymentLinePaymentMethod(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var AmountToCapture: Decimal)
+    var
+        NPLoyaltyDiscountHandler: Codeunit "NPR NPLoyalty Discount Handler";
+        PaymentLine: Record "NPR Magento Payment Line";
+        PaymentMapping: Record "NPR Magento Payment Mapping";
+        PaymentMethod: Record "Payment Method";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomVirtualItemEvents: Codeunit "NPR EcomVirtualItemEvents";
+        SkipPaymentLine: Boolean;
+        CardPaymentInstrumentTypeLbl: Label 'Card';
+    begin
+        if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::"Payment Method" then
+            exit;
+
+        if EcomSalesPmtLine.Amount = 0 then
+            exit;
+
+        if EcomSalesPmtLine."Captured Amount" = EcomSalesPmtLine.Amount then
+            exit;
+
+        PaymentMapping.Reset();
+        PaymentMapping.SetRange("External Payment Method Code", EcomSalesPmtLine."External Payment Method Code");
+        PaymentMapping.SetRange("External Payment Type", EcomSalesPmtLine."External Payment Type");
+        PaymentMapping.SetLoadFields("Allow Adjust Payment Amount", "Payment Gateway Code", "Payment Method Code", "Captured Externally");
+        if not PaymentMapping.FindFirst() then begin
+            PaymentMapping.SetRange("External Payment Type");
+            PaymentMapping.FindFirst();
+        end;
+
+        PaymentMapping.TestField("Payment Method Code");
+        PaymentMethod.Get(PaymentMapping."Payment Method Code");
+        EcomVirtualItemEvents.OnBeforeInitPaymentLinePaymentMethod(EcomSalesHeader, EcomSalesPmtLine, PaymentMapping, AmountToCapture, SkipPaymentLine);
+        if SkipPaymentLine then
+            exit;
 
         PaymentLine.Init();
         PaymentLine."Document Table No." := DATABASE::"NPR Ecom Sales Header";
@@ -152,6 +256,11 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         if IsShopifyDocument then
             SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLinePaymentMethodFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
 
+        if NPLoyaltyDiscountHandler.IsLoyaltyPointsPaymentLine(PaymentLine."Payment Gateway Code") then begin
+            PaymentLine."Points Payment" := true;
+            PaymentLine.Amount := EcomSalesPmtLine.Amount;
+        end;
+
         EcomVirtualItemEvents.OnBeforeInsertPaymentLinePaymentMethod(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
         PaymentLine.Insert(true);
 
@@ -186,7 +295,6 @@ codeunit 6248646 "NPR EcomCaptureImpl"
 
         if EcomSalesPmtLine."Captured Amount" = EcomSalesPmtLine.Amount then
             exit;
-
 
         if EcomSalesPmtLine."Processing Payment Amount" >= EcomSalesPmtLine.Amount then
             exit;

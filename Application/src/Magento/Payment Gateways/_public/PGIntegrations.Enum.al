@@ -71,4 +71,11 @@ enum 6151416 "NPR PG Integrations" implements "NPR IPaymentGateway", "NPR Pay by
                         "NPR Pay by Link" = "NPR Unknown PayByLink";
     }
 #endif
+    value(11; NPLoyalty_Discount)
+    {
+        Caption = 'NPLoyalty Discount';
+        Implementation = "NPR IPaymentGateway" = "NPR NPLoyalty Discount Handler",
+                        "NPR Pay by Link" = "NPR Unknown PayByLink";
+    }
+
 }

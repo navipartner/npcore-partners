@@ -783,13 +783,13 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesDocImplEvents.OnAfterInsertCommentLines(EcomSalesHeader, SalesHeader);
     end;
 
-
     local procedure InsertPaymentLinePaymentMethod(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentMapping: Record "NPR Magento Payment Mapping";
         PaymentMethod: Record "Payment Method";
         EcomSalesDocCrtImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        LoyaltyDiscountMngt: Codeunit "NPR NP Loyalty Discount Mgt";
         CardPaymentInstrumentTypeLbl: Label 'Card';
     begin
         if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::"Payment Method" then
@@ -848,17 +848,24 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if PaymentMapping."Captured Externally" then
             PaymentLine."Date Captured" := GetDate(SalesHeader."Order Date", SalesHeader."Posting Date");
 
+        if EcomSalesPmtLine."Points Payment" then
+            PaymentLine."Points Payment" := true;
+
         if IsShopifyDocument then
             SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLinePaymentMethodFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
 
         EcomSalesDocCrtImplEvents.OnInsertPaymentLinePaymentMethodBeforeFinalizeLine(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine);
         PaymentLine.Insert(true);
+
+        if EcomSalesPmtLine."Points Payment" then
+            LoyaltyDiscountMngt.CreateDiscountSalesLine(PaymentLine, SalesHeader);
     end;
 
     local procedure TransferCapturedPaymentLines(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; SalesHeader: Record "Sales Header")
     var
         PaymentLine: Record "NPR Magento Payment Line";
         NewPaymentLine: Record "NPR Magento Payment Line";
+        LoyaltyDiscountMngt: Codeunit "NPR NP Loyalty Discount Mgt";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         PaymentLine.Reset();
@@ -880,6 +887,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                 SpfyAssignedIDMgt.CopyAssignedShopifyID(PaymentLine.RecordId(), NewPaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             PaymentLine.Delete();
             NewPaymentLine.Insert(false, true);
+            if EcomSalesPmtLine."Points Payment" then
+                LoyaltyDiscountMngt.CreateDiscountSalesLine(NewPaymentLine, SalesHeader);
         until PaymentLine.Next() = 0;
     end;
 
@@ -1007,6 +1016,44 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesLine.Modify();
     end;
 
+    local procedure CancelPointsPaymentLines(IncEcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        SalesHeader: Record "Sales Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        if IncEcomSalesHeader."Document Type" = IncEcomSalesHeader."Document Type"::Order then
+            if not SalesHeader.Get(SalesHeader."Document Type"::Order, IncEcomSalesHeader."Created Doc No.") then
+                exit;
+
+        if IncEcomSalesHeader."Document Type" = IncEcomSalesHeader."Document Type"::"Return Order" then
+            if not SalesHeader.Get(SalesHeader."Document Type"::"Return Order", IncEcomSalesHeader."Created Doc No.") then
+                exit;
+
+        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        if PaymentLine.FindSet() then
+            repeat
+                CancelPointsPaymentLine(PaymentLine);
+            until PaymentLine.Next() = 0;
+    end;
+
+    local procedure CancelPointsPaymentLine(PaymentLine: Record "NPR Magento Payment Line")
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+        MagentpPmtMngt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        if PaymentLine."Payment Gateway Code" = '' then
+            exit;
+
+        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
+            exit;
+
+        if PaymentGateway."Integration Type" <> PaymentGateway."Integration Type"::NPLoyalty_Discount then
+            exit;
+
+        MagentpPmtMngt.CancelPaymentLine(PaymentLine);
+    end;
 
     local procedure InsertPaymentLineVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; PaymentLine: Record "NPR Magento Payment Line")
     var
@@ -1213,6 +1260,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         if IsPosted then
             exit;
+
+        CancelPointsPaymentLines(EcomSalesHeader);
 
         EcomSalesHeader."Creation Status" := EcomSalesHeader."Creation Status"::Canceled;
         EcomSalesHeader.Modify(true);

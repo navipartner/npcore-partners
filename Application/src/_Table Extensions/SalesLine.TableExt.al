@@ -212,6 +212,16 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Incoming Ecommerce Sales Line Id';
             DataClassification = CustomerContent;
         }
+        field(6059982; "NPR Loyalty Discount"; Boolean)
+        {
+            Caption = 'Loyalty Discount';
+            DataClassification = CustomerContent;
+        }
+        field(6059983; "NPR CreatedfrmPointsPmntLineId"; Guid)
+        {
+            Caption = 'Created from Points Payment Line Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     var

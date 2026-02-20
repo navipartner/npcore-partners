@@ -56,9 +56,13 @@ codeunit 6248516 "NPR EcomVirtualItemEvents"
     end;
 
     [IntegrationEvent(false, false)]
+    procedure OnBeforeInitPaymentLinePaymentMethod(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; PaymentMapping: Record "NPR Magento Payment Mapping"; AmountToCapture: Decimal; var SkipPaymentLine: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnBeforeInsertPaymentLinePaymentMethod(var PaymentLine: Record "NPR Magento Payment Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line");
     begin
-
     end;
 
     [IntegrationEvent(false, false)]

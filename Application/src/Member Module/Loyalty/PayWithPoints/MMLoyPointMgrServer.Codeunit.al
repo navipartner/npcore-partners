@@ -366,7 +366,7 @@
 
     end;
 
-    local procedure ValidateAuthorization(BasicCheck: Boolean; var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
+    procedure ValidateAuthorization(BasicCheck: Boolean; var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyServerStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         StoreSetup: Record "NPR MM Loyalty Store Setup";
@@ -699,7 +699,6 @@
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin
-
         MembershipPointsEntry.Init();
 
         MembershipPointsEntry."Entry No." := 0;
@@ -751,6 +750,7 @@
         MembershipPointsEntry.Description := TmpBuffer.Description;
 
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
+
         MembershipPointsEntry.Insert();
 
         InsertTagsFromBuffer(MembershipPointsEntry."Entry No.", TempMembershipEntryTagBuffer);
@@ -759,7 +759,7 @@
         TotalEarnAmount += MembershipPointsEntry."Amount (LCY)";
     end;
 
-    local procedure CreateCaptureEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; var TotalBurnAmount: Decimal)
+    procedure CreateCaptureEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; var TotalBurnAmount: Decimal)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -975,7 +975,7 @@
         exit(true);
     end;
 
-    local procedure CreateNotEligibleEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; TotalEarnAmount: Decimal; TotalBurnAmount: Decimal)
+    procedure CreateNotEligibleEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; TotalEarnAmount: Decimal; TotalBurnAmount: Decimal)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -1252,7 +1252,12 @@
             GenJournalLine.Insert(true);
     end;
 
-    local procedure MakeJournalLine(var GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20]; DocType: Enum "Gen. Journal Document Type"; AccNo: Code[20]; Description: Text[50]; CurrencyCode: Code[10]; AmountToPost: Decimal; BalanceGLAccont: Code[20]; InvoiceNo: Code[20])
+    local procedure MakeJournalLine(var GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20]; DocType: Enum "Gen. Journal Document Type"; AccNo: Code[20];
+                                                                                                                                          Description: Text[50];
+                                                                                                                                          CurrencyCode: Code[10];
+                                                                                                                                          AmountToPost: Decimal;
+                                                                                                                                          BalanceGLAccont: Code[20];
+                                                                                                                                          InvoiceNo: Code[20])
     begin
 
         GenJournalLine."Line No." += 10000;
@@ -1306,7 +1311,7 @@
         LoyaltyLedgerEntry.Insert();
     end;
 #pragma warning disable AA0139
-    local procedure CreateAuthorizationCode(): Text[40]
+    procedure CreateAuthorizationCode(): Text[40]
     begin
         exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
     end;
@@ -1317,5 +1322,6 @@
     begin
         exit(NullGuidValue);
     end;
+
 }
 
