@@ -177,7 +177,7 @@
         field(40; ExternalMembershipSystemId; Guid)
         {
             Caption = 'External Membership Id';
-            DataClassification = SystemMetadata;
+            DataClassification = CustomerContent;
         }
         field(100; "Awarded Points (Sale)"; Integer)
         {
