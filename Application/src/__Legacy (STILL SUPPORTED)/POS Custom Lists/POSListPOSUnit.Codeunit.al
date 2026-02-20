@@ -42,6 +42,7 @@ codeunit 6150876 "NPR POS List: POS Unit" implements "NPR POS Custom List IHandl
         Field: Record Field;
         POSUnit: Record "NPR POS Unit";
         POSCustomListHelper: Codeunit "NPR POS Custom List Helper";
+        UserSetup: Record "User Setup";
         CurrentPOSUnitNo: Code[10];
     begin
         CurrentPOSUnitNo := POSUnit.GetCurrentPOSUnit();
@@ -53,6 +54,17 @@ codeunit 6150876 "NPR POS List: POS Unit" implements "NPR POS Custom List IHandl
                 '<>' + CurrentPOSUnitNo,
                 ColumnFilters
             );
+        end;
+
+        if UserSetup.Get(UserId) then begin
+            if UserSetup."NPR Register Switch Filter" <> '' then begin
+                Field.Get(Database::"NPR POS Unit", POSUnit.FieldNo("No."));
+                POSCustomListHelper.AddMandatoryFilter(
+                    Field,
+                    UserSetup."NPR Register Switch Filter",
+                    ColumnFilters
+                );
+            end;
         end;
     end;
 

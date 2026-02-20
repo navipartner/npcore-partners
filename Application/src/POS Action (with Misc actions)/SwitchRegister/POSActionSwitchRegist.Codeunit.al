@@ -22,6 +22,11 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
         case Step of
+            'is_workflow_disabled':
+                begin
+                    IsWorkflowDisabled(Context, FrontEnd);
+                    exit; 
+                end;
             'EnterRegister':
                 SwitchToNewRegister(Context, Setup);
             else
@@ -29,6 +34,18 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
                     exit;
         end;
         InitAndRefreshFrontendSession();
+    end;
+
+    local procedure IsWorkflowDisabled(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        UserSetup: Record "User Setup";
+    begin
+        if UserSetup.Get(UserId) then
+            Context.SetContext('disabled', not UserSetup."NPR Allow Register Switch")
+        else
+            Context.SetContext('disabled', true);
+
+        FrontEnd.WorkflowResponse(Context.GetContextObject());
     end;
 
     internal procedure SwitchToNewRegister(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
@@ -70,7 +87,7 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
     begin
         exit(
             //###NPR_INJECT_FROM_FILE:POSActionSwitchRegister.js###
-            'let main=async({workflow:r,customList:s,toast:i,captions:n})=>{try{const e=await s.setParameters({topic:"POS_UNIT",maxPageSize:50,title:n.selectPOSUnitTitle});if(e){const t=JSON.parse(e).fields?.["1"];if(!t)return" ";await r.respond("EnterRegister",{RegisterNo:t})}else return" "}catch(e){return console.error("[SwitchRegister] Unexpected error:",e),i.error(e?.message||"An unexpected error occurred",{title:"Unable to Complete Action",hideAfter:5})," "}};'
+            'let isWorkflowDisabled=async({workflow:r})=>{try{return await r.respond("is_workflow_disabled")||!1}catch(t){return console.error("[SwitchRegister] Permission check failed:",t),!0}},main=async({workflow:r,customList:t,toast:i,captions:o})=>{try{const e=await t.setParameters({topic:"POS_UNIT",maxPageSize:50,title:o.selectPOSUnitTitle});if(e){const s=JSON.parse(e).fields?.["1"];if(!s)return" ";await r.respond("EnterRegister",{RegisterNo:s})}else return" "}catch(e){return console.error("[SwitchRegister] Unexpected error:",e),i.error(e?.message||"An unexpected error occurred",{title:"Unable to Complete Action",hideAfter:5})," "}};'
         );
     end;
 }

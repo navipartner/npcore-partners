@@ -1,3 +1,13 @@
+let isWorkflowDisabled = async ({ workflow }) => {
+  try {
+    const result = await workflow.respond("is_workflow_disabled");
+    return result || false;
+  } catch (err) {
+    console.error("[SwitchRegister] Permission check failed:", err);
+    return true;
+  }
+};
+
 let main = async ({ workflow, customList, toast, captions }) => {
     try {
         const selectedPosUnitStr = await customList.setParameters({
