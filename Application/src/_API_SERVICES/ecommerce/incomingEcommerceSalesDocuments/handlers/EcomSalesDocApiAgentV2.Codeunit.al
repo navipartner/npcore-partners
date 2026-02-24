@@ -178,7 +178,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesLine.Insert(true);
     end;
 
-    local procedure ReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
+    internal procedure ReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
     var
         VoucherSalesLine: Record "NPR NpRv Sales Line";
         Voucher: Record "NPR NpRv Voucher";

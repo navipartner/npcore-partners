@@ -439,6 +439,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     local procedure InsertEcommerceSalesPaymentLine(PaymentLineJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; LogEntry: Record "NPR Spfy Event Log Entry")
     var
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
         IncEcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
     begin
         EcomSalesPmtLine.Init();
@@ -450,6 +451,8 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         CheckIfPaymentLineExists(EcomSalesPmtLine);
         SpfyIntegrationEvents.OnBeforeInsertEcommerceSalesPaymentLine(PaymentLineJsonToken, EcomSalesHeader, EcomSalesPmtLine);
         EcomSalesPmtLine.Insert(true);
+        if EcomSalesPmtLine."Payment Method Type" = EcomSalesPmtLine."Payment Method Type"::Voucher then
+            EcomSalesDocApiAgentV2.ReserveVoucher(EcomSalesHeader, EcomSalesPmtLine);
     end;
 
     local procedure ParseEcommerceSalesPaymentLine(PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; LogEntry: Record "NPR Spfy Event Log Entry"; EcomSalesHeader: Record "NPR Ecom Sales Header")
@@ -549,7 +552,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         InitEcommerceHeader(LogEntry, EcomSalesHeader, Response);
         EcomSalesHeader."Requested API Version Date" := Today;
         EcomSalesHeader."API Version Date" := EcomSalesDocUtils.GetApiVersionDateByRequest(Today);
-        EcomSalesHeader."Price Excl. VAT" := true;
         ParseEcommerceHeader(EcomSalesHeader, Response);
         CheckIfEcommerceDocumentAlreadyExist(EcomSalesHeader);
         SpfyIntegrationEvents.OnBeforeInsertEcommerceSalesHeader(EcomSalesHeader, Response);
@@ -882,17 +884,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 #pragma warning restore AA0139
     end;
 
-    local procedure PopulateMembershipLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
-    begin
-        FindMembershipItem(SalesLineJsonToken, LogEntry, IncEcomSalesLine."No.", IncEcomSalesLine."Variant Code");
-#pragma warning disable AA0139
-        IncEcomSalesLine.Quantity := JsonHelper.GetJDecimal(SalesLineJsonToken, 'currentQuantity', true);
-        IncEcomSalesLine.Description := JsonHelper.GetJText(SalesLineJsonToken, 'title', MaxStrLen(IncEcomSalesLine.Description), true);
-        IncEcomSalesLine."Description 2" := JsonHelper.GetJText(SalesLineJsonToken, 'variantTitle', MaxStrLen(IncEcomSalesLine."Description 2"), false);
-        PopulateAmounts(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
-#pragma warning restore AA0139
-    end;
-
     local procedure PopulateAmounts(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
     var
         TotalQty: Decimal;
@@ -902,23 +893,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             CalcLineDiscountAmount(SalesLineJsonToken, IncEcomSalesLine, TotalQty), IncEcomSalesLine);
         IncEcomSalesLine."Line Amount" := IncEcomSalesLine."Unit Price" * IncEcomSalesLine.Quantity - IncEcomSalesLine."Line Discount Amount";
         IncEcomSalesLine."VAT %" := CalculateVAT(SalesLineJsonToken);
-    end;
-
-    local procedure FindMembershipItem(SalesLineJsonToken: JsonToken; LogEntry: Record "NPR Spfy Event Log Entry"; var ItemNo: Text[50]; var VariantCode: Code[10])
-    var
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
-        ProductId: Text[30];
-        WrongItemErr: Label 'The selected item %1 is not configured as a membership.', Comment = '%1=Item No.';
-        NotFoundItemErr: Label 'Item not found for Shopify Product ID %1', Comment = '%1= ShopifyProductID';
-    begin
-        ProductId := OrderMgt.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'product.id', true));
-        if not SpfyItemMgt.FindItemByShopifyProductID(LogEntry."Store Code", ProductId, SpfyStoreItemLink) then
-            Error(NotFoundItemErr);
-        if not IsMembershipItem(SpfyStoreItemLink."Item No.") then
-            Error(WrongItemErr);
-        ItemNo := SpfyStoreItemLink."Item No.";
-        VariantCode := SpfyStoreItemLink."Variant Code";
     end;
 
     local procedure CalculateVAT(SalesLineJsonToken: JsonToken) VATP: Decimal
@@ -994,8 +968,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
                 PopulateVoucherLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
             IncEcomSalesLine.Type::Item:
                 PopulateItemLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
-            IncEcomSalesLine.Type::Membership:
-                PopulateMembershipLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
             IncEcomSalesLine.Type::"Shipment Fee":
                 PopulateShipmentFeeLine(SalesLineJsonToken, IncEcomSalesLine);
             else
@@ -1009,9 +981,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         If _SpfyAPIOrderHelper.OrderLineIsGiftCard(SalesLineJsonToken) then
             exit(LineType::Voucher);
 
-        if _SpfyAPIOrderHelper.OrderLineIsMembership(SalesLineJsonToken) then
-            exit(LineType::Membership);
-        //TODO- TICKET
         exit(LineType::Item);
     end;
 
@@ -1115,32 +1084,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         exit(LineDiscountAmount);
     end;
 
-    local procedure IsMembershipItem(ItemNo: Text[50]): Boolean
-    var
-        MMMembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        ItemCode: Code[20];
-        Found: Boolean;
-        NotSupportedItemErr: Label 'Item %1 is setup as both Account and Item type in Membership Sales Setup.';
-    begin
-        if not Evaluate(ItemCode, ItemNo) then
-            exit;
-        if MMMembershipSalesSetup.Get(MMMembershipSalesSetup.Type::ACCOUNT, ItemCode) then
-            Found := true;
-
-        if MMMembershipSalesSetup.Get(MMMembershipSalesSetup.Type::ITEM, ItemCode) then
-            if Found then
-                Error(NotSupportedItemErr, ItemNo)
-            else
-                exit(true);
-
-        MMMembershipAlterationSetup.SetRange("Sales Item No.", ItemCode);
-        if MMMembershipAlterationSetup.FindFirst() then
-            exit(true);
-
-        exit(false)
-    end;
-
     local procedure InitEcommerceHeader(LogEntry: Record "NPR Spfy Event Log Entry"; var EcomSalesHeader: Record "NPR Ecom Sales Header"; Response: JsonToken)
     var
         SpfyAPIEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
@@ -1233,6 +1176,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         IsShpmtMappingShipAgent: Boolean;
     begin
         OrderJsonToken.SelectToken('data.order', HeaderToken);
+        EcomSalesHeader."Price Excl. VAT" := not JsonHelper.GetJBoolean(HeaderToken, 'taxesIncluded', false);
         GetEcStore(NpEcStore, EcomSalesHeader);
         GetCustomerAndPostingDate(NpEcStore, EcomSalesHeader, HeaderToken);
         SetShipmentMethod(HeaderToken, EcomSalesHeader, IsShpmtMappingLocation, IsShpmtMappingShipAgent);
