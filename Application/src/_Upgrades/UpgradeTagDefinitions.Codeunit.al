@@ -1149,7 +1149,7 @@
                     'UpgradeEcomSalesDocJQ':
                         exit('NPR-UpgradeEcomSalesDocJQ-20251117');
                     'UpgradeEcomSalesReturnDocJQ':
-                        exit('NPR-UpgradeEcomSalesReturnDocJQ-20251117');
+                        exit('NPR-UpgradeEcomSalesReturnDocJQ-20260224');
                     'UpgradeBucketId':
                         exit('NPR-UpgradeBucketId-20251117');
                 end;

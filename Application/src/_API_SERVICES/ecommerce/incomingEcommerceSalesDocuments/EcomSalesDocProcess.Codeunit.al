@@ -219,16 +219,6 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
         Session.LogMessage('NPR_API_Ecommerce_IncomingSalesDocumentProcessFailed', ErrorText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
-    local procedure AutoRefreshJobQueues()
-    var
-        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
-    begin
-        if not IncEcomSalesDocSetup.Get() then
-            IncEcomSalesDocSetup.Init();
-        HandleSalesReturnOrderProcessJQSchedule(IncEcomSalesDocSetup."Auto Proc Sales Ret Order");
-    end;
-
     var
         _UpdateRetryCount: Boolean;
         _Success: Boolean;
