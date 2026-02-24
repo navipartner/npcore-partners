@@ -60,6 +60,7 @@
         GRACE_PERIOD: Label 'The %1 is not allowed because of grace period constraint.';
         PREVENT_CARD_EXTEND: Label 'The validity for card %1 must first manually be extend until %2.';
         INVALID_ACTIVATION_DATE: Label 'The option %1 for %2 is not valid for alteration type %3.';
+        CANCEL_BLOCKED_BY_COMMITMENT: Label 'Membership is already cancelled with a commitment period.';
         AGE_VERIFICATION_SETUP: Label 'Add member failed on age verification because item number for sales was not provided.';
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
         ALLOW_MEMBER_MERGE_NOT_SET: Label 'This request violates the community’s unique member identity rules. See the API documentation for merge options.';
@@ -1996,6 +1997,7 @@
         Item: Record Item;
         EndDateNew: Date;
         CancelledFraction: Decimal;
+        CommitmentPeriodEnforced: Boolean;
         PlaceHolderLbl: Label '%1: %2 {%3 .. %4}', Locked = true;
     begin
 
@@ -2013,6 +2015,11 @@
         MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
         if (not MembershipEntry.FindLast()) then begin
             ReasonText := StrSubstNo(NOT_FOUND, MembershipEntry.TableCaption(), MembershipEntry.GetFilters());
+            exit(false);
+        end;
+
+        if IsCancelBlockedByCommitmentPeriod(MembershipEntry) then begin
+            ReasonText := CANCEL_BLOCKED_BY_COMMITMENT;
             exit(false);
         end;
 
@@ -2049,8 +2056,10 @@
             if (
                 (Subscription."Auto-Renew" = Subscription."Auto-Renew"::YES_INTERNAL) and
                 (Subscription."Committed Until" > EndDateNew)
-            ) then
+            ) then begin
                 EndDateNew := Subscription."Committed Until";
+                CommitmentPeriodEnforced := true;
+            end;
 
         if (MembershipEntry."Valid Until Date" <= EndDateNew) then begin
             ReasonText := StrSubstNo(NO_TIMEFRAME, EndDateNew, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
@@ -2085,7 +2094,7 @@
 
         if (WithUpdate) then begin
             RegretSubscription(Membership);
-            MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew);
+            MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, CommitmentPeriodEnforced);
             CarryOutMembershipCancel(Membership, MembershipEntry, EndDateNew);
         end;
 
@@ -2093,6 +2102,20 @@
         OutUntilDate := EndDateNew;
 
         exit(true);
+    end;
+
+    local procedure IsCancelBlockedByCommitmentPeriod(MembershipEntry: Record "NPR MM Membership Entry"): Boolean
+    var
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
+    begin
+        if not MembershipEntry.Cancelled then
+            exit(false);
+
+        MembershipEntryLink.SetCurrentKey("Membership Entry No.", Context);
+        MembershipEntryLink.SetRange("Membership Entry No.", MembershipEntry."Entry No.");
+        MembershipEntryLink.SetRange(Context, MembershipEntryLink.Context::CANCEL);
+        MembershipEntryLink.SetRange("Commitment Period Enforced", true);
+        exit(not MembershipEntryLink.IsEmpty());
     end;
 
     internal procedure CarryOutMembershipCancel(var Membership: Record "NPR MM Membership"; var MembershipEntry: Record "NPR MM Membership Entry"; EndDateNew: Date)

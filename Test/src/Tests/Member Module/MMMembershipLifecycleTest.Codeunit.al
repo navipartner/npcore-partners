@@ -398,6 +398,150 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure Cancel_02_DoubleCancelBlocked()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+        OptionId: Guid;
+        CurrentMembershipCode: Code[20];
+        ValidUntilAfterFirstCancel: Date;
+        MembershipStartDate: Date;
+        MembershipUntilDate: Date;
+        UnitPrice: Decimal;
+    begin
+        // Test: A cancelled membership with a subscription commitment period cannot be cancelled a second time.
+        // Scenario:
+        // - Create a GOLD membership + member with subscription (Auto-Renew = YES_INTERNAL)
+        //   and a 3-month commitment period.
+        // - Cancel the membership (first cancel: Valid Until = commitment end date, future).
+        //   The entry link is marked with "Commitment Period Enforced" = true.
+        // - After first cancel: Auto-Renew becomes NO, commitment check no longer applies.
+        // - Attempt to cancel again (second cancel tries to set Valid Until = today, bypassing commitment).
+        // Steps verified:
+        // 1) First cancellation sets Cancelled = true and Valid Until Date = commitment end date.
+        // 2) Second cancellation attempt returns false (blocked by commitment period enforced flag on entry link).
+        // 3) Valid Until Date remains at commitment end date (not overwritten to today).
+
+        Initialize();
+        CurrentMembershipCode := 'T-GOLD';
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+
+        // Set up membership and subscription with 3-month commitment period
+        Membership.GetBySystemId(MembershipId);
+        Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
+        Membership.Modify();
+
+        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+        Subscription.FindFirst();
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription."Started At" := CurrentDateTime();
+        Subscription."Committed Until" := CalcDate('<+3M>');
+        Subscription.Modify();
+
+        // Verify subscription setup
+        Assert.AreEqual(Subscription."Auto-Renew"::YES_INTERNAL, Subscription."Auto-Renew", 'Subscription should have Auto-Renew = YES_INTERNAL.');
+        Assert.IsTrue(Subscription."Committed Until" > Today(), 'Subscription should have a future Committed Until date.');
+
+        // Cancel the membership (first cancel - commitment period should be honored)
+        OptionId := _MemberModuleLib.SetupCancel_NoGrace(CurrentMembershipCode, _MemberModuleLib.CreateItem('T-320100-CANCEL2', '', 'Cancel Membership', 157), '', 'Cancel Membership');
+        CancelMembership(MembershipId, OptionId, 0D);
+
+        // Verify first cancellation succeeded with commitment date
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.SetFilter(Blocked, '=%1', false);
+        MembershipEntry.FindLast();
+        Assert.IsTrue(MembershipEntry.Cancelled, 'Membership entry should be cancelled after first cancellation.');
+        ValidUntilAfterFirstCancel := MembershipEntry."Valid Until Date";
+        Assert.IsTrue(ValidUntilAfterFirstCancel > CalcDate('<+1D>'), 'Valid Until Date should be in the future (commitment period honored).');
+
+        // Verify Auto-Renew is now NO (commitment check will be skipped on next attempt)
+        Subscription.FindFirst();
+        Assert.AreEqual(Subscription."Auto-Renew"::NO, Subscription."Auto-Renew", 'Subscription Auto-Renew should be NO after cancellation.');
+
+        // Attempt second cancellation directly via codeunit
+        // Without the commitment period enforced check, this would succeed because:
+        // - Auto-Renew is NO, so commitment period check is skipped
+        // - EndDateNew = tomorrow, which is between Valid From and Valid Until (commitment date)
+        // - The entry link's "Commitment Period Enforced" flag blocks the second cancel
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
+        MemberInfoCapture."Item No." := 'T-320100-CANCEL2';
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::CANCEL;
+        MemberInfoCapture."Document Date" := CalcDate('<+1D>');
+        MemberInfoCapture.Insert();
+
+        Assert.IsFalse(
+            MembershipManagement.CancelMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice),
+            'Second cancellation attempt should return false (blocked by commitment period enforced flag).');
+
+        // Verify Valid Until Date was NOT changed by the second attempt
+        MembershipEntry.Get(MembershipEntry."Entry No.");
+        Assert.AreEqual(ValidUntilAfterFirstCancel, MembershipEntry."Valid Until Date", 'Valid Until Date should remain at commitment end date after blocked second cancellation.');
+        Assert.IsTrue(MembershipEntry.Cancelled, 'Membership entry should still be cancelled.');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure Cancel_03_DoubleCancelAllowedWithoutCommitment()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+        OptionId: Guid;
+        CurrentMembershipCode: Code[20];
+    begin
+        // Test: A cancelled membership WITHOUT a commitment period can be cancelled again to move the date closer.
+        // Scenario:
+        // - Create a GOLD membership + member (no subscription commitment).
+        // - Cancel the membership with document date = +7D (future cancel).
+        // - Cancel again with document date = +3D (moving cancel date closer).
+        // Steps verified:
+        // 1) First cancellation sets Cancelled = true and Valid Until Date = +7D.
+        // 2) Second cancellation succeeds and moves Valid Until Date from +7D to +3D.
+
+        Initialize();
+        CurrentMembershipCode := 'T-GOLD';
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+
+        OptionId := _MemberModuleLib.SetupCancel_NoGrace(CurrentMembershipCode, _MemberModuleLib.CreateItem('T-320100-CANCEL3', '', 'Cancel Membership', 157), '', 'Cancel Membership');
+
+        // First cancel: set Valid Until to +7D
+        CancelMembership(MembershipId, OptionId, CalcDate('<+7D>'));
+
+        Membership.GetBySystemId(MembershipId);
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.SetFilter(Blocked, '=%1', false);
+        MembershipEntry.FindLast();
+        Assert.IsTrue(MembershipEntry.Cancelled, 'Membership entry should be cancelled after first cancellation.');
+        Assert.AreEqual(CalcDate('<+7D>'), MembershipEntry."Valid Until Date", 'Valid Until Date should be +7D after first cancel.');
+
+        // Second cancel: move Valid Until closer to +3D
+        CancelMembership(MembershipId, OptionId, CalcDate('<+3D>'));
+
+        MembershipEntry.Get(MembershipEntry."Entry No.");
+        Assert.IsTrue(MembershipEntry.Cancelled, 'Membership entry should still be cancelled.');
+        Assert.AreEqual(CalcDate('<+3D>'), MembershipEntry."Valid Until Date", 'Valid Until Date should be moved closer to +3D after second cancel.');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AutoRenew_01()
     var
         Assert: Codeunit Assert;

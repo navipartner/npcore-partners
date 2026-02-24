@@ -66,6 +66,11 @@ table 6151243 "NPR MM Membership Entry Link"
             Caption = 'Context Period Ending Date';
             DataClassification = CustomerContent;
         }
+        field(100; "Commitment Period Enforced"; Boolean)
+        {
+            Caption = 'Commitment Period Enforced';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -95,16 +100,21 @@ table 6151243 "NPR MM Membership Entry Link"
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::CANCEL;
         end;
 
-        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, Database::"NPR MM Subscr. Request");
+        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, Database::"NPR MM Subscr. Request", false);
     end;
 
     internal procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date)
+    begin
+        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, false);
+    end;
+
+    internal procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date; CommitmentPeriodEnforced: Boolean)
     var
         TableNumber: Integer;
     begin
         TableNumber := Database::"NPR POS Entry Sales Line";
         if (MemberInfoCapture."Receipt No." <> '') then begin
-            CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber);
+            CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber, CommitmentPeriodEnforced);
             exit;
         end;
 
@@ -115,7 +125,7 @@ table 6151243 "NPR MM Membership Entry Link"
             if (MembershipEntry."Document Type" = MembershipEntry."Document Type"::"0") then
                 TableNumber := Database::"NPR MM Member Info Capture"; // No document type set, so assume external document
 
-            CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber);
+            CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber, CommitmentPeriodEnforced);
             exit;
         end;
 
@@ -123,10 +133,10 @@ table 6151243 "NPR MM Membership Entry Link"
         TableNumber := Database::"NPR MM Membership Entry";
         MemberInfoCapture."Receipt No." := CopyStr('INT-' + Format(MembershipEntry."Entry No.", 0, 9).PadLeft(10, '0'), 1, MaxStrLen(MemberInfoCapture."Receipt No.")); // Note: "Entry No." max is 2^31-1 = 2147483647
         MemberInfoCapture."Line No." := MemberInfoCapture."Entry No.";
-        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber);
+        CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, TableNumber, CommitmentPeriodEnforced);
     end;
 
-    local procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date; DocumentType: Integer)
+    local procedure CreateMembershipEntryLink(MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; EndDateNew: Date; DocumentType: Integer; CommitmentPeriodEnforced: Boolean)
     var
         MembershipEntryLink: Record "NPR MM Membership Entry Link";
         DocumentNo: Code[20];
@@ -155,6 +165,7 @@ table 6151243 "NPR MM Membership Entry Link"
                 begin
                     MembershipEntryLink."Context Period Starting Date" := EndDateNew;
                     MembershipEntryLink."Context Period Ending Date" := MembershipEntry."Valid Until Date";
+                    MembershipEntryLink."Commitment Period Enforced" := CommitmentPeriodEnforced;
                 end;
             MembershipEntryLink.Context::REGRET:
                 SetRegretDeferralPeriodDates(MembershipEntryLink);
