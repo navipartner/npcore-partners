@@ -4,8 +4,7 @@ page 6184833 "NPR MM Subscr. Requests"
     Caption = 'Subscription Requests';
     PageType = List;
     SourceTable = "NPR MM Subscr. Request";
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-    UsageCategory = Tasks;
+    UsageCategory = None;
     Editable = false;
     SourceTableView = sorting("Subscription Entry No.", "Entry No.");
 

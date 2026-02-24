@@ -203,6 +203,13 @@ table 6150923 "NPR MM Subscr. Request"
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Subscr. Request"."Entry No." where(Type = const(Terminate));
         }
+        field(290; "Subs. Payment Request Count"; Integer)
+        {
+            Caption = 'Subscription Payment Request Count';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Payment Request" where("Subscr. Request Entry No." = field("Entry No.")));
+        }
     }
 
     keys
