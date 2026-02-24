@@ -68,6 +68,7 @@ page 6185077 "NPR MM SubsRequestTermination"
                     ToolTip = 'If enabled, the system will cancel the membership on the termination and refund according to the rule.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = _RefundAvailable;
+                    Enabled = (_NoPaymentRequest = '');
                 }
                 field(NoPaymentRequestWarning; _NoPaymentRequest)
                 {
