@@ -120,6 +120,20 @@ table 6150918 "NPR MM Subscription"
             FieldClass = FlowField;
             CalcFormula = exist("NPR MM Subscr. Request" where("Renew Schedule Date" = field("Subscr Renew Sched Date Filter"), "Renew Schedule Id" = field("Subscr Renew Sched Id Filter"), Type = Const(Renew), Status = filter(<> Cancelled), "Subscription Entry No." = field("Entry No.")));
         }
+        field(260; "External Membership No."; Code[20])
+        {
+            Caption = 'External Membership No.';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR MM Membership"."External Membership No." where("Entry No." = field("Membership Entry No.")));
+        }
+        field(270; "Subscr. Request Count"; Integer)
+        {
+            Caption = 'Subscr. Request Count';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Request" where("Subscription Entry No." = field("Entry No.")));
+        }
     }
 
     keys
