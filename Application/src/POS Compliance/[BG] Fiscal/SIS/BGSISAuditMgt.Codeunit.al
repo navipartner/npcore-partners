@@ -616,12 +616,13 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
         POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
-        POSSaleLine.SetFilter("Return Sale Sales Ticket No.", '<>%1', '');
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"Issue Voucher");
+        POSSaleLine.SetFilter(Quantity, '<0');
         if POSSaleLine.IsEmpty() then
             exit;
 
-        POSSaleLine.SetRange("Return Sale Sales Ticket No.");
         POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::"POS Payment");
+        POSSaleLine.SetRange(Quantity);
 
         if POSSaleLine.FindSet() then
             repeat

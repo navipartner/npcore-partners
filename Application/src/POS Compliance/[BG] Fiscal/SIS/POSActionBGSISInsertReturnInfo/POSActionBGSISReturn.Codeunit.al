@@ -63,7 +63,7 @@ codeunit 6248687 "NPR POS Action: BG SIS Return" implements "NPR IPOS Workflow"
         if not FoundPOSSale then
             BGSISPOSSale."POS Sale SystemId" := POSSale.SystemId;
 
-        BGSISPOSSale."Return Receipt Timestamp" := CopyStr(StrSubstNo(DateTimeFormatLbl, Format(ReceiptTime, 0, '<Seconds,2>,<Minutes,2>,<Hours24,2><Filler Character,0>'), Format(ReceiptDate, 0, '<Day,2>,<Month,2>,<Year,2>')), 1, MaxStrLen(BGSISPOSSale."Return Receipt Timestamp"));
+        BGSISPOSSale."Return Receipt Timestamp" := CopyStr(StrSubstNo(DateTimeFormatLbl, Format(ReceiptTime, 0, '<Seconds,2>,<Minutes,2>,<Hours24,2><Filler Character,0>'), Format(ReceiptDate, 0, '<Day,2>,<Month,2>,<Year,2><Filler Character,0>')), 1, MaxStrLen(BGSISPOSSale."Return Receipt Timestamp"));
         BGSISPOSSale."Return FP Memory No." := CopyStr(ReturnFPMemoryNo, 1, MaxStrLen(BGSISPOSSale."Return FP Memory No."));
         BGSISPOSSale."Return Grand Receipt No." := CopyStr(ReturnGrandReceiptNo, 1, MaxStrLen(BGSISPOSSale."Return Grand Receipt No."));
 
