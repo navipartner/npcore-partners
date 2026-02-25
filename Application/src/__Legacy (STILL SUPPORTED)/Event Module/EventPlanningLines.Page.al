@@ -1031,7 +1031,11 @@ page 6014549 "NPR Event Planning Lines"
                     begin
                         DemandOverview.SetCalculationParameter(true);
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                         DemandOverview.Initialize(0D, 3, Rec."Job No.", '', '');
+#else
+                        DemandOverview.SetParameters(0D, Enum::"Demand Order Source Type"::"Job Demand", Rec."Job No.", '', '');
+#endif
                         DemandOverview.RunModal();
                     end;
                 }

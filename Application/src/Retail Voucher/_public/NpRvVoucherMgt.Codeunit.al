@@ -121,26 +121,36 @@
     var
         ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         Navigate: Page Navigate;
+#endif
     begin
         if (DocNoFilter = '') and (PostingDateFilter = '') then
             exit;
         if VoucherEntry.ReadPermission() then begin
             VoucherEntry.SetFilter("Document No.", DocNoFilter);
             VoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
 #if BC17
             Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Voucher Entry", DocumentEntry."Document Type"::" ", VoucherEntry.TableCaption(), VoucherEntry.Count());
 #else
             Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Voucher Entry", VoucherEntry.TableCaption(), VoucherEntry.Count());
 #endif
+#else
+            DocumentEntry.InsertIntoDocEntry(Database::"NPR NpRv Voucher Entry", VoucherEntry.TableCaption(), VoucherEntry.Count());
+#endif
         end;
         if ArchVoucherEntry.ReadPermission() then begin
             ArchVoucherEntry.SetFilter("Document No.", DocNoFilter);
             ArchVoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
 #if BC17
             Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Arch. Voucher Entry", DocumentEntry."Document Type"::" ", ArchVoucherEntry.TableCaption(), ArchVoucherEntry.Count());
 #else
             Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Arch. Voucher Entry", ArchVoucherEntry.TableCaption(), ArchVoucherEntry.Count());
+#endif
+#else
+            DocumentEntry.InsertIntoDocEntry(Database::"NPR NpRv Arch. Voucher Entry", ArchVoucherEntry.TableCaption(), ArchVoucherEntry.Count());
 #endif
         end;
     end;

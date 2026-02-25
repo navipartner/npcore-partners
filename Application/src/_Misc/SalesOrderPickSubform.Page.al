@@ -919,7 +919,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByEvent())
+#else
+                            SalesAvailabilityMgt.ShowItemAvailabilityFromSalesLine(Rec, Enum::"Item Availability Type"::"Event");
+#endif
                         end;
                     }
                     action(Period)
@@ -932,7 +936,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByPeriod())
+#else
+                            SalesAvailabilityMgt.ShowItemAvailabilityFromSalesLine(Rec, Enum::"Item Availability Type"::Period);
+#endif
                         end;
                     }
                     action("Variant")
@@ -945,7 +953,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByVariant())
+#else
+                            SalesAvailabilityMgt.ShowItemAvailabilityFromSalesLine(Rec, Enum::"Item Availability Type"::Variant);
+#endif
                         end;
                     }
                     action(Location)
@@ -959,7 +971,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByLocation())
+#else
+                            SalesAvailabilityMgt.ShowItemAvailabilityFromSalesLine(Rec, Enum::"Item Availability Type"::Location);
+#endif
                         end;
                     }
                     action("BOM Level")
@@ -972,7 +988,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec, ItemAvailFormsMgt.ByBOM())
+#else
+                            SalesAvailabilityMgt.ShowItemAvailabilityFromSalesLine(Rec, Enum::"Item Availability Type"::BOM);
+#endif
                         end;
                     }
                 }
@@ -1301,7 +1321,11 @@
         TotalSalesHeader: Record "Sales Header";
         TotalSalesLine: Record "Sales Line";
         DocumentTotals: Codeunit "Document Totals";
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
+#else
+        SalesAvailabilityMgt: Codeunit "Sales Availability Mgt.";
+#endif
         SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
 
         TransferExtendedText: Codeunit "Transfer Extended Text";
@@ -1382,7 +1406,11 @@
     var
         TrackingForm: Page "Order Tracking";
     begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         TrackingForm.SetSalesLine(Rec);
+#else
+        TrackingForm.SetVariantRec(Rec, Rec."No.", Rec."Outstanding Qty. (Base)", Rec."Shipment Date", Rec."Shipment Date");
+#endif
         TrackingForm.RunModal();
     end;
 

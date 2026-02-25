@@ -1,8 +1,8 @@
 ﻿report 6014409 "NPR Prices Upgrade"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     ApplicationArea = NPRRetail;
     Caption = 'Prices Upgrade';
     UsageCategory = Administration;
@@ -72,11 +72,19 @@
 
     local procedure DeleteOldPricesAndDiscounts()
     var
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+#else
+        FeaturePriceCalculation: Codeunit "Feature - Price Calculation";
+#endif
     begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
 #pragma warning disable AL0432
         PriceCalculationMgt.TestIsEnabled();
 #pragma warning restore
+#else
+        FeaturePriceCalculation.FailIfFeatureDisabled();
+#endif
         DeleteRecords();
     end;
 

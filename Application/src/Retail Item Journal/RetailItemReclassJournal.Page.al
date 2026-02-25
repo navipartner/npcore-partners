@@ -593,7 +593,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByEvent())
+#else
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, Enum::"Item Availability Type"::"Event")
+#endif
                         end;
                     }
                     action(Period)
@@ -606,7 +610,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByPeriod())
+#else
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, Enum::"Item Availability Type"::Period)
+#endif
                         end;
                     }
                     action("Variant")
@@ -619,7 +627,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByVariant())
+#else
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, Enum::"Item Availability Type"::Variant)
+#endif
                         end;
                     }
                     action(Location)
@@ -633,7 +645,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByLocation())
+#else
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, Enum::"Item Availability Type"::Location)
+#endif
                         end;
                     }
                     action("BOM Level")
@@ -646,7 +662,11 @@
 
                         trigger OnAction()
                         begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
                             ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByBOM())
+#else
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, Enum::"Item Availability Type"::BOM)
+#endif
                         end;
                     }
                 }
@@ -851,4 +871,3 @@
         CurrPage.Update(false);
     end;
 }
-

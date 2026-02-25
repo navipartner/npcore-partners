@@ -397,12 +397,18 @@
         if FldRef.Class = FieldClass::FlowField then
             FldRef.CalcField();
 
-        if FldRef.Type = FieldType::Option then begin
-            OptionString := Format(FldRef.OptionCaption);
-            Evaluate(OptionNo, Format(FldRef.Value, 0, 9));
-            exit(SelectStr(OptionNo + 1, OptionString));
-        end else
-            exit(Format(FldRef.Value, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format".FromInteger(1), '')));
+        case FldRef.Type of
+            FieldType::Option:
+                begin
+                    OptionString := Format(FldRef.OptionCaption);
+                    Evaluate(OptionNo, Format(FldRef.Value, 0, 9));
+                    exit(SelectStr(OptionNo + 1, OptionString));
+                end;
+            FieldType::Decimal:
+                exit(Format(FldRef.Value, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format".FromInteger(1), '')));
+            else
+                exit(Format(FldRef.Value));
+        end;
     end;
 
     procedure ExtractMagentoPicture(DataUri: Text; PictureName: Text; PictureSize: Integer; PictureType: Integer;

@@ -109,7 +109,11 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByEvent());
+#else
+        ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Item, Enum::"Item Availability Type"::"Event");
+#endif
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
@@ -124,7 +128,11 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByVariant());
+#else
+        ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Item, Enum::"Item Availability Type"::Variant);
+#endif
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
@@ -139,7 +147,11 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByLocation());
+#else
+        ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Item, Enum::"Item Availability Type"::Location);
+#endif
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
@@ -154,7 +166,11 @@
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByPeriod());
+#else
+        ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Item, Enum::"Item Availability Type"::Period);
+#endif
     end;
 
 #IF BC17 or BC18 or BC19 or BC20
@@ -385,4 +401,3 @@
 
     end;
 }
-
