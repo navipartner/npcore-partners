@@ -44,6 +44,7 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     {
                         ApplicationArea = NPRRetail;
                         Tooltip = 'Specifies the default Job Queue runner user which will be used for refreshing job queue entries if no Job Queue runner is specified.';
+                        StyleExpr = _StyleExprTxt;
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -205,8 +206,13 @@ page 6150891 "NPR Job Queue Refresh Setup"
     trigger OnOpenPage()
     var
         ConfigurationsValidationNotification: Notification;
+        EntraAppValidationNotification: Notification;
         HttpResponseMessage: HttpResponseMessage;
+        ErrorText: Text;
+        EntraAppRemoved: Boolean;
         DisablingExternalJQWorkerLbl: Label 'Disabling External JQ Refresher.';
+        EntraAppFieldClearedLbl: Label 'Entra App is not registered in the External Refresher database - therefore it was removed from Job Queue Refresher Setup.';
+        NoValidEntraAppsLbl: Label 'No valid Entra Apps were found. ';
     begin
         Rec.GetSetup();
         if Rec."Use External JQ Refresher" then begin
@@ -219,9 +225,22 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     _ExternalJQRefresherMgt.ManageExternalJQRefresherTenants("NPR Ext. JQ Refresher Options"::delete, HttpResponseMessage);
                     _ExternalJQRefresherMgt.TryThrowIncompatibleBaseVersion();
                 end;
+
+            _ExternalJQRefresherMgt.UpdateJQRunnerUsersList(_JQRunnerUser, false);
+            CurrPage."Monitored Job Queues".Page.SetJQRunner(_JQRunnerUser);
+            if not _ExternalJQRefresherMgt.ValidateExternalJQRefresherEntraAppManager(Rec, EntraAppRemoved, _JQRunnerUser) then
+                ErrorText := NoValidEntraAppsLbl;
+
+            if EntraAppRemoved then begin
+                EntraAppValidationNotification.Message(EntraAppFieldClearedLbl);
+                EntraAppValidationNotification.Scope := NotificationScope::LocalScope;
+                EntraAppValidationNotification.Send();
+            end;
+
             if not Rec."Use External JQ Refresher" then begin
                 Rec.Modify();
-                ConfigurationsValidationNotification.Message(GetLastErrorText() + ' ' + DisablingExternalJQWorkerLbl);
+                ErrorText += GetLastErrorText() + ' ' + DisablingExternalJQWorkerLbl;
+                ConfigurationsValidationNotification.Message(ErrorText);
                 ConfigurationsValidationNotification.Scope := NotificationScope::LocalScope;
                 ConfigurationsValidationNotification.Send();
             end;
@@ -233,12 +252,19 @@ page 6150891 "NPR Job Queue Refresh Setup"
         _ExternalJQRefresherIsEnabled := Rec."Use External JQ Refresher";
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        _StyleExprTxt := _ExternalJQRefresherMgt.ChangeColorDocument(_JQRunnerUser, Rec."Default Refresher User Name");
+    end;
+
     local procedure ToggleExtJQRefresher(Enable: Boolean)
     begin
         Rec.Validate("Use External JQ Refresher", Enable);
     end;
 
     var
+        _JQRunnerUser: Record "NPR Job Queue Runner User";
         _ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+        _StyleExprTxt: Text[50];
         _ExternalJQRefresherIsEnabled: Boolean;
 }

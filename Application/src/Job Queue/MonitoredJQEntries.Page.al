@@ -44,6 +44,7 @@ page 6185041 "NPR Monitored JQ Entries"
                     ApplicationArea = NPRRetail;
                     Visible = _ExternalJQRefresherIsEnabled;
                     ToolTip = 'Specifies the JQ Runner User Name.';
+                    StyleExpr = _StyleExprTxt;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -243,6 +244,19 @@ page 6185041 "NPR Monitored JQ Entries"
     begin
         JQRefresherSetup.GetSetup();
         _ExternalJQRefresherIsEnabled := JQRefresherSetup."Use External JQ Refresher";
+        if not _JQRunnerUsersListInitialized then
+            _ExternalJQRefresherMgt.UpdateJQRunnerUsersList(_JQRunnerUser, false);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        _StyleExprTxt := _ExternalJQRefresherMgt.ChangeColorDocument(_JQRunnerUser, Rec."JQ Runner User Name");
+    end;
+
+    internal procedure SetJQRunner(var JQRunnerUser: Record "NPR Job Queue Runner User")
+    begin
+        _JQRunnerUser.Copy(JQRunnerUser, true);
+        _JQRunnerUsersListInitialized := true;
     end;
 
     local procedure DeleteSelectedMonitoredJQEntries()
@@ -256,6 +270,10 @@ page 6185041 "NPR Monitored JQ Entries"
     end;
 
     var
+        _JQRunnerUser: Record "NPR Job Queue Runner User";
+        _ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
         _MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+        _StyleExprTxt: Text[50];
         _ExternalJQRefresherIsEnabled: Boolean;
+        _JQRunnerUsersListInitialized: Boolean;
 }

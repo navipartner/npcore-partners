@@ -17,12 +17,19 @@ table 6151290 "NPR Job Queue Runner User"
         {
             Caption = 'Client ID';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                AADApplication: Record "AAD Application";
+            begin
+                if AADApplication.Get("Client ID") then
+                    "JQ Runner User Name" := AADApplication.Description;
+            end;
         }
-        field(20; "JQ Runner User Name"; Text[50])
+        field(20; "JQ Runner User Name"; Code[50])
         {
             Caption = 'JQ Runner User Name';
-            FieldClass = FlowField;
-            CalcFormula = lookup("AAD Application".Description where("Client Id" = field("Client ID")));
+            DataClassification = CustomerContent;
         }
         field(30; "Failed Attempts"; Integer)
         {
@@ -46,7 +53,7 @@ table 6151290 "NPR Job Queue Runner User"
         {
             Clustered = true;
         }
-        key(Key1; "Failed Attempts")
+        key(Key1; "JQ Runner User Name", "Failed Attempts")
         {
         }
     }

@@ -365,7 +365,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         ThrowIncompatibleBaseVersion();
     end;
 
-    internal procedure UpdateJQRunnerUsersList(var JQRunnerUser: Record "NPR Job Queue Runner User")
+    internal procedure UpdateJQRunnerUsersList(var JQRunnerUser: Record "NPR Job Queue Runner User"; WithDialog: Boolean)
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
         EnvironmentInformation: Codeunit "Environment Information";
@@ -382,7 +382,8 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         QueryingDialog: Label 'Querying refresher service...';
         FailedToRetrieveJQRunnerUsersListLbl: Label 'Failed to retrieve job queue runner users list.\External response:\%1';
     begin
-        Window.Open(QueryingDialog);
+        if WithDialog then
+            Window.Open(QueryingDialog);
         ManageJQRefresherUser(NullGuid, '', Enum::"NPR Ext. JQ Refresher Options"::list, HttpResponseMessage);
         HttpResponseMessage.Content().ReadAs(ResponseText);
         if not HttpResponseMessage.IsSuccessStatusCode() then
@@ -406,6 +407,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
                 JQRunnerUser.Init();
                 JQRunnerUser."Entry No." += 1;
                 Evaluate(JQRunnerUser."Client ID", JsonHelper.GetJText(EntraAppToken, 'ClientID', true));
+                JQRunnerUser.Validate("Client ID");
                 JQRunnerUser."Failed Attempts" := JsonHelper.GetJInteger(EntraAppToken, 'FailedAttempts', false);
                 JQRunnerUser."Last Success Date Time" := JsonHelper.GetJDT(EntraAppToken, 'LastSuccessDateTime', false);
                 JQRunnerUser."Last Error Text" := CopyStr(JsonHelper.GetJText(EntraAppToken, 'LastErrorText', false), 1, MaxStrLen(JQRunnerUser."Last Error Text"));
@@ -413,7 +415,17 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
             end;
         end;
 
-        Window.Close();
+        if WithDialog then
+            Window.Close();
+    end;
+
+    internal procedure JobQueueuRunnerIsOperational(var JQRunnerUser: Record "NPR Job Queue Runner User"; UserName: Code[50]): Boolean
+    begin
+        JQRunnerUser.Reset();
+        JQRunnerUser.SetCurrentKey("JQ Runner User Name", "Failed Attempts");
+        JQRunnerUser.SetRange("JQ Runner User Name", UserName);
+        JQRunnerUser.SetFilter("Failed Attempts", '<%1', 10);
+        exit(not JQRunnerUser.IsEmpty());
     end;
 
     internal procedure ResetJQRunnerUserFailedAttempts(var JQRunnerUser: Record "NPR Job Queue Runner User")
@@ -423,6 +435,8 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         ResponseToken: JsonToken;
         ChangedToken: JsonToken;
         Window: Dialog;
+        ChangedCount: Integer;
+        ReasonText: Text;
         ResponseText: Text;
         QueryingDialog: Label 'Querying refresher service...';
         FailedToResetJQRunnerUserFailedAttemptsLbl: Label 'Failed to reset job queue runner user Failed Attempts value.\External response:\%1';
@@ -432,22 +446,110 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         HttpResponseMessage.Content().ReadAs(ResponseText);
         if not HttpResponseMessage.IsSuccessStatusCode() then
             Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
-
         if not ResponseToken.ReadFrom(ResponseText) then
             Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
-
         if not ResponseToken.IsObject() then
             Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
+        if not JsonHelper.GetJBoolean(ResponseToken, 'success', true) then begin
+            if JsonHelper.TokenExists(ResponseToken, 'reason') then
+                ReasonText := JsonHelper.GetJText(ResponseToken, 'reason', false)
+            else begin
+                if JsonHelper.TokenExists(ResponseToken, 'changed') then begin
+                    ChangedToken := JsonHelper.GetJsonToken(ResponseToken, 'changed');
+                    if ChangedToken.IsObject() then
+                        ReasonText := JsonHelper.GetJText(ChangedToken, 'reason', false);
+                end;
+            end;
 
-        ChangedToken := JsonHelper.GetJsonToken(ResponseToken, 'changed');
-        if not JsonHelper.GetJBoolean(ResponseToken, 'success', true) then
-            Error(FailedToResetJQRunnerUserFailedAttemptsLbl, JsonHelper.GetJText(ChangedToken, 'reason', true));
+            if ReasonText <> '' then
+                Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ReasonText)
+            else
+                Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
+        end;
 
-        if JsonHelper.GetJInteger(ChangedToken, 'changed', true) < 1 then
-            Error(FailedToResetJQRunnerUserFailedAttemptsLbl, JsonHelper.GetJText(ChangedToken, 'reason', true));
+        if JsonHelper.TokenExists(ResponseToken, 'changed') then begin
+            ChangedToken := JsonHelper.GetJsonToken(ResponseToken, 'changed');
+
+            if ChangedToken.IsObject() then begin
+                ChangedCount := JsonHelper.GetJInteger(ChangedToken, 'changed', true);
+                ReasonText := JsonHelper.GetJText(ChangedToken, 'reason', false);
+            end else begin
+                ChangedCount := JsonHelper.GetJInteger(ResponseToken, 'changed', true);
+                if JsonHelper.TokenExists(ResponseToken, 'reason') then
+                    ReasonText := JsonHelper.GetJText(ResponseToken, 'reason', false);
+            end;
+        end;
+
+        if ChangedCount < 1 then begin
+            if ReasonText <> '' then
+                Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ReasonText)
+            else
+                Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
+        end;
+
         JQRunnerUser."Failed Attempts" := 0;
         JQRunnerUser.Modify();
         Window.Close();
+    end;
+
+    internal procedure ValidateExternalJQRefresherEntraAppManager(var JQRefreshSetup: Record "NPR Job Queue Refresh Setup"; var EntraAppCleared: Boolean; var JobQueueRunnerUser: Record "NPR Job Queue Runner User") ValidEntraAppExists: Boolean
+    var
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        MonitoredJQEntry2: Record "NPR Monitored Job Queue Entry";
+    begin
+        JobQueueRunnerUser.Reset();
+        if JQRefreshSetup."Default Refresher User Name" <> '' then begin
+            JobQueueRunnerUser.SetRange("JQ Runner User Name", JQRefreshSetup."Default Refresher User Name");
+            if JobQueueRunnerUser.IsEmpty() then begin
+                Clear(JQRefreshSetup."Default Refresher User Name");
+                JQRefreshSetup.Modify();
+                EntraAppCleared := true;
+            end else
+                ValidEntraAppExists := true;
+        end;
+
+        MonitoredJQEntry.SetCurrentKey("JQ Runner User Name");
+        MonitoredJQEntry.FilterGroup(2);
+        MonitoredJQEntry.SetFilter("JQ Runner User Name", '<>%1', '');
+        MonitoredJQEntry.FilterGroup(0);
+        MonitoredJQEntry.SetLoadFields("JQ Runner User Name");
+        if MonitoredJQEntry.FindFirst() then
+            repeat
+                MonitoredJQEntry.SetRange("JQ Runner User Name", MonitoredJQEntry."JQ Runner User Name");
+                MonitoredJQEntry.FindLast();
+                MonitoredJQEntry.SetRange("JQ Runner User Name");
+                JobQueueRunnerUser.SetRange("JQ Runner User Name", MonitoredJQEntry."JQ Runner User Name");
+                if JobQueueRunnerUser.IsEmpty() then begin
+                    MonitoredJQEntry2.SetRange("JQ Runner User Name", MonitoredJQEntry."JQ Runner User Name");
+                    MonitoredJQEntry2.ModifyAll("JQ Runner User Name", '');
+                    EntraAppCleared := true;
+                end else
+                    ValidEntraAppExists := true;
+            until MonitoredJQEntry.Next() = 0;
+    end;
+
+    internal procedure ChangeColorDocument(var JQRunnerUser: Record "NPR Job Queue Runner User"; JQRunnerUserName: Code[50]): Text[50]
+    begin
+        if JQRunnerUserName = '' then
+            exit('Standard');
+        if JobQueueuRunnerIsOperational(JQRunnerUser, JQRunnerUserName) then
+            exit('Standard');
+        exit('Unfavorable');
+    end;
+
+    internal procedure ValidateJQRefresherEntraApp(DefaultRefresherUserName: Code[50])
+    var
+        JobQueueRunnerUser: Record "NPR Job Queue Runner User";
+        EntraAppInvalidLbl: Label 'Entra App %1 is not registered in the External Refresher database or has reached its maximum Failed Attempts counter.\Please check if the Failed Attempts counter can be reset or re-register this Entra App.';
+    begin
+        if DefaultRefresherUserName = '' then
+            exit;
+        UpdateJQRunnerUsersList(JobQueueRunnerUser, false);
+        JobQueueRunnerUser.Reset();
+        JobQueueRunnerUser.SetFilter("Failed Attempts", '<%1', 10);
+        JobQueueRunnerUser.SetRange("JQ Runner User Name", DefaultRefresherUserName);
+        if JobQueueRunnerUser.IsEmpty() then
+            Error(EntraAppInvalidLbl, DefaultRefresherUserName);
     end;
 
     local procedure ThrowIncompatibleBaseVersion()

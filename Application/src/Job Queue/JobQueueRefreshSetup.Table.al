@@ -93,7 +93,10 @@ table 6059870 "NPR Job Queue Refresh Setup"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
+            var
+                ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
             begin
+                ExternalJQRefresherMgt.ValidateJQRefresherEntraApp("Default Refresher User Name");
                 UpdateRefresherUser("Default Refresher User Name");
             end;
         }

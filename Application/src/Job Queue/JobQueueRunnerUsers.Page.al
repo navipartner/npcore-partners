@@ -18,26 +18,31 @@ page 6248219 "NPR Job Queue Runner Users"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the client ID of the job queue runner user.';
+                    StyleExpr = _StyleExprTxt;
                 }
                 field("JQ Runner User Name"; Rec."JQ Runner User Name")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the name of the job queue runner user.';
+                    StyleExpr = _StyleExprTxt;
                 }
                 field("Failed Attempts"; Rec."Failed Attempts")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of failed attempts by the job queue runner user. If this value exceeds 9, the job queue runner user is considered inactive. Run the "Reset Failed Attempts" action to reset this value.';
+                    StyleExpr = _StyleExprTxt;
                 }
                 field("Last Success Date Time"; Rec."Last Success Date Time")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies when the job queue runner user was last successfully used by the external refresher.';
+                    StyleExpr = _StyleExprTxt;
                 }
                 field("Last Error Text"; Rec."Last Error Text")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the last error text for the job queue runner user if the last attempt to execute the refreshing routine using this user was unsuccessful. This field is cleared after a successful run.';
+                    StyleExpr = _StyleExprTxt;
                 }
             }
         }
@@ -137,10 +142,21 @@ page 6248219 "NPR Job Queue Runner Users"
         UpdateList();
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        if Rec."Failed Attempts" < 10 then
+            _StyleExprTxt := 'Standard'
+        else
+            _StyleExprTxt := 'Unfavorable';
+    end;
+
     local procedure UpdateList()
     var
         ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
     begin
-        ExternalJQRefresherMgt.UpdateJQRunnerUsersList(Rec);
+        ExternalJQRefresherMgt.UpdateJQRunnerUsersList(Rec, true);
     end;
+
+    var
+        _StyleExprTxt: Text[50];
 }

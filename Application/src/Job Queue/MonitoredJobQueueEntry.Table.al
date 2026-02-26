@@ -254,7 +254,9 @@ table 6151148 "NPR Monitored Job Queue Entry"
             trigger OnValidate()
             var
                 JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
+                ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
             begin
+                ExternalJQRefresherMgt.ValidateJQRefresherEntraApp("JQ Runner User Name");
                 JQRefresherSetup.UpdateRefresherUser("JQ Runner User Name");
             end;
         }
@@ -297,6 +299,9 @@ table 6151148 "NPR Monitored Job Queue Entry"
         {
         }
         key(Key3; "Object ID to Run", "Object Type to Run")
+        {
+        }
+        key(Key4; "JQ Runner User Name")
         {
         }
     }
