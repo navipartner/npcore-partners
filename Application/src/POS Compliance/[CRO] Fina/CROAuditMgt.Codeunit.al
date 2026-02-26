@@ -667,10 +667,15 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         ResponseText: Text;
         ZKIBaseValue: Text;
         ZKICodeNotSignedErr: Label 'There was an error generating and signing ZKI Code.';
+        FiscalTotalAmount: Decimal;
     begin
         CROFiscalSetup.Get();
 
-        ZKIBaseValue := StrSubstNo(BaseValuePatternLbl, CROFiscalSetup."Certificate Subject OIB", Format(CROPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>') + 'T' + Format(CROPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2>:<Minutes,2>:<Seconds,2>'), CROPOSAuditLogAuxInfo."Bill No.", CROPOSAuditLogAuxInfo."POS Store Code", CROPOSAuditLogAuxInfo."POS Unit No.", FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"));
+        FiscalTotalAmount := CROPOSAuditLogAuxInfo."Total Amount";
+        if CROPOSAuditLogAuxInfo."Audit Entry Type" = "NPR CRO Audit Entry Type"::"Sales Credit Memo" then
+            FiscalTotalAmount := -FiscalTotalAmount;
+
+        ZKIBaseValue := StrSubstNo(BaseValuePatternLbl, CROFiscalSetup."Certificate Subject OIB", Format(CROPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>') + 'T' + Format(CROPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2>:<Minutes,2>:<Seconds,2>'), CROPOSAuditLogAuxInfo."Bill No.", CROPOSAuditLogAuxInfo."POS Store Code", CROPOSAuditLogAuxInfo."POS Unit No.", FormatDecimal(FiscalTotalAmount));
         if SignZKICode(ZKIBaseValue, ResponseText) then begin
 #pragma warning disable AA0139
             CROPOSAuditLogAuxInfo."ZKI Code" := ResponseText;

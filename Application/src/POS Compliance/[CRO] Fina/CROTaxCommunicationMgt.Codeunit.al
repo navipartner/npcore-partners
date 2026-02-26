@@ -141,7 +141,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         VATSection := XmlElement.Create('Pdv');
         repeat
             VATElements := XmlElement.Create('Porez');
-            VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT %")));
+            VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(SalesCrMemoLines."VAT %")));
             VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT Base Amount")));
             VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(-(SalesCrMemoLines."Amount Including VAT" - SalesCrMemoLines."VAT Base Amount"))));
             VATSection.Add(VATElements);
@@ -317,6 +317,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         BaseValue: Text;
         ResponseText: Text;
         SignedValue: Text;
+        FiscalTotalAmount: Decimal;
     begin
         FillBaseValue(ReceiptDocument, BaseValue);
 
@@ -326,13 +327,17 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         if not SendToTA(CROPOSAuditLogAuxInfo, SignedValue, ResponseText) then
             exit;
 
+        FiscalTotalAmount := CROPOSAuditLogAuxInfo."Total Amount";
+        if CROPOSAuditLogAuxInfo."Audit Entry Type" = "NPR CRO Audit Entry Type"::"Sales Credit Memo" then
+            FiscalTotalAmount := -FiscalTotalAmount;
+
         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.WriteText(SignedValue);
         TempBlob.CreateInStream(IStream, TextEncoding::UTF8);
         CROPOSAuditLogAuxInfo."Receipt Content".ImportStream(IStream, CROPOSAuditLogAuxInfo.FieldCaption("Receipt Content"));
         CROPOSAuditLogAuxInfo."Receipt Fiscalized" := true;
         CROPOSAuditLogAuxInfo."JIR Code" := CopyStr(GetJIRCodeFromResponse(ResponseText), 1, MaxStrLen(CROPOSAuditLogAuxInfo."JIR Code"));
-        CROPOSAuditLogAuxInfo."Verification URL" := StrSubstNo(VerificationURLFormatLbl, CROPOSAuditLogAuxInfo."JIR Code", Format(CROPOSAuditLogAuxInfo."Entry Date", 8, '<Year4><Month,2><Day,2>'), Format(CROPOSAuditLogAuxInfo."Log Timestamp", 4, '<Hours24,2><Minutes,2>'), DelChr(CROAuditMgt.FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"), '=', '.'));
+        CROPOSAuditLogAuxInfo."Verification URL" := StrSubstNo(VerificationURLFormatLbl, CROPOSAuditLogAuxInfo."JIR Code", Format(CROPOSAuditLogAuxInfo."Entry Date", 8, '<Year4><Month,2><Day,2>'), Format(CROPOSAuditLogAuxInfo."Log Timestamp", 4, '<Hours24,2><Minutes,2>'), DelChr(CROAuditMgt.FormatDecimal(FiscalTotalAmount), '=', '.'));
         CROPOSAuditLogAuxInfo.Modify();
 
         case CROPOSAuditLogAuxInfo."Audit Entry Type" of
