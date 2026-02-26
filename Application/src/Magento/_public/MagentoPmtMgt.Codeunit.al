@@ -715,15 +715,18 @@
     #region Posting payment lines
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure Cu80OnAfterPostSalesInvoice(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesInvHdrNo: Code[20])
+    var
+        PaymentLinesToCaptureFound: Boolean;
     begin
         if SalesInvHdrNo = '' then
             exit;
 
-        CaptureSalesInvoice(SalesInvHdrNo);
-        Commit();
+        if CaptureSalesInvoice(SalesInvHdrNo) then
+            Commit();
 
-        OnAfterCaptureSalesInvoice(SalesInvHdrNo);
-        Commit();
+        OnAfterCaptureSalesInvoice(SalesInvHdrNo, PaymentLinesToCaptureFound);
+        if PaymentLinesToCaptureFound then
+            Commit();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', true, true)]
@@ -992,7 +995,7 @@
         end;
     end;
 
-    internal procedure CaptureSalesInvoice(SalesInvoiceNo: Code[20])
+    internal procedure CaptureSalesInvoice(SalesInvoiceNo: Code[20]) PaymentLinesToCaptureFound: Boolean
     var
         PaymentLine: Record "NPR Magento Payment Line";
     begin
@@ -1000,15 +1003,16 @@
         PaymentLine.SetRange("Document No.", SalesInvoiceNo);
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
         PaymentLine.SetRange("Date Captured", 0D);
-        if PaymentLine.FindSet() then
+        PaymentLinesToCaptureFound := PaymentLine.FindSet();
+        if PaymentLinesToCaptureFound then
             repeat
                 CapturePaymentLine(PaymentLine);
             until PaymentLine.Next() = 0;
     end;
 
-    internal procedure CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
+    internal procedure CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header") PaymentLinesToCaptureFound: Boolean
     begin
-        CaptureSalesInvoice(SalesInvoiceHeader."No.")
+        PaymentLinesToCaptureFound := CaptureSalesInvoice(SalesInvoiceHeader."No.")
     end;
 
     internal procedure CaptureSalesHeader(SalesHeader: Record "Sales Header")
@@ -1533,7 +1537,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCaptureSalesInvoice(SalesInvHdrNo: Code[20])
+    local procedure OnAfterCaptureSalesInvoice(SalesInvHdrNo: Code[20]; var PaymentLinesToCaptureFound: Boolean)
     begin
     end;
 
