@@ -44,6 +44,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         TempPOSEntrySalesLines.FindSet();
         repeat
             Clear(ReturnDocumentNo);
+            Clear(RetailValueEntry);
 
             RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempPOSEntrySalesLines."No.", TempPOSEntrySalesLines."Location Code", POSEntry."Posting Date");
 
@@ -98,10 +99,10 @@ codeunit 6151363 "NPR RS POS GL Addition"
             NivelationLines."Line No." := LineNo;
             NivelationLines."Document No." := NivelationHeader."No.";
             NivelationLines."Location Code" := TempNivelationSalesLines."Location Code";
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempNivelationSalesLines."No.", TempNivelationSalesLines."Location Code", POSEntry."Posting Date");
             NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
             NivelationLines.Validate("Item No.", TempNivelationSalesLines."No.");
             NivelationLines.Quantity := TempNivelationSalesLines.Quantity;
-            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempNivelationSalesLines."No.", TempNivelationSalesLines."Location Code", POSEntry."Posting Date");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
             NivelationLines."Posting Date" := POSEntry."Posting Date";
             NivelationLines.Validate("New Price", RSRLocalizationMgt.RoundAmountToCurrencyRounding((TempNivelationSalesLines."Amount Incl. VAT" / TempNivelationSalesLines.Quantity), TempNivelationSalesLines."Currency Code"));
@@ -342,7 +343,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         end
         else begin
             InsertAppliedValueEntryAdj(StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry);
-            InsertRetailValueEntry(RetailValueEntry, StdValueEntry, StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, POSEntry, false);
+            InsertRetailValueEntry(RetailValueEntry, StdValueEntry, StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, POSEntry, TempPOSEntrySalesLines.Quantity < 0);
         end;
     end;
 
@@ -425,7 +426,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
                 repeat
                     HandleApplicationValueEntry(ApplValueEntry, StdValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, QtyNeeded, QtyTakenFromEntry);
                 until (ApplValueEntry.Next() = 0) or (QtyNeeded <= 0);
-        until TempApplicationItemLedgerEntry.Next() = 0;
+        until (TempApplicationItemLedgerEntry.Next() = 0) or (QtyNeeded <= 0);
     end;
 
     local procedure InsertReturnAppliedValueEntryAdjust(var StdCorrectionValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; StdValueEntry: Record "Value Entry"; ReturnDocumentNo: Code[20])
