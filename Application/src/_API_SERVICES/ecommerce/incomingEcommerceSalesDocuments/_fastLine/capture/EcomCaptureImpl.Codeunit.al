@@ -148,6 +148,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
         PaymentLine.Amount := EcomSalesPmtLine.Amount;
+        PaymentLine."Requested Amount" := PaymentLine.Amount;
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
         PaymentLine."Payment Gateway Shopper Ref." := EcomSalesPmtLine."PAR Token";
@@ -234,6 +235,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
             PaymentLine.Amount := EcomSalesPmtLine.Amount
         else
             PaymentLine.Amount := AmountToCapture;
+        PaymentLine."Requested Amount" := PaymentLine.Amount;
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
         PaymentLine."Payment Gateway Shopper Ref." := EcomSalesPmtLine."PAR Token";

@@ -244,6 +244,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
     begin
         PaymentLine."Amount (Store Currency)" := EcomSalesPmtLine."Amount (Store Currency)";
+        PaymentLine."Requested Amt. (Store Curr.)" := PaymentLine."Amount (Store Currency)";
         PaymentLine."Store Currency Code" := EcomSalesPmtLine."Store Currency Code";
         PaymentLine."Payment Gateway Code" := SpfyCapturePayment.ShopifyPaymentGateway(PaymentLine."Store Currency Code");
         PaymentLine."External Payment Gateway" := EcomSalesPmtLine."External Payment Gateway";
@@ -283,6 +284,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
             Currency.InitRoundingPrecision();
         end;
         PaymentLine."Amount (Store Currency)" := Round(PaymentLine."Amount (Store Currency)" * PaymentLine.Amount / AvailableAmountToCapture, Currency."Amount Rounding Precision");
+        PaymentLine."Requested Amt. (Store Curr.)" := PaymentLine."Amount (Store Currency)";
     end;
 
     internal procedure RefreshShopifySalesHeaderPostingDate(var SalesHeader: Record "Sales Header"; EcomSalesHeader: Record "NPR Ecom Sales Header")

@@ -4,6 +4,7 @@
 
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
+        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
 
     [Obsolete('Delete when final v1/v2 workflow is gone', '2023-06-28')]
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean)
@@ -77,6 +78,7 @@
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         PmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         AvailableAmount: Decimal;
         AvailableAmountLCY: Decimal;
         ReturnAmount: Decimal;
@@ -118,16 +120,42 @@
         SalesHeader.CalcFields("NPR Magento Payment Amount");
         TotalSalesAmount := GetTotalAmtInclVat(SalesHeader);
         TotalPaidAmount := SalesHeader."NPR Magento Payment Amount";
-        TotalReturnAmount := TotalPaidAmount - TotalSalesAmount;
+
+        if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
+            TotalReturnAmount := CalcVoucherAmountBeforeCurrentLine(SalesHeader, MagentoPaymentLine."Line No.");
+            if TotalReturnAmount > 0 then
+                exit;
+            ReturnAmount := CalcTotalPositiveVoucherAmount(SalesHeader) - TotalSalesAmount;
+            if ReturnAmount < 0 then
+                ReturnAmount := 0;
+        end else
+            TotalReturnAmount := TotalPaidAmount - TotalSalesAmount;
 
         HasPOSPaymentMethodItemFilter := PmtMethodItemMgt.HasPOSPaymentMethodItemFilter(NpRvVoucherType."Payment Type");
         if HasPOSPaymentMethodItemFilter then begin
             SalesAmount := NpRvSalesDocMgt.CalcSalesOrderPaymentMethodItemSalesAmount(SalesHeader, NpRvVoucherType."Payment Type");
             PaidAmount := NpRvSalesDocMgt.CalcSalesOrderPaymentMethodItemPaymentAmount(SalesHeader, NpRvVoucherType.Code, NpRvVoucherType."Payment Type");
+
+            PaidAmount -= GetExistingReturnVoucherAmount(SalesHeader);
+
             ReturnAmount := PaidAmount - SalesAmount;
-            if ReturnAmount < TotalReturnAmount then
-                ReturnAmount := TotalReturnAmount;
-        end else
+
+            if HasExistingReturnVoucher(SalesHeader) then begin
+                if ReturnAmount > 0 then
+                    exit;
+                ReturnAmount := 0;
+            end else begin
+                if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
+                    if ReturnAmount < 0 then
+                        ReturnAmount := 0;
+                end else begin
+                    if ReturnAmount < TotalReturnAmount then
+                        ReturnAmount := TotalReturnAmount;
+                end;
+            end;
+        end;
+
+        if not HasPOSPaymentMethodItemFilter and not FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then
             ReturnAmount := TotalReturnAmount;
 
         NpRvReturnVoucherType.Get(NpRvVoucherType.Code);
@@ -141,7 +169,8 @@
             ReturnLineExists := true;
             MagentoPaymentLineNew.Get(Database::"Sales Header", NpRvSalesLineNew."Document Type",
               NpRvSalesLineNew."Document No.", NpRvSalesLineNew."Document Line No.");
-            ReturnAmount -= MagentoPaymentLineNew.Amount;
+            if not FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then
+                ReturnAmount -= MagentoPaymentLineNew.Amount;
         end;
 
         if ReturnAmount <= 0 then begin
@@ -173,6 +202,7 @@
 
         NpRvVoucherMgt.GenerateTempVoucher(NpRvVoucherTypeNew, TempNpRvVoucher);
 
+        MagentoPaymentLineNew.Reset();
         MagentoPaymentLineNew.SetRange("Document Table No.", Database::"Sales Header");
         MagentoPaymentLineNew.SetRange("Document Type", SalesHeader."Document Type");
         MagentoPaymentLineNew.SetRange("Document No.", SalesHeader."No.");
@@ -539,5 +569,44 @@
         TempSalesLine.CalcVATAmountLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
         TempSalesLine.UpdateVATOnLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
         exit(TempVATAmountLine.GetTotalAmountInclVAT());
+    end;
+
+    local procedure CalcVoucherAmountBeforeCurrentLine(SalesHeader: Record "Sales Header"; CurrentLineNo: Integer): Decimal
+    var
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        exit(MagentoPmtMgt.CalcVoucherAmountBeforeLine(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", CurrentLineNo, true));
+    end;
+
+    local procedure CalcTotalPositiveVoucherAmount(SalesHeader: Record "Sales Header"): Decimal
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        MagentoPmtMgt.SetVoucherPaymentLineFilters(MagentoPaymentLine, Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        MagentoPaymentLine.SetFilter(Amount, '>0');
+        MagentoPaymentLine.CalcSums(Amount);
+        exit(MagentoPaymentLine.Amount);
+    end;
+
+    local procedure HasExistingReturnVoucher(SalesHeader: Record "Sales Header"): Boolean
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        MagentoPmtMgt.SetVoucherPaymentLineFilters(MagentoPaymentLine, Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        MagentoPaymentLine.SetFilter(Amount, '<0');
+        exit(not MagentoPaymentLine.IsEmpty());
+    end;
+
+    local procedure GetExistingReturnVoucherAmount(SalesHeader: Record "Sales Header"): Decimal
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        MagentoPmtMgt.SetVoucherPaymentLineFilters(MagentoPaymentLine, Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        MagentoPaymentLine.SetFilter(Amount, '<0');
+        MagentoPaymentLine.CalcSums(Amount);
+        exit(MagentoPaymentLine.Amount);
     end;
 }

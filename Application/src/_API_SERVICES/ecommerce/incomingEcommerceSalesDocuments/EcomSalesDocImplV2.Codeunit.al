@@ -828,6 +828,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
         PaymentLine.Amount := EcomSalesPmtLine.Amount - EcomSalesPmtLine."Captured Amount";
+        PaymentLine."Requested Amount" := PaymentLine.Amount;
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
         PaymentLine."Payment Gateway Shopper Ref." := EcomSalesPmtLine."PAR Token";

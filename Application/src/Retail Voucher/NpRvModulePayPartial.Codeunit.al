@@ -4,6 +4,7 @@
 
     var
         Text000: Label 'Apply Payment - Partial';
+        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
 
     [Obsolete('Delete when final v1/v2 workflow is gone', '2023-06-28')]
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
@@ -34,19 +35,51 @@
     procedure ApplyPaymentSalesDoc(NpRvVoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        TotalAmtInclVat: Decimal;
         ReturnAmount: Decimal;
+        AmountUsedByPreviousVouchers: Decimal;
+        AmountNeededFromThisVoucher: Decimal;
     begin
         SalesHeader.CalcFields("NPR Magento Payment Amount");
-        ReturnAmount := SalesHeader."NPR Magento Payment Amount" - GetTotalAmtInclVat(SalesHeader);
-        if ReturnAmount <= 0 then
-            exit;
+        TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
+        if not FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
+            ReturnAmount := SalesHeader."NPR Magento Payment Amount" - TotalAmtInclVat;
+            if ReturnAmount <= 0 then
+                exit;
+        end;
 
         NpRvSalesLine.Get(NpRvSalesLine.Id);
         NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         MagentoPaymentLine.Get(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
 
-        MagentoPaymentLine.Amount -= ReturnAmount;
-        MagentoPaymentLine.Modify(true);
+        if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
+            AmountUsedByPreviousVouchers := GetVoucherAmountBeforeLine(SalesHeader, NpRvSalesLine."Document Line No.");
+            if MagentoPaymentLine."Requested Amount" = 0 then
+                MagentoPaymentLine."Requested Amount" := MagentoPaymentLine.Amount;
+            // Always use Requested Amount (original value) to calculate how much we can use from this voucher
+            if AmountUsedByPreviousVouchers >= TotalAmtInclVat then
+                AmountNeededFromThisVoucher := 0
+            else if (AmountUsedByPreviousVouchers + MagentoPaymentLine."Requested Amount") > TotalAmtInclVat then
+                AmountNeededFromThisVoucher := TotalAmtInclVat - AmountUsedByPreviousVouchers
+            else
+                AmountNeededFromThisVoucher := MagentoPaymentLine."Requested Amount";
+
+            if MagentoPaymentLine.Amount <> AmountNeededFromThisVoucher then begin
+                MagentoPaymentLine.Amount := AmountNeededFromThisVoucher;
+                MagentoPaymentLine.Modify(true);
+            end;
+        end else begin
+            MagentoPaymentLine.Amount -= ReturnAmount;
+            MagentoPaymentLine.Modify(true);
+        end;
+    end;
+
+    local procedure GetVoucherAmountBeforeLine(SalesHeader: Record "Sales Header"; CurrentLineNo: Integer): Decimal
+    var
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        exit(MagentoPmtMgt.CalcVoucherAmountBeforeLine(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", CurrentLineNo, false));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
@@ -192,4 +225,3 @@
     end;
     #endRegion
 }
-

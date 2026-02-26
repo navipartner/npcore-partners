@@ -331,8 +331,16 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeReleaseSalesDoc', '', true, true)]
     local procedure OnBeforeReleaseSalesDoc(var SalesHeader: Record "Sales Header")
     var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        TotalAmtInclVat: Decimal;
+        VoucherAmount: Decimal;
+        RemainingAmountNeeded: Decimal;
+        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
     begin
+        NpRvSalesLine.SetCurrentKey("Document Source", "Document Type", "Document No.", "Document Line No.");
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
         NpRvSalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -345,6 +353,65 @@
         repeat
             ApplyPayment(SalesHeader, NpRvSalesLine);
         until NpRvSalesLine.Next() = 0;
+
+        if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
+            TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
+            VoucherAmount := MagentoPmtMgt.GetNetVoucherAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+
+            MagentoPaymentLine.Reset();
+            MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+            MagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+            MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
+            MagentoPaymentLine.SetFilter("Payment Type", '<>%1', MagentoPaymentLine."Payment Type"::Voucher);
+
+            if VoucherAmount >= TotalAmtInclVat then begin
+                if MagentoPaymentLine.FindSet() then
+                    repeat
+                        AdjustPaymentLineAmount(MagentoPaymentLine, 0);
+                    until MagentoPaymentLine.Next() = 0;
+            end else begin
+                RemainingAmountNeeded := TotalAmtInclVat - VoucherAmount;
+                if MagentoPaymentLine.FindSet() then
+                    repeat
+                        if MagentoPaymentLine."Requested Amount" > 0 then begin
+                            if RemainingAmountNeeded <= 0 then
+                                AdjustPaymentLineAmount(MagentoPaymentLine, 0)
+                            else if MagentoPaymentLine."Requested Amount" <= RemainingAmountNeeded then
+                                AdjustPaymentLineAmount(MagentoPaymentLine, MagentoPaymentLine."Requested Amount")
+                            else
+                                AdjustPaymentLineAmount(MagentoPaymentLine, RemainingAmountNeeded);
+                            RemainingAmountNeeded -= MagentoPaymentLine.Amount;
+                        end;
+                    until MagentoPaymentLine.Next() = 0;
+            end;
+        end;
+    end;
+
+    local procedure AdjustPaymentLineAmount(var MagentoPaymentLine: Record "NPR Magento Payment Line"; NewAmount: Decimal)
+#if not BC17
+    var
+        Currency: Record Currency;
+#endif
+    begin
+        if MagentoPaymentLine.Amount = NewAmount then
+            exit;
+
+        if MagentoPaymentLine."Requested Amount" = 0 then
+            MagentoPaymentLine."Requested Amount" := MagentoPaymentLine.Amount;
+#if not BC17
+        if MagentoPaymentLine."Requested Amt. (Store Curr.)" = 0 then
+            MagentoPaymentLine."Requested Amt. (Store Curr.)" := MagentoPaymentLine."Amount (Store Currency)";
+
+        if (MagentoPaymentLine."Requested Amount" <> 0) and (MagentoPaymentLine."Requested Amt. (Store Curr.)" <> 0) then begin
+            if not Currency.Get(MagentoPaymentLine."Store Currency Code") then
+                Currency.InitRoundingPrecision();
+            MagentoPaymentLine."Amount (Store Currency)" :=
+                Round(MagentoPaymentLine."Requested Amt. (Store Curr.)" / MagentoPaymentLine."Requested Amount" * NewAmount, Currency."Amount Rounding Precision");
+        end;
+#endif
+
+        MagentoPaymentLine.Amount := NewAmount;
+        MagentoPaymentLine.Modify(true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterCheckSalesDoc', '', true, false)]

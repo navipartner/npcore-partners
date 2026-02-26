@@ -657,10 +657,12 @@
                 OutstandingAmt := TotalAmountInclVAT - PaymentAmt;
                 if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt + RefundPaymentsAmount) then begin
                     PaymentLine2.Amount := OutstandingAmt + RefundPaymentsAmount;
+                    PaymentLine2."Requested Amount" := PaymentLine2.Amount;
 #if not BC17
                     PaymentLine2."Amount (Store Currency)" := Round(PaymentLine."Amount (Store Currency)" / PaymentLine.Amount * PaymentLine2.Amount, 0.01);
                     if PaymentLine2."Amount (Store Currency)" > PaymentLine."Amount (Store Currency)" then
                         PaymentLine2."Amount (Store Currency)" := PaymentLine."Amount (Store Currency)";
+                    PaymentLine2."Requested Amt. (Store Curr.)" := PaymentLine2."Amount (Store Currency)";
 #endif
                     PaymentLine2.Modify();
 
@@ -674,12 +676,23 @@
                     PaymentLine."Amount (Store Currency)" := 0;
 #endif
                 end;
+                PaymentLine."Requested Amount" := PositiveOrZero(PaymentLine."Requested Amount" - PaymentLine2.Amount);
+#if not BC17
+                PaymentLine."Requested Amt. (Store Curr.)" := PositiveOrZero(PaymentLine."Requested Amt. (Store Curr.)" - PaymentLine2."Amount (Store Currency)");
+#endif
                 PaymentLine."Last Amount" := PaymentLine2.Amount;
                 PaymentLine."Last Posting No." := DocNo;
                 PaymentLine.Modify();
 
                 PaymentAmt += PaymentLine2.Amount;
             until (PaymentLine.Next() = 0) or ((PaymentAmt = TotalAmountInclVAT) and not (HasVouchers or HasPaymentsAndRefunds)); // we don't allow partial processing when there are vouchers or a mix of payments and refunds
+    end;
+
+    local procedure PositiveOrZero(AmountIn: Decimal): Decimal
+    begin
+        if AmountIn > 0 then
+            exit(AmountIn);
+        exit(0);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, true)]
@@ -1376,6 +1389,35 @@
             exit;
 
         PaymentsAndRefundsExist := true;
+    end;
+
+    internal procedure GetNetVoucherAmount(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]): Decimal
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        SetVoucherPaymentLineFilters(MagentoPaymentLine, DocTableNo, DocType, DocNo);
+        MagentoPaymentLine.CalcSums(Amount);
+        exit(MagentoPaymentLine.Amount);
+    end;
+
+    internal procedure SetVoucherPaymentLineFilters(var MagentoPaymentLine: Record "NPR Magento Payment Line"; DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20])
+    begin
+        MagentoPaymentLine.SetRange("Document Table No.", DocTableNo);
+        MagentoPaymentLine.SetRange("Document Type", DocType);
+        MagentoPaymentLine.SetRange("Document No.", DocNo);
+        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
+    end;
+
+    internal procedure CalcVoucherAmountBeforeLine(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]; CurrentLineNo: Integer; PositiveOnly: Boolean): Decimal
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        SetVoucherPaymentLineFilters(MagentoPaymentLine, DocTableNo, DocType, DocNo);
+        MagentoPaymentLine.SetFilter("Line No.", '<%1', CurrentLineNo);
+        if PositiveOnly then
+            MagentoPaymentLine.SetFilter(Amount, '>0');
+        MagentoPaymentLine.CalcSums(Amount);
+        exit(MagentoPaymentLine.Amount);
     end;
 
     local procedure CreateMembershipPaymentMethods(SalesInvoiceHeader: Record "Sales Invoice Header")

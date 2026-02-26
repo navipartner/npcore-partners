@@ -716,7 +716,9 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     local procedure SetPaymentAmounts(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         PaymentLine.Amount := JsonHelper.GetJDecimal(Transaction, 'amountSet.presentmentMoney.amount', false);
+        PaymentLine."Requested Amount" := PaymentLine.Amount;
         PaymentLine."Amount (Store Currency)" := JsonHelper.GetJDecimal(Transaction, 'amountSet.shopMoney.amount', true);
+        PaymentLine."Requested Amt. (Store Curr.)" := PaymentLine."Amount (Store Currency)";
         PaymentLine."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.shopMoney.currencyCode', false));
     end;
 

@@ -205,6 +205,15 @@
             Caption = 'Requested Amount';
             DataClassification = CustomerContent;
         }
+#if not BC17
+        field(315; "Requested Amt. (Store Curr.)"; Decimal)
+        {
+            Caption = 'Requested Amount (Store Currency)';
+            DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Store Currency Code";
+        }
+#endif
         field(320; "Date Canceled"; Date)
         {
             Caption = 'Date Canceled';
