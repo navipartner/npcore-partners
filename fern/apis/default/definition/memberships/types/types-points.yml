@@ -330,6 +330,9 @@ types:
       variantCode:
         type: string
         docs: The variant code of the item.
+      quantity:
+        type: double
+        docs: The quantity of the item in this entry.
       description:
         type: string
         docs: A description of the entry.
@@ -351,6 +354,7 @@ types:
           amountInclVAT: 1200.50
           item: "I52892"
           variantCode: "V9529"
+          quantity: 1.0
           description: "Purchase of items in a POS sale"
           id: "68e3ce0f-a5ec-f011-b3a5-ab8f942b8604"
 

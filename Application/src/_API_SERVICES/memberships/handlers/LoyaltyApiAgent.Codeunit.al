@@ -136,6 +136,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         Fields.Add(MembersPointsEntry.FieldNo("Amount (LCY)"), 'amountInclVAT');
         Fields.Add(MembersPointsEntry.FieldNo("Item No."), 'item');
         Fields.Add(MembersPointsEntry.FieldNo("Variant Code"), 'variantCode');
+        Fields.Add(MembersPointsEntry.FieldNo(Quantity), 'quantity');
         Fields.Add(MembersPointsEntry.FieldNo(Description), 'description');
         Response.RespondOK(Request.GetData(MembersPointsEntry, Fields));
     end;
