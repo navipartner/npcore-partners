@@ -225,6 +225,9 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
     begin
+        if DigitalNotifSetup."Exclude Vouchers From Manifest" then
+            exit;
+
         NpRvVoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.");
         NpRvVoucherEntry.SetFilter("Entry Type", '%1|%2',
             NpRvVoucherEntry."Entry Type"::"Issue Voucher",
@@ -532,7 +535,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         if DigitalNotifSetupRead then
             exit(true);
 
-        DigitalNotifSetup.SetLoadFields(Enabled, "Email Template Id Order");
+        DigitalNotifSetup.SetLoadFields(Enabled, "Email Template Id Order", "Exclude Vouchers From Manifest");
         if not DigitalNotifSetup.Get() then begin
             ErrorMessage := NoSetupErr;
             exit(false);

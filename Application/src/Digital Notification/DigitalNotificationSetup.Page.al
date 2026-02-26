@@ -28,6 +28,11 @@ page 6150919 "NPR Digital Notification Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the maximum number of attempts to send a failed notification before giving up. Set to 0 for unlimited attempts.';
                 }
+                field("Exclude Vouchers From Manifest"; Rec."Exclude Vouchers From Manifest")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether voucher assets should be excluded from the digital notification manifest.';
+                }
                 field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = NPRRetail;

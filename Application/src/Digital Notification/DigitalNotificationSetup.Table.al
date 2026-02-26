@@ -28,6 +28,11 @@ table 6248183 "NPR Digital Notification Setup"
                         Error(CannotClearTemplateErr);
             end;
         }
+        field(15; "Exclude Vouchers From Manifest"; Boolean)
+        {
+            Caption = 'Exclude Vouchers From Manifest';
+            DataClassification = CustomerContent;
+        }
         field(20; Enabled; Boolean)
         {
             Caption = 'Enabled';
