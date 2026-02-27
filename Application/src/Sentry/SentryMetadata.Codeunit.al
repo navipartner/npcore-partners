@@ -142,24 +142,31 @@ codeunit 6150966 "NPR Sentry Metadata"
         end;
     end;
 
-    internal procedure WriteModulesJson(Json: Codeunit "NPR Json Builder")
+    internal procedure WriteModulesJson(var Json: Codeunit "NPR Json Builder")
     var
         NAVAppInstalledApp: Record "NAV App Installed App";
-        App: Text;
+        AppKey: Text;
+        AppValue: Text;
+        i: Integer;
     begin
         if not _installedAppsLoaded then begin
+            i := 0;
+            NAVAppInstalledApp.SetCurrentKey(Name);
             NAVAppInstalledApp.SetFilter(Publisher, '<>%1', 'Microsoft');
             if NAVAppInstalledApp.FindSet() then begin
                 repeat
-                    _installedApp.Add(NAVAppInstalledApp.Name, StrSubstNo('%1.%2.%3.%4', NAVAppInstalledApp."Version Major", NAVAppInstalledApp."Version Minor", NAVAppInstalledApp."Version Build", NAVAppInstalledApp."Version Revision"));
+                    i += 1;
+                    AppKey := StrSubstNo('%1 - %2', i, NAVAppInstalledApp.Name);
+                    AppValue := StrSubstNo('%1.%2.%3.%4', NAVAppInstalledApp."Version Major", NAVAppInstalledApp."Version Minor", NAVAppInstalledApp."Version Build", NAVAppInstalledApp."Version Revision");
+                    _installedApp.Add(AppKey, AppValue);
                 until NAVAppInstalledApp.Next() = 0;
             end;
             _installedAppsLoaded := true;
         end;
 
         Json.StartObject('modules');
-        foreach App in _installedApp.Keys() do begin
-            Json.AddProperty(App, _installedApp.Get(App));
+        foreach AppKey in _installedApp.Keys() do begin
+            Json.AddProperty(AppKey, _installedApp.Get(AppKey));
         end;
         Json.EndObject();
     end;

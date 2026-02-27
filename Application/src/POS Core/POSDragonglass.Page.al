@@ -29,6 +29,7 @@ page 6150750 "NPR POS (Dragonglass)"
                     SentryTraceHeader: Text;
                     SentryTransactionName: Text;
                     StartTime: DateTime;
+                    ErrorText: Text;
                 begin
                     StartTime := CurrentDateTime();
 
@@ -58,11 +59,12 @@ page 6150750 "NPR POS (Dragonglass)"
                         CheckUserLocked();
                         CheckUserExpired();
                         if POSSession.GetErrorOnInitialize() then begin
+                            ErrorText := GetLastErrorText();
                             Sentry.AddLastErrorIfProgrammingBug();
                             FrameworkReadySpan.Finish();
                             Sentry.FinalizeScope();
                             CurrPage.Close();
-                            Error(GetLastErrorText());
+                            Error(ErrorText);
                         end;
 
                         Response.Add('RequestID', requestId);
@@ -99,9 +101,10 @@ page 6150750 "NPR POS (Dragonglass)"
                     MethodSpan.Finish();
 
                     if not Success then begin
+                        ErrorText := GetLastErrorText();
                         Sentry.AddLastErrorIfProgrammingBug();
                         Sentry.FinalizeScope();
-                        Error(GetLastErrorText());
+                        Error(ErrorText);
                     end;
 
                     ProcessBackgroundTaskQueues();

@@ -142,7 +142,7 @@ codeunit 6248497 "NPR Sentry"
     procedure FinalizeScope()
     begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        SentryScope.FinalizeScope();
+        if SentryScope.FinalizeScope() then;
 #endif
     end;
 

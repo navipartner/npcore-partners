@@ -20,7 +20,7 @@ codeunit 6150994 "NPR Sentry Scope"
         sample: Boolean;
     begin
         if HasActiveTransaction() then
-            FinalizeScope();
+            if FinalizeScope() then;
 
         ResetState();
 
@@ -54,7 +54,7 @@ codeunit 6150994 "NPR Sentry Scope"
         ReleaseVersion: Text;
     begin
         if HasActiveTransaction() then
-            FinalizeScope();
+            if FinalizeScope() then;
 
         ResetState();
 
@@ -490,6 +490,7 @@ codeunit 6150994 "NPR Sentry Scope"
         Exit(DbQuery);
     end;
 
+    [TryFunction]
     internal procedure FinalizeScope()
     begin
         if _activeSpanId = '' then

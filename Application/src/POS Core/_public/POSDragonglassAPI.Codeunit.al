@@ -26,6 +26,7 @@ codeunit 6060078 "NPR POS Dragonglass API"
         POSAPIStackCheck: Codeunit "NPR POS API Stack Check";
         Sentry: Codeunit "NPR Sentry";
         InvokeSpan: Codeunit "NPR Sentry Span";
+        ErrorText: Text;
     begin
         if not Sentry.HasActiveTransaction() then
             Sentry.InitScopeAndTransaction(StrSubstNo('Dragonglass API: %1', method), 'bc.odata.dragonglass');
@@ -47,10 +48,11 @@ codeunit 6060078 "NPR POS Dragonglass API"
         if method = 'FrameworkReady' then begin //once when POS frontend has loaded
             POSSession.ConstructFromWebserviceSession(true, '', '');
             if POSSession.GetErrorOnInitialize() then begin
+                ErrorText := GetLastErrorText();
                 Sentry.AddLastErrorIfProgrammingBug();
                 InvokeSpan.Finish();
                 Sentry.FinalizeScope();
-                Error(GetLastErrorText());
+                Error(ErrorText);
             end;
             Response.Add('ServerID', Format(ServiceInstanceId()));
             Response.WriteTo(JsonResponse);

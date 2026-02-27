@@ -79,6 +79,8 @@ codeunit 6248500 "NPR Sentry Error"
         Json.EndArray(); //values
         Json.EndObject(); //exception
 
+        SentryMetadata.WriteModulesJson(Json);
+
         Json.StartObject('tags');
         SentryMetadata.WriteTagsForBackendEvent(Json);
         Json.EndObject();
