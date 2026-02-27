@@ -38,24 +38,27 @@ let main = async ({
     addItemAddOn,
     baseLineNo,
     postAddWorkflows,
-    ticketToken,
+    tokensRequiringScheduleSelection,
+    tokensRequiringTicketHolder,
     itemNoId,
     itemReferenceId,
   } = await workflow.respond("addSalesLine");
 
-  if (ticketToken) {
+  if (!tokensRequiringScheduleSelection) tokensRequiringScheduleSelection = [];
+  if (!tokensRequiringTicketHolder) tokensRequiringTicketHolder = [];
+  if (tokensRequiringScheduleSelection.length > 0 || tokensRequiringTicketHolder.length > 0) {
     const scheduleSelection = await workflow.run("TM_SCHEDULE_SELECT", {
       context: {
-        TicketToken: ticketToken,
-        EditSchedule: true,
+        tokensRequiringScheduleSelection: tokensRequiringScheduleSelection,
+        tokensRequiringTicketHolder: tokensRequiringTicketHolder,
       },
     });
-    debugger;
     if (scheduleSelection.cancel) {
       await workflow.respond("cancelTicketItemLine");
       return;
     }
   }
+
   if (requiresAdditionalInformationCollection) {
     if (requiresUnitPriceInputPrompt) {
       context.unitPriceInput = await popup.numpad({

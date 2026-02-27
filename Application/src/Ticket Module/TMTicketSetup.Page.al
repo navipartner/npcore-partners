@@ -69,6 +69,11 @@
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Default Ticket Language field';
                 }
+                field(DefaultLanguageCode; Rec.DefaultLanguageCode)
+                {
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Default Language Code field';
+                }
                 field("Timeout (ms)"; Rec."Timeout (ms)")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;

@@ -350,6 +350,7 @@
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         ItemAddOnUnit: Codeunit "NPR NpIa Item AddOn";
+        DiscountManagement: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         JToken: JsonToken;
         AddonLineKey: Text;
         SelectedAddonLineKeys: List of [Text];
@@ -420,6 +421,8 @@
                     InsertPOSAddOnLineComment(JToken, ItemAddOn, SaleLinePOS);
         until TempItemAddOnLine.Next() = 0;
 
+        DiscountManagement.RecalculateAllSaleLinePOS(SalePOS);
+
         exit(true);
     end;
 
@@ -438,6 +441,7 @@
         POSSaleLine: Codeunit "NPR POS Sale Line";
         ItemAddOnUnit: Codeunit "NPR NpIa Item AddOn";
         LastErrorText: Text;
+        DiscountManagement: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
     begin
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         ItemAddOnLine.SetRange(Mandatory, true);
@@ -495,6 +499,8 @@
             repeat
                 InsertPOSAddOnLine(TempItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS);
             until TempItemAddOnLine.Next() = 0;
+
+            DiscountManagement.RecalculateAllSaleLinePOS(SalePOS);
 
             if SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo) then
                 POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
@@ -586,6 +592,7 @@
             POSSaleLine.SetUsePresetLineNo(true);
             POSSaleLine.SetSkipPOSInfo(true);
             POSSaleLine.InsertLine(SaleLinePOS);
+            SaleLinePOS.SetSkipCalcDiscount(false);
             POSSaleLine.SetUsePresetLineNo(false);
 
             if Item.Get(SaleLinePOS."No.") then

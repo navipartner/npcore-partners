@@ -179,6 +179,24 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         Response.Add('ItemAddonConfigAsString', ItemAddonConfigAsString);
     end;
 
+    internal procedure AddonRequiresUserInteraction(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        if (not Item.Get(SaleLinePOS."No.")) then
+            exit(true); // deal with this error in the workflow UI
+
+        if (not ItemAddOn.Get(Item."NPR Item Addon No.")) then
+            exit(true); // deal with this error in the workflow UI
+
+        if (not ItemAddOn.Enabled) then
+            exit(true); // deal with this error in the workflow UI
+
+        exit(ItemAddOnMgt.UserInterfaceIsRequired(ItemAddOn, ItemAddOnMgt.AttachedIteamAddonLinesExist(SaleLinePOS)));
+    end;
+
     local procedure FindAppliesToLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     begin
         if SaleLinePOS.Accessory then

@@ -174,17 +174,6 @@
 
     internal procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer)
     var
-        Token: Text[100];
-        TokenLineNumber: Integer;
-    begin
-        if (not GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then
-            exit;
-
-        AdjustPriceOnSalesLine(SaleLinePOS, NewQuantity, Token, TokenLineNumber);
-    end;
-
-    internal procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer; Token: Text[100]; TokenLineNumber: Integer)
-    var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         xSaleLinePOS: Record "NPR POS Sale Line";
@@ -192,8 +181,8 @@
         DiscountAmount: Decimal;
         DiscountPercent: Decimal;
         ForceItemAddOnUnitPrice: Boolean;
+        QtyChange: Boolean;
     begin
-
         if (SaleLinePOS."Manual Item Sales Price") then
             exit;
 
@@ -202,10 +191,14 @@
 
         if (SaleLinePOS.Quantity <> NewQuantity) then begin
             xSaleLinePOS := SaleLinePOS;
+            SaleLinePOS.SetSkipUpdateDependantQuantity(true);
             SaleLinePOS.Validate(Quantity, NewQuantity);
+            SaleLinePOS.UpdateAmounts(SaleLinePOS);
             SaleLinePOS.Modify();
-            POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS, xSaleLinePOS);
+            if (SaleLinePOS.Indentation = 0) then
+                POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS, xSaleLinePOS);
             SaleLinePOS.Get(SaleLinePOS.RecordId);
+            QtyChange := true;
         end;
 
         ForceItemAddOnUnitPrice := false;
@@ -221,9 +214,9 @@
             if (SaleLinePOSAddOn.FindFirst()) then begin
                 if (SaleLinePOS."Discount %" <> 0) then begin
                     if (SaleLinePOSAddOn.DiscountAmount <> 0) then
-                        DiscountAmount := SaleLinePOS."Discount Amount";
+                        DiscountAmount := SaleLinePOSAddOn.DiscountAmount * NewQuantity;
                     if (SaleLinePOSAddOn.DiscountPercent <> 0) then
-                        DiscountPercent := saleLinePOS."Discount %";
+                        DiscountPercent := SaleLinePOSAddOn.DiscountPercent;
                 end;
 
                 if (ItemAddOnLine.Get(SaleLinePOSAddOn."AddOn No.", SaleLinePOSAddOn."AddOn Line No.")) then
@@ -238,6 +231,7 @@
             SaleLinePOS."Unit Price" := ItemAddOnLine."Unit Price";
 
         end else begin
+            SaleLinePOS.SetSkipUpdateDependantQuantity(true);
             SaleLinePOS.Validate(Quantity, NewQuantity);
             SaleLinePOS."Eksp. Salgspris" := false;
             SaleLinePOS."Custom Price" := false;
@@ -249,10 +243,14 @@
         if (DiscountPercent <> 0) then
             SaleLinePOS.Validate("Discount %", DiscountPercent);
 
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        if (ForceItemAddOnUnitPrice or (DiscountAmount <> 0) or (DiscountPercent <> 0)) then
+            SaleLinePOS.UpdateAmounts(SaleLinePOS);
+
         SaleLinePOS.Modify();
 
-        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS, xSaleLinePOS);
+        if (SaleLinePOS.Indentation = 0) or (QtyChange) then
+            POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS, xSaleLinePOS);
+
     end;
 
 
@@ -316,28 +314,34 @@
         AdmScheduleEntry2: Record "NPR TM Admis. Schedule Entry";
         ExternalScheduleEntryNo: Integer;
     begin
-
-
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
-        if (TicketReservationRequest.FindSet()) then begin
-            repeat
-                TicketReservationRequest2.Reset();
-                if (TicketReservationRequest."Receipt No." <> '') then begin
-                    TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
-                end else begin
-                    TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
-                end;
 
+        if (TicketReservationRequest.FindSet()) then begin
+
+            // find same admission schedule for same admission code on the same sales receipt / token
+            TicketReservationRequest2.Reset();
+            TicketReservationRequest2.SetLoadFields("Receipt No.", "Session Token ID", "Admission Code", "External Adm. Sch. Entry No.", "Scheduled Time Description");
+            if (TicketReservationRequest."Receipt No." <> '') then begin
+                TicketReservationRequest2.SetCurrentKey("Receipt No.", "Admission Code", "External Adm. Sch. Entry No.");
+                TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            end else begin
+                TicketReservationRequest2.SetCurrentKey("Session Token ID");
+                TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
+            end;
+            // only look for those with a valid schedule already assigned
+            TicketReservationRequest2.SetFilter("External Adm. Sch. Entry No.", '>%1', 0);
+
+            repeat
                 TicketReservationRequest2.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
-                TicketReservationRequest2.SetFilter("External Adm. Sch. Entry No.", '>%1', 0);
                 if (TicketReservationRequest2.FindLast()) then begin
                     TicketReservationRequest."External Adm. Sch. Entry No." := TicketReservationRequest2."External Adm. Sch. Entry No.";
                     TicketReservationRequest."Scheduled Time Description" := TicketReservationRequest2."Scheduled Time Description";
                     TicketReservationRequest.Modify();
                 end;
+
             until (TicketReservationRequest.Next() = 0);
         end;
 
@@ -415,7 +419,6 @@
                 end;
             end;
         end;
-
     end;
 
     procedure AssignSameNotificationAddress(Token: Text[100])
@@ -423,30 +426,33 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
-
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Notification Address", '=%1', '');
         if (TicketReservationRequest.FindSet()) then begin
-            repeat
-                TicketReservationRequest2.Reset();
-                if (TicketReservationRequest."Receipt No." <> '') then begin
-                    TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
-                end else begin
-                    TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
-                end;
 
+            TicketReservationRequest2.Reset();
+            if (TicketReservationRequest."Receipt No." <> '') then begin
+                TicketReservationRequest2.SetCurrentKey("Receipt No.");
+                TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
                 TicketReservationRequest2.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
-                TicketReservationRequest2.SetFilter("Notification Address", '<>%1', '');
-                if (TicketReservationRequest2.FindLast()) then begin
+            end else begin
+                TicketReservationRequest2.SetCurrentKey("Session Token ID");
+                TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
+            end;
+
+            TicketReservationRequest2.SetFilter("Notification Address", '<>%1', '');
+
+            if (TicketReservationRequest2.FindLast()) then begin
+                repeat
                     TicketReservationRequest."Notification Method" := TicketReservationRequest2."Notification Method";
                     TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
                     TicketReservationRequest.TicketHolderName := TicketReservationRequest2.TicketHolderName;
                     TicketReservationRequest.TicketHolderPreferredLanguage := TicketReservationRequest2.TicketHolderPreferredLanguage;
                     TicketReservationRequest.Modify();
-                end;
-            until (TicketReservationRequest.Next() = 0);
+                until (TicketReservationRequest.Next() = 0);
+            end;
         end;
     end;
 
@@ -645,7 +651,8 @@
     procedure UpdateTicketOnSaleLineInsert(SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         SaleLinePOS.SetRecFilter();
         if (not SaleLinePOS.FindFirst()) then
@@ -658,6 +665,8 @@
 #if (BC17 or BC18 or BC19 or BC20 or BC21)
         TicketRequestManager.LockResources('UpdateTicketOnSaleLineInsert');
 #endif
+        Sentry.StartSpan(Span, 'bc.ticket.insert-sale-line: item:' + SaleLinePOS."No." + ' qty:' + Format(SaleLinePOS.Quantity));
+
         TicketRequestManager.ExpireReservationRequests();
 
         if (SaleLinePOS.Quantity > 0) then
@@ -665,6 +674,8 @@
 
         if (SaleLinePOS.Quantity < 0) then
             RevokeTicketSales(SaleLinePOS);
+
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Merg.Sml.LinesB", 'OnBeforeCollapseSaleLine', '', true, true)]
@@ -702,7 +713,7 @@
             exit;
 
         // This is a ticket event
-        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
+        if (GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
             if (TicketRequestManager.IsRequestStatusReservation(Token)) then
                 exit;
             if (TicketRequestManager.IsRequestStatusConfirmed(Token)) then
@@ -729,7 +740,7 @@
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
-        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then
+        if (GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then
             TicketRequestManager.SetTicketMember(Token, ExternalMemberNo);
     end;
 
@@ -739,6 +750,9 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
     begin
+        if (not IsTicketSalesLine(SaleLinePOS)) then
+            exit;
+
         if (not (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
             exit;
 
@@ -828,14 +842,46 @@
         end;
     end;
 
-    local procedure GetRequestToken(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer): Boolean
+    local procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer): Boolean
     var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        RequestStatus: Option;
     begin
-        exit(TicketRequestManager.GetTokenFromReceipt(ReceiptNo, LineNumber, Token, TokenLineNumber));
+        exit(GetTokenFromReceipt(ReceiptNo, LineNumber, Token, TokenLineNumber, RequestStatus));
     end;
 
-    local procedure IsTicketSalesLine(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    local procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer; var RequestStatus: Option): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        Token := '';
+        TokenLineNumber := 0;
+        if (ReceiptNo = '') then
+            exit(false);
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        TicketReservationRequest.ReadIsolation(IsolationLevel::ReadUncommitted);
+#ENDIF
+        // This path is 99.99% misses, so we want to avoid doing any unnecessary reads. 
+        // IsEmpty seem to be way faster when data is skewed - receipt number is mostly blank due to web sales.
+        // 1ms vs +50ms
+        TicketReservationRequest.SetFilter("Receipt No.", '=%1', ReceiptNo);
+        TicketReservationRequest.SetFilter("Line No.", '=%1', LineNumber);
+        if (TicketReservationRequest.IsEmpty()) then begin
+            exit(false);
+        end;
+
+        // But in the rare case that we do have a receipt number, then we need to find the token and reservation status
+        TicketReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Receipt No.", "Line No.");
+        TicketReservationRequest.FindFirst();
+        Token := TicketReservationRequest."Session Token ID";
+        TokenLineNumber := TicketReservationRequest."Ext. Line Reference No.";
+        RequestStatus := TicketReservationRequest."Request Status";
+
+        exit(true);
+    end;
+
+    internal procedure IsTicketSalesLine(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;
@@ -863,12 +909,13 @@
         TokenLineNumber: Integer;
         ExternalMemberNo: Code[20];
         RequiredAdmissionHasTimeSlots, AllAdmissionsRequired : Boolean;
+        RequestStatus: Option;
     begin
         if (not GuiAllowed()) then
             exit(0); // Self Service mode over REST API.
 
-        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
-            if (TicketRequestManager.IsRequestStatusReservation(Token)) then
+        if (GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber, RequestStatus)) then begin
+            if (RequestStatus = TicketReservationRequest."Request Status"::RESERVED) then
                 exit(0);
 
             TicketRequestManager.DeleteReservationRequest(Token, true);
@@ -899,7 +946,7 @@
                 if (not TicketRetailManager.UseFrontEndScheduleUX()) then
                     AcquireTicketParticipant(Token, ExternalMemberNo, false);
 
-                AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity, Token, TokenLineNumber);
+                AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity);
 
                 TicketReservationRequest.Reset();
                 TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -1032,6 +1079,5 @@
             end;
         end;
     end;
-
 }
 

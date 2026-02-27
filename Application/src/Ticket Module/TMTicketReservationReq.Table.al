@@ -301,7 +301,7 @@
         key(Key2; "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion")
         {
 #if not (BC17 or BC18)
-            IncludedFields = "Request Status", "Expires Date Time", "Primary Request Line", "Admission Created";
+            IncludedFields = "Request Status", "Expires Date Time", "Primary Request Line", "Admission Created", "Admission Code", "External Adm. Sch. Entry No.";
 #endif
 
         }
@@ -342,6 +342,10 @@
 #endif
         }
         key(Key10; "External Member No.")
+        {
+        }
+
+        key(Key11; "Receipt No.", "Admission Code", "External Adm. Sch. Entry No.")
         {
         }
 

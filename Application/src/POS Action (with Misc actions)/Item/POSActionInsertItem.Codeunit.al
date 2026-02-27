@@ -183,7 +183,9 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         LotSelectionFromList: Boolean;
         LotSelectionFromListOption: Option NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput;
         InputLotNo: Text;
-        TicketToken: Text;
+        TicketToken: Text[100];
+        ConfigureTicketScheduleSelectionList, ConfigureTicketHolderList : JsonArray;
+        RequiresSS, RequiresTH : Boolean;
     begin
         ItemIdentifier := Context.GetStringParameter('itemNo');
         UnitOfMeasure := Context.GetStringParameter('unitOfMeasure');
@@ -292,22 +294,97 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         end;
 
         if IfAddItemAddOns(Item) then begin
-            Response.Add('addItemAddOn', true);
+            // if the add-on item is configured to be "silent" we just insert here without further workflow round trips
             BaseLineNo := POSActionInsertItemB.GetLineNo();
-            Response.Add('baseLineNo', BaseLineNo);
+            if (AddonRequiresUserInteraction(SaleLinePOS)) then begin
+                Response.Add('addItemAddOn', true);
+                Response.Add('baseLineNo', BaseLineNo);
+            end else begin
+                AddItemAddonsInline(SaleLinePOS, ConfigureTicketScheduleSelectionList, ConfigureTicketHolderList);
+            end;
         end else
             if not SkipItemAvailabilityCheck then
                 CheckAvailability(PosInventoryProfile, PosItemCheckAvail);
 
         Response.Add('postAddWorkflows', AddPostWorkflowsToRun(Context, SaleLinePOS));
 
-        if (TicketRetailManager.UseFrontEndScheduleUX()) then
-            if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", TicketToken)) then begin
-                if (TicketRequestManager.RequestRequiresAttention(TicketToken)) then
-                    Response.Add('ticketToken', TicketToken);
-            end;
+        // Ticketing: Check if we need to trigger schedule selection UX for TM after adding the item (could be due to the item itself or due to add-ons)
+        if (TicketRetailManager.IsTicketSalesLine(SaleLinePOS)) then
+            if (TicketRetailManager.UseFrontEndScheduleUX()) then
+                if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", TicketToken)) then begin
+                    TicketRetailManager.AssignSameSchedule(TicketToken, false);
+                    TicketRetailManager.AssignSameNotificationAddress(TicketToken);
+                    TicketRequestManager.RequestRequiresAttention(TicketToken, RequiresSS, RequiresTH);
+                    if (RequiresSS) then
+                        ConfigureTicketScheduleSelectionList.Add(TicketToken);
+                    if (RequiresTH) then
+                        ConfigureTicketHolderList.Add(TicketToken);
+                end;
+
+        if (ConfigureTicketScheduleSelectionList.Count() > 0) then
+            Response.Add('tokensRequiringScheduleSelection', ConfigureTicketScheduleSelectionList);
+        if (ConfigureTicketHolderList.Count() > 0) then
+            Response.Add('tokensRequiringTicketHolder', ConfigureTicketHolderList);
 
         LogFinishTelem();
+    end;
+
+    local procedure AddonRequiresUserInteraction(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        ItemAddonAction: Codeunit "NPR POS Action: Run Item AddOn";
+    begin
+        exit(ItemAddonAction.AddonRequiresUserInteraction(SaleLinePOS));
+    end;
+
+    local procedure AddItemAddonsInline(SaleLinePOS: Record "NPR POS Sale Line"; var TicketTokenUXList: JsonArray; var TicketTokenTHList: JsonArray)
+    var
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        POSSession: Codeunit "NPR POS Session";
+        Token: Text[100];
+        RequiresUX: Boolean;
+        RequiresTH: Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+    begin
+        Item.Get(SaleLinePOS."No.");
+
+        ItemAddOn.Get(Item."NPR Item Addon No.");
+        if (not ItemAddOn.Enabled) then
+            exit;
+
+        Sentry.StartSpan(Span, 'bc.item.addon.inline-insert ' + Item."No.");
+
+        // Add the add-on lines silently without triggering the add-on workflow 
+        ItemAddOnMgt.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, SaleLinePOS."Line No.", false);
+
+        // Check if tickets need availability UI after adding add-ons, screen out non-attraction customers
+        if (TicketRetailManager.UseFrontEndScheduleUX()) then begin
+
+            SaleLinePOSAddOn.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
+            SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
+            SaleLinePOSAddOn.SetFilter("Sale Date", '=%1', SaleLinePOS.Date);
+            SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '=%1', SaleLinePOS."Line No.");
+            if (SaleLinePOSAddOn.FindSet()) then
+                repeat
+                    Clear(Token);
+                    if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOSAddOn."Sales Ticket No.", SaleLinePOSAddOn."Sale Line No.", Token)) then begin
+                        TicketRetailManager.AssignSameSchedule(Token, true);
+                        TicketRetailManager.AssignSameNotificationAddress(Token);
+                        TicketRequestManager.RequestRequiresAttention(Token, RequiresUX, RequiresTH);
+                        if (RequiresUX) then
+                            TicketTokenUXList.Add(Token);
+                        if (RequiresTH) then
+                            TicketTokenTHList.Add(Token);
+                    end;
+                until (SaleLinePOSAddOn.Next() = 0);
+        end;
+
+        Span.Finish();
     end;
 
     local procedure LogStartTelem()
@@ -946,7 +1023,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'const DYNAMIC_CAPTION_CURR_PRICE="#CURRPRICE#";let main=async({workflow:t,context:e,popup:i,parameters:n,captions:r,workflowCache:a})=>{debugger;if(e.additionalInformationCollected=!1,!(n.EditDescription&&(e.desc1=await i.input({title:r.editDesc_title,caption:r.editDesc_lead,value:e.defaultDescription}),e.desc1===null))&&!(n.EditDescription2&&(e.desc2=await i.input({title:r.editDesc2_title,caption:r.editDesc2_lead,value:e.defaultDescription}),e.desc2===null))){var{bomComponentLinesWithoutSerialLotNo:s,requiresUnitPriceInputPrompt:l,requiresSerialNoInputPrompt:o,requiresLotNoInputPrompt:f,requiresAdditionalInformationCollection:S,addItemAddOn:d,baseLineNo:m,postAddWorkflows:u,ticketToken:N,itemNoId:L,itemReferenceId:C}=await t.respond("addSalesLine");if(N){const c=await t.run("TM_SCHEDULE_SELECT",{context:{TicketToken:N,EditSchedule:!0}});debugger;if(c.cancel){await t.respond("cancelTicketItemLine");return}}if(S){if(l&&(e.unitPriceInput=await i.numpad({title:r.UnitPriceTitle,caption:r.unitPriceCaption}),e.unitPriceInput===null)||o&&(e.serialNoInput=await i.input({title:r.itemTracking_title,caption:r.itemTracking_lead}),e.serialNoInput===null)||f&&(e.lotNoInput=await i.input({title:r.itemTrackingLotNo_title,caption:r.itemTrackingLot_lead}),e.lotNoInput===null))return;e.additionalInformationCollected=!0,e.itemNoId=L,e.itemReferenceId=C;var{bomComponentLinesWithoutSerialLotNo:s,addItemAddOn:d,baseLineNo:m,postAddWorkflows:u}=await t.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNoLotNo(s,t,e,n,i,r),d&&(await t.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:m},parameters:{SkipItemAvailabilityCheck:!0}}),await t.respond("checkAvailability")),u)for(const c of Object.entries(u)){let[p,g]=c;p&&await t.run(p,{parameters:g})}}};const getButtonCaption=async({workflow:t,context:e})=>{try{if(!getDynamicCaptionTypes(e.currentCaptions))return e.currentCaptions;let i=window.__itemButtonCaptionCache||{};const n=t.scope.parameters.itemNo;i[n]||(i[n]={});let r={...e.currentCaptions};if(i[n].nextCaptionUpdateTime!=null&&Date.now()<Date.parse(i[n].nextCaptionUpdateTime))return replaceDynamicCaptions(i[n].currentItemPrice,r);const{currentItemPrice:a,nextUpdateTime:s}=await t.respondInNewSession("getCaption");if(!s)return e.currentCaptions;i[n].nextCaptionUpdateTime=s,i[n].currentItemPrice=a;let l=replaceDynamicCaptions(a,r);return window.__itemButtonCaptionCache=i,l}catch(i){return console.error(i),e.currentCaptions}};function getDynamicCaptionTypes(t){return t.caption?.includes(DYNAMIC_CAPTION_CURR_PRICE)||t.secondCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE)||t.thirdCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE)}function replaceDynamicCaptions(t,e){return t&&(e.caption=e.caption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t),e.secondCaption=e.secondCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t),e.thirdCaption=e.thirdCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t)),e}async function processBomComponentLinesWithoutSerialNoLotNo(t,e,i,n,r,a){if(t){debugger;for(var s=0;s<t.length;s++){let l=!0,o;for(;l;)l=!1,i.serialNoInput="",i.lotNoInput="",i.bomComponentLineWithoutSerialLotNo=t[s],i.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput&&(n.SelectSerialNo&&!n.SelectSerialNoListEmptyInput&&i.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo?(o=await e.respond("assignSerialNo"),!o.assignSerialNoSuccess&&o.assignSerialNoSuccessErrorText&&await r.confirm({title:a.serialNoError_title,caption:o.assignSerialNoSuccessErrorText})&&(l=!0)):(i.serialNoInput=await r.input({title:a.itemTracking_title,caption:format(a.bomItemTracking_Lead,i.bomComponentLineWithoutSerialLotNo.description,i.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(i.serialNoInput||n.SelectSerialNoListEmptyInput)&&(o=await e.respond("assignSerialNo"),!o.assignSerialNoSuccess&&o.assignSerialNoSuccessErrorText&&await r.confirm({title:a.serialNoError_title,caption:o.assignSerialNoSuccessErrorText})&&(l=!0)))),i.bomComponentLineWithoutSerialLotNo.requiresLotNoInput&&(n.SelectLotNo==1&&i.bomComponentLineWithoutSerialLotNo.useSpecTrackingLotNo?(o=await e.respond("assignLotNo"),!o.assignLotNoSuccess&&o.assignLotNoSuccessErrorText&&await r.confirm({title:a.lotNoError_title,caption:o.assignLotNoSuccessErrorText})&&(l=!0)):(i.lotNoInput=await r.input({title:a.ItemTrackingLot_TitleLbl,caption:format(a.bomItemTrackingLot_Lead,i.bomComponentLineWithoutSerialLotNo.description,i.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(i.lotNoInput||n.SelectLotNo==2)&&(o=await e.respond("assignLotNo"),!o.assignLotNoSuccess&&o.assignLotNoSuccessErrorText&&await r.confirm({title:a.lotNoError_title,caption:o.assignLotNoSuccessErrorText})&&(l=!0))))}}}function format(t,...e){if(!t.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return t.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(i,n,r)=>{if(n)return n.replace(/(?:{{)|(?:}})/g,a=>a[0]);if(r>=e.length)throw new Error("argument index is out of range in format");return e[r]})}'
+'const DYNAMIC_CAPTION_CURR_PRICE="#CURRPRICE#";let main=async({workflow:t,context:e,popup:i,parameters:n,captions:r,workflowCache:a})=>{debugger;if(e.additionalInformationCollected=!1,!(n.EditDescription&&(e.desc1=await i.input({title:r.editDesc_title,caption:r.editDesc_lead,value:e.defaultDescription}),e.desc1===null))&&!(n.EditDescription2&&(e.desc2=await i.input({title:r.editDesc2_title,caption:r.editDesc2_lead,value:e.defaultDescription}),e.desc2===null))){var{bomComponentLinesWithoutSerialLotNo:s,requiresUnitPriceInputPrompt:l,requiresSerialNoInputPrompt:o,requiresLotNoInputPrompt:S,requiresAdditionalInformationCollection:L,addItemAddOn:m,baseLineNo:N,postAddWorkflows:d,tokensRequiringScheduleSelection:u,tokensRequiringTicketHolder:c,itemNoId:C,itemReferenceId:g}=await t.respond("addSalesLine");if(u||(u=[]),c||(c=[]),(u.length>0||c.length>0)&&(await t.run("TM_SCHEDULE_SELECT",{context:{tokensRequiringScheduleSelection:u,tokensRequiringTicketHolder:c}})).cancel){await t.respond("cancelTicketItemLine");return}if(L){if(l&&(e.unitPriceInput=await i.numpad({title:r.UnitPriceTitle,caption:r.unitPriceCaption}),e.unitPriceInput===null)||o&&(e.serialNoInput=await i.input({title:r.itemTracking_title,caption:r.itemTracking_lead}),e.serialNoInput===null)||S&&(e.lotNoInput=await i.input({title:r.itemTrackingLotNo_title,caption:r.itemTrackingLot_lead}),e.lotNoInput===null))return;e.additionalInformationCollected=!0,e.itemNoId=C,e.itemReferenceId=g;var{bomComponentLinesWithoutSerialLotNo:s,addItemAddOn:m,baseLineNo:N,postAddWorkflows:d}=await t.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNoLotNo(s,t,e,n,i,r),m&&(await t.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:N},parameters:{SkipItemAvailabilityCheck:!0}}),await t.respond("checkAvailability")),d)for(const p of Object.entries(d)){let[f,I]=p;f&&await t.run(f,{parameters:I})}}};const getButtonCaption=async({workflow:t,context:e})=>{try{if(!getDynamicCaptionTypes(e.currentCaptions))return e.currentCaptions;let i=window.__itemButtonCaptionCache||{};const n=t.scope.parameters.itemNo;i[n]||(i[n]={});let r={...e.currentCaptions};if(i[n].nextCaptionUpdateTime!=null&&Date.now()<Date.parse(i[n].nextCaptionUpdateTime))return replaceDynamicCaptions(i[n].currentItemPrice,r);const{currentItemPrice:a,nextUpdateTime:s}=await t.respondInNewSession("getCaption");if(!s)return e.currentCaptions;i[n].nextCaptionUpdateTime=s,i[n].currentItemPrice=a;let l=replaceDynamicCaptions(a,r);return window.__itemButtonCaptionCache=i,l}catch(i){return console.error(i),e.currentCaptions}};function getDynamicCaptionTypes(t){return t.caption?.includes(DYNAMIC_CAPTION_CURR_PRICE)||t.secondCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE)||t.thirdCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE)}function replaceDynamicCaptions(t,e){return t&&(e.caption=e.caption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t),e.secondCaption=e.secondCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t),e.thirdCaption=e.thirdCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t)),e}async function processBomComponentLinesWithoutSerialNoLotNo(t,e,i,n,r,a){if(t){debugger;for(var s=0;s<t.length;s++){let l=!0,o;for(;l;)l=!1,i.serialNoInput="",i.lotNoInput="",i.bomComponentLineWithoutSerialLotNo=t[s],i.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput&&(n.SelectSerialNo&&!n.SelectSerialNoListEmptyInput&&i.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo?(o=await e.respond("assignSerialNo"),!o.assignSerialNoSuccess&&o.assignSerialNoSuccessErrorText&&await r.confirm({title:a.serialNoError_title,caption:o.assignSerialNoSuccessErrorText})&&(l=!0)):(i.serialNoInput=await r.input({title:a.itemTracking_title,caption:format(a.bomItemTracking_Lead,i.bomComponentLineWithoutSerialLotNo.description,i.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(i.serialNoInput||n.SelectSerialNoListEmptyInput)&&(o=await e.respond("assignSerialNo"),!o.assignSerialNoSuccess&&o.assignSerialNoSuccessErrorText&&await r.confirm({title:a.serialNoError_title,caption:o.assignSerialNoSuccessErrorText})&&(l=!0)))),i.bomComponentLineWithoutSerialLotNo.requiresLotNoInput&&(n.SelectLotNo==1&&i.bomComponentLineWithoutSerialLotNo.useSpecTrackingLotNo?(o=await e.respond("assignLotNo"),!o.assignLotNoSuccess&&o.assignLotNoSuccessErrorText&&await r.confirm({title:a.lotNoError_title,caption:o.assignLotNoSuccessErrorText})&&(l=!0)):(i.lotNoInput=await r.input({title:a.ItemTrackingLot_TitleLbl,caption:format(a.bomItemTrackingLot_Lead,i.bomComponentLineWithoutSerialLotNo.description,i.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(i.lotNoInput||n.SelectLotNo==2)&&(o=await e.respond("assignLotNo"),!o.assignLotNoSuccess&&o.assignLotNoSuccessErrorText&&await r.confirm({title:a.lotNoError_title,caption:o.assignLotNoSuccessErrorText})&&(l=!0))))}}}function format(t,...e){if(!t.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return t.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(i,n,r)=>{if(n)return n.replace(/(?:{{)|(?:}})/g,a=>a[0]);if(r>=e.length)throw new Error("argument index is out of range in format");return e[r]})}'
     )
     end;
 

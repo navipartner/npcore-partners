@@ -503,7 +503,8 @@
             CloneTicketReservationRequest.Insert(true);
         until TicketReservationRequest.Next() = 0;
         TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
-        TMTicketRetailMgt.AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity, CloneTicketReservationRequest."Session Token ID", TicketReservationRequest."Ext. Line Reference No.");
+
+        TMTicketRetailMgt.AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity);
     end;
 
     [IntegrationEvent(false, false)]

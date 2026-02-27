@@ -98,7 +98,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         // these functions are supported by the front ux
         exit(FunctionId in [
             3, // Edit Reservation
-            5,  // Edit TicketHolde
+            5,  // Edit TicketHolder
             10  // Additional Experience
         ])
     end;

@@ -208,15 +208,25 @@
 
     internal procedure RequireParticipantInfo(Token: Text[100]; var AdmissionCode: Code[20]; var SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; var SuggestNotificationAddress: Text[100]; var SuggestTicketHolderName: Text[100]; var SuggestTicketHolderLanguage: Code[10]) RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
     var
+        TicketSetup: Record "NPR TM Ticket Setup";
         Ticket: Record "NPR TM Ticket";
         Admission: Record "NPR TM Admission";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Member: Record "NPR MM Member";
     begin
+        TicketSetup.SetLoadFields(DefaultLanguageCode);
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (SuggestTicketHolderLanguage = '') then
+            SuggestTicketHolderLanguage := TicketSetup.DefaultLanguageCode;
+
+        RequireParticipantInformation := RequireParticipantInformation::NOT_REQUIRED;
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+
         if (not TicketReservationRequest.FindSet()) then
             exit(RequireParticipantInformation::NOT_REQUIRED);
 
@@ -224,7 +234,9 @@
             if (TicketReservationRequest."Primary Request Line") then begin
                 SuggestNotificationAddress := TicketReservationRequest."Notification Address";
                 SuggestTicketHolderName := TicketReservationRequest.TicketHolderName;
-                SuggestTicketHolderLanguage := TicketReservationRequest.TicketHolderPreferredLanguage;
+                if (TicketReservationRequest.TicketHolderPreferredLanguage <> '') then
+                    SuggestTicketHolderLanguage := TicketReservationRequest.TicketHolderPreferredLanguage;
+
                 AdmissionCode := TicketReservationRequest."Admission Code";
 
                 if (GetMember(Ticket."External Member Card No.", Member)) then begin
@@ -251,31 +263,38 @@
                 AdmissionCode := Admission."Admission Code";
             end;
 
-            if (TicketAdmissionBOM.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then begin
-                if ((TicketAdmissionBOM."Publish As eTicket") or
-                    (TicketAdmissionBOM."Notification Profile Code" <> '')) then begin
-                    AdmissionCode := TicketAdmissionBOM."Admission Code";
-                    SuggestNotificationMethod := SuggestNotificationMethod::SMS;
-                    if (SuggestNotificationAddress = '') then
-                        RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
-                end;
+            if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then begin
+                if (TicketAdmissionBOM.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then begin
+                    if ((TicketAdmissionBOM."Publish As eTicket") or
+                        (TicketAdmissionBOM."Notification Profile Code" <> '')) then begin
+                        AdmissionCode := TicketAdmissionBOM."Admission Code";
+                        SuggestNotificationMethod := SuggestNotificationMethod::SMS;
+                        if (SuggestNotificationAddress = '') then
+                            RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+                    end;
 
-                if (TicketAdmissionBOM."Publish Ticket URL" = TicketAdmissionBOM."Publish Ticket URL"::SEND) then begin
-                    AdmissionCode := TicketAdmissionBOM."Admission Code";
-                    SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
-                    if (SuggestNotificationAddress = '') then
-                        RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
-                end;
+                    if (TicketAdmissionBOM."Publish Ticket URL" = TicketAdmissionBOM."Publish Ticket URL"::SEND) then begin
+                        AdmissionCode := TicketAdmissionBOM."Admission Code";
+                        SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+                        if (SuggestNotificationAddress = '') then
+                            RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+                    end;
 
-                if (TicketAdmissionBOM.NPDesignerTemplateId <> '') then begin
-                    AdmissionCode := TicketAdmissionBOM."Admission Code";
-                    SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
-                    if (SuggestNotificationAddress = '') then
-                        RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+                    if ((TicketAdmissionBOM.NPDesignerTemplateId <> '') and (SuggestTicketHolderLanguage = '')) then begin
+                        AdmissionCode := TicketAdmissionBOM."Admission Code";
+                        SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+                        if (SuggestNotificationAddress = '') then
+                            RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+                    end;
                 end;
             end;
 
         until (TicketReservationRequest.Next() = 0);
+
+        // when invoked before a primary line is marked, we want to avoid asking for participant information if we already have a notification address from another line. 
+        // this occurs on the the second ticket line added to cart, and we don't want to ask for participant information twice if admission code is the same and we already have a notification address.
+        if ((SuggestNotificationAddress <> '') and (RequireParticipantInformation = RequireParticipantInformation::OPTIONAL)) then
+            RequireParticipantInformation := RequireParticipantInformation::NOT_REQUIRED;
     end;
 
     internal procedure GetTicketHolderFromNotificationAddress(NotificationAddress: Text[100]; var TicketHolder: Record "NPR TM TicketHolder")

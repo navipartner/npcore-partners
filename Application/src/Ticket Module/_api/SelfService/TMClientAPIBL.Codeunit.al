@@ -426,7 +426,7 @@ codeunit 6151543 "NPR TM Client API BL"
         if (not TicketRequest.FindFirst()) then
             exit;
 
-        TicketRetailManager.AdjustPriceOnSalesLine(SaleLinePOS, TicketRequest.Quantity, Token, TicketRequest."Ext. Line Reference No.");
+        TicketRetailManager.AdjustPriceOnSalesLine(SaleLinePOS, TicketRequest.Quantity);
         SaleLinePOS."Description 2" := TicketRequest."Scheduled Time Description";
         SaleLinePOS.Modify();
 

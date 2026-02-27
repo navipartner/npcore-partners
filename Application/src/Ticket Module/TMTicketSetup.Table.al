@@ -119,7 +119,19 @@
         {
             Caption = 'Default Ticket Language';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-02-27';
+            ObsoleteReason = 'Use Default Language Code field instead.';
+
         }
+
+        field(126; DefaultLanguageCode; Code[10])
+        {
+            Caption = 'Default Language Code';
+            DataClassification = CustomerContent;
+            TableRelation = Language;
+        }
+
         field(130; "Prepaid Excel Export Prompt"; Option)
         {
             Caption = 'Prepaid Excel Export Prompt';

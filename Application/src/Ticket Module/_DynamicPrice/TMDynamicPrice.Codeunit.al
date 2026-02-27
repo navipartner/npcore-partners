@@ -28,6 +28,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         ForceItemAddOnUnitPrice: Boolean;
         DiscountAmount: Decimal;
         DiscountPercent: Decimal;
+
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
@@ -67,6 +68,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
                     if (SaleLinePOS."Unit Price" <> TicketUnitPrice) then
                         SaleLinePOS."Unit Price" := TicketUnitPrice;
             end;
+
 
             if (not SaleLinePOS.IsTemporary) then begin
                 if (DiscountAmount <> 0) then
@@ -514,6 +516,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         end;
 
         HavePriceRule := false;
+        AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (AdmissionScheduleEntry.FindLast()) then begin
@@ -958,12 +961,14 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;
     begin
+        Item.SetLoadFields("NPR Ticket Type");
         if (not Item.Get(SaleLinePOS."No.")) then
             exit(false);
 
         if (Item."NPR Ticket Type" = '') then
             exit(false);
 
+        TicketType.SetLoadFields(Code);
         if (not TicketType.Get(Item."NPR Ticket Type")) then
             exit(false);
 

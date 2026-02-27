@@ -14,6 +14,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         EmailLbl: Label 'Email';
         LanguageLbl: Label 'Language';
     begin
+        WorkflowConfig.SetNonBlockingUI();
         WorkflowConfig.AddLabel('ticketHolderTitle', TicketHolderLbl);
         WorkflowConfig.AddLabel('ticketHolderCaption', TicketHolderCaptionLbl);
         WorkflowConfig.AddLabel('ticketHolderNameLabel', NameLbl);
@@ -30,6 +31,9 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         case Step of
             'AssignSameSchedule':
                 FrontEnd.WorkflowResponse(AssignSameSchedule(Context, SaleLine));
+            'AssignSameScheduleToSet':
+                FrontEnd.WorkflowResponse(AssignSameScheduleToSet(Context, SaleLine));
+
             'ConfigureWorkflow':
                 FrontEnd.WorkflowResponse(ConfigureWorkflow(Context));
             'SetTicketHolder':
@@ -37,7 +41,69 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         End;
     end;
 
+
     local procedure ConfigureWorkflow(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    var
+        Token: Text[100];
+        JToken: JsonToken;
+        Tokens: JsonArray;
+        ForceEditTicketHolder: Boolean;
+    begin
+
+        // Get ticket holder data for the first token
+        if (Context.HasProperty('TicketTokens')) then begin
+            JToken := Context.GetJToken('TicketTokens');
+            if (JToken.IsArray()) then
+                Tokens := JToken.AsArray();
+        end;
+
+        if (Context.HasProperty('TicketToken')) then begin
+            Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+            Tokens.Add(Token);
+        end;
+
+        if (not Context.GetBoolean('EditTicketHolder', ForceEditTicketHolder)) then
+            ForceEditTicketHolder := false;
+
+        if (Tokens.Count() = 0) then
+            Error('No ticket token provided for workflow configuration.');
+
+        Tokens.Get(0, JToken);
+        Token := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(Token));
+
+        AddAdditionExperience(Token, Context);
+        GetTicketHolder(Token, ForceEditTicketHolder, Response);
+    end;
+
+    local procedure AddAdditionExperience(Token: Text[100]; Context: Codeunit "NPR POS JSON Helper")
+    var
+        FunctionId: Integer;
+        Ticket: Record "NPR TM Ticket";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        POSFunction: Codeunit "NPR POS Action - Ticket Mgt B.";
+        POSSession: Codeunit "NPR POS Session";
+        TicketReference: Code[50];
+    begin
+        Context.GetInteger('FunctionId', FunctionId);
+
+        if (FunctionId = 10) then begin //if ticket request has all lines confirmed, not need to create request?
+            TicketRequest.SetCurrentKey("Session Token ID");
+            TicketRequest.SetFilter("Session Token ID", '=%1', Token);
+            if (TicketRequest.FindFirst()) then begin
+                Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
+                if (Ticket.FindFirst()) then
+                    TicketReference := Ticket."External Ticket No.";
+            end;
+
+            if (TicketReference = '') then
+                TicketReference := CopyStr(Token, 1, MaxStrLen(TicketReference));
+
+            POSFunction.AddAdditionalExperience(POSSession, TicketReference);
+        end;
+    end;
+
+
+    local procedure GetTicketHolder(Token: Text[100]; ForceEditTicketHolder: Boolean; var Response: JsonObject) CaptureTicketHolder: Boolean
     var
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
@@ -46,49 +112,24 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
         SuggestTicketHolderLanguage: Code[10];
-        Token: Text[100];
-        NewToken: Text[100];
-        ForceEditTicketHolder: Boolean;
-        FunctionId: Integer;
-        Ticket: Record "NPR TM Ticket";
-        TicketRequest: Record "NPR TM Ticket Reservation Req.";
-        POSFunction: Codeunit "NPR POS Action - Ticket Mgt B.";
-        POSSession: Codeunit "NPR POS Session";
-        TicketReference: Code[50];
+
+        // ForceEditTicketHolder: Boolean;
+
         Language: Record Language;
         JArray: JsonArray;
         JObject: JsonObject;
         NoSpecificLanguageLbl: Label 'No specific language';
     begin
-        Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
-        Context.GetInteger('FunctionId', FunctionId);
-
-        if FunctionId = 10 then begin //if ticket request has all lines confirmed, not need to create request?
-            TicketRequest.SetCurrentKey("Session Token ID");
-            TicketRequest.SetFilter("Session Token ID", '=%1', Token);
-            if TicketRequest.FindFirst() then begin
-                Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
-                if Ticket.FindFirst() then
-                    TicketReference := Ticket."External Ticket No.";
-            end;
-
-            if TicketReference = '' then
-                TicketReference := CopyStr(Token, 1, MaxStrLen(TicketReference));
-
-            POSFunction.AddAdditionalExperience(POSSession, TicketReference);
-        end;
-
-        NewToken := GetNewTicketToken(Token);
-        if NewToken <> '' then
-            Context.SetContext('TicketToken', NewToken);
 
         RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage);
         if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
-            if (Context.GetBoolean('EditTicketHolder', ForceEditTicketHolder)) then
-                if (ForceEditTicketHolder) then
-                    RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+            if (ForceEditTicketHolder) then
+                RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
 
+        if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
+            exit(false);
 
+        Response.Add('ticketToken', Token);
         Response.Add('ticketHolderName', SuggestTicketHolderName);
 
         if (SuggestTicketHolderLanguage = '') then
@@ -117,29 +158,8 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         end;
 
         Response.Add('availableLanguages', JArray);
-
-        Response.Add('CaptureTicketHolder', RequireParticipantInformation in [RequireParticipantInformation::OPTIONAL, RequireParticipantInformation::REQUIRED]);
-    end;
-
-    local procedure GetNewTicketToken(TicketReference: Code[100]) Token: Text[100]
-    var
-        TicketRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketRequestEntryNo: Integer;
-    begin
-        if (TicketReference <> '') then begin
-            TicketRequest.SetCurrentKey("Session Token ID");
-            TicketRequest.SetFilter("Session Token ID", '=%1', TicketReference);
-            if TicketRequest.FindFirst() then
-                TicketRequestEntryNo := TicketRequest."Entry No.";
-        end;
-
-        if TicketRequestEntryNo <> 0 then begin
-            Clear(TicketRequest);
-            TicketRequest.SetFilter("Request Status", '%1|%2|%3', TicketRequest."Request Status"::REGISTERED, TicketRequest."Request Status"::WIP, TicketRequest."Request Status"::OPTIONAL);
-            TicketRequest.SetRange("Superseeds Entry No.", TicketRequestEntryNo);
-            if TicketRequest.FindLast() then
-                Token := TicketRequest."Session Token ID";
-        end;
+        CaptureTicketHolder := RequireParticipantInformation in [RequireParticipantInformation::OPTIONAL, RequireParticipantInformation::REQUIRED];
+        Response.Add('CaptureTicketHolder', CaptureTicketHolder);
     end;
 
     local procedure SetTicketHolder(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
@@ -150,8 +170,20 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         Email: Text;
         Phone: Text;
         Language: Text;
+        JToken: JsonToken;
+        Tokens: JsonArray;
     begin
-        Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+        // Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+        // Get ticket holder data for the first token
+        if (Context.HasProperty('TicketTokens')) then begin
+            JToken := Context.GetJToken('TicketTokens');
+            if (JToken.IsArray()) then
+                Tokens := JToken.AsArray();
+        end;
+        if (Context.HasProperty('TicketToken')) then begin
+            Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+            Tokens.Add(Token);
+        end;
 
         if (not Context.GetString('ticketHolderName', Name)) then
             Name := '';
@@ -164,33 +196,154 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         if (Language = 'NO_LANGUAGE_SELECTED') then
             Language := '';
 
+
         TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        foreach JToken in Tokens do begin
+            Token := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(Token));
 
-        if (TicketReservationRequest.FindSet()) then begin
-            repeat
-                if ((Email <> '') and (StrPos(Email, '@') > 0)) then begin
-                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::Email;
-                    TicketReservationRequest."Notification Address" := CopyStr(Email, 1, MaxStrLen(TicketReservationRequest."Notification Address"));
-                end;
-                // Phone number bias
-                if ((Phone <> '') and (DelChr(Phone, '<=>', '+1234567890 ') = '') and (StrLen(Phone) >= 5)) then begin
-                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
-                    TicketReservationRequest."Notification Address" := CopyStr(Phone, 1, MaxStrLen(TicketReservationRequest."Notification Address"));
-                end;
-                TicketReservationRequest.TicketHolderName := CopyStr(Name, 1, MaxStrLen(TicketReservationRequest.TicketHolderName));
-                TicketReservationRequest.Validate(TicketHolderPreferredLanguage, Language.ToUpper());
-                TicketReservationRequest.Modify();
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
 
-            until (TicketReservationRequest.Next() = 0);
+            if (TicketReservationRequest.FindSet()) then begin
+                repeat
+                    if ((Email <> '') and (StrPos(Email, '@') > 0)) then begin
+                        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::Email;
+                        TicketReservationRequest."Notification Address" := CopyStr(Email, 1, MaxStrLen(TicketReservationRequest."Notification Address"));
+                    end;
+                    // Phone number bias
+                    if ((Phone <> '') and (DelChr(Phone, '<=>', '+1234567890 ') = '') and (StrLen(Phone) >= 5)) then begin
+                        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
+                        TicketReservationRequest."Notification Address" := CopyStr(Phone, 1, MaxStrLen(TicketReservationRequest."Notification Address"));
+                    end;
+                    TicketReservationRequest.TicketHolderName := CopyStr(Name, 1, MaxStrLen(TicketReservationRequest.TicketHolderName));
+                    TicketReservationRequest.Validate(TicketHolderPreferredLanguage, Language.ToUpper());
+                    TicketReservationRequest.Modify();
+
+                until (TicketReservationRequest.Next() = 0);
+            end;
         end;
 
         Response.ReadFrom('{}');
         exit;
     end;
 
+    local procedure AssignSameScheduleToSet(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
+    var
+        ConfiguredToken: Text[100];
+        TokensToConfigure: JsonArray;
+        ForceEditTicketHolder: Boolean;
+        FunctionId: Integer;
+        SaleLinePos: Record "NPR POS Sale Line";
+        RegisterNo: Code[10];
+    begin
+        if (Context.HasProperty('ConfiguredToken')) then
+            ConfiguredToken := CopyStr(Context.GetString('ConfiguredToken'), 1, MaxStrLen(ConfiguredToken));
 
-    local procedure AssignSameSchedule(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
+        if (Context.HasProperty('setSchedulesForTokens')) then
+            TokensToConfigure := Context.GetJToken('setSchedulesForTokens').AsArray();
+
+        if (not Context.GetBoolean('EditTicketHolder', ForceEditTicketHolder)) then
+            ForceEditTicketHolder := false;
+
+        FunctionId := -1;
+        if (Context.HasProperty('FunctionId')) then
+            FunctionId := Context.GetInteger('FunctionId');
+
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        RegisterNo := SaleLinePOS."Register No.";
+
+        ApplySelectedSchedulesToToken(FunctionId, ConfiguredToken, TokensToConfigure, ForceEditTicketHolder, RegisterNo, Response);
+    end;
+
+
+    local procedure ApplySelectedSchedulesToToken(FunctionId: Integer; MasterToken: Text[100]; TokensToConfigure: JsonArray; ForceEditTicketHolder: Boolean; RegisterNo: Code[10]; Response: JsonObject)
+    var
+        TicketReservationRequestMaster: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequestSlave: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequestOrder: Record "NPR TM Ticket Reservation Req.";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+
+        RequestToken: Text[100];
+        ResponseMessage: Text;
+
+        JToken: JsonToken;
+        MissingScheduleCount: Integer;
+        ConfiguredTokens: JsonArray;
+        TicketHolder: JsonObject;
+        TicketHolders: JsonArray;
+    begin
+
+        TicketReservationRequestMaster.SetCurrentKey("Session Token ID");
+        TicketReservationRequestMaster.SetFilter("Session Token ID", '=%1', MasterToken);
+
+        foreach JToken in TokensToConfigure do begin
+            RequestToken := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(RequestToken));
+            MissingScheduleCount := 0;
+
+            // For the slave token, find all non-time-slotted reservation lines and assign them the same schedule as the master token if they have the same admission code
+            TicketReservationRequestSlave.SetCurrentKey("Session Token ID");
+            TicketReservationRequestSlave.SetFilter("Session Token ID", '=%1', RequestToken);
+            TicketReservationRequestSlave.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
+            TicketReservationRequestSlave.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequestSlave."Admission Inclusion"::NOT_SELECTED);
+            if (TicketReservationRequestSlave.FindSet()) then begin
+                repeat
+                    MissingScheduleCount += 1;
+
+                    TicketReservationRequestMaster.SetFilter("Admission Code", '=%1', TicketReservationRequestSlave."Admission Code");
+                    if (TicketReservationRequestMaster.FindFirst()) then begin
+                        if (TicketReservationRequestMaster."External Adm. Sch. Entry No." > 0) then begin
+                            TicketReservationRequestSlave."External Adm. Sch. Entry No." := TicketReservationRequestMaster."External Adm. Sch. Entry No.";
+                            TicketReservationRequestSlave."Scheduled Time Description" := TicketReservationRequestMaster."Scheduled Time Description";
+                            TicketReservationRequestSlave.Modify();
+                            MissingScheduleCount -= 1;
+                        end;
+                    end;
+                until (TicketReservationRequestSlave.Next() = 0);
+            end;
+
+            if (MissingScheduleCount = 0) then begin
+                ConfiguredTokens.Add(RequestToken); // Signal that this token has been assigned the same schedule and does not need user selection
+
+                if (0 <> TicketRequestManager.IssueTicketFromReservationToken(RequestToken, false, ResponseMessage)) then begin
+                    // Abort the whole process if ticket creation fails
+                    Response.Add('CancelScheduleSelection', true); // Request to clean up the sale lines
+                    Response.Add('EditSchedule', false);
+                    Response.Add('Message', ResponseMessage);
+                    exit;
+                end;
+
+                TicketReservationRequestOrder.SetCurrentKey("Session Token ID");
+                TicketReservationRequestOrder.SetFilter("Session Token ID", '=%1', RequestToken);
+                TicketReservationRequestOrder.SetFilter("Primary Request Line", '=%1', true);
+                if (TicketReservationRequestOrder.FindFirst()) then begin
+                    SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+                    SaleLinePOS.SetFilter("Register No.", '=%1', RegisterNo);
+                    SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', TicketReservationRequestOrder."Receipt No.");
+                    SaleLinePOS.SetFilter("Line No.", '=%1', TicketReservationRequestOrder."Line No.");
+                    if (SaleLinePOS.FindFirst()) then begin
+                        SaleLinePOS."Description 2" := TicketReservationRequestOrder."Scheduled Time Description";
+                        SaleLinePOS.Modify();
+                    end;
+                end;
+            end;
+        end;
+
+        if (GetTicketHolder(MasterToken, ForceEditTicketHolder, TicketHolder)) then
+            TicketHolders.Add(TicketHolder);
+
+        Response.Add('AssignedTokens', ConfiguredTokens);
+        Response.Add('CancelScheduleSelection', false);
+        Response.Add('EditSchedule', (FunctionId = 3) or (ConfiguredTokens.Count() < TokensToConfigure.Count())); // 3 Edit Schedule (forced)
+        Response.Add('TicketHolders', TicketHolders);
+    end;
+
+
+    local procedure AssignSameSchedule(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line"): JsonObject
+    begin
+        exit(AssignSameScheduleWorker(Context, SaleLine));
+    end;
+
+    local procedure AssignSameScheduleWorker(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
     var
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -198,93 +351,143 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
         SaleLinePOS: Record "NPR POS Sale Line";
         Token: Text[100];
+        Tokens, ConfiguredTokens : JsonArray;
+        JToken: JsonToken;
         ResponseMessage: Text;
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+
+        TicketReservationRequestMaster: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequestCheck, TicketReservationRequestCheck2 : Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequestOrder: Record "NPR TM Ticket Reservation Req.";
+
         RequiredAdmissionHasTimeSlots, OnlyRequiredAdmissions : Boolean;
-        Item: Record "Item";
         HaveSaleTicketSalesLine: Boolean;
         FunctionId: Integer;
+        RegisterNo: Code[10];
+
+        TicketHolder: JsonObject;
+        TicketHolders: JsonArray;
+        ForceEditTicketHolder: Boolean;
     begin
 
-        Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        RegisterNo := SaleLinePOS."Register No.";
 
-        // 3 Edit Schedule (forced)
+        if (Context.HasProperty('TicketTokens')) then begin
+            JToken := Context.GetJToken('TicketTokens');
+            if (JToken.IsArray()) then
+                Tokens := JToken.AsArray();
+        end;
+        if (Context.HasProperty('TicketToken')) then begin
+            Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+            Tokens.Add(Token);
+        end;
+
         FunctionId := -1;
         if (Context.HasProperty('FunctionId')) then
             FunctionId := Context.GetInteger('FunctionId');
 
-        HaveSaleTicketSalesLine := true;
-        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        if (Tokens.Count() = 0) then begin
+            SaleLine.GetCurrentSaleLine(SaleLinePOS);
+            if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then
+                Tokens.Add(Token);
+        end;
 
-        if (Item.Get(SaleLinePOS."No.")) then begin
-            if (Item."NPR Item AddOn No." <> '') then begin
+        if (not Context.GetBoolean('EditTicketHolder', ForceEditTicketHolder)) then
+            ForceEditTicketHolder := false;
+
+        TicketReservationRequestMaster.Reset();
+        TicketReservationRequestMaster.SetCurrentKey("Session Token ID");
+        TicketReservationRequestMaster.SetLoadFields("Session Token ID", "Receipt No.", "Line No.");
+
+        TicketReservationRequestCheck.Reset();
+        TicketReservationRequestCheck.SetCurrentKey("Session Token ID");
+
+        TicketReservationRequestCheck2.Reset();
+        TicketReservationRequestCheck2.SetCurrentKey("Session Token ID");
+
+        TicketReservationRequestOrder.Reset();
+        TicketReservationRequestOrder.SetCurrentKey("Session Token ID");
+
+        foreach JToken in Tokens do begin
+            Token := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(Token));
+
+            if (FunctionId <> 3) then begin
                 HaveSaleTicketSalesLine := false;
-                TicketReservationRequest.Reset();
-                TicketReservationRequest.SetCurrentKey("Session Token ID");
-                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-                if (TicketReservationRequest.FindFirst()) then begin
+                TicketReservationRequestMaster.SetFilter("Session Token ID", '=%1', Token);
+                if (TicketReservationRequestMaster.FindFirst()) then begin
                     SaleLinePOS.Reset();
-                    SaleLinePOS.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
-                    SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', TicketReservationRequest."Receipt No.");
-                    SaleLinePOS.SetFilter("Line No.", '=%1', TicketReservationRequest."Line No.");
+                    SaleLinePOS.SetFilter("Register No.", '=%1', RegisterNo);
+                    SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', TicketReservationRequestMaster."Receipt No.");
+                    SaleLinePOS.SetFilter("Line No.", '=%1', TicketReservationRequestMaster."Line No.");
                     HaveSaleTicketSalesLine := SaleLinePOS.FindFirst();
                 end;
-            end;
-        end;
 
-        TicketRetailManagement.AssignSameSchedule(Token, HaveSaleTicketSalesLine and (SaleLinePOS.Indentation > 0));
-        TicketRetailManagement.AssignSameNotificationAddress(Token);
+                TicketRetailManagement.AssignSameSchedule(Token, HaveSaleTicketSalesLine and (SaleLinePOS.Indentation > 0));
+                TicketRetailManagement.AssignSameNotificationAddress(Token);
 
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
-        TicketReservationRequest.SetRange("Admission Inclusion", TicketReservationRequest."Admission Inclusion"::REQUIRED);
-        RequiredAdmissionHasTimeSlots := TicketReservationRequest.IsEmpty();
+                // Are all required admissions configured with time slots?
+                TicketReservationRequestCheck.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequestCheck.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
+                TicketReservationRequestCheck.SetFilter("Admission Inclusion", '=%1', TicketReservationRequestCheck."Admission Inclusion"::REQUIRED);
+                RequiredAdmissionHasTimeSlots := TicketReservationRequestCheck.IsEmpty();
 
-        TicketReservationRequest.SetRange("External Adm. Sch. Entry No.");
-        TicketReservationRequest.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
-        OnlyRequiredAdmissions := TicketReservationRequest.IsEmpty();
+                // Are there any non-required admissions that user has not selected
+                TicketReservationRequestCheck2.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequestCheck2.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequestCheck2."Admission Inclusion"::REQUIRED);
+                OnlyRequiredAdmissions := TicketReservationRequestCheck2.IsEmpty();
 
-        if ((not (RequiredAdmissionHasTimeSlots and OnlyRequiredAdmissions)) or (FunctionId = 3)) then begin
-            Response.Add('CancelScheduleSelection', false);
-            Response.Add('EditSchedule', true);
-            exit(Response);
-        end;
+                if (RequiredAdmissionHasTimeSlots and OnlyRequiredAdmissions) then begin
+                    ConfiguredTokens.Add(Token); // This token does not need schedule selection 
 
-        if (0 = TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage)) then begin
-            if (HaveSaleTicketSalesLine) then begin
-                TicketRetailManagement.AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity);
+                    // Create tickets for this token
+                    if (0 = TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage)) then begin
 
-                TicketReservationRequest.Reset();
-                TicketReservationRequest.SetCurrentKey("Session Token ID");
-                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-                TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
-                if (TicketReservationRequest.FindFirst()) then begin
-                    SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
-                    SaleLinePOS.Modify();
+                        if (HaveSaleTicketSalesLine) then begin
+                            TicketRetailManagement.AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity);
+
+                            TicketReservationRequestOrder.SetFilter("Session Token ID", '=%1', Token);
+                            TicketReservationRequestOrder.SetFilter("Primary Request Line", '=%1', true);
+                            if (TicketReservationRequestOrder.FindFirst()) then begin
+                                SaleLinePOS."Description 2" := TicketReservationRequestOrder."Scheduled Time Description";
+                                SaleLinePOS.Modify();
+                            end;
+
+                            POSProxyDisplay.UpdateDisplay(SaleLinePOS);
+                        end;
+                    end else begin
+                        // Abort the whole process if any token fails
+                        Response.Add('CancelScheduleSelection', true); // Request to clean up the sale lines
+                        Response.Add('EditSchedule', false);
+                        Response.Add('Message', ResponseMessage);
+                        exit(Response);
+                    end;
                 end;
-
-                HTMLDisplay.UpdateHTMLDisplay();
-                POSProxyDisplay.UpdateDisplay(SaleLinePOS);
             end;
-        end else begin
-            Response.Add('CancelScheduleSelection', true);
-            Response.Add('EditSchedule', false);
-            Response.Add('Message', ResponseMessage);
-            exit(Response);
+
+            Clear(TicketHolder);
+
+            if (GetTicketHolder(Token, ForceEditTicketHolder, TicketHolder)) then
+                TicketHolders.Add(TicketHolder);
+
         end;
 
+        HTMLDisplay.UpdateHTMLDisplay();
+
+        Response.Add('AssignedTokens', ConfiguredTokens);
         Response.Add('CancelScheduleSelection', false);
-        Response.Add('EditSchedule', false);
+        Response.Add('EditSchedule', (FunctionId = 3) or (ConfiguredTokens.Count() < Tokens.Count())); // 3 Edit Schedule (forced)
+        Response.Add('TicketHolders', TicketHolders);
+
         exit(Response);
+
     end;
+
 
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTMScheduleSelect.js###
-'const main=async({workflow:i,context:e,popup:t,toast:a,captions:c})=>{debugger;const l=await i.respond("AssignSameSchedule",e);if(l.CancelScheduleSelection)return a.error(l.Message),{cancel:!0};if(!l.EditSchedule&&!e.EditTicketHolder)return{cancel:!1};const r=await i.respond("ConfigureWorkflow",e);return e.EditSchedule&&await t.entertainment.scheduleSelection({token:e.TicketToken})===null?{cancel:!0}:((r.CaptureTicketHolder||e.EditTicketHolder)&&await captureTicketHolderInfo(i,r,c),{cancel:!1})};async function captureTicketHolderInfo(i,e,t){const a=await popup.configuration({title:t.ticketHolderTitle,caption:t.ticketHolderCaption,settings:[{id:"ticketHolderName",type:"text",caption:t.ticketHolderNameLabel,value:e.ticketHolderName},{id:"ticketHolderEmail",type:"text",caption:t.ticketHolderEmailLabel,value:e.ticketHolderEmail},{id:"ticketHolderPhone",type:"phoneNumber",caption:t.ticketHolderPhoneLabel,value:e.ticketHolderPhone},{id:"ticketHolderLanguage",type:"radio",caption:t.ticketHolderLanguageLabel,options:e.availableLanguages,value:e.ticketHolderLanguage,vertical:!1}]});a!==null&&await i.respond("SetTicketHolder",a)}'
+'const main=async({workflow:i,context:t,popup:e,toast:l,captions:n})=>{const a=!!(t.EditSchedule&&t.TicketToken)||t.FunctionId===5,r={sameScheduleAssigned:!1,ticketHolders:[],editTicketHolder:!1};debugger;if(a){const c=await handleSingleTokenFlow({workflow:i,context:t,popup:e,toast:l,state:r});if(c?.cancel)return c}else{const c=await handleMultiTokenFlow({workflow:i,context:t,popup:e,toast:l,state:r});if(c?.cancel)return c}if(r.sameScheduleAssigned&&r.ticketHolders.length===0)return{cancel:!1};const d=await getTicketHolderWorkflowConfig({workflow:i,context:t,state:r});if(!(r.editTicketHolder||d.CaptureTicketHolder||r.ticketHolders.length>0))return{cancel:!1};const o=normalizeTicketHolderConfig(d,r.ticketHolders);return await captureTicketHolderInfo({workflow:i,popup:e,wfConfig:o,captions:n}),{cancel:!1}};async function handleSingleTokenFlow({workflow:i,context:t,popup:e,toast:l,state:n}){const a=await i.respond("AssignSameSchedule",t);return n.ticketHolders=a.TicketHolders||[],n.editTicketHolder=n.ticketHolders.length>0||t.EditTicketHolder,a.CancelScheduleSelection?(l.error(a.Message),{cancel:!0}):!a.EditSchedule&&!n.editTicketHolder?{cancel:!1}:t.EditSchedule&&t.TicketToken&&!t.TicketTokens&&await e.entertainment.scheduleSelection({token:t.TicketToken})===null?{cancel:!0}:null}async function handleMultiTokenFlow({workflow:i,context:t,popup:e,toast:l,state:n}){let a=[...t.tokensRequiringScheduleSelection||[]];const r=[...t.tokensRequiringTicketHolder||[]];for(a.length===1&&r.length>0?(t.TicketTokens=a,n.editTicketHolder=!0):r.length>0&&(t.TicketTokens=r,n.editTicketHolder=!0);a.length>0;){const d=a[0];if(await e.entertainment.scheduleSelection({token:d})===null)return{cancel:!0};if(a.length===1)break;t.ConfiguredToken=d,a.shift(),t.setSchedulesForTokens=a;const o=await i.respond("AssignSameScheduleToSet",t);if(o.CancelScheduleSelection)return l.error(o.Message),{cancel:!0};n.sameScheduleAssigned=!0,n.ticketHolders.push(...o.TicketHolders||[]),n.editTicketHolder=n.ticketHolders.length>0;const c=o.AssignedTokens||[];c.length>0&&(a=a.filter(u=>!c.includes(u)))}return null}async function getTicketHolderWorkflowConfig({workflow:i,context:t,state:e}){return e.editTicketHolder?await i.respond("ConfigureWorkflow",t)||{}:{}}function normalizeTicketHolderConfig(i,t){const e=i&&Object.keys(i).length>0?{...i}:{};if(e.ticketHolderName=e.ticketHolderName??"",e.ticketHolderEmail=e.ticketHolderEmail??"",e.ticketHolderPhone=e.ticketHolderPhone??"",e.ticketHolderLanguage=e.ticketHolderLanguage??"",e.availableLanguages=e.availableLanguages??[],t.length>0){const l=t[0]||{};e.ticketHolderName=l.ticketHolderName||e.ticketHolderName,e.ticketHolderEmail=l.ticketHolderEmail||e.ticketHolderEmail,e.ticketHolderPhone=l.ticketHolderPhone||e.ticketHolderPhone,e.ticketHolderLanguage=l.ticketHolderLanguage||e.ticketHolderLanguage,e.availableLanguages=l.availableLanguages||e.availableLanguages}return e}async function captureTicketHolderInfo({workflow:i,popup:t,wfConfig:e,captions:l}){const n=await t.configuration({title:l.ticketHolderTitle,caption:l.ticketHolderCaption,settings:[{id:"ticketHolderName",type:"text",caption:l.ticketHolderNameLabel,value:e.ticketHolderName},{id:"ticketHolderEmail",type:"text",caption:l.ticketHolderEmailLabel,value:e.ticketHolderEmail},{id:"ticketHolderPhone",type:"phoneNumber",caption:l.ticketHolderPhoneLabel,value:e.ticketHolderPhone},{id:"ticketHolderLanguage",type:"radio",caption:l.ticketHolderLanguageLabel,options:e.availableLanguages,value:e.ticketHolderLanguage,vertical:!1}]});n!==null&&await i.respond("SetTicketHolder",n)}'
     );
     end;
 }

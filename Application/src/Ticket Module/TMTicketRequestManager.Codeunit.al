@@ -205,7 +205,6 @@
             end;
 
         until (TicketReservationRequest.Next() = 0);
-
         Span.Finish();
     end;
 
@@ -404,23 +403,39 @@
             exit(0);
         end;
 
-        DoIssueTicketFromReservationToken(Token);
-        exit(0);
+        exit(DoIssueTicketFromReservationToken(Token));
+        // exit(0);
     end;
 
-    internal procedure DoIssueTicketFromReservationToken(Token: Text[100])
+    internal procedure DoIssueTicketFromReservationToken(Token: Text[100]): Integer
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
     begin
-        AssignPrimaryReservationEntry(Token);
-        AssignListPrice(Token);
-
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.FindSet();
         repeat
+            if (TicketReservationRequest."External Adm. Sch. Entry No." = 0) then begin
+                if (TicketBom.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then
+                    if (TicketBom."Ticket Schedule Selection" = TicketBom."Ticket Schedule Selection"::SCHEDULE_ENTRY) then
+                        exit(-902); // Error: Missing schedule entry no, fast exit
+                if (Admission.Get(TicketReservationRequest."Admission Code")) then
+                    if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then
+                        exit(-902); // Error: Missing schedule entry no, fast exit
+            end;
+        until (TicketReservationRequest.Next() = 0);
+
+        AssignPrimaryReservationEntry(Token);
+        AssignListPrice(Token);
+
+        TicketReservationRequest.FindSet();
+        repeat
             IssueTicketFromReservation(TicketReservationRequest);
         until (TicketReservationRequest.Next() = 0);
+
+        exit(0);
     end;
 
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
@@ -511,7 +526,6 @@
         DurationExceeded: Label 'Service has exceeded the maximum allowed duration for making tickets. Please try again.';
         QuantityExceeded: Label 'The number of tickets requested exceeds the maximum allowed per request-line.';
     begin
-
         if (not TicketSetup.Get()) then
             TicketSetup.Init();
 
@@ -1947,6 +1961,7 @@
         end else begin
             if (ReservationRequest."External Adm. Sch. Entry No." <> ExternalAdmissionScheduleEntryNo) then begin
                 ReservationRequest."External Adm. Sch. Entry No." := ExternalAdmissionScheduleEntryNo;
+                AdmSchEntry.SetCurrentKey("External Schedule Entry No.");
                 AdmSchEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalAdmissionScheduleEntryNo);
                 AdmSchEntry.SetFilter(Cancelled, '=%1', false);
                 if (AdmSchEntry.FindLast()) then
@@ -2437,7 +2452,7 @@
         exit(false);
     end;
 
-    procedure RequestRequiresAttention(Token: Text[100]): boolean
+    procedure RequestRequiresAttention(Token: Text[100]; var RequireScheduleSelection: Boolean; var RequireParticipantInfo: Boolean)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
@@ -2450,19 +2465,20 @@
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::SELECTED, TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
-        if (not TicketReservationRequest.IsEmpty()) then
-            exit(true); // dynamic contents requires attention
-
-        RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage);
-        if (RequireParticipantInformation <> RequireParticipantInformation::NOT_REQUIRED) then
-            exit(true); // notifying participant requires attention
-
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
         TicketReservationRequest.SetFilter("Admission Created", '=%1', false);
-        exit(not TicketReservationRequest.IsEmpty());
+        RequireScheduleSelection := (not TicketReservationRequest.IsEmpty());
+
+        if (not RequireScheduleSelection) then begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetCurrentKey("Session Token ID");
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::SELECTED, TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+            RequireScheduleSelection := (not TicketReservationRequest.IsEmpty());
+        end;
+
+        RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage);
+        RequireParticipantInfo := (RequireParticipantInformation <> RequireParticipantInformation::NOT_REQUIRED);
     end;
 
     internal procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]): Boolean
