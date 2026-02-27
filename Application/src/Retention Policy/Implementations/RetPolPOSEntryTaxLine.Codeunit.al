@@ -30,7 +30,7 @@ codeunit 6248714 "NPR Ret.Pol.: POSEntryTaxLine" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR POS Entry Tax Line";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR POS Entry Tax Line", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR POS Entry Tax Line", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR POS Entry Tax Line", RetentionPolicyImpl);
     end;
 }
 #endif

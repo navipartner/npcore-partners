@@ -26,7 +26,7 @@ codeunit 6248722 "NPR Ret.Pol.: NPR Spfy Log" implements "NPR IRetention Policy"
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Spfy Log";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Spfy Log", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Spfy Log", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Spfy Log", RetentionPolicyImpl);
     end;
 }
 #endif

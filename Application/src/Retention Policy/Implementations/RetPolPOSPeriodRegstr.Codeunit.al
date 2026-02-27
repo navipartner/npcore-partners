@@ -30,7 +30,7 @@ codeunit 6248716 "NPR Ret.Pol.: POSPeriodRegstr" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR POS Period Register";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR POS Period Register", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR POS Period Register", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR POS Period Register", RetentionPolicyImpl);
     end;
 }
 #endif

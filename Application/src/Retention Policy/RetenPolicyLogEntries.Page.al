@@ -9,6 +9,7 @@ page 6248218 "NPR Reten. Policy Log Entries"
     SourceTable = "NPR Retention Policy Log Entry";
     SourceTableView = order(descending);
     UsageCategory = Administration;
+    ContextSensitiveHelpPage = 'docs/retail/retention_policy/explanation/retention_policy/';
 
     layout
     {

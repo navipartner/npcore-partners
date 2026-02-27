@@ -31,7 +31,7 @@ codeunit 6248708 "NPR Ret.Pol.: NPREWPadPrntLogE" implements "NPR IRetention Pol
 
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR NPRE W.Pad Prnt LogEntry";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR NPRE W.Pad Prnt LogEntry", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR NPRE W.Pad Prnt LogEntry", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR NPRE W.Pad Prnt LogEntry", RetentionPolicyImpl);
     end;
 }
 #endif

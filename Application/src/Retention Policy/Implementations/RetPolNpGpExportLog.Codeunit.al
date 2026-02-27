@@ -27,7 +27,7 @@ codeunit 6248704 "NPR Ret.Pol.: NpGp Export Log" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR NpGp Export Log";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR NpGp Export Log", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR NpGp Export Log", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR NpGp Export Log", RetentionPolicyImpl);
     end;
 }
 #endif

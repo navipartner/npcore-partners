@@ -32,7 +32,7 @@ codeunit 6248694 "NPR Ret.Pol.: EFT Receipt" implements "NPR IRetention Policy"
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR EFT Receipt";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR EFT Receipt", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR EFT Receipt", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR EFT Receipt", RetentionPolicyImpl);
     end;
 }
 #endif

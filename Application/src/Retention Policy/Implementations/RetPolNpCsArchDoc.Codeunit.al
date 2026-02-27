@@ -26,7 +26,7 @@ codeunit 6248703 "NPR Ret.Pol.: NpCs Arch. Doc." implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR NpCs Arch. Document";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR NpCs Arch. Document", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR NpCs Arch. Document", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR NpCs Arch. Document", RetentionPolicyImpl);
     end;
 }
 #endif

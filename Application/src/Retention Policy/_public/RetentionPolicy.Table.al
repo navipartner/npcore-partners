@@ -6,7 +6,6 @@ table 6151287 "NPR Retention Policy"
     DrillDownPageID = "NPR Retention Policy";
     LookupPageID = "NPR Retention Policy";
     Extensible = false;
-    Access = Internal;
 
 
     fields

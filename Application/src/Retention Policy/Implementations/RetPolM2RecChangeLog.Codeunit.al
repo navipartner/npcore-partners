@@ -26,7 +26,7 @@ codeunit 6248699 "NPR Ret.Pol.: M2 RecChangeLog" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR M2 Record Change Log";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR M2 Record Change Log", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR M2 Record Change Log", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR M2 Record Change Log", RetentionPolicyImpl);
     end;
 }
 #endif

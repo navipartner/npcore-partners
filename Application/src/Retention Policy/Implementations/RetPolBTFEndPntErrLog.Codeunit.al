@@ -26,7 +26,7 @@ codeunit 6248689 "NPR Ret.Pol.: BTFEndPntErrLog" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR BTF EndPoint Error Log";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR BTF EndPoint Error Log", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR BTF EndPoint Error Log", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR BTF EndPoint Error Log", RetentionPolicyImpl);
     end;
 }
 #endif

@@ -26,7 +26,7 @@ codeunit 6248690 "NPR Ret.Pol.: Repl. Error Log" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Replication Error Log";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Replication Error Log", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Replication Error Log", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Replication Error Log", RetentionPolicyImpl);
     end;
 }
 #endif

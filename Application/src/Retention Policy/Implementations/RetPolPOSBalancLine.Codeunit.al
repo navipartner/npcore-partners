@@ -30,7 +30,7 @@ codeunit 6248710 "NPR Ret.Pol.: POS Balanc. Line" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR POS Balancing Line";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR POS Balancing Line", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR POS Balancing Line", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR POS Balancing Line", RetentionPolicyImpl);
     end;
 }
 #endif

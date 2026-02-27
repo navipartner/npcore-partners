@@ -26,7 +26,7 @@ codeunit 6248721 "NPR Ret.Pol.: NPR Spfy App Req" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Spfy App Request";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Spfy App Request", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Spfy App Request", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Spfy App Request", RetentionPolicyImpl);
     end;
 }
 #endif

@@ -26,7 +26,7 @@ codeunit 6248711 "NPR Ret.Pol.: POSEntryOutptLog" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR POS Entry Output Log";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR POS Entry Output Log", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR POS Entry Output Log", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR POS Entry Output Log", RetentionPolicyImpl);
     end;
 }
 #endif

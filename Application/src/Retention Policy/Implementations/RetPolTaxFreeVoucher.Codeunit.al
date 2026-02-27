@@ -30,7 +30,7 @@ codeunit 6248720 "NPR Ret.Pol.: Tax Free Voucher" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Tax Free Voucher";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Tax Free Voucher", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Tax Free Voucher", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Tax Free Voucher", RetentionPolicyImpl);
     end;
 }
 #endif

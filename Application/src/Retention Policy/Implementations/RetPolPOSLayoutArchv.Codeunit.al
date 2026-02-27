@@ -26,7 +26,7 @@ codeunit 6248715 "NPR Ret.Pol.: POS Layout Archv" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR POS Layout Archive";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR POS Layout Archive", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR POS Layout Archive", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR POS Layout Archive", RetentionPolicyImpl);
     end;
 }
 #endif

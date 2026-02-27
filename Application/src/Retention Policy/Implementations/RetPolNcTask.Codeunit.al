@@ -37,7 +37,7 @@ codeunit 6248702 "NPR Ret.Pol.: Nc Task" implements "NPR IRetention Policy"
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Nc Task";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Nc Task", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Nc Task", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Nc Task", RetentionPolicyImpl);
     end;
 }
 #endif

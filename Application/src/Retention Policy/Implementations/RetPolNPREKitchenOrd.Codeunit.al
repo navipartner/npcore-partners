@@ -44,7 +44,7 @@ codeunit 6248706 "NPR Ret.Pol.: NPRE KitchenOrd." implements "NPR IRetention Pol
 
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR NPRE Kitchen Order";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR NPRE Kitchen Order", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR NPRE Kitchen Order", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR NPRE Kitchen Order", RetentionPolicyImpl);
     end;
 }
 #endif

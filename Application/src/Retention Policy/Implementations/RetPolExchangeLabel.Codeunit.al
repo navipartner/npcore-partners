@@ -30,7 +30,7 @@ codeunit 6248697 "NPR Ret.Pol.: Exchange Label" implements "NPR IRetention Polic
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Exchange Label";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Exchange Label", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Exchange Label", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Exchange Label", RetentionPolicyImpl);
     end;
 }
 #endif

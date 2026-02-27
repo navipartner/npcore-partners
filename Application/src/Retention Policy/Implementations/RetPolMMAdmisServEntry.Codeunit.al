@@ -26,7 +26,7 @@ codeunit 6248700 "NPR Ret.Pol.: MMAdmisServEntry" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR MM Admis. Service Entry";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR MM Admis. Service Entry", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR MM Admis. Service Entry", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR MM Admis. Service Entry", RetentionPolicyImpl);
     end;
 }
 #endif

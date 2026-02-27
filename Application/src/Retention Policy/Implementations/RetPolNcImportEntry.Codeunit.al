@@ -26,7 +26,7 @@ codeunit 6248701 "NPR Ret.Pol.: Nc Import Entry" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Nc Import Entry";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Nc Import Entry", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Nc Import Entry", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Nc Import Entry", RetentionPolicyImpl);
     end;
 }
 #endif

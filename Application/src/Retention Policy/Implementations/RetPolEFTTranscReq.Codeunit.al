@@ -26,7 +26,7 @@ codeunit 6248696 "NPR Ret.Pol.: EFT Transc. Req." implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR EFT Transaction Request";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR EFT Transaction Request", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR EFT Transaction Request", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR EFT Transaction Request", RetentionPolicyImpl);
     end;
 }
 #endif

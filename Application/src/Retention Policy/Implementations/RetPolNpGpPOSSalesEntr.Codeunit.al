@@ -30,7 +30,7 @@ codeunit 6248705 "NPR Ret.Pol.: NpGpPOSSalesEntr" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR NpGp POS Sales Entry";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR NpGp POS Sales Entry", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR NpGp POS Sales Entry", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR NpGp POS Sales Entry", RetentionPolicyImpl);
     end;
 }
 #endif

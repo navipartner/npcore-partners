@@ -33,7 +33,7 @@ codeunit 6248698 "NPR Ret.Pol.: HL Webhook Req." implements "NPR IRetention Poli
 
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR HL Webhook Request";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR HL Webhook Request", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR HL Webhook Request", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR HL Webhook Request", RetentionPolicyImpl);
     end;
 }
 #endif

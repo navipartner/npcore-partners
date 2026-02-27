@@ -26,7 +26,7 @@ codeunit 6150993 "NPR Ret.Pol.: Dig.Notif.Ent" implements "NPR IRetention Policy
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Digital Notification Entry";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Digital Notification Entry", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Digital Notification Entry", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Digital Notification Entry", RetentionPolicyImpl);
     end;
 }
 #endif

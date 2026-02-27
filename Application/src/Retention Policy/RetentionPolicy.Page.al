@@ -9,6 +9,7 @@ page 6248216 "NPR Retention Policy"
     PageType = List;
     SourceTable = "NPR Retention Policy";
     UsageCategory = Administration;
+    ContextSensitiveHelpPage = 'docs/retail/retention_policy/explanation/retention_policy/';
 
     layout
     {

@@ -40,7 +40,7 @@ codeunit 6248707 "NPR Ret.Pol.: NPRE Waiter Pad" implements "NPR IRetention Poli
 
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR NPRE Waiter Pad";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR NPRE Waiter Pad", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR NPRE Waiter Pad", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR NPRE Waiter Pad", RetentionPolicyImpl);
     end;
 }
 #endif

@@ -26,7 +26,7 @@ codeunit 6248684 "NPR Ret.Pol.: Log Entry RetPol" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Retention Policy Log Entry";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Retention Policy Log Entry", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Retention Policy Log Entry", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Retention Policy Log Entry", RetentionPolicyImpl);
     end;
 }
 #endif

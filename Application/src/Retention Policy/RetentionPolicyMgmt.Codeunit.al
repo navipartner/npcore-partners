@@ -85,7 +85,7 @@ codeunit 6248677 "NPR Retention Policy Mgmt."
     end;
     #endregion
 
-    internal procedure AddTablePolicy(TableId: Integer; var RetentionPolicyEnum: Enum "NPR Retention Policy")
+    internal procedure UpsertTablePolicy(TableId: Integer; var RetentionPolicyEnum: Enum "NPR Retention Policy")
     var
         RetentionPolicy: Record "NPR Retention Policy";
     begin
@@ -101,6 +101,17 @@ codeunit 6248677 "NPR Retention Policy Mgmt."
             RetentionPolicy.Enabled := true;
             RetentionPolicy.Insert();
         end;
+    end;
+
+    internal procedure DeleteTablePolicy(TableId: Integer)
+    var
+        RetentionPolicy: Record "NPR Retention Policy";
+        NonExistantPolicyErr: Label 'NPR Retention policy for table %1 doesn''t exist.';
+    begin
+        if RetentionPolicy.Get(TableId) then
+            RetentionPolicy.Delete()
+        else
+            Error(NonExistantPolicyErr, TableId);
     end;
 
     #region Job Queue

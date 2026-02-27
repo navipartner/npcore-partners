@@ -19,7 +19,7 @@ codeunit 6248676 "NPR Ret.Pol.: Data Log Record" implements "NPR IRetention Poli
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Data Log Record";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Data Log Record", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Data Log Record", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Data Log Record", RetentionPolicyImpl);
     end;
 }
 #endif

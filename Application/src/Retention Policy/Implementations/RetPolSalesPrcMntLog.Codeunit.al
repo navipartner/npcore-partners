@@ -27,7 +27,7 @@ codeunit 6248719 "NPR Ret.Pol.: SalesPrcMntLog" implements "NPR IRetention Polic
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Sales Price Maint. Log";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Sales Price Maint. Log", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Sales Price Maint. Log", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Sales Price Maint. Log", RetentionPolicyImpl);
     end;
 }
 #endif

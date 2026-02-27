@@ -36,7 +36,7 @@ codeunit 6248723 "NPR Ret.Pol.: SpfyWebhookNotif" implements "NPR IRetention Pol
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Spfy Webhook Notification";
         RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Spfy Webhook Notification", RetentionPolicyImpl);
-        RetentionPolicyMgmt.AddTablePolicy(Database::"NPR Spfy Webhook Notification", RetentionPolicyImpl);
+        RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Spfy Webhook Notification", RetentionPolicyImpl);
     end;
 }
 #endif
