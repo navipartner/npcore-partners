@@ -582,6 +582,23 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         exit(ConfirmManagement.GetResponseOrDefault(ResendConfirmQst, false));
     end;
 
+    local procedure PromptForRecipientEmail(var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary): Boolean
+    var
+        InputDialog: Page "NPR Input Dialog";
+        EmailAddress: Text;
+        EmailAddressLbl: Label 'Email Address';
+    begin
+        EmailAddress := TempHeaderBuffer."Recipient E-mail";
+        InputDialog.SetInput(1, EmailAddress, EmailAddressLbl);
+        if not (InputDialog.RunModal() = Action::OK) then
+            exit(false);
+
+        InputDialog.InputText(1, EmailAddress);
+        TempHeaderBuffer."Recipient E-mail" := CopyStr(EmailAddress, 1, MaxStrLen(TempHeaderBuffer."Recipient E-mail"));
+        TempHeaderBuffer.Modify();
+        exit(true);
+    end;
+
     local procedure ProcessSalesDocumentManual(RecVariant: Variant): Boolean
     var
         TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
@@ -589,8 +606,8 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         RecRef: RecordRef;
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        MailManagement: Codeunit "Mail Management";
         DocumentNo: Code[20];
-        CustomerNoEmailErr: Label 'Customer %1 does not have an email address configured. Please add an email address before sending the digital notification.', Comment = '%1 = Customer No.';
         UnsupportedDocumentTypeErr: Label 'Document type %1 is not supported for manual digital notification sending.', Comment = '%1 = Record name';
     begin
         RecRef.GetTable(RecVariant);
@@ -602,7 +619,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                     DocumentNo := SalesInvoiceHeader."No.";
 
                     if not ConfirmResendNotification(DocumentNo, "NPR Digital Document Type"::Invoice) then
-                        exit(false);
+                        Error('');
 
                     PopulateBuffersFromInvoice(SalesInvoiceHeader, TempHeaderBuffer, TempLineBuffer);
                 end;
@@ -613,7 +630,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                     DocumentNo := SalesCrMemoHeader."No.";
 
                     if not ConfirmResendNotification(DocumentNo, "NPR Digital Document Type"::"Credit Memo") then
-                        exit(false);
+                        Error('');
 
                     PopulateBuffersFromCrMemo(SalesCrMemoHeader, TempHeaderBuffer, TempLineBuffer);
                 end;
@@ -621,8 +638,9 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                 Error(UnsupportedDocumentTypeErr, RecRef.Name);
         end;
 
-        if TempHeaderBuffer."Recipient E-mail" = '' then
-            Error(CustomerNoEmailErr, TempHeaderBuffer."Customer No.");
+        if not PromptForRecipientEmail(TempHeaderBuffer) then
+            Error('');
+        MailManagement.CheckValidEmailAddresses(TempHeaderBuffer."Recipient E-mail");
 
         exit(ProcessSalesDocument(TempHeaderBuffer, TempLineBuffer));
     end;
