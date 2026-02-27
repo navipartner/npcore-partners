@@ -1,7 +1,7 @@
 enum 6014484 "NPR TM Sch. Block Sales Reason"
 {
 #IF NOT BC17
-    Access = Internal;       
+    Access = Internal;
 #ENDIF
     Extensible = false;
 
@@ -48,5 +48,9 @@ enum 6014484 "NPR TM Sch. Block Sales Reason"
     value(10; RemainingCapacityZeroOrLess)
     {
         Caption = 'Remaining Capacity Zero or Less.';
+    }
+    value(11; RequestedQuantityExceedsRemainingCapacity)
+    {
+        Caption = 'Requested Quantity Exceeds Remaining Capacity.';
     }
 }

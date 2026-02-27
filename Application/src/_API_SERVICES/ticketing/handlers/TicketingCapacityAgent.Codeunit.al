@@ -161,7 +161,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                 .AddProperty('discountPct', AdmCapacityPriceBuffer.DiscountPct)
                 .AddProperty('unitPriceIncludesVat', AdmCapacityPriceBuffer.UnitPriceIncludesVat)
                 .AddProperty('vatPct', AdmCapacityPriceBuffer.UnitPriceVatPercentage)
-                .AddArray(ScheduleEntryDTO(AdmCapacityPriceBuffer, ResponseJson, LocalDate, LocalTime, (Admission."Capacity Control" = Admission."Capacity Control"::"NONE")))
+                .AddArray(ScheduleEntryDTO(AdmCapacityPriceBuffer, ResponseJson, LocalDate, LocalTime, (Admission."Capacity Control" = Admission."Capacity Control"::"NONE"), AdmCapacityPriceBuffer.Quantity))
             .EndObject();
 
         until (AdmCapacityPriceBuffer.Next() = 0);
@@ -192,11 +192,11 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
             .AddArray(ScheduleEntrySimple(Admission, LocalDate, LocalTime, StartDate, EndDate, ScheduleCode, (Admission."Capacity Control" = Admission."Capacity Control"::"NONE"), ResponseJson))
         .EndObject();
 
-        Responsejson.EndObject();
+        ResponseJson.EndObject();
         Response.RespondOK(ResponseJson.Build());
     end;
 
-    local procedure ScheduleEntryDTO(AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder"; LocalDate: Date; LocalTime: Time; AdmissionCapacityControlNone: Boolean): Codeunit "NPR JSON Builder"
+    local procedure ScheduleEntryDTO(AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder"; LocalDate: Date; LocalTime: Time; AdmissionCapacityControlNone: Boolean; RequestedQuantity: Integer): Codeunit "NPR JSON Builder"
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -264,6 +264,12 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
 
                 if (RemainingCapacity < 0) then
                     RemainingCapacity := 0;
+
+                if (not AdmissionCapacityControlNone) then
+                    if ((RequestedQuantity > RemainingCapacity) and (CapacityStatusCode = _CapacityStatusCodeOption::OK)) then begin
+                        CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
+                        BlockSaleReason := BlockSaleReason::RequestedQuantityExceedsRemainingCapacity;
+                    end;
 
                 ResponseJson.StartObject()
                     .AddProperty('allocatable', CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING, _CapacityStatusCodeOption::UNLIMITED_CAPACITY])
