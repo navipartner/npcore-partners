@@ -108,7 +108,7 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
         until (TicketReservation.Next() = 0);
     end;
 
-    local procedure AdmitTicketSpeedGate(Token: Text[100]; PosUnitNo: Code[10]; var TicketsAdmittedList: JsonArray; var TicketsRejectedList: JsonArray)
+    internal procedure AdmitTicketSpeedGate(Token: Text[100]; PosUnitNo: Code[10]; var TicketsAdmittedList: JsonArray; var TicketsRejectedList: JsonArray)
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -123,7 +123,7 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
         ResponseCode: Integer;
         ResponseMessage: Text;
         ApiError: Enum "NPR API Error Code";
-        ErrorMessage: Label '%1: %2';
+        ErrorMessage: Label '%1: %2 %3';
     begin
         TicketReservation.SetCurrentKey("Session Token ID");
         TicketReservation.SetFilter("Session Token ID", '=%1', Token);
@@ -165,7 +165,7 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
 
                         end else begin
                             if (ResponseCode > 0) then
-                                TicketsRejectedList.Add(StrSubstNo(ErrorMessage, ResponseCode, ApiError.Names.Get(ApiError.Ordinals.IndexOf(ResponseCode))));
+                                TicketsRejectedList.Add(StrSubstNo(ErrorMessage, Ticket."External Ticket No.", ResponseCode, ApiError.Names.Get(ApiError.Ordinals.IndexOf(ResponseCode))));
 
                         end;
                     until (Ticket.Next() = 0);
