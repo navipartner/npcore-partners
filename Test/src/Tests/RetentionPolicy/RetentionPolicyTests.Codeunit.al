@@ -37,7 +37,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         InsertRetentionPolicyLogEntryRecord(1);
 
         // [GIVEN] Expiring reference DateTime
-        ReferenceDate := CalcDate('<+6M>', DT2Date(CurrentDateTime()));
+        ReferenceDate := CalcDate('<+7M>', DT2Date(CurrentDateTime()));
         ReferenceDateTime := CreateDateTime(ReferenceDate, DT2Time(CurrentDateTime())) + JobQueueManagement.DaysToDuration(1);
 
         // [WHEN] Retention Policy is applied
