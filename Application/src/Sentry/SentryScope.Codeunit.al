@@ -48,8 +48,6 @@ codeunit 6150994 "NPR Sentry Scope"
 
     internal procedure InitScopeAndTransaction(Name: Text; Operation: Text; ExternalTraceId: Text; ExternalSpanId: Text; ExternalSampled: Boolean; StartTime: DateTime)
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        DefaultDsn: Text;
         ModuleInfo: ModuleInfo;
         ReleaseVersion: Text;
     begin
@@ -65,9 +63,7 @@ codeunit 6150994 "NPR Sentry Scope"
             ReleaseVersion := 'npretail@dev';
         end;
 
-        if AzureKeyVaultMgt.TryGetAzureKeyVaultSecret('SentryIONpCore', DefaultDsn) then;
-
-        InitScopeAndTransaction(Name, Operation, DefaultDsn, ReleaseVersion, 1.0, ExternalTraceId, ExternalSpanId, ExternalSampled, StartTime);
+        InitScopeAndTransaction(Name, Operation, '', ReleaseVersion, 1.0, ExternalTraceId, ExternalSpanId, ExternalSampled, StartTime);
     end;
 
     local procedure ResetState()
@@ -460,6 +456,23 @@ codeunit 6150994 "NPR Sentry Scope"
                 exit;
             end;
         end;
+    end;
+
+    internal procedure AddTransactionTag(TagKey: Text; TagValue: Text)
+    begin
+        _transaction.AddTag(TagKey, TagValue);
+    end;
+
+    internal procedure AddTransactionData(DataKey: Text; DataValue: Text)
+    begin
+        _transaction.AddData(DataKey, DataValue);
+    end;
+
+    internal procedure SetTransactionName(Name: Text; Operation: Text)
+    begin
+        _transaction.SetDescription(Name);
+        _transaction.SetOperation(Operation);
+        _transaction.SetSource('route');
     end;
 
     internal procedure AddLastErrorInEnglish()

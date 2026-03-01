@@ -13,23 +13,34 @@ codeunit 6185052 "NPR API Request Processor"
         requestJson: JsonObject;
         responseJson: JsonObject;
         responseString: Text;
-        StartTime: DateTime;
+        RequestStartTime: DateTime;
+        SentryStartTime: DateTime;
         Sentry: Codeunit "NPR Sentry";
+        WSSessionInit: Codeunit "NPR API WS Session Init";
+        ApiProcessingSpan: Codeunit "NPR Sentry Span";
+        ApiFinalizationSpan: Codeunit "NPR Sentry Span";
     begin
-        StartTime := CurrentDateTime();
-        _SessionMetadata.SetStartTime(StartTime);
+        RequestStartTime := CurrentDateTime();
 
+        if WSSessionInit.IsInitialized() then
+            SentryStartTime := WSSessionInit.GetSessionStartTime()
+        else
+            SentryStartTime := RequestStartTime;
+
+        _SessionMetadata.SetStartTime(RequestStartTime);
         _SessionMetadata.SetStartRowsRead(SessionInformation.SqlRowsRead());
         _SessionMetadata.SetStartStatementsExecuted(SessionInformation.SqlStatementsExecuted());
 
         requestJson.ReadFrom(message);
-        responseJson := ProcessRequest(requestJson, StartTime);
+        responseJson := ProcessRequest(requestJson, SentryStartTime, RequestStartTime, ApiProcessingSpan, ApiFinalizationSpan);
         responseString := Format(responseJson);
+        ApiFinalizationSpan.Finish();
+        ApiProcessingSpan.Finish();
         Sentry.FinalizeScope();
         exit(responseString);
     end;
 
-    local procedure ProcessRequest(requestJson: JsonObject; StartTime: DateTime): JsonObject
+    local procedure ProcessRequest(requestJson: JsonObject; StartTime: DateTime; RequestStartTime: DateTime; var ApiProcessingSpan: Codeunit "NPR Sentry Span"; var ApiFinalizationSpan: Codeunit "NPR Sentry Span"): JsonObject
     var
         apiModuleResolver: Interface "NPR API Module Resolver";
         apiModule: Enum "NPR API Module";
@@ -50,9 +61,12 @@ codeunit 6185052 "NPR API Request Processor"
         jsonParser: Codeunit "NPR JSON Parser";
         SentryHttp: Codeunit "NPR Sentry Http";
         Sentry: Codeunit "NPR Sentry";
+        ParseSpan: Codeunit "NPR Sentry Span";
+        HandleSpan: Codeunit "NPR Sentry Span";
         ExternalTraceId: Text;
         ExternalSpanId: Text;
         ExternalSampled: Boolean;
+        ParameterizedName: Text;
     begin
         jsonParser.Load(requestJson);
         jsonParser
@@ -81,11 +95,18 @@ codeunit 6185052 "NPR API Request Processor"
             Sentry.InitScopeAndTransaction(StrSubstNo('%1 %2', requestHttpMethodStr, requestPath), StrSubstNo('http.server.bc:%1_%2', requestHttpMethodStr, requestPath), StartTime);
         end;
 
+        Sentry.StartSpan(ApiProcessingSpan, 'bc.api.request.processor');
+        ApiProcessingSpan.SetStartTime(RequestStartTime);
+
+        Sentry.StartSpan(ParseSpan, 'bc.api.parse');
+        ParseSpan.SetStartTime(RequestStartTime);
+
         apiModuleName := requestRelativePathSegments.Get(1);
         if (not Evaluate(apiModule, apiModuleName)) then begin
             foreach requestPathSegment in requestRelativePathSegments do begin
                 requestPathSegmentsStr += StrSubstNo('/%1', requestPathSegment)
             end;
+            ParseSpan.Finish();
             exit(responseCodeunit.RespondResourceNotFound(requestPathSegmentsStr).AddMetadataHeaders(_SessionMetadata).GetResponseJson());
         end;
 
@@ -96,26 +117,37 @@ codeunit 6185052 "NPR API Request Processor"
         if not HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), apiModuleResolver.GetRequiredPermissionSet()) then begin
 # pragma warning restore AA0139
             // For the API module, we require explicit permission sets declared on the entra app for each module to avoid "BC365 FULL ACCESS + NPR RETAIL" as go-to everywhere in prod.
+            ParseSpan.Finish();
             exit(responseCodeunit.RespondForbidden(StrSubstNo('Missing permissions: %1', apiModuleResolver.GetRequiredPermissionSet())).AddMetadataHeaders(_SessionMetadata).GetResponseJson());
         end;
 
         requestResolver := apiModuleResolver.Resolve(requestCodeunit);
+        ParseSpan.Finish();
 
+        Sentry.StartSpan(HandleSpan, 'bc.api.handle');
         case requestHttpMethod of
             requestHttpMethod::GET, requestHttpMethod::POST, requestHttpMethod::PUT, requestHttpMethod::PATCH, requestHttpMethod::DELETE:
                 begin
                     responseCodeunit := requestResolver.Handle(requestCodeunit);
                 end;
             else begin
+                HandleSpan.Finish();
                 exit(responseCodeunit.RespondBadRequestUnsupportedHttpMethod(requestHttpMethod).AddMetadataHeaders(_SessionMetadata).GetResponseJson());
             end;
         end;
+        HandleSpan.Finish();
 
-        if (not responseCodeunit.IsInitialized()) then begin
-            exit(responseCodeunit.RespondResourceNotFound().AddMetadataHeaders(_SessionMetadata).GetResponseJson());
+        Sentry.StartSpan(ApiFinalizationSpan, 'bc.api.finalize');
+        if requestCodeunit.GetMatchedRouteTemplate() <> '' then begin
+            ParameterizedName := BuildParameterizedTransactionName(requestHttpMethodStr, requestPath, requestRelativePathSegments, requestCodeunit.GetMatchedRouteTemplate());
+            Sentry.SetTransactionName(ParameterizedName, StrSubstNo('http.server.bc:%1_%2', requestHttpMethodStr, requestCodeunit.GetMatchedRouteTemplate()));
         end;
 
-        exit(responseCodeunit.AddMetadataHeaders(_SessionMetadata).GetResponseJson());
+        if (not responseCodeunit.IsInitialized()) then begin
+            exit(ResponseCodeunit.RespondResourceNotFound().AddMetadataHeaders(_SessionMetadata).GetResponseJson());
+        end;
+
+        exit(ResponseCodeunit.AddMetadataHeaders(_SessionMetadata).GetResponseJson());
     end;
 
     procedure RegisterService()
@@ -140,6 +172,36 @@ codeunit 6185052 "NPR API Request Processor"
         AccessControl.SetRange("Role ID", RoleId);
         AccessControl.SetFilter("Company Name", '%1|%2', '', Company);
         exit(not AccessControl.IsEmpty());
+    end;
+
+    local procedure BuildParameterizedTransactionName(Method: Text; FullPath: Text; RelativePathSegments: List of [Text]; RouteTemplate: Text): Text
+    var
+        FullPathSegments: List of [Text];
+        TemplateSegments: List of [Text];
+        Segment: Text;
+        Result: Text;
+        PrefixCount: Integer;
+        i: Integer;
+    begin
+        FullPathSegments := FullPath.Split('/');
+        FullPathSegments.Remove('');
+
+        PrefixCount := FullPathSegments.Count() - RelativePathSegments.Count();
+        if PrefixCount < 0 then
+            PrefixCount := 0;
+        for i := 1 to PrefixCount do
+            Result += '/*';
+
+        TemplateSegments := RouteTemplate.Split('/');
+        TemplateSegments.Remove('');
+        foreach Segment in TemplateSegments do begin
+            if Segment.StartsWith(':') then
+                Result += '/*'
+            else
+                Result += StrSubstNo('/%1', Segment);
+        end;
+
+        exit(StrSubstNo('%1 %2', Method, Result));
     end;
 
 }

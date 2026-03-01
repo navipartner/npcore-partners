@@ -9,6 +9,7 @@ codeunit 6185051 "NPR API Request"
         _QueryParams: Dictionary of [Text, Text];
         _Headers: Dictionary of [Text, Text];
         _BodyJson: JsonToken;
+        _MatchedRouteTemplate: Text;
 
     #region Initializer
     procedure Init(RequestHttpMethod: Enum "Http Method"; RequestPath: Text; RequestRelativePathSegments: List of [Text]; RequestQueryParams: Dictionary of [Text, Text];
@@ -21,6 +22,7 @@ codeunit 6185051 "NPR API Request"
         _Headers := RequestHeaders;
         _BodyJson := RequestBodyJson;
         _ModuleName := _RelativePathSegments.Get(1);
+        _MatchedRouteTemplate := '';
     end;
     #endregion
 
@@ -60,6 +62,11 @@ codeunit 6185051 "NPR API Request"
         exit(_BodyJson);
     end;
 
+    procedure GetMatchedRouteTemplate(): Text
+    begin
+        exit(_MatchedRouteTemplate);
+    end;
+
     procedure ApiVersion(): Date
     var
         _apiVersion: Date;
@@ -91,6 +98,7 @@ codeunit 6185051 "NPR API Request"
             end;
         end;
 
+        _MatchedRouteTemplate := _fullPath;
         exit(true);
     end;
 
@@ -469,6 +477,7 @@ codeunit 6185051 "NPR API Request"
     procedure SkipCacheIfNonStickyRequest(TableIds: List of [Integer])
     var
         RequestServerId: Integer;
+        Sentry: Codeunit "NPR Sentry";
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23 and not BC24
         TableId: Integer;
 #endif
@@ -479,12 +488,19 @@ codeunit 6185051 "NPR API Request"
                 exit;
         end;
 
+        If RequestServerId = 0 then
+            RequestServerId := -1;
+
+        Sentry.AddTransactionTag('bc.cache.headerServerId', Format(RequestServerId));
+        Sentry.AddTransactionTag('bc.cache.actualServerId', Format(ServiceInstanceId()));
+        Sentry.AddTransactionTag('bc.cache.miss', 'true');
+
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23 and not BC24
         foreach TableId in TableIds do begin
             SelectLatestVersion(TableId);
         end;
 #else
-        SelectLatestVersion(); // Skip cache for all tables in the entire request processing
+        SelectLatestVersion();
 #endif
     end;
 
