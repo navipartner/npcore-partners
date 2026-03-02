@@ -188,6 +188,27 @@ codeunit 6248497 "NPR Sentry"
     end;
 
 
+    internal procedure AddTransactionTag(TagKey: Text; TagValue: Text)
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        SentryScope.AddTransactionTag(TagKey, TagValue);
+#endif
+    end;
+
+    internal procedure AddTransactionData(DataKey: Text; DataValue: Text)
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        SentryScope.AddTransactionData(DataKey, DataValue);
+#endif
+    end;
+
+    internal procedure SetTransactionName(Name: Text; Operation: Text)
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        SentryScope.SetTransactionName(Name, Operation);
+#endif
+    end;
+
     procedure HttpInvoke(var Client: HttpClient; var Request: HttpRequestMessage; var Response: HttpResponseMessage)
     begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)

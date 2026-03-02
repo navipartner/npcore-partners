@@ -4,8 +4,9 @@ All of it is compiled into one Microsoft Business Central ISV .app
 ## Build
 If you are working in a dev environment running a newer BC version than BC17, temporarily increase the app.json versions to match your dev environment in both Application & Test apps.
 (remember, for app.json, "runtime"= {bc_version} minus 11, so BC27.0 = runtime 16.0 and baseapp dependency does NOT have to be declared in "dependencies" as it's implicit via "platform" and "application")
-Use the /bcdev claude skill to download symbols, compile, publish and run tests.  
+Use the /bcdev claude skill to download symbols, compile, publish and run tests.
 Use the -suppressWarnings flag when compiling unless directed to show warnings.
+When setting preprocessorSymbols for local compilation, define **only** the target version (e.g. `["BC27", "BC2700"]`), not all versions from BC17 through BC27. The guards use symbols as version-specific flags: `#if BC17 or BC18` means "only for that version", so defining BC17 when targeting BC27 would incorrectly include OnPrem-only code like dotnet.al.
 
 
 
@@ -34,3 +35,4 @@ For errors, you can log them to Sentry via Sentry.AddLastErrorIfProgrammingBug()
 - Never log API request/response bodies such as JSON/XML to blob/media fields as this is very slow in BC SaaS and our API module already logs all request/responses & metadata in cloudflare (our proxy around BC) & sentry.
 - If you need to log an error of the exception kind (="If this happened there's a bug and a developer needs to know about it"), use our sentry codeunit and make sure the error message is written in non-translated english with "This is a programming bug" at the end of the message.
 - Use the /al-id-manager claude skill to get next id when you create new objects, new table/tableextension fields and new enum/enumextension values.
+- Prefix global variable names with underscore

@@ -137,6 +137,8 @@ codeunit 6185053 "NPR API Response"
         AddHeader('x-npr-sql-rows-read-api', Format(SessionInformation.SqlRowsRead() - SessionMetadata.GetStartRowsRead()));
         AddHeader('x-npr-sql-statements-executed-api', Format(SessionInformation.SqlStatementsExecuted() - SessionMetadata.GetStartStatementsExecuted()));
 
+        AddSentryTag('http.status_code', Format(_StatusCode));
+
         exit(_CurrCodeunit);
     end;
 
@@ -147,7 +149,6 @@ codeunit 6185053 "NPR API Response"
         HeaderValue: Text;
         Base64Convert: Codeunit "Base64 Convert";
     begin
-
         ResponseJson.Add('statusCode', _StatusCode);
 
         Clear(HeadersJson);
@@ -493,9 +494,12 @@ codeunit 6185053 "NPR API Response"
     end;
 
     procedure AddSentryTag(TagKey: Text; TagValue: Text): Codeunit "NPR API Response"
+    var
+        Sentry: Codeunit "NPR Sentry";
     begin
         InitcurrCodeunit();
         _SentryTags.Add(TagKey, TagValue);
+        Sentry.AddTransactionTag(TagKey, TagValue);
         exit(_CurrCodeunit);
     end;
     #endregion
@@ -514,10 +518,12 @@ codeunit 6185053 "NPR API Response"
 
     procedure AddSentrySpanAttribute(AttrKey: Text; AttrValue: Variant): Codeunit "NPR API Response"
     var
+        Sentry: Codeunit "NPR Sentry";
         JsonBuilder: Codeunit "NPR Json Builder";
     begin
         InitcurrCodeunit();
         _SentrySpanAttribs.Add(AttrKey, JsonBuilder.CreateJsonValue(AttrValue));
+        Sentry.AddTransactionData(AttrKey, Format(AttrValue));
         exit(_CurrCodeunit);
     end;
     #endregion

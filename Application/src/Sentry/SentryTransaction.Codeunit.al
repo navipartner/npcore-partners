@@ -17,6 +17,9 @@ codeunit 6248499 "NPR Sentry Transaction"
         _externalSpanId: Text;
         _sampled: Boolean;
         _status: Enum "NPR Sentry Span Status";
+        _customTags: Dictionary of [Text, Text];
+        _customData: Dictionary of [Text, Text];
+        _source: Text;
 
     procedure Create(description: Text; operation: Text; dsn: Text; appRelease: Text; externalTraceId: text; externalSpanId: text; sampled: Boolean)
     begin
@@ -38,6 +41,7 @@ codeunit 6248499 "NPR Sentry Transaction"
         _operation := operation;
         _dsn := dsn;
         _appRelease := appRelease;
+        _source := 'url';
         if (externalTraceId <> '') then begin
             _traceId := externalTraceId;
             _externalSpanId := externalSpanId;
@@ -87,6 +91,37 @@ codeunit 6248499 "NPR Sentry Transaction"
         _status := Status;
     end;
 
+    procedure AddTag(TagKey: Text; TagValue: Text)
+    begin
+        if _customTags.ContainsKey(TagKey) then
+            _customTags.Set(TagKey, TagValue)
+        else
+            _customTags.Add(TagKey, TagValue);
+    end;
+
+    procedure AddData(DataKey: Text; DataValue: Text)
+    begin
+        if _customData.ContainsKey(DataKey) then
+            _customData.Set(DataKey, DataValue)
+        else
+            _customData.Add(DataKey, DataValue);
+    end;
+
+    procedure SetDescription(Name: Text)
+    begin
+        _description := Name;
+    end;
+
+    procedure SetOperation(Op: Text)
+    begin
+        _operation := Op;
+    end;
+
+    procedure SetSource(Source: Text)
+    begin
+        _source := Source;
+    end;
+
     procedure Log(var Spans: List of [Codeunit "NPR Sentry Span"]; var Errors: List of [Codeunit "NPR Sentry Error"])
     var
         Json: Codeunit "NPR Json Builder";
@@ -95,6 +130,8 @@ codeunit 6248499 "NPR Sentry Transaction"
         EventDimensions: Dictionary of [Text, Text];
         ExceptionDimensions: Dictionary of [Text, Text];
         SentryMetadata: Codeunit "NPR Sentry Metadata";
+        TagKey: Text;
+        DataKey: Text;
     begin
         if Errors.Count > 0 then
             _status := _status::InternalError;
@@ -106,7 +143,7 @@ codeunit 6248499 "NPR Sentry Transaction"
                 .AddProperty('timestamp', _finishedTimestampUtc)
                 .AddProperty('transaction', _description)
                 .StartObject('transaction_info')
-                    .AddProperty('source', 'custom')
+                    .AddProperty('source', _source)
                 .EndObject()
                 .AddProperty('platform', 'other')
                 .AddProperty('release', _appRelease)
@@ -136,7 +173,16 @@ codeunit 6248499 "NPR Sentry Transaction"
 
         Json.StartObject('tags');
         SentryMetadata.WriteTagsForBackendEvent(Json);
+        foreach TagKey in _customTags.Keys() do
+            Json.AddProperty(TagKey, _customTags.Get(TagKey));
         Json.EndObject();
+
+        if _customData.Count > 0 then begin
+            Json.StartObject('data');
+            foreach DataKey in _customData.Keys() do
+                Json.AddProperty(DataKey, _customData.Get(DataKey));
+            Json.EndObject();
+        end;
 
         Json.StartArray('spans');
         foreach Span in Spans do begin

@@ -18,6 +18,8 @@ codeunit 6248498 "NPR Sentry Span"
     procedure Finish()
     begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if _id = '' then
+            exit;
         _finishedTimestampUtc := Format(CurrentDateTime, 0, 9);
         _SentryScope.SetActiveSpanId(_parentId);
 #endif
@@ -28,6 +30,13 @@ codeunit 6248498 "NPR Sentry Span"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         _status := Status;
         Finish();
+#endif
+    end;
+
+    procedure SetStartTime(StartTime: DateTime)
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        _startedTimestampUtc := Format(StartTime, 0, 9);
 #endif
     end;
 
