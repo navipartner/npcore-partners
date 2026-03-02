@@ -32,8 +32,10 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
             if CheckIfEcomDocsExist() then begin
                 SetMonitoredJobQueueEntry(JobQueueEntry);
                 SetBucketParameterString(JobQueueEntry);
-            end else
+            end else begin
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
                 JobQueueEntry.Delete(true);
+            end;
         end;
 
         SetUpgradeTag();
@@ -83,8 +85,10 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
             if CheckIfEcomDocsExist() then begin
                 SetMonitoredJobQueueEntry(JobQueueEntry);
                 SetBucketParameterString(JobQueueEntry);
-            end else
+            end else begin
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
                 JobQueueEntry.Delete(true);
+            end;
         end;
 
         SetUpgradeTag();
