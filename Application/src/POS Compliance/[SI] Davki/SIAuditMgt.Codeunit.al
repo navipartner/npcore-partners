@@ -734,7 +734,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         end;
     end;
 
-    local procedure CalculateAndSignZOI(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
+    internal procedure CalculateAndSignZOI(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
         BaseValue: Text;
         ResponseText: Text;

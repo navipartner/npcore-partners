@@ -143,10 +143,14 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 trigger OnAction()
                 var
                     SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
+                    SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
                     BillAlreadyFiscalizedErr: Label 'This receipt has already been fiscalized! (EOR Code Received from Tax Authorities)';
                 begin
                     if Rec."EOR Code" <> '' then
                         Error(BillAlreadyFiscalizedErr);
+
+                    if Rec."ZOI Code" = '' then
+                        SIAuditMgt.CalculateAndSignZOI(Rec);
 
                     SITaxCommunicationMgt.CreateNormalSale(Rec, true);
                     Rec."Subsequent Submit" := true;
