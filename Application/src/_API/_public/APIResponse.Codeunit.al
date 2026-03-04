@@ -142,7 +142,7 @@ codeunit 6185053 "NPR API Response"
         exit(_CurrCodeunit);
     end;
 
-    procedure GetResponseJson() ResponseJson: JsonObject
+    local procedure GetResponseJsonBase64() ResponseJson: JsonObject
     var
         HeadersJson: JsonObject;
         HeaderKey: Text;
@@ -166,6 +166,38 @@ codeunit 6185053 "NPR API Response"
             ResponseJson.Add('body', Base64Convert.ToBase64(_ResponseJsonStream));
         end else begin
             ResponseJson.Add('body', EncodeJsonObjectToBase64(_ResponseBody));
+        end;
+    end;
+
+    procedure GetResponseJson() ResponseJson: JsonObject
+    var
+        HeadersJson: JsonObject;
+        HeaderKey: Text;
+        HeaderValue: Text;
+        StreamJsonToken: JsonToken;
+        FeatureFlag: Codeunit "NPR Feature Flags Management";
+    begin
+        if (not FeatureFlag.IsEnabled('bcRestApiProxyRawJsonStringTransfer')) then
+            exit(GetResponseJsonBase64());
+
+        ResponseJson.Add('statusCode', _StatusCode);
+
+        Clear(HeadersJson);
+        foreach HeaderKey in _Headers.Keys do begin
+            _Headers.Get(HeaderKey, HeaderValue);
+            HeadersJson.Add(HeaderKey, HeaderValue);
+        end;
+        HeadersJson.Add('x-server-cache-id', ServiceInstanceId());
+
+        ResponseJson.Add('headers', HeadersJson);
+        ResponseJson.Add('proxyMetadata', GetProxyResponseMetadata());
+        ResponseJson.Add('frontmatter', true);
+
+        if _StreamInitialized then begin
+            StreamJsonToken.ReadFrom(_ResponseJsonStream);
+            ResponseJson.Add('body', StreamJsonToken);
+        end else begin
+            ResponseJson.Add('body', _ResponseBody);
         end;
     end;
 
