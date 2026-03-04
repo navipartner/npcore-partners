@@ -335,7 +335,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
             WorkerBaseUrl := 'https://bc-media-crane.npretail.app';
 
 #if CF_MEDIA_PRELIVE
-        WorkerBaseUrl := 'https://bc-media-prelive.navipartner-prelive.workers.dev';
+        WorkerBaseUrl := 'https://bc-media-crane.npretail-prelive.app';
 #endif
     end;
 

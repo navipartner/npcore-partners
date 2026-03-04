@@ -541,6 +541,8 @@
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
         ValidateTicketConstraintsExceeded(TicketAccessEntryNo);
+        ValidateTicketBaseCalendar(AdmissionCode, Ticket."Item No.", Ticket."Variant Code", DT2Date(EventDateTime));
+
         ValidateAdmissionDurationExceeded(TicketAccessEntryNo, EventDateTime);
 
         AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
@@ -3551,7 +3553,7 @@
         if (LastAccessDate > Ticket."Valid To Date") then
             RaiseError(StrSubstNo(TICKET_EXPIRED, Ticket."External Ticket No.", Ticket."Valid To Date"), TICKET_EXPIRED_NO);
 
-        ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", LastAccessDate);
+
     end;
 
     local procedure ValidateReservationCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; var AllowAdmissionOverAllocation: Enum "NPR TM Ternary")
