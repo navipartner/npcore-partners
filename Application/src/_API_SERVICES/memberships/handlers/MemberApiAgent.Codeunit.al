@@ -510,7 +510,8 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         MemberJson := JToken.AsObject();
         if (MemberJson.Get('address', JToken)) then
-            MemberInfoCapture.Address := JToken.AsValue().AsText();
+            if (not JToken.AsValue().IsNull()) then
+                MemberInfoCapture.Address := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('birthday', JToken)) then
             if (not JToken.AsValue().IsNull()) then
@@ -519,19 +520,19 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         if (MemberJson.Get('city', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture.City := JToken.AsValue().AsText();
+                MemberInfoCapture.City := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('country', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture.Country := JToken.AsValue().AsText();
+                MemberInfoCapture.Country := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('email', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."E-Mail Address" := JToken.AsValue().AsText();
+                MemberInfoCapture."E-Mail Address" := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('firstName', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."First Name" := JToken.AsValue().AsText();
+                MemberInfoCapture."First Name" := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('gender', JToken)) then
             if (not JToken.AsValue().IsNull()) then
@@ -539,11 +540,11 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         if (MemberJson.Get('lastName', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Last Name" := JToken.AsValue().AsText();
+                MemberInfoCapture."Last Name" := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('middleName', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Middle Name" := JToken.AsValue().AsText();
+                MemberInfoCapture."Middle Name" := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('newsletter', JToken)) then begin
             if (not JToken.AsValue().IsNull()) then
@@ -552,11 +553,11 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         if (MemberJson.Get('phoneNo', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Phone No." := JToken.AsValue().AsText();
+                MemberInfoCapture."Phone No." := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('postCode', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Post Code Code" := JToken.AsValue().AsText();
+                MemberInfoCapture."Post Code Code" := JToken.AsValue().AsText().Trim();
 
         if (MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
@@ -569,7 +570,7 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         if (MemberJson.Get('preferredLanguage', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture.PreferredLanguageCode := JToken.AsValue().AsText();
+                MemberInfoCapture.PreferredLanguageCode := JToken.AsValue().AsText().Trim();
         if (MemberInfoCapture.PreferredLanguageCode <> '') then begin
             if (not Language.Get(MemberInfoCapture.PreferredLanguageCode)) then
                 MemberInfoCapture.PreferredLanguageCode := '';
@@ -585,7 +586,7 @@ codeunit 6248220 "NPR MemberApiAgent"
             CardJson := JToken.AsObject();
             if (CardJson.Get('cardNumber', JToken)) then
                 if (not JToken.AsValue().IsNull()) then
-                    MemberInfoCapture."External Card No." := JToken.AsValue().AsText();
+                    MemberInfoCapture."External Card No." := JToken.AsValue().AsText().Trim();
 
             if (CardJson.Get('temporary', JToken)) then
                 if (not JToken.AsValue().IsNull()) then
@@ -602,16 +603,16 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         if (MemberJson.Get('preassignedContactNumber', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Contact No." := JToken.AsValue().AsText();
+                MemberInfoCapture."Contact No." := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('storeCode', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Store Code" := JToken.AsValue().AsText();
+                MemberInfoCapture."Store Code" := JToken.AsValue().AsText().Trim();
 
         if (MemberJson.Get('nationalIdentifier', JToken)) then
             if (JToken.AsObject().Get('value', JToken2)) then
                 if (not JToken2.AsValue().IsNull()) then begin
-                    MemberInfoCapture."Social Security No." := CopyStr(JToken2.AsValue().AsText(), 1, MaxStrLen(MemberInfoCapture."Social Security No."));
+                    MemberInfoCapture."Social Security No." := CopyStr(JToken2.AsValue().AsText().Trim(), 1, MaxStrLen(MemberInfoCapture."Social Security No."));
 
                     JToken.AsObject().Get('type', JToken2); // Required if value is provided
                     if (not Evaluate(MemberInfoCapture.NationalIdentifierType, JToken2.AsValue().AsText())) then

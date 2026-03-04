@@ -428,7 +428,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
         Body := Request.BodyJson().AsObject();
 
         if (Body.Get('itemNumber', JToken)) then
-            MemberInfoCapture."Item No." := JToken.AsValue().AsText();
+            MemberInfoCapture."Item No." := JToken.AsValue().AsText().Trim();
 
         if (Body.Get('activationDate', JToken)) then
             if (not JToken.AsValue().IsNull()) then
@@ -436,15 +436,15 @@ codeunit 6185123 "NPR MembershipApiAgent"
 
         if (Body.Get('companyName', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Company Name" := JToken.AsValue().AsText();
+                MemberInfoCapture."Company Name" := JToken.AsValue().AsText().Trim();
 
         if (Body.Get('preassignedCustomerNumber', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Customer No." := JToken.AsValue().AsText();
+                MemberInfoCapture."Customer No." := JToken.AsValue().AsText().Trim();
 
         if (Body.Get('documentNo', JToken)) then
             if (not JToken.AsValue().IsNull()) then
-                MemberInfoCapture."Document No." := JToken.AsValue().AsText();
+                MemberInfoCapture."Document No." := JToken.AsValue().AsText().Trim();
 
         MemberInfoCapture."Import Entry Document ID" := CreateDocumentId();
         MemberInfoCapture.TestField("Item No.");
