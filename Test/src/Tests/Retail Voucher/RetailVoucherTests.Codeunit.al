@@ -6970,6 +6970,13 @@ codeunit 85024 "NPR Retail Voucher Tests"
         GeneralPostingSetup.Modify();
     end;
 
+    local procedure EnsureValidSalesVATPostingSetupCreated(VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20])
+    var
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+    begin
+        LibraryPOSMasterData.CreateVATPostingSetupForSaleItem(VATBusPostingGroup, VATProdPostingGroup);
+    end;
+
     local procedure CreateAndPostSalesOrderWithNewVoucher(var SalesHeader: Record "Sales Header"; CurrencyCode: Code[10]; VoucherAmountFCY: Decimal; VoucherTypeCode: Code[20]) VoucherNo: Code[20]
     var
         Customer: Record Customer;
@@ -6995,6 +7002,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         NpRvVoucherType.Get(VoucherTypeCode);
         GLAccount.Get(NpRvVoucherType."Account No.");
         EnsureValidSalesGeneralPostingSetupCreated(SalesHeader."Gen. Bus. Posting Group", GLAccount."Gen. Prod. Posting Group");
+        EnsureValidSalesVATPostingSetupCreated(SalesHeader."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group");
 
 #pragma warning disable AA0139
         VoucherNo := NpRvSalesDocMgt.IssueVoucher(SalesHeader, NpRvVoucherType);
@@ -7030,6 +7038,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
 
         // Create item line
         EnsureValidSalesGeneralPostingSetupCreated(SalesHeader."Gen. Bus. Posting Group", _Item."Gen. Prod. Posting Group");
+        EnsureValidSalesVATPostingSetupCreated(SalesHeader."VAT Bus. Posting Group", _Item."VAT Prod. Posting Group");
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, _Item."No.", 1);
         SalesLine.Validate("Unit Price", OrderAmountFCY);
         SalesLine.Modify(true);
@@ -7091,6 +7100,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         EcomSalesLine."Line Amount" := OrderAmountFCY;
         EcomSalesLine.Insert(true);
         EnsureValidSalesGeneralPostingSetupCreated(Customer."Gen. Bus. Posting Group", _Item."Gen. Prod. Posting Group");
+        EnsureValidSalesVATPostingSetupCreated(Customer."VAT Bus. Posting Group", _Item."VAT Prod. Posting Group");
 
         // Create ecommerce sales payment line (voucher)
         EcomSalesPmtLine.Init();

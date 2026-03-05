@@ -11,11 +11,11 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
         Initialized: Boolean;
         GatewayCode, CountryCode : Code[10];
-        ItemNo, ItemNo2, ExternalNo, PostCode, GLAccountNo : Code[20];
+        ExternalNo, PostCode, GLAccountNo : Code[20];
         MagentoPaymentCode, MagentoPaymentType : Code[50];
         TransactionId: Code[40];
-        ItemDesc, ItemDesc2, City, GLAccName : Text;
-        Qty, Qty2, UnitPrice, UnitPrice2, PymAmount1, PymAmount2 : Decimal;
+        ItemDesc, City : Text;
+        Qty, UnitPrice, PymAmount1 : Decimal;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -433,20 +433,20 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
 
     local procedure CreateSetupData()
     var
-        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
-        LibraryMagento: Codeunit "NPR Library - Magento";
-        LibrayPaymentGateway: Codeunit "NPR Library - Payment Gateway";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
         MagentoPaymentMapping: Record "NPR Magento Payment Mapping";
         MembershipSalesItem: Record "NPR MM Members. Sales Setup";
         MembershipSetup: Record "NPR MM Membership Setup";
+        PaymentMethod: Record "Payment Method";
         TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary;
         TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+        LibraryMagento: Codeunit "NPR Library - Magento";
+        LibrayPaymentGateway: Codeunit "NPR Library - Payment Gateway";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         ItemNo: Code[20];
-        PaymentMethod: Record "Payment Method";
     begin
-        LibraryPOSMasterData.CreatePartialVoucherType(_VoucherTypePartial, false);
         ItemNo := LibraryLoyalty.CreateScenario_Loyalty100(TmpTransactionAuthorization, TmpRegisterSaleLines, TmpRegisterPaymentLines);
         MembershipSalesItem.Get(MembershipSalesItem.Type::ITEM, ItemNo);
         MembershipSetup.Get(MembershipSalesItem."Membership Code");
@@ -455,6 +455,8 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         CreateMembership(ItemNo);
         AssignInitialPointstoMembership();
         UpdateCustomerDetails();
+        LibraryECommerce.CreateGLAccount(GLAccountNo);
+        LibraryPOSMasterData.CreatePartialVoucherType(_VoucherTypePartial, false);
 
         GatewayCode := LibrayPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::NPLoyalty_Discount);
         LibraryMagento.CreatePaymentMappingBalAccount(MagentoPaymentCode, MagentoPaymentType);
@@ -471,11 +473,11 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
 
     local procedure CreateMembership(ItemNo: Code[20])
     var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
         MemberLibrary: Codeunit "NPR Library - Member Module";
         ResponseMessage: Text;
         MembershipEntryNo: Integer;
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberEntryNo: Integer;
     begin
         if (not MemberApiLibrary.CreateMembership(ItemNo, MembershipEntryNo, ResponseMessage)) then
@@ -590,19 +592,15 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
     local procedure PrepareDataForJson()
     var
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+        Qty2, UnitPrice2, PymAmount2 : Decimal;
     begin
         GetCountryCode(CountryCode);
         LibraryECommerce.GetPostCodeAndCity(PostCode, City);
         LibraryECommerce.GetMagentoPaymentCode(MagentoPaymentCode);
         LibraryECommerce.GetMagentoPaymentType(MagentoPaymentType);
         LibraryECommerce.GetMagentoPointsPaymentId(TransactionId);
-        LibraryECommerce.CreateItem(ItemNo);
-        LibraryECommerce.CreateItem(ItemNo2);
-        LibraryECommerce.CreateGLAccount(GLAccountNo);
         LibraryECommerce.GetItemQuantitiesAndPrices(Qty, Qty2, UnitPrice, UnitPrice2);
         LibraryECommerce.GetLineDesc(ItemDesc, "Sales Line Type"::Item);
-        LibraryECommerce.GetLineDesc(ItemDesc2, "Sales Line Type"::Item);
-        LibraryECommerce.GetLineDesc(GLAccName, "Sales Line Type"::"G/L Account");
         LibraryECommerce.GetPaymentAmounts(PymAmount1, PymAmount2);
     end;
 
@@ -666,7 +664,11 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
     end;
 
     local procedure CreateAddSalesLineDetailsJsonObject(var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    var
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+        ItemNo: Code[20];
     begin
+        LibraryECommerce.CreateItem(ItemNo);
         SalesLineDetailsJsonObject.StartObject()
                                   .AddProperty('type', 'item')
                                   .AddProperty('no', ItemNo)
@@ -880,7 +882,11 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
     end;
 
     local procedure CreateItemLineJson(var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder"; ItemAmount: Decimal): Codeunit "NPR Json Builder"
+    var
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+        ItemNo: Code[20];
     begin
+        LibraryECommerce.CreateItem(ItemNo);
         SalesLineDetailsJsonObject.StartObject()
                                   .AddProperty('type', 'item')
                                   .AddProperty('no', ItemNo)
@@ -897,9 +903,9 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
 
     local procedure ProcessEcomDocWithFastLineCaptureNoPost(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var SalesHeader: Record "Sales Header"; var Success: Boolean; var ErrorText: Text)
     var
-        EcomCaptureImpl: Codeunit "NPR EcomCaptureImpl";
         VATPostingSetup: Record "VAT Posting Setup";
         SalesLine: Record "Sales Line";
+        EcomCaptureImpl: Codeunit "NPR EcomCaptureImpl";
     begin
         // Refresh the ecom header to get the latest data
         EcomSalesHeader.Find();
