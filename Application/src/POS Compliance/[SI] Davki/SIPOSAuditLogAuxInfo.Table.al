@@ -87,7 +87,6 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
         {
             Caption = 'Cashier ID';
             DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser".Code;
         }
         field(14; "Validation Code"; Text[60])
         {
