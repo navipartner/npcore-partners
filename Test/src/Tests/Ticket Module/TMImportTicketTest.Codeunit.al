@@ -529,6 +529,109 @@ codeunit 85174 "NPR TM ImportTicketTest"
         ValidateArrival(JobId);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateScheduleSelection01()
+    var
+        Admission: Record "NPR TM Admission";
+        ListOfSlots: List of [Integer];
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+    begin
+        AdmissionCode := 'ADMISSION1';
+        PrepareSelectTimeslot(AdmissionCode);
+
+        asserterror SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 080000T); // Should fail because there is no schedule entry
+
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 090000T, 110000T));
+
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 080000T), '01: Should select the only available slot');
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 100000T), '02: Should select the only available slot');
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 120000T), '03: Should select the only available slot');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateScheduleSelection02()
+    var
+        Admission: Record "NPR TM Admission";
+        ListOfSlots: List of [Integer];
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+    begin
+        AdmissionCode := 'ADMISSION1';
+        PrepareSelectTimeslot(AdmissionCode);
+
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 090000T, 110000T));
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 110000T, 130000T));
+
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 080000T), '01: Should select the first slot');
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 100000T), '02: Should select the first slot');
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 105959T), '03: Should select the first slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 110000T), '04: Should select the second slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 120000T), '05: Should select the second slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 130000T), '06: Should select the second slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 140000T), '07: Should select the second slot');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateScheduleSelection03()
+    var
+        Admission: Record "NPR TM Admission";
+        ListOfSlots: List of [Integer];
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+    begin
+        AdmissionCode := 'ADMISSION1';
+        PrepareSelectTimeslot(AdmissionCode);
+
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 090000T, 120000T));
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 140000T, 150000T));
+
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 115959T), '01: Should select the first slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 120000T), '02: Should select the second slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 120001T), '03: Should select the second slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 130000T), '04: Should select the second slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 170000T), '05: Should select the second slot');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateScheduleSelection04()
+    var
+        Admission: Record "NPR TM Admission";
+        ListOfSlots: List of [Integer];
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+    begin
+        AdmissionCode := 'ADMISSION1';
+        PrepareSelectTimeslot(AdmissionCode);
+
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 090000T, 180000T));
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 100000T, 180000T));
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 110000T, 180000T));
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 120000T, 180000T));
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 130000T, 180000T));
+        ListOfSlots.Add(AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 140000T, 180000T));
+
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 080000T), '01: Should select the first slot');
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 090000T), '02: Should select the first slot');
+        Assert.AreEqual(ListOfSlots.Get(1), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 095959T), '03: Should select the first slot');
+        Assert.AreEqual(ListOfSlots.Get(2), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 100000T), '04: Should select the second slot');
+        Assert.AreEqual(ListOfSlots.Get(3), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 110000T), '05: Should select the third slot');
+        Assert.AreEqual(ListOfSlots.Get(4), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 120000T), '06: Should select the fourth slot');
+        Assert.AreEqual(ListOfSlots.Get(5), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 130000T), '07: Should select the fifth slot');
+        Assert.AreEqual(ListOfSlots.Get(6), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 140000T), '08: Should select the sixth slot');
+        Assert.AreEqual(ListOfSlots.Get(6), SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 150000T), '08: Should select the sixth slot');
+
+    end;
+
+
+
     local procedure ValidateLog(JobIdTest: Code[40]; Success: Boolean; TotalTicketCount: Integer; ResponseMessage: Text)
     var
         Log: Record "NPR TM ImportTicketLog";
@@ -547,6 +650,38 @@ codeunit 85174 "NPR TM ImportTicketTest"
             Assert.AreEqual(ResponseMessage, Log.ResponseMessage, Log.FieldCaption(Log.ResponseMessage));
 
     end;
+
+    local procedure SelectTimeslot(AdmissionCode: Code[20]; DefaultSchedule: Option; ExpectedVisitDate: Date; ExpectedVisitTime: Time): Integer
+    var
+        ImportTicketWorker: Codeunit "NPR TM ImportTicketWorker";
+    begin
+        exit(ImportTicketWorker.GetAdmissionTimeSlot(AdmissionCode, DefaultSchedule, ExpectedVisitDate, ExpectedVisitTime));
+    end;
+
+    local procedure PrepareSelectTimeslot(AdmissionCode: Code[20])
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        ScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        ScheduleEntry.DeleteAll();
+    end;
+
+    local procedure AddScheduleEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; StartDate: Date; StartTime: Time; EndTime: Time): Integer
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        ScheduleEntry."Admission Code" := AdmissionCode;
+        ScheduleEntry."Schedule Code" := ScheduleCode;
+        ScheduleEntry."Admission Start Date" := StartDate;
+        ScheduleEntry."Admission Start Time" := StartTime;
+        ScheduleEntry."Admission End Time" := EndTime;
+        ScheduleEntry.Insert();
+        ScheduleEntry."External Schedule Entry No." := ScheduleEntry."Entry No.";
+        ScheduleEntry.Modify();
+
+        exit(ScheduleEntry."External Schedule Entry No.");
+    end;
+
 
     local procedure ValidateHeader(
         JobIdTest: Code[40];

@@ -234,7 +234,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketImport.Insert();
     end;
 
-    local procedure GetAdmissionTimeSlot(AdmissionCode: Code[20]; DefaultSchedule: Option; ExpectedVisitDate: Date; ExpectedVisitTime: Time): Integer
+    internal procedure GetAdmissionTimeSlot(AdmissionCode: Code[20]; DefaultSchedule: Option; ExpectedVisitDate: Date; ExpectedVisitTime: Time): Integer
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
@@ -252,13 +252,16 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
                 case true of
                     ExpectedVisitTime <= ScheduleEntry."Admission Start Time":
                         TimeDifference := ScheduleEntry."Admission Start Time" - ExpectedVisitTime;
-                    ExpectedVisitTime <= ScheduleEntry."Admission End Time":
+
+                    (ExpectedVisitTime >= ScheduleEntry."Admission Start Time") and
+                    (ExpectedVisitTime < ScheduleEntry."Admission End Time"):
                         TimeDifference := 0;
+
                     else
                         TimeDifference := ExpectedVisitTime - ScheduleEntry."Admission Start Time";
                 end;
 
-                if ((EntryNo = 0) or (TimeDifference < MinTimeDifference)) then begin
+                if ((EntryNo = 0) or (TimeDifference <= MinTimeDifference)) then begin
                     EntryNo := ScheduleEntry."Entry No.";
                     MinTimeDifference := TimeDifference;
                 end;
