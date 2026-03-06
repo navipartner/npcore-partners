@@ -59,6 +59,7 @@ service:
                 reservations:
                   - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                     quantity: 2
+                    lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                     ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
                     content:
                       - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -91,6 +92,7 @@ service:
                 reservations:
                   - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                     quantity: 2
+                    lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                     ticket: $ReservationTicketDetails.ExampleTicketUnconfirmedGroup
                     content:
                       - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -132,6 +134,7 @@ service:
               reservations:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 3
+                  lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                   ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
                   content:
                   - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -219,6 +222,7 @@ service:
               reservations:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 2
+                  lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                   ticket: $ReservationTicketDetails.ExampleTicketConfirmed
                   content:
                   - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -243,6 +247,7 @@ service:
               reservations:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 2
+                  lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                   ticket: $ReservationTicketDetails.ExampleTicketConfirmedGroup
                   content:
                   - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -277,6 +282,7 @@ service:
               reservations:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 2
+                  lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                   ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -294,6 +300,7 @@ service:
               reservations:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 2
+                  lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                   ticket: $ReservationTicketDetails.ExampleTicketConfirmed
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -313,6 +320,7 @@ service:
               reservations:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
                   quantity: 2
+                  lineId: $simpleTypes.ReservationLineId.ExampleReservationLineId
                   ticket: $ReservationTicketDetails.ExampleTicketConfirmedGroup
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
@@ -420,12 +428,13 @@ types:
 
   ## Nested Response types
   ReservationItemDetails:
-    docs: 
-      Contains detailed information about a specific item in a reservation. 
+    docs:
+      Contains detailed information about a specific item in a reservation.
       Includes the itemNumber, quantity reserved, associated ticket details, and a list of content items specifying admissions or other components included with the ticket.
     properties:
       itemNumber: simpleTypes.ItemNumber
       quantity: simpleTypes.NumberOfTickets
+      lineId: simpleTypes.ReservationLineId
       ticket: ReservationTicketDetails
       content: list<TicketContentDetails>
 

@@ -147,6 +147,13 @@ types:
       - name: ExampleTicket3
         value: FABCDEFA-1234-1234-1234-123456789014
 
+  ReservationLineId:
+    type: uuid
+    docs: Stable identifier for this reservation line. Store and echo it back when reconciling sales documents or tickets with the originating reservation.
+    examples:
+      - name: ExampleReservationLineId
+        value: 819647d5-9d69-492e-8bb5-87799bfbf179
+
   TicketExternalNumber:
     type: string
     docs: The unique identifier of a ticket

@@ -499,14 +499,14 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
         TicketReservationRequest.FindSet();
         repeat
-            ResponseJson.AddObject(ReservationDetailsDTO(ResponseJson, TicketReservationRequest."Entry No.", Token, TicketReservationRequest."Ext. Line Reference No."));
+            ResponseJson.AddObject(ReservationDetailsDTO(ResponseJson, TicketReservationRequest."Entry No.", Token, TicketReservationRequest."Ext. Line Reference No.", TicketReservationRequest.SystemId));
         until (TicketReservationRequest.Next() = 0);
         ResponseJson.EndArray();
 
         exit(ResponseJson);
     end;
 
-    local procedure ReservationDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer; Token: Code[100]; LineNo: Integer): Codeunit "NPR Json Builder";
+    local procedure ReservationDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer; Token: Code[100]; LineNo: Integer; PrimaryEntrySystemId: Guid): Codeunit "NPR Json Builder";
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketingCatalog: Codeunit "NPR TicketingCatalogAgent";
@@ -521,6 +521,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         ResponseJson.StartObject('reservations')
             .AddProperty('itemNumber', TicketReservationRequest."Item No.")
             .AddProperty('quantity', TicketReservationRequest."Quantity")
+            .AddProperty('lineId', Format(PrimaryEntrySystemId, 0, 4).ToLower())
             .AddObject(CompactTicketDetailsDTO(ResponseJson, PrimaryEntryNo, TicketReservationRequest."Quantity"))
             .StartArray('content');
         repeat
