@@ -36,6 +36,12 @@ codeunit 6014559 "NPR TM Dynamic Price"
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
+        // A price request with a receipt number of __none__ indicates that the caller has explicitly indicated that there is no 
+        // dynamic ticket price associated with this ticket request and only ERP price should be considered.
+        // It originates from CalculateErpPrice() function above.
+        if (SaleLinePOS."Sales Ticket No." = '__none__') or (SaleLinePOS."Sales Ticket No." = '') then
+            exit;
+
         Sentry.StartSpan(Span, 'bc.ticket.calc-dynamic-price');
 
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
@@ -121,7 +127,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TempTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
         OriginalWorkDate: Date;
     begin
-        TempSalePOS."Sales Ticket No." := Format(AdmCapacityPriceBuffer.EntryNo);
+        TempSalePOS."Sales Ticket No." := '__none__'; // allow fast exit in Dynamic Price calculation when there is no Ticket Request - no need to check.
         TempSalePOS."Customer No." := AdmCapacityPriceBuffer.CustomerNo;
         TempSalePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
         TempSalePOS.Insert();
