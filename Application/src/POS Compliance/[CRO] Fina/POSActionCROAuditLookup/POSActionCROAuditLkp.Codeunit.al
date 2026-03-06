@@ -2,12 +2,10 @@ codeunit 6184557 "NPR POS Action: CROAudit Lkp" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
-    var
-        ParameterShow_NameCaptionLbl: Label 'Show';
-
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This is a built-in action for displaying RS Audit transactions log.';
+        ParameterShow_NameCaptionLbl: Label 'Show';
         ParameterShow_NameDescriptionLbl: Label 'Specifies the type of RS Audit related data you want to display.';
         ParameterShow_OptionCaptionsLbl: Label 'All,All Fiscalised,All Non-Fiscalised,Last Transaction';
         ParameterShow_OptionsLbl: Label 'All,AllFiscalised,AllNonFiscalised,LastTransaction', Locked = true;
@@ -45,6 +43,6 @@ codeunit 6184557 "NPR POS Action: CROAudit Lkp" implements "NPR IPOS Workflow"
 
     local procedure ParameterShow_Name(): Text[30]
     begin
-        exit(ParameterShow_NameCaptionLbl);
+        exit('Show');
     end;
 }
