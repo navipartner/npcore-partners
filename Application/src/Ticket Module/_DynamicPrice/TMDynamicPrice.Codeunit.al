@@ -940,6 +940,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
     local procedure GetRequestToken(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
         Token := '';
 
@@ -948,17 +949,30 @@ codeunit 6014559 "NPR TM Dynamic Price"
 
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
         TicketReservationRequest.ReadIsolation(IsolationLevel::ReadUncommitted);
+        TicketReservationRequest2.ReadIsolation(IsolationLevel::ReadUncommitted);
 #ENDIF
-        TicketReservationRequest.SetCurrentKey("Receipt No.");
+        // In this flow, POS item insert spams the price calculation function 3 time
+        // before the ticket reservation request record is actually inserted. 
+        // It is then called once again after the record is inserted. So 3 calls with no record, and the 4th call with the record.
+        // In SaaS production, SQL query analyzer seem to struggle with this, and it looks like it's doing a lot of unnecessary work. 
+        // The IsEmpty consistently gets a better performance than FindFirst with same filters.
+        // IsEmpty typically returns in less than 1 ms, while FindFirst can take up to 50 ms or more.
+
         TicketReservationRequest.SetFilter("Receipt No.", '=%1', ReceiptNo);
         TicketReservationRequest.SetFilter("Line No.", '=%1', LineNumber);
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.");
-        if (TicketReservationRequest.FindFirst()) then begin
-            Token := TicketReservationRequest."Session Token ID";
-            TokenLineNumber := TicketReservationRequest."Ext. Line Reference No.";
-        end;
+        if (TicketReservationRequest.IsEmpty()) then
+            exit(false);
 
-        exit(Token <> '');
+        TicketReservationRequest2.SetCurrentKey("Receipt No.");
+        TicketReservationRequest2.SetLoadFields("Session Token ID", "Ext. Line Reference No.");
+        TicketReservationRequest2.SetFilter("Receipt No.", '=%1', ReceiptNo);
+        TicketReservationRequest2.SetFilter("Line No.", '=%1', LineNumber);
+        if (not TicketReservationRequest2.FindFirst()) then
+            exit(false);
+
+        Token := TicketReservationRequest2."Session Token ID";
+        TokenLineNumber := TicketReservationRequest2."Ext. Line Reference No.";
+        exit(true);
     end;
 
 

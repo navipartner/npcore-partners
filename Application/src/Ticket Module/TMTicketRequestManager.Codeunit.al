@@ -412,6 +412,7 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
+        RequestCount: Integer;
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -425,8 +426,22 @@
                     if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then
                         exit(-902); // Error: Missing schedule entry no, fast exit
             end;
+            RequestCount += 1;
         until (TicketReservationRequest.Next() = 0);
 
+        // Fast path for single line token, we can skip some of the processing when there is only one line in the token
+        if (RequestCount = 1) then begin
+            TicketReservationRequest."Authorization Code" := CreateAuthorizationCode();
+            if (not TicketReservationRequest."Primary Request Line") then
+                TicketReservationRequest."Primary Request Line" := true;
+            AssignListPrice(TicketReservationRequest);
+
+            TicketReservationRequest.Modify();
+            IssueTicketFromReservation(TicketReservationRequest);
+            exit(0);
+        end;
+
+        // When token has multiple lines, we need to make sure the primary line is assigned and list price is calculated for all lines before issuing any tickets
         AssignPrimaryReservationEntry(Token);
         AssignListPrice(Token);
 
@@ -632,6 +647,28 @@
                     TicketReservationRequest.Modify();
                 end;
             end;
+        end;
+    end;
+
+    internal procedure AssignListPrice(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        TicketPriceDict: Dictionary of [Integer, Dictionary of [Integer, Decimal]];
+        ExtLineReferenceNo: Integer;
+    begin
+        if (TicketReservationRequest.AmountSource <> TicketReservationRequest.AmountSource::BC) then
+            exit;
+
+        ExtLineReferenceNo := TicketReservationRequest."Ext. Line Reference No.";
+
+        SetListPriceForRequestEntry(TicketReservationRequest);
+
+        if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED) then begin
+            AggregateTicketPriceDetails(TicketReservationRequest, TicketPriceDict);
+
+            TicketReservationRequest.TicketUnitAmountExclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(1);
+            TicketReservationRequest.TicketUnitAmountInclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(2);
+            TicketReservationRequest.TicketListPriceExclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(1);
+            TicketReservationRequest.TicketListPriceInclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(2);
         end;
     end;
 
@@ -1167,7 +1204,7 @@
 #endif
 
 
-    local procedure EmitMessageToTelemetry(MessageText: Text)
+    internal procedure EmitMessageToTelemetry(MessageText: Text)
     var
         CustomDimensions: Dictionary of [Text, Text];
         ActiveSession: Record "Active Session";
@@ -3648,11 +3685,23 @@
             until Ticket.Next() = 0;
     end;
 
+    local procedure CreateAuthorizationCode() AuthorizationCode: Code[10]
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (TicketSetup."Authorization Code Scheme" = '') then
+            TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
+
+        AuthorizationCode := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(AuthorizationCode));
+    end;
+
     internal procedure AssignPrimaryReservationEntry(Token: Text[100])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketSetup: Record "NPR TM Ticket Setup";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         AuthorizationCode: Code[10];
         OldLineReference: Integer;
         PrimaryAssigned: Boolean;
@@ -3660,13 +3709,7 @@
     begin
         OldLineReference := Power(2, 31) - 1;
 
-        if (not TicketSetup.Get()) then
-            TicketSetup.Init();
-
-        if (TicketSetup."Authorization Code Scheme" = '') then
-            TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
-
-        AuthorizationCode := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(TicketReservationRequest."Authorization Code"));
+        AuthorizationCode := CreateAuthorizationCode();
 
         TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.", "Admission Inclusion");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
