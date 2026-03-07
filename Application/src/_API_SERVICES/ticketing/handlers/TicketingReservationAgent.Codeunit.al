@@ -460,18 +460,20 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         GeneralLedgerSetup.Get();
 
         ResponseJson.Initialize().StartArray();
+
         repeat
-            TicketingCatalog.GetCatalogItemDescription(StoreCode, Ticket."Item No.", TicketDescriptionBuffer, TicketRequest.TicketHolderPreferredLanguage);
             Ticket.SetCurrentKey("Ticket Reservation Entry No.");
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
             if (Ticket.FindSet()) then begin
                 TicketType.Get(Ticket."Ticket Type Code");
+                TicketingCatalog.GetCatalogItemDescription(StoreCode, Ticket."Item No.", TicketDescriptionBuffer, TicketRequest.TicketHolderPreferredLanguage);
+
                 repeat
                     ResponseJson.AddArray(TicketHandler.SingleTicketDTO(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code", true, false, false, TicketDescriptionBuffer, TicketType, TicketRequest));
                 until (Ticket.Next() = 0);
             end;
-
         until (TicketRequest.Next() = 0);
+
         ResponseJson.EndArray();
         Response.RespondOK(ResponseJson.BuildAsArray());
     end;
