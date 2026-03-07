@@ -93,6 +93,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR DE Fiscal" := IsDEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR BE Fiscal" := IsBEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR HU Laurel Fiscal" := IsHULaurelFiscalizationEnabled();
+        TempApplicationAreaSetup."NPR RO Fiscal" := IsROFiscalizationEnabled();
     end;
 
     local procedure EnableInternalPOSScenariosAndHideOldRelatedPages(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
@@ -310,6 +311,16 @@ codeunit 6151349 "NPR Enable Application Areas"
             exit(false);
 
         exit(HULFiscalizationSetup."HU Laurel Fiscal Enabled");
+    end;
+
+    local procedure IsROFiscalizationEnabled(): Boolean
+    var
+        ROFiscalisationSetup: Record "NPR RO Fiscalisation Setup";
+    begin
+        if not ROFiscalisationSetup.Get() then
+            exit(false);
+
+        exit(ROFiscalisationSetup."Enable RO Fiscal");
     end;
 
     internal procedure IsNPRRetailApplicationAreaEnabled(): Boolean
