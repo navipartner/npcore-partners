@@ -604,6 +604,7 @@
         MemberCommunicationProfiles: Record "NPR MM Member Communication";
         MemberCard: Record "NPR MM Member Card";
         MemberNotification: Record "NPR MM Membership Notific.";
+        NotificationEntry, NotificationEntry2 : Record "NPR MM Member Notific. Entry";
         MembershipRole: Record "NPR MM Membership Role";
     begin
 
@@ -636,6 +637,14 @@
 
         MemberNotification.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
         MemberNotification.ModifyAll("Member Entry No.", MemberToKeep."Entry No.");
+
+        NotificationEntry.SetCurrentKey("Member Entry No.");
+        NotificationEntry.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
+        if (NotificationEntry.FindSet()) then
+            repeat
+                NotificationEntry2.Get(NotificationEntry."Notification Entry No.", NotificationEntry."Member Entry No.");
+                NotificationEntry2.Rename(NotificationEntry."Notification Entry No.", MemberToKeep."Entry No.");
+            until (NotificationEntry.Next() = 0);
 
         MembershipRole.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
         if (MembershipRole.FindSet()) then

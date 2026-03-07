@@ -313,7 +313,7 @@
             exit(false);
 
         if (MemberNotificationEntry.Get(MembershipNotification."Entry No.", Member."Entry No.")) then begin
-            if ((not MemberNotificationEntry.Blocked) or
+            if ((MemberNotificationEntry.Blocked) or
                 (not (MemberNotificationEntry."Notification Send Status" = MemberNotificationEntry."Notification Send Status"::SENT))) then
                 MemberNotificationEntry.Delete();
         end;
