@@ -567,6 +567,7 @@
         DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         ResponseMessage: Text;
         PageAction: Action;
+        LoopCounter: Integer;
     begin
 
         repeat
@@ -575,10 +576,11 @@
             DisplayTicketReservationRequest.SetTicketItem(ItemNo, VariantCode);
             DisplayTicketReservationRequest.SetIgnoreScheduleSelectionFilter(true);
             DisplayTicketReservationRequest.SetAllowCustomizableTicketQtyChange(true);
-
             DisplayTicketReservationRequest.AllowQuantityChange(true);
             DisplayTicketReservationRequest.LookupMode(true);
             DisplayTicketReservationRequest.Editable(true);
+            if (LoopCounter > 0) then // forces same error in FinalizeReservationRequest() when clicking OK second time without changing any values
+                DisplayTicketReservationRequest.MarkReservationAsEdited();
 
             if (ResponseMessage <> '') then
                 if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
@@ -588,6 +590,7 @@
             if (PageAction <> Action::LookupOK) then
                 exit(false);
 
+            LoopCounter += 1;
         until (DisplayTicketReservationRequest.FinalizeReservationRequest(false, ResponseMessage) = 0);
 
         exit(true);

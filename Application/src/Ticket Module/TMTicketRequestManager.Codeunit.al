@@ -396,6 +396,8 @@
         AttemptTicket: Codeunit "NPR Ticket Attempt Create";
     begin
 
+        ResponseMessage := '';
+
         if (not FailWithError) then begin
             Commit();
             if (not AttemptTicket.AttemptIssueTicketFromReservationToken(Token, ResponseMessage)) then
@@ -418,14 +420,15 @@
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.FindSet();
         repeat
-            if (TicketReservationRequest."External Adm. Sch. Entry No." = 0) then begin
-                if (TicketBom.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then
-                    if (TicketBom."Ticket Schedule Selection" = TicketBom."Ticket Schedule Selection"::SCHEDULE_ENTRY) then
-                        exit(-902); // Error: Missing schedule entry no, fast exit
-                if (Admission.Get(TicketReservationRequest."Admission Code")) then
-                    if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then
-                        exit(-902); // Error: Missing schedule entry no, fast exit
-            end;
+            if (TicketReservationRequest."Admission Inclusion" in [TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED]) then
+                if (TicketReservationRequest."External Adm. Sch. Entry No." = 0) then begin
+                    if (TicketBom.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then
+                        if (TicketBom."Ticket Schedule Selection" = TicketBom."Ticket Schedule Selection"::SCHEDULE_ENTRY) then
+                            exit(-901); // Error: Missing schedule entry no, fast exit
+                    if (Admission.Get(TicketReservationRequest."Admission Code")) then
+                        if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then
+                            exit(-901); // Error: Missing schedule entry no, fast exit
+                end;
             RequestCount += 1;
         until (TicketReservationRequest.Next() = 0);
 

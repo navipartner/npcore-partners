@@ -195,8 +195,13 @@
     local procedure DoIssueTicketFromReservationToken(Token: Text[100])
     var
         TicketRequest: Codeunit "NPR TM Ticket Request Manager";
+        ResponseCode: Integer;
     begin
-        TicketRequest.DoIssueTicketFromReservationToken(Token);
+        ResponseCode := TicketRequest.DoIssueTicketFromReservationToken(Token);
+        if (ResponseCode = 0) then
+            exit;
+
+        Message('Failed to issue ticket from reservation token: %1', ResponseCode);
     end;
 
     local procedure DoIssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
