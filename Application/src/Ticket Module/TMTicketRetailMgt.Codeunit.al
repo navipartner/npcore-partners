@@ -75,6 +75,7 @@
         TimeSlotDescription: Text[30];
         ResolvedByTable: Integer;
         ResultCode: Integer;
+        LoopCounter: Integer;
     begin
 
         TicketReservationRequest.Reset();
@@ -140,6 +141,8 @@
                 DisplayTicketReservationRequest.SetAllowCustomizableTicketQtyChange(true);
                 DisplayTicketReservationRequest.LookupMode(true);
                 DisplayTicketReservationRequest.Editable(true);
+                if (LoopCounter > 0) then // forces same error in FinalizeReservationRequest() when clicking OK second time without changing any values
+                    DisplayTicketReservationRequest.MarkReservationAsEdited();
 
                 if (ResultCode <> 0) then
                     if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
@@ -157,6 +160,7 @@
                     exit(false);
                 end;
 
+                LoopCounter += 1;
             until (ResultCode = 0);
             DisplayTicketReservationRequest.GetChangedTicketQuantity(NewQuantity);
             TimeSlotDescription := DisplayTicketReservationRequest.GetDefaultAdmissionScheduleDescription();
@@ -467,6 +471,7 @@
         ResolvedByTable: Integer;
         ResultCode: Integer;
         Token: Text[100];
+        LoopCounter: Integer;
     begin
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
         if (not TicketRequestManager.CreateChangeRequestDynamicTicket(Ticket."External Ticket No.",
@@ -492,6 +497,8 @@
             DisplayTicketReservationRequest.SetAllowCustomizableTicketQtyChange(true);
             DisplayTicketReservationRequest.LookupMode(true);
             DisplayTicketReservationRequest.Editable(true);
+            if (LoopCounter > 0) then // forces same error in FinalizeReservationRequest() when clicking OK second time without changing any values
+                DisplayTicketReservationRequest.MarkReservationAsEdited();
 
             if (ResultCode <> 0) then
                 if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
@@ -511,6 +518,7 @@
                 exit(false);
             end;
 
+            LoopCounter += 1;
         until (ResultCode = 0);
 
         //fetch correct quantity

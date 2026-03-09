@@ -692,6 +692,11 @@
             Message(DIFFERENT_DATES_WARNING);
     end;
 
+    internal procedure MarkReservationAsEdited()
+    begin
+        _ReservationEdited := true;
+    end;
+
     internal procedure SetTicketItem(ItemNo: Code[20]; VariantCode: Code[10])
     var
         Item: Record Item;

@@ -30,7 +30,7 @@
         TICKET_NOT_VALID_YET: Label 'Ticket %1 is not valid until %2.';
         TICKET_EXPIRED: Label 'Ticket %1 expired on %2.';
         SHOULD_NOT_BE_ZERO: Label 'Should not be zero.';
-        SCHEDULE_ENTRY_EXPIRED: Label 'The schedule entry %1 specifies a time in the past (%2) and cant be used for ticket reservation at this time (%3).';
+        SCHEDULE_ENTRY_EXPIRED: Label 'The schedule entry %1 for %2, specifies a time in the past (%3) and cant be used for ticket reservation at this time (%4).';
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
         RESCHEDULE_NOT_ALLOWED: Label 'The ticket reschedule policy for %1 and %2, prevents changes at this time.';
@@ -1143,6 +1143,7 @@
                 (AdmissionSchEntry."Admission End Time" < ReferenceTime)) then begin
                 ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
                     AdmissionSchEntry."External Schedule Entry No.",
+                    AdmissionSchEntry."Admission Code",
                     StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
                     StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
                 Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO);
@@ -1153,6 +1154,7 @@
                 (AdmissionSchEntry."Event Arrival Until Time" < ReferenceTime)) then begin
                 ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
                     AdmissionSchEntry."External Schedule Entry No.",
+                    AdmissionSchEntry."Admission Code",
                     StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
                     StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
                 Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO2);
@@ -1164,6 +1166,7 @@
         if (AdmissionSchEntry."Admission End Date" < ReferenceDate) then begin
             ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
                 AdmissionSchEntry."External Schedule Entry No.",
+                AdmissionSchEntry."Admission Code",
                 StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission End Time", 0, 9)),
                 StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
             Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO3);
