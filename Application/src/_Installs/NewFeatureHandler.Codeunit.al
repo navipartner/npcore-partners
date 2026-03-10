@@ -292,6 +292,38 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+    internal procedure HandleNewVoucherReservation()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewVoucherReservationHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewVoucherReservationHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewVoucherReservationHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewVoucherReservationHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure NewVoucherReservationHandle()
+    var
+        Feature: Record "NPR Feature";
+        NewVoucherReservation: Codeunit "NPR New Voucher Reservation";
+    begin
+        if not Feature.Get(NewVoucherReservation.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR New Feature Handler");

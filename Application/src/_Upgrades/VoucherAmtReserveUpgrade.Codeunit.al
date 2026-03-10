@@ -29,7 +29,7 @@ codeunit 6248385 "NPR VoucherAmtReserve Upgrade"
     end;
 
 
-    local procedure UpgradeReservationAmount()
+    internal procedure UpgradeReservationAmount()
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";

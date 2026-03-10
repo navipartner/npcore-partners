@@ -140,4 +140,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Restaurant Print Experience';
         Implementation = "NPR Feature Management" = "NPR New Restaurant Print Exp.";
     }
+    value(210; "New Voucher Reservation")
+    {
+        Caption = 'New Voucher Reservation';
+        Implementation = "NPR Feature Management" = "NPR New Voucher Reservation";
+    }
 }

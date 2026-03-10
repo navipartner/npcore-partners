@@ -260,6 +260,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewEFTReceiptExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewRestaurantPrintExperienceHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewVoucherReservationHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSEditorFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSStatisticsDashboardFeatureHandle'));
@@ -267,6 +268,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewEFTReceiptExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewRestaurantPrintExperienceHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewVoucherReservationHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Update Wizards", 'UpdateWizardFiscalization'));
@@ -290,6 +292,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Global Sales", 'SetIsReturnOnGlobalPOSSalesLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Refund", 'CreateAdyenRefundjobs'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR VoucherAmtReserve Upgrade"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Voucher Reservation", 'MigrateFeatureFlag'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Api Key", 'UpgradeEFTAdyenPaymentTypeApiKey'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Api Key", 'UpgradeAdyenManagmentApiKey'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Api Key", 'UpgradeAdyenDownloadReportApiKey'));
@@ -992,6 +995,8 @@
                         exit('NPR-NewAttractionPrintExperienceHandle-20250924');
                     'NewRestaurantPrintExperienceHandle':
                         exit('NPR-NewRestaurantPrintExperienceHandle-20251207');
+                    'NewVoucherReservationHandle':
+                        exit('NPR-NewVoucherReservationHandle-20260315');
                 end;
             Codeunit::"NPR UPG New Feature Handler":
                 case UpgradeStep of
@@ -1009,6 +1014,8 @@
                         exit('NPR-NewAttractionPrintExperienceHandle-20250924');
                     'NewRestaurantPrintExperienceHandle':
                         exit('NPR-NewRestaurantPrintExperienceHandle-20251207');
+                    'NewVoucherReservationHandle':
+                        exit('NPR-NewVoucherReservationHandle-20260315');
                 end;
             Codeunit::"NPR UPG Pay By Link Setup":
                 case UpgradeStep of
@@ -1085,6 +1092,11 @@
                 end;
             Codeunit::"NPR VoucherAmtReserve Upgrade":
                 exit('NPRVoucherAmtReserveUpgrade-20250327');
+            Codeunit::"NPR New Voucher Reservation":
+                case UpgradeStep of
+                    'MigrateFeatureFlag':
+                        exit('NPRNewVoucherReservation-MigrateFeatureFlag-20260315');
+                end;
             Codeunit::"NPR UPG Adyen Api Key":
                 case UpgradeStep of
                     'UpgradeEFTAdyenPaymentTypeApiKey':

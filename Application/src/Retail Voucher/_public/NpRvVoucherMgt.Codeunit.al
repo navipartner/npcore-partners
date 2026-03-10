@@ -2346,9 +2346,9 @@
 
     internal procedure VoucherReservationByAmountFeatureEnabled(): Boolean
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        NewVoucherReservation: Codeunit "NPR New Voucher Reservation";
     begin
-        exit(FeatureFlagsManagement.IsEnabled('newVoucherReservation'));
+        exit(NewVoucherReservation.IsFeatureEnabled());
     end;
 
     [IntegrationEvent(false, false)]

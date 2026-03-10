@@ -6,7 +6,9 @@
     trigger OnUpgradePerCompany()
     var
         FeatureManagementInstall: Codeunit "NPR Feature Management Install";
+        NewVoucherReservation: Codeunit "NPR New Voucher Reservation";
     begin
         FeatureManagementInstall.AddFeatures();
+        NewVoucherReservation.HandleOnUpgrade();
     end;
 }

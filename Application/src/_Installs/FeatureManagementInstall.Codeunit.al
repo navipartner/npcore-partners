@@ -73,6 +73,8 @@ codeunit 6151434 "NPR Feature Management Install"
 #endif
         AddFeature(Feature::"New Attraction Print Exerience");
         AddFeature(Feature::"New Restaurant Print Experience");
+        AddFeature(Feature::"New Voucher Reservation");
+
         if ExistingFeature.FindSet() then
             repeat
                 TempExistingFeature.SetRange(Feature, ExistingFeature.Feature);
@@ -82,6 +84,7 @@ codeunit 6151434 "NPR Feature Management Install"
                         FeatureManagement.SetFeatureEnabled(true);
                 end;
             until ExistingFeature.Next() = 0;
+
     end;
 
     local procedure HandleNewFeatures()
@@ -103,6 +106,7 @@ codeunit 6151434 "NPR Feature Management Install"
 #endif
         NewFeatureHandler.HandleNewAttractionPrintExperience();
         NewFeatureHandler.HandleNewRestaurantPrintExperience();
+        NewFeatureHandler.HandleNewVoucherReservation();
         RefreshExperienceTierCurrentCompany();
     end;
 

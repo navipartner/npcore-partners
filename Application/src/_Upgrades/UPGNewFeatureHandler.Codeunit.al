@@ -12,6 +12,7 @@ codeunit 6150638 "NPR UPG New Feature Handler"
         NewEFTReceiptExperienceHandleUpgradeStepLbl: Label 'NewEFTReceiptExperienceHandle', Locked = true;
         NewAttractionPrintExperienceHandleUpgradeStepLbl: Label 'NewAttractionPrintExperienceHandle', Locked = true;
         NewRestaurantPrintExperienceHandleUpgradeStepLbl: Label 'NewRestaurantPrintExperienceHandle', Locked = true;
+        NewVoucherReservationHandleUpgradeStepLbl: Label 'NewVoucherReservationHandle', Locked = true;
     begin
         AddUpgradeTagIfNotExist(CurrCodeunitId(), POSEditorFeatureHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), ScenarioObsoletedFeatureUpgradeStepLbl);
@@ -20,6 +21,7 @@ codeunit 6150638 "NPR UPG New Feature Handler"
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewEFTReceiptExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewAttractionPrintExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewRestaurantPrintExperienceHandleUpgradeStepLbl);
+        AddUpgradeTagIfNotExist(CurrCodeunitId(), NewVoucherReservationHandleUpgradeStepLbl);
     end;
 
     local procedure AddUpgradeTagIfNotExist(UpgradeCodeunitId: Integer; UpgradeStep: Text)
