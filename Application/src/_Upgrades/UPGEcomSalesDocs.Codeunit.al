@@ -19,13 +19,13 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
 
     local procedure UpgradeEcomSalesDocJQ()
     var
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         JobQueueEntry: Record "Job Queue Entry";
     begin
         UpgradeStep := 'UpgradeEcomSalesDocJQ';
         if HasUpgradeTag() then
             exit;
 
-        JobQueueEntry.Reset();
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR EcomSalesOrderProcJQ");
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         if JobQueueEntry.FindFirst() then begin
@@ -33,6 +33,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
                 SetMonitoredJobQueueEntry(JobQueueEntry);
                 SetBucketParameterString(JobQueueEntry);
             end else begin
+                DeleteMonitoredJobQueueEntry(MonitoredJQEntry."Object Type to Run"::Codeunit, Codeunit::"NPR EcomSalesOrderProcJQ");
                 JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
                 JobQueueEntry.Delete(true);
             end;
@@ -54,12 +55,42 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         LogMessageStopwatch.LogFinish();
     end;
 
+    local procedure UpgradeEcomSalesReturnDocJQ()
+    var
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        UpgradeStep := 'UpgradeEcomSalesReturnDocJQ';
+        if HasUpgradeTag() then
+            exit;
+
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR EcomSalesRetOrderProcJQ");
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        if JobQueueEntry.FindFirst() then begin
+            if CheckIfEcomDocsExist() then begin
+                SetMonitoredJobQueueEntry(JobQueueEntry);
+                SetBucketParameterString(JobQueueEntry);
+            end else begin
+                DeleteMonitoredJobQueueEntry(MonitoredJQEntry."Object Type to Run"::Codeunit, Codeunit::"NPR EcomSalesRetOrderProcJQ");
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+                JobQueueEntry.Delete(true);
+            end;
+        end;
+
+        SetUpgradeTag();
+    end;
+
     local procedure SetMonitoredJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
     var
         JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         RefreshJobQueueEntry: Codeunit "NPR Refresh Job Queue Entry";
     begin
+        MonitoredJQEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run");
+        MonitoredJQEntry.SetRange("Object ID to Run", JobQueueEntry."Object ID to Run");
+        if not MonitoredJQEntry.IsEmpty() then
+            exit;
+
         JQRefreshSetup.GetSetup();
         MonitoredJQEntry.Init();
         MonitoredJQEntry."Entry No." := 0;
@@ -70,35 +101,20 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         MonitoredJQEntry.Modify();
     end;
 
-    local procedure UpgradeEcomSalesReturnDocJQ()
+    local procedure DeleteMonitoredJobQueueEntry(ObjectType: Option; ObjectId: Integer)
     var
-        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
     begin
-        UpgradeStep := 'UpgradeEcomSalesReturnDocJQ';
-        if HasUpgradeTag() then
-            exit;
-
-        JobQueueEntry.Reset();
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR EcomSalesRetOrderProcJQ");
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        if JobQueueEntry.FindFirst() then begin
-            if CheckIfEcomDocsExist() then begin
-                SetMonitoredJobQueueEntry(JobQueueEntry);
-                SetBucketParameterString(JobQueueEntry);
-            end else begin
-                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-                JobQueueEntry.Delete(true);
-            end;
-        end;
-
-        SetUpgradeTag();
+        MonitoredJQEntry.SetRange("Object Type to Run", ObjectType);
+        MonitoredJQEntry.SetRange("Object ID to Run", ObjectId);
+        if not MonitoredJQEntry.IsEmpty() then
+            MonitoredJQEntry.DeleteAll(true);
     end;
 
     local procedure CheckIfEcomDocsExist(): Boolean
     var
         EcomDocSalesHeader: Record "NPR Ecom Sales Header";
     begin
-        EcomDocSalesHeader.Reset();
         exit(not EcomDocSalesHeader.IsEmpty());
     end;
 
@@ -110,7 +126,6 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         if HasUpgradeTag() then
             exit;
 
-        EcomSalesHeader.Reset();
         EcomSalesHeader.SetRange("Bucket Id", 0);
         EcomSalesHeader.SetRange("Creation Status", EcomSalesHeader."Creation Status"::Pending);
         if EcomSalesHeader.FindSet() then
