@@ -481,6 +481,8 @@
         SeatingLocation: Record "NPR NPRE Seating Location";
         TempSeatingLocation: Record "NPR NPRE Seating Location" temporary;
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        RestaurantCodes: List of [Code[20]];
+        RestaurantCode: Code[20];
         FindForBlankLocation: Boolean;
     begin
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -498,18 +500,26 @@
 
         TemplateFound := false;
         FindForBlankLocation := not TempSeatingLocation.FindSet();
-        if not FindForBlankLocation then
+        if FindForBlankLocation then
+            RestaurantCodes.Add('')
+        else
             repeat
                 if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
                     TemplateFound := true
-                else
+                else begin
+                    if not RestaurantCodes.Contains(TempSeatingLocation."Restaurant Code") then
+                        RestaurantCodes.Add(TempSeatingLocation."Restaurant Code");
                     FindForBlankLocation := true;
+                end;
             until TempSeatingLocation.Next() = 0;
 
         if FindForBlankLocation then begin
             Clear(TempSeatingLocation);
-            if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
-                TemplateFound := true;
+            foreach RestaurantCode in RestaurantCodes do begin
+                TempSeatingLocation."Restaurant Code" := RestaurantCode;
+                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
+                    TemplateFound := true;
+            end;
         end;
     end;
 
@@ -607,6 +617,8 @@
         SeatingLocation: Record "NPR NPRE Seating Location";
         TempSeatingLocation: Record "NPR NPRE Seating Location" temporary;
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        RestaurantCodes: List of [Code[20]];
+        RestaurantCode: Code[20];
         FindForBlankLocation: Boolean;
     begin
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -624,18 +636,26 @@
 
         TemplateFound := false;
         FindForBlankLocation := not TempSeatingLocation.FindSet();
-        if not FindForBlankLocation then
+        if FindForBlankLocation then
+            RestaurantCodes.Add('')
+        else
             repeat
                 if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
                     TemplateFound := true
-                else
+                else begin
+                    if not RestaurantCodes.Contains(TempSeatingLocation."Restaurant Code") then
+                        RestaurantCodes.Add(TempSeatingLocation."Restaurant Code");
                     FindForBlankLocation := true;
+                end;
             until TempSeatingLocation.Next() = 0;
 
         if FindForBlankLocation then begin
             Clear(TempSeatingLocation);
-            if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
-                TemplateFound := true;
+            foreach RestaurantCode in RestaurantCodes do begin
+                TempSeatingLocation."Restaurant Code" := RestaurantCode;
+                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
+                    TemplateFound := true;
+            end;
         end;
     end;
 
