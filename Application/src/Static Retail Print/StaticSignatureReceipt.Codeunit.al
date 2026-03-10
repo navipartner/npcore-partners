@@ -341,4 +341,18 @@ codeunit 6248664 "NPR Static Signature Receipt"
 
         exit(false);
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Retail Report Select. Mgt.", 'OnBeforeLogOutput', '', false, false)]
+    local procedure OnBeforeLogOutput(ReportSelectionRetail: Record "NPR Report Selection Retail"; RecRef: RecordRef; var Handled: Boolean)
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        if ReportSelectionRetail."Codeunit ID" <> Codeunit::"NPR Static Signature Receipt" then
+            exit;
+        if RecRef.Number <> Database::"NPR POS Entry" then
+            exit;
+        RecRef.SetTable(POSEntry);
+        if not ShouldPrintSignatureReceipt(POSEntry) then
+            Handled := true;
+    end;
 }
