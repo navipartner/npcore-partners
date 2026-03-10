@@ -227,6 +227,13 @@ page 6150765 "NPR TM Admission Card"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the email or phone number of the admission code owner.';
                 }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                field("Stakeholder NP Email Template"; Rec."Stakeholder NP Email Template")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the NP Email template used for stakeholder notifications on this admission.';
+                }
+#endif
                 field("eTicket Type Code"; Rec."eTicket Type Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

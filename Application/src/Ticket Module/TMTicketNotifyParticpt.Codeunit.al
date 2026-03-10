@@ -574,6 +574,9 @@
             NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::SMS;
 
         NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NotificationEntry."Template Code" := Admission."Stakeholder NP Email Template";
+#endif
         NotificationEntry.Insert();
 
     end;
@@ -628,6 +631,9 @@
             NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::SMS;
 
         NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NotificationEntry."Template Code" := Admission."Stakeholder NP Email Template";
+#endif
         NotificationEntry.Insert();
 
     end;

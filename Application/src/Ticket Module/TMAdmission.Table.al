@@ -146,6 +146,16 @@
         {
             Caption = 'Stakeholder (E-Mail/Phone No.)';
             DataClassification = CustomerContent;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            trigger OnValidate()
+            var
+                NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
+                MissingTemplateWarningMsg: Label 'Stakeholder NP Email Template is not set. Stakeholder notifications require a template to be sent. Please assign a template.';
+            begin
+                if (Rec."Stakeholder (E-Mail/Phone No.)" <> '') and (Rec."Stakeholder NP Email Template" = '') and NewEmailExpFeature.IsFeatureEnabled() then
+                    Message(MissingTemplateWarningMsg);
+            end;
+#endif
         }
         field(80; "Waiting List Setup Code"; Code[20])
         {
@@ -238,6 +248,14 @@
             DataClassification = CustomerContent;
             InitValue = 0;
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        field(390; "Stakeholder NP Email Template"; Code[10])
+        {
+            Caption = 'Stakeholder NP Email Template';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate" where(DataProvider = const("NPR DynTemplateDataProvider"::TICKET_NOTIFICATION));
+        }
+#endif
     }
 
     keys

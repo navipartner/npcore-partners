@@ -87,6 +87,13 @@
                     ToolTip = 'Specifies the email or phone number of the admission code owner.';
                     Caption = 'Stakeholder Email/Phone No.';
                 }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                field("Stakeholder NP Email Template"; Rec."Stakeholder NP Email Template")
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the NP Email template used for stakeholder notifications on this admission.';
+                }
+#endif
                 field("Dependency Code"; Rec."Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
