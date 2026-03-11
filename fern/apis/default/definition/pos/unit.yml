@@ -6,6 +6,19 @@ imports:
 
 types:
 
+  SelfserviceProfile:
+    docs: Self-service configuration resolved from the unit's Self Service Profile. Extensible with additional profile fields in the future.
+    properties:
+      qrCardPaymentMethod:
+        type: optional<string>
+        docs: Default POS payment method code for QR code card payments
+      selfserviceCardPaymentMethod:
+        type: optional<string>
+        docs: POS payment method code for selfservice EFT terminal payments
+      kioskModeUnlockPin:
+        type: optional<string>
+        docs: PIN code required to unlock kiosk mode on the POS unit
+
   POSUnit:
     docs: A POS Unit defines the individual unit (either full size POS, mPOS, or other type of device) used for performing POS sales and POS related activities.
     properties:
@@ -15,6 +28,9 @@ types:
       posStoreCode:
         docs: The code of the POS Store that the unit is associated with.
         type: string
+      selfserviceProfile:
+        type: optional<SelfserviceProfile>
+        docs: Self-service configuration from the unit's Self Service Profile. Only present when the unit has a profile assigned.
     examples:
       - name: ExamplePOSUnitRetail
         value:
@@ -28,6 +44,16 @@ types:
           code: "0201"
           name: "Ticket Sales POS 1"
           posStoreCode: "02"
+      - name: ExamplePOSUnitSelfService
+        value:
+          id: 1c2d3e4f-5a6b-7c8d-9e0f-a1b2c3d4e5f6
+          code: "KIOSK01"
+          name: "Self Service Kiosk 1"
+          posStoreCode: "01"
+          selfserviceProfile:
+            qrCardPaymentMethod: "CARD"
+            selfserviceCardPaymentMethod: "CARD_EFT"
+            kioskModeUnlockPin: "1234"
 
   PaginatedPOSUnits:
     docs: A paginated response containing multiple POS Units
@@ -51,6 +77,41 @@ service:
   auth: true
   base-path: /pos
   endpoints:
+
+    getPOSUnitMe:
+      display-name: Get Current POS Unit
+      docs: |
+        Returns the POS Unit assigned to the current user via User Setup.
+        Includes profile-derived fields like payment method codes from the Self Service Profile.
+      method: GET
+      path: "/unit/me"
+      response: POSUnit
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: $POSUnit.ExamplePOSUnitSelfService
+
+    getPOSUnit:
+      display-name: Get POS Unit
+      docs: |
+        Returns a single POS Unit by its SystemId.
+        Includes profile-derived fields like payment method codes from the Self Service Profile.
+      method: GET
+      path: "/unit/{unitId}"
+      path-parameters:
+        unitId: uuid
+      response: POSUnit
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            unitId: 0a7e39b2-ec7b-4bbf-9914-1fa01b17657b
+          response:
+            body: $POSUnit.ExamplePOSUnitRetail
 
     getPOSUnits:
       display-name: List POS Units

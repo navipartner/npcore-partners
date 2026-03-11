@@ -76,5 +76,22 @@
             }
         }
     }
+
+    actions
+    {
+        area(Processing)
+        {
+            action(ChangeCaptions)
+            {
+                Caption = 'Change Captions';
+                Image = Edit;
+                RunObject = Page "NPR Item Addon Translation";
+                RunPageLink = "External Table SystemId" = field("SystemId");
+                ApplicationArea = NPRRetail;
+                ToolTip = 'View or edit translations for this add-on line option.';
+            }
+        }
+
+    }
 }
 

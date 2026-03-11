@@ -509,7 +509,14 @@
         exit(true);
     end;
 
-    local procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    internal procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        NullGuid: Guid;
+    begin
+        exit(InsertPOSAddOnLine(ItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS, NullGuid));
+    end;
+
+    internal procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"; NewLineSystemId: Guid): Boolean
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         Item: Record Item;
@@ -590,8 +597,11 @@
             SaleLinePOSAddOn.Insert(true);
 
             POSSaleLine.SetUsePresetLineNo(true);
+            POSSaleLine.SetUseCustomSystemId(true);
+            SaleLinePOS.SystemId := NewLineSystemId;
             POSSaleLine.SetSkipPOSInfo(true);
             POSSaleLine.InsertLine(SaleLinePOS);
+            POSSaleLine.SetUseCustomSystemId(false);
             SaleLinePOS.SetSkipCalcDiscount(false);
             POSSaleLine.SetUsePresetLineNo(false);
 
@@ -1145,7 +1155,7 @@
         exit(not ItemVariant.IsEmpty());
     end;
 
-    local procedure CopyItemAddOnLinesToTemp(var FromItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var ToItemAddOnLine: Record "NPR NpIa Item AddOn Line"; NewDataSet: Boolean)
+    internal procedure CopyItemAddOnLinesToTemp(var FromItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var ToItemAddOnLine: Record "NPR NpIa Item AddOn Line"; NewDataSet: Boolean)
     var
         ItemAddOn: Codeunit "NPR NpIa Item AddOn";
         MustBeTempMsg: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';

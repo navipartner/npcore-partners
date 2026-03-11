@@ -703,6 +703,9 @@
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         xKitchenOrder: Record "NPR NPRE Kitchen Order";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        NPRERestaurantWebhook: Codeunit "NPR NPRE Restaurant Webhooks";
+#endif
     begin
         KitchenOrder.Get(OrderID);
         xKitchenOrder := KitchenOrder;
@@ -710,8 +713,12 @@
         KitchenOrder.Modify();
 
         if KitchenOrder."Order Status" = KitchenOrder."Order Status"::"Ready for Serving" then
-            if xKitchenOrder."Order Status" <> xKitchenOrder."Order Status"::"Ready for Serving" then
+            if xKitchenOrder."Order Status" <> xKitchenOrder."Order Status"::"Ready for Serving" then begin
                 NotificationHandler.CreateOrderNotifications(KitchenOrder, "NPR NPRE Notification Trigger"::KDS_ORDER_READY_FOR_SERVING, 0DT);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+                NPRERestaurantWebhook.InvokeOrderReadyForServingWebhook(KitchenOrder.SystemId);
+#endif
+            end;
     end;
 
     internal procedure UpdateOrderStatus(var KitchenOrder: Record "NPR NPRE Kitchen Order")

@@ -16,6 +16,7 @@
         MaxAmountLimit: Label 'Maximum payment amount for %1 is %2.';
         MinAmountLimit: Label 'Minimum payment amount for %1 is %2.';
         InvalidAmount: Label 'The payment amount %1 cannot be accepted because it does not meet the rounding precision requirements ("%2") set for payment type %3.', Comment = '%1 - payment amount, %2 - rounding precision, %3 - payment type description';
+        UseCustomSystemId: Boolean;
 
     procedure Init(RegisterNoIn: Code[20]; SalesTicketNoIn: Code[20]; SaleIn: Codeunit "NPR POS Sale"; SetupIn: Codeunit "NPR POS Setup"; FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
@@ -574,7 +575,13 @@
         if Line.Description <> '' then
             Rec.Description := Line.Description;
 
-        Return := Rec.Insert(true);
+        if (not IsNullGuid(Line.SystemId)) then
+            Rec.SystemId := Line.SystemId;
+
+        if (UseCustomSystemId and (not IsNullGuid(Rec.SystemId))) then
+            Return := Rec.Insert(true, true)
+        else
+            Return := Rec.Insert(true);
 
         OnAfterInsertPaymentLine(Rec);
         POSSale.RefreshCurrent();
@@ -941,6 +948,11 @@
         TempSalesLine := TempCurrSalesLine;
         TempSalesLine.Reset();
         TempSalesLine.CopyFilters(TempCurrSalesLine);
+    end;
+
+    internal procedure SetUseCustomSystemId(Set: Boolean)
+    begin
+        UseCustomSystemId := Set;
     end;
 
     [IntegrationEvent(false, false)]

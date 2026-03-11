@@ -17,6 +17,17 @@
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
+        field(7; "Category Code"; Code[20])
+        {
+            Caption = 'Category Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpIa Item AddOn Category";
+        }
+        field(8; "Sort Key"; Integer)
+        {
+            Caption = 'Sort Key';
+            DataClassification = CustomerContent;
+        }
         field(10; Type; Option)
         {
             Caption = 'Type';
@@ -282,16 +293,20 @@
     keys
     {
         key(Key1; "AddOn No.", "Line No.") { }
+        key(Key2; "AddOn No.", "Sort Key") { }
     }
 
     trigger OnDelete()
     var
+        ItemAddonTranslation: Record "NPR Item Addon Translation";
         NpIaItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
     begin
+        ItemAddonTranslation.DeleteTranslations(SystemId);
+
         NpIaItemAddOnLineOption.SetRange("AddOn No.", "AddOn No.");
         NpIaItemAddOnLineOption.SetRange("AddOn Line No.", "Line No.");
         if NpIaItemAddOnLineOption.FindFirst() then
-            NpIaItemAddOnLineOption.DeleteAll();
+            NpIaItemAddOnLineOption.DeleteAll(true);
     end;
 
     trigger OnInsert()

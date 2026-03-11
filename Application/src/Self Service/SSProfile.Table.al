@@ -23,6 +23,18 @@
             Caption = 'Kiosk Mode Unlock PIN';
             DataClassification = CustomerContent;
         }
+        field(30; "QR Card Payment Method"; Code[10])
+        {
+            Caption = 'QR Card Payment Method';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Method";
+        }
+        field(40; "Selfservice Card Payment Meth."; Code[10])
+        {
+            Caption = 'Selfservice Card Payment Method';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Method";
+        }
     }
 
     keys

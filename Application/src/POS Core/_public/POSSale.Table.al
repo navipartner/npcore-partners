@@ -666,10 +666,9 @@
             Description = 'NPR5.54';
             Editable = false;
             FieldClass = FlowField;
-
-            trigger OnValidate()
-            begin
-            end;
+            ObsoleteReason = 'Wrong type filter';
+            ObsoleteTag = '2025-11-04';
+            ObsoleteState = Pending;
         }
         field(310; "Amount Including VAT"; Decimal)
         {
@@ -681,6 +680,9 @@
             Description = 'NPR5.54';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteReason = 'Wrong type filter';
+            ObsoleteTag = '2025-11-04';
+            ObsoleteState = Pending;
         }
         field(320; "Payment Amount"; Decimal)
         {
@@ -692,6 +694,9 @@
             Description = 'NPR5.54';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteReason = 'Wrong type filter';
+            ObsoleteTag = '2025-11-04';
+            ObsoleteState = Pending;
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -1079,29 +1084,9 @@
     local procedure AvoidGUIDCollision()
     var
         PosEntry: Record "NPR POS Entry";
-        CustomDimensions: Dictionary of [Text, Text];
-        ActiveSession: Record "Active Session";
     begin
-
-        while (IsNullGuid(Rec.SystemId) or (PosEntry.GetBySystemId(Rec.SystemId))) do begin
-
-            if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-                Clear(ActiveSession);
-
-            CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-            CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-            CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-            CustomDimensions.Add('NPR_CompanyName', CompanyName());
-            CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-            CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-            CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-            CustomDimensions.Add('NPR_OffendingGuid', Rec.SystemId);
-
-            if (not IsNullGuid(Rec.SystemId)) then
-                Session.LogMessage('NPR_3b1ef24f-53d4-4570-a227-14ad27ff9f7c', 'GUID collision avoided.', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
-            Rec.SystemId := CreateGuid();
-
-        end;
+        if (PosEntry.GetBySystemId(Rec.SystemId)) then
+            Rec.FieldError(SystemId);
     end;
 
     local procedure CheckCustomerOnConnectedSO()

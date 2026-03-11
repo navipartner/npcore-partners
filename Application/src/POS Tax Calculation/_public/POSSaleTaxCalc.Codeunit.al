@@ -101,7 +101,8 @@
         if POSTaxCalc.SkipTaxCalculation(POSSaleTax2, Rec, Currency) then
             exit;
 
-        if IsNullGuid(Rec.SystemId) then
+        //Skips on lines not yet inserted.
+        if IsNullGuid(Rec.SystemId) or (Rec.SystemCreatedAt = 0DT) then
             exit;
 
         if Rec."Line Type" in [Rec."Line Type"::"POS Payment", Rec."Line Type"::Comment, Rec."Line Type"::Rounding] then

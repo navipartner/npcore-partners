@@ -5,23 +5,204 @@ imports:
   posApiTypes: ./pos-api-types.yml
 
 types:
-  saleId: 
+  saleId:
     type: uuid
-    docs: The id of an active POS sale. This value can also be used to find the sale later when it's either parked or completed as a POS Entry.
-  
-  POSUnitFilter:
-    type: string
-    docs: A filter for POS Unit. It should be formatted according to Business Central filter syntax.
+    docs: The id of a POS sale. This can be provided by the API consumer when creating a new sale.
 
-  POSSaleLine:
-    docs: A sale line in an active POS sale
+  saleLineId:
+    type: uuid
+    docs: The id of a sale line within a POS sale.
+
+  paymentLineId:
+    type: uuid
+    docs: The id of a payment line within a POS sale.
+
+  PaymentType:
+    enum:
+      - name: CASH
+        value: 'Cash'
+      - name: EFT
+        value: 'EFT'
+
+  CreatePOSSale:
+    docs: Request body for creating a new POS sale
     properties:
-      id: uuid
+      posUnit:
+        type: string
+        docs: The POS Unit number (e.g., "QR_FOOD_APP", "SELFSERVICE_TICKETS")
+      customerNo:
+        type: optional<string>
+        docs: The customer number to assign to this sale
+      vatBusinessPostingGroup:
+        type: optional<string>
+        docs: The VAT Business Posting Group to use for this sale
+    examples:
+      - name: ExampleCreateSale
+        value:
+          posUnit: "QR_FOOD_APP"
+          customerNo: "C12345"
+
+  UpdatePOSSale:
+    docs: Request body for updating a POS sale
+    properties:
+      customerNo:
+        type: optional<string>
+        docs: The customer number to assign to this sale
+      vatBusinessPostingGroup:
+        type: optional<string>
+        docs: The VAT Business Posting Group to use for this sale
+    examples:
+      - name: ExampleUpdateSale
+        value:
+          customerNo: "C12345"
+
+  SaleLineAddon:
+    docs: Addon to be attached to a sale line
+    properties:
+      lineId:
+        type: uuid
+        docs: Unique identifier for this addon line
+      addonNo:
+        type: string
+        docs: The addon configuration number
+      addonLineNo:
+        type: integer
+        docs: The specific line within the addon configuration
+      quantity:
+        type: optional<double>
+        docs: Quantity of the addon (defaults to 1)
+      selectedOptionLineNo:
+        type: optional<integer>
+        docs: For Select-type addons, the selected option line number
+
+  CreateSaleLineAddonRequest:
+    docs: Request body for creating an addon line for an existing sale line
+    properties:
+      parentLineId:
+        type: saleLineId
+        docs: The SystemId of the parent sale line this addon applies to
+      addonNo:
+        type: string
+        docs: The addon configuration number
+      addonLineNo:
+        type: integer
+        docs: The specific line within the addon configuration
+      quantity:
+        type: optional<double>
+        docs: Quantity of the addon (defaults to 1)
+      selectedOptionLineNo:
+        type: optional<integer>
+        docs: For Select-type addons, the selected option line number
+    examples:
+      - name: ExampleQuantityAddon
+        value:
+          parentLineId: "8408f65c-3a3f-4a62-a459-a94fd6ff9063"
+          addonNo: "ADDON001"
+          addonLineNo: 1
+          quantity: 2
+      - name: ExampleSelectAddon
+        value:
+          parentLineId: "8408f65c-3a3f-4a62-a459-a94fd6ff9063"
+          addonNo: "ADDON001"
+          addonLineNo: 2
+          selectedOptionLineNo: 1
+
+  CreatePOSSaleLine:
+    docs: Request body for creating a new sale line. Prices are automatically calculated based on item configuration in Business Central.
+    properties:
+      type: posApiTypes.POSSaleLineType
+      code:
+        type: optional<string>
+        docs: Item number, G/L account, or other identifier (required unless barcode is provided)
+      barcode:
+        type: optional<string>
+        docs: Item barcode for lookup via item reference (alternative to code)
+      variantCode: optional<string>
+      description: optional<string>
+      description2: optional<string>
+      quantity: optional<double>
+      unitOfMeasure: optional<string>
+      addons:
+        type: optional<list<SaleLineAddon>>
+        docs: Optional list of addons to attach to this sale line
+    examples:
+      - name: ExampleItemLine
+        value:
+          type: "Item"
+          code: "ITEM-001"
+
+  UpdatePOSSaleLine:
+    docs: Request body for updating a sale line
+    properties:
+      quantity: optional<double>
+      discountAmount: optional<double>
+      description: optional<string>
+    examples:
+      - name: ExampleUpdateLine
+        value:
+          quantity: 3
+
+  CreatePOSPaymentLine:
+    docs: Request body for creating a new payment line
+    properties:
+      paymentMethodCode: string
+      paymentType:
+        type: PaymentType
+        docs: Type of payment (Cash or EFT)
+      amount: double
+      description: optional<string>
+      maskedCardNo:
+        type: optional<string>
+        docs: For EFT payments - masked card number
+      pspReference:
+        type: optional<string>
+        docs: For EFT payments - PSP reference number
+      parToken:
+        type: optional<string>
+        docs: For EFT payments - PAN token for recurring payments
+      cardApplicationId:
+        type: optional<string>
+        docs: For EFT payments - card application ID (AID) for payment method mapping
+      success:
+        type: optional<boolean>
+        docs: For EFT payments - whether the payment was successful
+      eftReceipt:
+        type: optional<list<string>>
+        docs: For EFT payments - receipt lines to store
+    examples:
+      - name: ExampleCashPayment
+        value:
+          paymentMethodCode: "CASH"
+          paymentType: "Cash"
+          amount: 100.00
+          description: "Cash payment"
+
+      - name: ExampleEFTPayment
+        value:
+          paymentMethodCode: "CARD"
+          paymentType: "EFT"
+          amount: 100.00
+          description: "Card payment"
+          maskedCardNo: "****1234"
+          pspReference: "PSP123456789"
+          parToken: "TOKEN123ABC"
+          success: true
+          eftReceipt:
+            - "VISA CREDIT"
+            - "****1234"
+            - "APPROVED"
+            - "AUTH: 123456"
+
+  POSSaleLineResponse:
+    docs: A sale line in the response
+    properties:
+      id: saleLineId
       sortKey: integer
       type: posApiTypes.POSSaleLineType
       code: string
       variantCode: string
       description: string
+      description2: optional<string>
       quantity: double
       unitPrice: double
       discountPct: double
@@ -30,93 +211,361 @@ types:
       amountInclVat: double
       amount: double
       unitOfMeasure: string
-    examples:
-      - name: ExampleSaleLine
-        value:
-          id: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
-          sortKey: 10000
-          type: "Item"
-          code: "M12345"
-          variantCode: "SKU-12345"
-          description: "Item Description"
-          quantity: 2
-          unitPrice: 100
-          discountPct: 50
-          discountAmount: 100
-          vatPercent: 25
-          amountInclVat: 100
-          amount: 80
-          unitOfMeasure: "PCS"
-  
-  POSPaymentLine:
-    docs: A payment line in an active POS sale
+      isAddon:
+        type: boolean
+        docs: Whether this line is an addon to another item
+      appliesToLine:
+        type: optional<saleLineId>
+        docs: If this is an addon, the SystemId of the parent line it applies to
+      deleted: optional<boolean>
+
+  POSPaymentLineResponse:
+    docs: A payment line in the response
     properties:
-      id: uuid
+      id: paymentLineId
       sortKey: integer
-      code: string
+      paymentMethodCode: string
       description: string
       amountInclVat: double
-    examples:
-      - name: ExamplePaymentLine
-        value:
-          id: 80c340c5-00ce-46c5-8a32-8736e59b7816
-          sortKey: 20000
-          code: "CASH"
-          description: "Cash"
-          amountInclVat: 50
+      deleted: optional<boolean>
 
-  POSSale:
-    docs: An active POS sale
+  POSSaleResponse:
+    docs: A POS sale with optional lines
     properties:
       saleId: saleId
       receiptNo: string
       posUnit: string
+      posStore: string
+      date: date
       startTime: datetime
       customerNo: string
-      saleLines: optional<list<POSSaleLine>>
-      paymentLines: optional<list<POSPaymentLine>>    
+      salespersonCode: string
+      vatBusinessPostingGroup: string
+      saleLines: optional<list<POSSaleLineResponse>>
+      paymentLines: optional<list<POSPaymentLineResponse>>
+      totalSalesAmountInclVat:
+        type: optional<double>
+        docs: Total amount of all sale lines including VAT (only present when withLines=true)
+      totalPaymentAmount:
+        type: optional<double>
+        docs: Total amount of all payment lines (only present when withLines=true)
     examples:
-      - name: ExamplePOSSale
-        value: 
+      - name: ExampleSale
+        value:
           saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
           receiptNo: "12345678"
-          posUnit: "POS-031"
+          posUnit: "QR_FOOD_APP"
+          posStore: "STORE01"
+          date: "2024-01-01"
           startTime: "2024-01-01T17:00:00Z"
           customerNo: "C12345"
-          saleLines: 
-            - $POSSaleLine.ExampleSaleLine
-          paymentLines: 
-            - $POSPaymentLine.ExamplePaymentLine
+          salespersonCode: "SP001"
+          vatBusinessPostingGroup: "DOMESTIC"
+
+  POSRefreshResponse:
+    docs: Response for operations that modify a sale. Returns full objects for created/modified lines, IDs for deleted lines, and calculated totals.
+    properties:
+      saleId: saleId
+      receiptNo: string
+      posUnit: string
+      posStore: string
+      date: date
+      startTime: datetime
+      customerNo: string
+      salespersonCode: string
+      vatBusinessPostingGroup: string
+      refreshedSaleLines:
+        type: list<POSSaleLineResponse>
+        docs: Full objects for all sale lines that were created or modified
+      refreshedPaymentLines:
+        type: list<POSPaymentLineResponse>
+        docs: Full objects for all payment lines that were created or modified
+      deletedSaleLines:
+        type: list<string>
+        docs: Array of SystemIds (UUIDs) for sale lines that were deleted
+      deletedPaymentLines:
+        type: list<string>
+        docs: Array of SystemIds (UUIDs) for payment lines that were deleted
+      totalSalesAmountInclVat:
+        type: double
+        docs: Total amount of all sale lines including VAT
+      totalPaymentAmount:
+        type: double
+        docs: Total amount of all payment lines
+    examples:
+      - name: ExampleRefreshWithSaleLine
+        value:
+          saleId: "bcc8ec51-906b-4a57-9680-1d120dd55b01"
+          receiptNo: "12345678"
+          posUnit: "QR_FOOD_APP"
+          posStore: "STORE01"
+          date: "2024-01-01"
+          startTime: "2024-01-01T17:00:00Z"
+          customerNo: "C12345"
+          salespersonCode: "SP001"
+          vatBusinessPostingGroup: "DOMESTIC"
+          refreshedSaleLines:
+            - id: "8408f65c-3a3f-4a62-a459-a94fd6ff9063"
+              sortKey: 10000
+              type: "Item"
+              code: "ITEM-001"
+              variantCode: ""
+              description: "Premium Widget"
+              quantity: 2
+              unitPrice: 50.00
+              discountPct: 0
+              discountAmount: 0
+              vatPercent: 25.00
+              amountInclVat: 125.00
+              amount: 100.00
+              unitOfMeasure: "PCS"
+              isAddon: false
+          refreshedPaymentLines: []
+          deletedSaleLines: []
+          deletedPaymentLines: []
+          totalSalesAmountInclVat: 125.00
+          totalPaymentAmount: 0.00
+      - name: ExampleRefreshWithPaymentLine
+        value:
+          saleId: "bcc8ec51-906b-4a57-9680-1d120dd55b01"
+          receiptNo: "12345678"
+          posUnit: "QR_FOOD_APP"
+          posStore: "STORE01"
+          date: "2024-01-01"
+          startTime: "2024-01-01T17:00:00Z"
+          customerNo: "C12345"
+          salespersonCode: "SP001"
+          vatBusinessPostingGroup: "DOMESTIC"
+          refreshedSaleLines: []
+          refreshedPaymentLines:
+            - id: "374a4076-52b8-f011-a901-904652264ae4"
+              sortKey: 20000
+              paymentMethodCode: "CASH"
+              description: "Cash Payment"
+              amountInclVat: 18.50
+          deletedSaleLines: []
+          deletedPaymentLines: []
+          totalSalesAmountInclVat: 125.00
+          totalPaymentAmount: 18.50
+
+  POSEntryResponse:
+    docs: Response after completing a sale
+    properties:
+      entryNo: integer
+      entryId: uuid
+      documentNo: string
+      totalAmountInclVat: double
+      kitchenOrderNo:
+        type: optional<long>
+        docs: The kitchen order number if one was created during end-of-sale
+      kitchenOrderId:
+        type: optional<uuid>
+        docs: SystemId of the kitchen order, for use with GET /restaurant/{restaurantId}/orders/{orderId}
+    examples:
+      - name: ExampleEntry
+        value:
+          entryNo: 12345
+          entryId: f3e4d5c6-b7a8-9091-2a3b-4c5d6e7f8901
+          documentNo: "12345678"
+          totalAmountInclVat: 100.00
+
+  KitchenOrderCustomerDetails:
+    docs: Customer details for a kitchen order
+    properties:
+      name:
+        type: optional<string>
+        docs: Customer name or table description
+      phoneNo:
+        type: optional<string>
+        docs: Customer phone number for order notifications
+      email:
+        type: optional<string>
+        docs: Customer email for order notifications
+
+  KitchenOrderRequest:
+    docs: Request to create a kitchen order during sale completion
+    properties:
+      seatingCode:
+        type: string
+        docs: The seating code for the kitchen order (e.g., table number, pickup station)
+      noOfGuests:
+        type: optional<integer>
+        docs: Number of guests (defaults to 1)
+      customerDetails:
+        type: optional<KitchenOrderCustomerDetails>
+        docs: Optional customer contact information
+
+  CompletePOSSaleRequest:
+    docs: Optional request body for completing a POS sale with kitchen order creation
+    properties:
+      kitchenRequest:
+        type: optional<KitchenOrderRequest>
+        docs: If provided, creates a kitchen order linked to this sale
+
+  transactionId:
+    type: uuid
+    docs: System-generated identifier for an EFT transaction request, used for polling status and cancellation.
+
+  EFTPrepareRequest:
+    docs: Request body for preparing an EFT payment
+    properties:
+      amount:
+        type: optional<double>
+        docs: Payment amount. If omitted, the remaining balance of the sale is used.
+    examples:
+      - name: ExamplePrepare
+        value:
+          amount: 100.00
+
+  EFTPrepareResponse:
+    docs: Response after preparing an EFT payment
+    properties:
+      transactionId: transactionId
+      status: EFTTransactionStatus
+    examples:
+      - name: ExamplePrepared
+        value:
+          transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          status: Prepared
+
+  EFTStartResponse:
+    docs: Response after starting an EFT payment. The actual payment result should be obtained by polling the status endpoint.
+    properties:
+      transactionId: transactionId
+      processed:
+        type: boolean
+        docs: Whether the payment request was processed (sent to the terminal and response received). Poll the status endpoint to get the actual result.
+    examples:
+      - name: ExampleStarted
+        value:
+          transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          processed: true
+
+  EFTTransactionStatus:
+    docs: Status of an EFT transaction through its lifecycle
+    enum:
+      - value: Prepared
+        docs: Transaction request created but not yet sent to terminal
+      - value: Initiated
+        docs: Request sent to terminal, waiting for result
+      - value: Completed
+        docs: Terminal returned a successful result
+      - value: Failed
+        docs: Terminal returned a declined or error result
+
+  EFTStatusResponse:
+    docs: Response with the current status of an EFT transaction. When successful, includes the full sale context and delta fields matching the payment line and sale line mutation endpoints.
+    properties:
+      transactionId: transactionId
+      status: EFTTransactionStatus
+      successful: boolean
+      resultCode:
+        type: optional<string>
+        docs: Result code from the payment provider (present when result is known)
+      cardNumber:
+        type: optional<string>
+        docs: Masked card number (present when result is known)
+      cardName:
+        type: optional<string>
+        docs: Card brand name (present when result is known)
+      authorizationNumber:
+        type: optional<string>
+        docs: Authorization number from the payment provider (present when result is known)
+      resultMessage:
+        type: optional<string>
+        docs: Human-readable result message (present when result is known)
+      refreshedSaleLines:
+        type: optional<list<POSSaleLineResponse>>
+        docs: Sale lines created or modified by the EFT payment (typically empty since EFT only adds payment lines). Present only when successful.
+      refreshedPaymentLines:
+        type: optional<list<POSPaymentLineResponse>>
+        docs: Payment lines created by the EFT payment. Present only when successful.
+      deletedSaleLines:
+        type: optional<list<string>>
+        docs: SystemIds of sale lines deleted during the payment (typically empty). Present only when successful.
+      deletedPaymentLines:
+        type: optional<list<string>>
+        docs: SystemIds of payment lines deleted during the payment (typically empty). Present only when successful.
+      totalSalesAmountInclVat:
+        type: optional<double>
+        docs: Total of all sale lines including VAT. Present only when successful.
+      totalPaymentAmount:
+        type: optional<double>
+        docs: Total of all payment lines. Present only when successful.
+    examples:
+      - name: ExampleCompleted
+        value:
+          transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          status: Completed
+          successful: true
+          resultCode: "0"
+          cardNumber: "****1234"
+          cardName: "Visa"
+          authorizationNumber: "123456"
+          resultMessage: "Approved"
+          refreshedSaleLines: []
+          refreshedPaymentLines:
+            - id: "374a4076-52b8-f011-a901-904652264ae4"
+              sortKey: 20000
+              paymentMethodCode: "CARD_EFT"
+              description: "Visa ****1234"
+              amountInclVat: 100.00
+          deletedSaleLines: []
+          deletedPaymentLines: []
+          totalSalesAmountInclVat: 100.00
+          totalPaymentAmount: 100.00
+      - name: ExamplePending
+        value:
+          transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          status: Initiated
+          successful: false
+
+  EFTCancelResponse:
+    docs: Response after requesting cancellation of an EFT transaction
+    properties:
+      transactionId: transactionId
+      cancelRequested:
+        type: boolean
+        docs: Always true when the endpoint returns 200. The abort request is fire-and-forget; poll the status endpoint to confirm the final outcome.
+    examples:
+      - name: ExampleCancelRequested
+        value:
+          transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          cancelRequested: true
 
 service:
   auth: true
   base-path: /pos
-  endpoints: 
+  endpoints:
+    # POS Sale endpoints
     searchPOSSale:
       display-name: Search POS Sale
-      docs: Find any active POS sales connected to specific POS units. This can be used to poll for real time updates as lines are scanned in the active POS sale.
+      docs: Returns the most recent active POS sale for a given POS unit.
       method: GET
       path: "/sale/search"
       request:
         name: searchPOSSaleRequest
         query-parameters:
-          posUnit: POSUnitFilter
-          withLines: boolean
-      response: POSSale
+          posunit:
+            type: string
+            docs: The POS unit number to search for (required)
+          withLines:
+            type: optional<boolean>
+            docs: Include sale lines and payment lines in the response
+      response: POSSaleResponse
       examples:
         - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-          response:
-            body: $POSSale.ExamplePOSSale
           query-parameters:
-            posUnit: "POS-031"
-            withLines: true
+            posunit: "QR_FOOD_APP"
+          response:
+            body: $POSSaleResponse.ExampleSale
 
     getPOSSale:
-      display-name: POS Sale
-      docs: Get a POS Sale by saleId
+      display-name: Get POS Sale
+      docs: Retrieves a POS sale by its ID with optional line details
       method: GET
       path: "/sale/{saleId}"
       path-parameters:
@@ -124,8 +573,89 @@ service:
       request:
         name: getPOSSaleRequest
         query-parameters:
-          withLines: boolean
-      response: POSSale
+          withLines:
+            type: optional<boolean>
+            docs: Include sale lines and payment lines in the response
+      response: POSSaleResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          query-parameters:
+            withLines: true
+          response:
+            body: $POSSaleResponse.ExampleSale
+
+    createPOSSale:
+      display-name: Create POS Sale
+      docs: Creates a new POS sale with the provided GUID. The API consumer must provide their own unique GUID which will be used as the SystemId. POS Unit must be of type UNATTENDED to support multiple concurrent active sales per unit.
+      method: POST
+      path: "/sale/{saleId}"
+      path-parameters:
+        saleId: saleId
+      request: CreatePOSSale
+      response:
+        type: POSSaleResponse
+        status-code: 201
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          request: $CreatePOSSale.ExampleCreateSale
+          response:
+            body: $POSSaleResponse.ExampleSale
+
+    updatePOSSale:
+      display-name: Update POS Sale
+      docs: Updates an existing POS sale (e.g., assign a customer). Returns the saleId and a refresh object with SystemIds of updated entities and totals.
+      method: PATCH
+      path: "/sale/{saleId}"
+      path-parameters:
+        saleId: saleId
+      request: UpdatePOSSale
+      response: POSRefreshResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          request: $UpdatePOSSale.ExampleUpdateSale
+          response:
+            body: $POSRefreshResponse.ExampleRefreshWithSaleLine
+
+    deletePOSSale:
+      display-name: Delete POS Sale
+      docs: Deletes/cancels a POS sale and all its lines
+      method: DELETE
+      path: "/sale/{saleId}"
+      path-parameters:
+        saleId: saleId
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+
+    completePOSSale:
+      display-name: Complete POS Sale
+      docs: Finalizes a POS sale and moves it to POS Entry. The sale must be fully paid. Optionally creates a kitchen order if kitchenRequest is provided in the request body. Returns error if sale is not fully paid or payment validation fails.
+      method: POST
+      path: "/sale/{saleId}/complete"
+      path-parameters:
+        saleId: saleId
+      request:
+        name: completePOSSaleRequest
+        body:
+          type: optional<CompletePOSSaleRequest>
+      response:
+        type: POSEntryResponse
+        status-code: 201
       examples:
         - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
@@ -133,6 +663,364 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
             saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
           response:
-            body: $POSSale.ExamplePOSSale
-          query-parameters:
-            withLines: true
+            body: $POSEntryResponse.ExampleEntry
+
+    # Sale Line endpoints
+    listPOSSaleLines:
+      display-name: List Sale Lines
+      docs: Retrieves all sale lines for a POS sale
+      method: GET
+      path: "/sale/{saleId}/saleline"
+      path-parameters:
+        saleId: saleId
+      response: list<POSSaleLineResponse>
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          response:
+            body:
+              - id: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
+                sortKey: 10000
+                type: "Item"
+                code: "ITEM-001"
+                variantCode: ""
+                description: "Premium Widget"
+                quantity: 2
+                unitPrice: 50.00
+                discountPct: 0
+                discountAmount: 0
+                vatPercent: 25.00
+                amountInclVat: 125.00
+                amount: 100.00
+                unitOfMeasure: "PCS"
+                isAddon: false
+
+    getPOSSaleLine:
+      display-name: Get Sale Line
+      docs: Retrieves a specific sale line
+      method: GET
+      path: "/sale/{saleId}/saleline/{saleLineId}"
+      path-parameters:
+        saleId: saleId
+        saleLineId: saleLineId
+      response: POSSaleLineResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            saleLineId: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
+          response:
+            body:
+              id: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
+              sortKey: 10000
+              type: "Item"
+              code: "ITEM-001"
+              variantCode: ""
+              description: "Premium Widget"
+              quantity: 2
+              unitPrice: 50.00
+              discountPct: 0
+              discountAmount: 0
+              vatPercent: 25.00
+              amountInclVat: 125.00
+              amount: 100.00
+              unitOfMeasure: "PCS"
+              isAddon: false
+
+    createPOSSaleLine:
+      display-name: Create Sale Line
+      docs: Creates a new sale line (Item, G/L, or Comment). The API consumer must provide a unique GUID for the saleLineId. Optionally supports creating addons inline via the addons array property. Returns the saleId and a refresh object with SystemIds of updated entities and totals.
+      method: POST
+      path: "/sale/{saleId}/saleline/{saleLineId}"
+      path-parameters:
+        saleId: saleId
+        saleLineId: saleLineId
+      request: CreatePOSSaleLine
+      response:
+        type: POSRefreshResponse
+        status-code: 201
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            saleLineId: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
+          request: $CreatePOSSaleLine.ExampleItemLine
+          response:
+            body: $POSRefreshResponse.ExampleRefreshWithSaleLine
+
+    createSaleLineAddon:
+      display-name: Create Sale Line Addon
+      docs: Creates an addon line for an existing sale line. The API consumer must provide a unique GUID for the addon line ID. Use this endpoint when you need to add addons after the parent line has been created. Returns the saleId and a refresh object with SystemIds of updated entities and totals.
+      method: POST
+      path: "/sale/{saleId}/saleline/{addonLineId}/addon"
+      path-parameters:
+        saleId: saleId
+        addonLineId:
+          type: saleLineId
+          docs: The unique GUID for this new addon line
+      request: CreateSaleLineAddonRequest
+      response:
+        type: POSRefreshResponse
+        status-code: 201
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            addonLineId: 9519f75d-4b4f-5c73-b560-b95de7ff0174
+          request: $CreateSaleLineAddonRequest.ExampleQuantityAddon
+          response:
+            body: $POSRefreshResponse.ExampleRefreshWithSaleLine
+
+    updatePOSSaleLine:
+      display-name: Update Sale Line
+      docs: Updates an existing sale line (e.g., change quantity or price). Returns the saleId and a refresh object with SystemIds of updated entities and totals.
+      method: PATCH
+      path: "/sale/{saleId}/saleline/{saleLineId}"
+      path-parameters:
+        saleId: saleId
+        saleLineId: saleLineId
+      request: UpdatePOSSaleLine
+      response: POSRefreshResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            saleLineId: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
+          request: $UpdatePOSSaleLine.ExampleUpdateLine
+          response:
+            body: $POSRefreshResponse.ExampleRefreshWithSaleLine
+
+    deletePOSSaleLine:
+      display-name: Delete Sale Line
+      docs: Deletes a sale line. Returns the saleId and a refresh object with SystemIds of updated entities and totals.
+      method: DELETE
+      path: "/sale/{saleId}/saleline/{saleLineId}"
+      path-parameters:
+        saleId: saleId
+        saleLineId: saleLineId
+      response: POSRefreshResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            saleLineId: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
+          response:
+            body: $POSRefreshResponse.ExampleRefreshWithSaleLine
+
+    # Payment Line endpoints
+    listPOSPaymentLines:
+      display-name: List Payment Lines
+      docs: Retrieves all payment lines for a POS sale
+      method: GET
+      path: "/sale/{saleId}/paymentline"
+      path-parameters:
+        saleId: saleId
+      response: list<POSPaymentLineResponse>
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          response:
+            body:
+              - id: 80c340c5-00ce-46c5-8a32-8736e59b7816
+                sortKey: 20000
+                paymentMethodCode: "CASH"
+                description: "Cash Payment"
+                amountInclVat: 125.00
+
+    getPOSPaymentLine:
+      display-name: Get Payment Line
+      docs: Retrieves a specific payment line
+      method: GET
+      path: "/sale/{saleId}/paymentline/{paymentLineId}"
+      path-parameters:
+        saleId: saleId
+        paymentLineId: paymentLineId
+      response: POSPaymentLineResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            paymentLineId: 80c340c5-00ce-46c5-8a32-8736e59b7816
+          response:
+            body:
+              id: 80c340c5-00ce-46c5-8a32-8736e59b7816
+              sortKey: 20000
+              paymentMethodCode: "CASH"
+              description: "Cash Payment"
+              amountInclVat: 125.00
+
+    createPOSPaymentLine:
+      display-name: Create Payment Line
+      docs: Creates a new payment line. The API consumer must provide a unique GUID for the paymentLineId. Supports Cash and EFT (with external payment data storage) payments. Returns the saleId and a refresh object with SystemIds of updated entities and totals.
+      method: POST
+      path: "/sale/{saleId}/paymentline/{paymentLineId}"
+      path-parameters:
+        saleId: saleId
+        paymentLineId: paymentLineId
+      request: CreatePOSPaymentLine
+      response:
+        type: POSRefreshResponse
+        status-code: 201
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            paymentLineId: 80c340c5-00ce-46c5-8a32-8736e59b7816
+          request: $CreatePOSPaymentLine.ExampleCashPayment
+          response:
+            body: $POSRefreshResponse.ExampleRefreshWithPaymentLine
+
+    deletePOSPaymentLine:
+      display-name: Delete Payment Line
+      docs: Deletes a payment line. Returns the saleId and a refresh object with SystemIds of updated entities and totals.
+      method: DELETE
+      path: "/sale/{saleId}/paymentline/{paymentLineId}"
+      path-parameters:
+        saleId: saleId
+        paymentLineId: paymentLineId
+      response: POSRefreshResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            paymentLineId: 80c340c5-00ce-46c5-8a32-8736e59b7816
+          response:
+            body: $POSRefreshResponse.ExampleRefreshWithPaymentLine
+
+    # EFT (Adyen Cloud) endpoints
+    prepareEFTPayment:
+      display-name: Prepare EFT Payment
+      docs: |
+        Creates an EFT transaction request for the sale. Uses the POS unit's self-service profile to resolve the EFT payment method.
+        Requires the POS unit to be of type UNATTENDED with a self-service profile configured.
+        If amount is omitted, the remaining balance of the sale is used.
+      method: POST
+      path: "/sale/{saleId}/eft/prepare"
+      path-parameters:
+        saleId: saleId
+      request: EFTPrepareRequest
+      response: EFTPrepareResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          request: $EFTPrepareRequest.ExamplePrepare
+          response:
+            body: $EFTPrepareResponse.ExamplePrepared
+
+    buildEFTRequest:
+      display-name: Build EFT Request (Local)
+      docs: Builds the integration-specific JSON request for a local EFT transaction (e.g., tap-to-pay). Not yet implemented.
+      method: GET
+      path: "/sale/{saleId}/eft/{transactionId}/local/buildRequest"
+      path-parameters:
+        saleId: saleId
+        transactionId: transactionId
+
+    parseEFTResponse:
+      display-name: Parse EFT Response (Local)
+      docs: Parses a JSON response from a local EFT integration (e.g., Adyen tap-to-pay SDK) and creates a payment line if successful. Not yet implemented.
+      method: POST
+      path: "/sale/{saleId}/eft/{transactionId}/local/parseResponse"
+      path-parameters:
+        saleId: saleId
+        transactionId: transactionId
+
+    startEFTPayment:
+      display-name: Start EFT Payment (Cloud)
+      docs: |
+        Starts the EFT payment by sending the request to the Adyen cloud terminal API synchronously.
+        This call blocks until the terminal responds (up to 5 minutes on BC SaaS).
+        The response indicates whether the request was processed - poll the status endpoint to get the actual payment result.
+      method: POST
+      path: "/sale/{saleId}/eft/{transactionId}/cloud/start"
+      path-parameters:
+        saleId: saleId
+        transactionId: transactionId
+      response: EFTStartResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          response:
+            body: $EFTStartResponse.ExampleStarted
+
+    pollEFTStatus:
+      display-name: Poll EFT Status
+      docs: |
+        Returns the current status of an EFT transaction.
+        When the result is known, additional fields like resultCode, cardNumber, cardName, authorizationNumber, and resultMessage are included.
+        When the transaction is successful, a paymentDelta is included containing the EFT payment line(s) in POS data source format with rows and totals.
+      method: GET
+      path: "/sale/{saleId}/eft/{transactionId}/cloud/status"
+      path-parameters:
+        saleId: saleId
+        transactionId: transactionId
+      response: EFTStatusResponse
+      examples:
+        - name: ExampleCompleted
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          response:
+            body: $EFTStatusResponse.ExampleCompleted
+        - name: ExamplePending
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          response:
+            body: $EFTStatusResponse.ExamplePending
+
+    cancelEFTTransaction:
+      display-name: Cancel EFT Transaction
+      docs: |
+        Requests cancellation of an in-progress EFT transaction by sending an abort request to the Adyen cloud terminal.
+        The cancellation is fire-and-forget - poll the status endpoint to confirm the final outcome.
+      method: POST
+      path: "/sale/{saleId}/eft/{transactionId}/cloud/cancel"
+      path-parameters:
+        saleId: saleId
+        transactionId: transactionId
+      response: EFTCancelResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+            transactionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          response:
+            body: $EFTCancelResponse.ExampleCancelRequested

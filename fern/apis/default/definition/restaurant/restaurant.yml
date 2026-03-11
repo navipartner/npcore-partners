@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  types: ./types-restaurant.yml
+
+service:
+  display-name: Restaurants
+  auth: true
+  base-path: /restaurant
+
+  endpoints:
+    getRestaurants:
+      docs: List all restaurants with branding information
+      display-name: List Restaurants
+      method: GET
+      path: ""
+      response: list<types.Restaurant>
+      examples:
+        - name: ExampleGetRestaurants
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body:
+              - id: "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
+                code: "BISTRO01"
+                name: "Downtown Bistro"
+                description: "Modern bistro with fusion cuisine"
+                primaryColor: "#FF5733"
+                secondaryColor: "#33FF57"
+                logoUrl: "https://cdn.example.com/logos/bistro01.png"

@@ -24,6 +24,7 @@
         IsAutoSplitKeyRecord: Boolean;
         SkipPOSInfo: Boolean;
         UsePresetLineNo: Boolean;
+        UseCustomSystemId: Boolean;
 
     procedure Init(RegisterNo: Code[20]; SalesTicketNo: Code[20]; SaleIn: Codeunit "NPR POS Sale"; SetupIn: Codeunit "NPR POS Setup"; FrontEndIn: Codeunit "NPR POS Front End Management")
     var
@@ -174,6 +175,9 @@
         InitLine();
 
         Rec."Line Type" := Line."Line Type";
+
+        if (not IsNullGuid(Line.SystemId)) then
+            Rec.SystemId := Line.SystemId;
 
         Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
@@ -701,10 +705,16 @@
         InvokeOnBeforeInsertSaleLineWorkflow(Rec);
         OnBeforeInsertPOSSaleLine(Rec);
 
-        if HandleReturnValue then
-            ReturnValue := Rec.Insert(true)
-        else begin
-            Rec.Insert(true);
+        if HandleReturnValue then begin
+            if (UseCustomSystemId and (not IsNullGuid(Rec.SystemId))) then
+                ReturnValue := Rec.Insert(true, true)
+            else
+                ReturnValue := Rec.Insert(true);
+        end else begin
+            if IsNullGuid(Rec.SystemId) then
+                Rec.Insert(true)
+            else
+                Rec.Insert(true, true);
             ReturnValue := true;
         end;
 
@@ -1039,6 +1049,11 @@
         UsePresetLineNo := Set;
     end;
 
+    internal procedure SetUseCustomSystemId(Set: Boolean)
+    begin
+        UseCustomSystemId := Set;
+    end;
+    
     procedure SetSkipPOSInfo(Skip: Boolean)
     begin
         SkipPOSInfo := Skip;

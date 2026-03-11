@@ -4,7 +4,7 @@
     Caption = 'Restaurant Card';
     PageType = Card;
     UsageCategory = None;
-    PromotedActionCategories = 'New,Process,Report,Kitchen,Layout';
+    PromotedActionCategories = 'New,Process,Report,Kitchen,Layout,Menus';
     SourceTable = "NPR NPRE Restaurant";
 
     layout
@@ -93,9 +93,36 @@
                     }
                 }
             }
+            group(MenuSetup)
+            {
+                Caption = 'Menu Setup';
+                field("Menu Primary Color"; Rec."Menu Primary Color")
+                {
+                    ToolTip = 'Specifies the primary color (hex code) for the menus.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Menu Secondary Color"; Rec."Menu Secondary Color")
+                {
+                    ToolTip = 'Specifies the secondary color (hex code) for the menus.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("QR Card Payment Method"; Rec."QR Card Payment Method")
+                {
+                    ToolTip = 'Specifies the default POS payment method to use for QR code card payments in self-service scenarios. This can be mapped to a more specific card payment method via EFT BIN matching.';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+            }
         }
         area(factboxes)
         {
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            part(RestaurantLogo; "NPR NPRERestaurantLogoFactBox")
+            {
+                ApplicationArea = NPRRetail;
+                SubPageLink = Code = field(Code);
+            }
+#endif
             systempart(Control6014412; Notes)
             {
                 ApplicationArea = NPRRetail;
@@ -112,6 +139,26 @@
     {
         area(navigation)
         {
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            group(Menus)
+            {
+                Caption = 'Menus';
+                Image = Web;
+                action(Menu)
+                {
+                    Caption = 'Menus';
+                    Image = List;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category6;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPR NPRE Menus";
+                    RunPageLink = "Restaurant Code" = FIELD(Code);
+                    ToolTip = 'View or edit menus for this restaurant.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+#endif
             group(Kitchen)
             {
                 Caption = 'Kitchen';

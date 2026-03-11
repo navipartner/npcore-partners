@@ -1,0 +1,178 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  types: ./types-restaurant.yml
+
+service:
+  display-name: Restaurant Menus
+  auth: true
+  base-path: /restaurant
+
+  endpoints:
+    listMenus:
+      docs: List all menus for a restaurant without full content
+      display-name: List Menus
+      method: GET
+      path: "/{restaurantId}/menu"
+      path-parameters:
+        restaurantId:
+          type: uuid
+          docs: The restaurant system ID
+      response: list<types.MenuSummary>
+      examples:
+        - name: ExampleListMenus
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            restaurantId: "e7b7e6b6-e3b7-f011-a901-f68f27c8de7a"
+          response:
+            body:
+              - id: "e7b7e6b6-e3b7-f011-a901-f68f27c8de7a"
+                code: "QR_MENU"
+                startTime: "09:00:00"
+                endTime: "18:00:00"
+                timezone: "(UTC+01:00) Brussels, Copenhagen, Madrid, Paris"
+                active: true
+                lastUpdated: "2026-01-15T14:30:00Z"
+
+    getMenu:
+      docs: Get a specific menu with full details including categories, items, addons, and translations
+      display-name: Get Menu
+      method: GET
+      path: "/{restaurantId}/menu/{menuId}"
+      path-parameters:
+        restaurantId:
+          type: uuid
+          docs: The restaurant system ID
+        menuId:
+          type: uuid
+          docs: The menu system ID
+      response: types.Menu
+      examples:
+        - name: ExampleGetMenu
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            restaurantId: "e7b7e6b6-e3b7-f011-a901-f68f27c8de7a"
+            menuId: "e7b7e6b6-e3b7-f011-a901-f68f27c8de7a"
+          response:
+            body:
+              id: "e7b7e6b6-e3b7-f011-a901-f68f27c8de7a"
+              code: "QR_MENU"
+              startTime: "09:00:00"
+              endTime: "18:00:00"
+              timezone: "(UTC+01:00) Brussels, Copenhagen, Madrid, Paris"
+              active: true
+              lastUpdated: "2026-01-15T14:30:00Z"
+              menuContent:
+                categories:
+                  - code: "DURUM"
+                    sortKey: 10000
+                    title:
+                      DAN: "Durum"
+                      ENU: "Durum"
+                    description:
+                      DAN: "Hjemmelavet fladbrød hver morgen"
+                      ENU: "Homemade flatbread every morning"
+                    items:
+                      - itemCode: "10000"
+                        variantCode: ""
+                        sortKey: 10000
+                        status: Active
+                        unitPrice: 120.0
+                        title:
+                          DAN: "Durum Kebab"
+                          ENU: "Durum Kebab"
+                        descriptionMarkdown:
+                          DAN: "# Overskrift\nlavet med kærlighed"
+                          ENU: "# Headline\nMade with love"
+                        nutritionMarkdown:
+                          DAN: "kcal per 100g: For mange"
+                          ENU: "kcal per 100g: Too many"
+                        addonItems:
+                          - category: "PROTEIN"
+                            sortKey: 1
+                            type: "Select"
+                            mandatory: false
+                            fixedQuantity: false
+                            quantityPerUnit: false
+                            quantity: 0.0
+                            itemCode: ""
+                            variantCode: ""
+                            unitPrice: 0.0
+                            description: {}
+                            selectOptions:
+                              - sortKey: 10000
+                                fixedQuantity: true
+                                quantityPerUnit: true
+                                quantity: 1.0
+                                itemCode: "10011"
+                                variantCode: ""
+                                unitPrice: 0.0
+                                description:
+                                  DAN: "Kebab fyld"
+                                  ENU: "Kebab filling"
+                              - sortKey: 20000
+                                fixedQuantity: true
+                                quantityPerUnit: true
+                                quantity: 1.0
+                                itemCode: "10012"
+                                variantCode: ""
+                                unitPrice: 0.0
+                                description:
+                                  DAN: "Falafel fyld"
+                                  ENU: "Falafel filling"
+                          - category: "EXTRAS"
+                            sortKey: 1
+                            type: "Quantity"
+                            mandatory: false
+                            fixedQuantity: false
+                            quantityPerUnit: false
+                            quantity: 0.0
+                            itemCode: "10006"
+                            variantCode: ""
+                            unitPrice: 15.0
+                            description:
+                              DAN: "Ekstra fyld"
+                              ENU: "Extra filling"
+                        upsellItems:
+                          - itemCode: "10018"
+                            variantCode: ""
+                            sortKey: 10000
+                            unitPrice: 80.0
+                            title: {}
+                            descriptionMarkdown: {}
+                            nutritionMarkdown: {}
+                checkoutUpsellItems:
+                  - itemCode: "10024"
+                    variantCode: ""
+                    sortKey: 20000
+                    unitPrice: 4.0
+                    title:
+                      DAN: "plastikpose"
+                      ENU: "plasticbag"
+                    descriptionMarkdown:
+                      DAN: ""
+                      ENU: ""
+                    nutritionMarkdown:
+                      DAN: ""
+                      ENU: ""
+                addonCategories:
+                  PROTEIN:
+                    sortKey: 1
+                    title:
+                      DAN: "Protein"
+                      ENU: "Protein"
+                    description:
+                      DAN: "Protein beskrivelse"
+                      ENU: "Protein description"
+                  EXTRAS:
+                    sortKey: 3
+                    title:
+                      DAN: "Tilvalg"
+                      ENU: "Extras"
+                    description:
+                      DAN: ""
+                      ENU: ""

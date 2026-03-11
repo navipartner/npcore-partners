@@ -99,6 +99,137 @@ codeunit 6014580 "NPR Object Output Mgt."
     end;
 #pragma warning restore AA0139
 
+#if not (BC17 or BC18)
+    internal procedure PrintMatrixJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR IMatrix Printer"; NoOfPrints: Integer)
+    var
+        ObjectOutput: Record "NPR Object Output Selection";
+        DefaultHandler: Codeunit "NPR Def. Retail Print Handler";
+        Handler: Interface "NPR IRetail Print Handler";
+        Skip: Boolean;
+    begin
+        if NoOfPrints < 1 then
+            exit;
+        OnBeforeSendMatrixPrint(TemplateCode, CodeunitId, ReportId, Printer, NoOfPrints, Skip);
+        if Skip then
+            exit;
+
+        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
+            exit;
+
+        Handler := DefaultHandler;
+        OnResolveRetailPrintHandler(Handler);
+
+        DispatchMatrixJobViaHandler(Handler, ObjectOutput, Printer, NoOfPrints, CodeunitId);
+    end;
+
+    local procedure DispatchMatrixJobViaHandler(var Handler: Interface "NPR IRetail Print Handler"; var ObjectOutput: Record "NPR Object Output Selection"; var Printer: Interface "NPR IMatrix Printer"; NoOfPrints: Integer; CodeunitId: Integer)
+    var
+        PrintJob: Text;
+        HTTPEndpoint: Text;
+        i: Integer;
+    begin
+        case ObjectOutput."Output Type" of
+            ObjectOutput."Output Type"::"Printer Name":
+                begin
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintBytesLocal(ObjectOutput."Output Path", PrintJob);
+                end;
+
+            ObjectOutput."Output Type"::HTTP:
+                begin
+                    if not Printer.PrepareJobForHTTP(HTTPEndpoint) then
+                        Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), '');
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintJob);
+                end;
+
+            ObjectOutput."Output Type"::Bluetooth:
+                begin
+                    if not Printer.PrepareJobForBluetooth() then
+                        Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), '');
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintBytesBluetooth(ObjectOutput."Output Path", PrintJob);
+                end;
+
+            ObjectOutput."Output Type"::"PrintNode Raw":
+                begin
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintJob, 1, CodeunitId);
+                end;
+        end;
+    end;
+
+    internal procedure PrintLineJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR ILine Printer"; NoOfPrints: Integer)
+    var
+        ObjectOutput: Record "NPR Object Output Selection";
+        DefaultHandler: Codeunit "NPR Def. Retail Print Handler";
+        Handler: Interface "NPR IRetail Print Handler";
+        Skip: Boolean;
+    begin
+        if NoOfPrints < 1 then
+            exit;
+        OnBeforeSendLinePrint(TemplateCode, CodeunitId, ReportId, Printer, NoOfPrints, Skip);
+        if Skip then
+            exit;
+        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
+            exit;
+
+        Handler := DefaultHandler;
+        OnResolveRetailPrintHandler(Handler);
+
+        DispatchLineJobViaHandler(Handler, ObjectOutput, Printer, NoOfPrints, CodeunitId);
+    end;
+
+    local procedure DispatchLineJobViaHandler(var Handler: Interface "NPR IRetail Print Handler"; var ObjectOutput: Record "NPR Object Output Selection"; var Printer: Interface "NPR ILine Printer"; NoOfPrints: Integer; CodeunitId: Integer)
+    var
+        PrintJob: Text;
+        HTTPEndpoint: Text;
+        i: Integer;
+    begin
+        case ObjectOutput."Output Type" of
+            ObjectOutput."Output Type"::"Printer Name":
+                begin
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintBytesLocal(ObjectOutput."Output Path", PrintJob);
+                end;
+
+            ObjectOutput."Output Type"::HTTP:
+                begin
+                    if not Printer.PrepareJobForHTTP(HTTPEndpoint) then
+                        Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), '');
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintJob);
+                end;
+
+            ObjectOutput."Output Type"::Bluetooth:
+                begin
+                    if not Printer.PrepareJobForBluetooth() then
+                        Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), '');
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintBytesBluetooth(ObjectOutput."Output Path", PrintJob);
+                end;
+
+            ObjectOutput."Output Type"::"PrintNode Raw":
+                begin
+                    PrintJob := Printer.GetPrintBufferAsBase64();
+                    for i := 1 to NoOfPrints do
+                        Handler.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintJob, 1, CodeunitId);
+                end;
+        end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnResolveRetailPrintHandler(var Handler: Interface "NPR IRetail Print Handler")
+    begin
+    end;
+#else
     internal procedure PrintMatrixJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR IMatrix Printer"; NoOfPrints: Integer)
     var
         ObjectOutput: Record "NPR Object Output Selection";
@@ -142,6 +273,7 @@ codeunit 6014580 "NPR Object Output Mgt."
                     for i := 1 to NoOfPrints do
                         PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintJob);
                 end;
+
             ObjectOutput."Output Type"::"PrintNode Raw":
                 begin
                     PrintJob := Printer.GetPrintBufferAsBase64();
@@ -167,7 +299,6 @@ codeunit 6014580 "NPR Object Output Mgt."
             exit;
         if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
             exit;
-
 
         case ObjectOutput."Output Type" of
             ObjectOutput."Output Type"::"Printer Name":
@@ -203,6 +334,7 @@ codeunit 6014580 "NPR Object Output Mgt."
                 end;
         end;
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR IMatrix Printer"; NoOfPrints: Integer; var Skip: Boolean)
@@ -214,4 +346,3 @@ codeunit 6014580 "NPR Object Output Mgt."
     begin
     end;
 }
-

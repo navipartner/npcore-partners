@@ -15,7 +15,6 @@
             {
                 field(Type; Rec.Type)
                 {
-
                     ToolTip = 'Specifies the type of entity that will be sold for this line.';
                     ApplicationArea = NPRRetail;
                 }
@@ -42,6 +41,16 @@
                 {
 
                     ToolTip = 'Specifies an additional description of the entry of the product to be sold.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Category Code"; Rec."Category Code")
+                {
+                    ToolTip = 'Specifies the category code for the line.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Sort Key"; Rec."Sort Key")
+                {
+                    ToolTip = 'Specifies the sort key for the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
@@ -147,6 +156,15 @@
 
                 ToolTip = 'View or edit list of different add-on line options which could be as a template applied to add-on line.';
                 ApplicationArea = NPRRetail;
+            }
+            action(ChangeCaptions)
+            {
+                Caption = 'Change Captions';
+                Image = Edit;
+                RunObject = Page "NPR Item Addon Translation";
+                RunPageLink = "External Table SystemId" = field("SystemId");
+                ApplicationArea = NPRRetail;
+                ToolTip = 'View or edit translations for this add-on line.';
             }
             action("Before Insert Setup")
             {

@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  commonApiTypes: ./../common-api-types.yml
+
+types:
+  OrderReadyForServingEvent:
+    properties:
+      values:
+        type: list<OrderReadyForServingObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $OrderReadyForServingObject.ExampleObject
+
+  OrderReadyForServingObject:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: OrderReadyForServingEventPayload
+    examples:
+      - name: ExampleObject
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored"
+          eventName: "restaurant_order_ready_for_serving"
+          eventVersion: "1.0"
+          payload: $OrderReadyForServingEventPayload.ExamplePayload
+
+  OrderReadyForServingEventPayload:
+    properties:
+      kitchenOrderNo:
+        type: long
+        docs: The kitchen order number
+      kitchenOrderId:
+        type: uuid
+        docs: SystemId of the kitchen order, for use with GET /restaurant/{restaurantId}/orders/{orderId}
+    examples:
+      - name: ExamplePayload
+        value:
+          kitchenOrderNo: 123456
+          kitchenOrderId: "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f90"
+
+webhooks:
+  orderReadyForServing:
+    display-name: Restaurant Order Ready for Serving
+    docs:
+      Event `restaurant_order_ready_for_serving`. Triggered when a kitchen order is marked as ready for serving. Your endpoint will receive this POST request.
+    method: POST
+    payload: OrderReadyForServingEvent
+    examples:
+      - payload: $OrderReadyForServingEvent.ExampleEvent

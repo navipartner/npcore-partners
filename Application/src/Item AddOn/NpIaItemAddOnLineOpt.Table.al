@@ -131,4 +131,11 @@
         {
         }
     }
+
+    trigger OnDelete()
+    var
+        ItemAddonTranslation: Record "NPR Item Addon Translation";
+    begin
+        ItemAddonTranslation.DeleteTranslations(SystemId);
+    end;
 }

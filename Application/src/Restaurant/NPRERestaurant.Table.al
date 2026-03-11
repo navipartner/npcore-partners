@@ -101,6 +101,27 @@
             Caption = 'Default Number of Guests';
             DataClassification = CustomerContent;
         }
+        field(200; "Menu Logo Media Key"; Text[200])
+        {
+            Caption = 'Menu Logo Media Key';
+            DataClassification = CustomerContent;
+        }
+        field(210; "Menu Primary Color"; Code[7])
+        {
+            Caption = 'Menu Primary Color';
+            DataClassification = CustomerContent;
+        }
+        field(220; "Menu Secondary Color"; Code[7])
+        {
+            Caption = 'Menu Secondary Color';
+            DataClassification = CustomerContent;
+        }
+        field(230; "QR Card Payment Method"; Code[10])
+        {
+            Caption = 'QR Card Payment Method';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Method";
+        }
     }
 
     keys

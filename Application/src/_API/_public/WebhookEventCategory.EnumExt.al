@@ -21,5 +21,9 @@ enumextension 6014420 "NPR Webhook Event Category" extends "EventCategory"
     {
         Caption = 'NP Designer';
     }
+    value(6014415; "NPR Restaurant")
+    {
+        Caption = 'Restaurant';
+    }
 }
 #endif

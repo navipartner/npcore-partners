@@ -1,0 +1,125 @@
+# Replace variable values below
+@saleId = f5432e48-ec47-4b1f-9ad6-b4477ed423ae
+@saleLineId = bba56a4f-2df4-4c17-9f28-7d3264b8a55a
+@paymentLineId = 4b8c81a1-918b-4e4b-bb75-3196042bb31d
+@transactionId = a1b2c3d4-e5f6-7890-abcd-ef1234567890
+@username =
+@password =
+
+###
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}} HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+content-type: application/json
+
+{
+    "posUnit": "01"
+}
+
+###
+
+GET https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/saleline HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+
+###
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/saleline/{{saleLineId}} HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+content-type: application/json
+
+{
+    "type": "Item",
+    "code": "100001"
+}
+
+###
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/paymentline/{{paymentLineId}} HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+content-type: application/json
+
+{
+    "paymentMethodCode": "CASH",
+    "paymentType": "Cash",
+    "amount": 120
+}
+
+###
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/paymentline/{{paymentLineId}} HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+content-type: application/json
+
+{
+    "paymentMethodCode": "CARD",
+    "paymentType": "EFT",
+    "amount": 120,
+    "maskedCardNo": "4571XXXXXX37",
+    "pspReference": "PSP_reference",
+    "parToken": "PAR_token",
+    "success": true,
+    "eftReceipt": ["line1","line2","line3"]
+}
+
+###
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/complete HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+content-type: application/json
+
+{
+    "kitchenRequest": {
+        "seatingCode": "SHAWBAR-PICKUP01",
+        "customerDetails":
+        {
+            "name": "Mikkel",
+            "phoneNo": "+45 12345678",
+            "email": "mmv@navipartner.dk"
+        }
+    }
+}
+
+### EFT Cloud Flow: Prepare → Start → Poll Status
+
+# Step 1: Prepare EFT Payment (creates transaction request, resolves EFT method from self-service profile)
+# Amount is optional - omit to use remaining sale balance
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/eft/prepare HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+content-type: application/json
+
+{
+    "amount": 120.00
+}
+
+###
+
+# Step 2: Start EFT Payment (sends request to Adyen cloud terminal, blocks until terminal responds)
+# Use the transactionId returned from prepare
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/eft/{{transactionId}}/cloud/start HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+
+###
+
+# Step 3: Poll EFT Status (check transaction result - includes payment delta when successful)
+
+GET https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/eft/{{transactionId}}/cloud/status HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}
+
+###
+
+# Cancel EFT Transaction (fire-and-forget abort request to terminal)
+
+POST https://api.npretail.app/np659015/BC/CRONUS+International+Ltd./pos/sale/{{saleId}}/eft/{{transactionId}}/cloud/cancel HTTP/1.1
+x-npr-api-remote-type: crane
+Authorization: Basic {{username}}:{{password}}

@@ -78,11 +78,11 @@
     begin
         NpIaItemAddOnLineOption.SetRange("AddOn No.", "No.");
         if NpIaItemAddOnLineOption.FindFirst() then
-            NpIaItemAddOnLineOption.DeleteAll();
+            NpIaItemAddOnLineOption.DeleteAll(true);
 
         NpIaItemAddOnLine.SetRange("AddOn No.", "No.");
         if NpIaItemAddOnLine.FindFirst() then
-            NpIaItemAddOnLine.DeleteAll();
+            NpIaItemAddOnLine.DeleteAll(true);
     end;
 
     trigger OnInsert()
@@ -100,4 +100,3 @@
         TestField("No.");
     end;
 }
-

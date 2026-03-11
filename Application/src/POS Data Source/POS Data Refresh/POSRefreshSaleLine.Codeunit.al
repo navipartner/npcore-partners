@@ -56,6 +56,13 @@ codeunit 6150693 "NPR POS Refresh Sale Line"
         exit(Data);
     end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    procedure GetRows(): Dictionary of [Text, Text]
+    begin
+        exit(_rows);
+    end;
+#endif
+
     procedure GetFullDataInCurrentSale(): JsonObject
     var
         POSSale: Codeunit "NPR POS Sale";
@@ -94,8 +101,8 @@ codeunit 6150693 "NPR POS Refresh Sale Line"
         RowObject := CreateRow(Rec, false);
         RowObject.Add('deleted', false);
         RowObject.WriteTo(RowObjectText);
-        _rowsNewInsert.Set(Format(Rec.SystemId), true);
-        _rows.Set(Format(Rec.SystemId), RowObjectText);
+        _rowsNewInsert.Set(Format(Rec.SystemId, 0, 4).ToLower(), true);
+        _rows.Set(Format(Rec.SystemId, 0, 4).ToLower(), RowObjectText);
     end;
 
     local procedure Delete(var Rec: Record "NPR POS Sale Line")
@@ -104,22 +111,22 @@ codeunit 6150693 "NPR POS Refresh Sale Line"
         RowObjectText: Text;
         NewInsert: Boolean;
     begin
-        if _rows.Get(Format(Rec.SystemId), RowObjectText) then begin
-            if _rowsNewInsert.Get(Format(Rec.Systemid), NewInsert) then begin
+        if _rows.Get(Format(Rec.SystemId, 0, 4).ToLower(), RowObjectText) then begin
+            if _rowsNewInsert.Get(Format(Rec.SystemId, 0, 4).ToLower(), NewInsert) then begin
                 if NewInsert then begin
-                    _rows.Remove(Format(Rec.SystemId));
-                    _rowsNewInsert.Remove(Format(Rec.SystemId));
+                    _rows.Remove(Format(Rec.SystemId, 0, 4).ToLower());
+                    _rowsNewInsert.Remove(Format(Rec.SystemId, 0, 4).ToLower());
                     exit;
                 end;
             end;
 
-            _rows.Remove(Format(Rec.SystemId));
+            _rows.Remove(Format(Rec.SystemId, 0, 4).ToLower());
         end;
 
         RowObject := CreateRow(Rec, true);
         RowObject.Add('deleted', true);
         RowObject.WriteTo(RowObjectText);
-        _rows.Add(Format(Rec.SystemId), RowObjectText);
+        _rows.Add(Format(Rec.SystemId, 0, 4).ToLower(), RowObjectText);
     end;
 
     local procedure Modify(var Rec: Record "NPR POS Sale Line")
@@ -127,13 +134,13 @@ codeunit 6150693 "NPR POS Refresh Sale Line"
         RowObject: JsonObject;
         RowObjectText: Text;
     begin
-        if _rows.Remove(Format(Rec.SystemId)) then;
+        if _rows.Remove(Format(Rec.SystemId, 0, 4).ToLower()) then;
 
         RowObject := CreateRow(Rec, false);
         RowObject.Add('deleted', false);
         RowObject.WriteTo(RowObjectText);
 
-        _rows.Set(Format(Rec.SystemId), RowObjectText);
+        _rows.Set(Format(Rec.SystemId, 0, 4).ToLower(), RowObjectText);
     end;
 
     local procedure Rename(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line")

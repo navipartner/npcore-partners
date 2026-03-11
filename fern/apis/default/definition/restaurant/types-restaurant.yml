@@ -1,0 +1,327 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+types:
+  Restaurant:
+    docs: Restaurant information with branding
+    properties:
+      id:
+        type: uuid
+        docs: The unique system identifier for the restaurant
+      code:
+        type: string
+        docs: The restaurant code
+      name:
+        type: string
+        docs: The restaurant name
+      description:
+        type: optional<string>
+        docs: Restaurant description
+      primaryColor:
+        type: optional<string>
+        docs: Primary brand color as hex code
+      secondaryColor:
+        type: optional<string>
+        docs: Secondary brand color as hex code
+      logoUrl:
+        type: optional<string>
+        docs: Cloudflare URL for the restaurant logo
+
+  TranslatedText:
+    docs: Multilingual text keyed by language code
+    type: map<string, string>
+
+  Menu:
+    docs: Menu with full details including categories, items, and translations
+    properties:
+      id:
+        type: uuid
+        docs: The unique system identifier for the menu
+      code:
+        type: string
+        docs: The menu code
+      startTime:
+        type: string
+        docs: When the menu becomes active (HH:MM:SS format)
+      endTime:
+        type: string
+        docs: When the menu stops accepting orders (HH:MM:SS format)
+      timezone:
+        type: string
+        docs: The timezone for the menu times
+      active:
+        type: boolean
+        docs: Whether the menu is currently active
+      lastUpdated:
+        type: optional<datetime>
+        docs: When the menu or any of its child content (categories, items, translations, upsells) was last modified (UTC)
+      menuContent: MenuContent
+
+  MenuSummary:
+    docs: Menu summary without full content (for list endpoints)
+    properties:
+      id:
+        type: uuid
+        docs: The unique system identifier for the menu
+      code:
+        type: string
+        docs: The menu code
+      startTime:
+        type: string
+        docs: When the menu becomes active (HH:MM:SS format)
+      endTime:
+        type: string
+        docs: When the menu stops accepting orders (HH:MM:SS format)
+      timezone:
+        type: string
+        docs: The timezone for the menu times
+      active:
+        type: boolean
+        docs: Whether the menu is currently active
+      lastUpdated:
+        type: optional<datetime>
+        docs: When the menu or any of its child content (categories, items, translations, upsells) was last modified (UTC)
+
+  MenuContent:
+    docs: Complete menu structure with categories, items, and upsells
+    properties:
+      categories:
+        type: list<Category>
+        docs: Menu categories with their items
+      checkoutUpsellItems:
+        type: list<UpsellItem>
+        docs: Items shown as upsells during checkout
+      addonCategories:
+        type: map<string, AddonCategory>
+        docs: Addon category definitions keyed by category code
+
+  Category:
+    docs: Menu category grouping items
+    properties:
+      code:
+        type: string
+        docs: Category code
+      sortKey:
+        type: integer
+        docs: Sort order for display
+      title:
+        type: TranslatedText
+        docs: Category title translations
+      description:
+        type: TranslatedText
+        docs: Category description translations
+      items:
+        type: list<MenuItem>
+        docs: Items in this category
+
+  MenuItemStatus:
+    docs: Menu item availability status
+    enum:
+      - Active
+      - value: Inactive Visible
+        name: InactiveVisible
+      - value: Inactive Hidden
+        name: InactiveHidden
+
+  MenuItem:
+    docs: Menu item with pricing, translations, addons, and upsells
+    properties:
+      itemCode:
+        type: string
+        docs: Business Central item number
+      variantCode:
+        type: string
+        docs: Item variant code
+      sortKey:
+        type: integer
+        docs: Sort order for display
+      status:
+        type: optional<MenuItemStatus>
+        docs: Item availability status. Active items can be ordered. Inactive Visible items are shown but cannot be ordered. Inactive Hidden items are not shown.
+      unitPrice:
+        type: double
+        docs: Item price
+      title:
+        type: TranslatedText
+        docs: Item title translations
+      descriptionMarkdown:
+        type: TranslatedText
+        docs: Item description in markdown format
+      nutritionMarkdown:
+        type: TranslatedText
+        docs: Nutritional information in markdown format
+      imageUrl:
+        type: optional<string>
+        docs: Cloudflare URL for the menu item image (with 16-hour TTL)
+      addonItems:
+        type: optional<list<AddonItem>>
+        docs: Addon options for this item
+      upsellItems:
+        type: optional<list<UpsellItem>>
+        docs: Upsell suggestions for this item
+
+  AddonItem:
+    docs: Addon option for a menu item (quantity or select type)
+    properties:
+      category:
+        type: string
+        docs: Addon category code
+      sortKey:
+        type: integer
+        docs: Sort order for display
+      type:
+        type: string
+        docs: Addon type (Quantity or Select)
+      mandatory:
+        type: boolean
+        docs: Whether this addon is mandatory when purchasing the main item
+      fixedQuantity:
+        type: boolean
+        docs: Whether quantity is fixed
+      quantityPerUnit:
+        type: boolean
+        docs: Whether quantity scales with parent item quantity
+      quantity:
+        type: double
+        docs: Default quantity
+      itemCode:
+        type: string
+        docs: Business Central item number (for Quantity type)
+      variantCode:
+        type: string
+        docs: Item variant code (for Quantity type)
+      unitPrice:
+        type: double
+        docs: Addon price
+      description:
+        type: TranslatedText
+        docs: Addon description translations
+      selectOptions:
+        type: optional<list<SelectOption>>
+        docs: Options to select from (for Select type)
+
+  SelectOption:
+    docs: Option within a Select-type addon
+    properties:
+      sortKey:
+        type: integer
+        docs: Sort order for display
+      fixedQuantity:
+        type: boolean
+        docs: Whether quantity is fixed
+      quantityPerUnit:
+        type: boolean
+        docs: Whether quantity scales with parent item quantity
+      quantity:
+        type: double
+        docs: Default quantity
+      itemCode:
+        type: string
+        docs: Business Central item number
+      variantCode:
+        type: string
+        docs: Item variant code
+      unitPrice:
+        type: double
+        docs: Option price
+      description:
+        type: TranslatedText
+        docs: Option description translations
+
+  UpsellItem:
+    docs: Upsell suggestion item
+    properties:
+      itemCode:
+        type: string
+        docs: Business Central item number
+      variantCode:
+        type: string
+        docs: Item variant code
+      sortKey:
+        type: integer
+        docs: Sort order for display
+      unitPrice:
+        type: double
+        docs: Item price
+      title:
+        type: TranslatedText
+        docs: Item title translations
+      descriptionMarkdown:
+        type: TranslatedText
+        docs: Item description in markdown format
+      nutritionMarkdown:
+        type: TranslatedText
+        docs: Nutritional information in markdown format
+      imageUrl:
+        type: optional<string>
+        docs: Cloudflare URL for the upsell item image (with 16-hour TTL)
+
+  AddonCategory:
+    docs: Addon category definition with translations
+    properties:
+      sortKey:
+        type: integer
+        docs: Sort order for display
+      title:
+        type: TranslatedText
+        docs: Category title translations
+      description:
+        type: TranslatedText
+        docs: Category description translations
+
+  KitchenOrdersResponse:
+    docs: Paginated response of kitchen orders
+    properties:
+      morePages:
+        type: boolean
+        docs: Whether there are more pages available
+      nextPageKey:
+        type: string
+        docs: Page key for next page
+      nextPageURL:
+        type: string
+        docs: Full URL to fetch next page
+      data:
+        type: list<KitchenOrder>
+        docs: Kitchen orders for this page
+
+  KitchenOrderStatus:
+    enum:
+      - name: ReadyForServing
+        value: "Ready for Serving"
+      - name: InProduction
+        value: "In-Production"
+      - Released
+      - Planned
+      - Finished
+      - Cancelled
+
+  KitchenOrder:
+    docs: Kitchen order with status and timing
+    properties:
+      orderId:
+        type: uuid
+        docs: Unique identifier (SystemId) of the kitchen order
+      orderNo:
+        type: long
+        docs: Kitchen order number
+      restaurantCode:
+        type: string
+        docs: Restaurant code
+      status:
+        type: KitchenOrderStatus
+        docs: Order status
+      priority:
+        type: integer
+        docs: Order priority
+      createdDateTime:
+        type: optional<string>
+        docs: When order was created (ISO 8601)
+      expectedDineDateTime:
+        type: optional<string>
+        docs: When guest expects to dine (ISO 8601)
+      finishedDateTime:
+        type: optional<string>
+        docs: When order was finished (ISO 8601)
+      onHold:
+        type: boolean
+        docs: Whether order is on hold

@@ -295,6 +295,9 @@ navigation:
           - pos.possale:
               title: POS Sale
               summary: ./docs/pages/pos/possale.mdx
+          - pos.posentry:
+              title: POS Entry
+              summary: ./docs/pages/pos/posentry.mdx
           - pos.unit:
               title: POS Unit
               summary: ./docs/pages/pos/unit.mdx
@@ -312,7 +315,19 @@ navigation:
               summary: ./docs/pages/pos/globalentry.mdx
           - pos.poswebhooks:
               title: Webhooks
-              
+
+        - section: Restaurant
+          summary: ./docs/pages/restaurant/overview.mdx
+          contents:
+          - restaurant.restaurant:
+              title: Restaurants
+          - restaurant.menu:
+              title: Menu
+          - restaurant.orders:
+              title: Orders
+          - restaurant.webhooks:
+              title: Webhooks
+
         - section: Inventory
           summary: ./docs/pages/inventory/overview.mdx
           contents:

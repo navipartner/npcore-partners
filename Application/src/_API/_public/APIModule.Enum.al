@@ -103,5 +103,10 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
         ObsoleteTag = '2026-01-23';
         ObsoleteReason = 'Unsused API as the only service GetNodeId() is handled directly via OData.';
     }
+
+    value(6150920; restaurant)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR API Restaurant Resolver";
+    }
 }
 #endif
