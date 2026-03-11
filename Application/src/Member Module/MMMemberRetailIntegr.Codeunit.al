@@ -917,6 +917,8 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        ListOfEntriesToDelete: List of [Integer];
+        EntryNo: Integer;
     begin
         MemberInfoCapture.LockTable(true);
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
@@ -943,10 +945,15 @@
                 MemberInfoCapture."Document Date" := SalesDate;
 
             MemberInfoCapture.Modify();
+            ListOfEntriesToDelete.Add(MemberInfoCapture."Entry No.");
         until (MemberInfoCapture.Next() = 0);
 
         CreateMembership.SetCreateMembership();
         CreateMembership.Run(MemberInfoCapture);
+
+        foreach EntryNo in ListOfEntriesToDelete do
+            if (MemberInfoCapture.Get(EntryNo)) then
+                if (not MemberInfoCapture.Delete()) then;
     end;
 
     internal procedure BlockMembershipEntryFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; MemberCount: Decimal)
