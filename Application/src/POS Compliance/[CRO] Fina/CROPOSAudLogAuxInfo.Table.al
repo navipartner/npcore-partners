@@ -183,6 +183,12 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
             Caption = 'Collect in Store';
             DataClassification = CustomerContent;
         }
+        field(31; "Salesperson Code"; Code[20])
+        {
+            Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser".Code;
+        }
     }
 
     keys

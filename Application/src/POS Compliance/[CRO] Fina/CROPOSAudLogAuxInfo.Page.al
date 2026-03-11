@@ -51,6 +51,11 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     ApplicationArea = NPRCROFiscal;
                     ToolTip = 'Specifies the POS Unit No. related to this record.';
                 }
+                field("Salesperson Code"; Rec."Salesperson Code")
+                {
+                    ApplicationArea = NPRCROFiscal;
+                    ToolTip = 'Specifies the value of the Salesperson Code field.';
+                }
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRCROFiscal;

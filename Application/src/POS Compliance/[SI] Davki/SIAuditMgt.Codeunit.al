@@ -418,6 +418,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SalespersonCode: Code[20];
     begin
         SIPOSAuditLogAuxInfo.Init();
         SIPOSAuditLogAuxInfo."Audit Entry Type" := SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header";
@@ -434,10 +435,14 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
         SIPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
 
-        SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
+        SalespersonCode := GetPOSSalespersonForSalesInvoice(SalesInvoiceHeader);
+        if SalespersonCode = '' then
+            SalespersonCode := SalesInvoiceHeader."Salesperson Code";
+
+        SalespersonPurchaser.Get(SalespersonCode);
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
-        SIPOSAuditLogAuxInfo."Salesperson Code" := SalesInvoiceHeader."Salesperson Code";
+        SIPOSAuditLogAuxInfo."Salesperson Code" := SalespersonCode;
         SaveCustomerDataToAuditLog(SIPOSAuditLogAuxInfo, SalesInvoiceHeader."Sell-to Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
@@ -452,6 +457,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         ReturnSIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SalespersonCode: Code[20];
     begin
         SIPOSAuditLogAuxInfo.Init();
         SIPOSAuditLogAuxInfo."Audit Entry Type" := SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Cr. Memo Header";
@@ -478,14 +484,58 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
         SIPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
 
-        SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
+        SalespersonCode := GetPOSSalespersonForSalesCrMemo(SalesCrMemoHeader);
+        if SalespersonCode = '' then
+            SalespersonCode := SalesCrMemoHeader."Salesperson Code";
+
+        SalespersonPurchaser.Get(SalespersonCode);
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
-        SIPOSAuditLogAuxInfo."Salesperson Code" := SalesCrMemoHeader."Salesperson Code";
+        SIPOSAuditLogAuxInfo."Salesperson Code" := SalespersonCode;
         SaveCustomerDataToAuditLog(SIPOSAuditLogAuxInfo, SalesCrMemoHeader."Sell-to Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
         CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
+    end;
+
+    local procedure GetPOSSalespersonForSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header"): Code[20]
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        if SalesInvoiceHeader."Order No." = '' then
+            exit('');
+
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
+        POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvoiceHeader."Order No.");
+        if not POSEntrySalesDocLink.FindFirst() then
+            exit('');
+
+        POSEntry.SetLoadFields("Salesperson Code");
+        if not POSEntry.Get(POSEntrySalesDocLink."POS Entry No.") then
+            exit('');
+
+        exit(POSEntry."Salesperson Code");
+    end;
+
+    local procedure GetPOSSalespersonForSalesCrMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Code[20]
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        if SalesCrMemoHeader."Return Order No." = '' then
+            exit('');
+
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::RETURN_ORDER);
+        POSEntrySalesDocLink.SetRange("Sales Document No", SalesCrMemoHeader."Return Order No.");
+        if not POSEntrySalesDocLink.FindFirst() then
+            exit('');
+
+        POSEntry.SetLoadFields("Salesperson Code");
+        if not POSEntry.Get(POSEntrySalesDocLink."POS Entry No.") then
+            exit('');
+
+        exit(POSEntry."Salesperson Code");
     end;
 
     local procedure SetAmounts(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var NpCsDocument: Record "NPR NpCs Document")

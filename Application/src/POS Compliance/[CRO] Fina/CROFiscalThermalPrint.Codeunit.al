@@ -558,14 +558,18 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
                 end;
             "NPR CRO Audit Entry Type"::"Sales Invoice":
                 begin
-                    SalesInvoiceHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.");
-                    if SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code") then
+                    if not SalespersonPurchaser.Get(CROPOSAuditLogAuxInfo."Salesperson Code") then
+                        if SalesInvoiceHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+                            SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
+                    if SalespersonPurchaser.Code <> '' then
                         PrintLine(Printer, StrSubstNo(SalespersonNameLbl, SalespersonPurchaser.Name), 0, true);
                 end;
             "NPR CRO Audit Entry Type"::"Sales Credit Memo":
                 begin
-                    SalesCrMemoHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.");
-                    if SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code") then
+                    if not SalespersonPurchaser.Get(CROPOSAuditLogAuxInfo."Salesperson Code") then
+                        if SalesCrMemoHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+                            SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
+                    if SalespersonPurchaser.Code <> '' then
                         PrintLine(Printer, StrSubstNo(SalespersonNameLbl, SalespersonPurchaser.Name), 0, true);
                 end;
         end;

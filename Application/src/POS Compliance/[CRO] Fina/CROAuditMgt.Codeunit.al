@@ -422,6 +422,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROAuxSalespPurch.TestField("NPR CRO Salesperson OIB");
         CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
+        CROPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
 
         SaveCustomerDataToAuditLog(CROPOSAuditLogAuxInfo, POSEntry."Customer No.");
 
@@ -447,6 +448,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SalespersonCode: Code[20];
     begin
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvoiceHeader);
         if CROAuxSalesInvHeader."NPR CRO POS Unit" = '' then
@@ -466,9 +468,14 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Evaluate(CROPOSAuditLogAuxInfo."Log Timestamp", Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
         CROPOSAuditLogAuxInfo."Total Amount" := SalesInvoiceHeader."Amount Including VAT";
 
-        SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
+        SalespersonCode := GetPOSSalespersonForSalesInvoice(SalesInvoiceHeader);
+        if SalespersonCode = '' then
+            SalespersonCode := SalesInvoiceHeader."Salesperson Code";
+
+        SalespersonPurchaser.Get(SalespersonCode);
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
+        CROPOSAuditLogAuxInfo."Salesperson Code" := SalespersonCode;
 
         SaveCustomerDataToAuditLog(CROPOSAuditLogAuxInfo, SalesInvoiceHeader."Sell-to Customer No.");
 
@@ -490,6 +497,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SalespersonCode: Code[20];
     begin
         CROAuxSalesCrMemoHeader.ReadCROAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         if CROAuxSalesCrMemoHeader."NPR CRO POS Unit" = '' then
@@ -509,9 +517,14 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Evaluate(CROPOSAuditLogAuxInfo."Log Timestamp", Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
         CROPOSAuditLogAuxInfo."Total Amount" := SalesCrMemoHeader."Amount Including VAT";
 
-        SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
+        SalespersonCode := GetPOSSalespersonForSalesCrMemo(SalesCrMemoHeader);
+        if SalespersonCode = '' then
+            SalespersonCode := SalesCrMemoHeader."Salesperson Code";
+
+        SalespersonPurchaser.Get(SalespersonCode);
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
+        CROPOSAuditLogAuxInfo."Salesperson Code" := SalespersonCode;
 
         SaveCustomerDataToAuditLog(CROPOSAuditLogAuxInfo, SalesCrMemoHeader."Sell-to Customer No.");
 
@@ -523,6 +536,46 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROAuxSalesCrMemoHeader."NPR CRO Audit Entry No." := CROPOSAuditLogAuxInfo."Audit Entry No.";
         CROAuxSalesCrMemoHeader.SaveCROAuxSalesCrMemoHeaderFields();
         exit(true);
+    end;
+
+    local procedure GetPOSSalespersonForSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header"): Code[20]
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        if SalesInvoiceHeader."Order No." = '' then
+            exit('');
+
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
+        POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvoiceHeader."Order No.");
+        if not POSEntrySalesDocLink.FindFirst() then
+            exit('');
+
+        POSEntry.SetLoadFields("Salesperson Code");
+        if not POSEntry.Get(POSEntrySalesDocLink."POS Entry No.") then
+            exit('');
+
+        exit(POSEntry."Salesperson Code");
+    end;
+
+    local procedure GetPOSSalespersonForSalesCrMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Code[20]
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        if SalesCrMemoHeader."Return Order No." = '' then
+            exit('');
+
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::RETURN_ORDER);
+        POSEntrySalesDocLink.SetRange("Sales Document No", SalesCrMemoHeader."Return Order No.");
+        if not POSEntrySalesDocLink.FindFirst() then
+            exit('');
+
+        POSEntry.SetLoadFields("Salesperson Code");
+        if not POSEntry.Get(POSEntrySalesDocLink."POS Entry No.") then
+            exit('');
+
+        exit(POSEntry."Salesperson Code");
     end;
 
     local procedure CheckAreDataSetAndAccordingToCompliance(FrontEnd: Codeunit "NPR POS Front End Management")
