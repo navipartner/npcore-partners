@@ -651,8 +651,7 @@
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        DigitalNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+        DigitalNotifHandlesVouchers: Boolean;
 #endif
     begin
         if not SalesHeader.Invoice then
@@ -681,20 +680,42 @@
         if not NpRvVoucherEntry.FindSet() then
             exit;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        DigitalNotifHandlesVouchers := IsDigitalNotifActiveForVouchers();
+#endif
         repeat
             if NpRvVoucher.Get(NpRvVoucherEntry."Voucher No.") then begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-                // Disable "Send via E-mail" in memory if digital notification will handle this voucher (no database modification)
-                if DigitalNotifMgt.ValidateDigitalNotifSetup() then begin
-                    NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
-                    if NpRvVoucherType.Get(NpRvVoucher."Voucher Type") and (NpRvVoucherType.PDFDesignerTemplateId <> '') then
+                if DigitalNotifHandlesVouchers then
+                    if VoucherTypeHasPDFDesignerTemplate(NpRvVoucher."Voucher Type") then
                         NpRvVoucher."Send via E-mail" := false;
-                end;
 #endif
                 SendVoucher(NpRvVoucher);
             end;
         until NpRvVoucherEntry.Next() = 0;
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure IsDigitalNotifActiveForVouchers(): Boolean
+    var
+        DigitalNotifSetup: Record "NPR Digital Notification Setup";
+        DigitalNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+    begin
+        if not DigitalNotifMgt.ValidateDigitalNotifSetup(DigitalNotifSetup) then
+            exit(false);
+        exit(not DigitalNotifSetup."Exclude Vouchers From Manifest");
+    end;
+
+    local procedure VoucherTypeHasPDFDesignerTemplate(VoucherTypeCode: Code[20]): Boolean
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
+        if not NpRvVoucherType.Get(VoucherTypeCode) then
+            exit(false);
+        exit(NpRvVoucherType.PDFDesignerTemplateId <> '');
+    end;
+#endif
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnAfterCopySalesLineFromSalesLineBuffer', '', true, false)]
     local procedure OnAfterCopyPostedSalesInvLine(var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; ToSalesHeader: Record "Sales Header")

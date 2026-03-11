@@ -555,6 +555,14 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         exit(true);
     end;
 
+    internal procedure ValidateDigitalNotifSetup(var DigitalNotificationSetup: Record "NPR Digital Notification Setup"): Boolean
+    begin
+        if not ValidateDigitalNotifSetup() then
+            exit(false);
+        DigitalNotificationSetup := DigitalNotifSetup;
+        exit(true);
+    end;
+
     local procedure IsManifestFeatureEnabled(): Boolean
     var
         NPDesignerSetup: Record "NPR NPDesignerSetup";
