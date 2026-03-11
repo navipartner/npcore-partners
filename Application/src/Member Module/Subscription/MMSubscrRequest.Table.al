@@ -26,7 +26,10 @@ table 6150923 "NPR MM Subscr. Request"
             trigger OnValidate()
             begin
                 if Rec.Status <> xRec.Status then
-                    Rec.Validate("Processing Status", Rec."Processing Status"::Pending);
+                    if Rec.Status = Rec.Status::Skipped then
+                        Rec.Validate("Processing Status", Rec."Processing Status"::Success)
+                    else
+                        Rec.Validate("Processing Status", Rec."Processing Status"::Pending);
 
                 Modify();
                 UpdateSubscriptionPaymentRequestStatus();

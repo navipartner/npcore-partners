@@ -245,6 +245,24 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     SetStatusCancelled();
                 end;
             }
+            action(Skipped)
+            {
+                Caption = 'Skip';
+                ToolTip = 'Sets the status of the current subscription payment request to Skipped';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = Stop;
+
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+#endif
+                trigger OnAction()
+                begin
+                    SetStatusSkipped();
+                end;
+            }
             action(Refund)
             {
                 Caption = 'Refund';
@@ -328,6 +346,7 @@ page 6184832 "NPR MM Subscr.Payment Requests"
             actionref(Process_Promoted; Process) { }
             actionref(ProcessWithoutTryCountUpdate_Promoted; ProcessWithoutTryCountUpdate) { }
             actionref(Cancel_Promoted; Cancel) { }
+            actionref(Skipped_Promoted; Skipped) { }
             actionref(Refund_Promoted; Refund) { }
             actionref(ResetTryCount_Promoted; ResetTryCount) { }
         }
@@ -353,6 +372,13 @@ page 6184832 "NPR MM Subscr.Payment Requests"
         SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
     begin
         SubsPayRequestUtils.SetSubscrPaymentRequestStatusCancelled(Rec, false);
+    end;
+
+    local procedure SetStatusSkipped()
+    var
+        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
+    begin
+        SubsPayRequestUtils.SetSubscrPaymentRequestStatusSkipped(Rec);
     end;
 
     local procedure FindPostedEntries()

@@ -190,6 +190,7 @@ page 6185077 "NPR MM SubsRequestTermination"
         MembershipNotSelectedLbl: Label 'A membership must be selected.';
         RefundNotAvailableLbl: Label 'The required configuration to cancel the membership is not present and therefore a refund cannot be executed automatically.';
         NoPaymentRequestRefundMayNotWorkLbl: Label 'This subscription is yet to be renewed automatically or all existing payments has previously been refunded. Some payment service providers do not allow unreferenced refunds and therefore the refund will fail later on.';
+        PaymentRequestSkippedLbl: Label 'The subscription renewal payment was skipped. No payment was collected, so a refund cannot be issued.';
     begin
         if _Membership."Entry No." = 0 then
             Error(MembershipNotSelectedLbl);
@@ -205,6 +206,10 @@ page 6185077 "NPR MM SubsRequestTermination"
         SubscriptionRequest.SetRange(Reversed, false);
         if (SubscriptionRequest.IsEmpty()) then
             _NoPaymentRequest := NoPaymentRequestRefundMayNotWorkLbl;
+
+        SubscriptionRequest.SetRange(Status, Enum::"NPR MM Subscr. Request Status"::Skipped);
+        if not SubscriptionRequest.IsEmpty() then
+            _NoPaymentRequest := PaymentRequestSkippedLbl;
 
         _RefundNotAvailable := RefundNotAvailableLbl;
 

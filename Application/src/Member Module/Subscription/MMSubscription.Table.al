@@ -67,7 +67,7 @@ table 6150918 "NPR MM Subscription"
             Caption = 'Outst. Subscr. Requests Exist';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = exist("NPR MM Subscr. Request" where("Subscription Entry No." = field("Entry No."), Type = field("Subscr. Request Type Filter"), "Processing Status" = Filter(Pending | Error), Status = filter(<> Cancelled)));
+            CalcFormula = exist("NPR MM Subscr. Request" where("Subscription Entry No." = field("Entry No."), Type = field("Subscr. Request Type Filter"), "Processing Status" = Filter(Pending | Error), Status = filter(<> Cancelled & <> Skipped)));
         }
         field(210; "Subscr. Request Type Filter"; Enum "NPR MM Subscr. Request Type")
         {
@@ -118,7 +118,7 @@ table 6150918 "NPR MM Subscription"
             Caption = 'Subscr. Renew Schedule Requests Exist';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = exist("NPR MM Subscr. Request" where("Renew Schedule Date" = field("Subscr Renew Sched Date Filter"), "Renew Schedule Id" = field("Subscr Renew Sched Id Filter"), Type = Const(Renew), Status = filter(<> Cancelled), "Subscription Entry No." = field("Entry No.")));
+            CalcFormula = exist("NPR MM Subscr. Request" where("Renew Schedule Date" = field("Subscr Renew Sched Date Filter"), "Renew Schedule Id" = field("Subscr Renew Sched Id Filter"), Type = Const(Renew), Status = filter(<> Cancelled & <> Skipped), "Subscription Entry No." = field("Entry No.")));
         }
         field(260; "External Membership No."; Code[20])
         {

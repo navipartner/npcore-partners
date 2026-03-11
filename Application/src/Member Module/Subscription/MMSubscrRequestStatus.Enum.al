@@ -12,4 +12,5 @@ enum 6059804 "NPR MM Subscr. Request Status"
     value(40; Rejected) { Caption = 'Rejected'; }
     value(50; Cancelled) { Caption = 'Cancelled'; }
     value(60; "Request Error") { Caption = 'Request Error'; }
+    value(70; "Skipped") { Caption = 'Skipped'; }
 }

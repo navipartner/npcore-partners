@@ -290,6 +290,24 @@ page 6184833 "NPR MM Subscr. Requests"
                     SetStatusCancelled();
                 end;
             }
+            action(Skipped)
+            {
+                Caption = 'Skip';
+                ToolTip = 'Sets the status of the current subscription request to Skipped';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = Stop;
+
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+#endif
+                trigger OnAction()
+                begin
+                    SetStatusSkipped();
+                end;
+            }
             action(Regret)
             {
                 Caption = 'Regret';
@@ -342,6 +360,7 @@ page 6184833 "NPR MM Subscr. Requests"
             actionref(Process_Promoted; Process) { }
             actionref(ProcessWithoutTryCountUpdate_Promoted; ProcessWithoutTryCountUpdate) { }
             actionref(Cancel_Promoted; Cancel) { }
+            actionref(Skipped_Promoted; Skipped) { }
             actionref(Regret_Promoted; Regret) { }
             actionref(ResetTryCount_Promoted; ResetTryCount) { }
         }
@@ -367,6 +386,13 @@ page 6184833 "NPR MM Subscr. Requests"
         SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
     begin
         SubscrRequestUtils.SetSubscriptionRequestStatusCancelledWithConfirmation(Rec, true);
+    end;
+
+    local procedure SetStatusSkipped()
+    var
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+    begin
+        SubscrRequestUtils.SetSubscriptionRequestStatusSkippedWithConfirmation(Rec, true);
     end;
 
     local procedure FindPostedEntries()

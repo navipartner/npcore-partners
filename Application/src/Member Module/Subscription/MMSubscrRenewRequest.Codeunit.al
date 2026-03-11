@@ -259,7 +259,8 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
             exit;
 
         SubscriptionRequest.Get(Rec."Subscr. Request Entry No.");
-        if (SubscriptionRequest.Status <> SubscriptionRequest.Status::Cancelled) and (Rec.Status <> Rec.Status::Cancelled) then
+        if not (SubscriptionRequest.Status in [SubscriptionRequest.Status::Cancelled, SubscriptionRequest.Status::Skipped]) and
+            not (Rec.Status in [Rec.Status::Cancelled, Rec.Status::Skipped]) then
             if SubscriptionRequest."Processing Status" = SubscriptionRequest."Processing Status"::Success then
                 Error(ProcessingStatusErrorLbl, SubscriptionRequest."Entry No.");
 
@@ -277,11 +278,14 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
                 SubscriptionRequest.Status := SubscriptionRequest.Status::Cancelled;
             Rec.Status::Error:
                 SubscriptionRequest.Status := SubscriptionRequest.Status::"Request Error";
+            Rec.Status::Skipped:
+                SubscriptionRequest.Status := SubscriptionRequest.Status::Skipped;
         end;
         if SubscriptionRequest.Status <> xSubscriptionRequest.Status then begin
-            if (SubscriptionRequest.Status = SubscriptionRequest.Status::Cancelled) and (Rec.Status = Rec.Status::Cancelled) then begin
+            if (SubscriptionRequest.Status in [SubscriptionRequest.Status::Cancelled, SubscriptionRequest.Status::Skipped]) and
+                (Rec.Status in [Rec.Status::Cancelled, Rec.Status::Skipped]) then begin
                 SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscriptionRequest."Entry No.");
-                SubscrPaymentRequest.SetFilter(Status, '<>%1', SubscrPaymentRequest.Status::Cancelled);
+                SubscrPaymentRequest.SetFilter(Status, '<>%1&<>%2', SubscrPaymentRequest.Status::Cancelled, SubscrPaymentRequest.Status::Skipped);
                 SubscrPaymentRequest.SetFilter("Entry No.", '<>%1', Rec."Entry No.");
                 if SubscrPaymentRequest.IsEmpty() then
                     SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success)

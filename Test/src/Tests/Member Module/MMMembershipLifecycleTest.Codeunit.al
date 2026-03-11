@@ -1054,6 +1054,174 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
 
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SkipSubscriptionRequestSkipsPaymentRequests()
+    var
+        Assert: Codeunit Assert;
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        // [SCENARIO] When a subscription request is set to Skipped, all related payment requests are also set to Skipped
+
+        // [GIVEN] A subscription request with a payment request
+        Initialize();
+        CreateSubscriptionRequestWithPaymentRequest(SubscriptionRequest, SubscrPaymentRequest);
+
+        // [WHEN] The subscription request status is set to Skipped
+        SubscriptionRequest.Validate(Status, SubscriptionRequest.Status::Skipped);
+        SubscriptionRequest.Modify(true);
+
+        // [THEN] The payment request should also be Skipped
+        SubscrPaymentRequest.Get(SubscrPaymentRequest."Entry No.");
+        Assert.AreEqual(SubscrPaymentRequest.Status::Skipped, SubscrPaymentRequest.Status, 'Payment request should be Skipped.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure SkipPaymentRequestSkipsSubscriptionRequest()
+    var
+        Assert: Codeunit Assert;
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
+    begin
+        // [SCENARIO] When a payment request is set to Skipped, the parent subscription request is also set to Skipped
+
+        // [GIVEN] A subscription request with a payment request
+        Initialize();
+        CreateSubscriptionRequestWithPaymentRequest(SubscriptionRequest, SubscrPaymentRequest);
+
+        // [WHEN] The payment request is skipped via SetSubscrPaymentRequestStatusSkipped
+        SubsPayRequestUtils.SetSubscrPaymentRequestStatusSkipped(SubscrPaymentRequest);
+
+        // [THEN] The subscription request should also be Skipped
+        SubscriptionRequest.Get(SubscriptionRequest."Entry No.");
+        Assert.AreEqual(SubscriptionRequest.Status::Skipped, SubscriptionRequest.Status, 'Subscription request should be Skipped.');
+        Assert.AreEqual(SubscriptionRequest."Processing Status"::Success, SubscriptionRequest."Processing Status", 'Processing status should be Success.');
+
+        // [THEN] The payment request should be Skipped
+        SubscrPaymentRequest.Get(SubscrPaymentRequest."Entry No.");
+        Assert.AreEqual(SubscrPaymentRequest.Status::Skipped, SubscrPaymentRequest.Status, 'Payment request should be Skipped.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SkippedEntriesDoNotBlockAutoRenewal()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionRequest2: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+        RequestSubscrRenewal: Codeunit "NPR MM Subscr. Renew: Request";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+    begin
+        // [SCENARIO] Skipped subscription and payment requests do not block auto-renewal of the subscription
+
+        // [GIVEN] A subscription with a Skipped renewal request created
+        Initialize();
+        _MemberModuleLib.SetupAutoRenew('T-GOLD', 'T-320100-AUTORENEW', '', 'Auto Renew GOLD');
+        DisableAgeVerification('T-GOLD');
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+        Membership.GetBySystemId(MembershipId);
+        CreateSubscriptionForRenewal(Subscription, Membership);
+        SetupRecurPaymentForAutoRenew(Membership."Membership Code", RecurPaymentSetup);
+
+        RequestSubscrRenewal.SetRecurringPaymentSetup(RecurPaymentSetup);
+        RequestSubscrRenewal.Run(Subscription);
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.FindLast();
+        SubscriptionRequest.Validate(Status, SubscriptionRequest.Status::Skipped);
+        SubscriptionRequest.Modify(true);
+
+        // [WHEN] Auto-renewal is attempted via the renewal codeunit
+        Clear(RequestSubscrRenewal);
+        RequestSubscrRenewal.SetRecurringPaymentSetup(RecurPaymentSetup);
+        RequestSubscrRenewal.Run(Subscription);
+
+        // [THEN] A new subscription request and payment request should be created successfully
+        SubscriptionRequest2.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest2.SetFilter(Status, '<>%1', SubscriptionRequest2.Status::Skipped);
+        SubscriptionRequest2.FindLast();
+        Assert.AreNotEqual(SubscriptionRequest."Entry No.", SubscriptionRequest2."Entry No.", 'Auto-renewal should create a new subscription request.');
+
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscriptionRequest2."Entry No.");
+        Assert.IsTrue(SubscrPaymentRequest.FindLast(), 'Auto-renewal should create a payment request for the new subscription request.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SkippedRequestDoesNotBlockProcessingOfOtherRequests()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionRequest2: Record "NPR MM Subscr. Request";
+        SubscriptionRequestCalc: Record "NPR MM Subscr. Request";
+        RequestSubscrRenewal: Codeunit "NPR MM Subscr. Renew: Request";
+        RenewProcess: Codeunit "NPR MM Subs Try Renew Process";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+    begin
+        // [SCENARIO] A Skipped subscription request does not block processing of another Confirmed request for the same subscription
+
+        // [GIVEN] A subscription with a Skipped renewal request and a second Confirmed renewal request
+        Initialize();
+        _MemberModuleLib.SetupAutoRenew('T-GOLD', 'T-320100-AUTORENEW', '', 'Auto Renew GOLD');
+        DisableAgeVerification('T-GOLD');
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+
+        Membership.GetBySystemId(MembershipId);
+        Membership."Auto-Renew" := Membership."Auto-Renew"::YES_EXTERNAL;
+        Membership.Modify();
+
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.FindLast();
+
+        Subscription."Membership Entry No." := Membership."Entry No.";
+        Subscription."Membership Ledger Entry No." := MembershipEntry."Entry No.";
+        Subscription."Valid From Date" := MembershipEntry."Valid From Date";
+        Subscription."Valid Until Date" := MembershipEntry."Valid Until Date";
+        Subscription.Insert();
+
+        // First request - set to Skipped
+        SubscriptionRequest.Type := Enum::"NPR MM Subscr. Request Type"::Renew;
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest.Insert();
+        SubscriptionRequest.Validate(Status, SubscriptionRequest.Status::Skipped);
+        SubscriptionRequest.Modify(true);
+
+        // Second request - Confirmed with renewal period
+        RequestSubscrRenewal.CalculateSubscriptionRenewal(Subscription, SubscriptionRequestCalc);
+
+        SubscriptionRequest2.Type := Enum::"NPR MM Subscr. Request Type"::Renew;
+        SubscriptionRequest2."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest2."New Valid From Date" := SubscriptionRequestCalc."New Valid From Date";
+        SubscriptionRequest2."New Valid Until Date" := SubscriptionRequestCalc."New Valid Until Date";
+        SubscriptionRequest2.Amount := SubscriptionRequestCalc.Amount;
+        SubscriptionRequest2.Status := SubscriptionRequest2.Status::Confirmed;
+        SubscriptionRequest2."Processing Status" := SubscriptionRequest2."Processing Status"::Pending;
+        SubscriptionRequest2.Insert();
+
+        // [WHEN] The renewal processor processes the second (Confirmed) request
+        RenewProcess.ProcessConfirmedStatus(SubscriptionRequest2);
+
+        // [THEN] The second request should be processed successfully
+        SubscriptionRequest2.Get(SubscriptionRequest2.RecordId);
+        Assert.AreEqual(SubscriptionRequest2."Processing Status"::Success, SubscriptionRequest2."Processing Status", 'Confirmed request should be processed successfully despite a Skipped request existing for the same subscription.');
+    end;
 
     [ConfirmHandler]
     procedure ConfirmYesHandler(Question: Text[1024]; var Reply: Boolean)
@@ -1081,7 +1249,7 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
     local procedure CreateGoldMembershipAndMember(var MembershipId: Text; var MembershipNumber: Text; var MemberId: Text; var MemberNumber: Text)
     begin
         CreateGoldMembership('T-320100', MembershipId, MembershipNumber);
-        AddMember(0D, MembershipId, MemberId, MemberNumber);
+        AddMember(CalcDate('<-30Y>'), MembershipId, MemberId, MemberNumber);
     end;
 
     local procedure CreateGoldMembershipAndMember(SalesItem: Code[20]; DateOfBirth: Date; var MembershipId: Text; var MembershipNumber: Text; var MemberId: Text; var MemberNumber: Text)
@@ -1332,6 +1500,77 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
 
         SubscriptionRequest.Get(SubscriptionRequest."Entry No.");
         SubscriptionRequest.TestField("Processing Status", SubscriptionRequest."Processing Status"::Success);
+    end;
+
+    local procedure CreateSubscriptionForRenewal(var Subscription: Record "NPR MM Subscription"; Membership: Record "NPR MM Membership")
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+    begin
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.FindLast();
+
+        Subscription.Init();
+        Subscription."Membership Entry No." := Membership."Entry No.";
+        Subscription."Membership Ledger Entry No." := MembershipEntry."Entry No.";
+        Subscription."Membership Code" := Membership."Membership Code";
+        Subscription."Valid From Date" := MembershipEntry."Valid From Date";
+        Subscription."Valid Until Date" := WorkDate();
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Insert();
+
+        MemberPaymentMethod.Init();
+        MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;
+        MemberPaymentMethod."Payment Token" := 'TEST-TOKEN';
+        MemberPaymentMethod.Status := "NPR MM Payment Method Status"::Active;
+        MemberPaymentMethod.Insert(true);
+
+        MembershipPmtMethodMap.Init();
+        MembershipPmtMethodMap.PaymentMethodId := MemberPaymentMethod.SystemId;
+        MembershipPmtMethodMap.MembershipId := Membership.SystemId;
+        MembershipPmtMethodMap.Status := "NPR MM Payment Method Status"::Active;
+        MembershipPmtMethodMap.Default := true;
+        MembershipPmtMethodMap.Insert();
+    end;
+
+    local procedure DisableAgeVerification(MembershipCode: Code[20])
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        MembershipSetup.Get(MembershipCode);
+        MembershipSetup."Enable Age Verification" := false;
+        MembershipSetup.Modify();
+    end;
+
+    local procedure SetupRecurPaymentForAutoRenew(MembershipCode: Code[20]; var RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup")
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        MembershipSetup.Get(MembershipCode);
+        RecurPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
+        RecurPaymentSetup."Subscr. Auto-Renewal On" := RecurPaymentSetup."Subscr. Auto-Renewal On"::"Expiry Date";
+        RecurPaymentSetup.Modify();
+    end;
+
+    local procedure CreateSubscriptionRequestWithPaymentRequest(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        Subscription.Init();
+        Subscription.Insert(true);
+
+        SubscriptionRequest.Init();
+        SubscriptionRequest.Type := Enum::"NPR MM Subscr. Request Type"::Renew;
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+        SubscriptionRequest.Insert(true);
+
+        SubscrPaymentRequest.Init();
+        SubscrPaymentRequest."Subscr. Request Entry No." := SubscriptionRequest."Entry No.";
+        SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::New;
+        SubscrPaymentRequest.Insert(true);
     end;
 }
 #endif

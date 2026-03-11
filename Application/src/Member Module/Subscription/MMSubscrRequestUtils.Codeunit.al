@@ -72,6 +72,22 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         EnableAutoRenewalOnTerminationCancellation(SubscrRequest);
     end;
 
+    local procedure SetSubscriptionRequestStatusSkipped(var SubscrRequest: Record "NPR MM Subscr. Request"; SkipTryCountUpdate: Boolean)
+    begin
+        SetSubscriptionRequestStatus(SubscrRequest, Enum::"NPR MM Subscr. Request Status"::Skipped, SkipTryCountUpdate);
+    end;
+
+    internal procedure SetSubscriptionRequestStatusSkippedWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request"; SkipTryCountUpdate: Boolean)
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        SkipConfirmLbl: Label 'Warning: This action only updates the status in Business Central. No communication will be made to the PSP provider and no other side effects will occur (e.g. reversals will not be undone, membership auto-renewal status will not change).\\If a transaction is pending or in progress at the PSP, it may still be processed. Before skipping, verify the status of this request directly with the PSP provider.\\Are you sure you want to set entry no. %1 to status "Skipped"?', Comment = '%1 - Entry No.';
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(SkipConfirmLbl, SubscrRequest."Entry No."), false) then
+            exit;
+
+        SetSubscriptionRequestStatusSkipped(SubscrRequest, SkipTryCountUpdate);
+    end;
+
     local procedure CheckSuccessfulPaymentRequestsExist(SubscrRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") Found: Boolean
     begin
         SubscrPaymentRequest.Reset();
@@ -101,7 +117,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
         NewPmtRequestStatus: Enum "NPR MM Payment Request Status";
     begin
-        if not (SubscrRequest.Status in [SubscrRequest.Status::Rejected, SubscrRequest.Status::Cancelled]) then
+        if not (SubscrRequest.Status in [SubscrRequest.Status::Rejected, SubscrRequest.Status::Cancelled, SubscrRequest.Status::Skipped]) then
             exit;
 
         case SubscrRequest.Status of
@@ -109,6 +125,8 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
                 NewPmtRequestStatus := NewPmtRequestStatus::Rejected;
             SubscrRequest.Status::Cancelled:
                 NewPmtRequestStatus := NewPmtRequestStatus::Cancelled;
+            SubscrRequest.Status::Skipped:
+                NewPmtRequestStatus := NewPmtRequestStatus::Skipped;
         end;
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
         SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
@@ -116,7 +134,8 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         SubscrPaymentRequest.SetLoadFields("Subscr. Request Entry No.", Status, "Entry No.");
         if not SubscrPaymentRequest.FindSet() then
             exit;
-        CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
+        if SubscrRequest.Status <> SubscrRequest.Status::Skipped then
+            CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
         repeat
             SubscrPaymentRequestForModify.Get(SubscrPaymentRequest.RecordId);
             SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPaymentRequestForModify, NewPmtRequestStatus, false);

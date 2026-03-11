@@ -149,7 +149,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
         if Subscription."Entry No." <> 0 then begin
             SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
             SubscriptionRequest.SetFilter("Processing Status", '%1|%2', SubscriptionRequest."Processing Status"::Pending, SubscriptionRequest."Processing Status"::Error);
-            SubscriptionRequest.SetFilter(Status, '<>%1', SubscriptionRequest.Status::Cancelled);
+            SubscriptionRequest.SetFilter(Status, '<>%1&<>%2', SubscriptionRequest.Status::Cancelled, SubscriptionRequest.Status::Skipped);
             SubscriptionRequestFound := SubscriptionRequest.FindLast();
         end else
             SubscriptionRequestFound := false;

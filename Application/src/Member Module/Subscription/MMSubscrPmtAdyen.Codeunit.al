@@ -2,6 +2,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 {
     Access = Internal;
 
+    var
+        PaymentRequestSkippedErr: Label 'The payment request has been skipped and cannot be processed.';
+
     internal procedure ProcessPaymentRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean;
     begin
         if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
@@ -980,7 +983,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         SubscriptionRequest.Reset();
         SubscriptionRequest.SetRange("Created from Entry No.", SubscrPaymentRequest."Entry No.");
         SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Renew);
-        SubscriptionRequest.SetFilter(Status, '<>%1', SubscriptionRequest.Status::Cancelled);
+        SubscriptionRequest.SetFilter(Status, '<>%1&<>%2', SubscriptionRequest.Status::Cancelled, SubscriptionRequest.Status::Skipped);
         SubscriptionRequest.SetFilter("Processing Status", '%1|%2', SubscriptionRequest."Processing Status"::Pending, SubscriptionRequest."Processing Status"::Error);
         SubscriptionRequest.SetLoadFields("Entry No.");
         if SubscriptionRequest.FindFirst() then
@@ -1159,6 +1162,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
         Status: Enum "NPR MM Payment Request Status";
     begin
+        if MMSubscrPaymentRequest.Status = Enum::"NPR MM Payment Request Status"::Skipped then
+            Error(PaymentRequestSkippedErr);
         MMSubsPayReqLogUtils.LogEntry(MMSubscrPaymentRequest,
                                         '',
                                         '',
@@ -1245,6 +1250,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PSPReference: Text[16];
         Success: Boolean;
     begin
+        if MMSubscrPaymentRequest.Status = Enum::"NPR MM Payment Request Status"::Skipped then
+            Error(PaymentRequestSkippedErr);
         MMSubsPayReqLogUtils.LogEntry(MMSubscrPaymentRequest,
                                        '',
                                        '',

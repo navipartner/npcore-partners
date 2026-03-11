@@ -12,4 +12,5 @@ enum 6059803 "NPR MM Payment Request Status"
     value(40; Rejected) { Caption = 'Rejected'; }
     value(50; Cancelled) { Caption = 'Cancelled'; }
     value(60; Error) { Caption = 'Error'; }
+    value(70; "Skipped") { Caption = 'Skipped'; }
 }

@@ -89,6 +89,17 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
         SubscrPaymentRequest.Get(SubscrPaymentRequest.RecordId);
     end;
 
+    internal procedure SetSubscrPaymentRequestStatusSkipped(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        SkipConfirmLbl: Label 'Warning: This action only updates the status in Business Central. No communication will be made to the PSP provider and no other side effects will occur (e.g. reversals will not be undone, membership auto-renewal status will not change).\\If a transaction is pending or in progress at the PSP, it may still be processed. Before skipping, verify the status of this request directly with the PSP provider.\\Are you sure you want to set entry no. %1 to status "Skipped"?', Comment = '%1 - entry no.';
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(SkipConfirmLbl, SubscrPaymentRequest."Entry No."), false) then
+            exit;
+
+        SetSubscrPaymentRequestStatus(SubscrPaymentRequest, Enum::"NPR MM Payment Request Status"::Skipped, true);
+    end;
+
     local procedure CreateSubscriptionPaymentRequestProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"): Boolean
     var
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
