@@ -488,8 +488,10 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     begin
         if QtyNeeded <= 0 then
             exit;
-        if not RSRetValueEntryMapp.Get(AppliedDocValueEntry."Entry No.") then
+        if not RSRetValueEntryMapp.Get(AppliedDocValueEntry."Entry No.") then begin
+            RSRLocalizationMgt.AccumulateUnmappedAppliedEntryCost(AppliedDocValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, QtyNeeded);
             exit;
+        end;
         if not ((RSRetValueEntryMapp."COGS Correction") and (RSRetValueEntryMapp.Open)) then
             exit;
 
@@ -499,7 +501,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         COGSCorrectionValueEntry.Copy(StdValueEntry);
         COGSCorrectionValueEntry."Entry No." := COGSCorrectionValueEntry.GetLastEntryNo() + 1;
         RSRLocalizationMgt.ResetValueEntryAmounts(COGSCorrectionValueEntry);
-        COGSCorrectionValueEntry."Cost per Unit" := Abs(AppliedDocValueEntry."Cost per Unit");
+        COGSCorrectionValueEntry."Cost per Unit" := Abs(RSRLocalizationMgt.CalculateAppliedCostPerUnit(AppliedDocValueEntry));
 
         case true of
             (QtyTakenFromEntry < QtyNeeded) or (QtyTakenFromEntry = QtyNeeded):

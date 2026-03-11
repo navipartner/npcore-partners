@@ -377,6 +377,45 @@ codeunit 6151490 "NPR RS R Localization Mgt."
 
         Error(PriceNotFoundErr, ItemNo, LocationCode);
     end;
+
+    internal procedure AccumulateUnmappedAppliedEntryCost(ApplValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; var QtyNeeded: Decimal)
+    var
+        AppliedCostPerUnit: Decimal;
+        QtyToTake: Decimal;
+    begin
+        if ApplValueEntry."Item Charge No." <> '' then
+            exit;
+        if ApplValueEntry."Entry Type" <> ApplValueEntry."Entry Type"::"Direct Cost" then
+            exit;
+
+        QtyToTake := Abs(ApplValueEntry."Invoiced Quantity");
+        if QtyToTake = 0 then
+            exit;
+        if QtyToTake > QtyNeeded then
+            QtyToTake := QtyNeeded;
+
+        AppliedCostPerUnit := CalculateAppliedCostPerUnit(ApplValueEntry);
+
+        SumOfCOGSCostPerUnit += AppliedCostPerUnit;
+        SumOfCOGSCostAmtAct += Abs(AppliedCostPerUnit * QtyToTake);
+        QtyNeeded -= QtyToTake;
+    end;
+
+    internal procedure CalculateAppliedCostPerUnit(ApplValueEntry: Record "Value Entry") AppliedCostPerUnit: Decimal
+    var
+        ItemChargeValueEntries: Record "Value Entry";
+    begin
+        ItemChargeValueEntries.SetLoadFields("Cost per Unit");
+        ItemChargeValueEntries.SetRange("Item Ledger Entry No.", ApplValueEntry."Item Ledger Entry No.");
+        ItemChargeValueEntries.SetFilter("Item Charge No.", '<>%1', '');
+        if ItemChargeValueEntries.IsEmpty() then
+            AppliedCostPerUnit := ApplValueEntry."Cost per Unit"
+        else begin
+            ItemChargeValueEntries.CalcSums("Cost per Unit");
+            AppliedCostPerUnit := ApplValueEntry."Cost per Unit" + ItemChargeValueEntries."Cost per Unit";
+        end;
+    end;
+
     #endregion RS Retail Localization Helper Procedures
 
     #region RS Retail Localization Report Run
