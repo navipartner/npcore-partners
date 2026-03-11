@@ -84,7 +84,7 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         Printer.SetFont(A11FontLbl);
         // Logo section
         RetailLogo.SetLoadFields("Register No.", "Start Date", "End Date");
-        RetailLogo.SetRange("Register No.", POSUnit.GetCurrentPOSUnit());
+        RetailLogo.SetRange("Register No.", POSEntry."POS Unit No.");
         if RetailLogo.IsEmpty() then
             RetailLogo.SetRange("Register No.", '');
         RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
@@ -94,6 +94,10 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
             Printer.AddLine(ReceiptLogoLbl, 1);
             Printer.SetFont(A11FontLbl);
         end;
+
+        // POS Unit information
+        POSUnit.SetLoadFields("POS Unit Receipt Text Profile", "POS Receipt Profile");
+        POSUnit.Get(POSEntry."POS Unit No.");
 
         // POS Store information
         POSStore.SetLoadFields(Name, Address, "Address 2", "Post Code", City, "Phone No.", "VAT Registration No.", "E-Mail", "Home Page");
