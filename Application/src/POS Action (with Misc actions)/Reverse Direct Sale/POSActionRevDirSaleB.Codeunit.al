@@ -229,7 +229,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
             repeat
                 if ((SaleLinePOS.Quantity < 0) and (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item)) then begin
                     AdjustedQty := GetRemainingQtyToReturn(OriginalSalesTicketNo, Abs(SaleLinePOS.Quantity), SaleLinePOS."Line No.", SaleLinePOS."Orig.POS Entry S.Line SystemId") * -1;
-                    if (AdjustedQty <> SaleLinePOS.Quantity) then begin
+                    if (AdjustedQty > SaleLinePOS.Quantity) then begin
                         SaleLinePOS.Validate(Quantity, AdjustedQty);
                         SaleLinePOS.Modify();
                         QtyIsAdjusted := true;

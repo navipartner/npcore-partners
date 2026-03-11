@@ -835,12 +835,11 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        if (POSSalesLine.Quantity < 0) then
+        if ((POSSalesLine.Quantity < 0) and (POSSalesLine."Return Sale Sales Ticket No." <> '')) then begin
             // When in refund by receipt number, we regret the membership entry (item number would represent the original membership item)
-            if (POSSalesLine."Return Sale Sales Ticket No." <> '') then begin
-                BlockMembershipEntryFromEndOfSaleWorker(POSSalesLine."Return Sale Sales Ticket No.", POSSalesLine."Line No.");
-                exit;
-            end;
+            BlockMembershipEntryFromEndOfSaleWorker(POSSalesLine."Return Sale Sales Ticket No.", POSSalesLine."Line No.", Abs(POSSalesLine.Quantity));
+            exit;
+        end;
 
         // This is an specific alteration item - membership action determined by the item no
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
@@ -865,46 +864,47 @@
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
-        IsMembership: Boolean;
-        IsRefundable: Boolean;
         ReasonText: Text;
+        IsMembership: Boolean;
+        ListOfEntriesToRefund: List of [Integer];
     begin
 
         if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
             exit;
 
-        CheckForMembershipRefundEligibility(SaleLinePOS."Return Sale Sales Ticket No.", SaleLinePOS."Line No.", IsMembership, IsRefundable, ReasonText);
+        CheckForMembershipRefundEligibility(SaleLinePOS."Return Sale Sales Ticket No.", SaleLinePOS."Line No.", ListOfEntriesToRefund, IsMembership, ReasonText);
         if (not IsMembership) then
-            exit; // Not a membership entry
+            exit; // Not a membership entry, nothing to do here
 
-        if (not IsRefundable) then begin
-            SaleLinePOS.Validate(Quantity, 0); // Prevent refund of membership entry
-            Message(ReasonText);
+        if (Abs(SaleLinePOS.Quantity) <> ListOfEntriesToRefund.Count()) then begin
+            SaleLinePOS.Validate(Quantity, -Abs(ListOfEntriesToRefund.Count()));
+            if (ReasonText <> '') then
+                Message(ReasonText); // reason text is set when there is at least one membership entry that cannot be refunded. 
         end;
 
-        MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
-        MembershipEntry.SetFilter("Receipt No.", '=%1', SaleLinePOS."Return Sale Sales Ticket No.");
-        MembershipEntry.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
-        if (not MembershipEntry.FindFirst()) then
-            exit;
+        // There is only one sales line, we can not show all members details being blocked
+        // This should be delegated to the PTE to decide how to show the information to the user
+        if (ListOfEntriesToRefund.Count() = 1) then begin
+            if (not MembershipEntry.Get(ListOfEntriesToRefund.Get(1))) then
+                exit;
 
-        if (not Membership.Get(MembershipEntry."Membership Entry No.")) then
-            exit;
+            if (not Membership.Get(MembershipEntry."Membership Entry No.")) then
+                exit;
 
-        if (Membership.Blocked) then
-            exit;
+            if (Membership.Blocked) then
+                exit;
 
-        MembershipRole.SetCurrentKey("Membership Entry No.");
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntry."Membership Entry No.");
-        MembershipRole.SetFilter(Blocked, '=%1', false);
-        if (not MembershipRole.FindFirst()) then
-            exit;
+            MembershipRole.SetCurrentKey("Membership Entry No.");
+            MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntry."Membership Entry No.");
+            MembershipRole.SetFilter(Blocked, '=%1', false);
+            if (not MembershipRole.FindFirst()) then
+                exit;
 
-        if (not Member.Get(MembershipRole."Member Entry No.")) then
-            exit;
+            if (not Member.Get(MembershipRole."Member Entry No.")) then
+                exit;
 
-        SaleLinePOS.Description := Member."Display Name";
-
+            SaleLinePOS.Description := Member."Display Name";
+        end;
     end;
 
     internal procedure IssueMembershipFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; SalesDate: Date; UnitPrice: Decimal; Amount_LCY: Decimal; AmountInclVat_LCY: Decimal; Description: Text; Quantity: Decimal)
@@ -949,83 +949,93 @@
         CreateMembership.Run(MemberInfoCapture);
     end;
 
-    internal procedure BlockMembershipEntryFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer)
+    internal procedure BlockMembershipEntryFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; MemberCount: Decimal)
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
         MembershipInternal: Codeunit "NPR MM MembershipMgtInternal";
+        ReasonText: Text;
         IsMembership: Boolean;
-        IsRefundable: Boolean;
+        ListOfEntriesToBlock: List of [Integer];
+        EntryNo: Integer;
+    begin
+        CheckForMembershipRefundEligibility(ReceiptNo, ReceiptLine, ListOfEntriesToBlock, IsMembership, ReasonText);
+        if (not IsMembership) then
+            exit; // Not a membership entry, nothing to do here
+
+        foreach EntryNo in ListOfEntriesToBlock do begin
+            if (MembershipEntry.Get(EntryNo)) then begin
+                Membership.Get(MembershipEntry."Membership Entry No.");
+                MembershipInternal.RegretSubscription(Membership);
+                MembershipInternal.CarryOutMembershipRegret(MembershipEntry);
+                MemberCount -= 1;
+            end;
+            if (MemberCount <= 0) then
+                exit;
+        end;
+
+    end;
+
+    internal procedure CheckForMembershipRefundEligibility(ReceiptNo: Code[20]; ReceiptLine: Integer; var ListOfEntriesToBlock: List of [Integer]; var IsMembership: Boolean; var LastReasonText: Text)
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
         ReasonText: Text;
     begin
-
-        CheckForMembershipRefundEligibility(ReceiptNo, ReceiptLine, IsMembership, IsRefundable, ReasonText);
-        if (not (IsMembership and IsRefundable)) then
-            exit; // Not a membership entry
+        Clear(ListOfEntriesToBlock);
+        LastReasonText := '';
+        IsMembership := false;
 
         MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
         MembershipEntry.SetFilter("Receipt No.", '=%1', ReceiptNo);
         MembershipEntry.SetFilter("Line No.", '=%1', ReceiptLine);
-        if (MembershipEntry.FindFirst()) then begin
-            if (not Membership.Get(MembershipEntry."Membership Entry No.")) then
-                exit;
-            MembershipInternal.RegretSubscription(Membership);
-            MembershipInternal.CarryOutMembershipRegret(MembershipEntry);
-        end;
+        if (not MembershipEntry.FindSet()) then
+            exit; // No membership entries on this receipt line
+
+        IsMembership := true;
+        repeat
+            if (CheckForMembershipRefundEligibility(MembershipEntry."Entry No.", ReasonText) = 0) then
+                ListOfEntriesToBlock.Add(MembershipEntry."Entry No.")
+            else
+                LastReasonText := ReasonText;
+        until (MembershipEntry.Next() = 0);
+
+        // Exit with IsMembership = true and a populated ListOfEntriesToBlock for each refundable membership entry on this receipt line 
     end;
 
-    internal procedure CheckForMembershipRefundEligibility(ReceiptNo: Code[20]; ReceiptLine: Integer; var IsMembership: Boolean; var IsRefundable: Boolean; var ReasonText: Text)
-    var
-        EntryBlocked: Label 'Membership entry referenced by the receipt is already blocked.';
-        NotLastEntry: Label 'This membership entry reference on line %1 is not the most recent one and cannot be automatically refunded.';
-        ReasonCode: Integer;
-    begin
-        ReasonCode := IsEligibleForRefund(ReceiptNo, ReceiptLine);
 
+    internal procedure CheckForMembershipRefundEligibility(MembershipEntryNo: Integer; var ReasonText: Text) ReasonCode: Integer;
+    begin
+        ReasonCode := IsEligibleForRefund(MembershipEntryNo);
+        DecodeRefundEligibilityReasonCode(ReasonCode, ReasonText);
+    end;
+
+    local procedure DecodeRefundEligibilityReasonCode(ReasonCode: Integer; var ReasonText: Text)
+    var
+        EntryBlocked: Label 'Not all memberships can be refunded. Membership entry referenced by the receipt is already blocked.';
+        NotLastEntry: Label 'Not all memberships can be refunded. The sales receipt does not reference the last membership entry.';
+    begin
         case ReasonCode of
             1:
-                begin
-                    IsMembership := false;
-                    IsRefundable := true;
-                    ReasonText := '';
-                end;
+                ReasonText := '';
             0:
-                begin
-                    IsRefundable := true;
-                    IsMembership := true;
-                    ReasonText := '';
-                end;
+                ReasonText := '';
             -1:
-                begin
-                    IsMembership := true;
-                    IsRefundable := false;
-                    ReasonText := EntryBlocked;
-                end;
+                ReasonText := EntryBlocked;
             -2:
-                begin
-                    IsMembership := true;
-                    IsRefundable := false;
-                    ReasonText := StrSubstNo(NotLastEntry, ReceiptLine);
-                end;
-            else begin
-                IsMembership := false;
-                IsRefundable := false;
+                ReasonText := NotLastEntry;
+            else
                 ReasonText := StrSubstNo('Unknown reason code %1 returned from eligibility check.', ReasonCode);
-            end;
         end;
     end;
 
-    local procedure IsEligibleForRefund(ReceiptNo: Code[20]; ReceiptLine: Integer) ReasonCode: Integer
+    local procedure IsEligibleForRefund(MembershipEntryNo: Integer) ReasonCode: Integer
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipEntry2: Record "NPR MM Membership Entry";
     begin
         ReasonCode := 0; // OK
 
-        MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
-        MembershipEntry.SetFilter("Receipt No.", '=%1', ReceiptNo);
-        MembershipEntry.SetFilter("Line No.", '=%1', ReceiptLine);
-        if (not MembershipEntry.FindFirst()) then
+        if (not MembershipEntry.Get(MembershipEntryNo)) then
             exit(1); // No membership entries on this receipt line
 
         // Verify that the membership entry is not blocked and that this receipt line is the last entry for this membership
@@ -1042,6 +1052,7 @@
         exit(ReasonCode); // Is membership and eligible for refund
 
     end;
+
 
     // This is outside of the end sales transactions, issuing tickets is considered same as printing
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
