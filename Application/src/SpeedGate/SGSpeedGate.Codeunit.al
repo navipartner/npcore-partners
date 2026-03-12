@@ -1317,6 +1317,13 @@ codeunit 6185130 "NPR SG SpeedGate"
         LocalDate: Date;
         TimeHelper: Codeunit "NPR TM TimeHelper";
     begin
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23
+        Membership.SetBaseLoadFields();
+        MemberCard.SetBaseLoadFields();
+        Member.SetBaseLoadFields();
+        MembershipSetup.SetBaseLoadFields();
+#endif
+
         MemberCard.SetCurrentKey("External Card No.");
         MemberCard.SetFilter("External Card No.", '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(MemberCard."External Card No.")));
         NumberIdentified := MemberCard.FindFirst();

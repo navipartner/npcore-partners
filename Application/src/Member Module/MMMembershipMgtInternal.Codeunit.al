@@ -1098,6 +1098,9 @@
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23
+        Membership.SetBaseLoadFields();
+#endif
 
         ValidFromDate := 0D;
         ValidUntilDate := 0D;
@@ -3894,6 +3897,12 @@
 
         Method := 'NA';
         Address := '';
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23
+        Membership.SetBaseLoadFields();
+        Member.SetBaseLoadFields();
+        MembershipRole.SetBaseLoadFields();
+#endif
 
         if (not Member.Get(MemberEntryNo)) then
             exit(false);

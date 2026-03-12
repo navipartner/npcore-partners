@@ -1177,32 +1177,13 @@
 
     end;
 
-    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20])
+    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; ListOfAdmissionCodes: List of [Code[20]])
     var
-        AdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+        AdmissionCode: Code[20];
     begin
-        AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
-        AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
-        AdmissionBOM.FindSet();
-        repeat
-            TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
-            TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-            TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionBOM."Admission Code");
-
-            if (TicketAccessEntry.FindFirst()) then begin
-                RegisterPayment_Worker(TicketAccessEntry, PaymentType, PaymentReferenceNo);
-
-                if (CustomerNo <> '') then begin
-                    TicketAccessEntry."Customer No." := CustomerNo;
-                    TicketAccessEntry.Modify();
-                end;
-
-                NotifyParticipant.CreateAdmissionWelcomeReminder(TicketAccessEntry, Ticket."External Member Card No.");
-                NotifyParticipant.CreateAdmissionReservationReminder(TicketAccessEntry, Ticket."External Member Card No.");
-            end;
-        until (AdmissionBOM.Next() = 0);
+        foreach AdmissionCode in ListOfAdmissionCodes do begin
+            CreatePaymentEntryType(Ticket, PaymentType, PaymentReferenceNo, CustomerNo, AdmissionCode);
+        end;
     end;
 
     internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; AdmissionCode: Code[20])

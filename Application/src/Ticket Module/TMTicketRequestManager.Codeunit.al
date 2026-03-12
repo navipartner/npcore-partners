@@ -917,6 +917,43 @@
         end;
 
     end;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure FinalizePayment(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        AdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        ListOfAdmissionCodes: List of [Code[20]];
+    begin
+        if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then
+            exit;
+
+        if (TicketReservationRequest.Default) then
+            if TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::CHANGE then
+                SwitchTicketReservationEntryNo(TicketReservationRequest);
+
+        if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            if (Ticket.FindSet()) then begin
+
+                // Find the admission code for the ticket, we will need it to link the payment entry to the admission when the admission is required
+                // This might not be true here - reservation request is expanded with all admission codes and so there could only be the one specified admission code, but we will keep it like this just in case and to keep the code simpler
+                AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
+                AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+                AdmissionBOM.FindSet();
+                repeat
+                    ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code");
+                until (AdmissionBOM.Next() = 0);
+
+                repeat
+                    if (TicketReservationRequest."Payment Option" <> TicketReservationRequest."Payment Option"::UNPAID) then
+                        TicketManagement.CreatePaymentEntryType(Ticket, TicketReservationRequest."Payment Option", TicketReservationRequest."External Order No.", TicketReservationRequest."Customer No.", ListOfAdmissionCodes);
+                until (Ticket.Next() = 0);
+            end;
+        end;
+    end;
+#endif
 
     local procedure FinalizePayment(Token: Text[100]; TokenLineNumber: Integer)
     var
@@ -925,6 +962,8 @@
         TicketManagement: Codeunit "NPR TM Ticket Management";
         EntryNos: List of [Integer];
         EntryNo: Integer;
+        AdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        ListOfAdmissionCodes: List of [Code[20]];
     begin
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -939,22 +978,34 @@
             if (TicketReservationRequest.Default) then
                 SwitchTicketReservationEntryNo(TicketReservationRequest);
 
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             if (Ticket.FindSet()) then begin
                 EntryNos.Add(Ticket."Ticket Reservation Entry No.");
+
+                // Find the admission code for the ticket, we will need it to link the payment entry to the admission when the admission is required
+                AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
+                AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+                AdmissionBOM.FindSet();
                 repeat
+                    ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code");
+                until (AdmissionBOM.Next() = 0);
 
+                repeat
                     if (TicketReservationRequest."Payment Option" <> TicketReservationRequest."Payment Option"::UNPAID) then
-                        TicketManagement.CreatePaymentEntryType(Ticket, TicketReservationRequest."Payment Option", TicketReservationRequest."External Order No.", TicketReservationRequest."Customer No.");
-
+                        TicketManagement.CreatePaymentEntryType(Ticket, TicketReservationRequest."Payment Option", TicketReservationRequest."External Order No.", TicketReservationRequest."Customer No.", ListOfAdmissionCodes);
                 until (Ticket.Next() = 0);
+
+                Clear(ListOfAdmissionCodes);
             end;
         until (TicketReservationRequest.Next() = 0);
+
 
         TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::SELECTED);
         if TicketReservationRequest.FindSet() then
             repeat
                 foreach EntryNo in EntryNos do begin
+                    Ticket.SetCurrentKey("Ticket Reservation Entry No.");
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', EntryNo);
                     if (Ticket.FindSet()) then begin
                         repeat
@@ -1066,8 +1117,10 @@
         Now: DateTime;
         RequestMutex: Record "NPR TM TicketRequestMutex";
         MutexKey: Text[100];
+        LineCounter: Integer;
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        Changed: Boolean;
     begin
         Sentry.StartSpan(Span, 'bc.ticket.request-manager.confirm-reservation-request-line');
 
@@ -1078,6 +1131,9 @@
         // Check if expired
         if (FinalizeReservation) then begin
             TicketReservationRequestRead.ReadIsolation := IsolationLevel::ReadUncommitted;
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23
+            TicketReservationRequest.SetBaseLoadFields();
+#endif
             TicketReservationRequestRead.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion");
             TicketReservationRequestRead.SetCurrentKey("Session Token ID");
             TicketReservationRequestRead.SetFilter("Session Token ID", '=%1', Token);
@@ -1124,60 +1180,57 @@
             end;
 
             if (FinalizeReservation) then begin
-                TicketReservationRequest.Reset();
-                TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
-                TicketReservationRequest.SetCurrentKey("Session Token ID");
-                TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Payment Option");
-                TicketReservationRequest.SetCurrentKey("Session Token ID");
-                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-                if (TokenLineNumber <> 0) then
-                    TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
-                TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::RESERVED);
-                if (TicketReservationRequest.FindSet()) then
-                    repeat
-                        TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::DIRECT;
-                        TicketReservationRequest.Modify();
-                    until (TicketReservationRequest.Next()) = 0;
 
-                // Confirm required and selected admissions
                 TicketReservationRequest.Reset();
                 TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
                 TicketReservationRequest.SetCurrentKey("Session Token ID");
-                TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23
+                TicketReservationRequest.SetBaseLoadFields();
+#endif
                 TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
                 if (TokenLineNumber <> 0) then
                     TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
                 TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
-                TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED);
                 if (TicketReservationRequest.FindSet()) then
                     repeat
-                        TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
-                        TicketReservationRequest."Request Status Date Time" := Now;
-                        TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
-                        TicketReservationRequest.Modify();
-                    until (TicketReservationRequest.Next()) = 0;
+                        Changed := false;
 
-                // Set OPTIONAL for not selected
-                TicketReservationRequest.Reset();
-                TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
-                TicketReservationRequest.SetCurrentKey("Session Token ID");
-                TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
-                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-                if (TokenLineNumber <> 0) then
-                    TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
-                TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
-                TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
-                if (TicketReservationRequest.FindSet()) then
-                    repeat
-                        TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::OPTIONAL;
-                        TicketReservationRequest."Request Status Date Time" := Now;
-                        TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
-                        TicketReservationRequest.Modify();
+                        if TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::RESERVED then begin
+                            TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::DIRECT;
+                            Changed := true;
+                        end;
+
+                        case TicketReservationRequest."Admission Inclusion" of
+                            TicketReservationRequest."Admission Inclusion"::REQUIRED,
+                            TicketReservationRequest."Admission Inclusion"::SELECTED:
+                                begin
+                                    TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
+                                    TicketReservationRequest."Request Status Date Time" := Now;
+                                    TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
+                                    Changed := true;
+                                end;
+
+                            TicketReservationRequest."Admission Inclusion"::NOT_SELECTED:
+                                begin
+                                    TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::OPTIONAL;
+                                    TicketReservationRequest."Request Status Date Time" := Now;
+                                    TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
+                                    Changed := true;
+                                end;
+                        end;
+
+                        if Changed then
+                            TicketReservationRequest.Modify();
+                        LineCounter += 1;
+
                     until (TicketReservationRequest.Next() = 0);
 
-                FinalizePayment(Token, TokenLineNumber);
-                RequestMutex.Release(MutexKey);
+                if (LineCounter = 1) then
+                    FinalizePayment(TicketReservationRequest);
+                if (LineCounter > 1) then
+                    FinalizePayment(Token, TokenLineNumber);
 
+                RequestMutex.Release(MutexKey);
                 ResponseCode := '';
                 ResponseMessage := 'OK';
             end;
@@ -1914,8 +1967,11 @@
     procedure POS_CreateReservationRequest(SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; ExternalMemberNo: Code[20]) Token: Text[100]
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
 
+        Sentry.StartSpan(Span, 'bc.ticket.request-manager.create-reservation-request');
         Token := GetNewToken();
 
         TicketBom.SetFilter("Item No.", '=%1', ItemNo);
@@ -1932,6 +1988,7 @@
                 POS_AppendToReservationRequest(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, TicketBom."Admission Code", Quantity, 0, ExternalMemberNo, 0);
             until (TicketBom.Next() = 0);
 
+        Span.Finish();
         exit(Token);
     end;
 
