@@ -422,4 +422,261 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         MembershipSetup.Get(Membership."Membership Code");
         RecurPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
     end;
+
+    internal procedure CreateInitialSaleSubscriptionRequest(Subscription: Record "NPR MM Subscription"; MembershipEntry: Record "NPR MM Membership Entry"; MemberPaymentMethod: Record "NPR MM Member Payment Method"; var EFTTransactionRequest: Record "NPR EFT Transaction Request"; SaleAmountInclVAT: Decimal)
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        InitialSaleDescrLbl: Label 'Initial sale';
+    begin
+        if EFTTransactionRequest."Result Amount" <= 0 then
+            exit;
+
+        if Subscription."Auto-Renew" <> Subscription."Auto-Renew"::YES_INTERNAL then
+            exit;
+
+        if EFTTransactionRequest."Manual Capture" then
+            exit;
+
+        SubscriptionRequest.SetCurrentKey("Subscription Entry No.", Type, "Processing Status", Status);
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::"Initial Sale");
+        SubscriptionRequest.SetRange(Reversed, false);
+        if not SubscriptionRequest.IsEmpty() then
+            exit;
+
+        SubscriptionRequest.Init();
+        SubscriptionRequest.Type := SubscriptionRequest.Type::"Initial Sale";
+        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
+        SubscriptionRequest.Amount := SaleAmountInclVAT;
+        SubscriptionRequest."Currency Code" := EFTTransactionRequest."Currency Code";
+        SubscriptionRequest."New Valid From Date" := MembershipEntry."Valid From Date";
+        SubscriptionRequest."New Valid Until Date" := MembershipEntry."Valid Until Date";
+        SubscriptionRequest."Posted M/ship Ledg. Entry No." := MembershipEntry."Entry No.";
+        SubscriptionRequest.Description := InitialSaleDescrLbl;
+        SubscriptionRequest.Insert(true);
+
+        CreateInitialSaleSubscrPaymentRequest(Subscription, SubscriptionRequest, MemberPaymentMethod, EFTTransactionRequest);
+    end;
+
+    local procedure CreateInitialSaleSubscrPaymentRequest(Subscription: Record "NPR MM Subscription"; SubscriptionRequest: Record "NPR MM Subscr. Request"; MemberPaymentMethod: Record "NPR MM Member Payment Method"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubsPayReqUtils: Codeunit "NPR MM Subs Pay Request Utils";
+    begin
+        SubscrPaymentRequest.Init();
+        SubscrPaymentRequest."Entry No." := 0;
+        SubscrPaymentRequest.Type := SubscrPaymentRequest.Type::Payment;
+        SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::Captured;
+        SubscrPaymentRequest."Subscr. Request Entry No." := SubscriptionRequest."Entry No.";
+        SubscrPaymentRequest.PSP := MemberPaymentMethod.PSP;
+        SubscrPaymentRequest."Payment Method Entry No." := MemberPaymentMethod."Entry No.";
+        SubscrPaymentRequest."Payment Token" := MemberPaymentMethod."Payment Token";
+        SubscrPaymentRequest.Amount := EFTTransactionRequest."Result Amount";
+        SubscrPaymentRequest."Currency Code" := EFTTransactionRequest."Currency Code";
+        SubscrPaymentRequest.Description := SubscriptionRequest.Description;
+        SubscrPaymentRequest."PSP Reference" := EFTTransactionRequest."PSP Reference";
+        SubscrPaymentRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPaymentRequest."Subscription Payment Reference"));
+        SubscrPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+        SubscrPaymentRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";
+        SubscrPaymentRequest."Masked PAN" := MemberPaymentMethod."Masked PAN";
+        SubsPayReqUtils.TrySetPaymentContactFromUserAcc(SubscrPaymentRequest, MemberPaymentMethod);
+        SubscrPaymentRequest.Insert(true);
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", OnAfterEndSale, '', false, false)]
+#endif
+    local procedure CreateInitialSaleSubscrRequestOnAfterEndSale(SalePOS: Record "NPR POS Sale")
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        if SalePOS."Header Type" = SalePOS."Header Type"::Cancelled then
+            exit;
+
+        if SalePOS."Sales Ticket No." = '' then
+            exit;
+
+        MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
+        MembershipEntry.SetRange("Receipt No.", SalePOS."Sales Ticket No.");
+        if not MembershipEntry.FindSet() then
+            exit;
+
+        repeat
+            ProcessMembershipEntryForInitialSale(SalePOS, MembershipEntry);
+        until MembershipEntry.Next() = 0;
+    end;
+
+    local procedure ProcessMembershipEntryForInitialSale(SalePOS: Record "NPR POS Sale"; MembershipEntry: Record "NPR MM Membership Entry")
+    var
+        ActiveMembershipEntry: Record "NPR MM Membership Entry";
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        if not Membership.Get(MembershipEntry."Membership Entry No.") then
+            exit;
+
+        ActiveMembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        ActiveMembershipEntry.SetRange(Blocked, false);
+        ActiveMembershipEntry.SetFilter(Context, '<>%1', ActiveMembershipEntry.Context::REGRET);
+        if not ActiveMembershipEntry.FindLast() then
+            exit;
+
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+        if not Subscription.FindFirst() then
+            exit;
+
+        if Subscription."Auto-Renew" <> Subscription."Auto-Renew"::YES_INTERNAL then
+            exit;
+
+        MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
+        MembershipPmtMethodMap.SetRange(Default, true);
+        if not MembershipPmtMethodMap.FindFirst() then
+            exit;
+
+        if not MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId) then
+            exit;
+
+        EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        EFTTransactionRequest.SetFilter("Sales Line No.", '<>%1', 0);
+        EFTTransactionRequest.SetRange(Successful, true);
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
+        EFTTransactionRequest.SetFilter("Recurring Detail Reference", '<>%1', '');
+        if EFTTransactionRequest.FindLast() then
+            CreateInitialSaleSubscriptionRequest(Subscription, ActiveMembershipEntry, MemberPaymentMethod, EFTTransactionRequest, EFTTransactionRequest."Result Amount");
+    end;
+
+    internal procedure CreateCancellationSubscriptionRequest(Subscription: Record "NPR MM Subscription"; MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; SalesTicketNo: Code[20])
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        PartialRegretRequest: Record "NPR MM Subscr. Request";
+        OriginalSubscrRequest: Record "NPR MM Subscr. Request";
+        OriginalSubscrPmtRequest: Record "NPR MM Subscr. Payment Request";
+        RefundPmtRequest: Record "NPR MM Subscr. Payment Request";
+        RefundPmtRequestCreated: Boolean;
+        OriginalSubscrRequestFound: Boolean;
+        PartialRegretDescrLbl: Label 'POS cancellation';
+    begin
+        SubscriptionRequest.SetCurrentKey("Subscription Entry No.", Type, "Processing Status", Status);
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::"Partial Regret");
+        SubscriptionRequest.SetRange("Membership Entry To Cancel", MembershipEntry."Entry No.");
+        if not SubscriptionRequest.IsEmpty() then
+            exit;
+
+        OriginalSubscrRequest.SetCurrentKey("Subscription Entry No.", Type, "Processing Status", Status);
+        OriginalSubscrRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        OriginalSubscrRequest.SetFilter(Type, '%1|%2', OriginalSubscrRequest.Type::Renew, OriginalSubscrRequest.Type::"Initial Sale");
+        OriginalSubscrRequest.SetRange("Posted M/ship Ledg. Entry No.", MembershipEntry."Entry No.");
+        OriginalSubscrRequest.SetRange("Processing Status", OriginalSubscrRequest."Processing Status"::Success);
+        OriginalSubscrRequest.SetRange(Reversed, false);
+        OriginalSubscrRequestFound := OriginalSubscrRequest.FindLast();
+
+        // Create Partial Regret subscription request
+        PartialRegretRequest.Init();
+        PartialRegretRequest."Entry No." := 0;
+        PartialRegretRequest.Type := PartialRegretRequest.Type::"Partial Regret";
+        PartialRegretRequest.Status := PartialRegretRequest.Status::Confirmed;
+        PartialRegretRequest."Processing Status" := PartialRegretRequest."Processing Status"::Success;
+        PartialRegretRequest."Subscription Entry No." := Subscription."Entry No.";
+        PartialRegretRequest."Membership Code" := Subscription."Membership Code";
+        PartialRegretRequest.Amount := MemberInfoCapture."Unit Price";
+        PartialRegretRequest."New Valid From Date" := MembershipEntry."Valid From Date";
+        PartialRegretRequest."New Valid Until Date" := MemberInfoCapture."Document Date";
+        PartialRegretRequest."Membership Entry To Cancel" := MembershipEntry."Entry No.";
+        PartialRegretRequest."Posted M/ship Ledg. Entry No." := MembershipEntry."Entry No.";
+        PartialRegretRequest.Description := PartialRegretDescrLbl;
+        if OriginalSubscrRequestFound then
+            PartialRegretRequest."Currency Code" := OriginalSubscrRequest."Currency Code";
+        PartialRegretRequest.Insert(true);
+
+        // Create Refund payment request (Adyen card-only)
+        RefundPmtRequestCreated := CreateCancellationRefundPmtRequest(Subscription, PartialRegretRequest, SalesTicketNo, RefundPmtRequest);
+
+        // Reverse connected Initial Sale / Renew
+        if OriginalSubscrRequestFound then begin
+            OriginalSubscrRequest.Reversed := true;
+            OriginalSubscrRequest."Reversed by Entry No." := PartialRegretRequest."Entry No.";
+            OriginalSubscrRequest.Modify(true);
+
+            if RefundPmtRequestCreated then begin
+                OriginalSubscrPmtRequest.SetRange("Subscr. Request Entry No.", OriginalSubscrRequest."Entry No.");
+                OriginalSubscrPmtRequest.SetRange(Reversed, false);
+                OriginalSubscrPmtRequest.SetRange(Status, OriginalSubscrPmtRequest.Status::Captured);
+                if OriginalSubscrPmtRequest.FindLast() then begin
+                    OriginalSubscrPmtRequest.Reversed := true;
+                    OriginalSubscrPmtRequest."Reversed by Entry No." := RefundPmtRequest."Entry No.";
+                    OriginalSubscrPmtRequest.Modify(true);
+                end;
+            end;
+        end;
+    end;
+
+    local procedure CreateCancellationRefundPmtRequest(Subscription: Record "NPR MM Subscription"; PartialRegretRequest: Record "NPR MM Subscr. Request"; SalesTicketNo: Code[20]; var RefundPmtRequest: Record "NPR MM Subscr. Payment Request"): Boolean
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        POSSaleLine: Record "NPR POS Sale Line";
+        Membership: Record "NPR MM Membership";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+        SubsPayReqUtils: Codeunit "NPR MM Subs Pay Request Utils";
+    begin
+        POSSaleLine.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::"POS Payment");
+        if not POSSaleLine.FindFirst() then
+            exit(false);
+        if POSSaleLine.Next() <> 0 then
+            exit(false);
+
+        EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
+        EFTTransactionRequest.SetRange(Successful, true);
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::REFUND);
+        if not EFTTransactionRequest.FindFirst() then
+            exit(false);
+        if EFTTransactionRequest.Next() <> 0 then
+            exit(false);
+        if CopyStr(EFTTransactionRequest."Integration Type", 1, 5) <> 'ADYEN' then
+            exit(false);
+
+        if not Membership.Get(Subscription."Membership Entry No.") then
+            exit(false);
+
+        MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
+        MembershipPmtMethodMap.SetRange(Default, true);
+        if not MembershipPmtMethodMap.FindFirst() then
+            exit(false);
+
+        if not MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId) then
+            exit(false);
+
+        RefundPmtRequest.Init();
+        RefundPmtRequest."Entry No." := 0;
+        RefundPmtRequest.Type := RefundPmtRequest.Type::Refund;
+        RefundPmtRequest.Status := RefundPmtRequest.Status::Captured;
+        RefundPmtRequest."Subscr. Request Entry No." := PartialRegretRequest."Entry No.";
+        RefundPmtRequest.PSP := MemberPaymentMethod.PSP;
+        RefundPmtRequest."Payment Method Entry No." := MemberPaymentMethod."Entry No.";
+        RefundPmtRequest."Payment Token" := MemberPaymentMethod."Payment Token";
+        RefundPmtRequest.Amount := EFTTransactionRequest."Result Amount";
+        RefundPmtRequest."Currency Code" := EFTTransactionRequest."Currency Code";
+        RefundPmtRequest.Description := PartialRegretRequest.Description;
+        RefundPmtRequest."PSP Reference" := EFTTransactionRequest."PSP Reference";
+        RefundPmtRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(RefundPmtRequest."Subscription Payment Reference"));
+        RefundPmtRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+        RefundPmtRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";
+        RefundPmtRequest."Masked PAN" := MemberPaymentMethod."Masked PAN";
+        SubsPayReqUtils.TrySetPaymentContactFromUserAcc(RefundPmtRequest, MemberPaymentMethod);
+        RefundPmtRequest.Insert(true);
+        exit(true);
+    end;
 }

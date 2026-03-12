@@ -1550,8 +1550,41 @@
                     Membership.Get(TempMembership."Entry No.");
                     PaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
                     MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+                    CreateInitialSaleSubscrRequestFromMagento(Membership, MemberPaymentMethod, TempPaymentLine);
                 until TempMembership.Next() = 0;
             until TempPaymentLine.Next() = 0;
+    end;
+
+    local procedure CreateInitialSaleSubscrRequestFromMagento(Membership: Record "NPR MM Membership"; MemberPaymentMethod: Record "NPR MM Member Payment Method"; var TempMagentoPaymentLine: Record "NPR Magento Payment Line" temporary)
+    var
+        Subscription: Record "NPR MM Subscription";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        PaymentLine: Record "NPR Magento Payment Line";
+        TempEFTTransactionRequest: Record "NPR EFT Transaction Request" temporary;
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        PaymentLine.SetLoadFields("Transaction ID", Amount, "Document Table No.", "Document Type", "Document No.");
+        if not PaymentLine.GetBySystemId(TempMagentoPaymentLine.SystemId) then
+            exit;
+
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+        if not Subscription.FindFirst() then
+            exit;
+
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        if not MembershipEntry.FindLast() then
+            exit;
+
+        TempEFTTransactionRequest.Init();
+        TempEFTTransactionRequest."PSP Reference" := CopyStr(PaymentLine."Transaction ID", 1, MaxStrLen(TempEFTTransactionRequest."PSP Reference"));
+        TempEFTTransactionRequest."Result Amount" := PaymentLine.Amount;
+        TempEFTTransactionRequest."Currency Code" := CopyStr(PaymentLine.TransactionCurrencyCode(true), 1, MaxStrLen(TempEFTTransactionRequest."Currency Code"));
+        TempEFTTransactionRequest."Manual Capture" := false;
+
+        SubscriptionMgtImpl.CreateInitialSaleSubscriptionRequest(Subscription, MembershipEntry, MemberPaymentMethod, TempEFTTransactionRequest, PaymentLine.Amount);
     end;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)

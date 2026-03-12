@@ -48,14 +48,14 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         if (RefundPrice > 0) then
             Error(RefundPricePositiveErr, RefundPrice);
 
-#if (BC17 or BC18 or BC19 or B20 or BC21)
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
         SubscriptionRequest.LockTable();
 #else
         SubscriptionRequest.ReadIsolation := IsolationLevel::UpdLock;
 #endif
         SubscriptionRequest.SetCurrentKey("Subscription Entry No.");
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
-        SubscriptionRequest.SetRange(Type, Enum::"NPR MM Subscr. Request Type"::Renew);
+        SubscriptionRequest.SetFilter(Type, '%1|%2', Enum::"NPR MM Subscr. Request Type"::Renew, Enum::"NPR MM Subscr. Request Type"::"Initial Sale");
         SubscriptionRequest.SetRange(Reversed, false);
         SubscriptionRequestFound := SubscriptionRequest.FindLast();
 

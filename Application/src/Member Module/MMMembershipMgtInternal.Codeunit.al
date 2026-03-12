@@ -2105,6 +2105,8 @@
             RegretSubscription(Membership);
             MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew, CommitmentPeriodEnforced);
             CarryOutMembershipCancel(Membership, MembershipEntry, EndDateNew);
+            if Subscription."Auto-Renew" in [Subscription."Auto-Renew"::YES_INTERNAL, Subscription."Auto-Renew"::TERMINATION_REQUESTED] then
+                SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, MemberInfoCapture."Receipt No.");
         end;
 
         OutStartDate := MembershipEntry."Valid From Date";

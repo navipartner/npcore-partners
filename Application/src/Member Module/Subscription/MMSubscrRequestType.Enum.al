@@ -7,6 +7,7 @@ enum 6059805 "NPR MM Subscr. Request Type"
     Caption = 'Subscription Request Type';
 
     value(0; " ") { Caption = ''; }
+    value(5; "Initial Sale") { Caption = 'Initial Sale'; }
     value(10; "Renew") { Caption = 'Renew'; }
     value(20; "Regret") { Caption = 'Regret'; }
     value(21; "Partial Regret") { Caption = 'Partial Regret'; }

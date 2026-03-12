@@ -190,6 +190,7 @@ page 6185077 "NPR MM SubsRequestTermination"
         MembershipNotSelectedLbl: Label 'A membership must be selected.';
         RefundNotAvailableLbl: Label 'The required configuration to cancel the membership is not present and therefore a refund cannot be executed automatically.';
         NoPaymentRequestRefundMayNotWorkLbl: Label 'This subscription is yet to be renewed automatically or all existing payments has previously been refunded. Some payment service providers do not allow unreferenced refunds and therefore the refund will fail later on.';
+        MembershipModifiedSincePaymentLbl: Label 'The membership has been modified since the last subscription payment. A refund through subscription termination is not available. Please contact the store where the membership was purchased.';
         PaymentRequestSkippedLbl: Label 'The subscription renewal payment was skipped. No payment was collected, so a refund cannot be issued.';
     begin
         if _Membership."Entry No." = 0 then
@@ -201,11 +202,16 @@ page 6185077 "NPR MM SubsRequestTermination"
         SelectSuggestedItemNo();
 
         SubscriptionRequest.SetRange("Subscription Entry No.", _Subscription."Entry No.");
-        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Renew);
+        SubscriptionRequest.SetFilter(Type, '%1|%2', SubscriptionRequest.Type::Renew, SubscriptionRequest.Type::"Initial Sale");
         SubscriptionRequest.SetRange("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.SetRange(Reversed, false);
         if (SubscriptionRequest.IsEmpty()) then
-            _NoPaymentRequest := NoPaymentRequestRefundMayNotWorkLbl;
+            _NoPaymentRequest := NoPaymentRequestRefundMayNotWorkLbl
+        else begin
+            SubscriptionRequest.FindLast();
+            if not MembershipEntryMatchesLastSubscriptionPayment(SubscriptionRequest) then
+                _NoPaymentRequest := MembershipModifiedSincePaymentLbl;
+        end;
 
         SubscriptionRequest.SetRange(Status, Enum::"NPR MM Subscr. Request Status"::Skipped);
         if not SubscriptionRequest.IsEmpty() then
@@ -306,5 +312,21 @@ page 6185077 "NPR MM SubsRequestTermination"
         TempMemberInfoCapture."Item No." := _RefundItemNo;
         TempMemberInfoCapture."Information Context" := TempMemberInfoCapture."Information Context"::CANCEL;
         TempMemberInfoCapture."Document Date" := _TerminationDate;
+    end;
+
+    local procedure MembershipEntryMatchesLastSubscriptionPayment(SubscriptionRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        if SubscriptionRequest."Posted M/ship Ledg. Entry No." = 0 then
+            exit(true);
+
+        MembershipEntry.SetRange("Membership Entry No.", _Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        if not MembershipEntry.FindLast() then
+            exit(false);
+
+        exit(MembershipEntry."Entry No." = SubscriptionRequest."Posted M/ship Ledg. Entry No.");
     end;
 }

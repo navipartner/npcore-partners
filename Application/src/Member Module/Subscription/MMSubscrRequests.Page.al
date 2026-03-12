@@ -416,8 +416,10 @@ page 6184833 "NPR MM Subscr. Requests"
         SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request";
         SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
         RefundReqestedMsg: Label 'A new entry of type "Regret" for the current subscription request entry has been successfully created.';
+        InvalidTypeForRefundErr: Label 'Refund is only available for subscription requests of type Renew or Initial Sale. The current request has type %1.', Comment = '%1 = current subscription request type';
     begin
-        Rec.TestField(Type, Rec.Type::Renew);
+        if not (Rec.Type in [Rec.Type::Renew, Rec.Type::"Initial Sale"]) then
+            Error(InvalidTypeForRefundErr, Rec.Type);
         Rec.TestField(Status, Rec.Status::Confirmed);
         SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", Rec."Entry No.");
         SubscrPaymentRequest.FindLast();
