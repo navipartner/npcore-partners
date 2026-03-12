@@ -57,6 +57,11 @@ codeunit 6150876 "NPR POS List: POS Unit" implements "NPR POS Custom List IHandl
         end;
 
         if UserSetup.Get(UserId) then begin
+            if not UserSetup."NPR Allow Register Switch" then begin
+                Field.Get(Database::"NPR POS Unit", POSUnit.FieldNo("No."));
+                POSCustomListHelper.AddMandatoryFilter(Field, '<>*', ColumnFilters);
+                exit;
+            end;
             if UserSetup."NPR Register Switch Filter" <> '' then begin
                 Field.Get(Database::"NPR POS Unit", POSUnit.FieldNo("No."));
                 POSCustomListHelper.AddMandatoryFilter(
@@ -65,6 +70,9 @@ codeunit 6150876 "NPR POS List: POS Unit" implements "NPR POS Custom List IHandl
                     ColumnFilters
                 );
             end;
+        end else begin
+            Field.Get(Database::"NPR POS Unit", POSUnit.FieldNo("No."));
+            POSCustomListHelper.AddMandatoryFilter(Field, '<>*', ColumnFilters);
         end;
     end;
 
