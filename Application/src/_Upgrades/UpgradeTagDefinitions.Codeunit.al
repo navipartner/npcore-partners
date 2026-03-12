@@ -308,6 +308,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'UpgradeEcomSalesDocJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'UpgradeEcomSalesReturnDocJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'UpgradeBucketId'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'UpdateJobTimeout'));
 #endif
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG No Series Experience", 'UpgradeImplementationFieldOnNoSeries'));
@@ -1164,6 +1165,8 @@
                         exit('NPR-UpgradeEcomSalesReturnDocJQ-20260306');
                     'UpgradeBucketId':
                         exit('NPR-UpgradeBucketId-20251117');
+                    'UpdateJobTimeout':
+                        exit('NPR-UpdateJobTimeout-20260310');
                 end;
 #endif
             Codeunit::"NPR UPGUserAccounts":

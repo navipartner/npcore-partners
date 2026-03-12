@@ -98,7 +98,7 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         JobDescriptionLbl: Label 'Process Incoming Ecommerce Sales Orders';
     begin
-        JobQueueMgt.SetJobTimeout(4, 0);
+        JobQueueMgt.SetJobTimeout(7, 0);
         JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
         JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
@@ -123,7 +123,7 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         JobDescriptionLbl: Label 'Process Incoming Ecommerce Sales Return Orders';
     begin
-        JobQueueMgt.SetJobTimeout(4, 0);
+        JobQueueMgt.SetJobTimeout(7, 0);
         JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
         JobQueueMgt.SetProtected(true);
         if JobQueueMgt.InitRecurringJobQueueEntry(
