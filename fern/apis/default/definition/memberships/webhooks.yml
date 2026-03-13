@@ -112,3 +112,35 @@ webhooks:
     payload: compositeTypes.MembershipActivatedEvent
     examples:
       - payload: $compositeTypes.MembershipActivatedEvent.ExampleEvent
+
+  # Member Details Updated
+  memberDetails_updated:
+    display-name: Member Details Updated
+    docs:
+      Event name `memberDetails_updated`<br><br>
+      This webhook is triggered when a watched field or custom attribute is changed on a member.
+      The payload contains only the `memberId` identifier. Use the
+      <a href="/api-reference/memberships/service-members/get-member">Get Member</a> endpoint with the `memberId` to retrieve the full current state of the member.<br><br>
+      **Watched fields:** memberNumber, firstName, middleName, lastName, address, postCode, city, country, email, phoneNo, gender, birthday, newsletter, blocked, attributes.<br><br>
+      **Note:** Multiple webhooks may be fired for a single edit session (e.g. when several fields are changed at once on a page).
+      Subscribers should maintain a queue of modified member IDs and deduplicate by fetching the latest state once, rather than processing each webhook individually.
+    method: POST
+    payload: compositeTypes.MemberDetailsUpdatedEvent
+    examples:
+      - payload: $compositeTypes.MemberDetailsUpdatedEvent.ExampleEvent
+
+  # Membership Details Updated
+  membershipDetails_updated:
+    display-name: Membership Details Updated
+    docs:
+      Event name `membershipDetails_updated`<br><br>
+      This webhook is triggered when a watched field or custom attribute is changed on a membership.
+      The payload contains only the `membershipId` identifier. Use the
+      <a href="/api-reference/memberships/service-membership/get-membership">Get Membership</a> endpoint with the `membershipId` to retrieve the full current state of the membership.<br><br>
+      **Watched fields:** membershipNumber, membershipDescription, communityCode, membershipCode, customerNumber, blocked, autoRenewalActivated, attributes.<br><br>
+      **Note:** Multiple webhooks may be fired for a single edit session (e.g. when several fields are changed at once on a page).
+      Subscribers should maintain a queue of modified membership IDs and deduplicate by fetching the latest state once, rather than processing each webhook individually.
+    method: POST
+    payload: compositeTypes.MembershipDetailsUpdatedEvent
+    examples:
+      - payload: $compositeTypes.MembershipDetailsUpdatedEvent.ExampleEvent

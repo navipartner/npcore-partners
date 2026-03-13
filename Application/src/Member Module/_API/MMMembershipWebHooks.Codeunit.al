@@ -121,6 +121,17 @@ codeunit 6248397 "NPR MM MembershipWebHooks"
     begin
     end;
 
+    [ExternalBusinessEvent('memberDetails_updated', 'Member Details Updated', 'Triggered when core fields or custom attributes are changed on a member', EventCategory::"NPR Membership", '1.0')]
+    [RequiredPermissions(PermissionObjectType::Codeunit, Codeunit::"NPR MM MembershipWebHooks", 'X')]
+    internal procedure OnMemberDetailsUpdated(memberId: Guid)
+    begin
+    end;
+
+    [ExternalBusinessEvent('membershipDetails_updated', 'Membership Details Updated', 'Triggered when fields or custom attributes are changed on a membership', EventCategory::"NPR Membership", '1.0')]
+    [RequiredPermissions(PermissionObjectType::Codeunit, Codeunit::"NPR MM MembershipWebHooks", 'X')]
+    internal procedure OnMembershipDetailsUpdated(membershipId: Guid)
+    begin
+    end;
 #else
     internal procedure TriggerMembershipActivatedWebhookCall(MembershipId: Guid; MembershipEntryId: Guid)
     begin
