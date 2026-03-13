@@ -30,6 +30,7 @@ codeunit 6151001 "NPR POS Action: NpEmailPOSRcpt" implements "NPR IPOS Workflow"
     internal procedure AddPostEndOfSaleWorkflow(Sale: Codeunit "NPR POS Sale"; var PostWorkflows: JsonObject)
     var
         NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
         POSEntry: Record "NPR POS Entry";
         ActionParameters: JsonObject;
     begin
@@ -41,7 +42,12 @@ codeunit 6151001 "NPR POS Action: NpEmailPOSRcpt" implements "NPR IPOS Workflow"
         if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::Other, POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale"]) then
             exit;
 
-        // Add workflow - validation of receipt profile and email happens in SendReceiptEmail
+        // Early exit to avoid unnecessary workflow roundtrip (~200ms) for POS units without email receipt setup
+        if not TryGetValidatedReceiptProfile(POSEntry, POSReceiptProfile) then
+            exit;
+        if GetEmailAddress(POSEntry) = '' then
+            exit;
+
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::EMAIL_RCPT_ON_SALE), ActionParameters);
     end;
 
