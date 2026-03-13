@@ -73,6 +73,9 @@ query 6014501 "NPR TMReservationRequest"
             column(RequestStatus; "Request Status")
             {
             }
+            column(ExternalOrderNo; "External Order No.")
+            {
+            }
             column(ScheduledTimeDescription; "Scheduled Time Description")
             {
             }
