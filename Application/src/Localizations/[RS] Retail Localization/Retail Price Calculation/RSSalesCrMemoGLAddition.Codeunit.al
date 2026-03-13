@@ -458,33 +458,42 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
     local procedure InsertAppliedValueEntryAdjust(var StdCorrectionValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; StdValueEntry: Record "Value Entry"; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
+        StdItemLedgerEntry: Record "Item Ledger Entry";
+        TempApplItemLedgerEntry: Record "Item Ledger Entry" temporary;
         AppliedDocValueEntry: Record "Value Entry";
-        QtyTakenFromEntry: Decimal;
+        ShowAppliedEntries: Codeunit "Show Applied Entries";
         QtyNeeded: Decimal;
     begin
         CorrectStdValueEntry(StdCorrectionValueEntry, StdValueEntry, SalesCrMemoHeader);
 
-        AppliedDocValueEntry.SetLoadFields("Cost per Unit", "Invoiced Quantity");
-        AppliedDocValueEntry.SetRange("Document No.", SalesCrMemoHeader."Applies-to Doc. No.");
-        AppliedDocValueEntry.SetRange("Item No.", TempSalesCrMemoLine."No.");
-        AppliedDocValueEntry.SetRange("Location Code", TempSalesCrMemoLine."Location Code");
-        if AppliedDocValueEntry.IsEmpty() then
+        if not StdItemLedgerEntry.Get(StdValueEntry."Item Ledger Entry No.") then
+            exit;
+
+        ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplItemLedgerEntry);
+
+        if TempApplItemLedgerEntry.IsEmpty() then
             exit;
 
         QtyNeeded := Abs(TempSalesCrMemoLine.Quantity);
 
-        AppliedDocValueEntry.FindSet();
+        TempApplItemLedgerEntry.FindSet();
         repeat
-            HandleAppliedDocumentAndInsertCOGSCorrection(AppliedDocValueEntry, StdValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, QtyNeeded, QtyTakenFromEntry, SalesCrMemoHeader);
-        until AppliedDocValueEntry.Next() = 0;
+            AppliedDocValueEntry.SetLoadFields("Cost per Unit", "Item Ledger Entry No.", "Item Charge No.", "Entry Type", "Invoiced Quantity");
+            AppliedDocValueEntry.SetRange("Item Ledger Entry No.", TempApplItemLedgerEntry."Entry No.");
+            if AppliedDocValueEntry.FindSet() then
+                repeat
+                    HandleAppliedDocumentAndInsertCOGSCorrection(AppliedDocValueEntry, StdValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, QtyNeeded, SalesCrMemoHeader);
+                until (AppliedDocValueEntry.Next() = 0) or (QtyNeeded <= 0);
+        until (TempApplItemLedgerEntry.Next() = 0) or (QtyNeeded <= 0);
     end;
 
-    local procedure HandleAppliedDocumentAndInsertCOGSCorrection(AppliedDocValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; var QtyNeeded: Decimal; QtyTakenFromEntry: Decimal; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    local procedure HandleAppliedDocumentAndInsertCOGSCorrection(AppliedDocValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; var QtyNeeded: Decimal; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
         COGSCorrectionValueEntry: Record "Value Entry";
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
         COGSCorrectionValueEntryDescLbl: Label 'COGS Correction';
         RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
+        QtyTakenFromEntry: Decimal;
     begin
         if QtyNeeded <= 0 then
             exit;
@@ -495,7 +504,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         if not ((RSRetValueEntryMapp."COGS Correction") and (RSRetValueEntryMapp.Open)) then
             exit;
 
-        QtyTakenFromEntry := Abs(AppliedDocValueEntry."Invoiced Quantity");
+        QtyTakenFromEntry := RSRetValueEntryMapp."Remaining Quantity";
 
         COGSCorrectionValueEntry.Init();
         COGSCorrectionValueEntry.Copy(StdValueEntry);
@@ -683,30 +692,41 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
     local procedure CalculateSumOfAppliedRetailCostAmounts(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
     var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
+        StdValueEntry: Record "Value Entry";
+        StdItemLedgerEntry: Record "Item Ledger Entry";
+        TempApplItemLedgerEntry: Record "Item Ledger Entry" temporary;
+        AppliedValueEntry: Record "Value Entry";
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
-        ValueEntry: Record "Value Entry";
+        ShowAppliedEntries: Codeunit "Show Applied Entries";
         SumOfCostAmounts: Decimal;
     begin
-        SalesInvoiceHeader.Get(SalesCrMemoHeader."Applies-to Doc. No.");
+        StdValueEntry.SetLoadFields("Item Ledger Entry No.");
+        StdValueEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
+        StdValueEntry.SetRange("Item No.", TempSalesCrMemoLine."No.");
+        StdValueEntry.SetRange("Location Code", TempSalesCrMemoLine."Location Code");
+        StdValueEntry.SetRange("Document Line No.", TempSalesCrMemoLine."Line No.");
+        if not StdValueEntry.FindFirst() then
+            exit(0);
 
-        ValueEntry.SetLoadFields("Cost per Unit");
-        ValueEntry.SetRange("Posting Date", SalesInvoiceHeader."Posting Date");
-        ValueEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
-        ValueEntry.SetRange("Item No.", TempSalesCrMemoLine."No.");
-        ValueEntry.SetRange("Location Code", TempSalesCrMemoLine."Location Code");
+        if not StdItemLedgerEntry.Get(StdValueEntry."Item Ledger Entry No.") then
+            exit(0);
 
-        if ValueEntry.IsEmpty() then
-            exit;
+        ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplItemLedgerEntry);
 
-        ValueEntry.FindSet();
+        if TempApplItemLedgerEntry.IsEmpty() then
+            exit(0);
+
+        AppliedValueEntry.SetLoadFields("Cost per Unit");
+        TempApplItemLedgerEntry.FindSet();
         repeat
-            case RSRetValueEntryMapp.Get(ValueEntry."Entry No.") of
-                true:
-                    if RSRetValueEntryMapp."Retail Calculation" then
-                        SumOfCostAmounts += ValueEntry."Cost per Unit";
-            end;
-        until ValueEntry.Next() = 0;
+            AppliedValueEntry.SetRange("Item Ledger Entry No.", TempApplItemLedgerEntry."Entry No.");
+            if AppliedValueEntry.FindSet() then
+                repeat
+                    if RSRetValueEntryMapp.Get(AppliedValueEntry."Entry No.") then
+                        if RSRetValueEntryMapp."Retail Calculation" then
+                            SumOfCostAmounts += AppliedValueEntry."Cost per Unit";
+                until AppliedValueEntry.Next() = 0;
+        until TempApplItemLedgerEntry.Next() = 0;
 
         exit(SumOfCostAmounts * TempSalesCrMemoLine.Quantity)
     end;
