@@ -30,8 +30,12 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         POSHardwareProfile: Record "NPR POS Hardware Profile";
         Response: JsonObject;
     begin
-        if not POSSession.IsInitialized() then
+        if not POSSession.IsInitialized() then begin
+            Response.Add('POSUnit', '');
+            Response.Add('HWCIPAddress', '');
+            FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
             exit;
+        end;
 
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
