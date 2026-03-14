@@ -116,4 +116,36 @@ codeunit 6185046 "NPR TicketingApiTranslations"
         end;
     end;
 
+
+    internal procedure EncodeAccessEntryType(AccessEntryType: Option): Text
+    var
+        TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        case AccessEntryType of
+            TicketAccessEntryLine.Type::INITIAL_ENTRY:
+                exit('initialEntry');
+            TicketAccessEntryLine.Type::RESERVATION:
+                exit('reservation');
+            TicketAccessEntryLine.Type::ADMITTED:
+                exit('admitted');
+            TicketAccessEntryLine.Type::DEPARTED:
+                exit('departed');
+            TicketAccessEntryLine.Type::CONSUMED:
+                exit('consumed');
+            TicketAccessEntryLine.Type::CANCELED_ADMISSION:
+                exit('canceledAdmission');
+            TicketAccessEntryLine.Type::PAYMENT:
+                exit('payment');
+            TicketAccessEntryLine.Type::PREPAID:
+                exit('prePaid');
+            TicketAccessEntryLine.Type::POSTPAID:
+                exit('postPaid');
+            TicketAccessEntryLine.Type::CANCELED_RESERVATION:
+                exit('canceledReservation');
+            9998: // Used when the above types are not applicable, f.ex. for schedule entries in the reservation API
+                exit('requested');
+            else
+                exit('unknown');
+        end;
+    end;
 }

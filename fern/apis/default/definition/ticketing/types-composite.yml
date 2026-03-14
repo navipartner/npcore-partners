@@ -41,8 +41,8 @@ types:
           capacityControl: sales
           description: $Descriptions.ExampleAdmissionCastle
 
-  ScheduleDetails: 
-    docs: Details of the schedule for a specific time slot.
+  ScheduleDetailsBase: 
+    docs: Generic details of the schedule for a time slot.
     properties:
       externalNumber: simpleTypes.ScheduleNumber
       code: string
@@ -54,6 +54,74 @@ types:
       duration: integer
       arrivalFromTime: optional<simpleTypes.ArrivalFromTime>
       arrivalUntilTime: optional<simpleTypes.ArrivalUntilTime>
+
+  ScheduleDetailsCapacity:
+    docs: Used for the capacity endpoint
+    extends: ScheduleDetailsBase
+    examples:
+      - name: ExampleMorning
+        value:
+          externalNumber: $simpleTypes.ScheduleNumber.ExampleMorningId
+          code: "MORNING"
+          description: "Morning schedule"
+          startDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          startTime: "09:00"
+          endDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          endTime: "12:00"
+          duration: 10800
+          arrivalFromTime: "08:30"
+          arrivalUntilTime: "10:00"
+      - name: ExampleEvening
+        value:
+          externalNumber: $simpleTypes.ScheduleNumber.ExampleEveningId
+          code: "EVENING"
+          description: "Evening schedule"
+          startDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          startTime: "17:00"  
+          endDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          endTime: "20:00"
+          duration: 10800
+          arrivalFromTime: "16:30"
+          arrivalUntilTime: "18:00"
+
+  ScheduleDetailsTicket:
+    docs: Used for the ticket content
+    extends: ScheduleDetailsBase
+    properties:
+      type: simpleTypes.TicketAccessEventType
+    examples:
+      - name: ExampleMorningTicket
+        value:
+          externalNumber: $simpleTypes.ScheduleNumber.ExampleMorningId
+          type: $simpleTypes.TicketAccessEventType.ExampleInitialEntry
+          code: "MORNING"
+          description: "Morning schedule"
+          startDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          startTime: "09:00"
+          endDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          endTime: "12:00"
+          duration: 10800
+          arrivalFromTime: "08:30"
+          arrivalUntilTime: "10:00"
+      - name: ExampleEveningTicket
+        value:
+          externalNumber: $simpleTypes.ScheduleNumber.ExampleEveningId
+          type: $simpleTypes.TicketAccessEventType.ExampleInitialEntry
+          code: "EVENING"
+          description: "Evening schedule"
+          startDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          startTime: "17:00"  
+          endDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          endTime: "20:00"
+          duration: 10800
+          arrivalFromTime: "16:30"
+          arrivalUntilTime: "18:00"
+
+  ScheduleDetails: 
+    docs: Details of the schedule for a specific reservation or ticket.
+    extends: ScheduleDetailsBase
+    properties:
+      type: optional<simpleTypes.TicketAccessEventType>
     examples:
       - name: ExampleMorning
         value:
@@ -225,19 +293,19 @@ types:
     docs: Details of the ticket content
     properties:
       admissionDetails: AdmissionDetails
-      scheduleDetails: ScheduleDetails
+      scheduleDetails: ScheduleDetailsTicket
     examples:
       - name: ExampleTicketContent1
         value:
           admissionDetails: $AdmissionDetails.ExampleAdmissionCastle
-          scheduleDetails: $ScheduleDetails.ExampleMorning
+          scheduleDetails: $ScheduleDetailsTicket.ExampleMorningTicket
       - name: ExampleTicketContent2
         value:
           admissionDetails: $AdmissionDetails.ExampleAdmissionCastle
-          scheduleDetails: $ScheduleDetails.ExampleEvening
+          scheduleDetails: $ScheduleDetailsTicket.ExampleEveningTicket
  
   ScheduleEntryDetails: 
-    docs: Details of the schedule for a specific time slot.
+    docs: Details of the schedule for a specific time slot. Get-Schedule endpoint returns a list of these for the specified admission.
     properties:
       externalNumber: simpleTypes.ScheduleNumber
       scheduleCode: simpleTypes.ScheduleCode

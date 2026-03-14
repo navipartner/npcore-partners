@@ -57,14 +57,14 @@ service:
                     allocationModel: capacity
                     remainingCapacity: 10
                     explanation: "Schedule is allocatable"
-                    schedule: $compositeTypes.ScheduleDetails.ExampleMorning
+                    schedule: $compositeTypes.ScheduleDetailsCapacity.ExampleMorning
                     price: $SchedulePrice.ExampleFixedPrice
                     sales: $ScheduleSales.ExampleSalesPeriod
                   - allocatable: true
                     allocationModel: capacity
                     remainingCapacity: 12
                     explanation: "Schedule is allocatable"
-                    schedule: $compositeTypes.ScheduleDetails.ExampleEvening
+                    schedule: $compositeTypes.ScheduleDetailsCapacity.ExampleEvening
                     price: $SchedulePrice.ExampleFixedPrice
                     sales: $ScheduleSales.ExampleSalesPeriod
 types:
@@ -106,7 +106,7 @@ types:
       allocationModel: simpleTypes.AllocationModel
       remainingCapacity: simpleTypes.RemainingCapacity
       explanation:  simpleTypes.AllocationExplanation
-      schedule: compositeTypes.ScheduleDetails
+      schedule: compositeTypes.ScheduleDetailsCapacity
       price: SchedulePrice
       sales: ScheduleSales
 

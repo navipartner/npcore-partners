@@ -532,7 +532,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             ResponseJson
                 .StartObject()
                 .AddObject(TicketAgent.AdmissionDTO(ResponseJson, 'admissionDetails', TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", false, TicketReservationRequest."Admission Inclusion", TicketDescriptionBuffer))
-                .AddObject(TicketAgent.ScheduleDTO(ResponseJson, 'scheduleDetails', TicketReservationRequest."External Adm. Sch. Entry No."))
+                .AddObject(TicketAgent.ScheduleDTO(ResponseJson, 'scheduleDetails', TicketReservationRequest."External Adm. Sch. Entry No.", 9998))
                 .EndObject()
         until (TicketReservationRequest.Next() = 0);
 

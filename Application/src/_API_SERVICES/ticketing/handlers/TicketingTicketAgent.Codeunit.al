@@ -595,6 +595,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
+        TicketTranslation: Codeunit "NPR TicketingApiTranslations";
 
         TimeHelper: Codeunit "NPR TM TimeHelper";
         MaxGroupSize: Integer;
@@ -633,7 +634,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
                     if (TicketAccessEntryLine.FindSet()) then begin
                         repeat
                             ResponseJson.StartObject()
-                                .AddProperty('event', AdmissionTypeToText(TicketAccessEntryLine.Type))
+                                .AddProperty('event', TicketTranslation.EncodeAccessEntryType(TicketAccessEntryLine.Type))
                                 .AddProperty('eventAt', TimeHelper.FormatDateTimeWithAdmissionTimeZone(TicketAccessEntry."Admission Code", TimeHelper.AdjustZuluToAdmissionLocalDateTime(TicketAccessEntry."Admission Code", TicketAccessEntryLine.SystemCreatedAt)))
                                 .EndObject();
                         until (TicketAccessEntryLine.Next() = 0);
@@ -891,13 +892,14 @@ codeunit 6185080 "NPR TicketingTicketAgent"
                 DetailAccessEntry.Init();
         end;
 
-        exit(ScheduleDTO(ResponseJson, ObjectName, DetailAccessEntry."External Adm. Sch. Entry No."));
+        exit(ScheduleDTO(ResponseJson, ObjectName, DetailAccessEntry."External Adm. Sch. Entry No.", DetailAccessEntry.Type));
     end;
 
-    internal procedure ScheduleDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ObjectName: Text; ExtScheduleEntryNo: Integer): Codeunit "NPR JSON Builder";
+    internal procedure ScheduleDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ObjectName: Text; ExtScheduleEntryNo: Integer; AccessEntryType: Option): Codeunit "NPR JSON Builder";
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Schedule: Record "NPR TM Admis. Schedule";
+        TicketTranslation: Codeunit "NPR TicketingApiTranslations";
         DurationAsInt: Integer;
     begin
         ResponseJson.StartObject(ObjectName);
@@ -922,6 +924,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
             ResponseJson
                 .AddProperty('externalNumber', ScheduleEntry."External Schedule Entry No.")
+                .AddProperty('type', TicketTranslation.EncodeAccessEntryType(AccessEntryType))
                 .AddProperty('code', ScheduleEntry."Schedule Code")
                 .AddProperty('startDate', ScheduleEntry."Admission Start Date")
                 .AddProperty('startTime', ScheduleEntry."Admission Start Time")
@@ -934,42 +937,13 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         end else begin
             ResponseJson
                 .AddProperty('externalNumber', -1)
+                .AddProperty('type', TicketTranslation.EncodeAccessEntryType(9999))
                 .AddProperty('code', '')
                 .AddProperty('description', 'No reservation required');
         end;
 
         ResponseJson.EndObject();
         exit(ResponseJson);
-    end;
-
-    local procedure AdmissionTypeToText(AdmissionType: Option): Text[50]
-    var
-        TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
-    begin
-        case AdmissionType of
-            TicketAccessEntryLine.Type::INITIAL_ENTRY:
-                exit('initialEntry');
-            TicketAccessEntryLine.Type::RESERVATION:
-                exit('reservation');
-            TicketAccessEntryLine.Type::ADMITTED:
-                exit('admitted');
-            TicketAccessEntryLine.Type::DEPARTED:
-                exit('departed');
-            TicketAccessEntryLine.Type::CONSUMED:
-                exit('consumed');
-            TicketAccessEntryLine.Type::CANCELED_ADMISSION:
-                exit('canceledAdmission');
-            TicketAccessEntryLine.Type::PAYMENT:
-                exit('payment');
-            TicketAccessEntryLine.Type::PREPAID:
-                exit('prePaid');
-            TicketAccessEntryLine.Type::POSTPAID:
-                exit('postPaid');
-            TicketAccessEntryLine.Type::CANCELED_RESERVATION:
-                exit('canceledReservation');
-            else
-                exit('unknown');
-        end;
     end;
 
     local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Text): Codeunit "NPR JSON Builder"

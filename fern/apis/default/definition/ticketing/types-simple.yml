@@ -503,9 +503,17 @@ types:
       - prePaid
       - postPaid
       - canceledReservation
+      - requested
       - unknown
 
   TicketAccessEventType:
       type: TicketAccessEventTypeEnum
       docs: 
         The types of events that can occur for a ticket.
+      examples:
+      - name: ExampleInitialEntry
+        value: initialEntry
+      - name: ExampleReservation
+        value: reservation
+      - name: ExampleRequested
+        value: requested
