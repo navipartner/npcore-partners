@@ -2730,12 +2730,61 @@
         end;
     end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure CloseInitialEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry") Closed: Boolean
+    var
+        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        DetailedTicketAccessEntryUpdate: Record "NPR TM Det. Ticket AccessEntry";
+        EntryNo: Integer;
+    begin
+
+        // During payment registration, we want to close the initial entry linked to the payment. 
+        // On first payment, there is only 1 initial entry and we want to close that one. 
+        // On subsequent payments, we want to close the initial entry that is not yet closed and that has the same quantity as the payment (in case there are multiple initial entries due to cancellations)
+        DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
+        DetailedTicketAccessEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+        DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', ClosedByAccessEntry."Ticket Access Entry No.");
+        DetailedTicketAccessEntry.SetFilter(Type, '=%1', DetailedTicketAccessEntry.Type::INITIAL_ENTRY);
+        DetailedTicketAccessEntry.SetFilter(Open, '=%1', true);
+        if (DetailedTicketAccessEntry.FindSet()) then begin
+            EntryNo := DetailedTicketAccessEntry."Entry No.";
+
+            repeat
+                // Prefer an entry without a closed link and that has same quantity
+                if ((DetailedTicketAccessEntry."Closed By Entry No." = 0) and (DetailedTicketAccessEntry.Quantity = ClosedByAccessEntry.Quantity)) then begin
+                    // changed to optimistic concurrency as we are already filtering for open entries, 
+                    DetailedTicketAccessEntry."Closed By Entry No." := ClosedByAccessEntry."Entry No.";
+                    DetailedTicketAccessEntry.Open := false;
+                    DetailedTicketAccessEntry.Modify();
+                    if (ClosedByAccessEntry.Quantity < 0) then
+                        ClosedByAccessEntry."External Adm. Sch. Entry No." := DetailedTicketAccessEntry."External Adm. Sch. Entry No.";
+                    exit(true);
+                end;
+            until (DetailedTicketAccessEntry.Next() = 0);
+        end;
+
+        // If we didn't find an entry matching the quantity and without a closed link, just close the first (oldest) open entry we found
+        DetailedTicketAccessEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
+        if (DetailedTicketAccessEntryUpdate.Get(EntryNo)) then begin
+            DetailedTicketAccessEntryUpdate."Closed By Entry No." := ClosedByAccessEntry."Entry No.";
+            DetailedTicketAccessEntryUpdate.Open := false;
+            DetailedTicketAccessEntryUpdate.Modify();
+            Closed := true;
+
+            if (ClosedByAccessEntry.Quantity < 0) then
+                ClosedByAccessEntry."External Adm. Sch. Entry No." := DetailedTicketAccessEntryUpdate."External Adm. Sch. Entry No.";
+        end;
+
+        exit(Closed);
+    end;
+#else
     local procedure CloseInitialEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean
     var
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
         exit(CloseTicketAccessEntry(ClosedByAccessEntry, DetailedTicketAccessEntry.Type::INITIAL_ENTRY));
     end;
+#endif
 
     local procedure CloseReservationEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean
     var
