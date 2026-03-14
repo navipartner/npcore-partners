@@ -1177,19 +1177,23 @@
 
     end;
 
-    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; ListOfAdmissionCodes: List of [Code[20]])
+    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; ListOfAdmissionCodes: Dictionary of [Code[20], Boolean])
     var
         AdmissionCode: Code[20];
+        CandidateForDeferral: Boolean;
     begin
-        foreach AdmissionCode in ListOfAdmissionCodes do begin
-            CreatePaymentEntryType(Ticket, PaymentType, PaymentReferenceNo, CustomerNo, AdmissionCode);
+        foreach AdmissionCode in ListOfAdmissionCodes.Keys() do begin
+            CandidateForDeferral := ListOfAdmissionCodes.Get(AdmissionCode);
+            CreatePaymentEntryType(Ticket, PaymentType, PaymentReferenceNo, CustomerNo, AdmissionCode, CandidateForDeferral);
         end;
     end;
 
-    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; AdmissionCode: Code[20])
+
+    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; AdmissionCode: Code[20]; CandidateForDeferral: Boolean)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+        DeferRevenue: Codeunit "NPR TM RevenueDeferral";
     begin
         TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
@@ -1202,6 +1206,9 @@
                 TicketAccessEntry."Customer No." := CustomerNo;
                 TicketAccessEntry.Modify();
             end;
+
+            if (CandidateForDeferral) then
+                DeferRevenue.CreateDeferRevenueRequest(TicketAccessEntry."Entry No.", Today());
 
             NotifyParticipant.CreateAdmissionWelcomeReminder(TicketAccessEntry, Ticket."External Member Card No.");
             NotifyParticipant.CreateAdmissionReservationReminder(TicketAccessEntry, Ticket."External Member Card No.");
@@ -2563,7 +2570,6 @@
     local procedure RegisterPayment_Worker(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; PaymentType: Option; PaymentReferenceNo: Code[20])
     var
         PaymentTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        DeferRevenue: Codeunit "NPR TM RevenueDeferral";
     begin
 
         PaymentTicketAccessEntry.Init();
@@ -2589,8 +2595,6 @@
         PaymentTicketAccessEntry."External Adm. Sch. Entry No." := 0;
         PaymentTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         PaymentTicketAccessEntry.Insert(true);
-
-        DeferRevenue.CreateDeferRevenueRequest(TicketAccessEntry."Entry No.", Today());
 
         CloseInitialEntry(PaymentTicketAccessEntry);
         OnDetailedTicketEvent(PaymentTicketAccessEntry);

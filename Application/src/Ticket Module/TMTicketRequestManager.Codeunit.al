@@ -923,7 +923,7 @@
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        ListOfAdmissionCodes: List of [Code[20]];
+        ListOfAdmissionCodes: Dictionary of [Code[20], Boolean];
     begin
         if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then
             exit;
@@ -943,7 +943,7 @@
                 AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
                 AdmissionBOM.FindSet();
                 repeat
-                    ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code");
+                    ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code", AdmissionBOM.DeferRevenue);
                 until (AdmissionBOM.Next() = 0);
 
                 repeat
@@ -963,7 +963,7 @@
         EntryNos: List of [Integer];
         EntryNo: Integer;
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        ListOfAdmissionCodes: List of [Code[20]];
+        ListOfAdmissionCodes: Dictionary of [Code[20], Boolean];
     begin
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -988,7 +988,7 @@
                 AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
                 AdmissionBOM.FindSet();
                 repeat
-                    ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code");
+                    ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code", AdmissionBOM.DeferRevenue);
                 until (AdmissionBOM.Next() = 0);
 
                 repeat
@@ -1010,7 +1010,7 @@
                     if (Ticket.FindSet()) then begin
                         repeat
                             if (TicketReservationRequest."Payment Option" <> TicketReservationRequest."Payment Option"::UNPAID) then
-                                TicketManagement.CreatePaymentEntryType(Ticket, TicketReservationRequest."Payment Option", TicketReservationRequest."External Order No.", TicketReservationRequest."Customer No.", TicketReservationRequest."Admission Code");
+                                TicketManagement.CreatePaymentEntryType(Ticket, TicketReservationRequest."Payment Option", TicketReservationRequest."External Order No.", TicketReservationRequest."Customer No.", TicketReservationRequest."Admission Code", true);
 
                         until (Ticket.Next() = 0);
                     end;
