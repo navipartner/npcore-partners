@@ -15,6 +15,7 @@
         {
             group(General)
             {
+                Caption = 'General';
                 field("External Member No."; Rec."External Member No.")
                 {
                     Editable = false;
@@ -81,6 +82,7 @@
             }
             group(CRM)
             {
+                Caption = 'CRM';
                 group(MemberImage)
                 {
                     Caption = 'Member Image';
@@ -176,6 +178,7 @@
                 group(Control6014407)
                 {
                     ShowCaption = false;
+                    Caption = 'Membership Points';
                     field("Remaining Points"; RemainingPoints)
                     {
                         Caption = 'Remaining Points';
