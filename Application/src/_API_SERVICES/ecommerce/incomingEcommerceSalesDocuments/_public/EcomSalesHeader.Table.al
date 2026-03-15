@@ -347,10 +347,31 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Vouchers Exist';
         }
+        field(5051; "Tickets Exist"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Tickets Exist';
+        }
+        field(5052; "Ticket Reservation Token"; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Ticket Reservation Token';
+        }
         field(5080; "Voucher Processing Status"; Enum "NPR EcomVoucherStatus")
         {
             DataClassification = CustomerContent;
             Caption = 'Voucher Processing Status';
+        }
+        field(5081; "Ticket Processing Status"; Enum "NPR EcomTicketStatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Ticket Processing Status';
+        }
+        field(5082; "Ticket Retry Count"; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Ticket Retry Count';
+            BlankZero = true;
         }
 
         field(5090; "Capture Processing Status"; Enum "NPR Ecom Capture Status")
@@ -387,8 +408,18 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
         }
 #endif
+        field(5180; "Ticket Holder Name"; Text[100])
+        {
+            Caption = 'Ticket Holder Name';
+            DataClassification = CustomerContent;
+        }
+        field(5190; "Ticket Holder Preferred Lang"; Code[10])
+        {
+            Caption = 'Ticket Holder Preferred Language';
+            DataClassification = CustomerContent;
+            TableRelation = Language.Code;
+        }
     }
-
     keys
     {
         key(Key1; "Entry No.")
@@ -408,6 +439,9 @@ table 6151258 "NPR Ecom Sales Header"
         {
         }
         key(VoucherProcessing; "Document Type", "Creation Status", "Vouchers Exist", "Capture Processing Status", "Voucher Processing Status", "Bucket Id")
+        {
+        }
+        key(TicketProcessing; "Document Type", "Creation Status", "Tickets Exist", "Capture Processing Status", "Ticket Processing Status", "Bucket Id")
         {
         }
         key(CaptureProcessing; "Creation Status", "Virtual Items Exist", "Capture Processing Status", "Bucket Id", "Capture Retry Count")

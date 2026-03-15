@@ -965,9 +965,15 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         IncEcomSalesLine."Shopify ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'id', true));
         case IncEcomSalesLine.Type of
             IncEcomSalesLine.Type::Voucher:
-                PopulateVoucherLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+                begin
+                    PopulateVoucherLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+                    IncEcomSalesLine.Subtype := IncEcomSalesLine.Subtype::Voucher;
+                end;
             IncEcomSalesLine.Type::Item:
-                PopulateItemLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+                begin
+                    PopulateItemLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+                    IncEcomSalesLine.Subtype := IncEcomSalesLine.Subtype::Item;
+                end;
             IncEcomSalesLine.Type::"Shipment Fee":
                 PopulateShipmentFeeLine(SalesLineJsonToken, IncEcomSalesLine);
             else

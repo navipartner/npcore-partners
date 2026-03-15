@@ -123,6 +123,7 @@ table 6151259 "NPR Ecom Sales Line"
             DataClassification = CustomerContent;
             Caption = 'Captured';
         }
+
         field(16; "Voucher Type"; Code[20])
         {
             Caption = 'Voucher Type';
@@ -158,6 +159,16 @@ table 6151259 "NPR Ecom Sales Line"
             DataClassification = CustomerContent;
         }
 #endif
+        field(5040; Subtype; Enum "NPR Ecom Sales Line Subtype")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Subtype';
+        }
+        field(5041; "Ticket Reservation Line Id"; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Ticket Reservation Line Id';
+        }
     }
 
     keys
@@ -179,5 +190,9 @@ table 6151259 "NPR Ecom Sales Line"
         key(Key5; "Document Entry No.", Type, Captured, "Virtual Item Process Status", "Virtual Item Proc Retry Count")
         {
         }
+        key(Key6; "Document Entry No.", Subtype, Captured, "Virtual Item Process Status", "Virtual Item Proc Retry Count")
+        {
+        }
     }
+
 }

@@ -58,6 +58,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         JsonHelper: Codeunit "NPR Json Helper";
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
         SalesDocToJsonToken: JsonToken;
         SellToCustomerJsonToken: JsonToken;
         ShipmentJsonToken: JsonToken;
@@ -81,6 +82,11 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesHeader."Your Reference" := JsonHelper.GetJText(RequestBody, 'yourReference', MaxStrLen(EcomSalesHeader."Your Reference"), true, false);
         EcomSalesHeader."Location Code" := JsonHelper.GetJText(RequestBody, 'locationCode', MaxStrLen(EcomSalesHeader."Location Code"), true, false);
         EcomSalesHeader."Price Excl. VAT" := JsonHelper.GetJBoolean(RequestBody, 'pricesExcludingVat', false);
+        EcomSalesHeader."Ticket Reservation Token" := JsonHelper.GetJText(RequestBody, 'ticketReservationToken', MaxStrLen(EcomSalesHeader."Ticket Reservation Token"), true, false).Trim();
+        if EcomSalesHeader."Ticket Reservation Token" <> '' then
+            EcomCreateTicketImpl.ValidateAndUpdateRequestsWithEcommerceDocNo(EcomSalesHeader);
+        EcomSalesHeader."Ticket Holder Name" := JsonHelper.GetJText(RequestBody, 'ticketHolder', MaxStrLen(EcomSalesHeader."Ticket Holder Name"), true, false);
+        EcomSalesHeader."Ticket Holder Preferred Lang" := JsonHelper.GetJText(RequestBody, 'ticketHolderLanguage', MaxStrLen(EcomSalesHeader."Ticket Holder Preferred Lang"), true, false);
 
         //Sell-to
         SellToCustomerJsonToken := JsonHelper.GetJsonToken(RequestBody, 'sellToCustomer');
@@ -231,6 +237,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     local procedure DeserializeIncomingEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         JsonHelper: Codeunit "NPR Json Helper";
         LineTypeText: Text;
         PropertyErrorText: Label 'Property %1 has incorrect value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
@@ -246,17 +253,23 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesLine."No." := JsonHelper.GetJText(SalesLineJsonToken, 'no', MaxStrLen(EcomSalesLine."No."), true, false);
                     if Strlen(EcomSalesLine."No.") > 20 then
                         Error(LengthErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'no'), Strlen(EcomSalesLine."No."), 20);
-                    EcomSalesLine."Variant Code" := JsonHelper.GetJText(SalesLineJsonToken, 'variantCode', MaxStrLen(EcomSalesLine."Variant Code"), true, false);
-                    EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
-                    if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
-                        Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'no'), EcomSalesLine."No.");
                     EcomSalesLine.Description := JsonHelper.GetJText(SalesLineJsonToken, 'description', MaxStrLen(EcomSalesLine.Description), true, false);
                     EcomSalesLine."Unit Price" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'unitPrice', true);
                     EcomSalesLine.Quantity := JsonHelper.GetJDecimal(SalesLineJsonToken, 'quantity', true);
-                    EcomSalesLine."Unit Of Measure Code" := JsonHelper.GetJText(SalesLineJsonToken, 'unitOfMeasure', MaxStrLen(EcomSalesLine."Unit Of Measure Code"), true, false);
                     EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
-                    EcomSalesLine."Requested Delivery Date" := JsonHelper.GetJDate(SalesLineJsonToken, 'requestedDeliveryDate', false);
+                    EcomSalesLine."Variant Code" := JsonHelper.GetJText(SalesLineJsonToken, 'variantCode', MaxStrLen(EcomSalesLine."Variant Code"), true, false);
+                    if EcomVirtualItemMgt.IsTicketItem(EcomSalesLine."No.") then begin
+                        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Ticket;
+                        ValidateTicketReservationLineId(SalesLineJsonToken, EcomSalesLine, EcomSalesHeader);
+                    end else begin
+                        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Item;
+                        EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
+                        if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
+                            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'no'), EcomSalesLine."No.");
+                        EcomSalesLine."Unit Of Measure Code" := JsonHelper.GetJText(SalesLineJsonToken, 'unitOfMeasure', MaxStrLen(EcomSalesLine."Unit Of Measure Code"), true, false);
+                        EcomSalesLine."Requested Delivery Date" := JsonHelper.GetJDate(SalesLineJsonToken, 'requestedDeliveryDate', false);
+                    end;
                 end;
             EcomSalesLine.Type::Comment:
                 begin
@@ -273,6 +286,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 end;
             EcomSalesLine.Type::Voucher:
                 begin
+                    EcomSalesLine.Subtype := EcomSalesLine.Subtype::Voucher;
                     EcomSalesLine."Voucher Type" := JsonHelper.GetJText(SalesLineJsonToken, 'voucherType', MaxStrLen(EcomSalesLine."Voucher Type"), true, false);
                     EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
                     if (EcomSalesLine."Barcode No." = '') then
@@ -539,6 +553,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                  .AddProperty('yourReference', EcomSalesHeader."Your Reference")
                                  .AddProperty('locationCode', EcomSalesHeader."Location Code")
                                  .AddProperty('pricesExcludingVat', EcomSalesHeader."Price Excl. VAT")
+                                 .AddProperty('ticketReservationToken', EcomSalesHeader."Ticket Reservation Token")
                                  .AddProperty('captureProcessingStatus', GetSalesDocumentCaptureProcessingStatusApiType(EcomSalesHeader))
                                  .AddProperty('lastCaptureErrorMessage', EcomSalesHeader."Last Capture Error Message")
                                  .StartObject('sellToCustomer')
@@ -686,7 +701,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('invoicedAmount', Format(EcomSalesLine."Invoiced Amount", 0, 9))
                                   .AddProperty('captured', EcomSalesLine.Captured)
                                   .AddProperty('virtualItemProcessStatus', GetVirtualItemProcessStatusApiType(EcomSalesLine))
-                                  .AddProperty('virtualItemProcessErrorMessage', EcomSalesLine."Virtual Item Process ErrMsg");
+                                  .AddProperty('virtualItemProcessErrorMessage', EcomSalesLine."Virtual Item Process ErrMsg")
+                                  .AddProperty('ticketReservationLineId', Format(EcomSalesLine."Ticket Reservation Line Id", 0, 4));
         EcomSalesDocApiEvents.OnCreateAddSalesLineDetailsCustomFieldsJsonObject(EcomSalesLine, SalesLineDetailsCustomFieldsJsonObject);
         if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then
             SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
@@ -787,6 +803,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         if EcomSalesHeader."Virtual Items Exist" then begin
             EcomVirtualItemMgt.CaptureEcomDocument(EcomSalesHeader, false, false);
             EcomVirtualItemMgt.CreateVouchers(EcomSalesHeader, false, false);
+            EcomVirtualItemMgt.CreateTickets(EcomSalesHeader, false, false);
         end;
         CreateDocument(EcomSalesHeader)
     end;
@@ -855,6 +872,37 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             exit;
         if not TypeHelper.IsPhoneNumber(PhoneNo) then
             Error(InvalidPhoneErr);
+    end;
+
+    local procedure ValidateTicketReservationLineId(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        TicketReservationLineTxt: Text;
+        TicketReservationPath: Text;
+        MissingTicketReservationTokenErr: Label '%1 must be provided when %2 is set.', Comment = '%1 = EcomSalesHeader.FieldCaption("Ticket Reservation Token"), %2 = incoming value';
+        MissingTicketReservationLineErr: Label '%1 is set, but %2 is missing on the line.', Comment = '%1 = EcomSalesHeader.FieldCaption("Ticket Reservation Token"), %2 = JSON path';
+        InvalidGuidErr: Label 'Invalid value at %1: "%2". Expected a GUID.', Comment = '%1 = JSON path, %2 = incoming value';
+    begin
+        if EcomSalesHeader."Ticket Reservation Token" = '' then
+            EcomCreateTicketImpl.ValidateEcommerceTicketLine(EcomSalesHeader, EcomSalesLine);
+
+        TicketReservationPath := JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'ticketReservationLineId');
+        TicketReservationLineTxt := JsonHelper.GetJText(SalesLineJsonToken, 'ticketReservationLineId', 50, false, false).Trim();
+        case true of
+            (TicketReservationLineTxt = '') and (EcomSalesHeader."Ticket Reservation Token" = ''):
+                exit;
+            (TicketReservationLineTxt <> '') and (EcomSalesHeader."Ticket Reservation Token" <> ''):
+                begin
+                    if not Evaluate(EcomSalesLine."Ticket Reservation Line Id", TicketReservationLineTxt) then
+                        Error(InvalidGuidErr, TicketReservationPath, TicketReservationLineTxt);
+                    exit;
+                end;
+            (TicketReservationLineTxt <> '') and (EcomSalesHeader."Ticket Reservation Token" = ''):
+                Error(MissingticketReservationTokenErr, EcomSalesHeader.FieldCaption("Ticket Reservation Token"), TicketReservationLineTxt);
+            else
+                Error(MissingTicketReservationLineErr, EcomSalesHeader.FieldCaption("Ticket Reservation Token"), TicketReservationPath);
+        end;
     end;
 }
 #endif

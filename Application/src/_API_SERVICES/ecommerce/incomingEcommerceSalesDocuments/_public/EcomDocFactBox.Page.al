@@ -72,7 +72,7 @@ page 6185130 "NPR Ecom Doc FactBox"
                     field("Virtual Items Exist"; Rec."Virtual Items Exist")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Virtual Items Exist field.';
+                        ToolTip = 'Specifies whether virtual items exist on this ecommerce document.';
                         trigger OnDrillDown()
                         var
                             EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
@@ -119,28 +119,68 @@ page 6185130 "NPR Ecom Doc FactBox"
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Capture Retry Count field.';
                     }
-                    field("Voucher Exists"; Rec."Vouchers Exist")
+
+                    group(Tickets)
                     {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Voucher Exists field.';
-                        trigger OnDrillDown()
-                        var
-                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
-                        begin
-                            EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
-                        end;
+                        Caption = 'Tickets';
+
+                        field("Ticket Exists"; Rec."Tickets Exist")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies whether tickets exist for this document.';
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomTicketLines(Rec);
+                            end;
+                        }
+                        field("Ticket Processing Status"; Rec."Ticket Processing Status")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Ticket Processing Status field.';
+                            StyleExpr = _TicketProcessingStatusStyleText;
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomTicketLines(Rec);
+                            end;
+                        }
+                        field("Ticket Reservation Token"; Rec."Ticket Reservation Token")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the reservation token for virtual tickets.';
+                        }
                     }
-                    field("Voucher Processing Status"; Rec."Voucher Processing Status")
+
+                    group(Vouchers)
                     {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Voucher Processing Status field.';
-                        StyleExpr = _VoucherProcessingStatusStyleText;
-                        trigger OnDrillDown()
-                        var
-                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
-                        begin
-                            EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
-                        end;
+                        Caption = 'Vouchers';
+
+                        field("Voucher Exists"; Rec."Vouchers Exist")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies whether vouchers exist for this document.';
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
+                            end;
+                        }
+                        field("Voucher Processing Status"; Rec."Voucher Processing Status")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the voucher processing status.';
+                            StyleExpr = _VoucherProcessingStatusStyleText;
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
+                            end;
+                        }
                     }
                 }
                 group("Error")
@@ -245,7 +285,7 @@ page 6185130 "NPR Ecom Doc FactBox"
     }
     trigger OnAfterGetCurrRecord()
     begin
-        GetStyles(_CreationStatusStyleText, _ErrorInformationStyleText, _VoucherProcessingStatusStyleText, _CaptureProcessingStatusStyleText, _CaptureErrorStyleText, _VirtualItemProcessingStatusStyleText);
+        GetStyles(_CreationStatusStyleText, _ErrorInformationStyleText, _VoucherProcessingStatusStyleText, _TicketProcessingStatusStyleText, _CaptureProcessingStatusStyleText, _CaptureErrorStyleText, _VirtualItemProcessingStatusStyleText);
     end;
 
     local procedure GetSystemReceivedByUserName() UserName: Code[50]
@@ -259,7 +299,7 @@ page 6185130 "NPR Ecom Doc FactBox"
         UserName := User."User Name";
     end;
 
-    local procedure GetStyles(var CreationStatusStyleText: Text; var ErrorInformationStyleText: Text; var VoucherProcessingStatusStyleText: Text; var CaptureProcessingStatusStyleText: Text; var CaptureErrorStyleText: Text; var VirtualItemProcessingStatusStyleText: Text)
+    local procedure GetStyles(var CreationStatusStyleText: Text; var ErrorInformationStyleText: Text; var VoucherProcessingStatusStyleText: Text; var TicketProcessingStatusStyleText: Text; var CaptureProcessingStatusStyleText: Text; var CaptureErrorStyleText: Text; var VirtualItemProcessingStatusStyleText: Text)
     var
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
@@ -267,6 +307,7 @@ page 6185130 "NPR Ecom Doc FactBox"
         CreationStatusStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderCreationStatusStyle(Rec);
         ErrorInformationStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderErrorInformationStyle(Rec);
         VoucherProcessingStatusStyleText := EcomVirtualItemMgt.GetVoucherProcessingStatusStyle(Rec);
+        TicketProcessingStatusStyleText := EcomVirtualItemMgt.GetTicketProcessingStatusStyle(Rec);
         CaptureProcessingStatusStyleText := EcomVirtualItemMgt.GetCaptureProcessingStatusStyle(Rec);
         CaptureErrorStyleText := EcomVirtualItemMgt.GetCaptureErrorStyle(Rec);
         VirtualItemProcessingStatusStyleText := EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
@@ -276,6 +317,7 @@ page 6185130 "NPR Ecom Doc FactBox"
         _CreationStatusStyleText: Text;
         _ErrorInformationStyleText: Text;
         _VoucherProcessingStatusStyleText: Text;
+        _TicketProcessingStatusStyleText: Text;
         _CaptureProcessingStatusStyleText: Text;
         _CaptureErrorStyleText: Text;
         _VirtualItemProcessingStatusStyleText: Text;

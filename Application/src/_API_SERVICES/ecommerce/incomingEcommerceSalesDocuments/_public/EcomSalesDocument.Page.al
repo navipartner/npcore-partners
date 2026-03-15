@@ -326,7 +326,6 @@ page 6248188 "NPR Ecom Sales Document"
                 end;
             }
         }
-
         area(Navigation)
         {
             action(RelatedSalesDocuments)
@@ -356,6 +355,35 @@ page 6248188 "NPR Ecom Sales Document"
                     EcomCreateVchrProcess.ShowRelatedVouchersAction(Rec);
                 end;
             }
+            action("Retail Tickets")
+            {
+                Caption = 'Tickets';
+                Image = Agreement;
+                ToolTip = 'View linked tickets';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
+                begin
+                    EcomCreateTicketProcess.ShowRelatedTicketsAction(Rec);
+                end;
+            }
+            action(ChangeTicketToken)
+            {
+                Caption = 'Change Ticket Reservation Token';
+                Image = Change;
+                ToolTip = 'Assign a different registered reservation token to this document if ticket processing resulted in an error';
+                ApplicationArea = NPRRetail;
+                Enabled = Rec."Ticket Processing Status" = Rec."Ticket Processing Status"::Error;
+                trigger OnAction()
+                var
+                    EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+                begin
+                    EcomCreateTicketImpl.ChangeEcommerceTicketReservationToken(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
         }
 
         area(Promoted)
@@ -365,7 +393,10 @@ page 6248188 "NPR Ecom Sales Document"
                 actionref(Process_Promoted; Process) { }
                 actionref(CaptureVirtualItems_Promoted; CaptureVirtualItems) { }
                 actionref(Sales_Documents; RelatedSalesDocuments) { }
-
+            }
+            group(Navigate)
+            {
+                actionref(ChangeTicketToken_Promoted; ChangeTicketToken) { }
             }
         }
     }

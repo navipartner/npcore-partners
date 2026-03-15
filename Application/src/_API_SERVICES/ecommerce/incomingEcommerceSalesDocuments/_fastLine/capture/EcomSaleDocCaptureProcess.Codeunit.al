@@ -46,6 +46,18 @@ codeunit 6248656 "NPR EcomSaleDocCaptureProcess"
             EmitError(LastErrorText);
         end else
             EcomLineCaptureProcess.SetSalesDocCaptureProcessingStatusProcessed(EcomSalesHeader);
+
+        UpdateTicketReservationExpiryTimeAfterCapture(EcomSalesHeader);
+    end;
+
+    local procedure UpdateTicketReservationExpiryTimeAfterCapture(var EcommSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+    begin
+        if EcommSalesHeader."Ticket Reservation Token" = '' then
+            exit;
+
+        EcomCreateTicketImpl.UpdateExpiryTimeBasedOnCapturedStatus(EcommSalesHeader);
     end;
 
     local procedure EmitError(ErrorText: Text)

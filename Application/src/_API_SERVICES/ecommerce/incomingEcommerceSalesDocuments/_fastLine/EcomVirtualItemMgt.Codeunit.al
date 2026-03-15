@@ -5,13 +5,19 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
     local procedure ProcessVirtualItemLine(var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
-        UnsupportedTypeLbl: Label 'Type %1 in %2 is not supported.', Comment = '%1 - ecom sales line type, %2 - record id';
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        UnsupportedSubtypeLbl: Label 'Subtype %1 in %2 is not supported.', Comment = '%1 - ecom sales line subtype, %2 - record id';
     begin
-        case EcomSalesLine.Type of
-            EcomSalesLine.Type::Voucher:
+        case EcomSalesLine.Subtype of
+            EcomSalesLine.Subtype::Voucher:
                 CreateVoucher(EcomSalesLine, true, false);
+            EcomSalesLine.Subtype::Ticket:
+                begin
+                    EcomSalesHeader.Get(EcomSalesLine."Document Entry No.");
+                    CreateTickets(EcomSalesHeader, true, false);
+                end;
             else
-                Error(UnsupportedTypeLbl, EcomSalesLine.Type, EcomSalesLine.RecordId);
+                Error(UnsupportedSubtypeLbl, EcomSalesLine.Subtype, EcomSalesLine.RecordId);
         end;
     end;
 
@@ -42,7 +48,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Voucher);
         EcomSalesLine.SetRange("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::" ");
         EcomSalesLine.SetRange(Captured, true);
         EcomSalesLine.SetFilter(Quantity, '<>0');
@@ -82,6 +88,65 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         Success := EcomCreateVchrProcess.Run(EcomSalesLine);
     end;
 
+    internal procedure CreateTickets(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
+    var
+        EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
+        Success: Boolean;
+    begin
+        if not EcomSalesHeader."Tickets Exist" then
+            exit;
+
+        if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
+            exit;
+
+        if (EcomSalesHeader."Capture Processing Status" <> EcomSalesHeader."Capture Processing Status"::"Partially Processed") and
+            (EcomSalesHeader."Capture Processing Status" <> EcomSalesHeader."Capture Processing Status"::Processed) then
+            exit;
+
+        if not AllTicketLinesCapturedAndUnprocessed(EcomSalesHeader, ShowError) then
+            exit;
+
+        Clear(EcomCreateTicketProcess);
+        EcomCreateTicketProcess.SetShowError(ShowError);
+        EcomCreateTicketProcess.SetUpdateRetryCount(UpdateRetryCount);
+        Success := EcomCreateTicketProcess.Run(EcomSalesHeader);
+
+        if not Success and ShowError then
+            Error(GetLastErrorText());
+
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+    end;
+
+    local procedure AllTicketLinesCapturedAndUnprocessed(EcomSalesHeader: Record "NPR Ecom Sales Header"; RunPageAction: Boolean): Boolean
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
+        EcomSalesLine.SetFilter(Quantity, '<>0');
+        EcomSalesLine.SetFilter("Unit Price", '<>0');
+
+        if EcomSalesLine.IsEmpty() then
+            exit(false);
+
+        EcomSalesLine.SetRange(Captured, false);
+        if not EcomSalesLine.IsEmpty() then
+            exit(false);
+
+        EcomSalesLine.SetRange(Captured);
+        if RunPageAction then begin
+            EcomSalesLine.SetFilter("Virtual Item Process Status", '<>%1&<>%2', EcomSalesLine."Virtual Item Process Status"::" ", EcomSalesLine."Virtual Item Process Status"::Error);
+            if not EcomSalesLine.IsEmpty() then
+                exit(false);
+        end else begin
+            EcomSalesLine.SetFilter("Virtual Item Process Status", '<>%1', EcomSalesLine."Virtual Item Process Status"::" ");
+            if not EcomSalesLine.IsEmpty() then
+                exit(false);
+        end;
+        exit(true);
+    end;
+
     internal procedure AssignBucketLines(EcomSalesHeader: Record "NPR Ecom Sales Header"): Integer
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
@@ -91,7 +156,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Type, '%1', EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
         EcomSalesLine.ModifyAll("Bucket Id", BucketInt);
 
         exit(BucketInt);
@@ -114,10 +179,14 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
 
-        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Voucher);
         EcomSalesHeader."Vouchers Exist" := not EcomSalesLine.IsEmpty;
 
-        EcomSalesHeader."Virtual Items Exist" := EcomSalesHeader."Vouchers Exist";
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
+        EcomSalesHeader."Tickets Exist" := not EcomSalesLine.IsEmpty;
+        EcomSalesLine.SetRange(Subtype);
+
+        EcomSalesHeader."Virtual Items Exist" := EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist";
         EcomVirtualItemEvents.OnUpdateVirtualInformationInHeaderBeforeModify(EcomSalesHeader);
         EcomSalesHeader.Modify();
     end;
@@ -138,7 +207,18 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     begin
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.Setfilter(Type, '%1', EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
+        Page.Run(0, EcomSalesLine);
+    end;
+
+    internal procedure OpenEcomTicketLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Item);
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
         Page.Run(0, EcomSalesLine);
     end;
 
@@ -158,6 +238,16 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
             EcomSalesHeader."Voucher Processing Status"::Error:
                 StyleText := 'Unfavorable';
             EcomSalesHeader."Voucher Processing Status"::Processed:
+                StyleText := 'Favorable';
+        end;
+    end;
+
+    internal procedure GetTicketProcessingStatusStyle(EcomSalesHeader: Record "NPR Ecom Sales Header") StyleText: Text
+    begin
+        case EcomSalesHeader."Ticket Processing Status" of
+            EcomSalesHeader."Ticket Processing Status"::Error:
+                StyleText := 'Unfavorable';
+            EcomSalesHeader."Ticket Processing Status"::Processed:
                 StyleText := 'Favorable';
         end;
     end;
@@ -254,22 +344,85 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     end;
 
     internal procedure CalculateVirtualItemsDocStatus(EcomSalesHeader: Record "NPR Ecom Sales Header") VirtualItemsDocStatus: Enum "NPR EcomVirtualItemDocStatus";
+    var
+        HasError: Boolean;
+        HasPartiallyProcessed: Boolean;
+        AllProcessed: Boolean;
+        VoucherProcessed: Boolean;
+        TicketProcessed: Boolean;
     begin
-        case true of
-            EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Error:
-                VirtualItemsDocStatus := VirtualItemsDocStatus::Error;
+        HasError := (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Error) or
+                    (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Error);
 
-            EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::"Partially Processed":
-                VirtualItemsDocStatus := VirtualItemsDocStatus::"Partially Processed";
-
-            EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Processed:
-                VirtualItemsDocStatus := VirtualItemsDocStatus::Processed;
-
-            EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Pending:
-                VirtualItemsDocStatus := VirtualItemsDocStatus::Pending;
+        if HasError then begin
+            VirtualItemsDocStatus := VirtualItemsDocStatus::Error;
+            exit;
         end;
 
+        VoucherProcessed := (not EcomSalesHeader."Vouchers Exist") or (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Processed);
+        TicketProcessed := (not EcomSalesHeader."Tickets Exist") or (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Processed);
+
+        // Partially Processed logic:
+        // - If vouchers don't exist, tickets can never be partially processed
+        // - If vouchers exist and tickets don't exist, check voucher status
+        // - If both exist, partial unless both are fully processed
+        if not EcomSalesHeader."Vouchers Exist" then
+            HasPartiallyProcessed := false
+        else begin
+            if not EcomSalesHeader."Tickets Exist" then
+                HasPartiallyProcessed := (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::"Partially Processed")
+            else
+                HasPartiallyProcessed := not (VoucherProcessed and TicketProcessed);
+        end;
+
+        if HasPartiallyProcessed then begin
+            VirtualItemsDocStatus := VirtualItemsDocStatus::"Partially Processed";
+            exit;
+        end;
+        AllProcessed := VoucherProcessed and TicketProcessed;
+        if AllProcessed and (EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist") then begin
+            VirtualItemsDocStatus := VirtualItemsDocStatus::Processed;
+            exit;
+        end;
+        // Default to Pending
+        VirtualItemsDocStatus := VirtualItemsDocStatus::Pending;
+    end;
+
+    internal procedure IsTicketItem(ItemNo: Text[50]): Boolean
+    var
+        Item: Record Item;
+        ItemCode: Code[20];
+    begin
+        if ItemNo = '' then
+            exit(false);
+        if not Evaluate(ItemCode, ItemNo) then
+            exit(false);
+        if not Item.Get(ItemCode) then
+            exit(false);
+        exit(Item."NPR Ticket Type" <> '');
+    end;
+
+    internal procedure EmitError(ErrorTxt: text; EventId: text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_ErrorText', ErrorTxt);
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
+
+        Session.LogMessage(EventId, ErrorTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
 }
+
 #endif

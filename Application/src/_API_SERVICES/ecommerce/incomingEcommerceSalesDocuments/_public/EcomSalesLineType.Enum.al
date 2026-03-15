@@ -26,9 +26,15 @@ enum 6059943 "NPR Ecom Sales Line Type"
     value(5; "Ticket")
     {
         Caption = 'Ticket';
+        ObsoleteState = Pending;
+        ObsoleteTag = '2026-02-23';
+        ObsoleteReason = 'Use Type::Item with Subtype::Ticket instead.';
     }
     value(6; "Membership")
     {
         Caption = 'Membership';
+        ObsoleteState = Pending;
+        ObsoleteTag = '2026-02-23';
+        ObsoleteReason = 'Use Type::Item instead with Subtype::Membership instead.';
     }
 }

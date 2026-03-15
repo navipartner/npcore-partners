@@ -121,7 +121,7 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Type, '%1', EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
         EcomSalesLine.SetFilter("Unit Price", '<>0');
         EcomSalesLine.SetFilter(Quantity, '<>0');
         EcomSalesLine.SetRange(Captured, true);
@@ -137,7 +137,7 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
         CapturedPaymentAmount -= CapturedSalesAmount;
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Type, '%1', EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
         EcomSalesLine.SetFilter("Unit Price", '<>0');
         EcomSalesLine.SetFilter(Quantity, '<>0');
         EcomSalesLine.SetRange(Captured, false);

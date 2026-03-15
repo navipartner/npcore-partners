@@ -7055,14 +7055,13 @@ codeunit 85024 "NPR Retail Voucher Tests"
     var
         Customer: Record Customer;
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        EcomSalesLine: Record "NPR Ecom Sales Line";
-        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
         SalesHeader: Record "Sales Header";
-        EcomSalesDocImpl: Codeunit "NPR Ecom Sales Doc Impl V2";
+        LibEcommerce: Codeunit "NPR Library Ecommerce";
         LibraryRandom: Codeunit "Library - Random";
         LibrarySales: Codeunit "Library - Sales";
         SalesPost: Codeunit "Sales-Post";
+        ExternalNo: Code[20];
     begin
         if not IncEcomSalesDocSetup.Get() then begin
             IncEcomSalesDocSetup.Init();
@@ -7071,48 +7070,12 @@ codeunit 85024 "NPR Retail Voucher Tests"
         IncEcomSalesDocSetup."Customer Mapping" := IncEcomSalesDocSetup."Customer Mapping"::"Customer No.";
         IncEcomSalesDocSetup.Modify();
 
-        // Create customer
         LibrarySales.CreateCustomer(Customer);
-
-        // Create ecommerce sales header
-        EcomSalesHeader.Init();
-        EcomSalesHeader."Document Type" := EcomSalesHeader."Document Type"::Order;
-        EcomSalesHeader."External No." := StrSubStNo('TEST-VOUCHER-%1', LibraryRandom.RandIntInRange(100000, 999999));
-        EcomSalesheader."Sell-to Customer No." := Customer."No.";
-        EcomSalesHeader."Currency Code" := CurrencyCode;
-        EcomSalesHeader."Price Excl. VAT" := false; // Prices including VAT
-        EcomSalesHeader."Ecommerce Store Code" := CreateMinimalEcomStore();
-        EcomSalesHeader."Location Code" := _POSStore."Location Code";
-        EcomSalesHeader."Sell-to Email" := 'test@example.com';
-        EcomSalesHeader."Received Date" := Today();
-        EcomSalesHeader."Received Time" := Time();
-        EcomSalesHeader."Entry No." := 0; // Auto-increment
-        EcomSalesHeader.Insert(true);
-
-        // Create ecommerce sales line (item)
-        EcomSalesLine.Init();
-        EcomSalesLine."Document Entry No." := EcomSalesHeader."Entry No.";
-        EcomSalesLine."Line No." := 10000;
-        EcomSalesLine.Type := EcomSalesLine.Type::Item;
-        EcomSalesLine."No." := _Item."No.";
-        EcomSalesLine.Quantity := 1;
-        EcomSalesLine."Unit Price" := OrderAmountFCY;
-        EcomSalesLine."Line Amount" := OrderAmountFCY;
-        EcomSalesLine.Insert(true);
         EnsureValidSalesGeneralPostingSetupCreated(Customer."Gen. Bus. Posting Group", _Item."Gen. Prod. Posting Group");
         EnsureValidSalesVATPostingSetupCreated(Customer."VAT Bus. Posting Group", _Item."VAT Prod. Posting Group");
 
-        // Create ecommerce sales payment line (voucher)
-        EcomSalesPmtLine.Init();
-        EcomSalesPmtLine."Document Entry No." := EcomSalesHeader."Entry No.";
-        EcomSalesPmtLine."Line No." := 10000;
-        EcomSalesPmtLine."Payment Method Type" := EcomSalesPmtLine."Payment Method Type"::Voucher;
-        EcomSalesPmtLine."Payment Reference" := NpRvVoucher."Reference No.";
-        EcomSalesPmtLine.Amount := OrderAmountFCY;
-        EcomSalesPmtLine.Insert(true);
-
-        // Process the ecommerce document
-        EcomSalesDocImpl.Process(EcomSalesHeader);
+        ExternalNo := CopyStr(StrSubStNo('TEST-VOUCHER-%1', LibraryRandom.RandIntInRange(100000, 999999)), 1, 20);
+        LibEcommerce.InsertEcomDocumentWithVoucherPayment(ExternalNo, _Item."No.", Customer."No.", CurrencyCode, NpRvVoucher, OrderAmountFCY, EcomSalesHeader);
 
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);

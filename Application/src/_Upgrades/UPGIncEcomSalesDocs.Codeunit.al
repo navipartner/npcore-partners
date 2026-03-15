@@ -17,6 +17,7 @@ codeunit 6248467 "NPR UPG Inc Ecom Sales Docs"
         UpgradeSalesReturnOrderJQ();
         UpgradeDocumentsToNewTables();
         UpgradeRetryCounts();
+        UpgradeSalesLineSubtype();
     end;
 
     internal procedure CreateIncEcomSalesDocSetup()
@@ -163,6 +164,25 @@ codeunit 6248467 "NPR UPG Inc Ecom Sales Docs"
 
             IncEcomSalesDocSetup.Modify();
         end;
+
+        SetUpgradeTag();
+    end;
+
+    local procedure UpgradeSalesLineSubtype()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        UpgradeStep := 'UpgradeSalesLineSubtype';
+        if HasUpgradeTag() then
+            exit;
+
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Voucher);
+        EcomSalesLine.ModifyAll(Subtype, EcomSalesLine.Subtype::Voucher);
+
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Item);
+        EcomSalesLine.ModifyAll(Subtype, EcomSalesLine.Subtype::Item);
 
         SetUpgradeTag();
     end;

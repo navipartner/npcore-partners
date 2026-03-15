@@ -26,7 +26,6 @@ types:
         value: 'paymentFee'
       - name: voucher
         value: 'voucher'
-  
   salesDocumentLineTypeRequest:
     enum:
       - name: item
@@ -37,7 +36,6 @@ types:
         value: 'shipmentFee'
       - name: voucher
         value: 'voucher'
-
   salesDocumentLineVirtualItemProcessStatus:
     enum:
       - name: blank
@@ -113,6 +111,7 @@ types:
       locationCode: string
       yourReference: string
       pricesExcludingVat: boolean 
+      ticketReservationToken: string
       captureProcessingStatus: salesDocumentcaptureProcessingStatus
       lastCaptureErrorMessage: string
       sellToCustomer: SalesDocumentSellToCustomerDTO
@@ -139,6 +138,7 @@ types:
           yourReference: "REF-789"
           pricesExcludingVat: false
           captureProcessingStatus: pending
+          ticketReservationToken: "ABC123456DEF789GHI"
           lastCaptureErrorMessage: ""
           sellToCustomer: $SalesDocumentSellToCustomerDTO.ExampleSellToCustomerDTO
           shipToCustomer: $SalesDocumentShipToCustomerDTO.ExampleShipToCustomerDTO
@@ -307,6 +307,7 @@ types:
       captured: boolean
       virtualItemProcessStatus: salesDocumentLineVirtualItemProcessStatus
       virtualItemProcessErrorMessage: string
+      ticketReservationLineId: uuid
       customFields: 
         type: optional<SalesDocumentCustomFieldsRequest>
         docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom serialization logic.
@@ -330,6 +331,7 @@ types:
           captured: true
           virtualItemProcessStatus: processed
           virtualItemProcessErrorMessage: ""
+          ticketReservationLineId: 'bbe793c7-2489-43b7-ab77-23577d59ae71'
           customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
 ############################################
 
@@ -565,6 +567,9 @@ types:
       voucherType: 
         type: optional<string>
         docs: Relevant for type voucher. It has to be populated if the barcodeNo is populated.
+      ticketReservationLineId:
+        type: optional<uuid>
+        docs: Links this sales line to a specific ticket reservation request created through the Ticket Reservation APIs. Must be populated when the header-level Ticket Reservation Token is set. The value should match the lineId returned by the Ticket Reservation API when the reservation was created.
       customFields: 
         type: optional<SalesDocumentLinesCustomFieldsRequest>
         docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom deserialization logic.
@@ -611,6 +616,15 @@ types:
         docs: Max. length 10 symbols.
       yourReference: optional<string>
       pricesExcludingVat: optional<boolean>
+      ticketReservationToken: 
+        type: optional<string>
+        docs: Used to link the sales document to a ticket reservation, enabling the system to associate ordered ticket items with their pre-reserved admissions. Obtained as the token from the Ticket Reservation API.
+      ticketHolder: 
+        type: optional<string>
+        docs: The name of the person holding the ticket(s). Max. length 100 symbols.
+      ticketHolderLanguage:
+        type: optional<string>
+        docs: The language code the ticket holder wants to receive notifications in. Max. length 10 symbols.
       customFields: 
         type: optional<SalesDocumentCustomFieldsRequest>
         docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom deserialization logic.

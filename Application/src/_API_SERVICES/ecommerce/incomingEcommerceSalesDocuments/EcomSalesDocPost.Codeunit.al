@@ -19,7 +19,7 @@ codeunit 6248657 "NPR Ecom Sales Doc Post"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Type, '%1', EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
         if not EcomSalesLine.FindSet() then
             exit;
 

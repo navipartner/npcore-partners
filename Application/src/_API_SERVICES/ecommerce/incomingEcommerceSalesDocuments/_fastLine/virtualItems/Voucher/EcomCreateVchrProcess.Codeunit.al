@@ -25,6 +25,7 @@ codeunit 6248514 "NPR EcomCreateVchrProcess"
     internal procedure HandleResponse(Success: Boolean; var EcomSalesLine: Record "NPR Ecom Sales Line"; UpdateRetryCount: Boolean)
     var
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         UpdateErrStatus: Boolean;
         VoucherEventId: Label 'NPR_API_Ecommerce_VirtualVoucherCreationFailed', Locked = true;
         ErrorMessage: Text;
@@ -41,31 +42,10 @@ codeunit 6248514 "NPR EcomCreateVchrProcess"
         if not Success then begin
             UpdateErrStatus := EcomSalesLine."Virtual Item Proc Retry Count" >= IncEcomSalesDocSetup."Max Virtual Item Retry Count";
             SetSalesDocVoucherStatusError(EcomSalesLine, CopyStr(GetLastErrorText(), 1, MaxStrLen(EcomSalesLine."Virtual Item Process ErrMsg")), UpdateErrStatus);
-            EmitError(ErrorMessage, VoucherEventId);
+            EcomVirtualItemMgt.EmitError(ErrorMessage, VoucherEventId);
         end else
             SetSalesDocVoucherStatusCreated(EcomSalesLine);
 
-    end;
-
-    local procedure EmitError(ErrorTxt: text; EventId: text)
-    var
-        CustomDimensions: Dictionary of [Text, Text];
-        ActiveSession: Record "Active Session";
-    begin
-        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-            Clear(ActiveSession);
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-        CustomDimensions.Add('NPR_ErrorText', ErrorTxt);
-        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
-
-        Session.LogMessage(EventId, ErrorTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     local procedure SetSalesDocVoucherStatusError(var EcomSalesLine: Record "NPR Ecom Sales Line"; ErrorMessage: Text[500]; UpdateStatus: Boolean)

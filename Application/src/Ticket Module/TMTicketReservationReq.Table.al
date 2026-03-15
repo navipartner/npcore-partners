@@ -291,6 +291,11 @@
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
+        field(1002; "Ecom Sales Id"; Guid)
+        {
+            Caption = 'Ecommerce Sales Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

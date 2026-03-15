@@ -496,7 +496,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         VariantCode: Code[10];
         ItemDoesntExistErrorLbl: Label 'Item %1 in %2 does not exist.', Comment = '%1 - external no., %2 - inc sales line record id';
     begin
-        if (EcomSalesLine.Type <> EcomSalesLine.Type::Item) then
+        if EcomSalesLine.Type <> EcomSalesLine.Type::Item then
             exit;
 
         if not EcomSalesDocUtils.GetItemNoAndVariantNoFromEcomSalesLine(EcomSalesLine, ItemNo, VariantCode) then
@@ -1308,6 +1308,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         Handled: Boolean;
         UnprocessedVirtualItemsErrorLbl: Label 'There is unprocessed virtual item on %1. Type: %2, no.: %3', Comment = '%1 - recordid, %2 - virtual item type, $3 - virtual item no.';
         CreatedDocumentErrorLbl: Label 'Sales document %1 has already been created from ecom document %2.', Comment = '%1 - sales document record id, %2 - ecom document record id';
+        SubtypeNotSetErr: Label 'Line No. %1 has no Subtype set.', Comment = '%1 - Line No.';
     begin
         EcomSalesDocImplEvents.OnBeforeCheckIfDocumentCanBeProcessed(EcomSalesHeader, Handled);
         if Handled then
@@ -1336,7 +1337,14 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Type, '%1', EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetFilter(Type, '%1|%2', EcomSalesLine.Type::Item, EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::" ");
+        if EcomSalesLine.FindFirst() then
+            Error(SubtypeNotSetErr, EcomSalesLine."Line No.");
+
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
         if EcomSalesLine.IsEmpty then
             exit;
 

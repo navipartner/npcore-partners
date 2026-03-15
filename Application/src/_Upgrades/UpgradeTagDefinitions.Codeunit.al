@@ -305,6 +305,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeDocumentsToNewTables'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeSalesOrderJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeSalesReturnOrderJQ'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeRetryCounts'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeSalesLineSubtype'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'UpgradeEcomSalesDocJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'UpgradeEcomSalesReturnDocJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'UpgradeBucketId'));
@@ -1156,6 +1158,8 @@
                         exit('NPR-UpgradeSalesReturnOrderJQ-20251022');
                     'UpgradeRetryCounts':
                         exit('NPR-UpgradeRetryCounts-20251109');
+                    'UpgradeSalesLineSubtype':
+                        exit('NPR-UpgradeSalesLineSubtype-20260220');
                 end;
             Codeunit::"NPR UPG Ecom Sales Docs":
                 case UpgradeStep of

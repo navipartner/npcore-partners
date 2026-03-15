@@ -115,6 +115,11 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Voucher Type field.';
                 }
+                field(Subtype; Rec.Subtype)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the business domain of the item line. Ticket indicates the line contains a ticket item as configured in BC item setup.';
+                }
             }
             group(Control28)
             {
