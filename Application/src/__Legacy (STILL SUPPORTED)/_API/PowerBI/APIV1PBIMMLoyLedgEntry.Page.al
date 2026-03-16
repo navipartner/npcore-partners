@@ -44,8 +44,27 @@ page 6150864 "NPR APIV1 PBIMMLoyLedgEntry"
             }
         }
     }
+    trigger OnAfterGetRecord()
+    begin
+        if (Rec."Card Number" = '') and (Rec."Membership Entry No." <> 0) then
+            Rec."Card Number" := GetFirstMemberCard(Rec."Membership Entry No.");
+    end;
+
+    local procedure GetFirstMemberCard(MembershipEntryNo: Integer): Text[50]
+    var
+        MemberCard: Record "NPR MM Member Card";
+    begin
+        MemberCard.SetFilter(Blocked, '=%1', false);
+        MemberCard.SetRange("Membership Entry No.", MembershipEntryNo);
+        MemberCard.SetFilter("Member Entry No.", '<>0');
+        MemberCard.SetLoadFields("External Card No.");
+        if (MemberCard.FindFirst()) then
+            exit(CopyStr(MemberCard."External Card No.", 1, 50));
+    end;
+
 #IF NOT (BC17 or BC18 or BC19 or BC20)
     var
         PowerBIUtils: Codeunit "NPR PowerBI Utils";
+
 #ENDIF
 }
