@@ -258,17 +258,23 @@ codeunit 6151076 "NPR POSActionWalletInventory" implements "NPR IPOS Workflow"
     local procedure GetWalletAssets(WalletReferenceNumber: Text[100]; var CouponsList: List of [JsonObject]; var InvalidCouponsList: List of [JsonObject])
     var
         WalletAssets: Query "NPR AttractionWalletAssets";
-        Wallet: Query "NPR FindAttractionWallets";
+        WalletQuery: Query "NPR FindAttractionWallets";
         WalletFacade: Codeunit "NPR AttractionWalletFacade";
         Coupon: Record "NPR NpDc Coupon";
         Option: JsonObject;
         InvalidLabel: Label '(Invalid)';
+        WalletExpired: Label 'The wallet with reference number %1 expired on %2.';
+        WalletNotFound: Label 'No valid wallet found with reference number %1.';
         AssetCaption: Text;
     begin
 
-        WalletFacade.FindWalletByReferenceNumber(WalletReferenceNumber, Wallet);
-        if (Wallet.Read()) then begin
-            WalletFacade.GetWalletAssets(Wallet.WalletReferenceNumber, WalletAssets);
+        WalletFacade.FindWalletByReferenceNumber(WalletReferenceNumber, WalletQuery);
+        if (WalletQuery.Read()) then begin
+
+            if ((WalletQuery.WalletExpirationDate <> 0DT) and (WalletQuery.WalletExpirationDate < CurrentDateTime())) then
+                Error(WalletExpired, WalletReferenceNumber, WalletQuery.WalletExpirationDate);
+
+            WalletFacade.GetWalletAssets(WalletQuery.WalletReferenceNumber, WalletAssets);
 
             while (WalletAssets.Read()) do begin
                 Clear(Option);
@@ -291,10 +297,11 @@ codeunit 6151076 "NPR POSActionWalletInventory" implements "NPR IPOS Workflow"
                                 Option.Add('value', Format(WalletAssets.AssetEntryNo));
                                 InvalidCouponsList.Add(Option);
                             end;
-
                         end;
                 end;
             end;
+        end else begin
+            Error(WalletNotFound, WalletReferenceNumber);
         end;
     end;
 

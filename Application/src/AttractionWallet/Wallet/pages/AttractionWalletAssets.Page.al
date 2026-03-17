@@ -159,17 +159,49 @@ page 6184847 "NPR AttractionWalletAssets"
                     end;
                 end;
             }
+
+            action(BlockAsset)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Block';
+                ToolTip = 'Running the action will block the selected asset.';
+                Image = CancelLine;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    AttractionWallet: Codeunit "NPR AttractionWallet";
+                begin
+                    AttractionWallet.BlockAsset(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
+            action(UnBlockAsset)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Unblock';
+                ToolTip = 'Running the action will unblock the selected asset.';
+                Image = CancelLine;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    AttractionWallet: Codeunit "NPR AttractionWallet";
+                begin
+                    AttractionWallet.UnBlockAsset(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
         }
     }
 
 
     trigger OnAfterGetRecord()
     var
-        Ticket: Record "NPR TM Ticket";
-        Coupon: Record "NPR NpDc Coupon";
         BundledAssets: Record "NPR NpIa POSEntryLineBndlAsset";
         BundleId: Record "NPR NpIa POSEntryLineBundleId";
         Wallet: Record "NPR AttractionWallet";
+        WalletManager: Codeunit "NPR AttractionWallet";
     begin
         _BundleReferenceNumber := '';
         _WalletHolder := '';
@@ -182,17 +214,17 @@ page 6184847 "NPR AttractionWalletAssets"
                 _WalletHolder := TempWallet.ReferenceNumber;
                 if (TempWallet.Description <> '') then
                     _WalletHolder := TempWallet.Description;
-            end else
+            end else begin
                 if (Wallet.Get(TempAssetLineRef.WalletEntryNo)) then
                     _WalletHolder := Wallet.ReferenceNumber; // This means I am the not the holder of the asset
-
+            end;
         end;
+
+        _AssetBlocked := WalletManager.GetAssetBlockState(Rec);
 
         case Rec.Type of
             Rec.Type::TICKET:
                 begin
-                    if (Ticket.GetBySystemId(Rec.LineTypeSystemId)) then
-                        _AssetBlocked := Ticket.Blocked;
                     BundledAssets.SetCurrentKey(AssetTableId, AssetSystemId);
                     BundledAssets.SetFilter(AssetTableId, '=%1', Database::"NPR TM Ticket");
                     BundledAssets.SetFilter(AssetSystemId, '=%1', Rec.LineTypeSystemId);
@@ -200,12 +232,7 @@ page 6184847 "NPR AttractionWalletAssets"
                         if (BundleId.Get(BundledAssets.AppliesToSaleLineId, BundledAssets.Bundle)) then
                             _BundleReferenceNumber := BundleId.ReferenceNumber;
                 end;
-            Rec.Type::COUPON:
-                begin
-                    _AssetBlocked := (not Coupon.GetBySystemId(Rec.LineTypeSystemId));
-                end;
-            else
-                _AssetBlocked := false;
+
         end;
     end;
 
@@ -308,5 +335,7 @@ page 6184847 "NPR AttractionWalletAssets"
         _WalletHolder: Text;
         _AssetBlocked: Boolean;
         _BundleReferenceNumber: Text[50];
+
+
 
 }

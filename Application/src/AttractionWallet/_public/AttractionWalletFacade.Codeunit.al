@@ -58,6 +58,44 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         WalletManagement.ExpireWallet(WalletEntryNo);
     end;
 
+    procedure BlockAllAssets(WalletEntryNo: Integer)
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        WalletManagement.BlockAllAssets(WalletEntryNo);
+    end;
+
+    procedure BlockAsset(AssetEntryNo: Integer)
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+        AssetLine: Record "NPR WalletAssetLine";
+    begin
+        if (not AssetLine.Get(AssetEntryNo)) then
+            exit;
+        WalletManagement.BlockAsset(AssetLine);
+    end;
+
+    procedure UnBlockAsset(AssetEntryNo: Integer)
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+        AssetLine: Record "NPR WalletAssetLine";
+    begin
+        if (not AssetLine.Get(AssetEntryNo)) then
+            exit;
+        WalletManagement.UnBlockAsset(AssetLine);
+    end;
+
+    procedure GetAssetBlockState(AssetEntryNo: Integer) Blocked: Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+        AssetLine: Record "NPR WalletAssetLine";
+    begin
+        if (not AssetLine.Get(AssetEntryNo)) then
+            exit(true);
+
+        exit(WalletManagement.GetAssetBlockState(AssetLine));
+    end;
+
     procedure AddTicketsToWallet(WalletEntryNo: Integer; TicketIds: List of [Guid])
     var
         WalletManagement: Codeunit "NPR AttractionWallet";

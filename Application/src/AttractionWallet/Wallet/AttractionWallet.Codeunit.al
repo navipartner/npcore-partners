@@ -718,6 +718,7 @@ codeunit 6185062 "NPR AttractionWallet"
         exit(true);
     end;
 
+    #region BlockAndExpire
     internal procedure ExpireWallet(WalletEntryNo: Integer)
     var
         Wallet: Record "NPR AttractionWallet";
@@ -767,6 +768,180 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletExternalReference.BlockedAt := CurrentDateTime();
         WalletExternalReference.Modify();
     end;
+
+    internal procedure UnBlockExternalReference(ExternalReference: Text[100])
+    var
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
+    begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+        WalletExternalReference.LockTable();
+#else
+        WalletExternalReference.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        WalletExternalReference.SetFilter(ExternalReference, '=%1', ExternalReference);
+        WalletExternalReference.SetFilter(BlockedAt, '<>%1', 0DT);
+        if (not WalletExternalReference.FindFirst()) then
+            exit;
+        WalletExternalReference.BlockedAt := 0DT;
+        WalletExternalReference.Modify();
+    end;
+
+    internal procedure BlockAllAssets(WalletEntryNo: Integer)
+    var
+        AttractionWallet: Record "NPR AttractionWallet";
+        WalletAssetLineRef: Record "NPR WalletAssetLineReference";
+        AssetLine: Record "NPR WalletAssetLine";
+    begin
+        AttractionWallet.Get(WalletEntryNo);
+        WalletAssetLineRef.SetCurrentKey(WalletEntryNo);
+        WalletAssetLineRef.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+        WalletAssetLineRef.SetFilter(SupersededBy, '=%1', 0);
+        if (WalletAssetLineRef.FindSet()) then
+            repeat
+                if (AssetLine.Get(WalletAssetLineRef.WalletAssetLineEntryNo)) then
+                    BlockAsset(AssetLine);
+            until (WalletAssetLineRef.Next() = 0);
+    end;
+
+    internal procedure BlockAsset(AssetLine: Record "NPR WalletAssetLine")
+    begin
+        case AssetLine.Type of
+            AssetLine.Type::TICKET:
+                SetTicketBlock(AssetLine.LineTypeSystemId, true);
+
+            AssetLine.Type::COUPON:
+                SetCouponBlock(AssetLine.LineTypeSystemId, true);
+
+            AssetLine.Type::MEMBERSHIP:
+                SetMemberCardBlock(AssetLine.LineTypeSystemId, true);
+
+            AssetLine.Type::VOUCHER:
+                SetVoucherBlock(AssetLine.LineTypeSystemId, true);
+
+            else
+                Error('Unknown asset type, this is a programming bug');
+        end;
+    end;
+
+    internal procedure UnBlockAsset(AssetLine: Record "NPR WalletAssetLine")
+    begin
+        case AssetLine.Type of
+            AssetLine.Type::TICKET:
+                SetTicketBlock(AssetLine.LineTypeSystemId, false);
+
+            AssetLine.Type::COUPON:
+                SetCouponBlock(AssetLine.LineTypeSystemId, false);
+
+            AssetLine.Type::MEMBERSHIP:
+                SetMemberCardBlock(AssetLine.LineTypeSystemId, false);
+
+            AssetLine.Type::VOUCHER:
+                SetVoucherBlock(AssetLine.LineTypeSystemId, false);
+
+            else
+                Error('Unknown asset type, this is a programming error that should be investigated and fixed');
+        end;
+    end;
+
+    internal procedure GetAssetBlockState(AssetLine: Record "NPR WalletAssetLine"): Boolean
+    var
+        Ticket: Record "NPR TM Ticket";
+        Coupon: Record "NPR NpDc Coupon";
+        MembershipCard: Record "NPR MM Member Card";
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        Voucher.SetAutoCalcFields(Open);
+        Coupon.SetAutoCalcFields(Open);
+
+        case AssetLine.Type of
+            AssetLine.Type::TICKET:
+                if (Ticket.GetBySystemId(AssetLine.LineTypeSystemId)) then
+                    exit(Ticket.Blocked);
+
+            AssetLine.Type::COUPON:
+                if (Coupon.GetBySystemId(AssetLine.LineTypeSystemId)) then
+                    exit(not Coupon.Open);
+
+            AssetLine.Type::MEMBERSHIP:
+                if (MembershipCard.GetBySystemId(AssetLine.LineTypeSystemId)) then
+                    exit(MembershipCard.Blocked);
+
+            AssetLine.Type::VOUCHER:
+                if (Voucher.GetBySystemId(AssetLine.LineTypeSystemId)) then
+                    exit(not Voucher.Open);
+
+            else
+                Error('Unknown asset type, this is a programming error that should be investigated and fixed');
+        end;
+
+        exit(true); // If we cannot find the asset, we consider it blocked to avoid any potential misuse. 
+    end;
+
+
+    local procedure SetTicketBlock(TicketSystemId: Guid; Block: Boolean)
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+    begin
+        Ticket.GetBySystemId(TicketSystemId);
+        Ticket.Blocked := Block;
+
+        if (Ticket.Blocked) then
+            Ticket."Blocked Date" := Today
+        else
+            Ticket."Blocked Date" := 0D;
+
+        Ticket.Modify();
+
+        if (Ticket.Blocked) then
+            TicketRequestManager.OnAfterBlockTicketPublisher(Ticket."No.");
+
+        if (not Ticket.Blocked) then
+            TicketRequestManager.OnAfterUnblockTicketPublisher(Ticket."No.");
+    end;
+
+    local procedure SetMemberCardBlock(MembershipCardSystemId: Guid; Block: Boolean)
+    var
+        MembershipCard: Record "NPR MM Member Card";
+        MembershipManager: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipCard.GetBySystemId(MembershipCardSystemId);
+        MembershipManager.BlockMemberCard(MembershipCard."Entry No.", Block);
+    end;
+
+    local procedure SetVoucherBlock(VoucherSystemId: Guid; Block: Boolean)
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+    begin
+        Voucher.GetBySystemId(VoucherSystemId);
+        VoucherEntry.SetCurrentKey("Voucher No.");
+        VoucherEntry.SetFilter("Voucher No.", '=%1', Voucher."No.");
+        VoucherEntry.SetFilter("Entry Type", '=%1', VoucherEntry."Entry Type"::"Issue Voucher");
+        if (not VoucherEntry.FindFirst()) then
+            exit;
+
+        VoucherEntry.Open := (not Block);
+        VoucherEntry.Modify();
+    end;
+
+    local procedure SetCouponBlock(CouponSystemId: Guid; Block: Boolean)
+    var
+        Coupon: Record "NPR NpDc Coupon";
+        CouponEntry: Record "NPR NpDc Coupon Entry";
+    begin
+        Coupon.GetBySystemId(CouponSystemId);
+        CouponEntry.SetCurrentKey("Coupon No.");
+        CouponEntry.SetFilter("Coupon No.", '=%1', Coupon."No.");
+        CouponEntry.SetFilter("Entry Type", '=%1', CouponEntry."Entry Type"::"Issue Coupon");
+        if (not CouponEntry.FindFirst()) then
+            exit;
+
+        CouponEntry.Open := (not Block);
+        CouponEntry.Modify();
+    end;
+    #endregion
+
 
     local procedure CreateOwnerWallet(var WalletAssetHeader: Record "NPR WalletAssetHeader"): Integer
     var

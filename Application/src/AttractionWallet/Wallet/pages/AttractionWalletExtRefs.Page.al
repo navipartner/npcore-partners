@@ -47,21 +47,38 @@ page 6185039 "NPR AttractionWalletExtRefs"
             action(BlockExternalReference)
             {
                 ApplicationArea = NPRRetail;
-                Caption = 'Block External Reference';
+                Caption = 'Block';
                 ToolTip = 'Running the action will block the selected external reference.';
                 Image = CancelLine;
+                Scope = Repeater;
 
                 trigger OnAction()
                 var
                     AttractionWallet: Codeunit "NPR AttractionWallet";
                 begin
                     AttractionWallet.BlockExternalReference(Rec.ExternalReference);
-                    Rec.BlockedAt := CurrentDateTime(); // This is not entirely true...
-                    Rec.Modify();
+                    CurrPage.Update(false);
+                end;
+            }
+            action(UnBlockExternalReference)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Unblock';
+                ToolTip = 'Running the action will unblock the selected external reference.';
+                Image = CancelLine;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    AttractionWallet: Codeunit "NPR AttractionWallet";
+                begin
+                    AttractionWallet.UnBlockExternalReference(Rec.ExternalReference);
+                    CurrPage.Update(false);
                 end;
             }
         }
     }
+
 
     var
         TempWallets: Record "NPR AttractionWallet" temporary;

@@ -122,7 +122,7 @@ page 6185090 "NPR AttractionWalletCard"
             {
                 ApplicationArea = NPRRetail;
                 Caption = 'Create New External Reference';
-                ToolTip = 'Running this action will create a new external reference';
+                ToolTip = 'Running this action will block existing external references and create a new external reference';
                 Image = Line;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -132,13 +132,31 @@ page 6185090 "NPR AttractionWalletCard"
                 var
                     WalletMgr: Codeunit "NPR AttractionWallet";
                 begin
+                    WalletMgr.BlockAllExternalReferences(Rec.EntryNo);
                     WalletMgr.CreateNewExternalReference(Rec.EntryNo);
+                    CurrPage.Update(false);
+                end;
+            }
+            action(BlockAllAssets)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Block All Assets';
+                ToolTip = 'Running this action will block all assets in the wallet';
+                Image = Cancel;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                var
+                    WalletMgr: Codeunit "NPR AttractionWallet";
+                begin
+                    WalletMgr.BlockAllAssets(Rec.EntryNo);
                     CurrPage.Update(false);
                 end;
             }
         }
     }
-
     var
         _OriginatesFromItemDesc: Text[100];
 
