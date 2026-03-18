@@ -91,8 +91,13 @@ codeunit 6248673 "NPR NPRE Static Pre Receipt"
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         if WaiterPadLine.FindSet() then
             repeat
-                Printer.AddTextField(1, 0, Format(WaiterPadLine.Quantity) + ' x ');
-                Printer.AddTextField(2, 0, WaiterPadLine.Description);
+                if WaiterPadLine."Attached to Line No." <> 0 then begin
+                    Printer.AddTextField(1, 0, '  ' + Format(WaiterPadLine.Quantity) + ' x ');
+                    Printer.AddTextField(2, 0, '  ' + WaiterPadLine.Description);
+                end else begin
+                    Printer.AddTextField(1, 0, Format(WaiterPadLine.Quantity) + ' x ');
+                    Printer.AddTextField(2, 0, WaiterPadLine.Description);
+                end;
                 Printer.AddTextField(3, 2, Format(WaiterPadLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
             until WaiterPadLine.Next() = 0;
 
