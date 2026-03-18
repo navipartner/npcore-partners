@@ -115,7 +115,7 @@ service:
           response:
             body: $couponTypes.ResponseApplyCouponDiscountDTO.ExampleApplyCouponDiscountDTO
 
-    checkCouypon:
+    checkCoupon:
       display-name: Check Coupon
       docs: Checks coupon availability.
       method: POST

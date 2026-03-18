@@ -41,7 +41,7 @@ service:
         Note that in the `Create Wallet` and `Add to Wallet`, API calls, the assets may also be identified by their visual reference numbers. 
         If the assetId does not interpret as a UUID, the system will attempt to resolve it as a visual reference number.
       display-name: Add to Wallet
-      method: POST
+      method: PUT
       path: /{walletId}
       path-parameters:
         walletId: simpleTypes.WalletId
