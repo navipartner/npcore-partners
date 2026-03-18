@@ -74,16 +74,23 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
 
         if WaiterPadLine.FindSet() then
             repeat
-                if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then
+                if WaiterPadLine."Attached to Line No." <> 0 then begin
                     Printer.SetFont(A11FontLbl);
-                Printer.SetBold(true);
-                Printer.AddTextField(1, 0, Format(WaiterPadLine.Quantity) + ' x ');
-                Printer.AddTextField(2, 0, WaiterPadLine.Description);
-                Printer.SetBold(false);
-                if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then begin
+                    Printer.AddTextField(1, 0, '  ' + Format(WaiterPadLine.Quantity) + ' x ');
+                    Printer.AddTextField(2, 0, '  ' + WaiterPadLine.Description);
                     Printer.SetFont(B21FontLbl);
-                    if WaiterPadLine."Line No." <> LastLineNo then
-                        Printer.AddLine('', 0);
+                end else begin
+                    if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then
+                        Printer.SetFont(A11FontLbl);
+                    Printer.SetBold(true);
+                    Printer.AddTextField(1, 0, Format(WaiterPadLine.Quantity) + ' x ');
+                    Printer.AddTextField(2, 0, WaiterPadLine.Description);
+                    Printer.SetBold(false);
+                    if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then begin
+                        Printer.SetFont(B21FontLbl);
+                        if WaiterPadLine."Line No." <> LastLineNo then
+                            Printer.AddLine('', 0);
+                    end;
                 end;
             until WaiterPadLine.Next() = 0;
 
