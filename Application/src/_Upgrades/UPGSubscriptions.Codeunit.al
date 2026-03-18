@@ -20,6 +20,7 @@ codeunit 6185060 "NPR UPG Subscriptions"
         UpdateSubscriptionAutoRenewStatus();
         UpdateSubscriptionRenewReqJobStartTime();
         UpdateSubscriptionRenewProcJobStartTime();
+        UpdateSubscriptionRenewProcJobTo1Min();
         UpgradeTerminationSubsRequest();
         UpgradePaymentSubscriptionRequests();
         UpgradePaymentSubscriptionRequestCardDetails();
@@ -155,6 +156,31 @@ codeunit 6185060 "NPR UPG Subscriptions"
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Proc. JQ");
         if JobQueueEntry.FindLast() then
             SetJobStartTime(JobQueueEntry, 230000T);
+
+        SetUpgradeTag();
+    end;
+
+    local procedure UpdateSubscriptionRenewProcJobTo1Min()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        UpgradeStep := 'UpdateSubscriptionRenewProcJobTo1Min';
+        if HasUpgradeTag() then
+            exit;
+
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Proc. JQ");
+        if JobQueueEntry.FindLast() then begin
+            if JobQueueEntry.Status <> JobQueueEntry.Status::"On Hold" then
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+            JobQueueEntry."Starting Time" := 0T;
+            JobQueueEntry."Ending Time" := 0T;
+            JobQueueEntry."No. of Minutes between Runs" := 1;
+            JobQueueEntry."Earliest Start Date/Time" := CurrentDateTime;
+            JobQueueEntry.Modify();
+            if not JobQueueEntry."NPR Manually Set On Hold" then
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
+        end;
 
         SetUpgradeTag();
     end;

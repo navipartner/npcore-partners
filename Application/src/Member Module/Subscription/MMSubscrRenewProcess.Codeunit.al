@@ -12,6 +12,15 @@ codeunit 6185036 "NPR MM Subscr. Renew: Process"
     begin
         NpPaySetup.Get();
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        SubscriptionRequest.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        SubscriptionRequest.LockTable();
+#endif
+        SubscriptionRequest.Get(SubscriptionRequest.RecordId);
+        if SubscriptionRequest."Processing Status" = SubscriptionRequest."Processing Status"::Success then
+            exit(true);
+
         PrepareRecords(SubscriptionRequest, SubsReqLogEntry, SkipTryCountUpdate, Manual);
         ClearLastError();
         Commit();

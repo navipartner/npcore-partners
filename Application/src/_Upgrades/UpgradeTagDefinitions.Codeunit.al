@@ -280,6 +280,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'SetMaxSubscriptionRequestProcessingTryCount'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpdateSubscriptionAutoRenewStatus'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpdateSubscriptionRenewProcJobStartTime'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpdateSubscriptionRenewProcJobTo1Min'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpdateSubscriptionRenewReqJobStartTime'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpgradeTerminationSubsRequest'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpgradePaymentSubscriptionRequests'));
@@ -1066,6 +1067,8 @@
                         exit('NPR-UpdateSubscriptionRenewReqJobStartTime-20250227');
                     'UpdateSubscriptionRenewProcJobStartTime':
                         exit('NPR-UpdateSubscriptionRenewProcJobStartTime-20250227');
+                    'UpdateSubscriptionRenewProcJobTo1Min':
+                        exit('NPR-UpdateSubscriptionRenewProcJobTo1Min-20260322');
                     'UpgradeTerminationSubsRequest':
                         exit('NPR-UpgradeTerminationSubsRequest-20251103');
                     'UpgradePaymentSubscriptionRequests':

@@ -188,11 +188,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         JobQueueManagement: Codeunit "NPR Job Queue Management";
         SubscriptionsJobQueueCategoryCode: Code[10];
         DescriptionLbl: Label 'Process subscription requests for expiring memberships';
-        StartDateTime: DateTime;
     begin
-        StartDateTime := CreateDateTime(Today, 230000T);
-        if CurrentDateTime > StartDateTime then
-            StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 230000T);
         SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
 
         JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
@@ -205,10 +201,8 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
                 Codeunit::"NPR MM Subscr. Renew Proc. JQ",
                 '',
                 DescriptionLbl,
-                StartDateTime,
-                230000T,
-                060000T,
-                1440,
+                CurrentDateTime,
+                1,
                 SubscriptionsJobQueueCategoryCode,
                 JobQueueEntry));
     end;
