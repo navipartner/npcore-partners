@@ -95,6 +95,10 @@
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
+        // Cancel Sale process can make a placeholder line that might mess with ticket reservation, skip to prevent DBZ 
+        if (POSSalesLine.Quantity = 0) then
+            exit;
+
         if (not TicketAction.GetRequestToken(POSEntry."Document No.", POSSalesLine."Line No.", Token, TokenLineNumber)) then
             exit;
 
@@ -107,6 +111,7 @@
             ListPriceInclVat := POSSalesLine."Unit Price" * (1 + (POSSalesLine."VAT %") / 100);
             ListPriceExclVat := POSSalesLine."Unit Price";
         end;
+
         ConfirmAndAdmitTicketsFromToken(Token, TokenLineNumber, POSEntry."Document No.", POSSalesLine."Line No.", POSEntry."POS Unit No.",
             POSSalesLine."Amount Incl. VAT (LCY)" / POSSalesLine.Quantity, POSSalesLine."Amount Excl. VAT (LCY)" / POSSalesLine.Quantity,
             ListPriceInclVat, ListPriceExclVat);

@@ -698,30 +698,52 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
     local procedure AddToPOS(ListOfTokens: List of [Text[100]])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
         SaleLinePos: Record "NPR POS Sale Line";
-        ListOfTicketSets: List of [Integer];
+        SetOfExternalLineNumbers: List of [Integer];
         Token: Text[100];
-        TicketSetId: Integer;
+        ExternalLineNumber: Integer;
+        INVALID_STATE: Label 'Reservation %1 must be in CONFIRMED or RESERVED and unpaid state to be picked up.';
     begin
         foreach Token in ListOfTokens do begin
-            Clear(ListOfTicketSets);
-            GetTicketSets(Token, ListOfTicketSets);
+            Clear(SetOfExternalLineNumbers);
+            GetReservationLineSet(Token, SetOfExternalLineNumbers);
 
-            foreach TicketSetId in ListOfTicketSets do begin
+            foreach ExternalLineNumber in SetOfExternalLineNumbers do begin
                 TicketReservationRequest.Reset();
                 TicketReservationRequest.SetCurrentKey("Session Token ID");
                 TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-                TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TicketSetId);
+                TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', ExternalLineNumber);
                 TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
+                TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
                 TicketReservationRequest.FindFirst();
+
+                // Unpaid and Confirmed reservation should be added to POS
+                if (not (TicketReservationRequest."Request Status" in [TicketReservationRequest."Request Status"::CONFIRMED, TicketReservationRequest."Request Status"::RESERVED])) then
+                    Error(INVALID_STATE, Token);
 
                 // Create POS sales lines which needs to be paid.
                 POSSession.GetSaleLine(POSSaleLine);
+                POSSaleLine.SetUsePresetLineNo(false);
                 POSSaleLine.GetNewSaleLine(SaleLinePos);
-                POSSaleLine.SetUsePresetLineNo(true);
+
+                // Move the tickets to this sale 
+                // POS End-Of-Sale routine will mark the individual tickets as paid (and possibly admit them)
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                Ticket.ModifyAll("Sales Receipt No.", SaleLinePos."Sales Ticket No.");
+                Ticket.ModifyAll("Line No.", SaleLinePos."Line No.");
+
+                // Move to this receipt, set RESERVED status to prevent InsertLine(SaleLinePos) to trigger ticket re-create
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetCurrentKey("Session Token ID");
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', ExternalLineNumber);
+                TicketReservationRequest.ModifyAll("Receipt No.", SaleLinePos."Sales Ticket No.");
+                TicketReservationRequest.ModifyAll("Line No.", SaleLinePos."Line No.");
+                TicketReservationRequest.ModifyAll("Request Status", TicketReservationRequest."Request Status"::RESERVED); // Confirmed -> Reserved
 
                 SaleLinePos."Line Type" := SaleLinePos."Line Type"::Item;
                 SaleLinePos."No." := TicketReservationRequest."Item No.";
@@ -734,8 +756,8 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
                     repeat
                         // Create POS sales lines for additional admissions that needs to be paid.
                         POSSession.GetSaleLine(POSSaleLine);
+                        POSSaleLine.SetUsePresetLineNo(false);
                         POSSaleLine.GetNewSaleLine(SaleLinePos);
-                        POSSaleLine.SetUsePresetLineNo(true);
 
                         SaleLinePos."Line Type" := SaleLinePos."Line Type"::Item;
                         SaleLinePos."No." := TicketReservationRequest."Item No.";
@@ -744,18 +766,11 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
                         POSSaleLine.InsertLine(SaleLinePos);
                     until (TicketReservationRequest.Next() = 0);
                 end;
-
-                TicketReservationRequest2.SetCurrentKey("Session Token ID");
-                TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
-                TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
-                TicketReservationRequest2.ModifyAll("Receipt No.", SaleLinePos."Sales Ticket No.");
-                TicketReservationRequest2.ModifyAll("Line No.", SaleLinePos."Line No.");
-                TicketReservationRequest2.ModifyAll("Request Status", TicketReservationRequest2."Request Status"::RESERVED);
             end;
         end;
     end;
 
-    local procedure GetTicketSets(Token: Text[100]; TicketSet: List of [Integer])
+    local procedure GetReservationLineSet(Token: Text[100]; TicketSet: List of [Integer])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
