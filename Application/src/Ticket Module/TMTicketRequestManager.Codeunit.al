@@ -415,6 +415,7 @@
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
         RequestCount: Integer;
+        NO_SCHEDULE_ENTRY: Label 'A schedule entry for admission %1 is missing and the settings prevents the system to select one for for you.';
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -422,12 +423,16 @@
         repeat
             if (TicketReservationRequest."Admission Inclusion" in [TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED]) then
                 if (TicketReservationRequest."External Adm. Sch. Entry No." = 0) then begin
-                    if (TicketBom.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then
+
+                    if (TicketBom.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then begin
                         if (TicketBom."Ticket Schedule Selection" = TicketBom."Ticket Schedule Selection"::SCHEDULE_ENTRY) then
-                            exit(-901); // Error: Missing schedule entry no, fast exit
-                    if (Admission.Get(TicketReservationRequest."Admission Code")) then
-                        if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then
-                            exit(-901); // Error: Missing schedule entry no, fast exit
+                            Error(NO_SCHEDULE_ENTRY, TicketReservationRequest."Admission Code");
+
+                        if (TicketBom."Ticket Schedule Selection" = TicketBom."Ticket Schedule Selection"::ADMISSION) then
+                            if (Admission.Get(TicketReservationRequest."Admission Code")) then
+                                if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then
+                                    Error(NO_SCHEDULE_ENTRY, TicketReservationRequest."Admission Code");
+                    end;
                 end;
             RequestCount += 1;
         until (TicketReservationRequest.Next() = 0);
@@ -799,7 +804,7 @@
         end;
     end;
 
-    local procedure _IssueOneAdmission(SourceRequest: Record "NPR TM Ticket Reservation Req."; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; QuantityPerTicket: Integer; ValidateWaitinglistReference: Boolean; var AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary")
+    local procedure _IssueOneAdmission(SourceRequest: Record "NPR TM Ticket Reservation Req."; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; QuantityPerTicket: Integer; ValidateWaitingListReference: Boolean; var AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary")
     var
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -873,24 +878,23 @@
         if (not CreateAdmission) then
             exit;
 
-        if (ValidateWaitinglistReference) then
-            ValidateWaitingListReferenceCode(WaitingListReferenceCode, Ticket, Admission."Admission Code", AdmissionSchEntry);
+        if (AdmissionSchEntry."Allocation By" = AdmissionSchEntry."Allocation By"::WAITINGLIST) then
+            if (ValidateWaitingListReference) then
+                ValidateWaitingListReferenceCode(WaitingListReferenceCode, AdmissionSchEntry);
+
+        if (AdmissionSchEntry."Entry No." <= 0) then
+            if (not AdmissionSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(Ticket, AdmissionCode, false))) then
+                Clear(AdmissionSchEntry);
 
         TicketManagement.CreateAdmissionAccessEntry(Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry, AdmissionOverAllocationConfirmed);
     end;
 
-    local procedure ValidateWaitingListReferenceCode(WaitingListReferenceCode: Code[10]; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
+    local procedure ValidateWaitingListReferenceCode(WaitingListReferenceCode: Code[10]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
     var
-        AdmissionSchEntryWaitingList: Record "NPR TM Admis. Schedule Entry";
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
         ResponseMessage: Text;
     begin
-
-        if (AdmissionSchEntry."Entry No." <= 0) then
-            if (not AdmissionSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(Ticket, AdmissionCode, false))) then
-                exit; // No default schedule - let someone else worry about that
 
         if (AdmissionSchEntry."Allocation By" = AdmissionSchEntry."Allocation By"::CAPACITY) then
             exit; // Normal
@@ -898,7 +902,7 @@
         if (WaitingListReferenceCode = '') then
             RaiseError(WAITINGLIST_REQUIRED_1202, '-1202');
 
-        if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry(WaitingListReferenceCode, CreateDateTime(Today, Time), true, AdmissionSchEntryWaitingList, TicketWaitingList, ResponseMessage)) then
+        if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry(WaitingListReferenceCode, CreateDateTime(Today, Time), true, AdmissionSchEntry, TicketWaitingList, ResponseMessage)) then
             Error(ResponseMessage);
 
     end;

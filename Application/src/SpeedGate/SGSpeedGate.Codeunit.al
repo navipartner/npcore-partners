@@ -1210,17 +1210,25 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (AdmitToCodes.Count = 0) then begin
             if (TicketProfileCode = '') then begin
                 TicketProfile.ValidationMode := TicketProfile.ValidationMode::FLEXIBLE;
-            end else
-                if (not TicketProfile.Get(TicketProfileCode)) then begin
+            end else begin
+                if (not TicketProfile.Get(TicketProfileCode)) then
                     TicketProfile.ValidationMode := TicketProfile.ValidationMode::STRICT;
-                end;
+            end;
 
             if (TicketProfile.ValidationMode = TicketProfile.ValidationMode::FLEXIBLE) then begin
-                TicketBom.Reset();
-                TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
-                TicketBom.SetFilter(Default, '=%1', true);
-                if (TicketBom.FindFirst()) then
-                    AdmitToCodes.Add(TicketBom."Admission Code");
+                if (SuggestedAdmissionCode <> '') then begin
+                    TicketBom.Reset();
+                    TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+                    TicketBom.SetFilter("Admission Code", '=%1', SuggestedAdmissionCode);
+                    if (TicketBom.FindFirst()) then
+                        AdmitToCodes.Add(SuggestedAdmissionCode);
+                end else begin
+                    TicketBom.Reset();
+                    TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+                    TicketBom.SetFilter(Default, '=%1', true);
+                    if (TicketBom.FindFirst()) then
+                        AdmitToCodes.Add(TicketBom."Admission Code");
+                end;
             end;
 
             if (TicketProfile.ValidationMode = TicketProfile.ValidationMode::STRICT) then
