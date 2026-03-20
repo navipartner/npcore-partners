@@ -13,7 +13,7 @@ codeunit 6248530 "NPR CouponApiAgent"
         if not VerifyCreateRequest(RequestJson, Response) then
             exit(Response);
 
-        CreateCoupon(RequestJson.AsToken(), Json);
+        CreateCoupon(Request.ApiVersion(), RequestJson.AsToken(), Json);
         exit(Response.RespondOK(Json));
     end;
 
@@ -31,7 +31,7 @@ codeunit 6248530 "NPR CouponApiAgent"
             exit(Response.RespondBadRequest('Coupon not found'));
 
         Json.StartObject('');
-        CoupontoJson(NPRNpDcCoupon, 'coupon', Json);
+        CouponToJson(Request.ApiVersion(), NPRNpDcCoupon, 'coupon', Json);
         Json.EndObject();
 
         exit(Response.RespondOK(Json));
@@ -110,7 +110,7 @@ codeunit 6248530 "NPR CouponApiAgent"
         end;
     end;
 
-    local procedure CreateCoupon(RequestJson: JsonToken; var Json: Codeunit "NPR JSON Builder")
+    local procedure CreateCoupon(VersionDate: Date; RequestJson: JsonToken; var Json: Codeunit "NPR JSON Builder")
     var
         Coupon: Record "NPR NpDc Coupon";
         CouponType: Record "NPR NpDc Coupon Type";
@@ -129,7 +129,7 @@ codeunit 6248530 "NPR CouponApiAgent"
         CouponType.TestField(Enabled, true);
 
         CouponMgt.PostIssueCoupon(Coupon);
-        CoupontoJson(Coupon, 'coupon', Json);
+        CouponToJson(VersionDate, Coupon, 'coupon', Json);
     end;
 
     internal procedure ApplyCouponDiscount(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -193,7 +193,7 @@ codeunit 6248530 "NPR CouponApiAgent"
         ResponseJson.StartArray('coupons');
         if NpDcCoupon.FindSet() then begin
             repeat
-                CoupontoJson(NpDcCoupon, 'coupon', ResponseJson);
+                CouponToJson(Request.ApiVersion(), NpDcCoupon, 'coupon', ResponseJson);
             until NpDcCoupon.Next() = 0;
         end;
         ResponseJson.EndArray().EndObject();
@@ -554,32 +554,46 @@ codeunit 6248530 "NPR CouponApiAgent"
         exit(true);
     end;
 
-    local procedure CoupontoJson(Coupon: Record "NPR NpDc Coupon"; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
+    local procedure CouponToJson(VersionDate: Date; Coupon: Record "NPR NpDc Coupon"; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
     begin
         Coupon.CalcFields(Open, "Remaining Quantity", "Issue Date");
         Json.StartObject(JsonObjectName)
             .AddProperty('id', Format(Coupon.SystemId, 0, 4).ToLower())
             .AddProperty('no', Coupon."No.")
-            .AddProperty('coupontype', Format(Coupon."Coupon Type"))
             .AddProperty('description', Coupon.Description)
             .AddProperty('referenceNo', Coupon."Reference No.");
+
+        if (VersionDate <= DMY2DATE(30, 4, 2026)) then
+            Json.AddProperty('coupontype', Format(Coupon."Coupon Type"));
+
+        Json.AddProperty('couponType', Format(Coupon."Coupon Type"));
+
         if Coupon.Open then
             Json.AddProperty('status', 'ACTIVE')
         else
             Json.AddProperty('status', 'CONSUMED');
+
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then
             Json.AddProperty('discountType', 'PERCENTAGE')
         else
             Json.AddProperty('discountType', 'AMOUNT');
-        Json.AddProperty('validFrom', Coupon."Starting Date");
-        Json.AddProperty('maxUsesPerSale', Coupon."Max Use per Sale");
+
         Json.AddProperty('issueDate', Coupon."Issue Date");
+
+        if (Coupon."Starting Date" > 0DT) then
+            Json.AddProperty('validFrom', Coupon."Starting Date");
+
+        if (Coupon."Ending Date" > 0DT) then
+            Json.AddProperty('validUntil', Coupon."Ending Date");
+
+        Json.AddProperty('maxUsesPerSale', Coupon."Max Use per Sale");
+
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then
             Json.AddProperty('discountPercent', Coupon."Discount %")
         else
             Json.AddProperty('discountAmount', Coupon."Discount Amount");
         Json.AddProperty('maxDiscountAmount', Coupon."Max. Discount Amount");
-        Json.AddProperty('validUntil', Coupon."Ending Date");
+
         Json.AddProperty('customerNo', Coupon."Customer No.");
         Json.AddProperty('remainingQuantity', Coupon."Remaining Quantity");
         Json.EndObject();

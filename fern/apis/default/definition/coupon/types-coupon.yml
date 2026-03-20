@@ -57,7 +57,7 @@ types:
         type: optional<double>
         docs: The maximum discount amount that can be applied.
       validFrom:
-        type: datetime
+        type: optional<datetime>
         docs: The date and time from which the coupon is valid.
       validUntil:
         type: optional<datetime>
