@@ -141,7 +141,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         PermissionSets.Add('SUPER (DATA)');
 #endif
         AADApplicationMgt.SetSilent(true);
-        AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayName, SecretDisplayName(), PermissionSets);
+        AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayName, SecretDisplayName(), PermissionSets, true);
         AADApplicationMgt.GetApplicationIDAndSecret(ClientID, ClientSecret);
     end;
 

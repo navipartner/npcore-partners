@@ -35,7 +35,13 @@ codeunit 6060060 "NPR AAD Application Mgt."
         _ErrorMessageBuffer: List of [Text];
 
     internal procedure CreateAzureADApplicationAndSecret(AppDisplayName: Text[50]; SecretDisplayName: Text; PermissionSets: List of [Code[20]])
+    begin
+        CreateAzureADApplicationAndSecret(AppDisplayName, SecretDisplayName, PermissionSets, false);
+    end;
+
+    internal procedure CreateAzureADApplicationAndSecret(AppDisplayName: Text[50]; SecretDisplayName: Text; PermissionSets: List of [Code[20]]; RegenerateSecret: Boolean)
     var
+        AADApplication: Record "AAD Application";
         AppJson: JsonObject;
         BufferToken: JsonToken;
         ApplicationId: Text;
@@ -112,7 +118,14 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
             RegisterAzureADApplication(ClientGuid, AppDisplayName, PermissionSets);
 
-            Message(ExistingAppRegisteredOnlyMsg, AppDisplayName);
+            if RegenerateSecret then begin
+                AADApplication.Get(ClientGuid);
+                RegenerateEntraAppSecret(AADApplication, false);
+            end;
+            _ClientID := ClientGuid;
+
+            if not _Silent then
+                Message(ExistingAppRegisteredOnlyMsg, AppDisplayName);
         end;
     end;
 
@@ -130,6 +143,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
         if (not TryCreateAzureADSecret(ApplicationObjectId, DisplayName, Secret, Expires)) then
             Error(CouldNotCreateSecretErr, GetLastErrorText());
+        _ClientSecret := Secret;
 
         ShowErrorAsWarningIfAllowed(StrSubstNo(CreatedSecretMsg, LowerCase(DelChr(ApplicationId, '=', '{}')), Secret, AzureADTenant.GetAadTenantId(), Expires));
     end;
@@ -139,9 +153,9 @@ codeunit 6060060 "NPR AAD Application Mgt."
         EntraApp.TestField("Client Id");
         EntraApp.TestField(Description);
 
-        if not Confirm(EntraAppRegenerateQst, false, EntraApp.Description) then begin
-            Error('');
-        end;
+        if WithConfirmDialog then
+            if not Confirm(EntraAppRegenerateQst, false, EntraApp.Description) then
+                Error('');
 
         CreateAzureADSecret(EntraApp."Client Id", StrSubstNo('%1 - %2', EntraApp.Description, Format(CurrentDateTime, 0, '<Year4>-<Month,2>-<Day,2> <Hours24,2>:<Minutes,2>')));
     end;
