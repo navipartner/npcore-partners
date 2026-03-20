@@ -219,6 +219,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                         Error('');
                     ItemList.GetRecord(Item);
                     Response.Add('selectedEntityId', Item."No.");
+                    Response.Add('selectedEntityName', Item.Description);
                 end;
 
             'POSLayout_SelectCustomer':
@@ -233,6 +234,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                         Error('');
                     CustomerList.GetRecord(Customer);
                     Response.Add('selectedEntityId', Customer."No.");
+                    Response.Add('selectedEntityName', Customer.Name);
                 end;
 
             'POSLayout_SelectPaymentMethod':
@@ -247,6 +249,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                         Error('');
                     POSPaymentMethodList.GetRecord(POSPaymentMethod);
                     Response.Add('selectedEntityId', POSPaymentMethod.Code);
+                    Response.Add('selectedEntityName', POSPaymentMethod.Description);
                 end;
 
             'POSLayout_SelectPOSAction':
@@ -256,6 +259,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                         Error('');
                     POSAction.Find();
                     Response.Add('selectedEntityId', POSAction.Code);
+                    Response.Add('selectedEntityName', POSAction.Code);
                     AddPOSActionParametersToResponse(POSAction, Response);
                 end;
             else
@@ -402,7 +406,10 @@ codeunit 6059925 "NPR POS Layout Assistant"
                         Workflow.Content().Add('CustomJavaScript', POSAction.GetCustomJavaScriptLogic());
                     if POSAction."Blocking UI" then
                         Workflow.Content().Add('Blocking', true);
-
+                    if (POSAction.InsertPlaceholderOnClick) then
+                        Workflow.Content().Add('InsertPlaceholderOnClick', true);
+                    if (POSAction.HideSelectedLineOnClick) then
+                        Workflow.Content().Add('HideSelectedLineOnClick', true);
                     Clear(ActionWorkflow);
                     ActionWorkflow.Add('Name', Workflow.Name());
                     ActionWorkflow.Add('RequestContext', Workflow.RequestContext());

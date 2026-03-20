@@ -4,7 +4,7 @@ table 6150701 "NPR POS Menu Button"
     ObsoleteTag = '2026-01-29';
     ObsoleteReason = 'This module is no longer being maintained';
 #IF NOT BC17
-    Access = Internal;      
+    Access = Internal;
 #ENDIF
     Caption = 'POS Menu Button';
     DataClassification = CustomerContent;
@@ -600,6 +600,12 @@ table 6150701 "NPR POS Menu Button"
 
         if POSAction."Blocking UI" then
             ActionIn.Content().Add('Blocking', true);
+
+        if (POSAction.InsertPlaceholderOnClick) then
+            ActionIn.Content().Add('InsertPlaceholderOnClick', true);
+        if (POSAction.HideSelectedLineOnClick) then
+            ActionIn.Content().Add('HideSelectedLineOnClick', true);
+
         ActionIn.Content().Add('requirePosUnitType', Format(POSAction."Requires POS Type", 0, 9));
     end;
 

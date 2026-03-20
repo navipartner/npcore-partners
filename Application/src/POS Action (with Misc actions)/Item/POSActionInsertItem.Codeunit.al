@@ -51,6 +51,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ItemTrackingLot_LeadLbl: Label 'This item requires Lot No., enter Lot No.';
     begin
         WorkflowConfig.SetNonBlockingUI();
+        WorkflowConfig.InsertPlaceholderOnClick();
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddLabel('itemTracking_title', ItemTracking_TitleLbl);

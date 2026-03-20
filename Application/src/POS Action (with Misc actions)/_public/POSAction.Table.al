@@ -127,6 +127,20 @@
             OptionCaption = 'Attended,Unattended';
             OptionMembers = ATTENDED,UNATTENDED;
         }
+
+        field(30; InsertPlaceholderOnClick; Boolean)
+        {
+            Caption = 'Insert Placeholder On Click';
+            DataClassification = CustomerContent;
+            Description = 'If true, when the action is clicked, a placeholder will be inserted into the sale lines grid while backend processing completes.';
+        }
+        field(31; HideSelectedLineOnClick; Boolean)
+        {
+            Caption = 'Hide Selected Line On Click';
+            DataClassification = CustomerContent;
+            Description = 'If true, when the action is clicked, the selected line in the sale lines grid will be hidden while backend processing completes.';
+        }
+
         field(40; "Workflow Implementation"; Enum "NPR POS Workflow")
         {
             DataClassification = CustomerContent;

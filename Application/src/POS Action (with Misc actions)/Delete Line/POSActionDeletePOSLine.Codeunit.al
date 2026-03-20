@@ -14,8 +14,10 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
         WorkflowConfig.AddBooleanParameter('ConfirmDialog', false, ConfirmParamCpt, ConfirmParamCpt);
         WorkflowConfig.AddLabel('title', TitleLbl);
-        WorkflowConfig.AddLabel('notallowed', NotAllowedLbl);
+        WorkflowConfig.AddLabel('notAllowed', NotAllowedLbl);
         WorkflowConfig.AddLabel('Prompt', PromptLbl);
+        WorkflowConfig.SetNonBlockingUI();
+        WorkflowConfig.HideSelectedLineOnClick();
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -27,12 +29,12 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
             'deleteOrGetPreWorkflows':
                 begin
                     Response := PreparePreWorkflows(Context, Sale, POSSession, SaleLine, PaymentLine);
-                    if not ResponseContainsPreworkflows(Response) then
-                        DeletePosLine(POSSession, Context);
+                    if not ResponseContainsPreWorkflows(Response) then
+                        DeletePosLine(POSSession, SaleLine, PaymentLine);
                     FrontEnd.WorkflowResponse(Response)
                 end;
             'deleteLineAfterPreWorkflows':
-                DeletePosLine(POSSession, Context);
+                DeletePosLine(POSSession, SaleLine, PaymentLine);
         end;
     end;
 
@@ -40,7 +42,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
-        'let main=async({workflow:e,parameters:a,captions:r})=>{debugger;switch(e.scope.view){case"payment":var t=runtime.getData("BUILTIN_PAYMENTLINE");break;default:var t=runtime.getData("BUILTIN_SALELINE")}if(!t.length||t._invalid){await popup.error(r.notallowed);return}if(a.ConfirmDialog&&!await popup.confirm({title:r.title,caption:r.Prompt.substitute(t._current[10])}))return;let{preWorkflows:i}=await e.respond("deleteOrGetPreWorkflows");!i||Object.keys(i).length===0||(await processWorkflows(i),await e.respond("deleteLineAfterPreWorkflows"))};async function processWorkflows(e){if(e)for(const[a,{mainParameters:r,customParameters:t}]of Object.entries(e))await workflow.run(a,{context:{customParameters:t},parameters:r})}'
+        'let main=async({workflow:t,parameters:n,captions:r})=>{let e;switch(t.scope.view){case"payment":e=runtime.getData("BUILTIN_PAYMENTLINE");break;default:e=runtime.getData("BUILTIN_SALELINE")}if(!e.length||e._invalid){await popup.error(r.notAllowed);return}if(n.ConfirmDialog&&!await popup.confirm({title:r.title,caption:r.Prompt.substitute(e._current[10])}))return;const{preWorkflows:a}=await t.respond("deleteOrGetPreWorkflows");!a||Object.keys(a).length===0||(await processWorkflows(t,a),await t.respond("deleteLineAfterPreWorkflows"))};async function processWorkflows(t,n){if(n)for(const[r,{mainParameters:e,customParameters:a}]of Object.entries(n))await t.run(r,{context:{customParameters:a},parameters:e})}'
         )
     end;
 
@@ -54,27 +56,34 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
         Response.Add('preWorkflows', PreWorkflows);
     end;
 
-    local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper")
+    local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line")
     var
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         CurrentView: Codeunit "NPR POS View";
         DeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
     begin
+        if (not POSSession.IsInitialized()) then
+            exit;
+
         POSSession.GetCurrentView(CurrentView);
 
         if (CurrentView.GetType() = CurrentView.GetType() ::Sale) then begin
-            POSSession.GetSaleLine(POSSaleLine);
-            SetPositionForPOSSaleLine(Context, POSSaleLine);
-            OnBeforeDeleteSaleLinePOS(POSSaleLine);
-            DeletePOSLineB.DeleteSaleLine(POSSaleLine);
+            if (not SaleLine.RefreshCurrent()) then
+                exit;
+
+            OnBeforeDeleteSaleLinePOS(SaleLine);
+            DeletePOSLineB.DeleteSaleLine(SaleLine);
         end;
 
         if (CurrentView.GetType() = CurrentView.GetType() ::Payment) then begin
-            DeletePOSLineB.DeletePaymentLine();
+            if (not PaymentLine.RefreshCurrent()) then
+                exit;
+
+            DeletePOSLineB.DeletePaymentLine(PaymentLine);
         end;
     end;
 
-    local procedure ResponseContainsPreworkflows(Response: JsonObject): Boolean
+
+    local procedure ResponseContainsPreWorkflows(Response: JsonObject): Boolean
     var
         PreWorkflows: JsonToken;
         PreWorkflowKeys: List of [Text];
@@ -98,11 +107,11 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     [Obsolete('Not Used', '2023-07-28')]
     procedure GetCurrentViewType() Response: JsonObject;
     var
-        NPRPOSSession: Codeunit "NPR POS Session";
-        NPRPOSView: Codeunit "NPR POS View";
+        POSSession: Codeunit "NPR POS Session";
+        POSView: Codeunit "NPR POS View";
     begin
-        NPRPOSSession.GetCurrentView(NPRPOSView);
-        Response.Add('viewType', Format(NPRPOSView.GetType()));
+        POSSession.GetCurrentView(POSView);
+        Response.Add('viewType', Format(POSView.GetType()));
     end;
 
     [IntegrationEvent(false, false)]

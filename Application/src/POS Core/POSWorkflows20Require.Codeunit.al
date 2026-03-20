@@ -37,12 +37,12 @@
             'picture.item':
                 RequireItemPicture(ID, JSON, FrontEnd);
             else begin
-                    OnRequireCustom(ID, Type, JSON, FrontEnd, CustomHandled);
-                    if not CustomHandled then begin
-                        FrontEnd.ReportBugAndThrowError(StrSubstNo(CustomHandlerMissingErr, Type));
-                        exit;
-                    end;
+                OnRequireCustom(ID, Type, JSON, FrontEnd, CustomHandled);
+                if not CustomHandled then begin
+                    FrontEnd.ReportBugAndThrowError(StrSubstNo(CustomHandlerMissingErr, Type));
+                    exit;
                 end;
+            end;
         end;
     end;
 
@@ -95,6 +95,11 @@
         if POSAction."Blocking UI" then begin
             WorkflowAction.Content().Add('Blocking', true);
         end;
+
+        if (POSAction.InsertPlaceholderOnClick) then
+            WorkflowAction.Content().Add('InsertPlaceholderOnClick', true);
+        if (POSAction.HideSelectedLineOnClick) then
+            WorkflowAction.Content().Add('HideSelectedLineOnClick', true);
 
         POSActionParam.SetRange("POS Action Code", POSAction.Code);
         if POSActionParam.FindSet() then

@@ -59,9 +59,11 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         CustomJSCode: Text;
         NonBlockingUI: Boolean;
         Description: Text;
+        InsertPlaceholderOnClick: Boolean;
+        HideSelectedLineOnClick: Boolean;
         ActionParameters: Record "NPR POS Action Parameter";
     begin
-        WorkflowConfig.GetWorkflowParameters(TempParameters, Javascript, Unattended, BoundToDataSource, DataSource, CustomJSMethod, CustomJSCode, NonBlockingUI, Description);
+        WorkflowConfig.GetWorkflowParameters(TempParameters, Javascript, Unattended, BoundToDataSource, DataSource, CustomJSMethod, CustomJSCode, NonBlockingUI, InsertPlaceholderOnClick, HideSelectedLineOnClick, Description);
 
         POSAction.LockTable();
         if POSAction.Get(ActionCode) then
@@ -72,6 +74,8 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         POSAction.Code := ActionCode;
 # pragma warning restore
         POSAction."Blocking UI" := not NonBlockingUI;
+        POSAction.InsertPlaceholderOnClick := InsertPlaceholderOnClick;
+        POSAction.HideSelectedLineOnClick := HideSelectedLineOnClick;
         POSAction."Bound to DataSource" := BoundToDataSource;
 # pragma warning disable AA0139
         POSAction."Data Source Name" := DataSource;

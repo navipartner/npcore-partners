@@ -16,6 +16,9 @@ codeunit 6059786 "NPR POS Workflow Config"
         _CustomJSCode: Text;
         _DescriptionCaption: Text;
         _NonBlockingUI: Boolean;
+        _InsertPlaceholderOnClick: Boolean;
+        _HideSelectedLineOnClick: Boolean;
+
         TempParameter: Record "NPR POS Action Parameter" temporary;
 
     procedure AddJavascript(Javascript: Text)
@@ -90,6 +93,16 @@ codeunit 6059786 "NPR POS Workflow Config"
         _NonBlockingUI := true;
     end;
 
+    procedure InsertPlaceholderOnClick()
+    begin
+        _InsertPlaceholderOnClick := true;
+    end;
+
+    procedure HideSelectedLineOnClick()
+    begin
+        _HideSelectedLineOnClick := true;
+    end;
+
     procedure SetActionCode(ActionCode: Text)
     begin
         _ActionCode := ActionCode;
@@ -155,13 +168,15 @@ codeunit 6059786 "NPR POS Workflow Config"
         ValueToHash.Append('<customJSmethod>' + _CustomJSMethod + '</customJSmethod>');
         ValueToHash.Append('<customJScode>' + _CustomJSCode + '</customJScode>');
         ValueToHash.Append('<nonblockingui>' + Format(_NonBlockingUI, 0, 9) + '</nonblockingui>');
+        ValueToHash.Append('<insertplaceholderonclick>' + Format(_InsertPlaceholderOnClick, 0, 9) + '</insertplaceholderonclick>');
+        ValueToHash.Append('<hideselectedlineonclick>' + Format(_HideSelectedLineOnClick, 0, 9) + '</hideselectedlineonclick>');
 
 # pragma warning disable AA0139
         Exit(CryptographyManagement.GenerateHash(ValueToHash.ToText(), HashAlgorithmType::MD5));
 # pragma warning restore
     end;
 
-    internal procedure GetWorkflowParameters(var ParametersOut: Record "NPR POS Action Parameter" temporary; var JavascriptOut: Text; var UnattendedOut: Boolean; var BoundToDataSourceOut: Boolean; var DataSourceOut: Text; var CustomJSMethod: Text; var CustomJSCode: Text; var NonBlockingUIOut: Boolean; var DescriptionOut: Text)
+    internal procedure GetWorkflowParameters(var ParametersOut: Record "NPR POS Action Parameter" temporary; var JavascriptOut: Text; var UnattendedOut: Boolean; var BoundToDataSourceOut: Boolean; var DataSourceOut: Text; var CustomJSMethod: Text; var CustomJSCode: Text; var NonBlockingUIOut: Boolean; var InsertPlaceholderOnClickOut: Boolean; var HideSelectedLineOnClickOut: Boolean; var DescriptionOut: Text)
     begin
         ParametersOut.Copy(TempParameter, true);
         JavascriptOut := _Javascript;
@@ -171,6 +186,8 @@ codeunit 6059786 "NPR POS Workflow Config"
         CustomJSMethod := _CustomJSMethod;
         CustomJSCode := _CustomJSCode;
         NonBlockingUIOut := _NonBlockingUI;
+        InsertPlaceholderOnClickOut := _InsertPlaceholderOnClick;
+        HideSelectedLineOnClickOut := _HideSelectedLineOnClick;
         DescriptionOut := _DescriptionCaption;
     end;
 
