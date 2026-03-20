@@ -37,8 +37,13 @@ codeunit 6060000 "NPR HL Upsert Member"
                 HLMember.Modify();
                 exit;
             end;
-        end else
+        end else begin
+            // Ticket buyers have no Membership Code — do not create a full BC member for them.
+            // If the buyer later gets a membership, the HL member record will be linked via GetHLMember().
+            if (HLMember."Membership Code" = '') and not HLMember."Created from HeyLoyalty" then
+                exit;
             NewMember := CreateNewMemberFromHL(HLMember, Member);
+        end;
         UpdateMemberFromHL(HLMember, Member);
 
         if not NewMember then

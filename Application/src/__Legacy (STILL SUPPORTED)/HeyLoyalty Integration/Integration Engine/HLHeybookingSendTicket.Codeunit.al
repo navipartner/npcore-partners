@@ -28,8 +28,10 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         NcTask: Record "NPR Nc Task";
         TicketNotifEntry: Record "NPR TM Ticket Notif. Entry";
         HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+        HLSendTicketBuyerInfo: Codeunit "NPR HL Heybooking Send Buyers";
         LastErrorText: Text;
         Success: Boolean;
+        TicketBuyerInfoSendingErr: Label 'An error occurred while sending ticket buyer information to HeyLoyalty. The ticket notifications (information about sold tickets) have been sent to HeyLoyalty, but the buyer information might be missing.\Error details:\%1';
     begin
         if TempTouchedTicketNotifEntry.IsEmpty() then
             exit;
@@ -73,6 +75,31 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         until TempTouchedTicketNotifEntry.Next() = 0;
 
         Commit();
+
+        ClearLastError();
+        If not HLSendTicketBuyerInfo.Run(TempTouchedTicketNotifEntry) then
+            EmitError('NPR_HL_Integration_TicketBuyerInfoSendingFailed', StrSubstNo(TicketBuyerInfoSendingErr, GetLastErrorText()));
+    end;
+
+    local procedure EmitError(ErrorEventID: Text; ErrorText: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_ErrorText', ErrorText);
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
+
+        Session.LogMessage(ErrorEventID, ErrorText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     [TryFunction]

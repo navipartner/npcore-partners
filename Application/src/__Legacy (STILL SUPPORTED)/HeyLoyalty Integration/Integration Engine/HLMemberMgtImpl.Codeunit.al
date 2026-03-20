@@ -437,6 +437,19 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         HLMember.SetCurrentKey("Member Entry No.");
         HLMember.SetRange("Member Entry No.", Member."Entry No.");
         if not HLMember.FindLast() then begin
+            if FindHLMemberByContactInfo(Member."E-Mail Address", Member."Phone No.", true, HLMember) then begin
+                HLMember."Member Entry No." := Member."Entry No.";
+                HLMember."Membership Entry No." := MembershipRole."Membership Entry No.";
+                HLMember.Deleted := false;
+                HLMember.Modify(true);
+
+                HLMember.SetCurrentKey("Member Entry No.");
+                HLMember.SetRange("Member Entry No.", Member."Entry No.");
+                HLMember.SetRange("E-Mail Address");
+                HLMember.SetRange("Phone No.");
+                exit(true);
+            end;
+
             Clear(HLMember);
             case AutoInsert of
                 AutoInsert::Never:
@@ -453,6 +466,36 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
             HLMember.Insert(true);
         end;
         exit(true);
+    end;
+
+    internal procedure FindHLMemberByContactInfo(EmailAddress: Text[80]; PhoneNo: Text[30]; OrphanOnly: Boolean; var HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
+    begin
+        Clear(HLMember);
+        if (EmailAddress = '') and (PhoneNo = '') then
+            exit(false);
+
+        if OrphanOnly then
+            HLMember.SetRange("Member Entry No.", 0);
+
+        if EmailAddress <> '' then begin
+            HLMember.SetRange("E-Mail Address", EmailAddress);
+            if HLMember.IsEmpty() then
+                HLMember.SetFilter("E-Mail Address", '@' + ConvertStr(EmailAddress, '@', '?'));
+        end;
+
+        if PhoneNo <> '' then begin
+            HLMember.SetRange("Phone No.", PhoneNo);
+            if HLMember.IsEmpty() then begin
+                if EmailAddress = '' then
+                    exit(false);
+                HLMember.SetRange("Phone No.");
+                if HLMember.IsEmpty() then begin
+                    HLMember.SetRange("E-Mail Address", '');
+                    HLMember.SetRange("Phone No.", PhoneNo);
+                end;
+            end;
+        end;
+        exit(HLMember.FindLast());
     end;
 
     procedure UpdateHLMemberWithDataFromHeyLoyalty(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken; OnlyEssentialFields: Boolean) Updated: Boolean

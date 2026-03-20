@@ -139,24 +139,7 @@ codeunit 6150799 "NPR HL Member Webhook Handler"
         end;
 
         HLMember2 := HLMember;
-        Clear(HLMember);
-        if HLMember2."E-Mail Address" <> '' then begin
-            HLMember.SetRange("E-Mail Address", HLMember2."E-Mail Address");
-            if HLMember.IsEmpty() then
-                HLMember.SetFilter("E-Mail Address", '@' + ConvertStr(HLMember2."E-Mail Address", '@', '?'));
-        end;
-        if HLMember2."Phone No." <> '' then begin
-            HLMember.SetRange("Phone No.", HLMember2."Phone No.");
-            if HLMember.IsEmpty() then
-                if HLMember2."E-Mail Address" <> '' then begin
-                    HLMember.SetRange("Phone No.");
-                    if HLMember.IsEmpty() then begin
-                        HLMember.SetRange("E-Mail Address", '');
-                        HLMember.SetRange("Phone No.", HLMember2."Phone No.");
-                    end;
-                end;
-        end;
-        if HLMember.FindLast() then
+        if HLMemberMgt.FindHLMemberByContactInfo(HLMember2."E-Mail Address", HLMember2."Phone No.", false, HLMember) then
             exit(true);
 
         if not GetMemberByContactInfo(HLMember2."E-Mail Address", HLMember2."Phone No.", Member) then
