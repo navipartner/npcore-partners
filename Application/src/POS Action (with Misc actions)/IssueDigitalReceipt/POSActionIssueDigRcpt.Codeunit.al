@@ -35,6 +35,7 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
         SalesTicketNoText: Text;
         TimeoutIntervalSec: Integer;
         ScanReceiptText: Label 'Scan your receipt';
+        ShowQRCodeOn: Enum "NPR Show QR Code On";
     begin
         if not Context.GetStringParameter('salesTicketNo', SalesTicketNoText) then
             Clear(SalesTicketNoText);
@@ -59,18 +60,19 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
         POSActionIssueDigRcptB.CreateDigitalReceipt(SalesTicketNoText, DigitalReceiptLink, FooterText);
 #pragma warning restore AA0139
         Setup.GetPOSUnit(POSUnit);
-        POSActionQRViewDigRcptB.PrepareQRCode(POSUnit, TimeoutIntervalSec);
+        POSActionQRViewDigRcptB.PrepareQRCode(POSUnit, TimeoutIntervalSec, ShowQRCodeOn);
         Response.Add('footerText', FooterText);
         Response.Add('digitalReceiptLink', DigitalReceiptLink);
         Response.Add('timeoutIntervalSec', TimeoutIntervalSec);
         Response.Add('scanReceiptText', ScanReceiptText);
+        Response.Add('showQRCodeOn', ShowQRCodeOn.AsInteger());
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionIssueDigRcpt.js###
-'let main=async({workflow:t})=>{debugger;let{digitalReceiptLink:e,footerText:a,timeoutIntervalSec:i,scanReceiptText:n}=await t.respond();e&&await popup.qr({caption:a,qrData:e,timeoutInSeconds:i},n)};'
+'let main=async({workflow:a})=>{debugger;let{digitalReceiptLink:e,footerText:t,timeoutIntervalSec:i,scanReceiptText:n,showQRCodeOn:r}=await a.respond();if(e)switch(r){case 0:await popup.qr({caption:t,qrData:e,timeoutInSeconds:i},n);break;case 1:await a.run("SHOW_TERMINAL_QRCODE",{parameters:{qrCodeLink:e}});break}};'
         );
     end;
 }

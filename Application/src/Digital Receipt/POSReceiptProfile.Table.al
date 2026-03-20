@@ -58,6 +58,17 @@ table 6150742 "NPR POS Receipt Profile"
             TableRelation = "NPR NPEmailTemplate" where(DataProvider = const("NPR DynTemplateDataProvider"::POS_RECEIPT_EMAIL));
         }
 #endif
+        field(90; "QR Code Setup Code"; Code[20])
+        {
+            Caption = 'QR Code Setup Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR QR Code Setup Header";
+        }
+        field(100; "Show QR Code On"; Enum "NPR Show QR Code On")
+        {
+            Caption = 'Show QR Code On';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -865,6 +865,41 @@ codeunit 6184796 "NPR Adyen Management"
             Error(ResponseErrorLbl, HttpResponseMessage.HttpStatusCode(), HttpResponseMessage.ReasonPhrase(), ResponseTxt);
     end;
 
+    internal procedure TestQRCodeSetupApiKey(QRCodeSetupCode: Code[20]; EnvironmentType: Enum "NPR Adyen Environment Type")
+    var
+        QRCodeSetup: Record "NPR QR Code Setup Header";
+        RequestURL: Text;
+        ResponseTxt: Text;
+        HttpClient: HttpClient;
+        HttpContent: HttpContent;
+        HttpHeaders: HttpHeaders;
+        HttpRequestMessage: HttpRequestMessage;
+        HttpResponseMessage: HttpResponseMessage;
+        GetCompaniesEndpoint: Label '/companies', Locked = true;
+        ResponseErrorLbl: Label 'Received a bad response from the API.\Status Code: %1 - %2. Body: %3', Comment = '%1 = status code, %2 = reason phrase, %3 = body';
+    begin
+        if not QRCodeSetup.Get(QRCodeSetupCode) then
+            exit;
+
+        RequestURL := GetManagementAPIURL(EnvironmentType) + GetCompaniesEndpoint;
+
+        Clear(HttpRequestMessage);
+        HttpContent.GetHeaders(HttpHeaders);
+        HttpHeaders.Clear();
+        HttpHeaders.Add('Content-Type', 'text/json; charset="utf-8"');
+        HttpHeaders.Add('x-api-key', QRCodeSetup.GetApiKey());
+
+        HttpRequestMessage.Content := HttpContent;
+        HttpRequestMessage.SetRequestUri(RequestUrl);
+        HttpRequestMessage.Method := 'GET';
+
+        HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
+        HttpResponseMessage.Content.ReadAs(ResponseTxt);
+
+        if not HttpResponseMessage.IsSuccessStatusCode() then
+            Error(ResponseErrorLbl, HttpResponseMessage.HttpStatusCode(), HttpResponseMessage.ReasonPhrase(), ResponseTxt);
+    end;
+
     internal procedure SetEFTAdyenIntegrationFilter(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";

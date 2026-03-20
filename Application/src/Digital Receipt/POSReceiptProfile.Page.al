@@ -65,6 +65,29 @@ page 6150757 "NPR POS Receipt Profile"
                             Error(CredentialsNotValidLbl);
                     end;
                 }
+                field("Show QR Code On"; Rec."Show QR Code On")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Show QR Code On field.';
+
+                    trigger OnValidate()
+                    begin
+                        _ShowQRCodeOnTerminal := Rec."Show QR Code On" = Rec."Show QR Code On"::Terminal;
+                        CurrPage.Update();
+                    end;
+                }
+                group(QRCodeSetupGroup)
+                {
+                    ShowCaption = false;
+                    Visible = _ShowQRCodeOnTerminal;
+                    Enabled = _ShowQRCodeOnTerminal;
+
+                    field("QR Code Setup Code"; Rec."QR Code Setup Code")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the QR Code Setup Code field.';
+                    }
+                }
                 field("Receipt Discount Information"; Rec."Receipt Discount Information")
                 {
                     ApplicationArea = NPRRetail;
@@ -101,6 +124,11 @@ page 6150757 "NPR POS Receipt Profile"
         }
     }
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        _ShowQRCodeOnTerminal := Rec."Show QR Code On" = Rec."Show QR Code On"::Terminal;
+    end;
+
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
     trigger OnOpenPage()
     var
@@ -112,4 +140,7 @@ page 6150757 "NPR POS Receipt Profile"
     var
         NewEmailExperience: Boolean;
 #endif
+
+    var
+        _ShowQRCodeOnTerminal: Boolean;
 }

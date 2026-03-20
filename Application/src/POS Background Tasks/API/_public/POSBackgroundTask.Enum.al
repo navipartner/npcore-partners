@@ -75,4 +75,9 @@ enum 6014505 "NPR POS Background Task" implements "NPR POS Background Task"
         Caption = 'DATA_COLLECTION_TASK', Locked = true;
         Implementation = "NPR POS Background Task" = "NPR Generic Data Collect Task";
     }
+    value(14; SHOW_TERMINAL_QRCODE)
+    {
+        Caption = 'SHOW_TERMINAL_QRCODE', Locked = true;
+        Implementation = "NPR POS Background Task" = "NPR EFT Adyen Show QRCode Task";
+    }
 }

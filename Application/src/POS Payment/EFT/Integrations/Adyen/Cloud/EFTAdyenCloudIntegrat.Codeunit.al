@@ -14,6 +14,7 @@
         SIGNATURE_COLLECTION: Label 'Signature Collection', MaxLength = 50;
         PHONE_NO_COLLECTION: Label 'Phone No Collection', MaxLength = 50;
         EMAIL_COLLECTION: Label 'EMail Collection', MaxLength = 50;
+        QRCODE_SHOW: Label 'QR Code Show', MaxLength = 50;
 
     procedure IntegrationType(): Code[20]
     begin
@@ -94,6 +95,12 @@
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(EMAIL_COLLECTION, 1, MaxStrLen(tmpEFTAuxOperation.Description));
+        tmpEFTAuxOperation.Insert();
+
+        tmpEFTAuxOperation.Init();
+        tmpEFTAuxOperation."Integration Type" := IntegrationType();
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::SHOW_QRCODE.AsInteger();
+        tmpEFTAuxOperation.Description := CopyStr(QRCODE_SHOW, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
     end;
 
