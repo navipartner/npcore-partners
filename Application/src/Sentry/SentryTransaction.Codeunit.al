@@ -122,91 +122,97 @@ codeunit 6248499 "NPR Sentry Transaction"
         _source := Source;
     end;
 
-    procedure Log(var Spans: List of [Codeunit "NPR Sentry Span"]; var Errors: List of [Codeunit "NPR Sentry Error"])
+    procedure Log(var Spans: List of [Codeunit "NPR Sentry Span"]; var Errors: List of [Codeunit "NPR Sentry Error"]; var FinalizeSpan: Codeunit "NPR Sentry Span")
     var
-        Json: Codeunit "NPR Json Builder";
         Span: Codeunit "NPR Sentry Span";
         Error: Codeunit "NPR Sentry Error";
+        SentryMetadata: Codeunit "NPR Sentry Metadata";
+        EventJson: JsonObject;
+        UserJson: JsonObject;
+        TransactionInfoJson: JsonObject;
+        ContextsJson: JsonObject;
+        TraceJson: JsonObject;
+        TagsJson: JsonObject;
+        DataJson: JsonObject;
+        SpansArray: JsonArray;
+        ErrorJson: JsonObject;
         EventDimensions: Dictionary of [Text, Text];
         ExceptionDimensions: Dictionary of [Text, Text];
-        SentryMetadata: Codeunit "NPR Sentry Metadata";
         TagKey: Text;
         DataKey: Text;
+        JsonText: Text;
     begin
         if Errors.Count > 0 then
             _status := _status::InternalError;
 
-        Json
-            .StartObject('')
-                .AddProperty('event_id', Format(CreateGuid(), 0, 3).ToLower())
-                .AddProperty('start_timestamp', _startedTimestampUtc)
-                .AddProperty('timestamp', _finishedTimestampUtc)
-                .AddProperty('transaction', _description)
-                .StartObject('transaction_info')
-                    .AddProperty('source', _source)
-                .EndObject()
-                .AddProperty('platform', 'other')
-                .AddProperty('release', _appRelease)
-                .AddProperty('type', 'transaction')
-                .AddProperty('environment', SentryMetadata.GetEnvironment())
-                .AddProperty('level', 'info')
-                .StartObject('user')
-                    .AddProperty('id', Format(UserSecurityId(), 0, 4).ToLower())
-                    .AddProperty('username', UserId)
-                .EndObject()
-                .StartObject('contexts')
-                    .StartObject('trace')
-                        .AddProperty('trace_id', _traceId)
-                        .AddProperty('span_id', _rootSpanId)
-                        .AddProperty('op', _operation)
-                        .AddProperty('status', Format(_status));
+        EventJson.Add('event_id', Format(CreateGuid(), 0, 3).ToLower());
+        EventJson.Add('start_timestamp', _startedTimestampUtc);
+        EventJson.Add('timestamp', _finishedTimestampUtc);
+        EventJson.Add('transaction', _description);
 
-        if _externalSpanId <> '' then begin
-            Json.AddProperty('parent_span_id', _externalSpanId);
-        end;
+        TransactionInfoJson.Add('source', _source);
+        EventJson.Add('transaction_info', TransactionInfoJson);
 
-        Json
-            .EndObject() // trace
-            .EndObject(); // contexts
+        EventJson.Add('platform', 'other');
+        EventJson.Add('release', _appRelease);
+        EventJson.Add('type', 'transaction');
+        EventJson.Add('environment', SentryMetadata.GetEnvironment());
+        EventJson.Add('level', 'info');
 
-        SentryMetadata.WriteModulesJson(Json);
+        UserJson.Add('id', Format(UserSecurityId(), 0, 4).ToLower());
+        UserJson.Add('username', UserId);
+        EventJson.Add('user', UserJson);
 
-        Json.StartObject('tags');
-        SentryMetadata.WriteTagsForBackendEvent(Json);
+        TraceJson.Add('trace_id', _traceId);
+        TraceJson.Add('span_id', _rootSpanId);
+        TraceJson.Add('op', _operation);
+        TraceJson.Add('status', Format(_status));
+        if _externalSpanId <> '' then
+            TraceJson.Add('parent_span_id', _externalSpanId);
+        ContextsJson.Add('trace', TraceJson);
+        EventJson.Add('contexts', ContextsJson);
+
+        EventJson.Add('modules', SentryMetadata.WriteModulesJson());
+
+        TagsJson := SentryMetadata.WriteTagsForBackendEvent();
         foreach TagKey in _customTags.Keys() do
-            Json.AddProperty(TagKey, _customTags.Get(TagKey));
-        Json.EndObject();
+            if TagsJson.Contains(TagKey) then
+                TagsJson.Replace(TagKey, _customTags.Get(TagKey))
+            else
+                TagsJson.Add(TagKey, _customTags.Get(TagKey));
+        EventJson.Add('tags', TagsJson);
 
         if _customData.Count > 0 then begin
-            Json.StartObject('data');
             foreach DataKey in _customData.Keys() do
-                Json.AddProperty(DataKey, _customData.Get(DataKey));
-            Json.EndObject();
+                DataJson.Add(DataKey, _customData.Get(DataKey));
+            EventJson.Add('data', DataJson);
         end;
 
-        Json.StartArray('spans');
-        foreach Span in Spans do begin
-            Span.ToJson(Json, _traceId);
-        end;
-        Json.EndArray();
-        Json.EndObject();
 
-        eventDimensions.Add('NPRSentryDsn', _dsn);
-        AddJsonChunks(eventDimensions, Json.BuildAsText());
-        // Our app.json connectionstring forwards events to a cloudflare worker that parses this JSON and sends it to navipartner-eu.sentry.io.        
-        Session.LogMessage('NPRSentryTransaction', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, eventDimensions);
-        Clear(Json);
+        foreach Span in Spans do
+            SpansArray.Add(Span.ToJson(_traceId));
+
+        // Finish the finalize span right before serializing spans so it captures all JSON assembly time above
+        FinalizeSpan.Finish();
+        SpansArray.Add(FinalizeSpan.ToJson(_traceId));
+        EventJson.Add('spans', SpansArray);
+
+        EventJson.WriteTo(JsonText);
+
+        EventDimensions.Add('NPRSentryDsn', _dsn);
+        AddJsonChunks(EventDimensions, JsonText);
+        Session.LogMessage('NPRSentryTransaction', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, EventDimensions);
 
         foreach Error in Errors do begin
-            Json := Error.ToJson();
+            ErrorJson := Error.ToJson();
+            ErrorJson.WriteTo(JsonText);
 
-            exceptionDimensions.Add('NPRSentryDsn', _dsn);
-            AddJsonChunks(exceptionDimensions, Json.BuildAsText());
-            exceptionDimensions.Add('NPRSentryTraceId', _traceId);
-            exceptionDimensions.Add('NPRSentrySpanId', Error.GetParentId());
-            Session.LogMessage('NPRSentryException', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, exceptionDimensions);
-            Clear(Json);
-            Clear(exceptionDimensions);
+            Clear(ExceptionDimensions);
+            ExceptionDimensions.Add('NPRSentryDsn', _dsn);
+            AddJsonChunks(ExceptionDimensions, JsonText);
+            ExceptionDimensions.Add('NPRSentryTraceId', _traceId);
+            ExceptionDimensions.Add('NPRSentrySpanId', Error.GetParentId());
+            Session.LogMessage('NPRSentryException', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, ExceptionDimensions);
         end;
     end;
 

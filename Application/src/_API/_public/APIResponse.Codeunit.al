@@ -132,10 +132,12 @@ codeunit 6185053 "NPR API Response"
         AddHeader('x-npr-start-time', Format(SessionMetadata.GetStartTime(), 0, 9));
         AddHeader('x-npr-end-time', Format(CurrentDateTime(), 0, 9));
         AddHeader('x-npr-duration', Format(CurrentDateTime() - SessionMetadata.GetStartTime()));
+#if API_PERF_DEBUG
         AddHeader('x-npr-sql-rows-read-total', Format(SessionInformation.SqlRowsRead()));
         AddHeader('x-npr-sql-statements-executed-total', Format(SessionInformation.SqlStatementsExecuted()));
         AddHeader('x-npr-sql-rows-read-api', Format(SessionInformation.SqlRowsRead() - SessionMetadata.GetStartRowsRead()));
         AddHeader('x-npr-sql-statements-executed-api', Format(SessionInformation.SqlStatementsExecuted() - SessionMetadata.GetStartStatementsExecuted()));
+#endif
 
         AddSentryTag('http.status_code', Format(_StatusCode));
 
@@ -452,7 +454,7 @@ codeunit 6185053 "NPR API Response"
 
     procedure CreateErrorResponse(ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text; ErrorStatusCode: enum "NPR API HTTP Status Code"): Codeunit "NPR API Response"
     var
-        JsonBuilder: Codeunit "NPR JSON Builder";
+        ErrorJson: JsonObject;
         ErrorCodeName: Text;
     begin
         InitcurrCodeunit();
@@ -470,27 +472,21 @@ codeunit 6185053 "NPR API Response"
 
         ErrorCodeName := ErrorCode.Names.Get(ErrorCode.Ordinals.IndexOf(ErrorCode.AsInteger()));
 
-        JsonBuilder.Initialize()
-            .StartObject('')
-                .AddProperty('code', ErrorCodeName)
-                .AddProperty('message', ErrorMessage)
-            .EndObject();
+        ErrorJson.Add('code', ErrorCodeName);
+        ErrorJson.Add('message', ErrorMessage);
 
         Init();
         SetStatusCode(ErrorStatusCode);
-        SetJson(JsonBuilder.Build());
+        SetJson(ErrorJson);
         exit(_CurrCodeunit);
     end;
 
     local procedure CreateSimpleJsonResponse(PropertyName: Text; PropertyValue: Text): JsonObject
     var
-        JsonBuilder: Codeunit "NPR JSON Builder";
+        SimpleJson: JsonObject;
     begin
-        JsonBuilder.Initialize()
-            .StartObject('')
-                .AddProperty(PropertyName, PropertyValue)
-            .EndObject();
-        exit(JsonBuilder.Build());
+        SimpleJson.Add(PropertyName, PropertyValue);
+        exit(SimpleJson);
     end;
 
     local procedure CreateEmptyJsonObject(): JsonObject
@@ -502,27 +498,23 @@ codeunit 6185053 "NPR API Response"
 
     local procedure GetProxyResponseMetadata(): JsonObject
     var
-        JsonBuilder: Codeunit "NPR JSON Builder";
+        ProxyJson: JsonObject;
     begin
-        JsonBuilder.Initialize()
-            .StartObject()
-                .AddProperty('sentryTags', GetSentryTagsJsonObject())
-                .AddProperty('sentrySpanAttributes', GetSentrySpanAttributesJsonObject())
-            .EndObject();
-        exit(JsonBuilder.Build());
+        ProxyJson.Add('sentryTags', GetSentryTagsJsonObject());
+        ProxyJson.Add('sentrySpanAttributes', GetSentrySpanAttributesJsonObject());
+        exit(ProxyJson);
     end;
     #endregion
 
     #region Sentry Tags
     local procedure GetSentryTagsJsonObject(): JsonObject
     var
-        JsonBuilder: Codeunit "NPR JSON Builder";
+        TagsJson: JsonObject;
+        TagKey: Text;
     begin
-        JsonBuilder.Initialize()
-            .StartObject()
-                .AddProperties(_SentryTags)
-            .EndObject();
-        exit(JsonBuilder.Build());
+        foreach TagKey in _SentryTags.Keys() do
+            TagsJson.Add(TagKey, _SentryTags.Get(TagKey));
+        exit(TagsJson);
     end;
 
     procedure AddSentryTag(TagKey: Text; TagValue: Text): Codeunit "NPR API Response"
@@ -539,22 +531,58 @@ codeunit 6185053 "NPR API Response"
     #region Sentry Attributes
     local procedure GetSentrySpanAttributesJsonObject(): JsonObject
     var
-        JsonBuilder: Codeunit "NPR JSON Builder";
+        AttribsJson: JsonObject;
+        AttrKey: Text;
     begin
-        JsonBuilder.Initialize()
-            .StartObject()
-                .AddProperties(_SentrySpanAttribs)
-            .EndObject();
-        exit(JsonBuilder.Build());
+        foreach AttrKey in _SentrySpanAttribs.Keys() do
+            AttribsJson.Add(AttrKey, _SentrySpanAttribs.Get(AttrKey));
+        exit(AttribsJson);
+    end;
+
+    procedure AddSentrySpanAttribute(AttrKey: Text; AttrValue: Text): Codeunit "NPR API Response"
+    var
+        JValue: JsonValue;
+        Sentry: Codeunit "NPR Sentry";
+    begin
+        InitcurrCodeunit();
+        JValue.SetValue(AttrValue);
+        _SentrySpanAttribs.Add(AttrKey, JValue);
+        Sentry.AddTransactionData(AttrKey, AttrValue);
+        exit(_CurrCodeunit);
+    end;
+
+    procedure AddSentrySpanAttribute(AttrKey: Text; AttrValue: Integer): Codeunit "NPR API Response"
+    var
+        JValue: JsonValue;
+        Sentry: Codeunit "NPR Sentry";
+    begin
+        InitcurrCodeunit();
+        JValue.SetValue(AttrValue);
+        _SentrySpanAttribs.Add(AttrKey, JValue);
+        Sentry.AddTransactionData(AttrKey, Format(AttrValue));
+        exit(_CurrCodeunit);
+    end;
+
+    procedure AddSentrySpanAttribute(AttrKey: Text; AttrValue: Decimal): Codeunit "NPR API Response"
+    var
+        JValue: JsonValue;
+        Sentry: Codeunit "NPR Sentry";
+    begin
+        InitcurrCodeunit();
+        JValue.SetValue(AttrValue);
+        _SentrySpanAttribs.Add(AttrKey, JValue);
+        Sentry.AddTransactionData(AttrKey, Format(AttrValue));
+        exit(_CurrCodeunit);
     end;
 
     procedure AddSentrySpanAttribute(AttrKey: Text; AttrValue: Variant): Codeunit "NPR API Response"
     var
+        JValue: JsonValue;
         Sentry: Codeunit "NPR Sentry";
-        JsonBuilder: Codeunit "NPR Json Builder";
     begin
         InitcurrCodeunit();
-        _SentrySpanAttribs.Add(AttrKey, JsonBuilder.CreateJsonValue(AttrValue));
+        JValue.SetValue(Format(AttrValue, 0, 9));
+        _SentrySpanAttribs.Add(AttrKey, JValue);
         Sentry.AddTransactionData(AttrKey, Format(AttrValue));
         exit(_CurrCodeunit);
     end;

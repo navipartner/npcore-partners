@@ -1994,7 +1994,7 @@
         if not IsValidLineOperation() then
             exit;
 
-        Sentry.StartSpan(Span, 'bc.pos.discount.mix.find_active');
+        Sentry.StartSpan(Span, 'bc.pos.discount.mix.find-active');
 
         MixedDiscountLine.SetCurrentKey("Disc. Grouping Type", "No.", "Variant Code", "Starting Date", "Ending Date", "Starting Time", "Ending Time", Status);
         MixedDiscountLine.SetRange(Status, MixedDiscountLine.Status::Active);

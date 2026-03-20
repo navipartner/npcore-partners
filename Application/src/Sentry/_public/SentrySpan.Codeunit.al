@@ -92,6 +92,9 @@ codeunit 6248498 "NPR Sentry Span"
     var
         Guid: Text;
     begin
+        if not _SentryScope.IsTracingEnabled() then
+            exit;
+
         Guid := Format(CreateGuid(), 0, 3).ToLower();
 
         _parentId := parentId;
@@ -105,6 +108,9 @@ codeunit 6248498 "NPR Sentry Span"
 
     internal procedure SetMetadata(var Client: HttpClient; var Request: HttpRequestMessage; var Response: HttpResponseMessage; Success: Boolean)
     begin
+        if _id = '' then
+            exit;
+
         _metadata.Add('method', Request.Method);
         _metadata.Add('url', Request.GetRequestUri());
         _metadata.Add('status_code', Format(Response.HttpStatusCode));
@@ -120,6 +126,9 @@ codeunit 6248498 "NPR Sentry Span"
     var
         PrevLanguage: Integer;
     begin
+        if _id = '' then
+            exit;
+
         PrevLanguage := GlobalLanguage();
         GlobalLanguage(1033);
 
@@ -135,35 +144,30 @@ codeunit 6248498 "NPR Sentry Span"
         GlobalLanguage(PrevLanguage);
     end;
 
-    internal procedure ToJson(Json: Codeunit "NPR Json Builder"; traceId: Text): Codeunit "NPR Json Builder"
+    internal procedure ToJson(traceId: Text): JsonObject
     var
         SentryMetadata: Codeunit "NPR Sentry Metadata";
+        SpanJson: JsonObject;
+        DataJson: JsonObject;
         metadataKey: Text;
     begin
-        Json
-            .StartObject('')
-                .AddProperty('span_id', _Id)
-                .AddProperty('parent_span_id', _parentId)
-                .AddProperty('description', _description)
-                .AddProperty('op', _operation)
-                .AddProperty('start_timestamp', _startedTimestampUtc)
-                .AddProperty('timestamp', _finishedTimestampUtc)
-                .AddProperty('trace_id', traceId)
-                .AddProperty('status', Format(_status));
+        SpanJson.Add('span_id', _Id);
+        SpanJson.Add('parent_span_id', _parentId);
+        SpanJson.Add('description', _description);
+        SpanJson.Add('op', _operation);
+        SpanJson.Add('start_timestamp', _startedTimestampUtc);
+        SpanJson.Add('timestamp', _finishedTimestampUtc);
+        SpanJson.Add('trace_id', traceId);
+        SpanJson.Add('status', Format(_status));
 
         if _metadata.Count > 0 then begin
-            Json.StartObject('data');
             foreach metadataKey in _metadata.Keys() do
-                Json.AddProperty(metadataKey, _metadata.Get(metadataKey));
-            Json.EndObject();
+                DataJson.Add(metadataKey, _metadata.Get(metadataKey));
+            SpanJson.Add('data', DataJson);
         end;
 
-        Json.StartObject('tags');
-        SentryMetadata.WriteTagsForBackendEvent(Json);
-        Json.EndObject();
-
-        Json.EndObject();
-        exit(Json);
+        SpanJson.Add('tags', SentryMetadata.WriteSpanTags());
+        exit(SpanJson);
     end;
 
     internal procedure GetId(): Text

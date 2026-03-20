@@ -61,7 +61,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                 end;
             TrxStatus::ResultReceived:
                 begin
-                    Sentry.StartSpan(Span, 'bc.pos.adyen.cloud.process_result');
+                    Sentry.StartSpan(Span, 'bc.pos.adyen.cloud.process-result');
                     Response := ProcessResult(EntryNo);
                     Span.Finish();
                     exit(Response);
@@ -93,7 +93,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(Span, 'bc.pos.adyen.cloud.start_transaction');
+        Sentry.StartSpan(Span, 'bc.pos.adyen.cloud.start-transaction');
 
         ClearGlobalState();
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);

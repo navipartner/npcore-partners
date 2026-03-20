@@ -606,7 +606,7 @@
 
         Commit();
 
-        Sentry.StartSpan(Span, 'bc.pos.endsale.taxfree_voucher');
+        Sentry.StartSpan(Span, 'bc.pos.endsale.taxfree-voucher');
         VoucherIssueFromPOSSale(SalePOS."Sales Ticket No.");
         Span.Finish();
     end;

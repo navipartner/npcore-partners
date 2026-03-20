@@ -5,8 +5,12 @@ codeunit 6150966 "NPR Sentry Metadata"
     SingleInstance = true;
 
     var
-        _installedAppsLoaded: Boolean;
-        _installedApp: Dictionary of [Text, Text];
+        _tagsLoaded: Boolean;
+        _cachedTags: JsonObject;
+        _modulesJsonLoaded: Boolean;
+        _cachedModulesJson: JsonObject;
+        _spanTagsLoaded: Boolean;
+        _cachedSpanTags: JsonObject;
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', true, true)]
@@ -69,7 +73,7 @@ codeunit 6150966 "NPR Sentry Metadata"
         Json.WriteStringProperty('POSType', Format(POSUnit."POS Type", 0, 9));
     end;
 
-    internal procedure WriteTagsForBackendEvent(var Json: Codeunit "NPR Json Builder")
+    internal procedure WriteTagsForBackendEvent(): JsonObject
     var
         TenantInformation: Codeunit "Tenant Information";
         EnvironmentInformation: Codeunit "Environment Information";
@@ -79,51 +83,76 @@ codeunit 6150966 "NPR Sentry Metadata"
         UserSetup: Record "User Setup";
         POSUnit: Record "NPR POS Unit";
     begin
+        if _tagsLoaded then
+            exit(_cachedTags.Clone().AsObject());
+
         if UserSetup.Get(UserId) then begin
             if POSUnit.Get(UserSetup."NPR POS Unit No.") then;
         end;
 
         if EnvironmentInformation.IsSaaSInfrastructure() then
-            Json.AddProperty('aadTenantId', AzureADTenant.GetAadTenantId())
+            _cachedTags.Add('aadTenantId', AzureADTenant.GetAadTenantId())
         else
-            Json.AddProperty('aadTenantId', '_');
+            _cachedTags.Add('aadTenantId', '_');
 
-        Json.AddProperty('tenantId', TenantInformation.GetTenantId());
+        _cachedTags.Add('tenantId', TenantInformation.GetTenantId());
         if TenantInformation.GetTenantDisplayName() <> '' then begin
-            Json.AddProperty('tenantDisplayName', TenantInformation.GetTenantDisplayName());
+            _cachedTags.Add('tenantDisplayName', TenantInformation.GetTenantDisplayName());
         end else begin
-            Json.AddProperty('tenantDisplayName', '_');
+            _cachedTags.Add('tenantDisplayName', '_');
         end;
 
         if POSUnit."No." <> '' then
-            Json.AddProperty('POSUnit', POSUnit."No.")
+            _cachedTags.Add('POSUnit', POSUnit."No.")
         else
-            Json.AddProperty('POSUnit', '_');
+            _cachedTags.Add('POSUnit', '_');
 
         if POSUnit."POS Store Code" <> '' then
-            Json.AddProperty('POSStore', POSUnit."POS Store Code")
+            _cachedTags.Add('POSStore', POSUnit."POS Store Code")
         else
-            Json.AddProperty('POSStore', '_');
+            _cachedTags.Add('POSStore', '_');
 
         if InstalledApp.Get('992c2309-cca4-43cb-9e41-911f482ec088') then begin
-            Json.AddProperty('retailAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
+            _cachedTags.Add('retailAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
         end;
         if InstalledApp.Get('437dbf0e-84ff-417a-965d-ed2bb9650972') then begin
-            Json.AddProperty('baseAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
+            _cachedTags.Add('baseAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
         end;
-        Json.AddProperty('company', CompanyName());
-        Json.AddProperty('environment', GetEnvironment());
-        Json.AddProperty('BCServiceInstanceId', ServiceInstanceId());
-        Json.AddProperty('BCSessionId', SessionId());
-        Json.AddProperty('BCClientType', Format(CurrentClientType()));
+        _cachedTags.Add('company', CompanyName());
+        _cachedTags.Add('environment', GetEnvironment());
+        _cachedTags.Add('BCServiceInstanceId', ServiceInstanceId());
+        _cachedTags.Add('BCSessionId', SessionId());
+        _cachedTags.Add('BCClientType', Format(CurrentClientType()));
         if ActiveSession.Get(ServiceInstanceId(), SessionId()) then begin
-            Json.AddProperty('BCSessionUniqueId', Format(ActiveSession."Session Unique ID", 0, 4).ToLower());
+            _cachedTags.Add('BCSessionUniqueId', Format(ActiveSession."Session Unique ID", 0, 4).ToLower());
             if ActiveSession."Server Instance Name" <> '' then
-                Json.AddProperty('BCServerInstanceName', ActiveSession."Server Instance Name")
+                _cachedTags.Add('BCServerInstanceName', ActiveSession."Server Instance Name")
             else
-                Json.AddProperty('BCServerInstanceName', '_');
+                _cachedTags.Add('BCServerInstanceName', '_');
         end;
-        Json.AddProperty('POSType', Format(POSUnit."POS Type", 0, 9));
+        _cachedTags.Add('POSType', Format(POSUnit."POS Type", 0, 9));
+
+        _tagsLoaded := true;
+        exit(_cachedTags.Clone().AsObject());
+    end;
+
+    internal procedure WriteSpanTags(): JsonObject
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        AzureADTenant: Codeunit "Azure AD Tenant";
+    begin
+        if _spanTagsLoaded then
+            exit(_cachedSpanTags);
+
+        if EnvironmentInformation.IsSaaSInfrastructure() then
+            _cachedSpanTags.Add('aadTenantId', AzureADTenant.GetAadTenantId())
+        else
+            _cachedSpanTags.Add('aadTenantId', '_');
+
+        _cachedSpanTags.Add('company', CompanyName());
+
+        _spanTagsLoaded := true;
+        exit(_cachedSpanTags);
     end;
 
     internal procedure GetEnvironment(): Text
@@ -142,33 +171,30 @@ codeunit 6150966 "NPR Sentry Metadata"
         end;
     end;
 
-    internal procedure WriteModulesJson(var Json: Codeunit "NPR Json Builder")
+    internal procedure WriteModulesJson(): JsonObject
     var
         NAVAppInstalledApp: Record "NAV App Installed App";
         AppKey: Text;
         AppValue: Text;
         i: Integer;
     begin
-        if not _installedAppsLoaded then begin
-            i := 0;
-            NAVAppInstalledApp.SetCurrentKey(Name);
-            NAVAppInstalledApp.SetFilter(Publisher, '<>%1', 'Microsoft');
-            if NAVAppInstalledApp.FindSet() then begin
-                repeat
-                    i += 1;
-                    AppKey := StrSubstNo('%1 - %2', i, NAVAppInstalledApp.Name);
-                    AppValue := StrSubstNo('%1.%2.%3.%4', NAVAppInstalledApp."Version Major", NAVAppInstalledApp."Version Minor", NAVAppInstalledApp."Version Build", NAVAppInstalledApp."Version Revision");
-                    _installedApp.Add(AppKey, AppValue);
-                until NAVAppInstalledApp.Next() = 0;
-            end;
-            _installedAppsLoaded := true;
+        if _modulesJsonLoaded then
+            exit(_cachedModulesJson.Clone().AsObject());
+
+        i := 0;
+        NAVAppInstalledApp.SetCurrentKey(Name);
+        NAVAppInstalledApp.SetFilter(Publisher, '<>%1', 'Microsoft');
+        if NAVAppInstalledApp.FindSet() then begin
+            repeat
+                i += 1;
+                AppKey := StrSubstNo('%1 - %2', i, NAVAppInstalledApp.Name);
+                AppValue := StrSubstNo('%1.%2.%3.%4', NAVAppInstalledApp."Version Major", NAVAppInstalledApp."Version Minor", NAVAppInstalledApp."Version Build", NAVAppInstalledApp."Version Revision");
+                _cachedModulesJson.Add(AppKey, AppValue);
+            until NAVAppInstalledApp.Next() = 0;
         end;
 
-        Json.StartObject('modules');
-        foreach AppKey in _installedApp.Keys() do begin
-            Json.AddProperty(AppKey, _installedApp.Get(AppKey));
-        end;
-        Json.EndObject();
+        _modulesJsonLoaded := true;
+        exit(_cachedModulesJson.Clone().AsObject());
     end;
 }
 #endif

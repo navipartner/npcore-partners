@@ -62,26 +62,46 @@ codeunit 6059899 "NPR Data Log Management"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseInsert', '', true, false)]
     local procedure SystemEventWrapperOnDatabaseInsert(RecRef: RecordRef)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.datalog.on-after-insert:' + RecRef.Name);
         LogDatabaseInsert(RecRef);
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseModify', '', true, false)]
     local procedure SystemEventWrapperOnDatabaseModify(RecRef: RecordRef)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.datalog.on-after-modify:' + RecRef.Name);
         LogDatabaseModify(RecRef);
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseDelete', '', true, false)]
     local procedure SystemEventWrapperOnDatabaseDelete(RecRef: RecordRef)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.datalog.on-after-delete:' + RecRef.Name);
         LogDatabaseDelete(RecRef);
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseRename', '', true, false)]
     local procedure SystemEventWrappeOnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.datalog.on-after-rename:' + RecRef.Name);
         LogDatabaseRename(RecRef, xRecRef);
+        Span.Finish();
     end;
 
     internal procedure LogDatabaseInsert(RecRef: RecordRef)

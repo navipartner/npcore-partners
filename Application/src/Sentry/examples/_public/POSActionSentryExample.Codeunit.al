@@ -24,13 +24,13 @@ codeunit 6184892 "NPR POS Action Sentry Example" implements "NPR IPOS Workflow"
         // a scope and transaction has automatically been started before your POS action runs
         // so you don't need to do it manually.
 
-        Sentry.StartSpan(ParentSpan, 'workflow_parent');
+        Sentry.StartSpan(ParentSpan, 'workflow-parent');
         Sleep(1000);
-        Sentry.StartSpan(ChildSpan, 'workflow_child');
+        Sentry.StartSpan(ChildSpan, 'workflow-child');
         Sleep(2000);
         ChildSpan.Finish();
 
-        Sentry.StartSpan(ChildSpan2, 'workflow_child2');
+        Sentry.StartSpan(ChildSpan2, 'workflow-child2');
         if Sentry.FindSet(Item, false, true) then
             repeat
                 ItemDescription += Item.Description;

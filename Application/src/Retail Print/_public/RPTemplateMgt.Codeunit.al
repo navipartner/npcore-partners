@@ -43,7 +43,7 @@
         Sentry: Codeunit "NPR Sentry";
         SentryPrintSpan: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(SentryPrintSpan, 'bc.print_template');
+        Sentry.StartSpan(SentryPrintSpan, 'bc.print-template');
 
         RPTemplateHeader.Get(TemplateCode);
 

@@ -54,6 +54,8 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         TargetQuantity: Integer;
         TopUp: Boolean;
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if (not POSSale.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.")) then
             exit;
@@ -77,9 +79,11 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         end;
 
         TopUp := (Item."NPR CreateAttractionWallet" or SaleLinePOSAddOn.AddToWallet);
-        if (TopUp) then
+        if (TopUp) then begin
+            Sentry.StartSpan(Span, 'bc.pos.attraction-wallet.create');
             TopUpIntermediateWalletsForLine(POSSale.SystemId, SaleLinePOS.SystemId, SaleLinePOS."Line No.", TargetQuantity);
-
+            Span.Finish();
+        end;
     end;
 
     internal procedure OnAfterSetQuantityPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)

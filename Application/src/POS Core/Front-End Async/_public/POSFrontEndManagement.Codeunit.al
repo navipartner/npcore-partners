@@ -380,19 +380,9 @@
 
     local procedure InvokeFrontEndAsync(Request: Interface "NPR Front-End Async Request")
     var
-        DebugTrace: Text;
-        ServerStopwatch: Text;
         POSSession: Codeunit "NPR POS Session";
         DragonglassResponseQueue: Codeunit "NPR Dragonglass Response Queue";
     begin
-        DebugTrace := _POSSession.DebugFlush();
-        if DebugTrace <> '' then
-            Trace(Request, 'debug_trace', DebugTrace);
-
-        ServerStopwatch := _POSSession.ServerStopwatchFlush();
-        if ServerStopwatch <> '' then
-            Trace(Request, 'server_stopwatch', ServerStopwatch);
-
         POSSession.GetResponseQueue(DragonglassResponseQueue);
         DragonglassResponseQueue.QueueInvokeFrontendRequest(Request.GetJson());
     end;

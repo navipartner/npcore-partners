@@ -29,17 +29,18 @@
     var
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
-        StartTime: DateTime;
         SaleLinePOS: Record "NPR POS Sale Line";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-        StartTime := CurrentDateTime;
-
+        Sentry.StartSpan(Span, 'bc.pos.discount.recalc-all-lines');
         CouponMgt.RemoveDiscount(SalePOS);
 
         SetupTempSalesLines(SalePOS, TempSaleLinePOS);
         if not TempSaleLinePOS.FindLast() then begin
             CouponMgt.ApplyDiscount(SalePOS);
+            Span.Finish();
             exit;
         end;
 
@@ -49,8 +50,7 @@
         SaleLinePOS.Get(TempSaleLinePOS."Register No.", TempSaleLinePOS."Sales Ticket No.", TempSaleLinePOS.Date, TempSaleLinePOS."Sale Type", TempSaleLinePOS."Line No.");
         ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, SaleLinePOS, SaleLinePOS, 0, true);
         CouponMgt.ApplyDiscount(SalePOS);
-
-        LogStopwatch('DISCOUNT_RECALCULATE', CurrentDateTime - StartTime);
+        Span.Finish();
     end;
 
     internal procedure OnAfterInsertSaleLinePOS(var Rec: Record "NPR POS Sale Line")
@@ -59,15 +59,11 @@
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
-        StartTime: DateTime;
-        DiscountCalculated: Boolean;
     begin
         if not CheckDiscTrigger(Rec) then
             exit;
         if not SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.") then
             exit;
-
-        StartTime := CurrentDateTime;
 
         NpDcCouponMgt.RemoveDiscount(SalePOS);
 
@@ -78,8 +74,6 @@
                 ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, Rec, 0, true);
             end else
                 ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, Rec, 0, false);
-
-            DiscountCalculated := true;
         end;
 
         NpDcCouponMgt.ApplyDiscount(SalePOS);
@@ -87,9 +81,6 @@
         // The individual discuont modules can change Rec with out using this particular instance.
         // Refresh the record to get latest data.
         if (not Rec.Get(Rec.RecordId())) then;
-
-        if DiscountCalculated then
-            LogStopwatch('DISCOUNT_ON_INSERT', CurrentDateTime - StartTime);
     end;
 
     internal procedure OnAfterModifySaleLinePOS(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line")
@@ -98,15 +89,11 @@
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
-        StartTime: DateTime;
-        DiscountCalculated: Boolean;
     begin
         if not CheckDiscTrigger(Rec) then
             exit;
         if not SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.") then
             exit;
-
-        StartTime := CurrentDateTime;
 
         NpDcCouponMgt.RemoveDiscount(SalePOS);
 
@@ -117,7 +104,6 @@
                 ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, xRec, 1, true);
             end else
                 ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, xRec, 1, false);
-            DiscountCalculated := true;
         end;
 
         NpDcCouponMgt.ApplyDiscount(SalePOS);
@@ -125,9 +111,6 @@
         // The individual discuont modules can change Rec with out using this particular instance.
         // Refresh the record to get latest data.
         if (not Rec.Get(Rec.RecordId())) then;
-
-        if DiscountCalculated then
-            LogStopwatch('DISCOUNT_ON_MODIFY', CurrentDateTime - StartTime);
     end;
 
     internal procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR POS Sale Line")
@@ -136,8 +119,6 @@
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
-        StartTime: DateTime;
-        DiscountCalculated: Boolean;
     begin
         if (Rec."Discount Amount" = 0) and (Rec."Discount Type" = Rec."Discount Type"::" ") and (Rec."Discount Code" = Rec."Discount Code") and (Rec."Total Discount Code" = '') then
             exit;
@@ -145,8 +126,6 @@
             exit;
         if not SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.") then
             exit;
-
-        StartTime := CurrentDateTime;
 
         NpDcCouponMgt.RemoveDiscount(SalePOS);
 
@@ -157,14 +136,9 @@
                 ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, Rec, 2, true);
             end else
                 ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, Rec, 2, false);
-
-            DiscountCalculated := true;
         end;
 
         NpDcCouponMgt.ApplyDiscount(SalePOS);
-
-        if DiscountCalculated then
-            LogStopwatch('DISCOUNT_ON_DELETE', CurrentDateTime - StartTime);
     end;
 
     internal procedure OnAfterInsertSaleLinePOSCoupon(var Rec: Record "NPR NpDc SaleLinePOS Coupon")
@@ -186,8 +160,6 @@
         SalePOS: Record "NPR POS Sale";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
-        StartTime: DateTime;
-        DiscountCalculated: Boolean;
     begin
         if not CheckDiscTriggerTotal(Rec) then
             exit;
@@ -195,17 +167,10 @@
         if not SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.") then
             exit;
 
-        StartTime := CurrentDateTime;
-
         if FindRelevantSaleLineDiscountsTotal(SalePOS, Rec, Rec, TempDiscountPriority, 3) then begin
             SetupTempSalesLines(SalePOS, TempSaleLinePOS, true);
             ApplyDiscountsTotal(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, Rec, 3, false);
-
-            DiscountCalculated := true;
         end;
-
-        if DiscountCalculated then
-            LogStopwatch('DISCOUNT_ON_TOTALPRESSED', CurrentDateTime - StartTime);
     end;
 
     internal procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total; RecalculateAllLines: Boolean)
@@ -339,7 +304,7 @@
         if DiscountPriority.IsEmpty then
             InitDiscountPriority(DiscountPriority);
 
-        Sentry.StartSpan(Span, 'bc.pos.discount.find_active');
+        Sentry.StartSpan(Span, 'bc.pos.discount.find-active');
         tmpDiscountPriority.Reset();
         tmpDiscountPriority.DeleteAll();
 
@@ -428,17 +393,6 @@
                 end;
                 TempSaleLinePOS.Insert();
             until SaleLinePOS.Next() = 0;
-    end;
-
-    local procedure LogStopwatch(Keyword: Text; Duration: Duration)
-    var
-        POSSession: Codeunit "NPR POS Session";
-        FrontEnd: Codeunit "NPR POS Front End Management";
-    begin
-        if not POSSession.IsActiveSession(FrontEnd) then
-            exit;
-        FrontEnd.GetSession(POSSession);
-        POSSession.AddServerStopwatch(Keyword, Duration);
     end;
 
     procedure InitializeDiscountPriority()

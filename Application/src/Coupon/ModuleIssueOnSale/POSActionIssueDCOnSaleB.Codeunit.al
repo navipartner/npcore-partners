@@ -23,11 +23,15 @@ codeunit 6060004 "NPR POSAction Issue DC OnSaleB"
     procedure AddNewSaleCoupons(SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not TriggerOnSaleCoupon(SaleLinePOS, SalePOS) then
             exit;
 
+        Sentry.StartSpan(Span, 'bc.pos.line.insert.post-processing.coupons');
         AddNewCoupons(SalePOS);
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterDeletePOSSaleLine', '', true, true)]

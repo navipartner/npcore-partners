@@ -266,13 +266,13 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Response := GetReservation(Token);
         case Abs(SentryTagQuantity) of
             0 .. 10:
-                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'low');
+                Response.AddSentryTag('bc.ticket-api.reservation.quantity', 'low');
             11 .. 50:
-                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'medium');
+                Response.AddSentryTag('bc.ticket-api.reservation.quantity', 'medium');
             51 .. 100:
-                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'high');
+                Response.AddSentryTag('bc.ticket-api.reservation.quantity', 'high');
             else
-                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'x-high');
+                Response.AddSentryTag('bc.ticket-api.reservation.quantity', 'x-high');
         end;
 
         exit(Response);
@@ -300,7 +300,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Span: Codeunit "NPR Sentry Span";
 
     begin
-        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.initialization');
+        Sentry.StartSpan(Span, 'bc.ticket-api.reservation.initialization');
         TicketRequestManager.ExpireReservationRequestsV2();
         Commit();
 
@@ -311,7 +311,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             Token := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(Token));
 
         Span.Finish();
-        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.insert-request');
+        Sentry.StartSpan(Span, 'bc.ticket-api.reservation.insert-request');
 
         foreach LineToken in Lines do begin
 
@@ -355,7 +355,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         end;
 
         Span.Finish();
-        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.finalize');
+        Sentry.StartSpan(Span, 'bc.ticket-api.reservation.finalize');
 
         Success := TicketWebRequestManager.FinalizeTicketReservation(Token, ExternalId);
         if (not Success) then begin
@@ -364,7 +364,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         end;
 
         Span.Finish();
-        Sentry.StartSpan(Span, 'bc.ticket_api.reservation.decorate-response');
+        Sentry.StartSpan(Span, 'bc.ticket-api.reservation.decorate-response');
 
         TicketResponse.Reset();
         TicketResponse.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");

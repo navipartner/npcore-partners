@@ -120,14 +120,18 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         POSUnit: Record "NPR POS Unit";
         Request: JsonObject;
         HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         POSSession.GetSetup(PosSetup);
         if (not POSUnit.Get(PosSetup.GetPOSUnitNo())) then
             exit;
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
+        Sentry.StartSpan(Span, 'bc.pos.html-customer-display');
         HtmlDisplayReq.UpdateReceiptRequest(Request);
         SendRequest(Request);
+        Span.Finish();
     end;
 
     local procedure HandleGetInputResponse(Response: JsonToken)

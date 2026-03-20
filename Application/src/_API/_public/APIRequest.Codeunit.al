@@ -136,42 +136,43 @@ codeunit 6185051 "NPR API Request"
 
     local procedure GetRecord(var RecRef: RecordRef; Fields: Dictionary of [Integer, Text]; id: Text): JsonObject
     var
-        Json: Codeunit "NPR JSON Builder";
+        RecordJson: JsonObject;
         FieldNo: Integer;
         FieldRef: FieldRef;
         Field: Record Field;
     begin
-        if not Fields.ContainsKey(RecRef.SystemIdNo()) then begin
+        if not Fields.ContainsKey(RecRef.SystemIdNo()) then
             Fields.Add(RecRef.SystemIdNo(), 'id');
-        end;
 
         foreach FieldNo in Fields.Keys() do begin
             Field.Get(RecRef.Number(), FieldNo);
             if Field.Class = Field.Class::Normal then
                 RecRef.AddLoadFields(FieldNo);
-            //If MS ever realises they are missing a RecordRef.SetAutoCalcFields() add it here instead of calculating flowfields inside the loop ...
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+            if Field.Class = Field.Class::FlowField then
+                RecRef.SetAutoCalcFields(FieldNo);
+#endif
         end;
 
-        if not Fields.ContainsKey(0) then begin
+        if not Fields.ContainsKey(0) then
             Fields.Add(0, 'rowVersion');
-        end;
 
-        Json.StartObject('');
         RecRef.ReadIsolation := IsolationLevel::ReadCommitted;
         RecRef.GetBySystemId(id);
 
         foreach FieldNo in Fields.Keys() do begin
             FieldRef := RecRef.Field(FieldNo);
-            AddFieldToJson(FieldRef, Json, Fields.Get(FieldNo));
+            AddFieldToJson(FieldRef, RecordJson, Fields.Get(FieldNo));
         end;
 
-        Json.EndObject();
-        exit(Json.BuildAsJsonToken().AsObject());
+        exit(RecordJson);
     end;
 
     local procedure GetRecords(var RecRef: RecordRef; Fields: Dictionary of [Integer, Text]): JsonObject
     var
-        JsonArray: Codeunit "NPR JSON Builder";
+        DataArray: JsonArray;
+        RecordJson: JsonObject;
+        ResultJson: JsonObject;
         Limit: Integer;
         FieldNo: Integer;
         i: Integer;
@@ -179,7 +180,6 @@ codeunit 6185051 "NPR API Request"
         MoreRecords: Boolean;
         PageKey: Text;
         Field: Record Field;
-        JsonObject: JsonObject;
         Sync: Boolean;
         PageContinuation: Boolean;
         DataFound: Boolean;
@@ -197,68 +197,61 @@ codeunit 6185051 "NPR API Request"
 
         if _QueryParams.ContainsKey('sync') then begin
             Evaluate(Sync, _QueryParams.Get('sync'));
-            if Sync then begin
-                // Error if table is missing a key that starts with rowVersion for efficient data replication.
+            if Sync then
                 SetKeyToRowVersion(RecRef);
-            end;
 
-            if _QueryParams.ContainsKey('lastRowVersion') then begin
+            if _QueryParams.ContainsKey('lastRowVersion') then
                 RecRef.Field(0).SetFilter('>%1', _QueryParams.Get('lastRowVersion'));
-            end;
         end;
 
-        if not Fields.ContainsKey(RecRef.SystemIdNo()) then begin
+        if not Fields.ContainsKey(RecRef.SystemIdNo()) then
             Fields.Add(RecRef.SystemIdNo(), 'id');
-        end;
 
         foreach FieldNo in Fields.Keys() do begin
             Field.Get(RecRef.Number(), FieldNo);
             if Field.Class = Field.Class::Normal then
                 RecRef.AddLoadFields(FieldNo);
-            //If MS ever realises they are missing a RecordRef.SetAutoCalcFields() add it here instead of calculating flowfields inside the loop ...
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+            if Field.Class = Field.Class::FlowField then
+                RecRef.SetAutoCalcFields(FieldNo);
+#endif
         end;
 
-        if Sync and (not Fields.ContainsKey(0)) then begin
+        if Sync and (not Fields.ContainsKey(0)) then
             Fields.Add(0, 'rowVersion');
-        end;
 
-        JsonArray.StartArray('data');
         RecRef.ReadIsolation := IsolationLevel::ReadCommitted;
 
-        if PageContinuation then begin
-            DataFound := RecRef.Find('>');
-        end else begin
+        if PageContinuation then
+            DataFound := RecRef.Find('>')
+        else
             DataFound := RecRef.Find('-');
-        end;
 
         if DataFound then begin
             repeat
-                JsonArray.StartObject();
+                Clear(RecordJson);
                 foreach FieldNo in Fields.Keys() do begin
                     FieldRef := RecRef.Field(FieldNo);
-                    AddFieldToJson(FieldRef, JsonArray, Fields.Get(FieldNo));
+                    AddFieldToJson(FieldRef, RecordJson, Fields.Get(FieldNo));
                 end;
-                JsonArray.EndObject();
+                DataArray.Add(RecordJson);
 
                 i += 1;
-                if (i = Limit) then begin
-                    //Prepare next pageKey
+                if (i = Limit) then
                     PageKey := GetPageKey(RecRef);
-                end;
                 MoreRecords := RecRef.Next() <> 0;
             until (not MoreRecords) or (i = Limit);
         end;
-        JsonArray.EndArray();
 
         if not MoreRecords then
             PageKey := '';
 
-        JsonObject.Add('morePages', MoreRecords);
-        JsonObject.Add('nextPageKey', PageKey);
-        JsonObject.Add('nextPageURL', GetNextPageUrl(PageKey));
-        JsonObject.Add('data', JsonArray.BuildAsArray());
+        ResultJson.Add('morePages', MoreRecords);
+        ResultJson.Add('nextPageKey', PageKey);
+        ResultJson.Add('nextPageURL', GetNextPageUrl(PageKey));
+        ResultJson.Add('data', DataArray);
 
-        exit(JsonObject);
+        exit(ResultJson);
     end;
 
     procedure SetKeyToRowVersion(var RecRef: RecordRef)
@@ -332,7 +325,7 @@ codeunit 6185051 "NPR API Request"
         end;
     end;
 
-    local procedure AddFieldToJson(var FieldRef: FieldRef; var Json: Codeunit "NPR Json Builder"; FieldName: Text)
+    local procedure AddFieldToJson(var FieldRef: FieldRef; var JsonObj: JsonObject; FieldName: Text)
     var
         StringValue: Text;
         BooleanValue: Boolean;
@@ -341,12 +334,13 @@ codeunit 6185051 "NPR API Request"
         BigIntegerValue: BigInteger;
         PrevLanguage: Integer;
     begin
-        if FieldRef.Class = FieldCLass::FlowField then begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
+        if FieldRef.Class = FieldCLass::FlowField then
             FieldRef.CalcField();
-        end;
+#endif
 
         if FieldRef.Number = 0 then begin
-            Json.AddProperty(FieldName, Format(FieldRef.Value(), 0, 9));
+            JsonObj.Add(FieldName, Format(FieldRef.Value(), 0, 9));
             exit;
         end;
 
@@ -354,46 +348,42 @@ codeunit 6185051 "NPR API Request"
             FieldRef.Type::Integer:
                 begin
                     IntegerValue := FieldRef.Value();
-                    Json.AddProperty(FieldName, IntegerValue);
+                    JsonObj.Add(FieldName, IntegerValue);
                 end;
             FieldRef.Type::Decimal:
                 begin
                     DecimalValue := FieldRef.Value();
-                    Json.AddProperty(FieldName, DecimalValue);
+                    JsonObj.Add(FieldName, DecimalValue);
                 end;
             FieldRef.Type::Boolean:
                 begin
                     BooleanValue := FieldRef.Value();
-                    Json.AddProperty(FieldName, BooleanValue);
+                    JsonObj.Add(FieldName, BooleanValue);
                 end;
             FieldRef.Type::Text,
             FieldRef.Type::Code:
                 begin
                     StringValue := FieldRef.Value();
-                    Json.AddProperty(FieldName, StringValue);
+                    JsonObj.Add(FieldName, StringValue);
                 end;
             FieldRef.Type::BigInteger:
                 begin
                     BigIntegerValue := FieldRef.Value();
-                    Json.AddProperty(FieldName, BigIntegerValue);
+                    JsonObj.Add(FieldName, BigIntegerValue);
                 end;
             FieldRef.Type::Guid:
-                begin
-                    Json.AddProperty(FieldName, Format(FieldRef.Value(), 0, 4).ToLower());
-                end;
+                JsonObj.Add(FieldName, Format(FieldRef.Value(), 0, 4).ToLower());
             FieldRef.Type::Option:
                 begin
                     PrevLanguage := GlobalLanguage();
-                    Json.AddProperty(FieldName, Format(FieldRef.Value));
+                    JsonObj.Add(FieldName, Format(FieldRef.Value));
                     GlobalLanguage(PrevLanguage);
                 end;
             else begin
-                //apparently MS forgot to add FieldRef.Type::Enum so we have to check manually here:
-                if FieldRef.IsEnum() then begin
-                    Json.AddProperty(FieldName, FieldRef.GetEnumValueName(FieldRef.Value));
-                end else begin
-                    Json.AddProperty(FieldName, Format(FieldRef.Value(), 0, 9));
-                end;
+                if FieldRef.IsEnum() then
+                    JsonObj.Add(FieldName, FieldRef.GetEnumValueName(FieldRef.Value))
+                else
+                    JsonObj.Add(FieldName, Format(FieldRef.Value(), 0, 9));
             end;
         end;
     end;

@@ -233,7 +233,7 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         ClearLastError();
 
         ApiName := ApiFunction.Names.Get(ApiFunction.Ordinals.IndexOf(ApiFunction.AsInteger())).ToLower();
-        Sentry.StartSpan(Span, StrSubstNo('bc.membership_api.handler.%1', ApiName));
+        Sentry.StartSpan(Span, StrSubstNo('bc.membership-api.handler.%1', ApiName));
 
         Request.SkipCacheIfNonStickyRequest(MembershipTransactionTables());
 

@@ -23,76 +23,75 @@ codeunit 6248500 "NPR Sentry Error"
         _traceId := traceId;
     end;
 
-    procedure ToJson() Json: Codeunit "NPR Json Builder"
+    procedure ToJson(): JsonObject
     var
         SentryMetadata: Codeunit "NPR Sentry Metadata";
         SentryErrorHandling: Codeunit "NPR Sentry Error Handling";
+        EventJson: JsonObject;
+        UserJson: JsonObject;
+        ExceptionJson: JsonObject;
+        ValuesArray: JsonArray;
+        ExceptionValue: JsonObject;
+        MechanismJson: JsonObject;
+        StacktraceJson: JsonObject;
+        FramesArray: JsonArray;
+        FrameJson: JsonObject;
+        ContextsJson: JsonObject;
+        TraceJson: JsonObject;
         ErrorCallStack: List of [Text];
         ErrorFrame: Text;
         HasFrames: Boolean;
     begin
-        Json
-            .StartObject('')
-                .AddProperty('event_id', _id)
-                .AddProperty('timestamp', _timestampUtc)
-                .AddProperty('platform', 'other')
-                .AddProperty('release', _release)
-                .AddProperty('environment', SentryMetadata.GetEnvironment())
-                .AddProperty('level', 'error')
-                .StartObject('user')
-                    .AddProperty('id', Format(UserSecurityId(), 0, 4).ToLower())
-                    .AddProperty('username', UserId)
-                .EndObject()
-                .StartObject('exception')
-                    .StartArray('values')
-                        .StartObject('')
-                            .AddProperty('type', GetExceptionType())
-                            .AddProperty('value', _errorText)
-                            .StartObject('mechanism')
-                                .AddProperty('type', 'generic')
-                                .AddProperty('handled', false)
-                            .EndObject()
-                            .StartObject('stacktrace')
-                                .StartArray('frames');
+        EventJson.Add('event_id', _id);
+        EventJson.Add('timestamp', _timestampUtc);
+        EventJson.Add('platform', 'other');
+        EventJson.Add('release', _release);
+        EventJson.Add('environment', SentryMetadata.GetEnvironment());
+        EventJson.Add('level', 'error');
 
-        // Sentry requires at least one frame - add placeholder if no valid frames exist
+        UserJson.Add('id', Format(UserSecurityId(), 0, 4).ToLower());
+        UserJson.Add('username', UserId);
+        EventJson.Add('user', UserJson);
+
+        MechanismJson.Add('type', 'generic');
+        MechanismJson.Add('handled', false);
+
         SentryErrorHandling.SplitErrorStacktrace(_errorCallstack, ErrorCallStack);
         HasFrames := false;
         foreach ErrorFrame in ErrorCallStack do begin
             if ErrorFrame.Trim() <> '' then begin
-                Json
-                    .StartObject()
-                        .AddProperty('function', ErrorFrame)
-                    .EndObject();
+                Clear(FrameJson);
+                FrameJson.Add('function', ErrorFrame);
+                FramesArray.Add(FrameJson);
                 HasFrames := true;
             end;
         end;
-        if not HasFrames then
-            Json
-                .StartObject()
-                    .AddProperty('function', '<unknown>')
-                .EndObject();
+        if not HasFrames then begin
+            FrameJson.Add('function', '<unknown>');
+            FramesArray.Add(FrameJson);
+        end;
 
-        Json.EndArray(); //frames
-        Json.EndObject(); //stacktrace
-        Json.EndObject(); //''
-        Json.EndArray(); //values
-        Json.EndObject(); //exception
+        StacktraceJson.Add('frames', FramesArray);
 
-        SentryMetadata.WriteModulesJson(Json);
+        ExceptionValue.Add('type', GetExceptionType());
+        ExceptionValue.Add('value', _errorText);
+        ExceptionValue.Add('mechanism', MechanismJson);
+        ExceptionValue.Add('stacktrace', StacktraceJson);
 
-        Json.StartObject('tags');
-        SentryMetadata.WriteTagsForBackendEvent(Json);
-        Json.EndObject();
+        ValuesArray.Add(ExceptionValue);
+        ExceptionJson.Add('values', ValuesArray);
+        EventJson.Add('exception', ExceptionJson);
 
-        Json.
-            StartObject('contexts')
-                .StartObject('trace')
-                    .AddProperty('trace_id', _traceId)
-                    .AddProperty('span_id', _parentSpanId)
-                .EndObject()
-            .EndObject()
-        .EndObject();
+        EventJson.Add('modules', SentryMetadata.WriteModulesJson());
+
+        EventJson.Add('tags', SentryMetadata.WriteTagsForBackendEvent());
+
+        TraceJson.Add('trace_id', _traceId);
+        TraceJson.Add('span_id', _parentSpanId);
+        ContextsJson.Add('trace', TraceJson);
+        EventJson.Add('contexts', ContextsJson);
+
+        exit(EventJson);
     end;
 
     procedure GetParentId(): Text

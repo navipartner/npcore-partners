@@ -584,6 +584,8 @@
         AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
 
         if (SaleLinePOS.Quantity < 0) then
@@ -598,15 +600,21 @@
         if (SaleLinePOS.Quantity <> 1) then
             exit(-1101);
 
-        if (not CheckCrossLineSalesRules(SaleLinePOS, gLastMessage)) then
+        Sentry.StartSpan(Span, 'bc.pos.line.insert.post-processing.member');
+
+        if (not CheckCrossLineSalesRules(SaleLinePOS, gLastMessage)) then begin
+            Span.Finish();
             exit(-1100);
+        end;
 
         if ((MembershipSalesSetup."Membership Code" = '') and
           (MembershipSalesSetup."Business Flow Type" in [MembershipSalesSetup."Business Flow Type"::ADD_CARD, MembershipSalesSetup."Business Flow Type"::REPLACE_CARD])) then begin
             MembershipSetup.Init();
         end else begin
-            if (not MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
+            if (not MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then begin
+                Span.Finish();
                 exit(-1103);
+            end;
         end;
 
         if (MembershipSetup."Membership Member Cardinality" < 2) then
@@ -659,8 +667,10 @@
                         MemberInfoCapture.Insert();
                     end;
 
-                else
+                else begin
+                    Span.Finish();
                     Error('Business Flow Type %1 not handled when preparing user input.', MembershipSalesSetup."Business Flow Type");
+                end;
             end;
         end;
 
@@ -682,8 +692,10 @@
             Commit();
             AttemptCreateMembership.SetAttemptCreateMembershipForcedRollback();
             if (not AttemptCreateMembership.run(MemberInfoCapture)) then
-                if (not AttemptCreateMembership.WasSuccessful(ReasonMessage)) then
+                if (not AttemptCreateMembership.WasSuccessful(ReasonMessage)) then begin
+                    Span.Finish();
                     Error(ReasonMessage);
+                end;
 
             if (SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOS."Line No.")) then begin
                 SaleLinePOS."Description 2" := MemberInfoCapture."External Membership No.";
@@ -691,14 +703,17 @@
             end;
 
             Commit();
+            Span.Finish();
             exit(1);
         end;
 
         DeleteMemberInfoCapture(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
 
         // When a sales line is created as part of web service (f.ex coupon complimentary item)
-        if (not GuiAllowed()) then
+        if (not GuiAllowed()) then begin
+            Span.Finish();
             exit(-1100);
+        end;
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteLine();
@@ -707,9 +722,11 @@
 
         if (ReasonMessage <> '') then begin
             gLastMessage := ReasonMessage;
+            Span.Finish();
             exit(-1100);
         end;
 
+        Span.Finish();
         exit(-1102);
     end;
 
@@ -773,6 +790,8 @@
         MemberInfoCaptureListPage: Page "NPR MM Member Capture List";
         PageAction: Action;
         ShowStandardUserInterface: Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
 
         MemberInfoCapture.Reset();
@@ -796,13 +815,17 @@
                     MemberInfoCaptureListPage.SetPOSUnit(SaleLinePOS."Register No.");
                     MemberInfoCaptureListPage.LookupMode(true);
                     MemberInfoCaptureListPage.Editable(true);
+                    Sentry.StartSpan(Span, 'ui.bc.pos.member.info-capture');
                     PageAction := MemberInfoCaptureListPage.RunModal();
+                    Span.Finish();
                 end else begin
                     MemberInfoCapturePage.SetTableView(MemberInfoCapture);
                     MemberInfoCapturePage.SetPOSUnit(SaleLinePOS."Register No.");
                     MemberInfoCapturePage.LookupMode(true);
                     MemberInfoCapturePage.Editable(true);
+                    Sentry.StartSpan(Span, 'ui.bc.pos.member.info-capture');
                     PageAction := MemberInfoCapturePage.RunModal();
+                    Span.Finish();
                 end;
                 LookupOK := (PageAction = Action::LookupOK);
             end else begin

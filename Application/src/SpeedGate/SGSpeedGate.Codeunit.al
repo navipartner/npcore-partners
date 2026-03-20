@@ -747,7 +747,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(Span, 'bc.speedgate.wallet_validation');
+        Sentry.StartSpan(Span, 'bc.speedgate.wallet-validation');
 
         Number := ValidationRequest.ReferenceNo;
         SuggestedAdmissionCode := ValidationRequest.AdmissionCode;
@@ -887,7 +887,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(Span, 'bc.speedgate.ticket_request-validation');
+        Sentry.StartSpan(Span, 'bc.speedgate.ticket-request-validation');
         IsValid := IsTicketRequestValidForAdmit(TicketProfileCode, ValidationRequest, NumberIdentified);
         Span.Finish();
         exit(IsValid);

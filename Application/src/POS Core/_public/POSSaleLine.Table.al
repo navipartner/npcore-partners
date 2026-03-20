@@ -2576,7 +2576,10 @@
         CreateDimensions: Boolean;
 #ENDIF
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.create-dim-from-default-dim:' + Format(FieldNo));
         GetPOSHeader();
         InitDefaultDimensionSources(DefaultDimSource, FieldNo);
 #ENDIF
@@ -2587,6 +2590,7 @@
 #IF NOT (BC17 or BC18 or BC19)
         CreateDim(DefaultDimSource);
         OnAfterCreateDimFromDefaultDim(Rec, xRec, SalePOS, CurrFieldNo, FieldNo);
+        Span.Finish();
     end;
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
@@ -2695,8 +2699,12 @@
     procedure CalculateTax()
     var
         POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.calculate-tax');
         POSSaleTaxCalc.CalculateTax(Rec, SalePOS, 0);
+        Span.Finish();
     end;
 
     procedure UpdateLineVatAmounts(var SaleLinePOS: Record "NPR POS Sale Line")

@@ -57,7 +57,7 @@
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(Span, 'bc.pos.calc_line_price');
+        Sentry.StartSpan(Span, 'bc.pos.calc-line-price');
         if POSUnit.Get(SalePOS."Register No.") then;
         PricingProfile.GetItemPriceFunctionIfProfileExist(POSUnit."POS Pricing Profile", ItemPriceCodeunitId, ItemPriceFunction);
 

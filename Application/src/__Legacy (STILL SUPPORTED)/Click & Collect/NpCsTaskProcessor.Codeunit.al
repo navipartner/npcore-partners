@@ -26,7 +26,7 @@ codeunit 6150812 "NPR NpCs Task Processor"
         Sentry: Codeunit "NPR Sentry";
         ProcessSpan: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(ProcessSpan, StrSubstNo('process_task_%1', NcTask."Task Processor Code"));
+        Sentry.StartSpan(ProcessSpan, StrSubstNo('process-task:%1', NcTask."Task Processor Code"));
 
         NpCsDocument.SetPosition(NcTask."Record Position");
         if not NpCsDocument.Find() then begin

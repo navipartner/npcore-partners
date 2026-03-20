@@ -9,6 +9,7 @@ codeunit 6150994 "NPR Sentry Scope"
         _errors: List of [Codeunit "NPR Sentry Error"];
         _transaction: Codeunit "NPR Sentry Transaction";
         _activeSpanId: Text;
+        _tracingEnabled: Boolean;
 
     procedure InitScopeAndTransaction(Name: Text; Operation: Text; Dsn: Text; AppRelease: Text; SamplingRate: Decimal; ExternalTraceId: Text; ExternalSpanId: Text; ExternalSampled: Boolean)
     begin
@@ -38,6 +39,7 @@ codeunit 6150994 "NPR Sentry Scope"
 
         _transaction.Create(Name, Operation, Dsn, AppRelease, ExternalTraceId, ExternalSpanId, sample, StartTime);
         _activeSpanId := _transaction.GetRootSpanId();
+        _tracingEnabled := true;
     end;
 
 
@@ -86,12 +88,12 @@ codeunit 6150994 "NPR Sentry Scope"
         Span: Codeunit "NPR Sentry Span";
         Operation: Text;
     begin
-        Operation := StrSubstNo('function.bc:%1', Description.ToLower());
+        Operation := Description.ToLower();
         Operation := DelChr(Operation, '=', '\/{}[]()|!@#$%^&*_§±=;');
         Operation := Operation.Replace(' ', '_');
 
         Span.Create(_activeSpanId, Description, Operation);
-        _spans.Add(Span);
+        AddSpanToList(Span);
         exit(Span);
     end;
 
@@ -104,9 +106,9 @@ codeunit 6150994 "NPR Sentry Scope"
         RequestUri: Text;
     begin
         Span.Create(_activeSpanId, StrSubstNo('HTTP %1 %2', Request.Method, Request.GetRequestUri), 'http.client');
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
-        if PropagateSentryHeaders then begin
+        if PropagateSentryHeaders and _tracingEnabled then begin
             Request.GetHeaders(HttpHeaders);
             SentryHttpHeader.AddSentryTraceHeader(HttpHeaders, _transaction.GetTraceId(), _activeSpanId, _transaction.GetSampled());
         end;
@@ -132,7 +134,7 @@ codeunit 6150994 "NPR Sentry Scope"
     begin
         ReportMetadata.Get(ReportId);
         Span.Create(_activeSpanId, StrSubstNo('BC Report: %1', ReportMetadata.Name), StrSubstNo('function.bc.report:%1', ReportId));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         Report.RunModal(ReportId, RequestWindow, false, Rec);
 
@@ -146,7 +148,7 @@ codeunit 6150994 "NPR Sentry Scope"
     begin
         ReportMetadata.Get(ReportId);
         Span.Create(_activeSpanId, StrSubstNo('BC Report: %1', ReportMetadata.Name), StrSubstNo('function.bc.report:%1', ReportId));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         Report.RunModal(ReportId, RequestWindow);
 
@@ -171,7 +173,7 @@ codeunit 6150994 "NPR Sentry Scope"
         end;
 
         Span.Create(_activeSpanId, StrSubstNo('BC Page: %1', PageMetadata.Name), StrSubstNo('ui.bc.page:%1', PageId));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         PageAction := Page.RunModal(PageId, Rec);
 
@@ -199,7 +201,7 @@ codeunit 6150994 "NPR Sentry Scope"
         PageMetadata.Get(PageId);
 
         Span.Create(_activeSpanId, StrSubstNo('BC Page: %1', PageMetadata.Name), StrSubstNo('ui.bc.page:%1', PageId));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         PageAction := Page.RunModal(PageId);
 
@@ -227,7 +229,7 @@ codeunit 6150994 "NPR Sentry Scope"
         DbQuery := FormatDbQuery(RecRef, StrSubstNo('FindSet(%1)', Format(ForUpdate, 0, 9)));
 
         Span.Create(_activeSpanId, DbQuery, StrSubstNo('db.query:%1', RecRef.Number));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         RowsReadBefore := SessionInformation.SqlRowsRead;
 
@@ -256,7 +258,7 @@ codeunit 6150994 "NPR Sentry Scope"
         DbQuery := FormatDbQuery(RecRef, StrSubstNo('Find(%1)', Which));
 
         Span.Create(_activeSpanId, DbQuery, StrSubstNo('db.query:%1', RecRef.Number));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         RowsReadBefore := SessionInformation.SqlRowsRead;
 
@@ -285,7 +287,7 @@ codeunit 6150994 "NPR Sentry Scope"
         DbQuery := FormatDbQuery(RecRef, StrSubstNo('Delete(%1)', Format(RunTrigger, 0, 9)));
 
         Span.Create(_activeSpanId, DbQuery, StrSubstNo('db.query:%1', RecRef.Number));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         RowsReadBefore := SessionInformation.SqlRowsRead;
 
@@ -313,7 +315,7 @@ codeunit 6150994 "NPR Sentry Scope"
         DbQuery := FormatDbQuery(RecRef, 'IsEmpty');
 
         Span.Create(_activeSpanId, DbQuery, StrSubstNo('db.query:%1', RecRef.Number));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         RowsReadBefore := SessionInformation.SqlRowsRead;
         Result := RecRef.IsEmpty();
@@ -336,7 +338,7 @@ codeunit 6150994 "NPR Sentry Scope"
         DbQuery := FormatDbQuery(RecRef, StrSubstNo('Next(%1)', Steps));
 
         Span.Create(_activeSpanId, DbQuery, StrSubstNo('db.query:%1', RecRef.Number));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         RowsReadBefore := SessionInformation.SqlRowsRead;
         Result := RecRef.Next(Steps);
@@ -358,7 +360,7 @@ codeunit 6150994 "NPR Sentry Scope"
         DbQuery := FormatDbQuery(RecRef, StrSubstNo('DeleteAll(%1)', Format(RunTrigger, 0, 9)));
 
         Span.Create(_activeSpanId, DbQuery, StrSubstNo('db.query:%1', RecRef.Number));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         RowsReadBefore := SessionInformation.SqlRowsRead;
 
@@ -380,7 +382,7 @@ codeunit 6150994 "NPR Sentry Scope"
         CodeUnitMetadata.Get(Id);
 
         Span.Create(_activeSpanId, StrSubstNo('BC Codeunit: %1', CodeUnitMetadata.Name), StrSubstNo('function.bc.codeunit:%1', Id));
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         if HandleReturnValue then
             Result := CodeUnit.Run(Id, RecVariant)
@@ -400,7 +402,7 @@ codeunit 6150994 "NPR Sentry Scope"
         Result: Boolean;
     begin
         Span.Create(_activeSpanId, StrSubstNo('BC Confirm: %1', Message), 'ui.bc.confirm');
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         Result := Dialog.Confirm(Message, DefaultValue);
 
@@ -420,7 +422,7 @@ codeunit 6150994 "NPR Sentry Scope"
         Result: Integer;
     begin
         Span.Create(_activeSpanId, StrSubstNo('BC StrMenu: %1', Instruction), 'ui.bc.strmenu');
-        _spans.Add(Span);
+        AddSpanToList(Span);
 
         Result := Dialog.StrMenu(OptionMembers, DefaultNumber, Instruction);
 
@@ -456,6 +458,24 @@ codeunit 6150994 "NPR Sentry Scope"
                 exit;
             end;
         end;
+    end;
+
+    local procedure AddSpanToList(var Span: Codeunit "NPR Sentry Span")
+    begin
+        if Span.GetId() = '' then
+            exit;
+
+        _spans.Add(Span);
+
+        if _spans.Count >= 200 then begin
+            _tracingEnabled := false;
+            _transaction.AddTag('span_limit_reached', 'true');
+        end;
+    end;
+
+    internal procedure IsTracingEnabled(): Boolean
+    begin
+        exit(_tracingEnabled);
     end;
 
     internal procedure AddTransactionTag(TagKey: Text; TagValue: Text)
@@ -505,6 +525,8 @@ codeunit 6150994 "NPR Sentry Scope"
 
     [TryFunction]
     internal procedure FinalizeScope()
+    var
+        FinalizeSpan: Codeunit "NPR Sentry Span";
     begin
         if _activeSpanId = '' then
             exit;
@@ -516,7 +538,8 @@ codeunit 6150994 "NPR Sentry Scope"
         if (not _transaction.GetSampled()) and (_errors.Count = 0) then
             exit;
 
-        _transaction.Log(_spans, _errors);
+        FinalizeSpan.Create(_transaction.GetRootSpanId(), 'FinalizeScope', 'sentry.finalize');
+        _transaction.Log(_spans, _errors, FinalizeSpan);
 
         ResetState();
     end;

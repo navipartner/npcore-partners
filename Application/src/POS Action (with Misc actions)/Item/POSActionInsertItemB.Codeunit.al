@@ -23,7 +23,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         Sentry: Codeunit "NPR Sentry";
         SentryGetItemSpan: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(SentryGetItemSpan, 'bc.pos.item_insert.get_item');
+        Sentry.StartSpan(SentryGetItemSpan, 'bc.pos.item-insert.get-item');
 
         if not Item.AreFieldsLoaded(GTIN) then
             Item.AddLoadFields(GTIN);

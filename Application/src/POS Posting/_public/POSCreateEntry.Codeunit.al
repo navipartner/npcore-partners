@@ -13,15 +13,20 @@
         SaleCancelled: Boolean;
         POSSaleMediaInfo: Record "NPR POS Sale Media Info";
         POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         Clear(GlobalPOSEntry);
         ValidateSaleHeader(Rec);
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.subscribers-before');
         OnBeforeCreatePOSEntry(Rec);
+        Span.Finish();
 
         if not GetPOSPeriodRegister(Rec, POSPeriodRegister, true) then
             Error(ERR_NO_OPEN_UNIT, POSPeriodRegister.TableCaption, POSPeriodRegister.FieldCaption("POS Unit No."), Rec."Register No.");
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.insert-pos-entry');
         SaleCancelled := IsCancelledSale(Rec);
         if SaleCancelled then begin
             InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::"Cancelled Sale");
@@ -30,27 +35,37 @@
         end else begin
             InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::"Direct Sale");
         end;
+        Span.Finish();
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.create-lines');
         CreateLines(POSEntry, Rec);
+        Span.Finish();
 
         UpdatePostSaleDocumentStatus(POSEntry, SaleCancelled);
         if POSEntry."Entry Type" = POSEntry."Entry Type"::"Direct Sale" then
             if POSAsyncPostingMgt.AsyncPostingEnabled() then
                 CreateBufferLines(POSEntry, Rec);
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.recalculate');
         POSEntryManagement.RecalculatePOSEntry(POSEntry, WasModified);
         POSEntry.Modify();
+        Span.Finish();
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.audit-log');
         if SaleCancelled then begin
             POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CANCEL_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CANCEL_SALE_END, '')
         end else begin
             POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
             POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::DIRECT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_DIRECT_SALE_END, '');
         end;
+        Span.Finish();
 
         POSSaleMediaInfo.TransferEntriesToPOSEntryMediaInfo(Rec, POSEntry, true);
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.subscribers-after');
         OnAfterInsertPOSEntry(Rec, POSEntry);
+        Span.Finish();
+
         GlobalPOSEntry := POSEntry;
     end;
 

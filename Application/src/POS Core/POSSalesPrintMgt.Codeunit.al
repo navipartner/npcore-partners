@@ -55,7 +55,7 @@
             then
                 exit;
 
-        Sentry.StartSpan(Span, 'bc.pos.endsale.receipt_print');
+        Sentry.StartSpan(Span, 'bc.pos.endsale.receipt-print');
         RecRef.GetTable(POSEntry);
         RetailReportSelectionMgt.SetRegisterNo(POSEntry."POS Unit No.");
         RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Receipt (POS Entry)".AsInteger());

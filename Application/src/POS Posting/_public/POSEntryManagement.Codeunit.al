@@ -279,7 +279,7 @@
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(Span, 'bc.print_pos_entry');
+        Sentry.StartSpan(Span, 'bc.print-pos-entry');
 
         POSEntryOutputLog.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryOutputLog.SetRange("Output Method", POSEntryOutputLog."Output Method"::Print);

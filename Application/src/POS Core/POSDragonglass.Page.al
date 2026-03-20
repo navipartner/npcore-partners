@@ -52,7 +52,7 @@ page 6150750 "NPR POS (Dragonglass)"
                         exit;
                     end;
                     if method = 'FrameworkReady' then begin //once when POS frontend has loaded
-                        Sentry.StartSpan(FrameworkReadySpan, 'bc.pos.framework_ready');
+                        Sentry.StartSpan(FrameworkReadySpan, 'bc.pos.framework-ready');
 
                         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
                         POSSession.Constructor(POSBackgroundTaskAPI);
@@ -124,9 +124,7 @@ page 6150750 "NPR POS (Dragonglass)"
     begin
         _PageId := CreateGuid();
         POSSession.SetPageId(_PageId);
-        POSSession.DebugWithTimestamp('Action discovery starts');
         TempAction.DiscoverActions();
-        POSSession.DebugWithTimestamp('Action discovery ends');
 
         if ClientDiagnostic.Get(UserSecurityId(), UserLoginType::POS) then
             TempClientDiagnostic := ClientDiagnostic;
@@ -149,7 +147,7 @@ page 6150750 "NPR POS (Dragonglass)"
         if (QueuedTasks.Count() = 0) and (QueuedCancellations.Count() = 0) then
             exit;
 
-        Sentry.StartSpan(BackgroundTaskSpan, 'bc.pos.process_background_tasks');
+        Sentry.StartSpan(BackgroundTaskSpan, 'bc.pos.process-background-tasks');
 
         foreach WrapperTaskId in QueuedTasks do begin
             Clear(PBTTaskId);

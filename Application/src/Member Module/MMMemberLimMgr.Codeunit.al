@@ -178,7 +178,7 @@
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(Span, 'bc.membership.arrival.check_limitations');
+        Sentry.StartSpan(Span, 'bc.membership.arrival.check-limitations');
         // Get first rule that is violated
         RuleNo := CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, NewResponseMessage, NewResponseCode);
 

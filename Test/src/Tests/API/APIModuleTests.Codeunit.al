@@ -161,6 +161,42 @@ codeunit 85139 "NPR API Module Tests"
         Assert.AreEqual(Format(RecRef, 0, 9), Format(RecRef2, 0, 9), 'Broken pagination filter');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure HelloWorldSqlRoundtripBudget()
+    var
+        LibraryAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SqlBefore: BigInteger;
+        SqlAfter: BigInteger;
+        SqlRoundtrips: BigInteger;
+        MaxAllowedRoundtrips: BigInteger;
+    begin
+        // [SCENARIO] The helloworld API endpoint should use minimal SQL roundtrips
+        // to catch regressions where someone adds DB reads to the generic hot path.
+
+        // [GIVEN] API permissions are set up and cache is skipped
+        LibraryAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API HelloWorld');
+        SelectLatestVersion();
+
+        // [WHEN] We call the helloworld API and measure SQL roundtrips
+        SqlBefore := SessionInformation.SqlStatementsExecuted();
+        Response := LibraryAPI.CallApi('GET', '/helloworld', Response, QueryParams, Headers);
+        SqlAfter := SessionInformation.SqlStatementsExecuted();
+        SqlRoundtrips := SqlAfter - SqlBefore;
+
+        // [THEN] The response is successful
+        Assert.IsTrue(LibraryAPI.IsSuccessStatusCode(Response), 'HelloWorld API should return success');
+
+        // [THEN] SQL roundtrips stay within budget
+        MaxAllowedRoundtrips := 7;
+        Assert.IsTrue(SqlRoundtrips <= MaxAllowedRoundtrips,
+            StrSubstNo('HelloWorld API used %1 SQL roundtrips (max allowed: %2). If you intentionally added DB reads to the generic API path, increase this budget and document why.', SqlRoundtrips, MaxAllowedRoundtrips));
+    end;
+
     local procedure InitializeData()
     var
         LibrarySales: Codeunit "Library - Sales";

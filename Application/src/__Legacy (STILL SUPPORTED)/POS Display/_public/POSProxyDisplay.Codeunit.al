@@ -80,6 +80,8 @@ codeunit 6151002 "NPR POS Proxy - Display"
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         POSAction: Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
@@ -89,11 +91,15 @@ codeunit 6151002 "NPR POS Proxy - Display"
         if not POSSession.IsInitialized() then
             exit;
 
+        Sentry.StartSpan(Span, 'bc.pos.proxy-customer-display');
+
         if _DisplayIsActivated then
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, POSAction::Payment, 0)
         else
             if _MatrixIsActivated then
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
+
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterDeletePOSSaleLine', '', true, true)]

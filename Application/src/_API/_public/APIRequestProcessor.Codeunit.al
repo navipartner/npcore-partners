@@ -28,8 +28,10 @@ codeunit 6185052 "NPR API Request Processor"
             SentryStartTime := RequestStartTime;
 
         _SessionMetadata.SetStartTime(RequestStartTime);
+#if API_PERF_DEBUG
         _SessionMetadata.SetStartRowsRead(SessionInformation.SqlRowsRead());
         _SessionMetadata.SetStartStatementsExecuted(SessionInformation.SqlStatementsExecuted());
+#endif
 
         requestJson.ReadFrom(message);
         responseJson := ProcessRequest(requestJson, SentryStartTime, RequestStartTime, ApiProcessingSpan, ApiFinalizationSpan);
@@ -56,9 +58,8 @@ codeunit 6185052 "NPR API Request Processor"
         requestHeaders: Dictionary of [Text, Text];
         requestQueryParams: Dictionary of [Text, Text];
         requestBodyJson: JsonToken;
-        requestBodyStr: Text;
+        jToken: JsonToken;
         responseCodeunit: Codeunit "NPR API Response";
-        jsonParser: Codeunit "NPR JSON Parser";
         SentryHttp: Codeunit "NPR Sentry Http";
         Sentry: Codeunit "NPR Sentry";
         ParseSpan: Codeunit "NPR Sentry Span";
@@ -68,16 +69,20 @@ codeunit 6185052 "NPR API Request Processor"
         ExternalSampled: Boolean;
         ParameterizedName: Text;
     begin
-        jsonParser.Load(requestJson);
-        jsonParser
-            .GetProperty('httpMethod', requestHttpMethodStr)
-            .GetProperty('path', requestPath)
-            .GetProperty('queryParams', requestQueryParams)
-            .GetProperty('body', requestBodyStr)
-            .GetProperty('relativePathSegments', requestRelativePathSegments)
-            .GetProperty('headers', requestHeaders);
-
-        if (not requestBodyJson.ReadFrom(requestBodyStr)) then;
+        if requestJson.Get('httpMethod', jToken) then
+            requestHttpMethodStr := jToken.AsValue().AsText();
+        if requestJson.Get('path', jToken) then
+            requestPath := jToken.AsValue().AsText();
+        if requestJson.Get('body', jToken) then
+            if jToken.IsValue() then begin
+                // Normalize stringified JSON bodies sent by older proxy versions
+                if not requestBodyJson.ReadFrom(jToken.AsValue().AsText()) then
+                    requestBodyJson := jToken;
+            end else
+                requestBodyJson := jToken;
+        ParseDictionaryFromJson(requestJson, 'queryParams', requestQueryParams);
+        ParseDictionaryFromJson(requestJson, 'headers', requestHeaders);
+        ParseListFromJson(requestJson, 'relativePathSegments', requestRelativePathSegments);
 
         Evaluate(requestHttpMethod, requestHttpMethodStr);
 
@@ -202,6 +207,38 @@ codeunit 6185052 "NPR API Request Processor"
         end;
 
         exit(StrSubstNo('%1 %2', Method, Result));
+    end;
+
+    local procedure ParseDictionaryFromJson(SourceJson: JsonObject; PropertyName: Text; var Dict: Dictionary of [Text, Text])
+    var
+        jToken: JsonToken;
+        PropToken: JsonToken;
+        ChildObj: JsonObject;
+        PropName: Text;
+    begin
+        Clear(Dict);
+        if not SourceJson.Get(PropertyName, jToken) then
+            exit;
+        if not jToken.IsObject() then
+            exit;
+        ChildObj := jToken.AsObject();
+        foreach PropName in ChildObj.Keys() do
+            if ChildObj.Get(PropName, PropToken) and PropToken.IsValue() then
+                Dict.Add(PropName, PropToken.AsValue().AsText());
+    end;
+
+    local procedure ParseListFromJson(SourceJson: JsonObject; PropertyName: Text; var ListOut: List of [Text])
+    var
+        jToken: JsonToken;
+        ArrayElement: JsonToken;
+    begin
+        Clear(ListOut);
+        if not SourceJson.Get(PropertyName, jToken) then
+            exit;
+        if not jToken.IsArray() then
+            exit;
+        foreach ArrayElement in jToken.AsArray() do
+            ListOut.Add(ArrayElement.AsValue().AsText());
     end;
 
 }

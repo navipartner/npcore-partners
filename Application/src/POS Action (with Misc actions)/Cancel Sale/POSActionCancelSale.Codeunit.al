@@ -39,12 +39,20 @@ codeunit 6150797 "NPR POSAction: Cancel Sale" implements "NPR IPOS Workflow"
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         POSActionCancelSaleB: Codeunit "NPR POSAction: Cancel Sale B";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-        if not POSActionCancelSaleB.CancelSale() then
+        Sentry.StartSpan(Span, 'bc.pos.cancel-sale');
+        if not POSActionCancelSaleB.CancelSale() then begin
+            Span.Finish();
             exit(false);
+        end;
+        Span.Finish();
 
+        Sentry.StartSpan(Span, 'bc.pos.cancel-sale.select-view');
         POSSession.GetSale(POSSale);
         POSSale.SelectViewForEndOfSale();
+        Span.Finish();
         exit(true);
     end;
 

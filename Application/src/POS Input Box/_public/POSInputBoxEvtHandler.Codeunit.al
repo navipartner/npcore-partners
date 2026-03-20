@@ -84,7 +84,7 @@
 
         repeat
             InScope := false;
-            Sentry.StartSpan(Span, StrSubstNo('bc.pos.inputbox.check_scope:%1_%2', EanBoxSetupEvent."Event Code", EanBoxSetupEvent."Action Code"));
+            Sentry.StartSpan(Span, StrSubstNo('bc.pos.inputbox.check-scope:%1.%2', EanBoxSetupEvent."Event Code", EanBoxSetupEvent."Action Code"));
             SetEanBoxEventInScope(EanBoxSetupEvent, EanBoxValue, InScope);
             Span.Finish();
             if InScope then begin

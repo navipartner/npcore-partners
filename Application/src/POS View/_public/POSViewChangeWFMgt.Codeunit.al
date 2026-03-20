@@ -46,12 +46,9 @@
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
-        StartTime: DateTime;
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
     begin
-        StartTime := CurrentDateTime;
-
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
         POSSalesWorkflowStep.SetFilter("Set Code", '=%1', '');
         POSSession.GetSale(POSSale);
@@ -66,8 +63,6 @@
         repeat
             OnPaymentView(POSSalesWorkflowStep, POSSession);
         until POSSalesWorkflowStep.Next() = 0;
-
-        POSSession.AddServerStopwatch('PAYMENT_VIEW_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
     [Obsolete('Remove after POS Scenario is removed', '2025-09-14')]
@@ -98,11 +93,8 @@
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
-        StartTime: DateTime;
         POSSale: Codeunit "NPR POS Sale";
     begin
-        StartTime := CurrentDateTime;
-
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
         POSSalesWorkflowStep.SetFilter("Set Code", '=%1', '');
         POSSession.GetSale(POSSale);
@@ -117,8 +109,6 @@
         repeat
             OnAfterLogin_OnRun(POSSalesWorkflowStep);
         until POSSalesWorkflowStep.Next() = 0;
-
-        POSSession.AddServerStopwatch('AFTER_LOGIN_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
     [Obsolete('Use OnAfterLogin in cdu 6151544 "NPR POS Login Events"', '2023-10-28')]

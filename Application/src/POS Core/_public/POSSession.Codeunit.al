@@ -138,35 +138,22 @@
         if _InitializedUI then
             exit;
 
-        DebugWithTimestamp('GetSalespersonRecord');
         _Setup.GetSalespersonRecord(Salesperson);
-        DebugWithTimestamp('GetPOSUnit');
         _Setup.GetPOSUnit(_POSUnit);
         UsesLegacyPOSMenus := not _Setup.UsesNewPOSFrontEnd();
         EmitPOSLayoutUsageTelemetry(_POSUnit, UsesLegacyPOSMenus);
-        DebugWithTimestamp('UI.Initialize');
         UI.Initialize(_FrontEnd);
-        DebugWithTimestamp('UI.SetOptions');
         UI.SetOptions(_Setup);
-        DebugWithTimestamp('UI.InitializeCaptions');
         UI.InitializeCaptions();
         if UsesLegacyPOSMenus then begin
-            DebugWithTimestamp('UI.InitializeLogo');
             UI.InitializeLogo(_POSUnit);
-            DebugWithTimestamp('UI.InitializeNumberAndDateFormat');
             UI.InitializeNumberAndDateFormat(_POSUnit);
-            DebugWithTimestamp('UI.ConfigureFonts');
             UI.ConfigureFonts();
-            DebugWithTimestamp('UI.InitializeMenus');
             UI.InitializeMenus(_POSUnit, Salesperson);
-            DebugWithTimestamp('InitializeTheme');
             UI.InitializeTheme(_POSUnit);
         end;
-        DebugWithTimestamp('UI.ConfigureReusableWorkflow');
         UI.ConfigureReusableWorkflows(_Setup);
-        DebugWithTimestamp('InitializeSecureMethods');
         _FrontEnd.ConfigureSecureMethods();
-        DebugWithTimestamp('InitializeTelemetricsMetadata');
         _FrontEnd.InitializeTelemetricsMetadata();
         _InitializedUI := true;
     end;
@@ -676,17 +663,20 @@
         InitializeDataSources();
     end;
 
+    [Obsolete('Replaced by sentry telemetry', '2026-03-13')]
     procedure DebugWithTimestamp(Trace: Text)
     begin
         _DebugTrace += Trace + ' at ' + Format(CurrentDateTime, 0, '<Hours24,2>:<Minutes,2>:<Seconds,2><Second dec>') + ';';
     end;
 
+    [Obsolete('Replaced by sentry telemetry', '2026-03-13')]
     procedure DebugFlush() Result: Text
     begin
         Result := _DebugTrace;
         _DebugTrace := '';
     end;
 
+    [Obsolete('Replaced by sentry telemetry', '2026-03-13')]
     procedure AddServerStopwatch(Keyword: Text; Duration: Duration)
     var
         ServerStopwatchLbl: Label '[%1:%2]', Locked = true;
@@ -696,6 +686,7 @@
         _ServerStopwatch += StrSubstNo(ServerStopwatchLbl, DelChr(Keyword, '=', '[:]'), Durationms);
     end;
 
+    [Obsolete('Replaced by sentry telemetry', '2026-03-13')]
     procedure ServerStopwatchFlush() Result: Text
     begin
         Result := _ServerStopwatch;

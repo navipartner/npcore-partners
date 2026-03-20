@@ -50,9 +50,9 @@ page 6185086 "NPR Sentry Example"
                     Sentry: Codeunit "NPR Sentry";
                     SentrySpan: Codeunit "NPR Sentry Span";
                 begin
-                    Sentry.InitScopeAndTransaction('Sentry Error Example', 'ui.bc.page.action:error_example');
+                    Sentry.InitScopeAndTransaction('Sentry Error Example', 'ui.bc.page.action:error-example');
 
-                    Sentry.StartSpan(SentrySpan, 'bc.error_example');
+                    Sentry.StartSpan(SentrySpan, 'bc.error-example');
                     if not TryDivideByZero() then
                         Sentry.AddLastErrorInEnglish();
                     SentrySpan.Finish();

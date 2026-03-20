@@ -168,9 +168,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
         StartTime := CurrentDateTime();
 
-        POSSession.DebugWithTimestamp('InitializeUI');
         POSSession.InitializeUI();
-        POSSession.DebugWithTimestamp('InitializeSession');
         POSSession.InitializeSession(false);
 
         POSRefreshData.SetFullRefresh();

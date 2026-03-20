@@ -459,33 +459,45 @@
         SentryEndSaleSpan: Codeunit "NPR Sentry Span";
         SentryPreEndSaleSpan: Codeunit "NPR Sentry Span";
         SentryPostEndSaleSpan: Codeunit "NPR Sentry Span";
+        Span: Codeunit "NPR Sentry Span";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
     begin
-        Sentry.StartSpan(SentryPreEndSaleSpan, 'bc.end_sale.pre_processing');
+        Sentry.StartSpan(SentryPreEndSaleSpan, 'bc.pos.endsale.pre-processing');
 
         CheckItemAvailability();
         _PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         MMPaymentMethodMgt.SetMemberPaymentMethodDefaultBeforeEndSale(_Rec);
         RetailSalesDocMgt.HandleLinkedDocuments(POSSession);
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.pre-processing.subscribers');
         OnBeforeEndSale(_Rec);
+        Span.Finish();
 
         SalePOS := _Rec;
 
         SentryPreEndSaleSpan.Finish();
-        Sentry.StartSpan(SentryEndSaleSpan, 'bc.end_sale.pos_entry_write');
+        Sentry.StartSpan(SentryEndSaleSpan, 'bc.pos.endsale.pos-entry-write');
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.pos-entry-write.validate');
         ValidateSaleBeforeEnd(_Rec);
+        Span.Finish();
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.pos-entry-write.create-entry');
         EndSaleTransaction(SalePOS);
+        Span.Finish();
+
+        Sentry.StartSpan(Span, 'bc.pos.endsale.pos-entry-write.commit');
         Commit(); // Sale is now committed to POS entry
+        Span.Finish();
 
         _Ended := true;
 
         SentryEndSaleSpan.Finish();
-        Sentry.StartSpan(SentryPostEndSaleSpan, 'bc.end_sale.post_processing');
+        Sentry.StartSpan(SentryPostEndSaleSpan, 'bc.pos.endsale.post-processing');
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.post-processing.after-end-sale');
         RunAfterEndSale(SalePOS); //Any error here would leave the front end with inconsistent state as view switch to new sale or login screen has not happened yet.
+        Span.Finish();
 
         if StartNew then
             if not SelectNextWaiterPadForEndOfSale() then
@@ -527,6 +539,8 @@
         POSSession: Codeunit "NPR POS Session";
         POSViewProfile: Record "NPR POS View Profile";
         POSUnit: Record "NPR POS Unit";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         _Setup.GetPOSUnit(POSUnit);
         if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then begin
@@ -537,6 +551,7 @@
         POSViewProfile.Init();
         _Setup.GetPOSViewProfile(POSViewProfile);
         if (POSViewProfile."After End-of-Sale View" = POSViewProfile."After End-of-Sale View"::INITIAL_SALE_VIEW) then begin
+            Sentry.StartSpan(Span, 'bc.pos.endsale.auto-start-new-sale');
             POSSession.StartTransaction();
 
             case POSViewProfile."Initial Sales View" of
@@ -545,9 +560,11 @@
                 POSViewProfile."Initial Sales View"::RESTAURANT_VIEW:
                     POSSession.ChangeViewRestaurant();
             end;
-
+            Span.Finish();
         end else begin
+            Sentry.StartSpan(Span, 'bc.pos.endsale.load-login-view');
             POSSession.StartPOSSession();
+            Span.Finish();
         end;
     end;
 
@@ -847,47 +864,20 @@
         Success: Boolean;
         AfterEndSaleErr: Label 'An error occurred after the sale ended: %1';
         POSWebhooks: Codeunit "NPR POS Webhooks";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         //Any error at this time would leave the POS with inconsistent front-end state.
+        Sentry.StartSpan(Span, 'bc.pos.endsale.post-processing.finish-sale-workflows');
         ClearLastError();
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
             Message(AfterEndSaleErr, GetLastErrorText);
+        Span.Finish();
 
+        Sentry.StartSpan(Span, 'bc.pos.endsale.post-processing.webhooks');
         POSWebhooks.InvokeEndOfSaleWebhook(xRec.SystemId);
-    end;
-
-    local procedure LogStopwatch(Keyword: Text; Duration: Duration)
-    var
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        if not POSSession.IsInitialized() then
-            exit;
-        POSSession.AddServerStopwatch(Keyword, Duration);
-        LogFinishTelem(Duration);
-    end;
-
-    local procedure LogFinishTelem(EndSaleDuration: Duration)
-    var
-        FinishEventIdTok: Label 'NPR_POSEndSale', Locked = true;
-        LogDict: Dictionary of [Text, Text];
-        MsgTok: Label 'Company:%1, Tenant: %2, Instance: %3, Server: %4, Duration: %5';
-        Msg: Text;
-        ActiveSession: Record "Active Session";
-        DurationMs: Integer;
-    begin
-        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
-            Clear(ActiveSession);
-
-        DurationMs := EndSaleDuration;
-        LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
-        LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        LogDict.Add('NPR_TenantId', Database.TenantId());
-        LogDict.Add('NPR_CompanyName', CompanyName());
-        LogDict.Add('NPR_UserID', ActiveSession."User ID");
-        LogDict.Add('NPR_POSEndSaleDurationMs', Format(DurationMs, 0, 9));
-        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(DurationMs, 0, 9));
-        Session.LogMessage(FinishEventIdTok, 'POS End Sale: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
+        Span.Finish();
     end;
 
     procedure CheckItemAvailability()
@@ -1079,9 +1069,9 @@
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         POSSalesWorkflow: Record "NPR POS Sales Workflow";
-        StartTime: DateTime;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-        StartTime := CurrentDateTime;
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
         POSSalesWorkflowStep.SetFilter("Set Code", '=%1', '');
         if NPRPOSUnit.Get(SalePOS."Register No.") and (NPRPOSUnit."POS Sales Workflow Set" <> '') and POSSalesWorkflowSetEntry.Get(NPRPOSUnit."POS Sales Workflow Set", OnFinishSaleCode()) then
@@ -1097,28 +1087,28 @@
 
         Refresh(SalePOS);
         repeat
+            Sentry.StartSpan(Span, StrSubstNo('bc.pos.endsale.workflow-step:%1', POSSalesWorkflowStep."Subscriber Codeunit ID"));
             InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep);
+            Span.Finish();
         until POSSalesWorkflowStep.Next() = 0;
-
-        LogStopwatch('FINISH_SALE_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
     internal procedure InvokeOnFinishSaleWorkflows(SalePOS: Record "NPR POS Sale")
     var
-        StartTime: DateTime;
         TempExecutionOrderOnSale: Record "NPR Execution Order On Sale" temporary;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
-        StartTime := CurrentDateTime;
         InitializeExecutionOrder(TempExecutionOrderOnSale);
         if not TempExecutionOrderOnSale.FindSet() then
             exit;
 
         Refresh(SalePOS);
         repeat
+            Sentry.StartSpan(Span, StrSubstNo('bc.pos.endsale.workflow:%1', TempExecutionOrderOnSale."Codeunit ID"));
             InvokeOnFinishSaleWorkflows_OnRun(TempExecutionOrderOnSale);
+            Span.Finish();
         until TempExecutionOrderOnSale.Next() = 0;
-
-        LogStopwatch('FINISH_SALE_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
     [Obsolete('Remove after POS Scenario is removed, use OnAfterEndSale', '2024-01-28')]

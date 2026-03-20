@@ -31,7 +31,7 @@ codeunit 6060078 "NPR POS Dragonglass API"
         if not Sentry.HasActiveTransaction() then
             Sentry.InitScopeAndTransaction(StrSubstNo('Dragonglass API: %1', method), 'bc.odata.dragonglass');
 
-        Sentry.StartSpan(InvokeSpan, StrSubstNo('invoke_method_%1', method));
+        Sentry.StartSpan(InvokeSpan, StrSubstNo('invoke-method:%1', method));
 
         if ((lastServerId = '') or (lastServerId <> Format(ServiceInstanceId()))) then begin
             SelectLatestVersion(); //Unlike control addin requests, inbound webservice requests can be load balanced across multiple NSTs meaning the cache sync delay can lead to invisible records.
@@ -66,7 +66,6 @@ codeunit 6060078 "NPR POS Dragonglass API"
         ContextJsonObject.ReadFrom(parameters);
         GetSaleKey(ContextJsonObject, POSUnitNo, SalesTicketNo);
         POSSession.ConstructFromWebserviceSession(false, POSUnitNo, SalesTicketNo);
-        POSSession.DebugWithTimestamp('Method:' + method);
 
         JavaScript.InvokeMethod(method, ContextJsonObject, JavaScript);
 

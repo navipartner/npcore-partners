@@ -16,6 +16,8 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
         CANCEL_SALELbl: Label 'Sale was canceled %1';
         POSSession: Codeunit "NPR POS Session";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -29,7 +31,10 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
 
         POSSession.GetSaleLine(POSSaleLine);
         OnBeforeDeletePOSSaleLine(POSSaleLine, SalePOS);
+
+        Sentry.StartSpan(Span, 'bc.pos.cancel-sale.delete-lines');
         POSSaleLine.DeleteAll();
+        Span.Finish();
 
         Line."Line Type" := Line."Line Type"::Comment;
         if AltSaleCancelDescription <> '' then begin

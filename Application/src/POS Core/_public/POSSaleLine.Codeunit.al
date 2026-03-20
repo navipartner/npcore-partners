@@ -165,7 +165,7 @@
         Sentry: Codeunit "NPR Sentry";
         SentryInsertLineSpan: Codeunit "NPR Sentry Span";
     begin
-        Sentry.StartSpan(SentryInsertLineSpan, 'bc.insert_sale_line');
+        Sentry.StartSpan(SentryInsertLineSpan, 'bc.pos.insert-sale-line');
 
         if UsePresetLineNo then
             Rec."Line No." := Line."Line No.";
@@ -574,7 +574,7 @@
         if ItemVariantBuffer.IsEmpty() then
             exit('');
 
-        Sentry.StartSpan(SentryVariantLookupSpan, 'bc.item_variant_lookup');
+        Sentry.StartSpan(SentryVariantLookupSpan, 'ui.bc.pos.item-variant-lookup');
         ItemVariantBuffer.SetRange("Location Filter", LocationCode);
         if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
             SentryVariantLookupSpan.Finish();
@@ -595,7 +595,7 @@
         if ItemVariantBuffer.IsEmpty() then
             exit('');
 
-        Sentry.StartSpan(SentryVariantLookupSpan, 'ui.bc.item_variant_lookup');
+        Sentry.StartSpan(SentryVariantLookupSpan, 'ui.bc.pos.item-variant-lookup');
         ItemVariantBuffer.SetRange("Location Filter", LocationCode);
         if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
             SentryVariantLookupSpan.Finish();
@@ -697,13 +697,17 @@
         WalletCreate: Codeunit "NPR AttractionWalletCreate";
         Sentry: Codeunit "NPR Sentry";
         PostProcessingSpan: Codeunit "NPR Sentry Span";
+        WorkflowSpan: Codeunit "NPR Sentry Span";
+        SubscribersSpan: Codeunit "NPR Sentry Span";
+        PreProcessingSpan: Codeunit "NPR Sentry Span";
     begin
         Rec := Line;
 
+        Sentry.StartSpan(PreProcessingSpan, 'bc.pos.line.insert.pre-processing');
         CheckMandatoryFields(Line);
-
         InvokeOnBeforeInsertSaleLineWorkflow(Rec);
         OnBeforeInsertPOSSaleLine(Rec);
+        PreProcessingSpan.Finish();
 
         if HandleReturnValue then begin
             if (UseCustomSystemId and (not IsNullGuid(Rec.SystemId))) then
@@ -711,37 +715,43 @@
             else
                 ReturnValue := Rec.Insert(true);
         end else begin
-            if IsNullGuid(Rec.SystemId) then
-                Rec.Insert(true)
+            if (UseCustomSystemId and (not IsNullGuid(Rec.SystemId))) then
+                Rec.Insert(true, true)
             else
-                Rec.Insert(true, true);
+                Rec.Insert(true);
             ReturnValue := true;
         end;
 
-        Sentry.StartSpan(PostProcessingSpan, 'bc.pos.line.insert.post_processing');
+        Sentry.StartSpan(PostProcessingSpan, 'bc.pos.line.insert.post-processing');
 
         Rec.UpdateAmounts(Rec);
         if (not (Rec.GetSkipCalcDiscount())) then
             POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOS(Rec);
 
+        Sentry.StartSpan(SubscribersSpan, 'bc.pos.line.insert.post-processing.subscribers-before-workflows');
         OnAfterInsertPOSSaleLineBeforeWorkflows(Rec);
+        SubscribersSpan.Finish();
 
         POSIssueOnSale.AddNewSaleCoupons(Rec);
-
         WalletCreate.CreateIntermediateWallet(Rec);
         TicketRetailMgt.UpdateTicketOnSaleLineInsert(Rec);
         POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
-
         HTMLDisplay.UpdateHTMLDisplay();
         POSProxyDisplay.UpdateDisplay(Rec);
+
+        Sentry.StartSpan(WorkflowSpan, 'bc.pos.line.insert.post-processing.workflows');
         InvokeOnAfterInsertSaleLineWorkflow(Rec);
+        WorkflowSpan.Finish();
 
         RefreshCurrent();
+
+        Sentry.StartSpan(SubscribersSpan, 'bc.pos.line.insert.post-processing.subscribers-after');
         OnAfterInsertPOSSaleLineBeforeCommit(Rec);
         OnAfterInsertPOSSaleLine(Rec);
         Commit();
-
         OnAfterInsertPOSSaleLineAfterCommit(Rec);
+        SubscribersSpan.Finish();
+
         POSSale.RefreshCurrent();
 
         Line := Rec;

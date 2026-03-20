@@ -114,7 +114,6 @@
     var
         MenuButton: Record "NPR POS Menu Button";
     begin
-        POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
         InitializeMenuObject(Menu, MenuObj);
 
         if (CurrentClientType() = ClientType::Phone) and (Menu.UseOrdinalForOrdering()) then
