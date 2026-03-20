@@ -74,13 +74,18 @@
         SalesSetup: Record "Sales & Receivables Setup";
         ShipmentDocument: Record "NPR Shipping Provider Document";
         ConsignorEntry: Record "NPR Consignor Entry";
+        ConsignorExtMgt: Codeunit "NPR Consignor Ext. Mgt.";
         RecRef: RecordRef;
-
+        SkipInsertion: Boolean;
     begin
         if not InitPackageProvider() then
             exit;
 
         if not SalesHeader.Ship then
+            exit;
+
+        ConsignorExtMgt.OnBeforeInsertConsignorEntry(SalesHeader, SalesShptHdrNo, RetRcpHdrNo, SalesInvHdrNo, SalesCrMemoHdrNo, SkipInsertion);
+        if SkipInsertion then
             exit;
 
         if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
