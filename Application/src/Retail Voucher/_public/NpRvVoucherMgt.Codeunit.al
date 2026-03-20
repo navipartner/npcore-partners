@@ -2351,6 +2351,13 @@
         exit(NewVoucherReservation.IsFeatureEnabled());
     end;
 
+    internal procedure AllowTopupFromMasterFeatureEnabled(): Boolean
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        exit(FeatureFlagsManagement.IsEnabled('allowTopupFromMaster'));
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     begin

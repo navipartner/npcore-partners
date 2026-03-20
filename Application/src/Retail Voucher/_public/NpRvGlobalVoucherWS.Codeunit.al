@@ -734,6 +734,7 @@
         TempNpRvVoucherBuffer."Issue Partner Code" := NpRvVoucher."Issue Partner Code";
         if NPRPOSUnit.Get(NpRvVoucher."Issue Register No.") then
             TempNpRvVoucherBuffer."POS Store Code" := NPRPOSUnit."POS Store Code";
+        TempNpRvVoucherBuffer."Allow Top-up" := NpRvVoucher."Allow Top-up";
     end;
 
     local procedure SetGlobalLanguage(LanguageUsername: Text)

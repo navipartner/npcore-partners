@@ -24,6 +24,9 @@ codeunit 6059962 "NPR POS Act. Voucher Top-up-B"
             if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeCode, VoucherReferenceNumber, NpRvVoucher) then
                 Error(NotFoundErr, VoucherReferenceNumber, VoucherTypeCode);
 
+        if NpRvVoucherMgt.AllowTopupFromMasterFeatureEnabled() then
+            NpRvVoucher.Get(NpRvVoucher."No.");
+
         if not NpRvVoucher."Allow Top-up" then
             Error(TopupNotAllowErr, NpRvVoucher."Reference No.");
 

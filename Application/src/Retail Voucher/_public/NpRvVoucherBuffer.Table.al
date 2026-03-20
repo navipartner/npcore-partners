@@ -45,6 +45,11 @@
             TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
                                                  "Direct Posting" = CONST(true));
         }
+        field(62; "Allow Top-up"; Boolean)
+        {
+            Caption = 'Allow Top-up';
+            DataClassification = CustomerContent;
+        }
         field(75; Amount; Decimal)
         {
             Caption = 'Amount';
@@ -82,8 +87,6 @@
             Caption = 'Reservation Id';
             DataClassification = CustomerContent;
         }
-
-
         field(110; "Validate Voucher Module"; Code[20])
         {
             Caption = 'Validate Voucher Module';

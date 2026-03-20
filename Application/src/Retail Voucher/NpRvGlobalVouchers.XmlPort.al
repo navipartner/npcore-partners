@@ -159,6 +159,10 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                fieldelement(allow_topup; NpRvVoucherBuffer."Allow Top-up")
+                {
+                    MinOccurs = Zero;
+                }
                 textelement(reservation_lines)
                 {
                     MinOccurs = Zero;
