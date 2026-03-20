@@ -3,6 +3,7 @@ codeunit 6151500 "NPR Nc Setup Mgt."
     ObsoleteState = Pending;
     ObsoleteTag = '2026-01-29';
     ObsoleteReason = 'This module is no longer being maintained';
+
     var
         NaviConnectSetup: Record "NPR Nc Setup";
 
@@ -85,7 +86,10 @@ codeunit 6151500 "NPR Nc Setup Mgt."
     local procedure AddDefaultNCJobQueues_OnRefreshNPRJobQueueList()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        NcSetup: Record "NPR Nc Setup";
     begin
+        if not NcSetup.Get() then
+            exit;
         SetupTaskProcessingJobQueue(JobQueueEntry, true);
         SetupTaskCountResetJobQueue(JobQueueEntry, true);
         SetupDefaultNcImportListProcessingJobQueue(true);

@@ -4,7 +4,7 @@ page 6151500 "NPR Nc Setup"
     ObsoleteTag = '2026-01-29';
     ObsoleteReason = 'This module is no longer being maintained';
     Caption = 'NaviConnect Setup';
-    DeleteAllowed = false;
+    DeleteAllowed = true;
     InsertAllowed = false;
     SourceTable = "NPR Nc Setup";
     UsageCategory = Administration;
