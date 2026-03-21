@@ -33,10 +33,10 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
         case Step of
-            'preparePreWorkflows':
-                Frontend.WorkflowResponse(PreparePreWorkflows(Context));
             'preparePaymentWorkflow':
-                Frontend.WorkflowResponse(PreparePayment(Sale, PaymentLine, Context));
+                Frontend.WorkflowResponse(PreparePaymentWithPreprocessing(Sale, PaymentLine, Context));
+            'continuePaymentWorkflow':
+                Frontend.WorkflowResponse(PreparePaymentAndDetectPostprocessing(Sale, PaymentLine, Context));
             'SetMembershipSubscPayerEmail':
                 SetMembershipSubscPayerEmail(Context, Sale);
             'tryEndSale':
@@ -44,8 +44,43 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
             'doLegacyPaymentWorkflow':
                 Frontend.WorkflowResponse(DoLegacyPayment(Context, FrontEnd));
             'preparePostWorkflows':
-                Frontend.WorkflowResponse(PreparePostWorkflows(Context, Sale, PaymentLine));
+                Frontend.WorkflowResponse(CollectPostprocessingWorkflows(Context, Sale, PaymentLine));
         end;
+    end;
+
+    local procedure PreparePaymentWithPreprocessing(Sale: codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    var
+        PreWorkflows: JsonObject;
+    begin
+        PreWorkflows := AddPreWorkflowsToRun(Context);
+        if PreWorkflows.Keys.Count() <> 0 then begin
+            Response.ReadFrom('{}');
+            Response.Add('preWorkflows', PreWorkflows);
+            exit(Response);
+        end;
+
+        Response := PreparePaymentAndDetectPostprocessing(Sale, PaymentLine, Context);
+    end;
+
+    local procedure PreparePaymentAndDetectPostprocessing(Sale: codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    var
+        HULAuditMgt: Codeunit "NPR HU L Audit Mgt.";
+    begin
+        Response := PreparePayment(Sale, PaymentLine, Context);
+
+        if HULAuditMgt.HasPaymentPostprocessingWorkflow(Sale) or HasExternalPostprocessingSubscribers() then
+            Response.Add('needsPostprocessingWorkflows', true);
+    end;
+
+    local procedure HasExternalPostprocessingSubscribers(): Boolean
+    var
+        EventSubscription: Record "Event Subscription";
+    begin
+        EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+        EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR Payment Processing Events");
+        EventSubscription.SetRange("Published Function", 'OnAddPostWorkflowsToRun');
+        EventSubscription.SetRange(Active, true);
+        exit(not EventSubscription.IsEmpty());
     end;
 
     local procedure PreparePayment(Sale: codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
@@ -92,12 +127,6 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         exit(Response);
     end;
 
-    local procedure PreparePreWorkflows(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
-    begin
-        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context));
-        exit(Response);
-    end;
-
     local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper") PreWorkflows: JsonObject
     var
         SalePOS: Record "NPR POS Sale";
@@ -112,12 +141,14 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         PmtProcessingEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
     end;
 
-    local procedure PreparePostWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line") Response: JsonObject
+    local procedure CollectPostprocessingWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line") Response: JsonObject
     var
+        HULAuditMgt: Codeunit "NPR HU L Audit Mgt.";
         PmtProcessingEvents: Codeunit "NPR Payment Processing Events";
         PostWorkflows: JsonObject;
     begin
         PostWorkflows.ReadFrom('{}');
+        HULAuditMgt.AddPaymentPostprocessingWorkflow(Context, Sale, PaymentLine, PostWorkflows);
         PmtProcessingEvents.OnAddPostWorkflowsToRun(Context, Sale, PaymentLine, PostWorkflows);
         Response.Add('postWorkflows', PostWorkflows);
     end;
@@ -215,7 +246,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'const main=async({workflow:e,popup:r,parameters:n,context:i,captions:o})=>{const{HideAmountDialog:c,HideZeroAmountDialog:p}=n,{preWorkflows:m}=await e.respond("preparePreWorkflows");if(m)for(const l of Object.entries(m)){const[u,N]=l;u&&await e.run(u,{parameters:N})}const{dispatchToWorkflow:f,paymentType:y,remainingAmount:t,paymentDescription:d,amountPrompt:A,forceAmount:E,mmPaymentMethodAssigned:P,collectReturnInformation:b,EnableMemberSubscPayerEmail:W,membershipEmail:g}=await e.respond("preparePaymentWorkflow");if(P&&!await r.confirm(o.paymentMethodAssignedCaption))return{};if(W){if(i.membershipPayerEmail=await r.input({title:o.MembershipSubscPayerEmailTitle,caption:o.MembershipSubscPayerEmailCaption,value:g}),i.membershipPayerEmail===null)return{};await e.respond("SetMembershipSubscPayerEmail")}let a=t;if(!c&&(!p||t>0)){if(a=await r.numpad({title:d,caption:A,value:t}),a===null)return{};if(a===0&&t>0)return{}}if(b&&t===a&&!(await e.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success)return{};let{postWorkflows:w}=await e.respond("preparePostWorkflows",{paymentAmount:a});if(await processWorkflows(w),a===0&&t===0&&!E)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{};const s=await e.run(f,{context:{paymentType:y,suggestedAmount:a,remainingAmount:t}});return s.legacy?(i.fallbackAmount=a,await e.respond("doLegacyPaymentWorkflow")):s.tryEndSale&&n.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{success:s.success}};async function processWorkflows(e){if(e)for(const[r,{mainParameters:n,customParameters:i}]of Object.entries(e))await workflow.run(r,{context:{customParameters:i},parameters:n})}'
+'const main=async({workflow:e,popup:r,parameters:n,context:i,captions:m})=>{const{HideAmountDialog:u,HideZeroAmountDialog:c}=n;let s=await e.respond("preparePaymentWorkflow");if(s.preWorkflows){for(const[o,w]of Object.entries(s.preWorkflows))o&&await e.run(o,{parameters:w});s=await e.respond("continuePaymentWorkflow")}const{dispatchToWorkflow:p,paymentType:f,remainingAmount:a,paymentDescription:y,amountPrompt:d,forceAmount:P,mmPaymentMethodAssigned:A,collectReturnInformation:E,EnableMemberSubscPayerEmail:b,membershipEmail:W,needsPostprocessingWorkflows:g}=s;if(A&&!await r.confirm(m.paymentMethodAssignedCaption))return{};if(b){if(i.membershipPayerEmail=await r.input({title:m.MembershipSubscPayerEmailTitle,caption:m.MembershipSubscPayerEmailCaption,value:W}),i.membershipPayerEmail===null)return{};await e.respond("SetMembershipSubscPayerEmail")}let t=a;if(!u&&(!c||a>0)){if(t=await r.numpad({title:y,caption:d,value:a}),t===null)return{};if(t===0&&a>0)return{}}if(E&&a===t&&!(await e.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success)return{};if(g){let{postWorkflows:o}=await e.respond("preparePostWorkflows",{paymentAmount:t});await processWorkflows(o)}if(t===0&&a===0&&!P)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{};const l=await e.run(p,{context:{paymentType:f,suggestedAmount:t,remainingAmount:a}});return l.legacy?(i.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):l.tryEndSale&&n.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{success:l.success}};async function processWorkflows(e){if(e)for(const[r,{mainParameters:n,customParameters:i}]of Object.entries(e))await workflow.run(r,{context:{customParameters:i},parameters:n})}'
         );
     end;
 }

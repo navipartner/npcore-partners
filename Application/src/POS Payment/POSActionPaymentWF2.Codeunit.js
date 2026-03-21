@@ -3,17 +3,20 @@
 */
 const main = async ({ workflow, popup, parameters, context, captions }) => {
   const { HideAmountDialog, HideZeroAmountDialog } = parameters;
-  const { preWorkflows } = await workflow.respond("preparePreWorkflows");
 
-  if (preWorkflows) {
-    for (const preWorkflow of Object.entries(preWorkflows)) {
-      const [preWorkflowName, preWorkflowParameters] = preWorkflow;
+  let result = await workflow.respond("preparePaymentWorkflow");
+
+  if (result.preWorkflows) {
+    for (const [preWorkflowName, preWorkflowParameters] of Object.entries(
+      result.preWorkflows
+    )) {
       if (preWorkflowName) {
         await workflow.run(preWorkflowName, {
           parameters: preWorkflowParameters,
         });
       }
     }
+    result = await workflow.respond("continuePaymentWorkflow");
   }
 
   const {
@@ -27,7 +30,9 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     collectReturnInformation,
     EnableMemberSubscPayerEmail,
     membershipEmail,
-  } = await workflow.respond("preparePaymentWorkflow");  
+    needsPostprocessingWorkflows,
+  } = result;
+
   if (mmPaymentMethodAssigned) {
     if (!(await popup.confirm(captions.paymentMethodAssignedCaption)))
       return {};
@@ -38,7 +43,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
       caption: captions.MembershipSubscPayerEmailCaption,
       value: membershipEmail,
     });
-    if (context.membershipPayerEmail === null) return {}; // user cancelled dialog
+    if (context.membershipPayerEmail === null) return {};
     await workflow.respond("SetMembershipSubscPayerEmail");
   }
 
@@ -49,8 +54,8 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
       caption: amountPrompt,
       value: remainingAmount,
     });
-    if (suggestedAmount === null) return {}; // user cancelled dialog
-    if (suggestedAmount === 0 && remainingAmount > 0) return {}; // user paid 0 with remaining amount
+    if (suggestedAmount === null) return {};
+    if (suggestedAmount === 0 && remainingAmount > 0) return {};
   }
   if (collectReturnInformation) {
     if (remainingAmount === suggestedAmount) {
@@ -64,9 +69,13 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
       }
     }
   }
-  
-  let {postWorkflows} = await workflow.respond("preparePostWorkflows", {paymentAmount: suggestedAmount});  
-  await processWorkflows(postWorkflows);
+
+  if (needsPostprocessingWorkflows) {
+    let { postWorkflows } = await workflow.respond("preparePostWorkflows", {
+      paymentAmount: suggestedAmount,
+    });
+    await processWorkflows(postWorkflows);
+  }
 
   if (suggestedAmount === 0 && remainingAmount === 0 && !forceAmount) {
     await workflow.run("END_SALE", {
@@ -77,7 +86,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     });
     return {};
   }
-  
+
   const paymentResult = await workflow.run(dispatchToWorkflow, {
     context: {
       paymentType: paymentType,
@@ -85,7 +94,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
       remainingAmount: remainingAmount,
     },
   });
-  
+
   if (paymentResult.legacy) {
     context.fallbackAmount = suggestedAmount;
     await workflow.respond("doLegacyPaymentWorkflow");

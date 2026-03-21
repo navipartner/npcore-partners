@@ -437,8 +437,18 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Payment Processing Events", 'OnAddPostWorkflowsToRun', '', false, false)]
-    local procedure OnAddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; var PostWorkflows: JsonObject)
+    internal procedure HasPaymentPostprocessingWorkflow(Sale: Codeunit "NPR POS Sale"): Boolean
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSale: Record "NPR POS Sale";
+    begin
+        Sale.GetCurrentSale(POSSale);
+        if not POSUnit.Get(POSSale."Register No.") then
+            exit(false);
+        exit(IsHULaurelAuditEnabled(POSUnit."POS Audit Profile"));
+    end;
+
+    internal procedure AddPaymentPostprocessingWorkflow(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; var PostWorkflows: JsonObject)
     var
         POSUnit: Record "NPR POS Unit";
         POSSale: Record "NPR POS Sale";
