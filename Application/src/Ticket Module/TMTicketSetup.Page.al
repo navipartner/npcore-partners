@@ -288,6 +288,11 @@
                         ApplicationArea = NPRTicketAdvanced;
                         ToolTip = 'Specifies the value of the POS Unattended Expire Time (Seconds) field.';
                     }
+                    field(ExpireReservationWithJobQueue; Rec.ExpireReservationWithJobQueue)
+                    {
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies whether to use the Job Queue for expiring reservation requests. If false, reservation requests will be expired inline.';
+                    }
                 }
                 group(SOAPSanityCheck)
                 {

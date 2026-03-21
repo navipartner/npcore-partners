@@ -304,6 +304,21 @@
             InitValue = 1500;
             MinValue = 60;
         }
+        field(355; ExpireReservationWithJobQueue; Boolean)
+        {
+            Caption = 'Expire Reservations With Job Queue';
+            DataClassification = CustomerContent;
+            InitValue = true;
+
+            trigger OnValidate()
+            var
+                ReservationExpirationJob: Codeunit "NPR TMReservationExpirationJob";
+                JobQueueEntry: Record "Job Queue Entry";
+            begin
+                if (Rec.ExpireReservationWithJobQueue <> xRec.ExpireReservationWithJobQueue) and (Rec.ExpireReservationWithJobQueue) then
+                    ReservationExpirationJob.CreateJobQueue(JobQueueEntry, false);
+            end;
+        }
         field(360; MaxTicketsPerSOAPRequest; Integer)
         {
             Caption = 'Max Tickets Per SOAP Request';

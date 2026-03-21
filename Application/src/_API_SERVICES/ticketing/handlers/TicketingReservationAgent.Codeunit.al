@@ -301,7 +301,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
     begin
         Sentry.StartSpan(Span, 'bc.ticket-api.reservation.initialization');
-        TicketRequestManager.ExpireReservationRequestsV2();
+        TicketRequestManager.ExpireReservationRequestsV2_Inline();
         Commit();
 
         if (Token <> '') then

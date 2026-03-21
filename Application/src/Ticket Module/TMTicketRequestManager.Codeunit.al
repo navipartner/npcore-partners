@@ -1410,13 +1410,31 @@
     end;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-    internal procedure ExpireReservationRequestsV2(): Integer
+    internal procedure ExpireReservationRequestsV2_Inline(): Integer
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
     begin
-        exit(ExpireReservationRequestsV2(30));
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (not TicketSetup.ExpireReservationWithJobQueue) then
+            exit(ExpireReservationRequestsV2_Worker(30));
     end;
 
+    internal procedure ExpireReservationRequestsV2_JobQueue(): Integer
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (TicketSetup.ExpireReservationWithJobQueue) then
+            exit(ExpireReservationRequestsV2_Worker(30));
+    end;
+
+
     [CommitBehavior(CommitBehavior::Error)]
-    internal procedure ExpireReservationRequestsV2(MaxNumberOfTokensPerSession: Integer): Integer
+    local procedure ExpireReservationRequestsV2_Worker(MaxNumberOfTokensPerSession: Integer): Integer
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         RequestMutex: Record "NPR TM TicketRequestMutex";
@@ -1516,7 +1534,7 @@
     begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         if (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule')) then begin
-            ExpireReservationRequestsV2(30);
+            ExpireReservationRequestsV2_Inline();
             exit;
         end;
 #endif
