@@ -305,6 +305,29 @@
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Card No." = FIELD("External Card No.");
             }
+
+            action(MembershipTimeline)
+            {
+                Caption = 'Timeline';
+                ToolTip = 'Opens the membership timeline which shows important events in the lifecycle of the membership.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = Timeline;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
+                trigger OnAction()
+                var
+                    TimelinePage: Page "NPR MMTimelineList";
+                    TimelineEvents: Record "NPR MMTimelineEventBuffer";
+                    TimelineHandler: Codeunit "NPR MMTimelineHandler";
+                begin
+                    TimelineHandler.GetTimelineEvents(Rec."Membership Entry No.", TimelineEvents);
+                    TimelinePage.TransferData(TimelineEvents);
+                    TimelinePage.Run();
+                end;
+            }
+
             action("Ledger E&ntries")
             {
                 Caption = 'Ledger E&ntries';

@@ -837,6 +837,27 @@
             {
                 Caption = 'History';
                 Image = History;
+
+                action(MembershipTimeline)
+                {
+                    Caption = 'Timeline';
+                    ToolTip = 'Opens the membership timeline which shows important events in the lifecycle of the membership.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Image = Timeline;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    trigger OnAction()
+                    var
+                        TimelinePage: Page "NPR MMTimelineList";
+                        TimelineEvents: Record "NPR MMTimelineEventBuffer";
+                        TimelineHandler: Codeunit "NPR MMTimelineHandler";
+                    begin
+                        TimelineHandler.GetTimelineEvents(Rec."Entry No.", TimelineEvents);
+                        TimelinePage.TransferData(TimelineEvents);
+                        TimelinePage.Run();
+                    end;
+                }
                 action("Ledger E&ntries")
                 {
                     Caption = 'Ledger E&ntries';

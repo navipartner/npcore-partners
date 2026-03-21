@@ -471,6 +471,28 @@
                 RunObject = page "NPR MM Subscription Details";
                 RunPageLink = "Membership Entry No." = field("Entry No.");
             }
+            action(MembershipTimeline)
+            {
+                Caption = 'Timeline';
+                ToolTip = 'Opens the membership timeline which shows important events in the lifecycle of the membership.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = Timeline;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    TimelinePage: Page "NPR MMTimelineList";
+                    TimelineEvents: Record "NPR MMTimelineEventBuffer";
+                    TimelineHandler: Codeunit "NPR MMTimelineHandler";
+                begin
+                    TimelineHandler.GetTimelineEvents(Rec."Entry No.", TimelineEvents);
+                    TimelinePage.TransferData(TimelineEvents);
+                    TimelinePage.Run();
+                end;
+
+            }
             group(History)
             {
                 Caption = 'History';
