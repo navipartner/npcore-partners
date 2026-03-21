@@ -99,6 +99,9 @@
         key(Key6; "EFT Trans. Request Entry No.", "Receipt No.", Date)
         {
         }
+        key(Key7; SystemCreatedAt)
+        {
+        }
     }
 
     fieldgroups

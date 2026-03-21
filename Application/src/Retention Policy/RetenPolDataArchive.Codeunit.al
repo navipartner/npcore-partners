@@ -15,7 +15,6 @@ codeunit 6059927 "NPR Reten. Pol. Data Archive"
         if not IsDataArchiveEnabled(RecRef) then
             exit;
 #endif
-
         UseDataArchive := DataArchive.DataArchiveProviderExists();
         if not UseDataArchive then
             exit;
