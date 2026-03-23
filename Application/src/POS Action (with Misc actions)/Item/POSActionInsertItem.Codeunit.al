@@ -313,8 +313,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         if (TicketRetailManager.IsTicketSalesLine(SaleLinePOS)) then
             if (TicketRetailManager.UseFrontEndScheduleUX()) then
                 if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", TicketToken)) then begin
-                    TicketRetailManager.AssignSameSchedule(TicketToken, false);
-                    TicketRetailManager.AssignSameNotificationAddress(TicketToken);
                     TicketRequestManager.RequestRequiresAttention(TicketToken, RequiresSS, RequiresTH);
                     if (RequiresSS) then
                         ConfigureTicketScheduleSelectionList.Add(TicketToken);
@@ -374,8 +372,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 repeat
                     Clear(Token);
                     if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOSAddOn."Sales Ticket No.", SaleLinePOSAddOn."Sale Line No.", Token)) then begin
-                        TicketRetailManager.AssignSameSchedule(Token, true);
-                        TicketRetailManager.AssignSameNotificationAddress(Token);
                         TicketRequestManager.RequestRequiresAttention(Token, RequiresUX, RequiresTH);
                         if (RequiresUX) then
                             TicketTokenUXList.Add(Token);

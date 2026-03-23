@@ -4,6 +4,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
 
     var
         ActionDescription: Label 'This workflow drives the ticket schedule and ticket holder selection process for front-end UX.', MaxLength = 250;
+        _TicketEvents: Codeunit "NPR TMTicketEvents";
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
@@ -262,6 +263,8 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         TicketReservationRequestOrder: Record "NPR TM Ticket Reservation Req.";
         SaleLinePOS: Record "NPR POS Sale Line";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        ExternalScheduleEntryNo: Integer;
+        AdmScheduleEntryVerify: Record "NPR TM Admis. Schedule Entry";
 
         RequestToken: Text[100];
         ResponseMessage: Text;
@@ -298,6 +301,28 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
                             MissingScheduleCount -= 1;
                         end;
                     end;
+
+                    // Allow PTE business rules to suggest a schedule, to avoid unnecessary UX
+                    if (TicketReservationRequestSlave."External Adm. Sch. Entry No." <= 0) then begin
+                        ExternalScheduleEntryNo := 0;
+                        _TicketEvents.OnAssignSameScheduleFailure(TicketReservationRequestSlave."Entry No.", TicketReservationRequestSlave."Receipt No.", TicketReservationRequestSlave."Item No.", TicketReservationRequestSlave."Variant Code", TicketReservationRequestSlave."Admission Code", ExternalScheduleEntryNo);
+
+                        if (ExternalScheduleEntryNo > 0) then begin
+                            AdmScheduleEntryVerify.Reset();
+                            AdmScheduleEntryVerify.SetCurrentKey("External Schedule Entry No.");
+                            AdmScheduleEntryVerify.SetLoadFields("Admission Code", "Schedule Code", "Admission Start Date", "Admission Start Time");
+                            AdmScheduleEntryVerify.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
+                            AdmScheduleEntryVerify.SetFilter("Admission Code", '=%1', TicketReservationRequestSlave."Admission Code");
+                            AdmScheduleEntryVerify.SetFilter(Cancelled, '=%1', false);
+                            if (AdmScheduleEntryVerify.FindFirst()) then begin
+                                TicketReservationRequestSlave."External Adm. Sch. Entry No." := ExternalScheduleEntryNo;
+                                TicketReservationRequestSlave."Scheduled Time Description" := StrSubstNo('(%1) %2', AdmScheduleEntryVerify."Admission Start Date", AdmScheduleEntryVerify."Admission Start Time");
+                                TicketReservationRequestSlave.Modify();
+                                MissingScheduleCount -= 1;
+                            end;
+                        end;
+                    end;
+
                 until (TicketReservationRequestSlave.Next() = 0);
             end;
 
