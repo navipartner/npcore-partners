@@ -262,7 +262,8 @@ codeunit 6060004 "NPR POSAction Issue DC OnSaleB"
         case NpDcIssueOnSaleSetup.Type of
             NpDcIssueOnSaleSetup.Type::"Item Sales Amount":
                 begin
-                    NpDcIssueOnSaleSetup.TestField("Item Sales Amount");
+                    if NpDcIssueOnSaleSetup."Item Sales Amount" <= 0 then
+                        exit(0);
                     NewCouponQty := TempNpDcItemBuffer."Line Amount" div NpDcIssueOnSaleSetup."Item Sales Amount";
                 end;
             NpDcIssueOnSaleSetup.Type::"Item Sales Qty.":

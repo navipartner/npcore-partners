@@ -23,6 +23,8 @@
         {
             Caption = 'Item Sales Amount';
             DataClassification = CustomerContent;
+            InitValue = 1;
+            MinValue = 0.01;
         }
         field(25; "Item Sales Qty."; Decimal)
         {
