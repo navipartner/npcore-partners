@@ -600,7 +600,10 @@
             POSSaleLine.SetUseCustomSystemId(true);
             SaleLinePOS.SystemId := NewLineSystemId;
             POSSaleLine.SetSkipPOSInfo(true);
+            SaleLinePOS.SetSkipCalcDiscount(true);
+
             POSSaleLine.InsertLine(SaleLinePOS);
+
             POSSaleLine.SetUseCustomSystemId(false);
             SaleLinePOS.SetSkipCalcDiscount(false);
             POSSaleLine.SetUsePresetLineNo(false);

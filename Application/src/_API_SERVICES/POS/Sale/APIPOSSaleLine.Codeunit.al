@@ -91,6 +91,7 @@ codeunit 6248630 "NPR API POS Sale Line"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         APIPOSSale: Codeunit "NPR API POS Sale";
         DeltaBuilder: Codeunit "NPR API POS Delta Builder";
+        DiscountManagement: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         SaleLineId: Guid;
         AddonsArray: JsonToken;
     begin
@@ -128,6 +129,7 @@ codeunit 6248630 "NPR API POS Sale Line"
         if Body.AsObject().Get('addons', AddonsArray) and AddonsArray.IsArray() then begin
             POSSaleLine.GetCurrentSaleLine(CreatedLine);
             ProcessAddonsArray(AddonsArray, CreatedLine);
+            DiscountManagement.RecalculateAllSaleLinePOS(POSSaleRec);
         end;
 
         exit(Response.RespondCreated(DeltaBuilder.BuildDeltaResponse()));
@@ -147,6 +149,7 @@ codeunit 6248630 "NPR API POS Sale Line"
         CreatedLine: Record "NPR POS Sale Line";
         APIPOSSale: Codeunit "NPR API POS Sale";
         DeltaBuilder: Codeunit "NPR API POS Delta Builder";
+        DiscountManagement: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         ParentLineIdText: Text;
     begin
         Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
@@ -183,6 +186,7 @@ codeunit 6248630 "NPR API POS Sale Line"
         DeltaBuilder.StartDataCollection();
 
         InsertAddonLineFromApi(Body, ParentLine, CreatedLine);
+        DiscountManagement.OnAfterInsertSaleLinePOS(CreatedLine);
 
         exit(Response.RespondCreated(DeltaBuilder.BuildDeltaResponse()));
     end;
