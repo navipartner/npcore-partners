@@ -42,6 +42,7 @@
             var
                 MembershipRole: Record "NPR MM Membership Role";
                 Contact: Record Contact;
+                MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
             begin
                 Rec."Blocked At" := CreateDateTime(0D, 0T);
                 Rec."Blocked By" := '';
@@ -54,7 +55,6 @@
                 MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
                 if (MembershipRole.FindSet()) then begin
                     repeat
-                        // -MM1.41 [369123]
                         MembershipRole.Validate(Blocked, Rec.Blocked);
                         MembershipRole.Modify();
 
@@ -63,6 +63,10 @@
                             Contact.Modify();
                         end;
                     until (MembershipRole.Next() = 0);
+
+                    // Must be after membership role is updated with unblock, otherwise the validation will fail
+                    if (not Rec.Blocked) and (xRec.Blocked) then
+                        MembershipManagement.ValidateMemberUniqueIdAny(Rec, true);
                 end;
 
             end;

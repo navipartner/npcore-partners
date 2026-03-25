@@ -1410,6 +1410,37 @@
         ConflictsWithMemberEntryNo := CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
     end;
 
+    internal procedure ValidateMemberUniqueIdAny(Member: Record "NPR MM Member"; FailWithError: Boolean) ConflictsWithMemberEntryNo: Integer
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        CommunityCode: Code[20];
+        ConflictExists: Label 'The unique identifier(s) of this member conflicts with another existing member. Please change the unique identifier(s) to be able to update the member information.';
+        CommunityCodeNotFound: Label 'No membership found for Member %1 (membership role could be blocked).';
+    begin
+        if (Member."Entry No." = 0) then
+            exit(0);
+
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+        MemberInfoCapture."Member Entry No" := Member."Entry No.";
+        MemberInfoCapture."Phone No." := Member."Phone No.";
+        MemberInfoCapture."First Name" := Member."First Name";
+        MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
+        MemberInfoCapture."Social Security No." := Member."Social Security No.";
+
+        if (not GetMemberCommunityCode(Member."Entry No.", CommunityCode)) then
+            Error(CommunityCodeNotFound, Member."External Member No.");
+
+        ConflictsWithMemberEntryNo := CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
+        if ((ConflictsWithMemberEntryNo = Member."Entry No.") or (ConflictsWithMemberEntryNo = 0)) then
+            exit(0);
+
+        if (FailWithError) then
+            Error(ConflictExists);
+
+        exit(ConflictsWithMemberEntryNo);
+    end;
+
     internal procedure CheckMemberUniqueId(CommunityCode: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture") MemberEntryNo: Integer
     var
         Community: Record "NPR MM Member Community";
