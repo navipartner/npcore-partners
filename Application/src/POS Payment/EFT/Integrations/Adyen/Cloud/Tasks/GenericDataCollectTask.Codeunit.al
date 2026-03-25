@@ -12,6 +12,7 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
         JsonObject: JsonObject;
         InStr: InStream;
         SignatureData: Text;
+        DataCollectionStep: Integer;
     begin
         TempAddInfoRequest.Init();
         Evaluate(TempAddInfoRequest."EFT Transaction No.", Parameters.Get('EntryNo'));
@@ -25,12 +26,13 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
                 IAddInfoRequest := Enum::"NPR MM Add. Info. Request"::Adyen;
         end;
 
-        case Parameters.Get('DataCollectionStep') of
-            'Signature':
+        Evaluate(DataCollectionStep, Parameters.Get('DataCollectionStep'), 9);
+        case DataCollectionStep of
+            Enum::"NPR Data Collect Step"::Signature.AsInteger():
                 TempAddInfoRequest."Data Collection Step" := TempAddInfoRequest."Data Collection Step"::Signature;
-            'PhoneNo':
+            Enum::"NPR Data Collect Step"::PhoneNo.AsInteger():
                 TempAddInfoRequest."Data Collection Step" := TempAddInfoRequest."Data Collection Step"::PhoneNo;
-            'EMail':
+            Enum::"NPR Data Collect Step"::EMail.AsInteger():
                 TempAddInfoRequest."Data Collection Step" := TempAddInfoRequest."Data Collection Step"::EMail;
         end;
         IAddInfoRequest.RequestAdditionalInfo(TempAddInfoRequest, TempAddInfoResponse);
@@ -65,6 +67,7 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
         Error: Text;
         ErrorCallstack: Text;
         EntryNo: Integer;
+        DataCollectionStep: Integer;
         Logs: Text;
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
@@ -72,13 +75,14 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
         //Trx done, either complete (success/failure) or handled error
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         Evaluate(Completed, Results.Get('Completed'), 9);
+        Evaluate(DataCollectionStep, Parameters.Get('DataCollectionStep'), 9);
 
-        case Parameters.Get('DataCollectionStep') of
-            'Signature':
+        case DataCollectionStep of
+            Enum::"NPR Data Collect Step"::Signature.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::SignatureResponseReceived;
-            'PhoneNo':
+            Enum::"NPR Data Collect Step"::PhoneNo.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::PhoneNoResponseRecevied;
-            'EMail':
+            Enum::"NPR Data Collect Step"::EMail.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::EmailResponseReceived;
         end;
 
@@ -103,18 +107,20 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
     var
         EFTAdyenTaskStatus: Enum "NPR EFT DataCollect TaskStatus";
         EntryNo: Integer;
+        DataCollectionStep: Integer;
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
         //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
 
-        case Parameters.Get('DataCollectionStep') of
-            'Signature':
+        Evaluate(DataCollectionStep, Parameters.Get('DataCollectionStep'), 9);
+        case DataCollectionStep of
+            Enum::"NPR Data Collect Step"::Signature.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::SignatureResponseReceived;
-            'PhoneNo':
+            Enum::"NPR Data Collect Step"::PhoneNo.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::PhoneNoResponseRecevied;
-            'EMail':
+            Enum::"NPR Data Collect Step"::EMail.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::EmailResponseReceived;
         end;
 
@@ -127,18 +133,20 @@ codeunit 6150750 "NPR Generic Data Collect Task" implements "NPR POS Background 
     var
         EFTAdyenTaskStatus: Enum "NPR EFT DataCollect TaskStatus";
         EntryNo: Integer;
+        DataCollectionStep: Integer;
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
         //Trx result unknown - log error and start lookup
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
 
-        case Parameters.Get('DataCollectionStep') of
-            'Signature':
+        Evaluate(DataCollectionStep, Parameters.Get('DataCollectionStep'), 9);
+        case DataCollectionStep of
+            Enum::"NPR Data Collect Step"::Signature.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::SignatureResponseReceived;
-            'PhoneNo':
+            Enum::"NPR Data Collect Step"::PhoneNo.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::PhoneNoResponseRecevied;
-            'EMail':
+            Enum::"NPR Data Collect Step"::EMail.AsInteger():
                 EFTAdyenTaskStatus := EFTAdyenTaskStatus::EmailResponseReceived;
         end;
 
