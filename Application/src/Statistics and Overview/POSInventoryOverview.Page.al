@@ -158,7 +158,7 @@
                 {
 
                     DecimalPlaces = 0 : 2;
-                    ToolTip = 'Specifies the value of the Quantity field';
+                    ToolTip = 'Specifies the available quantity (Inventory minus Qty. on Sales Orders).';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Description"; Rec."Item Description")
@@ -232,6 +232,7 @@
         ItemVariant: Record "Item Variant";
         HasVariants: Boolean;
         POSInventoryOverview: Page "NPR POS Inventory Overview";
+        AvailableQty: Decimal;
     begin
         if ItemCode = '' then
             exit;
@@ -278,38 +279,34 @@
                     if ItemVariant.FindSet() then
                         repeat
                             Item.SetFilter("Variant Filter", ItemVariant.Code);
-                            Item.CalcFields(Inventory);
-                            //-NPR5.55 [404868]
-                            //IF Item.Inventory > 0 THEN BEGIN
-                            if Item.Inventory <> 0 then begin
-                                //+NPR5.55 [404868]
+                            Item.CalcFields(Inventory, "Qty. on Sales Order");
+                            AvailableQty := Item.Inventory - Item."Qty. on Sales Order";
+                            if AvailableQty <> 0 then begin
                                 Rec."Item No." := Item."No.";
                                 Rec."Item Description" := Item.Description;
                                 Rec."Variant Code" := ItemVariant.Code;
                                 Rec."Variant Description" := ItemVariant.Description;
                                 Rec."Location Code" := Location.Code;
                                 Rec."Location Name" := Location.Name;
-                                Rec.Quantity := Item.Inventory;
+                                Rec.Quantity := AvailableQty;
                                 Rec.Insert();
                                 if CurrentLocationCode = Location.Code then
-                                    QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
+                                    QtyCurrentLocation := QtyCurrentLocation + AvailableQty;
                             end;
                         until ItemVariant.Next() = 0;
                 end else begin
                     Item.SetFilter("Variant Filter", '');
-                    Item.CalcFields(Inventory);
-                    //-NPR5.55 [404868]
-                    //IF Item.Inventory > 0 THEN BEGIN
-                    if Item.Inventory <> 0 then begin
-                        //+NPR5.55 [404868]
+                    Item.CalcFields(Inventory, "Qty. on Sales Order");
+                    AvailableQty := Item.Inventory - Item."Qty. on Sales Order";
+                    if AvailableQty <> 0 then begin
                         Rec."Item No." := Item."No.";
                         Rec."Item Description" := Item.Description;
                         Rec."Location Code" := Location.Code;
                         Rec."Location Name" := Location.Name;
-                        Rec.Quantity := Item.Inventory;
+                        Rec.Quantity := AvailableQty;
                         Rec.Insert();
                         if CurrentLocationCode = Location.Code then
-                            QtyCurrentLocation := QtyCurrentLocation + Item.Inventory;
+                            QtyCurrentLocation := QtyCurrentLocation + AvailableQty;
                     end;
                 end;
             until Location.Next() = 0;
