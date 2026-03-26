@@ -16,6 +16,8 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
                     EcomSalesHeader.Get(EcomSalesLine."Document Entry No.");
                     CreateTickets(EcomSalesHeader, true, false);
                 end;
+            EcomSalesLine.Subtype::Membership:
+                CreateMembership(EcomSalesLine, true, false);
             else
                 Error(UnsupportedSubtypeLbl, EcomSalesLine.Subtype, EcomSalesLine.RecordId);
         end;
@@ -88,6 +90,45 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         Success := EcomCreateVchrProcess.Run(EcomSalesLine);
     end;
 
+    internal procedure CreateMemberships(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        if not EcomSalesHeader."Memberships Exist" then
+            exit;
+
+        if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
+            exit;
+
+        if (EcomSalesHeader."Capture Processing Status" <> EcomSalesHeader."Capture Processing Status"::"Partially Processed") and
+                    (EcomSalesHeader."Capture Processing Status" <> EcomSalesHeader."Capture Processing Status"::Processed) then
+            exit;
+
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Membership);
+        EcomSalesLine.SetRange("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::" ");
+        EcomSalesLine.SetRange(Captured, true);
+        EcomSalesLine.SetFilter(Quantity, '<>0');
+        EcomSalesLine.SetFilter("Unit Price", '<>0');
+        if EcomSalesLine.FindSet() then
+            repeat
+                CreateMembership(EcomSalesLine, ShowError, UpdateRetryCount);
+            until EcomSalesLine.Next() = 0;
+
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+    end;
+
+    local procedure CreateMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; ShowError: Boolean; UpdateRetryCount: Boolean) Success: Boolean
+    var
+        EcomCreateMMShipProcess: Codeunit "NPR EcomCreateMMShipProcess";
+    begin
+        Clear(EcomCreateMMShipProcess);
+        EcomCreateMMShipProcess.SetShowError(ShowError);
+        EcomCreateMMShipProcess.SetUpdateRetryCount(UpdateRetryCount);
+        Success := EcomCreateMMShipProcess.Run(EcomSalesLine);
+    end;
+
     internal procedure CreateTickets(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
     var
         EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
@@ -156,7 +197,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership, EcomSalesLine.Subtype::Ticket);
         EcomSalesLine.ModifyAll("Bucket Id", BucketInt);
 
         exit(BucketInt);
@@ -184,9 +225,12 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
         EcomSalesHeader."Tickets Exist" := not EcomSalesLine.IsEmpty;
-        EcomSalesLine.SetRange(Subtype);
 
-        EcomSalesHeader."Virtual Items Exist" := EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist";
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Membership);
+        EcomSalesHeader."Memberships Exist" := not EcomSalesLine.IsEmpty;
+
+        EcomSalesLine.SetRange(Subtype);
+        EcomSalesHeader."Virtual Items Exist" := EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist";
         EcomVirtualItemEvents.OnUpdateVirtualInformationInHeaderBeforeModify(EcomSalesHeader);
         EcomSalesHeader.Modify();
     end;
@@ -201,13 +245,24 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         Page.Run(0, EcomSalesLine);
     end;
 
+    internal procedure OpenEcomMembershipLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Item);
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Membership);
+        Page.Run(0, EcomSalesLine);
+    end;
+
     internal procedure OpenEcomVirtualItemLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
     begin
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership);
         Page.Run(0, EcomSalesLine);
     end;
 
@@ -298,6 +353,16 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         end;
     end;
 
+    internal procedure GetMembershipProcessingStatusStyle(EcomSalesHeader: Record "NPR Ecom Sales Header") StyleText: Text
+    begin
+        case EcomSalesHeader."Membership Processing Status" of
+            EcomSalesHeader."Membership Processing Status"::Error:
+                StyleText := 'Unfavorable';
+            EcomSalesHeader."Membership Processing Status"::Processed:
+                StyleText := 'Favorable';
+        end;
+    end;
+
     internal procedure FindVoucher(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var Voucher: Record "NPR NpRv Voucher")
     var
         GlobalVoucherWS: Codeunit "NPR NpRv Global Voucher WS";
@@ -346,13 +411,14 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     internal procedure CalculateVirtualItemsDocStatus(EcomSalesHeader: Record "NPR Ecom Sales Header") VirtualItemsDocStatus: Enum "NPR EcomVirtualItemDocStatus";
     var
         HasError: Boolean;
-        HasPartiallyProcessed: Boolean;
         AllProcessed: Boolean;
         VoucherProcessed: Boolean;
         TicketProcessed: Boolean;
+        MembershipProcessed: Boolean;
     begin
         HasError := (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Error) or
-                    (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Error);
+                    (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Error) or
+                    (EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::Error);
 
         if HasError then begin
             VirtualItemsDocStatus := VirtualItemsDocStatus::Error;
@@ -361,45 +427,74 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
         VoucherProcessed := (not EcomSalesHeader."Vouchers Exist") or (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Processed);
         TicketProcessed := (not EcomSalesHeader."Tickets Exist") or (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Processed);
+        MembershipProcessed := (not EcomSalesHeader."Memberships Exist") or (EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::Processed);
 
         // Partially Processed logic:
-        // - If vouchers don't exist, tickets can never be partially processed
-        // - If vouchers exist and tickets don't exist, check voucher status
-        // - If both exist, partial unless both are fully processed
-        if not EcomSalesHeader."Vouchers Exist" then
-            HasPartiallyProcessed := false
-        else begin
-            if not EcomSalesHeader."Tickets Exist" then
-                HasPartiallyProcessed := (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::"Partially Processed")
-            else
-                HasPartiallyProcessed := not (VoucherProcessed and TicketProcessed);
-        end;
-
-        if HasPartiallyProcessed then begin
+        // - Tickets can never be partially processed on their own; they are either processed or not processed
+        // - Vouchers and memberships can be partially processed
+        // - The document is partially processed if any voucher or membership is explicitly partially processed,
+        //   or if existing virtual item types are in a mixed processed/not-processed state
+        if IsPartiallyProcessed(EcomSalesHeader, VoucherProcessed, TicketProcessed, MembershipProcessed) then begin
             VirtualItemsDocStatus := VirtualItemsDocStatus::"Partially Processed";
             exit;
         end;
-        AllProcessed := VoucherProcessed and TicketProcessed;
-        if AllProcessed and (EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist") then begin
+
+        AllProcessed := VoucherProcessed and TicketProcessed and MembershipProcessed;
+        if AllProcessed and (EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist") then begin
             VirtualItemsDocStatus := VirtualItemsDocStatus::Processed;
             exit;
         end;
+
         // Default to Pending
         VirtualItemsDocStatus := VirtualItemsDocStatus::Pending;
     end;
 
-    internal procedure IsTicketItem(ItemNo: Text[50]): Boolean
+    local procedure IsPartiallyProcessed(EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherProcessed: Boolean; TicketProcessed: Boolean; MembershipProcessed: Boolean
+    ): Boolean
     var
-        Item: Record Item;
-        ItemCode: Code[20];
+        AnyExists: Boolean;
+        AllProcessed: Boolean;
+        NoneProcessed: Boolean;
     begin
-        if ItemNo = '' then
-            exit(false);
-        if not Evaluate(ItemCode, ItemNo) then
-            exit(false);
-        if not Item.Get(ItemCode) then
-            exit(false);
+        if EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::"Partially Processed" then
+            exit(true);
+
+        if EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::"Partially Processed" then
+            exit(true);
+
+        AnyExists := EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist";
+
+        AllProcessed := ((not EcomSalesHeader."Vouchers Exist") or VoucherProcessed) and ((not EcomSalesHeader."Tickets Exist") or TicketProcessed) and ((not EcomSalesHeader."Memberships Exist") or MembershipProcessed);
+
+        NoneProcessed := ((not EcomSalesHeader."Vouchers Exist") or (not VoucherProcessed)) and ((not EcomSalesHeader."Tickets Exist") or (not TicketProcessed)) and ((not EcomSalesHeader."Memberships Exist") or (not MembershipProcessed));
+
+        exit(AnyExists and not AllProcessed and not NoneProcessed);
+    end;
+
+    internal procedure IsTicketLine(Item: Record Item): Boolean
+    begin
         exit(Item."NPR Ticket Type" <> '');
+    end;
+
+    internal procedure IsMembershipLine(ItemNo: Code[20]): Boolean
+    var
+        MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+    begin
+        if EcomCreateMMShipImpl.GetMembershipSaleSetup(MMMembershipSalesSetup, ItemNo) then
+            exit(true);
+        //do we need different logic for these
+        if HasMembershipAlterationSetup(ItemNo) then
+            exit(true);
+        exit(false);
+    end;
+
+    internal procedure HasMembershipAlterationSetup(ItemNo: Code[20]): Boolean
+    var
+        MMMembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+    begin
+        MMMembershipAlterationSetup.SetRange("Sales Item No.", ItemNo);
+        exit(not MMMembershipAlterationSetup.IsEmpty());
     end;
 
     internal procedure EmitError(ErrorTxt: text; EventId: text)

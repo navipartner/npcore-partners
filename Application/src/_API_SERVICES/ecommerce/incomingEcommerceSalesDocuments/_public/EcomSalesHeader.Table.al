@@ -357,6 +357,11 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Ticket Reservation Token';
         }
+        field(5053; "Memberships Exist"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Memberships Exist';
+        }
         field(5080; "Voucher Processing Status"; Enum "NPR EcomVoucherStatus")
         {
             DataClassification = CustomerContent;
@@ -372,6 +377,11 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Ticket Retry Count';
             BlankZero = true;
+        }
+        field(5083; "Membership Processing Status"; Enum "NPR EcomMembershipStatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Membership Processing Status';
         }
 
         field(5090; "Capture Processing Status"; Enum "NPR Ecom Capture Status")
@@ -442,6 +452,9 @@ table 6151258 "NPR Ecom Sales Header"
         {
         }
         key(TicketProcessing; "Document Type", "Creation Status", "Tickets Exist", "Capture Processing Status", "Ticket Processing Status", "Bucket Id")
+        {
+        }
+        key(MembershipProcessing; "Document Type", "Creation Status", "Memberships Exist", "Capture Processing Status", "Membership Processing Status", "Bucket Id")
         {
         }
         key(CaptureProcessing; "Creation Status", "Virtual Items Exist", "Capture Processing Status", "Bucket Id", "Capture Retry Count")

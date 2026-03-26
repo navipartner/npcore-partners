@@ -1,6 +1,6 @@
 /// <summary>
 /// Classifies the virtual item subtype of an ecommerce sales line.
-/// Blank = regular item/membership (no virtual item processing).
+/// Item = regular item line (no virtual item processing).
 /// </summary>
 enum 6014581 "NPR Ecom Sales Line Subtype"
 {
@@ -21,5 +21,9 @@ enum 6014581 "NPR Ecom Sales Line Subtype"
     value(3; Item)
     {
         Caption = 'Item';
+    }
+    value(4; Membership)
+    {
+        Caption = 'Membership';
     }
 }

@@ -22,9 +22,10 @@ codeunit 6248560 "NPR Ecom Job Management"
         JobQueueEntry: Record "Job Queue Entry";
         EcomCreateVoucherJQ: Codeunit "NPR EcomCreateVoucherJQ";
         EcomCreateTicketJQ: Codeunit "NPR EcomCreateTicketJQ";
+        EcomCreateMembershipJQ: Codeunit "NPR EcomCreateMembershipJQ";
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.Setfilter("Object ID to Run", '%1|%2', EcomCreateVoucherJQ.GetCodeunitId(), EcomCreateTicketJQ.GetCodeunitId());
+        JobQueueEntry.Setfilter("Object ID to Run", '%1|%2|%3', EcomCreateVoucherJQ.GetCodeunitId(), EcomCreateTicketJQ.GetCodeunitId(), EcomCreateMembershipJQ.GetCodeunitId());
         Page.Run(0, JobQueueEntry);
     end;
 

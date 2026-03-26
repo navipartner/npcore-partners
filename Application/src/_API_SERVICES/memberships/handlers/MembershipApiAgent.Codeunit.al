@@ -361,7 +361,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
         exit(true);
     end;
 
-    local procedure CreateMembershipWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    internal procedure CreateMembershipWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         Item: Record Item;

@@ -94,7 +94,7 @@ types:
 
   ActivationDate:
     type: date
-    docs: The date from which the membership should be active. Setup can dictated and override this date.
+    docs: The date from which the membership should be active. Setup can dictate and override this date.
     examples:
       - name: ExampleActivationDate
         value: "2024-09-17"

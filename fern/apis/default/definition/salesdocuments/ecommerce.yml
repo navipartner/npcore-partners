@@ -308,7 +308,22 @@ types:
       virtualItemProcessStatus: salesDocumentLineVirtualItemProcessStatus
       virtualItemProcessErrorMessage: string
       ticketReservationLineId: uuid
-      customFields: 
+      membershipId: uuid
+      memberFirstName: string
+      memberLastName: string
+      memberMiddleName: string
+      memberEmail: string
+      memberPhoneNo: string
+      memberBirthday: date
+      memberGender: string
+      memberAddress: string
+      memberCity: string
+      memberCountry: string
+      memberPostCode: string
+      memberNewsletter: string
+      memberGdprApproval: string
+      membershipActivationDate: date
+      customFields:
         type: optional<SalesDocumentCustomFieldsRequest>
         docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom serialization logic.
     examples:
@@ -332,6 +347,21 @@ types:
           virtualItemProcessStatus: processed
           virtualItemProcessErrorMessage: ""
           ticketReservationLineId: 'bbe793c7-2489-43b7-ab77-23577d59ae71'
+          membershipId: '3a8b7c47-3228-4985-8bf0-bba09653f063'
+          memberFirstName: ""
+          memberLastName: ""
+          memberMiddleName: ""
+          memberEmail: ""
+          memberPhoneNo: ""
+          memberBirthday: "2027-01-01"
+          memberGender: ""
+          memberAddress: ""
+          memberCity: ""
+          memberCountry: ""
+          memberPostCode: ""
+          memberNewsletter: ""
+          memberGdprApproval: ""
+          membershipActivationDate: "2027-01-01"
           customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
 ############################################
 
@@ -570,6 +600,51 @@ types:
       ticketReservationLineId:
         type: optional<uuid>
         docs: Links this sales line to a specific ticket reservation request created through the Ticket Reservation APIs. Must be populated when the header-level Ticket Reservation Token is set. The value should match the lineId returned by the Ticket Reservation API when the reservation was created.
+      membershipId:
+        type: optional<uuid>
+        docs: Links this sales line to a pre-existing membership. If no membership Id is provided and the sales line represents a membership sale, a new membership is created from the member information on the line.
+      memberFirstName:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 50 symbols.
+      memberLastName:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 50 symbols.
+      memberMiddleName:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 50 symbols.
+      memberEmail:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 80 symbols.
+      memberPhoneNo:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 30 symbols.
+      memberBirthday:
+        type: optional<date>
+        docs: Relevant for membership lines without a membershipId.
+      memberGender:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Accepted values - male, female, other. If omitted or set to any other value, it is treated as not specified.
+      memberAddress:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 100 symbols.
+      memberCity:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 50 symbols.
+      memberCountry:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 50 symbols.
+      memberPostCode:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Max. length 20 symbols.
+      memberNewsletter:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Accepted values - yes, no. If omitted or set to any other value, it is treated as not specified.
+      memberGdprApproval:
+        type: optional<string>
+        docs: Relevant for membership lines without a membershipId. Accepted values - pending, accepted, rejected. If omitted, it is treated as not specified.
+      membershipActivationDate:
+        type: optional<date>
+        docs: Relevant for membership lines without a membershipId. The date from which the membership should be active. Setup can dictate and override this date.
       customFields: 
         type: optional<SalesDocumentLinesCustomFieldsRequest>
         docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom deserialization logic.

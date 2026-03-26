@@ -120,6 +120,82 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the business domain of the item line. Ticket indicates the line contains a ticket item as configured in BC item setup.';
                 }
+                field("Membership Id"; Rec."Membership Id")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the membership id linked to this line.';
+                    HideValue = _HideNullGuid;
+                }
+                field("Member First Name"; Rec."Member First Name")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member First Name field.';
+                }
+                field("Member Last Name"; Rec."Member Last Name")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Last Name field.';
+                }
+                field("Member Middle Name"; Rec."Member Middle Name")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Middle Name field.';
+                }
+                field("Member Email"; Rec."Member Email")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Email field.';
+                }
+                field("Member Phone No."; Rec."Member Phone No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Phone No. field.';
+                }
+                field("Member Birthday"; Rec."Member Birthday")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Birthday field.';
+                }
+                field("Member Gender"; Rec."Member Gender")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Gender field.';
+                }
+                field("Member Address"; Rec."Member Address")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Address field.';
+                }
+                field("Member City"; Rec."Member City")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member City field.';
+                }
+                field("Member Country"; Rec."Member Country")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Country field.';
+                }
+                field("Member Post Code"; Rec."Member Post Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Post Code field.';
+                }
+                field("Member Newsletter"; Rec."Member Newsletter")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member Newsletter field.';
+                }
+                field("Member GDPR Approval"; Rec."Member GDPR Approval")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Member GDPR Approval field.';
+                }
+                field("Membership Activation Date"; Rec."Membership Activation Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Membership Activation Date field.';
+                }
             }
             group(Control28)
             {
@@ -171,6 +247,7 @@ page 6248182 "NPR Ecom Sales Doc Sub"
     trigger OnAfterGetRecord()
     begin
         GetStyles();
+        _HideNullGuid := IsNullGuid(Rec."Membership Id");
     end;
 
     var
@@ -179,6 +256,7 @@ page 6248182 "NPR Ecom Sales Doc Sub"
 
         _EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         _VirtualItemActionVisibility: Boolean;
+        _HideNullGuid: Boolean;
         _VirtualItemProcessingStatusStyle: Text;
         _VirtualItemErrorTextStyle: Text;
 

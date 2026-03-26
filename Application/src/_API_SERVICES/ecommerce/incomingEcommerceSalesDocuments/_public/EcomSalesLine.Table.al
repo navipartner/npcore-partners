@@ -123,7 +123,6 @@ table 6151259 "NPR Ecom Sales Line"
             DataClassification = CustomerContent;
             Caption = 'Captured';
         }
-
         field(16; "Voucher Type"; Code[20])
         {
             Caption = 'Voucher Type';
@@ -168,6 +167,81 @@ table 6151259 "NPR Ecom Sales Line"
         {
             DataClassification = CustomerContent;
             Caption = 'Ticket Reservation Line Id';
+        }
+        field(5042; "Membership Id"; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Membership Id';
+        }
+        field(5043; "Member First Name"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member First Name';
+        }
+        field(5044; "Member Last Name"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Last Name';
+        }
+        field(5045; "Member Middle Name"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Middle Name';
+        }
+        field(5046; "Member Email"; Text[80])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Email';
+        }
+        field(5047; "Member Phone No."; Text[30])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Phone No.';
+        }
+        field(5048; "Member Birthday"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Birthday';
+        }
+        field(5049; "Member Gender"; Text[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Gender';
+        }
+        field(5050; "Member Address"; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Address';
+        }
+        field(5051; "Member City"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member City';
+        }
+        field(5052; "Member Country"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Country';
+        }
+        field(5053; "Member Post Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Post Code';
+        }
+        field(5054; "Member Newsletter"; Text[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member Newsletter';
+        }
+        field(5055; "Member GDPR Approval"; Text[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member GDPR Approval';
+        }
+        field(5056; "Membership Activation Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Membership Activation Date';
         }
     }
 

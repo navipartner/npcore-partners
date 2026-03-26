@@ -630,7 +630,7 @@ codeunit 6248220 "NPR MemberApiAgent"
     end;
 #pragma warning restore AA0139
 
-    local procedure DecodeGdprConsent(ConsentText: Text): Option
+    internal procedure DecodeGdprConsent(ConsentText: Text): Option
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
@@ -646,7 +646,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         end;
     end;
 
-    local procedure DecodeGender(GenderText: Text): Option
+    internal procedure DecodeGender(GenderText: Text): Option
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
@@ -662,7 +662,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         end;
     end;
 
-    local procedure DecodeNewsLetter(NewsLetter: Text): Option
+    internal procedure DecodeNewsLetter(NewsLetter: Text): Option
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin

@@ -403,7 +403,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
     begin
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher);
+        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership);
         EcomSalesLine.SetFilter(Quantity, '<>%1', 0);
         EcomSalesLine.SetFilter("Unit Price", '<>%1', 0);
         EcomSalesLine.SetLoadFields("Line Amount", "VAT %");

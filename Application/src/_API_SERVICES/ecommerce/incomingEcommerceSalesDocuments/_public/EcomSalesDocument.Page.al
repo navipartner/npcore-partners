@@ -384,6 +384,20 @@ page 6248188 "NPR Ecom Sales Document"
                     CurrPage.Update(false);
                 end;
             }
+            action(Memberships)
+            {
+                Caption = 'Memberships';
+                Image = ContactPerson;
+                ToolTip = 'View linked memberships';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    EcomCreateMMShipProcess: Codeunit "NPR EcomCreateMMShipProcess";
+                begin
+                    EcomCreateMMShipProcess.ShowRelatedMembershipsAction(Rec);
+                end;
+            }
         }
 
         area(Promoted)

@@ -46,6 +46,39 @@ codeunit 85161 "NPR Library Ecommerce"
         exit(LibTicket.CreateItem('', LibTicket.CreateTicketType(LibTicket.GenerateCode10(), '<+7D>', 0, 0, "NPR TM ActivationMethod_Type"::SCAN, 0, 0), 100));
     end;
 
+    procedure CreateCapturedMembershipLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20]; Membership: Record "NPR MM Membership")
+    begin
+        CreateMembershipLine(EcomSalesLine, EcomSalesHeader, ItemNo, 1, 100);
+        EcomSalesLine."Membership Id" := Membership.SystemId;
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Modify();
+    end;
+
+    procedure CreateCapturedMembershipLineNoToken(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20])
+    begin
+        CreateMembershipLine(EcomSalesLine, EcomSalesHeader, ItemNo, 1, 100);
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Modify();
+    end;
+
+    local procedure CreateMembershipLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20]; Qty: Decimal; UnitPrice: Decimal)
+    begin
+        EcomSalesLine.Init();
+        EcomSalesLine."Document Entry No." := EcomSalesHeader."Entry No.";
+        EcomSalesLine."Document Type" := EcomSalesHeader."Document Type";
+        EcomSalesLine."External Document No." := CopyStr(EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesLine."External Document No."));
+        EcomSalesLine."Line No." := GetNextLineNo(EcomSalesHeader);
+        EcomSalesLine.Type := EcomSalesLine.Type::Item;
+        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Membership;
+#pragma warning disable AA0139
+        EcomSalesLine."No." := ItemNo;
+#pragma warning restore AA0139
+        EcomSalesLine.Quantity := Qty;
+        EcomSalesLine."Unit Price" := UnitPrice;
+        EcomSalesLine."Line Amount" := Qty * UnitPrice;
+        EcomSalesLine.Insert(true);
+    end;
+
     procedure CreateAdmissionWithDefaultSchedule(AdmissionCode: Code[20]; DefaultSchedule: Option): Code[20]
     var
         Admission: Record "NPR TM Admission";
@@ -93,6 +126,40 @@ codeunit 85161 "NPR Library Ecommerce"
         Body.Add('ticketReservationToken', ReservationToken);
         AddDefaultSellTo(Body);
         AddSalesLineJson(Lines, ItemNo, 1, 100, 0, LineId);
+        Body.Add('salesDocumentLines', Lines);
+        Body.Add('payments', Payments);
+        ProcessEcomDocument(Body, ExternalNo, EcomSalesHeader);
+    end;
+
+    procedure InsertEcomDocumentWithMemberData(ExternalNo: Code[20]; ItemNo: Code[20]; FirstName: Text; LastName: Text; Email: Text; Quantity: Decimal; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Body: JsonObject;
+        Lines: JsonArray;
+        Payments: JsonArray;
+        EmptyGuid: Guid;
+    begin
+        Body := CreateHeaderJson(ExternalNo);
+        AddDefaultSellTo(Body);
+        AddMembershipLineJsonWithMemberData(Lines, ItemNo, EmptyGuid, FirstName, LastName, Email, Quantity);
+        Body.Add('salesDocumentLines', Lines);
+        Body.Add('payments', Payments);
+        ProcessEcomDocument(Body, ExternalNo, EcomSalesHeader);
+    end;
+
+    procedure InsertEcomDocumentWithMembershipToken(ExternalNo: Code[20]; ItemNo: Code[20]; MembershipToken: Guid; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        InsertEcomDocumentWithMembershipTokenQty(ExternalNo, ItemNo, MembershipToken, 1, EcomSalesHeader);
+    end;
+
+    procedure InsertEcomDocumentWithMembershipTokenQty(ExternalNo: Code[20]; ItemNo: Code[20]; MembershipToken: Guid; Quantity: Decimal; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Body: JsonObject;
+        Lines: JsonArray;
+        Payments: JsonArray;
+    begin
+        Body := CreateHeaderJson(ExternalNo);
+        AddDefaultSellTo(Body);
+        AddMembershipLineJsonWithMemberData(Lines, ItemNo, MembershipToken, '', '', '', Quantity);
         Body.Add('salesDocumentLines', Lines);
         Body.Add('payments', Payments);
         ProcessEcomDocument(Body, ExternalNo, EcomSalesHeader);
@@ -189,6 +256,30 @@ codeunit 85161 "NPR Library Ecommerce"
         Line.Add('lineAmount', Quantity * UnitPrice);
         if not IsNullGuid(TicketReservationLineId) then
             Line.Add('ticketReservationLineId', Format(ticketReservationLineId));
+        Lines.Add(Line);
+    end;
+
+
+    local procedure AddMembershipLineJsonWithMemberData(var Lines: JsonArray; ItemNo: Code[20]; MembershipToken: Guid; FirstName: Text; LastName: Text; Email: Text; Quantity: Decimal)
+    var
+        Line: JsonObject;
+    begin
+        Line.Add('type', 'item');
+        Line.Add('no', ItemNo);
+        Line.Add('quantity', Quantity);
+        Line.Add('unitPrice', 100);
+        Line.Add('vatPercent', 0);
+        Line.Add('lineAmount', Quantity * 100);
+        if not IsNullGuid(MembershipToken) then
+#pragma warning disable AA0139
+            Line.Add('membershipId', Format(MembershipToken, 0, 4).ToLower());
+#pragma warning restore AA0139
+        if FirstName <> '' then
+            Line.Add('memberFirstName', FirstName);
+        if LastName <> '' then
+            Line.Add('memberLastName', LastName);
+        if Email <> '' then
+            Line.Add('memberEmail', Email);
         Lines.Add(Line);
     end;
 

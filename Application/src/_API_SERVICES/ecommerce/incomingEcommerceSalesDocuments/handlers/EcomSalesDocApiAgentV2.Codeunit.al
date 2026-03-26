@@ -65,7 +65,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         ShipToJsonToken: JsonToken;
     begin
 #pragma warning disable AA0139
-
         SalesDocToJsonToken := RequestBody;
         EcomSalesHeader."External No." := JsonHelper.GetJText(RequestBody, 'externalNo', MaxStrLen(EcomSalesHeader."External No."), true, true);
         EcomSalesHeader."Document Type" := GetEcomDocumentTypeFromRequest(RequestBody);
@@ -237,7 +236,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     local procedure DeserializeIncomingEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
-        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
         JsonHelper: Codeunit "NPR Json Helper";
         LineTypeText: Text;
         PropertyErrorText: Label 'Property %1 has incorrect value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
@@ -259,16 +258,28 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
                     EcomSalesLine."Variant Code" := JsonHelper.GetJText(SalesLineJsonToken, 'variantCode', MaxStrLen(EcomSalesLine."Variant Code"), true, false);
-                    if EcomVirtualItemMgt.IsTicketItem(EcomSalesLine."No.") then begin
-                        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Ticket;
-                        ValidateTicketReservationLineId(SalesLineJsonToken, EcomSalesLine, EcomSalesHeader);
-                    end else begin
-                        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Item;
-                        EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
-                        if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
-                            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'no'), EcomSalesLine."No.");
-                        EcomSalesLine."Unit Of Measure Code" := JsonHelper.GetJText(SalesLineJsonToken, 'unitOfMeasure', MaxStrLen(EcomSalesLine."Unit Of Measure Code"), true, false);
-                        EcomSalesLine."Requested Delivery Date" := JsonHelper.GetJDate(SalesLineJsonToken, 'requestedDeliveryDate', false);
+                    SetSubtype(EcomSalesLine);
+                    case EcomSalesLine.Subtype of
+                        EcomSalesLine.Subtype::Item:
+                            begin
+                                EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
+                                if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
+                                    Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'no'), EcomSalesLine."No.");
+                                EcomSalesLine."Unit Of Measure Code" := JsonHelper.GetJText(SalesLineJsonToken, 'unitOfMeasure', MaxStrLen(EcomSalesLine."Unit Of Measure Code"), true, false);
+                                EcomSalesLine."Requested Delivery Date" := JsonHelper.GetJDate(SalesLineJsonToken, 'requestedDeliveryDate', false);
+                            end;
+                        EcomSalesLine.Subtype::Ticket:
+                            ValidateTicketReservationLineId(SalesLineJsonToken, EcomSalesLine, EcomSalesHeader);
+                        EcomSalesLine.Subtype::Membership:
+                            begin
+                                ValidateMembershipToken(SalesLineJsonToken, EcomSalesLine);
+                                if IsNullGuid(EcomSalesLine."Membership Id") then begin
+                                    EcomSalesLine."Membership Activation Date" := JsonHelper.GetJDate(SalesLineJsonToken, 'membershipActivationDate', false);
+                                    ParseMemberFields(SalesLineJsonToken, EcomSalesLine);
+                                    EcomCreateMMShipImpl.ValidateMembershipRequestForDirectCreation(EcomSalesLine);
+                                end else
+                                    EcomCreateMMShipImpl.ValidateMembershipToken(EcomSalesLine, EcomSalesHeader)
+                            end;
                     end;
                 end;
             EcomSalesLine.Type::Comment:
@@ -305,6 +316,43 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 
         EcomSalesDocApiEvents.OnAfterDeserializeIncomingEcomSalesLine(SalesLineJsonToken, EcomSalesLine);
 #pragma warning restore AA0139
+    end;
+
+    local procedure SetSubtype(var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+        case EcomSalesLine.Type of
+            EcomSalesLine.Type::Voucher:
+                EcomSalesLine.Subtype := EcomSalesLine.Subtype::Voucher;
+            EcomSalesLine.Type::Item:
+                begin
+                    if EcomSalesLine."No." <> '' then
+                        EcomSalesLine.Subtype := TrySetItemSubtype(EcomSalesLine."No.");
+                    if EcomSalesLine.Subtype = EcomSalesLine.Subtype::" " then
+                        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Item;//If Item No. is not provided, try to resolve it later using the barcode
+                end;
+        end;
+    end;
+
+    local procedure TrySetItemSubtype(ItemNo: Text[50]) Subtype: Enum "NPR Ecom Sales Line Subtype"
+    var
+        Item: Record Item;
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        ItemCode: Code[20];
+        ItemNotFoundErr: Label 'Item with SKU %1 does not exist.', Comment = '%1 - SKU';
+    begin
+        if not Evaluate(ItemCode, ItemNo) then
+            Error(ItemNotFoundErr, ItemNo);
+        Item.SetLoadFields("NPR Ticket Type");
+        if not Item.Get(ItemCode) then
+            Error(ItemNotFoundErr, ItemNo);
+        case true of
+            EcomVirtualItemMgt.IsTicketLine(Item):
+                exit(Subtype::Ticket);
+            EcomVirtualItemMgt.IsMembershipLine(Item."No."):
+                exit(Subtype::Membership);
+            else
+                exit(Subtype::Item);
+        end;
     end;
 
     [TryFunction]
@@ -702,7 +750,22 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('captured', EcomSalesLine.Captured)
                                   .AddProperty('virtualItemProcessStatus', GetVirtualItemProcessStatusApiType(EcomSalesLine))
                                   .AddProperty('virtualItemProcessErrorMessage', EcomSalesLine."Virtual Item Process ErrMsg")
-                                  .AddProperty('ticketReservationLineId', Format(EcomSalesLine."Ticket Reservation Line Id", 0, 4));
+                                  .AddProperty('ticketReservationLineId', Format(EcomSalesLine."Ticket Reservation Line Id", 0, 4).ToLower())
+                                  .AddProperty('membershipId', Format(EcomSalesLine."Membership Id", 0, 4).ToLower())
+                                  .AddProperty('memberFirstName', EcomSalesLine."Member First Name")
+                                  .AddProperty('memberLastName', EcomSalesLine."Member Last Name")
+                                  .AddProperty('memberMiddleName', EcomSalesLine."Member Middle Name")
+                                  .AddProperty('memberEmail', EcomSalesLine."Member Email")
+                                  .AddProperty('memberPhoneNo', EcomSalesLine."Member Phone No.")
+                                  .AddProperty('memberBirthday', Format(EcomSalesLine."Member Birthday",0,9))
+                                  .AddProperty('memberGender', EcomSalesLine."Member Gender")
+                                  .AddProperty('memberAddress', EcomSalesLine."Member Address")
+                                  .AddProperty('memberCity', EcomSalesLine."Member City")
+                                  .AddProperty('memberCountry', EcomSalesLine."Member Country")
+                                  .AddProperty('memberPostCode', EcomSalesLine."Member Post Code")
+                                  .AddProperty('memberNewsletter', EcomSalesLine."Member Newsletter")
+                                  .AddProperty('memberGdprApproval', EcomSalesLine."Member GDPR Approval")
+                                  .AddProperty('membershipActivationDate', Format(EcomSalesLine."Membership Activation Date",0,9));
         EcomSalesDocApiEvents.OnCreateAddSalesLineDetailsCustomFieldsJsonObject(EcomSalesLine, SalesLineDetailsCustomFieldsJsonObject);
         if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then
             SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
@@ -804,6 +867,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             EcomVirtualItemMgt.CaptureEcomDocument(EcomSalesHeader, false, false);
             EcomVirtualItemMgt.CreateVouchers(EcomSalesHeader, false, false);
             EcomVirtualItemMgt.CreateTickets(EcomSalesHeader, false, false);
+            EcomVirtualItemMgt.CreateMemberships(EcomSalesHeader, false, false);
         end;
         CreateDocument(EcomSalesHeader)
     end;
@@ -903,6 +967,43 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             else
                 Error(MissingTicketReservationLineErr, EcomSalesHeader.FieldCaption("Ticket Reservation Token"), TicketReservationPath);
         end;
+    end;
+
+    local procedure ParseMemberFields(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
+#pragma warning disable AA0139
+        EcomSalesLine."Member First Name" := JsonHelper.GetJText(SalesLineJsonToken, 'memberFirstName', MaxStrLen(EcomSalesLine."Member First Name"), false, false);
+        EcomSalesLine."Member Last Name" := JsonHelper.GetJText(SalesLineJsonToken, 'memberLastName', MaxStrLen(EcomSalesLine."Member Last Name"), false, false);
+        EcomSalesLine."Member Middle Name" := JsonHelper.GetJText(SalesLineJsonToken, 'memberMiddleName', MaxStrLen(EcomSalesLine."Member Middle Name"), false, false);
+        EcomSalesLine."Member Email" := JsonHelper.GetJText(SalesLineJsonToken, 'memberEmail', MaxStrLen(EcomSalesLine."Member Email"), false, false);
+        EcomSalesLine."Member Phone No." := JsonHelper.GetJText(SalesLineJsonToken, 'memberPhoneNo', MaxStrLen(EcomSalesLine."Member Phone No."), false, false);
+        EcomSalesLine."Member Address" := JsonHelper.GetJText(SalesLineJsonToken, 'memberAddress', MaxStrLen(EcomSalesLine."Member Address"), false, false);
+        EcomSalesLine."Member City" := JsonHelper.GetJText(SalesLineJsonToken, 'memberCity', MaxStrLen(EcomSalesLine."Member City"), false, false);
+        EcomSalesLine."Member Country" := JsonHelper.GetJText(SalesLineJsonToken, 'memberCountry', MaxStrLen(EcomSalesLine."Member Country"), false, false);
+        EcomSalesLine."Member Post Code" := JsonHelper.GetJText(SalesLineJsonToken, 'memberPostCode', MaxStrLen(EcomSalesLine."Member Post Code"), false, false);
+        EcomSalesLine."Member Gender" := JsonHelper.GetJText(SalesLineJsonToken, 'memberGender', MaxStrLen(EcomSalesLine."Member Gender"), false, false);
+        EcomSalesLine."Member Newsletter" := JsonHelper.GetJText(SalesLineJsonToken, 'memberNewsletter', MaxStrLen(EcomSalesLine."Member Newsletter"), false, false);
+        EcomSalesLine."Member GDPR Approval" := JsonHelper.GetJText(SalesLineJsonToken, 'memberGdprApproval', MaxStrLen(EcomSalesLine."Member GDPR Approval"), false, false);
+        EcomSalesLine."Member Birthday" := JsonHelper.GetJDate(SalesLineJsonToken, 'memberBirthday', false);
+#pragma warning restore AA0139
+    end;
+
+    local procedure ValidateMembershipToken(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        MembershipTokenPath: Text;
+        MembershipToken: Text;
+        InvalidGuidErr: Label 'Invalid value at %1: "%2". Expected a GUID.', Comment = '%1 = JSON path, %2 = incoming value';
+    begin
+        MembershipToken := JsonHelper.GetJText(SalesLineJsonToken, 'membershipId', 50, false, false).Trim();
+        if MembershipToken = '' then
+            exit;
+        MembershipTokenPath := JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'membershipId');
+        if not Evaluate(EcomSalesLine."Membership Id", MembershipToken) then
+            Error(InvalidGuidErr, MembershipTokenPath, MembershipToken);
+
     end;
 }
 #endif

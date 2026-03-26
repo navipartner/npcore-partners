@@ -266,6 +266,11 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(220; "Ecom Sale Id"; Guid)
+        {
+            Caption = 'Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

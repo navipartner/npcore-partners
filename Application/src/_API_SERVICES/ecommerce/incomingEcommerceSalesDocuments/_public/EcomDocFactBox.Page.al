@@ -74,10 +74,8 @@ page 6185130 "NPR Ecom Doc FactBox"
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies whether virtual items exist on this ecommerce document.';
                         trigger OnDrillDown()
-                        var
-                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
                         begin
-                            EcomVirtualItemMgt.OpenEcomVirtualItemLines(Rec);
+                            _EcomVirtualItemMgt.OpenEcomVirtualItemLines(Rec);
                         end;
                     }
                     field("Virtual Items Proccess Status"; Rec."Virtual Items Process Status")
@@ -86,10 +84,8 @@ page 6185130 "NPR Ecom Doc FactBox"
                         ToolTip = 'Specifies the value of the Virtual Item Processing Status field.';
                         StyleExpr = _VirtualItemProcessingStatusStyleText;
                         trigger OnDrillDown()
-                        var
-                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
                         begin
-                            EcomVirtualItemMgt.OpenEcomVirtualItemLines(Rec);
+                            _EcomVirtualItemMgt.OpenEcomVirtualItemLines(Rec);
                         end;
                     }
                     field("Capture Processing Status"; Rec."Capture Processing Status")
@@ -98,10 +94,8 @@ page 6185130 "NPR Ecom Doc FactBox"
                         ToolTip = 'Specifies the value of the Capture Processing Status field.';
                         StyleExpr = _CaptureProcessingStatusStyleText;
                         trigger OnDrillDown()
-                        var
-                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
                         begin
-                            EcomVirtualItemMgt.OpenEcomCapturedLines(Rec);
+                            _EcomVirtualItemMgt.OpenEcomCapturedLines(Rec);
                         end;
                     }
                     field("Last Capture Error Message"; Rec."Last Capture Error Message")
@@ -129,10 +123,8 @@ page 6185130 "NPR Ecom Doc FactBox"
                             ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies whether tickets exist for this document.';
                             trigger OnDrillDown()
-                            var
-                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
                             begin
-                                EcomVirtualItemMgt.OpenEcomTicketLines(Rec);
+                                _EcomVirtualItemMgt.OpenEcomTicketLines(Rec);
                             end;
                         }
                         field("Ticket Processing Status"; Rec."Ticket Processing Status")
@@ -141,10 +133,8 @@ page 6185130 "NPR Ecom Doc FactBox"
                             ToolTip = 'Specifies the value of the Ticket Processing Status field.';
                             StyleExpr = _TicketProcessingStatusStyleText;
                             trigger OnDrillDown()
-                            var
-                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
                             begin
-                                EcomVirtualItemMgt.OpenEcomTicketLines(Rec);
+                                _EcomVirtualItemMgt.OpenEcomTicketLines(Rec);
                             end;
                         }
                         field("Ticket Reservation Token"; Rec."Ticket Reservation Token")
@@ -163,10 +153,8 @@ page 6185130 "NPR Ecom Doc FactBox"
                             ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies whether vouchers exist for this document.';
                             trigger OnDrillDown()
-                            var
-                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
                             begin
-                                EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
+                                _EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
                             end;
                         }
                         field("Voucher Processing Status"; Rec."Voucher Processing Status")
@@ -175,109 +163,131 @@ page 6185130 "NPR Ecom Doc FactBox"
                             ToolTip = 'Specifies the voucher processing status.';
                             StyleExpr = _VoucherProcessingStatusStyleText;
                             trigger OnDrillDown()
-                            var
-                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
                             begin
-                                EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
+                                _EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
                             end;
                         }
                     }
-                }
-                group("Error")
-                {
-                    Caption = 'Error';
-                    field("Last Error Message"; Rec."Last Error Message")
+                    group(Memberships)
                     {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Error Message field.';
-                        StyleExpr = _ErrorInformationStyleText;
-                        trigger OnDrillDown()
-                        begin
-                            Message(Rec."Last Error Message");
-                        end;
+                        Caption = 'Memberships';
+                        field("Memberships Exist"; Rec."Memberships Exist")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Memberships Exist field.';
+                            trigger OnDrillDown()
+                            begin
+                                _EcomVirtualItemMgt.OpenEcomMembershipLines(Rec);
+                            end;
+                        }
+                        field("Membership Processing Status"; Rec."Membership Processing Status")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Membership Processing Status field.';
+                            StyleExpr = _MembershipProcessingStatusStyleText;
+                            trigger OnDrillDown()
+                            begin
+                                _EcomVirtualItemMgt.OpenEcomMembershipLines(Rec);
+                            end;
+                        }
                     }
-                    field("Error Date"; Rec."Last Error Date")
-                    {
-                        ApplicationArea = NPRRetail;
-                        StyleExpr = _ErrorInformationStyleText;
-                        ToolTip = 'Specifies the value of the Last Error Date field.';
-                    }
-                    field("Error Time"; Rec."Last Error Time")
-                    {
-                        ApplicationArea = NPRRetail;
-                        StyleExpr = _ErrorInformationStyleText;
-                        ToolTip = 'Specifies the value of the Last Error Time field.';
-                    }
-                    field("Error Received By User Name"; Rec."Last Error Rcvd By User Name")
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Error Received By User Name field.';
-                        StyleExpr = _ErrorInformationStyleText;
-                    }
-                    field("Process Retry Count"; Rec."Process Retry Count")
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Process Retry Count field.';
-                        StyleExpr = _ErrorInformationStyleText;
-                    }
-                }
-                group(Receive)
-                {
-                    Caption = 'Receive';
-                    field(ReceivedDate; Rec."Received Date")
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Received Date field.';
-                    }
-                    field(ReceivedTime; Rec."Received Time")
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Received Time field.';
-                    }
-                    field(ReceivedByUserName; GetSystemReceivedByUserName())
-                    {
-                        Caption = 'Received By User Name';
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Received By User Name field.';
-                    }
-                }
-                group(Payment)
-                {
-                    Caption = 'Payment';
-                    field("Payment Amount"; Rec."Payment Amount")
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Payment Amount field.';
 
-                    }
-                    field("Captured Payment Amount"; Rec."Captured Payment Amount")
+                    group("Error")
                     {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Captured Payment Amount field.';
+                        Caption = 'Error';
+                        field("Last Error Message"; Rec."Last Error Message")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Error Message field.';
+                            StyleExpr = _ErrorInformationStyleText;
+                            trigger OnDrillDown()
+                            begin
+                                Message(Rec."Last Error Message");
+                            end;
+                        }
+                        field("Error Date"; Rec."Last Error Date")
+                        {
+                            ApplicationArea = NPRRetail;
+                            StyleExpr = _ErrorInformationStyleText;
+                            ToolTip = 'Specifies the value of the Last Error Date field.';
+                        }
+                        field("Error Time"; Rec."Last Error Time")
+                        {
+                            ApplicationArea = NPRRetail;
+                            StyleExpr = _ErrorInformationStyleText;
+                            ToolTip = 'Specifies the value of the Last Error Time field.';
+                        }
+                        field("Error Received By User Name"; Rec."Last Error Rcvd By User Name")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Error Received By User Name field.';
+                            StyleExpr = _ErrorInformationStyleText;
+                        }
+                        field("Process Retry Count"; Rec."Process Retry Count")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Process Retry Count field.';
+                            StyleExpr = _ErrorInformationStyleText;
+                        }
                     }
-                    field("Invoiced Payment Amount"; Rec."Invoiced Payment Amount")
+                    group(Receive)
                     {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Captured Payment Amount field.';
+                        Caption = 'Receive';
+                        field(ReceivedDate; Rec."Received Date")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Received Date field.';
+                        }
+                        field(ReceivedTime; Rec."Received Time")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Received Time field.';
+                        }
+                        field(ReceivedByUserName; GetSystemReceivedByUserName())
+                        {
+                            Caption = 'Received By User Name';
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Received By User Name field.';
+                        }
                     }
-                }
-                group(Sale)
-                {
-                    Caption = 'Sale';
-                    field("Posting Status"; Rec."Posting Status")
+                    group(Payment)
                     {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Posting Status field.';
+                        Caption = 'Payment';
+                        field("Payment Amount"; Rec."Payment Amount")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Payment Amount field.';
+
+                        }
+                        field("Captured Payment Amount"; Rec."Captured Payment Amount")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Captured Payment Amount field.';
+                        }
+                        field("Invoiced Payment Amount"; Rec."Invoiced Payment Amount")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Captured Payment Amount field.';
+                        }
                     }
-                    field(Amount; Rec.Amount)
+                    group(Sale)
                     {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Amount field.';
-                    }
-                    field("Invoiced Amount"; Rec."Invoiced Amount")
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Invoiced Amount field.';
+                        Caption = 'Sale';
+                        field("Posting Status"; Rec."Posting Status")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Posting Status field.';
+                        }
+                        field(Amount; Rec.Amount)
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Amount field.';
+                        }
+                        field("Invoiced Amount"; Rec."Invoiced Amount")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the value of the Invoiced Amount field.';
+                        }
                     }
                 }
             }
@@ -285,7 +295,7 @@ page 6185130 "NPR Ecom Doc FactBox"
     }
     trigger OnAfterGetCurrRecord()
     begin
-        GetStyles(_CreationStatusStyleText, _ErrorInformationStyleText, _VoucherProcessingStatusStyleText, _TicketProcessingStatusStyleText, _CaptureProcessingStatusStyleText, _CaptureErrorStyleText, _VirtualItemProcessingStatusStyleText);
+        GetStyles(_CreationStatusStyleText, _ErrorInformationStyleText, _VoucherProcessingStatusStyleText, _TicketProcessingStatusStyleText, _CaptureProcessingStatusStyleText, _CaptureErrorStyleText, _VirtualItemProcessingStatusStyleText, _MembershipProcessingStatusStyleText);
     end;
 
     local procedure GetSystemReceivedByUserName() UserName: Code[50]
@@ -299,21 +309,22 @@ page 6185130 "NPR Ecom Doc FactBox"
         UserName := User."User Name";
     end;
 
-    local procedure GetStyles(var CreationStatusStyleText: Text; var ErrorInformationStyleText: Text; var VoucherProcessingStatusStyleText: Text; var TicketProcessingStatusStyleText: Text; var CaptureProcessingStatusStyleText: Text; var CaptureErrorStyleText: Text; var VirtualItemProcessingStatusStyleText: Text)
+    local procedure GetStyles(var CreationStatusStyleText: Text; var ErrorInformationStyleText: Text; var VoucherProcessingStatusStyleText: Text; var TicketProcessingStatusStyleText: Text; var CaptureProcessingStatusStyleText: Text; var CaptureErrorStyleText: Text; var VirtualItemProcessingStatusStyleText: Text; var MembershipProcessingStatusStyleText: Text)
     var
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
-        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
         CreationStatusStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderCreationStatusStyle(Rec);
         ErrorInformationStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderErrorInformationStyle(Rec);
-        VoucherProcessingStatusStyleText := EcomVirtualItemMgt.GetVoucherProcessingStatusStyle(Rec);
-        TicketProcessingStatusStyleText := EcomVirtualItemMgt.GetTicketProcessingStatusStyle(Rec);
-        CaptureProcessingStatusStyleText := EcomVirtualItemMgt.GetCaptureProcessingStatusStyle(Rec);
-        CaptureErrorStyleText := EcomVirtualItemMgt.GetCaptureErrorStyle(Rec);
-        VirtualItemProcessingStatusStyleText := EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
+        VoucherProcessingStatusStyleText := _EcomVirtualItemMgt.GetVoucherProcessingStatusStyle(Rec);
+        TicketProcessingStatusStyleText := _EcomVirtualItemMgt.GetTicketProcessingStatusStyle(Rec);
+        CaptureProcessingStatusStyleText := _EcomVirtualItemMgt.GetCaptureProcessingStatusStyle(Rec);
+        CaptureErrorStyleText := _EcomVirtualItemMgt.GetCaptureErrorStyle(Rec);
+        VirtualItemProcessingStatusStyleText := _EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
+        MembershipProcessingStatusStyleText := _EcomVirtualItemMgt.GetMembershipProcessingStatusStyle(Rec);
     end;
 
     var
+        _EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         _CreationStatusStyleText: Text;
         _ErrorInformationStyleText: Text;
         _VoucherProcessingStatusStyleText: Text;
@@ -321,5 +332,6 @@ page 6185130 "NPR Ecom Doc FactBox"
         _CaptureProcessingStatusStyleText: Text;
         _CaptureErrorStyleText: Text;
         _VirtualItemProcessingStatusStyleText: Text;
+        _MembershipProcessingStatusStyleText: Text;
 }
 #endIf

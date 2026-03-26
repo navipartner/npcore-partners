@@ -198,6 +198,19 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                     EcomCreateTicketJQ.ScheduleJobQueueWithConfirmation();
                 end;
             }
+            action(ConfigureEcomMembershipProcessingJobQueue)
+            {
+                Caption = 'Configure Membership Processing Job Queue';
+                ApplicationArea = NPRRetail;
+                Image = Add;
+                ToolTip = 'Configure Membership Processing Job Queue';
+                trigger OnAction()
+                var
+                    NPREcomCreateMembershipJQ: Codeunit "NPR EcomCreateMembershipJQ";
+                begin
+                    NPREcomCreateMembershipJQ.ScheduleJobQueueWithConfirmation();
+                end;
+            }
         }
         area(Navigation)
         {
@@ -253,7 +266,7 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                 actionref(ConfigureEcomSalesOrderProcessingJobQueue_Promoted; ConfigureEcomSalesOrderProcessingJobQueue) { }
                 actionref(ConfigureEcomSalesReturnOrderProcessingJobQueue_Promoted; ConfigureEcomSalesReturnOrderProcessingJobQueue) { }
                 actionref(ConfigureEcomTicketProcessingJobQueue_Promoted; ConfigureEcomTicketProcessingJobQueue) { }
-
+                actionref(ConfigureEcomMembershipProcessingJobQueue_Promoted; ConfigureEcomMembershipProcessingJobQueue) { }
             }
         }
     }
