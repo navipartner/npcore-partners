@@ -1889,26 +1889,9 @@
     end;
 
     [TryFunction]
+    [Obsolete('Send Notification On Sale setting removed. It spawned background sessions on every sale, spamming the NST and killing cache performance.', '2026-03-22')]
     internal procedure SendInlineNotifications()
-    var
-        MembershipNotification: Record "NPR MM Membership Notific.";
-        SessionId: Integer;
     begin
-
-        SelectLatestVersion();
-
-        MembershipNotification.Reset();
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        MembershipNotification.SetFilter("Processing Method", '=%1', MembershipNotification."Processing Method"::INLINE);
-        MembershipNotification.SetFilter("Date To Notify", '=%1', Today);
-        MembershipNotification.SetFilter(Blocked, '=%1', false);
-
-        if (not MembershipNotification.IsEmpty()) then
-            if (not Session.StartSession(SessionId, Codeunit::"NPR MM Process Inline Notif", CompanyName(), MembershipNotification)) then
-                Error(GetLastErrorText());
-
-        if (not Session.StartSession(SessionId, Codeunit::"NPR MM Sponsorship Ticket Mgt")) then
-            Error(GetLastErrorText());
     end;
 
     [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
@@ -1983,10 +1966,9 @@
         Session.LogMessage('NPR_MemberNotification', FailReason, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
+    [Obsolete('Send Notification On Sale setting removed. It spawned background sessions on every sale, spamming the NST and killing cache performance.', '2026-03-22')]
     procedure SendMemberNotification()
     begin
-        if (not SendInlineNotifications()) then
-            ; // Do nothing, the test framework can not start session to send notifications
     end;
 
     [TryFunction]

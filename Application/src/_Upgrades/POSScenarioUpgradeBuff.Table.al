@@ -40,6 +40,9 @@ table 6150852 "NPR POS Scenario Upgrade Buff"
         {
             Caption = 'Send Notification On Sale';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-03-22';
+            ObsoleteReason = 'Enabling this field spams NST sessions and was only used for demos.';
         }
         field(8; "Print Ticket On Sale"; Boolean)
         {

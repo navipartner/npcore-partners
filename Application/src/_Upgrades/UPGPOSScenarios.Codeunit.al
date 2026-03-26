@@ -525,14 +525,12 @@ codeunit 6150945 "NPR UPG POS Scenarios"
                 repeat
                     POSMemberProfile.Reset();
                     POSMemberProfile.SetRange("Print Membership On Sale", POSScenarioUpgradeBuff."Print Membership On Sale");
-                    POSMemberProfile.SetRange("Send Notification On Sale", POSScenarioUpgradeBuff."Send Notification On Sale");
                     POSMemberProfile.SetRange(Code, POSUnit."POS Member Profile");
                     if POSMemberProfile.IsEmpty then
                         if not NPRMemberProfileUpgBuff.Get(POSUnit."POS Sales Workflow Set", POSUnit."POS Member Profile") then begin
                             NewPOSMemberProfile.Init();
                             NewPOSMemberProfile.Code := GetPOSMemberProfileUpgradeCode();
                             NewPOSMemberProfile."Print Membership On Sale" := POSScenarioUpgradeBuff."Print Membership On Sale";
-                            NewPOSMemberProfile."Send Notification On Sale" := POSScenarioUpgradeBuff."Send Notification On Sale";
                             NewPOSMemberProfile.Insert();
 
                             NPRMemberProfileUpgBuff.Init();
@@ -598,13 +596,6 @@ codeunit 6150945 "NPR UPG POS Scenarios"
                 POSScenarioUpgradeBuff."Print Membership On Sale" := false
             else
                 POSScenarioUpgradeBuff."Print Membership On Sale" := POSSalesWorkflowStep.Enabled;
-
-            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR MM Member Notification");
-            POSSalesWorkflowStep.SetRange("Subscriber Function", 'SendMemberNotificationOnSales');
-            if not POSSalesWorkflowStep.FindFirst() then
-                POSScenarioUpgradeBuff."Send Notification On Sale" := false
-            else
-                POSScenarioUpgradeBuff."Send Notification On Sale" := POSSalesWorkflowStep.Enabled;
 
             POSScenarioUpgradeBuff.Modify();
 

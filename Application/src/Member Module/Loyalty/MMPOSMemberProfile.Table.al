@@ -27,6 +27,9 @@ table 6150851 "NPR MM POS Member Profile"
         {
             Caption = 'Send Notification On Sale';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-03-22';
+            ObsoleteReason = 'Enabling this field spams NST sessions and was only used for demos.';
         }
         field(6; "Alteration Group"; Code[10])
         {

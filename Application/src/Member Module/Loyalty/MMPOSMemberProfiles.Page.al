@@ -26,12 +26,6 @@ page 6184631 "NPR MM POS Member Profiles"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Description field.';
                 }
-                field("Send Notification On Sale"; Rec."Send Notification On Sale")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies if member notifications are going to be send after the end of the pos sale.';
-                }
-
                 field("Print Membership On Sale"; Rec."Print Membership On Sale")
                 {
                     ApplicationArea = NPRRetail;
