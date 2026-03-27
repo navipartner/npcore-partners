@@ -13,6 +13,10 @@
     begin
         if not RunTrigger then
             exit;
+        if not Rec.AreFieldsLoaded(Rec."Unit Cost", Rec."Last Direct Cost", Rec."Unit Price", Rec."Standard Cost", Rec."Item Category Code") then
+            exit;
+        if not xRec.AreFieldsLoaded(xRec."Unit Cost", xRec."Last Direct Cost", xRec."Unit Price", xRec."Standard Cost", xRec."Item Category Code") then
+            exit;
         if (Rec."Unit Cost" = xRec."Unit Cost") and
            (Rec."Last Direct Cost" = xRec."Last Direct Cost") and
            (Rec."Unit Price" = xRec."Unit Price") and

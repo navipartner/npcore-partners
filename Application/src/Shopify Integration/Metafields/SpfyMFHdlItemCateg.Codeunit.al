@@ -526,6 +526,10 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
     begin
         if Rec.IsTemporary() then
             exit;
+        if not Rec.AreFieldsLoaded(Rec."Item Category Code") then
+            exit;
+        if not xRec.AreFieldsLoaded(xRec."Item Category Code") then
+            exit;
         if Rec."Item Category Code" = xRec."Item Category Code" then
             exit;
         SpfyStoreItemLink.SetRange(Type, SpfyStoreItemLink.Type::Item);

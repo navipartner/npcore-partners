@@ -1,4 +1,4 @@
-﻿codeunit 6060053 "NPR Item Wksht. Wf Events"
+codeunit 6060053 "NPR Item Wksht. Wf Events"
 {
     Access = Internal;
     local procedure ItemStatusChanged(): Code[128]
@@ -39,6 +39,10 @@
     var
         WorkflowManagement: Codeunit "Workflow Management";
     begin
+        if not Rec.AreFieldsLoaded(Rec."NPR Item Status") then
+            exit;
+        if not xRec.AreFieldsLoaded(xRec."NPR Item Status") then
+            exit;
         if Rec."NPR Item Status" = xRec."NPR Item Status" then
             exit;
         WorkflowManagement.HandleEventWithxRec(ItemStatusChanged(), Rec, xRec);

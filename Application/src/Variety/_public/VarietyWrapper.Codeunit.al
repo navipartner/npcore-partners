@@ -571,6 +571,12 @@
         if Rec.IsTemporary then
             exit;
 
+        if not Rec.AreFieldsLoaded(Rec."NPR Variety 1", Rec."NPR Variety 2", Rec."NPR Variety 3", Rec."NPR Variety 4",
+            Rec."NPR Variety 1 Table", Rec."NPR Variety 2 Table", Rec."NPR Variety 3 Table", Rec."NPR Variety 4 Table") then
+            exit;
+        if not xRec.AreFieldsLoaded(xRec."NPR Variety 1", xRec."NPR Variety 2", xRec."NPR Variety 3", xRec."NPR Variety 4",
+            xRec."NPR Variety 1 Table", xRec."NPR Variety 2 Table", xRec."NPR Variety 3 Table", xRec."NPR Variety 4 Table") then
+            exit;
         VrtCheck.ChangeItemVariety(Rec, xRec);
     end;
 

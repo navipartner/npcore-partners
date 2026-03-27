@@ -11,6 +11,10 @@ codeunit 6150976 "NPR M2 Record Change Mgt."
         if (Rec.IsTemporary()) then
             exit;
 
+        if not Rec.AreFieldsLoaded(Rec."NPR Magento Item") then
+            exit;
+        if not xRec.AreFieldsLoaded(xRec."NPR Magento Item") then
+            exit;
         if (Rec."NPR Magento Item" = xRec."NPR Magento Item") then
             exit;
 
