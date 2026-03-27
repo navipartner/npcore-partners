@@ -7,14 +7,13 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
     begin
-        EcomSalesHeader.SetLoadFields("Creation Status");
         EcomSalesHeader.Get(EcommSalesLine."Document Entry No.");
         IsShopifyDocument := SpfyEcomSalesDocPrcssr.IsShopifyDocument(EcomSalesHeader);
         //lock table
         EcommSalesLine.ReadIsolation := EcommSalesLine.ReadIsolation::UpdLock;
         EcommSalesLine.Get(EcommSalesLine.RecordId);
         CheckIfLineCanBeProcessed(EcommSalesLine, EcomSalesHeader);
-        CreateVoucher(EcommSalesLine);
+        CreateVoucher(EcommSalesLine, EcomSalesHeader);
 
         EcomVirtualItemEvents.OnAfterVoucherProcessBeforeCommit(EcommSalesLine);
         exit(true);
@@ -22,10 +21,6 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
     internal procedure CheckIfLineCanBeProcessed(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
-        EcomSalesHeader.SetLoadFields("Creation Status");
-        EcomSalesHeader.Get(EcommSalesLine."Document Entry No.");
-
-
         if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
             EcomSalesHeader.FieldError("Creation Status");
 
@@ -48,13 +43,12 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
             EcommSalesLine.FieldError(EcommSalesLine."Virtual Item Process Status");
     end;
 
-    local procedure ReserveVoucher(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"): text[50]
+    local procedure ReserveVoucher(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherFaceValueLCY: Decimal): text[50]
     var
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
     begin
         EcommSalesLine.TestField("Voucher Type");
         VoucherType.Get(EcommSalesLine."Voucher Type");
@@ -67,7 +61,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 #pragma warning disable AA0139
         NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
 #pragma warning restore AA0139
-        NpRvSalesLine.Amount := EcommSalesLine."Line Amount";
+        NpRvSalesLine.Amount := VoucherFaceValueLCY;
         NpRvSalesLine.Insert();
 
         NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, TempVoucher);
@@ -86,14 +80,11 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         NpRvSalesLine.Description := Voucher.Description;
     end;
 
-    local procedure UpdateRvSalesLineFromEcomm(var NpRvSalesLine: Record "NPR NpRv Sales Line"; EcommSalesLine: Record "NPR Ecom Sales Line")
-    var
-        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    local procedure UpdateRvSalesLineFromEcomm(var NpRvSalesLine: Record "NPR NpRv Sales Line"; EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherFaceValueLCY: Decimal)
     begin
-        NpRvSalesLine.Amount := EcommSalesLine."Line Amount";
+        NpRvSalesLine.Amount := VoucherFaceValueLCY;
         NpRvSalesLine."NPR Inc Ecom Sales Line Id" := EcommSalesLine.SystemId;
         NpRvSalesLine."Document Type" := EcommSalesLine."Document Type";
-        EcomSalesHeader.Get(EcommSalesLine."Document Entry No.");
         UpdateRvSalesLineFromHeader(NpRvSalesLine, EcomSalesHeader);
     end;
 
@@ -108,18 +99,18 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
             NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
     end;
 
-    local procedure CreateVoucher(var EcommSalesLine: Record "NPR Ecom Sales Line")
+    local procedure CreateVoucher(var EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLineRef: Record "NPR NpRv Sales Line Ref.";
         NpRvGlobalVoucher: Codeunit "NPR NpRv Global Voucher WS";
-        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        VoucherFaceValueLCY: Decimal;
     begin
-        EcomSalesHeader.Get(EcommSalesLine."Document Entry No.");
+        VoucherFaceValueLCY := CalculateVoucherFaceValueLCY(EcomSalesHeader, EcommSalesLine);
         IF EcommSalesLine."Barcode No." = '' then
-            EcommSalesLine."Barcode No." := ReserveVoucher(EcommSalesLine, EcomSalesHeader);
+            EcommSalesLine."Barcode No." := ReserveVoucher(EcommSalesLine, EcomSalesHeader, VoucherFaceValueLCY);
 
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
         NpRvSalesLine.SetRange("Reference No.", EcommSalesLine."Barcode No.");
@@ -146,7 +137,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         NpRvSalesLine.FindFirst();
         CheckVoucherLinkedWithSalesDocument(NpRvSalesLine);
         NpRvSalesLine.TestField("Voucher Type");
-        UpdateRvSalesLineFromEcomm(NpRvSalesLine, EcommSalesLine);
+        UpdateRvSalesLineFromEcomm(NpRvSalesLine, EcommSalesLine, EcomSalesHeader, VoucherFaceValueLCY);
         NpRvSalesLine.UpdateIsSendViaEmail();
 
         NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
@@ -154,7 +145,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
             InsertVoucher(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
         UpdateSalesLineFromVoucher(NpRvVoucher, NpRvSalesLine);
 
-        PostIssueVoucherEntry(NpRvVoucher, EcommSalesLine, NpRvVoucherType, NpRvSalesLine);
+        PostIssueVoucherEntry(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
         NpRvSalesLine.Posted := true;
         NpRvSalesLine.Modify();
 
@@ -222,8 +213,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 #endif
     end;
 
-
-    local procedure PostIssueVoucherEntry(Voucher: Record "NPR NpRv Voucher"; IncEcomLines: record "NPR Ecom Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; NpRvSalesLine: Record "NPR NpRv Sales Line")
+    local procedure PostIssueVoucherEntry(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
@@ -237,7 +227,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
                 VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
         VoucherEntry."External Document No." := NpRvSalesLine."External Document No.";
         VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-        VoucherEntry.Amount := IncEcomLines."Line Amount";
+        VoucherEntry.Amount := NpRvSalesLine.Amount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
         VoucherEntry."Posting Date" := DT2Date(Voucher."Starting Date");
@@ -254,6 +244,32 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         VoucherEntry."Spfy Initiated in Shopify" := NpRvSalesLine."Spfy Initiated in Shopify";
 #endif
         VoucherEntry.Insert();
+    end;
+
+    local procedure CalculateVoucherFaceValueLCY(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: record "NPR Ecom Sales Line"): Decimal
+    var
+        Currency: Record Currency;
+        CurrExchRate: Record "Currency Exchange Rate";
+        FaceValueTCY: Decimal;
+        Precalculated: Boolean;
+    begin
+        if EcomSalesHeader."Price Excl. VAT" and (EcomSalesLine."VAT %" > 0) then
+            FaceValueTCY := EcomSalesLine."Unit Price" * (1 + EcomSalesLine."VAT %" / 100)
+        else
+            FaceValueTCY := EcomSalesLine."Unit Price";
+
+        if NpRvSalesDocMgt.IsLCY(EcomSalesHeader."Currency Code") then begin
+            Currency.InitRoundingPrecision();
+            exit(Round(FaceValueTCY, Currency."Amount Rounding Precision"));
+        end;
+
+        if EcomSalesHeader."Received Date" = 0D then
+            EcomSalesHeader."Received Date" := WorkDate();
+        if (EcomSalesHeader."Currency Code" <> '') and (EcomSalesHeader."Currency Exchange Rate" = 0) then
+            EcomSalesHeader."Currency Exchange Rate" := CurrExchRate.ExchangeRate(EcomSalesHeader."Received Date", EcomSalesHeader."Currency Code");
+        exit(
+            NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(
+                FaceValueTCY, EcomSalesHeader."Currency Code", EcomSalesHeader."Currency Exchange Rate", EcomSalesHeader."Received Date", Precalculated));
     end;
 
     local procedure VoucherAlreadyExist(VoucherNo: Code[20]): Boolean
@@ -331,6 +347,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
     var
         EcomVirtualItemEvents: codeunit "NPR EcomVirtualItemEvents";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
         IsShopifyDocument: Boolean;
 }

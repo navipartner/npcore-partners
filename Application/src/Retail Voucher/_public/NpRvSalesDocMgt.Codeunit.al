@@ -1861,7 +1861,7 @@
             Message(VouchersOnlyInLCYMsg, CurrencyCode);
     end;
 
-    local procedure IsLCY(CurrencyCode: Code[10]): Boolean
+    internal procedure IsLCY(CurrencyCode: Code[10]): Boolean
     begin
         if CurrencyCode = '' then
             exit(true);
