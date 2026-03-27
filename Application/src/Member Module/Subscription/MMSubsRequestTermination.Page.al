@@ -244,10 +244,13 @@ page 6185077 "NPR MM SubsRequestTermination"
     var
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         SubscriptionReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        TryRenewProcess: Codeunit "NPR MM Subs Try Renew Process";
         Subscription: Record "NPR MM Subscription";
         TerminationRequest: Record "NPR MM Subscr. Request";
     begin
         SubscriptionMgtImpl.RequestTermination(Membership, RequestedDate, Reason, TerminationRequest);
+        if (RequestedDate <= WorkDate()) then
+            TryRenewProcess.ProcessTermination(TerminationRequest);
 
         if (_RefundRemaining) then begin
             Subscription.Get(_Subscription."Entry No.");
