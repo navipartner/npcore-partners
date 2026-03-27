@@ -191,12 +191,15 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         JsonHelper: Codeunit "NPR Json Helper";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         Body: JsonToken;
         Tags: JsonToken;
         Tag: JsonToken;
         ExpiresAtMinutes: Integer;
         RequestType: Option WITHDRAW,DEPOSIT;
     begin
+        Sentry.StartSpan(Span, 'bc.loyaltyapi.ValidateReservePointsRequest');
         Body := Request.BodyJson();
         TempAuthorization.Init();
 #pragma warning disable AA0139        
@@ -244,6 +247,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
                 TempMembershipEntryTagBuffer."Tag Value" := CopyStr(JsonHelper.GetJText(Tag, 'value', true), 1, MaxStrLen(TempMembershipEntryTagBuffer."Tag Value"));
                 TempMembershipEntryTagBuffer.Insert();
             end;
+        Span.Finish();
     end;
 
     local procedure ValidateRegisterSaleRequest(MembershipSystemId: Guid; var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSaleLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
@@ -251,6 +255,8 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         GeneralLedgerSetup: Record "General Ledger Setup";
         ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
         JsonHelper: Codeunit "NPR Json Helper";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         Body: JsonToken;
         PointItems: JsonToken;
         PointItem: JsonToken;
@@ -260,6 +266,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         Tag: JsonToken;
         AuthorizationCode: Text;
     begin
+        Sentry.StartSpan(Span, 'bc.loyaltyapi.ValidateRegisterSaleRequest');
         Body := Request.BodyJson();
         TempAuthorization.Init();
 #pragma warning disable AA0139        
@@ -299,10 +306,14 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
                 TempPaymentLineBuffer.Init();
                 TempPaymentLineBuffer."Entry No." += 1;
                 AuthorizationCode := JsonHelper.GetJText(Reservation, 'authorizationCode', true);
-                if StrLen(AuthorizationCode) > MaxStrLen(ReservationLedgerEntry."Authorization Code") then
+                if StrLen(AuthorizationCode) > MaxStrLen(ReservationLedgerEntry."Authorization Code") then begin
+                    Span.Finish();
                     Error(ReservationNotFoundLbl, AuthorizationCode);
-                if not GetReservationEntryFromAuthorization(ReservationLedgerEntry, AuthorizationCode) then
+                end;
+                if not GetReservationEntryFromAuthorization(ReservationLedgerEntry, AuthorizationCode) then begin
+                    Span.Finish();
                     Error(ReservationNotFoundLbl, AuthorizationCode);
+                end;
                 TempPaymentLineBuffer."Authorization Code" := CopyStr(AuthorizationCode, 1, MaxStrLen(TempPaymentLineBuffer."Authorization Code"));
                 TempPaymentLineBuffer."Currency Code" := GeneralLedgerSetup."LCY Code";
                 TempPaymentLineBuffer."Total Points" := -ReservationLedgerEntry."Burned Points";
@@ -325,6 +336,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
                 TempMembershipEntryTagBuffer."Tag Value" := CopyStr(JsonHelper.GetJText(Tag, 'value', true), 1, MaxStrLen(TempMembershipEntryTagBuffer."Tag Value"));
                 TempMembershipEntryTagBuffer.Insert();
             end;
+        Span.Finish();
     end;
 
     local procedure ProcessRegisterSaleRequest(MembershipSystemId: Guid; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSalesLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary) Response: Codeunit "NPR API Response"

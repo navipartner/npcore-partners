@@ -53,16 +53,18 @@
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MembershipEntryNo: Integer;
         TotalEarnAmount: Decimal;
         TotalBurnAmount: Decimal;
     begin
-
         if (not ValidateAuthorization(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
             exit(false);
 
         if (not ValidateRegisterSales(TmpSaleLinesIn, TmpPaymentLinesIn, ResponseMessage, ResponseMessageId)) then
             exit(false);
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.RegisterSales');
 
         // validations are done in the validate functions
         Membership.Get(MembershipEntryNo);
@@ -109,6 +111,7 @@
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
+        Span.Finish();
         exit(true);
     end;
 
@@ -127,6 +130,8 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MembershipEntryNo: Integer;
     begin
 
@@ -135,6 +140,7 @@
 
         if (not ValidateReservePoints(TmpReserveLinesIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
             exit(false);
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.ReservePoints');
 
         // validations are done in the validate functions
         Membership.Get(MembershipEntryNo);
@@ -170,6 +176,7 @@
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
+        Span.Finish();
         exit(true);
     end;
 
@@ -185,17 +192,21 @@
         ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
         Membership: Record "NPR MM Membership";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MembershipEntryNo: Integer;
     begin
 
         if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
             exit(false);
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CancelReservation');
 
         TmpCancelLinesIn.Reset();
         TmpCancelLinesIn.FindFirst();
         if (TmpCancelLinesIn."Authorization Code" = '') then begin
             ResponseMessage := StrSubstNo(RESERVE_1, '', 1);
             ResponseMessageId := '-1300';
+            Span.Finish();
             exit(false);
         end;
 
@@ -207,6 +218,7 @@
             if (ReservationLedgerEntry."Reservation is Captured") then begin
                 ResponseMessage := StrSubstNo(CANCEL_1, TmpCancelLinesIn."Authorization Code");
                 ResponseMessageId := '-1301';
+                Span.Finish();
                 exit(false);
             end;
 
@@ -215,12 +227,14 @@
                 ReservationLedgerEntry.FindFirst();
                 TmpPointsOut.TransferFields(ReservationLedgerEntry, true);
                 TmpPointsOut.Insert();
+                Span.Finish();
                 exit(true);
             end;
 
         end else begin
             ResponseMessage := StrSubstNo(RESERVE_1, TmpCancelLinesIn."Authorization Code", 3);
             ResponseMessageId := '-1302';
+            Span.Finish();
             exit(false);
         end;
 
@@ -239,6 +253,7 @@
             if (not CreateCancelReserveEntry(TmpCancelLinesIn."Authorization Code", LoyaltyStoreLedger."Burned Points")) then begin
                 ResponseMessage := StrSubstNo(RESERVE_1, TmpCancelLinesIn."Authorization Code", 4);
                 ResponseMessageId := '-1303';
+                Span.Finish();
                 exit(false);
             end;
 
@@ -253,6 +268,7 @@
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
+        Span.Finish();
         exit(true);
     end;
 
@@ -267,17 +283,21 @@
         ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
         Membership: Record "NPR MM Membership";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         MembershipEntryNo: Integer;
     begin
 
         if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
             exit(false);
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CaptureReservation');
 
         TmpCaptureLinesIn.Reset();
         TmpCaptureLinesIn.FindFirst();
         if (TmpCaptureLinesIn."Authorization Code" = '') then begin
             ResponseMessage := StrSubstNo(RESERVE_1, '', 1);
             ResponseMessageId := '-1400';
+            Span.Finish();
             exit(false);
         end;
 
@@ -289,18 +309,20 @@
             if (ReservationLedgerEntry."Reservation is Captured") then begin
                 ResponseMessage := StrSubstNo(CAPTURE_1, TmpCaptureLinesIn."Authorization Code");
                 ResponseMessageId := '-1401';
+                Span.Finish();
                 exit(false);
             end;
 
             if (ReservationLedgerEntry."Reservation is Cancelled") then begin
                 ResponseMessage := StrSubstNo(CANCEL_2, TmpCaptureLinesIn."Authorization Code");
                 ResponseMessageId := '-1401';
+                Span.Finish();
                 exit(false);
-
             end;
         end else begin
             ResponseMessage := StrSubstNo(RESERVE_1, TmpCaptureLinesIn."Authorization Code", 3);
             ResponseMessageId := '-1402';
+            Span.Finish();
             exit(false);
         end;
 
@@ -319,6 +341,7 @@
             if (not CreateCaptureReserveEntry(TmpCaptureLinesIn."Authorization Code", LoyaltyStoreLedger."Burned Points")) then begin
                 ResponseMessage := StrSubstNo(RESERVE_1, TmpCaptureLinesIn."Authorization Code", 4);
                 ResponseMessageId := '-1403';
+                Span.Finish();
                 exit(false);
             end;
 
@@ -333,6 +356,7 @@
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
+        Span.Finish();
         exit(true);
     end;
 
@@ -477,6 +501,7 @@
 
         if (TmpAuthorizationIn."Entry Type" = TmpAuthorizationIn."Entry Type"::CANCEL_RESERVE) then
             exit(true);
+
         if TestUniqnessOn = TestUniqnessOn::TRANSACTIONID then begin
             LoyaltyServerStoreLedger.SetFilter("Entry Type", '=%1', TmpAuthorizationIn."Entry Type");
             LoyaltyServerStoreLedger.SetFilter("Foreign Transaction Id", '=%1', TmpAuthorizationIn."Foreign Transaction Id");
@@ -649,8 +674,11 @@
     local procedure ValidateReservePoints(var TmpReserveLines: Record "NPR MM Reg. Sales Buffer" temporary; MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         TotalReservePoints: Decimal;
     begin
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.ValidateReservePoints');
 
         Membership.Get(MembershipEntryNo);
         Membership.CalcFields("Remaining Points");
@@ -664,17 +692,21 @@
                     if (not (TmpReserveLines.Type in [TmpReserveLines.Type::PAYMENT, TmpReserveLines.Type::REFUND])) then begin
                         ResponseMessage := RESERVE_4;
                         ResponseMessageId := '-1202';
+                        Span.Finish();
+                        exit(false);
                     end;
 
                     if (TmpReserveLines."Total Points" < 0) and (TmpReserveLines.Type = TmpReserveLines.Type::PAYMENT) then begin
                         ResponseMessage := RESERVE_2;
                         ResponseMessageId := '-1200';
+                        Span.Finish();
                         exit(false);
                     end;
 
                     if (TmpReserveLines."Total Points" > 0) and (TmpReserveLines.Type = TmpReserveLines.Type::REFUND) then begin
                         ResponseMessage := RESERVE_3;
                         ResponseMessageId := '-1201';
+                        Span.Finish();
                         exit(false);
                     end;
 
@@ -686,11 +718,12 @@
             if (TotalReservePoints > Membership."Remaining Points") then begin
                 ResponseMessage := StrSubstNo(PAYMENT_4, TotalReservePoints, Membership."Remaining Points");
                 ResponseMessageId := '-1203';
+                Span.Finish();
                 exit(false);
             end;
 
         end;
-
+        Span.Finish();
         exit(true);
     end;
 
@@ -698,7 +731,10 @@
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CreateSalesEntry');
         MembershipPointsEntry.Init();
 
         MembershipPointsEntry."Entry No." := 0;
@@ -757,13 +793,17 @@
 
         LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
         TotalEarnAmount += MembershipPointsEntry."Amount (LCY)";
+        Span.Finish();
     end;
 
     procedure CreateCaptureEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary; var TotalBurnAmount: Decimal)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CreateCaptureEntry');
 
         MembershipPointsEntry.Init();
         MembershipPointsEntry."Entry No." := 0;
@@ -820,13 +860,17 @@
         // Payment points are negative
         LoyaltyStoreLedger."Burned Points" += MembershipPointsEntry.Points;
         TotalBurnAmount += MembershipPointsEntry."Amount (LCY)";
+        Span.Finish();
     end;
 
     local procedure CreateReserveEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CreateReserveEntry');
 
         MembershipPointsEntry.Init();
         MembershipPointsEntry."Entry No." := 0;
@@ -877,6 +921,7 @@
         MembershipPointsEntry.Insert();
 
         InsertTagsFromBuffer(MembershipPointsEntry."Entry No.", TempMembershipEntryTagBuffer);
+        Span.Finish();
     end;
 
     local procedure IsReservationCancelled(AuthorizationCode: Text[40]): Boolean
@@ -916,7 +961,10 @@
     var
         ReservePointsEntry: Record "NPR MM Members. Points Entry";
         CancelledPointsEntry: Record "NPR MM Members. Points Entry";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CreateCancelReserveEntry');
         ReversedPoints := 0;
         ReservePointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
         ReservePointsEntry.SetFilter("Authorization Code", '=%1', AuthorizationCodeToCancel);
@@ -937,6 +985,7 @@
         CopyPointEntryTags(ReservePointsEntry."Entry No.", CancelledPointsEntry."Entry No.");
 
         ReversedPoints := CancelledPointsEntry.Points;
+        Span.Finish();
         exit(true);
     end;
 
@@ -944,13 +993,18 @@
     var
         ReservePointsEntry: Record "NPR MM Members. Points Entry";
         CapturePointsEntry: Record "NPR MM Members. Points Entry";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CreateCaptureReserveEntry');
         CapturedPoints := 0;
         ReservePointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
         ReservePointsEntry.SetFilter("Authorization Code", '=%1', AuthorizationCodeToCancel);
         ReservePointsEntry.SetFilter("Entry Type", '=%1', ReservePointsEntry."Entry Type"::RESERVE);
-        if (not ReservePointsEntry.FindLast()) then
+        if (not ReservePointsEntry.FindLast()) then begin
+            Span.Finish();
             exit(false);
+        end;
 
         CapturePointsEntry.TransferFields(ReservePointsEntry, false);
         CapturePointsEntry."Entry No." := 0;
@@ -972,6 +1026,7 @@
         ReservePointsEntry.Modify();
 
         CapturedPoints := CapturePointsEntry.Points;
+        Span.Finish();
         exit(true);
     end;
 
@@ -979,8 +1034,11 @@
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         EarnRatio: Decimal;
     begin
+        Sentry.StartSpan(Span, 'bc.loypointmgrserver.CreateNotEligibleEntry');
         MembershipPointsEntry.Init();
         MembershipPointsEntry."Entry No." := 0;
         MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::CAPTURE;
@@ -1023,6 +1081,7 @@
         InsertTagsFromBuffer(MembershipPointsEntry."Entry No.", TempMembershipEntryTagBuffer);
 
         LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
+        Span.Finish();
     end;
 
     local procedure InsertTagsFromBuffer(MemberPointEntryNo: Integer; var TempMembershipEntryTagBuffer: Record "NPR MM Memb. Entry Tag Buff" temporary)
@@ -1264,7 +1323,7 @@
         GenJournalLine.Init();
 
         GenJournalLine.Validate("Posting Date", PostingDate);
-        if (DocumentNo = '') then
+        if(DocumentNo = '') then
             DocumentNo := InvoiceNo;
 
         GenJournalLine."Document No." := DocumentNo;

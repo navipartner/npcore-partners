@@ -754,10 +754,12 @@
         DowngradeAlteration: Record "NPR MM Loyalty Alter Members.";
         TempValidCouponToCreate: Record "NPR MM Loyalty Point Setup" temporary;
         MemberNotification: Codeunit "NPR MM Member Notification";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         UpgradeAvailable: Boolean;
         DowngradeAvailable: Boolean;
     begin
-
+        Sentry.StartSpan(Span, 'bc.loyaltypointmgt.AfterMembershipPointsUpdate');
         // Adjust membership level based on points.
         UpgradeAvailable := EligibleForMembershipAlteration(MembershipEntryNo, true, false, UpgradeAlteration);
         DowngradeAvailable := EligibleForMembershipAlteration(MembershipEntryNo, false, false, DowngradeAlteration);
@@ -778,7 +780,7 @@
         MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
         if (not MembershipRole.IsEmpty()) then
             MemberNotification.CreateUpdateWalletNotification(MembershipEntryNo, 0, 0, Today());
-
+        Span.Finish();
     end;
 
     local procedure CheckItemRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var RuleReference: Integer): Integer
