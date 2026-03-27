@@ -540,11 +540,13 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         MemberNumber: Text;
         CancellationAmount: Decimal;
         CancellationDate: Date;
+        NewValidUntilDate: Date;
     begin
         // [SCENARIO] Happy path - CreateCancellationSubscriptionRequest creates a Partial Regret with correct fields.
         Initialize();
         CancellationAmount := -150.00;
         CancellationDate := CalcDate('<+7D>');
+        NewValidUntilDate := CalcDate('<+30D>');
 
         // [GIVEN] A membership with subscription and a CANCEL MemberInfoCapture
         CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
@@ -556,7 +558,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", CancellationAmount, CancellationDate);
 
         // [WHEN] CreateCancellationSubscriptionRequest is called
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-001');
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-001', NewValidUntilDate);
 
         // [THEN] A Partial Regret subscription request is created with correct fields
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
@@ -566,7 +568,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         Assert.AreEqual(SubscriptionRequest."Processing Status"::Success, SubscriptionRequest."Processing Status", 'Processing Status should be Success.');
         Assert.AreEqual(CancellationAmount, SubscriptionRequest.Amount, 'Amount should match cancellation amount.');
         Assert.AreEqual(MembershipEntry."Valid From Date", SubscriptionRequest."New Valid From Date", 'Valid From Date should match membership entry.');
-        Assert.AreEqual(CancellationDate, SubscriptionRequest."New Valid Until Date", 'Valid Until Date should match cancellation date.');
+        Assert.AreEqual(NewValidUntilDate, SubscriptionRequest."New Valid Until Date", 'Valid Until Date should match the NewValidUntilDate parameter, not Document Date.');
         Assert.AreEqual(MembershipEntry."Entry No.", SubscriptionRequest."Membership Entry To Cancel", 'Membership Entry To Cancel should match.');
         Assert.AreEqual(Subscription."Membership Code", SubscriptionRequest."Membership Code", 'Membership Code should match.');
     end;
@@ -602,7 +604,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] CreateCancellationSubscriptionRequest is called
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-002');
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-002', CalcDate('<+7D>'));
 
         // [THEN] The Initial Sale request is reversed pointing to the Partial Regret
         OriginalRequest.Get(OriginalRequest."Entry No.");
@@ -645,7 +647,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] CreateCancellationSubscriptionRequest is called
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-003');
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-003', CalcDate('<+7D>'));
 
         // [THEN] The Renew request is reversed
         OriginalRequest.Get(OriginalRequest."Entry No.");
@@ -686,7 +688,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] CreateCancellationSubscriptionRequest is called
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-004');
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-004', CalcDate('<+7D>'));
 
         // [THEN] Partial Regret is still created
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
@@ -732,7 +734,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] CreateCancellationSubscriptionRequest is called
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-005');
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-005', CalcDate('<+7D>'));
 
         // [THEN] The already-reversed request is NOT overwritten
         OriginalRequest.Get(OriginalRequest."Entry No.");
@@ -783,7 +785,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] CreateCancellationSubscriptionRequest is called
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, SalesTicketNo);
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, SalesTicketNo, CalcDate('<+7D>'));
 
         // [THEN] A Refund payment request is created
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
@@ -834,7 +836,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] CreateCancellationSubscriptionRequest is called (no EFT, no payment lines setup)
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-007');
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-007', CalcDate('<+7D>'));
 
         // [THEN] Partial Regret exists but no refund payment request
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
@@ -894,7 +896,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] CreateCancellationSubscriptionRequest is called
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, SalesTicketNo);
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, SalesTicketNo, CalcDate('<+7D>'));
 
         // [THEN] Partial Regret exists but no refund payment request (split tender blocks it)
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
@@ -934,8 +936,8 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         CreateCancelMemberInfoCapture(MemberInfoCapture, Membership."Entry No.", -150.00, CalcDate('<+7D>'));
 
         // [WHEN] Called twice
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-008');
-        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-008');
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-008', CalcDate('<+7D>'));
+        SubscriptionMgtImpl.CreateCancellationSubscriptionRequest(Subscription, MembershipEntry, MemberInfoCapture, 'TEST-RECEIPT-008', CalcDate('<+7D>'));
 
         // [THEN] Exactly 1 Partial Regret exists
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");

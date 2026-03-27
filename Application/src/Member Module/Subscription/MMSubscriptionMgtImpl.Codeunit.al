@@ -555,7 +555,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
             CreateInitialSaleSubscriptionRequest(Subscription, ActiveMembershipEntry, MemberPaymentMethod, EFTTransactionRequest, EFTTransactionRequest."Result Amount");
     end;
 
-    internal procedure CreateCancellationSubscriptionRequest(Subscription: Record "NPR MM Subscription"; MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; SalesTicketNo: Code[20])
+    internal procedure CreateCancellationSubscriptionRequest(Subscription: Record "NPR MM Subscription"; MembershipEntry: Record "NPR MM Membership Entry"; MemberInfoCapture: Record "NPR MM Member Info Capture"; SalesTicketNo: Code[20]; NewValidUntilDate: Date)
     var
         SubscriptionRequest: Record "NPR MM Subscr. Request";
         PartialRegretRequest: Record "NPR MM Subscr. Request";
@@ -591,7 +591,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         PartialRegretRequest."Membership Code" := Subscription."Membership Code";
         PartialRegretRequest.Amount := MemberInfoCapture."Unit Price";
         PartialRegretRequest."New Valid From Date" := MembershipEntry."Valid From Date";
-        PartialRegretRequest."New Valid Until Date" := MemberInfoCapture."Document Date";
+        PartialRegretRequest."New Valid Until Date" := NewValidUntilDate;
         PartialRegretRequest."Membership Entry To Cancel" := MembershipEntry."Entry No.";
         PartialRegretRequest."Posted M/ship Ledg. Entry No." := MembershipEntry."Entry No.";
         PartialRegretRequest.Description := PartialRegretDescrLbl;
