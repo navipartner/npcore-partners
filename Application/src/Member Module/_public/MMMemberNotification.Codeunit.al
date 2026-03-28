@@ -7,7 +7,7 @@
     begin
 
         // Invoked by Task Queue when scheduled for background notifications
-        HandleBatchNotifications(Today);
+        HandleBatchNotifications(Today());
 
         SponsorshipTicketMgmt.NotifyRecipients();
 
@@ -107,7 +107,7 @@
         if (NotificationSetup."Cancel Overdue Notif. (Days)" = 0) then
             NotificationSetup."Cancel Overdue Notif. (Days)" := 7; // notification older than 7 days will be cancelled unless setup sets a different value
 
-        if (MembershipNotification."Date To Notify" + Abs(NotificationSetup."Cancel Overdue Notif. (Days)") < Today) then
+        if (MembershipNotification."Date To Notify" + Abs(NotificationSetup."Cancel Overdue Notif. (Days)") < Today()) then
             exit(_NOTIFICATION_ACTION::CANCEL);
 
         case MembershipNotification."Notification Trigger" of
@@ -115,13 +115,13 @@
                 begin
                     // Notification Date is offset from subscription ends
                     StartDate := CalcDate('<+1D>', MembershipNotification."Date To Notify" + NotificationSetup."Days Before");
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
                         exit(_NOTIFICATION_ACTION::CANCEL); // membership is valid, cancel notification
 
-                    if (FromDate > Today) then
+                    if (FromDate > Today()) then
                         exit(_NOTIFICATION_ACTION::CANCEL); // Valid in the future, but not on startdate, cancel notification
 
                     exit(_NOTIFICATION_ACTION::SEND); // Send notification
@@ -131,17 +131,22 @@
                 begin
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
                         exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
 
-                    if (FromDate > Today) then
-                        exit(_NOTIFICATION_ACTION::IGNORE); //wait until membership becomes active
+                    // When "Days Before" is set, send notification if within the window before membership becomes active, including activate on first use (FromDate = 0D).
+                    if ((NotificationSetup."Days Before" <> 0) and ((FromDate > Today()) or (FromDate = 0D))) then
+                        if ((StartDate + Abs(NotificationSetup."Days Before")) >= FromDate) then
+                            exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
 
-                    if (FromDate = 0D) then
-                        exit(_NOTIFICATION_ACTION::IGNORE); //wait until membership becomes active, not yet activated
+                    if (FromDate > Today()) then
+                        exit(_NOTIFICATION_ACTION::IGNORE); // wait until membership becomes active
+
+                    if (FromDate = 0D) then // activate on first use
+                        exit(_NOTIFICATION_ACTION::IGNORE); // wait until membership becomes active, not yet activated
 
                     exit(_NOTIFICATION_ACTION::CANCEL); // Cancel welcome notification
                 end;
@@ -149,7 +154,7 @@
                 begin
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
@@ -159,7 +164,7 @@
                 begin
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
@@ -168,7 +173,7 @@
                 begin
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
@@ -177,7 +182,7 @@
                 begin
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
@@ -187,7 +192,7 @@
                 begin
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
@@ -212,7 +217,7 @@
                 begin
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
-                    if (StartDate < Today) then
+                    if (StartDate < Today()) then
                         StartDate := Today();
 
                     exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
@@ -367,13 +372,28 @@
             MemberNotificationEntry."Card Valid Until" := MemberCard."Valid Until";
         end;
 
-        MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
-          MemberNotificationEntry."Membership Valid From",
-          MemberNotificationEntry."Membership Valid Until");
+        if (NotificationSetup.Type = NotificationSetup.Type::WELCOME) then begin
+            MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.",
+              MembershipNotification."Date To Notify" + Abs(NotificationSetup."Days Before"),
+              MemberNotificationEntry."Membership Valid From",
+              MemberNotificationEntry."Membership Valid Until");
 
-        MembershipManagement.GetConsecutiveTimeFrame(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
-          MemberNotificationEntry."Membership Consecutive From",
-          MemberNotificationEntry."Membership Consecutive Until");
+            MembershipManagement.GetConsecutiveTimeFrame(MembershipNotification."Membership Entry No.",
+              MembershipNotification."Date To Notify" + Abs(NotificationSetup."Days Before"),
+              MemberNotificationEntry."Membership Consecutive From",
+              MemberNotificationEntry."Membership Consecutive Until");
+        end else begin
+
+            MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.",
+              MembershipNotification."Date To Notify",
+              MemberNotificationEntry."Membership Valid From",
+              MemberNotificationEntry."Membership Valid Until");
+
+            MembershipManagement.GetConsecutiveTimeFrame(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
+              MemberNotificationEntry."Membership Consecutive From",
+              MemberNotificationEntry."Membership Consecutive Until");
+        end;
+
 
         MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
         MembershipEntry.SetFilter(Blocked, '=%1', false);
@@ -922,7 +942,7 @@
                 MembershipEntry.SetFilter(Context, '%1..%2|%3', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND, MembershipEntry.Context::AUTORENEW);
 
                 if (MembershipEntry.FindLast()) then
-                    if (MembershipEntry."Valid Until Date" > Today) then
+                    if (MembershipEntry."Valid Until Date" > Today()) then
                         AddMembershipRenewalNotificationWorker(MembershipEntry, MembershipSetup, CommunitySetup);
 
                 if (GuiAllowed()) then
@@ -1129,7 +1149,7 @@
         MembershipNotification."Membership Entry No." := MembershipLedgerEntry."Membership Entry No.";
         MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
         MembershipNotification."Notification Code" := NotificationSetup.Code;
-        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Date To Notify" := Today();
         MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS;
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
@@ -1172,7 +1192,7 @@
         MembershipNotification."Membership Entry No." := MembershipEntryNo;
         MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
         MembershipNotification."Notification Code" := NotificationSetup.Code;
-        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Date To Notify" := Today();
         MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::RENEWAL_FAILURE;
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
@@ -1209,7 +1229,7 @@
         MembershipNotification."Membership Entry No." := MembershipEntryNo;
         MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
         MembershipNotification."Notification Code" := NotificationSetup.Code;
-        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Date To Notify" := Today();
         MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION;
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
@@ -1257,7 +1277,7 @@
         MembershipNotification."Membership Entry No." := MembershipEntryNo;
         MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
         MembershipNotification."Notification Code" := NotificationSetup.Code;
-        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Date To Notify" := Today();
         MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED;
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
@@ -1303,7 +1323,7 @@
         MembershipNotification."Membership Entry No." := MembershipEntryNo;
         MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
         MembershipNotification."Notification Code" := NotificationSetup.Code;
-        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Date To Notify" := Today();
         MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED;
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
@@ -1782,7 +1802,7 @@
             MemberCard.SetFilter("Member Entry No.", '=%1', MembershipRole."Member Entry No.");
             MemberCard.SetFilter(Blocked, '=%1', false);
             MemberCard.Setfilter("Card Is Temporary", '=%1', false);
-            MemberCard.SetFilter("Valid Until", '>=%1', Today);
+            MemberCard.SetFilter("Valid Until", '>=%1', Today());
             if (MemberCard.FindLast()) then
                 CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", MemberCard."Entry No.", Today());
 
@@ -1863,7 +1883,6 @@
         MembershipNotification.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         MembershipNotification.SetFilter("Notification Code", '=%1', NotificationSetup.Code);
         MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        MembershipNotification.SetFilter("Date To Notify", '=%1', Today);
         MembershipNotification.SetFilter("Notification Trigger", '=%1', NotificationTriggerType);
         MembershipNotification.SetFilter("Date To Notify", '=%1', DateToSendNotification);
         if (MembershipNotification.FindFirst()) then
