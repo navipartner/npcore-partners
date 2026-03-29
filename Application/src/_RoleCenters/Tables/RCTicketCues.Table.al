@@ -107,8 +107,11 @@
         Admitted := 0;
         Utilization := 0;
 
+        AdmissionScheduleEntry.SetCurrentKey("Admission Start Date");
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
         AdmissionScheduleEntry.SetFilter("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::OPEN);
+        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        AdmissionScheduleEntry.SetAutoCalcFields("Open Reservations", "Open Admitted", Departed);
 
         if (not AdmissionScheduleEntry.FindSet()) then
             exit;
@@ -117,15 +120,15 @@
             if (Admission.Get(AdmissionScheduleEntry."Admission Code")) then begin
                 if (Admission.Type = Admission.Type::OCCASION) then begin
                     if (AdmissionScheduleLine.Get(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code")) then begin
-                        AdmissionScheduleEntry.CalcFields("Open Reservations", "Open Admitted", Departed);
 
                         EventCount += 1;
-
                         Capacity := 0;
+
                         TicketManagement.GetAdmissionCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", Capacity, CapacityControl);
                         MaxCapacity += Capacity;
                         if (Capacity = 0) then
                             Capacity := 1;
+
                         OpenReservations += AdmissionScheduleEntry."Open Reservations";
                         Admitted += AdmissionScheduleEntry."Open Admitted";
                         if (AdmissionScheduleLine."Max Capacity Per Sch. Entry" > 0) then
