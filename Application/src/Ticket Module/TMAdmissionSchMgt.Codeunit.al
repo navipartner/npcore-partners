@@ -390,7 +390,9 @@
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         AdmissionScheduleLines2: Record "NPR TM Admis. Schedule Lines";
         TicketCalendarManagement: Codeunit "NPR TMBaseCalendarManager";
-        EndDateTime: DateTime;
+        TotalEndDuration: Duration;
+        ExtraDays: Integer;
+        MsPerDay: Duration;
     begin
 
         // we are not creating historical entries
@@ -429,9 +431,18 @@
         TmpAdmissionScheduleEntry."Admission End Date" := StartFromDate;
         TmpAdmissionScheduleEntry."Admission End Time" := Schedule."Stop Time";
         if (Schedule."Event Duration" > 0) then begin
-            EndDateTime := CreateDateTime(StartFromDate, Schedule."Start Time") + Schedule."Event Duration";
-            TmpAdmissionScheduleEntry."Admission End Date" := DT2Date(EndDateTime);
-            TmpAdmissionScheduleEntry."Admission End Time" := DT2Time(EndDateTime);
+            // Avoid CreateDateTime/DT2Date/DT2Time: on BC18, these are DST-sensitive and diverge on DST
+            // transition days because CreateDateTime captures the pre-transition offset while DT2Time
+            // applies the post-transition offset, corrupting the computed end time by up to 1 hour.
+            // Instead, use pure 64-bit Duration arithmetic which is timezone-agnostic:
+            //   total ms from midnight of start day to end of event = StartTime_ms + EventDuration
+            //   extra whole days = floor(total / ms_per_day)
+            //   end time = remainder after removing whole days
+            MsPerDay := 86400000;
+            TotalEndDuration := (Schedule."Start Time" - 000000T) + Schedule."Event Duration";
+            ExtraDays := Round(TotalEndDuration / MsPerDay, 1, '<');
+            TmpAdmissionScheduleEntry."Admission End Date" := StartFromDate + ExtraDays;
+            TmpAdmissionScheduleEntry."Admission End Time" := 000000T + (TotalEndDuration - ExtraDays * MsPerDay);
             TmpAdmissionScheduleEntry."Event Duration" := Schedule."Event Duration";
         end;
 
