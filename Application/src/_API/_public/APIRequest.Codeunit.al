@@ -427,7 +427,7 @@ codeunit 6185051 "NPR API Request"
         end;
     end;
 
-    internal procedure GetNextPageUrl(NextPageKey: Text): Text
+    procedure GetNextPageUrl(NextPageKey: Text): Text
     var
         Url: Text;
         QueryParam: Text;
