@@ -69,6 +69,31 @@ codeunit 85191 "NPR TM TicketDstTest"
         until (DateRec.Next() = 0);
     end;
 
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    procedure DaysSinceUnixEpoch_SmokeTests()
+    var
+        Assert: Codeunit "Assert";
+        MediaImpl: Codeunit "NPR CloudflareMediaImpl";
+    begin
+        // https://howardhinnant.github.io/date_algorithms.html#days_from_civil
+
+        Assert.AreEqual(0, MediaImpl.DaysSinceUnixEpoch(1970, 1, 1), '1970-01-01 must be day 0');
+        Assert.AreEqual(1, MediaImpl.DaysSinceUnixEpoch(1970, 1, 2), '1970-01-02 must be day 1');
+        Assert.AreEqual(-1, MediaImpl.DaysSinceUnixEpoch(1969, 12, 31), '1969-12-31 must be day -1');
+        Assert.AreEqual(31, MediaImpl.DaysSinceUnixEpoch(1970, 2, 1), '1970-02-01 must be day 31');
+        Assert.AreEqual(59, MediaImpl.DaysSinceUnixEpoch(1970, 3, 1), '1970-03-01 must be day 59');
+        Assert.AreEqual(365, MediaImpl.DaysSinceUnixEpoch(1971, 1, 1), '1971-01-01 must be day 365');
+
+        Assert.AreEqual(788, MediaImpl.DaysSinceUnixEpoch(1972, 2, 28), '1972-02-28 must be day 788');
+        Assert.AreEqual(789, MediaImpl.DaysSinceUnixEpoch(1972, 2, 29), '1972-02-29 must be day 789');
+        Assert.AreEqual(790, MediaImpl.DaysSinceUnixEpoch(1972, 3, 1), '1972-03-01 must be day 790');
+        Assert.AreEqual(789, MediaImpl.DaysSinceUnixEpoch(1972, 2, 29), '1972-02-29 must be day 789');
+        Assert.AreEqual(11016, MediaImpl.DaysSinceUnixEpoch(2000, 2, 29), '2000-02-29 must be day 11016');
+        Assert.AreEqual(47541, MediaImpl.DaysSinceUnixEpoch(2100, 3, 1), '2100-03-01 must be day 47541');
+    end;
+#endif
+
     [Normal]
     local procedure VerifyNotDstEurope(TestDate: Date)
     var

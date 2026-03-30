@@ -212,7 +212,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
         if (CurrentDateTime() > ExpirationDate) then
             exit(false); // fall back to worker signing
 
-        Exp := Format(Round((GetUTCDateTime() - CreateDateTime(DMY2Date(1, 1, 1970), 0T)) / 1000 + TimeToLive, 1), 0, 9);  // Unix epoch time in seconds (UTC)
+        Exp := Format(GetUnixTimeSecondsUTC() + TimeToLive, 0, 9);
         ImgUrl := StrSubstNo('/img/%1?variant=%2&response=bytes&kid=%3&exp=%4', UrlEncode(MediaKey), Variant.Names.Get(Variant.Ordinals.IndexOf(Variant.AsInteger())).ToLower(), Kid, Exp);
         ToSign := StrSubstNo('GET|%1|%2|%3|%4', MediaKey, Variant.Names.Get(Variant.Ordinals.IndexOf(Variant.AsInteger())).ToLower(), Kid, Exp);
         Signature := Cryptography.GenerateHashAsBase64String(ToSign, Secret, HashAlgorithmType::SHA256).Replace('+', '-').Replace('/', '_').Replace('=', '');
@@ -223,23 +223,76 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
     end;
 
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-    local procedure GetUTCDateTime(): DateTime
+    local procedure GetUnixTimeSecondsUTC(): BigInteger
     var
         TypeHelper: Codeunit "Type Helper";
-        DateString: Text;
-        UtcDate: Date;
-        UtcTime: Time;
+        IsoUtc: Text;
+        Year: Integer;
+        Month: Integer;
+        Day: Integer;
+        Hour: Integer;
+        Minute: Integer;
+        Second: Integer;
     begin
-        // yyyy-MM-ddTHH:mm:ssZ
-        DateString := TypeHelper.GetCurrUTCDateTimeISO8601();
-        Evaluate(UtcDate, (CopyStr(DateString, 1, 10)), 9);
-        Evaluate(UtcTime, (CopyStr(DateString, 12, 8)), 9);
-        exit(CreateDateTime(UtcDate, UtcTime));
+        // Expected format: yyyy-MM-ddTHH:mm:ssZ
+        IsoUtc := TypeHelper.GetCurrUTCDateTimeISO8601();
+
+        Evaluate(Year, CopyStr(IsoUtc, 1, 4));
+        Evaluate(Month, CopyStr(IsoUtc, 6, 2));
+        Evaluate(Day, CopyStr(IsoUtc, 9, 2));
+        Evaluate(Hour, CopyStr(IsoUtc, 12, 2));
+        Evaluate(Minute, CopyStr(IsoUtc, 15, 2));
+        Evaluate(Second, CopyStr(IsoUtc, 18, 2));
+
+        exit(DaysSinceUnixEpoch(Year, Month, Day) * 86400 +
+             Hour * 3600 +
+             Minute * 60 +
+             Second);
+    end;
+
+    internal procedure DaysSinceUnixEpoch(Year: Integer; Month: Integer; Day: Integer): Integer
+    var
+        Era: Integer;
+        YearOfEra: Integer;
+        DayOfYear: Integer;
+        DayOfEra: Integer;
+        AdjustedYear: Integer;
+        AdjustedMonth: Integer;
+    begin
+        // For the Howard Hinnant's algorithms, see: 
+        //  https://howardhinnant.github.io/date_algorithms.html
+        //  https://howardhinnant.github.io/date_algorithms.html#days_from_civil
+
+        if (Month <= 2) then
+            AdjustedYear := Year - 1
+        else
+            AdjustedYear := Year;
+
+        if (AdjustedYear >= 0) then
+            Era := AdjustedYear div 400
+        else
+            Era := (AdjustedYear - 399) div 400;
+
+        YearOfEra := AdjustedYear - Era * 400;
+
+        if (Month > 2) then
+            AdjustedMonth := Month - 3
+        else
+            AdjustedMonth := Month + 9;
+
+        DayOfYear := (153 * AdjustedMonth + 2) div 5 + Day - 1;
+        DayOfEra := YearOfEra * 365 + YearOfEra div 4 - YearOfEra div 100 + DayOfYear;
+
+        exit(Era * 146097 + DayOfEra - 719468);
     end;
 #else
-    local procedure GetUTCDateTime(): DateTime
+    local procedure GetUnixTimeSecondsUTC(): BigInteger
     begin
-        exit(CurrentDateTime() + 12 * 3600 * 1000); // BC17-22 does not have GetCurrUTCDateTime, so we add 12 hours to approximate worst case UTC time offset
+        // BC17-22 does not have GetCurrUTCDateTime
+        exit(
+            Round((CurrentDateTime() - CreateDateTime(DMY2Date(1, 1, 1970), 0T)) / 1000, 1) // Unix epoch time in seconds (UTC) is current time minus unix epoch
+            + (12 * 3600) // and adjust with add 12 hours to approximate worst case UTC time offset
+        );
     end;
 #endif
 
