@@ -29,11 +29,15 @@ table 6150858 "NPR TM POS Ticket Profile"
             Caption = 'End-Of-Sale Admit Method';
             DataClassification = CustomerContent;
             InitValue = LEGACY;
+            ValuesAllowed = LEGACY, INLINE_SPEED_GATE;
         }
         field(21; ShowSpinnerDuringWorkflowAdmit; Boolean)
         {
             Caption = 'Show Spinner During Workflow Admit';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-03-22';
+            ObsoleteReason = 'Ticket admission on end of sale now runs inline. The post-workflow roundtrip has been removed for performance.';
         }
         field(22; ScannerIdForUnitAdmitOnEndSale; Code[10])
         {

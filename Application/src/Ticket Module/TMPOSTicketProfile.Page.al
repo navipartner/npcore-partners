@@ -42,11 +42,6 @@ page 6184639 "NPR TM POS Ticket Profile"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the method used to admit tickets at the end of sale.';
                 }
-                field(ShowSpinnerDuringWorkflowAdmit; Rec."ShowSpinnerDuringWorkflowAdmit")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies if a spinner is going to be shown during the workflow admit.';
-                }
                 field(ScannerIdForUnitAdmitOnEndOfSale; Rec.ScannerIdForUnitAdmitOnEndSale)
                 {
                     ApplicationArea = NPRRetail;

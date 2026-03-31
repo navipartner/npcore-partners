@@ -127,9 +127,7 @@
         IsCheckedBySubscriber: Boolean;
         IsValid: Boolean;
         AdmitMethod: Enum "NPR TM AdmitTicketOnEoSMethod";
-        SpeedgateAdmit: Codeunit "NPR POSAction TicketAdmitOnEoS";
-        TicketsAdmittedArray, TicketsRejectedArray : JsonArray;
-        AdmitViaWorkflow: Boolean;
+        TicketsRejectedArray: JsonArray;
         JToken: JsonToken;
     begin
 
@@ -144,7 +142,6 @@
         if (TicketRequestManager.IsReservationRequest(Token)) then begin
 
             AdmitMethod := SelectEndOfSaleAdmitMethod(PosUnitNo);
-            AdmitViaWorkflow := AdmitTicketsFromWorkflowOnEndSale(PosUnitNo);
 
             Ticket.Reset();
             Ticket.SetCurrentKey("Sales Receipt No.");
@@ -161,22 +158,20 @@
                     Ticket.ListPriceExclVat := UnitPriceExclVat;
                     Ticket.Modify();
 
-                    if (not AdmitViaWorkflow) then
-                        if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::LEGACY) then
-                            AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo);
+                    if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::LEGACY) then
+                        AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo);
 
                 until (Ticket.Next() = 0);
 
-                if (not AdmitViaWorkflow) then
-                    if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::INLINE_SPEED_GATE) then begin
-                        SpeedgateAdmit.AdmitTicketSpeedGate(Token, PosUnitNo, TicketsAdmittedArray, TicketsRejectedArray);
-                        if (TicketsRejectedArray.Count() > 0) then begin
-                            ResponseMessage := 'There was one or more error when admitting ticket(s): <br>';
-                            foreach JToken in TicketsRejectedArray do
-                                ResponseMessage += JToken.AsValue().AsText() + '<br>';
-                            Error(ResponseMessage);
-                        end;
+                if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::INLINE_SPEED_GATE) then begin
+                    AdmitTicketSpeedGate(Token, PosUnitNo, TicketsRejectedArray);
+                    if (TicketsRejectedArray.Count() > 0) then begin
+                        ResponseMessage := 'There was one or more error when admitting ticket(s): <br>';
+                        foreach JToken in TicketsRejectedArray do
+                            ResponseMessage += JToken.AsValue().AsText() + '<br>';
+                        Error(ResponseMessage);
                     end;
+                end;
             end;
         end;
 
@@ -233,26 +228,52 @@
         exit("NPR TM AdmitTicketOnEoSMethod"::LEGACY);
     end;
 
-    internal procedure AdmitTicketsFromWorkflowOnEndSale(PosUnitNo: Code[10]): Boolean
+    local procedure AdmitTicketSpeedGate(Token: Text[100]; PosUnitNo: Code[10]; var TicketsRejectedList: JsonArray)
     var
-        POSUnit: Record "NPR POS Unit";
-        TicketProfile: Record "NPR TM POS Ticket Profile";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketReservation: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        AdmitToken: Guid;
+        AdmitToCodes: List of [Code[20]];
+        IsCheckedBySubscriber, IsValid : Boolean;
+        ResponseCode: Integer;
+        ResponseMessage: Text;
+        ApiError: Enum "NPR API Error Code";
+        ErrorMessage: Label '%1: %2 %3';
     begin
-        POSUnit.SetLoadFields("POS Ticket Profile");
-        if (not POSUnit.Get(PosUnitNo)) then
-            exit(false);
+        TicketReservation.SetCurrentKey("Session Token ID");
+        TicketReservation.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservation.SetFilter("Primary Request Line", '=%1', true);
+        TicketReservation.SetFilter("Request Status", '=%1', TicketReservation."Request Status"::CONFIRMED);
+        if (not TicketReservation.FindSet()) then
+            exit;
 
-        if (not TicketProfile.Get(POSUnit."POS Ticket Profile")) then
-            exit(false);
+        repeat
+            if (TicketRequestManager.IsReservationRequest(Token)) and (TicketReservation.EndOfSaleAdmitMode <> TicketReservation.EndOfSaleAdmitMode::NO_ADMIT_ON_EOS) then begin
+                SpeedGate.SetEndOfSalesAdmitMode(TicketReservation.EndOfSaleAdmitMode = TicketReservation.EndOfSaleAdmitMode::SALE);
 
-        if (TicketProfile."EndOfSaleAdmitMethod" = TicketProfile."EndOfSaleAdmitMethod"::LEGACY) then
-            exit(false);
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservation."Entry No.");
+                if (Ticket.FindSet()) then
+                    repeat
+                        if (SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToCodes, ResponseCode)) then begin
 
-        if (TicketProfile."EndOfSaleAdmitMethod" = TicketProfile."EndOfSaleAdmitMethod"::INLINE_SPEED_GATE) then
-            exit(false);
+                            AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+                            SpeedGate.Admit(AdmitToken, 1);
 
+                            OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
+                            if ((IsCheckedBySubscriber) and (not IsValid)) then
+                                TicketsRejectedList.Add(ResponseMessage);
 
-        exit(true);
+                        end else begin
+                            if (ResponseCode > 0) then
+                                TicketsRejectedList.Add(StrSubstNo(ErrorMessage, Ticket."External Ticket No.", ResponseCode, ApiError.Names.Get(ApiError.Ordinals.IndexOf(ResponseCode))));
+
+                        end;
+                    until (Ticket.Next() = 0);
+            end;
+        until (TicketReservation.Next() = 0);
     end;
 
 
