@@ -1135,7 +1135,10 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(380; EMAIL_RCPT_ON_SALE)
     {
         Caption = 'EMAIL_RCPT_ON_SALE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: NpEmailPOSRcpt";
+        Implementation = "NPR IPOS Workflow" = "NPR NPEmail POS Receipt OnSale";
+        ObsoleteState = Pending;
+        ObsoleteTag = '2026-03-16';
+        ObsoleteReason = 'Email receipt sending moved to OnAfterEndSale event subscriber. No workflow needed for backend-only operation.';
     }
 #endif
     value(6150899; WALLET_ASSET_REFUND)

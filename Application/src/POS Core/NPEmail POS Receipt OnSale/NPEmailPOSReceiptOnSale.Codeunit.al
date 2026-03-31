@@ -1,83 +1,62 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-codeunit 6151001 "NPR POS Action: NpEmailPOSRcpt" implements "NPR IPOS Workflow"
+codeunit 6151001 "NPR NPEmail POS Receipt OnSale" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    // Obsolete workflow interface stubs - kept only because EMAIL_RCPT_ON_SALE enum value cannot be deleted yet (AS0083).
+    // Remove together with the enum value in the next major version.
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Send POS Receipt Email after sale (SendGrid)';
+        ActionDescription: Label 'Obsolete: Send POS Receipt Email after sale (SendGrid)';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
-        WorkflowConfig.AddJavascript(GetActionScript());
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
-        case Step of
-            'SendReceiptEmail':
-                FrontEnd.WorkflowResponse(SendReceiptEmailResponse(Sale));
-        end;
     end;
 
-    local procedure SendReceiptEmailResponse(Sale: Codeunit "NPR POS Sale") Response: JsonObject
-    var
-        POSEntry: Record "NPR POS Entry";
-    begin
-        Sale.GetLastSalePOSEntry(POSEntry);
-        Response.Add('success', SendReceiptEmail(POSEntry));
-    end;
-
-    internal procedure AddPostEndOfSaleWorkflow(Sale: Codeunit "NPR POS Sale"; var PostWorkflows: JsonObject)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", OnAfterEndSale, '', false, false)]
+    local procedure SendReceiptEmailOnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
-        POSReceiptProfile: Record "NPR POS Receipt Profile";
         POSEntry: Record "NPR POS Entry";
-        ActionParameters: JsonObject;
     begin
         if not NewEmailExperienceFeature.IsFeatureEnabled() then
             exit;
 
-        Sale.GetLastSalePOSEntry(POSEntry);
+        if SalePOS."Header Type" = SalePOS."Header Type"::Cancelled then
+            exit;
+
+        Sender.GetLastSalePOSEntry(POSEntry);
+        if POSEntry."Entry No." = 0 then
+            exit;
 
         if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::Other, POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale"]) then
             exit;
 
-        // Early exit to avoid unnecessary workflow roundtrip (~200ms) for POS units without email receipt setup
-        if not TryGetValidatedReceiptProfile(POSEntry, POSReceiptProfile) then
-            exit;
-        if GetEmailAddress(POSEntry) = '' then
-            exit;
-
-        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::EMAIL_RCPT_ON_SALE), ActionParameters);
+        SendReceiptEmail(POSEntry);
     end;
 
-    local procedure GetActionScript(): Text
-    begin
-        exit(
-        //###NPR_INJECT_FROM_FILE:POSActionNpEmailPOSRcpt.js###
-'const main=async({workflow:s})=>{try{(await s.respond("SendReceiptEmail")).success?console.log("Receipt email sent successfully"):console.warn("Receipt email not sent - no valid email address or configuration")}catch(e){console.error("Email send failed:",e)}};'
-        );
-    end;
-
-    local procedure SendReceiptEmail(POSEntry: Record "NPR POS Entry"): Boolean
+    local procedure SendReceiptEmail(POSEntry: Record "NPR POS Entry")
     var
         NPEmail: Codeunit "NPR NP Email";
         POSReceiptProfile: Record "NPR POS Receipt Profile";
         EmailAddress: Text[250];
     begin
         if not TryGetValidatedReceiptProfile(POSEntry, POSReceiptProfile) then
-            exit(false);
+            exit;
 
         EmailAddress := GetEmailAddress(POSEntry);
         if EmailAddress = '' then
-            exit(false);
+            exit;
 
-        exit(NPEmail.TrySendEmail(
+        NPEmail.TrySendEmail(
             POSReceiptProfile."E-mail Template Id",
             POSEntry,
             EmailAddress,
             GetLanguageCode(POSEntry)
-        ));
+        );
     end;
 
     local procedure TryGetValidatedReceiptProfile(POSEntry: Record "NPR POS Entry"; var POSReceiptProfile: Record "NPR POS Receipt Profile"): Boolean
