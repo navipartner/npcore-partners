@@ -693,12 +693,11 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         if (not Ticket.GetBySystemId(TicketId)) then
             exit(ResponseJson);
 
-        if (AdmissionCode = '') then begin
-            if (not (SpeedGate.CheckTicket(ScannerId, Ticket."External Ticket No.", AdmissionCode, ValidAdmitToCodes, ResponseCode))) then
-                exit(ResponseJson);
-        end else begin
-            ValidAdmitToCodes.Add(AdmissionCode);
-        end;
+        if (Ticket.Blocked) then
+            exit(ResponseJson);
+
+        if (not (SpeedGate.CheckTicket(ScannerId, Ticket."External Ticket No.", AdmissionCode, ValidAdmitToCodes, ResponseCode))) then
+            exit(ResponseJson);
 
         foreach AdmissionCode in ValidAdmitToCodes do begin
             AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");

@@ -1169,41 +1169,40 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         TicketProfileLine.Reset();
         repeat
-            AdmissionLocalTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
-            LocalTime := DT2Time(AdmissionLocalTime);
-            LocalDate := DT2Date(AdmissionLocalTime);
-
-            TicketProfileLine.SetFilter(Code, '=%1', TicketProfileCode);
-            TicketProfileLine.SetFilter(ItemNo, '=%1|=%2', Ticket."Item No.", '');
-            TicketProfileLine.SetFilter(AdmissionCode, '=%1|=%2', TicketBom."Admission Code", '');
-            TicketProfileLine.SetFilter(RuleType, '=%1', TicketProfileLine.RuleType::ALLOW);
-            if (TicketProfileLine.FindSet()) then
-                repeat
-                    IsRuleValid := true; // Assume working hours
-                    if (TicketProfileLine.CalendarCode <> '') then
-                        IsRuleValid := not (CheckAdmissionIsNonWorking(TicketBom."Admission Code", TicketProfileLine.CalendarCode, LocalDate));
-
-                    if (TicketProfileLine.PermitFromTime <> 0T) and (TicketProfileLine.PermitUntilTime <> 0T) then
-                        IsRuleValid := IsRuleValid and (LocalTime >= TicketProfileLine.PermitFromTime) and (LocalTime <= TicketProfileLine.PermitUntilTime);
-
-                    if (IsRuleValid) then begin
-                        if (not AdmitToCodes.Contains(TicketBom."Admission Code")) then
-                            AdmitToCodes.Add(TicketBom."Admission Code");
-                        ProfileLineId := TicketProfileLine.SystemId;
-                    end;
-                until (TicketProfileLine.Next() = 0);
-
             TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
             TicketAccessEntry.SetLoadFields(Quantity, Status);
             TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
             TicketAccessEntry.SetFilter("Admission Code", '=%1', TicketBom."Admission Code");
             TicketAccessEntry.FindFirst();
 
-            if (TicketAccessEntry.Status = TicketAccessEntry.Status::BLOCKED) then
-                exit(SetApiError(_ApiErrors::ticket_blocked));
+            if (TicketAccessEntry.Status <> TicketAccessEntry.Status::BLOCKED) then begin
+                AdmissionLocalTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
+                LocalTime := DT2Time(AdmissionLocalTime);
+                LocalDate := DT2Date(AdmissionLocalTime);
 
-            if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
-                SuggestedQuantity := TicketAccessEntry.Quantity;
+                TicketProfileLine.SetFilter(Code, '=%1', TicketProfileCode);
+                TicketProfileLine.SetFilter(ItemNo, '=%1|=%2', Ticket."Item No.", '');
+                TicketProfileLine.SetFilter(AdmissionCode, '=%1|=%2', TicketBom."Admission Code", '');
+                TicketProfileLine.SetFilter(RuleType, '=%1', TicketProfileLine.RuleType::ALLOW);
+                if (TicketProfileLine.FindSet()) then
+                    repeat
+                        IsRuleValid := true; // Assume working hours
+                        if (TicketProfileLine.CalendarCode <> '') then
+                            IsRuleValid := not (CheckAdmissionIsNonWorking(TicketBom."Admission Code", TicketProfileLine.CalendarCode, LocalDate));
+
+                        if (TicketProfileLine.PermitFromTime <> 0T) and (TicketProfileLine.PermitUntilTime <> 0T) then
+                            IsRuleValid := IsRuleValid and (LocalTime >= TicketProfileLine.PermitFromTime) and (LocalTime <= TicketProfileLine.PermitUntilTime);
+
+                        if (IsRuleValid) then begin
+                            if (not AdmitToCodes.Contains(TicketBom."Admission Code")) then
+                                AdmitToCodes.Add(TicketBom."Admission Code");
+                            ProfileLineId := TicketProfileLine.SystemId;
+                        end;
+                    until (TicketProfileLine.Next() = 0);
+
+                if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
+                    SuggestedQuantity := TicketAccessEntry.Quantity;
+            end;
 
         until (TicketBom.Next() = 0);
 
