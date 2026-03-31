@@ -401,7 +401,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
                 MembershipEntry.SetRange(Blocked);
             MembershipEntry.SetCurrentKey("Membership Entry No.");
             if MembershipEntry.FindLast() then
-                if MembershipSetup.Get(Membership."Entry No.") then
+                if MembershipSetup.Get(Membership."Membership Code") then
                     if MembershipSetup.Perpetual then
                         MembershipEntry."Valid Until Date" := 99991231D;
         end else
