@@ -753,18 +753,18 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
     begin
-
         TicketReservationRequest.Get(RequestEntryNo);
         AddRequestToTmp(TicketReservationRequest."Session Token ID", TempTicketReservationRequest);
 
         TicketReservationRequest.CalcFields("Is Superseeded");
         repeat
             if (TicketReservationRequest."Is Superseeded") then begin
-                TicketReservationRequest.Reset();
                 TicketReservationRequest.SetFilter("Superseeds Entry No.", '=%1', TicketReservationRequest."Entry No.");
-                TicketReservationRequest.FindFirst();
-                AddRequestToTmp(TicketReservationRequest."Session Token ID", TempTicketReservationRequest);
-
+                if (TicketReservationRequest.FindSet()) then begin
+                    repeat
+                        AddRequestToTmp(TicketReservationRequest."Session Token ID", TempTicketReservationRequest);
+                    until (TicketReservationRequest.Next() = 0);
+                end;
                 TicketReservationRequest.CalcFields("Is Superseeded");
             end;
         until (not TicketReservationRequest."Is Superseeded");
@@ -776,12 +776,11 @@
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
-
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then begin
             repeat
-                TmpTicketReservationRequest.TRANSFERFIELDS(TicketReservationRequest, true);
-                TmpTicketReservationRequest.Insert();
+                TmpTicketReservationRequest.TransferFields(TicketReservationRequest, true);
+                if (not TmpTicketReservationRequest.Insert()) then; // already exists, do nothing
             until (TicketReservationRequest.Next() = 0);
         end;
     end;
