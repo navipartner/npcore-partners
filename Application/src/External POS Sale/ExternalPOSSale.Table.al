@@ -412,7 +412,10 @@
         {
 
         }
+        key(Key7; "Converted To POS Entry", "Send Receipt: Email", "Email Receipt Sent")
+        {
 
+        }
     }
 
 

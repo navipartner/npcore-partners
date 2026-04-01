@@ -65,6 +65,35 @@ codeunit 6248222 "NPR External POS Sale Pub"
         Found := true;
     end;
 
+    procedure FindSetByEmailReceiptSent(var ExternalPOSSaleBuf: Record "NPR External POS Sale Buf"; ConvertedToPOSEntry: Boolean) Found: Boolean
+    begin
+        ExternalPOSSaleBuf.Reset();
+        ExternalPOSSaleBuf.DeleteAll();
+
+        ExternalPOSSale.Reset();
+        ExternalPOSSale.SetCurrentKey("Converted To POS Entry", "Send Receipt: Email", "Email Receipt Sent");
+        ExternalPOSSale.Setrange("Converted To POS Entry", ConvertedToPOSEntry);
+        ExternalPOSSale.SetRange("Send Receipt: Email", true);
+        ExternalPOSSale.SetRange("Email Receipt Sent", false);
+        if not ExternalPOSSale.FindSet() then
+            exit;
+
+        repeat
+            PopulateBufferFromRec(ExternalPOSSaleBuf, ExternalPOSSale);
+        until ExternalPOSSale.Next() = 0;
+        ExternalPOSSaleBuf.FindFirst();
+        Found := true;
+    end;
+
+    procedure ModifyEmailReceiptSent(ExternalPOSSaleBuf: Record "NPR External POS Sale Buf"; EmailReceiptSent: Boolean)
+    begin
+        if ExternalPOSSale.Get(ExternalPOSSaleBuf."Entry No.") then
+            if ExternalPOSSale."Email Receipt Sent" <> EmailReceiptSent then begin
+                ExternalPOSSale."Email Receipt Sent" := EmailReceiptSent;
+                ExternalPOSSale.Modify();
+            end;
+    end;
+
     local procedure PopulateBufferFromRec(var ExternalPOSSaleBuf: Record "NPR External POS Sale Buf"; ExternalPOSSaleRec: Record "NPR External POS Sale")
     begin
         ExternalPOSSaleBuf.Init();
