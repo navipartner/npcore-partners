@@ -976,11 +976,14 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if not EcomSalesLine.GetBySystemId(SalesInvLine."NPR Inc Ecom Sales Line Id") then
             exit;
 
-        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date");
+        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date", "Document Type");
         if not EcomSalesHeader.Get(EcomSalesLine."Document Entry No.") then
             exit;
 
         if (EcomSalesHeader."API Version Date" <> GetApiVersion()) then
+            exit;
+
+        if EcomSalesHeader."Document Type" <> EcomSalesHeader."Document Type"::Order then
             exit;
 
         EcomSalesLine."Invoiced Qty." += SalesInvLine.Quantity;
@@ -1001,11 +1004,14 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if not EcomSalesLine.GetBySystemId(SalesCrMemoLine."NPR Inc Ecom Sales Line Id") then
             exit;
 
-        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date");
+        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date", "Document Type");
         if not EcomSalesHeader.Get(EcomSalesLine."Document Entry No.") then
             exit;
 
         if (EcomSalesHeader."API Version Date" <> GetApiVersion()) then
+            exit;
+
+        if EcomSalesHeader."Document Type" <> EcomSalesHeader."Document Type"::"Return Order" then
             exit;
 
         EcomSalesLine."Invoiced Qty." += SalesCrMemoLine.Quantity;
@@ -1171,6 +1177,20 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesPmtLine."Captured Amount" += PaymentLine.Amount;
         EcomSalesDocImplEvents.OnUpdateSalesDocumentPaymentLineCaptureInformationBeforeFinalizeRecord(PaymentLine, EcomSalesPmtLine);
         EcomSalesPmtLine.Modify();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnBeforeInsertToSalesLine', '', true, false)]
+    local procedure OnBeforeInsertToSalesLine(var ToSalesLine: Record "Sales Line"; var FromSalesLine: Record "Sales Line"; FromDocType: Option; RecalcLines: Boolean; var ToSalesHeader: Record "Sales Header"; DocLineNo: Integer; var NextLineNo: Integer; RecalculateAmount: Boolean; var IsHandled: Boolean)
+    begin
+        if not IsNullGuid(ToSalesLine."NPR Inc Ecom Sales Line Id") then
+            Clear(ToSalesLine."NPR Inc Ecom Sales Line Id");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnBeforeModifySalesHeader', '', true, false)]
+    local procedure OnBeforeModifySalesHeader(var ToSalesHeader: Record "Sales Header"; FromDocType: Option; FromDocNo: Code[20]; IncludeHeader: Boolean; FromDocOccurenceNo: Integer; FromDocVersionNo: Integer; RecalculateLines: Boolean; FromSalesHeader: Record "Sales Header"; FromSalesInvoiceHeader: Record "Sales Invoice Header"; FromSalesCrMemoHeader: Record "Sales Cr.Memo Header"; OldSalesHeader: Record "Sales Header")
+    begin
+        if not IsNullGuid(ToSalesHeader."NPR Inc Ecom Sale Id") then
+            Clear(ToSalesHeader."NPR Inc Ecom Sale Id");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesLine', '', true, false)]

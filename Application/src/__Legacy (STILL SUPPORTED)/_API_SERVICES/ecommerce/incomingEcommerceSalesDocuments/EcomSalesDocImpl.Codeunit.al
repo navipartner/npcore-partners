@@ -843,13 +843,15 @@ codeunit 6248616 "NPR Ecom Sales Doc Impl"
         if not EcomSalesLine.GetBySystemId(SalesInvLine."NPR Inc Ecom Sales Line Id") then
             exit;
 
-        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date");
+        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date", "Document Type");
         if not EcomSalesHeader.Get(EcomSalesLine."Document Entry No.") then
             exit;
 
         if (EcomSalesHeader."API Version Date" <> 0D) and (EcomSalesHeader."API Version Date" <> GetApiVersion()) then
             exit;
 
+        if EcomSalesHeader."Document Type" <> EcomSalesHeader."Document Type"::Order then
+            exit;
 
         EcomSalesLine."Invoiced Qty." += SalesInvLine.Quantity;
         if EcomSalesHeader."Price Excl. VAT" then
@@ -869,13 +871,15 @@ codeunit 6248616 "NPR Ecom Sales Doc Impl"
         if not EcomSalesLine.GetBySystemId(SalesCrMemoLine."NPR Inc Ecom Sales Line Id") then
             exit;
 
-        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date");
+        EcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date", "Document Type");
         if not EcomSalesHeader.Get(EcomSalesLine."Document Entry No.") then
             exit;
 
         if (EcomSalesHeader."API Version Date" <> 0D) and (EcomSalesHeader."API Version Date" <> GetApiVersion()) then
             exit;
 
+        if EcomSalesHeader."Document Type" <> EcomSalesHeader."Document Type"::"Return Order" then
+            exit;
 
         EcomSalesLine."Invoiced Qty." += SalesCrMemoLine.Quantity;
         if EcomSalesHeader."Price Excl. VAT" then
