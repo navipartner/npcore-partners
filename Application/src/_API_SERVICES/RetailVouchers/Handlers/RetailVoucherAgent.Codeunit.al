@@ -117,6 +117,12 @@ codeunit 6248253 "NPR RetailVoucherAgent"
         ReservationId: Text;
     begin
         if Reserve then begin
+            if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
+                if NpRvVoucher.CalcInUseQty() > 0 then begin
+                    Response.RespondBadRequest('Voucher is already in use');
+                    exit(false);
+                end;
+
             NpRvVoucher.CalcFields("Apply Payment Module", NpRvVoucher."Initial Amount");
             Amount := JsonHelper.GetJDecimal(RequestJToken, 'amount', true);
             if NpRvVoucher."Apply Payment Module" = ModuleCode() then begin
