@@ -21,9 +21,11 @@ codeunit 6248538 "NPR EcomSaleCaptureJQ"
         MaxDuration := GetDefaultDuration();
 
         repeat
+            if EcomJobManagement.ShouldSoftExit(JobQueueEntry.ID) then
+                exit;
             ProcessRecords(JobQueueEntry);
             Sleep(1000);
-        until EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
+        until (not JobQueueEntry."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
     end;
 
     local procedure GetDefaultDuration(): Duration
