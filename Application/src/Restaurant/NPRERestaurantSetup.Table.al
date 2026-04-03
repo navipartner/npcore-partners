@@ -128,6 +128,13 @@
             InitValue = "All Requests";
             ValuesAllowed = "All Requests", "Any Request";
         }
+        field(51; "Mark Requests as Served"; Enum "NPR NPRE Mark Req. as Served")
+        {
+            Caption = 'Mark Requests as Served';
+            DataClassification = CustomerContent;
+            InitValue = Manual;
+            ValuesAllowed = Manual, "When Prod. Finished";
+        }
         field(60; "Order ID Assign. Method"; Option)
         {
             Caption = 'Order ID Assign. Method';

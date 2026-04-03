@@ -101,6 +101,11 @@
             Caption = 'Default Number of Guests';
             DataClassification = CustomerContent;
         }
+        field(100; "Mark Requests as Served"; Enum "NPR NPRE Mark Req. as Served")
+        {
+            Caption = 'Mark Requests as Served';
+            DataClassification = CustomerContent;
+        }
         field(200; "Menu Logo Media Key"; Text[200])
         {
             Caption = 'Menu Logo Media Key';

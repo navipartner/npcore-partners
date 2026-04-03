@@ -19,6 +19,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
         UpdateKitchenRequestProductionStatuses();
         UpdateOrderFinishedDT();
         UpdateRVNewWaiterPadPosActionParams();
+        UpdateMarkRequestsAsServedParameter();
     end;
 
     local procedure RefreshKitchenOrderStatus()
@@ -244,5 +245,24 @@ codeunit 6151316 "NPR NPRE Upgrade"
             exit;
         ParamValue.Value := NewValue;
         ParamValue.Modify();
+    end;
+
+    local procedure UpdateMarkRequestsAsServedParameter()
+    var
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        UpgradeStep := 'UpdateMarkRequestsAsServedParameter';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
+
+        if RestaurantSetup.Get() then
+            if RestaurantSetup."Mark Requests as Served" = RestaurantSetup."Mark Requests as Served"::Default then begin
+                RestaurantSetup."Mark Requests as Served" := RestaurantSetup."Mark Requests as Served"::Manual;
+                RestaurantSetup.Modify();
+            end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
     end;
 }

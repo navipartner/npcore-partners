@@ -45,6 +45,7 @@ codeunit 6184783 "NPR NPRE Send Notification"
     local procedure IsExpired(var NotificationEntry: Record "NPR NPRE Notification Entry"): Boolean
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         Expired: Boolean;
         NotifExpiredTxt: Label 'Notification has expired and won’t be sent.', MaxLength = 250;
     begin
@@ -57,9 +58,16 @@ codeunit 6184783 "NPR NPRE Send Notification"
                         not KitchenOrder.Get(NotificationEntry."Kitchen Order ID") or (KitchenOrder."On Hold") or
                         not (KitchenOrder."Order Status" in [KitchenOrder."Order Status"::"In-Production", KitchenOrder."Order Status"::Released, KitchenOrder."Order Status"::Planned]);
                 NotificationEntry."Notification Trigger"::KDS_ORDER_READY_FOR_SERVING:
-                    Expired :=
-                        not KitchenOrder.Get(NotificationEntry."Kitchen Order ID") or
-                        (KitchenOrder."Order Status" in [KitchenOrder."Order Status"::Finished, KitchenOrder."Order Status"::Cancelled]);
+                    begin
+                        if not KitchenOrder.Get(NotificationEntry."Kitchen Order ID") then
+                            Expired := true
+                        else
+                            if KitchenOrder."Order Status" = KitchenOrder."Order Status"::Finished then begin
+                                SetupProxy.SetRestaurant(KitchenOrder."Restaurant Code");
+                                Expired := not (SetupProxy.MarkRequestsAsServed() = SetupProxy.MarkRequestsAsServed() ::"When Prod. Finished");
+                            end else
+                                Expired := KitchenOrder."Order Status" = KitchenOrder."Order Status"::Cancelled;
+                    end;
             end;
 
         if Expired then begin

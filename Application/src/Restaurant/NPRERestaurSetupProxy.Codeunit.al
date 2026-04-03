@@ -110,6 +110,9 @@
         if _Restaurant."Order Is Ready For Serving" = _Restaurant."Order Is Ready For Serving"::Default then
             _Restaurant."Order Is Ready For Serving" := _NPRESetup."Order Is Ready For Serving";
 
+        if _Restaurant."Mark Requests as Served" = _Restaurant."Mark Requests as Served"::Default then
+            _Restaurant."Mark Requests as Served" := _NPRESetup."Mark Requests as Served";
+
         _Initialized := true;
     end;
 
@@ -209,6 +212,12 @@
     begin
         MakeSureIsInitialized();
         exit(_Restaurant."Order Is Ready For Serving");
+    end;
+
+    procedure MarkRequestsAsServed(): Enum "NPR NPRE Mark Req. as Served"
+    begin
+        MakeSureIsInitialized();
+        exit(_Restaurant."Mark Requests as Served");
     end;
 
     procedure GetRestaurantList(var TempRestaurant: Record "NPR NPRE Restaurant")

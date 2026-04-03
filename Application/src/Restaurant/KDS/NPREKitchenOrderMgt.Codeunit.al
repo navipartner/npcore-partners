@@ -621,8 +621,14 @@
         UpdateRequestLineStatus(KitchenRequest);
         KitchenRequest.Modify();
 
-        if RefreshOrderStatus then
+        if RefreshOrderStatus then begin
             UpdateOrderStatus(KitchenRequest."Order ID");
+            if KitchenRequest."Line Status" = KitchenRequest."Line Status"::"Ready for Serving" then begin
+                SetupProxy.SetRestaurant(KitchenRequest."Restaurant Code");
+                if SetupProxy.MarkRequestsAsServed() = SetupProxy.MarkRequestsAsServed()::"When Prod. Finished" then
+                    SetRequestLineAsServed(KitchenRequest);
+            end;
+        end;
     end;
 
     local procedure UpdateRequestProdStatus(var KitchenRequest: Record "NPR NPRE Kitchen Request")

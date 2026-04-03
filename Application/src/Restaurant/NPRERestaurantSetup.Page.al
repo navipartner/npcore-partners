@@ -124,6 +124,11 @@
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies how existing kitchen station production requests should be handled, if a product has been served prior to finishing production. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                     }
+                    field("Mark Requests as Served"; Rec."Mark Requests as Served")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies when kitchen requests are marked as Served. "Manual" requires a restaurant employee to mark requests as served. "When Production is Finished" automatically marks requests as served once all kitchen stations finish production, skipping the "Ready for Serving" step. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
+                    }
                     field("Order Is Ready For Serving"; Rec."Order Is Ready For Serving")
                     {
                         ApplicationArea = NPRRetail;
