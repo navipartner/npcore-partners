@@ -20,6 +20,8 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
     end;
 
     internal procedure CheckIfLineCanBeProcessed(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
     begin
         if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
             EcomSalesHeader.FieldError("Creation Status");
@@ -41,6 +43,8 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
         if EcommSalesLine."Virtual Item Process Status" = EcommSalesLine."Virtual Item Process Status"::Processed then
             EcommSalesLine.FieldError(EcommSalesLine."Virtual Item Process Status");
+
+        EcomSalesDocUtils.ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
     end;
 
     local procedure ReserveVoucher(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherFaceValueLCY: Decimal): text[50]

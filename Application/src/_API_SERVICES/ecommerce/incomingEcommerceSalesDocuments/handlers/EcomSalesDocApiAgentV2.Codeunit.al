@@ -236,6 +236,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     local procedure DeserializeIncomingEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
         JsonHelper: Codeunit "NPR Json Helper";
         LineTypeText: Text;
@@ -297,6 +298,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 end;
             EcomSalesLine.Type::Voucher:
                 begin
+                    EcomSalesDocUtils.ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
                     EcomSalesLine.Subtype := EcomSalesLine.Subtype::Voucher;
                     EcomSalesLine."Voucher Type" := JsonHelper.GetJText(SalesLineJsonToken, 'voucherType', MaxStrLen(EcomSalesLine."Voucher Type"), true, false);
                     EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
@@ -456,6 +458,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 
     local procedure DeserializeIncomingEcomSalesPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
     var
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         JsonHelper: Codeunit "NPR Json Helper";
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         LineTypeText: Text;
@@ -483,6 +486,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 end;
             EcomSalesPmtLine."Payment Method Type"::Voucher:
                 begin
+                    EcomSalesDocUtils.ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
 #pragma warning disable AA0139
                     EcomSalesPmtLine."Payment Reference" := JsonHelper.GetJText(PaymentLineJsonToken, 'paymentReference', MaxStrLen(EcomSalesPmtLine."Payment Reference"), true, true);
                     EcomSalesPmtLine.Amount := JsonHelper.GetJDecimal(PaymentLineJsonToken, 'paymentAmount', true);

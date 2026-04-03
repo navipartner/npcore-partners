@@ -1215,11 +1215,10 @@ codeunit 85024 "NPR Retail Voucher Tests"
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure RedeemFullVoucherOnEcommerceForeignCurrencySalesOrderWithRounding()
-    // [SCENARIO] Fully redeem a retail voucher on an ecommerce sales order in a foreign currency, where the remaining amount on the voucher is slightly less than the order amount due to a rounding difference
+    // [SCENARIO] Voucher redemption on an ecommerce sales order in a foreign currency should be blocked
     var
         Currency: Record Currency;
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         Assert: Codeunit "Assert";
         CurrencyExchangeRate: Decimal;
         OrderAmountFCY: Decimal;
@@ -1233,16 +1232,13 @@ codeunit 85024 "NPR Retail Voucher Tests"
         // [GIVEN] A foreign currency with exchange rate 0.132345
         CurrencyExchangeRate := 0.132345;
         CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
-        OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 200 LCY, which equals 26.47 FCY
+        OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision");
 
-        // [WHEN] Create and process an ecommerce sales order with voucher redemption
-        // The voucher redemption amount will be 200.01 LCY when calculated from 26.47 FCY. So, there will be a rounding difference of 0.01 LCY, but the voucher should still be redeemed in full and archived.
-        CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher, Currency.Code, OrderAmountFCY);
+        // [WHEN] Attempting to create an ecommerce sales order with voucher redemption in FCY
+        asserterror CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher, Currency.Code, OrderAmountFCY);
 
-        // [THEN] Voucher should be archived
-        Assert.IsFalse(NpRvVoucher.Find(), 'Voucher should no longer exist after full redemption');
-        NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
-        Assert.IsTrue(NpRvArchVoucher.FindFirst(), 'Archived voucher should exist');
+        // [THEN] Error is raised because vouchers are not supported in FCY documents
+        Assert.ExpectedError('Vouchers are not supported in documents with a foreign currency');
     end;
 #endif
 

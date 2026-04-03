@@ -575,6 +575,41 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
             NpRvSalesLine.DeleteAll(true);
     end;
 
+    local procedure IsFCYDocument(CurrencyCode: Code[10]): Boolean
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        if CurrencyCode = '' then
+            exit(false);
+        GLSetup.Get();
+        exit(CurrencyCode <> GLSetup."LCY Code");
+    end;
+
+    internal procedure ErrorIfFCYDocument(CurrencyCode: Code[10])
+    var
+        VouchersNotSupportedInFCYDocumentLbl: Label 'Vouchers are not supported in documents with a foreign currency. Currency Code: %1', Comment = '%1 - currency code', Locked = true;
+    begin
+        if IsFCYDocument(CurrencyCode) then
+            Error(VouchersNotSupportedInFCYDocumentLbl, CurrencyCode);
+    end;
+
+    internal procedure CheckFCYDocumentHasNoVouchers(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+    begin
+        if not IsFCYDocument(EcomSalesHeader."Currency Code") then
+            exit;
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Voucher);
+        if not EcomSalesLine.IsEmpty() then
+            ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesPmtLine.SetRange("Payment Method Type", EcomSalesPmtLine."Payment Method Type"::Voucher);
+        if not EcomSalesPmtLine.IsEmpty() then
+            ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
+    end;
+
     internal procedure ValidateDocBySource(EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
         if EcomSalesHeader."Document Type" <> EcomSalesHeader."Document Type"::Order then
@@ -688,6 +723,5 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
             Error(NoPaymentLinesErr, EcomSalesHeader."External No.");
         end;
     end;
-
 }
 #endif

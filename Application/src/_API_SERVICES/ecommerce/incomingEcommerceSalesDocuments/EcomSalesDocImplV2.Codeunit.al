@@ -1324,8 +1324,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         EcomSalesLine: Record "NPR Ecom Sales Line";
-        EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         Handled: Boolean;
         UnprocessedVirtualItemsErrorLbl: Label 'There is unprocessed virtual item on %1. Type: %2, no.: %3', Comment = '%1 - recordid, %2 - virtual item type, $3 - virtual item no.';
         CreatedDocumentErrorLbl: Label 'Sales document %1 has already been created from ecom document %2.', Comment = '%1 - sales document record id, %2 - ecom document record id';
@@ -1363,6 +1363,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::" ");
         if EcomSalesLine.FindFirst() then
             Error(SubtypeNotSetErr, EcomSalesLine."Line No.");
+
+        EcomSalesDocUtils.CheckFCYDocumentHasNoVouchers(EcomSalesHeader);
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
