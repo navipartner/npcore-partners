@@ -1821,7 +1821,7 @@
     var
         WrongCustomerTok: Label 'Voucher %1 is issued for customer %2 and cannot be used by customer %3.';
     begin
-        if not VoucherType."Validate Customer No." then
+        if not VoucherType."Require Customer Match" then
             exit;
         if Voucher."Customer No." = '' then
             exit;
@@ -2253,6 +2253,8 @@
             POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
             POSLine.Modify();
         end;
+
+        CheckCustomer(VoucherType, Voucher, SalePOS);
 
         InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
 

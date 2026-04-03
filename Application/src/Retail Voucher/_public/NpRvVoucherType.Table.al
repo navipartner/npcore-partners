@@ -263,6 +263,14 @@
         {
             Caption = 'Validate Customer No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-04-02';
+            ObsoleteReason = 'Renamed to Require Customer Match.';
+        }
+        field(303; "Require Customer Match"; Boolean)
+        {
+            Caption = 'Require Customer Match';
+            DataClassification = CustomerContent;
         }
         field(330; "Top-up Extends Ending Date"; Boolean)
         {

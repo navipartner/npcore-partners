@@ -293,6 +293,16 @@
                     {
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Validate Customer No. field. If this field is selected and voucher was issued to a customer this voucher can be spend only by that customer.';
+                        Visible = false;
+                        Enabled = false;
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '2026-04-02';
+                        ObsoleteReason = 'Replaced by Require Customer Match.';
+                    }
+                    field("Require Customer Match"; Rec."Require Customer Match")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies whether the customer on the POS sale must match the customer assigned to the voucher during redemption. If enabled and the voucher was issued to a customer, it can only be redeemed by that customer.';
                     }
                     field("Valid Period"; Rec."Valid Period")
                     {
