@@ -4,7 +4,7 @@
 
 ### Overview
 
-This is an NP Retail (NaviPartner) Business Central ISV app monorepo. The primary application code is in `Application/`, tests in `Test/`, and API documentation in `fern/`. See `CLAUDE.md` for coding rules, conventions, and the standard development workflow.
+This is an NP Retail (NaviPartner) Business Central ISV app monorepo. The primary application code is in `Application/`, tests in `Test/`. API documentation (Fern) lives in a separate repository: https://github.com/navipartner/documentation. See `CLAUDE.md` for coding rules, conventions, and the standard development workflow.
 
 ### bcdev CLI
 
@@ -95,4 +95,4 @@ To open the POS page directly in BC, append `?page=6150750` to the BC URL. For n
 
 ### Fern API Docs
 
-After changing AL API endpoints, update fern definitions and validate with `cd fern && fern check`. See `CLAUDE.md` for common pitfalls.
+Fern API documentation has moved to https://github.com/navipartner/documentation. When changing AL API endpoints, update the Fern definitions in that repository.

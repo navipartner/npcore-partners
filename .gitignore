@@ -264,6 +264,3 @@ ModelManifest.xml
 
 # Exceptions to **/packages/* Dragonglass
 !**/packages/dragonglass-*
-
-# FERN
-.fern_sdk_generated/

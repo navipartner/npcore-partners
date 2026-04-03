@@ -7,10 +7,6 @@
     {
       "name": "TEST",
       "path": "./Test"
-    },
-    {
-      "name": "FERN",
-      "path": "./fern"
     }
   ],
   "settings": {
