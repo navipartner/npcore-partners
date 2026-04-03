@@ -104,10 +104,12 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
         ManifestId: Guid;
         var AssetsAdded: Integer)
+    var
+        _ProcessedTicketReqEntryNos: List of [Integer];
     begin
         if TempLineBuffer.FindSet() then
             repeat
-                ProcessLineAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
+                ProcessLineAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded, _ProcessedTicketReqEntryNos);
             until TempLineBuffer.Next() = 0;
     end;
 
@@ -115,7 +117,8 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
         ManifestId: Guid;
-        var AssetsAdded: Integer)
+        var AssetsAdded: Integer;
+        var ProcessedTicketReqEntryNos: List of [Integer])
     var
         AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
     begin
@@ -132,7 +135,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
             AssetType::Coupon:
                 ProcessCouponAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
             AssetType::Ticket:
-                ProcessTicketAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
+                ProcessTicketAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded, ProcessedTicketReqEntryNos);
             AssetType::Wallet:
                 ProcessWalletAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
         end;
@@ -279,7 +282,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
     begin
         // Find membership entry for this order line (should be only one per line)
-        MembershipEntry.SetRange("Document No.", TempHeaderBuffer."External Order No.");
+        // For Shopify orders use the Shopify Order ID (the canonical identifier used when creating the membership)
+        if TempHeaderBuffer."Shopify Order ID" <> '' then
+            MembershipEntry.SetRange("Document No.", TempHeaderBuffer."Shopify Order ID")
+        else
+            MembershipEntry.SetRange("Document No.", TempHeaderBuffer."External Order No.");
         MembershipEntry.SetRange("Item No.", TempLineBuffer."No.");
         if not MembershipEntry.FindLast() then
             exit;
@@ -380,29 +387,62 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
         ManifestId: Guid;
-        var AssetsAdded: Integer)
+        var AssetsAdded: Integer;
+        var ProcessedTicketReqEntryNos: List of [Integer])
     var
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        OrderID: Text;
+    begin
+        OrderID := TempHeaderBuffer."External Order No.";
+        // For Shopify orders use the Shopify Order ID (the canonical identifier used when creating the reservation)
+        if TempHeaderBuffer."Shopify Order ID" <> '' then
+            OrderID := TempHeaderBuffer."Shopify Order ID";
+
+        FilterTicketReservations(OrderID, TempLineBuffer, TicketReservationReq);
+        if not TicketReservationReq.FindSet() then
+            exit;
+
+        repeat
+            AddTicketsFromReservation(TicketReservationReq, ManifestId, AssetsAdded, ProcessedTicketReqEntryNos);
+        until TicketReservationReq.Next() = 0;
+    end;
+
+    local procedure FilterTicketReservations(
+        OrderID: Text;
+        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
+        var TicketReservationReq: Record "NPR TM Ticket Reservation Req.")
+    begin
+        TicketReservationReq.Reset();
+        TicketReservationReq.SetRange("External Order No.", OrderID);
+        TicketReservationReq.SetRange("Request Status", TicketReservationReq."Request Status"::CONFIRMED);
+
+        // Try precise match first: Ext. Line Reference No.
+        TicketReservationReq.SetRange("Ext. Line Reference No.", TempLineBuffer."Line No.");
+        if not TicketReservationReq.IsEmpty() then
+            exit;
+
+        // Fallback: match by Item No. + Variant Code
+        // Process ALL matching reservations to handle multiple timeslots for the same item
+        TicketReservationReq.SetRange("Ext. Line Reference No.");
+        TicketReservationReq.SetRange("Item No.", TempLineBuffer."No.");
+        TicketReservationReq.SetRange("Variant Code", TempLineBuffer."Variant Code");
+    end;
+
+    local procedure AddTicketsFromReservation(
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        ManifestId: Guid;
+        var AssetsAdded: Integer;
+        var ProcessedTicketReqEntryNos: List of [Integer])
+    var
         Ticket: Record "NPR TM Ticket";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
     begin
-        // Filter by External Order No. + Line No. to match this specific sales line
-        TicketReservationReq.SetRange("External Order No.", TempHeaderBuffer."External Order No.");
-        TicketReservationReq.SetRange("Ext. Line Reference No.", TempLineBuffer."Line No.");
-        TicketReservationReq.SetRange("Request Status", TicketReservationReq."Request Status"::CONFIRMED);
-
-        if TicketReservationReq.IsEmpty() then begin
-            // External system might not send the Ext. Line Reference No., so we search by Item No and Variant Code
-            TicketReservationReq.SetRange("Ext. Line Reference No.");
-            TicketReservationReq.SetRange("Item No.", TempLineBuffer."No.");
-            TicketReservationReq.SetRange("Variant Code", TempLineBuffer."Variant Code");
-        end;
-
-        if not TicketReservationReq.FindLast() then
+        if ProcessedTicketReqEntryNos.Contains(TicketReservationReq."Entry No.") then
             exit;
 
-        // Process all tickets for this reservation (multiple tickets if qty > 1)
+        ProcessedTicketReqEntryNos.Add(TicketReservationReq."Entry No.");
+
         Ticket.SetLoadFields("Item No.", "Variant Code", "External Ticket No.", SystemId);
         Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationReq."Entry No.");
         if Ticket.FindSet() then
@@ -411,12 +451,12 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                 if TicketAdmissionBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketReservationReq."Admission Code") then
                     if TicketAdmissionBOM.NPDesignerTemplateId <> '' then begin
                         NPDesignerManifestFacade.AddAssetToManifest(
-                           ManifestId,
-                           Database::"NPR TM Ticket",
-                           Ticket.SystemId,
-                           Ticket."External Ticket No.",
-                           TicketAdmissionBOM.NPDesignerTemplateId
-                       );
+                            ManifestId,
+                            Database::"NPR TM Ticket",
+                            Ticket.SystemId,
+                            Ticket."External Ticket No.",
+                            TicketAdmissionBOM.NPDesignerTemplateId
+                        );
                         AssetsAdded += 1;
                     end;
             until Ticket.Next() = 0;
@@ -433,8 +473,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         WalletAssetLine: Record "NPR WalletAssetLine";
         FoundWallet: Boolean;
     begin
-        // Filter wallets by External Order No.
-        WalletAssetHeaderRef.SetRange(LinkToReference, TempHeaderBuffer."External Order No.");
+        // For Shopify orders use the Shopify Order ID (the canonical identifier used when creating the wallet)
+        if TempHeaderBuffer."Shopify Order ID" <> '' then
+            WalletAssetHeaderRef.SetRange(LinkToReference, TempHeaderBuffer."Shopify Order ID")
+        else
+            WalletAssetHeaderRef.SetRange(LinkToReference, TempHeaderBuffer."External Order No.");
 
         if not WalletAssetHeaderRef.FindSet() then
             exit;
@@ -506,6 +549,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
         DigitalNotifEntry.Init();
         DigitalNotifEntry."External Order No." := TempHeaderBuffer."External Order No.";
+        DigitalNotifEntry."Shopify Order ID" := TempHeaderBuffer."Shopify Order ID";
         DigitalNotifEntry."Document Type" := TempHeaderBuffer."Document Type";
         DigitalNotifEntry."Posted Document No." := TempHeaderBuffer."Posted Document No.";
         DigitalNotifEntry."Recipient E-mail" := TempHeaderBuffer."Recipient E-mail";
@@ -720,6 +764,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := SalesInvHeader."NPR External Order No.";
+        TempHeaderBuffer."Shopify Order ID" := GetShopifyOrderID(SalesInvHeader.RecordId());
         TempHeaderBuffer."Document Type" := TempHeaderBuffer."Document Type"::Invoice;
         TempHeaderBuffer."Posted Document No." := SalesInvHeader."No.";
         TempHeaderBuffer."Customer No." := SalesInvHeader."Sell-to Customer No.";
@@ -780,6 +825,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := SalesCrMemoHeader."NPR External Order No.";
+        TempHeaderBuffer."Shopify Order ID" := GetShopifyOrderID(SalesCrMemoHeader.RecordId());
         TempHeaderBuffer."Document Type" := TempHeaderBuffer."Document Type"::"Credit Memo";
         TempHeaderBuffer."Posted Document No." := SalesCrMemoHeader."No.";
         TempHeaderBuffer."Customer No." := SalesCrMemoHeader."Sell-to Customer No.";
@@ -811,6 +857,13 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                 TempLineBuffer."VAT %" := SalesCrMemoLine."VAT %";
                 TempLineBuffer.Insert();
             until SalesCrMemoLine.Next() = 0;
+    end;
+
+    local procedure GetShopifyOrderID(PostedDocRecordId: RecordId): Text[30]
+    var
+        SpfyAssignedIDMgtImpl: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        exit(SpfyAssignedIDMgtImpl.GetAssignedShopifyID(PostedDocRecordId, "NPR Spfy ID Type"::"Entry ID"));
     end;
 }
 #endif

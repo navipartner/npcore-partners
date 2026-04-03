@@ -74,6 +74,11 @@ table 6248184 "NPR Digital Doc. Header Buffer"
             DataClassification = SystemMetadata;
             AutoFormatType = 1;
         }
+        field(110; "Shopify Order ID"; Text[30])
+        {
+            Caption = 'Shopify Order ID';
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys

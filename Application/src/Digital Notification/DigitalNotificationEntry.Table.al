@@ -76,6 +76,11 @@ table 6248181 "NPR Digital Notification Entry"
             Caption = 'Sent Date-Time';
             DataClassification = CustomerContent;
         }
+        field(110; "Shopify Order ID"; Text[30])
+        {
+            Caption = 'Shopify Order ID';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

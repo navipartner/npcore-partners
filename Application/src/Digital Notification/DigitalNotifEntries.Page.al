@@ -29,6 +29,12 @@ page 6150918 "NPR Digital Notif. Entries"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the external order number.';
                 }
+                field("Shopify Order ID"; Rec."Shopify Order ID")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Shopify Order ID, if the order originated from Shopify.';
+                    Visible = false;
+                }
                 field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = NPRRetail;
