@@ -178,6 +178,12 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
     end;
 
     internal procedure ValidateAndUpdateRequestsWithEcommerceDocNo(EcommSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        ValidateTicketRequest(EcommSalesHeader);
+        UpdateExpiryTimeBasedOnCapturedStatus(EcommSalesHeader);
+    end;
+
+    internal procedure ValidateTicketRequest(EcommSalesHeader: Record "NPR Ecom Sales Header")
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         InvalidTicketErr: Label 'No valid ticket reservations found for the provided Token.';
@@ -197,8 +203,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
                 then
                     Error(InvalidTicketErr);
             until TicketRequest.Next() = 0;
-
-        UpdateExpiryTimeBasedOnCapturedStatus(EcommSalesHeader);
     end;
 
     internal procedure UpdateExpiryTimeBasedOnCapturedStatus(var EcommSalesHeader: Record "NPR Ecom Sales Header")

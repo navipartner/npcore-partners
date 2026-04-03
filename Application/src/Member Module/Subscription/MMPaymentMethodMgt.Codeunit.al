@@ -371,6 +371,8 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         InvalidMonthErrorLbl: Label 'Invalid month format: %1', Comment = '%1 - Month';
         InvalidYearErrorLbl: Label 'Invalid year format: %1', Comment = '%1 - Year';
     begin
+        if DateText = '' then
+            exit;
         SeparatorPosition := StrPos(DateText, '/');
         MonthText := CopyStr(DateText, 1, SeparatorPosition - 1);
         if not Evaluate(Month, MonthText) then

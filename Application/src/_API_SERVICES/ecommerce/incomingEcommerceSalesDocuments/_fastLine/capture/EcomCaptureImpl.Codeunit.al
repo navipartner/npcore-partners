@@ -13,6 +13,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         EcomLineCaptureProcess: Codeunit "NPR EcomLineCaptureProcess";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         AmountToCapture: Decimal;
         AmountToCaptureForPaymentLineCreation: Decimal;
         TotalProcessingPaymentAmount: Decimal;
@@ -22,12 +23,13 @@ codeunit 6248646 "NPR EcomCaptureImpl"
     begin
         if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
             EcomSalesHeader.FieldError("Creation Status");
+        if EcomSalesHeader."Capture Processing Status" = EcomSalesHeader."Capture Processing Status"::Processed then
+            Error(VirtualItemsAlreadyCapturedLbl, EcomSalesHeader.RecordId);
+        EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
 
         EcomSalesHeader.CalcFields("Captured Payment Amount");
         AmountToCapture := CalculateAmountToCapture(EcomSalesHeader) - EcomSalesHeader."Captured Payment Amount";
         AmountToCaptureForPaymentLineCreation := AmountToCapture;
-        if EcomSalesHeader."Capture Processing Status" = EcomSalesHeader."Capture Processing Status"::Processed then
-            Error(VirtualItemsAlreadyCapturedLbl, EcomSalesHeader.RecordId);
 
         IsShopifyDocument := SpfyEcomSalesDocPrcssr.IsShopifyDocument(EcomSalesHeader);
 

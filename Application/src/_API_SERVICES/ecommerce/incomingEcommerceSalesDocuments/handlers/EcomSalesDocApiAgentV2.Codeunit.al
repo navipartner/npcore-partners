@@ -757,7 +757,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('memberMiddleName', EcomSalesLine."Member Middle Name")
                                   .AddProperty('memberEmail', EcomSalesLine."Member Email")
                                   .AddProperty('memberPhoneNo', EcomSalesLine."Member Phone No.")
-                                  .AddProperty('memberBirthday', Format(EcomSalesLine."Member Birthday",0,9))
+                                  .AddProperty('memberBirthday', Format(EcomSalesLine."Member Birthday", 0, 9))
                                   .AddProperty('memberGender', EcomSalesLine."Member Gender")
                                   .AddProperty('memberAddress', EcomSalesLine."Member Address")
                                   .AddProperty('memberCity', EcomSalesLine."Member City")
@@ -765,7 +765,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('memberPostCode', EcomSalesLine."Member Post Code")
                                   .AddProperty('memberNewsletter', EcomSalesLine."Member Newsletter")
                                   .AddProperty('memberGdprApproval', EcomSalesLine."Member GDPR Approval")
-                                  .AddProperty('membershipActivationDate', Format(EcomSalesLine."Membership Activation Date",0,9));
+                                  .AddProperty('membershipActivationDate', Format(EcomSalesLine."Membership Activation Date", 0, 9));
         EcomSalesDocApiEvents.OnCreateAddSalesLineDetailsCustomFieldsJsonObject(EcomSalesLine, SalesLineDetailsCustomFieldsJsonObject);
         if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then
             SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
@@ -938,7 +938,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             Error(InvalidPhoneErr);
     end;
 
-    local procedure ValidateTicketReservationLineId(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    internal procedure ValidateTicketReservationLineId(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         JsonHelper: Codeunit "NPR Json Helper";
         EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";

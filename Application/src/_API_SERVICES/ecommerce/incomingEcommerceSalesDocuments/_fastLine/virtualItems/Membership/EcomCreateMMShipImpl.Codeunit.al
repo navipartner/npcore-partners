@@ -198,12 +198,12 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         Community: Record "NPR MM Member Community";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberApiAgent: Codeunit "NPR MemberApiAgent";
-        UniqueIdentityEmailRequiredErr: Label 'Membership community requires member email (Member Unique Identity = E-Mail). memberEmail must be provided.', Locked = true;
-        UniqueIdentityPhoneRequiredErr: Label 'Membership community requires member phone number (Member Unique Identity = Phone No.). memberPhoneNo must be provided.', Locked = true;
-        UniqueIdentitySsnNotSupportedErr: Label 'Membership community requires Social Security No. (Member Unique Identity = SSN). This is not supported via ecommerce. This is a programming bug.', Locked = true;
-        UniqueIdentityEmailAndPhoneRequiredErr: Label 'Membership community requires both member email and phone number (Member Unique Identity = E-Mail and Phone No.). Both memberEmail and memberPhoneNo must be provided.', Locked = true;
-        UniqueIdentityEmailOrPhoneRequiredErr: Label 'Membership community requires member email or phone number (Member Unique Identity = E-Mail or Phone No.). memberEmail or memberPhoneNo must be provided.', Locked = true;
-        UniqueIdentityEmailAndFirstNameRequiredErr: Label 'Membership community requires member email and first name (Member Unique Identity = E-Mail and First Name). Both memberEmail and memberFirstName must be provided.', Locked = true;
+        UniqueIdentityEmailRequiredErr: Label 'Membership community requires member email (Member Unique Identity = E-Mail). Member Email must be provided.', Locked = true;
+        UniqueIdentityPhoneRequiredErr: Label 'Membership community requires member phone number (Member Unique Identity = Phone No.). Member Phone No. must be provided.', Locked = true;
+        UniqueIdentitySsnNotSupportedErr: Label 'Membership community requires Social Security No. (Member Unique Identity = SSN). This is not supported via ecommerce.', Locked = true;
+        UniqueIdentityEmailAndPhoneRequiredErr: Label 'Membership community requires both member email and phone number (Member Unique Identity = E-Mail and Phone No.). Both Member Email and Member Phone No. must be provided.', Locked = true;
+        UniqueIdentityEmailOrPhoneRequiredErr: Label 'Membership community requires member email or phone number (Member Unique Identity = E-Mail or Phone No.). Member Email or Member Phone No. must be provided.', Locked = true;
+        UniqueIdentityEmailAndFirstNameRequiredErr: Label 'Membership community requires member email and first name (Member Unique Identity = E-Mail and First Name). Both Member Email and Member First Name must be provided.', Locked = true;
         GdprApprovalRequiredErr: Label 'Membership %1 has GDPR Mode = Required. memberGdprApproval must be set to "accepted".', Comment = '%1=Membership Code', Locked = true;
         InvalidEmailErr: Label 'memberEmail "%1" is not a valid email address.', Comment = '%1=Email address', Locked = true;
     begin
@@ -269,8 +269,8 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     var
         MMNPRMembership: Codeunit "NPR MM NPR Membership";
         ItemNotMembershipErr: Label 'Item %1 is not set up as a membership item.', Comment = '%1=Item No.', Locked = true;
-        ForeignMembershipErr: Label 'Membership for an external membership community cannot be created here. Use the Membership APIs. This is a programming bug.', Locked = true;
-        BusinessFlowTypeErr: Label 'Membership item is not set up as Membership Business Flow Type. Use the Membership APIs. This is a programming bug.', Locked = true;
+        ForeignMembershipErr: Label 'Membership for an external membership community cannot be created here. Use the Membership APIs.', Locked = true;
+        BusinessFlowTypeErr: Label 'Membership item is not set up as Membership Business Flow Type. Use the Membership APIs.', Locked = true;
     begin
         if not GetMembershipSaleSetup(MembershipSalesSetup, ItemNoCode) then
             Error(ItemNotMembershipErr, EcomSalesLine."No.");
@@ -300,23 +300,30 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
-        QuantityErr: Label 'Membership line quantity must be 1.';
     begin
-        if EcomSalesLine.Quantity <> 1 then
-            Error(QuantityErr);
-
         ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader, Membership, MembershipEntry);
         Membership."Ecom Sale Id" := EcomSalesHeader.SystemId;
         Membership.Modify();
+    end;
+
+    internal procedure ValidateMembershipForToken(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader, Membership, MembershipEntry);
     end;
 
     local procedure ValidateMembershipForToken(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; var Membership: Record "NPR MM Membership"; var MembershipEntry: Record "NPR MM Membership Entry")
     var
         MembershipNotFoundErr: Label 'Membership with Id %1 not found.';
         MembershipBlockedErr: Label 'Membership %1 is blocked.';
+        QuantityErr: Label 'Membership line quantity must be 1.';
         AlreadyClaimedErr: Label 'Membership %1 is already linked to another document.', Comment = '%1=External Membership No.';
         MembershipEntryMissingErr: Label 'No active membership entry found for membership %1.';
     begin
+        if EcomSalesLine.Quantity <> 1 then
+            Error(QuantityErr);
         if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
             Error(MembershipNotFoundErr, EcomSalesLine."Membership Id");
 

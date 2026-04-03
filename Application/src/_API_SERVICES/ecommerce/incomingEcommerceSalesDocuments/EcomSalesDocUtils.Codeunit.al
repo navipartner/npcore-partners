@@ -574,5 +574,120 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         if not NpRvSalesLine.IsEmpty then
             NpRvSalesLine.DeleteAll(true);
     end;
+
+    internal procedure ValidateDocBySource(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        if EcomSalesHeader."Document Type" <> EcomSalesHeader."Document Type"::Order then
+            exit;
+        if EcomSalesHeader."Ecommerce Store Code" = '' then
+            exit;
+        ValidateImportedOrder(EcomSalesHeader);
+    end;
+
+    internal procedure ValidateImportedOrder(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        ValidateImportedHeader(EcomSalesHeader);
+        ValidateImportedLines(EcomSalesHeader);
+        ValidateImportedPaymentLines(EcomSalesHeader);
+    end;
+
+    local procedure ValidateImportedHeader(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+    begin
+        if EcomSalesHeader."Ticket Reservation Token" <> '' then
+            EcomCreateTicketImpl.ValidateTicketRequest(EcomSalesHeader);
+    end;
+
+    local procedure ValidateImportedLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        if EcomSalesLine.FindSet() then
+            repeat
+                ValidateImportedLine(EcomSalesHeader, EcomSalesLine);
+            until EcomSalesLine.Next() = 0;
+    end;
+
+    local procedure ValidateImportedLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MissingItemNoErr: Label 'Item number is missing on line %1.', Comment = '%1 - line no.';
+        MissingTicketReservationLineErr: Label '%1 is set on the document, but ticket line %2 is missing %3.', Comment = '%1 - token field caption, %2 - line no., %3 - reservation line id field caption';
+        MissingSubtypeErr: Label 'Line subtype is not set for line %1.', Comment = '%1 - line no.';
+    begin
+        case EcomSalesLine.Type of
+            EcomSalesLine.Type::Item:
+                begin
+                    case EcomSalesLine.Subtype of
+                        EcomSalesLine.Subtype::Item:
+                            if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
+                                error(MissingItemNoErr, EcomSalesLine."Line No.");
+                        EcomSalesLine.Subtype::Ticket:
+                            begin
+                                ValidateImportedVItemNo(EcomSalesLine);
+                                if (EcomSalesHeader."Ticket Reservation Token" = '') then
+                                    exit;
+                                if IsNullGuid(EcomSalesLine."Ticket Reservation Line Id") then
+                                    Error(MissingTicketReservationLineErr, EcomSalesHeader.FieldCaption("Ticket Reservation Token"), EcomSalesLine."Line No.", EcomSalesLine.FieldCaption("Ticket Reservation Line Id"));
+                            end;
+                        EcomSalesLine.Subtype::Membership:
+                            begin
+                                ValidateImportedVItemNo(EcomSalesLine);
+                                if IsNullGuid(EcomSalesLine."Membership Id") then
+                                    EcomCreateMMShipImpl.ValidateMembershipRequestForDirectCreation(EcomSalesLine)
+                                else
+                                    EcomCreateMMShipImpl.ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader)
+                            end;
+                        else
+                            Error(MissingSubtypeErr, EcomSalesLine."Line No.");
+                    end;
+                end;
+            EcomSalesLine.Type::Voucher:
+                ValidateImportedVoucherLine(EcomSalesLine);
+        end;
+    end;
+
+    local procedure ValidateImportedVItemNo(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        Item: Record Item;
+        ItemCode: Code[20];
+        ItemNotFoundErr: Label 'Item with SKU %1 does not exist.', Comment = '%1 - SKU';
+        ItemNotExistErr: Label 'Item does not exist.';
+    begin
+        if EcomSalesLine."No." = '' then
+            Error(ItemNotExistErr);
+
+        if not Evaluate(ItemCode, EcomSalesLine."No.") then
+            Error(ItemNotFoundErr, EcomSalesLine."No.");
+
+        if not Item.Get(ItemCode) then
+            Error(ItemNotFoundErr, EcomSalesLine."No.");
+    end;
+
+    local procedure ValidateImportedVoucherLine(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        MissingVoucherTypeErr: Label 'Missing voucher type on voucher sales line %1.', Comment = '%1=Line No.';
+    begin
+        if (EcomSalesLine."Barcode No." = '') then
+            if (EcomSalesLine."Voucher Type" = '') then
+                Error(MissingVoucherTypeErr, EcomSalesLine."Line No.");
+    end;
+
+    local procedure ValidateImportedPaymentLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        NoPaymentLinesErr: Label 'Document %1 has no payment lines.', Comment = '%1 - document no.';
+    begin
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        if EcomSalesPmtLine.IsEmpty() then begin
+            EcomSalesHeader.CalcFields(Amount);
+            if EcomSalesHeader.Amount = 0 then
+                exit;//allow orders with no payments if total amount is 0
+            Error(NoPaymentLinesErr, EcomSalesHeader."External No.");
+        end;
+    end;
+
 }
 #endif

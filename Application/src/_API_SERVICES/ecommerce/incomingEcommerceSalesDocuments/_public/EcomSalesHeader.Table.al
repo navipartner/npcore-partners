@@ -429,6 +429,11 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             TableRelation = Language.Code;
         }
+        field(5200; "External Document Id"; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'External Document Id';
+        }
     }
     keys
     {
@@ -463,7 +468,6 @@ table 6151258 "NPR Ecom Sales Header"
         key(VirtualItemProcessing; "Document Type", "Creation Status", "Virtual Items Exist", "Virtual Items Process Status", "Bucket Id", "Process Retry Count")
         {
         }
-
     }
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
     trigger OnDelete()
