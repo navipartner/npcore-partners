@@ -131,6 +131,57 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifySetup."Shopify Api Version");
     end;
 
+    procedure ShopifyApiVersionIsAtLeast(ApiVersionToCheck: Text): Boolean
+    var
+        CheckMonth: Integer;
+        CheckYear: Integer;
+        CurrentMonth: Integer;
+        CurrentYear: Integer;
+        CurrentApiVersion: Text;
+    begin
+        CurrentApiVersion := ShopifyApiVersion();
+
+        if not TryParseShopifyApiVersion(ApiVersionToCheck, CheckYear, CheckMonth) then
+            exit(false);
+
+        if not TryParseShopifyApiVersion(CurrentApiVersion, CurrentYear, CurrentMonth) then
+            exit(false);
+
+        if CheckYear > CurrentYear then
+            exit(false);
+
+        if CheckYear < CurrentYear then
+            exit(true);
+
+        exit(CheckMonth <= CurrentMonth);
+    end;
+
+    local procedure TryParseShopifyApiVersion(ApiVersion: Text; var Year: Integer; var Month: Integer): Boolean
+    var
+        YearText: Text;
+        MonthText: Text;
+    begin
+        Year := 0;
+        Month := 0;
+
+        if StrLen(ApiVersion) <> 7 then
+            exit(false);
+
+        if StrPos(ApiVersion, '-') <> 5 then
+            exit(false);
+
+        YearText := CopyStr(ApiVersion, 1, 4);
+        MonthText := CopyStr(ApiVersion, 6, 2);
+
+        if not Evaluate(Year, YearText) then
+            exit(false);
+
+        if not Evaluate(Month, MonthText) then
+            exit(false);
+
+        exit(true);
+    end;
+
     procedure IsSendSalesPrices(ShopifyStoreCode: Code[20]): Boolean
     begin
         GetStore(ShopifyStoreCode);

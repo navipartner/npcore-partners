@@ -158,9 +158,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         OStream: OutStream;
         IncludedNcTasks: Integer;
         MaxPerRequest: Integer;
+        UpdateLevelItemRequest: Text;
         ShopifyInventoryItemID: Text[30];
         LocInvItemNotActivatedErr: Label 'The specified Shopify Inventory Item ID %1 is not stocked at Shopify Location ID %2 at Shopify Store %3. Awaiting the activation task to complete.', Comment = '%1 =ShopifyInventoryItemID;%2=InventoryLevel."Shopify Location ID";%3=InventoryLevel."Shopify Store Code"';
-        UpdateLevelItemRequest: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",ignoreCompareQuantity:true,quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4}]}){userErrors{field message}}', Locked = true;
+        UpdateLevelItemRequestOutdated: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",ignoreCompareQuantity:true,quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4}]}){userErrors{field message}}', Locked = true;
+        UpdateLevelItemRequest202604: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4,changeFromQuantity:null}]}){userErrors{field message}}', Locked = true;
         VariantNotAvailErr: Label 'The variant is marked as not available in Shopify. The request is no longer applicable.';
     begin
         if not (NcTaskIn.IsTemporary() and NcTaskOut.IsTemporary()) then
@@ -171,6 +173,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStore.Get(NcTaskIn."Store Code");
         MaxPerRequest := SpfyStore.InventoryLevelUpdateRequestBatchSize();
         IncludedNcTasks := 0;
+        if _SpfyIntegrationMgt.ShopifyApiVersionIsAtLeast('2026-04') then
+            UpdateLevelItemRequest := UpdateLevelItemRequest202604
+        else
+            UpdateLevelItemRequest := UpdateLevelItemRequestOutdated;
+
         repeat
             Clear(ShopifyInventoryItemID);
             ClearLastError();
