@@ -356,6 +356,7 @@
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if (Rec."Transaction ID" <> '') then
             Request."Transaction ID" := Rec."Transaction ID"
@@ -392,11 +393,14 @@
                 end;
             Database::"NPR Ecom Sales Header":
                 begin
-                    EcomSalesHeader.SetLoadFields(SystemId, "External Document No.");
+                    EcomSalesHeader.SetLoadFields(SystemId, "External No.", "External Document No.");
                     EcomSalesHeader.GetBySystemId(Rec."NPR Inc Ecom Sale Id");
 
                     Request."Document System Id" := EcomSalesHeader.SystemId;
-                    Request."Request Description" := IncomingEcomDocLbl + ' ' + EcomSalesHeader."External Document No."
+                    if FeatureFlagsManagement.IsEnabled('useExternalNoInEcommerceFlow') then
+                        Request."Request Description" := IncomingEcomDocLbl + ' ' + EcomSalesHeader."External No."
+                    else
+                        Request."Request Description" := IncomingEcomDocLbl + ' ' + EcomSalesHeader."External Document No."
                 end;
 
             else

@@ -1573,6 +1573,7 @@
         VoucherType: Record "NPR NpRv Voucher Type";
         RelatedVoucherType: Record "NPR NpRv Voucher Type";
         TempMagentoPaymentLineProccessed: Record "NPR Magento Payment Line" temporary;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         SkipLine: Boolean;
         TempOtherVoucherPaymentLineTemporaryError: Label 'The parameter TempOtherVoucherPaymentLine must be temporary. This is a programming error.';
     begin
@@ -1585,7 +1586,10 @@
 
         CurrMagentoPaymentLine.Reset();
         CurrMagentoPaymentLine.SetRange("Document Table No.", Database::"NPR Ecom Sales Header");
-        CurrMagentoPaymentLine.SetRange("Document No.", EcomSalesHeader."External Document No.");
+        if FeatureFlagsManagement.IsEnabled('useExternalNoInEcommerceFlow') then
+            CurrMagentoPaymentLine.SetRange("Document No.", EcomSalesHeader."External No.")
+        else
+            CurrMagentoPaymentLine.SetRange("Document No.", EcomSalesHeader."External Document No.");
         CurrMagentoPaymentLine.SetRange("Payment Type", CurrMagentoPaymentLine."Payment Type"::Voucher);
         CurrMagentoPaymentLine.SetLoadFields("Document Table No.", "Document No.", "Payment Type", "No.");
         if not CurrMagentoPaymentLine.FindSet() then

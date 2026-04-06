@@ -17,6 +17,7 @@
         SalesInvHeader: Record "Sales Invoice Header";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         AdyenSetup: Record "NPR PG Adyen Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
@@ -51,7 +52,10 @@
                 begin
                     EcomSalesHeader.GetBySystemId(Request."Document System Id");
                     CurrencyCode := EcomSalesHeader."Currency Code";
-                    Reference := EcomSalesHeader."External Document No.";
+                    if FeatureFlagsManagement.IsEnabled('useExternalNoInEcommerceFlow') then
+                        Reference := EcomSalesHeader."External No."
+                    else
+                        Reference := EcomSalesHeader."External Document No.";
                 end;
             else
                 Error(WrongTableSuppliedErr, Request."Document Table No.", StrSubstNo('%1, %2', Database::"Sales Header", Database::"Sales Invoice Header"));
