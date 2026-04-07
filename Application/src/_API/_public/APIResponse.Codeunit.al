@@ -13,6 +13,7 @@ codeunit 6185053 "NPR API Response"
         _ResponseBody: JsonToken;
         _ResponseJsonStream: InStream;
         _StreamInitialized: Boolean;
+        _SentrySpanParameterizedName: Text;
         UnsupportedHttpMethodErr: Label 'Http method %1 is not supported', Comment = '%1 = name of the Http method, do not translate';
         UnsupportedErrorStatusCodeErr: Label 'Status Code %1 is not a supported status code for error handling. This is not a user error; it is a development error.';
         ResourceNotFoundErr: Label '%1 Not Found', Comment = '%1 = the resource requested by the client';
@@ -499,9 +500,15 @@ codeunit 6185053 "NPR API Response"
     local procedure GetProxyResponseMetadata(): JsonObject
     var
         ProxyJson: JsonObject;
+        SentrySpanParameterizedNameTrimmed: Text;
     begin
         ProxyJson.Add('sentryTags', GetSentryTagsJsonObject());
         ProxyJson.Add('sentrySpanAttributes', GetSentrySpanAttributesJsonObject());
+
+        SentrySpanParameterizedNameTrimmed := _SentrySpanParameterizedName.Trim();
+        if (SentrySpanParameterizedNameTrimmed <> '') then
+            ProxyJson.Add('sentryRouteTemplate', SentrySpanParameterizedNameTrimmed);
+
         exit(ProxyJson);
     end;
     #endregion
@@ -585,6 +592,13 @@ codeunit 6185053 "NPR API Response"
         _SentrySpanAttribs.Add(AttrKey, JValue);
         Sentry.AddTransactionData(AttrKey, Format(AttrValue));
         exit(_CurrCodeunit);
+    end;
+    #endregion
+
+    #region Sentry General Functions
+    internal procedure SetSentrySpanParameterizedName(SentrySpanParameterizedName: Text)
+    begin
+        _SentrySpanParameterizedName := SentrySpanParameterizedName;
     end;
     #endregion
 

@@ -146,6 +146,7 @@ codeunit 6185052 "NPR API Request Processor"
         if requestCodeunit.GetMatchedRouteTemplate() <> '' then begin
             ParameterizedName := BuildParameterizedTransactionName(requestHttpMethodStr, requestPath, requestRelativePathSegments, requestCodeunit.GetMatchedRouteTemplate());
             Sentry.SetTransactionName(ParameterizedName, StrSubstNo('http.server.bc:%1_%2', requestHttpMethodStr, requestCodeunit.GetMatchedRouteTemplate()));
+            responseCodeunit.SetSentrySpanParameterizedName(ParameterizedName);
         end;
 
         if (not responseCodeunit.IsInitialized()) then begin
