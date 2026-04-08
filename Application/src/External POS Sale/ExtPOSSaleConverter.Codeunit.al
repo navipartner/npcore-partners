@@ -73,7 +73,7 @@
         //Should fail on bad info
 #pragma warning disable AA0139
         EFTTransactionRequest.Token := CreateGuid();
-        EFTTransactionRequest."Integration Type" := 'External POS';
+        EFTTransactionRequest."Integration Type" := IntegrationType();
         EFTTransactionRequest."Amount Input" := ExternalPOSSaleLine.Amount;
         EFTTransactionRequest."Result Amount" := ExternalPOSSaleLine.Amount;
         EFTTransactionRequest."User ID" := ExternalPOSSale."User ID";
@@ -130,5 +130,10 @@
             EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
         end;
 
+    end;
+
+    procedure IntegrationType(): Code[20]
+    begin
+        exit('EXTERNAL POS');
     end;
 }

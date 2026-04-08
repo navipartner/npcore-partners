@@ -907,8 +907,9 @@ codeunit 6184796 "NPR Adyen Management"
         AdyenMposLanIntegration: Codeunit "NPR EFT Adyen Mpos Lan Integ.";
         AdyenHWCIntegration: Codeunit "NPR EFT Adyen HWC Integrat.";
         AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
+        ExtPOSSaleConverter: Codeunit "NPR Ext. POS Sale Converter";
     begin
-        EFTTransactionRequest.SetFilter("Integration Type", '%1|%2|%3|%4|%5', AdyenCloudIntegration.IntegrationType(), AdyenTTPIntegration.IntegrationType(), AdyenMposLanIntegration.IntegrationType(), AdyenHWCIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
+        EFTTransactionRequest.SetFilter("Integration Type", '%1|%2|%3|%4|%5|%6', AdyenCloudIntegration.IntegrationType(), AdyenTTPIntegration.IntegrationType(), AdyenMposLanIntegration.IntegrationType(), AdyenHWCIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType(), ExtPOSSaleConverter.IntegrationType());
     end;
     #endregion
 
