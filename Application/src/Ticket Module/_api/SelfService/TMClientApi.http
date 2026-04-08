@@ -249,3 +249,28 @@ Company: {{companyId}}
     }",
     "lastServerId": ""
 }
+
+###
+
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "OnAction20",
+    "parameters": "
+    {   
+        \"name\": \"ITEM\",
+        \"step\": \"getCaption\",
+        \"id\": 1,
+        \"actionId\": 1,
+        \"context\": {
+            \"parameters\": {
+                \"itemNo\": \"31001\",
+                \"itemIdentifierType\": \"0\"
+            }
+        }
+    }",
+    "lastServerId": ""
+}

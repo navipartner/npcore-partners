@@ -753,7 +753,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ItemPrice := POSActionInsertItemB.CalculateItemPrice(Item, ItemReference, Sale);
 
         Currency.InitRoundingPrecision();
-        NextUpdateTime := CreateDateTime(Today(), 235959T); // does not update recurringly unless a PTE subscribes and sets a custom rule for it
+        // calculate and push past midnight of local today in UTC; handles timezone offset and DST (ie 00:00:00Z tomorrow) 
+        NextUpdateTime := CurrentDateTime() + (CreateDateTime(CalcDate('<+1D>'), 000000T) - (CreateDateTime(Today(), Time())));
         ItemProcessingEvents.OnSetNextCaptionUpdateTime(Item, ItemReference, NextUpdateTime);
 
         Json.Add('currentItemPrice', Format(Round(ItemPrice, Currency."Amount Rounding Precision")));
