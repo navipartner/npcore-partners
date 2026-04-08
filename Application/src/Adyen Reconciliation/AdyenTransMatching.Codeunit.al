@@ -581,7 +581,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             EFTTransactionRequest.SetRange(Reversed, false);
 
         if not EFTTransactionRequest.FindFirst() then
-            exit;
+            if not TryMatchingVoidPaymentWithEFT(EFTTransactionRequest, ReconciliationLine) then
+                exit;
 
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"EFT Transaction";
         ReconciliationLine."Matching Entry System ID" := EFTTransactionRequest.SystemId;
@@ -593,6 +594,17 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
 
         exit(true);
+    end;
+
+    local procedure TryMatchingVoidPaymentWithEFT(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    begin
+        if ReconciliationLine."Transaction Type" <> ReconciliationLine."Transaction Type"::Refunded then
+            exit;
+
+        EFTTransactionRequest.SetRange("PSP Reference");
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::VOID);
+        EFTTransactionRequest.SetRange("Sales Ticket No.", ReconciliationLine."Merchant Reference");
+        exit(EFTTransactionRequest.FindFirst());
     end;
 
     local procedure TryMatchingPaymentWithMagento(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
