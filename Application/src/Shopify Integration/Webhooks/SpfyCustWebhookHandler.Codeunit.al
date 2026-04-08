@@ -65,11 +65,13 @@ codeunit 6248665 "NPR Spfy Cust. Webhook Handler" implements "NPR Spfy Webhook N
     local procedure FindStoreCustomerLink(SpfyWebhookNotification: Record "NPR Spfy Webhook Notification"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
     var
         SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyWebhookNotifParser: Codeunit "NPR Spfy Webhook Notif. Parser";
     begin
         if SpfyWebhookNotification."Triggered for Source ID" = '' then
             SpfyWebhookNotifParser.UpdateSourceIDFromPayload(SpfyWebhookNotification);
         SpfyWebhookNotification.TestField("Triggered for Source ID");
+        SpfyIntegrationEvents.OnBeforeFindCustomerByShopifyID(SpfyWebhookNotification.GetStoreCode(), SpfyWebhookNotification."Triggered for Source ID");
         if not SpfyCustomerMgt.FindCustomerByShopifyID(SpfyWebhookNotification.GetStoreCode(), SpfyWebhookNotification."Triggered for Source ID", SpfyStoreCustomerLink) then
             Error(CustomerNotFoundErr, SpfyWebhookNotification."Triggered for Source ID");
     end;

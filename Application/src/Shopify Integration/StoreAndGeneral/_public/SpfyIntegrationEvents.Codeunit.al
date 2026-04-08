@@ -29,6 +29,11 @@ codeunit 6184824 "NPR Spfy Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnBeforeFindCustomerByShopifyID(ShopifyStoreCode: Code[20]; ShopifyCustomerID: Text[30])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnUpdateSalesHeader(Order: JsonToken; var SalesHeader: Record "Sales Header")
     begin
     end;

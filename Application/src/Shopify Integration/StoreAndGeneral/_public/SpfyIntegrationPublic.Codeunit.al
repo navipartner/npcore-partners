@@ -71,5 +71,12 @@ codeunit 6184805 "NPR Spfy Integration Public"
         SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, endCursor, ShopifyStoreCode, RequestQueryString, OrderGID, IncludeCursor);
     end;
 
+    procedure ToggleWebhook(ShopifyStoreCode: Code[20]; Topic: Enum "NPR Spfy Webhook Topic"; IncludeFields: List of [Text]; Enable: Boolean) WebhookSubscrEntryNo: Integer
+    var
+        SpfyWebhookMgt: Codeunit "NPR Spfy Webhook Mgt.";
+    begin
+        WebhookSubscrEntryNo := SpfyWebhookMgt.ToggleWebhook(ShopifyStoreCode, Topic, IncludeFields, Enable);
+    end;
+
 }
 #endif
