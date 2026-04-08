@@ -346,6 +346,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
                     SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', TicketReservationRequestOrder."Receipt No.");
                     SaleLinePOS.SetFilter("Line No.", '=%1', TicketReservationRequestOrder."Line No.");
                     if (SaleLinePOS.FindFirst()) then begin
+                        SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity); // To trigger price adjustment on the sales line  
                         SaleLinePOS."Description 2" := TicketReservationRequestOrder."Scheduled Time Description";
                         SaleLinePOS.Modify();
                     end;
