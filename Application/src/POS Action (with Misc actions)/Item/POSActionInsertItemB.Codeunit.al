@@ -657,7 +657,9 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
         WalletTemplate: Record "NPR NpIa Item AddOn";
         AttractionWallet: Codeunit "NPR AttractionWallet";
+        TicketTimeHelper: Codeunit "NPR TM TimeHelper";
 
+        LocalDateTime: DateTime;
         ReferenceDate: Date;
         ReferenceTime: Time;
         ErpUnitPrice: Decimal;
@@ -667,8 +669,9 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         CustomerNo: Code[20];
         Quantity: Integer; // Can only sell whole wallets/tickets
     begin
-        ReferenceDate := Today();
-        ReferenceTime := Time();
+        LocalDateTime := TicketTimeHelper.GetLocalTimeAtAdmission('');
+        ReferenceDate := DT2Date(LocalDateTime);
+        ReferenceTime := DT2Time(LocalDateTime);
         Quantity := 1;
 
         if (Item."NPR Item AddOn No." <> '') then
