@@ -30,6 +30,11 @@ page 6150796 "NPR NpCs Task Processor Setup"
                     ToolTip = 'Specifies the value of the Task Processor used for updating the Expiration of Collect Documents.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Log Failed Posting In TaskList"; Rec."Log Failed Posting as error")
+                {
+                    ToolTip = 'Specifies if failing NaviConnect tasks for Posting of Collect Documents should be marked as errors.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

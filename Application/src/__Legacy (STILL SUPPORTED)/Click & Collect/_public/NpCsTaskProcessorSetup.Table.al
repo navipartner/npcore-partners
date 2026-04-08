@@ -32,6 +32,11 @@ table 6059837 "NPR NpCs Task Processor Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR Nc Task Processor";
         }
+        field(21; "Log Failed Posting as error"; Boolean)
+        {
+            Caption = 'Log failed posting as error';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

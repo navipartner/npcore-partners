@@ -5,6 +5,10 @@ codeunit 6151210 "NPR NpCs Post Document"
     ObsoleteReason = 'This module is no longer being maintained';
     TableNo = "NPR NpCs Document";
 
+    var
+        _ErrorOnFailedPosting: Boolean;
+        _ProcessSpan: Codeunit "NPR Sentry Span";
+
     trigger OnRun()
     var
         NpCsDocument: Record "NPR NpCs Document";
@@ -14,10 +18,21 @@ codeunit 6151210 "NPR NpCs Post Document"
         Rec := NpCsDocument;
     end;
 
+    internal procedure SetErrorOnFailedPosting(ThrowError: Boolean)
+    begin
+        _ErrorOnFailedPosting := ThrowError;
+    end;
+
+    internal procedure SetProcessSpan(Span: Codeunit "NPR Sentry Span")
+    begin
+        _ProcessSpan := Span;
+    end;
+
     local procedure PostDocument(var NpCsDocument: Record "NPR NpCs Document")
     var
         SalesHeader: Record "Sales Header";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+        PostingErrorMessage: Text;
     begin
         if SkipPosting(NpCsDocument) then
             exit;
@@ -26,11 +41,18 @@ codeunit 6151210 "NPR NpCs Post Document"
 
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;
-
-        if not Codeunit.Run(Codeunit::"Sales-Post", SalesHeader) then
+        ClearLastError();
+        if not Codeunit.Run(Codeunit::"Sales-Post", SalesHeader) then begin
             LogPosting(NpCsDocument, SalesHeader, GetLastErrorText);
-
+            if _ErrorOnFailedPosting then
+                PostingErrorMessage := GetLastErrorText;
+        end;
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
+        if PostingErrorMessage <> '' then begin
+            _ProcessSpan.Finish();
+            Commit();
+            Error(PostingErrorMessage);
+        end;
     end;
 
     local procedure LogPosting(NpCsDocument: Record "NPR NpCs Document"; SalesHeader: Record "Sales Header"; ErrorText: Text)

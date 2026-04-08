@@ -39,7 +39,13 @@ codeunit 6150812 "NPR NpCs Task Processor"
             NpCsTaskProcessorSetup."Run Workflow Code":
                 NpCsWorkflowMgt.Run(NpCsDocument);
             NpCsTaskProcessorSetup."Document Posting Code":
-                NpCsPostDocument.Run(NpCsDocument);
+                begin
+                    if NpCsTaskProcessorSetup."Log Failed Posting as error" then begin
+                        NpCsPostDocument.SetErrorOnFailedPosting(true);
+                        NpCsPostDocument.SetProcessSpan(ProcessSpan);
+                    end;
+                    NpCsPostDocument.Run(NpCsDocument);
+                end;
             NpCsTaskProcessorSetup."Expiration Code":
                 NpCsExpirationMgt.Run(NpCsDocument);
             else begin
