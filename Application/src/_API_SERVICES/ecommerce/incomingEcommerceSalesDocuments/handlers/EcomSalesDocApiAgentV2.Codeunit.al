@@ -784,6 +784,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         case EcomSalesPmtLine."Payment Method Type" of
             EcomSalesPmtLine."Payment Method Type"::"Payment Method":
                 PaymentMethodTypeJsonValue := 'paymentGateway';
+            EcomSalesPmtLine."Payment Method Type"::Voucher:
+                PaymentMethodTypeJsonValue := 'voucher';
             else
                 Error(NotSupportedStatusErrorLbl, EcomSalesPmtLine."Payment Method Type");
         end;
