@@ -4,6 +4,10 @@ codeunit 6248404 "NPR UserAccountMgtImpl"
 
     internal procedure CreateAccount(var UserAccount: Record "NPR UserAccount") AccountId: Guid
     begin
+#pragma warning disable AA0139
+        UserAccount.EmailAddress := UserAccount.EmailAddress.Trim().ToLower();
+        UserAccount.PhoneNo := UserAccount.PhoneNo.Trim();
+#pragma warning restore AA0139
         CheckUniqueness(UserAccount);
 
         UserAccount.SystemId := CreateGuid();
@@ -15,7 +19,10 @@ codeunit 6248404 "NPR UserAccountMgtImpl"
     internal procedure UpdateAccount(var AccountToUpdate: Record "NPR UserAccount"; TempUserAccount: Record "NPR UserAccount" temporary) IsModified: Boolean
     begin
         TempUserAccount.TestField(SystemId, AccountToUpdate.SystemId);
-
+#pragma warning disable AA0139
+        TempUserAccount.EmailAddress := TempUserAccount.EmailAddress.Trim().ToLower();
+        TempUserAccount.PhoneNo := TempUserAccount.PhoneNo.Trim();
+#pragma warning restore AA0139
         CheckUniqueness(TempUserAccount);
 
         if (AccountToUpdate.FirstName <> TempUserAccount.FirstName) then begin

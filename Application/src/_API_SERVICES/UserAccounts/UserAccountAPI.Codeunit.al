@@ -36,6 +36,9 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
         if (not Request.QueryParams().Get('phoneNumber', PhoneNumber)) then;
         if (not Request.QueryParams().Get('emailAddress', EmailAddress)) then;
 
+        PhoneNumber := PhoneNumber.Trim();
+        EmailAddress := EmailAddress.Trim().ToLower();
+
         if (PhoneNumber = '') and (EmailAddress = '') then
             exit(Response.RespondBadRequest('Either "phoneNumber" or "emailAddress" must be filled out, both cannot be empty.'));
 
