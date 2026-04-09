@@ -263,6 +263,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         TicketReservationRequestOrder: Record "NPR TM Ticket Reservation Req.";
         SaleLinePOS: Record "NPR POS Sale Line";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
         ExternalScheduleEntryNo: Integer;
         AdmScheduleEntryVerify: Record "NPR TM Admis. Schedule Entry";
 
@@ -346,7 +347,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
                     SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', TicketReservationRequestOrder."Receipt No.");
                     SaleLinePOS.SetFilter("Line No.", '=%1', TicketReservationRequestOrder."Line No.");
                     if (SaleLinePOS.FindFirst()) then begin
-                        SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity); // To trigger price adjustment on the sales line  
+                        TicketRetailManagement.AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity);
                         SaleLinePOS."Description 2" := TicketReservationRequestOrder."Scheduled Time Description";
                         SaleLinePOS.Modify();
                     end;
