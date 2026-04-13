@@ -61,6 +61,7 @@
     var
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
         TempBlob: Codeunit "Temp Blob";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         OutStream: OutStream;
         InStr: InStream;
         HttpWebRequest: HttpRequestMessage;
@@ -118,6 +119,7 @@
         HttpWebRequest.GetHeaders(HeadersReq);
 
         MagentoInventoryCompany.SetRequestHeadersAuthorization(HeadersReq);
+        HeadersReq.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         HttpWebRequest.Content(Content);
         HttpWebRequest.SetRequestUri(MagentoInventoryCompany."Api Url");

@@ -216,7 +216,9 @@ codeunit 6151556 "NPR NpXml Template Mgt."
     var
         NpXmlTemplate: Record "NPR NpXml Template";
         TempBlob: Codeunit "Temp Blob";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         Client: HttpClient;
+        ClientHeaders: HttpHeaders;
         Response: HttpResponseMessage;
         InStr: InStream;
         Document: XmlDocument;
@@ -235,6 +237,8 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         if not NpXmlTemplate.Get(TemplateCode) then begin
             OnBeforeGetTemplate(SkipDownload, DownloadHandled, TempBlob);
             if not SkipDownload then begin
+                ClientHeaders := Client.DefaultRequestHeaders();
+                ClientHeaders.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
                 Client.Get(TemplateUrl + LowerCase(TemplateCode) + '.xml', Response);
                 if Response.IsSuccessStatusCode then begin
                     Response.Content.ReadAs(InStr);

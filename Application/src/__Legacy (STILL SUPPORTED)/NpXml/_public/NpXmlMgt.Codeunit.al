@@ -475,6 +475,7 @@ codeunit 6151551 "NPR NpXml Mgt."
         NpXmlNamespaces: Record "NPR NpXml Namespace";
         XMLDomManagement: Codeunit "XML DOM Management";
         JsonManagement: Codeunit "JSON Management";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
@@ -603,6 +604,9 @@ codeunit 6151551 "NPR NpXml Mgt."
             repeat
                 AddApiHeader(NpXmlApiHeader, Client, RequestHeader, ContentHeader);
             until NpXmlApiHeader.Next() = 0;
+
+        if not RequestHeader.Contains('User-Agent') then
+            RequestHeader.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         RequestMessage.Content(RequestContent);
         Client.Send(RequestMessage, ResponseMessage);

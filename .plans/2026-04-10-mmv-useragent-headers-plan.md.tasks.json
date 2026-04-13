@@ -1,0 +1,13 @@
+{
+  "planPath": ".plans/2026-04-10-mmv-useragent-headers-plan.md",
+  "tasks": [
+    {"id": 7, "subject": "Task 1: Create UserAgentHelper codeunit", "status": "pending"},
+    {"id": 8, "subject": "Task 2: Add User-Agent to Magento v1 core codeunits", "status": "pending", "blockedBy": [7]},
+    {"id": 9, "subject": "Task 3: Add User-Agent to MagentoPicture table", "status": "pending", "blockedBy": [7]},
+    {"id": 10, "subject": "Task 4: Add User-Agent to Magento 2 core codeunits", "status": "pending", "blockedBy": [7]},
+    {"id": 11, "subject": "Task 5: Replace hardcoded User-Agent in M2MSITaskMgt", "status": "pending", "blockedBy": [7]},
+    {"id": 12, "subject": "Task 6: Add User-Agent fallback to NpXml", "status": "pending", "blockedBy": [7]},
+    {"id": 13, "subject": "Task 7: Compile and verify", "status": "pending", "blockedBy": [8, 9, 10, 11, 12]}
+  ],
+  "lastUpdated": "2026-04-10T00:00:00Z"
+}

@@ -184,9 +184,13 @@
     [TryFunction]
     internal procedure TryDownloadPicture(PictureUrl: Text; var Stream: InStream)
     var
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         WebClient: HttpClient;
+        Headers: HttpHeaders;
         Response: HttpResponseMessage;
     begin
+        Headers := WebClient.DefaultRequestHeaders();
+        Headers.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
         WebClient.Get(PictureUrl, Response);
         if (not Response.IsSuccessStatusCode()) then
             Error(ErrorCannotAccesUrl, PictureUrl, Response.HttpStatusCode);
@@ -197,14 +201,18 @@
     [TryFunction]
     internal procedure TryCheckPicture()
     var
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         Client: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
+        Headers: HttpHeaders;
         PictureUrl: Text;
     begin
         PictureUrl := GetMagentoUrl();
         Request.Method := 'HEAD';
         Request.SetRequestUri(PictureUrl);
+        Request.GetHeaders(Headers);
+        Headers.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
         Client.Send(Request, Response);
         if (not Response.IsSuccessStatusCode()) then
             Error(ErrorCannotAccesUrl, PictureUrl, Response.HttpStatusCode);

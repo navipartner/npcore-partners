@@ -94,6 +94,7 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
 
     var
         _ItemHelper: Codeunit "NPR M2 Integration Item Helper";
+        _UserAgentHelper: Codeunit "NPR UserAgent Helper";
         _HttpClient: HttpClient;
         _ClientInitialized: Boolean;
         BadApiResponseErr: Label 'Error received from the Magento API\Status Code: %1 - %2\Body: %3';
@@ -198,7 +199,7 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
 
         ClientHeaders := _HttpClient.DefaultRequestHeaders();
         SetHeader(ClientHeaders, 'Authorization', MagentoSetup."Api Authorization");
-        SetHeader(ClientHeaders, 'User-Agent', 'Microsoft-Dynamics-365-Business-Central-NP-Retail');
+        SetHeader(ClientHeaders, 'User-Agent', _UserAgentHelper.GetUserAgentHeader());
         SetHeader(ClientHeaders, 'Connection', 'Keep-Alive');
         SetHeader(ClientHeaders, 'Accept', 'application/json');
 

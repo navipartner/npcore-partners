@@ -100,6 +100,7 @@
     procedure MagentoApiPost(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
     var
         MagentoSetup: Record "NPR Magento Setup";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         RequestHeaders: HttpHeaders;
@@ -127,6 +128,7 @@
 
         MagentoSetup.Get();
         RequestHeaders.Add('Authorization', MagentoSetup."Api Authorization");
+        RequestHeaders.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         HttpWebRequest.Content(Content);
         Client.Timeout := 300000;

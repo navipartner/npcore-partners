@@ -104,6 +104,7 @@
     internal procedure MagentoApiGet(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
     var
         XmlDom: Codeunit "XML DOM Management";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
@@ -124,6 +125,7 @@
             HeadersReq.Add('Accept', 'navision/xml');
             HeadersReq.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
         end;
+        HeadersReq.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         HttpWebRequest.SetRequestUri(MagentoApiUrl + Method);
         HttpWebRequest.Method := 'GET';
@@ -146,6 +148,7 @@
     var
         XmlDom: Codeunit "XML DOM Management";
         TempBlob: Codeunit "Temp Blob";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
@@ -178,6 +181,7 @@
             HeadersReq.Add('Accept', 'navision/xml');
             HeadersReq.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
         end;
+        HeadersReq.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         Content.WriteFrom(StreamIn);
         HttpWebRequest.Content(Content);

@@ -445,6 +445,7 @@
     procedure MagentoApiGet(Method: Text; var Result: JsonToken)
     var
         MagentoSetup: Record "NPR Magento Setup";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
@@ -467,6 +468,7 @@
             Headers.Add('Authorization', MagentoSetup."Api Authorization")
         else
             Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
+        Headers.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         Client.Timeout := 60000;
         Client.Send(HttpWebRequest, HttpWebResponse);

@@ -463,6 +463,7 @@
     var
         MagentoSetup: Record "NPR Magento Setup";
         XmlMgt: Codeunit "XML DOM Management";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Headers: HttpHeaders;
@@ -480,6 +481,7 @@
         if MagentoSetup."Api Authorization" <> '' then
             Headers.Add('Authorization', MagentoSetup."Api Authorization");
         Headers.Add('Accept', 'naviconnect/xml');
+        Headers.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         Client.Timeout := 300000;
         Client.Send(HttpWebRequest, HttpWebResponse);
@@ -495,6 +497,7 @@
     var
         MagentoSetup: Record "NPR Magento Setup";
         XmlMgt: Codeunit "XML DOM Management";
+        UserAgentHelper: Codeunit "NPR UserAgent Helper";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Content: HttpContent;
@@ -523,6 +526,7 @@
             Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
             Headers.Add('Accept', 'application/xml');
         end;
+        Headers.Add('User-Agent', UserAgentHelper.GetUserAgentHeader());
 
         Client.Timeout := 300000;
         Client.Send(HttpWebRequest, HttpWebResponse);
