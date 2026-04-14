@@ -1494,6 +1494,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         PropertyKeys: List of [Text];
         PropertyKey: Text;
     begin
+        if PropertyValue = '' then
+            exit;
         if PropertyName.ToLower() = 'json_data' then begin
             Properties.ReadFrom(PropertyValue);
             if Properties.IsObject() then begin
@@ -1502,13 +1504,13 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                     PropertyValue := JsonHelper.GetJText(Properties, PropertyKey, false);
                     AddPropertyToDict(PropertyKey, PropertyValue, PropertyDict);
                 end;
+                exit;
             end;
-        end else begin
-            PropertyName := AdjustPropertyName(PropertyName);
-            if not PropertyDict.ContainsKey(PropertyName) then
-                if PropertyValue <> '' then
-                    PropertyDict.Add(PropertyName, PropertyValue);
         end;
+
+        PropertyName := AdjustPropertyName(PropertyName);
+        if not PropertyDict.ContainsKey(PropertyName) then
+            PropertyDict.Add(PropertyName, PropertyValue);
     end;
 
     local procedure AdjustPropertyName(PropertyName: Text): Text
