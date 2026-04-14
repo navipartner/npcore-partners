@@ -3,6 +3,9 @@
     Access = Internal;
 
     var
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+#endif
         Text000: Label 'Apply Payment - Limit';
 
     local procedure DoEndSale(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"): Boolean
@@ -170,20 +173,23 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EcomSalesDocApiEvents", OnAfterDeserializeIncomingEcomSalesLine, '', false, false)]
     local procedure OnAfterDeserializeIncomingEcomSalesLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; SalesLineJsonToken: JsonToken)
-    var
-        VoucherType: Record "NPR NpRv Voucher Type";
-        JsonHelper: Codeunit "NPR Json Helper";
-        PropertyErrorText: Label 'Property %1 has unsupported value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
     begin
-        if EcomSalesLine.Type <> EcomSalesLine.Type::Voucher then
-            exit;
+        EcomSalesDocUtils.CheckPartialVoucherAllowed(EcomSalesLine, SalesLineJsonToken, ModuleCode());
+    end;
 
-        VoucherType.SetLoadFields("Apply Payment Module");
-        if not VoucherType.Get(EcomSalesLine."Voucher Type") then
-            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'type'), EcomSalesLine."Voucher Type");
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EcomSalesDocApiEvents", OnAfterReserveVoucher, '', false, false)]
+    local procedure "NPR EcomSalesDocApiEvents_OnAfterReserveVoucher"(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var VoucherSalesLine: Record "NPR NpRv Sales Line")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if FeatureFlagsManagement.IsEnabled('blockNonpartialVouchersAsEcommercePayment') then
+            EcomSalesDocUtils.CheckPartialVoucherAllowed(EcomSalesPmtLine, VoucherSalesLine, ModuleCode());
+    end;
 
-        if VoucherType."Apply Payment Module" = ModuleCode() then
-            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'type'), EcomSalesLine."Voucher Type");
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Entria Integration Events", OnAfterReserveEntriaVoucher, '', false, false)]
+    local procedure "NPR Entria Integration Events_OnAfterReserveEntriaVoucher"(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var VoucherSalesLine: Record "NPR NpRv Sales Line")
+    begin
+        EcomSalesDocUtils.CheckPartialVoucherAllowed(EcomSalesPmtLine, VoucherSalesLine, ModuleCode());
     end;
 #endif
     local procedure CurrCodeunitId(): Integer

@@ -610,6 +610,40 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
             ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
     end;
 
+    internal procedure CheckPartialVoucherAllowed(var EcomSalesLine: Record "NPR Ecom Sales Line"; SalesLineJsonToken: JsonToken; VoucherModuleCode: Code[20])
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        JsonHelper: Codeunit "NPR Json Helper";
+        PropertyErrorText: Label 'Property %1 has unsupported value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
+    begin
+        if EcomSalesLine.Type <> EcomSalesLine.Type::Voucher then
+            exit;
+
+        VoucherType.SetLoadFields("Apply Payment Module");
+        if not VoucherType.Get(EcomSalesLine."Voucher Type") then
+            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'voucherType'), EcomSalesLine."Voucher Type");
+
+        if VoucherType."Apply Payment Module" = VoucherModuleCode then
+            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'voucherType'), EcomSalesLine."Voucher Type");
+    end;
+
+    internal procedure CheckPartialVoucherAllowed(var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; VoucherSalesLine: Record "NPR NpRv Sales Line"; VoucherModuleCode: Code[20])
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        VoucherTypeNotFoundErr: Label 'Voucher type %1 does not exist.', Comment = '%1 - Voucher Type', Locked = true;
+        VoucherNotPartialErr: Label 'Voucher type %1 cannot be used as payment because only vouchers with partial payment application are allowed.', Comment = '%1 - Voucher Type', Locked = true;
+    begin
+        if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
+            exit;
+
+        VoucherType.SetLoadFields("Apply Payment Module");
+        if not VoucherType.Get(VoucherSalesLine."Voucher Type") then
+            Error(VoucherTypeNotFoundErr, VoucherSalesLine."Voucher Type");
+
+        if VoucherType."Apply Payment Module" = VoucherModuleCode then
+            Error(VoucherNotPartialErr, VoucherSalesLine."Voucher Type");
+    end;
+
     internal procedure ValidateDocBySource(EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
         if EcomSalesHeader."Document Type" <> EcomSalesHeader."Document Type"::Order then
