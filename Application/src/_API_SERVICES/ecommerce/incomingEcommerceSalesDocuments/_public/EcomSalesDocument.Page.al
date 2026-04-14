@@ -373,9 +373,9 @@ page 6248188 "NPR Ecom Sales Document"
             {
                 Caption = 'Change Ticket Reservation Token';
                 Image = Change;
-                ToolTip = 'Assign a different registered reservation token to this document if ticket processing resulted in an error';
+                ToolTip = 'Assign a different registered reservation token to this document if ticket wasn''t processed successfully.';
                 ApplicationArea = NPRRetail;
-                Enabled = Rec."Ticket Processing Status" = Rec."Ticket Processing Status"::Error;
+                Enabled = ChangeTicketTokenEnabled;
                 trigger OnAction()
                 var
                     EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
@@ -384,6 +384,7 @@ page 6248188 "NPR Ecom Sales Document"
                     CurrPage.Update(false);
                 end;
             }
+
             action(Memberships)
             {
                 Caption = 'Memberships';
@@ -416,6 +417,7 @@ page 6248188 "NPR Ecom Sales Document"
     }
     var
         EcomSalesDocImplV2: Codeunit "NPR Ecom Sales Doc Impl V2";
+        ChangeTicketTokenEnabled: Boolean;
         ShowCustomerTypeField: Boolean;
         ShowCustomerTemplateFields: Boolean;
 
@@ -429,6 +431,8 @@ page 6248188 "NPR Ecom Sales Document"
     trigger OnAfterGetRecord()
     begin
         HandleCustomerTypeAndTemplatesVisiblityFields();
+        ChangeTicketTokenEnabled := (Rec."Ticket Processing Status" <> Rec."Ticket Processing Status"::Processed) and (Rec."Document Type" = Rec."Document Type"::Order) and
+               Rec."Tickets Exist";
     end;
 
     local procedure HandleCustomerTypeAndTemplatesVisiblityFields(): Boolean

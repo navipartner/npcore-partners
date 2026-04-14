@@ -569,35 +569,51 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
     internal procedure ChangeEcommerceTicketReservationToken(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
-        TicketRequest: Record "NPR TM Ticket Reservation Req.";
-        ConfirmMsg: Label 'This action will allow assigning a different registered reservation token to this ecommerce document if processing the existing token resulted in an error.\\Do you want to continue?';
+        TicketReservationRemap: Page "NPR Ticket Reservation Remap";
+        TempRemapBuffer: Record "NPR Ticket Reservation Buffer" temporary;
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ConfirmManagement: Codeunit "Confirm Management";
+        ConfirmMsg: Label 'This action will allow assigning a different registered Ticket reservation token to this ecommerce document.\Do you want to continue?';
         NoSelectionErr: Label 'No reservation token was selected.';
         SuccessMsg: Label 'Ticket reservation token %1 has been successfully assigned to this document.', Comment = '%1=Session Token ID';
+        NewReservationToken: Text[100];
     begin
-        if (not EcomSalesHeader."Tickets Exist") or (EcomSalesHeader."Ticket Reservation Token" = '') then
+        if (not EcomSalesHeader."Tickets Exist") then
+            exit;
+        if not ConfirmManagement.GetResponseOrDefault(ConfirmMsg, true) then
+            exit;
+        TicketReservationRemap.LookupMode(true);
+        TicketReservationRemap.SetDocument(EcomSalesHeader);
+        if TicketReservationRemap.RunModal() <> Action::LookupOK then
             exit;
 
-        if EcomSalesHeader."Ticket Processing Status" <> EcomSalesHeader."Ticket Processing Status"::Error then
+        if not TicketReservationRemap.GetApplyConfirmed() then
             exit;
 
-        if not Confirm(ConfirmMsg) then
-            exit;
-        TicketRequest.SetRange("Entry Type", TicketRequest."Entry Type"::PRIMARY);
-        TicketRequest.SetRange("Request Status", TicketRequest."Request Status"::REGISTERED);
-        if Page.RunModal(Page::"NPR TM Ticket Request", TicketRequest) = Action::LookupOK then begin
-            if TicketRequest."Session Token ID" = '' then
-                Error(NoSelectionErr);
-            EcomSalesHeader."Ticket Reservation Token" := TicketRequest."Session Token ID";
-            EcomSalesHeader."Ticket Processing Status" := EcomSalesHeader."Ticket Processing Status"::Pending;
-            EcomSalesHeader."Ticket Retry Count" := 0;
-            EcomCreateTicketProcess.UpdateVirtualItemDocStatus(EcomSalesHeader);
-            ClearVirtualItemErrorMessagesOnLines(EcomSalesHeader);
-            EcomSalesHeader.Modify(true);
+        NewReservationToken := TicketReservationRemap.GetNewReservationToken();
+        if NewReservationToken = '' then
+            Error(NoSelectionErr);
 
-            UpdateExpiryTimeBasedOnCapturedStatus(EcomSalesHeader);
+        TicketReservationRemap.GetLineMappings(TempRemapBuffer);
+        if TempRemapBuffer.FindSet() then
+            repeat
+                EcomSalesLine.Reset();
+                EcomSalesLine.SetRange("Document Entry No.", TempRemapBuffer."Document Entry No.");
+                EcomSalesLine.SetRange("Line No.", TempRemapBuffer."Sales Line No.");
+                EcomSalesLine.FindFirst();
+                EcomSalesLine."Ticket Reservation Line Id" := TempRemapBuffer."Ticket Reservation Line Id";
+                EcomSalesLine.Modify(true);
+            until TempRemapBuffer.Next() = 0;
 
-            Message(SuccessMsg, TicketRequest."Session Token ID");
-        end;
+        EcomSalesHeader."Ticket Reservation Token" := NewReservationToken;
+        EcomSalesHeader."Ticket Processing Status" := EcomSalesHeader."Ticket Processing Status"::Pending;
+        EcomSalesHeader."Ticket Retry Count" := 0;
+        EcomCreateTicketProcess.UpdateVirtualItemDocStatus(EcomSalesHeader);
+        ClearVirtualItemErrorMessagesOnLines(EcomSalesHeader);
+        EcomSalesHeader.Modify(true);
+        UpdateExpiryTimeBasedOnCapturedStatus(EcomSalesHeader);
+
+        Message(SuccessMsg, NewReservationToken);
     end;
 
     local procedure ClearVirtualItemErrorMessagesOnLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
