@@ -1345,6 +1345,34 @@ codeunit 6185062 "NPR AttractionWallet"
             NewPrice := Round(PriceIn * (1 - (WalletTemplateLine."Discount %" / 100)), 0.01);
     end;
 
+    internal procedure GetNextPossibleAdmissionScheduleStartDateTime(ItemNo: Code[20]; var SuggestedNextStartDateTime: DateTime)
+    var
+        Item: Record Item;
+        WalletTemplate: Record "NPR NpIa Item AddOn";
+        WalletTemplateLine: Record "NPR NpIa Item AddOn Line";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        Item.Get(ItemNo);
+        if (Item."NPR Item AddOn No." = '') then
+            exit;
+
+        if (not WalletTemplate.Get(Item."NPR Item AddOn No.")) then
+            exit;
+
+        if (not WalletTemplate.WalletTemplate) then
+            exit;
+
+        WalletTemplateLine.SetFilter("AddOn No.", '=%1', WalletTemplate."No.");
+        if (not WalletTemplateLine.FindSet()) then
+            exit;
+
+        repeat
+            if (Item.Get(WalletTemplateLine."Item No.")) then
+                if (Item."NPR Ticket Type" <> '') then
+                    TicketManagement.GetNextPossibleAdmissionScheduleStartDateTime(WalletTemplateLine."Item No.", WalletTemplateLine."Variant Code", SuggestedNextStartDateTime);
+        until (WalletTemplateLine.Next() = 0);
+    end;
+
     #region facade implementation
     internal procedure CreateWalletFromFacade(OriginatesFromItemNo: Code[20]; Name: Text[100]; var WalletReferenceNumber: Text[50]) WalletEntryNo: Integer
     var

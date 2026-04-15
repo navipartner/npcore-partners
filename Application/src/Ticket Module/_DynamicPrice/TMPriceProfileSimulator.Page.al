@@ -169,6 +169,7 @@ page 6059867 "NPR TM Price Profile Simulator"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 PromotedOnly = true;
+                Visible = _ItemNo <> '';
                 ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                 trigger OnAction()
                 var
@@ -177,7 +178,7 @@ page 6059867 "NPR TM Price Profile Simulator"
                     if (_LocalAdmissionTime = 0T) then
                         _LocalAdmissionTime := DT2Time(TicketTimeHelper.GetLocalTimeAtAdmission(_AdmissionCode));
                     CalculateButtonPrice();
-                    Message('The price on the POS button should be %1, and the next update time should be %2', _ButtonPriceCaption, _ButtonPriceNextUpdateTime);
+                    Message('The price on the POS button should be %1, and the next update time should be %2 (UTC: %3)', _ButtonPriceCaption, _NextUpdateTime, _ButtonPriceNextUpdateTimeText);
                 end;
             }
         }
@@ -199,7 +200,8 @@ page 6059867 "NPR TM Price Profile Simulator"
 
         _LocalAdmissionTime: Time;
         _ButtonPriceCaption: Text;
-        _ButtonPriceNextUpdateTime: Text;
+        _ButtonPriceNextUpdateTimeText: Text;
+        _NextUpdateTime: DateTime;
         _CustomerNo: Code[20];
 
     trigger OnInit()
@@ -265,6 +267,7 @@ page 6059867 "NPR TM Price Profile Simulator"
     local procedure CalculateButtonPrice()
     var
         TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
 
         Item: Record Item;
         ItemReference: Record "Item Reference";
@@ -282,7 +285,6 @@ page 6059867 "NPR TM Price Profile Simulator"
 
         ItemPrice: Decimal;
         Currency: Record Currency;
-        NextUpdateTime: DateTime;
         ItemProcessingEvents: Codeunit "NPR POS Act. Insert Item Event";
     begin
         Item.Get(_ItemNo);
@@ -305,10 +307,15 @@ page 6059867 "NPR TM Price Profile Simulator"
 
         Currency.InitRoundingPrecision();
         // calculate and push past midnight of local today in UTC; handles timezone offset and DST (ie 00:00:00Z tomorrow) 
-        NextUpdateTime := CurrentDateTime() + (CreateDateTime(CalcDate('<+1D>'), 000000T) - (CreateDateTime(Today(), Time())));
-        ItemProcessingEvents.OnSetNextCaptionUpdateTime(Item, ItemReference, NextUpdateTime);
+        _NextUpdateTime := CurrentDateTime() + (CreateDateTime(CalcDate('<+1D>'), 000000T) - (CreateDateTime(Today(), Time())));
+
+        // Ticket - find the next schedule
+        if (Item."NPR Ticket Type" <> '') then
+            TicketManagement.GetNextPossibleAdmissionScheduleStartDateTime(Item."No.", ItemReference."Variant Code", _NextUpdateTime);
+
+        ItemProcessingEvents.OnSetNextCaptionUpdateTime(Item, ItemReference, _NextUpdateTime);
 
         _ButtonPriceCaption := Format(Round(ItemPrice, Currency."Amount Rounding Precision"));
-        _ButtonPriceNextUpdateTime := Format(NextUpdateTime, 0, 9);
+        _ButtonPriceNextUpdateTimeText := Format(_NextUpdateTime, 0, 9);
     end;
 }

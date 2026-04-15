@@ -120,36 +120,18 @@ codeunit 6184773 "NPR TM TimeHelper"
 
     #region UTC
 
-    internal procedure UtcNow(TimeZoneNo: Integer) UtcDateTime: DateTime
+    internal procedure UtcNow(): DateTime
     var
-        TypeHelper: Codeunit "Type Helper";
-        IsDaylightSavingsTime: Boolean;
-    begin
-        UtcDateTime := TypeHelper.GetCurrUTCDateTime();
-
-        // When BC type casts from .net datetime to datetime in web client, it magically applies the user timezone offset and daylight savings. 
-        // So we are not getting UTC time unless we remove those offsets.
-        if (CurrentClientType = ClientType::Web) or
-           (CurrentClientType = ClientType::Phone) then
-            UtcDateTime := UtcDateTime - GetUserTimeZoneOffset() - GetDstOffset(TimeZoneNo, DT2Date(UtcDateTime), IsDaylightSavingsTime);
-
-    end;
-
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-    internal procedure GetCurrentUTCDateTime(): DateTime
-    var
-        TypeHelper: Codeunit "Type Helper";
-        DateString: Text;
+        UtcText: Text;
         UtcDate: Date;
         UtcTime: Time;
     begin
         // yyyy-MM-ddTHH:mm:ssZ
-        DateString := TypeHelper.GetCurrUTCDateTimeISO8601();
-        Evaluate(UtcDate, (CopyStr(DateString, 1, 10)), 9);
-        Evaluate(UtcTime, (CopyStr(DateString, 12, 8)), 9);
+        UtcText := Format(CurrentDateTime(), 0, 9);
+        Evaluate(UtcDate, CopyStr(UtcText, 1, 10), 9);
+        Evaluate(UtcTime, CopyStr(UtcText, 12, 8), 9);
         exit(CreateDateTime(UtcDate, UtcTime));
     end;
-#endif
 
     #endregion
 
@@ -169,6 +151,17 @@ codeunit 6184773 "NPR TM TimeHelper"
         // Get the time zone offset for the given admission (the general setup time zone is used if the admission does not have a time zone)
         OffsetDuration := GetTimeZoneOffsetForAdmission(AdmissionCode, LocalDateTime);
         LocalDateTimeAsText := Format(LocalDateTime, 0, _UFormat) + GetTimeZoneOffsetAsText(OffsetDuration);
+    end;
+
+    internal procedure AdjustAdmissionLocalDateTimeToUtc(AdmissionCode: Code[20]; LocalDate: Date; LocalTime: Time): DateTime
+    var
+        LocalDateTime: DateTime;
+    begin
+        if (LocalDate = 0D) then
+            exit(0DT);
+
+        LocalDateTime := CreateDateTime(LocalDate, LocalTime);
+        exit(LocalDateTime - GetTimeZoneOffsetForAdmission(AdmissionCode, LocalDateTime));
     end;
 
     internal procedure AdjustZuluToAdmissionLocalDateTime(AdmissionCode: Code[20]; LocalDateTime: DateTime): DateTime
@@ -208,7 +201,7 @@ codeunit 6184773 "NPR TM TimeHelper"
         TimeZone: Record "Time Zone";
         TimeZoneDuration: Duration;
     begin
-        LocalDateTime := UtcNow(TimeZoneNo);
+        LocalDateTime := UtcNow();
         TimeZoneCode := _UTCTimeZoneCode;
 
         if (TimeZoneNo = 0) then begin

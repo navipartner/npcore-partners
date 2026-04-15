@@ -4376,42 +4376,86 @@
 
     internal procedure GetNextPossibleAdmissionScheduleStartTime(ItemNo: Code[20]; VariantCode: Code[10]): Time
     var
+        NextUpdateTime: DateTime;
+    begin
+        NextUpdateTime := CurrentDateTime() + (CreateDateTime(CalcDate('<+1D>'), 000000T) - (CreateDateTime(Today(), Time())));
+        GetNextPossibleAdmissionScheduleStartDateTime(ItemNo, VariantCode, NextUpdateTime);
+
+        exit(DT2Time(NextUpdateTime));
+    end;
+
+    internal procedure GetNextPossibleAdmissionScheduleStartDateTime(ItemNo: Code[20]; VariantCode: Code[10]; var SuggestedNextUpdateTime: DateTime)
+    var
         AdmisScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
         EarliestUpcomingTime: Time;
         EarliestScheduleTime: Time;
-        HaveUpcomingTime: Boolean;
-        TicketTimeHelper: Codeunit "NPR TM TimeHelper";
-        AdmissionLocalDateTime: Datetime;
+        StartTime: Time;
+        NextScheduleTime: Time;
+        HaveUpcomingTimeToday: Boolean;
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        AdmissionLocalDateTime: DateTime;
         AdmissionLocalTime: Time;
+        NextUpdateTimeUtc, NextUpdateTimeUser : DateTime;
+        NextLocalDate: Date;
+        UtcNow, UserNow : DateTime;
     begin
-        EarliestScheduleTime := 235959T;
-        EarliestUpcomingTime := 235959T;
+        UtcNow := TimeHelper.UtcNow();
+        UserNow := CurrentDateTime();
 
+        AdmisScheduleLines.Reset();
         AdmisScheduleLines.SetAutoCalcFields("Scheduled Start Time");
-        AdmisScheduleLines.SetRange("Admission Code", GetDefaultAdmissionCode(ItemNo, VariantCode));
-        AdmisScheduleLines.SetRange(Blocked, false);
-        if (AdmisScheduleLines.FindSet()) then begin
-            AdmissionLocalDateTime := TicketTimeHelper.GetLocalTimeAtAdmission(AdmisScheduleLines."Admission Code");
+        AdmisScheduleLines.SetFilter(Blocked, '=%1', false);
+
+        TicketBOM.Reset();
+        TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
+        if (VariantCode <> '') then
+            TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
+
+        if (not TicketBOM.FindSet()) then
+            exit;
+
+        repeat
+            NextUpdateTimeUtc := 0DT;
+            NextUpdateTimeUser := 0DT;
+
+            AdmissionLocalDateTime := TimeHelper.GetLocalTimeAtAdmission(TicketBOM."Admission Code");
             AdmissionLocalTime := DT2Time(AdmissionLocalDateTime);
 
-            repeat
-                if (AdmisScheduleLines."Scheduled Start Time" < EarliestScheduleTime) then begin
-                    EarliestScheduleTime := AdmisScheduleLines."Scheduled Start Time";
-                    if (EarliestScheduleTime < EarliestUpcomingTime) and (AdmissionLocalTime < EarliestScheduleTime) then begin
-                        EarliestUpcomingTime := EarliestScheduleTime;
-                        HaveUpcomingTime := true;
-                    end
-                end
-            until AdmisScheduleLines.Next() = 0;
+            AdmisScheduleLines.SetFilter("Admission Code", '=%1', TicketBOM."Admission Code");
+            if (AdmisScheduleLines.FindSet()) then begin
+                EarliestScheduleTime := 235959T;
+                EarliestUpcomingTime := 235959T;
+                HaveUpcomingTimeToday := false;
 
-            if (not HaveUpcomingTime) then
-                EarliestUpcomingTime := EarliestScheduleTime;
+                repeat
+                    StartTime := AdmisScheduleLines."Scheduled Start Time";
 
-            // Convert admission-local schedule time to a time that can be compared to the sessions current time in any timezone. 
-            EarliestUpcomingTime := DT2Time(CurrentDateTime() + (EarliestUpcomingTime - AdmissionLocalTime));
-        end;
+                    if (StartTime < EarliestScheduleTime) then
+                        EarliestScheduleTime := StartTime;
 
-        exit(EarliestUpcomingTime);
+                    if (StartTime > AdmissionLocalTime) and (StartTime < EarliestUpcomingTime) then begin
+                        EarliestUpcomingTime := StartTime;
+                        HaveUpcomingTimeToday := true;
+                    end;
+                until (AdmisScheduleLines.Next() = 0);
+
+                if (HaveUpcomingTimeToday) then begin
+                    NextLocalDate := DT2Date(AdmissionLocalDateTime);
+                    NextScheduleTime := EarliestUpcomingTime;
+                end else begin
+                    NextLocalDate := CalcDate('<+1D>', DT2Date(AdmissionLocalDateTime));
+                    NextScheduleTime := EarliestScheduleTime;
+                end;
+
+                NextUpdateTimeUtc := TimeHelper.AdjustAdmissionLocalDateTimeToUtc(TicketBOM."Admission Code", NextLocalDate, NextScheduleTime);
+                NextUpdateTimeUser := NextUpdateTimeUtc + (UserNow - UtcNow);
+            end;
+
+            if (NextUpdateTimeUtc <> 0DT) and (NextUpdateTimeUser < SuggestedNextUpdateTime) and (NextUpdateTimeUser > UserNow) then
+                SuggestedNextUpdateTime := NextUpdateTimeUser;
+
+        until (TicketBOM.Next() = 0);
     end;
 
     internal procedure RevokeTicket(Ticket: Record "NPR TM Ticket")

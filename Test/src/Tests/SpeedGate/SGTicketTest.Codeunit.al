@@ -669,17 +669,19 @@ codeunit 85217 "NPR SG TicketTest"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketProfileCode: Code[10];
-
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalAdmissionTime: DateTime;
     begin
         ExternalTicketNumber := GetOneTicket();
         Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
         Ticket.FindFirst();
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         TicketAccessEntry.FindFirst();
+        LocalAdmissionTime := TimeHelper.GetLocalTimeAtAdmission(TicketAccessEntry."Admission Code");
 
         WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
         TicketProfileCode := SpeedGateLibrary.CreateProfile();
-        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', Time() - 5 * 1000, Time() + 5 * 1000);
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', DT2Time(LocalAdmissionTime) - 5 * 1000, DT2Time(LocalAdmissionTime) + 5 * 1000);
 
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
@@ -698,17 +700,19 @@ codeunit 85217 "NPR SG TicketTest"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketProfileCode: Code[10];
-
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalAdmissionTime: DateTime;
     begin
         ExternalTicketNumber := GetOneTicket();
         Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
         Ticket.FindFirst();
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         TicketAccessEntry.FindFirst();
+        LocalAdmissionTime := TimeHelper.GetLocalTimeAtAdmission(TicketAccessEntry."Admission Code");
 
         WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
         TicketProfileCode := SpeedGateLibrary.CreateProfile();
-        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', Time() + 5 * 1000, Time() + 10 * 1000);
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', DT2Time(LocalAdmissionTime) + 5 * 1000, DT2Time(LocalAdmissionTime) + 10 * 1000);
 
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
@@ -727,7 +731,8 @@ codeunit 85217 "NPR SG TicketTest"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketProfileCode: Code[10];
-
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalAdmissionTime: DateTime;
     begin
         ExternalTicketNumber := GetOneTicket();
         Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
@@ -735,9 +740,11 @@ codeunit 85217 "NPR SG TicketTest"
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         TicketAccessEntry.FindFirst();
 
+        LocalAdmissionTime := TimeHelper.GetLocalTimeAtAdmission(TicketAccessEntry."Admission Code");
+
         WhitelistCode := SpeedGateLibrary.AddToWhitelist(ExternalTicketNumber, 0, false);
         TicketProfileCode := SpeedGateLibrary.CreateProfile();
-        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', Time() - 10 * 1000, Time() - 5 * 1000);
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', '', '', DT2Time(LocalAdmissionTime) - 10 * 1000, DT2Time(LocalAdmissionTime) - 5 * 1000);
 
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
@@ -1455,6 +1462,8 @@ codeunit 85217 "NPR SG TicketTest"
         TicketProfileCode: Code[10];
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AdmissionCode: Code[20];
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalDateTime: DateTime;
     begin
         ExternalTicketNumber := GetOneTicket();
         Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
@@ -1470,10 +1479,11 @@ codeunit 85217 "NPR SG TicketTest"
         TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBom.FindFirst();
         AdmissionCode := TicketBom."Admission Code";
+        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
 
         // Add a SPECIFIC reject that does NOT match time (future window),
         // and also add a BLANK reject that would match always.
-        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", AdmissionCode, '', Time() + 5 * 1000, Time() + 10 * 1000);
+        SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", AdmissionCode, '', DT2Time(LocalDateTime) + 5 * 1000, DT2Time(LocalDateTime) + 10 * 1000);
         SpeedGateLibrary.AddToProfile(TicketProfileCode, false, Ticket."Item No.", '', '', 0T, 0T);
 
         SpeedGateLibrary.DefaultSetup(false, false, '', '');

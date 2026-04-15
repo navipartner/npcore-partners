@@ -329,6 +329,14 @@
                 {
                     Caption = 'Time Zone';
 
+                    field(UtcTimeNow; _UtcNow)
+                    {
+                        Caption = 'Current UTC Date Time';
+                        ToolTip = 'Specifies the current UTC date and time.';
+                        ApplicationArea = NPRTicketAdvanced;
+                        Editable = false;
+                        Visible = true;
+                    }
                     field(ServerDateTime; _UserDateTime)
                     {
                         Caption = 'User Date Time';
@@ -625,6 +633,8 @@
             _ServiceTimeZoneDescription := BCTimeZone."Display Name";
 
         _ServiceDateTime := TimeHelper.GetLocalTimeForServiceAsText();
+
+        _UtcNow := TimeHelper.UtcNow();
     end;
 
     var
@@ -633,5 +643,6 @@
         _ServiceDateTime: Text;
         _UserDateTime: Text;
         _ServerDateTimeWithTimeZone: Text;
+        _UtcNow: DateTime;
 }
 

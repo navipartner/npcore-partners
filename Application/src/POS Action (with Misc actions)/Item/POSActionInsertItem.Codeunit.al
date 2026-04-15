@@ -732,6 +732,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ItemIdentifier: Text;
         ItemIdentifierType: Integer;
         POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        AttractionWallet: Codeunit "NPR AttractionWallet";
         Item: Record Item;
         ItemReference: Record "Item Reference";
         ItemPrice: Decimal;
@@ -752,11 +754,22 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         ItemPrice := POSActionInsertItemB.CalculateItemPrice(Item, ItemReference, Sale);
 
-        Currency.InitRoundingPrecision();
-        // calculate and push past midnight of local today in UTC; handles timezone offset and DST (ie 00:00:00Z tomorrow) 
+        // When is next price update?
+        // ERP price - calculate and push past midnight of local today in UTC; handles timezone offset and DST (ie 00:00:00Z tomorrow) 
         NextUpdateTime := CurrentDateTime() + (CreateDateTime(CalcDate('<+1D>'), 000000T) - (CreateDateTime(Today(), Time())));
+
+        // Ticket - find the next schedule
+        if (Item."NPR Ticket Type" <> '') then
+            TicketManagement.GetNextPossibleAdmissionScheduleStartDateTime(Item."No.", ItemReference."Variant Code", NextUpdateTime);
+
+        // Wallet - check all tickets in the wallet
+        if (Item."NPR Item AddOn No." <> '') then
+            AttractionWallet.GetNextPossibleAdmissionScheduleStartDateTime(Item."No.", NextUpdateTime);
+
+        // allow PTE to override the next update time if needed
         ItemProcessingEvents.OnSetNextCaptionUpdateTime(Item, ItemReference, NextUpdateTime);
 
+        Currency.InitRoundingPrecision();
         Json.Add('currentItemPrice', Format(Round(ItemPrice, Currency."Amount Rounding Precision")));
         Json.Add('nextUpdateTime', Format(NextUpdateTime, 0, 9));
 

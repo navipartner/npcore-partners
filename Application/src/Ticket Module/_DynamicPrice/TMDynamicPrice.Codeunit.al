@@ -210,7 +210,9 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TicketBom: Record "NPR TM Ticket Admission BOM";
         BasePrice: Decimal;
         AddonPrice: Decimal;
+        HavePriceRule: Boolean;
     begin
+        HavePriceRule := false;
         AdmissionScheduleEntry.Reset();
         AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
 
@@ -227,7 +229,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
                 AdmissionScheduleEntry.SetFilter("Admission End Time", '>%1', ReferenceTime);
                 AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
                 if (AdmissionScheduleEntry.FindFirst()) then
-                    CalculateScheduleEntryPrice(
+                    HavePriceRule := HavePriceRule or CalculateScheduleEntryPrice(
                         TicketBom."Item No.",
                         TicketBom."Variant Code",
                         TicketBom."Admission Code",
@@ -239,11 +241,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
                         ReferenceTime,
                         BasePrice,
                         AddonPrice
-                    )
-                else begin
-                    if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
-                        TicketUnitPrice += OriginalUnitPrice;
-                end;
+                    );
 
                 if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
                     TicketUnitPrice += BasePrice + AddonPrice;
@@ -253,6 +251,10 @@ codeunit 6014559 "NPR TM Dynamic Price"
 
             until (TicketBom.Next() = 0);
         end;
+
+        if (Not HavePriceRule) and (TicketUnitPrice = 0) then
+            TicketUnitPrice := OriginalUnitPrice;
+
         exit(TicketUnitPrice);
     end;
 
