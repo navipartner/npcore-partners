@@ -362,6 +362,16 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Memberships Exist';
         }
+        field(5054; "Coupons Exist"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Coupons Exist';
+        }
+        field(5055; "Attraction Wallets Exist"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Attraction Wallets Exist';
+        }
         field(5080; "Voucher Processing Status"; Enum "NPR EcomVoucherStatus")
         {
             DataClassification = CustomerContent;
@@ -383,7 +393,16 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Membership Processing Status';
         }
-
+        field(5084; "Coupon Processing Status"; Enum "NPR EcomCouponStatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Coupon Processing Status';
+        }
+        field(5085; "Attr. Wallet Processing Status"; Enum "NPR EcomH_WalletProcessStatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Attr. Wallet Processing Status';
+        }
         field(5090; "Capture Processing Status"; Enum "NPR Ecom Capture Status")
         {
             DataClassification = CustomerContent;
@@ -468,6 +487,8 @@ table 6151258 "NPR Ecom Sales Header"
         key(VirtualItemProcessing; "Document Type", "Creation Status", "Virtual Items Exist", "Virtual Items Process Status", "Bucket Id", "Process Retry Count")
         {
         }
+        key(CouponProcessing; "Document Type", "Creation Status", "Coupons Exist", "Capture Processing Status", "Coupon Processing Status", "Bucket Id") { }
+        key(WalletProcessing; "Document Type", "Creation Status", "Attraction Wallets Exist", "Capture Processing Status", "Attr. Wallet Processing Status", "Bucket Id") { }
     }
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
     trigger OnDelete()

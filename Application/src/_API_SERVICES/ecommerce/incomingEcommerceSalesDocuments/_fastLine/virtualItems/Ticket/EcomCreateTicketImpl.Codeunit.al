@@ -301,8 +301,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
 
     internal procedure ShowRelatedTicketsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
-        Ticket: Record "NPR TM Ticket";
-        TempTickets: Record "NPR TM Ticket" temporary;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
         if EcomSalesHeader."Ticket Reservation Token" = '' then
@@ -311,18 +309,37 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', EcomSalesHeader."Ticket Reservation Token");
-        if (TicketReservationRequest.FindSet()) then
+        ShowRelatedTicketsAction(TicketReservationRequest);
+    end;
+
+    internal procedure ShowRelatedTicketsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        if IsNullGuid(EcomSalesLine."Ticket Reservation Line Id") then
+            exit;
+        if not TicketReservationRequest.GetBySystemId(EcomSalesLine."Ticket Reservation Line Id") then
+            exit;
+        TicketReservationRequest.SetRecFilter();
+        ShowRelatedTicketsAction(TicketReservationRequest);
+    end;
+
+    local procedure ShowRelatedTicketsAction(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        Ticket: Record "NPR TM Ticket";
+        TempTickets: Record "NPR TM Ticket" temporary;
+    begin
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+        if TicketReservationRequest.FindSet() then
             repeat
-                Ticket.Reset();
-                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
                 Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
                 if (Ticket.FindSet()) then
                     repeat
                         TempTickets.TransferFields(Ticket);
-                        TempTickets.Insert();
+                        if TempTickets.Insert() then;
                     until (Ticket.Next() = 0);
             until (TicketReservationRequest.Next() = 0);
-        TempTickets.Reset();
+
         if not TempTickets.IsEmpty() then
             Page.Run(Page::"NPR TM Ticket List", TempTickets);
     end;

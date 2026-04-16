@@ -22,7 +22,9 @@ codeunit 6248612 "NPR EcomSalesOrderProcJQ"
             if EcomJobManagement.ShouldSoftExit(JobQueueEntry.ID) then
                 exit;
             ProcessSalesOrders(JobQueueEntry);
-            Sleep(1000);
+            Commit();
+            if JobQueueEntry."Recurring Job" then
+                Sleep(1000);
         until (not JobQueueEntry."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
 
     end;
@@ -45,7 +47,7 @@ codeunit 6248612 "NPR EcomSalesOrderProcJQ"
             BucketFilter := JQParamStrMgt.GetParamValueAsText(EcomJobManagement.ParamBucketFilter());
 
 
-        //We're processing first the vouchers in order to apply filters that will prevent locking. 
+        //We're processing first the virtual items in order to apply filters that will prevent locking. 
         EcomSalesHeader.Reset();
         EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
         EcomSalesHeader.SetRange("Creation Status", EcomSalesHeader."Creation Status"::Pending);

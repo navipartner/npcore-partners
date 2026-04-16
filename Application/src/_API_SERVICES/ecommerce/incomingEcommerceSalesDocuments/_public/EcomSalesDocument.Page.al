@@ -355,6 +355,20 @@ page 6248188 "NPR Ecom Sales Document"
                     EcomCreateVchrProcess.ShowRelatedVouchersAction(Rec);
                 end;
             }
+            action("Retail Coupons")
+            {
+                Caption = 'Coupons';
+                Image = Voucher;
+                ToolTip = 'View issued coupons linked to this document.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    EcomCreateCouponProcess: Codeunit "NPR EcomCreateCouponProcess";
+                begin
+                    EcomCreateCouponProcess.ShowRelatedCouponsAction(Rec);
+                end;
+            }
             action("Retail Tickets")
             {
                 Caption = 'Tickets';
@@ -367,6 +381,20 @@ page 6248188 "NPR Ecom Sales Document"
                     EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
                 begin
                     EcomCreateTicketProcess.ShowRelatedTicketsAction(Rec);
+                end;
+            }
+            action("Attraction Wallets")
+            {
+                Caption = 'Attraction Wallets';
+                Image = CreateBinContent;
+                ToolTip = 'View created attraction wallets linked to this document.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+                begin
+                    EcomCreateWalletMgt.ShowRelatedWallets(Database::"NPR Ecom Sales Header", Rec.SystemId);
                 end;
             }
             action(ChangeTicketToken)

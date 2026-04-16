@@ -6,8 +6,8 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     TableNo = "Job Queue Entry";
     trigger OnRun()
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
-        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
         StartTime: DateTime;
         StoresDict: Dictionary of [Code[20], Boolean];
         MaxDuration: Duration;
@@ -18,15 +18,16 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         MaxDuration := JobQueueManagement.HoursToDuration(1);
         InitGlobals();
         repeat
-            if SpfyEcomSalesDocPrcssr.ShouldSoftExit(Rec.ID) then
+            if EcomJobManagement.ShouldSoftExit(Rec.ID) then
                 exit;
             if (CurrentDateTime() - LastStoresReload) > (5 * 60000) then
                 LoadEnabledStores(StoresDict);
 
             Process(StoresDict);
-            Sleep(1000);
-
-        until DurationLimitReached(StartTime, MaxDuration);
+            Commit();
+            if Rec."Recurring Job" then
+                Sleep(1000);
+        until not Rec."Recurring Job" or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
 
         FinalizeMarkers(StoresDict);
     end;
@@ -324,11 +325,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
                 exit;
 
         exit(true);
-    end;
-
-    local procedure DurationLimitReached(StartDateTime: DateTime; DurationLimit: Duration): Boolean
-    begin
-        exit(CurrentDateTime - StartDateTime >= DurationLimit);
     end;
 
     [TryFunction]

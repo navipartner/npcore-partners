@@ -191,7 +191,62 @@ page 6185130 "NPR Ecom Doc FactBox"
                             end;
                         }
                     }
+                    group(Coupons)
+                    {
+                        Caption = 'Coupons';
 
+                        field("Coupons Exist"; Rec."Coupons Exist")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies whether coupons exist for this document.';
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomCouponLines(Rec);
+                            end;
+                        }
+                        field("Coupon Processing Status"; Rec."Coupon Processing Status")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the coupon processing status.';
+                            StyleExpr = _CouponProcessingStatusStyleText;
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomCouponLines(Rec);
+                            end;
+                        }
+                    }
+                    group(Wallets)
+                    {
+                        Caption = 'Attraction Wallets';
+
+                        field("Attraction Wallets Exist"; Rec."Attraction Wallets Exist")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies whether attraction wallets exist for this document.';
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomWalletLines(Rec);
+                            end;
+                        }
+                        field("Attr. Wallet Processing Status"; Rec."Attr. Wallet Processing Status")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the attraction wallet processing status.';
+                            StyleExpr = _WalletProcessingStatusStyleText;
+                            trigger OnDrillDown()
+                            var
+                                EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                            begin
+                                EcomVirtualItemMgt.OpenEcomWalletLines(Rec);
+                            end;
+                        }
+                    }
                     group("Error")
                     {
                         Caption = 'Error';
@@ -293,9 +348,10 @@ page 6185130 "NPR Ecom Doc FactBox"
             }
         }
     }
+
     trigger OnAfterGetCurrRecord()
     begin
-        GetStyles(_CreationStatusStyleText, _ErrorInformationStyleText, _VoucherProcessingStatusStyleText, _TicketProcessingStatusStyleText, _CaptureProcessingStatusStyleText, _CaptureErrorStyleText, _VirtualItemProcessingStatusStyleText, _MembershipProcessingStatusStyleText);
+        GetStyles();
     end;
 
     local procedure GetSystemReceivedByUserName() UserName: Code[50]
@@ -309,22 +365,25 @@ page 6185130 "NPR Ecom Doc FactBox"
         UserName := User."User Name";
     end;
 
-    local procedure GetStyles(var CreationStatusStyleText: Text; var ErrorInformationStyleText: Text; var VoucherProcessingStatusStyleText: Text; var TicketProcessingStatusStyleText: Text; var CaptureProcessingStatusStyleText: Text; var CaptureErrorStyleText: Text; var VirtualItemProcessingStatusStyleText: Text; var MembershipProcessingStatusStyleText: Text)
+    local procedure GetStyles()
     var
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
     begin
-        CreationStatusStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderCreationStatusStyle(Rec);
-        ErrorInformationStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderErrorInformationStyle(Rec);
-        VoucherProcessingStatusStyleText := _EcomVirtualItemMgt.GetVoucherProcessingStatusStyle(Rec);
-        TicketProcessingStatusStyleText := _EcomVirtualItemMgt.GetTicketProcessingStatusStyle(Rec);
-        CaptureProcessingStatusStyleText := _EcomVirtualItemMgt.GetCaptureProcessingStatusStyle(Rec);
-        CaptureErrorStyleText := _EcomVirtualItemMgt.GetCaptureErrorStyle(Rec);
-        VirtualItemProcessingStatusStyleText := _EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
-        MembershipProcessingStatusStyleText := _EcomVirtualItemMgt.GetMembershipProcessingStatusStyle(Rec);
+        _CouponProcessingStatusStyleText := _EcomVirtualItemMgt.GetCouponProcessingStatusStyle(Rec);
+        _CreationStatusStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderCreationStatusStyle(Rec);
+        _ErrorInformationStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderErrorInformationStyle(Rec);
+        _VoucherProcessingStatusStyleText := _EcomVirtualItemMgt.GetVoucherProcessingStatusStyle(Rec);
+        _TicketProcessingStatusStyleText := _EcomVirtualItemMgt.GetTicketProcessingStatusStyle(Rec);
+        _CaptureProcessingStatusStyleText := _EcomVirtualItemMgt.GetCaptureProcessingStatusStyle(Rec);
+        _CaptureErrorStyleText := _EcomVirtualItemMgt.GetCaptureErrorStyle(Rec);
+        _VirtualItemProcessingStatusStyleText := _EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
+        _MembershipProcessingStatusStyleText := _EcomVirtualItemMgt.GetMembershipProcessingStatusStyle(Rec);
+        _WalletProcessingStatusStyleText := _EcomVirtualItemMgt.GetWalletProcessingStatusStyle(Rec);
     end;
 
     var
         _EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        _CouponProcessingStatusStyleText: Text;
         _CreationStatusStyleText: Text;
         _ErrorInformationStyleText: Text;
         _VoucherProcessingStatusStyleText: Text;
@@ -333,5 +392,6 @@ page 6185130 "NPR Ecom Doc FactBox"
         _CaptureErrorStyleText: Text;
         _VirtualItemProcessingStatusStyleText: Text;
         _MembershipProcessingStatusStyleText: Text;
+        _WalletProcessingStatusStyleText: Text;
 }
 #endIf

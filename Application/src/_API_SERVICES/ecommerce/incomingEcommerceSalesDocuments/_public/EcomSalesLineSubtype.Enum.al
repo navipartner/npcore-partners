@@ -26,4 +26,8 @@ enum 6014581 "NPR Ecom Sales Line Subtype"
     {
         Caption = 'Membership';
     }
+    value(5; Coupon)
+    {
+        Caption = 'Coupon';
+    }
 }

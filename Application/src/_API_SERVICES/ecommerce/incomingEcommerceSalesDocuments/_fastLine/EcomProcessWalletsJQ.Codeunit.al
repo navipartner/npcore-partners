@@ -1,23 +1,23 @@
-codeunit 6248518 "NPR EcomCreateVoucherJQ"
+codeunit 6151069 "NPR EcomProcessWalletsJQ"
 {
     Access = Internal;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
-    var
     begin
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         Process(Rec)
 #endif
     end;
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
     local procedure Process(var JobQueueEntry: Record "Job Queue Entry")
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
         StartTime: DateTime;
         MaxDuration: Duration;
     begin
-        StartTime := CurrentDateTime;
+        StartTime := CurrentDateTime();
         MaxDuration := GetDefaultDuration();
         repeat
             if EcomJobManagement.ShouldSoftExit(JobQueueEntry.ID) then
@@ -26,7 +26,7 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
             Commit();
             if JobQueueEntry."Recurring Job" then
                 Sleep(1000);
-        until (not JobQueueEntry."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
+        until not JobQueueEntry."Recurring Job" or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
     end;
 
     local procedure GetDefaultDuration(): Duration
@@ -37,46 +37,41 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
         exit(Timeout);
     end;
 
-    local procedure ProcessRecords(var JobQueueEntry: Record "Job Queue Entry");
+    local procedure ProcessRecords(var JobQueueEntry: Record "Job Queue Entry")
     var
-        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
-        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
         BucketFilter: Text;
     begin
-        if not IncEcomSalesDocSetup.Get() then
-            IncEcomSalesDocSetup.Init();
-
         JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
         if JQParamStrMgt.ContainsParam(EcomJobManagement.ParamBucketFilter()) then
             BucketFilter := JQParamStrMgt.GetParamValueAsText(EcomJobManagement.ParamBucketFilter());
 
-        EcomSalesHeader.Reset();
         EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
         EcomSalesHeader.SetRange("Creation Status", EcomSalesHeader."Creation Status"::Pending);
-        EcomSalesHeader.SetRange("Vouchers Exist", true);
+        EcomSalesHeader.SetRange("Attraction Wallets Exist", true);
         EcomSalesHeader.SetFilter("Capture Processing Status", '%1|%2', EcomSalesHeader."Capture Processing Status"::"Partially Processed", EcomSalesHeader."Capture Processing Status"::Processed);
-        EcomSalesHeader.SetFilter("Voucher Processing Status", '%1|%2', EcomSalesHeader."Voucher Processing Status"::"Partially Processed", EcomSalesHeader."Voucher Processing Status"::Pending);
+        EcomSalesHeader.SetFilter("Attr. Wallet Processing Status", '%1|%2', EcomSalesHeader."Attr. Wallet Processing Status"::"Partially Processed", EcomSalesHeader."Attr. Wallet Processing Status"::Pending);
         EcomSalesHeader.SetFilter("Bucket Id", BucketFilter);
-        EcomSalesHeader.SetLoadFields("Entry No.");
         if EcomSalesHeader.FindSet() then
             repeat
-                EcomVirtualItemMgt.CreateVouchers(EcomSalesHeader, false, true);
+                EcomCreateWalletMgt.CreateWallets(EcomSalesHeader, false, true);
             until EcomSalesHeader.Next() = 0;
     end;
+
 #endif
-    local procedure SetJQDescription(): Text;
+    local procedure SetJQDescription(): Text
     var
-        JobDescriptionLbl: label 'Process Voucher From Ecommerce Document';
+        JobDescriptionLbl: Label 'Process Wallets From Ecommerce Document';
     begin
         exit(JobDescriptionLbl);
     end;
 
-    internal procedure GetCodeunitId(): Integer;
+    internal procedure GetCodeunitId(): Integer
     begin
-        exit(codeunit::"NPR EcomCreateVoucherJQ");
+        exit(codeunit::"NPR EcomProcessWalletsJQ");
     end;
 
     local procedure ScheduleJobQueue()
@@ -88,18 +83,17 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
 
     internal procedure ScheduleJobQueueWithConfirmation()
     var
-        ConfirmManagemnet: Codeunit "Confirm Management";
-        ScheduleJobQueueConfirmLbl: Label 'Are you sure you want to configure the job queue for ecommerce document voucher processing?';
+        ConfirmManagement: Codeunit "Confirm Management";
+        ScheduleJobQueueConfirmLbl: Label 'Are you sure you want to configure the job queue for ecommerce document wallet processing?';
     begin
-        if not ConfirmManagemnet.GetResponseOrDefault(ScheduleJobQueueConfirmLbl, true) then
+        if not ConfirmManagement.GetResponseOrDefault(ScheduleJobQueueConfirmLbl, true) then
             exit;
 
         ScheduleJobQueue();
     end;
 
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-
-    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnAfterValidateEvent, 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry")
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
@@ -114,6 +108,5 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
         if Rec."Parameter String" = '' then
             Rec."Parameter String" := CopyStr((EcomJobManagement.ParamBucketFilter() + '='), 1, MaxStrLen(Rec."Parameter String"));
     end;
-
 #endif
 }

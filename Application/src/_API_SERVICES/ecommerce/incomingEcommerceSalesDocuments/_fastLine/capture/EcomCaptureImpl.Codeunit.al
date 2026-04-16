@@ -402,10 +402,14 @@ codeunit 6248646 "NPR EcomCaptureImpl"
     local procedure CalculateAmountToCapture(EcomSalesHeader: Record "NPR Ecom Sales Header") AmountToCapture: Decimal
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership);
+        EcomSalesLine.FilterGroup(-1); // Virtual item subtype or attraction wallet
+        EcomVirtualItemMgt.SetVirtualItemSubtypeFilter(EcomSalesLine);
+        EcomSalesLine.SetRange("Is Attraction Wallet", true);
+        EcomSalesLine.FilterGroup(0);
         EcomSalesLine.SetFilter(Quantity, '<>%1', 0);
         EcomSalesLine.SetFilter("Unit Price", '<>%1', 0);
         EcomSalesLine.SetLoadFields("Line Amount", "VAT %");

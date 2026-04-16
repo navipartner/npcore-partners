@@ -22,6 +22,7 @@ codeunit 6059994 "NPR Json Helper"
         exit(GetJText(Token, Path, MaxLength, false, Required, DefaultValue));
     end;
 
+    [Obsolete('A typo in the parameter `TextMaxLength` name. Will be changed to `TestMaxLength`.', '2026-03-23')]
     procedure GetJText(Token: JsonToken; Path: Text; MaxLength: Integer; TextMaxLength: Boolean; Required: Boolean): Text
     begin
         exit(GetJText(Token, Path, MaxLength, TextMaxLength, Required, ''));

@@ -128,6 +128,45 @@ table 6151259 "NPR Ecom Sales Line"
             Caption = 'Voucher Type';
             DataClassification = CustomerContent;
         }
+        field(40; "External Line ID"; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'External Line ID';
+        }
+        field(41; "Parent Ext. Line ID"; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Parent Ext. Line ID';
+            TableRelation = "NPR Ecom Sales Line"."External Line ID" where("Document Entry No." = field("Document Entry No."));
+            ValidateTableRelation = false;
+        }
+        field(42; Indentation; Integer)
+        {
+            Caption = 'Indentation';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
+        field(50; "Is Attraction Wallet"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Is Attraction Wallet';
+        }
+        field(51; "Attr. Wallet Processing Status"; Enum "NPR EcomVirtualItemProcestatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Attr. Wallet Processing Status';
+        }
+        field(52; "Attr. Wallet Process ErrMsg"; Text[500])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Attr. Wallet Process Error Message';
+        }
+        field(53; "Attr. Wallet Retry Count"; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Attr. Wallet Retry Count';
+            BlankZero = true;
+        }
         field(5000; "Bucket Id"; Integer)
         {
             Caption = 'Bucket';
@@ -260,13 +299,18 @@ table 6151259 "NPR Ecom Sales Line"
         key(Key4; "External Document No.", "Document Type", Type, "Virtual Item Process Status", Captured)
         {
         }
-
         key(Key5; "Document Entry No.", Type, Captured, "Virtual Item Process Status", "Virtual Item Proc Retry Count")
         {
         }
         key(Key6; "Document Entry No.", Subtype, Captured, "Virtual Item Process Status", "Virtual Item Proc Retry Count")
         {
         }
+        key(WalletProcessing; "Document Entry No.", "Is Attraction Wallet", "Attr. Wallet Processing Status") { }
+        key(BundleLines; "Document Entry No.", "Parent Ext. Line ID", "External Line ID", "Is Attraction Wallet", Subtype, "Virtual Item Process Status") { }
     }
 
+    internal procedure IsVirtualItem(): Boolean
+    begin
+        exit(Subtype in [Subtype::Voucher, Subtype::Ticket, Subtype::Membership, Subtype::Coupon]);
+    end;
 }

@@ -342,6 +342,20 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
             PAGE.Run(0, TempNpRvVoucher);
     end;
 
+    internal procedure ShowRelatedVouchersAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NoVoucherFoundMsg: Label 'No retail vouchers are linked to this line in the system.';
+    begin
+        if EcomSalesLine."No." <> '' then
+            if NpRvVoucher.Get(EcomSalesLine."No.") then begin
+                NpRvVoucher.SetRecFilter();
+                Page.Run(Page::"NPR NpRv Voucher Card", NpRvVoucher);
+                exit;
+            end;
+        Message(NoVoucherFoundMsg);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnAfterPostSalesLine, '', false, false)]
     local procedure "Sales-Post_OnAfterPostSalesLine"(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; CommitIsSuppressed: Boolean; var SalesInvLine: Record "Sales Invoice Line"; var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var xSalesLine: Record "Sales Line")
     begin

@@ -128,20 +128,22 @@ codeunit 6151027 "NPR Entria Order Impl."
 
     local procedure ProcessEcommerceSaleLine(ItemToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; var LastLineNo: Integer)
     var
-        LineType: Enum "NPR Ecom Sales Line Type";
-        LineSubType: Enum "NPR Ecom Sales Line Subtype";
+        EcomSalesLineParams: Record "NPR Ecom Sales Line";
+        EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
         QuantityCount: Integer;
         QuantityIndex: Integer;
         TotalAmount: Decimal;
         InsertedAmount: Decimal;
     begin
-        SetLineTypes(ItemToken, LineType, LineSubType);
+        Clear(EcomSalesLineParams);
+        SetLineTypes(ItemToken, EcomSalesLineParams);
+        EcomSalesLineParams."Is Attraction Wallet" := EcomCreateWalletMgt.IsAttractionWallet(EcomSalesLineParams);
 
-        QuantityCount := GetQuantityCount(ItemToken, LineSubType);
+        QuantityCount := GetQuantityCount(ItemToken, EcomSalesLineParams.Subtype);
         TotalAmount := _JsonHelper.GetJDecimal(ItemToken, 'total', true);
 
         for QuantityIndex := 1 to QuantityCount do
-            InsertEcomSalesLine(ItemToken, EcomSalesHeader, LineType, LastLineNo, LineSubType, QuantityIndex, QuantityCount, TotalAmount, InsertedAmount);
+            InsertEcomSalesLine(ItemToken, EcomSalesHeader, EcomSalesLineParams, LastLineNo, QuantityIndex, QuantityCount, TotalAmount, InsertedAmount);
     end;
 
     local procedure GetQuantityCount(ItemToken: JsonToken; LineSubType: Enum "NPR Ecom Sales Line Subtype"): Integer
@@ -155,7 +157,7 @@ codeunit 6151027 "NPR Entria Order Impl."
         end;
     end;
 
-    local procedure InsertEcomSalesLine(ItemToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; LineType: Enum "NPR Ecom Sales Line Type"; var LastLineNo: Integer; LineSubType: Enum "NPR Ecom Sales Line Subtype"; QuantityIndex: Integer; QuantityCount: Integer; TotalAmount: Decimal; var InsertedAmount: Decimal)
+    local procedure InsertEcomSalesLine(ItemToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLineParams: Record "NPR Ecom Sales Line"; var LastLineNo: Integer; QuantityIndex: Integer; QuantityCount: Integer; TotalAmount: Decimal; var InsertedAmount: Decimal)
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
     begin
@@ -165,30 +167,27 @@ codeunit 6151027 "NPR Entria Order Impl."
         EcomSalesLine."Document Type" := EcomSalesHeader."Document Type";
         EcomSalesLine."External Document No." := EcomSalesHeader."External No.";
         EcomSalesLine."Line No." := LastLineNo;
-        EcomSalesLine.Type := LineType;
-        EcomSalesLine.Subtype := LineSubType;
-        DeserializeEcomSalesLine(ItemToken, EcomSalesLine, QuantityIndex, QuantityCount, TotalAmount, InsertedAmount);
+        EcomSalesLine.Type := EcomSalesLineParams.Type;
+        EcomSalesLine.Subtype := EcomSalesLineParams.Subtype;
+        DeserializeEcomSalesLine(ItemToken, EcomSalesLine, EcomSalesLineParams, QuantityIndex, QuantityCount, TotalAmount, InsertedAmount);
         _IntegrationEvents.OnBeforeInsertEcommerceSalesLine(ItemToken, EcomSalesHeader, EcomSalesLine);
         EcomSalesLine.Insert(true);
         _IntegrationEvents.OnAfterInsertEcommerceSalesLine(ItemToken, EcomSalesHeader, EcomSalesLine);
     end;
 
-    local procedure DeserializeEcomSalesLine(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line"; QuantityIndex: Integer; QuantityCount: Integer; TotalAmount: Decimal; var InsertedAmount: Decimal)
+    local procedure DeserializeEcomSalesLine(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesLineParams: Record "NPR Ecom Sales Line"; QuantityIndex: Integer; QuantityCount: Integer; TotalAmount: Decimal; var InsertedAmount: Decimal)
     var
-        ItemNo: Text[50];
         TicketReservationLineTxt: Text[50];
         InvalidGuidErr: Label 'Invalid value at %1. Expected a GUID.', Comment = '%1 = FieldCaption("Ticket Reservation Line Id")';
     begin
 #pragma warning disable AA0139
-        ItemNo := _JsonHelper.GetJText(SalesLineJsonToken, 'variant_sku', MaxStrLen(ItemNo), true, false);
         case EcomSalesLine.Type of
             EcomSalesLine.Type::Item:
                 begin
-                    EcomSalesLine."No." := ItemNo;
-                    EcomSalesLine.Description := _JsonHelper.GetJText(SalesLineJsonToken, 'title', MaxStrLen(EcomSalesLine.Description), true, false);
-                    EcomSalesLine."Unit Price" := _JsonHelper.GetJDecimal(SalesLineJsonToken, 'unit_price', true);
+                    EcomSalesLine."No." := EcomSalesLineParams."No.";
                     case EcomSalesLine.Subtype of
-                        EcomSalesLine.Subtype::Item:
+                        EcomSalesLine.Subtype::Item,
+                        EcomSalesLine.Subtype::Coupon:
                             DeserializeItemLineValues(SalesLineJsonToken, EcomSalesLine);
                         EcomSalesLine.Subtype::Ticket:
                             begin
@@ -210,10 +209,13 @@ codeunit 6151027 "NPR Entria Order Impl."
                 end;
             EcomSalesLine.Type::Voucher:
                 begin
-                    EcomSalesLine."Voucher Type" := ItemNo;
+                    EcomSalesLine."Voucher Type" := EcomSalesLineParams."No.";
                     DeserializeSplitedLineValues(SalesLineJsonToken, EcomSalesLine, QuantityIndex, QuantityCount, TotalAmount, InsertedAmount);
                 end;
         end;
+        EcomSalesLine.Description := _JsonHelper.GetJText(SalesLineJsonToken, 'title', MaxStrLen(EcomSalesLine.Description), true, false);
+        EcomSalesLine."Unit Price" := _JsonHelper.GetJDecimal(SalesLineJsonToken, 'unit_price', false);
+        EcomSalesLine."Is Attraction Wallet" := EcomSalesLineParams."Is Attraction Wallet";
 
         _IntegrationEvents.OnAfterDeserializeEcommerceSalesLine(SalesLineJsonToken, EcomSalesLine);
 #pragma warning restore AA0139
@@ -279,33 +281,32 @@ codeunit 6151027 "NPR Entria Order Impl."
         exit(Round((ItemTaxTotal / SubtotalExclVat) * 100, _Currency."Amount Rounding Precision"));
     end;
 
-    local procedure SetLineTypes(ItemToken: JsonToken; var LineType: Enum "NPR Ecom Sales Line Type"; var LineSubType: Enum "NPR Ecom Sales Line Subtype")
+    local procedure SetLineTypes(ItemToken: JsonToken; var EcomSalesLineParams: Record "NPR Ecom Sales Line")
     var
         ProductTypeText: Text;
-        ItemNo: Text[50];
     begin
 #pragma warning disable AA0139
-        ItemNo := _JsonHelper.GetJText(ItemToken, 'variant_sku', MaxStrLen(ItemNo), false, false);
+        EcomSalesLineParams."No." := _JsonHelper.GetJText(ItemToken, 'variant_sku', MaxStrLen(EcomSalesLineParams."No."), false, false);
 #pragma warning restore AA0139
-        Clear(LineSubType);
-        Clear(LineType);
+        Clear(EcomSalesLineParams.Subtype);
+        Clear(EcomSalesLineParams.Type);
         ProductTypeText := LowerCase(_JsonHelper.GetJText(ItemToken, 'product_type', false));
         if _JsonHelper.GetJBoolean(ItemToken, 'is_giftcard', false) or (ProductTypeText = 'voucher') then begin
-            LineType := LineType::Voucher;
-            LineSubType := LineSubType::Voucher;
+            EcomSalesLineParams.Type := EcomSalesLineParams.Type::Voucher;
+            EcomSalesLineParams.Subtype := EcomSalesLineParams.Subtype::Voucher;
             exit;
         end;
-        LineType := LineType::Item;
-        LineSubType := TrySetItemSubtype(ItemNo);
+        EcomSalesLineParams.Type := EcomSalesLineParams.Type::Item;
+        EcomSalesLineParams.Subtype := TrySetItemSubtype(EcomSalesLineParams);
     end;
 
-    local procedure TrySetItemSubtype(ItemNo: Text[50]) Subtype: Enum "NPR Ecom Sales Line Subtype"
+    local procedure TrySetItemSubtype(EcomSalesLine: Record "NPR Ecom Sales Line") Subtype: Enum "NPR Ecom Sales Line Subtype"
     var
         Item: Record Item;
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         ItemCode: Code[20];
     begin
-        If not Evaluate(ItemCode, ItemNo) then
+        If not Evaluate(ItemCode, EcomSalesLine."No.") then
             exit;
         Item.SetLoadFields("NPR Ticket Type");//add missing fields for other types if needed
         if not Item.Get(ItemCode) then
@@ -315,6 +316,8 @@ codeunit 6151027 "NPR Entria Order Impl."
                 exit(Subtype::Ticket);
             EcomVirtualItemMgt.IsMembershipLine(Item."No."):
                 exit(Subtype::Membership);
+            EcomVirtualItemMgt.IsCouponItem(EcomSalesLine, false):
+                exit(Subtype::Coupon);
             else
                 exit(Subtype::Item);
         end;

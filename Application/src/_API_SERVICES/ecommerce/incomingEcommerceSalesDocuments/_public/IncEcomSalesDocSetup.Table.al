@@ -99,9 +99,16 @@ table 6151190 "NPR Inc Ecom Sales Doc Setup"
         }
         field(19; "Max Virtual Item Retry Count"; Integer)
         {
-            Caption = 'Max Virutal Item Retry Count';
+            Caption = 'Max Virtual Item Retry Count';
             DataClassification = CustomerContent;
             InitValue = 3;
+        }
+        field(20; "Max Attr. Wallet Retry Count"; Integer)
+        {
+            Caption = 'Max Attr. Wallet Retry Count';
+            DataClassification = CustomerContent;
+            InitValue = 3;
+            MinValue = 0;
         }
     }
     keys

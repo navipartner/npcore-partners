@@ -92,6 +92,13 @@ codeunit 6248548 "NPR EcomCreateTicketProcess"
         EcomCreateTicketImpl.ShowRelatedTicketsAction(EcomSalesHeader);
     end;
 
+    internal procedure ShowRelatedTicketsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+    begin
+        EcomCreateTicketImpl.ShowRelatedTicketsAction(EcomSalesLine);
+    end;
+
     internal procedure SetUpdateRetryCount(UpdateRetryCount: Boolean)
     begin
         _UpdateRetryCount := UpdateRetryCount;

@@ -26,6 +26,7 @@ table 6150940 "NPR WalletCouponSetup"
         key(Key1; "Coupon Type")
         {
         }
+        key(Key2; TriggerOnItemNo) { }
     }
 
 }

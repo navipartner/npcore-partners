@@ -5,7 +5,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     internal procedure CreateIncomingEcomDocument(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
         InsertSalesDocument(Request, EcomSalesHeader);
@@ -154,6 +153,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     local procedure ProcessIncomingSalesLines(RequestBody: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         JsonHelper: Codeunit "NPR Json Helper";
+        EcomCreateCouponImpl: Codeunit "NPR EcomCreateCouponImpl";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         SalesLineJsonToken: JsonToken;
         SalesLinesJsonToken: JsonToken;
         SalesLinesNoArrayErr: Label 'The salesLines property is not an array.', Locked = true;
@@ -165,6 +166,11 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 
         foreach SalesLineJsonToken in SalesLinesJsonToken.AsArray() do
             InsertIncomingSalesLine(SalesLineJsonToken, EcomSalesHeader);
+
+        EcomSalesDocUtils.ValidateBundleIntegrity(EcomSalesHeader);
+        EcomCreateCouponImpl.EnsureNoAttractionCouponsOutsideWallets(EcomSalesHeader);
+        EcomSalesDocUtils.UpdateIndentation(EcomSalesHeader);
+        EcomSalesDocUtils.EnsureNoUnsupportedAssetsInWallets(EcomSalesHeader);
     end;
 
     local procedure InsertIncomingSalesLine(SalesLineJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header")
@@ -238,8 +244,10 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
         JsonHelper: Codeunit "NPR Json Helper";
         LineTypeText: Text;
+        FractionalQtyErr: Label 'Whole numbers only are accepted as the quantity for ticket, membership or coupon lines. Received %1 value: %2.', Comment = '%1 - absolute path, %2 - value', Locked = true;
         PropertyErrorText: Label 'Property %1 has incorrect value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
         LengthErrorText: Label 'Property %1 has incorrect length: %2. Max length: %3', Comment = '%1 - absolute path, %2 - type', Locked = true;
     begin
@@ -259,11 +267,11 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
                     EcomSalesLine."Variant Code" := JsonHelper.GetJText(SalesLineJsonToken, 'variantCode', MaxStrLen(EcomSalesLine."Variant Code"), true, false);
+                    EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
                     SetSubtype(EcomSalesLine);
                     case EcomSalesLine.Subtype of
                         EcomSalesLine.Subtype::Item:
                             begin
-                                EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
                                 if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
                                     Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'no'), EcomSalesLine."No.");
                                 EcomSalesLine."Unit Of Measure Code" := JsonHelper.GetJText(SalesLineJsonToken, 'unitOfMeasure', MaxStrLen(EcomSalesLine."Unit Of Measure Code"), true, false);
@@ -282,6 +290,11 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                     EcomCreateMMShipImpl.ValidateMembershipToken(EcomSalesLine, EcomSalesHeader)
                             end;
                     end;
+                    EcomSalesLine."Is Attraction Wallet" := EcomCreateWalletMgt.IsAttractionWallet(EcomSalesLine);
+
+                    if EcomSalesLine.Subtype in [EcomSalesLine.Subtype::Coupon, EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Membership] then
+                        if EcomSalesLine.Quantity <> Round(EcomSalesLine.Quantity, 1) then  // quantity must be a whole number
+                            Error(FractionalQtyErr, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'quantity'), EcomSalesLine.Quantity);
                 end;
             EcomSalesLine.Type::Comment:
                 begin
@@ -314,7 +327,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
                 end;
         end;
-
+        EcomSalesLine."External Line ID" := JsonHelper.GetJText(SalesLineJsonToken, 'externalLineId', MaxStrLen(EcomSalesLine."External Line ID"), true, false);
+        EcomSalesLine."Parent Ext. Line ID" := JsonHelper.GetJText(SalesLineJsonToken, 'parentExternalLineId', MaxStrLen(EcomSalesLine."Parent Ext. Line ID"), true, false);
 
         EcomSalesDocApiEvents.OnAfterDeserializeIncomingEcomSalesLine(SalesLineJsonToken, EcomSalesLine);
 #pragma warning restore AA0139
@@ -327,26 +341,31 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 EcomSalesLine.Subtype := EcomSalesLine.Subtype::Voucher;
             EcomSalesLine.Type::Item:
                 begin
-                    if EcomSalesLine."No." <> '' then
-                        EcomSalesLine.Subtype := TrySetItemSubtype(EcomSalesLine."No.");
+                    if (EcomSalesLine."No." <> '') or (EcomSalesLine."Barcode No." <> '') then
+                        EcomSalesLine.Subtype := TrySetItemSubtype(EcomSalesLine);
                     if EcomSalesLine.Subtype = EcomSalesLine.Subtype::" " then
                         EcomSalesLine.Subtype := EcomSalesLine.Subtype::Item;//If Item No. is not provided, try to resolve it later using the barcode
                 end;
         end;
     end;
 
-    local procedure TrySetItemSubtype(ItemNo: Text[50]) Subtype: Enum "NPR Ecom Sales Line Subtype"
+    local procedure TrySetItemSubtype(EcomSalesLine: Record "NPR Ecom Sales Line") Subtype: Enum "NPR Ecom Sales Line Subtype"
     var
         Item: Record Item;
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         ItemCode: Code[20];
         ItemNotFoundErr: Label 'Item with SKU %1 does not exist.', Comment = '%1 - SKU';
     begin
-        if not Evaluate(ItemCode, ItemNo) then
-            Error(ItemNotFoundErr, ItemNo);
+        if EcomVirtualItemMgt.IsCouponItem(EcomSalesLine, true) then
+            exit(Subtype::Coupon);
+        if EcomSalesLine."No." = '' then
+            exit;
+
+        if not Evaluate(ItemCode, EcomSalesLine."No.") then
+            Error(ItemNotFoundErr, EcomSalesLine."No.");
         Item.SetLoadFields("NPR Ticket Type");
         if not Item.Get(ItemCode) then
-            Error(ItemNotFoundErr, ItemNo);
+            Error(ItemNotFoundErr, EcomSalesLine."No.");
         case true of
             EcomVirtualItemMgt.IsTicketLine(Item):
                 exit(Subtype::Ticket);
@@ -752,8 +771,10 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('invoicedQuantity', Format(EcomSalesLine."Invoiced Qty.", 0, 9))
                                   .AddProperty('invoicedAmount', Format(EcomSalesLine."Invoiced Amount", 0, 9))
                                   .AddProperty('captured', EcomSalesLine.Captured)
-                                  .AddProperty('virtualItemProcessStatus', GetVirtualItemProcessStatusApiType(EcomSalesLine))
+                                  .AddProperty('virtualItemProcessStatus', GetVirtualItemProcessStatusApiType(EcomSalesLine."Virtual Item Process Status"))
                                   .AddProperty('virtualItemProcessErrorMessage', EcomSalesLine."Virtual Item Process ErrMsg")
+                                  .AddProperty('attractionWalletProcessStatus', GetVirtualItemProcessStatusApiType(EcomSalesLine."Attr. Wallet Processing Status"))
+                                  .AddProperty('attractionWalletProcessErrorMessage', EcomSalesLine."Attr. Wallet Process ErrMsg")
                                   .AddProperty('ticketReservationLineId', Format(EcomSalesLine."Ticket Reservation Line Id", 0, 4).ToLower())
                                   .AddProperty('membershipId', Format(EcomSalesLine."Membership Id", 0, 4).ToLower())
                                   .AddProperty('memberFirstName', EcomSalesLine."Member First Name")
@@ -770,6 +791,13 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('memberNewsletter', EcomSalesLine."Member Newsletter")
                                   .AddProperty('memberGdprApproval', EcomSalesLine."Member GDPR Approval")
                                   .AddProperty('membershipActivationDate', Format(EcomSalesLine."Membership Activation Date", 0, 9));
+
+        if (EcomSalesLine."External Line ID" <> '') or (EcomSalesLine."Parent Ext. Line ID" <> '') then begin
+            SalesLineDetailsJsonObject.AddProperty('externalLineId', EcomSalesLine."External Line ID");
+            if EcomSalesLine."Parent Ext. Line ID" <> '' then
+                SalesLineDetailsJsonObject.AddProperty('parentExternalLineId', EcomSalesLine."Parent Ext. Line ID");
+        end;
+
         EcomSalesDocApiEvents.OnCreateAddSalesLineDetailsCustomFieldsJsonObject(EcomSalesLine, SalesLineDetailsCustomFieldsJsonObject);
         if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then
             SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
@@ -868,12 +896,15 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     internal procedure PreProcessDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
     begin
         if EcomSalesHeader."Virtual Items Exist" then begin
             EcomVirtualItemMgt.CaptureEcomDocument(EcomSalesHeader, false, false);
             EcomVirtualItemMgt.CreateVouchers(EcomSalesHeader, false, false);
             EcomVirtualItemMgt.CreateTickets(EcomSalesHeader, false, false);
             EcomVirtualItemMgt.CreateMemberships(EcomSalesHeader, false, false);
+            EcomVirtualItemMgt.CreateCoupons(EcomSalesHeader, false, false);
+            EcomCreateWalletMgt.CreateWallets(EcomSalesHeader, false, false);
         end;
         CreateDocument(EcomSalesHeader)
     end;
@@ -908,16 +939,12 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         end;
     end;
 
-    local procedure GetVirtualItemProcessStatusApiType(EcomSalesLine: Record "NPR Ecom Sales Line") VirtualItemProcessStatus: Text
+    local procedure GetVirtualItemProcessStatusApiType(ProcessingStatus: Enum "NPR EcomVirtualItemProcestatus"): Text
+    var
+        Result: Text;
     begin
-        case EcomSalesLine."Virtual Item Process Status" of
-            EcomSalesLine."Virtual Item Process Status"::" ":
-                VirtualItemProcessStatus := '';
-            EcomSalesLine."Virtual Item Process Status"::Processed:
-                VirtualItemProcessStatus := 'processed';
-            EcomSalesLine."Virtual Item Process Status"::Error:
-                VirtualItemProcessStatus := 'error';
-        end;
+        ProcessingStatus.Names().Get(ProcessingStatus.Ordinals().IndexOf(ProcessingStatus.AsInteger()), Result);
+        exit(Result.ToLower());
     end;
 
     local procedure IsLoyaltyPointsPaymentLine(PaymentMapping: Record "NPR Magento Payment Mapping"): Boolean

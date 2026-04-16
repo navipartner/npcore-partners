@@ -8,18 +8,27 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         UnsupportedSubtypeLbl: Label 'Subtype %1 in %2 is not supported.', Comment = '%1 - ecom sales line subtype, %2 - record id';
     begin
-        case EcomSalesLine.Subtype of
-            EcomSalesLine.Subtype::Voucher:
-                CreateVoucher(EcomSalesLine, true, false);
-            EcomSalesLine.Subtype::Ticket:
-                begin
-                    EcomSalesHeader.Get(EcomSalesLine."Document Entry No.");
-                    CreateTickets(EcomSalesHeader, true, false);
-                end;
-            EcomSalesLine.Subtype::Membership:
-                CreateMembership(EcomSalesLine, true, false);
-            else
-                Error(UnsupportedSubtypeLbl, EcomSalesLine.Subtype, EcomSalesLine.RecordId);
+        if EcomSalesLine."Virtual Item Process Status" <> EcomSalesLine."Virtual Item Process Status"::Processed then
+            case EcomSalesLine.Subtype of
+                EcomSalesLine.Subtype::Voucher:
+                    CreateVoucher(EcomSalesLine, true, false);
+                EcomSalesLine.Subtype::Ticket:
+                    begin
+                        EcomSalesHeader.Get(EcomSalesLine."Document Entry No.");
+                        CreateTickets(EcomSalesHeader, true, false);
+                    end;
+                EcomSalesLine.Subtype::Membership:
+                    CreateMembership(EcomSalesLine, true, false);
+                EcomSalesLine.Subtype::Coupon:
+                    CreateCoupons(EcomSalesLine, true, false);
+                else
+                    if not EcomSalesLine."Is Attraction Wallet" then
+                        Error(UnsupportedSubtypeLbl, EcomSalesLine.Subtype, EcomSalesLine.RecordId);
+            end;
+
+        if EcomSalesLine."Is Attraction Wallet" then begin
+            EcomSalesLine.Get(EcomSalesLine.RecordId());
+            CreateWallets(EcomSalesLine, true, false);
         end;
     end;
 
@@ -129,6 +138,47 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         Success := EcomCreateMMShipProcess.Run(EcomSalesLine);
     end;
 
+    internal procedure CreateCoupons(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        if not EcomSalesHeader."Coupons Exist" then
+            exit;
+        if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
+            exit;
+        if not (EcomSalesHeader."Capture Processing Status" in [EcomSalesHeader."Capture Processing Status"::"Partially Processed", EcomSalesHeader."Capture Processing Status"::Processed]) then
+            exit;
+
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Coupon);
+        EcomSalesLine.SetRange("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::" ");
+        EcomSalesLine.SetRange(Captured, true);
+        EcomSalesLine.SetFilter(Quantity, '<>%1', 0);
+        if EcomSalesLine.FindSet() then
+            repeat
+                CreateCoupons(EcomSalesLine, ShowError, UpdateRetryCount);
+            until EcomSalesLine.Next() = 0;
+
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId());
+    end;
+
+    local procedure CreateCoupons(var EcomSalesLine: Record "NPR Ecom Sales Line"; ShowError: Boolean; UpdateRetryCount: Boolean) Success: Boolean
+    var
+        EcomCreateCouponProcess: Codeunit "NPR EcomCreateCouponProcess";
+    begin
+        Clear(EcomCreateCouponProcess);
+        EcomCreateCouponProcess.SetShowError(ShowError);
+        EcomCreateCouponProcess.SetUpdateRetryCount(UpdateRetryCount);
+        Success := EcomCreateCouponProcess.Run(EcomSalesLine);
+    end;
+
+    local procedure CreateWallets(var EcomSalesLine: Record "NPR Ecom Sales Line"; ShowError: Boolean; UpdateRetryCount: Boolean)
+    var
+        EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+    begin
+        EcomCreateWalletMgt.CreateWalletsForTopLevelParentLineWithCheck(EcomSalesLine, ShowError, UpdateRetryCount);
+    end;
+
     internal procedure CreateTickets(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
     var
         EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
@@ -197,7 +247,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership, EcomSalesLine.Subtype::Ticket);
+        SetVirtualItemSubtypeFilter(EcomSalesLine);
         EcomSalesLine.ModifyAll("Bucket Id", BucketInt);
 
         exit(BucketInt);
@@ -229,8 +279,17 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Membership);
         EcomSalesHeader."Memberships Exist" := not EcomSalesLine.IsEmpty;
 
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Coupon);
+        EcomSalesHeader."Coupons Exist" := not EcomSalesLine.IsEmpty();
         EcomSalesLine.SetRange(Subtype);
-        EcomSalesHeader."Virtual Items Exist" := EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist";
+
+        EcomSalesLine.SetRange("Is Attraction Wallet", true);
+        EcomSalesHeader."Attraction Wallets Exist" := not EcomSalesLine.IsEmpty();
+        EcomSalesLine.SetRange("Is Attraction Wallet");
+
+        EcomSalesHeader."Virtual Items Exist" :=
+            EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist" or EcomSalesHeader."Coupons Exist" or EcomSalesHeader."Attraction Wallets Exist";
+
         EcomVirtualItemEvents.OnUpdateVirtualInformationInHeaderBeforeModify(EcomSalesHeader);
         EcomSalesHeader.Modify();
     end;
@@ -262,7 +321,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     begin
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership);
+        SetVirtualItemSubtypeFilter(EcomSalesLine);
         Page.Run(0, EcomSalesLine);
     end;
 
@@ -274,6 +333,25 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Item);
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
+        Page.Run(0, EcomSalesLine);
+    end;
+
+    internal procedure OpenEcomCouponLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Coupon);
+        Page.Run(0, EcomSalesLine);
+    end;
+
+    internal procedure OpenEcomWalletLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        EcomSalesLine.SetCurrentKey("Document Entry No.", "Is Attraction Wallet");
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange("Is Attraction Wallet", true);
         Page.Run(0, EcomSalesLine);
     end;
 
@@ -289,6 +367,10 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
     internal procedure GetVoucherProcessingStatusStyle(EcomSalesHeader: Record "NPR Ecom Sales Header") StyleText: Text
     begin
+        if not EcomSalesHeader."Vouchers Exist" then begin
+            StyleText := 'Subordinate';
+            exit;
+        end;
         case EcomSalesHeader."Voucher Processing Status" of
             EcomSalesHeader."Voucher Processing Status"::Error:
                 StyleText := 'Unfavorable';
@@ -297,8 +379,26 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         end;
     end;
 
+    internal procedure GetCouponProcessingStatusStyle(EcomSalesHeader: Record "NPR Ecom Sales Header") StyleText: Text
+    begin
+        if not EcomSalesHeader."Coupons Exist" then begin
+            StyleText := 'Subordinate';
+            exit;
+        end;
+        case EcomSalesHeader."Coupon Processing Status" of
+            EcomSalesHeader."Coupon Processing Status"::Error:
+                StyleText := 'Unfavorable';
+            EcomSalesHeader."Coupon Processing Status"::Processed:
+                StyleText := 'Favorable';
+        end;
+    end;
+
     internal procedure GetTicketProcessingStatusStyle(EcomSalesHeader: Record "NPR Ecom Sales Header") StyleText: Text
     begin
+        if not EcomSalesHeader."Tickets Exist" then begin
+            StyleText := 'Subordinate';
+            exit;
+        end;
         case EcomSalesHeader."Ticket Processing Status" of
             EcomSalesHeader."Ticket Processing Status"::Error:
                 StyleText := 'Unfavorable';
@@ -355,10 +455,38 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
 
     internal procedure GetMembershipProcessingStatusStyle(EcomSalesHeader: Record "NPR Ecom Sales Header") StyleText: Text
     begin
+        if not EcomSalesHeader."Memberships Exist" then begin
+            StyleText := 'Subordinate';
+            exit;
+        end;
         case EcomSalesHeader."Membership Processing Status" of
             EcomSalesHeader."Membership Processing Status"::Error:
                 StyleText := 'Unfavorable';
             EcomSalesHeader."Membership Processing Status"::Processed:
+                StyleText := 'Favorable';
+        end;
+    end;
+
+    internal procedure GetWalletProcessingStatusStyle(EcomSalesHeader: Record "NPR Ecom Sales Header") StyleText: Text
+    begin
+        if not EcomSalesHeader."Attraction Wallets Exist" then begin
+            StyleText := 'Subordinate';
+            exit;
+        end;
+        case EcomSalesHeader."Attr. Wallet Processing Status" of
+            EcomSalesHeader."Attr. Wallet Processing Status"::Error:
+                StyleText := 'Unfavorable';
+            EcomSalesHeader."Attr. Wallet Processing Status"::Processed:
+                StyleText := 'Favorable';
+        end;
+    end;
+
+    internal procedure GetWalletProcessingStatusStyle(EcomSalesLine: Record "NPR Ecom Sales Line") StyleText: Text
+    begin
+        case EcomSalesLine."Attr. Wallet Processing Status" of
+            EcomSalesLine."Attr. Wallet Processing Status"::Error:
+                StyleText := 'Unfavorable';
+            EcomSalesLine."Attr. Wallet Processing Status"::Processed:
                 StyleText := 'Favorable';
         end;
     end;
@@ -412,35 +540,30 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     var
         HasError: Boolean;
         AllProcessed: Boolean;
-        VoucherProcessed: Boolean;
-        TicketProcessed: Boolean;
-        MembershipProcessed: Boolean;
     begin
-        HasError := (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Error) or
-                    (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Error) or
-                    (EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::Error);
+        HasError :=
+            (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Error) or
+            (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Error) or
+            (EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::Error) or
+            (EcomSalesHeader."Coupon Processing Status" = EcomSalesHeader."Coupon Processing Status"::Error) or
+            (EcomSalesHeader."Attr. Wallet Processing Status" = EcomSalesHeader."Attr. Wallet Processing Status"::Error);
 
         if HasError then begin
             VirtualItemsDocStatus := VirtualItemsDocStatus::Error;
             exit;
         end;
 
-        VoucherProcessed := (not EcomSalesHeader."Vouchers Exist") or (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Processed);
-        TicketProcessed := (not EcomSalesHeader."Tickets Exist") or (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Processed);
-        MembershipProcessed := (not EcomSalesHeader."Memberships Exist") or (EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::Processed);
-
         // Partially Processed logic:
         // - Tickets can never be partially processed on their own; they are either processed or not processed
-        // - Vouchers and memberships can be partially processed
-        // - The document is partially processed if any voucher or membership is explicitly partially processed,
+        // - Vouchers, coupons, memberships and wallets can be partially processed
+        // - The document is partially processed if any voucher, coupon, membership or wallet is explicitly partially processed,
         //   or if existing virtual item types are in a mixed processed/not-processed state
-        if IsPartiallyProcessed(EcomSalesHeader, VoucherProcessed, TicketProcessed, MembershipProcessed) then begin
+        if IsPartiallyProcessed(EcomSalesHeader, AllProcessed) then begin
             VirtualItemsDocStatus := VirtualItemsDocStatus::"Partially Processed";
             exit;
         end;
 
-        AllProcessed := VoucherProcessed and TicketProcessed and MembershipProcessed;
-        if AllProcessed and (EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist") then begin
+        if AllProcessed and (EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist" or EcomSalesHeader."Coupons Exist" or EcomSalesHeader."Attraction Wallets Exist") then begin
             VirtualItemsDocStatus := VirtualItemsDocStatus::Processed;
             exit;
         end;
@@ -449,24 +572,39 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         VirtualItemsDocStatus := VirtualItemsDocStatus::Pending;
     end;
 
-    local procedure IsPartiallyProcessed(EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherProcessed: Boolean; TicketProcessed: Boolean; MembershipProcessed: Boolean
-    ): Boolean
+    local procedure IsPartiallyProcessed(EcomSalesHeader: Record "NPR Ecom Sales Header"; var AllProcessed: Boolean): Boolean
     var
         AnyExists: Boolean;
-        AllProcessed: Boolean;
+        CouponProcessed: Boolean;
+        MembershipProcessed: Boolean;
         NoneProcessed: Boolean;
+        TicketProcessed: Boolean;
+        VoucherProcessed: Boolean;
+        WalletProcessed: Boolean;
     begin
-        if EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::"Partially Processed" then
+        if (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::"Partially Processed") or
+           (EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::"Partially Processed") or
+           (EcomSalesHeader."Coupon Processing Status" = EcomSalesHeader."Coupon Processing Status"::"Partially Processed") or
+           (EcomSalesHeader."Attr. Wallet Processing Status" = EcomSalesHeader."Attr. Wallet Processing Status"::"Partially Processed")
+        then
             exit(true);
 
-        if EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::"Partially Processed" then
-            exit(true);
+        VoucherProcessed := (not EcomSalesHeader."Vouchers Exist") or (EcomSalesHeader."Voucher Processing Status" = EcomSalesHeader."Voucher Processing Status"::Processed);
+        TicketProcessed := (not EcomSalesHeader."Tickets Exist") or (EcomSalesHeader."Ticket Processing Status" = EcomSalesHeader."Ticket Processing Status"::Processed);
+        MembershipProcessed := (not EcomSalesHeader."Memberships Exist") or (EcomSalesHeader."Membership Processing Status" = EcomSalesHeader."Membership Processing Status"::Processed);
+        CouponProcessed := (not EcomSalesHeader."Coupons Exist") or (EcomSalesHeader."Coupon Processing Status" = EcomSalesHeader."Coupon Processing Status"::Processed);
+        WalletProcessed := (not EcomSalesHeader."Attraction Wallets Exist") or (EcomSalesHeader."Attr. Wallet Processing Status" = EcomSalesHeader."Attr. Wallet Processing Status"::Processed);
 
-        AnyExists := EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist";
+        AnyExists := EcomSalesHeader."Vouchers Exist" or EcomSalesHeader."Tickets Exist" or EcomSalesHeader."Memberships Exist" or EcomSalesHeader."Coupons Exist" or EcomSalesHeader."Attraction Wallets Exist";
 
-        AllProcessed := ((not EcomSalesHeader."Vouchers Exist") or VoucherProcessed) and ((not EcomSalesHeader."Tickets Exist") or TicketProcessed) and ((not EcomSalesHeader."Memberships Exist") or MembershipProcessed);
+        AllProcessed := VoucherProcessed and TicketProcessed and MembershipProcessed and CouponProcessed and WalletProcessed;
 
-        NoneProcessed := ((not EcomSalesHeader."Vouchers Exist") or (not VoucherProcessed)) and ((not EcomSalesHeader."Tickets Exist") or (not TicketProcessed)) and ((not EcomSalesHeader."Memberships Exist") or (not MembershipProcessed));
+        NoneProcessed :=
+            ((not EcomSalesHeader."Vouchers Exist") or (not VoucherProcessed)) and
+            ((not EcomSalesHeader."Tickets Exist") or (not TicketProcessed)) and
+            ((not EcomSalesHeader."Memberships Exist") or (not MembershipProcessed)) and
+            ((not EcomSalesHeader."Coupons Exist") or (not CouponProcessed)) and
+            ((not EcomSalesHeader."Attraction Wallets Exist") or (not WalletProcessed));
 
         exit(AnyExists and not AllProcessed and not NoneProcessed);
     end;
@@ -497,6 +635,13 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         exit(not MMMembershipAlterationSetup.IsEmpty());
     end;
 
+    internal procedure IsCouponItem(EcomSalesLine: Record "NPR Ecom Sales Line"; CheckCouponTypes: Boolean): Boolean
+    var
+        EcomCreateCouponImpl: Codeunit "NPR EcomCreateCouponImpl";
+    begin
+        exit(EcomCreateCouponImpl.IsCouponItem(EcomSalesLine, CheckCouponTypes));
+    end;
+
     internal procedure EmitError(ErrorTxt: text; EventId: text)
     var
         CustomDimensions: Dictionary of [Text, Text];
@@ -518,6 +663,9 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         Session.LogMessage(EventId, ErrorTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
+    internal procedure SetVirtualItemSubtypeFilter(var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3|%4', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.SubType::Membership, EcomSalesLine.Subtype::Coupon);
+    end;
 }
-
 #endif

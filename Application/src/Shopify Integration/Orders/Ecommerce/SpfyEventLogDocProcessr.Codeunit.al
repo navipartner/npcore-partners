@@ -194,22 +194,6 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         end;
     end;
 
-    internal procedure ShouldSoftExit(JobQueueEntryId: Guid): Boolean
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        ///When the status of the Job Queue that’s running in a loop is changed to On Hold - active session won't be stopped.
-        ///Job Queue will still run in background until loop finishes or exits on its own.
-        ///This way, we’ll exit the loop and stop further execution.
-        ///The Error status is handled in case of unexpected behavior after an app upgrade — the JQ might get stuck in an error state while the log still shows it as being in process.
-        if not JobQueueEntry.Get(JobQueueEntryId) then
-            exit(true);
-
-        if JobQueueEntry.Status in [JobQueueEntry.Status::"On Hold", JobQueueEntry.Status::Error] then
-            exit(true);
-        exit(false);
-    end;
-
     internal procedure IsShopifyDocument(EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
     var
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";

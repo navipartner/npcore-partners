@@ -1326,10 +1326,12 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesLine: Record "NPR Ecom Sales Line";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         Handled: Boolean;
         UnprocessedVirtualItemsErrorLbl: Label 'There is unprocessed virtual item on %1. Type: %2, no.: %3', Comment = '%1 - recordid, %2 - virtual item type, $3 - virtual item no.';
         CreatedDocumentErrorLbl: Label 'Sales document %1 has already been created from ecom document %2.', Comment = '%1 - sales document record id, %2 - ecom document record id';
         SubtypeNotSetErr: Label 'Line No. %1 has no Subtype set.', Comment = '%1 - Line No.';
+        UnprocessedAttractionWalletErrorLbl: Label 'Unprocessed attraction wallets exist for ecom document %1.', Comment = '%1 - ecom document record id';
     begin
         EcomSalesDocImplEvents.OnBeforeCheckIfDocumentCanBeProcessed(EcomSalesHeader, Handled);
         if Handled then
@@ -1368,13 +1370,20 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.SubType::Membership);
+        EcomVirtualItemMgt.SetVirtualItemSubtypeFilter(EcomSalesLine);
         if EcomSalesLine.IsEmpty then
             exit;
 
         EcomSalesLine.SetFilter("Virtual Item Process Status", '%1|%2', EcomSalesLine."Virtual Item Process Status"::Error, EcomSalesLine."Virtual Item Process Status"::" ");
         if EcomSalesLine.FindFirst() then
             Error(UnprocessedVirtualItemsErrorLbl, EcomSalesLine.RecordId, EcomSalesLine.Type, EcomSalesLine."No.");
+
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange("Is Attraction Wallet", true);
+        EcomSalesLine.SetFilter("Attr. Wallet Processing Status", '<>%1', EcomSalesLine."Attr. Wallet Processing Status"::Processed);
+        if not EcomSalesLine.IsEmpty() then
+            Error(UnprocessedAttractionWalletErrorLbl, EcomSalesHeader.RecordId());
 
         EcomSalesDocImplEvents.OnAfterCheckIfDocumentCanBeProcessed(EcomSalesHeader);
     end;
@@ -1389,7 +1398,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if Handled then
             exit;
 
-        if not EcomSalesHeader."Virtual Items Exist" then
+        if not (EcomSalesHeader."Virtual Items Exist" or EcomSalesHeader."Attraction Wallets Exist") then
             exit;
 
         if EcomSalesHeader."Creation Status" <> EcomSalesHeader."Creation Status"::Created then

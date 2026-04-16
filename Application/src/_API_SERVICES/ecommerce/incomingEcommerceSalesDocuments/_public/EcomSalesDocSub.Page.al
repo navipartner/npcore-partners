@@ -15,6 +15,8 @@ page 6248182 "NPR Ecom Sales Doc Sub"
         {
             repeater(Control1)
             {
+                IndentationColumn = Rec.Indentation;
+                IndentationControls = Description;
                 ShowCaption = false;
                 field(Type; Rec.Type)
                 {
@@ -98,11 +100,56 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                         EcomSalesDocUtils.OpenPostedSalesInvoiceLines(Rec);
                     end;
                 }
+                field("External Line ID"; Rec."External Line ID")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the External Line ID field.';
+                }
+                field("Parent Ext. Line ID"; Rec."Parent Ext. Line ID")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Parent Ext. Line ID field.';
+                }
+                field(Subtype; Rec.Subtype)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the business domain of the item line. Ticket indicates the line contains a ticket item as configured in BC item setup.';
+                }
                 field("Virtual Item Process Status"; Rec."Virtual Item Process Status")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Virtual Item Process Status field.';
                     StyleExpr = _VirtualItemProcessingStatusStyle;
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    var
+                        EcomCreateCouponProcess: Codeunit "NPR EcomCreateCouponProcess";
+                        EcomCreateMMShipProcess: Codeunit "NPR EcomCreateMMShipProcess";
+                        EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
+                        EcomCreateVchrProcess: Codeunit "NPR EcomCreateVchrProcess";
+                        NoErrorMsg: Label 'No virtual item processing error message was recorded for the document line.';
+                    begin
+                        case Rec."Virtual Item Process Status" of
+                            Rec."Virtual Item Process Status"::Error:
+                                if Rec."Virtual Item Process ErrMsg" <> '' then
+                                    Message(Rec."Virtual Item Process ErrMsg")
+                                else
+                                    Message(NoErrorMsg);
+
+                            Rec."Virtual Item Process Status"::Processed:
+                                case Rec.Subtype of
+                                    Rec.Subtype::Coupon:
+                                        EcomCreateCouponProcess.ShowRelatedCouponsAction(Rec);
+                                    Rec.Subtype::Membership:
+                                        EcomCreateMMShipProcess.ShowRelatedMembershipsAction(Rec);
+                                    Rec.Subtype::Ticket:
+                                        EcomCreateTicketProcess.ShowRelatedTicketsAction(Rec);
+                                    Rec.Subtype::Voucher:
+                                        EcomCreateVchrProcess.ShowRelatedVouchersAction(Rec);
+                                end;
+                        end;
+                    end;
                 }
                 field("Virtual Item Process ErrMsg"; Rec."Virtual Item Process ErrMsg")
                 {
@@ -110,15 +157,54 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     ToolTip = 'Specifies the value of the Virtual Item Process ErrMsg field.';
                     StyleExpr = _VirtualItemErrorTextStyle;
                 }
+                field("Is Attraction Wallet"; Rec."Is Attraction Wallet")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Indicates whether the line represents an attraction wallet parent line.';
+                }
+                field("Attr. Wallets Processing Status"; Rec."Attr. Wallet Processing Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the attraction wallet processing status.';
+                    StyleExpr = _WalletProcessingStatusStyleText;
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    var
+                        EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+                    begin
+                        case Rec."Attr. Wallet Processing Status" of
+                            Rec."Attr. Wallet Processing Status"::Error:
+                                ShowWalletErrorMessage();
+                            Rec."Attr. Wallet Processing Status"::Processed:
+                                EcomCreateWalletMgt.ShowRelatedWallets(Database::"NPR Ecom Sales Line", Rec.SystemId);
+                        end;
+                    end;
+                }
+                field("Attr. Wallet Retry Count"; Rec."Attr. Wallet Retry Count")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the number of times processing has been retried for this attraction wallet line.';
+                    Visible = false;
+                }
+                field("Attr. Wallet Process ErrMsg"; Rec."Attr. Wallet Process ErrMsg")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Attr. Wallet Process Error Message';
+                    ToolTip = 'Specifies the error message if there was an error when processing this attraction wallet line.';
+                    AssistEdit = true;
+                    Visible = false;
+                    StyleExpr = _WalletProcessingStatusStyleText;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ShowWalletErrorMessage();
+                    end;
+                }
                 field("Voucher Type"; Rec."Voucher Type")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Voucher Type field.';
-                }
-                field(Subtype; Rec.Subtype)
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the business domain of the item line. Ticket indicates the line contains a ticket item as configured in BC item setup.';
                 }
                 field("Membership Id"; Rec."Membership Id")
                 {
@@ -259,6 +345,7 @@ page 6248182 "NPR Ecom Sales Doc Sub"
         _HideNullGuid: Boolean;
         _VirtualItemProcessingStatusStyle: Text;
         _VirtualItemErrorTextStyle: Text;
+        _WalletProcessingStatusStyleText: Text;
 
     local procedure GetGlobals()
     begin
@@ -276,6 +363,17 @@ page 6248182 "NPR Ecom Sales Doc Sub"
     begin
         _VirtualItemProcessingStatusStyle := EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
         _VirtualItemErrorTextStyle := EcomVirtualItemMgt.GetVirtualItemErrorTextStyle(Rec);
+        _WalletProcessingStatusStyleText := EcomVirtualItemMgt.GetWalletProcessingStatusStyle(Rec);
+    end;
+
+    local procedure ShowWalletErrorMessage()
+    var
+        NoErrorMsg: Label 'No wallet processing error message was recorded for the document line.';
+    begin
+        if Rec."Attr. Wallet Process ErrMsg" <> '' then
+            Message(Rec."Attr. Wallet Process ErrMsg")
+        else
+            Message(NoErrorMsg);
     end;
 }
 #endif

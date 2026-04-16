@@ -6,6 +6,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
 
     trigger OnRun()
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
         StartTime: DateTime;
@@ -18,8 +19,10 @@ codeunit 6248580 "NPR Entria Order Import JQ"
             if ShouldSoftExit(Rec.ID, Span) then
                 exit;
             ProcessEnabledStores();
-            Sleep(1000);
-        until (not Rec."Recurring Job") or DurationLimitReached(StartTime, MaxDuration);
+            Commit();
+            if Rec."Recurring Job" then
+                Sleep(1000);
+        until (not Rec."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
 
         Span.Finish();
         FinalizeStoresMarkers();
@@ -35,27 +38,13 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     end;
 
     local procedure ShouldSoftExit(JobQueueEntryID: Guid; var Span: Codeunit "NPR Sentry Span"): Boolean
+    var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
-        if not ShouldSoftExit(JobQueueEntryID) then
+        if not EcomJobManagement.ShouldSoftExit(JobQueueEntryID) then
             exit(false);
         Span.Finish();
         exit(true);
-    end;
-
-    internal procedure ShouldSoftExit(JobQueueEntryId: Guid): Boolean
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        ///When the status of the Job Queue that's running in a loop is changed to On Hold - active session won't be stopped.
-        ///Job Queue will still run in background until loop finishes or exits on its own.
-        ///This way, we'll exit the loop and stop further execution.
-        ///The Error status is handled in case of unexpected behavior after an app upgrade — the JQ might get stuck in an error state while the log still shows it as being in process.
-        if not JobQueueEntry.Get(JobQueueEntryId) then
-            exit(true);
-
-        if JobQueueEntry.Status in [JobQueueEntry.Status::"On Hold", JobQueueEntry.Status::Error] then
-            exit(true);
-        exit(false);
     end;
 
     internal procedure ProcessEnabledStores()
@@ -403,11 +392,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     local procedure GetDefaultFromDT(): DateTime
     begin
         exit(CreateDateTime(DMY2Date(1, 1, 2024), 0T));
-    end;
-
-    local procedure DurationLimitReached(StartDateTime: DateTime; DurationLimit: Duration): Boolean
-    begin
-        exit(CurrentDateTime - StartDateTime >= DurationLimit);
     end;
 
     internal procedure SetupJobQueue(Enable: Boolean)

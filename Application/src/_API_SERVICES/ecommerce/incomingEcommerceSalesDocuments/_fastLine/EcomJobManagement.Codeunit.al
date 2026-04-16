@@ -16,16 +16,19 @@ codeunit 6248560 "NPR Ecom Job Management"
         exit(BucketLbl);
     end;
 
-
     internal procedure OpenJobQueueList()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        EcomCreateCouponJQ: Codeunit "NPR EcomCreateCouponJQ";
         EcomCreateVoucherJQ: Codeunit "NPR EcomCreateVoucherJQ";
         EcomCreateTicketJQ: Codeunit "NPR EcomCreateTicketJQ";
         EcomCreateMembershipJQ: Codeunit "NPR EcomCreateMembershipJQ";
+        EcomProcessWalletsJQ: Codeunit "NPR EcomProcessWalletsJQ";
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.Setfilter("Object ID to Run", '%1|%2|%3', EcomCreateVoucherJQ.GetCodeunitId(), EcomCreateTicketJQ.GetCodeunitId(), EcomCreateMembershipJQ.GetCodeunitId());
+        JobQueueEntry.Setfilter("Object ID to Run", '%1|%2|%3|%4|%5',
+            EcomCreateVoucherJQ.GetCodeunitId(), EcomCreateTicketJQ.GetCodeunitId(), EcomCreateMembershipJQ.GetCodeunitId(),
+            EcomCreateCouponJQ.GetCodeunitId(), EcomProcessWalletsJQ.GetCodeunitId());
         Page.Run(0, JobQueueEntry);
     end;
 

@@ -107,8 +107,10 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
     internal procedure UpdateEcomSalesLineCaptureStatusProcessed(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var FullAmtCaptured: Boolean)
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesLine2: Record "NPR Ecom Sales Line";
         CapturedPaymentLine: Record "NPR Magento Payment Line";
         EcomVirtualItemEvents: Codeunit "NPR EcomVirtualItemEvents";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         CapturedPaymentAmount: Decimal;
         CapturedSalesAmount: Decimal;
         SalesAmount: Decimal;
@@ -121,8 +123,8 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
 
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership);
-        EcomSalesLine.SetFilter("Unit Price", '<>0');
+        EcomVirtualItemMgt.SetVirtualItemSubtypeFilter(EcomSalesLine);
+        EcomSalesLine.SetFilter("Line Amount", '<>0');
         EcomSalesLine.SetFilter(Quantity, '<>0');
         EcomSalesLine.SetRange(Captured, true);
         EcomSalesLine.SetLoadFields("Line Amount", "VAT %");
@@ -137,8 +139,7 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
         CapturedPaymentAmount -= CapturedSalesAmount;
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership);
-        EcomSalesLine.SetFilter("Unit Price", '<>0');
+        EcomVirtualItemMgt.SetVirtualItemSubtypeFilter(EcomSalesLine);
         EcomSalesLine.SetFilter(Quantity, '<>0');
         EcomSalesLine.SetRange(Captured, false);
         EcomSalesLine.ReadIsolation := EcomSalesLine.ReadIsolation::UpdLock;
@@ -149,12 +150,13 @@ codeunit 6248649 "NPR EcomLineCaptureProcess"
                 else
                     SalesAmount := EcomSalesLine."Line Amount";
                 CapturedPaymentAmount -= SalesAmount;
-                if CapturedPaymentAmount >= 0 then begin
-                    EcomSalesLine.Captured := true;
-                    EcomVirtualItemEvents.OnUpdateEcomSalesLineCaptureStatusProcessedBeforeModify(EcomSalesHeader, CapturedPaymentAmount, EcomSalesLine);
-                    EcomSalesLine.Modify();
+                if (CapturedPaymentAmount >= 0) or (SalesAmount = 0) then begin
+                    EcomSalesLine2 := EcomSalesLine;
+                    EcomSalesLine2.Captured := true;
+                    EcomVirtualItemEvents.OnUpdateEcomSalesLineCaptureStatusProcessedBeforeModify(EcomSalesHeader, CapturedPaymentAmount, EcomSalesLine2);
+                    EcomSalesLine2.Modify();
                 end;
-            until (EcomSalesLine.Next() = 0) or (CapturedPaymentAmount <= 0);
+            until EcomSalesLine.Next() = 0;
 
         FullAmtCaptured := CapturedPaymentAmount >= 0;
     end;

@@ -359,6 +359,18 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             PAGE.Run(0, Membership);
     end;
 
+    internal procedure ShowRelatedMembershipsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        if IsNullGuid(EcomSalesLine."Membership Id") then
+            exit;
+        if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
+            exit;
+        Membership.SetRecFilter();
+        Page.Run(Page::"NPR MM Membership Card", Membership);
+    end;
+
     local procedure CreateMembershipPaymentMethods(EcomSalesHeader: Record "NPR Ecom Sales Header"; Membership: Record "NPR MM Membership")
     var
         TempPaymentLine: Record "NPR Magento Payment Line" temporary;

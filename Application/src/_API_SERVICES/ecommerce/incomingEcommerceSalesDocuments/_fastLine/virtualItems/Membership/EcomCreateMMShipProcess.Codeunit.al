@@ -157,6 +157,13 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
         EcomCreateMMShipImpl.ShowRelatedMembershipsAction(EcomSalesHeader);
     end;
 
+    internal procedure ShowRelatedMembershipsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+    begin
+        EcomCreateMMShipImpl.ShowRelatedMembershipsAction(EcomSalesLine);
+    end;
+
     internal procedure SetUpdateRetryCount(UpdateRetryCount: Boolean)
     begin
         _UpdateRetryCount := UpdateRetryCount;

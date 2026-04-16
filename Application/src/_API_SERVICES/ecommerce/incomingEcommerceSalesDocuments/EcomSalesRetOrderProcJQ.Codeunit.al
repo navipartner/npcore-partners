@@ -22,7 +22,9 @@ codeunit 6248613 "NPR EcomSalesRetOrderProcJQ"
             if EcomJobManagement.ShouldSoftExit(JobQueueEntry.ID) then
                 exit;
             ProcessSalesReturnOrders(JobQueueEntry);
-            Sleep(1000);
+            Commit();
+            if JobQueueEntry."Recurring Job" then
+                Sleep(1000);
         until (not JobQueueEntry."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
 
     end;

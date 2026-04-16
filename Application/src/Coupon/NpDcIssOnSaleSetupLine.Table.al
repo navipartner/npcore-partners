@@ -101,6 +101,7 @@
         key(Key1; "Coupon Type", "Line No.")
         {
         }
+        key(Key2; Type, "No.", "Variant Code") { }
     }
 }
 

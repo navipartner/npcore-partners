@@ -671,17 +671,26 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
     local procedure ValidateImportedLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomCreateCouponImpl: Codeunit "NPR EcomCreateCouponImpl";
     begin
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         if EcomSalesLine.FindSet() then
             repeat
                 ValidateImportedLine(EcomSalesHeader, EcomSalesLine);
             until EcomSalesLine.Next() = 0;
+
+        ValidateBundleIntegrity(EcomSalesHeader);
+        EcomCreateCouponImpl.EnsureNoAttractionCouponsOutsideWallets(EcomSalesHeader);
+        UpdateIndentation(EcomSalesHeader);
+        EnsureNoUnsupportedAssetsInWallets(EcomSalesHeader);
     end;
 
     local procedure ValidateImportedLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        CouldNotIdentifyCouponTypeErr: Label 'The type of coupon on line %1 could not be identified. Please ensure that the item number or barcode corresponds to a valid coupon item.', Comment = '%1 - line no.';
+        FractionalQtyErr: Label 'Whole numbers only are accepted as the quantity for ticket, membership or coupon lines. Received quantity on line %1: %2.', Comment = '%1 - line no., %2 - received quantity';
         MissingItemNoErr: Label 'Item number is missing on line %1.', Comment = '%1 - line no.';
         MissingTicketReservationLineErr: Label '%1 is set on the document, but ticket line %2 is missing %3.', Comment = '%1 - token field caption, %2 - line no., %3 - reservation line id field caption';
         MissingSubtypeErr: Label 'Line subtype is not set for line %1.', Comment = '%1 - line no.';
@@ -709,6 +718,11 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
                                 else
                                     EcomCreateMMShipImpl.ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader)
                             end;
+                        EcomSalesLine.Subtype::Coupon:
+                            begin
+                                if not EcomVirtualItemMgt.IsCouponItem(EcomSalesLine, true) then
+                                    Error(CouldNotIdentifyCouponTypeErr, EcomSalesLine."Line No.");
+                            end;
                         else
                             Error(MissingSubtypeErr, EcomSalesLine."Line No.");
                     end;
@@ -716,6 +730,10 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
             EcomSalesLine.Type::Voucher:
                 ValidateImportedVoucherLine(EcomSalesLine);
         end;
+
+        if EcomSalesLine.Subtype in [EcomSalesLine.Subtype::Coupon, EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Membership] then
+            if EcomSalesLine.Quantity <> Round(EcomSalesLine.Quantity, 1) then  // quantity must be a whole number
+                Error(FractionalQtyErr, EcomSalesLine."Line No.", EcomSalesLine.Quantity);
     end;
 
     local procedure ValidateImportedVItemNo(EcomSalesLine: Record "NPR Ecom Sales Line")
@@ -756,6 +774,183 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
                 exit;//allow orders with no payments if total amount is 0
             Error(NoPaymentLinesErr, EcomSalesHeader."External No.");
         end;
+    end;
+
+    internal procedure ValidateBundleIntegrity(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        LineIds: List of [Text[100]];
+        xParentExtLineId: Text[100];
+        DuplicateLineIdErr: Label 'Duplicate line ID %1 found in ecom sales document %2.', Comment = '%1 - external line id, %2 - external document number', Locked = true;
+        NonExistentParentLineErr: Label 'Parent line with line ID %1 does not exist in document %2.', Comment = '%1 - parent external line id, %2 - external document number', Locked = true;
+        ReferenceItselfErr: Label 'Line with line ID %1 cannot reference itself as parent line in document %2.', Comment = '%1 - external line id, %2 - external document number', Locked = true;
+    begin
+        // Check all Line IDs are unique within the document
+        Clear(LineIds);
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetFilter("External Line ID", '<>%1', '');
+        EcomSalesLine.SetLoadFields("External Line ID");
+        if EcomSalesLine.FindSet() then
+            repeat
+                if LineIds.Contains(EcomSalesLine."External Line ID") then
+                    Error(DuplicateLineIdErr, EcomSalesLine."External Line ID", EcomSalesHeader."External No.");
+                LineIds.Add(EcomSalesLine."External Line ID");
+            until EcomSalesLine.Next() = 0;
+
+        // Check bundle components reference a parent line that exists
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetCurrentKey("Document Entry No.", "Parent Ext. Line ID");
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetFilter("Parent Ext. Line ID", '<>%1', '');
+        if EcomSalesLine.IsEmpty() then
+            exit; // If there are no lines with a parent line id, skip the rest of the validation
+
+        EcomSalesLine.SetLoadFields("External Line ID", "Parent Ext. Line ID");
+        if EcomSalesLine.FindSet() then
+            repeat
+                if EcomSalesLine."Parent Ext. Line ID" <> xParentExtLineId then begin
+                    if not LineIds.Contains(EcomSalesLine."Parent Ext. Line ID") then
+                        Error(NonExistentParentLineErr, EcomSalesLine."Parent Ext. Line ID", EcomSalesHeader."External No.");
+                    xParentExtLineId := EcomSalesLine."Parent Ext. Line ID";
+                end;
+                if EcomSalesLine."External Line ID" = EcomSalesLine."Parent Ext. Line ID" then
+                    Error(ReferenceItselfErr, EcomSalesLine."External Line ID", EcomSalesHeader."External No.");
+            until EcomSalesLine.Next() = 0;
+
+        // Check bundle components do not reference each other in a circular manner
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetCurrentKey("Document Entry No.", "Parent Ext. Line ID", "External Line ID");
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetFilter("External Line ID", '<>%1', '');
+        EcomSalesLine.SetLoadFields("External Line ID");
+        if EcomSalesLine.FindSet() then
+            repeat
+                Clear(LineIds);
+                LineIds.Add(EcomSalesLine."External Line ID");
+                CheckBundleComponentLinesForCircularReferences(EcomSalesLine, LineIds);
+            until EcomSalesLine.Next() = 0;
+    end;
+
+    local procedure CheckBundleComponentLinesForCircularReferences(ParentEcomSalesLine: Record "NPR Ecom Sales Line"; var BundleLineIds: List of [Text[100]])
+    var
+        BundleComponentLine: Record "NPR Ecom Sales Line";
+        CircularReferenceErr: Label 'Circular reference detected in bundle components for line ID %1', Comment = '%1 - external line id', Locked = true;
+    begin
+        if ParentEcomSalesLine."External Line ID" = '' then
+            exit; // Lines without a Line ID cannot be the parent of a bundle, so skip processing
+
+        BundleComponentLine.SetCurrentKey("Document Entry No.", "Parent Ext. Line ID", "External Line ID");
+        BundleComponentLine.SetRange("Document Entry No.", ParentEcomSalesLine."Document Entry No.");
+        BundleComponentLine.SetRange("Parent Ext. Line ID", ParentEcomSalesLine."External Line ID");
+        BundleComponentLine.SetFilter("External Line ID", '<>%1&<>%2', '', ParentEcomSalesLine."External Line ID");
+        BundleComponentLine.SetLoadFields("External Line ID", "Parent Ext. Line ID");
+        if BundleComponentLine.FindSet() then
+            repeat
+                if BundleLineIds.Contains(BundleComponentLine."External Line ID") then
+                    Error(CircularReferenceErr, BundleComponentLine."External Line ID");
+                BundleLineIds.Add(BundleComponentLine."External Line ID");
+
+                CheckBundleComponentLinesForCircularReferences(BundleComponentLine, BundleLineIds);
+            until BundleComponentLine.Next() = 0;
+    end;
+
+    internal procedure UpdateIndentation(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        EcomSalesLine.SetCurrentKey("Document Entry No.", "Parent Ext. Line ID");
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetFilter(Indentation, '<>%1', 0);
+        if not EcomSalesLine.IsEmpty() then
+            EcomSalesLine.ModifyAll(Indentation, 0);
+        EcomSalesLine.SetRange(Indentation);
+        EcomSalesLine.SetFilter("Parent Ext. Line ID", '<>%1', '');
+        if EcomSalesLine.IsEmpty() then
+            exit; // If there are no lines with a parent line id, skip the rest of the processing
+
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetCurrentKey("Document Entry No.", "Parent Ext. Line ID", "External Line ID");
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange("Parent Ext. Line ID", '');
+        EcomSalesLine.SetFilter("External Line ID", '<>%1', '');
+        EcomSalesLine.SetLoadFields("External Line ID", Indentation);
+        if EcomSalesLine.FindSet() then
+            repeat
+                UpdateIndentation(EcomSalesLine);
+            until EcomSalesLine.Next() = 0;
+    end;
+
+    local procedure UpdateIndentation(ParentEcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        BundleComponentLine: Record "NPR Ecom Sales Line";
+        BundleComponentLine2: Record "NPR Ecom Sales Line";
+    begin
+        if ParentEcomSalesLine."External Line ID" = '' then
+            exit; // Lines without a Line ID cannot be the parent of a bundle, so skip processing
+
+        BundleComponentLine2.ReadIsolation := IsolationLevel::UpdLock;
+
+        BundleComponentLine.SetCurrentKey("Document Entry No.", "Parent Ext. Line ID", "External Line ID");
+        BundleComponentLine.SetRange("Document Entry No.", ParentEcomSalesLine."Document Entry No.");
+        BundleComponentLine.SetRange("Parent Ext. Line ID", ParentEcomSalesLine."External Line ID");
+        BundleComponentLine.SetFilter("External Line ID", '<>%1', ParentEcomSalesLine."External Line ID");
+        BundleComponentLine.SetLoadFields("External Line ID", "Parent Ext. Line ID", Indentation);
+        if BundleComponentLine.FindSet() then
+            repeat
+                if BundleComponentLine.Indentation <> ParentEcomSalesLine.Indentation + 1 then begin
+                    BundleComponentLine2.Get(BundleComponentLine.RecordId());
+                    BundleComponentLine2.Indentation := ParentEcomSalesLine.Indentation + 1;
+                    BundleComponentLine2.Modify();
+                    BundleComponentLine.Indentation := BundleComponentLine2.Indentation;
+                end;
+                UpdateIndentation(BundleComponentLine);
+            until BundleComponentLine.Next() = 0;
+    end;
+
+    [Obsolete('This is a temporary limitation. Will be removed when we fully support vouchers and memberships as attraction wallet components.', '2026-04-08')]
+    internal procedure EnsureNoUnsupportedAssetsInWallets(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        ParentEcomSalesLine: Record "NPR Ecom Sales Line";
+    begin
+        ParentEcomSalesLine.SetCurrentKey("Document Entry No.", "Is Attraction Wallet");
+        ParentEcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        ParentEcomSalesLine.SetRange("Is Attraction Wallet", true);
+        ParentEcomSalesLine.SetLoadFields("External Line ID", Subtype);
+        if ParentEcomSalesLine.FindSet() then
+            repeat
+                EnsureNoUnsupportedAssetsInWalletComponentLines(ParentEcomSalesLine);
+            until ParentEcomSalesLine.Next() = 0;
+    end;
+
+    local procedure EnsureNoUnsupportedAssetsInWalletComponentLines(ParentEcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        BundleComponentLine: Record "NPR Ecom Sales Line";
+        MembershipsNotSupportedAsWalletComponentErr: Label 'Memberships are not supported as attraction wallet component lines. Ecom document line: %1', Comment = '%1 - ecom document line record Id', Locked = true;
+        VoucherNotSupportedAsWalletComponentErr: Label 'Vouchers are not supported as attraction wallet component lines. Ecom document line: %1', Comment = '%1 - ecom document line record Id', Locked = true;
+    begin
+        if ParentEcomSalesLine.Subtype = ParentEcomSalesLine.Subtype::Voucher then
+            Error(VoucherNotSupportedAsWalletComponentErr, ParentEcomSalesLine.RecordId());
+        if ParentEcomSalesLine.Subtype = ParentEcomSalesLine.Subtype::Membership then
+            Error(MembershipsNotSupportedAsWalletComponentErr, ParentEcomSalesLine.RecordId());
+
+        if ParentEcomSalesLine."External Line ID" = '' then
+            exit; // Lines without a Line ID cannot be the parent of a bundle, so skip processing
+
+        BundleComponentLine.SetCurrentKey("Document Entry No.", "Parent Ext. Line ID", "External Line ID", "Is Attraction Wallet", Subtype);
+        BundleComponentLine.SetRange("Document Entry No.", ParentEcomSalesLine."Document Entry No.");
+        BundleComponentLine.SetRange("Parent Ext. Line ID", ParentEcomSalesLine."External Line ID");
+        BundleComponentLine.SetFilter("External Line ID", '<>%1', ParentEcomSalesLine."External Line ID");
+        BundleComponentLine.SetRange("Is Attraction Wallet", false);
+        BundleComponentLine.SetLoadFields(Subtype);
+        if BundleComponentLine.FindSet() then
+            repeat
+                if BundleComponentLine.Subtype = BundleComponentLine.Subtype::Voucher then
+                    Error(VoucherNotSupportedAsWalletComponentErr, BundleComponentLine.RecordId());
+                if BundleComponentLine.Subtype = BundleComponentLine.Subtype::Membership then
+                    Error(MembershipsNotSupportedAsWalletComponentErr, BundleComponentLine.RecordId());
+
+                EnsureNoUnsupportedAssetsInWalletComponentLines(BundleComponentLine);
+            until BundleComponentLine.Next() = 0;
     end;
 }
 #endif

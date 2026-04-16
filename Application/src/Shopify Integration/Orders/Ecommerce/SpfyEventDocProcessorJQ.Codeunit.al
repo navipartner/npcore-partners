@@ -6,9 +6,9 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
     Permissions = tabledata "NPR Spfy Store" = rm;
     trigger OnRun()
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
-        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
         StartTime: DateTime;
         MaxDuration: Duration;
         BucketFilter: text;
@@ -20,16 +20,13 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
         StartTime := CurrentDateTime;
         MaxDuration := JobQueueManagement.HoursToDuration(6);
         repeat
-            if SpfyEcomSalesDocPrcssr.ShouldSoftExit(Rec.ID) then
+            if EcomJobManagement.ShouldSoftExit(Rec.ID) then
                 exit;
             ProcessLogEntries(BucketFilter);
-            Sleep(1000);
-        until DurationLimitReached(StartTime, MaxDuration);
-    end;
-
-    local procedure DurationLimitReached(StartDateTime: DateTime; DurationLimit: Duration): Boolean
-    begin
-        exit(CurrentDateTime - StartDateTime >= DurationLimit);
+            Commit();
+            if Rec."Recurring Job" then
+                Sleep(1000);
+        until not Rec."Recurring Job" or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
     end;
 
     local procedure ProcessLogEntries(BucketFilter: Text)

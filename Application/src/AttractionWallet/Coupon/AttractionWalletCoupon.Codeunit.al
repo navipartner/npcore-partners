@@ -84,7 +84,7 @@ codeunit 6185068 "NPR AttractionWalletCoupon"
         Error(Text001);
     end;
 
-    local procedure ModuleCode(): Code[20]
+    internal procedure ModuleCode(): Code[20]
     begin
         exit('ON-ATTRACTION-WALLET');
     end;

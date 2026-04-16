@@ -12,14 +12,17 @@ codeunit 6248657 "NPR Ecom Sales Doc Post"
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
         SalesLine: Record "Sales Line";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
         if SalesHeader."Document Type" <> SalesHeader."Document Type"::Order then
             exit;
 
-
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetFilter(Subtype, '%1|%2|%3', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Membership);
+        EcomSalesLine.FilterGroup(-1); // Virtual item subtype or attraction wallet
+        EcomVirtualItemMgt.SetVirtualItemSubtypeFilter(EcomSalesLine);
+        EcomSalesLine.SetRange("Is Attraction Wallet", true);
+        EcomSalesLine.FilterGroup(0);
         if not EcomSalesLine.FindSet() then
             exit;
 
@@ -91,7 +94,5 @@ codeunit 6248657 "NPR Ecom Sales Doc Post"
 
         Success := true;
     end;
-
-
 }
 #endif

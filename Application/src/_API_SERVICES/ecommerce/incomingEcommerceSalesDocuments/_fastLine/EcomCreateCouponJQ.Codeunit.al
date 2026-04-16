@@ -1,4 +1,4 @@
-codeunit 6248518 "NPR EcomCreateVoucherJQ"
+codeunit 6151117 "NPR EcomCreateCouponJQ"
 {
     Access = Internal;
     TableNo = "Job Queue Entry";
@@ -6,11 +6,11 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
     trigger OnRun()
     var
     begin
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         Process(Rec)
 #endif
     end;
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
     local procedure Process(var JobQueueEntry: Record "Job Queue Entry")
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
@@ -26,7 +26,7 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
             Commit();
             if JobQueueEntry."Recurring Job" then
                 Sleep(1000);
-        until (not JobQueueEntry."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
+        until not JobQueueEntry."Recurring Job" or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
     end;
 
     local procedure GetDefaultDuration(): Duration
@@ -39,44 +39,38 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
 
     local procedure ProcessRecords(var JobQueueEntry: Record "Job Queue Entry");
     var
-        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         BucketFilter: Text;
     begin
-        if not IncEcomSalesDocSetup.Get() then
-            IncEcomSalesDocSetup.Init();
-
         JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
         if JQParamStrMgt.ContainsParam(EcomJobManagement.ParamBucketFilter()) then
             BucketFilter := JQParamStrMgt.GetParamValueAsText(EcomJobManagement.ParamBucketFilter());
 
-        EcomSalesHeader.Reset();
         EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
         EcomSalesHeader.SetRange("Creation Status", EcomSalesHeader."Creation Status"::Pending);
-        EcomSalesHeader.SetRange("Vouchers Exist", true);
+        EcomSalesHeader.SetRange("Coupons Exist", true);
         EcomSalesHeader.SetFilter("Capture Processing Status", '%1|%2', EcomSalesHeader."Capture Processing Status"::"Partially Processed", EcomSalesHeader."Capture Processing Status"::Processed);
-        EcomSalesHeader.SetFilter("Voucher Processing Status", '%1|%2', EcomSalesHeader."Voucher Processing Status"::"Partially Processed", EcomSalesHeader."Voucher Processing Status"::Pending);
+        EcomSalesHeader.SetFilter("Coupon Processing Status", '%1|%2', EcomSalesHeader."Coupon Processing Status"::"Partially Processed", EcomSalesHeader."Coupon Processing Status"::Pending);
         EcomSalesHeader.SetFilter("Bucket Id", BucketFilter);
-        EcomSalesHeader.SetLoadFields("Entry No.");
         if EcomSalesHeader.FindSet() then
             repeat
-                EcomVirtualItemMgt.CreateVouchers(EcomSalesHeader, false, true);
+                EcomVirtualItemMgt.CreateCoupons(EcomSalesHeader, false, true);
             until EcomSalesHeader.Next() = 0;
     end;
 #endif
     local procedure SetJQDescription(): Text;
     var
-        JobDescriptionLbl: label 'Process Voucher From Ecommerce Document';
+        JobDescriptionLbl: label 'Process Coupon From Ecommerce Document';
     begin
         exit(JobDescriptionLbl);
     end;
 
     internal procedure GetCodeunitId(): Integer;
     begin
-        exit(codeunit::"NPR EcomCreateVoucherJQ");
+        exit(codeunit::"NPR EcomCreateCouponJQ");
     end;
 
     local procedure ScheduleJobQueue()
@@ -88,18 +82,17 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
 
     internal procedure ScheduleJobQueueWithConfirmation()
     var
-        ConfirmManagemnet: Codeunit "Confirm Management";
-        ScheduleJobQueueConfirmLbl: Label 'Are you sure you want to configure the job queue for ecommerce document voucher processing?';
+        ConfirmManagement: Codeunit "Confirm Management";
+        ScheduleJobQueueConfirmLbl: Label 'Are you sure you want to configure the job queue for ecommerce document coupon processing?';
     begin
-        if not ConfirmManagemnet.GetResponseOrDefault(ScheduleJobQueueConfirmLbl, true) then
+        if not ConfirmManagement.GetResponseOrDefault(ScheduleJobQueueConfirmLbl, true) then
             exit;
 
         ScheduleJobQueue();
     end;
 
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-
-    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnAfterValidateEvent, 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry")
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";

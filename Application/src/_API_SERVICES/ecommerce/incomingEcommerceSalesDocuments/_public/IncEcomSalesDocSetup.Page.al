@@ -55,6 +55,11 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Max Capture Retry Count field.';
                     }
+                    field("Max Attr. Wallet Retry Count"; Rec."Max Attr. Wallet Retry Count")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the number of times to retry processing attraction wallets for an ecommerce sales order before setting the wallet processing status to error. Default value is 3.';
+                    }
                     field("Def. Sales Location Code"; Rec."Def. Sales Location Code")
                     {
                         ApplicationArea = NPRRetail;
@@ -211,6 +216,32 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                     NPREcomCreateMembershipJQ.ScheduleJobQueueWithConfirmation();
                 end;
             }
+            action(ConfigureEcomCouponProcessingJobQueue)
+            {
+                Caption = 'Configure Coupon Processing Job Queue';
+                ApplicationArea = NPRRetail;
+                Image = Add;
+                ToolTip = 'Configure Coupon Processing Job Queue';
+                trigger OnAction()
+                var
+                    NPREcomCreateCouponJQ: Codeunit "NPR EcomCreateCouponJQ";
+                begin
+                    NPREcomCreateCouponJQ.ScheduleJobQueueWithConfirmation();
+                end;
+            }
+            action(ConfigureEcomWalletProcessingJobQueue)
+            {
+                Caption = 'Configure Wallet Processing Job Queue';
+                ApplicationArea = NPRRetail;
+                Image = Add;
+                ToolTip = 'Configure Wallet Processing Job Queue';
+                trigger OnAction()
+                var
+                    NPREcomCreateWalletJQ: Codeunit "NPR EcomProcessWalletsJQ";
+                begin
+                    NPREcomCreateWalletJQ.ScheduleJobQueueWithConfirmation();
+                end;
+            }
         }
         area(Navigation)
         {
@@ -267,6 +298,8 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                 actionref(ConfigureEcomSalesReturnOrderProcessingJobQueue_Promoted; ConfigureEcomSalesReturnOrderProcessingJobQueue) { }
                 actionref(ConfigureEcomTicketProcessingJobQueue_Promoted; ConfigureEcomTicketProcessingJobQueue) { }
                 actionref(ConfigureEcomMembershipProcessingJobQueue_Promoted; ConfigureEcomMembershipProcessingJobQueue) { }
+                actionref(ConfigureEcomCouponProcessingJobQueue_Promoted; ConfigureEcomCouponProcessingJobQueue) { }
+                actionref(ConfigureEcomWalletProcessingJobQueue_Promoted; ConfigureEcomWalletProcessingJobQueue) { }
             }
         }
     }
