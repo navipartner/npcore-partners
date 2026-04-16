@@ -926,7 +926,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         if IsHandled then
             exit(true);
 
-        Url := 'https://crocompilance.azurewebsites.net/api/SignReceipt?code=' + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceCROSignReceipt');
+        Url := 'https://cro-fiscalization-gateway.azurewebsites.net/api/SignReceipt?code=' + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceCROSignReceipt');
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
@@ -977,7 +977,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         if IsHandled then
             exit(true);
 
-        Url := 'https://crocompilance.azurewebsites.net/api/GenerateZKI?code=' + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceCROGenerateZKI');
+        Url := 'https://cro-fiscalization-gateway.azurewebsites.net/api/GenerateZKI?code=' + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceCROGenerateZKI');
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
@@ -1001,12 +1001,20 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         ErrorText: Text;
     begin
         Clear(ResponseMessage);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+        Client.UseServerCertificateValidation(false);
+#endif
         IsResponseSuccess := Client.Send(RequestMessage, ResponseMessage);
-        if (not IsResponseSuccess) then
+        if (not IsResponseSuccess) then begin
             if SkipErrorMessage then
-                exit(IsResponseSuccess)
-            else
-                Error(GetLastErrorText);
+                exit(IsResponseSuccess);
+            ErrorText := GetLastErrorText();
+            if ResponseMessage.HttpStatusCode() <> 0 then
+                ErrorText := Format(ResponseMessage.HttpStatusCode(), 0, 9) + ': ' + ResponseMessage.ReasonPhrase;
+            if ResponseMessage.Content.ReadAs(ResponseText) then
+                ErrorText += ':\' + ResponseText;
+            Error(CopyStr(ErrorText, 1, 1000));
+        end;
 
         IsResponseSuccess := ResponseMessage.IsSuccessStatusCode();
         if (not IsResponseSuccess) and (not SkipErrorMessage) and GuiAllowed then begin

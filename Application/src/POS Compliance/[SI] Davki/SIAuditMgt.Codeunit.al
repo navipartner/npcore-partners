@@ -865,7 +865,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         RequestMessage: HttpRequestMessage;
         InStr: InStream;
         RequestMessageLbl: Label '{"certificateBase64": "%1","certificatePass": "%2","methodType": "%3", "URLToSend": "%4", "contentToSign": "%5"}', Locked = true;
-        SignAndSendXMLAzureFunctionURLLbl: Label 'https://slofiscalcompilance.azurewebsites.net/api/SignAndSend?code=', Locked = true;
+        SignAndSendXMLAzureFunctionURLLbl: Label 'https://slo-fiscal-gateway.azurewebsites.net/api/SignAndSend?code=', Locked = true;
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
@@ -900,7 +900,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         RequestMessage: HttpRequestMessage;
         InStr: InStream;
         RequestMessageLbl: Label '{"certificateBase64": "%1","certificatePass": "%2","baseValue": "%3"}', Locked = true;
-        SignZOIAzureFunctionURLLbl: Label 'https://slocompilance.azurewebsites.net/api/GenerateZOI?code=', Locked = true;
+        SignZOIAzureFunctionURLLbl: Label 'https://slo-fiscal-gateway.azurewebsites.net/api/GenerateZOI?code=', Locked = true;
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
@@ -947,12 +947,20 @@ codeunit 6151546 "NPR SI Audit Mgt."
         ErrorText: Text;
     begin
         Clear(ResponseMessage);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
+        Client.UseServerCertificateValidation(false);
+#endif
         IsResponseSuccess := Client.Send(RequestMessage, ResponseMessage);
-        if (not IsResponseSuccess) then
+        if (not IsResponseSuccess) then begin
             if SkipErrorMessage then
-                exit(IsResponseSuccess)
-            else
-                Error(GetLastErrorText);
+                exit(IsResponseSuccess);
+            ErrorText := GetLastErrorText();
+            if ResponseMessage.HttpStatusCode() <> 0 then
+                ErrorText := Format(ResponseMessage.HttpStatusCode(), 0, 9) + ': ' + ResponseMessage.ReasonPhrase;
+            if ResponseMessage.Content.ReadAs(ResponseText) then
+                ErrorText += ':\' + ResponseText;
+            Error(CopyStr(ErrorText, 1, 1000));
+        end;
 
         IsResponseSuccess := ResponseMessage.IsSuccessStatusCode();
         if (not IsResponseSuccess) and (not SkipErrorMessage) and GuiAllowed then begin
