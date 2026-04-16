@@ -168,6 +168,12 @@ page 6248189 "NPR Ecom Sales Documents"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Captured Payment Amount field.';
                 }
+                field("Currency Code"; Rec."Currency Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the currency code of the ecommerce sales document.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
