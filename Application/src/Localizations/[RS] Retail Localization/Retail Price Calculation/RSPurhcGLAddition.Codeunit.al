@@ -312,7 +312,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
     local procedure CalculateRSGLVATAmount(): Decimal
     begin
-        exit((PriceListLine."Unit Price" * TempPurchInvLine.Quantity) * RSRLocalizationMgt.CalculateVATBreakDown(TempPurchInvLine."VAT Bus. Posting Group", TempPurchInvLine."VAT Prod. Posting Group"));
+        exit((PriceListLine."Unit Price" * TempPurchInvLine.Quantity) * RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."VAT Prod. Posting Group"));
     end;
 
     #endregion

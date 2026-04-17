@@ -367,7 +367,7 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         if not PriceListHeader.FindSet() then
             Error(PriceListNotFoundErr, LocationCode);
 
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
+        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)", "VAT Prod. Posting Group");
         PriceListLine.SetRange("Asset No.", ItemNo);
         repeat
             PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
