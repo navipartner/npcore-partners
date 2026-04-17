@@ -945,6 +945,122 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         Assert.AreEqual(1, SubscriptionRequest.Count(), 'Exactly 1 Partial Regret should exist after calling twice.');
     end;
 
+    // === Context Guard Tests (CORE-227) ===
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ProcessMembershipEntryForInitialSale_SkipsRenewContext()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SalePOS: Record "NPR POS Sale";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+        SalesTicketNo: Code[20];
+    begin
+        // [SCENARIO] ProcessMembershipEntryForInitialSale exits early when the membership entry
+        // context is RENEW, preventing an Initial Sale subscription request (regression for CORE-227).
+        Initialize();
+        SalesTicketNo := CopyStr('TEST-RENEW-' + Format(CreateGuid()).Substring(1, 5), 1, MaxStrLen(SalesTicketNo));
+
+        // [GIVEN] A membership with subscription (Auto-Renew = YES_INTERNAL) and all required payment data
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+        Membership.GetBySystemId(MembershipId);
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.FindLast();
+
+        // Set context to RENEW (simulating a POS renewal) and link to the sales ticket
+        MembershipEntry.Context := MembershipEntry.Context::RENEW;
+        MembershipEntry."Original Context" := MembershipEntry."Original Context"::RENEW;
+        MembershipEntry."Receipt No." := SalesTicketNo;
+        MembershipEntry.Modify();
+
+        // Subscription is auto-created with the membership; set Auto-Renew to YES_INTERNAL
+        Assert.IsTrue(SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription), 'Subscription should exist after membership creation.');
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Modify(true);
+
+        CreateMemberPaymentMethod(MemberPaymentMethod);
+        CreateMembershipPmtMethodMap(MembershipPmtMethodMap, MemberPaymentMethod, Membership);
+        CreateEndSaleEFTTransactionRequest(EFTTransactionRequest, SalesTicketNo, 299.00);
+
+        SalePOS.Init();
+        SalePOS."Sales Ticket No." := SalesTicketNo;
+
+        // [WHEN] ProcessMembershipEntryForInitialSale is called with a RENEW-context membership entry
+        SubscriptionMgtImpl.ProcessMembershipEntryForInitialSale(SalePOS, MembershipEntry);
+
+        // [THEN] No Initial Sale subscription request is created
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::"Initial Sale");
+        Assert.IsTrue(SubscriptionRequest.IsEmpty(), 'No Initial Sale subscription request should be created for RENEW context.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ProcessMembershipEntryForInitialSale_CreatesForNewContext()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SalePOS: Record "NPR POS Sale";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+        SalesTicketNo: Code[20];
+    begin
+        // [SCENARIO] ProcessMembershipEntryForInitialSale creates an Initial Sale subscription request
+        // when the membership entry context is NEW (positive test for CORE-227 fix).
+        Initialize();
+        SalesTicketNo := CopyStr('TEST-NEW-' + Format(CreateGuid()).Substring(1, 5), 1, MaxStrLen(SalesTicketNo));
+
+        // [GIVEN] A membership with subscription (Auto-Renew = YES_INTERNAL) and all required payment data
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+        Membership.GetBySystemId(MembershipId);
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.FindLast();
+
+        // Context is already NEW from creation, just link to the sales ticket
+        MembershipEntry."Receipt No." := SalesTicketNo;
+        MembershipEntry.Modify();
+
+        // Subscription is auto-created with the membership; set Auto-Renew to YES_INTERNAL
+        Assert.IsTrue(SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription), 'Subscription should exist after membership creation.');
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Modify(true);
+
+        CreateMemberPaymentMethod(MemberPaymentMethod);
+        CreateMembershipPmtMethodMap(MembershipPmtMethodMap, MemberPaymentMethod, Membership);
+        CreateEndSaleEFTTransactionRequest(EFTTransactionRequest, SalesTicketNo, 299.00);
+
+        SalePOS.Init();
+        SalePOS."Sales Ticket No." := SalesTicketNo;
+
+        // [WHEN] ProcessMembershipEntryForInitialSale is called with a NEW-context membership entry
+        SubscriptionMgtImpl.ProcessMembershipEntryForInitialSale(SalePOS, MembershipEntry);
+
+        // [THEN] An Initial Sale subscription request IS created
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::"Initial Sale");
+        Assert.IsTrue(SubscriptionRequest.FindFirst(), 'Initial Sale subscription request should be created for NEW context.');
+    end;
+
     // === Helper Procedures ===
 
     local procedure Initialize()
@@ -1148,6 +1264,22 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::REFUND;
         EFTTransactionRequest."Recurring Detail Reference" := 'RECURRING-REF-001';
         EFTTransactionRequest."Integration Type" := 'ADYEN_CLOUD';
+        EFTTransactionRequest.Insert(true);
+    end;
+
+    local procedure CreateEndSaleEFTTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; SalesTicketNo: Code[20]; Amount: Decimal)
+    begin
+        EFTTransactionRequest.Init();
+        EFTTransactionRequest."Entry No." := 0;
+        EFTTransactionRequest."Sales Ticket No." := SalesTicketNo;
+        EFTTransactionRequest."Sales Line No." := 10000;
+        EFTTransactionRequest."Result Amount" := Amount;
+        EFTTransactionRequest."PSP Reference" := CopyStr('PSP-' + Format(CreateGuid()), 1, 16);
+        EFTTransactionRequest."Currency Code" := '';
+        EFTTransactionRequest.Successful := true;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::PAYMENT;
+        EFTTransactionRequest."Recurring Detail Reference" := 'RECURRING-REF-TEST';
+        EFTTransactionRequest."Manual Capture" := false;
         EFTTransactionRequest.Insert(true);
     end;
 

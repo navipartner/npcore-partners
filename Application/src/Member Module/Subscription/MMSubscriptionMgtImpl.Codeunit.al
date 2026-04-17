@@ -511,7 +511,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         until MembershipEntry.Next() = 0;
     end;
 
-    local procedure ProcessMembershipEntryForInitialSale(SalePOS: Record "NPR POS Sale"; MembershipEntry: Record "NPR MM Membership Entry")
+    internal procedure ProcessMembershipEntryForInitialSale(SalePOS: Record "NPR POS Sale"; MembershipEntry: Record "NPR MM Membership Entry")
     var
         ActiveMembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -520,6 +520,9 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
+        if MembershipEntry.Context <> MembershipEntry.Context::NEW then
+            exit;
+
         if not Membership.Get(MembershipEntry."Membership Entry No.") then
             exit;
 
