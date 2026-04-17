@@ -8,6 +8,7 @@ codeunit 6248620 "NPR API POS Entry"
         POSEntry: Record "NPR POS Entry";
         JsonArray: Codeunit "NPR Json Builder";
         Params: Dictionary of [Text, Text];
+        WithLines: Boolean;
         POSStoreFilter: Text;
         POSUnitFilter: Text;
         DocumentNoFilter: Text;
@@ -33,6 +34,9 @@ codeunit 6248620 "NPR API POS Entry"
             POSEntry.SetRange("Document No.", DocumentNoFilter);
 
         POSEntry.SetFilter("Entry Type", '<>%1', POSEntry."Entry Type"::Other);
+
+        if Params.ContainsKey('withLines') then
+            Evaluate(WithLines, Params.Get('withLines'));
 
         if Params.ContainsKey('sync') then
             Evaluate(SyncMode, Params.Get('sync'));
@@ -95,7 +99,7 @@ codeunit 6248620 "NPR API POS Entry"
 
         if (DataFound) then
             repeat
-                JsonArray.AddObject(EntryToJson(JsonArray, POSEntry, false, SyncMode));
+                JsonArray.AddObject(EntryToJson(JsonArray, POSEntry, WithLines, SyncMode));
                 Itt += 1;
                 if (Itt = PageSize) then begin
                     RecRef.GetTable(POSEntry);

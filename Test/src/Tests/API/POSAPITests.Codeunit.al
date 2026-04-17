@@ -99,6 +99,101 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure ListEntries_WithLinesParameter_ControlsReturnedLines()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        PaymentLineId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        ReceiptNo: Text;
+        EntriesArray: JsonArray;
+        EntryToken: JsonToken;
+        EntryObject: JsonObject;
+        SalesLines: JsonArray;
+        PaymentLines: JsonArray;
+    begin
+        // [SCENARIO] List POS entries returns lines only when withLines=true is requested
+        Initialize();
+
+        // [GIVEN] A completed sale that created a POS entry
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        PaymentLineId := CreateGuid();
+
+        Body.Add('posUnit', _POSUnit."No.");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        Clear(Body);
+        Body.Add('paymentMethodCode', _CashPaymentMethod.Code);
+        Body.Add('paymentType', 'Cash');
+        Body.Add('amount', _Item."Unit Price");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create payment line should succeed');
+
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('documentNo', JToken), 'Response should contain documentNo');
+        ReceiptNo := JToken.AsValue().AsText();
+
+        // [WHEN] List entries without withLines
+        Clear(QueryParams);
+        QueryParams.Add('documentNo', ReceiptNo);
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/entry', Body, QueryParams, Headers);
+
+        // [THEN] The entry is returned without line arrays
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'List entries without withLines should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('data', JToken), 'Response should contain data');
+        EntriesArray := JToken.AsArray();
+        Assert.AreEqual(1, EntriesArray.Count(), 'Document filter should return exactly one entry');
+        EntriesArray.Get(0, EntryToken);
+        EntryObject := EntryToken.AsObject();
+        Assert.IsFalse(EntryObject.Get('salesLines', JToken), 'salesLines should be omitted by default');
+        Assert.IsFalse(EntryObject.Get('paymentLines', JToken), 'paymentLines should be omitted by default');
+        Assert.IsFalse(EntryObject.Get('taxLines', JToken), 'taxLines should be omitted by default');
+
+        // [WHEN] List entries with withLines=true
+        Clear(QueryParams);
+        QueryParams.Add('documentNo', ReceiptNo);
+        QueryParams.Add('withLines', 'true');
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/entry', Body, QueryParams, Headers);
+
+        // [THEN] The entry includes serialized lines
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'List entries with withLines should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('data', JToken), 'Response should contain data');
+        EntriesArray := JToken.AsArray();
+        Assert.AreEqual(1, EntriesArray.Count(), 'Document filter should still return exactly one entry');
+        EntriesArray.Get(0, EntryToken);
+        EntryObject := EntryToken.AsObject();
+        Assert.IsTrue(EntryObject.Get('salesLines', JToken), 'salesLines should be returned when withLines=true');
+        SalesLines := JToken.AsArray();
+        Assert.AreEqual(1, SalesLines.Count(), 'Completed sale should expose one sales line');
+        Assert.IsTrue(EntryObject.Get('paymentLines', JToken), 'paymentLines should be returned when withLines=true');
+        PaymentLines := JToken.AsArray();
+        Assert.AreEqual(1, PaymentLines.Count(), 'Completed sale should expose one payment line');
+        Assert.IsTrue(EntryObject.Get('taxLines', JToken), 'taxLines should be returned when withLines=true');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSale_MissingPosUnit_ReturnsBadRequest()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
