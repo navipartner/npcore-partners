@@ -259,7 +259,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             Database::"Sales Header":
                 begin
                     SalesHeader.SetLoadFields("Currency Factor", "Dimension Set ID");
-                    DocumentFound := SalesHeader.Get(MagentoPaymentLine."Document No.", MagentoPaymentLine."Document Type");
+                    DocumentFound := SalesHeader.Get(MagentoPaymentLine."Document Type", MagentoPaymentLine."Document No.");
                     if DocumentFound then begin
                         SetDimensions(SalesHeader, DimensionSetID);
                         if SalesHeader."Currency Factor" <> 0 then
