@@ -34,8 +34,6 @@
         RunRequestPage: Boolean;
         RecordSetting: Option "None","Sale Line POS","Sale POS";
         SetRecord: Variant;
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
     begin
@@ -49,7 +47,6 @@
             RecordSetting::"Sale Line POS":
                 begin
                     SaleLine.GetCurrentSaleLine(SaleLinePOS);
-                    POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
                     SaleLinePOS.SetRecFilter();
                     SetRecord := SaleLinePOS;
                     RunReport(ReportId, RunRequestPage, SetRecord)
@@ -57,7 +54,6 @@
             RecordSetting::"Sale POS":
                 begin
                     Sale.GetCurrentSale(SalePOS);
-                    POSSale.GetCurrentSale(SalePOS);
                     SalePOS.SetRecFilter();
                     SetRecord := SalePOS;
                     RunReport(ReportId, RunRequestPage, SetRecord)
