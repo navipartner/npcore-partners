@@ -1153,7 +1153,7 @@
 
     local procedure GetAuthorizationExpirationDurationInDays() AuthorizationExpirationDays: Integer
     begin
-        AuthorizationExpirationDays := CalcDate('<28D>', Today) - Today;
+        AuthorizationExpirationDays := CalcDate('<179D>', Today) - Today;
     end;
 
     #endregion
