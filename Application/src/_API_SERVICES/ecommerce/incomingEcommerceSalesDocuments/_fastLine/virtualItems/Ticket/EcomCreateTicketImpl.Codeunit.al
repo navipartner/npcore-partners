@@ -28,6 +28,7 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
     internal procedure CreateRequestsForTicketLines(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomSalesHeader2: Record "NPR Ecom Sales Header";
+        EcomSalesHeader3: Record "NPR Ecom Sales Header";
     begin
         EcomSalesHeader2.ReadIsolation := EcomSalesHeader2.ReadIsolation::UpdLock;
         EcomSalesHeader2.Get(EcomSalesHeader.RecordId);
@@ -38,7 +39,13 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         CreateReservationRequestsForToken(EcomSalesHeader2);
         if EcomSalesHeader2."Ticket Reservation Token" = '' then
             exit; // No requests created
-        EcomSalesHeader2.Modify(true);
+
+        EcomSalesHeader3.ReadIsolation := EcomSalesHeader3.ReadIsolation::UpdLock;
+        EcomSalesHeader3.Get(EcomSalesHeader.RecordId);
+        if EcomSalesHeader3."Ticket Reservation Token" <> '' then
+            exit; // already processed by another session
+        EcomSalesHeader3."Ticket Reservation Token" := EcomSalesHeader2."Ticket Reservation Token";
+        EcomSalesHeader3.Modify(true);
         Commit();
     end;
 
