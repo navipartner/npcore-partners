@@ -158,6 +158,16 @@ table 6059861 "NPR RS Fiscalisation Setup"
             Caption = 'Receipt Cut Per Section';
             DataClassification = CustomerContent;
         }
+        field(76; "Print Shopify No. on Receipt"; Boolean)
+        {
+            Caption = 'Print Shopify Order No. on Receipt';
+            DataClassification = CustomerContent;
+        }
+        field(77; "Print Customer Info on Receipt"; Boolean)
+        {
+            Caption = 'Print Customer Info on Receipt';
+            DataClassification = CustomerContent;
+        }
         field(90; "Enable POS Entry CLE Posting"; Boolean)
         {
             Caption = 'Enable POS Entry Cust. Ledg. Entry Posting';

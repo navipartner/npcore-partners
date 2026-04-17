@@ -65,6 +65,9 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         if RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE] then
             PrintInvoiceNumberBarcode(Printer, RSPOSAuditLogAuxInfo);
 
+        PrintCustomerInfo(Printer, RSPOSAuditLogAuxInfo."Audit Entry Type", RSPOSAuditLogAuxInfo."Source Document No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+        PrintShopifyOrderNo(Printer, RSPOSAuditLogAuxInfo."Audit Entry Type", RSPOSAuditLogAuxInfo."Source Document No.");
+
         GetRSFiscalisationSetup();
         if RSFiscalisationSetup."Receipt Cut Per Section" then begin
             PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
@@ -154,6 +157,9 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
 
         if RSPOSAuditLogAuxCopy."RS Transaction Type" in [RSPOSAuditLogAuxCopy."RS Transaction Type"::SALE] then
             PrintInvoiceNumberBarcode(Printer, RSPOSAuditLogAuxCopy);
+
+        PrintCustomerInfo(Printer, RSPOSAuditLogAuxCopy."Audit Entry Type", RSPOSAuditLogAuxCopy."Source Document No.", RSPOSAuditLogAuxCopy."POS Entry No.");
+        PrintShopifyOrderNo(Printer, RSPOSAuditLogAuxCopy."Audit Entry Type", RSPOSAuditLogAuxCopy."Source Document No.");
 
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
 
@@ -302,6 +308,88 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         PrintThermalLine(Printer, Create40LengthText(LeftToPayForPrepaymentLbl, '0,00'), 'A11', true, 'CENTER', true, false);
     end;
 
+    #endregion
+
+    #region Customer Info Printing
+    local procedure PrintCustomerInfo(var Printer: Codeunit "NPR RP Line Print Mgt."; AuditEntryType: Enum "NPR RS Audit Entry Type"; SourceDocumentNo: Code[20]; POSEntryNo: Integer)
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        POSEntry: Record "NPR POS Entry";
+        Customer: Record Customer;
+        CustomerName: Text;
+        CustomerAddress: Text;
+        CustomerVATNo: Text;
+        CustomerNameLbl: Label 'Купац: ', Locked = true;
+        VATRegNoLbl: Label 'ПИБ: ', Locked = true;
+    begin
+        GetRSFiscalisationSetup();
+        if not RSFiscalisationSetup."Print Customer Info on Receipt" then
+            exit;
+        case AuditEntryType of
+            AuditEntryType::"Sales Invoice Header":
+                begin
+                    if SourceDocumentNo = '' then
+                        exit;
+                    if not SalesInvoiceHeader.Get(SourceDocumentNo) then
+                        exit;
+                    CustomerName := SalesInvoiceHeader."Bill-to Name";
+                    CustomerAddress := SalesInvoiceHeader."Bill-to Address";
+                    CustomerVATNo := SalesInvoiceHeader."VAT Registration No.";
+                end;
+            AuditEntryType::"POS Entry":
+                begin
+                    if POSEntryNo = 0 then
+                        exit;
+                    if not POSEntry.Get(POSEntryNo) then
+                        exit;
+                    if POSEntry."Customer No." = '' then
+                        exit;
+                    if not Customer.Get(POSEntry."Customer No.") then
+                        exit;
+                    CustomerName := Customer.Name;
+                    CustomerAddress := Customer.Address;
+                    CustomerVATNo := Customer."VAT Registration No.";
+                end;
+            else
+                exit;
+        end;
+        if CustomerName = '' then
+            exit;
+        PrintThermalLine(Printer, CustomerNameLbl + CustomerName, 'A11', false, 'CENTER', true, false);
+        if CustomerAddress <> '' then
+            PrintThermalLine(Printer, CustomerAddress, 'A11', false, 'CENTER', true, false);
+        if CustomerVATNo <> '' then
+            PrintThermalLine(Printer, VATRegNoLbl + CustomerVATNo, 'A11', false, 'CENTER', true, false);
+    end;
+    #endregion
+
+    #region Shopify Order No Printing
+    local procedure PrintShopifyOrderNo(var Printer: Codeunit "NPR RP Line Print Mgt."; AuditEntryType: Enum "NPR RS Audit Entry Type"; SourceDocumentNo: Code[20])
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        RecRef: RecordRef;
+        FieldRef: FieldRef;
+        ShopifyOrderNo: Text;
+        ExternalOrderNoLbl: Label 'Веб наруџбина: ', Locked = true;
+    begin
+        GetRSFiscalisationSetup();
+        if not RSFiscalisationSetup."Print Shopify No. on Receipt" then
+            exit;
+        if SourceDocumentNo = '' then
+            exit;
+        if AuditEntryType <> AuditEntryType::"Sales Invoice Header" then
+            exit;
+        if not SalesInvoiceHeader.Get(SourceDocumentNo) then
+            exit;
+        RecRef.GetTable(SalesInvoiceHeader);
+        if not RecRef.FieldExist(30101) then
+            exit;
+        FieldRef := RecRef.Field(30101);
+        ShopifyOrderNo := Format(FieldRef.Value());
+        if ShopifyOrderNo = '' then
+            exit;
+        PrintThermalLine(Printer, ExternalOrderNoLbl + ShopifyOrderNo, 'A11', false, 'CENTER', true, false);
+    end;
     #endregion
 
     #region Barcode printing

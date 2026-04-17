@@ -80,6 +80,16 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Receipt Cut Per Section field.', Comment = '%';
                 }
+                field("Print Shopify No. on Receipt"; Rec."Print Shopify No. on Receipt")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether the Shopify order number is printed at the end of fiscal receipts. Requires the Shopify Connector app to be installed.';
+                }
+                field("Print Customer Info on Receipt"; Rec."Print Customer Info on Receipt")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether customer name, address and VAT registration number are printed at the end of fiscal receipts.';
+                }
             }
             group(LPFRAccess)
             {
