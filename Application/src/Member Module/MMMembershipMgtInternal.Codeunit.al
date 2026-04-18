@@ -654,11 +654,63 @@
                 if (not MembershipRole.Insert()) then;
             until (MembershipRole.Next() = 0);
 
+        TransferMemberImage(MemberToKeep.SystemId, MemberToRemove.SystemId, NewExternalMemberNo);
+        TransferMemberNotes(MemberToKeep.RecordId(), MemberToRemove.RecordId());
+
         DeleteMember(MemberToRemove."Entry No.", true);
 
         MembershipEvents.OnAfterMemberIsMerged(MemberToKeep, MemberToRemove);
     end;
 
+    local procedure TransferMemberImage(MemberToKeepSystemId: Guid; MemberToRemoveSystemId: Guid; NewExternalMemberNo: Code[20])
+    var
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+        MediaFacade: Codeunit "NPR CloudflareMediaFacade";
+        MediaKey: Text;
+        MediaSystemId: Guid;
+        MediaUploadResponse: JsonObject;
+        MemberToKeep, MemberToRemove : Record "NPR MM Member";
+        ImageInStream: InStream;
+        ImageOutStream: OutStream;
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        if (MemberMedia.IsFeatureEnabled()) then begin
+            if (not MemberMedia.HaveMemberImage(MemberToKeepSystemId)) and MemberMedia.HaveMemberImage(MemberToRemoveSystemId) then
+                if MemberMedia.GetMediaDetails(MemberToRemoveSystemId, MediaSystemId, MediaKey) then begin
+                    MediaUploadResponse.Add('key', MediaKey);
+                    MediaFacade.StoreMediaKey(Database::"NPR MM Member", MemberToKeepSystemId, NewExternalMemberNo, Enum::"NPR CloudflareMediaSelector"::MEMBER_PHOTO, MediaUploadResponse);
+                    MediaFacade.DeleteMediaKey(Database::"NPR MM Member", MemberToRemoveSystemId, Enum::"NPR CloudflareMediaSelector"::MEMBER_PHOTO);
+                end;
+        end else begin
+            if (not MemberToKeep.GetBySystemId(MemberToKeepSystemId)) then
+                exit;
+            if (not MemberToRemove.GetBySystemId(MemberToRemoveSystemId)) then
+                exit;
+            if (not MemberToKeep.Image.HasValue() and MemberToRemove.Image.HasValue()) then begin
+                TempBlob.CreateOutStream(ImageOutStream);
+                MemberToRemove.Image.ExportStream(ImageOutStream);
+                TempBlob.CreateInStream(ImageInStream);
+                MemberToKeep.Image.ImportStream(ImageInStream, MemberToKeep.FieldName(Image));
+                MemberToKeep.Modify();
+            end;
+        end
+    end;
+
+    local procedure TransferMemberNotes(MemberToKeepRecordId: RecordId; MemberToRemoveRecordId: RecordId)
+    var
+        RecordLink, RecordLink2 : Record "Record Link";
+    begin
+        RecordLink.SetCurrentKey("Record ID");
+        RecordLink.SetFilter("Record ID", '=%1', MemberToRemoveRecordId);
+        RecordLink.SetFilter(Type, '=%1', RecordLink.Type::Note);
+        if (RecordLink.FindSet()) then begin
+            repeat
+                RecordLink2.Get(RecordLink."Link ID");
+                RecordLink2."Record ID" := MemberToKeepRecordId;
+                RecordLink2.Modify();
+            until (RecordLink.Next() = 0);
+        end;
+    end;
 
     internal procedure DeleteMember(MemberEntryNo: Integer; ForceMemberDelete: Boolean)
     var
