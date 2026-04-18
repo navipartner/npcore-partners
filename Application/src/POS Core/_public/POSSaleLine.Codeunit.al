@@ -259,8 +259,10 @@
         Rec.Indentation := Line.Indentation;
 
         Return := InsertLineInternal(Rec, true);
+
         SkipPOSInfo := false;
         Rec.SetSkipPOSInfo(SkipPOSInfo);
+        Rec.SetSkipCalcDiscount(false);
         Line := Rec;
 
         if not Return then
@@ -1063,7 +1065,7 @@
     begin
         UseCustomSystemId := Set;
     end;
-    
+
     procedure SetSkipPOSInfo(Skip: Boolean)
     begin
         SkipPOSInfo := Skip;
