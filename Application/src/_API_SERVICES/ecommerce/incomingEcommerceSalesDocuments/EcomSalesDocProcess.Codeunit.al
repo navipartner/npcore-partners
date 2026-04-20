@@ -69,6 +69,23 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
         end;
     end;
 
+    internal procedure UpdateSalesDocVoucherPaymentLineCaptureOnPosting(var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        if PaymentLine."Payment Type" <> PaymentLine."Payment Type"::Voucher then
+            exit;
+
+        if IsNullGuid(PaymentLine."NPR Inc Ecom Sale Id") then
+            exit;
+
+        if PaymentLine."Date Captured" <> 0D then
+            exit;
+
+        PaymentLine."Date Captured" := Today();
+        PaymentLine.Modify(true);
+
+        UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
+    end;
+
     internal procedure UpdateSalesDocPaymentLineCaptureInformation(PaymentLine: Record "NPR Magento Payment Line")
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";

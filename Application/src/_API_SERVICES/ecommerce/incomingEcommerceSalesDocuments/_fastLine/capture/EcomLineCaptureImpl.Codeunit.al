@@ -45,15 +45,21 @@ codeunit 6248647 "NPR EcomLineCaptureImpl"
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        VoucherSalesLineNotFoundErr: Label 'Voucher sales line not found for ecom sale %1 and reference %2. This is a programming bug.', Comment = '%1 - ecom sale id, %2 - voucher reference';
     begin
         //lock records
         PaymentLine.ReadIsolation := PaymentLine.ReadIsolation::UpdLock;
         PaymentLine.Get(PaymentLine.RecordId);
 
+        if PaymentLine."Date Captured" <> 0D then
+            exit;
+
         NpRvSalesLine.Reset();
         NpRvSalesLine.SetRange("NPR Inc Ecom Sale Id", PaymentLine."NPR Inc Ecom Sale Id");
         NpRvSalesLine.SetRange("Reference No.", PaymentLine."No.");
-        NpRvSalesLine.FindFirst();
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+        if not NpRvSalesLine.FindFirst() then
+            Error(VoucherSalesLineNotFoundErr, PaymentLine."NPR Inc Ecom Sale Id", PaymentLine."No.");
 
         if NpRvVoucherMgt.PostIncEcomPayment(NpRvSalesLine, PaymentLine) then begin
             PaymentLine."Date Captured" := Today;
