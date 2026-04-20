@@ -67,6 +67,14 @@ page 6185084 "NPR APIV1 PBI MembPaymMethods"
                 {
                     Caption = 'PAN Last 4 Digits', Locked = true;
                 }
+                field(memberDisplayName; _MemberDisplayName)
+                {
+                    Caption = 'Member Display Name', Locked = true;
+                }
+                field(memberEmail; _MemberEmail)
+                {
+                    Caption = 'Member Email', Locked = true;
+                }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
                 {
@@ -76,4 +84,21 @@ page 6185084 "NPR APIV1 PBI MembPaymMethods"
             }
         }
     }
+
+    var
+        _MemberDisplayName: Text[250];
+        _MemberEmail: Text[80];
+
+    trigger OnAfterGetRecord()
+    var
+        UserAccount: Record "NPR UserAccount";
+    begin
+        Clear(_MemberDisplayName);
+        Clear(_MemberEmail);
+        UserAccount.SetLoadFields(DisplayName, EmailAddress);
+        if UserAccount.Get(Rec."BC Record ID") then begin
+            _MemberDisplayName := UserAccount.DisplayName;
+            _MemberEmail := UserAccount.EmailAddress;
+        end;
+    end;
 }
