@@ -366,9 +366,26 @@
                 {
                     Caption = 'Cloudflare Media';
 
+                    action(MigrateMemberPicturesToCFOnDemand)
+                    {
+                        Caption = 'Migrate Member Pictures - Synchronous Upload to Cloudflare R2';
+                        ToolTip = 'Executes the migration of member pictures to the cloud storage synchronously.';
+                        Image = Action;
+                        ApplicationArea = NPRMembershipAdvanced;
+
+                        trigger OnAction()
+                        var
+                            MemberPictureMgt: Codeunit "NPR MemberImageMigrateToCFR2";
+                            SyncUpload: Label 'This will execute the migration of member pictures to Cloudflare R2 synchronously. It can take a considerable amount of time. Do you want to continue?';
+                        begin
+                            if (Confirm(SyncUpload, false)) then
+                                MemberPictureMgt.Run();
+                        end;
+                    }
+
                     action(MigrateMemberPicturesToCFAsTask)
                     {
-                        Caption = 'Migrate Member Pictures - Asynchronous Upload to Cloudflare R2';
+                        Caption = 'Migrate Member Pictures (TASK) - Asynchronous Upload to Cloudflare R2';
                         ToolTip = 'Executes the migration of member pictures to the cloud storage as a task.';
                         Image = Action;
                         ApplicationArea = NPRMembershipAdvanced;

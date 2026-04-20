@@ -6,14 +6,23 @@ codeunit 6248573 "NPR MemberImageMigrateToCFR2"
 
     var
         _NotEnabledMsg: Label 'Cloudflare Media feature is not enabled. Please enable the feature to run this job.';
-        _IsMigrating: Label 'A migration task is already running. Please wait until it completes before starting a new one or reset the migration start time to be able to force a restart.';
+        _IsMigrating: Label 'A migration task is already running. Please wait until it completes before starting a new one.';
         _CFFeature: Codeunit "NPR MemberImageMediaFeature";
 
     trigger OnRun()
+    var
+        FullMemberScan: Boolean;
     begin
-        SetMigrationStartTime();
-        RunMigration();
-        SetMigrationCompletionTime();
+        if (not _CFFeature.IsFeatureEnabled()) then
+            Error(_NotEnabledMsg);
+
+        FullMemberScan := SetMigrationStartTime();
+
+        RunMigrationFromEnqueued();
+        if (FullMemberScan) then
+            RunMigrationFull();
+
+        SetMigrationCompletionTime(FullMemberScan);
     end;
 
     internal procedure StartMigrationAsync(): Boolean
@@ -37,11 +46,16 @@ codeunit 6248573 "NPR MemberImageMigrateToCFR2"
         if (IsMigrationRunning()) then
             Error(_IsMigrating);
 
-        TaskGuid := TaskScheduler.CreateTask(Codeunit::"NPR MemberImageMigrateToCFR2", Codeunit::"NPR MemberImageMigrateToCFErr", true, CompanyName(), CurrentDateTime());
-
-        MigrationStatus.TaskId := TaskGuid;
+        MigrationStatus.Get();
         MigrationStatus.StartTime := CurrentDateTime();
         MigrationStatus.CompletionTime := 0DT;
+        MigrationStatus.LastFullScanStartTime := 0DT;
+        MigrationStatus.Modify();
+
+        TaskGuid := TaskScheduler.CreateTask(Codeunit::"NPR MemberImageMigrateToCFR2", Codeunit::"NPR MemberImageMigrateToCFErr", true, CompanyName(), CurrentDateTime());
+
+        MigrationStatus.Get();
+        MigrationStatus.TaskId := TaskGuid;
         MigrationStatus.Modify();
         Commit();
 
@@ -71,15 +85,36 @@ codeunit 6248573 "NPR MemberImageMigrateToCFR2"
         exit(StrSubstNo(Completed, Format(MigrationStatus.CompletionTime, 0, 9)));
     end;
 
+    local procedure RunMigrationFromEnqueued(): Integer
+    var
+        MemberMediaUploadQueue: Record "NPR MM MemberMediaUploadQueue";
+        Member: Record "NPR MM Member";
+        MigratedCount: Integer;
+    begin
+        if (MemberMediaUploadQueue.FindSet()) then
+            repeat
+                Commit();
+                if (Member.GetBySystemId(MemberMediaUploadQueue.MemberSystemId)) then
+                    if (MigrateMemberImage(Member)) then
+                        MigratedCount += 1;
 
-    local procedure RunMigration(): Integer
+                // Regardless of whether migration succeeded or not, we remove the entry from the queue to avoid blocking future attempts for the same member.
+                if (not MemberMediaUploadQueue.Delete()) then; // Ignore - record might have been deleted by another process
+
+            until (MemberMediaUploadQueue.Next() = 0);
+
+        if (MigratedCount > 0) then
+            LogMessage(StrSubstNo('[Member Media] %1 member images migrated from the queue.', MigratedCount));
+
+        exit(MigratedCount);
+    end;
+
+
+    local procedure RunMigrationFull(): Integer
     var
         Member: Record "NPR MM Member";
         MemberCount, MigratedCount : Integer;
     begin
-        if (not _CFFeature.IsFeatureEnabled()) then
-            Error(_NotEnabledMsg);
-
         MemberCount := Member.Count();
 
         MigratedCount := 0;
@@ -88,10 +123,11 @@ codeunit 6248573 "NPR MemberImageMigrateToCFR2"
                 Commit();
                 if (MigrateMemberImage(Member)) then
                     MigratedCount += 1;
-            until Member.Next() = 0;
+            until (Member.Next() = 0);
 
+        if (MigratedCount > 0) then
+            LogMessage(StrSubstNo('[Member Media] %1 members scanned, %2 member images migrated.', MemberCount, MigratedCount));
 
-        LogMessage(StrSubstNo('[Member Media] Total members processed: %1, total images migrated: %2', MemberCount, MigratedCount));
         exit(MigratedCount);
     end;
 
@@ -115,7 +151,6 @@ codeunit 6248573 "NPR MemberImageMigrateToCFR2"
         if (not MemberMedia.PutMemberImageFromStream(Member.SystemId, '', InsStr)) then
             exit(false);
 
-        // Put member image is relatively slow re-fetching the member record to clear the image
         Member.SetLoadFields("Entry No.", Image, SystemId);
         Member.GetBySystemId(Member.SystemId);
         Clear(Member.Image);
@@ -124,28 +159,43 @@ codeunit 6248573 "NPR MemberImageMigrateToCFR2"
         exit(true);
     end;
 
-    local procedure SetMigrationStartTime()
+    local procedure SetMigrationStartTime(): Boolean
     var
         MigrationStatus: Record "NPR MemberImageMigrateToCFR2";
     begin
-        MigrationStatus.Get();
+        if (not MigrationStatus.Get()) then begin
+            MigrationStatus.Init();
+            MigrationStatus.Insert();
+        end;
         MigrationStatus.StartTime := CurrentDateTime();
         MigrationStatus.CompletionTime := 0DT;
         MigrationStatus.Modify();
 
-        LogMessage(StrSubstNo('[Member Media] Migration Started: %1', Format(CurrentDateTime(), 0, 9)));
+        // exit true for full member scan
+        if (MigrationStatus.LastFullScanStartTime = 0DT) then
+            exit(true);
+
+        exit((CurrentDateTime() - MigrationStatus.LastFullScanStartTime) > 3600 * 1000);
+
     end;
 
-    local procedure SetMigrationCompletionTime()
+    local procedure SetMigrationCompletionTime(FullMemberScan: Boolean)
     var
         MigrationStatus: Record "NPR MemberImageMigrateToCFR2";
     begin
         MigrationStatus.Get();
         MigrationStatus.CompletionTime := CurrentDateTime();
+        if (FullMemberScan) then
+            MigrationStatus.LastFullScanStartTime := MigrationStatus.CompletionTime;
         Clear(MigrationStatus.TaskId);
+
         MigrationStatus.Modify();
 
-        LogMessage(StrSubstNo('[Member Media] Migration Completed: %1', Format(CurrentDateTime(), 0, 9)));
+        if (FullMemberScan) then
+            LogMessage(StrSubstNo('[Member Media] Full Migration Completed: %1', Format(CurrentDateTime(), 0, 9)))
+        else
+            LogMessage(StrSubstNo('[Member Media] Incremental Migration Completed: %1', Format(CurrentDateTime(), 0, 9)));
+
     end;
 
     local procedure IsMigrationRunning(): Boolean

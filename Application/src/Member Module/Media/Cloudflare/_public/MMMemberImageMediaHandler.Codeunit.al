@@ -174,4 +174,50 @@ codeunit 6248559 "NPR MMMemberImageMediaHandler" implements "NPR CloudflareMigra
 
         exit(MediaFacade.GetMediaKey(Database::"NPR MM Member", MemberId, Enum::"NPR CloudflareMediaSelector"::MEMBER_PHOTO, MediaId, MediaKey));
     end;
+
+    procedure EnqueueMemberImageForUpload(MemberId: Guid): Boolean
+    begin
+        if (not IsFeatureEnabled()) then
+            exit(false);
+
+        exit(EnqueueMemberImageForUploadWorker(MemberId));
+    end;
+
+    procedure EnqueueMembershipImagesForUpload(MembershipEntryNo: Integer)
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        Member: Record "NPR MM Member";
+    begin
+        if (not IsFeatureEnabled()) then
+            exit;
+
+        MembershipRole.SetCurrentKey("Membership Entry No.");
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        if (MembershipRole.FindSet()) then begin
+            Member.SetLoadFields("Entry No.", "SystemId", Image);
+            repeat
+                if (Member.Get(MembershipRole."Member Entry No.")) then
+                    if (Member.Image.HasValue()) then
+                        EnqueueMemberImageForUploadWorker(Member."SystemId");
+            until (MembershipRole.Next() = 0);
+        end;
+    end;
+
+    local procedure EnqueueMemberImageForUploadWorker(MemberId: Guid): Boolean
+    var
+        MemberImageUploadQueue: Record "NPR MM MemberMediaUploadQueue";
+    begin
+        if (IsNullGuid(MemberId)) then
+            exit(false);
+
+        MemberImageUploadQueue.SetCurrentKey(MemberSystemId);
+        MemberImageUploadQueue.SetFilter(MemberSystemId, '%1', MemberId);
+        if (not (MemberImageUploadQueue.IsEmpty())) then
+            exit(false);
+
+        MemberImageUploadQueue.MemberSystemId := MemberId;
+        exit(MemberImageUploadQueue.Insert())
+    end;
+
 }

@@ -3405,6 +3405,7 @@
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberCard: Record "NPR MM Member Card";
+        MediaHandler: Codeunit "NPR MMMemberImageMediaHandler";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
         ValidFromDate: Date;
@@ -3445,6 +3446,8 @@
         end;
 
         LedgerEntryNo := AddMembershipLedgerEntry(MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate, MembershipScheduledForUpdate);
+        MediaHandler.EnqueueMembershipImagesForUpload(MembershipEntryNo);
+
         OnMembershipChangeEvent(MembershipEntryNo);
         Span.Finish();
 
@@ -5382,6 +5385,7 @@
         PlaceHolderLbl: Label '%1%2', Locked = true;
         NationalIdentifierInterface: Interface "NPR NationalIdentifierIface";
         ErrorMessage: Text;
+        MediaHandler: Codeunit "NPR MMMemberImageMediaHandler";
     begin
         Sentry.StartSpan(Span, 'bc.membership.setmemberfields');
 
@@ -5461,6 +5465,7 @@
             MemberInfoCapture.Image.ExportStream(OutStr);
             TempBlob.CreateInStream(InStr);
             Member.Image.ImportStream(InStr, Member.FieldName(Image));
+            MediaHandler.EnqueueMemberImageForUpload(Member.SystemId);
         end;
 
         Member."Display Name" := GetDisplayName(Member);

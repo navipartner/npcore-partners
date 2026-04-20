@@ -28,6 +28,12 @@ table 6151262 "NPR MemberImageMigrateToCFR2"
             DataClassification = CustomerContent;
             Caption = 'Migration Completion Time';
         }
+
+        field(40; LastFullScanStartTime; DateTime)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Last Full Scan Start Time';
+        }
     }
 
     keys
