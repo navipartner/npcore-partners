@@ -535,12 +535,12 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
             if not IsNullGuid(EcomSalesLine."Ticket Reservation Line Id") then
                 if TicketRequest.GetBySystemId(EcomSalesLine."Ticket Reservation Line Id") then begin
                     TicketRequestManager.ConfirmReservationRequestWithValidate(EcomSalesHeader2."Ticket Reservation Token", TicketRequest."Ext. Line Reference No.");
-                    UpdateTicketAmounts(EcomSalesHeader2, EcomSalesLine, TicketRequest);
+                    UpdateTicketOnConfirm(EcomSalesHeader2, EcomSalesLine, TicketRequest);
                 end;
         until EcomSalesLine.Next() = 0;
     end;
 
-    local procedure UpdateTicketAmounts(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; TicketRequest: Record "NPR TM Ticket Reservation Req.")
+    local procedure UpdateTicketOnConfirm(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; TicketRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
         AmountExclVat: Decimal;
@@ -549,9 +549,11 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         CalculateTicketAmounts(EcomSalesHeader, EcomSalesLine, AmountExclVat, AmountInclVat);
         Ticket.Reset();
         Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
-        Ticket.SetLoadFields(AmountExclVat, AmountInclVat);
+        Ticket.SetLoadFields(AmountExclVat, AmountInclVat, "Sales Header No.");
         if Ticket.FindSet(true) then
             repeat
+                if Ticket."Sales Header No." = '' then
+                    Ticket."Sales Header No." := TicketRequest."External Order No.";
                 Ticket.AmountInclVat := AmountInclVat;
                 Ticket.AmountExclVat := AmountExclVat;
                 Ticket.Modify();

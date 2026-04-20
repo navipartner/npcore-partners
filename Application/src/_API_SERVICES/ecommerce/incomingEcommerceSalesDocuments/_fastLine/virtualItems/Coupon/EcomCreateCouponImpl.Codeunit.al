@@ -67,6 +67,7 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
                     Clear(Coupon);
                     Coupon.Init();
                     Coupon.Validate("Coupon Type", CouponType.Code);
+                    Coupon.Description := CopyStr(EcomSalesLine.Description, 1, MaxStrLen(Coupon.Description));
                     Coupon."No." := '';
                     Coupon.Insert(true);
 
