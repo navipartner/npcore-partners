@@ -73,7 +73,7 @@ codeunit 6060102 "NPR POS Action-Set Sale VAT-B."
             until SaleLinePOS.Next() = 0;
         if (NewGenBusPostingGroup <> '') and (SalePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
             SalePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
-        if (NewVATBusPostingGroup <> '') and (SaleLinePOS."VAT Bus. Posting Group" <> VATBusinessPostingGroup.Code) then
+        if (NewVATBusPostingGroup <> '') and (SalePOS."VAT Bus. Posting Group" <> VATBusinessPostingGroup.Code) then
             SalePOS.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup.Code);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
