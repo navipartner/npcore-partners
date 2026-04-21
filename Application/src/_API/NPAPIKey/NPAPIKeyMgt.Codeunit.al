@@ -18,7 +18,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
         InvalidApiKeyFormatErr: Label 'Invalid API Key format.';
         InvalidApiKeySignatureErr: Label 'Invalid API Key signature.';
         OnlySaaSSupportedErr: Label 'NaviPartner API Key feature is supported in SaaS only!';
-        ApiKeyValidationFailedErr: Label 'Error: %1\Details:%2', Comment = '%1 = error message, %2 = details';
+        ApiKeyValidationFailedErr: Label 'Error: %1\Details: %2', Comment = '%1 = error message, %2 = details';
         AtLeastOnePermissionSetMustBeAssignedErr: Label 'At least one permission set must be assigned to the API key before registering an Entra ID application.';
         AtLeastOnePermissionSetMustBeAssignedForSyncErr: Label 'At least one permission set must be assigned to the API key before synchronizing to Entra ID application.';
         FailedToRotateApiKeyErr: Label 'Failed to rotate API key. Status code: %1. Response: %2', Comment = '%1 = HTTP status code, %2 = response body';
@@ -295,6 +295,9 @@ codeunit 6248565 "NPR NP API Key Mgt."
         Signature: Text;
         IsSignatureValid: Boolean;
         JWTVer: Codeunit "NPR JWT RS256 Verification";
+        DetectedIssues: List of [Text];
+        DetectedIssue: Text;
+        IssuesTextBuilder: TextBuilder;
     begin
         JwtParts := ApiKey.Split('.');
         DataToVerify := JwtParts.Get(1) + '.' + JwtParts.Get(2);
@@ -302,8 +305,12 @@ codeunit 6248565 "NPR NP API Key Mgt."
 
         IsSignatureValid := JWTVer.VerifyCompleteJWT(ApiKey, GetPublicCertificateKey(), GetExpectedIssueer(), 'bc-rest-api-proxy', 300);
 
-        if (not IsSignatureValid) then
-            Error(ApiKeyValidationFailedErr, InvalidApiKeySignatureErr, JWTVer.GetLastDetectedIssues());
+        if (not IsSignatureValid) then begin
+            DetectedIssues := JWTVer.GetLastDetectedIssues();
+            foreach DetectedIssue in DetectedIssues do
+                IssuesTextBuilder.AppendLine(DetectedIssue);
+            Error(ApiKeyValidationFailedErr, InvalidApiKeySignatureErr, IssuesTextBuilder.ToText());
+        end;
 
     end;
 

@@ -6,12 +6,12 @@ codeunit 6248567 "NPR JWT RS256 Verification"
     var
         LastDetectedIssues: List of [Text];
         JwtInvalidFormatErr: Label 'JWT token format is invalid';
-        IssuerClaimMismatchErr: Label 'Issuer claim does not match expected value';
-        AudienceClaimMismatchErr: Label 'Audience claim does not match expected value';
-        JwtExpiredErr: Label 'JWT token has expired';
-        JwtIssuedInFutureErr: Label 'JWT token was issued in the future';
-        JwtNotYetValidErr: Label 'JWT token is not yet valid';
-        JwtMissingClaimErr: Label 'Requested claim is missing in JWT payload';
+        IssuerClaimMismatchErr: Label 'Issuer claim does not match expected value. Expected: %1, Actual: %2', Comment = '%1 = expected issuer, %2 = actual issuer';
+        AudienceClaimMismatchErr: Label 'Audience claim does not match expected value. Expected: %1, Actual: %2', Comment = '%1 = expected audience, %2 = actual audience';
+        JwtExpiredErr: Label 'JWT token has expired. Token exp: %1, Current time: %2, Allowed skew: %3s', Comment = '%1 = expiration unix time, %2 = current unix time, %3 = allowed clock skew seconds';
+        JwtIssuedInFutureErr: Label 'JWT token was issued in the future. Token iat: %1, Current time: %2, Allowed skew: %3s', Comment = '%1 = issued at unix time, %2 = current unix time, %3 = allowed clock skew seconds';
+        JwtNotYetValidErr: Label 'JWT token is not yet valid. Token nbf: %1, Current time: %2, Allowed skew: %3s', Comment = '%1 = not before unix time, %2 = current unix time, %3 = allowed clock skew seconds';
+        JwtMissingClaimErr: Label 'Requested claim is missing in JWT payload. Claim: %1', Comment = '%1 = claim name';
         JwtpayloadEmptyErr: Label 'JWT payload is empty';
     //JwtEmptyErr: Label 'JWT token or public key is empty';
     //WrongAlgorithmErr: Label 'Token algorithm is %1, expected %2', Comment = '%1 - actual algorithm, %2 - expected algorithm';
@@ -164,14 +164,14 @@ codeunit 6248567 "NPR JWT RS256 Verification"
         if (ExpectedIssuer <> '') then begin
             JsonParser.GetProperty('iss', IssuerClaim);
             if (IssuerClaim <> ExpectedIssuer) then
-                exit(ExitAndStoreLastDetectedIssue(IssuerClaimMismatchErr));
+                exit(ExitAndStoreLastDetectedIssue(StrSubstNo(IssuerClaimMismatchErr, ExpectedIssuer, IssuerClaim)));
         end;
 
         // Verify audience (aud)
         if (ExpectedAudience <> '') then begin
             JsonParser.GetProperty('aud', AudienceClaim);
             if (AudienceClaim <> ExpectedAudience) then
-                exit(ExitAndStoreLastDetectedIssue(AudienceClaimMismatchErr));
+                exit(ExitAndStoreLastDetectedIssue(StrSubstNo(AudienceClaimMismatchErr, ExpectedAudience, AudienceClaim)));
         end;
 
         // Get current Unix timestamp
@@ -182,7 +182,7 @@ codeunit 6248567 "NPR JWT RS256 Verification"
         JsonParser.GetProperty('exp', ExpirationTime, HasProperty);
         if (HasProperty) then begin
             if (CurrentUnixTime > (ExpirationTime + AllowClockSkewSeconds)) then
-                exit(ExitAndStoreLastDetectedIssue(JwtExpiredErr));
+                exit(ExitAndStoreLastDetectedIssue(StrSubstNo(JwtExpiredErr, ExpirationTime, CurrentUnixTime, AllowClockSkewSeconds)));
         end;
 
         // Verify issued at (iat) - token not issued in the future
@@ -190,7 +190,7 @@ codeunit 6248567 "NPR JWT RS256 Verification"
         JsonParser.GetProperty('iat', IssuedAtTime, HasProperty);
         if (HasProperty) then begin
             if (IssuedAtTime > (CurrentUnixTime + AllowClockSkewSeconds)) then
-                exit(ExitAndStoreLastDetectedIssue(JwtIssuedInFutureErr));
+                exit(ExitAndStoreLastDetectedIssue(StrSubstNo(JwtIssuedInFutureErr, IssuedAtTime, CurrentUnixTime, AllowClockSkewSeconds)));
         end;
 
         // Verify not before (nbf) - token not valid yet
@@ -198,7 +198,7 @@ codeunit 6248567 "NPR JWT RS256 Verification"
         JsonParser.GetProperty('nbf', NotBeforeTime, HasProperty);
         if (HasProperty) then begin
             if (CurrentUnixTime < (NotBeforeTime - AllowClockSkewSeconds)) then
-                exit(ExitAndStoreLastDetectedIssue(JwtNotYetValidErr));  // Token not yet valid
+                exit(ExitAndStoreLastDetectedIssue(StrSubstNo(JwtNotYetValidErr, NotBeforeTime, CurrentUnixTime, AllowClockSkewSeconds)));
         end;
 
         exit(true);
@@ -240,7 +240,7 @@ codeunit 6248567 "NPR JWT RS256 Verification"
         HasProperty := false;
         JsonParser.GetProperty(ClaimName, ClaimValue, HasProperty);
         if (not HasProperty) then
-            exit(ExitAndStoreLastDetectedIssue(JwtMissingClaimErr));
+            exit(ExitAndStoreLastDetectedIssue(StrSubstNo(JwtMissingClaimErr, ClaimName)));
 
         exit(true);
     end;
