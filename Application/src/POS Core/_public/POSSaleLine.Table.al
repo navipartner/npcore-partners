@@ -2096,6 +2096,11 @@
     end;
 
     procedure FindItemSalesPrice(): Decimal
+    begin
+        exit(FindItemSalesPrice(Rec));
+    end;
+
+    procedure FindItemSalesPrice(BaseSaleLinePOS: Record "NPR POS Sale Line"): Decimal
     var
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
@@ -2105,7 +2110,7 @@
         GetPOSHeader();
         TempSaleLinePOS := Rec;
         TempSaleLinePOS."Currency Code" := '';
-        POSSalesPriceCalcMgt.FindItemPrice(SalePOS, TempSaleLinePOS);
+        POSSalesPriceCalcMgt.FindItemPrice(SalePOS, BaseSaleLinePOS, TempSaleLinePOS);
         "Allow Line Discount" := TempSaleLinePOS."Allow Line Discount";
         if not "Allow Line Discount" then begin
             "Discount %" := 0;

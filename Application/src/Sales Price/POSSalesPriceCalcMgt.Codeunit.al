@@ -48,6 +48,14 @@
 
     procedure FindItemPrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
+        xSaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        xSaleLinePOS := SaleLinePOS;
+        FindItemPrice(SalePOS, xSaleLinePOS, SaleLinePOS);
+    end;
+
+    procedure FindItemPrice(SalePOS: Record "NPR POS Sale"; xSaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
         POSUnit: Record "NPR POS Unit";
         PricingProfile: Codeunit "NPR POS Pricing Profile";
         ItemPriceFunction: Text[250];
@@ -69,7 +77,7 @@
             end
         end;
 
-        FindSalesLinePrice(SalePOS, SaleLinePOS);
+        FindSalesLinePrice(SalePOS, xSaleLinePOS, SaleLinePOS);
 
         POSSalesPriceCalcMgtW.OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
         Span.Finish();
@@ -78,6 +86,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Pricing Profile", 'OnFindItemPrice', '', true, true)]
     local procedure FindBestRetailPrice(ItemPriceCodeunitId: Integer; ItemPriceFunctionName: Text[250]; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
     var
+        xSaleLinePOS: Record "NPR POS Sale Line";
         POSSalesPriceCalcMgtW: Codeunit "NPR POS Sales Price Calc.Mgt.W";
     begin
         if ItemPriceCodeunitId <> GetPublisherCodeunitId() then
@@ -86,12 +95,13 @@
             exit;
 
         Handled := true;
-        FindSalesLinePrice(SalePOS, SaleLinePOS);
+        xSaleLinePOS := SaleLinePOS;
+        FindSalesLinePrice(SalePOS, xSaleLinePOS, SaleLinePOS);
 
         POSSalesPriceCalcMgtW.OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
     end;
 
-    local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
+    local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; BaseSaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketPrice: Codeunit "NPR TM Dynamic Price";
     begin
@@ -109,15 +119,16 @@
         Item.Get(SaleLinePOS."No.");
 
         if Item."NPR Group sale" or SaleLinePOS."Custom Price" then begin
+            //The caller must set the correct values in the BaseSaleLinePOS record to ensure that the CalcBestUnitPrice() can correctly recognise differences in VAT, currency and UoM, and perform the necessary conversions
             TempSalesPriceListLine.DeleteAll();
             TempSalesPriceListLine."Source Type" := TempSalesPriceListLine."Source Type"::"All Customers";
             TempSalesPriceListLine."Asset Type" := TempSalesPriceListLine."Asset Type"::Item;
             TempSalesPriceListLine."Asset No." := SaleLinePOS."No.";
-            TempSalesPriceListLine."VAT Bus. Posting Gr. (Price)" := SaleLinePOS."VAT Bus. Posting Group";
-            TempSalesPriceListLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-            TempSalesPriceListLine."Currency Code" := SaleLinePOS."Currency Code";
+            TempSalesPriceListLine."VAT Bus. Posting Gr. (Price)" := BaseSaleLinePOS."VAT Bus. Posting Group";
+            TempSalesPriceListLine."Unit of Measure Code" := BaseSaleLinePOS."Unit of Measure Code";
+            TempSalesPriceListLine."Currency Code" := BaseSaleLinePOS."Currency Code";
             TempSalesPriceListLine."Unit Price" := SaleLinePOS."Unit Price";
-            TempSalesPriceListLine."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
+            TempSalesPriceListLine."Price Includes VAT" := BaseSaleLinePOS."Price Includes VAT";
             TempSalesPriceListLine."Allow Line Disc." := SaleLinePOS."Allow Line Discount";
             TempSalesPriceListLine.Insert();
         end else
