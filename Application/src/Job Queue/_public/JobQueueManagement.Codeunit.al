@@ -1495,4 +1495,14 @@
     internal procedure OnBeforeRenewMonitoredJobQueueEntry(xMonitoredJQEntry: Record "NPR Monitored Job Queue Entry"; var MonitoredJQEntry: Record "NPR Monitored Job Queue Entry")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeBuildMonitoredFromJobQueueEntry(var MonitoredJQEntry: Record "NPR Monitored Job Queue Entry"; JobQueueEntry: Record "Job Queue Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeRestoreJobQueueEntryFromMonitored(var JobQueueEntry: Record "Job Queue Entry"; MonitoredJQEntry: Record "NPR Monitored Job Queue Entry")
+    begin
+    end;
 }

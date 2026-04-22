@@ -1,6 +1,5 @@
 page 6185041 "NPR Monitored JQ Entries"
 {
-    Extensible = false;
     UsageCategory = None;
     Caption = 'Monitored Jobs';
     PageType = ListPart;

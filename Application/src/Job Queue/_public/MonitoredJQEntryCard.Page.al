@@ -8,7 +8,6 @@ page 6185042 "NPR Monitored JQ Entry Card"
     ModifyAllowed = true;
     InsertAllowed = false;
     DeleteAllowed = false;
-    Extensible = false;
 
     layout
     {

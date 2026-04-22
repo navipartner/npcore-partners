@@ -81,6 +81,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         end;
         JobQueueEntry.CalcFields(XML);
         MonitoredJQEntry.TransferFields(JobQueueEntry, false);
+        JobQueueMgt.OnBeforeBuildMonitoredFromJobQueueEntry(MonitoredJQEntry, JobQueueEntry);
         if not IsNullGuid(JobQueueEntry.ID) then
             MonitoredJQEntry."Job Queue Entry ID" := JobQueueEntry.ID;
 

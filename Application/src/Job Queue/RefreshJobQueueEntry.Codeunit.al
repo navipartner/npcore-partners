@@ -67,6 +67,7 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
         Parameters.TransferFields(JQMonitorEntry, false);
         Parameters.ID := JQMonitorEntry."Job Queue Entry ID";
         Parameters."User ID" := JQMonitorEntry."JQ Runner User Name";
+        JobQueueMgt.OnBeforeRestoreJobQueueEntryFromMonitored(Parameters, JQMonitorEntry);
         if JobQueueMgt.InitRecurringJobQueueEntry(Parameters, JobQueueEntry) then begin
             if not ProtectedJob then begin
                 if ManagedByApp.Get(JobQueueEntry.ID) then begin
