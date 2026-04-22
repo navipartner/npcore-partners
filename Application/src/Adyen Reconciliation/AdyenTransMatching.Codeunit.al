@@ -314,6 +314,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     InsertAcquirerPayout(ReconciliationHeader, LineNo);
                     ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::AcquirerPayout;
                 end;
+            'DepositCorrection':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::DepositCorrection;
             'PaymentCost':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::PaymentCost;
             'SentForSettle':
@@ -480,6 +482,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     ReconciliationLine2."Transaction Type"::PaymentCost,
                     ReconciliationLine2."Transaction Type"::MerchantPayout,
                     ReconciliationLine2."Transaction Type"::AcquirerPayout,
+                    ReconciliationLine2."Transaction Type"::DepositCorrection,
                     ReconciliationLine2."Transaction Type"::AdvancementCommissionExternallyWithInfo,
                     ReconciliationLine2."Transaction Type"::RefundedInstallmentExternallyWithInfo,
                     ReconciliationLine2."Transaction Type"::SettledInstallmentExternallyWithInfo:
@@ -603,7 +606,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
         EFTTransactionRequest.SetRange("PSP Reference");
         EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::VOID);
-        EFTTransactionRequest.SetRange("Sales Ticket No.", ReconciliationLine."Merchant Reference");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", CopyStr(ReconciliationLine."Merchant Reference", 1, MaxStrLen(EFTTransactionRequest."Sales Ticket No.")));
         exit(EFTTransactionRequest.FindFirst());
     end;
 
@@ -704,31 +707,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     local procedure TryMatchingAdjustments(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") MatchedEntries: Integer
     var
         FeeCreatePost: Codeunit "NPR Adyen Fee Posting";
-        RecordPrepared: Boolean;
-        GLAccountType: Enum "NPR Adyen Posting GL Accounts";
     begin
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"G/L Entry";
-        RecordPrepared := false;
-        case ReconciliationLine."Transaction Type" of
-            ReconciliationLine."Transaction Type"::Fee:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Fee G/L Account");
-            ReconciliationLine."Transaction Type"::InvoiceDeduction:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Invoice Deduction G/L Account");
-            ReconciliationLine."Transaction Type"::PaymentCost:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Chargeback Fees G/L Account");
-            ReconciliationLine."Transaction Type"::MerchantPayout:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Merchant Payout Account");
-            ReconciliationLine."Transaction Type"::AcquirerPayout:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Acquirer Payout Account");
-            ReconciliationLine."Transaction Type"::AdvancementCommissionExternallyWithInfo:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Advancement External Commission G/L Account");
-            ReconciliationLine."Transaction Type"::RefundedInstallmentExternallyWithInfo:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Refunded External Commission G/L Account");
-            ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Settled External Commission G/L Account");
-        end;
         ReconciliationLine.Status := ReconciliationLine.Status::"Not to be Matched";
-        if RecordPrepared then
+        if PrepareRecords(ReconciliationLine, ReconciliationHeader, FeeCreatePost) then
             if FeeCreatePost.FeePosted(ReconciliationLine) then begin
                 ReconciliationLine."Matching Entry System ID" := FeeCreatePost.GetGlEntrySystemID();
                 ReconciliationLine.Status := ReconciliationLine.Status::Posted;
@@ -1067,29 +1049,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     local procedure TryPostingAdjustments(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") UnPostedEntries: Integer
     var
         FeeCreateAndPost: Codeunit "NPR Adyen Fee Posting";
-        GLAccountType: Enum "NPR Adyen Posting GL Accounts";
-        RecordsOK: Boolean;
     begin
-        RecordsOK := false;
-        case ReconciliationLine."Transaction Type" of
-            ReconciliationLine."Transaction Type"::Fee:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Fee G/L Account");
-            ReconciliationLine."Transaction Type"::InvoiceDeduction:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Invoice Deduction G/L Account");
-            ReconciliationLine."Transaction Type"::PaymentCost:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Chargeback Fees G/L Account");
-            ReconciliationLine."Transaction Type"::MerchantPayout:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Merchant Payout Account");
-            ReconciliationLine."Transaction Type"::AcquirerPayout:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Acquirer Payout Account");
-            ReconciliationLine."Transaction Type"::AdvancementCommissionExternallyWithInfo:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Advancement External Commission G/L Account");
-            ReconciliationLine."Transaction Type"::RefundedInstallmentExternallyWithInfo:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Refunded External Commission G/L Account");
-            ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo:
-                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Settled External Commission G/L Account");
-        end;
-        if not RecordsOK then begin
+        if not PrepareRecords(ReconciliationLine, ReconciliationHeader, FeeCreateAndPost) then begin
             UnPostedEntries += 1;
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, GetLastErrorText(), ReconciliationHeader."Webhook Request ID");
             exit(UnPostedEntries);
@@ -1103,6 +1064,32 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
         ReconciliationLine."Matching Entry System ID" := FeeCreateAndPost.GetGlEntrySystemID();
         ReconciliationLine.Status := ReconciliationLine.Status::Posted;
+    end;
+
+    local procedure PrepareRecords(ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; var FeeCreateAndPost: Codeunit "NPR Adyen Fee Posting") RecordsPrepared: Boolean
+    var
+        GLAccountType: Enum "NPR Adyen Posting GL Accounts";
+    begin
+        case ReconciliationLine."Transaction Type" of
+            ReconciliationLine."Transaction Type"::Fee:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Fee G/L Account");
+            ReconciliationLine."Transaction Type"::InvoiceDeduction:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Invoice Deduction G/L Account");
+            ReconciliationLine."Transaction Type"::PaymentCost:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Chargeback Fees G/L Account");
+            ReconciliationLine."Transaction Type"::MerchantPayout:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Merchant Payout Account");
+            ReconciliationLine."Transaction Type"::AcquirerPayout:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Acquirer Payout Account");
+            ReconciliationLine."Transaction Type"::DepositCorrection:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Deposit G/L Account");
+            ReconciliationLine."Transaction Type"::AdvancementCommissionExternallyWithInfo:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Advancement External Commission G/L Account");
+            ReconciliationLine."Transaction Type"::RefundedInstallmentExternallyWithInfo:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Refunded External Commission G/L Account");
+            ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo:
+                RecordsPrepared := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Settled External Commission G/L Account");
+        end;
     end;
 
     local procedure AssignPostingDateAndNo(var ReconLine: Record "NPR Adyen Recon. Line"; ReconHeader: Record "NPR Adyen Reconciliation Hdr")

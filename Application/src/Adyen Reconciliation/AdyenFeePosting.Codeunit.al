@@ -69,6 +69,8 @@ codeunit 6184827 "NPR Adyen Fee Posting"
                 ReconRelation.SetRange("Amount Type", AmountType::"Merchant Payout");
             _GLAccountType::"Acquirer Payout Account":
                 ReconRelation.SetRange("Amount Type", AmountType::"Acquirer Payout");
+            _GLAccountType::"Deposit G/L Account":
+                ReconRelation.SetRange("Amount Type", AmountType::"Deposit");
             _GLAccountType::"Advancement External Commission G/L Account":
                 ReconRelation.SetRange("Amount Type", AmountType::"Advancement External Commission");
             _GLAccountType::"Refunded External Commission G/L Account":
@@ -132,6 +134,12 @@ codeunit 6184827 "NPR Adyen Fee Posting"
                     _MerchantCurrencySetup.SetRange("Reconciliation Account Type", _MerchantCurrencySetup."Reconciliation Account Type"::"External Merchant Payout");
                     if _MerchantCurrencySetup.IsEmpty() then
                         _AdyenMerchantSetup.TestField("Acquirer Payout Acc. No.");
+                end;
+            _GLAccountType::"Deposit G/L Account":
+                begin
+                    _MerchantCurrencySetup.SetRange("Reconciliation Account Type", _MerchantCurrencySetup."Reconciliation Account Type"::Deposit);
+                    if _MerchantCurrencySetup.IsEmpty() then
+                        _AdyenMerchantSetup.TestField("Deposit G/L Account");
                 end;
             _GLAccountType::"Advancement External Commission G/L Account":
                 begin
@@ -203,6 +211,14 @@ codeunit 6184827 "NPR Adyen Fee Posting"
                         GenJnlLine.Validate("Account No.", _AdyenMerchantSetup."Acquirer Payout Acc. No.");
                     end;
                     AmountType := AmountType::"Acquirer Payout";
+                end;
+            _GLAccountType::"Deposit G/L Account":
+                begin
+                    if _MerchantCurrencySetup.FindFirst() then
+                        GenJnlLine.Validate("Account No.", _MerchantCurrencySetup."Account No.")
+                    else
+                        GenJnlLine.Validate("Account No.", _AdyenMerchantSetup."Deposit G/L Account");
+                    AmountType := AmountType::Deposit;
                 end;
             _GLAccountType::"Advancement External Commission G/L Account":
                 begin

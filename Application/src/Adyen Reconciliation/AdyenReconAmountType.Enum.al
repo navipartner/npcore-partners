@@ -57,4 +57,8 @@ enum 6014687 "NPR Adyen Recon. Amount Type"
     {
         Caption = 'Realized Losses';
     }
+    value(120; "Deposit")
+    {
+        Caption = 'Deposit';
+    }
 }
