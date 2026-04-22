@@ -44,6 +44,7 @@ codeunit 6060102 "NPR POS Action-Set Sale VAT-B."
         GenBusinessPostingGroup: Record "Gen. Business Posting Group";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
+        BaseSaleLinePOS: Record "NPR POS Sale Line";
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
         NewVATTotal: Decimal;
         OldVATTotal: Decimal;
@@ -60,13 +61,14 @@ codeunit 6060102 "NPR POS Action-Set Sale VAT-B."
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if SaleLinePOS.FindSet() then
             repeat
+                BaseSaleLinePOS := SaleLinePOS;
                 OldVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
                 if (NewGenBusPostingGroup <> '') and (SaleLinePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
                     SaleLinePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
                 if (NewVATBusPostingGroup <> '') and (SaleLinePOS."VAT Bus. Posting Group" <> VATBusinessPostingGroup.Code) then
                     SaleLinePOS.Validate("VAT Bus. Posting Group", NewVATBusPostingGroup);
                 SaleLinePOS.UpdateVATSetup();
-                SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
+                SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice(BaseSaleLinePOS);
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
                 SaleLinePOS.Modify();
                 NewVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
