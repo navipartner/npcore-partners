@@ -193,29 +193,15 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     var
         VoucherSalesLine: Record "NPR NpRv Sales Line";
         Voucher: Record "NPR NpRv Voucher";
-        VoucherMngt: Codeunit "NPR NpRv Voucher Mgt.";
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
-        VoucherInUser: Label 'Voucher with type %1 and reference no. %2 is already in use';
     begin
         if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
             exit;
 
         EcomVirtualItemMgt.FindVoucher(EcomSalesPmtLine, Voucher);
 
-        VoucherSalesLine.Reset();
-        VoucherSalesLine.SetRange("Document Source", VoucherSalesLine."Document Source"::"Sales Document");
-        VoucherSalesLine.SetRange("External Document No.", EcomSalesHeader."External No.");
-        VoucherSalesLine.SetRange("Voucher Type", Voucher."Voucher Type");
-        VoucherSalesLine.SetRange("Voucher No.", Voucher."No.");
-        VoucherSalesLine.SetRange(Type, VoucherSalesLine.Type::Payment);
-        if not VoucherSalesLine.FindFirst() then begin
-            if not VoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
-                if Voucher.CalcInUseQty() > 0 then
-                    Error(VoucherInUser, Voucher."Voucher Type", Voucher."Reference No.");
-            end;
-
-
+        if not FindOrValidateVoucherSalesLine(EcomSalesHeader, Voucher, VoucherSalesLine) then begin
             VoucherSalesLine.Init();
             VoucherSalesLine.Id := CreateGuid();
             VoucherSalesLine."Document Source" := VoucherSalesLine."Document Source"::"Sales Document";
@@ -237,6 +223,28 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         end;
 
         EcomSalesDocApiEvents.OnAfterReserveVoucher(EcomSalesHeader, EcomSalesPmtLine, VoucherSalesLine);
+    end;
+
+    internal procedure FindOrValidateVoucherSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; Voucher: Record "NPR NpRv Voucher"; var VoucherSalesLine: Record "NPR NpRv Sales Line") Found: Boolean
+    var
+        VoucherMngt: Codeunit "NPR NpRv Voucher Mgt.";
+        VoucherInUseErr: Label 'Voucher with type %1 and reference no. %2 is already in use.', Comment = '%1 - voucher type, %2 - reference no.';
+    begin
+        VoucherSalesLine.Reset();
+        VoucherSalesLine.SetRange("Document Source", VoucherSalesLine."Document Source"::"Sales Document");
+        VoucherSalesLine.SetRange("External Document No.", EcomSalesHeader."External No.");
+        VoucherSalesLine.SetRange("Voucher Type", Voucher."Voucher Type");
+        VoucherSalesLine.SetRange("Voucher No.", Voucher."No.");
+        VoucherSalesLine.SetRange(Type, VoucherSalesLine.Type::Payment);
+
+        if VoucherSalesLine.FindFirst() then
+            exit(true);
+
+        if not VoucherMngt.VoucherReservationByAmountFeatureEnabled() then
+            if Voucher.CalcInUseQty() > 0 then
+                Error(VoucherInUseErr, Voucher."Voucher Type", Voucher."Reference No.");
+
+        exit(false);
     end;
 
     local procedure DeserializeIncomingEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
@@ -443,7 +451,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         PaymentMapping: Record "NPR Magento Payment Mapping";
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
-        ExternalPaymentMethodNotSetupErr: Label 'External payment method type: %1, external payment method code: %2 is not set up for payment.', Comment = '%1 - external payment method type, %2 - external payment method code', Locked = true;
         VoucherLbl: Label 'Voucher';
     begin
         EcomSalesPmtLine.Init();
@@ -456,8 +463,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         case EcomSalesPmtLine."Payment Method Type" of
             EcomSalesPmtLine."Payment Method Type"::"Payment Method":
                 begin
-                    if not TryGetPaymentMethod(EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code", PaymentMethod, PaymentMapping) then
-                        Error(ExternalPaymentMethodNotSetupErr, EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code");
+                    ValidatePaymentMethod(EcomSalesPmtLine, PaymentMethod, PaymentMapping);
                     EcomSalesPmtLine.Description := CopyStr(PaymentMethod.Description + ' ' + EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesPmtLine.Description));
                     if IsLoyaltyPointsPaymentLine(PaymentMapping) then
                         EcomSalesPmtLine."Points Payment" := true;
@@ -473,6 +479,16 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 
         if EcomSalesPmtLine."Payment Method Type" = EcomSalesPmtLine."Payment Method Type"::Voucher then
             ReserveVoucher(EcomSalesHeader, EcomSalesPmtLine);
+    end;
+
+    Internal procedure ValidatePaymentMethod(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var PaymentMethod: Record "Payment Method"; var PaymentMapping: Record "NPR Magento Payment Mapping")
+    var
+        ExternalPaymentMethodNotSetupErr: Label 'External payment method type: %1, external payment method code: %2 is not set up for payment.', Comment = '%1 - external payment method type, %2 - external payment method code', Locked = true;
+    begin
+        Clear(PaymentMethod);
+        Clear(PaymentMapping);
+        if not TryGetPaymentMethod(EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code", PaymentMethod, PaymentMapping) then
+            Error(ExternalPaymentMethodNotSetupErr, EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code");
     end;
 
     local procedure DeserializeIncomingEcomSalesPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")

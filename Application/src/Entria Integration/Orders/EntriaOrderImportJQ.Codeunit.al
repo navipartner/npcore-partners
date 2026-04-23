@@ -153,7 +153,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         if UpdatedAtFrom <> 0DT then
             UpdatedAtText := StrSubstNo('&updated_at[$gte]=%1', FormatDateTime(UpdatedAtFrom));
 
-        exit(StrSubstNo('admin/orders?offset=%1&limit=%2&order=updated_at&fields=-summary,+gift_card_transactions,+billing_address.*,+shipping_address.*,+currency_code,+email,+payment_collections.payments.*%3', Offset, Limit, UpdatedAtText));
+        exit(StrSubstNo('admin/orders?offset=%1&limit=%2&order=updated_at&fields=-summary,+billing_address.*,+shipping_address.*,+shipping_methods.name,+currency_code,+email,+payment_collections.payments.*%3', Offset, Limit, UpdatedAtText));
     end;
 
     local procedure FormatDateTime(DT: DateTime): Text

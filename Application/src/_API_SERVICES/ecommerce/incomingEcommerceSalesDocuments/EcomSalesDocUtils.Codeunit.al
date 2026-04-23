@@ -664,6 +664,7 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
     var
         EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
     begin
+        EcomSalesHeader.TestField("External No.");
         if EcomSalesHeader."Ticket Reservation Token" <> '' then
             EcomCreateTicketImpl.ValidateTicketRequest(EcomSalesHeader);
     end;
@@ -693,15 +694,20 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         FractionalQtyErr: Label 'Whole numbers only are accepted as the quantity for ticket, membership or coupon lines. Received quantity on line %1: %2.', Comment = '%1 - line no., %2 - received quantity';
         MissingItemNoErr: Label 'Item number is missing on line %1.', Comment = '%1 - line no.';
         MissingTicketReservationLineErr: Label '%1 is set on the document, but ticket line %2 is missing %3.', Comment = '%1 - token field caption, %2 - line no., %3 - reservation line id field caption';
-        MissingSubtypeErr: Label 'Line subtype is not set for line %1.', Comment = '%1 - line no.';
+        MissingSubtypeErr: Label 'Line subtype is not set for line %1 because the item was not recognized during import.', Comment = '%1 - line no.';
+        UnsupportedWalletItemErr: Label 'Item %1 belongs to a wallet, but items with subtype Item are not supported in wallets.', Comment = '%1 - Item no.';
     begin
         case EcomSalesLine.Type of
             EcomSalesLine.Type::Item:
                 begin
                     case EcomSalesLine.Subtype of
                         EcomSalesLine.Subtype::Item:
-                            if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
-                                error(MissingItemNoErr, EcomSalesLine."Line No.");
+                            begin
+                                if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
+                                    Error(MissingItemNoErr, EcomSalesLine."Line No.");
+                                if EcomSalesline."Parent Ext. Line ID" <> '' then
+                                    Error(UnsupportedWalletItemErr, EcomSalesLine."No.");
+                            end;
                         EcomSalesLine.Subtype::Ticket:
                             begin
                                 ValidateImportedVItemNo(EcomSalesLine);
@@ -730,6 +736,9 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
             EcomSalesLine.Type::Voucher:
                 ValidateImportedVoucherLine(EcomSalesLine);
         end;
+
+        if EcomSalesLine.Type <> EcomSalesLine.Type::Comment then
+            EcomSalesLine.TestField(Quantity);
 
         if EcomSalesLine.Subtype in [EcomSalesLine.Subtype::Coupon, EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Membership] then
             if EcomSalesLine.Quantity <> Round(EcomSalesLine.Quantity, 1) then  // quantity must be a whole number
@@ -768,12 +777,55 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         NoPaymentLinesErr: Label 'Document %1 has no payment lines.', Comment = '%1 - document no.';
     begin
         EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        if EcomSalesPmtLine.IsEmpty() then begin
+        if EcomSalesPmtLine.FindSet() then
+            repeat
+                if (EcomSalesPmtLine."Captured Amount" <> EcomSalesPmtLine.Amount) then
+                    ValidateImportedPaymentLine(EcomSalesHeader, EcomSalesPmtLine);
+            until EcomSalesPmtLine.Next() = 0
+        else begin
             EcomSalesHeader.CalcFields(Amount);
             if EcomSalesHeader.Amount = 0 then
-                exit;//allow orders with no payments if total amount is 0
+                exit; // Allow zero-value orders without payment lines.
+
             Error(NoPaymentLinesErr, EcomSalesHeader."External No.");
         end;
+    end;
+
+    local procedure ValidateImportedPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
+    var
+        NotSupportPaymentTypeErr: Label 'Payment type: %1 is not supported.', Comment = '%1 - payment type';
+    begin
+        case EcomSalesPmtLine."Payment Method Type" of
+            EcomSalesPmtLine."Payment Method Type"::"Payment Method":
+                ValidatePaymentMethodPayment(EcomSalesPmtLine);
+            EcomSalesPmtLine."Payment Method Type"::Voucher:
+                ValidateVoucherPayment(EcomSalesHeader, EcomSalesPmtLine);
+            else
+                Error(NotSupportPaymentTypeErr, EcomSalesPmtLine."Payment Method Type");
+        end;
+
+    end;
+
+    local procedure ValidateVoucherPayment(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
+            exit;
+        _EcomVirtualItemMgt.FindVoucher(EcomSalesPmtLine, Voucher);
+        _EcomSalesDocApiAgentV2.FindOrValidateVoucherSalesLine(EcomSalesHeader, Voucher, VoucherSalesLine);
+    end;
+
+    local procedure ValidatePaymentMethodPayment(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
+    var
+        PaymentMethod: Record "Payment Method";
+        PaymentMapping: Record "NPR Magento Payment Mapping";
+    begin
+        if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::"Payment Method" then
+            exit;
+        EcomSalesPmtLine.TestField("Payment Reference");
+        _EcomSalesDocApiAgentV2.ValidatePaymentMethod(EcomSalesPmtLine, PaymentMethod, PaymentMapping);
     end;
 
     internal procedure ValidateBundleIntegrity(EcomSalesHeader: Record "NPR Ecom Sales Header")
@@ -952,5 +1004,9 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
                 EnsureNoUnsupportedAssetsInWalletComponentLines(BundleComponentLine);
             until BundleComponentLine.Next() = 0;
     end;
+
+    var
+        _EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        _EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
 }
 #endif

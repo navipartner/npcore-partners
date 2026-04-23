@@ -498,7 +498,13 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         if not GlobalVoucherWS.FindVoucher('', CopyStr(EcomSalesPmtLine."Payment Reference", 1, 50), Voucher) then
             CheckIfVoucherHasBeenArchived(EcomSalesPmtLine)
         else
-            ValidateActiveVoucher(Voucher)
+            ValidateActiveVoucher(Voucher);
+    end;
+
+    [TryFunction]
+    internal procedure TryFindVoucher(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var Voucher: Record "NPR NpRv Voucher")
+    begin
+        FindVoucher(EcomSalesPmtLine, Voucher);
     end;
 
     local procedure CheckIfVoucherHasBeenArchived(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
