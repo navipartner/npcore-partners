@@ -544,27 +544,23 @@ codeunit 6185083 "NPR TicketingReservationAgent"
     local procedure CompactTicketDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer; OrderedQuantity: Integer): Codeunit "NPR Json Builder";
     var
         Ticket: Record "NPR TM Ticket";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         TicketType: Record "NPR TM Ticket Type";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         TicketAgent: Codeunit "NPR TicketingTicketAgent";
-        TimeZoneHelper: Codeunit "NPR TM TimeHelper";
         EnumEncoder: Codeunit "NPR TicketingApiTranslations";
     begin
-        GeneralLedgerSetup.Get();
         Ticket.SetCurrentKey("Ticket Reservation Entry No.");
         Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', PrimaryEntryNo);
         if (not Ticket.FindFirst()) then
             exit(ResponseJson);
 
         TicketType.Get(Ticket."Ticket Type Code");
+        GeneralLedgerSetup.Get();
 
         ResponseJson.StartObject('ticket')
             .AddProperty('ticketKind', EnumEncoder.EncodeTicketTypeAdmissionKind(TicketType."Admission Registration"))
-            .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
-            .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
-            .AddProperty('unitPrice', Ticket.AmountExclVat)
-            .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
-            .AddProperty('currencyCode', GeneralLedgerSetup."LCY Code")
+            .AddObject(TicketAgent.TicketValidDateProperties(ResponseJson, Ticket))
+            .AddObject(TicketAgent.TicketPriceInformation(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code"))
             .AddArray(CompactTicketList(ResponseJson, PrimaryEntryNo, 'ticketNumbers'));
 
         if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then

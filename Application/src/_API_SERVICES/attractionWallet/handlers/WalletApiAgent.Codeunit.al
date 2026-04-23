@@ -364,12 +364,15 @@ codeunit 6248331 "NPR WalletApiAgent"
     var
         TicketAgent: Codeunit "NPR TicketingTicketAgent";
         TicketType: Record "NPR TM Ticket Type";
+        GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         TicketType.Get(Ticket."Ticket Type Code");
+        GeneralLedgerSetup.Get();
 
         ResponseJson
             .StartObject('ticketDetails')
             .AddObject(TicketAgent.TicketValidDateProperties(ResponseJson, Ticket))
+            .AddObject(TicketAgent.TicketPriceInformation(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code"))
             .AddObject(TicketAgent.AdmissionDetailsDTO(ResponseJson, 'content', Ticket, LanguageCode))
             .AddArray(TicketAgent.TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, TicketType, false))
             .EndObject();

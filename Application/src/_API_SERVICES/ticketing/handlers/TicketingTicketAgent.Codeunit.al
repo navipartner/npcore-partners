@@ -712,9 +712,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
         ResponseJson
             .AddProperty('pinCode', ReservationRequest."Authorization Code")
-            .AddProperty('unitPrice', Ticket.AmountExclVat)
-            .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
-            .AddProperty('currencyCode', CurrencyCode)
+            .AddObject(TicketPriceInformation(ResponseJson, Ticket, CurrencyCode))
             .AddProperty('ticketHolder', ReservationRequest.TicketHolderName)
             .AddProperty('ticketHolderLanguage', ReservationRequest.TicketHolderPreferredLanguage)
             .AddProperty('notificationAddress', ReservationRequest."Notification Address")
@@ -763,6 +761,15 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
             .AddProperty('issuedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime('', Ticket.SystemCreatedAt)))
             .AddProperty('blocked', Ticket.Blocked);
+        exit(ResponseJson);
+    end;
+
+    internal procedure TicketPriceInformation(ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"; CurrencyCode: Code[10]): Codeunit "NPR JSON Builder";
+    begin
+        ResponseJson
+            .AddProperty('unitPrice', Ticket.AmountExclVat)
+            .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
+            .AddProperty('currencyCode', CurrencyCode);
         exit(ResponseJson);
     end;
 
