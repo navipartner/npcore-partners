@@ -97,6 +97,17 @@ codeunit 6151092 "NPR MMTimelineHandler"
         exit('--');
     end;
 
+    local procedure GetUserName(UserName: Code[50]): Text[100]
+    var
+        User: Record User;
+    begin
+        User.SetRange("User Name", UserName);
+        if (User.FindFirst()) then
+            exit(GetUserName(User."User Security ID"));
+
+        exit('--');
+    end;
+
     local procedure CollectedMembershipEvents(MembershipEntryNo: Integer; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
     var
         MembershipEntry: Record "NPR MM Membership Entry";
