@@ -430,6 +430,12 @@
             TableRelation = "Customer Price Group";
             DataClassification = CustomerContent;
         }
+        field(71; "VAT Bus. Posting Group"; Code[20])
+        {
+            Caption = 'VAT Bus. Posting Group';
+            TableRelation = "VAT Business Posting Group";
+            DataClassification = CustomerContent;
+        }
         field(72; "Customer Disc. Group"; Code[20])
         {
             Caption = 'Customer Disc. Group';
@@ -633,7 +639,7 @@
         TempSaleLinePOS."No." := "Item No.";
         TempSaleLinePOS."Variant Code" := "Variant Code";
 
-        POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS);
+        POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS, Rec."VAT Bus. Posting Group");
         if "Register No." <> '' then
 #pragma warning disable AA0139
             TempSalePOS."Register No." := "Register No.";
@@ -775,6 +781,7 @@
         "Calculation Date" := RetailJournalHeader."Date of creation";
         "Customer Price Group" := RetailJournalHeader."Customer Price Group";
         "Customer Disc. Group" := RetailJournalHeader."Customer Disc. Group";
+        "VAT Bus. Posting Group" := RetailJournalHeader."VAT Bus. Posting Group";
 
         "Register No." := RetailJournalHeader."Register No.";
     end;
@@ -845,6 +852,7 @@
         "Calculation Date" := RetailJnlHeader."Date of creation";
         "Customer Price Group" := RetailJnlHeader."Customer Price Group";
         "Customer Disc. Group" := RetailJnlHeader."Customer Disc. Group";
+        "VAT Bus. Posting Group" := RetailJnlHeader."VAT Bus. Posting Group";
     end;
 
     local procedure UpdateBarcode()

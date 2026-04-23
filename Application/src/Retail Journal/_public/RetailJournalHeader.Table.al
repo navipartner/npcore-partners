@@ -66,6 +66,12 @@
             TableRelation = "Customer Price Group";
             DataClassification = CustomerContent;
         }
+        field(31; "VAT Bus. Posting Group"; Code[20])
+        {
+            Caption = 'VAT Bus. Posting Group';
+            TableRelation = "VAT Business Posting Group";
+            DataClassification = CustomerContent;
+        }
         field(40; "Customer Disc. Group"; Code[20])
         {
             Caption = 'Customer Disc. Group';

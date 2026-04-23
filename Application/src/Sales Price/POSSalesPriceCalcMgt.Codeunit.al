@@ -25,22 +25,37 @@
 
 
     procedure InitTempPOSItemSale(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSalePOS: Record "NPR POS Sale" temporary)
+    begin
+        InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS, '');
+    end;
+
+    procedure InitTempPOSItemSale(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSalePOS: Record "NPR POS Sale" temporary; VATBusPostingGroupParam: Code[20])
     var
         VATPostingSetup: Record "VAT Posting Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        VATBusPostingGroup: Code[20];
         Handled: Boolean;
+        MissingVATPostingSetupErr: Label 'No %1 for %2 ''%3'' and %4 ''%5'' (%6 %7 ''%8'').', Comment = '%1 = VAT Posting Setup table caption, %2 = VAT Bus. Posting Group field caption, %3 = VAT Bus. Posting Group value, %4 = VAT Prod. Posting Group field caption, %5 = VAT Prod. Posting Group value, %6 = Item table caption, %7 = Item No., %8 = Item Description';
     begin
         if not Item.Get(TempSaleLinePOS."No.") then
             exit;
 
-        VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
+        VATBusPostingGroup := Item."VAT Bus. Posting Gr. (Price)";
+        if VATBusPostingGroupParam <> '' then
+            VATBusPostingGroup := VATBusPostingGroupParam;
+        if not VATPostingSetup.Get(VATBusPostingGroup, Item."VAT Prod. Posting Group") then
+            Error(MissingVATPostingSetupErr,
+                  VATPostingSetup.TableCaption,
+                  VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), VATBusPostingGroup,
+                  VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), Item."VAT Prod. Posting Group",
+                  Item.TableCaption, Item."No.", Item.Description);
         POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
 
         TempSalePOS.Date := Today();
         TempSalePOS."Prices Including VAT" := TempSaleLinePOS."Price Includes VAT";
         TempSaleLinePOS."VAT %" := VATPostingSetup."VAT %";
         TempSaleLinePOS."VAT Calculation Type" := TempSaleLinePOS."VAT Calculation Type"::"Normal VAT";
-        TempSaleLinePOS."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
+        TempSaleLinePOS."VAT Bus. Posting Group" := VATBusPostingGroup;
 #IF BC19
         TempSaleLinePOS."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
 #ENDIF
