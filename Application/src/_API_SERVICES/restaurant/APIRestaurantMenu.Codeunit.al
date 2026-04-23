@@ -46,10 +46,12 @@ codeunit 6248644 "NPR API Restaurant Menu"
     var
         Restaurant: Record "NPR NPRE Restaurant";
         Menu: Record "NPR NPRE Menu";
+        VATBusPostingGroupRec: Record "VAT Business Posting Group";
         Json: Codeunit "NPR JSON Builder";
         RestaurantId: Guid;
         MenuId: Guid;
         PosUnitCode: Code[10];
+        VATBusPostingGroup: Code[20];
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
 
@@ -75,6 +77,14 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if PosUnitCode = '' then
             exit(Response.RespondBadRequest('User has no POS Unit configured'));
 
+        if Request.QueryParams().ContainsKey('vatBusinessPostingGroup') then
+#pragma warning disable AA0139 // Intentional: let the Text→Code[20] assignment blow up on >20-char input rather than silently truncating
+            VATBusPostingGroup := Request.QueryParams().Get('vatBusinessPostingGroup');
+#pragma warning restore AA0139
+        if VATBusPostingGroup <> '' then
+            if not VATBusPostingGroupRec.Get(VATBusPostingGroup) then
+                exit(Response.RespondBadRequest(StrSubstNo('Unknown VAT Business Posting Group ''%1''.', VATBusPostingGroup)));
+
         Json.StartObject('')
             .AddProperty('id', Format(Menu.SystemId, 0, 4).ToLower())
             .AddProperty('code', Menu.Code)
@@ -85,14 +95,21 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if Menu."Last Updated" <> 0DT then
             Json.AddProperty('lastUpdated', Menu."Last Updated");
 
-        BuildMenuContent(Restaurant, Menu, PosUnitCode, Json);
+        if not TryBuildMenuContent(Restaurant, Menu, PosUnitCode, VATBusPostingGroup, Json) then
+            exit(Response.RespondBadRequest(GetLastErrorText()));
 
         Json.EndObject();
 
         exit(Response.RespondOK(Json.Build()));
     end;
 
-    local procedure BuildMenuContent(Restaurant: Record "NPR NPRE Restaurant"; Menu: Record "NPR NPRE Menu"; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    [TryFunction]
+    local procedure TryBuildMenuContent(Restaurant: Record "NPR NPRE Restaurant"; Menu: Record "NPR NPRE Menu"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
+    begin
+        BuildMenuContent(Restaurant, Menu, PosUnitCode, VATBusPostingGroup, Json);
+    end;
+
+    local procedure BuildMenuContent(Restaurant: Record "NPR NPRE Restaurant"; Menu: Record "NPR NPRE Menu"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         MenuCategory: Record "NPR NPRE Menu Category";
     begin
@@ -107,12 +124,12 @@ codeunit 6248644 "NPR API Restaurant Menu"
 
         if MenuCategory.FindSet() then
             repeat
-                BuildCategory(Restaurant, Menu, MenuCategory, PosUnitCode, Json);
+                BuildCategory(Restaurant, Menu, MenuCategory, PosUnitCode, VATBusPostingGroup, Json);
             until MenuCategory.Next() = 0;
         Json.EndArray();
 
         Json.StartArray('checkoutUpsellItems');
-        BuildCheckoutUpsells(Menu, PosUnitCode, Json);
+        BuildCheckoutUpsells(Menu, PosUnitCode, VATBusPostingGroup, Json);
         Json.EndArray();
 
         Json.StartObject('addonCategories');
@@ -122,7 +139,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         Json.EndObject();
     end;
 
-    local procedure BuildCategory(Restaurant: Record "NPR NPRE Restaurant"; Menu: Record "NPR NPRE Menu"; MenuCategory: Record "NPR NPRE Menu Category"; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildCategory(Restaurant: Record "NPR NPRE Restaurant"; Menu: Record "NPR NPRE Menu"; MenuCategory: Record "NPR NPRE Menu Category"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         MenuItem: Record "NPR NPRE Menu Item";
         MenuCatTrans: Record "NPR NPRE Menu Cat. Translation";
@@ -164,14 +181,14 @@ codeunit 6248644 "NPR API Restaurant Menu"
 
         if MenuItem.FindSet() then
             repeat
-                BuildMenuItem(MenuItem, PosUnitCode, Json);
+                BuildMenuItem(MenuItem, PosUnitCode, VATBusPostingGroup, Json);
             until MenuItem.Next() = 0;
         Json.EndArray();
 
         Json.EndObject();
     end;
 
-    local procedure BuildMenuItem(MenuItem: Record "NPR NPRE Menu Item"; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildMenuItem(MenuItem: Record "NPR NPRE Menu Item"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         Item: Record Item;
         MenuItemTrans: Record "NPR NPRE Menu Item Translation";
@@ -187,7 +204,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
             .AddProperty('sortKey', MenuItem."Sort Key")
             .AddProperty('status', MenuItem.Status.Names.Get(MenuItem.Status.Ordinals.IndexOf(MenuItem.Status.AsInteger())));
 
-        UnitPrice := GetItemPrice(MenuItem."Item No.", MenuItem."Variant Code", PosUnitCode);
+        UnitPrice := GetItemPrice(MenuItem."Item No.", MenuItem."Variant Code", PosUnitCode, VATBusPostingGroup);
         Json.AddProperty('unitPrice', UnitPrice);
 
         Json.StartObject('title');
@@ -222,14 +239,14 @@ codeunit 6248644 "NPR API Restaurant Menu"
 
         if Item.Get(MenuItem."Item No.") and (Item."NPR Item AddOn No." <> '') then begin
             Json.StartArray('addonItems');
-            BuildItemAddons(Item."NPR Item AddOn No.", PosUnitCode, Json);
+            BuildItemAddons(Item."NPR Item AddOn No.", PosUnitCode, VATBusPostingGroup, Json);
             Json.EndArray();
         end;
 
         HasUpsells := CheckIfHasUpsells(MenuItem.SystemId);
         if HasUpsells then begin
             Json.StartArray('upsellItems');
-            BuildItemUpsells(MenuItem.SystemId, PosUnitCode, Json);
+            BuildItemUpsells(MenuItem.SystemId, PosUnitCode, VATBusPostingGroup, Json);
             Json.EndArray();
         end;
 
@@ -246,7 +263,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         exit(not Upsell.IsEmpty());
     end;
 
-    local procedure BuildItemAddons(ItemAddOnNo: Code[20]; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildItemAddons(ItemAddOnNo: Code[20]; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
@@ -271,7 +288,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
                     .AddProperty('mandatory', ItemAddOnLine.Mandatory);
 
                 if ItemAddOnLine.Type = ItemAddOnLine.Type::Quantity then begin
-                    BuildAddonItemFromLine(ItemAddOnLine, PosUnitCode, Json);
+                    BuildAddonItemFromLine(ItemAddOnLine, PosUnitCode, VATBusPostingGroup, Json);
                 end else begin
                     Json.StartArray('selectOptions');
                     ItemAddOnLineOpt.ReadIsolation := IsolationLevel::ReadCommitted;
@@ -284,7 +301,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
                         repeat
                             Json.StartObject('');
                             Json.AddProperty('sortKey', ItemAddOnLineOpt."Line No.");
-                            BuildAddonItemFromOption(ItemAddOnLineOpt, PosUnitCode, Json);
+                            BuildAddonItemFromOption(ItemAddOnLineOpt, PosUnitCode, VATBusPostingGroup, Json);
                             Json.EndObject();
                         until ItemAddOnLineOpt.Next() = 0;
                     Json.EndArray();
@@ -294,7 +311,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
             until ItemAddOnLine.Next() = 0;
     end;
 
-    local procedure BuildAddonItemFromLine(var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildAddonItemFromLine(var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         CalculatedPrice: Decimal;
         ItemAddonTranslation: Record "NPR Item Addon Translation";
@@ -312,7 +329,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         else if (ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::"Non-Zero") and (ItemAddOnLine."Unit Price" <> 0) then
             CalculatedPrice := ItemAddOnLine."Unit Price"
         else
-            CalculatedPrice := GetItemPrice(ItemAddOnLine."Item No.", ItemAddOnLine."Variant Code", PosUnitCode);
+            CalculatedPrice := GetItemPrice(ItemAddOnLine."Item No.", ItemAddOnLine."Variant Code", PosUnitCode, VATBusPostingGroup);
 
         Json.AddProperty('unitPrice', CalculatedPrice);
 
@@ -325,7 +342,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         Json.EndObject();
     end;
 
-    local procedure BuildAddonItemFromOption(var ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt."; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildAddonItemFromOption(var ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt."; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         CalculatedPrice: Decimal;
         ItemAddonTranslation: Record "NPR Item Addon Translation";
@@ -344,7 +361,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         else if (ItemAddOnLineOpt."Use Unit Price" = ItemAddOnLineOpt."Use Unit Price"::"Non-Zero") and (ItemAddOnLineOpt."Unit Price" <> 0) then
             CalculatedPrice := ItemAddOnLineOpt."Unit Price"
         else
-            CalculatedPrice := GetItemPrice(ItemAddOnLineOpt."Item No.", ItemAddOnLineOpt."Variant Code", PosUnitCode);
+            CalculatedPrice := GetItemPrice(ItemAddOnLineOpt."Item No.", ItemAddOnLineOpt."Variant Code", PosUnitCode, VATBusPostingGroup);
 
         Json.AddProperty('unitPrice', CalculatedPrice);
 
@@ -357,7 +374,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         Json.EndObject();
     end;
 
-    local procedure BuildItemUpsells(MenuItemSystemId: Guid; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildItemUpsells(MenuItemSystemId: Guid; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         Upsell: Record "NPR NPRE Upsell";
         UpsellMenuItem: Record "NPR NPRE Menu Item";
@@ -371,11 +388,11 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if Upsell.FindSet() then
             repeat
                 if UpsellMenuItem.GetBySystemId(Upsell."Menu Item System Id") then
-                    BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, Json);
+                    BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
             until Upsell.Next() = 0;
     end;
 
-    local procedure BuildCheckoutUpsells(Menu: Record "NPR NPRE Menu"; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildCheckoutUpsells(Menu: Record "NPR NPRE Menu"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         Upsell: Record "NPR NPRE Upsell";
         UpsellMenuItem: Record "NPR NPRE Menu Item";
@@ -389,11 +406,11 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if Upsell.FindSet() then
             repeat
                 if UpsellMenuItem.GetBySystemId(Upsell."Menu Item System Id") then
-                    BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, Json);
+                    BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
             until Upsell.Next() = 0;
     end;
 
-    local procedure BuildUpsellItem(MenuItem: Record "NPR NPRE Menu Item"; SortKey: Integer; PosUnitCode: Code[10]; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildUpsellItem(MenuItem: Record "NPR NPRE Menu Item"; SortKey: Integer; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         MenuItemTrans: Record "NPR NPRE Menu Item Translation";
         PictureHandler: Codeunit "NPR NPREMenuItemPictureHandler";
@@ -407,7 +424,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
             .AddProperty('sortKey', SortKey);
 
         // Get unit price
-        UnitPrice := GetItemPrice(MenuItem."Item No.", MenuItem."Variant Code", PosUnitCode);
+        UnitPrice := GetItemPrice(MenuItem."Item No.", MenuItem."Variant Code", PosUnitCode, VATBusPostingGroup);
         Json.AddProperty('unitPrice', UnitPrice);
 
         // Build title translations
@@ -485,11 +502,12 @@ codeunit 6248644 "NPR API Restaurant Menu"
             until ItemAddOnCategory.Next() = 0;
     end;
 
-    local procedure GetItemPrice(ItemNo: Code[20]; VariantCode: Code[10]; PosUnitCode: Code[10]): Decimal
+    local procedure GetItemPrice(ItemNo: Code[20]; VariantCode: Code[10]; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]): Decimal
     var
         TempRetailJournalLine: Record "NPR Retail Journal Line" temporary;
     begin
         TempRetailJournalLine.Init();
+        TempRetailJournalLine."VAT Bus. Posting Group" := VATBusPostingGroup;
         TempRetailJournalLine.Validate("Register No.", PosUnitCode);
         TempRetailJournalLine.Validate("Item No.", ItemNo);
         TempRetailJournalLine.Validate("Variant Code", VariantCode);
