@@ -687,7 +687,7 @@
         if TempSaleLinePOS2.Get(TempSaleLinePOS.RecordId) then begin
             if not GeneralLedgerSetup.Get() then
                 Clear(GeneralLedgerSetup);
-            "Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS."Unit Price", TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+            "Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS."Unit Price", TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Unit-Amount Rounding Precision");
             "Discount Price Incl. Vat" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS2.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
             "VAT %" := TempSaleLinePOS2."VAT %";
             "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
