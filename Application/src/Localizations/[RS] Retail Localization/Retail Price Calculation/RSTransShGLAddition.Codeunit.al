@@ -4,6 +4,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     Permissions = tabledata "G/L Entry" = rimd,
                 tabledata "Value Entry" = rimd,
                 tabledata "Item Ledger Entry" = rimd,
+                tabledata "Item Application Entry" = r,
                 tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19)
@@ -240,7 +241,6 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         TransferFromItemLedgerEntry: Record "Item Ledger Entry";
         TempTransferFromILEAppliedItemLedgerEntries: Record "Item Ledger Entry" temporary;
         TransitLocationItemLedgerEntries: Record "Item Ledger Entry";
-        ShowAppliedEntries: Codeunit "Show Applied Entries";
         TransitCostPerUnit: Decimal;
         AppliedEntryCostPerUnit: Decimal;
     begin
@@ -261,7 +261,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
         TransferFromItemLedgerEntry.FindSet();
         repeat
-            ShowAppliedEntries.FindAppliedEntries(TransferFromItemLedgerEntry, TempTransferFromILEAppliedItemLedgerEntries);
+            FindAppliedInboundEntries(TransferFromItemLedgerEntry, TempTransferFromILEAppliedItemLedgerEntries);
         until TransferFromItemLedgerEntry.Next() = 0;
 
         if TempTransferFromILEAppliedItemLedgerEntries.IsEmpty() then
@@ -279,6 +279,35 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         until (TransitLocationItemLedgerEntries.Next() = 0) and (TempTransferFromILEAppliedItemLedgerEntries.Next() = 0);
 
         DocumentNo := TempTransferFromILEAppliedItemLedgerEntries."Document No.";
+    end;
+
+    local procedure FindAppliedInboundEntries(OutboundItemLedgerEntry: Record "Item Ledger Entry"; var TempAppliedItemLedgerEntry: Record "Item Ledger Entry" temporary)
+    var
+        ItemApplicationEntry: Record "Item Application Entry";
+        AppliedItemLedgerEntry: Record "Item Ledger Entry";
+        AppliedQuantity: Decimal;
+    begin
+        ItemApplicationEntry.SetCurrentKey("Outbound Item Entry No.", "Item Ledger Entry No.", "Cost Application");
+        ItemApplicationEntry.SetRange("Outbound Item Entry No.", OutboundItemLedgerEntry."Entry No.");
+        ItemApplicationEntry.SetRange("Item Ledger Entry No.", OutboundItemLedgerEntry."Entry No.");
+        ItemApplicationEntry.SetFilter("Inbound Item Entry No.", '<>%1', 0);
+        ItemApplicationEntry.SetLoadFields("Inbound Item Entry No.", Quantity);
+        if not ItemApplicationEntry.FindSet() then
+            exit;
+        repeat
+            if AppliedItemLedgerEntry.Get(ItemApplicationEntry."Inbound Item Entry No.") then begin
+                AppliedQuantity := -ItemApplicationEntry.Quantity;
+                if AppliedQuantity * AppliedItemLedgerEntry.Quantity >= 0 then
+                    if not TempAppliedItemLedgerEntry.Get(AppliedItemLedgerEntry."Entry No.") then begin
+                        TempAppliedItemLedgerEntry := AppliedItemLedgerEntry;
+                        TempAppliedItemLedgerEntry.Quantity := AppliedQuantity;
+                        TempAppliedItemLedgerEntry.Insert();
+                    end else begin
+                        TempAppliedItemLedgerEntry.Quantity += AppliedQuantity;
+                        TempAppliedItemLedgerEntry.Modify();
+                    end;
+            end;
+        until ItemApplicationEntry.Next() = 0;
     end;
 
     local procedure InsertCorrectionalValueEntryForTransitLocation(TransitLocationItemLedgerEntries: Record "Item Ledger Entry"; AppliedEntryCostPerUnit: Decimal; TransitCostPerUnit: Decimal)
