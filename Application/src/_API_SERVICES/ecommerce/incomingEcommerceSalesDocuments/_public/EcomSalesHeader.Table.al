@@ -453,6 +453,32 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'External Document Id';
         }
+        field(5210; "Global Dimension 1 Code"; Code[20])
+        {
+            CaptionClass = '1,1,1';
+            Caption = 'Global Dimension 1 Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
+            Editable = false;
+        }
+        field(5220; "Global Dimension 2 Code"; Code[20])
+        {
+            CaptionClass = '1,1,2';
+            Caption = 'Global Dimension 2 Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
+            Editable = false;
+        }
+        field(5230; "Dimension Set ID"; Integer)
+        {
+            Caption = 'Dimension Set ID';
+            DataClassification = SystemMetadata;
+        }
+        field(5240; "Document Source"; Enum "NPR Ecom Sales Doc Source")
+        {
+            Caption = 'Document Source';
+            DataClassification = SystemMetadata;
+        }
     }
     keys
     {

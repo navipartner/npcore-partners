@@ -5,6 +5,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
     var
         SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+        DimMgt: Codeunit DimensionManagement;
         IsShopifyDocument: Boolean;
         CustomerModeCreationErrorLbl: Label 'Customer Create is not allowed when Customer Update Mode is %1';
 
@@ -242,12 +243,29 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         SalesHeader."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
         EcomSalesDocImplEvents.OnInsertSalesHeaderBeforeFinalizeSalesHeader(EcomSalesHeader, SalesHeader);
+
+        if EcomSalesHeader."Dimension Set ID" <> 0 then begin
+            SalesHeader."Dimension Set ID" := MergeEcomDimSetID(SalesHeader."Dimension Set ID", EcomSalesHeader."Dimension Set ID");
+            DimMgt.UpdateGlobalDimFromDimSetID(SalesHeader."Dimension Set ID", SalesHeader."Shortcut Dimension 1 Code", SalesHeader."Shortcut Dimension 2 Code");
+        end;
+
         SalesHeader.Modify(true);
 
         EcomSalesHeader."Created Doc No." := SalesHeader."No.";
         EcomSalesHeader.Modify(true);
 
         EcomSalesDocImplEvents.OnAfterInsertSalesHeader(EcomSalesHeader, SalesHeader);
+    end;
+
+    local procedure MergeEcomDimSetID(BaseDimSetID: Integer; EcomDimSetID: Integer): Integer
+    var
+        DimSetIDArr: array[10] of Integer;
+        ShortcutDim1Code: Code[20];
+        ShortcutDim2Code: Code[20];
+    begin
+        DimSetIDArr[1] := BaseDimSetID;
+        DimSetIDArr[2] := EcomDimSetID;
+        exit(DimMgt.GetCombinedDimensionSetID(DimSetIDArr, ShortcutDim1Code, ShortcutDim2Code));
     end;
 
     local procedure InsertCustomer(EcomSalesHeader: Record "NPR Ecom Sales Header"; var Customer: Record Customer) Success: Boolean

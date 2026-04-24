@@ -38,6 +38,8 @@ codeunit 6151027 "NPR Entria Order Impl."
         EcomSalesHeader."API Version Date" := _EcomSalesDocUtils.GetApiVersionDateByRequest(Today);
         EcomSalesHeader."Location Code" := EntriaStore."Location Code";
         EcomSalesHeader."Ecommerce Store Code" := EntriaStore.Code;
+        EcomSalesHeader."Document Source" := EcomSalesHeader."Document Source"::Entria;
+        SetEcomSalesHeaderDimensions(EntriaStore, EcomSalesHeader);
         DeserializeEntriaOrderHeader(Request, EcomSalesHeader);
 
         _IntegrationEvents.OnBeforeInsertEcommerceSalesHeader(EcomSalesHeader, Request);
@@ -585,6 +587,19 @@ codeunit 6151027 "NPR Entria Order Impl."
         end;
 
         _IntegrationEvents.OnAfterReserveEntriaVoucher(EcomSalesHeader, EcomSalesPmtLine, VoucherSalesLine);
+    end;
+
+    local procedure SetEcomSalesHeaderDimensions(EntriaStore: Record "NPR Entria Store"; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        DimensionMgt: Codeunit DimensionManagement;
+        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+        GlobalDim1Code: Code[20];
+        GlobalDim2Code: Code[20];
+    begin
+        DimensionMgt.AddDimSource(DefaultDimSource, Database::"NPR Entria Store", EntriaStore.Code);
+        EcomSalesHeader."Dimension Set ID" := DimensionMgt.GetDefaultDimID(DefaultDimSource, '', GlobalDim1Code, GlobalDim2Code, 0, 0);
+        EcomSalesHeader."Global Dimension 1 Code" := GlobalDim1Code;
+        EcomSalesHeader."Global Dimension 2 Code" := GlobalDim2Code;
     end;
 
     var

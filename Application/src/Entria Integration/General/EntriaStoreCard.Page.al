@@ -60,6 +60,16 @@ page 6150929 "NPR Entria Store Card"
                     ToolTip = 'Specifies the Business Central location code that will be used when creating sales orders imported from this store.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
+                {
+                    ToolTip = 'Specifies the default value of Global Dimension 1 to be applied to sales orders imported from this store.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
+                {
+                    ToolTip = 'Specifies the default value of Global Dimension 2 to be applied to sales orders imported from this store.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Connection)
             {
@@ -126,6 +136,16 @@ page 6150929 "NPR Entria Store Card"
         }
         area(Navigation)
         {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID" = const(Database::"NPR Entria Store"), "No." = field(Code);
+                ShortCutKey = 'Alt+D';
+                ToolTip = 'View or edit default dimensions for this Entria store. These dimensions will be applied to all sales orders imported from this store.';
+                ApplicationArea = NPRRetail;
+            }
             action(Orders)
             {
                 Caption = 'Orders';

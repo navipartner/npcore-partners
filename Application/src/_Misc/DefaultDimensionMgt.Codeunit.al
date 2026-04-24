@@ -19,6 +19,9 @@
         DimMgt.InsertObject(TempAllObjWithCaption, Database::"NPR POS Unit");
         DimMgt.InsertObject(TempAllObjWithCaption, Database::"NPR NPRE Seating");
         DimMgt.InsertObject(TempAllObjWithCaption, Database::"NPR MM Recur. Paym. Setup");
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        DimMgt.InsertObject(TempAllObjWithCaption, Database::"NPR Entria Store");
+#endif
     end;
 
     procedure UpdateGlobalDimCode(GlobalDimCodeNo: Integer; "Table ID": Integer; "No.": Code[20]; NewDimValue: Code[20])
@@ -40,6 +43,10 @@
                 UpdateNPRESeatingGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
             Database::"NPR MM Recur. Paym. Setup":
                 UpdateRecurPaymSetupGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            Database::"NPR Entria Store":
+                UpdateEntriaStoreGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
+#endif
         end;
     end;
 
@@ -163,4 +170,21 @@
             RecurPaymSetup.Modify(true);
         end;
     end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure UpdateEntriaStoreGlobalDimCode(GlobalDimCodeNo: Integer; EntriaStoreCode: Code[20]; NewDimValue: Code[20])
+    var
+        EntriaStore: Record "NPR Entria Store";
+    begin
+        if EntriaStore.Get(EntriaStoreCode) then begin
+            case GlobalDimCodeNo of
+                1:
+                    EntriaStore."Global Dimension 1 Code" := NewDimValue;
+                2:
+                    EntriaStore."Global Dimension 2 Code" := NewDimValue;
+            end;
+            EntriaStore.Modify(true);
+        end;
+    end;
+#endif
 }

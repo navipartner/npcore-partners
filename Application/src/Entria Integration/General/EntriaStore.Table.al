@@ -83,6 +83,28 @@ table 6059910 "NPR Entria Store"
             Caption = 'Process Order On Import';
             DataClassification = CustomerContent;
         }
+        field(11; "Global Dimension 1 Code"; Code[20])
+        {
+            CaptionClass = '1,1,1';
+            Caption = 'Global Dimension 1 Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+            end;
+        }
+        field(12; "Global Dimension 2 Code"; Code[20])
+        {
+            CaptionClass = '1,1,2';
+            Caption = 'Global Dimension 2 Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+            end;
+        }
     }
 
     keys
@@ -96,9 +118,15 @@ table 6059910 "NPR Entria Store"
         }
     }
 
+    trigger OnInsert()
+    begin
+        DimMgt.UpdateDefaultDim(Database::"NPR Entria Store", Code, "Global Dimension 1 Code", "Global Dimension 2 Code");
+    end;
+
     trigger OnDelete()
     begin
         DeleteAPIKey();
+        DimMgt.DeleteDefaultDim(Database::"NPR Entria Store", Code);
     end;
 
     [NonDebuggable]
@@ -141,7 +169,17 @@ table 6059910 "NPR Entria Store"
         Rec.Modify(true);
     end;
 
+    local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    begin
+        DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
+        if not IsTemporary() then begin
+            DimMgt.SaveDefaultDim(Database::"NPR Entria Store", Code, FieldNumber, ShortcutDimCode);
+            Modify();
+        end;
+    end;
+
     var
+        DimMgt: Codeunit DimensionManagement;
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
 }
 #endif

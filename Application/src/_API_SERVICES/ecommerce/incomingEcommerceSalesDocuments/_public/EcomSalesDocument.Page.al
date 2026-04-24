@@ -62,6 +62,16 @@ page 6248188 "NPR Ecom Sales Document"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Price Excl. VAT field.';
                 }
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field.';
+                }
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field.';
+                }
             }
             group(sellToCustomer)
             {
@@ -328,6 +338,20 @@ page 6248188 "NPR Ecom Sales Document"
         }
         area(Navigation)
         {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                ApplicationArea = NPRRetail;
+                ToolTip = 'View the dimension set assigned to this document.';
+                trigger OnAction()
+                var
+                    DimMgt: Codeunit DimensionManagement;
+                    DimSetIdLbl: Label '%1 %2', Locked = true;
+                begin
+                    DimMgt.ShowDimensionSet(Rec."Dimension Set ID", StrSubstNo(DimSetIdLbl, CurrPage.Caption(), Rec."External No."));
+                end;
+            }
             action(RelatedSalesDocuments)
             {
                 Caption = 'Related Sales Documents';
@@ -439,6 +463,7 @@ page 6248188 "NPR Ecom Sales Document"
             }
             group(Navigate)
             {
+                actionref(Dimensions_Promoted; Dimensions) { }
                 actionref(ChangeTicketToken_Promoted; ChangeTicketToken) { }
             }
         }

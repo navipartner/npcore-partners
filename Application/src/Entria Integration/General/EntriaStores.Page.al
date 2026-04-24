@@ -40,6 +40,22 @@ page 6150930 "NPR Entria Stores"
     {
         area(Navigation)
         {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = DimensionSets;
+                ToolTip = 'View or edit dimensions for a group of records. You can assign dimension codes to transactions to distribute costs and analyze historical information.';
+                ApplicationArea = NPRRetail;
+                trigger OnAction()
+                var
+                    EntriaStore: Record "NPR Entria Store";
+                    DefaultDimMultiple: Page "Default Dimensions-Multiple";
+                begin
+                    CurrPage.SetSelectionFilter(EntriaStore);
+                    DefaultDimMultiple.SetMultiRecord(EntriaStore, Rec.FieldNo(Code));
+                    DefaultDimMultiple.RunModal();
+                end;
+            }
             action(EntriaIntegrationSetup)
             {
                 Caption = 'Integration Setup';

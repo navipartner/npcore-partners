@@ -1103,6 +1103,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 #pragma warning restore AA0139
         EcomSalesHeader."Ecommerce Store Code" := FindNpEcStore(LogEntry."Store Code", OrderToken);
         EcomSalesHeader."External Document No." := CopyStr((LogEntry."Store Code" + '-' + _SpfyAPIOrderHelper.GetOrderNo(OrderToken)), 1, MaxStrLen(EcomSalesHeader."External Document No."));
+        EcomSalesHeader."Document Source" := EcomSalesHeader."Document Source"::"Shopify";
         SpfyAPIEventLogMgt.CalculateCurrencyFactor(EcomSalesHeader."Currency Exchange Rate", LogEntry);
         EcomSalesHeader."Currency Code" := LogEntry."Presentment Currency Code";
         if LogEntry."Closed Date-Time" < LogEntry."Event Date-Time" then begin
