@@ -416,6 +416,10 @@
         {
 
         }
+        key(Key8; "Converted To POS Entry", "Send Receipt: SMS", "SMS Receipt Sent")
+        {
+
+        }
     }
 
 
