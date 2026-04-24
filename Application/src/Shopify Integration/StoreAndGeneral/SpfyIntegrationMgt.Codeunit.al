@@ -303,6 +303,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 [_ShopifyStore."Get Payment Lines from Shopify"::ON_CAPTURE, _ShopifyStore."Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE]);
     end;
 
+    procedure CurrencyBlankForLCY(ShopifyStoreCode: Code[20]): Boolean
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Currency Blank for LCY");
+    end;
+
     procedure IsSendNegativeInventory(ShopifyStoreCode: Code[20]): Boolean
     begin
         GetStore(ShopifyStoreCode);

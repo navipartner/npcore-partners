@@ -458,7 +458,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     local procedure ParseEcommerceSalesPaymentLine(PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; LogEntry: Record "NPR Spfy Event Log Entry"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
-        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         GiftCardTransaction: Boolean;
     begin
         EcomSalesPmtLine."Shopify ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(PaymentLineJsonToken, 'id', true));
@@ -1104,8 +1103,17 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         EcomSalesHeader."Ecommerce Store Code" := FindNpEcStore(LogEntry."Store Code", OrderToken);
         EcomSalesHeader."External Document No." := CopyStr((LogEntry."Store Code" + '-' + _SpfyAPIOrderHelper.GetOrderNo(OrderToken)), 1, MaxStrLen(EcomSalesHeader."External Document No."));
         EcomSalesHeader."Document Source" := EcomSalesHeader."Document Source"::"Shopify";
-        SpfyAPIEventLogMgt.CalculateCurrencyFactor(EcomSalesHeader."Currency Exchange Rate", LogEntry);
-        EcomSalesHeader."Currency Code" := LogEntry."Presentment Currency Code";
+
+        if SpfyPaymentGatewayHdlr.IsLCY(LogEntry."Presentment Currency Code") then begin
+            if not SpfyIntegrationMgt.CurrencyBlankForLCY(LogEntry."Store Code") then
+                EcomSalesHeader."Currency Code" := LogEntry."Presentment Currency Code";
+            if EcomSalesHeader."Currency Code" <> '' then
+                EcomSalesHeader."Currency Exchange Rate" := 1;
+        end else begin
+            EcomSalesHeader."Currency Code" := LogEntry."Presentment Currency Code";
+            EcomSalesHeader."Currency Exchange Rate" := SpfyAPIEventLogMgt.CalculateCurrencyFactor(LogEntry);
+        end;
+
         if LogEntry."Closed Date-Time" < LogEntry."Event Date-Time" then begin
             EcomSalesHeader."Received Date" := DT2Date(LogEntry."Event Date-Time");
             EcomSalesHeader."Received Time" := DT2Time(LogEntry."Event Date-Time");
@@ -1385,6 +1393,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         _IncEcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
 
         GLSetupRetrived: Boolean;

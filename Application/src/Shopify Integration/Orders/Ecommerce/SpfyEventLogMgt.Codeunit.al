@@ -69,32 +69,32 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         SpfyEventLogEntry."Amount (SCY)" := JsonHelper.GetJDecimal(Order, 'currentTotalPriceSet.shopMoney.amount', true);
         SpfyEventLogEntry."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJCode(Order, 'currencyCode', false), false, StoreCurrencyCodeIsLCY);
 
-        if StoreCurrencyCodeIsLCY and not PresentmentCurrencyCodeIsLCY and
-           (SpfyEventLogEntry."Amount (PCY)" <> 0) and (SpfyEventLogEntry."Amount (SCY)" <> 0)
-        then begin
-            if SpfyEventLogEntry."Amount (SCY)" = SpfyEventLogEntry."Amount (PCY)" then
-                CurrencyFactor := 1
-            else
-                CurrencyFactor := SpfyEventLogEntry."Amount (PCY)" / SpfyEventLogEntry."Amount (SCY)";
-        end;
-        if CurrencyFactor = 0 then
-            CalculateCurrencyFactor(CurrencyFactor, SpfyEventLogEntry);
-        Currency.InitRoundingPrecision();
         case true of
             StoreCurrencyCodeIsLCY:
                 SpfyEventLogEntry."Amount (LCY)" := SpfyEventLogEntry."Amount (SCY)";
             PresentmentCurrencyCodeIsLCY:
                 SpfyEventLogEntry."Amount (LCY)" := SpfyEventLogEntry."Amount (PCY)";
-            else
+            else begin
+                if StoreCurrencyCodeIsLCY and not PresentmentCurrencyCodeIsLCY and
+                   (SpfyEventLogEntry."Amount (PCY)" <> 0) and (SpfyEventLogEntry."Amount (SCY)" <> 0)
+                then begin
+                    if SpfyEventLogEntry."Amount (SCY)" = SpfyEventLogEntry."Amount (PCY)" then
+                        CurrencyFactor := 1
+                    else
+                        CurrencyFactor := SpfyEventLogEntry."Amount (PCY)" / SpfyEventLogEntry."Amount (SCY)";
+                end;
+                if CurrencyFactor = 0 then
+                    CurrencyFactor := CalculateCurrencyFactor(SpfyEventLogEntry);
                 SpfyEventLogEntry."Amount (LCY)" :=
                     CurrExchRate.ExchangeAmtFCYToLCY(
                              DT2Date(SpfyEventLogEntry."Event Date-Time"), SpfyEventLogEntry."Presentment Currency Code", SpfyEventLogEntry."Amount (PCY)", CurrencyFactor);
-
+            end;
         end;
+        Currency.InitRoundingPrecision();
         SpfyEventLogEntry."Amount (LCY)" := Round(SpfyEventLogEntry."Amount (LCY)", Currency."Amount Rounding Precision");
     end;
 
-    internal procedure CalculateCurrencyFactor(var CurrencyFactor: Decimal; SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
+    internal procedure CalculateCurrencyFactor(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry") CurrencyFactor: Decimal
     var
         CurrExchRate: Record "Currency Exchange Rate";
         CurrencyDate: Date;

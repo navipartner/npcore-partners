@@ -91,6 +91,7 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Currency Code';
             TableRelation = Currency;
             DataClassification = CustomerContent;
+            ValidateTableRelation = false;
         }
         field(40; "Get Orders Starting From"; DateTime)
         {
@@ -272,6 +273,12 @@ table 6150810 "NPR Spfy Store"
                 if "Get Payment Lines from Shopify" in ["Get Payment Lines from Shopify"::ON_CAPTURE, "Get Payment Lines from Shopify"::ON_IMPORT_AND_CAPTURE] then
                     TestField("Send Payment Capture Requests");
             end;
+        }
+        field(87; "Currency Blank for LCY"; Boolean)
+        {
+            Caption = 'Currency Blank for LCY';
+            DataClassification = CustomerContent;
+            InitValue = true;
         }
         field(90; "Send Order Fulfillments"; Boolean)
         {

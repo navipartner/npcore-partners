@@ -660,6 +660,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         PaymentMgt: Codeunit "NPR Magento Pmt. Mgt.";
         CurrencyFactor: Decimal;
+        CurrencyBlankForLCY: Boolean;
+        CurrentOrderCurrencyIsLCY: Boolean;
         PresentmentCurrencyCodeIsLCY: Boolean;
         StoreCurrencyCodeIsLCY: Boolean;
     begin
@@ -668,12 +670,22 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyEventLogEntry."Amount (SCY)" := JsonHelper.GetJDecimal(Order, 'total_price_set.shop_money.amount', true);
         SpfyEventLogEntry."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJCode(Order, 'currency', false), false, StoreCurrencyCodeIsLCY);
 
-        if SalesHeader."Currency Code" <> SpfyEventLogEntry."Presentment Currency Code" then begin
+        CurrencyBlankForLCY := SpfyIntegrationMgt.CurrencyBlankForLCY(SpfyEventLogEntry."Store Code");
+        CurrentOrderCurrencyIsLCY := SpfyPaymentGatewayHdlr.IsLCY(SalesHeader."Currency Code");
+
+        if (SalesHeader."Currency Code" <> SpfyEventLogEntry."Presentment Currency Code") and
+           not (PresentmentCurrencyCodeIsLCY and CurrencyBlankForLCY and CurrentOrderCurrencyIsLCY)  //Skip currency change check when both presentment and current order are LCY and the store blanks LCY
+        then begin
             TestCurrencyCodeChangePossible(SalesHeader);
             if PaymentMgt.HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
                 PaymentLine.DeleteAll();
         end;
-        SalesHeader.Validate("Currency Code", SpfyEventLogEntry."Presentment Currency Code");
+        if not (PresentmentCurrencyCodeIsLCY and CurrencyBlankForLCY) then
+            SalesHeader.Validate("Currency Code", SpfyEventLogEntry."Presentment Currency Code")
+        else
+            if not CurrentOrderCurrencyIsLCY then
+                SalesHeader.Validate("Currency Code", '');
+
         if StoreCurrencyCodeIsLCY and not PresentmentCurrencyCodeIsLCY and
            (SpfyEventLogEntry."Amount (PCY)" <> 0) and (SpfyEventLogEntry."Amount (SCY)" <> 0)
         then begin

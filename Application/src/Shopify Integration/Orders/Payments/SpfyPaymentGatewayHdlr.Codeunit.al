@@ -213,12 +213,12 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
 
     internal procedure TranslateCurrencyCode(ShopifyCurrencyCode: Text): Code[10]
     var
-        IsLCY: Boolean;
+        CurrencyIsLCY: Boolean;
     begin
-        exit(TranslateCurrencyCode(ShopifyCurrencyCode, false, IsLCY));
+        exit(TranslateCurrencyCode(ShopifyCurrencyCode, false, CurrencyIsLCY));
     end;
 
-    internal procedure TranslateCurrencyCode(ShopifyCurrencyCode: Text; BlankIfLCY: Boolean; var IsLCY: Boolean): Code[10]
+    internal procedure TranslateCurrencyCode(ShopifyCurrencyCode: Text; BlankIfLCY: Boolean; var CurrencyIsLCY: Boolean): Code[10]
     var
         Currency: Record Currency;
     begin
@@ -237,8 +237,8 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
                         Currency.FindFirst();  //raise error
                 end;
         end;
-        IsLCY := Currency.Code = _GLSetup."LCY Code";
-        if IsLCY and BlankIfLCY then
+        CurrencyIsLCY := IsLCY(Currency.Code);
+        if CurrencyIsLCY and BlankIfLCY then
             exit('');
         exit(Currency.Code);
     end;
@@ -257,6 +257,15 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
                 exit(Currency."ISO Code");
 
         exit(CopyStr(CurrencyCode, 1, 3));
+    end;
+
+    internal procedure IsLCY(CurrencyCode: Code[10]): Boolean
+    begin
+        if CurrencyCode = '' then
+            exit(true);
+
+        GetGLSetup();
+        exit(CurrencyCode = _GLSetup."LCY Code");
     end;
 
     local procedure GetGLSetup()

@@ -24,16 +24,25 @@ page 6184704 "NPR Spfy Store Card"
                 {
                     ToolTip = 'Specifies the description of the Shopify store.';
                     ApplicationArea = NPRShopify;
+                    Importance = Promoted;
+                }
+                field(Enabled; Rec.Enabled)
+                {
+                    ToolTip = 'Specifies whether the integration with this Shopify store is enabled.';
+                    ApplicationArea = NPRShopify;
+                    Importance = Promoted;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
                     ToolTip = 'Specifies the language code of the Shopify store. The system will use this to select appropriate master data translations, if available.';
                     ApplicationArea = NPRShopify;
                 }
-                field(Enabled; Rec.Enabled)
+                field("Currency Code"; Rec."Currency Code")
                 {
-                    ToolTip = 'Specifies whether the integration with this Shopify store is enabled.';
+                    ToolTip = 'Specifies the currency code of the Shopify Store.';
                     ApplicationArea = NPRShopify;
+                    Style = Unfavorable;
+                    StyleExpr = _InvalidCurrencyCode;
                 }
             }
             group(ItemListIntegrationArea)
@@ -254,6 +263,12 @@ page 6184704 "NPR Spfy Store Card"
                         UpdateControlVisibility();
                     end;
                 }
+                field("Currency Blank for LCY"; Rec."Currency Blank for LCY")
+                {
+                    ToolTip = 'Specifies whether the currency code should be left blank on sales orders created from Shopify orders when the order transaction currency is the same as the local currency of the Business Central environment.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _SalesOrderIntegrationIsEnabled;
+                }
                 field("Default Ec Store Code"; Rec."Default Ec Store Code")
                 {
                     ToolTip = 'Specifies the default e-commerce store code that will be used when creating sales orders from Shopify orders. This is used when the Shopify order does not specify a source name, or when the specified source name is not linked to an e-commerce store in Business Central.';
@@ -330,13 +345,6 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;
-                }
-                field("Currency Code"; Rec."Currency Code")
-                {
-                    ToolTip = 'Specifies the currency code of the Shopify Store. Orders imported from Shopify will be created in Business Central with this currency code.';
-                    ApplicationArea = NPRShopify;
-                    Style = Unfavorable;
-                    StyleExpr = _InvalidCurrencyCode;
                 }
                 field("Get Orders Starting From"; Rec."Get Orders Starting From")
                 {
