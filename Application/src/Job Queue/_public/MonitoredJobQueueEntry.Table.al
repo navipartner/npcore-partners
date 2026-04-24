@@ -1,7 +1,6 @@
 table 6151148 "NPR Monitored Job Queue Entry"
 {
     Caption = 'Monitored Job';
-    Access = Internal;
     DataCaptionFields = "Object Type to Run", "Object ID to Run", "Object Caption to Run";
     DataClassification = CustomerContent;
 
@@ -234,7 +233,7 @@ table 6151148 "NPR Monitored Job Queue Entry"
         {
             Caption = 'JQ Runner User Name';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2025-06-14';
             ObsoleteReason = 'Replaced by field "JQ Runner User Name"';
         }
@@ -242,7 +241,7 @@ table 6151148 "NPR Monitored Job Queue Entry"
         {
             Caption = 'NP Protected Job';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2025-05-12';
             ObsoleteReason = 'Not used anymore.';
         }
