@@ -57,4 +57,9 @@ table 6151290 "NPR Job Queue Runner User"
         {
         }
     }
+
+    internal procedure MaxFailedAttempts(): Integer
+    begin
+        exit(15);
+    end;
 }

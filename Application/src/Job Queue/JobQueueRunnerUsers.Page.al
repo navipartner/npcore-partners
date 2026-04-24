@@ -29,7 +29,7 @@ page 6248219 "NPR Job Queue Runner Users"
                 field("Failed Attempts"; Rec."Failed Attempts")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the number of failed attempts by the job queue runner user. If this value exceeds 9, the job queue runner user is considered inactive. Run the "Reset Failed Attempts" action to reset this value.';
+                    ToolTip = 'Specifies the number of failed attempts by the job queue runner user. If this value exceeds 14, the job queue runner user is considered inactive. Run the "Reset Failed Attempts" action to reset this value.';
                     StyleExpr = _StyleExprTxt;
                 }
                 field("Last Success Date Time"; Rec."Last Success Date Time")
@@ -144,7 +144,7 @@ page 6248219 "NPR Job Queue Runner Users"
 
     trigger OnAfterGetRecord()
     begin
-        if Rec."Failed Attempts" < 10 then
+        if Rec."Failed Attempts" < Rec.MaxFailedAttempts() then
             _StyleExprTxt := 'Standard'
         else
             _StyleExprTxt := 'Unfavorable';

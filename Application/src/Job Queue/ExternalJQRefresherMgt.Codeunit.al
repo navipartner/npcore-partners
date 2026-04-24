@@ -424,7 +424,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         JQRunnerUser.Reset();
         JQRunnerUser.SetCurrentKey("JQ Runner User Name", "Failed Attempts");
         JQRunnerUser.SetRange("JQ Runner User Name", UserName);
-        JQRunnerUser.SetFilter("Failed Attempts", '<%1', 10);
+        JQRunnerUser.SetFilter("Failed Attempts", '<%1', JQRunnerUser.MaxFailedAttempts());
         exit(not JQRunnerUser.IsEmpty());
     end;
 
@@ -546,7 +546,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
             exit;
         UpdateJQRunnerUsersList(JobQueueRunnerUser, false);
         JobQueueRunnerUser.Reset();
-        JobQueueRunnerUser.SetFilter("Failed Attempts", '<%1', 10);
+        JobQueueRunnerUser.SetFilter("Failed Attempts", '<%1', JobQueueRunnerUser.MaxFailedAttempts());
         JobQueueRunnerUser.SetRange("JQ Runner User Name", DefaultRefresherUserName);
         if JobQueueRunnerUser.IsEmpty() then
             Error(EntraAppInvalidLbl, DefaultRefresherUserName);
