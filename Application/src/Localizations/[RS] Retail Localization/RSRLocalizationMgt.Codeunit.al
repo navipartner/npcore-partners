@@ -1,7 +1,8 @@
 codeunit 6151490 "NPR RS R Localization Mgt."
 {
     Access = Internal;
-    Permissions = tabledata "G/L Register" = rimd;
+    Permissions = tabledata "G/L Register" = rimd,
+                  tabledata "Item Application Entry" = r;
 
     var
         HasRSLocalizationSetup: Boolean;
@@ -414,6 +415,46 @@ codeunit 6151490 "NPR RS R Localization Mgt."
             ItemChargeValueEntries.CalcSums("Cost per Unit");
             AppliedCostPerUnit := ApplValueEntry."Cost per Unit" + ItemChargeValueEntries."Cost per Unit";
         end;
+    end;
+
+    internal procedure FindAppliedEntries(ItemLedgerEntry: Record "Item Ledger Entry"; var TempAppliedItemLedgerEntry: Record "Item Ledger Entry" temporary)
+    var
+        ItemApplicationEntry: Record "Item Application Entry";
+        AppliedItemLedgerEntry: Record "Item Ledger Entry";
+        AppliedQuantity: Decimal;
+        AppliedEntryNo: Integer;
+    begin
+        if ItemLedgerEntry.Positive then begin
+            ItemApplicationEntry.SetCurrentKey("Inbound Item Entry No.", "Outbound Item Entry No.", "Cost Application");
+            ItemApplicationEntry.SetRange("Inbound Item Entry No.", ItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.SetFilter("Outbound Item Entry No.", '<>%1', 0);
+        end else begin
+            ItemApplicationEntry.SetCurrentKey("Outbound Item Entry No.", "Item Ledger Entry No.", "Cost Application");
+            ItemApplicationEntry.SetRange("Outbound Item Entry No.", ItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.SetFilter("Inbound Item Entry No.", '<>%1', 0);
+        end;
+        ItemApplicationEntry.SetLoadFields("Inbound Item Entry No.", "Outbound Item Entry No.", Quantity);
+        if not ItemApplicationEntry.FindSet() then
+            exit;
+        repeat
+            if ItemLedgerEntry.Positive then
+                AppliedEntryNo := ItemApplicationEntry."Outbound Item Entry No."
+            else
+                AppliedEntryNo := ItemApplicationEntry."Inbound Item Entry No.";
+            if AppliedItemLedgerEntry.Get(AppliedEntryNo) then begin
+                AppliedQuantity := -ItemApplicationEntry.Quantity;
+                if AppliedQuantity * AppliedItemLedgerEntry.Quantity >= 0 then
+                    if not TempAppliedItemLedgerEntry.Get(AppliedItemLedgerEntry."Entry No.") then begin
+                        TempAppliedItemLedgerEntry := AppliedItemLedgerEntry;
+                        TempAppliedItemLedgerEntry.Quantity := AppliedQuantity;
+                        TempAppliedItemLedgerEntry.Insert();
+                    end else begin
+                        TempAppliedItemLedgerEntry.Quantity += AppliedQuantity;
+                        TempAppliedItemLedgerEntry.Modify();
+                    end;
+            end;
+        until ItemApplicationEntry.Next() = 0;
     end;
 
     #endregion RS Retail Localization Helper Procedures

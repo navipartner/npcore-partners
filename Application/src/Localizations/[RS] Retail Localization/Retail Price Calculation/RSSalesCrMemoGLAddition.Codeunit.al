@@ -462,7 +462,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         StdItemLedgerEntry: Record "Item Ledger Entry";
         TempApplItemLedgerEntry: Record "Item Ledger Entry" temporary;
         AppliedDocValueEntry: Record "Value Entry";
-        ShowAppliedEntries: Codeunit "Show Applied Entries";
         QtyNeeded: Decimal;
     begin
         CorrectStdValueEntry(StdCorrectionValueEntry, StdValueEntry, SalesCrMemoHeader);
@@ -470,7 +469,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         if not StdItemLedgerEntry.Get(StdValueEntry."Item Ledger Entry No.") then
             exit;
 
-        ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplItemLedgerEntry);
+        RSRLocalizationMgt.FindAppliedEntries(StdItemLedgerEntry, TempApplItemLedgerEntry);
 
         if TempApplItemLedgerEntry.IsEmpty() then
             exit;
@@ -698,7 +697,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         TempApplItemLedgerEntry: Record "Item Ledger Entry" temporary;
         AppliedValueEntry: Record "Value Entry";
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
-        ShowAppliedEntries: Codeunit "Show Applied Entries";
         SumOfCostAmounts: Decimal;
     begin
         StdValueEntry.SetLoadFields("Item Ledger Entry No.");
@@ -712,7 +710,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         if not StdItemLedgerEntry.Get(StdValueEntry."Item Ledger Entry No.") then
             exit(0);
 
-        ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplItemLedgerEntry);
+        RSRLocalizationMgt.FindAppliedEntries(StdItemLedgerEntry, TempApplItemLedgerEntry);
 
         if TempApplItemLedgerEntry.IsEmpty() then
             exit(0);

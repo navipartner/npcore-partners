@@ -200,7 +200,6 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     var
         StdItemLedgerEntry: Record "Item Ledger Entry";
         TempAppliedItemLedgerEntry: Record "Item Ledger Entry" temporary;
-        ShowAppliedEntries: Codeunit "Show Applied Entries";
     begin
         StdItemLedgerEntry.SetCurrentKey("Document No.", "Document Line No.", "Document Type");
         StdItemLedgerEntry.SetLoadFields("Cost Amount (Actual)", "Invoiced Quantity", "Entry No.");
@@ -212,7 +211,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         StdItemLedgerEntry.SetAutoCalcFields("Cost Amount (Actual)");
         if StdItemLedgerEntry.FindSet() then
             repeat
-                ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempAppliedItemLedgerEntry);
+                RSRLocalizationMgt.FindAppliedEntries(StdItemLedgerEntry, TempAppliedItemLedgerEntry);
                 ProcessAppliedItemLedgerEntriesForTransit(TempAppliedItemLedgerEntry, StdItemLedgerEntry);
                 TempAppliedItemLedgerEntry.Reset();
                 TempAppliedItemLedgerEntry.DeleteAll();

@@ -405,7 +405,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
         StdItemLedgerEntry: Record "Item Ledger Entry";
         TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ApplValueEntry: Record "Value Entry";
-        ShowAppliedEntries: Codeunit "Show Applied Entries";
         QtyTakenFromEntry: Decimal;
         QtyNeeded: Decimal;
     begin
@@ -414,7 +413,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
         CorrectStdValueEntry(StdCorrectionValueEntry, StdValueEntry, false);
 
-        ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplicationItemLedgerEntry);
+        RSRLocalizationMgt.FindAppliedEntries(StdItemLedgerEntry, TempApplicationItemLedgerEntry);
 
         if TempApplicationItemLedgerEntry.IsEmpty() then
             exit;
