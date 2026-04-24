@@ -47,6 +47,10 @@ test.describe("Sale test", () => {
       .frameLocator("iframe")
       .getByRole("cell", { name: "Small Draft Beer" })
     ).toBeVisible();
+    await expect(
+      page.frameLocator("iframe").locator(".item-panel__skeleton-row")
+    ).toHaveCount(0);
+
     await page
     .frameLocator("iframe")
     .getByRole("button", { name: "Delete Line" })
@@ -69,6 +73,9 @@ test.describe("Sale test", () => {
         .frameLocator("iframe")
         .getByRole("cell", { name: "Small Draft Beer" })
       ).toBeVisible();
+      await expect(
+        page.frameLocator("iframe").locator(".item-panel__skeleton-row")
+      ).toHaveCount(0);
       await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Go to Payment" })
@@ -133,6 +140,9 @@ test.describe("Sale test", () => {
       await page.frameLocator('iframe').getByRole('button', { name: 'Overwrite current layout' }).click();
       await page.frameLocator('iframe').getByRole('button', { name: 'Test Items' }).click();
       await page.frameLocator('iframe').getByRole('button', { name: 'BELLING COOKER HOOD 100CM' }).click();
+      await expect(
+        page.frameLocator('iframe').locator('.item-panel__skeleton-row')
+      ).toHaveCount(0);
       await page.frameLocator('iframe').getByRole('button', { name: 'Discounts' }).click();
       await page.frameLocator('iframe').getByRole('button', { name: 'Line Amount' }).click();
       await page.waitForTimeout(1000)
