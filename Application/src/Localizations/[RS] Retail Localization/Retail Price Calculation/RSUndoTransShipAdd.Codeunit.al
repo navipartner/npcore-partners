@@ -375,6 +375,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         GenJournalLine."Due Date" := ValueEntry."Posting Date";
         GenJournalLine."Source Code" := ValueEntry."Source Code";
         GenJournalLine."Account No." := GetRSAccountNoFromSetup(ValueEntry, RSRetailCalculationType);
+        GenJournalLine."System-Created Entry" := true;
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")

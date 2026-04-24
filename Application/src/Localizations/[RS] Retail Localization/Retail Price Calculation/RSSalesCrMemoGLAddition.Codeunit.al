@@ -222,6 +222,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         GenJournalLine."Due Date" := CalculationValueEntry."Posting Date";
         GenJournalLine."Source Code" := CalculationValueEntry."Source Code";
         GenJournalLine."Account No." := GetRSAccountNoFromSetup(SalesCrMemoHeader, RSRetailCalculationType);
+        GenJournalLine."System-Created Entry" := true;
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")

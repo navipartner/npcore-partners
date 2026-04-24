@@ -161,6 +161,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         GenJournalLine."Due Date" := CalculationValueEntry."Posting Date";
         GenJournalLine."Source Code" := CalculationValueEntry."Source Code";
         GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
+        GenJournalLine."System-Created Entry" := true;
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
