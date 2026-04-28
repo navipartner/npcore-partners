@@ -411,10 +411,10 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         NoAvailableScheduleErr: Label 'Admission %1 has no open schedule entry available.';
     begin
         if Admission."Default Schedule" = Admission."Default Schedule"::TODAY then
-            if not HasOpenScheduleEntryForToday(AdmissionCode) then
+            if not CheckOpenScheduleEntryWithStartDate(AdmissionCode) then
                 Error(NoOpenScheduleErr, AdmissionCode);
         if Admission."Default Schedule" = Admission."Default Schedule"::NEXT_AVAILABLE then
-            if not HasAnyOpenScheduleEntry(AdmissionCode) then
+            if not CheckAnyOpenScheduleEntry(AdmissionCode) then
                 Error(NoAvailableScheduleErr, AdmissionCode);
     end;
 
@@ -451,27 +451,46 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
             ValidateTicketTypeActivationMethod(EcommSalesLine."No.", AdmissionCode);
     end;
 
-    local procedure HasOpenScheduleEntryForToday(AdmissionCode: Code[20]): Boolean
-    var
-        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    local procedure CheckOpenScheduleEntryWithStartDate(AdmissionCode: Code[20]): Boolean
     begin
-        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
-        ScheduleEntry.SetRange(Cancelled, false);
-        ScheduleEntry.SetRange("Admission Is", ScheduleEntry."Admission Is"::OPEN);
-        ScheduleEntry.SetFilter("Admission Start Date", '<=%1', Today());
-        ScheduleEntry.SetFilter("Admission End Date", '%1|>=%2', 0D, Today());
-        exit(not ScheduleEntry.IsEmpty());
+        exit(CheckOpenScheduleEntry(AdmissionCode, true));
     end;
 
-    local procedure HasAnyOpenScheduleEntry(AdmissionCode: Code[20]): Boolean
+    local procedure CheckAnyOpenScheduleEntry(AdmissionCode: Code[20]): Boolean
+    begin
+        exit(CheckOpenScheduleEntry(AdmissionCode, false));
+    end;
+
+    local procedure CheckOpenScheduleEntry(AdmissionCode: Code[20]; CheckStartDate: Boolean): Boolean
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketTimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalDateTime: DateTime;
+        LocalDate: Date;
+        LocalTime: Time;
+        ResponseMessage: Text;
+        ResponseCode: Integer;
     begin
+        LocalDateTime := TicketTimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
+        LocalDate := DT2Date(LocalDateTime);
+        LocalTime := DT2Time(LocalDateTime);
+
         ScheduleEntry.SetRange("Admission Code", AdmissionCode);
         ScheduleEntry.SetRange(Cancelled, false);
         ScheduleEntry.SetRange("Admission Is", ScheduleEntry."Admission Is"::OPEN);
-        ScheduleEntry.SetFilter("Admission End Date", '%1|>=%2', 0D, Today());
-        exit(not ScheduleEntry.IsEmpty());
+
+        if CheckStartDate then
+            ScheduleEntry.SetFilter("Admission Start Date", '<=%1', LocalDate);
+        ScheduleEntry.SetFilter("Admission End Date", '>=%1', LocalDate);
+        if not ScheduleEntry.FindSet() then
+            exit(false);
+        repeat
+            if not TicketManagement.IsSelectedAdmissionSchEntryExpired(ScheduleEntry, LocalDate, LocalTime, ResponseMessage, ResponseCode) then
+                exit(true);
+        until ScheduleEntry.Next() = 0;
+
+        exit(false);
     end;
 
     local procedure ValidateTicketTypeActivationMethod(ItemNo: Text[50]; AdmissionCode: Code[20])
