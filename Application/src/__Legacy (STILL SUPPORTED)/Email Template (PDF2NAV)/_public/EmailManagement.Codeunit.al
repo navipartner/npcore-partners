@@ -117,7 +117,7 @@ codeunit 6014450 "NPR E-mail Management"
     begin
         ErrorMessage := SetupEmailTemplate(RecRef, CopyStr(RecipientEmail, 1, 250), Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
-            exit;
+            exit(ErrorMessage);
         if ErrorMessage = '' then
             ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, 0);
 
@@ -165,7 +165,7 @@ codeunit 6014450 "NPR E-mail Management"
         if ErrorMessage = '' then
             ErrorMessage := SetupEmailTemplate(RecRef, RecipientEmail, Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
-            exit;
+            exit(ErrorMessage);
 
         if ErrorMessage = '' then
             ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, ReportID);
