@@ -948,7 +948,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
     begin
         Clear(ResponseMessage);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
-        Client.UseServerCertificateValidation(false);
+        if Client.UseServerCertificateValidation(false) then;
 #endif
         IsResponseSuccess := Client.Send(RequestMessage, ResponseMessage);
         if (not IsResponseSuccess) then begin
