@@ -18,9 +18,7 @@ codeunit 85139 "NPR API Module Tests"
         RecRef: RecordRef;
         SalesHeader: Record "Sales Header";
         RecRef2: RecordRef;
-        Base64Convert: Codeunit "Base64 Convert";
         PageKey: Text;
-        PageKeyJson: JsonObject;
     begin
         // [GIVEN] Given a table with: PK key, key filters and ascending and some data.
         InitializeData();
@@ -32,7 +30,6 @@ codeunit 85139 "NPR API Module Tests"
         SalesHeader.Next();
         RecRef.GetTable(SalesHeader);
         PageKey := APIRequest.GetPageKey(RecRef);
-        PageKeyJson.ReadFrom(Base64Convert.FromBase64(PageKey));
 
         // [THEN] The next record in RecRef is equal to first in new record after applying pagination filter
         RecRef2.Open(Database::"Sales Header");
@@ -87,9 +84,7 @@ codeunit 85139 "NPR API Module Tests"
         Assert: Codeunit Assert;
         RecRef: RecordRef;
         SalesHeader: Record "Sales Header";
-        Base64Convert: Codeunit "Base64 Convert";
         PageKey: Text;
-        PageKeyJson: JsonObject;
         RecRef2: REcordRef;
     begin
         // [GIVEN] Given a table with: Non-PK key that contains some PK fields, key filters and ascending.
@@ -108,7 +103,6 @@ codeunit 85139 "NPR API Module Tests"
         SalesHeader.Next();
         RecRef.GetTable(SalesHeader);
         PageKey := APIRequest.GetPageKey(RecRef);
-        PageKeyJson.ReadFrom(Base64Convert.FromBase64(PageKey));
 
         // [THEN] The next record in RecRef is equal to first in new record after applying pagination filter
         RecRef2.Open(Database::"Sales Header");

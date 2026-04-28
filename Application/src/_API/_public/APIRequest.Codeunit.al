@@ -300,7 +300,7 @@ codeunit 6185051 "NPR API Request"
         JsonPageKey.Add('view', RecRef.GetView(false));
         JsonPageKey.Add('indexFields', Fields);
         JsonPageKey.WriteTo(JsonText);
-        exit(Base64Convert.ToBase64(JsonText));
+        exit(ToUrlSafeBase64(Base64Convert.ToBase64(JsonText)));
     end;
 
     procedure ApplyPageKey(PageKeyBase64: Text; var RecRef: RecordRef)
@@ -313,7 +313,7 @@ codeunit 6185051 "NPR API Request"
         FieldValueToken: JsonToken;
         FieldRef: FieldRef;
     begin
-        JsonPageKey.ReadFrom(Base64Convert.FromBase64(PageKeyBase64));
+        JsonPageKey.ReadFrom(Base64Convert.FromBase64(FromUrlSafeBase64(PageKeyBase64)));
         JsonPageKey.Get('view', JsonToken);
         RecRef.SetView(JsonToken.AsValue().AsText());
         JsonPageKey.Get('indexFields', JsonToken);
@@ -323,6 +323,26 @@ codeunit 6185051 "NPR API Request"
             FieldRef := RecRef.Field(FieldNoInteger);
             ReadValueFromJson(FieldRef, FieldValueToken.AsValue());
         end;
+    end;
+
+    local procedure ToUrlSafeBase64(Base64: Text): Text
+    begin
+        Base64 := Base64.Replace('+', '-');
+        Base64 := Base64.Replace('/', '_');
+        exit(Base64.TrimEnd('='));
+    end;
+
+    local procedure FromUrlSafeBase64(UrlSafeBase64: Text): Text
+    var
+        PaddingNeeded: Integer;
+    begin
+        UrlSafeBase64 := UrlSafeBase64.Replace('-', '+');
+        UrlSafeBase64 := UrlSafeBase64.Replace('_', '/');
+        UrlSafeBase64 := UrlSafeBase64.Replace(' ', '+');
+        PaddingNeeded := (4 - (StrLen(UrlSafeBase64) mod 4)) mod 4;
+        if PaddingNeeded > 0 then
+            UrlSafeBase64 += PadStr('', PaddingNeeded, '=');
+        exit(UrlSafeBase64);
     end;
 
     local procedure AddFieldToJson(var FieldRef: FieldRef; var JsonObj: JsonObject; FieldName: Text)
