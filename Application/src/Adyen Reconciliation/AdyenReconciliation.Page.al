@@ -339,7 +339,7 @@ page 6184502 "NPR Adyen Reconciliation"
     begin
         _DocumentPosted := Rec.Status = Rec.Status::Posted;
         _DocumentReconciled := Rec.Status = Rec.Status::Reconciled;
-        _HasPostedLines := Rec."Total Posted Amount" > 0;
+        _HasPostedLines := Rec."Total Posted Amount" <> 0;
         _IsExternalReport := Rec."Document Type" = Rec."Document Type"::"External Settlement detail (C)";
         _OpeningBalanceNull := Rec."Opening Balance" = 0;
         _ClosingBalanceNull := Rec."Closing Balance" = 0;

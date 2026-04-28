@@ -7,15 +7,15 @@ codeunit 6184943 "NPR Adyen Missing Trans. Post"
         AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         if _ReconciliationLine."Amount (TCY)" <> 0 then begin
-            CreateAndPostGenJnlLine(_MissingTransactionAccountType, _MissingTransactionAccountNo, _ReconciliationLine."Transaction Currency Code", _ReconciliationLine."Amount (TCY)", _ReconciledAccountType, _ReconciledAccountNo);
+            CreateAndPostGenJnlLine(_MissingTransactionAccountType, _MissingTransactionAccountNo, _ReconciliationLine."Transaction Currency Code", _ReconciliationLine."Amount (TCY)", _ReconciledAccountType, _ReconciledAccountNo, false);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(_GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", Enum::"NPR Adyen Recon. Amount Type"::Transaction, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
         if _ReconciliationLine."Markup (LCY)" <> 0 then begin
-            CreateAndPostGenJnlLine(Enum::"Gen. Journal Account Type"::"G/L Account", _MarkupAccountNo, _ReconciliationLine."Adyen Acc. Currency Code", _ReconciliationLine."Markup (LCY)", _MissingTransactionAccountType, _MissingTransactionAccountNo);
+            CreateAndPostGenJnlLine(Enum::"Gen. Journal Account Type"::"G/L Account", _MarkupAccountNo, _ReconciliationLine."Adyen Acc. Currency Code", _ReconciliationLine."Markup (LCY)", _MissingTransactionAccountType, _MissingTransactionAccountNo, true);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(_GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", Enum::"NPR Adyen Recon. Amount Type"::Markup, _ReconciliationLine."Markup (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
         if _ReconciliationLine."Other Commissions (LCY)" <> 0 then begin
-            CreateAndPostGenJnlLine(Enum::"Gen. Journal Account Type"::"G/L Account", _OtherCommAccountNo, _ReconciliationLine."Adyen Acc. Currency Code", _ReconciliationLine."Other Commissions (LCY)", _MissingTransactionAccountType, _MissingTransactionAccountNo);
+            CreateAndPostGenJnlLine(Enum::"Gen. Journal Account Type"::"G/L Account", _OtherCommAccountNo, _ReconciliationLine."Adyen Acc. Currency Code", _ReconciliationLine."Other Commissions (LCY)", _MissingTransactionAccountType, _MissingTransactionAccountNo, true);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(_GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", Enum::"NPR Adyen Recon. Amount Type"::"Other commissions", _ReconciliationLine."Other Commissions (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
     end;
@@ -31,7 +31,7 @@ codeunit 6184943 "NPR Adyen Missing Trans. Post"
         exit(_GLEntrySystemID);
     end;
 
-    local procedure CreateGenJournalLine(var GenJnlLine: Record "Gen. Journal Line"; PaymentAccType: Enum "Gen. Journal Account Type"; PaymentAccNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal)
+    local procedure CreateGenJournalLine(var GenJnlLine: Record "Gen. Journal Line"; PaymentAccType: Enum "Gen. Journal Account Type"; PaymentAccNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; CopyVATSetup: Boolean)
     var
         AdyenTransactionLabel: Label 'NP Pay: Transaction %1', MaxLength = 100;
     begin
@@ -44,7 +44,7 @@ codeunit 6184943 "NPR Adyen Missing Trans. Post"
             GenJnlLine."Posting Date" := _ReconciliationLine."Posting Date";
         GenJnlLine."Document Type" := GenJnlLine."Document Type"::" ";
         GenJnlLine."Account Type" := PaymentAccType;
-        GenJnlLine."Copy VAT Setup to Jnl. Lines" := false;
+        GenJnlLine."Copy VAT Setup to Jnl. Lines" := CopyVATSetup;
         GenJnlLine.Validate("Account No.", PaymentAccNo);
         if (CurrencyCode <> '') and (CurrencyCode <> _GLSetup."LCY Code") then
             GenJnlLine.Validate("Currency Code", CurrencyCode);
@@ -82,13 +82,13 @@ codeunit 6184943 "NPR Adyen Missing Trans. Post"
             _AdyenMerchantSetup.TestField("Reconciled Payment Acc. No.");
     end;
 
-    local procedure CreateAndPostGenJnlLine(PaymentAccType: Enum "Gen. Journal Account Type"; PaymentAccNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; BalancingAccType: Enum "Gen. Journal Account Type"; BalancingAccNo: Code[20])
+    local procedure CreateAndPostGenJnlLine(PaymentAccType: Enum "Gen. Journal Account Type"; PaymentAccNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; BalancingAccType: Enum "Gen. Journal Account Type"; BalancingAccNo: Code[20]; CopyVATSetup: Boolean)
     var
         GenJournalLine: Record "Gen. Journal Line";
         GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
         GLEntry: Record "G/L Entry";
     begin
-        CreateGenJournalLine(GenJournalLine, PaymentAccType, PaymentAccNo, CurrencyCode, Amount);
+        CreateGenJournalLine(GenJournalLine, PaymentAccType, PaymentAccNo, CurrencyCode, Amount, CopyVATSetup);
         _GLEntryNo := PostGenJnlLine(GenJournalLine, GenJournalPostLine);
 
         if GLEntry.Get(_GLEntryNo) then

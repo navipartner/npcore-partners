@@ -24,10 +24,10 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         else
             GenJnlLine."Posting Date" := _ReconciliationHeader."Posting Date";
         GenJnlLine."Document Type" := GenJnlLine."Document Type"::" ";
-        GenJnlLine."Copy VAT Setup to Jnl. Lines" := false;
 
         GenJnlLine."Document No." := _ReconciliationLine."Posting No.";
         GenJnlLine.Description := CopyStr(_ReconciliationLine."Modification Reference", 1, MaxStrLen(GenJnlLine.Description));
+        GenJnlLine."Copy VAT Setup to Jnl. Lines" := true;
         AssignAccountNoAndAmountType(GenJnlLine, AmountType);
         if GenJnlLine."Currency Code" <> CurrencyCode then
             GenJnlLine.Validate("Currency Code", CurrencyCode);
@@ -35,6 +35,12 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         GenJnlLine."Source Code" := _AdyenMerchantSetup."Posting Source Code";
         _GLEntryNo := EFTTransPosting.PostGenJnlLine(GenJnlLine, GenJournalPostLine);
 
+        GenJnlLine."Copy VAT Setup to Jnl. Lines" := false;
+        Clear(GenJnlLine."Gen. Posting Type");
+        Clear(GenJnlLine."Gen. Bus. Posting Group");
+        Clear(GenJnlLine."Gen. Prod. Posting Group");
+        Clear(GenJnlLine."VAT Bus. Posting Group");
+        Clear(GenJnlLine."VAT Prod. Posting Group");
         if MerchantCurrencySetup.Get(_ReconciliationLine."Merchant Account", MerchantCurrencySetup."Reconciliation Account Type"::"Reconciled Payment", _ReconciliationLine."Adyen Acc. Currency Code") then begin
             GenJnlLine."Account Type" := MerchantCurrencySetup."Account Type";
             GenJnlLine.Validate("Account No.", MerchantCurrencySetup."Account No.");
