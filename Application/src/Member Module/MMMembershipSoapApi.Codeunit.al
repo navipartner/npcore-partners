@@ -615,8 +615,8 @@ codeunit 6248507 "NPR MMMembershipSoapApi"
                     TempRequestMemberFieldUpdate."Field No." := NpXmlDomMgt.GetAttributeInt(Element, '', 'fieldno', true);
                     TempRequestMemberFieldUpdate."Request Datetime" := CurrentDateTime();
 #pragma warning disable AA0139        
-                    TempRequestMemberFieldUpdate."Current Value" := NpXmlDomMgt.GetXmlText(Element, '//currentvalue', MaxStrLen(TempRequestMemberFieldUpdate."Current Value"), true);
-                    TempRequestMemberFieldUpdate.Caption := NpXmlDomMgt.GetXmlText(Element, '//caption', MaxStrLen(TempRequestMemberFieldUpdate.Caption), true);
+                    TempRequestMemberFieldUpdate."Current Value" := NpXmlDomMgt.GetXmlText(Element, 'currentvalue', MaxStrLen(TempRequestMemberFieldUpdate."Current Value"), true);
+                    TempRequestMemberFieldUpdate.Caption := NpXmlDomMgt.GetXmlText(Element, 'caption', MaxStrLen(TempRequestMemberFieldUpdate.Caption), true);
 #pragma warning restore AA0139
                     TempRequestMemberFieldUpdate.Insert();
                 end;
