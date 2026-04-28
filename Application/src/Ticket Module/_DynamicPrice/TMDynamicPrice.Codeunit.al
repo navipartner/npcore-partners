@@ -43,10 +43,17 @@ codeunit 6014559 "NPR TM Dynamic Price"
             exit;
 
         Sentry.StartSpan(Span, 'bc.ticket.calc-dynamic-price');
-
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
+
+            // For non-indented lines, we will only apply dynamic price if there is no manually set price
+            if (SaleLinePOS.Indentation = 0) then begin
+                if (not SaleLinePOS."Custom Price") then
+                    if (GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
+                        SaleLinePOS."Unit Price" := TicketUnitPrice;
+            end;
+
             if (SaleLinePOS.Indentation > 0) then begin
-                // Addon price should might override ticket dynamic price
+                // A fixed addon price should override ticket dynamic price
                 SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
                 SaleLinePOSAddOn.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
                 SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
@@ -57,35 +64,32 @@ codeunit 6014559 "NPR TM Dynamic Price"
                         if (SaleLinePOSAddOn.DiscountAmount <> 0) then
                             DiscountAmount := SaleLinePOS."Discount Amount";
                         if (SaleLinePOSAddOn.DiscountPercent <> 0) then
-                            DiscountPercent := saleLinePOS."Discount %";
+                            DiscountPercent := SaleLinePOS."Discount %";
                     end;
 
                     if (ItemAddOnLine.Get(SaleLinePOSAddOn."AddOn No.", SaleLinePOSAddOn."AddOn Line No.")) then
                         ForceItemAddOnUnitPrice := ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) or
                                                     ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::"Non-Zero") and (ItemAddOnLine."Unit Price" <> 0)));
                 end;
-            end;
 
-            if (ForceItemAddOnUnitPrice) then begin
-                SaleLinePOS."Unit Price" := ItemAddOnLine."Unit Price";
+                if (ForceItemAddOnUnitPrice) then begin
+                    SaleLinePOS."Unit Price" := ItemAddOnLine."Unit Price";
 
-            end else begin
-                if (GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
-                    if (SaleLinePOS."Unit Price" <> TicketUnitPrice) then
+                end else begin
+                    if (GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
                         SaleLinePOS."Unit Price" := TicketUnitPrice;
+                end;
+
+                // Addon line discount overrides original line discount, we need to re-apply it after price change
+                if (not SaleLinePOS.IsTemporary) then begin
+                    if (DiscountAmount <> 0) then
+                        SaleLinePOS.Validate("Discount Amount", DiscountAmount);
+
+                    if (DiscountPercent <> 0) then
+                        SaleLinePOS.Validate("Discount %", DiscountPercent);
+                end;
             end;
-
-
-            if (not SaleLinePOS.IsTemporary) then begin
-                if (DiscountAmount <> 0) then
-                    SaleLinePOS.Validate("Discount Amount", DiscountAmount);
-
-                if (DiscountPercent <> 0) then
-                    SaleLinePOS.Validate("Discount %", DiscountPercent);
-            end;
-
         end;
-
         Span.Finish();
     end;
 
