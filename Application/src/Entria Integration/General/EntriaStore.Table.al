@@ -82,6 +82,9 @@ table 6059910 "NPR Entria Store"
         {
             Caption = 'Process Order On Import';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-04-20';
+            ObsoleteReason = 'The field is no longer used as orders are now processed by job queues.';
         }
         field(11; "Global Dimension 1 Code"; Code[20])
         {

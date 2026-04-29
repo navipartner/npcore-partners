@@ -20,62 +20,51 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
 
     local procedure UpgradeEcomSalesDocJQ()
     var
-        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         JobQueueEntry: Record "Job Queue Entry";
+        EcomSalesOrderProcJQ: Codeunit "NPR EcomSalesOrderProcJQ";
+        EcomDocsExist: Boolean;
     begin
         UpgradeStep := 'UpgradeEcomSalesDocJQ';
         if HasUpgradeTag() then
             exit;
 
+        EcomDocsExist := CheckIfEcomDocsExist();
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR EcomSalesOrderProcJQ");
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        if JobQueueEntry.FindFirst() then begin
-            if CheckIfEcomDocsExist() then begin
-                SetMonitoredJobQueueEntry(JobQueueEntry);
-                SetBucketParameterString(JobQueueEntry);
-            end else begin
-                DeleteMonitoredJobQueueEntry(MonitoredJQEntry."Object Type to Run"::Codeunit, Codeunit::"NPR EcomSalesOrderProcJQ");
-                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-                JobQueueEntry.Delete(true);
-            end;
+        if not EcomDocsExist then begin
+            if JobQueueEntry.FindFirst() then
+                DeleteMonitoredJobQueueEntry(JobQueueEntry);
+        end else begin
+            if not JobQueueEntry.FindFirst() then
+                EcomSalesOrderProcJQ.ScheduleJobQueue(JobQueueEntry);
+            SetBucketParameterString(JobQueueEntry);
+            SetMonitoredJobQueueEntry(JobQueueEntry);
         end;
 
         SetUpgradeTag();
     end;
 
-    local procedure HasUpgradeTag(): Boolean
-    begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", UpgradeStep)) then
-            exit(true);
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Ecom Sales Docs', UpgradeStep);
-    end;
-
-    local procedure SetUpgradeTag()
-    begin
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", UpgradeStep));
-        LogMessageStopwatch.LogFinish();
-    end;
-
     local procedure UpgradeEcomSalesReturnDocJQ()
     var
-        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         JobQueueEntry: Record "Job Queue Entry";
+        EcomSalesReturnProcJQ: Codeunit "NPR EcomSalesRetOrderProcJQ";
+        EcomDocsExist: Boolean;
     begin
         UpgradeStep := 'UpgradeEcomSalesReturnDocJQ';
         if HasUpgradeTag() then
             exit;
 
+        EcomDocsExist := CheckIfEcomDocsExist();
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR EcomSalesRetOrderProcJQ");
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        if JobQueueEntry.FindFirst() then begin
-            if CheckIfEcomDocsExist() then begin
-                SetMonitoredJobQueueEntry(JobQueueEntry);
-                SetBucketParameterString(JobQueueEntry);
-            end else begin
-                DeleteMonitoredJobQueueEntry(MonitoredJQEntry."Object Type to Run"::Codeunit, Codeunit::"NPR EcomSalesRetOrderProcJQ");
-                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-                JobQueueEntry.Delete(true);
-            end;
+        if not EcomDocsExist then begin
+            if JobQueueEntry.FindFirst() then
+                DeleteMonitoredJobQueueEntry(JobQueueEntry);
+        end else begin
+            if not JobQueueEntry.FindFirst() then
+                EcomSalesReturnProcJQ.ScheduleJobQueue(JobQueueEntry);
+            SetBucketParameterString(JobQueueEntry);
+            SetMonitoredJobQueueEntry(JobQueueEntry);
         end;
 
         SetUpgradeTag();
@@ -84,32 +73,23 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
     local procedure SetMonitoredJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
     var
         JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
-        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
-        RefreshJobQueueEntry: Codeunit "NPR Refresh Job Queue Entry";
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        MonitoredJQEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run");
-        MonitoredJQEntry.SetRange("Object ID to Run", JobQueueEntry."Object ID to Run");
-        if not MonitoredJQEntry.IsEmpty() then
-            exit;
-
         JQRefreshSetup.GetSetup();
-        MonitoredJQEntry.Init();
-        MonitoredJQEntry."Entry No." := 0;
-        MonitoredJQEntry.TransferFields(JobQueueEntry);
-        MonitoredJQEntry.Insert();
-
-        RefreshJobQueueEntry.RefreshJobQueueEntry(MonitoredJQEntry, false);
-        MonitoredJQEntry.Modify();
+        MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(false, true, JobQueueEntry);
     end;
 
-    local procedure DeleteMonitoredJobQueueEntry(ObjectType: Option; ObjectId: Integer)
+    local procedure DeleteMonitoredJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
     var
-        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        ManagedByAppJobQueue: Record "NPR Managed By App Job Queue";
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        MonitoredJQEntry.SetRange("Object Type to Run", ObjectType);
-        MonitoredJQEntry.SetRange("Object ID to Run", ObjectId);
-        if not MonitoredJQEntry.IsEmpty() then
-            MonitoredJQEntry.DeleteAll(true);
+        if ManagedByAppJobQueue.Get(JobQueueEntry.ID) then
+            ManagedByAppJobQueue.Delete();
+        MonitoredJQMgt.RemoveMonitoredJobQueueEntry(JobQueueEntry);
+
+        JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+        JobQueueEntry.Delete(true);
     end;
 
     local procedure CheckIfEcomDocsExist(): Boolean
@@ -181,6 +161,19 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
             until JobQueueEntry.Next() = 0;
 
         SetUpgradeTag();
+    end;
+
+    local procedure HasUpgradeTag(): Boolean
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", UpgradeStep)) then
+            exit(true);
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Ecom Sales Docs', UpgradeStep);
+    end;
+
+    local procedure SetUpgradeTag()
+    begin
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
     end;
 }
 #endif

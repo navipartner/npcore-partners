@@ -5,12 +5,14 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     internal procedure CreateIncomingEcomDocument(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
         InsertSalesDocument(Request, EcomSalesHeader);
 
         Commit();
-        PreProcessDocument(EcomSalesHeader);
+        if not FeatureFlagsManagement.IsEnabled(DisableApiEcomDocumentPreprocessing()) then
+            PreProcessDocument(EcomSalesHeader);
 
         AssignBucketId(EcomSalesHeader);
         exit(Response.RespondOK(GetSalesDocumentCreateResponse(EcomSalesHeader)));
@@ -925,6 +927,10 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         CreateDocument(EcomSalesHeader)
     end;
 
+    internal procedure DisableApiEcomDocumentPreprocessing(): Text[50]
+    begin
+        exit('disableApiEcomDocumentPreprocessing');
+    end;
 
     local procedure CreateDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var

@@ -1170,9 +1170,9 @@
             Codeunit::"NPR UPG Ecom Sales Docs":
                 case UpgradeStep of
                     'UpgradeEcomSalesDocJQ':
-                        exit('NPR-UpgradeEcomSalesDocJQ-20251117');
+                        exit('NPR-UpgradeEcomSalesDocJQ-20260420');
                     'UpgradeEcomSalesReturnDocJQ':
-                        exit('NPR-UpgradeEcomSalesReturnDocJQ-20260306');
+                        exit('NPR-UpgradeEcomSalesReturnDocJQ-20260420');
                     'UpgradeBucketId':
                         exit('NPR-UpgradeBucketId-20251117');
                     'UpdateJobTimeout':

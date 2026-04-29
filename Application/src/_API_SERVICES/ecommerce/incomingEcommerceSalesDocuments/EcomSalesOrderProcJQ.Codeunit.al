@@ -113,22 +113,23 @@ codeunit 6248612 "NPR EcomSalesOrderProcJQ"
         exit(codeunit::"NPR EcomSalesOrderProcJQ");
     end;
 
-    local procedure ScheduleJobQueue()
+    internal procedure ScheduleJobQueue(var JobQueueEntry: Record "Job Queue Entry")
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
-        EcomJobManagement.ScheduleJobQueue(GetCodeunitId(), SetJQDescription());
+        EcomJobManagement.ScheduleJobQueue(GetCodeunitId(), SetJQDescription(), JobQueueEntry);
     end;
 
     internal procedure ScheduleJobQueueWithConfirmation()
     var
+        JobQueueEntry: Record "Job Queue Entry";
         ConfirmManagemnet: Codeunit "Confirm Management";
         ScheduleJobQueueConfirmLbl: Label 'Are you sure you want to configure the job queue for Ecommerce sales orders processing?';
     begin
         if not ConfirmManagemnet.GetResponseOrDefault(ScheduleJobQueueConfirmLbl, true) then
             exit;
 
-        ScheduleJobQueue();
+        ScheduleJobQueue(JobQueueEntry);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]

@@ -56,7 +56,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         EntriaStore.SetCurrentKey(Enabled);
         EntriaStore.SetRange(Enabled, true);
         EntriaStore.SetRange("Sales Order Integration", true);
-        EntriaStore.SetLoadFields(Code, "Last Orders Imported At", "Location Code", "Process Order On Import");
+        EntriaStore.SetLoadFields(Code, "Last Orders Imported At", "Location Code");
         if EntriaStore.FindSet() then
             repeat
                 ProcessStore(EntriaStore);
@@ -227,8 +227,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         Clear(EntriaOrderProcessor);
         EntriaOrderProcessor.SetParams(OrderTkn, EntriaStore, DocumentNo);
         if EntriaOrderProcessor.Run(EcomSalesHeader) then begin
-            If EntriaStore."Process Order On Import" then
-                EcomSalesDocApiAgent.PreProcessDocument(EcomSalesHeader);
             EcomSalesDocApiAgent.AssignBucketId(EcomSalesHeader);
             exit(true);
         end;

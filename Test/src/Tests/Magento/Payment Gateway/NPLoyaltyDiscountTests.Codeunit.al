@@ -205,6 +205,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         PaymentLine: Record "NPR Magento Payment Line";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         Assert: Codeunit "Assert";
+        EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
         LibraryRandom: Codeunit "Library - Random";
         InitialBalance: Decimal;
         FinalBalance: Decimal;
@@ -236,8 +237,9 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         //[GIVEN] Random external number for the ecom document
         ExternalNo := LibraryRandom.RandText(20);
 
-        //[WHEN] Create Ecom document with voucher line (line amount 100, payment line 100)
+        //[WHEN] Create Ecom document with voucher line (line amount 100, payment line 100) and pre-process the document
         CreateEcomDocWithVoucher(EcomSalesHeader, VoucherReferenceNo, VoucherAmount, PaymentAmount);
+        EcomSalesDocApiAgentV2.PreProcessDocument(EcomSalesHeader);
 
         //[THEN] Verify Sales Order was created and posted automatically
         SalesInvoiceHeader.SetRange("External Document No.", ExternalNo);
@@ -274,6 +276,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         PaymentLine: Record "NPR Magento Payment Line";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         Assert: Codeunit "Assert";
+        EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
         LibraryRandom: Codeunit "Library - Random";
         SalesPost: Codeunit "Sales-Post";
         FinalBalance: Decimal;
@@ -311,6 +314,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
 
         //[WHEN] Create Ecom document with voucher line (30), item line (90), and payment line (120)
         CreateEcomDocWithVoucherAndItem(EcomSalesHeader, VoucherReferenceNo, VoucherAmount, ItemAmount, PaymentAmount);
+        EcomSalesDocApiAgentV2.PreProcessDocument(EcomSalesHeader);
 
         //[WHEN] Process ecom document using fast line capture (without automatic posting)
         ProcessEcomDocWithFastLineCaptureNoPost(EcomSalesHeader, SalesHeader, Success, ErrorText);
@@ -371,7 +375,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
     local procedure CreateEcomDocRestAPIandProcess(var SalesHeader: Record "Sales Header")
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-
+        EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
         Headers: Dictionary of [Text, Text];
         QueryParameters: Dictionary of [Text, Text];
         GuidValue: Guid;
@@ -397,6 +401,8 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
                 Error('Ecom document not found');
         end else
             Error('id missing from response');
+
+        EcomSalesDocApiAgentV2.PreProcessDocument(EcomSalesHeader);
 
         if not SalesHeader.Get(SalesHeader."Document Type"::Order, EcomSalesHeader."Created Doc No.") then
             error('sales header not created');

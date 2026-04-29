@@ -48,12 +48,6 @@ page 6150929 "NPR Entria Store Card"
                     ToolTip = 'Specifies the timestamp of the last successfully imported order update for this store. Used as the starting point for incremental order sync (updated_at). When new orders are processed, this value is updated periodically during the job queue run.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Process Order On Import"; Rec."Process Order On Import")
-                {
-                    Caption = 'Process Order On Import';
-                    ToolTip = 'Specifies whether imported orders are processed immediately during Ecommerce document import, within the same transaction.';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Location Code"; Rec."Location Code")
                 {
                     Caption = 'Location Code';

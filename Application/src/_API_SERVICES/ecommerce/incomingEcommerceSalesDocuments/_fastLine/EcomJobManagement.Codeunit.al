@@ -36,6 +36,12 @@ codeunit 6248560 "NPR Ecom Job Management"
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
+        ScheduleJobQueue(CodeunitId, JobDescription, JobQueueEntry);
+    end;
+
+    internal procedure ScheduleJobQueue(CodeunitId: Integer; JobDescription: text; var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        Clear(JobQueueEntry);
         JobQueueEntry.SetCurrentKey("Object Type to Run", "Object ID to Run");
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CodeunitId);
@@ -51,21 +57,21 @@ codeunit 6248560 "NPR Ecom Job Management"
             until JobQueueEntry.Next() = 0;
     end;
 
-    local procedure ScheduleJobQueue(JobQueueEntry: Record "Job Queue Entry")
+    local procedure ScheduleJobQueue(var JobQueueEntry: Record "Job Queue Entry")
     var
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         JobQueueMgt.SetJobTimeout(7, 0); //shouldn't be less than loop in the specific job queue
         JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
         if JobQueueMgt.InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit,
+            JobQueueEntry."Object Type to Run",
             JobQueueEntry."Object ID to Run",
             JobQueueEntry."Parameter String",
-             JobQueueEntry.Description,
-             CreateDateTime(Today(), 070000T),
-                1,
-                '',
-                JobQueueEntry)
+            JobQueueEntry.Description,
+            CreateDateTime(Today(), 070000T),
+            1,
+            '',
+            JobQueueEntry)
         then
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
 
