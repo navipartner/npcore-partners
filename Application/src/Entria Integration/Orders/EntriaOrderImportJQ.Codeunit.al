@@ -25,7 +25,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         until (not Rec."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
 
         Span.Finish();
-        FinalizeStoresMarkers();
     end;
 
     local procedure SetTimeMarkers(var StartTime: DateTime; var MaxDuration: Duration)
@@ -56,7 +55,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         EntriaStore.SetCurrentKey(Enabled);
         EntriaStore.SetRange(Enabled, true);
         EntriaStore.SetRange("Sales Order Integration", true);
-        EntriaStore.SetLoadFields(Code, "Last Orders Imported At", "Location Code");
+        EntriaStore.SetAutoCalcFields("Last Order Import Sync At");
+        EntriaStore.SetLoadFields(Code, "Location Code");
         if EntriaStore.FindSet() then
             repeat
                 ProcessStore(EntriaStore);
@@ -67,7 +67,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     begin
         SetMarkers(EntriaStore);
         DownloadOrders(EntriaStore);
-        TryUpdateMarkers(EntriaStore);
     end;
 
     local procedure DownloadOrders(EntriaStore: Record "NPR Entria Store")
@@ -75,8 +74,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         HasMore: Boolean;
         Limit: Integer;
         Offset: Integer;
-        OrderCount: Integer;
         OrdersArr: JsonArray;
+        OrderCount: Integer;
     begin
         Offset := 0;
         Limit := 40;
@@ -90,10 +89,23 @@ codeunit 6248580 "NPR Entria Order Import JQ"
             if OrderCount = 0 then
                 exit;
             ProcessList(OrdersArr, EntriaStore);
+            FlushMarker(EntriaStore);
 
             HasMore := OrderCount = Limit;
             Offset += Limit;
         until not HasMore;
+    end;
+
+    local procedure FlushMarker(EntriaStore: Record "NPR Entria Store")
+    var
+        EntriaStoreUpd: Record "NPR Entria Store";
+    begin
+        if _HasSessionErrors.Get(EntriaStore.Code) then
+            exit;
+
+        EntriaStoreUpd.SetAutoCalcFields("Last Order Import Sync At");
+        EntriaStoreUpd.Get(EntriaStore.RecordId);
+        UpdateLastImportedAt(EntriaStoreUpd, _SessionMaxUpdatedAt.Get(EntriaStore.Code));
     end;
 
     local procedure BuildOrderDocNoIndex(OrdersArr: JsonArray; var DocToIdx: Dictionary of [Code[20], Integer])
@@ -158,8 +170,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
 
     local procedure FormatDateTime(DT: DateTime): Text
     begin
-        //Introduces a 6-minute safety overlap window in incremental sync to prevent missing recently updated orders due to Entria Admin API propagation delays
-        exit(Format(DT - 6 * 60 * 1000, 0, 9));
+        //Introduces a 1-minute safety overlap window in incremental sync to prevent missing recently updated orders due to Entria Admin API propagation delays
+        exit(Format(DT - 1 * 60 * 1000, 0, 9));
     end;
 
     local procedure GetExistingEcomDocsForBatch(DocToIdx: Dictionary of [Code[20], Integer]; var ExistingDocs: Dictionary of [Code[20], Boolean]; EntriaStoreCode: Code[20])
@@ -249,10 +261,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     /// _SessionMaxUpdatedAt[StoreCode]
     ///   Tracks the highest updatedAt value encountered during this JQ cycle.
     ///   This value becomes the new "Last Orders Imported At" when the marker is updated.
-    /// _LastMarkerUpdate[StoreCode]
-    ///   Records the last time the marker was written to the database.
-    ///   Used to control periodic marker updates and reduce database write frequency.
-    ///_ErrorsSinceLastMarker[StoreCode]
+    ///_HasSessionErrors[StoreCode]
     ///   Marker to track for any errors and prevent "Last Orders Imported At" from being updated is error exists.
     /// </summary>
     local procedure SetMarkers(EntriaStore: Record "NPR Entria Store")
@@ -260,8 +269,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         FromDT: DateTime;
     begin
         if not _InitialFromDT.ContainsKey(EntriaStore.Code) then begin
-            if EntriaStore."Last Orders Imported At" <> 0DT then
-                FromDT := EntriaStore."Last Orders Imported At"
+            if EntriaStore."Last Order Import Sync At" <> 0DT then
+                FromDT := EntriaStore."Last Order Import Sync At"
             else
                 FromDT := GetDefaultFromDT();
             _InitialFromDT.Add(EntriaStore.Code, FromDT);
@@ -270,46 +279,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         if not _SessionMaxUpdatedAt.ContainsKey(EntriaStore.Code) then
             _SessionMaxUpdatedAt.Add(EntriaStore.Code, _InitialFromDT.Get(EntriaStore.Code));
 
-        if not _LastMarkerUpdate.ContainsKey(EntriaStore.Code) then
-            _LastMarkerUpdate.Add(EntriaStore.Code, CurrentDateTime());
-
-        if not _ErrorsSinceLastMarker.ContainsKey(EntriaStore.Code) then
-            _ErrorsSinceLastMarker.Add(EntriaStore.Code, false);
-    end;
-
-    local procedure TryUpdateMarkers(EntriaStore: Record "NPR Entria Store")
-    var
-        EntriaStoreUpd: Record "NPR Entria Store";
-        NowDT: DateTime;
-    begin
-        NowDT := CurrentDateTime();
-        if (NowDT - _LastMarkerUpdate.Get(EntriaStore.Code)) < (5 * 60000) then
-            exit;
-        if _ErrorsSinceLastMarker.Get(EntriaStore.Code) then
-            exit;
-
-        EntriaStoreUpd.ReadIsolation := IsolationLevel::UpdLock;
-        EntriaStoreUpd.Get(EntriaStore.RecordId);
-        UpdateLastImportedAt(EntriaStoreUpd);
-        _LastMarkerUpdate.Set(EntriaStoreUpd.Code, NowDT);
-    end;
-
-    local procedure FinalizeStoresMarkers()
-    var
-        EntriaStore: Record "NPR Entria Store";
-    begin
-        EntriaStore.Reset();
-        EntriaStore.ReadIsolation := IsolationLevel::ReadCommitted;
-        EntriaStore.SetCurrentKey(Enabled);
-        EntriaStore.SetRange(Enabled, true);
-        EntriaStore.SetRange("Sales Order Integration", true);
-        EntriaStore.SetLoadFields(Code, "Last Orders Imported At");
-        if EntriaStore.FindSet() then
-            repeat
-                if _SessionMaxUpdatedAt.ContainsKey(EntriaStore.Code) then
-                    if not _ErrorsSinceLastMarker.Get(EntriaStore.Code) then
-                        UpdateLastImportedAt(EntriaStore);
-            until EntriaStore.Next() = 0;
+        if not _HasSessionErrors.ContainsKey(EntriaStore.Code) then
+            _HasSessionErrors.Add(EntriaStore.Code, false);
     end;
 
     local procedure UpdateSessionMax(StoreCode: Code[20]; UpdatedAt: DateTime)
@@ -322,23 +293,20 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     end;
     #endregion
 
-    local procedure UpdateLastImportedAt(EntriaStore: Record "NPR Entria Store")
-    var
-        NewDT: DateTime;
+    local procedure UpdateLastImportedAt(EntriaStore: Record "NPR Entria Store"; NewDT: DateTime)
     begin
-        NewDT := _SessionMaxUpdatedAt.Get(EntriaStore.Code);
-        if EntriaStore."Last Orders Imported At" < NewDT then begin
-            EntriaStore.SetLastOrdersImportedAt(NewDT);
+        if EntriaStore."Last Order Import Sync At" < NewDT then begin
+            EntriaStore.SetLastOrdersImportedAt(EntriaStore.Code, NewDT);
             _InitialFromDT.Set(EntriaStore.Code, NewDT);
+            Commit();
         end;
-        Commit();// Commit here is required to release UpdLock before next Sleep() iteration
     end;
 
     local procedure LogError(ErrMsg: Text; StoreCode: Code[20]; DocumentNo: Code[20])
     var
         EventIdLbl: Label 'NPR_EntriaAPI_OrderImportFailed', Locked = true;
     begin
-        _ErrorsSinceLastMarker.Set(StoreCode, true);
+        _HasSessionErrors.Set(StoreCode, true);
         EmitError(ErrMsg, EventIdLbl, DocumentNo);
     end;
 
@@ -369,8 +337,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     begin
         Clear(_InitialFromDT);
         Clear(_SessionMaxUpdatedAt);
-        Clear(_LastMarkerUpdate);
-        Clear(_ErrorsSinceLastMarker);
+        Clear(_HasSessionErrors);
     end;
 
     local procedure GetFromDT(EntriaStore: Record "NPR Entria Store"): DateTime
@@ -423,9 +390,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         _EntriaAPIHandler: Codeunit "NPR Entria API Handler";
         _EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
         _JsonHelper: Codeunit "NPR Json Helper";
-        _ErrorsSinceLastMarker: Dictionary of [Code[20], Boolean];
+        _HasSessionErrors: Dictionary of [Code[20], Boolean];
         _InitialFromDT: Dictionary of [Code[20], DateTime];
-        _LastMarkerUpdate: Dictionary of [Code[20], DateTime];
         _SessionMaxUpdatedAt: Dictionary of [Code[20], DateTime];
 }
 #endif

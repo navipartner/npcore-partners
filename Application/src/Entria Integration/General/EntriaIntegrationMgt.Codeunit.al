@@ -203,5 +203,13 @@ codeunit 6150987 "NPR Entria Integration Mgt."
         JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
         exit(not JobQueueEntry.IsEmpty());
     end;
+
+    internal procedure DeleteRelatedRecords(StoreCode: Code[20])
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+    begin
+        EntriaStoreSyncState.SetRange("Store Code", StoreCode);
+        EntriaStoreSyncState.DeleteAll();
+    end;
 }
 #endif

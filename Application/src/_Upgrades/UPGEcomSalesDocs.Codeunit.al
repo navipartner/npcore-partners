@@ -16,6 +16,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         UpgradeEcomSalesReturnDocJQ();
         UpgradeBucketId();
         UpdateJobTimeout();
+        UpdateLastOrdersImportedAt();
     end;
 
     local procedure UpgradeEcomSalesDocJQ()
@@ -174,6 +175,25 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
     begin
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", UpgradeStep));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateLastOrdersImportedAt()
+    var
+        EntriaStore: Record "NPR Entria Store";
+    begin
+        UpgradeStep := 'UpdateLastOrdersImportedAt';
+        if HasUpgradeTag() then
+            exit;
+        if EntriaStore.FindSet() then
+            repeat
+                if EntriaStore."Last Orders Imported At" <> 0DT then begin
+                    EntriaStore.SetLastOrdersImportedAt(EntriaStore.Code, EntriaStore."Last Orders Imported At");
+                    EntriaStore."Last Orders Imported At" := 0DT;
+                    EntriaStore.Modify();
+                end;
+            until EntriaStore.Next() = 0;
+
+        SetUpgradeTag();
     end;
 }
 #endif

@@ -70,14 +70,18 @@ table 6059910 "NPR Entria Store"
         {
             Caption = 'Last Orders Imported At';
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            var
-                JQRunningErr: Label 'The "Last Orders Imported At" value cannot be modified while the order import job is running. Stop the job queue and try again.';
-            begin
-                if EntriaIntegrationMgt.HasRunningEntriaJob() then
-                    Error(JQRunningErr);
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-04-20';
+            ObsoleteReason = 'Replaced by the "Last Order Import Sync At".';
         }
+        field(9; "Last Order Import Sync At"; DateTime)
+        {
+            Caption = 'Last Orders Imported At';
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Entria Store Sync State"."Last Orders Imported At" where("Store Code" = field(Code)));
+            Editable = false;
+        }
+
         field(10; "Process Order On Import"; Boolean)
         {
             Caption = 'Process Order On Import';
@@ -130,6 +134,7 @@ table 6059910 "NPR Entria Store"
     begin
         DeleteAPIKey();
         DimMgt.DeleteDefaultDim(Database::"NPR Entria Store", Code);
+        EntriaIntegrationMgt.DeleteRelatedRecords(Rec.Code);
     end;
 
     [NonDebuggable]
@@ -166,10 +171,25 @@ table 6059910 "NPR Entria Store"
         exit(IsolatedStorage.Contains(Rec."Entria API Key Token", DataScope::Company));
     end;
 
-    internal procedure SetLastOrdersImportedAt(NewLastOrdersImportedAt: DateTime)
+    internal procedure SetLastOrdersImportedAt(StoreCode: Code[20]; NewDateTime: DateTime)
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
     begin
-        Rec."Last Orders Imported At" := NewLastOrdersImportedAt;
-        Rec.Modify(true);
+        FindSyncState(StoreCode, EntriaStoreSyncState);
+        EntriaStoreSyncState."Last Orders Imported At" := NewDateTime;
+        EntriaStoreSyncState.Modify();
+    end;
+
+    local procedure FindSyncState(StoreCode: Code[20]; var EntriaStoreSyncState: Record "NPR Entria Store Sync State")
+    begin
+        EntriaStoreSyncState.ReadIsolation := ReadIsolation::UpdLock;
+        if EntriaStoreSyncState.Get(StoreCode) then
+            exit;
+
+        EntriaStoreSyncState.Init();
+        EntriaStoreSyncState."Store Code" := StoreCode;
+        if not EntriaStoreSyncState.Insert() then
+            EntriaStoreSyncState.Get(StoreCode);
     end;
 
     local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
