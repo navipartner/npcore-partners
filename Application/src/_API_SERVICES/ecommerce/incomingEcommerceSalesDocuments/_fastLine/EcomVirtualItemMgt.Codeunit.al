@@ -119,7 +119,6 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetRange("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::" ");
         EcomSalesLine.SetRange(Captured, true);
         EcomSalesLine.SetFilter(Quantity, '<>0');
-        EcomSalesLine.SetFilter("Unit Price", '<>0');
         if EcomSalesLine.FindSet() then
             repeat
                 CreateMembership(EcomSalesLine, ShowError, UpdateRetryCount);
@@ -216,7 +215,6 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
         EcomSalesLine.SetFilter(Quantity, '<>0');
-        EcomSalesLine.SetFilter("Unit Price", '<>0');
 
         if EcomSalesLine.IsEmpty() then
             exit(false);

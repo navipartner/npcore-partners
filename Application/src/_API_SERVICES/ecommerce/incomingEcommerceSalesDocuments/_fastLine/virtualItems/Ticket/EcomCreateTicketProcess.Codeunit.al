@@ -39,7 +39,6 @@ codeunit 6248548 "NPR EcomCreateTicketProcess"
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
         EcomSalesLine.SetFilter(Quantity, '<>0');
-        EcomSalesLine.SetFilter("Unit Price", '<>0');
         EcomSalesLine.SetRange(Captured, true);
         if not EcomSalesLine.FindSet() then
             exit;

@@ -64,23 +64,6 @@ codeunit 85160 "NPR Ecommerce Ticket Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckIfLineCanBeProcessed_ZeroUnitPrice_Error()
-    var
-        EcomSalesHeader: Record "NPR Ecom Sales Header";
-        EcomSalesLine: Record "NPR Ecom Sales Line";
-        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
-        ItemNo: Code[20];
-    begin
-        // [Scenario] CheckIfLineCanBeProcessed raises error when unit price is 0
-        ItemNo := CreateSmokeTicketItemNo();
-
-        SetupEcomHeaderAndTicketLine(EcomSalesHeader, EcomSalesLine, ItemNo, 1, 0, true);
-
-        asserterror EcomCreateTicketImpl.CheckIfLineCanBeProcessed(EcomSalesLine, EcomSalesHeader);
-    end;
-
-    [Test]
-    [TestPermissions(TestPermissions::Disabled)]
     procedure CheckIfLineCanBeProcessed_ReturnOrder_Error()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -138,6 +121,23 @@ codeunit 85160 "NPR Ecommerce Ticket Tests"
         EcomSalesLine.Modify();
 
         asserterror EcomCreateTicketImpl.CheckIfLineCanBeProcessed(EcomSalesLine, EcomSalesHeader);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckIfLineCanBeProcessed_ZeroUnitPrice_Ok()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+    begin
+        // [Scenario] CheckIfLineCanBeProcessed succeeds when unit price is 0 (free tickets are allowed)
+        ItemNo := CreateSmokeTicketItemNo();
+
+        SetupEcomHeaderAndTicketLine(EcomSalesHeader, EcomSalesLine, ItemNo, 1, 0, true);
+
+        EcomCreateTicketImpl.CheckIfLineCanBeProcessed(EcomSalesLine, EcomSalesHeader);
     end;
 
     // ---------------------------------------------------------------
@@ -603,6 +603,52 @@ codeunit 85160 "NPR Ecommerce Ticket Tests"
             until TicketRequest.Next() = 0;
 
         Assert.AreEqual(2, TotalTicketCount, 'One ticket should have been created per confirmed reservation request');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EcomTicketFlow_ZeroUnitPrice_TicketConfirmed()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        Item: Record Item;
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        EcomCreateTicketTryProcess: Codeunit "NPR EcomCreateTicketTryProcess";
+        LibTicket: Codeunit "NPR Library - Ticket Module";
+        ItemNo: Code[20];
+    begin
+        // [Scenario] A captured ticket line with Unit Price = 0 (free ticket) goes through the full
+        // ecommerce fast lane flow and ends up with a Confirmed reservation request,
+        // and the resulting ticket amount is 0 even though the underlying item still has a non-zero price.
+
+        // [Given] A smoke-test ticket item (item Unit Price is non-zero) and an ecom header
+        ItemNo := LibTicket.CreateScenario_SmokeTest();
+        Item.Get(ItemNo);
+        Assert.AreNotEqual(0, Item."Unit Price", 'Precondition: smoke-test item should have a non-zero Unit Price');
+
+        _Lib.CreateEcomSalesHeader(EcomSalesHeader);
+
+        // [Given] A captured ticket line with Unit Price = 0
+        _Lib.CreateTicketLine(EcomSalesLine, EcomSalesHeader, ItemNo, 1, 0);
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Modify();
+
+        // [When] The fast lane flow creates reservation requests and confirms the tickets
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        EcomCreateTicketTryProcess.Run(EcomSalesHeader);
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        // [Then] The reservation request for this token is in Confirmed status
+        TicketRequest.SetFilter("Session Token ID", '=%1', EcomSalesHeader."Ticket Reservation Token");
+        TicketRequest.FindFirst();
+        Assert.AreEqual(TicketRequest."Request Status"::Confirmed, TicketRequest."Request Status", 'Reservation request for a 0-price ticket line should be Confirmed at the end of the flow');
+
+        // [Then] The created ticket carries a 0 amount, while the item price is unchanged (non-zero)
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
+        Ticket.FindFirst();
+        Assert.AreEqual(0, Ticket.AmountInclVat, 'Ticket AmountInclVat should be 0 because the ecom line was captured at Unit Price = 0');
+        Assert.AreEqual(0, Ticket.AmountExclVat, 'Ticket AmountExclVat should be 0 because the ecom line was captured at Unit Price = 0');
     end;
 
     // ---------------------------------------------------------------

@@ -56,6 +56,59 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmMembership_ZeroUnitPrice_Confirmed()
+    // Test: A captured membership line with Unit Price = 0 (free membership) goes through the full
+    // ecommerce flow — membership gets linked and the entry is confirmed, with amount = 0,
+    // while the underlying item still has its non-zero catalog price.
+    var
+        Assert: Codeunit Assert;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Item: Record Item;
+        MemberApiLib: Codeunit "NPR Library - Member XML API";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        Initialize();
+
+        // [Given] The membership item has a non-zero catalog Unit Price
+        Item.Get('T-ECOM-ITEM');
+        Assert.AreNotEqual(0, Item."Unit Price", 'Precondition: membership item should have a non-zero Unit Price');
+
+        // [Given] A GOLD membership pre-created via the membership API
+        Assert.IsTrue(MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        // [Given] An ecom sales order with a captured membership line at Unit Price = 0
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        _LibEcommerce.CreateCapturedMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM', Membership);
+        EcomSalesLine."Unit Price" := 0;
+        EcomSalesLine."Line Amount" := 0;
+        EcomSalesLine.Modify();
+
+        // [When] Process the membership line
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+
+        // [Then] Membership is linked to the ecom sale
+        Membership.Get(Membership."Entry No.");
+
+        // [Then] Membership entry is confirmed with the ecom order external no.
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.FindFirst();
+        Assert.AreEqual(EcomSalesHeader."External No.", MembershipEntry."Document No.", 'MembershipEntry."Document No." must match EcomSalesHeader."External No."');
+
+        // [Then] Membership entry amounts are 0 because the line was captured at Unit Price = 0
+        Assert.AreEqual(0, MembershipEntry.Amount, 'MembershipEntry.Amount should be 0 because the line was captured at Unit Price = 0');
+        Assert.AreEqual(0, MembershipEntry."Amount Incl VAT", 'MembershipEntry."Amount Incl VAT" should be 0 because the line was captured at Unit Price = 0');
+        Assert.AreNotEqual(0, MembershipEntry."Unit Price", 'Unit Price should remain non-zero');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ConfirmMembership_SameOrderIsIdempotent()
     // Test: Calling Process a second time for the same ecom order is idempotent — no error is raised.
     var

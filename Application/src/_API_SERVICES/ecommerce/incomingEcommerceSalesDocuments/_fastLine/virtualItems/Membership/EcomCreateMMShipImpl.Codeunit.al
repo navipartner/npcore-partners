@@ -40,9 +40,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         if (EcommSalesLine.Quantity <> 1) then
             EcommSalesLine.FieldError(Quantity);
 
-        if (EcommSalesLine."Unit Price" = 0) then
-            EcommSalesLine.FieldError("Unit Price");
-
         if EcommSalesLine."Document Type" = EcommSalesLine."Document Type"::"Return Order" then
             EcommSalesLine.FieldError("Document Type");
 
@@ -430,9 +427,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     local procedure UpdateMembershipEntryAmounts(var MembershipEntry: Record "NPR MM Membership Entry"; EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
-        if EcomSalesLine."Line Amount" = 0 then
-            exit;
-
         if EcomSalesHeader."Price Excl. VAT" then begin
             MembershipEntry.Amount := EcomSalesLine."Line Amount";
             MembershipEntry."Amount Incl VAT" := Round(EcomSalesLine."Line Amount" * (1 + EcomSalesLine."VAT %" / 100), 0.01);

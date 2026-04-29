@@ -112,9 +112,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         if (EcommSalesLine.Quantity = 0) then
             EcommSalesLine.FieldError(Quantity);
 
-        if (EcommSalesLine."Unit Price" = 0) then
-            EcommSalesLine.FieldError("Unit Price");
-
         if EcommSalesLine."Document Type" = EcommSalesLine."Document Type"::"Return Order" then
             EcommSalesLine.FieldError("Document Type");
 
@@ -222,7 +219,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         EcomSalesLine.SetRange("Document Entry No.", EcommSalesHeader."Entry No.");
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
         EcomSalesLine.SetFilter(Quantity, '<>0');
-        EcomSalesLine.SetFilter("Unit Price", '<>0');
         if not EcomSalesLine.IsEmpty() then begin
             EcomSalesLine.SetLoadFields(Captured);
             EcomSalesLine.SetRange(Captured, false);
@@ -520,7 +516,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         EcomSalesLine.SetFilter("Virtual Item Process Status", '<>%1', EcomSalesLine."Virtual Item Process Status"::Processed);
         EcomSalesLine.SetRange(Captured, true);
         EcomSalesLine.SetFilter(Quantity, '<>0');
-        EcomSalesLine.SetFilter("Unit Price", '<>0');
     end;
 
     internal procedure ConfirmTickets(var EcomSalesHeader: Record "NPR Ecom Sales Header")
