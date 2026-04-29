@@ -540,6 +540,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
     local procedure AddPOSEntrySalesLines(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry")
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        UnitPriceGross: Decimal;
+        DerivedDiscount: Decimal;
     begin
         JsonTextWriter.WriteStringProperty('iItemCnt', GetPOSSalesLinesCount(POSEntry));
         JsonTextWriter.WriteStartArray('items');
@@ -554,14 +556,18 @@ codeunit 6248367 "NPR HU L Communication Mgt."
                 JsonTextWriter.WriteStringProperty('sArtNr', POSEntrySalesLine."No.");
 
                 if POSEntry."Prices Including VAT" then
-                    JsonTextWriter.WriteStringProperty('fPrice', FormatDecimalValue(Round(POSEntrySalesLine."Unit Price", 1)))
+                    UnitPriceGross := Round(POSEntrySalesLine."Unit Price", 1)
                 else
-                    JsonTextWriter.WriteStringProperty('fPrice', FormatDecimalValue(Round(POSEntrySalesLine."Unit Price" * (1 + POSEntrySalesLine."VAT %" / 100), 1)));
+                    UnitPriceGross := Round(POSEntrySalesLine."Unit Price" * (1 + POSEntrySalesLine."VAT %" / 100), 1);
 
+                JsonTextWriter.WriteStringProperty('fPrice', FormatDecimalValue(UnitPriceGross));
                 JsonTextWriter.WriteStringProperty('fQuantity', FormatQuantityValue(Abs(POSEntrySalesLine.Quantity)));
 
-                if POSEntrySalesLine."Line Discount %" <> 0 then
-                    AddItemDiscountArray(JsonTextWriter, POSEntrySalesLine);
+                if POSEntrySalesLine."Line Discount %" <> 0 then begin
+                    DerivedDiscount := UnitPriceGross * Abs(POSEntrySalesLine.Quantity) - Round(Abs(POSEntrySalesLine."Amount Incl. VAT"), 1, '=');
+                    if DerivedDiscount <> 0 then
+                        AddItemDiscountArray(JsonTextWriter, POSEntrySalesLine, DerivedDiscount);
+                end;
 
                 JsonTextWriter.WriteEndObject(); // stItem
                 JsonTextWriter.WriteEndObject();
@@ -570,14 +576,14 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteEndArray(); // items
     end;
 
-    local procedure AddItemDiscountArray(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    local procedure AddItemDiscountArray(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; DiscountAmount: Decimal)
     begin
         JsonTextWriter.WriteStartArray('itemDsc');
         JsonTextWriter.WriteStartObject('');
         JsonTextWriter.WriteStringProperty('iDscCnt', 1);
         JsonTextWriter.WriteStartObject('stDiscount');
         JsonTextWriter.WriteStringProperty('sName', StrSubstNo(DiscountValueFormatLbl, POSEntrySalesLine."Line Discount %"));
-        JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(-Abs(POSEntrySalesLine."Line Discount Amount Incl. VAT")));
+        JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(-Abs(DiscountAmount)));
         JsonTextWriter.WriteEndObject(); // stDiscount
         JsonTextWriter.WriteEndObject();
         JsonTextWriter.WriteEndArray(); // itemDsc
