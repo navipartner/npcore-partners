@@ -223,6 +223,55 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateSale_EchoesVATBusinessPostingGroupAndCustomerNo()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryERM: Codeunit "Library - ERM";
+        LibrarySales: Codeunit "Library - Sales";
+        Assert: Codeunit Assert;
+        AltVATBusGroup: Record "VAT Business Posting Group";
+        AltVATPostingSetup: Record "VAT Posting Setup";
+        Customer: Record Customer;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] POST /pos/sale with body.vatBusinessPostingGroup and body.customerNo echoes both back in the response,
+        //             confirming the server applied the overrides (regression — response used to echo stale session defaults).
+        Initialize();
+
+        LibraryERM.CreateVATBusinessPostingGroup(AltVATBusGroup);
+        LibraryERM.CreateVATPostingSetup(AltVATPostingSetup, AltVATBusGroup.Code, _Item."VAT Prod. Posting Group");
+        AltVATPostingSetup."VAT %" := 0;
+        AltVATPostingSetup."VAT Calculation Type" := AltVATPostingSetup."VAT Calculation Type"::"Normal VAT";
+        AltVATPostingSetup."VAT Identifier" := 'ZERO';
+        AltVATPostingSetup."Sales VAT Account" := LibraryERM.CreateGLAccountNo();
+        AltVATPostingSetup."Purchase VAT Account" := LibraryERM.CreateGLAccountNo();
+        AltVATPostingSetup.Modify();
+        LibrarySales.CreateCustomer(Customer);
+        Commit();
+
+        SaleId := CreateGuid();
+        Body.Add('posUnit', _POSUnit."No.");
+        Body.Add('vatBusinessPostingGroup', AltVATBusGroup.Code);
+        Body.Add('customerNo', Customer."No.");
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('vatBusinessPostingGroup', JToken), 'Response should contain vatBusinessPostingGroup');
+        Assert.AreEqual(AltVATBusGroup.Code, JToken.AsValue().AsText(), 'Response should echo the requested vatBusinessPostingGroup');
+        Assert.IsTrue(ResponseBody.Get('customerNo', JToken), 'Response should contain customerNo');
+        Assert.AreEqual(Customer."No.", JToken.AsValue().AsText(), 'Response should echo the requested customerNo');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetSale_NonExistent_ReturnsNotFound()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";

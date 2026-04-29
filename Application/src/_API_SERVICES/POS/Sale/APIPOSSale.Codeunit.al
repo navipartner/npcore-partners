@@ -108,19 +108,18 @@ codeunit 6248632 "NPR API POS Sale"
         CreateSale(SaleSystemId, POSUnitNo);
         POSSession.GetSale(POSSale);
 
-        if CustomerNo <> '' then begin
+        if (CustomerNo <> '') or (VATBusinessPostingGroup <> '') then begin
             POSSale.GetCurrentSale(POSSaleRec);
-            POSSaleRec.Validate("Customer No.", CustomerNo);
-            POSSaleRec.Modify(true);
-        end;
-
-        if VATBusinessPostingGroup <> '' then begin
-            POSSale.GetCurrentSale(POSSaleRec);
-            POSSaleRec.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup);
+            POSSaleRec.GetBySystemId(POSSaleRec.SystemId);
+            if CustomerNo <> '' then
+                POSSaleRec.Validate("Customer No.", CustomerNo);
+            if VATBusinessPostingGroup <> '' then
+                POSSaleRec.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup);
             POSSaleRec.Modify(true);
         end;
 
         POSSale.GetCurrentSale(POSSaleRec);
+        POSSaleRec.GetBySystemId(POSSaleRec.SystemId);
         exit(Response.RespondCreated(POSSaleAsJson(POSSaleRec, true)));
     end;
 
