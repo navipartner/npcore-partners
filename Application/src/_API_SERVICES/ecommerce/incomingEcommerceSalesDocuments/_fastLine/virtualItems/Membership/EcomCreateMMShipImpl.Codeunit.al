@@ -90,11 +90,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         UpdateMembershipEntryAmounts(MembershipEntry, EcomSalesLine, EcomSalesHeader);
         MembershipEntry.Modify();
 
-        if IsNullGuid(Membership."Ecom Sale Id") then begin
-            Membership."Ecom Sale Id" := EcomSalesHeader.SystemId;
-            Membership.Modify();
-        end;
-
         SponsorshipTicketMgmt.OnMembershipPayment(MembershipEntry);
 
         CreateMembershipPaymentMethods(EcomSalesHeader, Membership);
@@ -126,9 +121,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             Error(ResponseMessage);
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
-        Membership."Ecom Sale Id" := EcomSalesHeader.SystemId;
-        Membership.Modify();
-
         EcomSalesLine."Membership Id" := Membership.SystemId;
         EcomSalesLine.Modify();
         MemberInfoCapture.Delete();
@@ -293,16 +285,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             Error(NotNamedErr, MembershipSalesSetup."Membership Code");
     end;
 
-    internal procedure ValidateMembershipToken(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipEntry: Record "NPR MM Membership Entry";
-    begin
-        ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader, Membership, MembershipEntry);
-        Membership."Ecom Sale Id" := EcomSalesHeader.SystemId;
-        Membership.Modify();
-    end;
-
     internal procedure ValidateMembershipForToken(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         Membership: Record "NPR MM Membership";
@@ -327,9 +309,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         if Membership.Blocked then
             Error(MembershipBlockedErr, Membership."Entry No.");
 
-        if (not IsNullGuid(Membership."Ecom Sale Id")) and (Membership."Ecom Sale Id" <> EcomSalesHeader.SystemId) then
-            Error(AlreadyClaimedErr, Membership."External Membership No.");
-
         MembershipEntry.Reset();
         MembershipEntry.SetCurrentKey("Membership Entry No.");
         MembershipEntry.SetLoadFields("Document No.");
@@ -350,10 +329,23 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     internal procedure ShowRelatedMembershipsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         Membership: Record "NPR MM Membership";
+        TempMembership: Record "NPR MM Membership" temporary;
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EmptyGuid: Guid;
     begin
-        Membership.SetRange("Ecom Sale Id", EcomSalesHeader.SystemId);
-        if not Membership.IsEmpty() then
-            PAGE.Run(0, Membership);
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Membership);
+        EcomSalesLine.SetFilter("Membership Id", '<>%1', EmptyGuid);
+        EcomSalesLine.SetLoadFields("Membership Id");
+        if EcomSalesLine.FindSet() then
+            repeat
+                if Membership.GetBySystemId(EcomSalesLine."Membership Id") then begin
+                    TempMembership := Membership;
+                    if TempMembership.Insert() then;
+                end;
+            until EcomSalesLine.Next() = 0;
+        if not TempMembership.IsEmpty() then
+            PAGE.Run(0, TempMembership);
     end;
 
     internal procedure ShowRelatedMembershipsAction(EcomSalesLine: Record "NPR Ecom Sales Line")

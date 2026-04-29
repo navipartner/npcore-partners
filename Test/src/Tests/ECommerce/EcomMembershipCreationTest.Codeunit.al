@@ -48,10 +48,6 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         MembershipEntry.SetRange(Blocked, false);
         MembershipEntry.FindFirst();
         Assert.AreEqual(EcomSalesHeader."External No.", MembershipEntry."Document No.", 'MembershipEntry."Document No." must match EcomSalesHeader."External No."');
-
-        // [Then] Membership is linked to the ecom sale
-        Membership.Get(Membership."Entry No.");
-        Assert.AreEqual(EcomSalesHeader.SystemId, Membership."Ecom Sale Id", 'Membership."Ecom Sale Id" must match EcomSalesHeader.SystemId');
     end;
 
     [Test]
@@ -169,7 +165,7 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CreateMembership_DirectCreation()
     // Test: No pre-existing membership — membership is created directly during ecom processing.
-    // Verifies: token set on line, Membership."Ecom Sale Id" linked, MembershipEntry."Document No." confirmed.
+    // Verifies: token set on line, MembershipEntry."Document No." confirmed.
     var
         Assert: Codeunit Assert;
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -205,12 +201,9 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         EcomSalesLine.Get(EcomSalesLine.RecordId);
         Assert.IsFalse(IsNullGuid(EcomSalesLine."Membership Id"), 'Membership token must be set after direct creation');
 
-        // [Then] Membership is linked to the ecom sale
+        // [Then] Membership entry is confirmed with the ecom order external no.
         MembershipSystemId := EcomSalesLine."Membership Id";
         Membership.GetBySystemId(MembershipSystemId);
-        Assert.AreEqual(EcomSalesHeader.SystemId, Membership."Ecom Sale Id", 'Membership."Ecom Sale Id" must match EcomSalesHeader.SystemId');
-
-        // [Then] Membership entry is confirmed with the ecom order external no.
         MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
         MembershipEntry.SetRange(Blocked, false);
         MembershipEntry.FindFirst();
@@ -262,7 +255,6 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         Assert.IsFalse(IsNullGuid(EcomSalesLine."Membership Id"), 'Membership token must be set');
         MembershipSystemId := EcomSalesLine."Membership Id";
         Membership.GetBySystemId(MembershipSystemId);
-        Assert.AreEqual(EcomSalesHeader.SystemId, Membership."Ecom Sale Id", 'Membership."Ecom Sale Id" must match');
 
         // [Then] MemberInfoCapture was consumed (deleted after processing)
         MemberInfoCapture.SetRange("Membership Entry No.", Membership."Entry No.");

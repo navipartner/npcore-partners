@@ -270,6 +270,9 @@
         {
             Caption = 'Ecommerce Sale Id';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2027-04-15';
+            ObsoleteReason = 'Not needed.';
         }
     }
 

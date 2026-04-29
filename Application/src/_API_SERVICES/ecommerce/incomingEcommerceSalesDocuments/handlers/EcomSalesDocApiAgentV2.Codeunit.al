@@ -60,6 +60,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        FeatureFlag: Codeunit "NPR Feature Flags Management";
         SalesDocToJsonToken: JsonToken;
         SellToCustomerJsonToken: JsonToken;
         ShipmentJsonToken: JsonToken;
@@ -85,9 +86,12 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesHeader."Ticket Reservation Token" := JsonHelper.GetJText(RequestBody, 'ticketReservationToken', MaxStrLen(EcomSalesHeader."Ticket Reservation Token"), true, false).Trim();
         if EcomSalesHeader."Ticket Reservation Token" <> '' then
             EcomCreateTicketImpl.ValidateAndUpdateRequestsWithEcommerceDocNo(EcomSalesHeader);
-        EcomSalesHeader."Ticket Holder Name" := JsonHelper.GetJText(RequestBody, 'ticketHolder', MaxStrLen(EcomSalesHeader."Ticket Holder Name"), true, false);
-        EcomSalesHeader."Ticket Holder Preferred Lang" := JsonHelper.GetJText(RequestBody, 'ticketHolderLanguage', MaxStrLen(EcomSalesHeader."Ticket Holder Preferred Lang"), true, false);
-
+        if not FeatureFlag.IsEnabled(EcomCreateTicketImpl.RemoveEcomTicketHolderNameAndLanguage()) then begin
+#pragma warning disable AL0432
+            EcomSalesHeader."Ticket Holder Name" := JsonHelper.GetJText(RequestBody, 'ticketHolder', MaxStrLen(EcomSalesHeader."Ticket Holder Name"), true, false);
+            EcomSalesHeader."Ticket Holder Preferred Lang" := JsonHelper.GetJText(RequestBody, 'ticketHolderLanguage', MaxStrLen(EcomSalesHeader."Ticket Holder Preferred Lang"), true, false);
+#pragma warning restore AL0432
+        end;
         //Sell-to
         SellToCustomerJsonToken := JsonHelper.GetJsonToken(RequestBody, 'sellToCustomer');
         EcomSalesHeader."Sell-to Customer No." := JsonHelper.GetJText(RequestBody, 'sellToCustomer.no', MaxStrLen(EcomSalesHeader."Sell-to Customer No."), true, false);
@@ -297,7 +301,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                     ParseMemberFields(SalesLineJsonToken, EcomSalesLine);
                                     EcomCreateMMShipImpl.ValidateMembershipRequestForDirectCreation(EcomSalesLine);
                                 end else
-                                    EcomCreateMMShipImpl.ValidateMembershipToken(EcomSalesLine, EcomSalesHeader)
+                                    EcomCreateMMShipImpl.ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader)
                             end;
                     end;
                     EcomSalesLine."Is Attraction Wallet" := EcomCreateWalletMgt.IsAttractionWallet(EcomSalesLine);

@@ -441,12 +441,18 @@ table 6151258 "NPR Ecom Sales Header"
         {
             Caption = 'Ticket Holder Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2027-04-15';
+            ObsoleteReason = 'Derived from Sell-to Name instead.';
         }
         field(5190; "Ticket Holder Preferred Lang"; Code[10])
         {
             Caption = 'Ticket Holder Preferred Language';
             DataClassification = CustomerContent;
             TableRelation = Language.Code;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2027-04-15';
+            ObsoleteReason = 'Not supported.';
         }
         field(5200; "External Document Id"; Text[100])
         {
