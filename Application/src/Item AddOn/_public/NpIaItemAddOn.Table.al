@@ -34,7 +34,11 @@
             Caption = 'Package Template';
             DataClassification = CustomerContent;
         }
-
+        field(30; "Simplified Descriptions on POS"; Boolean)
+        {
+            Caption = 'Simplified Descriptions on POS';
+            DataClassification = CustomerContent;
+        }
         field(210; NPDesignerTemplateId; Text[40])
         {
             Caption = 'Design Layout Id';

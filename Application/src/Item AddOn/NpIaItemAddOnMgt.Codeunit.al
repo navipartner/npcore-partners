@@ -168,7 +168,7 @@
 
                     Clear(ItemAddOn_LineJObject);
                     ItemAddOn_LineJObject.Add('id', ItemAddOnLine."Line No.");
-                    ItemAddOn_LineJObject.Add('caption', GetLineCaption(ItemAddOnLine, 0));
+                    ItemAddOn_LineJObject.Add('caption', GetLineCaption(ItemAddOn, ItemAddOnLine, 0));
                     case ItemAddOnLine.Type of
                         ItemAddOnLine.Type::Quantity:
                             begin
@@ -241,7 +241,7 @@
                         ItemAddOn_GroupLineSettingsJArray.Add(ItemAddOn_LineJObject);
 
                         Clear(ItemAddOn_GroupLineJObject);
-                        ItemAddOn_GroupLineJObject.Add('caption', GetLineCaption(ItemAddOnLine, 1));
+                        ItemAddOn_GroupLineJObject.Add('caption', GetLineCaption(ItemAddOn, ItemAddOnLine, 1));
                         ItemAddOn_GroupLineJObject.Add('type', 'group');
                         ItemAddOn_GroupLineJObject.Add('expanded', true);
                         ItemAddOn_GroupLineJObject.Add('settings', ItemAddOn_GroupLineSettingsJArray);
@@ -258,8 +258,9 @@
         ConfigJObject.Add('settings', ItemAddOn_LinesJArray);
     end;
 
-    local procedure GetLineCaption(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; UseField: Option Description,"Description 2",Both) LineCaption: Text
+    local procedure GetLineCaption(ItemAddOn: Record "NPR NpIa Item AddOn"; ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; UseField: Option Description,"Description 2",Both) LineCaption: Text
     var
+        HideCaptionQtyExtensions: Boolean;
         PerUnitLbl: Label 'per unit';
         QuantityLbl: Label 'quantity';
         SelectOptionsLbl: Label 'Select one';
@@ -289,9 +290,12 @@
                     LineCaption := SelectOptionsLbl;
             end;
         end;
-        if ItemAddOnLine."Fixed Quantity" then
-            LineCaption := LineCaption + StrSubstNo(PlaceHolder2Lbl, QuantityLbl, ItemAddOnLine.Quantity);
-        if ItemAddOnLine."Per Unit" then
+        if ItemAddOnLine."Fixed Quantity" then begin
+            HideCaptionQtyExtensions := not ShowCaptionQtyExtensions(ItemAddOn, ItemAddOnLine);
+            if not HideCaptionQtyExtensions then
+                LineCaption := LineCaption + StrSubstNo(PlaceHolder2Lbl, QuantityLbl, ItemAddOnLine.Quantity);
+        end;
+        if ItemAddOnLine."Per Unit" and not HideCaptionQtyExtensions then
             LineCaption := LineCaption + '/' + PerUnitLbl;
     end;
 
@@ -305,6 +309,13 @@
         if VariantCode <> '' then
             Description := StrSubstNo(VariantCodeLbl, Description, VariantCode);
         exit(Description);
+    end;
+
+    local procedure ShowCaptionQtyExtensions(ItemAddOn: Record "NPR NpIa Item AddOn"; ItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Boolean
+    begin
+        if not (ItemAddOnLine.Quantity in [-1, 0, 1]) then
+            exit(true);
+        exit(not ItemAddOn."Simplified Descriptions on POS");
     end;
 
     local procedure CommentLineID(LineNo: Integer): Text
