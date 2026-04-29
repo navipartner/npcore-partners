@@ -1174,9 +1174,10 @@
             POSSaleTax.Delete();
     end;
 
-    procedure CopyToPosSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
+    local procedure CopyToPosSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
     begin
         POSSaleLine.SystemId := Rec.SystemId;
+        POSSaleLine.SystemCreatedAt := Rec.SystemCreatedAt;
         POSSaleLine.Amount := Rec.Amount;
         POSSaleLine."Amount Including VAT" := Rec."Amount Including VAT";
         POSSaleLine."Currency Amount" := Rec."Currency Amount";
@@ -1212,7 +1213,7 @@
         POSSaleline."VAT Calculation Type" := Rec."VAT Calculation Type";
     end;
 
-    procedure CopyFromPosSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
+    local procedure CopyFromPosSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
     begin
         Rec.Amount := POSSaleLine.Amount;
         Rec."Amount Including VAT" := POSSaleLine."Amount Including VAT";
