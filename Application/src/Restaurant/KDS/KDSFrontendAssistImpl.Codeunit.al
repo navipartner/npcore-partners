@@ -70,6 +70,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         KitchenRequest: Record "NPR NPRE Kitchen Request";
+        KitchenRequest2: Record "NPR NPRE Kitchen Request";
         KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         RestaurantCode: Code[20];
@@ -107,6 +108,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 
         if KitchenRequest.FindSet(true) then
             repeat
+                KitchenRequest2 := KitchenRequest;
                 case KitchenActionToRun of
                     KitchenActionToRun::"Accept Change",
                     KitchenActionToRun::"Set Production Not Started",
@@ -122,9 +124,9 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                                         KitchenActionToRun::"Accept Change":
                                             KitchenOrderMgt.AcceptQtyChange(KitchenRequestStation);
                                         KitchenActionToRun::"Set Production Not Started":
-                                            KitchenOrderMgt.SetProductionNotStarted(KitchenRequest, KitchenRequestStation);
+                                            KitchenOrderMgt.SetProductionNotStarted(KitchenRequest2, KitchenRequestStation);
                                         KitchenActionToRun::"Start Production":
-                                            KitchenOrderMgt.StartProduction(KitchenRequest, KitchenRequestStation);
+                                            KitchenOrderMgt.StartProduction(KitchenRequest2, KitchenRequestStation);
                                         KitchenActionToRun::"End Production":
                                             KitchenOrderMgt.EndProduction(KitchenRequestStation);
                                         KitchenActionToRun::"Set OnHold",
@@ -135,9 +137,9 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                         end;
 
                     KitchenActionToRun::"Set Served":
-                        KitchenOrderMgt.SetRequestLineAsServed(KitchenRequest);
+                        KitchenOrderMgt.SetRequestLineAsServed(KitchenRequest2);
                     KitchenActionToRun::"Revoke Serving":
-                        KitchenOrderMgt.RevokeServingForRequestLine(KitchenRequest);
+                        KitchenOrderMgt.RevokeServingForRequestLine(KitchenRequest2, true);
                 end;
             until KitchenRequest.Next() = 0;
         AddServerIDToResponse(Response);

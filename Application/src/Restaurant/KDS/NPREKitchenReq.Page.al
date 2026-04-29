@@ -409,6 +409,7 @@
     local procedure RunKitchenStationRelatedAction(ActionToRun: Option)
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
+        KitchenRequest2: Record "NPR NPRE Kitchen Request";
         KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
     begin
         CurrPage.SetSelectionFilter(KitchenRequest);
@@ -420,11 +421,12 @@
         if KitchenRequest.FindSet() then
             repeat
                 GetRequestStation(KitchenRequest, KitchenRequestStation);
+                KitchenRequest2 := KitchenRequest;
                 case ActionToRun of
                     KitchenStationAction::"Accept Qty. Change":
                         KitchenOrderMgt.AcceptQtyChange(KitchenRequestStation);
                     KitchenStationAction::"Start Production":
-                        KitchenOrderMgt.StartProduction(KitchenRequest, KitchenRequestStation);
+                        KitchenOrderMgt.StartProduction(KitchenRequest2, KitchenRequestStation);
                     KitchenStationAction::"End Production":
                         KitchenOrderMgt.EndProduction(KitchenRequestStation);
                 end;

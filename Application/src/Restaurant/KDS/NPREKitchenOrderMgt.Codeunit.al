@@ -7,8 +7,6 @@
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         _HideValidationDialog: Boolean;
-        AlreadyFinishedMsg: Label 'Production of the item has already been marked as finished. Are you sure you want to start over?';
-        RequestCancelledMsg: Label 'The kitchen request is cancelled. Are you sure you want to continue?';
 
     procedure SendWPLinesToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
     var
@@ -524,18 +522,12 @@
         exit(100);
     end;
 
-    procedure SetProductionNotStarted(KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
+    procedure SetProductionNotStarted(var KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
     begin
         if KitchenRequestStation."Production Status" in [KitchenRequestStation."Production Status"::Pending, KitchenRequestStation."Production Status"::"Not Started"] then
             exit;
-        if KitchenRequest."Line Status" = KitchenRequest."Line Status"::Cancelled then
-            if not _HideValidationDialog and GuiAllowed() then
-                if not Confirm(RequestCancelledMsg, false) then
-                    Error('');
-        if KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::Finished then
-            if not _HideValidationDialog and GuiAllowed() then
-                if not Confirm(AlreadyFinishedMsg, true) then
-                    Error('');
+        CheckCurrentStatusAndConfirmChange(KitchenRequest, KitchenRequestStation);
+        ConfirmAndRevokeServingIfServed(KitchenRequest);
 
         KitchenRequestStation."Start Date-Time" := 0DT;
         KitchenRequestStation."End Date-Time" := 0DT;
@@ -555,18 +547,12 @@
         StartProduction(KitchenRequest, KitchenRequestStation);
     end;
 
-    procedure StartProduction(KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
+    procedure StartProduction(var KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
     begin
         if KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::Started then
             exit;
-        if KitchenRequest."Line Status" = KitchenRequest."Line Status"::Cancelled then
-            if not _HideValidationDialog and GuiAllowed() then
-                if not Confirm(RequestCancelledMsg, false) then
-                    Error('');
-        if KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::Finished then
-            if not _HideValidationDialog and GuiAllowed() then
-                if not Confirm(AlreadyFinishedMsg, true) then
-                    Error('');
+        CheckCurrentStatusAndConfirmChange(KitchenRequest, KitchenRequestStation);
+        ConfirmAndRevokeServingIfServed(KitchenRequest);
 
         if KitchenRequestStation."Start Date-Time" = 0DT then
             KitchenRequestStation."Start Date-Time" := CurrentDateTime();
@@ -605,6 +591,33 @@
             KitchenRequestStation."Last Qty. Change Accepted" := CurrentDateTime();
             KitchenRequestStation.Modify();
         end;
+    end;
+
+    local procedure CheckCurrentStatusAndConfirmChange(KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
+    var
+        AlreadyFinishedMsg: Label 'Production of the item has already been marked as finished for %1 %2. Are you sure you want to start over?', Comment = '%1 = Kitchen Request tablecaption, %2 = Kitchen Request No.';
+        RequestCancelledMsg: Label 'The %1 %2 is cancelled. Are you sure you want to continue?', Comment = '%1 = Kitchen Request tablecaption, %2 = Kitchen Request No.';
+    begin
+        if KitchenRequest."Line Status" = KitchenRequest."Line Status"::Cancelled then
+            if not _HideValidationDialog and GuiAllowed() then
+                if not Confirm(RequestCancelledMsg, false, KitchenRequest.TableCaption(), KitchenRequest."Request No.") then
+                    Error('');
+        if KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::Finished then
+            if not _HideValidationDialog and GuiAllowed() then
+                if not Confirm(AlreadyFinishedMsg, true, KitchenRequest.TableCaption(), KitchenRequest."Request No.") then
+                    Error('');
+    end;
+
+    local procedure ConfirmAndRevokeServingIfServed(var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        RequestServedMsg: Label 'The %1 %2 has already been marked as served. If you continue, the serving will be revoked and the item will be marked as not served.\Are you sure you want to continue?', Comment = '%1 = Kitchen Request tablecaption, %2 = Kitchen Request No.';
+    begin
+        if KitchenRequest."Line Status" <> KitchenRequest."Line Status"::Served then
+            exit;
+        if not _HideValidationDialog and GuiAllowed() then
+            if not Confirm(RequestServedMsg, false, KitchenRequest.TableCaption(), KitchenRequest."Request No.") then
+                Error('');
+        RevokeServingForRequestLine(KitchenRequest, false);
     end;
 
     local procedure UpdateRequestStatusesFromStation(KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station"; RefreshOrderStatus: Boolean)
@@ -844,19 +857,20 @@
             until ChildKitchenRequest.Next() = 0;
     end;
 
-    procedure RevokeServingForRequestLine(var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    procedure RevokeServingForRequestLine(var KitchenRequest: Record "NPR NPRE Kitchen Request"; RefreshOrderStatus: Boolean)
     begin
-        RevokeServingForChildRequestLines(KitchenRequest);
+        RevokeServingForChildRequestLines(KitchenRequest, RefreshOrderStatus);
         KitchenRequest.TestField("Line Status", KitchenRequest."Line Status"::Served);
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::"Ready for Serving";
         KitchenRequest."Served Date-Time" := 0DT;
         KitchenRequest.Modify();
 
-        UpdateOrderStatus(KitchenRequest."Order ID");
+        if RefreshOrderStatus then
+            UpdateOrderStatus(KitchenRequest."Order ID");
         ReopenSourceDocument(KitchenRequest);
     end;
 
-    local procedure RevokeServingForChildRequestLines(KitchenRequest: Record "NPR NPRE Kitchen Request")
+    local procedure RevokeServingForChildRequestLines(KitchenRequest: Record "NPR NPRE Kitchen Request"; RefreshOrderStatus: Boolean)
     var
         ChildKitchenRequest: Record "NPR NPRE Kitchen Request";
     begin
@@ -864,7 +878,7 @@
         ChildKitchenRequest.SetRange("Line Status", ChildKitchenRequest."Line Status"::Served);
         if ChildKitchenRequest.FindSet(true) then
             repeat
-                RevokeServingForRequestLine(ChildKitchenRequest);
+                RevokeServingForRequestLine(ChildKitchenRequest, RefreshOrderStatus);
             until ChildKitchenRequest.Next() = 0;
     end;
 
