@@ -32,6 +32,11 @@ page 6150934 "NPR NPRE Menu Items Part"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the variant code for the item.';
                 }
+                field(Status; Rec.Status)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the status of the menu item. Active items are shown on the menu, Inactive (visible) items are shown but cannot be ordered, and Inactive (hidden) items are not shown.';
+                }
                 field("Captions Filled"; Rec."Captions Filled")
                 {
                     ApplicationArea = NPRRetail;

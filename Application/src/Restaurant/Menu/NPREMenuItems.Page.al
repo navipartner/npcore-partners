@@ -30,6 +30,10 @@ page 6150933 "NPR NPRE Menu Items"
                 {
                     ToolTip = 'Specifies the variant code for the item.';
                 }
+                field(Status; Rec.Status)
+                {
+                    ToolTip = 'Specifies the status of the menu item. Active items are shown on the menu, Inactive (visible) items are shown but cannot be ordered, and Inactive (hidden) items are not shown.';
+                }
                 field("Captions Filled"; Rec."Captions Filled")
                 {
                     ToolTip = 'Specifies whether the item has captions defined.';
