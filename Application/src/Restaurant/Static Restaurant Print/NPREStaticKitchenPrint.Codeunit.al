@@ -28,12 +28,16 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         Customer: Record Customer;
         LastWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         B21FontLbl: Label 'B21', Locked = true;
-        A11FontLbl: Label 'A11', Locked = true;
+        B22FontLbl: Label 'B22', Locked = true;
+        B12FontLbl: Label 'B12', Locked = true;
         NumberOfGuestsLbl: Label 'Number of Guests: ';
+        KitchenDescriptionLineMaxLength: Integer;
         LastLineNo: Integer;
     begin
         if not WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
             exit;
+
+        KitchenDescriptionLineMaxLength := 20; // B22/B12 on 80mm paper = 28 chars/line; col 2 gets 85% = ~20
 
         Printer.SetFont(B21FontLbl);
         Printer.AddLine('', 0);
@@ -75,26 +79,73 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         if WaiterPadLine.FindSet() then
             repeat
                 if WaiterPadLine."Attached to Line No." <> 0 then begin
-                    Printer.SetFont(A11FontLbl);
-                    Printer.AddTextField(1, 0, '  ' + Format(WaiterPadLine.Quantity) + ' x ');
-                    Printer.AddTextField(2, 0, '  ' + WaiterPadLine.Description);
+                    Printer.SetFont(B12FontLbl);
+                    PrintWrappedDescriptionLine('  ' + Format(WaiterPadLine.Quantity) + ' x ', '  ' + WaiterPadLine.Description, KitchenDescriptionLineMaxLength, false);
                     Printer.SetFont(B21FontLbl);
                 end else begin
-                    if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then
-                        Printer.SetFont(A11FontLbl);
-                    Printer.SetBold(true);
-                    Printer.AddTextField(1, 0, Format(WaiterPadLine.Quantity) + ' x ');
-                    Printer.AddTextField(2, 0, WaiterPadLine.Description);
-                    Printer.SetBold(false);
-                    if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then begin
-                        Printer.SetFont(B21FontLbl);
-                        if WaiterPadLine."Line No." <> LastLineNo then
-                            Printer.AddLine('', 0);
-                    end;
+                    Printer.SetFont(B22FontLbl);
+                    PrintWrappedDescriptionLine(
+                        Format(WaiterPadLine.Quantity) + ' x ',
+                        WaiterPadLine.Description,
+                        KitchenDescriptionLineMaxLength,
+                        WaiterPadLine."Line Type" <> WaiterPadLine."Line Type"::Comment);
+                    if (WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment) and (WaiterPadLine."Line No." <> LastLineNo) then
+                        Printer.AddLine('', 0);
                 end;
             until WaiterPadLine.Next() = 0;
 
         Printer.SetFont('COMMAND');
         Printer.AddLine('PAPERCUT', 0);
+    end;
+
+    local procedure PrintWrappedDescriptionLine(LeftColumnText: Text; DescriptionText: Text; MaxLineLength: Integer; Bold: Boolean)
+    var
+        RemainingText: Text;
+        TextChunk: Text;
+    begin
+        RemainingText := DelChr(DescriptionText, '<', ' ');
+
+        Printer.SetBold(Bold);
+
+        Printer.AddTextField(1, 0, LeftColumnText);
+        TextChunk := GetNextTextChunk(RemainingText, MaxLineLength);
+        Printer.AddTextField(2, 0, TextChunk);
+
+        while RemainingText <> '' do begin
+            Printer.NewLine();
+            Printer.AddTextField(1, 0, '');
+            TextChunk := GetNextTextChunk(RemainingText, MaxLineLength);
+            Printer.AddTextField(2, 0, TextChunk);
+        end;
+
+        Printer.SetBold(false);
+    end;
+
+    local procedure GetNextTextChunk(var RemainingText: Text; MaxLineLength: Integer): Text
+    var
+        ChunkText: Text;
+        SplitPosition: Integer;
+        i: Integer;
+    begin
+        if StrLen(RemainingText) <= MaxLineLength then begin
+            ChunkText := RemainingText;
+            RemainingText := '';
+            exit(ChunkText);
+        end;
+
+        ChunkText := CopyStr(RemainingText, 1, MaxLineLength);
+        for i := StrLen(ChunkText) downto 1 do
+            if ChunkText[i] = ' ' then begin
+                SplitPosition := i;
+                break;
+            end;
+
+        if SplitPosition > 0 then begin
+            ChunkText := DelChr(CopyStr(ChunkText, 1, SplitPosition - 1), '>', ' ');
+            RemainingText := DelChr(CopyStr(RemainingText, SplitPosition + 1), '<', ' ');
+        end else
+            RemainingText := DelChr(CopyStr(RemainingText, MaxLineLength + 1), '<', ' ');
+
+        exit(ChunkText);
     end;
 }
