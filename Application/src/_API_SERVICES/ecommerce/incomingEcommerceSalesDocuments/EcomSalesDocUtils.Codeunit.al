@@ -719,10 +719,8 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
                         EcomSalesLine.Subtype::Membership:
                             begin
                                 ValidateImportedVItemNo(EcomSalesLine);
-                                if IsNullGuid(EcomSalesLine."Membership Id") then
-                                    EcomCreateMMShipImpl.ValidateMembershipRequestForDirectCreation(EcomSalesLine)
-                                else
-                                    EcomCreateMMShipImpl.ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader)
+                                EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+
                             end;
                         EcomSalesLine.Subtype::Coupon:
                             begin

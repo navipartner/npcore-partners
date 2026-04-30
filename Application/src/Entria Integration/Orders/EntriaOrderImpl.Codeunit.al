@@ -302,6 +302,8 @@ codeunit 6151027 "NPR Entria Order Impl."
     end;
 
     local procedure DeserializeEcomSalesLine(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesLineParams: Record "NPR Ecom Sales Line"; QuantityIndex: Integer; QuantityCount: Integer; TotalAmount: Decimal; var InsertedAmount: Decimal)
+    var
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
     begin
 #pragma warning disable AA0139
         case EcomSalesLine.Type of
@@ -320,6 +322,8 @@ codeunit 6151027 "NPR Entria Order Impl."
                         EcomSalesLine.Subtype::Membership:
                             begin
                                 DeserializeSplitedLineValues(SalesLineJsonToken, EcomSalesLine, QuantityIndex, QuantityCount, TotalAmount, InsertedAmount);
+                                GetMembershipRoutingInformation(SalesLineJsonToken, EcomSalesLine);
+                                EcomSalesLine."Membership Operation" := EcomCreateMMShipImpl.DetermineMembershipOperation(EcomSalesLine);
                                 EcomSalesLine."Member Birthday" := _JsonHelper.GetJDate(SalesLineJsonToken, 'metadata.birthdate', false);
                                 EcomSalesLine."Membership Activation Date" := _JsonHelper.GetJDate(SalesLineJsonToken, 'metadata.activation_date', false);
                                 EcomSalesLine."Member First Name" := _JsonHelper.GetJText(SalesLineJsonToken, 'metadata.member_first_name', MaxStrLen(EcomSalesLine."Member First Name"), false, false);
@@ -600,6 +604,25 @@ codeunit 6151027 "NPR Entria Order Impl."
         EcomSalesHeader."Dimension Set ID" := DimensionMgt.GetDefaultDimID(DefaultDimSource, '', GlobalDim1Code, GlobalDim2Code, 0, 0);
         EcomSalesHeader."Global Dimension 1 Code" := GlobalDim1Code;
         EcomSalesHeader."Global Dimension 2 Code" := GlobalDim2Code;
+    end;
+
+    local procedure GetMembershipRoutingInformation(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        MembershipId, OptionId : Text;
+        InvalidGuidErr: Label 'Invalid value: ":%1". Expected a GUID.', Comment = '%1 = incoming value';
+    begin
+        MembershipId := JsonHelper.GetJText(SalesLineJsonToken, 'metadata.membership_id', 50, false, false).Trim();
+        if (MembershipId = '') then
+            exit;
+
+        if (not Evaluate(EcomSalesLine."Membership Id", MembershipId)) then
+            Error(InvalidGuidErr, MembershipId);
+
+        OptionId := JsonHelper.GetJText(SalesLineJsonToken, 'metadata.membership_option_id', 50, false, false).Trim();
+        if (OptionId <> '') then
+            if (not Evaluate(EcomSalesLine."Alteration Option System Id", OptionId)) then
+                Error(InvalidGuidErr, OptionId);
     end;
 
     var

@@ -189,6 +189,11 @@ page 6248186 "NPR Ecom Sales Lines"
                         ShowWalletErrorMessage();
                     end;
                 }
+                field("Membership Operation"; Rec."Membership Operation")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Membership Operation field.';
+                }
                 field("Membership Id"; Rec."Membership Id")
                 {
                     ApplicationArea = NPRRetail;

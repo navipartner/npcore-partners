@@ -18,7 +18,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
                         CreateTickets(EcomSalesHeader, true, false);
                     end;
                 EcomSalesLine.Subtype::Membership:
-                    CreateMembership(EcomSalesLine, true, false);
+                    HandleMembership(EcomSalesLine, true, false);
                 EcomSalesLine.Subtype::Coupon:
                     CreateCoupons(EcomSalesLine, true, false);
                 else
@@ -121,13 +121,13 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetFilter(Quantity, '<>0');
         if EcomSalesLine.FindSet() then
             repeat
-                CreateMembership(EcomSalesLine, ShowError, UpdateRetryCount);
+                HandleMembership(EcomSalesLine, ShowError, UpdateRetryCount);
             until EcomSalesLine.Next() = 0;
 
         EcomSalesHeader.Get(EcomSalesHeader.RecordId);
     end;
 
-    local procedure CreateMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; ShowError: Boolean; UpdateRetryCount: Boolean) Success: Boolean
+    local procedure HandleMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; ShowError: Boolean; UpdateRetryCount: Boolean) Success: Boolean
     var
         EcomCreateMMShipProcess: Codeunit "NPR EcomCreateMMShipProcess";
     begin

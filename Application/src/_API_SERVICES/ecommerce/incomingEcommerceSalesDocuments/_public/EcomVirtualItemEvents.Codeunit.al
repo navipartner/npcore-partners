@@ -103,6 +103,24 @@ codeunit 6248516 "NPR EcomVirtualItemEvents"
     internal procedure OnAfterSetSalesDocMembershipStatusCreated(var EcomSalesLine: Record "NPR Ecom Sales Line"; var EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnAfterMembershipRenewedBeforeCommit(var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnAfterMembershipExtendedBeforeCommit(var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnAfterMembershipUpgradedBeforeCommit(var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+    end;
 }
 
 #endif

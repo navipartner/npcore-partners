@@ -3304,7 +3304,7 @@
         end;
     end;
 
-    local procedure CheckExtendMemberCards(WithUpdate: Boolean; MembershipEntryNo: Integer; ExpiredCardOption: Integer; NewTimeFrameEndDate: Date; ExternalCardNo: Text[100]; var MemberCardEntryNoOut: Integer; var ResponseMessage: Text): Boolean
+    internal procedure CheckExtendMemberCards(WithUpdate: Boolean; MembershipEntryNo: Integer; ExpiredCardOption: Integer; NewTimeFrameEndDate: Date; ExternalCardNo: Text[100]; var MemberCardEntryNoOut: Integer; var ResponseMessage: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -4148,7 +4148,7 @@
         Span.Finish();
     end;
 
-    local procedure ValidAlterationGracePeriod(MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MembershipEntry: Record "NPR MM Membership Entry"; ReferenceDate: Date): Boolean
+    internal procedure ValidAlterationGracePeriod(MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MembershipEntry: Record "NPR MM Membership Entry"; ReferenceDate: Date): Boolean
     var
         GracePeriodDate: Date;
         GraceDayCount: Integer;
@@ -4205,7 +4205,7 @@
         exit(InGracePeriod);
     end;
 
-    local procedure ValidateChangeMembershipCode(WithConfirm: Boolean; MembershipEntryNo: Integer; ToMembershipCode: Code[20]; var ReasonText: Text): Boolean
+    internal procedure ValidateChangeMembershipCode(WithConfirm: Boolean; MembershipEntryNo: Integer; ToMembershipCode: Code[20]; var ReasonText: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -4232,7 +4232,7 @@
         exit(true);
     end;
 
-    local procedure CheckAgeConstraintOnMembershipAlter(Membership: Record "NPR MM Membership"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; SalesDate: Date; PeriodStartDate: Date; PeriodEndDate: Date; var ReasonText: Text): Boolean
+    internal procedure CheckAgeConstraintOnMembershipAlter(Membership: Record "NPR MM Membership"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; SalesDate: Date; PeriodStartDate: Date; PeriodEndDate: Date; var ReasonText: Text): Boolean
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         ReferenceDate: Date;
@@ -4569,7 +4569,7 @@
         exit(MemberCount);
     end;
 
-    local procedure ConflictingLedgerEntries(MembershipEntryNo: Integer; StartDate: Date; EndDate: Date; var StartEntryNo: Integer; var EndEntryNo: Integer): Boolean
+    internal procedure ConflictingLedgerEntries(MembershipEntryNo: Integer; StartDate: Date; EndDate: Date; var StartEntryNo: Integer; var EndEntryNo: Integer): Boolean
     begin
 
         if (not GetLedgerEntryForDate(MembershipEntryNo, StartDate, StartEntryNo)) then
@@ -4581,7 +4581,7 @@
         exit(StartEntryNo <> EndEntryNo);
     end;
 
-    local procedure GetLedgerEntryForDate(MembershipEntryNo: Integer; DateToCheck: Date; var EntryNo: Integer): Boolean
+    internal procedure GetLedgerEntryForDate(MembershipEntryNo: Integer; DateToCheck: Date; var EntryNo: Integer): Boolean
     var
         MembershipEntry: Record "NPR MM Membership Entry";
     begin

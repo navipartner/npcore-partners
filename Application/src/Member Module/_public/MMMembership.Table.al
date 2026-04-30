@@ -257,6 +257,15 @@
             Caption = 'Synchronized At';
             DataClassification = CustomerContent;
         }
+        field(220; "Ecom Sale Id"; Guid)
+        {
+            Caption = 'Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2027-04-15';
+            ObsoleteReason = 'Not needed.';
+        }
+
         field(1000; "Has Membership Entry"; Boolean)
         {
             CalcFormula = Exist("NPR MM Membership Entry" WHERE("Membership Entry No." = FIELD("Entry No."),
@@ -265,14 +274,6 @@
             Caption = 'Has Membership Entry';
             Editable = false;
             FieldClass = FlowField;
-        }
-        field(220; "Ecom Sale Id"; Guid)
-        {
-            Caption = 'Ecommerce Sale Id';
-            DataClassification = CustomerContent;
-            ObsoleteState = Pending;
-            ObsoleteTag = '2027-04-15';
-            ObsoleteReason = 'Not needed.';
         }
     }
 

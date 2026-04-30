@@ -6,6 +6,12 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     internal procedure Process(var EcomSalesLine: Record "NPR Ecom Sales Line") Success: Boolean
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomMembershipOperation: Enum "NPR Ecom Membership Operation";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        OperationName: Text;
+        NoOperationErr: Label 'The operation to be performed on the membership could not be determined for line %1. Check that membershipId and operationId are correctly provided for the line and try again.', Comment = '%1 - line number', Locked = true;
+        UnknownOperationErr: Label 'Unknown membership operation for line %1.', Comment = '%1 - line number', Locked = true;
     begin
         EcomSalesHeader.Get(EcomSalesLine."Document Entry No.");
         CheckIfLineCanBeProcessed(EcomSalesLine, EcomSalesHeader);
@@ -13,42 +19,129 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         EcomSalesLine.ReadIsolation := EcomSalesLine.ReadIsolation::UpdLock;
         EcomSalesLine.Get(EcomSalesLine.RecordId);
 
-        if IsNullGuid(EcomSalesLine."Membership Id") then begin
-            CreateMembership(EcomSalesLine, EcomSalesHeader);
-            EcomVirtualItemEvents.OnAfterMembershipCreatedBeforeCommit(EcomSalesLine);
+        EcomMembershipOperation := DetermineMembershipOperation(EcomSalesLine);
+        if (EcomSalesLine."Membership Operation" <> EcomMembershipOperation) then begin
+            EcomSalesLine."Membership Operation" := EcomMembershipOperation;
+            EcomSalesLine.Modify();
         end;
 
-        ConfirmMembership(EcomSalesLine, EcomSalesHeader);
-        EcomVirtualItemEvents.OnAfterMembershipConfirmedBeforeCommit(EcomSalesLine);
+        OperationName := EcomSalesLine."Membership Operation".Names.Get(EcomSalesLine."Membership Operation".Ordinals.IndexOf(EcomSalesLine."Membership Operation".AsInteger())).ToLower().replace(' ', '');
+        Sentry.StartSpan(SentrySpan, 'bc.e-com.membership.process.' + OperationName);
+
+        case EcomSalesLine."Membership Operation" of
+            EcomMembershipOperation::NoOperationSelected:
+                begin
+                    SentrySpan.Finish();
+                    Error(NoOperationErr, EcomSalesLine."Line No.");
+                end;
+
+            EcomMembershipOperation::CreateMembership:
+                begin
+                    CreateMembership(EcomSalesLine, EcomSalesHeader);
+                    _EcomVirtualItemEvents.OnAfterMembershipCreatedBeforeCommit(EcomSalesLine);
+                    ConfirmMembership(EcomSalesLine, EcomSalesHeader);
+                    _EcomVirtualItemEvents.OnAfterMembershipConfirmedBeforeCommit(EcomSalesLine);
+                end;
+            EcomMembershipOperation::ConfirmMembership:
+                begin
+                    ConfirmMembership(EcomSalesLine, EcomSalesHeader);
+                    _EcomVirtualItemEvents.OnAfterMembershipConfirmedBeforeCommit(EcomSalesLine);
+                end;
+
+            EcomMembershipOperation::RenewMembership:
+                begin
+                    ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader);
+                    _EcomVirtualItemEvents.OnAfterMembershipRenewedBeforeCommit(EcomSalesLine);
+                end;
+
+            EcomMembershipOperation::ExtendMembership:
+                begin
+                    ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader);
+                    _EcomVirtualItemEvents.OnAfterMembershipExtendedBeforeCommit(EcomSalesLine);
+                end;
+
+            EcomMembershipOperation::UpgradeMembership:
+                begin
+                    ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader);
+                    _EcomVirtualItemEvents.OnAfterMembershipUpgradedBeforeCommit(EcomSalesLine);
+                end;
+
+            else begin
+                SentrySpan.Finish();
+                Error(UnknownOperationErr, EcomSalesLine."Line No.");
+            end;
+
+        end;
+
+        SentrySpan.Finish();
         exit(true);
     end;
 
-    internal procedure CheckIfLineCanBeProcessed(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+
+    internal procedure DetermineMembershipOperation(EcomSalesLine: Record "NPR Ecom Sales Line") EcomMembershipOperation: Enum "NPR Ecom Membership Operation"
     var
-        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
-        MembershipAlterationNotSupportedErr: Label 'Membership alteration items are currently not supported in ecommerce. Item %1 cannot be processed.', Comment = '%1=Item No.';
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+    begin
+        if (EcomSalesLine.Subtype <> EcomSalesLine.Subtype::Membership) then
+            exit(EcomMembershipOperation::NoOperationSelected);
+
+        if (IsNullGuid(EcomSalesLine."Membership Id")) then
+            exit(EcomMembershipOperation::CreateMembership);
+
+        if (IsMembershipCreateItem(EcomSalesLine)) then
+            exit(EcomMembershipOperation::ConfirmMembership);
+
+        if (not IsNullGuid(EcomSalesLine."Alteration Option System Id")) then begin
+            if (not MembershipAlterationSetup.GetBySystemId(EcomSalesLine."Alteration Option System Id")) then
+                exit(EcomMembershipOperation::NoOperationSelected);
+
+            if (MembershipAlterationSetup."Alteration Type" = MembershipAlterationSetup."Alteration Type"::RENEW) then
+                exit(EcomMembershipOperation::RenewMembership);
+
+            if (MembershipAlterationSetup."Alteration Type" = MembershipAlterationSetup."Alteration Type"::UPGRADE) then
+                exit(EcomMembershipOperation::UpgradeMembership);
+
+            if (MembershipAlterationSetup."Alteration Type" = MembershipAlterationSetup."Alteration Type"::EXTEND) then
+                exit(EcomMembershipOperation::ExtendMembership);
+        end;
+
+        exit(EcomMembershipOperation::NoOperationSelected);
+    end;
+
+
+    local procedure IsMembershipCreateItem(EcomSalesLine: Record "NPR Ecom Sales Line"): Boolean
+    var
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        ItemNoCode: Code[20];
+    begin
+        ItemNoCode := GetItemNoAsCode20(EcomSalesLine);
+        if (not GetMembershipSaleSetup(MembershipSalesSetup, ItemNoCode)) then
+            exit(false);
+
+        exit(MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+    end;
+
+
+    internal procedure CheckIfLineCanBeProcessed(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
         if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
             EcomSalesHeader.FieldError("Creation Status");
 
-        if EcommSalesLine.Subtype <> EcommSalesLine.Subtype::Membership then
-            EcommSalesLine.FieldError(Subtype);
+        if EcomSalesLine.Subtype <> EcomSalesLine.Subtype::Membership then
+            EcomSalesLine.FieldError(Subtype);
 
-        if not EcommSalesLine.Captured then
-            EcommSalesLine.FieldError(Captured);
+        if not EcomSalesLine.Captured then
+            EcomSalesLine.FieldError(Captured);
 
-        if (EcommSalesLine.Quantity <> 1) then
-            EcommSalesLine.FieldError(Quantity);
+        if (EcomSalesLine.Quantity <> 1) then
+            EcomSalesLine.FieldError(Quantity);
 
-        if EcommSalesLine."Document Type" = EcommSalesLine."Document Type"::"Return Order" then
-            EcommSalesLine.FieldError("Document Type");
+        if EcomSalesLine."Document Type" = EcomSalesLine."Document Type"::"Return Order" then
+            EcomSalesLine.FieldError("Document Type");
 
-        if EcommSalesLine."Virtual Item Process Status" = EcommSalesLine."Virtual Item Process Status"::Processed then
-            EcommSalesLine.FieldError(EcommSalesLine."Virtual Item Process Status");
-#pragma warning disable AA0139
-        if EcomVirtualItemMgt.HasMembershipAlterationSetup(EcommSalesLine."No.") then
-            Error(MembershipAlterationNotSupportedErr, EcommSalesLine."No.");
-#pragma warning restore
+        if EcomSalesLine."Virtual Item Process Status" = EcomSalesLine."Virtual Item Process Status"::Processed then
+            EcomSalesLine.FieldError(EcomSalesLine."Virtual Item Process Status");
+
     end;
 
     local procedure ConfirmMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
@@ -91,39 +184,40 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MembershipEntry.Modify();
 
         SponsorshipTicketMgmt.OnMembershipPayment(MembershipEntry);
-
         CreateMembershipPaymentMethods(EcomSalesHeader, Membership);
     end;
 
     internal procedure CreateMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
-        ResponseMessage: Text;
     begin
         MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
-#pragma warning disable AA0139
-        MemberInfoCapture."Item No." := EcomSalesLine."No.";
-        MemberInfoCapture."Import Entry Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
-#pragma warning restore AA0139
+        MemberInfoCapture."Item No." := GetItemNoAsCode20(EcomSalesLine);
+        MemberInfoCapture."Import Entry Document ID" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(MemberInfoCapture."Import Entry Document ID"));
         MemberInfoCapture.Insert();
 
         UpdateMemberInfoCaptureFromLine(MemberInfoCapture, EcomSalesLine);
         SetNotificationMethod(MemberInfoCapture);
         MemberInfoCapture.Modify();
 
-        MembershipApiAgent.CreateMembershipWorker(MemberInfoCapture);
+        GetMembershipSaleSetup(MembershipSalesSetup, GetItemNoAsCode20(EcomSalesLine));
+        MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
 
-        if not MembershipManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage) then
-            Error(ResponseMessage);
-
+        // TODO - Wrong cardinality. Multiple sales interact with the membership over time.
+        // Field will be removed
         Membership.Get(MemberInfoCapture."Membership Entry No.");
         EcomSalesLine."Membership Id" := Membership.SystemId;
         EcomSalesLine.Modify();
         MemberInfoCapture.Delete();
+    end;
+
+    internal procedure ProcessMembershipAlteration(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        ReshapeMembershipDuration(EcomSalesLine, EcomSalesHeader);
     end;
 
     local procedure SetNotificationMethod(var MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -158,7 +252,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberInfoCapture."GDPR Approval" := MemberApiAgent.DecodeGdprConsent(EcomSalesLine."Member GDPR Approval");
         MemberInfoCapture."Document Date" := EcomSalesLine."Membership Activation Date";
 #pragma warning restore AA0139
-        EcomVirtualItemEvents.OnAfterUpdateMemberInfoCaptureFromLine(MemberInfoCapture);
+        _EcomVirtualItemEvents.OnAfterUpdateMemberInfoCaptureFromLine(MemberInfoCapture);
     end;
 
     internal procedure ValidateMembershipRequestForDirectCreation(EcomSalesLine: Record "NPR Ecom Sales Line")
@@ -171,12 +265,15 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     begin
         if EcomSalesLine.Quantity <> 1 then
             Error(QuantityErr);
+
         ItemNoCode := GetItemNoAsCode20(EcomSalesLine);
+
         GetAndValidateMembershipSalesSetup(EcomSalesLine, ItemNoCode, MembershipSalesSetup);
         if MembershipSalesSetup.Blocked then
             MembershipSalesSetup.FieldError(Blocked);
         if (MembershipSalesSetup."Valid From Base" = MembershipSalesSetup."Valid From Base"::PROMPT) and (EcomSalesLine."Membership Activation Date" = 0D) then
             Error(PromptActivationDateRequiredErr, EcomSalesLine."No.");
+
         ValidateMembershipSetup(MembershipSalesSetup, MembershipSetup);
         ValidateMemberIdentityRequirements(EcomSalesLine, MembershipSetup);
         ValidateMemberDataForDirectCreation(EcomSalesLine, MembershipSalesSetup, MembershipSetup);
@@ -246,6 +343,30 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             Error(MemberAgeConstraintErr, MembershipSalesSetup."Membership Code");
     end;
 
+    internal procedure ValidateMembershipOperation(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        NoOperationErr: Label 'Membership operation is not selected for line %1.', Comment = '%1 = line no.';
+        MissingOperationIdErr: Label 'Missing or invalid membership operation.';
+    begin
+        case EcomSalesLine."Membership Operation" of
+            EcomSalesLine."Membership Operation"::NoOperationSelected:
+                Error(NoOperationErr, EcomSalesLine."Line No.");
+            EcomSalesLine."Membership Operation"::CreateMembership:
+                EcomCreateMMShipImpl.ValidateMembershipRequestForDirectCreation(EcomSalesLine);
+            // TODO - function name! Decide how to handle a not yet paid membership. This is an order after all!
+            // Currently the create membership is creating the membership time entry regardless.
+            EcomSalesLine."Membership Operation"::ConfirmMembership:
+                EcomCreateMMShipImpl.ValidateMembershipForToken(EcomSalesLine, EcomSalesHeader);
+            EcomSalesLine."Membership Operation"::RenewMembership,
+            EcomSalesLine."Membership Operation"::ExtendMembership,
+            EcomSalesLine."Membership Operation"::UpgradeMembership:
+                EcomCreateMMShipImpl.ValidateMembershipAlterationRequest(EcomSalesLine, EcomSalesHeader);
+            else
+                Error(MissingOperationIdErr);
+        end;
+    end;
+
     local procedure GetItemNoAsCode20(EcomSalesLine: Record "NPR Ecom Sales Line") ItemNoCode: Code[20]
     var
         ItemNoInvalidErr: Label 'Invalid item number "%1". Expected a value that can be converted to Code[20].', Comment = '%1=EcomSalesLine."No."', Locked = true;
@@ -256,15 +377,15 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     local procedure GetAndValidateMembershipSalesSetup(EcomSalesLine: Record "NPR Ecom Sales Line"; ItemNoCode: Code[20]; var MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
     var
-        MMNPRMembership: Codeunit "NPR MM NPR Membership";
-        ItemNotMembershipErr: Label 'Item %1 is not set up as a membership item.', Comment = '%1=Item No.', Locked = true;
+        DistributedMembershipHandler: Codeunit "NPR MM NPR Membership";
+        ItemNotMembershipErr: Label 'Item %1 is not set up as a membership sale item.', Comment = '%1=Item No.', Locked = true;
         ForeignMembershipErr: Label 'Membership for an external membership community cannot be created here. Use the Membership APIs.', Locked = true;
         BusinessFlowTypeErr: Label 'Membership item is not set up as Membership Business Flow Type. Use the Membership APIs.', Locked = true;
     begin
         if not GetMembershipSaleSetup(MembershipSalesSetup, ItemNoCode) then
             Error(ItemNotMembershipErr, EcomSalesLine."No.");
 
-        if MMNPRMembership.IsForeignMembershipCommunity(MembershipSalesSetup."Membership Code") then
+        if DistributedMembershipHandler.IsForeignMembershipCommunity(MembershipSalesSetup."Membership Code") then
             Error(ForeignMembershipErr);
 
         if MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::MEMBERSHIP then
@@ -321,6 +442,178 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             Error(AlreadyClaimedErr, Membership."External Membership No.");
     end;
 
+    internal procedure ValidateMembershipAlterationRequest(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        DocumentDate: Date;
+        StartDateNew: Date;
+        EndDateNew: Date;
+        CardEntryNo: Integer;
+        ExternalCardNo: Text[100];
+        ReasonText: Text;
+        MembershipNotFoundErr: Label 'Membership with Id %1 not found.', Locked = true;
+        MembershipBlockedErr: Label 'Membership %1 is blocked.', Locked = true;
+        AlterationSetupNotFoundErr: Label 'Membership alteration option %1 not found.', Locked = true;
+        AlterationSetupMismatchErr: Label 'Membership alteration option %1 is not valid for membership type %2.', Comment = '%1=Alteration Option SystemId, %2=Membership Code', Locked = true;
+        AlterationNotAvailableViaWebServiceErr: Label 'Membership alteration option %1 is not available via web service.', Locked = true;
+        AlterationItemMismatchErr: Label 'Item %1 does not match the sales item %2 configured for membership alteration option %3.', Comment = '%1=Line Item No., %2=Setup Sales Item No., %3=Alteration Option SystemId', Locked = true;
+        MembershipEntryNotFoundErr: Label 'No active membership entry found for membership %1.', Comment = '%1=External Membership No.', Locked = true;
+        MembershipNotActivatedErr: Label 'Membership %1 must be activated before it can be altered.', Comment = '%1=External Membership No.', Locked = true;
+        GracePeriodErr: Label 'Membership is outside the grace period for alteration type %1.', Comment = '%1=Alteration Type', Locked = true;
+    begin
+        if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
+            Error(MembershipNotFoundErr, EcomSalesLine."Membership Id");
+
+        if Membership.Blocked then
+            Error(MembershipBlockedErr, Membership."Entry No.");
+
+        if not MembershipAlterationSetup.GetBySystemId(EcomSalesLine."Alteration Option System Id") then
+            Error(AlterationSetupNotFoundErr, EcomSalesLine."Alteration Option System Id");
+
+        if MembershipAlterationSetup."From Membership Code" <> Membership."Membership Code" then
+            Error(AlterationSetupMismatchErr, EcomSalesLine."Alteration Option System Id", Membership."Membership Code");
+
+        if MembershipAlterationSetup."Not Available Via Web Service" then
+            Error(AlterationNotAvailableViaWebServiceErr, EcomSalesLine."Alteration Option System Id");
+
+        if EcomSalesLine."No." <> MembershipAlterationSetup."Sales Item No." then
+            Error(AlterationItemMismatchErr, EcomSalesLine."No.", MembershipAlterationSetup."Sales Item No.", EcomSalesLine."Alteration Option System Id");
+
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.SetFilter(Blocked, '=%1', false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        if not MembershipEntry.FindLast() then
+            Error(MembershipEntryNotFoundErr, Membership."External Membership No.");
+
+        if MembershipEntry."Activate On First Use" then
+            Error(MembershipNotActivatedErr, Membership."External Membership No.");
+
+        DocumentDate := ResolveAlterationDocumentDate(EcomSalesHeader);
+
+        if not MembershipMgtInternal.ValidAlterationGracePeriod(MembershipAlterationSetup, MembershipEntry, DocumentDate) then
+            Error(GracePeriodErr, MembershipAlterationSetup."Alteration Type");
+
+        case MembershipAlterationSetup."Alteration Type" of
+            MembershipAlterationSetup."Alteration Type"::RENEW:
+                ValidateRenewRestrictions(MembershipEntry, MembershipAlterationSetup, Membership."Entry No.", StartDateNew, EndDateNew);
+            MembershipAlterationSetup."Alteration Type"::EXTEND:
+                ValidateExtendRestrictions(MembershipEntry, MembershipAlterationSetup, DocumentDate, Membership."Entry No.", StartDateNew, EndDateNew);
+            MembershipAlterationSetup."Alteration Type"::UPGRADE:
+                ValidateUpgradeRestrictions(MembershipEntry, MembershipAlterationSetup, DocumentDate, Membership."External Membership No.", StartDateNew, EndDateNew);
+        end;
+
+        if (MembershipAlterationSetup."Alteration Type" = MembershipAlterationSetup."Alteration Type"::UPGRADE) or (MembershipAlterationSetup."To Membership Code" <> '') then
+            if not MembershipMgtInternal.ValidateChangeMembershipCode(false, Membership."Entry No.", MembershipAlterationSetup."To Membership Code", ReasonText) then
+                Error(ReasonText);
+
+        if not MembershipMgtInternal.CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, DocumentDate, StartDateNew, EndDateNew, ReasonText) then
+            Error(ReasonText);
+
+        if not MembershipMgtInternal.CheckExtendMemberCards(false, Membership."Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, ExternalCardNo, CardEntryNo, ReasonText) then
+            Error(ReasonText);
+    end;
+
+    local procedure ResolveAlterationDocumentDate(EcomSalesHeader: Record "NPR Ecom Sales Header"): Date
+    begin
+        if EcomSalesHeader."Received Date" <> 0D then
+            exit(EcomSalesHeader."Received Date");
+        exit(Today());
+    end;
+
+    local procedure ValidateRenewRestrictions(var MembershipEntry: Record "NPR MM Membership Entry"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MembershipNo: Integer; var StartDateNew: Date; var EndDateNew: Date)
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        LedgerEntryNo: Integer;
+        ConflictingEntryErr: Label 'New membership period %1..%2 conflicts with the existing one.', Comment = '%1=Start Date, %2=End Date', Locked = true;
+        StackingNotAllowedErr: Label 'Stacking membership %1 on %2 is not allowed by alteration setup.', Comment = '%1=Membership Entry No., %2=Date', Locked = true;
+    begin
+        if (MembershipAlterationSetup."Alteration Activate From" <> MembershipAlterationSetup."Alteration Activate From"::B2B) then
+            if (MembershipEntry."Valid Until Date" < Today) then
+                MembershipEntry."Valid Until Date" := CalcDate('<-1D>', Today);
+
+        case MembershipAlterationSetup."Alteration Activate From" of
+            MembershipAlterationSetup."Alteration Activate From"::ASAP,
+            MembershipAlterationSetup."Alteration Activate From"::B2B:
+                StartDateNew := CalcDate('<+1D>', MembershipEntry."Valid Until Date");
+            MembershipAlterationSetup."Alteration Activate From"::DF:
+                StartDateNew := CalcDate(MembershipAlterationSetup."Alteration Date Formula", MembershipEntry."Valid Until Date");
+        end;
+
+        if (MembershipAlterationSetup."Alteration Activate From" <> MembershipAlterationSetup."Alteration Activate From"::B2B) then
+            if (StartDateNew < Today) then
+                StartDateNew := Today();
+
+        EndDateNew := CalcDate(MembershipAlterationSetup."Membership Duration", StartDateNew);
+
+        if (StartDateNew <= MembershipEntry."Valid Until Date") then
+            Error(ConflictingEntryErr, StartDateNew, EndDateNew);
+
+        if not MembershipAlterationSetup."Stacking Allowed" then
+            if MembershipMgtInternal.GetLedgerEntryForDate(MembershipNo, Today, LedgerEntryNo) then
+                if LedgerEntryNo <> MembershipEntry."Entry No." then
+                    Error(StackingNotAllowedErr, MembershipNo, Today);
+    end;
+
+    local procedure ValidateExtendRestrictions(MembershipEntry: Record "NPR MM Membership Entry"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; DocumentDate: Date; MembershipNo: Integer; var StartDateNew: Date; var EndDateNew: Date)
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        StartDateLedgerEntryNo: Integer;
+        EndDateLedgerEntryNo: Integer;
+        InvalidActivationDateErr: Label 'Activation option %1 (%2) is not supported for alteration type %3.', Comment = '%1=Activate From, %2=FieldCaption, %3=Alteration Type', Locked = true;
+        ConflictingEntryErr: Label 'New membership period %1..%2 conflicts with the existing one.', Comment = '%1=Start Date, %2=End Date', Locked = true;
+        ExtendToShortErr: Label 'Extending the membership to %1 would shorten it below the current end date %2.', Comment = '%1=New End Date, %2=Current End Date', Locked = true;
+        MultipleTimeframesErr: Label 'Alteration %1 on membership %2 (%3..%4) spans multiple existing ledger entries (%5, %6).', Comment = '%1=Alteration Type, %2=Membership Entry No., %3=Start, %4=End, %5=Start Entry No., %6=End Entry No.', Locked = true;
+    begin
+        case MembershipAlterationSetup."Alteration Activate From" of
+            MembershipAlterationSetup."Alteration Activate From"::ASAP:
+                StartDateNew := DocumentDate;
+            MembershipAlterationSetup."Alteration Activate From"::DF:
+                StartDateNew := CalcDate(MembershipAlterationSetup."Alteration Date Formula", DocumentDate);
+            else
+                Error(InvalidActivationDateErr, Format(MembershipAlterationSetup."Alteration Activate From"),
+                    MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
+        end;
+
+        EndDateNew := CalcDate(MembershipAlterationSetup."Membership Duration", StartDateNew);
+
+        if (StartDateNew <= MembershipEntry."Valid From Date") then
+            Error(ConflictingEntryErr, StartDateNew, EndDateNew);
+
+        if (EndDateNew < MembershipEntry."Valid Until Date") then
+            Error(ExtendToShortErr, EndDateNew, MembershipEntry."Valid Until Date");
+
+        if MembershipMgtInternal.ConflictingLedgerEntries(MembershipNo, StartDateNew, EndDateNew, StartDateLedgerEntryNo, EndDateLedgerEntryNo) then
+            Error(MultipleTimeframesErr, MembershipAlterationSetup."Alteration Type", MembershipNo, StartDateNew, EndDateNew, StartDateLedgerEntryNo, EndDateLedgerEntryNo);
+    end;
+
+    local procedure ValidateUpgradeRestrictions(MembershipEntry: Record "NPR MM Membership Entry"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; DocumentDate: Date; ExternalMembershipNo: Code[20]; var StartDateNew: Date; var EndDateNew: Date)
+    var
+        InvalidActivationDateErr: Label 'Activation option %1 (%2) is not supported for alteration type %3.', Comment = '%1=Activate From, %2=FieldCaption, %3=Alteration Type', Locked = true;
+        MembershipEntryMissingErr: Label 'No active membership entry found for membership %1 on the upgrade date.', Comment = '%1=External Membership No.', Locked = true;
+        ConflictingEntryErr: Label 'Upgrade start date %1 precedes the current membership entry start date (%2..).', Comment = '%1=Start Date, %2=Valid From Date', Locked = true;
+    begin
+        case MembershipAlterationSetup."Alteration Activate From" of
+            MembershipAlterationSetup."Alteration Activate From"::ASAP:
+                StartDateNew := DocumentDate;
+            else
+                Error(InvalidActivationDateErr, Format(MembershipAlterationSetup."Alteration Activate From"),
+                    MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
+        end;
+
+        EndDateNew := MembershipEntry."Valid Until Date";
+        if MembershipAlterationSetup."Upgrade With New Duration" then
+            EndDateNew := CalcDate(MembershipAlterationSetup."Membership Duration", StartDateNew);
+
+        if (MembershipEntry."Valid Until Date" < StartDateNew) then
+            Error(MembershipEntryMissingErr, ExternalMembershipNo);
+
+        if (StartDateNew < MembershipEntry."Valid From Date") then
+            Error(ConflictingEntryErr, StartDateNew, MembershipEntry."Valid From Date");
+    end;
+
     internal procedure GetMembershipSaleSetup(var MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup"; ItemNo: Code[20]): Boolean
     begin
         exit(MMMembershipSalesSetup.Get(MMMembershipSalesSetup.Type::ITEM, ItemNo));
@@ -328,9 +621,9 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     internal procedure ShowRelatedMembershipsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
         Membership: Record "NPR MM Membership";
         TempMembership: Record "NPR MM Membership" temporary;
-        EcomSalesLine: Record "NPR Ecom Sales Line";
         EmptyGuid: Guid;
     begin
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
@@ -428,6 +721,72 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         end;
     end;
 
+    local procedure ReshapeMembershipDuration(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipStartDate: Date;
+        MembershipUntilDate: Date;
+        UnitPrice: Decimal;
+    begin
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+
+        Membership.GetBySystemId(EcomSalesLine."Membership Id");
+        MembershipAlterationSetup.GetBySystemId(EcomSalesLine."Alteration Option System Id");
+
+        MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::SALESHEADER;
+        MemberInfoCapture."Document Type" := MemberInfoCapture."Document Type"::"1";
+        MemberInfoCapture."Document No." := EcomSalesHeader."External No.";
+        MemberInfoCapture."Document Line No." := EcomSalesLine."Line No.";
+
+        if (EcomSalesHeader."Price Excl. VAT") then begin
+            // TODO   MemberInfoCapture."Unit Price" := EcomSalesLine."Unit Price";
+            MemberInfoCapture.Amount := EcomSalesLine."Line Amount";
+            MemberInfoCapture."Amount Incl VAT" := Round(EcomSalesLine."Line Amount" * (1 + EcomSalesLine."VAT %" / 100), 0.01);
+        end else begin
+            MemberInfoCapture."Amount Incl VAT" := EcomSalesLine."Line Amount";
+            //  TODO MemberInfoCapture."Unit Price" := EcomSalesLine."Unit Price"; 
+            MemberInfoCapture.Amount := Round(EcomSalesLine."Line Amount" / (1 + EcomSalesLine."VAT %" / 100), 0.01);
+        end;
+
+        MemberInfoCapture."Document Date" := Today();
+        if (EcomSalesHeader."Received Date" <> 0D) then
+            MemberInfoCapture."Document Date" := EcomSalesHeader."Received Date";
+
+        MemberInfoCapture."Import Entry Document ID" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(MemberInfoCapture."Import Entry Document ID"));
+
+        // Fill in the member info capture record with the relevant info for processing the alteration
+        MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
+        MemberInfoCapture."Item No." := MembershipAlterationSetup."Sales Item No.";
+        case MembershipAlterationSetup."Alteration Type" of
+            MembershipAlterationSetup."Alteration Type"::RENEW:
+                MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;
+            MembershipAlterationSetup."Alteration Type"::UPGRADE:
+                MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::UPGRADE;
+            MembershipAlterationSetup."Alteration Type"::EXTEND:
+                MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::EXTEND;
+        end;
+        MemberInfoCapture.Insert(); // Gets me the auto-increment Entry No. for tracking purposes
+
+        // Execute the alteration logic
+        case MemberInfoCapture."Information Context" of
+            MemberInfoCapture."Information Context"::RENEW:
+                MembershipManagement.RenewMembership(MemberInfoCapture, true, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
+
+            MemberInfoCapture."Information Context"::UPGRADE:
+                MembershipManagement.UpgradeMembership(MemberInfoCapture, true, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
+
+            MemberInfoCapture."Information Context"::EXTEND:
+                MembershipManagement.ExtendMembership(MemberInfoCapture, true, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
+        end;
+
+        MemberInfoCapture.Delete();
+    end;
+
     [TryFunction]
     local procedure TryCheckValidEmailAddress(_Email: Text)
     var
@@ -437,6 +796,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     end;
 
     var
-        EcomVirtualItemEvents: Codeunit "NPR EcomVirtualItemEvents";
+        _EcomVirtualItemEvents: Codeunit "NPR EcomVirtualItemEvents";
 }
 #endif

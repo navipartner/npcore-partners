@@ -206,6 +206,11 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Voucher Type field.';
                 }
+                field("Membership Operation"; Rec."Membership Operation")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Membership Operation field.';
+                }
                 field("Membership Id"; Rec."Membership Id")
                 {
                     ApplicationArea = NPRRetail;
