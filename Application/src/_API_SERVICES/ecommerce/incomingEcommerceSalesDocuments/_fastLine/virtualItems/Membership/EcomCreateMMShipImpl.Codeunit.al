@@ -273,8 +273,8 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     local procedure ValidateMembershipSetup(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; var MembershipSetup: Record "NPR MM Membership Setup")
     var
-        NotIndividualTypeErr: Label 'Membership %1 is not of type Individual and cannot be created via ecommerce. This is a programming bug.', Comment = '%1=Membership Code', Locked = true;
-        NotNamedErr: Label 'Membership %1 does not require named member information and cannot be created via ecommerce. This is a programming bug.', Comment = '%1=Membership Code', Locked = true;
+        NotIndividualTypeErr: Label 'Membership %1 is not of type Individual and cannot be created via ecommerce.', Comment = '%1=Membership Code', Locked = true;
+        NotNamedErr: Label 'Membership %1 does not require named member information and cannot be created via ecommerce.', Comment = '%1=Membership Code', Locked = true;
     begin
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
