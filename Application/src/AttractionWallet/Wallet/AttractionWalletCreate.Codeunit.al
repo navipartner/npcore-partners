@@ -363,4 +363,33 @@ codeunit 6185076 "NPR AttractionWalletCreate"
             if (IntermediaryWallet.Get(IntermediaryWalletLine.SaleHeaderSystemId, IntermediaryWalletLine.WalletNumber)) then
                 IntermediaryWallet.Delete();
     end;
+
+    internal procedure GetWalletByReferenceOrExtRef(ReferenceNumberParam: Code[50]; var ExistingWallet: Record "NPR AttractionWallet")
+    var
+        WalletExtRef: Record "NPR AttractionWalletExtRef";
+        InvalidReferenceErr: Label 'Invalid reference number %1.';
+        WalletHasExpiredErr: Label 'The wallet with reference number %1 has expired.';
+        NumberIsBlockedErr: Label 'The wallet with reference number %1 is blocked.';
+    begin
+        ExistingWallet.Reset();
+
+        WalletExtRef.SetFilter(ExternalReference, '=%1', ReferenceNumberParam);
+        if (WalletExtRef.FindFirst()) then begin
+            if (WalletExtRef.BlockedAt <> 0DT) then
+                Error(NumberIsBlockedErr, ReferenceNumberParam);
+            if ((WalletExtRef.ExpiresAt <= CurrentDateTime()) and (WalletExtRef.ExpiresAt <> 0DT)) then
+                Error(WalletHasExpiredErr, ReferenceNumberParam);
+            ExistingWallet.SetFilter(EntryNo, '=%1', WalletExtRef.WalletEntryNo);
+        end else begin
+            ExistingWallet.SetCurrentKey(ReferenceNumber);
+            ExistingWallet.SetFilter(ReferenceNumber, '=%1', ReferenceNumberParam);
+        end;
+
+        if (not ExistingWallet.FindFirst()) then
+            Error(InvalidReferenceErr, ReferenceNumberParam);
+
+        if ((ExistingWallet.ExpirationDate <= CurrentDateTime()) and (ExistingWallet.ExpirationDate <> 0DT)) then
+            Error(WalletHasExpiredErr, ReferenceNumberParam);
+
+    end;
 }

@@ -14,8 +14,8 @@ page 6184875 "NPR AttractionWalletAssignment"
         {
             field(_SelectWalletReference; _SelectWalletReference)
             {
-                Caption = 'Select Wallet';
-                ToolTip = 'Specifies the value of the Select Wallet field.';
+                Caption = 'Assign New Wallet';
+                ToolTip = 'Specify the reference number of the actual Wallet to assign.';
                 ApplicationArea = NPRRetail;
                 Editable = true;
 
@@ -44,9 +44,7 @@ page 6184875 "NPR AttractionWalletAssignment"
                     IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
                     WalletManager: Codeunit "NPR AttractionWalletCreate";
                     ExistingWallet: Record "NPR AttractionWallet";
-                    WalletExtRef: Record "NPR AttractionWalletExtRef";
                     WalletNumber: Integer;
-                    InvalidReferenceErr: Label 'Invalid reference number';
                 begin
                     ValidateNumberOfWallets();
 
@@ -54,6 +52,7 @@ page 6184875 "NPR AttractionWalletAssignment"
                     if (Evaluate(WalletNumber, _SelectWalletReference)) then
                         if (IntermediaryWallet.Get(Rec.SaleHeaderSystemId, WalletNumber)) then begin
                             WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.SaleLineId, Rec.LineNumber);
+                            _SelectWalletReference := '';
                             exit;
                         end;
 
@@ -64,31 +63,19 @@ page 6184875 "NPR AttractionWalletAssignment"
                     IntermediaryWallet.SetFilter(ReferenceNumber, '=%1', _SelectWalletReference);
                     if (IntermediaryWallet.FindFirst()) then begin
                         WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.SaleLineId, Rec.LineNumber);
+                        _SelectWalletReference := '';
                         exit;
                     end;
 
                     // Existing Wallet, not yet added to intermediate wallet list
-                    WalletExtRef.SetLoadFields(WalletEntryNo);
-                    WalletExtRef.SetRange(ExternalReference, _SelectWalletReference);
-                    WalletExtRef.SetFilter(BlockedAt, '=%1', 0DT);
-                    WalletExtRef.SetFilter(ExpiresAt, '>%1|%2', CurrentDateTime(), 0DT);
-                    if (WalletExtRef.FindFirst()) then
-                        ExistingWallet.SetRange(EntryNo, WalletExtRef.WalletEntryNo)
-                    else begin
-                        ExistingWallet.SetCurrentKey(ReferenceNumber);
-                        ExistingWallet.SetFilter(ReferenceNumber, '=%1', _SelectWalletReference);
-                    end;
-
-                    if (not ExistingWallet.FindFirst()) then
-                        Error(InvalidReferenceErr);
-
+                    WalletManager.GetWalletByReferenceOrExtRef(_SelectWalletReference, ExistingWallet);
                     WalletManager.CreateIntermediateWalletForExistingWallet(
                         Rec.SaleHeaderSystemId, Rec.SaleLineId, Rec.LineNumber,
                         ExistingWallet.Description, ExistingWallet.ReferenceNumber, ExistingWallet.EntryNo);
 
                     _SelectWalletReference := '';
-                    CurrPage.Update(false);
 
+                    CurrPage.Update(false);
                 end;
 
             }
@@ -127,30 +114,30 @@ page 6184875 "NPR AttractionWalletAssignment"
                 field(_ReferenceNumber; _ReferenceNumber)
                 {
                     Caption = 'Reference Number';
-                    ToolTip = 'Specifies the value of the Reference Number field.';
+                    ToolTip = 'Specify the reference number of the actual Wallet to assign.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     var
                         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
                         ExistingWallet: Record "NPR AttractionWallet";
+                        WalletManager: Codeunit "NPR AttractionWalletCreate";
+                        AlreadyInUse: Label 'Reference number %1 is already in use on intermediate wallet %2, please choose a different reference number.';
                     begin
-                        ExistingWallet.SetCurrentKey(ReferenceNumber);
-                        ExistingWallet.SetFilter(ReferenceNumber, '=%1', _ReferenceNumber);
-                        if (not ExistingWallet.FindFirst()) then
-                            error('Invalid reference number');
+                        WalletManager.GetWalletByReferenceOrExtRef(_ReferenceNumber, ExistingWallet);
 
                         IntermediaryWallet.SetFilter(SaleHeaderSystemId, '=%1', Rec.SaleHeaderSystemId);
-                        IntermediaryWallet.SetFilter(ReferenceNumber, '=%1', _ReferenceNumber);
+                        IntermediaryWallet.SetFilter(ReferenceNumber, '=%1', ExistingWallet.ReferenceNumber);
                         if (IntermediaryWallet.FindFirst()) then
-                            error('Reference number %1 is already in use on intermediate wallet %2', _ReferenceNumber, IntermediaryWallet.WalletNumber);
+                            error(AlreadyInUse, ExistingWallet.ReferenceNumber, IntermediaryWallet.WalletNumber);
 
                         // Update intermediate wallet with info from existing wallet
                         IntermediaryWallet.Get(Rec.SaleHeaderSystemId, Rec.WalletNumber);
-                        IntermediaryWallet.ReferenceNumber := _ReferenceNumber;
+                        IntermediaryWallet.ReferenceNumber := ExistingWallet.ReferenceNumber;
                         if (ExistingWallet.Description <> '') then
                             IntermediaryWallet.Name := ExistingWallet.Description;
                         IntermediaryWallet.WalletEntryNo := ExistingWallet.EntryNo;
                         IntermediaryWallet.Modify();
+
                         CurrPage.Update(false);
                     end;
                 }
