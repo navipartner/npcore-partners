@@ -300,11 +300,16 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'ApplyDiscount', '', true, true)]
     local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
 
+        Sentry.StartSpan(Span, 'bc.pos.discount.period.apply');
         ApplyPeriodDiscounts(SalePOS, TempSaleLinePOS, Rec, xRec, LineOperation, RecalculateAllLines);
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]
@@ -312,6 +317,8 @@
     var
         DiscountPriority: Record "NPR Discount Priority";
         PeriodDiscountLine: Record "NPR Period Discount Line";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not DiscountPriority.Get(DiscSourceTableId()) then
             exit;
@@ -319,6 +326,8 @@
             exit;
         if not IsValidLineOperation(LineOperation) then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.discount.period.find-active');
 
         PeriodDiscountLine.SetCurrentKey("Item No.", "Variant Code", "Starting Date", "Ending Date", Status);
         PeriodDiscountLine.SetRange("Item No.", Rec."No.");
@@ -331,6 +340,8 @@
             tmpDiscountPriority := DiscountPriority;
             tmpDiscountPriority.Insert();
         end;
+
+        Span.Finish();
     end;
 
     local procedure IsSubscribedDiscount(DiscountPriority: Record "NPR Discount Priority"): Boolean
