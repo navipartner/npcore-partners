@@ -152,7 +152,8 @@
         ParamValue: Record "NPR POS Parameter Value";
         RecRef: RecordRef;
     begin
-        RecRef.Get(RecordID);
+        if not RecRef.Get(RecordID) then
+            exit(false);
 
         // Record defines deprecated parameters
         ParamValue.FilterParameters(RecordID, FieldID);
