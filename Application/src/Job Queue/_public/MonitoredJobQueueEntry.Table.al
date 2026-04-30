@@ -255,7 +255,7 @@ table 6151148 "NPR Monitored Job Queue Entry"
                 JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
                 ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
             begin
-                ExternalJQRefresherMgt.ValidateJQRefresherEntraApp("JQ Runner User Name");
+                ExternalJQRefresherMgt.ValidateJQRunnerUser(Rec."JQ Runner User Name", _JQRunnerUser);
                 JQRefresherSetup.UpdateRefresherUser("JQ Runner User Name");
             end;
         }
@@ -411,4 +411,12 @@ table 6151148 "NPR Monitored Job Queue Entry"
             ErrorText := NoErrorMessageTxt;
         exit(ErrorText);
     end;
+
+    internal procedure SetJQRunner(var JQRunnerUser: Record "NPR Job Queue Runner User")
+    begin
+        _JQRunnerUser.Copy(JQRunnerUser, true);
+    end;
+
+    var
+        _JQRunnerUser: Record "NPR Job Queue Runner User";
 }

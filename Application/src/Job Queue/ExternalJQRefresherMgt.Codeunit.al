@@ -176,21 +176,36 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         CreateCloudflareHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::POST, HttpResponseMessage);
     end;
 
-    internal procedure LookupJQRefresherUserName(var Text: Text): Boolean
+    internal procedure LookupJQRefresherUserName(var Text: Text; var JQRunnerUser: Record "NPR Job Queue Runner User"): Boolean
     var
-        AADApplication: Record "AAD Application";
-        User: Record User;
-        AADApplicationPage: Page "AAD Application List";
+        JQRunnerUser1: Record "NPR Job Queue Runner User";
+        JQRunnerUserPage: Page "NPR Job Queue Runner Users";
     begin
-        FilterJQRefresherAADApps(AADApplication);
-        AADApplicationPage.SetTableView(AADApplication);
-        AADApplicationPage.LookupMode := true;
-        if AADApplicationPage.RunModal() <> Action::LookupOK then
+        JQRunnerUser1.Copy(JQRunnerUser, true);
+        JQRunnerUser1.Reset();
+        JQRunnerUser1.SetFilter("Failed Attempts", '<%1', JQRunnerUser1.MaxFailedAttempts());
+        JQRunnerUserPage.SetTableView(JQRunnerUser1);
+        JQRunnerUserPage.LookupMode := true;
+        if JQRunnerUserPage.RunModal() <> Action::LookupOK then
             exit(false);
-        AADApplicationPage.GetRecord(AADApplication);
-        User.Get(AADApplication."User ID");
-        Text := User."User Name";
+        JQRunnerUserPage.GetRecord(JQRunnerUser1);
+        Text := JQRunnerUser1."JQ Runner User Name";
         exit(true);
+    end;
+
+    internal procedure ValidateJQRunnerUser(JQRunnerUserName: Code[50]; var JQRunnerUser: Record "NPR Job Queue Runner User")
+    var
+        UserDoesNotExistErr: Label '%1 %2 does not exist or has reached its maximum Failed Attempts counter.\Please check if the Failed Attempts counter can be reset or re-register this %3.', Comment = '%1 = Job Queue Runner User table caption, %2 = Job Queue Runner User Name, %3 = Job Queue Runner User Name field caption';
+    begin
+        if JQRunnerUserName = '' then
+            exit;
+        JQRunnerUser.Reset();
+        if JQRunnerUser.IsEmpty() then
+            UpdateJQRunnerUsersList(JQRunnerUser, false);
+        JQRunnerUser.SetRange("JQ Runner User Name", JQRunnerUserName);
+        JQRunnerUser.SetFilter("Failed Attempts", '<%1', JQRunnerUser.MaxFailedAttempts());
+        if JQRunnerUser.IsEmpty() then
+            Error(UserDoesNotExistErr, JQRunnerUser.TableCaption(), JQRunnerUserName, JQRunnerUser.FieldCaption("JQ Runner User Name"));
     end;
 
     internal procedure FilterJQRefresherAADApps(var AADApplication: Record "AAD Application")
@@ -535,21 +550,6 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         if JobQueueuRunnerIsOperational(JQRunnerUser, JQRunnerUserName) then
             exit('Standard');
         exit('Unfavorable');
-    end;
-
-    internal procedure ValidateJQRefresherEntraApp(DefaultRefresherUserName: Code[50])
-    var
-        JobQueueRunnerUser: Record "NPR Job Queue Runner User";
-        EntraAppInvalidLbl: Label 'Entra App %1 is not registered in the External Refresher database or has reached its maximum Failed Attempts counter.\Please check if the Failed Attempts counter can be reset or re-register this Entra App.';
-    begin
-        if DefaultRefresherUserName = '' then
-            exit;
-        UpdateJQRunnerUsersList(JobQueueRunnerUser, false);
-        JobQueueRunnerUser.Reset();
-        JobQueueRunnerUser.SetFilter("Failed Attempts", '<%1', JobQueueRunnerUser.MaxFailedAttempts());
-        JobQueueRunnerUser.SetRange("JQ Runner User Name", DefaultRefresherUserName);
-        if JobQueueRunnerUser.IsEmpty() then
-            Error(EntraAppInvalidLbl, DefaultRefresherUserName);
     end;
 
     local procedure ThrowIncompatibleBaseVersion()

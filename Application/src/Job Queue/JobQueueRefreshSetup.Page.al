@@ -50,7 +50,7 @@ page 6150891 "NPR Job Queue Refresh Setup"
                         var
                             ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
                         begin
-                            exit(ExternalJQRefresherMgt.LookupJQRefresherUserName(Text));
+                            exit(ExternalJQRefresherMgt.LookupJQRefresherUserName(Text, _JQRunnerUser));
                         end;
                     }
                 }
@@ -228,6 +228,7 @@ page 6150891 "NPR Job Queue Refresh Setup"
 
             _ExternalJQRefresherMgt.UpdateJQRunnerUsersList(_JQRunnerUser, false);
             CurrPage."Monitored Job Queues".Page.SetJQRunner(_JQRunnerUser);
+            Rec.SetJQRunner(_JQRunnerUser);
             if not _ExternalJQRefresherMgt.ValidateExternalJQRefresherEntraAppManager(Rec, EntraAppRemoved, _JQRunnerUser) then
                 ErrorText := NoValidEntraAppsLbl;
 

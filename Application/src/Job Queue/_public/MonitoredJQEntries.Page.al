@@ -49,7 +49,7 @@ page 6185041 "NPR Monitored JQ Entries"
                     var
                         ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
                     begin
-                        exit(ExternalJQRefresherMgt.LookupJQRefresherUserName(Text));
+                        exit(ExternalJQRefresherMgt.LookupJQRefresherUserName(Text, _JQRunnerUser));
                     end;
                 }
                 field("NP Managed Job"; Rec."NP Protected Job")
@@ -245,6 +245,7 @@ page 6185041 "NPR Monitored JQ Entries"
         _ExternalJQRefresherIsEnabled := JQRefresherSetup."Use External JQ Refresher";
         if not _JQRunnerUsersListInitialized then
             _ExternalJQRefresherMgt.UpdateJQRunnerUsersList(_JQRunnerUser, false);
+        Rec.SetJQRunner(_JQRunnerUser);
     end;
 
     trigger OnAfterGetRecord()

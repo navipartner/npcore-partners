@@ -96,7 +96,7 @@ table 6059870 "NPR Job Queue Refresh Setup"
             var
                 ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
             begin
-                ExternalJQRefresherMgt.ValidateJQRefresherEntraApp("Default Refresher User Name");
+                ExternalJQRefresherMgt.ValidateJQRunnerUser(Rec."Default Refresher User Name", _JQRunnerUser);
                 UpdateRefresherUser("Default Refresher User Name");
             end;
         }
@@ -253,4 +253,12 @@ table 6059870 "NPR Job Queue Refresh Setup"
         exit(Rec."Default Job Time Zone");
 #endif
     end;
+
+    internal procedure SetJQRunner(var JQRunnerUser: Record "NPR Job Queue Runner User")
+    begin
+        _JQRunnerUser.Copy(JQRunnerUser, true);
+    end;
+
+    var
+        _JQRunnerUser: Record "NPR Job Queue Runner User";
 }
