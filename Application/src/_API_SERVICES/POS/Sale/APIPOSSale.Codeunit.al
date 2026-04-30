@@ -2,6 +2,16 @@
 codeunit 6248632 "NPR API POS Sale"
 {
     Access = Internal;
+
+    internal procedure AssertPOSUnitOpenForSale(POSUnitNo: Code[10]): Boolean
+    var
+        _POSUnit: Record "NPR POS Unit";
+    begin
+        if not _POSUnit.Get(POSUnitNo) then
+            exit(false);
+        exit(_POSUnit.Status = _POSUnit.Status::OPEN);
+    end;
+
     procedure GetSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         SaleId: Text;
@@ -237,6 +247,43 @@ codeunit 6248632 "NPR API POS Sale"
 
         POSSale.GetLastSalePOSEntry(POSEntry);
         exit(Response.RespondCreated(POSEntryAsJson(POSEntry)));
+    end;
+
+    [CommitBehavior(CommitBehavior::Ignore)]
+    procedure ParkSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        SaleId: Text;
+        SaleSystemId: Guid;
+        POSSaleRec: Record "NPR POS Sale";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
+        SavePOSSvSl: Codeunit "NPR POS Action: SavePOSSvSl B";
+        Json: Codeunit "NPR JSON Builder";
+    begin
+        Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
+
+        SaleId := Request.Paths().Get(3);
+        if SaleId = '' then
+            exit(Response.RespondBadRequest('Missing required path parameter: saleId'));
+
+        if not Evaluate(SaleSystemId, SaleId) then
+            exit(Response.RespondBadRequest('Invalid saleId format'));
+
+        if not POSSaleRec.GetBySystemId(SaleSystemId) then
+            exit(Response.RespondResourceNotFound());
+
+        if not AssertPOSUnitOpenForSale(POSSaleRec."Register No.") then
+            exit(Response.RespondBadRequest('POS Unit is not open for sales'));
+
+        ReconstructSession(SaleSystemId);
+        SavePOSSvSl.SaveSale(POSQuoteEntry);
+
+        Json.StartObject('')
+            .AddProperty('saleId', Format(POSQuoteEntry.SystemId, 0, 4).ToLower())
+            .AddProperty('receiptNo', POSQuoteEntry."Sales Ticket No.")
+            .AddProperty('posUnit', POSQuoteEntry."Register No.")
+            .AddProperty('parkedAt', Format(POSQuoteEntry."Created at", 0, 9))
+            .EndObject();
+        exit(Response.RespondCreated(Json));
     end;
 
     local procedure POSSaleAsJson(POSSale: Record "NPR POS Sale"; WithLines: Boolean): Codeunit "NPR Json Builder"
