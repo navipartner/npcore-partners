@@ -356,6 +356,7 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
     var
         EcomSalesHeader2: Record "NPR Ecom Sales Header";
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
         if not IncEcomSalesDocSetup.Get() then
@@ -391,6 +392,8 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
             EcomSalesHeader2.Modify(true);
 
         EcomSalesHeader := EcomSalesHeader2;
+        if Success then
+            DigitalOrderNotifMgt.TryCreateEcomDigitalNotification(EcomSalesHeader2);
     end;
 
     local procedure CalculateWalletDocStatus(var EcomSalesHeader: Record "NPR Ecom Sales Header")

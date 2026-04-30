@@ -101,6 +101,7 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
 
     local procedure SetSalesDocMembershipStatusCreated(var CurrEcomSalesLine: Record "NPR Ecom Sales Line")
     var
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomSalesLine: Record "NPR Ecom Sales Line";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
@@ -148,6 +149,7 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
             EcomSalesHeader.Modify(true);
 
         EcomVirtualItemEvents.OnAfterSetSalesDocMembershipStatusCreated(CurrEcomSalesLine, EcomSalesHeader);
+        DigitalOrderNotifMgt.TryCreateEcomDigitalNotification(EcomSalesHeader);
     end;
 
     internal procedure ShowRelatedMembershipsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")

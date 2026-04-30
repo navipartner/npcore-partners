@@ -485,6 +485,15 @@ table 6151258 "NPR Ecom Sales Header"
             Caption = 'Document Source';
             DataClassification = SystemMetadata;
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        field(5250; "Digital Notif. Entry Created"; Boolean)
+        {
+            Caption = 'Digital Notif. Entry Created';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Digital Notification Entry" where("Source Document Id" = field(SystemId)));
+        }
+#endif
     }
     keys
     {

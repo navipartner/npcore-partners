@@ -910,9 +910,11 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     internal procedure AssignBucketId(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
     begin
         EcomSalesHeader."Bucket Id" := EcomVirtualItemMgt.AssignBucketLines(EcomSalesHeader);
         EcomSalesHeader.Modify();
+        DigitalOrderNotifMgt.SyncBucketIdToNotifEntry(EcomSalesHeader);
     end;
 
     internal procedure PreProcessDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")

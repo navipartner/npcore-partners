@@ -242,6 +242,19 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                     NPREcomCreateWalletJQ.ScheduleJobQueueWithConfirmation();
                 end;
             }
+            action(ConfigureEcomDigitalNotifJobQueue)
+            {
+                Caption = 'Configure Digital Notification Job Queue';
+                ApplicationArea = NPRRetail;
+                Image = Add;
+                ToolTip = 'Configure the job queue for sending digital notification emails for ecommerce documents.';
+                trigger OnAction()
+                var
+                    EcomDigitalNotifJQ: Codeunit "NPR EcomDigitalNotifJQ";
+                begin
+                    EcomDigitalNotifJQ.ScheduleJobQueueWithConfirmation();
+                end;
+            }
         }
         area(Navigation)
         {
@@ -300,6 +313,7 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                 actionref(ConfigureEcomMembershipProcessingJobQueue_Promoted; ConfigureEcomMembershipProcessingJobQueue) { }
                 actionref(ConfigureEcomCouponProcessingJobQueue_Promoted; ConfigureEcomCouponProcessingJobQueue) { }
                 actionref(ConfigureEcomWalletProcessingJobQueue_Promoted; ConfigureEcomWalletProcessingJobQueue) { }
+                actionref(ConfigureEcomDigitalNotifJobQueue_Promoted; ConfigureEcomDigitalNotifJobQueue) { }
             }
         }
     }

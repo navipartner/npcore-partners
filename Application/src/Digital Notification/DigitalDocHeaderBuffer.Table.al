@@ -79,6 +79,16 @@ table 6248184 "NPR Digital Doc. Header Buffer"
             Caption = 'Shopify Order ID';
             DataClassification = SystemMetadata;
         }
+        field(120; "Source Document Id"; Guid)
+        {
+            Caption = 'Source Document Id';
+            DataClassification = SystemMetadata;
+        }
+        field(130; "Bucket Id"; Integer)
+        {
+            Caption = 'Bucket Id';
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys

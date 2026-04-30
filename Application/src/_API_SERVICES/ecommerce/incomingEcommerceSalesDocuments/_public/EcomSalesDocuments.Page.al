@@ -77,6 +77,11 @@ page 6248189 "NPR Ecom Sales Documents"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Voucher Processing Status field.';
                 }
+                field("Digital Notif. Entry Created"; Rec."Digital Notif. Entry Created")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether a digital notification entry has been created for this document.';
+                }
                 field("Creation Status"; Rec."Creation Status")
                 {
                     ApplicationArea = NPRRetail;
@@ -212,6 +217,9 @@ page 6248189 "NPR Ecom Sales Documents"
                     EcomSalesDocConfirm.Run(Rec);
                 end;
             }
+        }
+        area(Navigation)
+        {
             action(RelatedSalesDocuments)
             {
                 Caption = 'Related Sales Documents';
@@ -224,6 +232,15 @@ page 6248189 "NPR Ecom Sales Documents"
                 begin
                     EcomSalesDocUtils.OpenRelatedSalesDocumentsFromEcomDoc(Rec);
                 end;
+            }
+            action(DigitalNotificationEntries)
+            {
+                Caption = 'Digital Notification Entries';
+                ToolTip = 'Open digital notification entries related to the selected document.';
+                ApplicationArea = NPRRetail;
+                Image = SendTo;
+                RunObject = Page "NPR Digital Notif. Entries";
+                RunPageLink = "Source Document Id" = field(SystemId);
             }
         }
         area(Promoted)

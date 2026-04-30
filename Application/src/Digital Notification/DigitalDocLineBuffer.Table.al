@@ -73,6 +73,26 @@ table 6248185 "NPR Digital Doc. Line Buffer"
             Caption = 'VAT %';
             DataClassification = SystemMetadata;
         }
+        field(110; "Ecom Line Subtype"; Enum "NPR Ecom Sales Line Subtype")
+        {
+            Caption = 'Ecom Line Subtype';
+            DataClassification = SystemMetadata;
+        }
+        field(120; "Ticket Reservation Line Id"; Guid)
+        {
+            Caption = 'Ticket Reservation Line Id';
+            DataClassification = SystemMetadata;
+        }
+        field(130; "Source Line System Id"; Guid)
+        {
+            Caption = 'Source Line System Id';
+            DataClassification = SystemMetadata;
+        }
+        field(140; "Is Wallet"; Boolean)
+        {
+            Caption = 'Is Wallet';
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys

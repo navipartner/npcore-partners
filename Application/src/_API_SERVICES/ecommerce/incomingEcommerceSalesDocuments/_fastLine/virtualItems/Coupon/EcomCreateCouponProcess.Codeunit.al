@@ -84,6 +84,7 @@ codeunit 6151122 "NPR EcomCreateCouponProcess"
 
     local procedure SetSalesDocCouponStatusCreated(var CurrEcomSalesLine: Record "NPR Ecom Sales Line")
     var
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomSalesLine: Record "NPR Ecom Sales Line";
         EcomVirtualItemDocStatus: Enum "NPR EcomVirtualItemDocStatus";
@@ -125,6 +126,8 @@ codeunit 6151122 "NPR EcomCreateCouponProcess"
 
         if Modi then
             EcomSalesHeader.Modify(true);
+
+        DigitalOrderNotifMgt.TryCreateEcomDigitalNotification(EcomSalesHeader);
     end;
 
     internal procedure ShowRelatedCouponsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")

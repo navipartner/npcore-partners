@@ -24,11 +24,20 @@ codeunit 6248560 "NPR Ecom Job Management"
         EcomCreateTicketJQ: Codeunit "NPR EcomCreateTicketJQ";
         EcomCreateMembershipJQ: Codeunit "NPR EcomCreateMembershipJQ";
         EcomProcessWalletsJQ: Codeunit "NPR EcomProcessWalletsJQ";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        EcomDigitalNotifJQ: Codeunit "NPR EcomDigitalNotifJQ";
+#endif
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        JobQueueEntry.Setfilter("Object ID to Run", '%1|%2|%3|%4|%5|%6',
+            EcomCreateVoucherJQ.GetCodeunitId(), EcomCreateTicketJQ.GetCodeunitId(), EcomCreateMembershipJQ.GetCodeunitId(),
+            EcomCreateCouponJQ.GetCodeunitId(), EcomProcessWalletsJQ.GetCodeunitId(), EcomDigitalNotifJQ.GetCodeunitId());
+#else
         JobQueueEntry.Setfilter("Object ID to Run", '%1|%2|%3|%4|%5',
             EcomCreateVoucherJQ.GetCodeunitId(), EcomCreateTicketJQ.GetCodeunitId(), EcomCreateMembershipJQ.GetCodeunitId(),
             EcomCreateCouponJQ.GetCodeunitId(), EcomProcessWalletsJQ.GetCodeunitId());
+#endif
         Page.Run(0, JobQueueEntry);
     end;
 

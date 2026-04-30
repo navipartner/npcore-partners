@@ -81,6 +81,18 @@ table 6248181 "NPR Digital Notification Entry"
             Caption = 'Shopify Order ID';
             DataClassification = CustomerContent;
         }
+        field(120; "Bucket Id"; Integer)
+        {
+            Caption = 'Bucket Id';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(130; "Source Document Id"; Guid)
+        {
+            Caption = 'Source Document Id';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
 
     keys
@@ -89,10 +101,13 @@ table 6248181 "NPR Digital Notification Entry"
         {
             Clustered = true;
         }
-        key(SendingStatus; Sent, "Attempt Count")
+        key(SendingStatus; Sent, "Document Type", "Bucket Id", "Attempt Count")
         {
         }
         key(Manifest; "Manifest ID")
+        {
+        }
+        key(SourceDocument; "Source Document Id")
         {
         }
     }

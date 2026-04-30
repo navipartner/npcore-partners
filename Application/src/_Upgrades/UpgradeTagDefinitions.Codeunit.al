@@ -323,6 +323,9 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS License Billing Upgrd.", 'AddPOSBillingFeature'));
 #endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Digital Notif. Entr.", 'UpgradeSourceDocumentIdOnDigitalNotifEntries'));
+#endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR RS Retail Calculation Upg.", 'MatchRemainingQtyToRSRetailValueEntryMapping'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeBCRecordSystemIdInMemberPaymentMethods'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG CRO Customer No.", 'init-customer-no-on-cro-pos-audit-log'));
@@ -1211,6 +1214,11 @@
                         exit('NPR-UpgradePOSSaleDigitalReceiptEntryTransfer-20250720');
                 end;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            Codeunit::"NPR UPG Digital Notif. Entr.":
+                case UpgradeStep of
+                    'UpgradeSourceDocumentIdOnDigitalNotifEntries':
+                        exit('NPR-UpgradeSourceDocumentIdOnDigitalNotifEntries-20260427');
+                end;
             Codeunit::"NPR UPG NP Email":
                 case UpgradeStep of
                     'RemoveSenderIdentityUpdateJQ':

@@ -97,6 +97,7 @@ codeunit 6248185 "NPR NPEmailDigNotifDataProv" implements "NPR IDynamicTemplateD
     var
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
         DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
     begin
         case NotifEntry."Document Type" of
@@ -109,6 +110,11 @@ codeunit 6248185 "NPR NPEmailDigNotifDataProv" implements "NPR IDynamicTemplateD
                 begin
                     if SalesCrMemoHeader.Get(NotifEntry."Posted Document No.") then
                         DigitalOrderNotifMgt.PopulateBuffersFromCrMemo(SalesCrMemoHeader, TempHeaderBuffer, TempLineBuffer);
+                end;
+            NotifEntry."Document Type"::"Ecom Sales Document":
+                begin
+                    if EcomSalesHeader.GetBySystemId(NotifEntry."Source Document Id") then
+                        DigitalOrderNotifMgt.PopulateBuffersFromEcomDoc(EcomSalesHeader, TempHeaderBuffer, TempLineBuffer);
                 end;
         end;
     end;

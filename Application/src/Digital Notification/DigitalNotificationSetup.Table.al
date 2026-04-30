@@ -33,6 +33,11 @@ table 6248183 "NPR Digital Notification Setup"
             Caption = 'Exclude Vouchers From Manifest';
             DataClassification = CustomerContent;
         }
+        field(17; "Exclude Tickets From Manifest"; Boolean)
+        {
+            Caption = 'Exclude Tickets From Manifest';
+            DataClassification = CustomerContent;
+        }
         field(20; Enabled; Boolean)
         {
             Caption = 'Enabled';

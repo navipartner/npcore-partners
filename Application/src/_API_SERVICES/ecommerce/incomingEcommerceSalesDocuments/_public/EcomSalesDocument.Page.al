@@ -72,6 +72,11 @@ page 6248188 "NPR Ecom Sales Document"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field.';
                 }
+                field("Digital Notif. Entry Created"; Rec."Digital Notif. Entry Created")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether a digital notification entry has been created for this document.';
+                }
             }
             group(sellToCustomer)
             {
@@ -335,6 +340,21 @@ page 6248188 "NPR Ecom Sales Document"
                     EcomSalesDocConfirm.Run(Rec);
                 end;
             }
+            action(SendDigitalNotification)
+            {
+                Caption = 'Send Digital Notification';
+                ToolTip = 'Send a digital notification email with tickets/vouchers to the customer.';
+                ApplicationArea = NPRRetail;
+                Image = Email;
+
+                trigger OnAction()
+                var
+                    DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+                begin
+                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
         }
         area(Navigation)
         {
@@ -364,6 +384,15 @@ page 6248188 "NPR Ecom Sales Document"
                 begin
                     EcomSalesDocUtils.OpenRelatedSalesDocumentsFromEcomDoc(Rec);
                 end;
+            }
+            action(DigitalNotificationEntries)
+            {
+                Caption = 'Digital Notification Entries';
+                ToolTip = 'Open digital notification entries related to this document.';
+                ApplicationArea = NPRRetail;
+                Image = SendTo;
+                RunObject = Page "NPR Digital Notif. Entries";
+                RunPageLink = "Source Document Id" = field(SystemId);
             }
             action("Retail Vouchers")
             {

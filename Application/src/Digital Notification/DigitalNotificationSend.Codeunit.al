@@ -11,44 +11,64 @@ codeunit 6150963 "NPR Digital Notification Send"
     local procedure SendNotifications()
     var
         NotifEntry: Record "NPR Digital Notification Entry";
-        NotifEntry2: Record "NPR Digital Notification Entry";
     begin
         FilterNotificationsToSend(NotifEntry);
 
-        if NotifEntry.FindSet(true) then begin
+        if NotifEntry.FindSet() then begin
             repeat
-                NotifEntry2 := NotifEntry;
-                SendNotification(NotifEntry2);
+                SendNotification(NotifEntry);
             until NotifEntry.Next() = 0;
-
-            // inside SendNotification -> TrySendEmail commits at the start of each iteration, which saves the previous iteration's Modify().
-            // This final Commit() is needed to save the last iteration's changes (no next iteration to commit it).
             Commit();
         end;
     end;
 
     internal procedure SendNotification(var NotifEntry: Record "NPR Digital Notification Entry"): Boolean
     var
-        NPEmail: Codeunit "NPR NP Email";
+        AlreadySentIgnored: Boolean;
     begin
-        NotifEntry."Attempt Count" += 1;
-        ClearLastError();
-        if NPEmail.TrySendEmail(
-            NotifEntry."Email Template Id",
-            NotifEntry,
-            NotifEntry."Recipient E-mail",
-            NotifEntry."Language Code"
-        ) then begin
-            NotifEntry.Sent := true;
-            NotifEntry."Sent Date-Time" := CurrentDateTime;
-            NotifEntry."Error Message" := '';
-            NotifEntry.Modify();
-            exit(true);
-        end else begin
-            NotifEntry."Error Message" := CopyStr(GetLastErrorText(), 1, 250);
-            NotifEntry.Modify();
+        exit(SendNotification(NotifEntry, AlreadySentIgnored));
+    end;
+
+    internal procedure SendNotification(var NotifEntry: Record "NPR Digital Notification Entry"; var AlreadySent: Boolean): Boolean
+    var
+        NotifEntryLocked: Record "NPR Digital Notification Entry";
+        NPEmail: Codeunit "NPR NP Email";
+        TrySendResult: Boolean;
+        LastErrorText: Text;
+    begin
+        AlreadySent := false;
+        NotifEntryLocked.ReadIsolation := IsolationLevel::UpdLock;
+        if not NotifEntryLocked.Get(NotifEntry."Entry No.") then
             exit(false);
+        if NotifEntryLocked.Sent then begin
+            AlreadySent := true;
+            NotifEntry := NotifEntryLocked;
+            exit(true);
         end;
+
+        ClearLastError();
+        TrySendResult := NPEmail.TrySendEmail(
+            NotifEntryLocked."Email Template Id",
+            NotifEntryLocked,
+            NotifEntryLocked."Recipient E-mail",
+            NotifEntryLocked."Language Code");
+        if not TrySendResult then
+            LastErrorText := GetLastErrorText();
+
+        // Re-acquire lock + re-read fresh DB state so the final Modify is serialized with any concurrent worker.
+        NotifEntryLocked.ReadIsolation := IsolationLevel::UpdLock;
+        NotifEntryLocked.Get(NotifEntryLocked."Entry No.");
+        NotifEntryLocked."Attempt Count" += 1;
+        if TrySendResult then begin
+            NotifEntryLocked.Sent := true;
+            NotifEntryLocked."Sent Date-Time" := CurrentDateTime;
+            NotifEntryLocked."Error Message" := '';
+        end else
+            NotifEntryLocked."Error Message" := CopyStr(LastErrorText, 1, MaxStrLen(NotifEntryLocked."Error Message"));
+        NotifEntryLocked.Modify();
+        Commit();
+        NotifEntry := NotifEntryLocked;
+        exit(TrySendResult);
     end;
 
     internal procedure SetJobQueueEntry(Create: Boolean)
@@ -85,22 +105,13 @@ codeunit 6150963 "NPR Digital Notification Send"
         DigitalNotifSetup: Record "NPR Digital Notification Setup";
     begin
         NotifEntry.SetRange(Sent, false);
+        NotifEntry.SetFilter("Document Type", '<>%1', "NPR Digital Document Type"::"Ecom Sales Document");
 
         if not DigitalNotifSetup.Get() then
             exit;
 
         if DigitalNotifSetup."Max Attempts" > 0 then
             NotifEntry.SetFilter("Attempt Count", '<%1', DigitalNotifSetup."Max Attempts");
-    end;
-
-    internal procedure IsJobQueueActive(): Boolean
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Digital Notification Send");
-        JobQueueEntry.SetFilter(Status, '%1|%2', JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process");
-        exit(not JobQueueEntry.IsEmpty);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]

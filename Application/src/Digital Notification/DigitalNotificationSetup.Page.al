@@ -33,6 +33,11 @@ page 6150919 "NPR Digital Notification Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether voucher assets should be excluded from the digital notification manifest.';
                 }
+                field("Exclude Tickets From Manifest"; Rec."Exclude Tickets From Manifest")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether ticket assets should be excluded from the digital notification manifest. Enable this when the legacy welcome-ticket email is active and you want to avoid duplicate ticket delivery. Tickets inside attraction wallets are not affected by this flag — they remain rendered inside the wallet asset.';
+                }
                 field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = NPRRetail;
@@ -64,8 +69,8 @@ page 6150919 "NPR Digital Notification Setup"
                 action(SetJobQueueEntry)
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Create Job Queue Entry for Digital Notification';
-                    ToolTip = 'Manually create and start the recurring job queue entry for processing digital notifications. Normally this is managed automatically when enabling the feature.';
+                    Caption = 'Create Job Queue Entry';
+                    ToolTip = 'Create and start the recurring job queue entry for processing non-ecommerce digital notifications (invoices, credit memos). For ecommerce notifications, configure the job queue from the Ecommerce Setup page.';
                     Image = ResetStatus;
                     Promoted = true;
                     PromotedCategory = Process;
@@ -84,8 +89,8 @@ page 6150919 "NPR Digital Notification Setup"
                 action(RemoveJobQueueEntry)
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Remove Job Queue Entry for Digital Notification';
-                    ToolTip = 'Manually remove all job queue entries for digital notification processing. Normally this is managed automatically when disabling the feature.';
+                    Caption = 'Remove Job Queue Entry';
+                    ToolTip = 'Remove the job queue entry for processing non-ecommerce digital notifications. For ecommerce notifications, manage the job queue from the Ecommerce Setup page.';
                     Image = ReopenCancelled;
                     Promoted = true;
                     PromotedCategory = Process;

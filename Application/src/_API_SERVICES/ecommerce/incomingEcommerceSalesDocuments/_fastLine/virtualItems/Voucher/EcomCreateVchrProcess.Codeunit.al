@@ -88,6 +88,7 @@ codeunit 6248514 "NPR EcomCreateVchrProcess"
         EcomSalesLine: Record "NPR Ecom Sales Line";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         EcomVirtualItemEvents: Codeunit "NPR EcomVirtualItemEvents";
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         EcomVirtualItemDocStatus: Enum "NPR EcomVirtualItemDocStatus";
         Modi: Boolean;
     begin
@@ -130,6 +131,7 @@ codeunit 6248514 "NPR EcomCreateVchrProcess"
             EcomSalesHeader.Modify(true);
 
         EcomVirtualItemEvents.OnAfterSetSalesDocVoucherStatusCreated(CurrEcomSalesLine, EcomSalesHeader);
+        DigitalOrderNotifMgt.TryCreateEcomDigitalNotification(EcomSalesHeader);
     end;
 
     internal procedure ShowRelatedVouchersAction(EcomSalesHeader: Record "NPR Ecom Sales Header")

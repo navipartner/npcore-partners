@@ -26,7 +26,7 @@ codeunit 6248548 "NPR EcomCreateTicketProcess"
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
         EcomSalesHeader2: Record "NPR Ecom Sales Header";
         EcomSalesLine: Record "NPR Ecom Sales Line";
-
+        DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         UpdateErrStatus: Boolean;
         TicketEventId: Label 'NPR_API_Ecommerce_VirtualTicketCreationFailed', Locked = true;
     begin
@@ -73,6 +73,8 @@ codeunit 6248548 "NPR EcomCreateTicketProcess"
         UpdateVirtualItemDocStatus(EcomSalesHeader2);
         EcomSalesHeader2.Modify(true);
 
+        if Success then
+            DigitalOrderNotifMgt.TryCreateEcomDigitalNotification(EcomSalesHeader2);
     end;
 
     internal procedure UpdateVirtualItemDocStatus(var EcomSalesHeader: Record "NPR Ecom Sales Header")
