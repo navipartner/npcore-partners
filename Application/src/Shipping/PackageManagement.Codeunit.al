@@ -622,6 +622,27 @@ codeunit 6059947 "NPR Package Management"
         ValidateShipmentMethodCode(Rec);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterInsertEvent', '', false, false)]
+    local procedure OnAfterInsertSalesHeader(var Rec: Record "Sales Header"; RunTrigger: Boolean);
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if Rec."Shipment Method Code" = '' then
+            exit;
+
+        if not (Rec."Document Type" in [Rec."Document Type"::Order, Rec."Document Type"::"Return Order"]) then
+            exit;
+
+        if Rec."Sell-to Customer No." = '' then
+            exit;
+
+        if not InitPackageProvider() then
+            exit;
+
+        ValidateShipmentMethodCode(Rec);
+    end;
+
     local procedure InitPackageProvider(): Boolean;
     begin
         if not PackageProviderSetup.Get() then
