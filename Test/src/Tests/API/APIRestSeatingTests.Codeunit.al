@@ -1,5 +1,5 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-codeunit 85245 "NPR APIRest Seating Tests"
+codeunit 85239 "NPR APIRest Seating Tests"
 {
     // [FEATURE] GET /restaurant/:restaurantId/seating and GET /restaurant/:restaurantId/seating/:seatingId
 
