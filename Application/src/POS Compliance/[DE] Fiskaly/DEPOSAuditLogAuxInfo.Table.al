@@ -67,6 +67,11 @@
             Caption = 'Transaction ID';
             DataClassification = CustomerContent;
         }
+        field(65; "Transaction Number"; BigInteger)
+        {
+            Caption = 'Transaction Number';
+            DataClassification = CustomerContent;
+        }
         field(70; "Start Time"; DateTime)
         {
             Caption = 'Start Time';
@@ -167,5 +172,16 @@
     trigger OnInsert()
     begin
         SystemId := CreateGuid();
+    end;
+
+    internal procedure GetQRData() QRData: Text
+    var
+        InStream: InStream;
+    begin
+        Rec.CalcFields("QR Data");
+        if not Rec."QR Data".HasValue() then
+            exit(QRData);
+        Rec."QR Data".CreateInStream(InStream, TextEncoding::UTF8);
+        InStream.ReadText(QRData);
     end;
 }

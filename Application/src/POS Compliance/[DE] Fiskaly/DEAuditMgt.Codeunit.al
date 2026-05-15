@@ -297,6 +297,9 @@
         ResponseJson.SelectToken('_id', Token);
         DeAuditAux."Transaction ID" := Token.AsValue().AsText();
 
+        if ResponseJson.SelectToken('number', Token) then
+            DeAuditAux."Transaction Number" := Token.AsValue().AsBigInteger();
+
         ResponseJson.SelectToken('tss_id', Token);
         DeAuditAux."TSS ID" := Token.AsValue().AsText();
         if DETSS.GetBySystemId(DeAuditAux."TSS ID") then
@@ -330,17 +333,17 @@
         if ResponseJson.SelectToken('signature.algorithm', Token) then
             DeAuditAux."Signature Algorithm" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."Signature Algorithm"));
         if ResponseJson.SelectToken('signature.value', Token) then begin
-            DeAuditAux.Signature.CreateOutStream(OutStr);
-            OutStr.Write(Token.AsValue().AsText());
+            DeAuditAux.Signature.CreateOutStream(OutStr, TextEncoding::UTF8);
+            OutStr.WriteText(Token.AsValue().AsText());
         end;
         if ResponseJson.SelectToken('signature.public_key', Token) then begin
-            DeAuditAux."Public Key".CreateOutStream(OutStr);
-            OutStr.Write(Token.AsValue().AsText());
+            DeAuditAux."Public Key".CreateOutStream(OutStr, TextEncoding::UTF8);
+            OutStr.WriteText(Token.AsValue().AsText());
         end;
 
         if ResponseJson.SelectToken('qr_code_data', Token) then begin
-            DeAuditAux."QR Data".CreateOutStream(OutStr);
-            OutStr.Write(Token.AsValue().AsText());
+            DeAuditAux."QR Data".CreateOutStream(OutStr, TextEncoding::UTF8);
+            OutStr.WriteText(Token.AsValue().AsText());
         end;
 
         if DeAuditAux."Fiskaly Transaction State" in [DeAuditAux."Fiskaly Transaction State"::FINISHED, DeAuditAux."Fiskaly Transaction State"::CANCELLED] then
