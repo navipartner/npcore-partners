@@ -60,8 +60,10 @@
 #endif
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
-        if IsUpgrade then
+        if IsUpgrade then begin
             TransferNPRRetentionPolicies();
+            InitiateV2RetentionPolicyUpgrade();
+        end;
 #endif
 
         if IsUpgrade then
@@ -179,6 +181,18 @@
 
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_IRLFiscalizationPreservation');
         end;
+    end;
+
+    internal procedure InitiateV2RetentionPolicyUpgrade()
+    var
+        RetentionPolicy: Record "NPR Retention Policy";
+    begin
+        if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'InitiateV2RetentionPolicyUpgrade') then
+            exit;
+
+        RetentionPolicy.DiscoverRetentionPolicyTables();
+
+        SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'InitiateV2RetentionPolicyUpgrade');
     end;
 #endif
 

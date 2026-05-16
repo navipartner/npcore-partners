@@ -2,7 +2,7 @@
 page 6248218 "NPR Reten. Policy Log Entries"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'NPR Retention Policy Log Entries';
+    Caption = 'NP Retail Retention Policy Log Entries';
     Editable = false;
     Extensible = false;
     PageType = List;

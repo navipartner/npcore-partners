@@ -1,5 +1,5 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
-codeunit 6150993 "NPR Ret.Pol.: Dig.Notif.Ent" implements "NPR IRetention Policy"
+codeunit 6150993 "NPR Ret.Pol.: Dig.Notif.Ent" implements "NPR IRetention Policy V2"
 {
     Access = Internal;
 
@@ -8,8 +8,11 @@ codeunit 6150993 "NPR Ret.Pol.: Dig.Notif.Ent" implements "NPR IRetention Policy
         DigitalNotificationEntry: Record "NPR Digital Notification Entry";
         ExpirationDateTime: DateTime;
         ExpirationDate: Date;
+        RetentionPeriod: DateFormula;
     begin
-        ExpirationDate := CalcDate('<-1M>', DT2Date(ReferenceDateTime));
+        RetentionPeriod := RetentionPolicy.GetActiveRetentionPeriod(Enum::"NPR Retention Period Type"::"Period 1");
+
+        ExpirationDate := CalcDate(RetentionPeriod, DT2Date(ReferenceDateTime));
         ExpirationDateTime := CreateDateTime(ExpirationDate, DT2Time(ReferenceDateTime));
 
         DigitalNotificationEntry.SetFilter(SystemCreatedAt, '<%1', ExpirationDateTime);
@@ -17,15 +20,34 @@ codeunit 6150993 "NPR Ret.Pol.: Dig.Notif.Ent" implements "NPR IRetention Policy
             DigitalNotificationEntry.DeleteAll();
     end;
 
+    internal procedure GetDefaultRetentionPeriod(PeriodType: Enum "NPR Retention Period Type") PeriodDateFormula: DateFormula
+    var
+        EmptyDateFormula: DateFormula;
+    begin
+        case PeriodType of
+            Enum::"NPR Retention Period Type"::"Period 1":
+                Evaluate(PeriodDateFormula, '<-1M>');
+            else
+                exit(EmptyDateFormula);
+        end;
+    end;
+
+    internal procedure ShowSetup(RetentionPolicy: Record "NPR Retention Policy"; PolicyEditable: Boolean)
+    var
+        RetentionPolicyMgmt: Codeunit "NPR Retention Policy Mgmt.";
+    begin
+        RetentionPolicyMgmt.ShowDefaultNPSetup(RetentionPolicy, PolicyEditable);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Retention Policy", OnDiscoverRetentionPolicyTables, '', true, true)]
     local procedure AddNPRDigitalNotificationEntryOnDiscoverRetentionPolicyTables()
     var
         RetentionPolicy: Codeunit "NPR Retention Policy";
         RetentionPolicyMgmt: Codeunit "NPR Retention Policy Mgmt.";
-        RetentionPolicyImpl: Enum "NPR Retention Policy";
+        RetentionPolicyImpl: Enum "NPR Retention Policy V2";
     begin
         RetentionPolicyImpl := RetentionPolicyImpl::"NPR Digital Notification Entry";
-        RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTables(Database::"NPR Digital Notification Entry", RetentionPolicyImpl);
+        RetentionPolicy.OnBeforeAddTableOnDiscoverRetentionPolicyTablesV2(Database::"NPR Digital Notification Entry", RetentionPolicyImpl);
         RetentionPolicyMgmt.UpsertTablePolicy(Database::"NPR Digital Notification Entry", RetentionPolicyImpl);
     end;
 }

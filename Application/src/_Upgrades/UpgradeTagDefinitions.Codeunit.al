@@ -452,7 +452,9 @@
                     'NPRRetPolicy_DataLog_Cleanup':
                         exit('NPRRetPolicy_DataLog_Cleanup-20260114');
                     'NPRRetPolicy_IRLFiscalizationPreservation':
-                        exit('NPRRetPolicy_IRLFiscalizationPreservation-20260120')
+                        exit('NPRRetPolicy_IRLFiscalizationPreservation-20260120');
+                    'InitiateV2RetentionPolicyUpgrade':
+                        exit('InitiateV2RetentionPolicyUpgrade-20260516');
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of

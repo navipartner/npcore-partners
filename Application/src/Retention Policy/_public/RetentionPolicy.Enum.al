@@ -1,6 +1,10 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
 enum 6059962 "NPR Retention Policy" implements "NPR IRetention Policy"
 {
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-05-15';
+    ObsoleteReason = 'Please use newer "NPR Retention Policy v2" implementations.';
+
     Extensible = true;
     DefaultImplementation = "NPR IRetention Policy" = "NPR Ret.Pol.: Undefined";
 

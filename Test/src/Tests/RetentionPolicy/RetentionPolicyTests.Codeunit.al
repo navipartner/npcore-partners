@@ -23,15 +23,17 @@ codeunit 85241 "NPR Retention Policy Tests"
     var
         RetentionPolicyLogEntry: Record "NPR Retention Policy Log Entry";
         RetentionPolicy: Record "NPR Retention Policy";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
         ReferenceDateTime: DateTime;
         ReferenceDate: Date;
     begin
         // [GIVEN] Default Retention Policy for table "NPR Retention Policy Log Entry"
         Initialize();
         RetentionPolicyLogEntry.DeleteAll();
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR Retention Policy Log Entry";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Retention Policy Log Entry";
+        RetentionPolicy.Insert();
 
         // [GIVEN] "NPR Retention Policy Log Entry" Record
         InsertRetentionPolicyLogEntryRecord(1);
@@ -41,7 +43,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         ReferenceDateTime := CreateDateTime(ReferenceDate, DT2Time(CurrentDateTime())) + JobQueueManagement.DaysToDuration(1);
 
         // [WHEN] Retention Policy is applied
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
 
         // [THEN] The expired record is deleted
@@ -56,15 +58,18 @@ codeunit 85241 "NPR Retention Policy Tests"
     var
         RetentionPolicyLogEntry: Record "NPR Retention Policy Log Entry";
         RetentionPolicy: Record "NPR Retention Policy";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
         ReferenceDateTime: DateTime;
         ReferenceDate: Date;
     begin
         // [GIVEN] Default Retention Policy for table "NPR Retention Policy Log Entry"
         Initialize();
         RetentionPolicyLogEntry.DeleteAll();
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR Retention Policy Log Entry";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Retention Policy Log Entry";
+        RetentionPolicy.Insert();
+
 
         // [GIVEN] "NPR Retention Policy Log Entry" Record
         InsertRetentionPolicyLogEntryRecord(1);
@@ -74,7 +79,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         ReferenceDateTime := CreateDateTime(ReferenceDate, DT2Time(CurrentDateTime())) - JobQueueManagement.DaysToDuration(1);
 
         // [WHEN] Retention Policy is applied
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
 
         // [THEN] The expired record is preserved
@@ -92,14 +97,16 @@ codeunit 85241 "NPR Retention Policy Tests"
         DataLogField: Record "NPR Data Log Field";
         DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
         RetentionPolicy: Record "NPR Retention Policy";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
         TableID: Integer;
     begin
         // [GIVEN] Default Retention Policy for table "NPR Data Log Record"
         Initialize();
         InitializeDataLogData();
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR Data Log Record";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Data Log Record";
+        RetentionPolicy.Insert();
 
         // [GIVEN] Data Log Setup for a specific table ID
         TableID := Database::Customer;
@@ -111,7 +118,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         InsertDataLogProcessingEntry(TableID, 1);
 
         // [WHEN] Retention Policy is applied at an expiring DateTime
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(10));
 
         // [THEN] Data Log content is deleted
@@ -134,14 +141,16 @@ codeunit 85241 "NPR Retention Policy Tests"
         DataLogField: Record "NPR Data Log Field";
         DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
         RetentionPolicy: Record "NPR Retention Policy";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
         TableID: Integer;
     begin
         // [GIVEN] Default Retention Policy for table "NPR Data Log Record"
         Initialize();
         InitializeDataLogData();
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR Data Log Record";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Data Log Record";
+        RetentionPolicy.Insert();
 
         // [GIVEN] Data Log Setup for a specific table ID
         TableID := Database::Customer;
@@ -153,7 +162,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         InsertDataLogProcessingEntry(TableID, 1);
 
         // [WHEN] Retention Policy is applied at a non-expiring DateTime
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(1));
 
         // [THEN] Data Log content is preserved
@@ -176,15 +185,17 @@ codeunit 85241 "NPR Retention Policy Tests"
         DataLogField: Record "NPR Data Log Field";
         RetentionPolicy: Record "NPR Retention Policy";
         DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
         ExpiringTableID: Integer;
         NonExpiringTableID: Integer;
     begin
         // [GIVEN] Default Retention Policy for table "NPR Data Log Record"
         Initialize();
         InitializeDataLogData();
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR Data Log Record";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Data Log Record";
+        RetentionPolicy.Insert();
 
         // [GIVEN] Data Log Setup for a specific table ID with a 40 day retention period
         ExpiringTableID := Database::Customer;
@@ -204,7 +215,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         InsertDataLogProcessingEntry(NonExpiringTableID, 2);
 
         // [WHEN] Retention Policy is applied after 45 days
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(45));
 
         // [THEN] The expiring Data Log content is deleted, but non-expiring Data Log content is preserved
@@ -236,14 +247,16 @@ codeunit 85241 "NPR Retention Policy Tests"
         DataLogField: Record "NPR Data Log Field";
         DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
         RetentionPolicy: Record "NPR Retention Policy";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
         TableID: Integer;
     begin
         // [GIVEN] Default Retention Policy for table "NPR Data Log Record"
         Initialize();
         InitializeDataLogData();
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR Data Log Record";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Data Log Record";
+        RetentionPolicy.Insert();
 
         // [GIVEN] Data Log Setup for a specific table ID with a 100 day retention period
         TableID := Database::Customer;
@@ -262,7 +275,7 @@ codeunit 85241 "NPR Retention Policy Tests"
 
 
         // [WHEN] Retention Policy is applied after 95 days
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(95));
 
         // [THEN] Both table-specific and orphaned Data Log content is deleted
@@ -283,13 +296,15 @@ codeunit 85241 "NPR Retention Policy Tests"
     var
         NcTask: Record "NPR Nc Task";
         RetentionPolicy: Record "NPR Retention Policy";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
     begin
         // [GIVEN] Default Retention Policy for table "NPR Nc Task"
         Initialize();
         NcTask.DeleteAll(true);
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR Nc Task";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Nc Task";
+        RetentionPolicy.Insert();
 
         // [GIVEN] "NPR Nc Task" records with various Processed and "Process Error" values
         InsertNcTaskRecord(1, false, false);
@@ -298,7 +313,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         InsertNcTaskRecord(4, true, true);
 
         // [WHEN] Retention Policy is applied after 15 days
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(15));
 
         // [THEN] The default retention policy is applied succesfully
@@ -322,13 +337,15 @@ codeunit 85241 "NPR Retention Policy Tests"
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         RetentionPolicy: Record "NPR Retention Policy";
-        IRetentionPolicy: Interface "NPR IRetention Policy";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
     begin
         // [GIVEN] Default Retention Policy for table "NPR NPRE Kitchen Order"
         Initialize();
         KitchenOrder.DeleteAll(true);
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        RetentionPolicy.Implementation := RetentionPolicy.Implementation::"NPR NPRE Kitchen Order";
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR NPRE Kitchen Order";
+        RetentionPolicy.Insert();
 
         // [GIVEN] "NPR NPRE Kitchen Order" records with various "On Hold" and "Order Status" values
         InsertKitchenOrderRecord(1, true, KitchenOrder."Order Status"::Finished);
@@ -343,7 +360,7 @@ codeunit 85241 "NPR Retention Policy Tests"
         InsertKitchenOrderRecord(7, false, KitchenOrder."Order Status"::Released);
 
         // [WHEN] Retention Policy is applied after 15 days
-        IRetentionPolicy := RetentionPolicy.Implementation;
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(15));
 
         // [THEN] The default retention policy is applied succesfully
@@ -375,31 +392,34 @@ codeunit 85241 "NPR Retention Policy Tests"
     // [SCENARIO] Application of retention policies for IRL Fiscalization affected tables
     var
         RetentionPolicy: Record "NPR Retention Policy";
-        ExchangeLabelIRetentionPolicy: Interface "NPR IRetention Policy";
-        NpGpPOSSalesEntryIRetentionPolicy: Interface "NPR IRetention Policy";
-        TaxFreeVoucherIRetentionPolicy: Interface "NPR IRetention Policy";
-        POSEntryIRetentionPolicy: Interface "NPR IRetention Policy";
-        POSEntryTaxLineIRetentionPolicy: Interface "NPR IRetention Policy";
-        POSPeriodRegisterIRetentionPolicy: Interface "NPR IRetention Policy";
-        POSEntrySalesLineIRetentionPolicy: Interface "NPR IRetention Policy";
-        POSEntryPaymentLineIRetentionPolicy: Interface "NPR IRetention Policy";
-        POSBalancingLineIRetentionPolicy: Interface "NPR IRetention Policy";
+        ExchangeLabelIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        NpGpPOSSalesEntryIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        TaxFreeVoucherIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        POSEntryIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        POSEntryTaxLineIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        POSPeriodRegisterIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        POSEntrySalesLineIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        POSEntryPaymentLineIRetentionPolicy: Interface "NPR IRetention Policy V2";
+        POSBalancingLineIRetentionPolicy: Interface "NPR IRetention Policy V2";
         ReferenceDateTime: DateTime;
         ReferenceDate: Date;
     begin
         // [GIVEN] Default Retention Policies for IRL Fiscalization affected tables
         Initialize();
         SetupIRLFiscalization();
+        RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
-        ExchangeLabelIRetentionPolicy := RetentionPolicy.Implementation::"NPR Exchange Label";
-        NpGpPOSSalesEntryIRetentionPolicy := RetentionPolicy.Implementation::"NPR NpGp POS Sales Entry";
-        TaxFreeVoucherIRetentionPolicy := RetentionPolicy.Implementation::"NPR Tax Free Voucher";
-        POSEntryIRetentionPolicy := RetentionPolicy.Implementation::"NPR POS Entry";
-        POSEntryTaxLineIRetentionPolicy := RetentionPolicy.Implementation::"NPR POS Entry Tax Line";
-        POSPeriodRegisterIRetentionPolicy := RetentionPolicy.Implementation::"NPR POS Period Register";
-        POSEntrySalesLineIRetentionPolicy := RetentionPolicy.Implementation::"NPR POS Entry Sales Line";
-        POSEntryPaymentLineIRetentionPolicy := RetentionPolicy.Implementation::"NPR POS Entry Payment Line";
-        POSBalancingLineIRetentionPolicy := RetentionPolicy.Implementation::"NPR POS Balancing Line";
+        RetentionPolicy.Insert();
+
+        ExchangeLabelIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR Exchange Label";
+        NpGpPOSSalesEntryIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR NpGp POS Sales Entry";
+        TaxFreeVoucherIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR Tax Free Voucher";
+        POSEntryIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR POS Entry";
+        POSEntryTaxLineIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR POS Entry Tax Line";
+        POSPeriodRegisterIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR POS Period Register";
+        POSEntrySalesLineIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR POS Entry Sales Line";
+        POSEntryPaymentLineIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR POS Entry Payment Line";
+        POSBalancingLineIRetentionPolicy := RetentionPolicy."Implementation V2"::"NPR POS Balancing Line";
 
         // [GIVEN] IRL Fiscalization affected table records
         InitializeIRLFiscalizationData();
@@ -409,14 +429,40 @@ codeunit 85241 "NPR Retention Policy Tests"
         ReferenceDateTime := CreateDateTime(ReferenceDate, DT2Time(CurrentDateTime())) + JobQueueManagement.DaysToDuration(1);
 
         // [WHEN] Retention Policies are applied
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Exchange Label";
+        RetentionPolicy.Modify();
         ExchangeLabelIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR NpGp POS Sales Entry";
+        RetentionPolicy.Modify();
         NpGpPOSSalesEntryIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Tax Free Voucher";
+        RetentionPolicy.Modify();
         TaxFreeVoucherIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR POS Entry";
+        RetentionPolicy.Modify();
         POSEntryIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR POS Entry Tax Line";
+        RetentionPolicy.Modify();
         POSEntryTaxLineIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR POS Period Register";
+        RetentionPolicy.Modify();
         POSPeriodRegisterIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR POS Entry Sales Line";
+        RetentionPolicy.Modify();
         POSEntrySalesLineIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR POS Entry Payment Line";
+        RetentionPolicy.Modify();
         POSEntryPaymentLineIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR POS Balancing Line";
+        RetentionPolicy.Modify();
         POSBalancingLineIRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
 
         // [THEN] Records are preserved

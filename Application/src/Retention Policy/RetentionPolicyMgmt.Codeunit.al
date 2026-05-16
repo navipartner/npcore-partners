@@ -85,19 +85,19 @@ codeunit 6248677 "NPR Retention Policy Mgmt."
     end;
     #endregion
 
-    internal procedure UpsertTablePolicy(TableId: Integer; var RetentionPolicyEnum: Enum "NPR Retention Policy")
+    internal procedure UpsertTablePolicy(TableId: Integer; var RetentionPolicyEnum: Enum "NPR Retention Policy V2")
     var
         RetentionPolicy: Record "NPR Retention Policy";
     begin
         if RetentionPolicy.Get(TableId) then begin
-            if RetentionPolicy.Implementation <> RetentionPolicyEnum then begin
-                RetentionPolicy.Implementation := RetentionPolicyEnum;
+            if RetentionPolicy."Implementation V2" <> RetentionPolicyEnum then begin
+                RetentionPolicy."Implementation V2" := RetentionPolicyEnum;
                 RetentionPolicy.Modify();
             end;
         end else begin
             RetentionPolicy.Init();
             RetentionPolicy.Validate("Table Id", TableId);
-            RetentionPolicy.Implementation := RetentionPolicyEnum;
+            RetentionPolicy."Implementation V2" := RetentionPolicyEnum;
             RetentionPolicy.Enabled := true;
             RetentionPolicy.Insert();
         end;
@@ -113,6 +113,70 @@ codeunit 6248677 "NPR Retention Policy Mgmt."
         else
             Error(NonExistantPolicyErr, TableId);
     end;
+
+    internal procedure ShowDefaultNPSetup(RetentionPolicy: Record "NPR Retention Policy"; RetentionPeriodsEditable: Boolean)
+    var
+        EmptyPeriodDescriptions: Dictionary of [Enum "NPR Retention Period Type", Text];
+    begin
+        ShowDefaultNPSetup(RetentionPolicy, RetentionPeriodsEditable, EmptyPeriodDescriptions);
+    end;
+
+    internal procedure ShowDefaultNPSetup(RetentionPolicy: Record "NPR Retention Policy"; RetentionPeriodsEditable: Boolean;
+                                          PeriodDescriptions: Dictionary of [Enum "NPR Retention Period Type", Text])
+    var
+        RetentionPeriodInfo: Page "NPR Retention Period Info";
+        NewPeriods: Dictionary of [Enum "NPR Retention Period Type", DateFormula];
+    begin
+        RetentionPeriodInfo.SetRetentionPeriodsEditable(RetentionPeriodsEditable);
+        RetentionPeriodInfo.SetRetentionPeriodDescriptions(PeriodDescriptions);
+        RetentionPeriodInfo.SetRetentionPolicy(RetentionPolicy);
+
+        if not RetentionPeriodsEditable then begin
+            RetentionPeriodInfo.RunModal();
+            exit;
+        end;
+
+        RetentionPeriodInfo.LookupMode(true);
+        if RetentionPeriodInfo.RunModal() = Action::LookupOK then begin
+            RetentionPeriodInfo.GetRetentionPeriods(NewPeriods);
+            SaveNonDefaultPeriods(RetentionPolicy, NewPeriods);
+        end;
+    end;
+
+    local procedure SaveNonDefaultPeriods(RetentionPolicy: Record "NPR Retention Policy"; NewPeriods: Dictionary of [Enum "NPR Retention Period Type", DateFormula])
+    var
+        PeriodType: Enum "NPR Retention Period Type";
+    begin
+        foreach PeriodType in NewPeriods.Keys() do
+            SaveNonDefaultPeriod(RetentionPolicy, PeriodType, NewPeriods.Get(PeriodType));
+    end;
+
+    local procedure SaveNonDefaultPeriod(RetentionPolicy: Record "NPR Retention Policy"; PeriodType: Enum "NPR Retention Period Type"; NewPeriod: DateFormula)
+    var
+        RetentionPolicyPeriod: Record "NPR Retention Policy Period";
+        DefaultPeriod: DateFormula;
+        EmptyDateFormula: DateFormula;
+    begin
+        DefaultPeriod := RetentionPolicy.GetDefaultRetentionPeriod(PeriodType);
+
+        if RetentionPolicyPeriod.Get(RetentionPolicy."Table Id", PeriodType) then begin
+            if (NewPeriod = DefaultPeriod) or (NewPeriod = EmptyDateFormula) then
+                RetentionPolicyPeriod.Delete()
+            else
+                if RetentionPolicyPeriod."Retention Period" <> NewPeriod then begin
+                    RetentionPolicyPeriod."Retention Period" := NewPeriod;
+                    RetentionPolicyPeriod.Modify();
+                end;
+        end else
+            if (NewPeriod <> DefaultPeriod) and (NewPeriod <> EmptyDateFormula) then begin
+                RetentionPolicyPeriod.Init();
+                RetentionPolicyPeriod."Table Id" := RetentionPolicy."Table Id";
+                RetentionPolicyPeriod."Period Type" := PeriodType;
+                RetentionPolicyPeriod."Retention Period" := NewPeriod;
+                RetentionPolicyPeriod.Insert();
+            end;
+    end;
+
 
     #region Job Queue
     internal procedure SetupRetentionPolicyJobQueue()

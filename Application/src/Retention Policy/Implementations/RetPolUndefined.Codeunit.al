@@ -1,5 +1,5 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
-codeunit 6248685 "NPR Ret.Pol.: Undefined" implements "NPR IRetention Policy"
+codeunit 6248685 "NPR Ret.Pol.: Undefined" implements "NPR IRetention Policy V2"
 {
     Access = Internal;
 
@@ -14,6 +14,18 @@ codeunit 6248685 "NPR Ret.Pol.: Undefined" implements "NPR IRetention Policy"
     begin
         RetentionPolicy.CalcFields("Table Caption");
         Error(NoHandlerErr, RetentionPolicy."Table Id", RetentionPolicy."Table Caption");
+    end;
+
+    internal procedure GetDefaultRetentionPeriod(PeriodType: Enum "NPR Retention Period Type"): DateFormula
+    var
+        EmptyDateFormula: DateFormula;
+    begin
+        exit(EmptyDateFormula);
+    end;
+
+    internal procedure ShowSetup(RetentionPolicy: Record "NPR Retention Policy"; PolicyEditable: Boolean)
+    begin
+
     end;
 }
 #endif

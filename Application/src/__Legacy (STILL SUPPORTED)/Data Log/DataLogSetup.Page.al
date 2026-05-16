@@ -236,7 +236,7 @@ page 6059897 "NPR Data Log Setup"
         end;
 #else
         if Confirm(DataLogDeletionQst, false) then
-            DataLogSubscriberMgt.CleanDataLog(CurrentDateTime());
+            DataLogSubscriberMgt.CleanDataLog(CurrentDateTime(), 90);
 #endif
         CurrPage.Update(false);
     end;

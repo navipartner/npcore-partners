@@ -17,7 +17,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
         Error(CleanupErr);
 #else
-        CleanDataLog(CurrentDateTime());
+        CleanDataLog(CurrentDateTime(), 90);
 #endif
     end;
 
@@ -83,21 +83,21 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         end;
     end;
 
-    internal procedure CleanDataLog(ReferenceDateTime: DateTime)
+    internal procedure CleanDataLog(ReferenceDateTime: DateTime; DaysKeptFor: Integer)
     var
         DataLogSetup: Record "NPR Data Log Setup (Table)";
     begin
         if DataLogSetup.FindSet() then
             repeat
-                CleanDataLog(DataLogSetup, ReferenceDateTime);
+                CleanDataLog(DataLogSetup, ReferenceDateTime, DaysKeptFor);
             until DataLogSetup.Next() = 0;
 
-        // Clear all data log entries without setup definition or older than 90 days
+        // Clear all data log entries without setup definition or older than the number of DaysKeptFor
         Clear(DataLogSetup);
-        CleanDataLog(DataLogSetup, ReferenceDateTime);
+        CleanDataLog(DataLogSetup, ReferenceDateTime, DaysKeptFor);
     end;
 
-    internal procedure CleanDataLog(DataLogSetup: Record "NPR Data Log Setup (Table)"; ReferenceDateTime: DateTime)
+    internal procedure CleanDataLog(DataLogSetup: Record "NPR Data Log Setup (Table)"; ReferenceDateTime: DateTime; DaysKeptFor: Integer)
     var
         DataLogField: Record "NPR Data Log Field";
         DataLogRecord: Record "NPR Data Log Record";
@@ -106,13 +106,13 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         TimeStamp: DateTime;
     begin
         if DataLogSetup."Table ID" <> 0 then
-            if DataLogSetup."Keep Log for" > JobQueueManagement.DaysToDuration(90) then
+            if DataLogSetup."Keep Log for" > JobQueueManagement.DaysToDuration(DaysKeptFor) then
                 exit;  //will be handled on the next iteration
 
         if DataLogSetup."Keep Log for" > 0 then
             TimeStamp := ReferenceDateTime - DataLogSetup."Keep Log for"
         else
-            TimeStamp := ReferenceDateTime - JobQueueManagement.DaysToDuration(90);
+            TimeStamp := ReferenceDateTime - JobQueueManagement.DaysToDuration(DaysKeptFor);
 
         if DataLogSetup."Table ID" <> 0 then begin
             DataLogProcessingEntry.SetRange("Table Number", DataLogSetup."Table ID");

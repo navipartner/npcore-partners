@@ -2,7 +2,7 @@
 page 6248216 "NPR Retention Policy"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'NPR Retention Policies';
+    Caption = 'NP Retail Retention Policies';
     DeleteAllowed = false;
     Extensible = False;
     InsertAllowed = false;
@@ -38,7 +38,7 @@ page 6248216 "NPR Retention Policy"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether the retention policy is enabled.';
                 }
-                field(Implementation; Rec.Implementation)
+                field(Implementation; Rec."Implementation V2")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the codeunit handling the retention of the table.';
@@ -50,13 +50,21 @@ page 6248216 "NPR Retention Policy"
     {
         area(Promoted)
         {
-            actionref(PromotedApplySinglePolicyManually; "Apply Single Policy Manually")
+            group(ApplyPolicies)
             {
+                Caption = 'Apply Retention Policies';
+                ShowAs = SplitButton;
+                actionref(PromotedApplySinglePolicyManually; "Apply Single Policy Manually")
+                {
+                }
+                actionref(PromotedApplyAllPoliciesManually; "Apply All Policies Manually")
+                {
+                }
             }
             actionref(PromotedRetentionPolicyLog; "Retention Policy Log")
             {
             }
-            actionref(PromotedApplyAllPoliciesManually; "Apply All Policies Manually")
+            actionref(PromotedShowRetentionPeriodInfo; "Show Retention Period Info")
             {
             }
         }
@@ -92,6 +100,24 @@ page 6248216 "NPR Retention Policy"
                 trigger OnAction()
                 begin
                     RetentionPolicyMgmt.ApplyRetentionPoliciesManually();
+                end;
+            }
+            action("Show Retention Period Info")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Retention Details';
+                Image = ShowList;
+                ToolTip = 'View information about retention periods of this policy.';
+
+                trigger OnAction()
+                var
+                    RetentionPolicy: Codeunit "NPR Retention Policy";
+                    IRetentionPolicy: Interface "NPR IRetention Policy V2";
+                    RetentionPeriodsEditable: Boolean;
+                begin
+                    RetentionPolicy.OnSetRetentionPolicyPeriodsEditable(RetentionPeriodsEditable);
+                    IRetentionPolicy := Rec."Implementation V2";
+                    IRetentionPolicy.ShowSetup(Rec, RetentionPeriodsEditable);
                 end;
             }
         }
