@@ -11,7 +11,7 @@
         TXTMerged: Label 'Waiter pad lines merged into waiter pad %1 - %2.';
         CFRM_Merge: Label 'Do you want to move lines from waiter pad %1 %2 into waiter pad %3 %4.';
         WPInAnotherSale: Label 'Waiter pad %1 (seating %2) is being processed in another sale at the moment. If you continue, you will get only lines, which were not copied to the other sale.\Are you sure you want to continue?';
-        CannotParkWPSale: Label 'Waiter pad related transaction cannot be parked. Please finish your work with the sale by moving it to the waiter pad instead.';
+        WPInParkedSale: Label 'Waiter pad %1 (seating %2) is currently held in a parked sale. If you continue, you will get only the lines that are not being held by the parked sale.\Are you sure you want to continue?';
 
     procedure SplitWaiterPadLine(var FromWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad")
     var
@@ -283,6 +283,7 @@
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        ConfirmMsg: Text;
     begin
         WaiterPad.CalcFields("Current Seating FF");
 
@@ -292,9 +293,14 @@
 
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter("Sale Retail ID", '<>%1&<>%2', GetNullGuid(), SalePOS.SystemId);
-        if not WaiterPadLine.IsEmpty then
-            if not Confirm(WPInAnotherSale, false, WaiterPad."No.", WaiterPad."Current Seating FF") then
+        if WaiterPadLine.FindFirst() then begin
+            if IsParkedSale(WaiterPadLine."Sale Retail ID") then
+                ConfirmMsg := WPInParkedSale
+            else
+                ConfirmMsg := WPInAnotherSale;
+            if not Confirm(ConfirmMsg, false, WaiterPad."No.", WaiterPad."Current Seating FF") then
                 Error('');
+        end;
 
         SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
         SalePOS."NPRE Pre-Set Seating Code" := WaiterPad."Current Seating FF";
@@ -739,7 +745,7 @@
         if ModifyRec then
             SalePOS.Modify();
 
-        ClearWPLineSaleHdrLinks(SalePOS);
+        ClearWPLineSaleHdrLinks(SalePOS, true);
     end;
 
     procedure GetNullGuid(): Guid
@@ -750,7 +756,7 @@
         exit(NullGuid);
     end;
 
-    local procedure ClearWPLineSaleHdrLinks(SalePOS: Record "NPR POS Sale")
+    local procedure ClearWPLineSaleHdrLinks(SalePOS: Record "NPR POS Sale"; IgnoreParkedSale: Boolean)
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
@@ -758,11 +764,15 @@
             exit;
         WaiterPadLine.SetCurrentKey("Sale Retail ID");
         WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
-        if not WaiterPadLine.IsEmpty() then
-            WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
+        if WaiterPadLine.IsEmpty() then
+            exit;
+        if not IgnoreParkedSale then
+            if IsParkedSale(SalePOS.SystemId) then
+                exit;
+        WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
     end;
 
-    local procedure ClearWPLineSaleLineLinks(SaleLinePOS: Record "NPR POS Sale Line")
+    local procedure ClearWPLineSaleLineLinks(SaleLinePOS: Record "NPR POS Sale Line"; IgnoreParkedSale: Boolean)
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
@@ -770,8 +780,13 @@
             exit;
         WaiterPadLine.SetCurrentKey("Sale Line Retail ID");
         WaiterPadLine.SetRange("Sale Line Retail ID", SaleLinePOS.SystemId);
-        if not WaiterPadLine.IsEmpty() then
-            WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
+        if WaiterPadLine.IsEmpty() then
+            exit;
+        if not IgnoreParkedSale then
+            if IsParkedSaleLine(SaleLinePOS.SystemId) then
+                exit;
+        WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
+        WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
     internal procedure AddPosEntrySalesLineWaiterPadLineLink(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
@@ -1043,15 +1058,37 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, false)]
     local procedure ClearWPadLinksOnSaleHdrDelete(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
     begin
-        if not Rec.IsTemporary then
-            ClearWPLineSaleHdrLinks(Rec);
+        if Rec.IsTemporary() then
+            exit;
+        ClearWPLineSaleHdrLinks(Rec, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, false)]
     local procedure ClearWPadLinksOnSaleLineDelete(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     begin
-        if not Rec.IsTemporary then
-            ClearWPLineSaleLineLinks(Rec);
+        if Rec.IsTemporary() then
+            exit;
+        ClearWPLineSaleLineLinks(Rec, false);
+    end;
+
+    internal procedure IsParkedSale(SaleSystemId: Guid): Boolean
+    var
+        POSSavedSaleEntry: Record "NPR POS Saved Sale Entry";
+    begin
+        if IsNullGuid(SaleSystemId) then
+            exit(false);
+        POSSavedSaleEntry.SetRange(SystemId, SaleSystemId);
+        exit(not POSSavedSaleEntry.IsEmpty());
+    end;
+
+    local procedure IsParkedSaleLine(SaleLineSystemId: Guid): Boolean
+    var
+        POSSavedSaleLine: Record "NPR POS Saved Sale Line";
+    begin
+        if IsNullGuid(SaleLineSystemId) then
+            exit(false);
+        POSSavedSaleLine.SetRange(SystemId, SaleLineSystemId);
+        exit(not POSSavedSaleLine.IsEmpty());
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Waiter Pad Line", 'OnAfterDeleteEvent', '', true, false)]
@@ -1101,17 +1138,75 @@
             WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: SavePOSSvSl B", 'OnBeforeSaveAsQuote', '', true, false)]
-    local procedure OnBeforeSaveAsPOSQuote(var SalePOS: Record "NPR POS Sale")
-    begin
-        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then
-            Error(CannotParkWPSale);
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnBeforeLoadFromPOSQuote', '', true, false)]
     local procedure OnBeforeLoadPOSQuote(var SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var XmlDoc: XmlDocument)
     begin
         ClearSaleHdrNPREPresetFields(SalePOS, true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnAfterLoadFromQuote', '', true, false)]
+    local procedure OnAfterLoadPOSQuoteAssertSystemId(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
+    var
+        SysIDPreservBrokenErr: Label 'Park-Unpark SystemId preservation broken at NPR POS Action: LoadPOSSvSl B.OnAfterLoadFromQuote. This is a programming bug.', Locked = true,
+                               Comment = 'This is to detect any future code changes that could cause the SystemId to be lost when switching between park and unpark, which is essential for maintaining the link between the POS sale and the waiter pad lines. It is untranslatable because it needs to be caught by Sentry.';
+    begin
+        if not WPHasLinkToQuote(POSQuoteEntry.SystemId) then
+            exit;
+        if SalePOS.SystemId = POSQuoteEntry.SystemId then
+            exit;
+        Error(SysIDPreservBrokenErr);
+    end;
+
+    local procedure WPHasLinkToQuote(QuoteSystemId: Guid): Boolean
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        if IsNullGuid(QuoteSystemId) then
+            exit(false);
+        WaiterPadLine.SetCurrentKey("Sale Retail ID");
+        WaiterPadLine.SetRange("Sale Retail ID", QuoteSystemId);
+        exit(not WaiterPadLine.IsEmpty());
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Saved Sale Entry", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure ClearWPadLinksOnParkedSaleEntryDelete(var Rec: Record "NPR POS Saved Sale Entry"; RunTrigger: Boolean)
+    var
+        SalePOS: Record "NPR POS Sale";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if IsNullGuid(Rec.SystemId) then
+            exit;
+        WaiterPadLine.SetCurrentKey("Sale Retail ID");
+        WaiterPadLine.SetRange("Sale Retail ID", Rec.SystemId);
+        if WaiterPadLine.IsEmpty() then
+            exit;
+        SalePOS.SetRange(SystemId, Rec.SystemId);
+        if not SalePOS.IsEmpty() then
+            exit;
+        WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Saved Sale Line", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure ClearWPadLinksOnParkedSaleLineDelete(var Rec: Record "NPR POS Saved Sale Line"; RunTrigger: Boolean)
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if IsNullGuid(Rec.SystemId) then
+            exit;
+        WaiterPadLine.SetCurrentKey("Sale Line Retail ID");
+        WaiterPadLine.SetRange("Sale Line Retail ID", Rec.SystemId);
+        if WaiterPadLine.IsEmpty() then
+            exit;
+        SaleLinePOS.SetRange(SystemId, Rec.SystemId);
+        if not SaleLinePOS.IsEmpty() then
+            exit;
+        WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
+        WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry", 'OnAfterDeleteEvent', '', true, false)]
