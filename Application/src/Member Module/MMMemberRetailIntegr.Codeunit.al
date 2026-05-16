@@ -940,8 +940,6 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        ListOfEntriesToDelete: List of [Integer];
-        EntryNo: Integer;
     begin
         MemberInfoCapture.LockTable(true);
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
@@ -968,15 +966,10 @@
                 MemberInfoCapture."Document Date" := SalesDate;
 
             MemberInfoCapture.Modify();
-            ListOfEntriesToDelete.Add(MemberInfoCapture."Entry No.");
         until (MemberInfoCapture.Next() = 0);
 
         CreateMembership.SetCreateMembership();
         CreateMembership.Run(MemberInfoCapture);
-
-        foreach EntryNo in ListOfEntriesToDelete do
-            if (MemberInfoCapture.Get(EntryNo)) then
-                if (not MemberInfoCapture.Delete()) then;
     end;
 
     internal procedure BlockMembershipEntryFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; MemberCount: Decimal)
@@ -1084,13 +1077,14 @@
     end;
 
 
-    // This is outside of the end sales transactions, issuing tickets is considered same as printing
+    // This is outside of the end sales transactions
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
-    local procedure AdmitMembersOnEndOfSales(SalePOS: Record "NPR POS Sale")
+    local procedure FinalizeMembershipsOnEndOfSale(SalePOS: Record "NPR POS Sale")
     var
         MemberInfoCaptureSales: Record "NPR MM Member Info Capture";
         MemberInfoCaptureLine: Record "NPR MM Member Info Capture";
         MemberAdmitOnEndOfSale: Codeunit "NPR POSAction MemberAdmitOnEoS";
+        AdmitMethod: Enum "NPR MM AdmitMemberOnEoSMethod";
         ReasonCode: Integer;
         ReasonText: Text;
         PreviousLineNo: Integer;
@@ -1102,33 +1096,39 @@
         if (SalePOS."Sales Ticket No." = '') then
             exit;
 
-        if (not (MemberAdmitOnEndOfSale.GetAdmitMethod(SalePOS."Register No.") = Enum::"NPR MM AdmitMemberOnEoSMethod"::LEGACY)) then
-            exit; // Admit is handled by adding a end-of-sale workflow in AddPostWorkflowsToRun()
+        AdmitMethod := MemberAdmitOnEndOfSale.GetAdmitMethod(SalePOS."Register No.");
 
         MemberInfoCaptureSales.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCaptureSales.SetFilter("Receipt No.", '=%1', SalePOS."Sales Ticket No.");
         if (not MemberInfoCaptureSales.FindSet()) then
             exit;
 
-        PreviousLineNo := -1;
-        repeat
-            ReasonCode := 0;
-            if (PreviousLineNo <> MemberInfoCaptureSales."Line No.") then begin
-                MemberInfoCaptureLine.SetCurrentKey("Receipt No.", "Line No.");
-                MemberInfoCaptureLine.SetFilter("Receipt No.", '=%1', MemberInfoCaptureSales."Receipt No.");
-                MemberInfoCaptureLine.SetFilter("Line No.", '=%1', MemberInfoCaptureSales."Line No.");
+        if (AdmitMethod = AdmitMethod::LEGACY) then begin
+            PreviousLineNo := -1;
+            repeat
+                ReasonCode := 0;
+                if (PreviousLineNo <> MemberInfoCaptureSales."Line No.") then begin
+                    MemberInfoCaptureLine.SetCurrentKey("Receipt No.", "Line No.");
+                    MemberInfoCaptureLine.SetFilter("Receipt No.", '=%1', MemberInfoCaptureSales."Receipt No.");
+                    MemberInfoCaptureLine.SetFilter("Line No.", '=%1', MemberInfoCaptureSales."Line No.");
 
-                if (not MemberAdmitOnEndOfSale.AdmitMembersOnEndOfSalesWorkerLegacy(MemberInfoCaptureLine, AdmittedCount, SalePOS."Register No.", ReasonCode, ReasonText)) then
-                    Message(MemberTicketAdmitError, MemberInfoCaptureLine."First Name" + ' ' + MemberInfoCaptureLine."Last Name", ReasonText);
-            end;
-            PreviousLineNo := MemberInfoCaptureSales."Line No.";
-        until ((MemberInfoCaptureSales.Next() = 0));
+                    if (not MemberAdmitOnEndOfSale.AdmitMembersOnEndOfSalesWorkerLegacy(MemberInfoCaptureLine, AdmittedCount, SalePOS."Register No.", ReasonCode, ReasonText)) then
+                        Message(MemberTicketAdmitError, MemberInfoCaptureLine."First Name" + ' ' + MemberInfoCaptureLine."Last Name", ReasonText);
+                end;
+                PreviousLineNo := MemberInfoCaptureSales."Line No.";
+            until ((MemberInfoCaptureSales.Next() = 0));
 
-        MemberInfoCaptureSales.DeleteAll();
+            if (AdmittedCount > 0) then
+                Message(MemberTicketConfirm, AdmittedCount);
+
+            MemberInfoCaptureSales.DeleteAll();
+        end else begin
+            // Auto-Admit in workflow cleans-up consumed lines
+            MemberInfoCaptureSales.SetFilter("Auto-Admit Member", '=%1', false);
+            MemberInfoCaptureSales.DeleteAll();
+        end;
+
         Commit();
-
-        if (AdmittedCount > 0) then
-            Message(MemberTicketConfirm, AdmittedCount);
 
     end;
 
