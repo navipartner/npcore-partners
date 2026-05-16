@@ -58,6 +58,16 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         WalletManagement.ExpireWallet(WalletEntryNo);
     end;
 
+    /// <summary>Physically deletes the wallet shell and the artifacts it solely owns
+    /// (line references, orphaned asset lines, this wallet's header self-link, orphaned header, external references). 
+    /// No-op when the wallet does not exist.</summary>
+    procedure DeleteWallet(WalletEntryNo: Integer)
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        WalletManagement.DeleteWallet(WalletEntryNo);
+    end;
+
     procedure BlockAllAssets(WalletEntryNo: Integer)
     var
         WalletManagement: Codeunit "NPR AttractionWallet";

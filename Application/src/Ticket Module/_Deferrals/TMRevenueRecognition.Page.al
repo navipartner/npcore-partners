@@ -266,6 +266,7 @@ page 6151476 "NPR TM RevenueRecognition"
                 trigger OnAction()
                 var
                     DeferRevenue: Record "NPR TM DeferRevenueRequest";
+                    RevenueDeferral: Codeunit "NPR TM RevenueDeferral";
                     ConfirmMessage: Label 'Are you sure you want to delete all deferral requests with status Registered?';
                 begin
                     if (not Confirm(ConfirmMessage, false)) then
@@ -273,7 +274,7 @@ page 6151476 "NPR TM RevenueRecognition"
 
                     DeferRevenue.SetCurrentKey("Status");
                     DeferRevenue.SetFilter("Status", '=%1', DeferRevenue.Status::REGISTERED);
-                    DeferRevenue.DeleteAll();
+                    RevenueDeferral.DeleteDeferralRequests(DeferRevenue);
                 end;
             }
             action(DeleteUnresolved)
@@ -286,6 +287,7 @@ page 6151476 "NPR TM RevenueRecognition"
                 trigger OnAction()
                 var
                     DeferRevenue: Record "NPR TM DeferRevenueRequest";
+                    RevenueDeferral: Codeunit "NPR TM RevenueDeferral";
                     ConfirmMessage: Label 'Are you sure you want to delete all deferral requests with status Unresolved?';
                 begin
                     if (not Confirm(ConfirmMessage, false)) then
@@ -293,7 +295,7 @@ page 6151476 "NPR TM RevenueRecognition"
 
                     DeferRevenue.SetCurrentKey("Status");
                     DeferRevenue.SetFilter("Status", '=%1', DeferRevenue.Status::UNRESOLVED);
-                    DeferRevenue.DeleteAll();
+                    RevenueDeferral.DeleteDeferralRequests(DeferRevenue);
                 end;
             }
         }

@@ -164,7 +164,7 @@
                         end;
 
                         DetailedTicketAccessEntryDelete(Ticket."No.");
-                        TicketAccessEntryDelete(Ticket."No.");
+                        TicketAccessEntryDelete(Ticket."No.", (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CANCELED));
 
                         TicketNotification.ReadIsolation := IsolationLevel::UpdLock;
                         TicketNotification.SetCurrentKey("Ticket No.");
@@ -227,21 +227,28 @@
         end;
     end;
 
-    local procedure TicketAccessEntryDelete(TicketNo: Code[20])
+    local procedure TicketAccessEntryDelete(TicketNo: Code[20]; DeleteDeferralRequests: Boolean)
     var
         TicketAccessEntry, TicketAccessEntryUpdate : Record "NPR TM Ticket Access Entry";
+        RevenueDeferral: Codeunit "NPR TM RevenueDeferral";
+        EntryNos: List of [Integer];
     begin
         TicketAccessEntry.ReadIsolation := IsolationLevel::ReadUnCommitted;
         TicketAccessEntry.SetCurrentKey("Ticket No.");
         TicketAccessEntry.SetLoadFields("Entry No.");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
-        if (TicketAccessEntry.FindSet()) then begin
-            TicketAccessEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
-            repeat
-                TicketAccessEntryUpdate.Get(TicketAccessEntry."Entry No.");
+        if (not TicketAccessEntry.FindSet()) then
+            exit;
+
+        TicketAccessEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
+        repeat
+            EntryNos.Add(TicketAccessEntry."Entry No.");
+            if (TicketAccessEntryUpdate.Get(TicketAccessEntry."Entry No.")) then
                 TicketAccessEntryUpdate.Delete();
-            until (TicketAccessEntry.Next() = 0);
-        end;
+        until (TicketAccessEntry.Next() = 0);
+
+        if (DeleteDeferralRequests) then
+            RevenueDeferral.DeleteDeferralRequests(EntryNos);
 
     end;
 #endif
@@ -1953,16 +1960,19 @@
             exit(false);
 
         repeat
-            TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA;
-            if (NotificationAddress <> '') then begin
-                if (StrPos(NotificationAddress, '@') > 1) then
-                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL;
-
-                if (DelChr(NotificationAddress, '=', '0123456789+- ') = '') then
-                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
-
+            if (TicketReservationRequest."Notification Address" = '') then
                 TicketReservationRequest."Notification Address" := NotificationAddress;
-            end;
+
+            if (TicketReservationRequest."Notification Address" = '') then
+                TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA
+            else
+                if (StrPos(TicketReservationRequest."Notification Address", '@') > 1) then
+                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
+                else
+                    if (DelChr(TicketReservationRequest."Notification Address", '=', '0123456789+- ') = '') then
+                        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS
+                    else
+                        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA;
 
             TicketReservationRequest."External Order No." := ExternalOrderNo;
             if (ExternalOrderNo <> '') then
@@ -1971,10 +1981,10 @@
             if ((TicketReservationRequest."Receipt No." = '') and (ExternalOrderNo = '')) then
                 TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::UNPAID;
 
-            if (TicketHolderName <> '') then
+            if (TicketReservationRequest.TicketHolderName = '') then
                 TicketReservationRequest.TicketHolderName := TicketHolderName;
 
-            if (TicketHolderLanguage <> '') then
+            if ((TicketReservationRequest.TicketHolderPreferredLanguage = '') and (TicketHolderLanguage <> '')) then
                 TicketReservationRequest.Validate(TicketHolderPreferredLanguage, TicketHolderLanguage);
 
             if (SkipPriceCalculation) then

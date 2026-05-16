@@ -290,7 +290,9 @@
     var
         Ticket: Record "NPR TM Ticket";
     begin
-        //with RT11 -> Ticket.ReadIsolation(ReadIsolation::ReadUncommitted);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        Ticket.ReadIsolation(ReadIsolation::ReadUncommitted);
+#ENDIF
         Ticket.SetCurrentKey("External Ticket No.");
         Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
         exit(Ticket.IsEmpty());

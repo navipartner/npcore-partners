@@ -4473,5 +4473,21 @@
         TicketRequestManager.RevokeReservationTokenRequest(Token, false);
     end;
 
+
+    internal procedure RevokeTicket(Ticket: Record "NPR TM Ticket"; ReferenceNumber: Code[20])
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        AmountToReverse: Decimal;
+        QtyToReverse: Integer;
+        Token: Text[100];
+    begin
+        Token := TicketRequestManager.GetNewToken();
+        AmountToReverse := 0;
+        QtyToReverse := 0;
+
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", ReferenceNumber, 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.RevokeReservationTokenRequest(Token, false);
+    end;
+
 }
 

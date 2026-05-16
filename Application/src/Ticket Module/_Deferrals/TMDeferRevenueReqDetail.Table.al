@@ -59,6 +59,9 @@ table 6150779 "NPR TM DeferRevenueReqDetail"
         {
             Clustered = true;
         }
+        key(Key2; TicketAccessEntryNo)
+        {
+        }
     }
 
 }

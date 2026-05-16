@@ -942,6 +942,170 @@ codeunit 6185062 "NPR AttractionWallet"
     end;
     #endregion
 
+    #region Delete
+
+    // DeleteWallet: physically deletes a wallet shell and the artifacts it solely owns. The cascade walks
+    // all six wallet tables: AttractionWallet (shell), AttractionWalletExtRef (external references),
+    // WalletAssetLineReference (line joins), WalletAssetLine (assets — only the orphans), WalletAssetHeader
+    // (transaction header — only when orphaned), WalletAssetHeaderReference (this wallet's self-link to its
+    // own header). 
+    // Asset lines and the header that are still referenced from other wallets/sources are left intact.
+    internal procedure DeleteWallet(WalletEntryNo: Integer)
+    var
+        Wallet: Record "NPR AttractionWallet";
+        HeaderEntryNo: Integer;
+        OrphanedAssetLineEntryNos: List of [Integer];
+    begin
+        if (WalletEntryNo = 0) then
+            exit;
+        if (not Wallet.Get(WalletEntryNo)) then
+            exit;
+
+        HeaderEntryNo := FindWalletAssetHeaderEntryNo(Wallet);
+        CollectExclusivelyOwnedAssetLines(WalletEntryNo, OrphanedAssetLineEntryNos);
+
+        DeleteWalletAssetReferences(WalletEntryNo);
+        DeleteOrphanedAssetLines(OrphanedAssetLineEntryNos);
+
+        if (HeaderEntryNo <> 0) then begin
+            DeleteWalletSelfHeaderReferences(HeaderEntryNo, Wallet.SystemId);
+            DeleteAssetHeaderIfOrphaned(HeaderEntryNo);
+        end;
+
+        DeleteWalletExternalReferences(WalletEntryNo);
+
+        Wallet.Delete();
+    end;
+
+    local procedure DeleteWalletAssetReferences(WalletEntryNo: Integer)
+    var
+        Ref: Record "NPR WalletAssetLineReference";
+        InnerRef: Record "NPR WalletAssetLineReference";
+        EntryNos: List of [Integer];
+        EntryNo: Integer;
+    begin
+        Ref.SetCurrentKey(WalletEntryNo);
+        Ref.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+        Ref.SetLoadFields(EntryNo);
+        if (Ref.FindSet()) then
+            repeat
+                EntryNos.Add(Ref.EntryNo);
+            until (Ref.Next() = 0);
+
+        foreach EntryNo in EntryNos do
+            if (InnerRef.Get(EntryNo)) then
+                InnerRef.Delete();
+    end;
+
+    local procedure DeleteWalletExternalReferences(WalletEntryNo: Integer)
+    var
+        ExtRef: Record "NPR AttractionWalletExtRef";
+        InnerExtRef: Record "NPR AttractionWalletExtRef";
+        ExternalReferences: List of [Text];
+        ExternalReference: Text;
+    begin
+        ExtRef.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+        ExtRef.SetLoadFields(ExternalReference);
+        if (ExtRef.FindSet()) then
+            repeat
+                ExternalReferences.Add(ExtRef.ExternalReference);
+            until (ExtRef.Next() = 0);
+
+        foreach ExternalReference in ExternalReferences do
+            if (InnerExtRef.Get(ExternalReference)) then
+                InnerExtRef.Delete();
+    end;
+
+    local procedure FindWalletAssetHeaderEntryNo(var Wallet: Record "NPR AttractionWallet"): Integer
+    var
+        HeaderRef: Record "NPR WalletAssetHeaderReference";
+    begin
+        HeaderRef.SetCurrentKey(LinkToTableId, LinkToSystemId);
+        HeaderRef.SetFilter(LinkToTableId, '=%1', Database::"NPR AttractionWallet");
+        HeaderRef.SetFilter(LinkToSystemId, '=%1', Wallet.SystemId);
+        HeaderRef.SetLoadFields(WalletHeaderEntryNo);
+        if (HeaderRef.FindFirst()) then
+            exit(HeaderRef.WalletHeaderEntryNo);
+
+        exit(0);
+    end;
+
+    local procedure CollectExclusivelyOwnedAssetLines(WalletEntryNo: Integer; var AssetLineEntryNos: List of [Integer])
+    var
+        Ref: Record "NPR WalletAssetLineReference";
+        OtherRef: Record "NPR WalletAssetLineReference";
+    begin
+        Ref.SetCurrentKey(WalletEntryNo);
+        Ref.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+        Ref.SetLoadFields(WalletAssetLineEntryNo);
+        if (not Ref.FindSet()) then
+            exit;
+
+        repeat
+            OtherRef.Reset();
+            OtherRef.SetCurrentKey(WalletAssetLineEntryNo, SupersededBy, WalletEntryNo);
+            OtherRef.SetFilter(WalletAssetLineEntryNo, '=%1', Ref.WalletAssetLineEntryNo);
+            OtherRef.SetFilter(WalletEntryNo, '<>%1', WalletEntryNo);
+            if (OtherRef.IsEmpty()) then
+                if (not AssetLineEntryNos.Contains(Ref.WalletAssetLineEntryNo)) then
+                    AssetLineEntryNos.Add(Ref.WalletAssetLineEntryNo);
+        until (Ref.Next() = 0);
+    end;
+
+    local procedure DeleteOrphanedAssetLines(AssetLineEntryNos: List of [Integer])
+    var
+        Line: Record "NPR WalletAssetLine";
+        Ref: Record "NPR WalletAssetLineReference";
+        AssetLineEntryNo: Integer;
+    begin
+        foreach AssetLineEntryNo in AssetLineEntryNos do begin
+            // Re-check after the references pass — concurrent writers may have added a reference.
+            Ref.Reset();
+            Ref.SetCurrentKey(WalletAssetLineEntryNo, SupersededBy, WalletEntryNo);
+            Ref.SetFilter(WalletAssetLineEntryNo, '=%1', AssetLineEntryNo);
+            if (Ref.IsEmpty()) then
+                if (Line.Get(AssetLineEntryNo)) then
+                    Line.Delete();
+        end;
+    end;
+
+    local procedure DeleteWalletSelfHeaderReferences(HeaderEntryNo: Integer; WalletSystemId: Guid)
+    var
+        Ref: Record "NPR WalletAssetHeaderReference";
+        InnerRef: Record "NPR WalletAssetHeaderReference";
+        EntryNos: List of [Integer];
+        EntryNo: Integer;
+    begin
+        Ref.SetCurrentKey(LinkToTableId, LinkToSystemId);
+        Ref.SetFilter(LinkToTableId, '=%1', Database::"NPR AttractionWallet");
+        Ref.SetFilter(LinkToSystemId, '=%1', WalletSystemId);
+        Ref.SetFilter(WalletHeaderEntryNo, '=%1', HeaderEntryNo);
+        Ref.SetLoadFields(EntryNo);
+        if (Ref.FindSet()) then
+            repeat
+                EntryNos.Add(Ref.EntryNo);
+            until (Ref.Next() = 0);
+
+        foreach EntryNo in EntryNos do
+            if (InnerRef.Get(EntryNo)) then
+                InnerRef.Delete();
+    end;
+
+    local procedure DeleteAssetHeaderIfOrphaned(HeaderEntryNo: Integer)
+    var
+        Header: Record "NPR WalletAssetHeader";
+        Ref: Record "NPR WalletAssetHeaderReference";
+    begin
+        // Only nuke the header when nothing else (POS sales, etc.) still references it.
+        Ref.SetFilter(WalletHeaderEntryNo, '=%1', HeaderEntryNo);
+        if (not Ref.IsEmpty()) then
+            exit;
+
+        if (Header.Get(HeaderEntryNo)) then
+            Header.Delete();
+    end;
+
+    #endregion
 
     local procedure CreateOwnerWallet(var WalletAssetHeader: Record "NPR WalletAssetHeader"): Integer
     var
@@ -1073,7 +1237,7 @@ codeunit 6185062 "NPR AttractionWallet"
         exit(WalletAssetHeader.TransactionId);
     end;
 
-    internal procedure getWalletExternalReferenceNumber(WalletEntryNo: Integer; var _ExternalReferenceNo: Text[100]): Boolean
+    internal procedure GetWalletExternalReferenceNumber(WalletEntryNo: Integer; var _ExternalReferenceNo: Text[100]): Boolean
     var
         WalletExternalReference: Record "NPR AttractionWalletExtRef";
     begin
@@ -1294,13 +1458,9 @@ codeunit 6185062 "NPR AttractionWallet"
     var
         WalletTemplateLine: Record "NPR NpIa Item AddOn Line";
         Item: Record Item;
-        TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
-        TicketPrice: Decimal;
-
-        ErpUnitPrice: Decimal;
-        ErpDiscountPct: Decimal;
-        ErpUnitPriceIncludesVat: Boolean;
-        ErpUnitPriceVatPercentage: Decimal;
+        PerUnitExclVat: Decimal;
+        PerUnitInclVat: Decimal;
+        LineQty: Integer;
     begin
         Clear(WalletPrice);
 
@@ -1310,28 +1470,17 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletTemplateLine.SetRange("AddOn No.", WalletTemplate."No.");
         if (WalletTemplateLine.FindSet()) then
             repeat
-
-                if ((WalletTemplateLine."Use Unit Price" = WalletTemplateLine."Use Unit Price"::Always) or
-                    (WalletTemplateLine."Unit Price" <> 0)) then begin
-                    // Use price from wallet template
-                    WalletPrice += AdjustForDiscount(WalletTemplateLine, WalletTemplateLine."Unit Price" * WalletTemplateLine.Quantity);
-
-                end else begin
-                    // Use price from item card
-                    Item.SetLoadFields("NPR Ticket Type", "Unit Price");
+                if (CalculateAddOnLineUnitPrice(WalletTemplateLine, CustomerNo, ReferenceDate, ReferenceTime, PerUnitExclVat, PerUnitInclVat)) then begin
+                    LineQty := WalletTemplateLine.Quantity;
+                    if (LineQty < 1) then
+                        LineQty := 1;
+                    Item.SetLoadFields("Price Includes VAT");
                     Item.Get(WalletTemplateLine."Item No.");
-                    if (Item."NPR Ticket Type" <> '') then begin
-                        TicketPrice := TicketDynamicPrice.CalculatePrice(Item."No.", '', CustomerNo, ReferenceDate, ReferenceTime, WalletTemplateLine.Quantity, ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
-                        if (TicketPrice = 0) then
-                            TicketPrice := ErpUnitPrice;
-
-                        WalletPrice += AdjustForDiscount(WalletTemplateLine, TicketPrice * WalletTemplateLine.Quantity);
-
-                    end else begin
-                        WalletPrice += AdjustForDiscount(WalletTemplateLine, Item."Unit Price" * WalletTemplateLine.Quantity);
-                    end;
+                    if (Item."Price Includes VAT") then
+                        WalletPrice += PerUnitInclVat * LineQty
+                    else
+                        WalletPrice += PerUnitExclVat * LineQty;
                 end;
-
             until (WalletTemplateLine.Next() = 0);
 
         exit(true);
@@ -1343,6 +1492,89 @@ codeunit 6185062 "NPR AttractionWallet"
             NewPrice := PriceIn - WalletTemplateLine.DiscountAmount
         else
             NewPrice := Round(PriceIn * (1 - (WalletTemplateLine."Discount %" / 100)), 0.01);
+    end;
+
+    internal procedure CalculateAddOnLineUnitPrice(
+        AddOnLine: Record "NPR NpIa Item AddOn Line";
+        CustomerNo: Code[20];
+        ReferenceDate: Date;
+        ReferenceTime: Time;
+        var UnitPriceExclVat: Decimal;
+        var UnitPriceInclVat: Decimal) PriceCalculated: Boolean
+    var
+        Item: Record Item;
+        TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
+        RawPrice: Decimal;
+        LineTotal: Decimal;
+        UnitPrice: Decimal;
+        ErpUnitPrice: Decimal;
+        ErpDiscountPct: Decimal;
+        ErpUnitPriceIncludesVat: Boolean;
+        ErpUnitPriceVatPercentage: Decimal;
+        AddOnLineQty: Integer;
+    begin
+        UnitPriceExclVat := 0;
+        UnitPriceInclVat := 0;
+
+        if (AddOnLine.Type <> AddOnLine.Type::Quantity) then
+            exit(false);
+
+        if (AddOnLine."Item No." = '') then
+            exit(false);
+
+        AddOnLineQty := AddOnLine.Quantity;
+        if (AddOnLineQty <= 0) then
+            exit(true);
+
+        Item.SetLoadFields("NPR Ticket Type", "Unit Price", "Price Includes VAT", "VAT Prod. Posting Group", "VAT Bus. Posting Gr. (Price)");
+        Item.Get(AddOnLine."Item No.");
+
+        if ((AddOnLine."Use Unit Price" = AddOnLine."Use Unit Price"::Always) or
+            (AddOnLine."Unit Price" <> 0)) then begin
+            // Template override — AddOn line dictates the unit price.
+            RawPrice := AddOnLine."Unit Price";
+            ErpUnitPriceIncludesVat := Item."Price Includes VAT";
+            ErpUnitPriceVatPercentage := GetItemVatPercentage(Item);
+        end else begin
+            if (Item."NPR Ticket Type" <> '') then begin
+                RawPrice := TicketDynamicPrice.CalculatePrice(
+                    AddOnLine."Item No.", AddOnLine."Variant Code", CustomerNo, ReferenceDate, ReferenceTime, AddOnLineQty,
+                    ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
+                if (RawPrice = 0) then
+                    RawPrice := ErpUnitPrice;
+            end else begin
+                RawPrice := Item."Unit Price";
+                ErpUnitPriceIncludesVat := Item."Price Includes VAT";
+                ErpUnitPriceVatPercentage := GetItemVatPercentage(Item);
+            end;
+        end;
+
+        LineTotal := AdjustForDiscount(AddOnLine, RawPrice * AddOnLineQty);
+        UnitPrice := Round(LineTotal / AddOnLineQty, 0.01);
+
+        if (ErpUnitPriceIncludesVat) then begin
+            UnitPriceInclVat := UnitPrice;
+            if (ErpUnitPriceVatPercentage <> 0) then
+                UnitPriceExclVat := Round(UnitPriceInclVat / (1 + ErpUnitPriceVatPercentage / 100), 0.01)
+            else
+                UnitPriceExclVat := UnitPriceInclVat;
+        end else begin
+            UnitPriceExclVat := UnitPrice;
+            UnitPriceInclVat := Round(UnitPriceExclVat * (1 + ErpUnitPriceVatPercentage / 100), 0.01);
+        end;
+
+        exit(true);
+    end;
+
+    local procedure GetItemVatPercentage(Item: Record Item): Decimal
+    var
+        VATSetup: Record "VAT Posting Setup";
+    begin
+        if (Item."VAT Bus. Posting Gr. (Price)" = '') then
+            exit(0);
+        if (VATSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group")) then
+            exit(VATSetup."VAT %");
+        exit(0);
     end;
 
     internal procedure GetNextPossibleAdmissionScheduleStartDateTime(ItemNo: Code[20]; var SuggestedNextStartDateTime: DateTime)

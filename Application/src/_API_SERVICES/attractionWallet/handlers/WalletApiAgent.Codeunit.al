@@ -275,7 +275,7 @@ codeunit 6248331 "NPR WalletApiAgent"
             .AddProperty('lastPrintedAt', Wallet.LastPrintAt)
             .AddProperty('printCount', Wallet.PrintCount);
 
-        if (AttractionWallet.getWalletExternalReferenceNumber(Wallet.EntryNo, ExternalReference)) then
+        if (AttractionWallet.GetWalletExternalReferenceNumber(Wallet.EntryNo, ExternalReference)) then
             ResponseJson.AddProperty('externalReferenceNumber', ExternalReference)
         else
             ResponseJson.AddProperty('externalReferenceNumber');

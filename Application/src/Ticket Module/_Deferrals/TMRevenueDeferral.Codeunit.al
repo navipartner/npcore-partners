@@ -14,6 +14,62 @@ codeunit 6184739 "NPR TM RevenueDeferral"
         ProcessStatusPendingDeferral();
     end;
 
+    internal procedure DeleteDeferralRequests(TicketAccessEntryNos: List of [Integer])
+    var
+        Detail: Record "NPR TM DeferRevenueReqDetail";
+        InnerDetail: Record "NPR TM DeferRevenueReqDetail";
+        TempDetailKeys: Record "NPR TM DeferRevenueReqDetail" temporary;
+        Request: Record "NPR TM DeferRevenueRequest";
+        TicketAccessEntryNo: Integer;
+    begin
+        if (TicketAccessEntryNos.Count() = 0) then
+            exit;
+
+        // Phase 1: collect every detail PK across the batch into the temp buffer (records stay in scope).
+        Detail.SetCurrentKey(TicketAccessEntryNo);
+        Detail.SetLoadFields(TokenID, ItemNo, VariantCode, AdmissionCode, EntryNo);
+        foreach TicketAccessEntryNo in TicketAccessEntryNos do begin
+            if (not (TicketAccessEntryNo = 0)) then begin
+                Detail.SetFilter(TicketAccessEntryNo, '=%1', TicketAccessEntryNo);
+                if (Detail.FindSet()) then
+                    repeat
+                        TempDetailKeys := Detail;
+                        TempDetailKeys.Insert();
+                    until (Detail.Next() = 0);
+            end;
+        end;
+
+        // Phase 2: point-delete every detail row from the temp buffer.
+        TempDetailKeys.Reset();
+        if (TempDetailKeys.FindSet()) then
+            repeat
+                if (InnerDetail.Get(TempDetailKeys.TokenID, TempDetailKeys.ItemNo, TempDetailKeys.VariantCode, TempDetailKeys.AdmissionCode, TempDetailKeys.EntryNo)) then
+                    InnerDetail.Delete(false);
+            until (TempDetailKeys.Next() = 0);
+
+        // Phase 3: point-delete every request row.
+        foreach TicketAccessEntryNo in TicketAccessEntryNos do
+            if (TicketAccessEntryNo <> 0) then
+                if (Request.Get(TicketAccessEntryNo)) then
+                    Request.Delete(false);
+    end;
+
+    internal procedure DeleteDeferralRequests(var FilteredRequest: Record "NPR TM DeferRevenueRequest")
+    var
+        TicketAccessEntryNos: List of [Integer];
+    begin
+        if (not FilteredRequest.HasFilter()) then
+            exit;
+
+        FilteredRequest.SetLoadFields(TicketAccessEntryNo);
+        if (FilteredRequest.FindSet()) then
+            repeat
+                TicketAccessEntryNos.Add(FilteredRequest.TicketAccessEntryNo);
+            until (FilteredRequest.Next() = 0);
+
+        DeleteDeferralRequests(TicketAccessEntryNos);
+    end;
+
     [CommitBehavior(CommitBehavior::Error)]
     internal procedure ProcessOne(DeferRevenueRequest: Record "NPR TM DeferRevenueRequest")
     var

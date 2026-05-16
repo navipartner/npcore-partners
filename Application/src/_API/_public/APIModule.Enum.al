@@ -30,6 +30,12 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     {
         Implementation = "NPR API Module Resolver" = "NPR API Customer Resolver";
     }
+
+    value(6151047; channelManager)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR ChannelMgrModuleResolver";
+    }
+
     value(6185039; ticketing)
     {
         Implementation = "NPR API Module Resolver" = "NPR TicketingModuleResolver";
@@ -108,5 +114,6 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     {
         Implementation = "NPR API Module Resolver" = "NPR API Restaurant Resolver";
     }
+
 }
 #endif
