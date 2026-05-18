@@ -50,6 +50,10 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('membership_valid_from_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Valid From", Entry.PreferredLanguageCode));
         JObject.Add('membership_valid_until', Entry."Membership Valid Until");
         JObject.Add('membership_valid_until_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Valid Until", Entry.PreferredLanguageCode));
+        JObject.Add('membership_consecutive_from', Entry."Membership Consecutive From");
+        JObject.Add('membership_consecutive_from_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Consecutive From", Entry.PreferredLanguageCode));
+        JObject.Add('membership_consecutive_until', Entry."Membership Consecutive Until");
+        JObject.Add('membership_consecutive_until_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Consecutive Until", Entry.PreferredLanguageCode));
         JObject.Add('membership_description', Entry."Membership Description");
         JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf(Entry."Auto-Renew".AsInteger())));
         JObject.Add('membership_remaining_points', Entry."Remaining Points");
@@ -110,6 +114,10 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('membership_valid_from_formatted', Format(20250101D, 0, '<Standard Format,0>'));
         JObject.Add('membership_valid_until', 20251130D);
         JObject.Add('membership_valid_until_formatted', Format(20251130D, 0, '<Standard Format,0>'));
+        JObject.Add('membership_consecutive_from', 20240101D);
+        JObject.Add('membership_consecutive_from_formatted', Format(20240101D, 0, '<Standard Format,0>'));
+        JObject.Add('membership_consecutive_until', 20251130D);
+        JObject.Add('membership_consecutive_until_formatted', Format(20251130D, 0, '<Standard Format,0>'));
         JObject.Add('membership_description', 'Gold membership');
         JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf("NPR MM MembershipAutoRenew"::YES_INTERNAL.AsInteger())));
         JObject.Add('membership_remaining_points', 0);
