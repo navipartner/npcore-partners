@@ -5,11 +5,12 @@ codeunit 6059860 "NPR End Of Day Worker"
     var
         EndOfDayOptions: Option "X-Report","Z-Report",CloseWorkShift;
 
-    procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]): Boolean
+    procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]; POSSetup: Codeunit "NPR POS Setup"): Boolean
     var
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
         POSSavedSaleMgt: Codeunit "NPR POS Saved Sale Mgt.";
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         SaleMustBeEmpty: Label 'Delete all sales lines before balancing the register';
     begin
         if (SalesTicketNo = '') then
@@ -19,6 +20,9 @@ codeunit 6059860 "NPR End Of Day Worker"
         SalePOS.Get(POSUnitCode, SalesTicketNo);
         if (LineExists(SalePOS)) then
             Error(SaleMustBeEmpty);
+
+        if not WaiterPadMgt.CleanupWaiterPadsBeforeBalancing(POSSetup) then
+            Error('');
 
         if not POSSavedSaleMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
             Error('');

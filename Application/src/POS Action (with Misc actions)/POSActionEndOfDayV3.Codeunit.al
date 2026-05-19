@@ -95,7 +95,7 @@
         case WorkflowStep of
             'ValidateRequirements':
                 begin
-                    if (not (POSEndOfDay.ValidateRequirements(POSUnit."No.", SalePOS."Sales Ticket No."))) then
+                    if (not (POSEndOfDay.ValidateRequirements(POSUnit."No.", SalePOS."Sales Ticket No.", POSSetup))) then
                         FrontEnd.ContinueAtStep('EndOfWorkflow');
                     POSCreateEntry.InsertUnitCloseBeginEntry(POSUnit."No.", SalespersonPurchaser.Code);
                 end;

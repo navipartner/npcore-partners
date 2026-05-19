@@ -947,4 +947,65 @@
     local procedure OnAfterChangeWaiterPadStatus(xWaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
     end;
+
+    internal procedure CleanupWaiterPadsBeforeBalancing(POSSetup: Codeunit "NPR POS Setup"): Boolean
+    var
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+    begin
+        if not GuiAllowed() then
+            exit(true);
+        POSSetup.GetPOSRestProfile(POSRestProfile);
+        if POSRestProfile."Restaurant Code" = '' then
+            exit(true);
+        exit(CleanupWaiterPadsInteractive(POSRestProfile."Restaurant Code"));
+    end;
+
+    internal procedure CleanupWaiterPadsInteractive(RestaurantCode: Code[20]): Boolean
+    var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        SeatingWPLinkQry: Query "NPR NPRE Seating - W/Pad Link";
+        UnfinishedWaiterPadsQst: Label 'There are unfinished waiter pads. All waiter pads must be finished and closed before the end of the day. Do you want to continue with the end-of-day process?';
+        StillUnfinishedWaiterPadsQst: Label 'There are still unfinished waiter pads. Do you want to continue with the end-of-day process?';
+    begin
+        if not OpenWaiterPadsExistForRestaurant(RestaurantCode, SeatingWPLinkQry) then
+            exit(true);
+
+        if not Confirm(UnfinishedWaiterPadsQst, false) then
+            exit(false);
+
+        MarkOpenWaiterPadsForRestaurant(SeatingWPLinkQry, WaiterPad);
+        WaiterPad.SetRange(Closed, false);
+        WaiterPad.MarkedOnly(true);
+        if Page.RunModal(Page::"NPR NPRE Waiter Pad List", WaiterPad) <> Action::LookupOK then
+            exit(false);
+        Commit();
+
+        if WaiterPad.IsEmpty() then
+            exit(true);
+
+        exit(Confirm(StillUnfinishedWaiterPadsQst, false));
+    end;
+
+    local procedure MarkOpenWaiterPadsForRestaurant(var SeatingWPLinkQry: Query "NPR NPRE Seating - W/Pad Link"; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+        repeat
+            WaiterPad."No." := SeatingWPLinkQry.WaiterPadNo;
+            if not WaiterPad.Mark() then
+                WaiterPad.Mark(true);
+        until not SeatingWPLinkQry.Read();
+    end;
+
+    internal procedure OpenWaiterPadsExistForRestaurant(RestaurantCode: Code[20]; var SeatingWPLinkQry: Query "NPR NPRE Seating - W/Pad Link"): Boolean
+    var
+        SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
+        LocationFilter: Text;
+    begin
+        LocationFilter := SeatingMgt.RestaurantSeatingLocationFilter(RestaurantCode);
+        if LocationFilter = '' then
+            exit(false);
+        SeatingWPLinkQry.SetFilter(SeatingLocation, LocationFilter);
+        SeatingWPLinkQry.SetRange(WaiterPadClosed, false);
+        SeatingWPLinkQry.Open();
+        exit(SeatingWPLinkQry.Read());
+    end;
 }

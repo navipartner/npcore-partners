@@ -163,6 +163,17 @@ codeunit 85242 "NPR Library - Restaurant"
         end;
     end;
 
+    procedure CreateWaiterPadForSeating(SeatingCode: Code[20]; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        SeatingWPLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        CreateRestaurantSetup(RestaurantSetup);
+        Clear(WaiterPad);
+        WaiterPadMgt.AddNewWaiterPadForSeating(SeatingCode, WaiterPad, SeatingWPLink);
+    end;
+
     procedure CreateItemAddon(var ItemAddOn: Record "NPR NpIa Item AddOn")
     var
         LibraryUtility: Codeunit "Library - Utility";

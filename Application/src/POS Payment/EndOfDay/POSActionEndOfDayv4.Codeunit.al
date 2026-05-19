@@ -41,7 +41,7 @@ codeunit 6014600 "NPR POS Action: EndOfDay V4" implements "NPR IPOS Workflow"
 
         case Step of
             'ValidateRequirements':
-                EndOfDayWorker.ValidateRequirements(Setup.GetPOSUnitNo(), SalePOS."Sales Ticket No.");
+                EndOfDayWorker.ValidateRequirements(Setup.GetPOSUnitNo(), SalePOS."Sales Ticket No.", Setup);
             'DiscoverEftIntegrationsForEndOfDay':
                 FrontEnd.WorkflowResponse(EndOfDayWorker.DiscoverEftIntegrationsForEndOfDay(EndOfDayType));
             'OpenCashDrawer':
