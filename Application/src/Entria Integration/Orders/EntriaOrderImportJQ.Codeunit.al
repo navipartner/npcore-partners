@@ -239,7 +239,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         Clear(EntriaOrderProcessor);
         EntriaOrderProcessor.SetParams(OrderTkn, EntriaStore, DocumentNo);
         if EntriaOrderProcessor.Run(EcomSalesHeader) then begin
-            EcomSalesDocApiAgent.AssignBucketId(EcomSalesHeader);
+            if EcomSalesHeader."Bucket Id" = 0 then
+                EcomSalesDocApiAgent.AssignBucketId(EcomSalesHeader);
             exit(true);
         end;
         LogError(GetErrorText(DocumentNo), EntriaStore.Code, DocumentNo);

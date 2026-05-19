@@ -5,7 +5,28 @@ codeunit 6151027 "NPR Entria Order Impl."
 
     internal procedure ImportOrder(OrderTkn: JsonToken; EntriaStore: Record "NPR Entria Store"; DocumentNo: Code[20]; var EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
+        if TryGetExistingOrder(EntriaStore, DocumentNo, EcomSalesHeader) then
+            exit;
+
         CreateEcommerceDocument(OrderTkn, EntriaStore, DocumentNo, EcomSalesHeader);
+    end;
+
+    local procedure TryGetExistingOrder(EntriaStore: Record "NPR Entria Store"; DocumentNo: Code[20]; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
+    var
+        EntriaStoreLock: Record "NPR Entria Store";
+        ExistingHeader: Record "NPR Ecom Sales Header";
+    begin
+        EntriaStoreLock.ReadIsolation := IsolationLevel::UpdLock;
+        EntriaStoreLock.Get(EntriaStore.RecordId);
+
+        ExistingHeader.SetRange("Document Type", ExistingHeader."Document Type"::Order);
+        ExistingHeader.SetRange("Ecommerce Store Code", EntriaStore.Code);
+        ExistingHeader.SetRange("External No.", DocumentNo);
+        if not ExistingHeader.FindFirst() then
+            exit(false);
+
+        EcomSalesHeader := ExistingHeader;
+        exit(true);
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
