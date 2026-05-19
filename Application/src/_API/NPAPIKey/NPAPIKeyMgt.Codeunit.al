@@ -175,6 +175,17 @@ codeunit 6248565 "NPR NP API Key Mgt."
         ChangeStatus(NPAPIKey2, "NPR NP API Key Status"::Active, FailedToActivateApiKeyErr);
     end;
 
+    internal procedure DeleteApiKey(NPAPIKey: Record "NPR NaviPartner API Key")
+    var
+        NPAPIKey2: Record "NPR NaviPartner API Key";
+    begin
+        NPAPIKey2.LockTable();
+        NPAPIKey2.Get(NPAPIKey.Id);
+        NPAPIKey2.TestField(Status, "NPR NP API Key Status"::Revoked);
+        NPAPIKey2.Validate(Status, "NPR NP API Key Status"::Deleted);
+        NPAPIKey2.Modify(true);
+    end;
+
     procedure SynchronizeApiKeyPermissionsToEntraApps(NPAPIKeyId: Guid)
     var
         NPAPIKey: Record "NPR NaviPartner API Key";
@@ -421,6 +432,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
             Error(FailedToRemoveEntraAppErr, ResponseMsg.HttpStatusCode, ResponseBody);
         end;
 
+        EntraApp.SetDeletingViaNPAPIKeyFlow(true);
         EntraApp.Delete(true);
     end;
 

@@ -180,6 +180,31 @@ page 6185107 "NPR NP API Key List"
                         CurrPage.Update(false);
                     end;
                 }
+                action(DeleteApiKey)
+                {
+                    Caption = 'Delete API Key';
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    Image = InactivityDescription;
+                    ToolTip = 'Permanently deletes the selected API Key. This action cannot be undone. Once deleted, linked Entra applications can be manually removed.';
+                    Enabled = Rec.Status = Rec.Status::Revoked;
+                    Ellipsis = true;
+                    AccessByPermission = tabledata "NPR NaviPartner API Key" = M;
+
+                    trigger OnAction()
+                    var
+                        NPAPIKeyMgt: Codeunit "NPR NP API Key Mgt.";
+                        ConfirmMgt: Codeunit "Confirm Management";
+                    begin
+                        if (not ConfirmMgt.GetResponseOrDefault(DeleteApiKeyQst, false)) then
+                            exit;
+
+                        NPAPIKeyMgt.DeleteApiKey(Rec);
+
+                        CurrPage.Update(false);
+                    end;
+                }
             }
         }
     }
@@ -193,6 +218,7 @@ page 6185107 "NPR NP API Key List"
         RevokeApiKeyQst: Label 'Are you sure you want to revoke the API key?';
         ActivateApiKeyQst: Label 'Are you sure you want to activate the API key?';
         RotateApiKeyQst: Label 'Are you sure you want to rotate the existing API key? This will produce a new API Key secret for the existing NaviPartner API Key.';
+        DeleteApiKeyQst: Label 'Are you sure you want to delete the API key? This action cannot be undone. The API key will be permanently deleted and cannot be reactivated.';
         APIKeyRotatedMsg: Label 'API Key rotated. New API Key secret: %1', Comment = '%1 = new API Key secret';
         RotateActionEnabled: Boolean;
         HasPermissionsDefined: Boolean;
@@ -242,7 +268,7 @@ page 6185107 "NPR NP API Key List"
         IsApiKeyActive := false;
 
         if (not IsNullGuid(Rec.Id)) then begin
-            RotateActionEnabled := (not (Rec.Status = Rec.Status::Revoked));
+            RotateActionEnabled := (Rec.Status = Rec.Status::Active);
 
             NPAPIKeyPermission.Reset();
             NPAPIKeyPermission.SetRange("NPR NP API Key Id", Rec.Id);

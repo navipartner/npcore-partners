@@ -50,9 +50,8 @@ page 6185109 "NPR NP API Key Entra App List"
             action("Delete")
             {
                 Caption = 'Delete';
-                ToolTip = 'Deletes the selected Entra ID application. This action cannot be undone.';
+                ToolTip = 'Deletes the selected Entra ID application from NaviPartner Auth Provider and Business Central. This action cannot be undone. Useful when the Entra App is deleted or corrupted in Azure and not synced with NaviPartner Auth Provider.';
                 Image = Delete;
-                Enabled = true;
                 Ellipsis = true;
 
                 trigger OnAction()
@@ -70,12 +69,65 @@ page 6185109 "NPR NP API Key Entra App List"
                     CurrPage.Update(false);
                 end;
             }
+            action(DeleteInAzure)
+            {
+                Caption = 'Delete in Azure';
+                ToolTip = 'Deletes the Entra ID application in Azure, removes it from NaviPartner Auth Provider and Business Central. This action is only available when the linked NaviPartner API Key is deleted. This action cannot be undone.';
+                Image = DeleteXML;
+                Enabled = IsApiKeyDeleted;
+                Ellipsis = true;
+
+                trigger OnAction()
+                var
+                    NPAPIKey: Record "NPR NaviPartner API Key";
+                    AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+                    NPAPIKeyMgt: Codeunit "NPR NP API Key Mgt.";
+                    ConfirmMgt: Codeunit "Confirm Management";
+                    ClientId: Guid;
+                begin
+                    Rec.TestField("Client Id");
+                    ClientId := Rec."Client Id";
+
+                    if (not ConfirmMgt.GetResponseOrDefault(StrSubstNo(DeleteInAzureQst, ClientId), false)) then
+                        exit;
+
+                    NPAPIKey.Get(Rec."NPR NaviPartner API Key Id");
+                    NPAPIKeyMgt.RemoveEntraApp(NPAPIKey, Rec);
+                    AADApplicationMgt.DeleteAzureADApplication(ClientId);
+
+                    CurrPage.Update(false);
+                    Message(DeletedInAzureMsg, ClientId);
+                end;
+            }
         }
     }
 
-
     var
         EntraAppNotFoundErr: Label 'Entra ID application with Client ID %1 not found.', Comment = '%1 - Client ID';
-        DeleteQst: Label 'Do you want to delete the Entra ID application with Client ID %1?', Comment = '%1 - Client ID';
+        DeleteQst: Label 'Do you want to delete the Entra ID application with Client ID %1? This will delete the application from the NaviPartner Auth Provider and Business Central.', Comment = '%1 - Client ID';
+        DeleteInAzureQst: Label 'Do you want to delete the Entra ID application with Client ID %1 in Azure, NaviPartner Auth Provider and Business Central? This action cannot be undone.', Comment = '%1 - Client ID';
+        DeletedInAzureMsg: Label 'Entra ID application with Client ID %1 has been deleted in Azure, NaviPartner Auth Provider and Business Central.', Comment = '%1 - Client ID';
+        IsApiKeyDeleted: Boolean;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        UpdateRecControls();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        UpdateRecControls();
+    end;
+
+    local procedure UpdateRecControls()
+    var
+        NPAPIKey: Record "NPR NaviPartner API Key";
+    begin
+        IsApiKeyDeleted := false;
+
+        if (not IsNullGuid(Rec."NPR NaviPartner API Key Id")) then
+            if (NPAPIKey.Get(Rec."NPR NaviPartner API Key Id")) then
+                IsApiKeyDeleted := (NPAPIKey.Status = NPAPIKey.Status::Deleted);
+    end;
 }
 #endif

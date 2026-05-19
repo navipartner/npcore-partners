@@ -17,5 +17,9 @@ enum 6059924 "NPR NP API Key Status"
     {
         Caption = 'Revoked';
     }
+    value(3; Deleted)
+    {
+        Caption = 'Deleted';
+    }
 }
 #endif

@@ -9,6 +9,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
         CreatedSecretMsg: Label 'Created secret for Entra ID App. Details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\Expires: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.', Comment = '%1 = client id, %2 = client secret, %3 = entra id tenant id, %4 = expiration date';
         CouldNotCreateAADAppErr: Label 'Could not create Entra ID App with the Microsoft Graph API.\\Error message: %1', Comment = '%1 = error message';
         CouldNotCreateSecretErr: Label 'Could not create secret. Error message was:\\%1';
+        CouldNotDeleteAADAppErr: Label 'Could not delete Entra ID App. Error message was:\\%1';
         MissingPermissionsErr: Label 'You need to have write permission to both %1 and %2. If you do not have access to manage users and Entra ID Applications, you cannot perform this action', Comment = '%1 = table caption of "AAD Application", %2 = table caption of "Access Control"';
         ResponseMalformedValueNotArrayOrObjectErr: Label 'The response from the Graph API is malformed. Expected "value" to be either an array or an object, but it is neither.\\Response: %1', Comment = '%1 = response body';
         NoAzureADRegisteredErr: Label 'System was not able to acquire the Entra ID Tenant ID. This is required to be able to get an access token.';
@@ -23,6 +24,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
         FindExistingEntraAppsErr: Label 'An error occurred while searching for existing Entra apps with DisplayName = %1 in Entra directory. Error message was:\\%2', Comment = '%1 = name of the application, %2 = error message.';
         ExistingAppRegisteredOnlyMsg: Label 'The Entra application %1 has already been found in the Entra directory, so it was only registered in Business Central.', Comment = '%1 = name of the application';
         EntraAppRegenerateQst: Label 'Do you want to regenerate secret for the Microsoft Entra Application %1?', Comment = '%1 = Application Name; Do not translate Microsoft Entra Application.';
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        EntraAppCannotBeRegeneratedErr: Label 'The secret for the Microsoft Entra Application %1 cannot be regenerated. It is managed by the %2 feature.', Comment = '%1 = Application Name, %2 = NaviPartner API Key table caption; Do not translate Microsoft Entra Application.';
+#endif
+        GraphApiTransportErr: Label 'Could not reach the Microsoft Graph API. The HTTP request failed before receiving a response.', Locked = true;
         [NonDebuggable]
         _AccessToken: Text;
         _AccessTokenExpiry: DateTime;
@@ -149,15 +154,35 @@ codeunit 6060060 "NPR AAD Application Mgt."
     end;
 
     internal procedure RegenerateEntraAppSecret(var EntraApp: Record "AAD Application"; WithConfirmDialog: Boolean)
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    var
+        NPAPIKey: Record "NPR NaviPartner API Key";
+#endif
     begin
         EntraApp.TestField("Client Id");
         EntraApp.TestField(Description);
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        if (EntraApp.IsManagedEntraApp()) then
+            Error(EntraAppCannotBeRegeneratedErr, EntraApp.Description, NPAPIKey.TableCaption());
+#endif
 
         if WithConfirmDialog then
             if not Confirm(EntraAppRegenerateQst, false, EntraApp.Description) then
                 Error('');
 
         CreateAzureADSecret(EntraApp."Client Id", StrSubstNo('%1 - %2', EntraApp.Description, Format(CurrentDateTime, 0, '<Year4>-<Month,2>-<Day,2> <Hours24,2>:<Minutes,2>')));
+    end;
+
+    internal procedure DeleteAzureADApplication(ApplicationId: Guid)
+    var
+        ApplicationObjectId: Guid;
+    begin
+        if (not TryGetAzureAppObjectIdFromAppId(ApplicationId, ApplicationObjectId)) then
+            Error(CouldNotFindObjectIdFromAppIdErr, ApplicationId);
+
+        if (not TryDeleteAzureADApplication(ApplicationObjectId)) then
+            Error(CouldNotDeleteAADAppErr, GetLastErrorText());
     end;
 
     local procedure CreateAzureADApplication(DisplayName: Text[50]; PermissionSets: List of [Code[20]]) AppJson: JsonObject
@@ -372,6 +397,28 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
         Secret := SecretToken.AsValue().AsText();
         Expires := ExpiresToken.AsValue().AsDateTime();
+    end;
+
+    [NonDebuggable]
+    [TryFunction]
+    local procedure TryDeleteAzureADApplication(ApplicationObjectId: Guid)
+    var
+        Client: HttpClient;
+        RequestMsg: HttpRequestMessage;
+        ResponseMsg: HttpResponseMessage;
+        ResponseTxt: Text;
+    begin
+        Client.DefaultRequestHeaders().Add('Authorization', 'Bearer ' + GetGraphAccessToken());
+        Client.DefaultRequestHeaders().Add('Accept', 'application/json');
+        RequestMsg.Method('DELETE');
+        RequestMsg.SetRequestUri(StrSubstNo('https://graph.microsoft.com/v1.0/applications/%1', DelChr(ApplicationObjectId, '=', '{}')));
+        if (not Client.Send(RequestMsg, ResponseMsg)) then
+            Error(GraphApiTransportErr);
+
+        ResponseMsg.Content().ReadAs(ResponseTxt);
+
+        if not ResponseMsg.IsSuccessStatusCode() then
+            Error(BadApiResponseErr, ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseTxt);
     end;
 
     [NonDebuggable]

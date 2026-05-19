@@ -34,6 +34,12 @@ tableextension 6014525 "NPR AAD Application" extends "AAD Application"
 #endif
     }
 
+    var
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        _DeletingViaNPAPIKeyFlow: Boolean;
+        EntraAppCannotBeDeletedErr: Label 'The Entra application %1 cannot be deleted because it is associated with an existing %2. You can delete the Entra application from the %2 management page.', Comment = '%1 = Entra Application Description, %2 = NaviPartner API Key table caption';
+#endif
+
     trigger OnBeforeDelete()
     var
         AccessControl: Record "Access Control";
@@ -52,5 +58,41 @@ tableextension 6014525 "NPR AAD Application" extends "AAD Application"
                 Error(CouldNotDeleteEntraAppLbl, ResponseText);
             end;
         end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        RunNPAPIKeyEntraAppRemovalChecks();
+#endif
     end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    internal procedure IsManagedEntraApp(): Boolean
+    begin
+        exit(not (IsNullGuid(Rec."NPR NaviPartner API Key Id")));
+    end;
+
+    internal procedure SetDeletingViaNPAPIKeyFlow(Value: Boolean)
+    begin
+        _DeletingViaNPAPIKeyFlow := Value;
+    end;
+
+    local procedure RunNPAPIKeyEntraAppRemovalChecks()
+    var
+        NPAPIKey: Record "NPR NaviPartner API Key";
+    begin
+        if (not IsManagedEntraApp()) then
+            exit;
+
+        if (_DeletingViaNPAPIKeyFlow) then
+            exit;
+
+        if (not NPAPIKey.Get(Rec."NPR NaviPartner API Key Id")) then
+            exit;
+
+        if (NPAPIKey.Status = NPAPIKey.Status::Deleted) then
+            exit;
+
+        Error(EntraAppCannotBeDeletedErr, Rec.Description, NPAPIKey.TableCaption());
+    end;
+#endif
+
 }
