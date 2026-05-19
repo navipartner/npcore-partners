@@ -301,6 +301,12 @@ page 6248188 "NPR Ecom Sales Document"
                 SubPageLink = "External Document No." = field("External No."), "Document Type" = field("Document Type");
                 UpdatePropagation = Both;
             }
+            part(VouchersSubPage; "NPR Ecom Voucher Sub")
+            {
+                Caption = 'Vouchers';
+                ApplicationArea = NPRRetail;
+                UpdatePropagation = Both;
+            }
         }
         area(factboxes)
         {
@@ -414,7 +420,7 @@ page 6248188 "NPR Ecom Sales Document"
             {
                 Caption = 'Vouchers';
                 Image = Certificate;
-                ToolTip = 'View linked vouchers';
+                ToolTip = 'View all vouchers linked to this document, including archived ones.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -518,6 +524,9 @@ page 6248188 "NPR Ecom Sales Document"
         ChangeTicketTokenEnabled: Boolean;
         ShowCustomerTypeField: Boolean;
         ShowCustomerTemplateFields: Boolean;
+        _SubpagesBackgroundTaskId: Integer;
+        _SubpagesPendingForSystemId: Guid;
+        _SubpagesLoadedForSystemId: Guid;
 
     trigger OnOpenPage()
     begin
@@ -529,6 +538,95 @@ page 6248188 "NPR Ecom Sales Document"
         HandleCustomerTypeAndTemplatesVisiblityFields();
         ChangeTicketTokenEnabled := (Rec."Ticket Processing Status" <> Rec."Ticket Processing Status"::Processed) and (Rec."Document Type" = Rec."Document Type"::Order) and
                Rec."Tickets Exist";
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        EnqueueSubpagesRefresh(Rec);
+    end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    var
+        AllSubpagesLoaded: Boolean;
+    begin
+        if TaskId <> _SubpagesBackgroundTaskId then
+            exit; // stale completion from a previous header
+        // Route the task results to each virtual-item subpage. Each PopulateXSubpage returns whether
+        // its payload was present; we require ALL subpages to have loaded before promoting Pending ->
+        // Loaded. If any is missing, leave Loaded clear so the next OnAfterGetCurrRecord on the same
+        // doc retries. Future subpages add one helper + one line here.
+        AllSubpagesLoaded := PopulateVouchersSubpage(Results);
+        // AllSubpagesLoaded := PopulateTicketsSubpage(Results) and AllSubpagesLoaded;
+        // AllSubpagesLoaded := PopulateMembershipsSubpage(Results) and AllSubpagesLoaded;
+        if AllSubpagesLoaded then
+            _SubpagesLoadedForSystemId := _SubpagesPendingForSystemId
+        else
+            Clear(_SubpagesLoadedForSystemId);
+        Clear(_SubpagesPendingForSystemId);
+    end;
+
+    trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
+    begin
+        if TaskId <> _SubpagesBackgroundTaskId then begin
+            IsHandled := true;
+            exit;
+        end;
+        // Clear pending without promoting to loaded — next OnAfterGetCurrRecord will retry.
+        Clear(_SubpagesPendingForSystemId);
+        Clear(_SubpagesLoadedForSystemId);
+        ClearAllSubpages();
+        IsHandled := true;
+    end;
+
+    local procedure PopulateVouchersSubpage(Results: Dictionary of [Text, Text]) PayloadPresent: Boolean
+    var
+        EcomDocSubpagesTask: Codeunit "NPR Ecom Doc Subpages Task";
+        PayloadText: Text;
+    begin
+        PayloadPresent := Results.Get(EcomDocSubpagesTask.VouchersResultKeyTok(), PayloadText);
+        if PayloadPresent then
+            CurrPage.VouchersSubPage.Page.PopulateFromJsonText(PayloadText)
+        else
+            CurrPage.VouchersSubPage.Page.ClearContents();
+    end;
+
+    local procedure ClearAllSubpages()
+    begin
+        // Called when we start a new refresh or when the task errors. Future subpages add a line here.
+        CurrPage.VouchersSubPage.Page.ClearContents();
+        // CurrPage.TicketsSubPage.Page.ClearContents();
+        // CurrPage.MembershipsSubPage.Page.ClearContents();
+    end;
+
+    local procedure EnqueueSubpagesRefresh(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomDocSubpagesTask: Codeunit "NPR Ecom Doc Subpages Task";
+        Sync: Codeunit "NPR Ecom Subpages Sync";
+        Params: Dictionary of [Text, Text];
+        WasDirty: Boolean;
+    begin
+        // Single background task feeds all virtual-item subpages for this document. Today only
+        // vouchers; future tickets/coupons/etc. extend the task's OnRun and the completion routing
+        // above without changing this entry point or any subpage's PBT plumbing.
+        // If a subpage action (e.g. Process Virtual Item on EcomSalesDocSub) just mutated this
+        // doc's data, Sync.ConsumeDirty drops the page-local Loaded cache so the check below
+        // falls through to a fresh PBT. When dirty AND a PBT is already in flight, we must cancel
+        // and re-enqueue — the in-flight task has pre-mutation data and would otherwise complete
+        // and promote stale state to Loaded.
+        WasDirty := Sync.ConsumeDirty(EcomSalesHeader.SystemId);
+        if WasDirty then
+            Clear(_SubpagesLoadedForSystemId);
+        if EcomSalesHeader.SystemId = _SubpagesLoadedForSystemId then
+            exit; // already loaded for this doc — skip redundant refresh on focus/CurrPage.Update
+        if (not WasDirty) and (EcomSalesHeader.SystemId = _SubpagesPendingForSystemId) then
+            exit; // load already in flight and no mutation since — let it complete
+        if _SubpagesBackgroundTaskId <> 0 then
+            CurrPage.CancelBackgroundTask(_SubpagesBackgroundTaskId);
+        _SubpagesPendingForSystemId := EcomSalesHeader.SystemId;
+        Clear(_SubpagesLoadedForSystemId);
+        ClearAllSubpages();
+        Params.Add(EcomDocSubpagesTask.HeaderSystemIdParamTok(), Format(EcomSalesHeader.SystemId, 0, 4));
+        CurrPage.EnqueueBackgroundTask(_SubpagesBackgroundTaskId, Codeunit::"NPR Ecom Doc Subpages Task", Params);
     end;
 
     local procedure HandleCustomerTypeAndTemplatesVisiblityFields(): Boolean

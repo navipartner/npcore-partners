@@ -32,15 +32,16 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         end;
     end;
 
-    internal procedure ProcessVirtualItemLineWithConfirmation(var EcomSalesLine: Record "NPR Ecom Sales Line")
+    internal procedure ProcessVirtualItemLineWithConfirmation(var EcomSalesLine: Record "NPR Ecom Sales Line") Processed: Boolean
     var
         ConfirmManagement: Codeunit "Confirm Management";
         ConfirmVirtualItemLbl: Label 'Are you sure you want to process the virtual item?';
     begin
         if not ConfirmManagement.GetResponseOrDefault(ConfirmVirtualItemLbl, true) then
-            exit;
+            exit(false);
 
         ProcessVirtualItemLine(EcomSalesLine);
+        exit(true);
     end;
 
     internal procedure CreateVouchers(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)

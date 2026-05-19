@@ -6,16 +6,23 @@ codeunit 6248514 "NPR EcomCreateVchrProcess"
     trigger OnRun()
     var
         EcomCreateVchrTryProcess: Codeunit "NPR EcomCreateVchrTryProcess";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
     begin
 
         ClearLastError();
         Commit();
+        Sentry.StartSpan(SentrySpan, 'bc.e-com.voucher.process');
 
         Clear(EcomCreateVchrTryProcess);
         _Success := EcomCreateVchrTryProcess.Run(Rec);
 
+        if not _Success then
+            Sentry.AddLastErrorIfProgrammingBug();
+
         HandleResponse(_Success, Rec, _UpdateRetryCount);
         Commit();
+        SentrySpan.Finish();
 
         if (not _Success) and _ShowError then
             Error(GetLastErrorText);

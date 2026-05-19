@@ -32,7 +32,13 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         if not EcommSalesLine.Captured then
             EcommSalesLine.FieldError(Captured);
 
-        if (EcommSalesLine.Quantity = 0) then
+        if EcommSalesLine.Quantity <> Round(EcommSalesLine.Quantity, 1) then
+            EcommSalesLine.FieldError(Quantity);
+
+        if EcommSalesLine.Quantity < 1 then
+            EcommSalesLine.FieldError(Quantity);
+
+        if (EcommSalesLine."Barcode No." <> '') and (EcommSalesLine.Quantity <> 1) then
             EcommSalesLine.FieldError(Quantity);
 
         if (EcommSalesLine."Unit Price" = 0) then
@@ -45,6 +51,132 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
             EcommSalesLine.FieldError(EcommSalesLine."Virtual Item Process Status");
 
         EcomSalesDocUtils.ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
+    end;
+
+    local procedure CreateVoucher(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        QtyToIssue: Integer;
+        AlreadyLinked: Integer;
+        i: Integer;
+        IssuedVoucher: Record "NPR NpRv Voucher";
+        FirstVoucherNoOfLine: Code[20];
+        FirstVoucherTypeOfLine: Code[20];
+        FirstReferenceNoOfLine: Text[50];
+        LinkCountExceedsQtyErr: Label 'Internal data inconsistency on voucher line %1: %2 voucher(s) issued but quantity is %3. Contact support to investigate. This is a programming bug.', Locked = true;
+        PartialLinkStateErr: Label 'Internal data inconsistency on voucher line %1: %2 of %3 voucher(s) issued. Contact support to investigate. This is a programming bug.', Locked = true;
+    begin
+        QtyToIssue := EcomSalesLine.Quantity;
+        AlreadyLinked := CountExistingLinks(EcomSalesHeader, EcomSalesLine);
+
+        // Defensive invariant checks. UpdLock on EcomSalesLine prevents concurrent re-entry into
+        // CreateVoucher for the same line, but it doesn't protect against a prior attempt that
+        // crashed mid-loop (each IssueOrTopUpSingleVoucher commits voucher + link as a unit, so
+        // partial state can survive on disk). The > and partial branches surface that as a
+        // programming bug instead of silently re-issuing duplicate vouchers.
+        case true of
+            AlreadyLinked = QtyToIssue:
+                exit;  // race recovery — another session already issued these vouchers
+            AlreadyLinked > QtyToIssue:
+                Error(LinkCountExceedsQtyErr, EcomSalesLine.RecordId(), AlreadyLinked, QtyToIssue);
+            (AlreadyLinked > 0) and (AlreadyLinked < QtyToIssue):
+                Error(PartialLinkStateErr, EcomSalesLine.RecordId(), AlreadyLinked, QtyToIssue);
+        end;
+
+        if EcomSalesLine."Barcode No." <> '' then begin
+            IssueOrTopUpSingleVoucher(EcomSalesLine, EcomSalesHeader, EcomSalesLine."Barcode No.", IssuedVoucher);
+            EcomSalesLine."No." := IssuedVoucher."No.";
+            EcomSalesLine."Voucher Type" := IssuedVoucher."Voucher Type";
+            EcomSalesLine.Modify(true);
+            exit;
+        end;
+
+        for i := 1 to QtyToIssue do begin
+            IssueOrTopUpSingleVoucher(EcomSalesLine, EcomSalesHeader, '', IssuedVoucher);
+            if i = 1 then begin
+                FirstVoucherNoOfLine := IssuedVoucher."No.";
+                FirstVoucherTypeOfLine := IssuedVoucher."Voucher Type";
+                FirstReferenceNoOfLine := IssuedVoucher."Reference No.";
+            end;
+        end;
+
+        if QtyToIssue = 1 then begin
+            EcomSalesLine."Barcode No." := FirstReferenceNoOfLine;
+            EcomSalesLine."No." := FirstVoucherNoOfLine;
+            EcomSalesLine."Voucher Type" := FirstVoucherTypeOfLine;
+            EcomSalesLine.Modify(true);
+        end;
+    end;
+
+    local procedure IssueOrTopUpSingleVoucher(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; BarcodeNoParam: Text[50]; var NpRvVoucherOut: Record "NPR NpRv Voucher")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvSalesLineRef: Record "NPR NpRv Sales Line Ref.";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        NpRvGlobalVoucher: Codeunit "NPR NpRv Global Voucher WS";
+        VoucherFaceValueLCY: Decimal;
+        EffectiveBarcode: Text[50];
+    begin
+        // Sequencing invariant: InsertVoucherLink (the last call in this procedure) MUST remain
+        // the final database operation. The link row is the durable race-recovery marker; any
+        // future commit between voucher issuance and link insert would break CreateVoucher's
+        // count-based guard. Do not move it.
+        VoucherFaceValueLCY := CalculateVoucherFaceValueLCY(EcomSalesHeader, EcomSalesLine);
+        EffectiveBarcode := BarcodeNoParam;
+        if EffectiveBarcode = '' then
+            EffectiveBarcode := ReserveVoucher(EcomSalesLine, EcomSalesHeader, VoucherFaceValueLCY);
+
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("Reference No.", EffectiveBarcode);
+        NpRvSalesLine.SetRange("External Document No.", EcomSalesHeader."External No.");
+        NpRvSalesLine.SetFilter(Type, '%1|%2', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up");
+        if not NpRvSalesLine.FindFirst() then begin
+            if NpRvGlobalVoucher.FindVoucher('', CopyStr(EffectiveBarcode, 1, 50), NpRvVoucher) then begin
+                NpRvVoucher.CalcFields("Issue Date");
+                if (NpRvVoucher."Issue Date" <> 0D) then
+                    NpRvVoucher.TestField("Allow Top-up");
+                NpRvSalesLine.Init();
+                NpRvSalesLine.Id := CreateGuid();
+                NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
+                NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+                NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+                NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+                NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+                NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+                NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
+                NpRvSalesLine.Description := NpRvVoucher.Description;
+                NpRvSalesLine.Insert(true);
+            end;
+        end;
+        NpRvSalesLine.FindFirst();
+        CheckVoucherLinkedWithSalesDocument(NpRvSalesLine);
+        NpRvSalesLine.TestField("Voucher Type");
+        UpdateRvSalesLineFromEcomm(NpRvSalesLine, EcomSalesLine, EcomSalesHeader, VoucherFaceValueLCY);
+        NpRvSalesLine.UpdateIsSendViaEmail();
+
+        NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
+        if not VoucherAlreadyExist(NpRvSalesLine."Voucher No.") then
+            InsertVoucher(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
+        UpdateSalesLineFromVoucher(NpRvVoucher, NpRvSalesLine);
+
+        PostIssueVoucherEntry(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
+        NpRvSalesLine.Posted := true;
+        NpRvSalesLine.Modify();
+
+        NpRvSalesLineRef.SetLoadFields(Posted);
+        NpRvSalesLineRef.SetCurrentKey("Sales Line Id", Posted);
+        NpRvSalesLineRef.SetRange("Sales Line Id", NpRvSalesLine.Id);
+        NpRvSalesLineRef.SetRange(Posted, false);
+        if NpRvSalesLineRef.FindFirst() then begin
+            NpRvSalesLineRef.Posted := true;
+            NpRvSalesLineRef.Modify();
+        end;
+
+        if NpRvSalesLine."Spfy Gift Card ID" <> '' then
+            SpfyEcomSalesDocPrcssr.AssignShopifyIDToVoucher(NpRvVoucher, NpRvSalesLine);
+
+        NpRvVoucherOut := NpRvVoucher;
+        InsertVoucherLink(EcomSalesHeader, EcomSalesLine, NpRvVoucher);
     end;
 
     local procedure ReserveVoucher(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherFaceValueLCY: Decimal): text[50]
@@ -94,80 +226,12 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
     local procedure UpdateRvSalesLineFromHeader(var NpRvSalesLine: Record "NPR NpRv Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
-        // EcomSalesHeader."Sell-to Invoice Email"?
         if NpRvSalesLine."E-mail" = '' then
             NpRvSalesLine."E-mail" := EcomSalesHeader."Sell-to Email";
         if NpRvSalesLine."Phone No." = '' then
             NpRvSalesLine."Phone No." := EcomSalesHeader."Sell-to Phone No.";
         if NpRvSalesLine."External Document No." = '' then
             NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
-    end;
-
-    local procedure CreateVoucher(var EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
-    var
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NpRvSalesLineRef: Record "NPR NpRv Sales Line Ref.";
-        NpRvGlobalVoucher: Codeunit "NPR NpRv Global Voucher WS";
-        VoucherFaceValueLCY: Decimal;
-    begin
-        VoucherFaceValueLCY := CalculateVoucherFaceValueLCY(EcomSalesHeader, EcommSalesLine);
-        IF EcommSalesLine."Barcode No." = '' then
-            EcommSalesLine."Barcode No." := ReserveVoucher(EcommSalesLine, EcomSalesHeader, VoucherFaceValueLCY);
-
-        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
-        NpRvSalesLine.SetRange("Reference No.", EcommSalesLine."Barcode No.");
-        NpRvSalesLine.SetRange("External Document No.", EcomSalesHeader."External No.");
-        NpRvSalesLine.SetFilter(Type, '%1|%2', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up");
-        if not NpRvSalesLine.FindFirst() then begin
-            if NpRvGlobalVoucher.FindVoucher('', CopyStr(EcommSalesLine."Barcode No.", 1, 50), NpRvVoucher) then begin
-                NpRvVoucher.CalcFields("Issue Date");
-                if (NpRvVoucher."Issue Date" <> 0D) then
-                    NpRvVoucher.TestField("Allow Top-up");
-                NpRvSalesLine.Init();
-                NpRvSalesLine.Id := CreateGuid();
-                NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
-                NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
-                NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
-                NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
-                NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
-                NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
-                NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
-                NpRvSalesLine.Description := NpRvVoucher.Description;
-                NpRvSalesLine.Insert(true);
-            end;
-        end;
-        NpRvSalesLine.FindFirst();
-        CheckVoucherLinkedWithSalesDocument(NpRvSalesLine);
-        NpRvSalesLine.TestField("Voucher Type");
-        UpdateRvSalesLineFromEcomm(NpRvSalesLine, EcommSalesLine, EcomSalesHeader, VoucherFaceValueLCY);
-        NpRvSalesLine.UpdateIsSendViaEmail();
-
-        NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
-        if not VoucherAlreadyExist(NpRvSalesLine."Voucher No.") then
-            InsertVoucher(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
-        UpdateSalesLineFromVoucher(NpRvVoucher, NpRvSalesLine);
-
-        PostIssueVoucherEntry(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
-        NpRvSalesLine.Posted := true;
-        NpRvSalesLine.Modify();
-
-        NpRvSalesLineRef.SetLoadFields(Posted);
-        NpRvSalesLineRef.SetCurrentKey("Sales Line Id", Posted);
-        NpRvSalesLineRef.SetRange("Sales Line Id", NpRvSalesLine.Id);
-        NpRvSalesLineRef.SetRange(Posted, false);
-        if NpRvSalesLineRef.FindFirst() then begin
-            NpRvSalesLineRef.Posted := true;
-            NpRvSalesLineRef.Modify();
-        end;
-
-        EcommSalesLine."No." := NpRvVoucher."No.";
-        EcommSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
-        EcommSalesLine.Modify(true);
-
-        if NpRvSalesLine."Spfy Gift Card ID" <> '' then
-            SpfyEcomSalesDocPrcssr.AssignShopifyIDToVoucher(NpRvVoucher, NpRvSalesLine);
     end;
 
     local procedure CheckVoucherLinkedWithSalesDocument(var NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -288,8 +352,33 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         exit(true);
     end;
 
+    local procedure CountExistingLinks(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"): Integer
+    var
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+    begin
+        EcomSalesVoucherLink.SetCurrentKey("Source System Id", "Source Line System Id");
+        EcomSalesVoucherLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        exit(EcomSalesVoucherLink.Count());
+    end;
+
+    local procedure InsertVoucherLink(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; NpRvVoucher: Record "NPR NpRv Voucher")
+    var
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+    begin
+        EcomSalesVoucherLink.Init();
+        EcomSalesVoucherLink."Source System Id" := EcomSalesHeader.SystemId;
+        EcomSalesVoucherLink."Source Line System Id" := EcomSalesLine.SystemId;
+        EcomSalesVoucherLink."Voucher System Id" := NpRvVoucher.SystemId;
+        EcomSalesVoucherLink."Voucher No." := NpRvVoucher."No.";
+        EcomSalesVoucherLink."Reference No." := NpRvVoucher."Reference No.";
+        EcomSalesVoucherLink."Voucher Type" := NpRvVoucher."Voucher Type";
+        EcomSalesVoucherLink."Voucher State" := EcomSalesVoucherLink."Voucher State"::Active;
+        EcomSalesVoucherLink.Insert(true);
+    end;
+
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-    local procedure UpdateVoucherEntryPostingInformationSalesInvoice(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesInvLine: Record "Sales Invoice Line")
+    internal procedure UpdateVoucherEntryPostingInformationSalesInvoice(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesInvLine: Record "Sales Invoice Line")
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -305,55 +394,171 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         NpRvSalesLine.SetRange("NPR Inc Ecom Sales Line Id", SalesLine."NPR Inc Ecom Sales Line Id");
         NpRvSalesLine.SetRange("External Document No.", SalesHeader."NPR External Order No.");
         NpRvSalesLine.SetRange(Posted, true);
-        if not NpRvSalesLine.FindFirst() then
+        if not NpRvSalesLine.FindSet() then
             exit;
-        NpRvVoucherEntry.SetCurrentKey("Entry No.", "Voucher No.", "Voucher Type", "External Document No.");
+
+        NpRvVoucherEntry.SetCurrentKey("Voucher No.", "Entry Type", "Partner Code");
         NpRvVoucherEntry.SetFilter("Entry Type", '%1|%2', NpRvVoucherEntry."Entry Type"::"Issue Voucher", NpRvVoucherEntry."Entry Type"::"Top-up");
-        NpRvVoucherEntry.SetRange("Voucher No.", NpRvSalesLine."Voucher No.");
-        NpRvVoucherEntry.SetRange("Voucher Type", NpRvSalesLine."Voucher Type");
         NpRvVoucherEntry.SetRange("External Document No.", SalesHeader."NPR External Order No.");
+        NpRvVoucherEntry.SetRange("Document No.", '');
         NpRvVoucherEntry.SetLoadFields("Document No.", "Document Line No.");
-        IF NpRvVoucherEntry.FindFirst() then begin
-            NpRvVoucherEntry."Document No." := SalesInvLine."Document No.";
-            NpRvVoucherEntry."Document Line No." := SalesInvLine."Line No.";
-            NpRvVoucherEntry.Modify();
-        end;
+        repeat
+            NpRvVoucherEntry.SetRange("Voucher No.", NpRvSalesLine."Voucher No.");
+            NpRvVoucherEntry.SetRange("Voucher Type", NpRvSalesLine."Voucher Type");
+            if NpRvVoucherEntry.FindFirst() then begin
+                NpRvVoucherEntry."Document No." := SalesInvLine."Document No.";
+                NpRvVoucherEntry."Document Line No." := SalesInvLine."Line No.";
+                NpRvVoucherEntry.Modify();
+            end;
+        until NpRvSalesLine.Next() = 0;
     end;
 #endif
+
     internal procedure ShowRelatedVouchersAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
-        EcomSalesLine: Record "NPR Ecom Sales Line";
+        TempVoucher: Record "NPR NpRv Voucher" temporary;
     begin
-        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.Setrange(Type, EcomSalesLine.Type::Voucher);
-        EcomSalesLine.SetRange("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::Processed);
-        if not EcomSalesLine.FindSet() then
-            exit;
-        repeat
-            Clear(NpRvVoucher);
-            if NpRvVoucher.Get(EcomSalesLine."No.") then begin
-                TempNpRvVoucher.TransferFields(NpRvVoucher);
-                TempNpRvVoucher.Insert();
-            end;
-        until EcomSalesLine.Next() = 0;
-        if not TempNpRvVoucher.IsEmpty() then
-            PAGE.Run(0, TempNpRvVoucher);
+        BuildVoucherTempBufferForDoc(EcomSalesHeader, TempVoucher);
+        if not TempVoucher.IsEmpty() then
+            Page.RunModal(Page::"NPR Ecom Voucher Lookup", TempVoucher);
     end;
 
     internal procedure ShowRelatedVouchersAction(EcomSalesLine: Record "NPR Ecom Sales Line")
     var
-        NpRvVoucher: Record "NPR NpRv Voucher";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        TempVoucher: Record "NPR NpRv Voucher" temporary;
         NoVoucherFoundMsg: Label 'No retail vouchers are linked to this line in the system.';
     begin
-        if EcomSalesLine."No." <> '' then
-            if NpRvVoucher.Get(EcomSalesLine."No.") then begin
-                NpRvVoucher.SetRecFilter();
-                Page.Run(Page::"NPR NpRv Voucher Card", NpRvVoucher);
-                exit;
-            end;
-        Message(NoVoucherFoundMsg);
+        if not EcomSalesHeader.Get(EcomSalesLine."Document Entry No.") then
+            exit;
+        BuildVoucherTempBufferForLine(EcomSalesHeader, EcomSalesLine, TempVoucher);
+        case TempVoucher.Count() of
+            0:
+                Message(NoVoucherFoundMsg);
+            1:
+                begin
+                    TempVoucher.FindFirst();
+                    OpenVoucherCardForSystemId(TempVoucher.SystemId);
+                end;
+            else
+                Page.RunModal(Page::"NPR Ecom Voucher Lookup", TempVoucher);
+        end;
+    end;
+
+    internal procedure BuildVoucherTempBufferForDoc(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        EmptyGuid: Guid;
+    begin
+        BuildVoucherTempBuffer(EcomSalesHeader, EmptyGuid, TempVoucher);
+    end;
+
+    internal procedure BuildVoucherTempBufferForLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    begin
+        BuildVoucherTempBuffer(EcomSalesHeader, EcomSalesLine.SystemId, TempVoucher);
+    end;
+
+    local procedure BuildVoucherTempBuffer(EcomSalesHeader: Record "NPR Ecom Sales Header"; SourceLineSystemIdFilter: Guid; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+    begin
+        EcomSalesVoucherLink.SetCurrentKey("Source System Id", "Source Line System Id");
+        EcomSalesVoucherLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        if not IsNullGuid(SourceLineSystemIdFilter) then
+            EcomSalesVoucherLink.SetRange("Source Line System Id", SourceLineSystemIdFilter);
+
+        if EcomSalesVoucherLink.FindSet() then begin
+            repeat
+                case EcomSalesVoucherLink."Voucher State" of
+                    EcomSalesVoucherLink."Voucher State"::Active:
+                        if NpRvVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then begin
+                            TempVoucher := NpRvVoucher;
+                            if TempVoucher.Insert() then;
+                        end;
+                    EcomSalesVoucherLink."Voucher State"::Archived:
+                        if NpRvArchVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then
+                            InsertArchivedAsTempVoucher(NpRvArchVoucher, TempVoucher);
+                end;
+            until EcomSalesVoucherLink.Next() = 0;
+            exit;
+        end;
+
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Voucher);
+        EcomSalesLine.SetRange("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::Processed);
+        if not IsNullGuid(SourceLineSystemIdFilter) then
+            EcomSalesLine.SetRange(SystemId, SourceLineSystemIdFilter);
+        if EcomSalesLine.FindSet() then
+            repeat
+                if EcomSalesLine."No." <> '' then
+                    if NpRvVoucher.Get(EcomSalesLine."No.") then begin
+                        TempVoucher := NpRvVoucher;
+                        if TempVoucher.Insert() then;
+                    end else begin
+                        NpRvArchVoucher.SetCurrentKey("Arch. No.");
+                        NpRvArchVoucher.SetRange("Arch. No.", EcomSalesLine."No.");
+                        if NpRvArchVoucher.FindFirst() then
+                            InsertArchivedAsTempVoucher(NpRvArchVoucher, TempVoucher);
+                    end;
+            until EcomSalesLine.Next() = 0;
+    end;
+
+    local procedure InsertArchivedAsTempVoucher(NpRvArchVoucher: Record "NPR NpRv Arch. Voucher"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        OriginalNo: Code[20];
+    begin
+        TempVoucher.Init();
+        TempVoucher.TransferFields(NpRvArchVoucher);
+        OriginalNo := NpRvArchVoucher."Arch. No.";
+        if OriginalNo = '' then
+            OriginalNo := NpRvArchVoucher."No.";
+        TempVoucher."No." := OriginalNo;
+        TempVoucher.Description := CopyStr(BuildArchivedDescription(NpRvArchVoucher.Description), 1, MaxStrLen(TempVoucher.Description));
+        TempVoucher.SystemId := NpRvArchVoucher.SystemId;
+        if TempVoucher.Insert() then;
+    end;
+
+    internal procedure BuildArchivedDescription(SourceDescription: Text): Text
+    begin
+        exit(GetArchivedPrefix() + SourceDescription);
+    end;
+
+    internal procedure IsArchivedTempDescription(Description: Text): Boolean
+    var
+        Prefix: Text;
+    begin
+        Prefix := GetArchivedPrefix();
+        if Prefix = '' then
+            exit(false);
+        exit(Description.StartsWith(Prefix));
+    end;
+
+    local procedure GetArchivedPrefix(): Text
+    var
+        ArchivedPrefixLbl: Label '[Archived] ';
+    begin
+        exit(ArchivedPrefixLbl);
+    end;
+
+    internal procedure OpenVoucherCardForSystemId(SystemIdParam: Guid)
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NotAvailableMsg: Label 'This voucher is no longer available in the system.';
+    begin
+        if NpRvVoucher.GetBySystemId(SystemIdParam) then begin
+            NpRvVoucher.SetRecFilter();
+            Page.Run(Page::"NPR NpRv Voucher Card", NpRvVoucher);
+            exit;
+        end;
+        if NpRvArchVoucher.GetBySystemId(SystemIdParam) then begin
+            NpRvArchVoucher.SetRecFilter();
+            Page.Run(Page::"NPR NpRv Arch. Voucher Card", NpRvArchVoucher);
+            exit;
+        end;
+        Message(NotAvailableMsg);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnAfterPostSalesLine, '', false, false)]
@@ -361,6 +566,28 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
     begin
         if SalesHeader.Invoice then
             UpdateVoucherEntryPostingInformationSalesInvoice(SalesHeader, SalesLine, SalesInvLine);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Voucher Mgt.", OnAfterArchiveVoucher, '', false, false)]
+    local procedure OnAfterArchiveVoucher_FlipLinkState(Voucher: Record "NPR NpRv Voucher"; ArchVoucher: Record "NPR NpRv Arch. Voucher")
+    var
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+    begin
+        EcomSalesVoucherLink.SetCurrentKey("Voucher System Id", "Voucher State");
+        EcomSalesVoucherLink.SetRange("Voucher System Id", ArchVoucher.SystemId);
+        EcomSalesVoucherLink.SetRange("Voucher State", EcomSalesVoucherLink."Voucher State"::Active);
+        EcomSalesVoucherLink.ModifyAll("Voucher State", EcomSalesVoucherLink."Voucher State"::Archived);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Voucher Mgt.", OnAfterUnArchiveVoucher, '', false, false)]
+    local procedure OnAfterUnArchiveVoucher_FlipLinkState(ArchVoucher: Record "NPR NpRv Arch. Voucher"; Voucher: Record "NPR NpRv Voucher")
+    var
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+    begin
+        EcomSalesVoucherLink.SetCurrentKey("Voucher System Id", "Voucher State");
+        EcomSalesVoucherLink.SetRange("Voucher System Id", Voucher.SystemId);
+        EcomSalesVoucherLink.SetRange("Voucher State", EcomSalesVoucherLink."Voucher State"::Archived);
+        EcomSalesVoucherLink.ModifyAll("Voucher State", EcomSalesVoucherLink."Voucher State"::Active);
     end;
 
     var

@@ -320,8 +320,16 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                 trigger OnAction()
                 var
                     EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                    EcomSalesHeader: Record "NPR Ecom Sales Header";
+                    Sync: Codeunit "NPR Ecom Subpages Sync";
                 begin
-                    EcomVirtualItemMgt.ProcessVirtualItemLineWithConfirmation(Rec);
+                    if not EcomVirtualItemMgt.ProcessVirtualItemLineWithConfirmation(Rec) then
+                        exit; // user declined confirmation, nothing changed
+                    // CurrPage.Update(true) propagates to the parent so its OnAfterGetCurrRecord
+                    // consumes the dirty flag and refreshes the virtual-item subpages.
+                    if EcomSalesHeader.Get(Rec."Document Entry No.") then
+                        Sync.MarkDirty(EcomSalesHeader.SystemId);
+                    CurrPage.Update(true);
                 end;
             }
         }

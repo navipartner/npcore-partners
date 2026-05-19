@@ -426,6 +426,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         var AssetsAdded: Integer)
     var
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
@@ -433,8 +434,30 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         if _DigitalNotifSetup."Exclude Vouchers From Manifest" then
             exit;
 
-        // Ecom documents: voucher no. is directly on the ecom sales line
         if TempHeaderBuffer."Document Type" = TempHeaderBuffer."Document Type"::"Ecom Sales Document" then begin
+            EcomSalesVoucherLink.SetCurrentKey("Source System Id", "Source Line System Id");
+            EcomSalesVoucherLink.SetRange("Source System Id", TempHeaderBuffer."Source Document Id");
+            EcomSalesVoucherLink.SetRange("Source Line System Id", TempLineBuffer."Source Line System Id");
+            EcomSalesVoucherLink.SetRange("Voucher State", EcomSalesVoucherLink."Voucher State"::Active);
+            if EcomSalesVoucherLink.FindSet() then begin
+                repeat
+                    if NpRvVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then begin
+                        NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
+                        if NpRvVoucherType.Get(NpRvVoucher."Voucher Type") and (NpRvVoucherType.PDFDesignerTemplateId <> '') then begin
+                            NPDesignerManifestFacade.AddAssetToManifest(
+                                ManifestId,
+                                Database::"NPR NpRv Voucher",
+                                NpRvVoucher.SystemId,
+                                EcomSalesVoucherLink."Reference No.",
+                                NpRvVoucherType.PDFDesignerTemplateId);
+                            AssetsAdded += 1;
+                        end;
+                    end;
+                until EcomSalesVoucherLink.Next() = 0;
+                exit;
+            end;
+            // Legacy fallback for ecom docs created before the link table existed.
+            // Active-only by design — archived legacy vouchers are intentionally skipped from the manifest.
             NpRvVoucher.SetLoadFields("Voucher Type", SystemId, "Reference No.");
             if NpRvVoucher.Get(TempLineBuffer."No.") then begin
                 NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
@@ -444,8 +467,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                         Database::"NPR NpRv Voucher",
                         NpRvVoucher.SystemId,
                         NpRvVoucher."Reference No.",
-                        NpRvVoucherType.PDFDesignerTemplateId
-                    );
+                        NpRvVoucherType.PDFDesignerTemplateId);
                     AssetsAdded += 1;
                 end;
             end;

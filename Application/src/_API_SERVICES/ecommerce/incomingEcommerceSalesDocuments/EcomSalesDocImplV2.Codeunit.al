@@ -647,27 +647,39 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
     var
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        RvArchVoucher: Record "NPR NpRv Arch. Voucher";
-        VoucherDoesntExistErrMsg: Label 'Voucher %1 doesn''t exist';
+        LinkExists: Boolean;
+        VoucherTypeCode: Code[20];
+        VoucherDoesntExistErr: Label 'Voucher %1 doesn''t exist.', Comment = '%1 - voucher No.';
     begin
         if EcomSalesLine.Type <> EcomSalesLine.Type::Voucher then
             exit;
 
-        if (EcomSalesLine."No." = '') then
+        EcomSalesVoucherLink.SetCurrentKey("Source System Id", "Source Line System Id");
+        EcomSalesVoucherLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        LinkExists := not EcomSalesVoucherLink.IsEmpty();
+
+        if (not LinkExists) and (EcomSalesLine."No." = '') then
             exit;
 
-        if not NpRvVoucher.Get(EcomSalesLine."No.") then
-            if not RvArchVoucher.Get(EcomSalesLine."No.") then
-                Error(VoucherDoesntExistErrMsg, EcomSalesLine."No.");
-
-        NpRvSalesLine.SetCurrentKey("Document No.", "NPR Inc Ecom Sales Line Id");
-        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
-        NpRvSalesLine.SetRange("NPR Inc Ecom Sales Line Id", EcomSalesLine.SystemId);
-        NpRvSalesLine.FindFirst();
-        NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
+        if LinkExists then begin
+            EcomSalesVoucherLink.FindFirst();
+            VoucherTypeCode := EcomSalesVoucherLink."Voucher Type";
+        end else begin
+            if not NpRvVoucher.Get(EcomSalesLine."No.") then begin
+                NpRvArchVoucher.SetCurrentKey("Arch. No.");
+                NpRvArchVoucher.SetRange("Arch. No.", EcomSalesLine."No.");
+                if NpRvArchVoucher.IsEmpty() then
+                    Error(VoucherDoesntExistErr, EcomSalesLine."No.");
+            end;
+            VoucherTypeCode := EcomSalesLine."Voucher Type";
+        end;
+        NpRvVoucherType.Get(VoucherTypeCode);
 
         SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";
@@ -677,7 +689,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
         SalesLine.Validate("No.", NpRvVoucherType."Account No.");
-        SalesLine.Description := CopyStr((StrSubstNo('%1 %2', EcomSalesLine."Barcode No.", NpRvVoucherType.Description)), 1, MaxStrLen(SalesLine.Description));
+        SalesLine.Description := CopyStr(StrSubstNo('%1 %2', ResolveLineDescriptor(EcomSalesLine, EcomSalesVoucherLink, LinkExists), NpRvVoucherType.Description), 1, MaxStrLen(SalesLine.Description));
         SalesLine.Validate(Quantity, EcomSalesLine.Quantity);
         SalesLine.Validate("VAT %", EcomSalesLine."VAT %");
         SalesLine.Validate("Unit Price", EcomSalesLine."Unit Price");
@@ -685,14 +697,32 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             SalesLine.Validate("Line Amount", EcomSalesLine."Line Amount");
         SalesLine."NPR Inc Ecom Sales Line Id" := EcomSalesLine.SystemId;
 
-        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
-        NpRvSalesLine."Document Type" := SalesLine."Document Type";
-        NpRvSalesLine."Document No." := SalesLine."Document No.";
-        NpRvSalesLine."Document Line No." := SalesLine."Line No.";
-        NpRvSalesLine.Modify(true);
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("NPR Inc Ecom Sales Line Id", EcomSalesLine.SystemId);
+        if NpRvSalesLine.FindSet() then
+            repeat
+                NpRvSalesLine."Document Type" := SalesLine."Document Type";
+                NpRvSalesLine."Document No." := SalesLine."Document No.";
+                NpRvSalesLine."Document Line No." := SalesLine."Line No.";
+                NpRvSalesLine.Modify(true);
+            until NpRvSalesLine.Next() = 0;
 
         EcomSalesDocImplEvents.OnInsertSalesLineVoucherBeforeFinalizeLine(EcomSalesHeader, SalesHeader, EcomSalesLine, SalesLine);
         SalesLine.Modify(true);
+    end;
+
+    local procedure ResolveLineDescriptor(EcomSalesLine: Record "NPR Ecom Sales Line"; var EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link"; LinkExists: Boolean): Text
+    var
+        FirstReferenceNo: Text[50];
+        LinkCount: Integer;
+    begin
+        if not LinkExists then
+            exit(EcomSalesLine."Barcode No.");
+        LinkCount := EcomSalesVoucherLink.Count();
+        FirstReferenceNo := EcomSalesVoucherLink."Reference No.";
+        if LinkCount = 1 then
+            exit(FirstReferenceNo);
+        exit(StrSubstNo('%1 +%2', FirstReferenceNo, LinkCount - 1));
     end;
 
     local procedure PopulateSalesLineDescriptionFromEcomSalesLine(EcomSalesLine: Record "NPR Ecom Sales Line"; var SalesLine: Record "Sales Line")

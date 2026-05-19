@@ -262,8 +262,9 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
         JsonHelper: Codeunit "NPR Json Helper";
         LineTypeText: Text;
-        FractionalQtyErr: Label 'Whole numbers only are accepted as the quantity for ticket, membership or coupon lines. Received %1 value: %2.', Comment = '%1 - absolute path, %2 - value', Locked = true;
+        FractionalQtyErr: Label 'Whole numbers only are accepted as the quantity for ticket, membership, voucher or coupon lines. Received %1 value: %2.', Comment = '%1 - absolute path, %2 - value', Locked = true;
         PropertyErrorText: Label 'Property %1 has incorrect value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
+        BarcodeNoQtyMustBeOneErr: Label 'Voucher line quantity must be 1 when barcodeNo is supplied. Property %1 value: %2.', Comment = '%1 - absolute path, %2 - value', Locked = true;
         LengthErrorText: Label 'Property %1 has incorrect length: %2. Max length: %3', Comment = '%1 - absolute path, %2 - type', Locked = true;
     begin
         LineTypeText := JsonHelper.GetJText(SalesLineJsonToken, 'type', true);
@@ -337,8 +338,12 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesLine.Description := JsonHelper.GetJText(SalesLineJsonToken, 'description', MaxStrLen(EcomSalesLine.Description), true, true);
                     EcomSalesLine."Unit Price" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'unitPrice', true);
                     EcomSalesLine.Quantity := JsonHelper.GetJDecimal(SalesLineJsonToken, 'quantity', true);
-                    if EcomSalesLine.Quantity <> 1 then
+                    if EcomSalesLine.Quantity <> Round(EcomSalesLine.Quantity, 1) then
+                        Error(FractionalQtyErr, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'quantity'), EcomSalesLine.Quantity);
+                    if EcomSalesLine.Quantity < 1 then
                         Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'quantity'), EcomSalesLine.Quantity);
+                    if (EcomSalesLine."Barcode No." <> '') and (EcomSalesLine.Quantity <> 1) then
+                        Error(BarcodeNoQtyMustBeOneErr, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'quantity'), EcomSalesLine.Quantity);
                     EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
                 end;
@@ -846,7 +851,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
         SalesLineDetailsJsonObject.EndObject();
     end;
-
 
     local procedure GetPaymentMethodTypeJsonValue(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line") PaymentMethodTypeJsonValue: Text
     var

@@ -575,6 +575,15 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
             NpRvSalesLine.DeleteAll(true);
     end;
 
+    internal procedure DeleteVoucherLinks(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+    begin
+        EcomSalesVoucherLink.SetCurrentKey("Source System Id");
+        EcomSalesVoucherLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        EcomSalesVoucherLink.DeleteAll(false);
+    end;
+
     local procedure IsFCYDocument(CurrencyCode: Code[10]): Boolean
     var
         GLSetup: Record "General Ledger Setup";
