@@ -444,7 +444,6 @@ codeunit 85113 "NPR TM Statistics Test"
         ExternalOrderNo: Text;
         Token: Text[100];
         AmountToReverse: Decimal;
-        QtyToReverse: Integer;
         AdmissionHour: Integer;
     begin
 
@@ -489,7 +488,7 @@ codeunit 85113 "NPR TM Statistics Test"
 
 
         Token := TicketRequestMgt.GetNewToken();
-        TicketRequestMgt.POS_CreateRevokeRequest(Token, TmpCreatedTickets."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse, QtyToReverse);
+        TicketRequestMgt.POS_CreateRevokeRequest(Token, TmpCreatedTickets."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse);
         TicketRequestMgt.RevokeReservationTokenRequest(Token, false);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 

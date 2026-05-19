@@ -1021,11 +1021,12 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         NoRemainingTickets: Label 'No remaining tickets to refund for line %1.';
         PartialRefundQtyChange: Label 'Line %1 has been partially refunded, and the quantity has been adjusted from %2 to %3.';
+        AmountAdjustment: Label 'Line %1 is a group ticket and the unit price has been adjusted to reflect the refunded quantity.';
         UnitPrice: Decimal;
         Token: Text[100];
         TicketCount: Integer;
-        RevokeQuantity: Integer;
         Refundable: Boolean;
+        GroupRefundDiffers, IndividualRefundDiffers : Boolean;
     begin
         if (ReturnSaleLinePOS."Return Sale Sales Ticket No." = '') then
             exit;
@@ -1054,22 +1055,34 @@
 
                 if (Refundable) then begin
                     UnitPrice := ReturnSaleLinePOS."Unit Price";
-                    if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", ReturnSaleLinePOS."Sales Ticket No.", ReturnSaleLinePOS."Line No.", UnitPrice, RevokeQuantity)) then
-                        TicketCount -= RevokeQuantity;
+                    if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", ReturnSaleLinePOS."Sales Ticket No.", ReturnSaleLinePOS."Line No.", UnitPrice)) then
+                        TicketCount -= 1;
                 end;
 
             until (Ticket.Next() = 0);
 
-            if (TicketCount <> 0) then begin
-                if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then begin
-                    UnitPrice := UnitPrice / Abs(OriginalSaleLine.Quantity);
-                    // Partial refund of group tickets can not be done when refunding using receipt.
-                    TicketCount := -1 * RevokeQuantity * Abs(OriginalSaleLine.Quantity);
-                end;
-            end;
+            if (TicketCount <> 0) then
+                if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
+                    TicketCount := -1;
+
+            GroupRefundDiffers :=
+                (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) and
+                (TicketCount <> 0) and
+                (Abs(TicketCount * UnitPrice) <> Abs(ReturnSaleLinePOS.Quantity * ReturnSaleLinePOS."Unit Price"));
+
+            IndividualRefundDiffers :=
+                (TicketType."Admission Registration" = TicketType."Admission Registration"::INDIVIDUAL) and
+                (TicketCount <> 0) and
+                (TicketCount <> ReturnSaleLinePOS.Quantity);
 
             if (TicketCount = 0) then
                 Message(NoRemainingTickets, OriginalSaleLine."Line No.");
+
+            if (IndividualRefundDiffers) then
+                Message(PartialRefundQtyChange, OriginalSaleLine."Line No.", Abs(ReturnSaleLinePOS.Quantity), Abs(TicketCount));
+
+            if (GroupRefundDiffers) then
+                Message(AmountAdjustment, OriginalSaleLine."Line No.");
 
             // on partial refunds unit price will become altered and qty should be one.
             if (UnitPrice <> ReturnSaleLinePOS."Unit Price") then begin
@@ -1078,13 +1091,11 @@
             end;
 
             if (TicketCount <> ReturnSaleLinePOS.Quantity) then begin
-                if (TicketCount <> 0) then
-                    Message(PartialRefundQtyChange, OriginalSaleLine."Line No.", Abs(ReturnSaleLinePOS.Quantity), Abs(TicketCount));
-
                 ReturnSaleLinePOS.Quantity := TicketCount;
                 ReturnSaleLinePOS.UpdateAmounts(ReturnSaleLinePOS);
                 ReturnSaleLinePOS.Modify();
             end;
+
         end;
     end;
 }

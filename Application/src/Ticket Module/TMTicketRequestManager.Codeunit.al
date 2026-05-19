@@ -2106,12 +2106,12 @@
         ReservationRequest.Insert();
     end;
 
-    internal procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer): Boolean
+    internal procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal): Boolean
     var
         ResponseMessage: Text;
         ResponseCode: Integer;
     begin
-        ResponseCode := POS_CreateRevokeRequestWorker(Token, TicketNo, SalesReceiptNo, SalesLineNo, AmountInOut, RevokeQuantity, ResponseMessage);
+        ResponseCode := POS_CreateRevokeRequestWorker(Token, TicketNo, SalesReceiptNo, SalesLineNo, AmountInOut, ResponseMessage);
 
         if (ResponseCode = 0) then
             exit(false);
@@ -2123,12 +2123,12 @@
         exit(true);
     end;
 
-    internal procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer; var ResponseMessage: Text): Integer
+    internal procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var ResponseMessage: Text): Integer
     begin
-        exit(POS_CreateRevokeRequestWorker(Token, TicketNo, SalesReceiptNo, SalesLineNo, AmountInOut, RevokeQuantity, ResponseMessage));
+        exit(POS_CreateRevokeRequestWorker(Token, TicketNo, SalesReceiptNo, SalesLineNo, AmountInOut, ResponseMessage));
     end;
 
-    local procedure POS_CreateRevokeRequestWorker(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var QuantityToRevoke: Integer; var ResponseMessage: Text): Integer
+    local procedure POS_CreateRevokeRequestWorker(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var ResponseMessage: Text): Integer
     var
         Ticket: Record "NPR TM Ticket";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -2142,7 +2142,7 @@
         TotalPct: Decimal;
         UsePctDistribution: Boolean;
         NumberOfAdmissions: Integer;
-        PaidQuantity, QuantityPerUnit : Integer;
+        PaidQuantity, QuantityPerUnit, QuantityToRevoke : Integer;
         UnitPrice: Decimal;
         AlreadyAsked: Boolean;
         AllowRevoke: Boolean;
@@ -2321,7 +2321,6 @@
 
         until (TicketAccessEntry.Next() = 0);
 
-        QuantityToRevoke := 1;
         AmountInOut := Round(TotalRefundAmount, 0.01);
 
         exit(REVOKE_OK);
@@ -2748,7 +2747,6 @@
         OriginalSaleLine: Record "NPR POS Entry Sales Line";
         Ticket: Record "NPR TM Ticket";
         TicketCount: Integer;
-        RevokeQuantity: Integer;
         ChangeQuantityNotPossible: Label 'Quantity for configurable tickets must be changed in the edit ticket reservation page.';
         RequestMutex: Record "NPR TM TicketRequestMutex";
     begin
@@ -2814,8 +2812,8 @@
                     DeleteReservationRequest(Token, true);
                     repeat
 
-                        if (POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."Unit Price", RevokeQuantity)) then
-                            TicketCount += RevokeQuantity;
+                        if (POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."Unit Price")) then
+                            TicketCount += 1;
 
                     until ((Ticket.Next() = 0) or (TicketCount >= Abs(SaleLinePOS.Quantity)));
 

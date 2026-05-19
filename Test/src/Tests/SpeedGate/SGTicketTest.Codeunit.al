@@ -272,7 +272,6 @@ codeunit 85217 "NPR SG TicketTest"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketCount: Integer;
         AmountToReverse: Decimal;
-        QtyToReverse: Integer;
         Token: Text[100];
     begin
         ExternalTicketNumber := GetOneTicket();
@@ -285,8 +284,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.GateSetup('GATE01', true, '', '');
 
         AmountToReverse := 0;
-        QtyToReverse := 0;
-        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse);
         TicketRequestManager.RevokeReservationTokenRequest(Token, false);
 
         ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
@@ -305,7 +303,6 @@ codeunit 85217 "NPR SG TicketTest"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketCount: Integer;
         AmountToReverse: Decimal;
-        QtyToReverse: Integer;
         Token: Text[100];
         HaveError: Boolean;
         ErrorMessage: Text;
@@ -320,8 +317,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.GateSetup('GATE01', true, '', '');
 
         AmountToReverse := 0;
-        QtyToReverse := 0;
-        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse);
         TicketRequestManager.RevokeReservationTokenRequest(Token, false);
 
         asserterror SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01', true, HaveError, ErrorMessage);
@@ -340,7 +336,6 @@ codeunit 85217 "NPR SG TicketTest"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketCount: Integer;
         AmountToReverse: Decimal;
-        QtyToReverse: Integer;
         Token: Text[100];
         HaveError: Boolean;
         ErrorMessage: Text;
@@ -355,8 +350,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.GateSetup('GATE01', true, '', '');
 
         AmountToReverse := 0;
-        QtyToReverse := 0;
-        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse);
         TicketRequestManager.RevokeReservationTokenRequest(Token, false);
 
         SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01', false, HaveError, ErrorMessage);
@@ -378,7 +372,6 @@ codeunit 85217 "NPR SG TicketTest"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketCount: Integer;
         AmountToReverse: Decimal;
-        QtyToReverse: Integer;
         Token: Text[100];
         HaveError: Boolean;
         ErrorMessage: Text;
@@ -394,8 +387,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.GateSetup('GATE01', true, '', '');
 
         AmountToReverse := 0;
-        QtyToReverse := 0;
-        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse);
         TicketRequestManager.RevokeReservationTokenRequest(Token, false);
 
         asserterror SpeedGate.Admit(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01', false, HaveError, ErrorMessage), 1);

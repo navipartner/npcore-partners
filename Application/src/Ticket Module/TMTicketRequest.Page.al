@@ -491,7 +491,6 @@
         RequestCount: Integer;
         TicketCount: Integer;
         AmountToReverse: Decimal;
-        QtyToRevoke: Integer;
         Token: Text[100];
     begin
 
@@ -518,8 +517,7 @@
                 Token := TicketRequestManager.GetNewToken();
                 repeat
                     AmountToReverse := 0;
-                    QtyToRevoke := 0;
-                    TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse, QtyToRevoke);
+                    TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse);
                 until (Ticket.Next() = 0);
                 TicketRequestManager.RevokeReservationTokenRequest(Token, false);
             end;

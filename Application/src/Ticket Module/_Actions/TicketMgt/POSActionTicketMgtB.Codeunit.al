@@ -76,7 +76,6 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         TicketAccessEntryNo: Integer;
         Token: Text[100];
         UnitPriceToRevoke: Decimal;
-        RevokeQuantity: Integer;
         RequestMutex: Record "NPR TM TicketRequestMutex";
         TICKET_BLOCKED: Label 'Ticket %1 is blocked.';
     begin
@@ -171,7 +170,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
                     UnitPriceToRevoke := Ticket.ListPriceExclVat;
         end;
 
-        ResponseCode := TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPriceToRevoke, RevokeQuantity, ResponseMessage);
+        ResponseCode := TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPriceToRevoke, ResponseMessage);
         RequestMutex.Release(Ticket."No.");
 
         if (ResponseCode <= 0) then begin
@@ -179,7 +178,6 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
             exit(-105);
         end;
 
-        POSSaleLine.SetQuantity(-1 * Abs(RevokeQuantity));
         POSSaleLine.SetUnitPrice(UnitPriceToRevoke);
         AddAdditionalExperienceRevokeLines(POSSession, Ticket, SaleLinePOS."Sales Ticket No.");
 

@@ -658,7 +658,6 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketCount: Integer;
         AmountToReverse: Decimal;
-        QtyToReverse: Integer;
         Token: Text[100];
     begin
 
@@ -672,8 +671,7 @@
             Token := TicketRequestManager.GetNewToken();
             repeat
                 AmountToReverse := 0;
-                QtyToReverse := 0;
-                TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse, QtyToReverse);
+                TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse);
             until (Ticket.Next() = 0);
             TicketRequestManager.RevokeReservationTokenRequest(Token, false);
         end;
