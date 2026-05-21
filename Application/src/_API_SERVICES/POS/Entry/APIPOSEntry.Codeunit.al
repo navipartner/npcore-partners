@@ -288,6 +288,7 @@ codeunit 6248620 "NPR API POS Entry"
             POSEntrySalesLine."Amount Incl. VAT (LCY)",
             POSEntrySalesLine."Unit of Measure Code",
             POSEntrySalesLine."Location Code",
+            POSEntrySalesLine."Exclude from Posting",
             POSEntrySalesLine.SystemId
         );
         if (POSEntrySalesLine.FindSet()) then
@@ -309,6 +310,7 @@ codeunit 6248620 "NPR API POS Entry"
                     .AddProperty('taxAmount', POSEntrySalesLine."Amount Incl. VAT (LCY)" - POSEntrySalesLine."Amount Excl. VAT (LCY)")
                     .AddProperty('unitOfMeasure', POSEntrySalesLine."Unit of Measure Code")
                     .AddProperty('locationCode', POSEntrySalesLine."Location Code")
+                    .AddProperty('excludeFromPosting', POSEntrySalesLine."Exclude from Posting")
                     .EndObject();
             until POSEntrySalesLine.Next() = 0;
         Json.EndArray();
