@@ -635,9 +635,16 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
         PricingProfile: Codeunit "NPR POS Pricing Profile";
     begin
+        Item.Get("Item No.");
+
         TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
         TempSaleLinePOS."No." := "Item No.";
         TempSaleLinePOS."Variant Code" := "Variant Code";
+
+        TempSaleLinePOS."Price Includes VAT" := Item."Price Includes VAT";
+
+        TempSaleLinePOS."VAT Bus. Posting Group" := Rec."VAT Bus. Posting Group";
+        TempSaleLinePOS."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
 
         POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS, Rec."VAT Bus. Posting Group");
         if "Register No." <> '' then
@@ -660,7 +667,6 @@
         if "Calculation Date" <> 0D then
             TempSalePOS.Date := "Calculation Date";
 
-        Item.Get("Item No.");
         TempSaleLinePOS."Customer Price Group" := TempSalePOS."Customer Price Group";
 
         TempSaleLinePOS."Item Disc. Group" := Item."Item Disc. Group";
@@ -668,12 +674,16 @@
         TempSaleLinePOS.Date := "Calculation Date";
         TempSaleLinePOS.SetPOSHeader(TempSalePOS);
         TempSaleLinePOS.Validate(Quantity, "Quantity for Discount Calc");
-#pragma warning disable AA0139        
+#pragma warning disable AA0139
         TempSaleLinePOS."Register No." := "Register No.";
 #pragma warning restore
         TempSaleLinePOS."Unit of Measure Code" := "Unit of Measure";
         TempSaleLinePOS."Qty. per Unit of Measure" := UnitofMeasureManagement.GetQtyPerUnitOfMeasure(Item, Rec."Unit of Measure");
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            GeneralLedgerSetup.Init();
+
         POSSalesDiscountCalcMgt.InitDiscountPriority(TempDiscountPriority);
         TempSaleLinePOS2.SetPOSHeader(TempSalePOS);
         TempSaleLinePOS2 := TempSaleLinePOS;
@@ -685,18 +695,26 @@
                     POSSalesDiscountCalcMgt.ApplyDiscount(TempDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
                     if TempSaleLinePOS2.Get(TempSaleLinePOS.RecordId) then begin
                         TempSaleLinePOS2.SetPOSHeader(TempSalePOS);
+                        if (TempSaleLinePOS2."Discount Type" = TempSaleLinePOS2."Discount Type"::Mix) and TempSaleLinePOS2."Price Includes VAT" then begin
+                            TempSaleLinePOS2."Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS2."Unit Price", TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Unit-Amount Rounding Precision");
+                            TempSaleLinePOS2.Amount := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS2.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                        end;
                         TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
                         TempSaleLinePOS2.Modify();
                     end;
                 until (TempDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
 
         if TempSaleLinePOS2.Get(TempSaleLinePOS.RecordId) then begin
-            if not GeneralLedgerSetup.Get() then
-                Clear(GeneralLedgerSetup);
-            "Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS."Unit Price", TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Unit-Amount Rounding Precision");
-            "Discount Price Incl. Vat" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS2.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+            if TempSaleLinePOS2."Price Includes VAT" then begin
+                "Unit Price" := Round(TempSaleLinePOS."Unit Price", GeneralLedgerSetup."Unit-Amount Rounding Precision");
+                "Discount Price Incl. Vat" := Round(TempSaleLinePOS2."Amount Including VAT", GeneralLedgerSetup."Amount Rounding Precision");
+                "Discount Price Excl. VAT" := POSSaleTaxCalc.CalcAmountWithoutVAT(TempSaleLinePOS2."Amount Including VAT", TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+            end else begin
+                "Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS."Unit Price", TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Unit-Amount Rounding Precision");
+                "Discount Price Incl. Vat" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS2.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
+            end;
             "VAT %" := TempSaleLinePOS2."VAT %";
-            "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
             "Discount Type" := TempSaleLinePOS2."Discount Type";
             "Discount Code" := TempSaleLinePOS2."Discount Code";
             "Discount Pct." := TempSaleLinePOS2."Discount %";
