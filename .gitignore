@@ -264,3 +264,6 @@ ModelManifest.xml
 
 # Exceptions to **/packages/* Dragonglass
 !**/packages/dragonglass-*
+
+# superpowers-extended-cc writing-plans skill state file
+.plans/*.tasks.json
