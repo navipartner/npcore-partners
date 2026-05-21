@@ -1937,6 +1937,284 @@ codeunit 85137 "NPR Retail Journal Tests"
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UnitPriceDoesNotDriftFromInclVATItemUnderWholeUnitRounding()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Assert: Codeunit Assert;
+        RetailJournalNo: Text;
+    begin
+        // [SCENARIO] CORE-339: A 172 NOK item entered incl. VAT @ 15% must yield Unit Price 172 on the retail journal line
+        // (matching the live POS sale line and the item card), not 173 as the menu API previously returned because it
+        // round-tripped through an excl. VAT base (172 -> 149.57 -> round to 150 -> *1.15 = 172.5 -> round to 173) when
+        // "Unit-Amount Rounding Precision" is whole units.
+
+        Initialize();
+
+        // [GIVEN] Whole-unit Unit-Amount/Amount Rounding Precision (Norwegian setup that surfaces the bug)
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Unit-Amount Rounding Precision" := 1;
+        GeneralLedgerSetup."Amount Rounding Precision" := 0.01;
+        GeneralLedgerSetup.Modify();
+
+        // [GIVEN] VAT Posting Setup with 15% VAT
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 15;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with "Price Includes VAT" = true and Unit Price 172
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 172;
+        Item.Modify();
+
+        // [WHEN] Item is added to a retail journal line
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] The stored Unit Price matches the item card (172), no rounding drift to 173
+        Assert.AreEqual(172, RetailJournalLine."Unit Price", 'Unit Price drifted from incl. VAT item price - rounding round-trip through excl. VAT base regressed (CORE-339).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UnitPriceDoesNotDriftFromInclVATItemAtDefaultRounding()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        Assert: Codeunit Assert;
+        RetailJournalNo: Text;
+    begin
+        // [SCENARIO] CORE-339: Even without configuring "Unit-Amount Rounding Precision" (i.e. whatever the standard BC
+        // default is), an incl. VAT item priced 172 @ 15% VAT must yield Unit Price 172 on the retail journal line.
+        // Before the fix, stripping VAT to 149.5652..., rounding, then re-adding VAT introduced a small (0.01) drift
+        // that this exact-equality assertion would catch.
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup with 15% VAT - "Unit-Amount Rounding Precision" left at whatever GLSetup default is
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 15;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with "Price Includes VAT" = true and Unit Price 172
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 172;
+        Item.Modify();
+
+        // [WHEN] Item is added to a retail journal line
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] The stored Unit Price exactly equals the item card price (no drift, even sub-NOK)
+        Assert.AreEqual(172, RetailJournalLine."Unit Price", 'Unit Price drifted from incl. VAT item price at default rounding precision (CORE-339).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure InclVATItemWithDiscountDoesNotDriftUnderWholeUnitRounding()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        RetailJournalNo: Text;
+        LineDiscPct: Decimal;
+        ExpectedDiscountPriceInclTax: Decimal;
+        ExpectedDiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] CORE-339 (discounted variant): With whole-unit "Unit-Amount Rounding Precision", an incl. VAT item that
+        // also has a customer line discount must keep the Unit Price aligned with the item card and derive both
+        // Discount Price Incl. VAT and Discount Price Excl. VAT consistently from the same incl. VAT base.
+
+        Initialize();
+
+        // [GIVEN] Whole-unit Unit-Amount Rounding Precision (Norwegian setup that surfaces the bug)
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Unit-Amount Rounding Precision" := 1;
+        GeneralLedgerSetup."Amount Rounding Precision" := 0.01;
+        GeneralLedgerSetup.Modify();
+
+        // [GIVEN] VAT Posting Setup with 15% VAT
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 15;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with "Price Includes VAT" = true and Unit Price 172
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 172;
+        Item.Modify();
+
+        // [GIVEN] 25% customer line discount on the item
+        LineDiscPct := POSCustoDiscandTax.CreateDiscount(Item, 25);
+
+        // [WHEN] Item is added to a retail journal line
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        ExpectedDiscountPriceInclTax := Item."Unit Price" * (1 - LineDiscPct / 100);
+        ExpectedDiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(ExpectedDiscountPriceInclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] The unit price and discount fields stay aligned with the item card incl. VAT base
+        Assert.AreEqual(172, RetailJournalLine."Unit Price", 'Unit Price drifted under whole-unit rounding for discounted incl. VAT item (CORE-339).');
+        Assert.AreEqual(VATPostingSetup."VAT %", RetailJournalLine."VAT %", 'VAT % not propagated from posting setup.');
+        Assert.AreEqual(RetailJournalLine."Discount Type"::Customer, RetailJournalLine."Discount Type", 'Discount Type not Customer.');
+        Assert.AreEqual(LineDiscPct, RetailJournalLine."Discount Pct.", 'Discount % not propagated.');
+        Assert.AreNearlyEqual(ExpectedDiscountPriceInclTax, RetailJournalLine."Discount Price Incl. Vat", 0.01, 'Discount Price Incl. VAT drifted under whole-unit rounding (CORE-339).');
+        Assert.AreNearlyEqual(ExpectedDiscountPriceExclTax, RetailJournalLine."Discount Price Excl. VAT", 0.01, 'Discount Price Excl. VAT drifted under whole-unit rounding (CORE-339).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExclVATItemUnderWholeUnitRoundingProducesInclVATUnitPrice()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Assert: Codeunit Assert;
+        RetailJournalNo: Text;
+    begin
+        // [SCENARIO] CORE-339 regression guard for the excl. VAT branch: when the item is stored without VAT, the retail
+        // journal must still expose the incl. VAT Unit Price (excl + VAT) under whole-unit rounding. The fix's new
+        // conditional must not regress this path - it should continue to call CalcAmountWithVAT.
+
+        Initialize();
+
+        // [GIVEN] Whole-unit Unit-Amount Rounding Precision (Norwegian setup)
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Unit-Amount Rounding Precision" := 1;
+        GeneralLedgerSetup."Amount Rounding Precision" := 0.01;
+        GeneralLedgerSetup.Modify();
+
+        // [GIVEN] VAT Posting Setup with 15% VAT
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 15;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with "Price Includes VAT" = false and Unit Price 100 excl. VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 100;
+        Item.Modify();
+
+        // [WHEN] Item is added to a retail journal line
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] The stored Unit Price equals item price + 15% VAT, rounded to whole units (100 * 1.15 = 115)
+        Assert.AreEqual(115, RetailJournalLine."Unit Price", 'Excl. VAT path regressed - Unit Price did not equal Item.Unit Price * (1 + VAT/100) under whole-unit rounding (CORE-339).');
+        Assert.AreEqual(VATPostingSetup."VAT %", RetailJournalLine."VAT %", 'VAT % not propagated from posting setup.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExclVATItemWithDiscountUnderWholeUnitRounding()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        RetailJournalNo: Text;
+        LineDiscPct: Decimal;
+        ExpectedDiscountPriceExclTax: Decimal;
+        ExpectedDiscountPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] CORE-339 regression guard for the excl. VAT + discount branch: when the item is stored without VAT
+        // and has a customer line discount, the retail journal must still expose the correct incl. and excl. VAT prices
+        // after discount under whole-unit rounding. The fix must not regress this path.
+
+        Initialize();
+
+        // [GIVEN] Whole-unit Unit-Amount Rounding Precision (Norwegian setup)
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Unit-Amount Rounding Precision" := 1;
+        GeneralLedgerSetup."Amount Rounding Precision" := 0.01;
+        GeneralLedgerSetup.Modify();
+
+        // [GIVEN] VAT Posting Setup with 15% VAT
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 15;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with "Price Includes VAT" = false and Unit Price 100 excl. VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 100;
+        Item.Modify();
+
+        // [GIVEN] 25% customer line discount on the item
+        LineDiscPct := POSCustoDiscandTax.CreateDiscount(Item, 25);
+
+        // [WHEN] Item is added to a retail journal line
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        ExpectedDiscountPriceExclTax := Item."Unit Price" * (1 - LineDiscPct / 100);
+        ExpectedDiscountPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(ExpectedDiscountPriceExclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Unit price equals Item.Unit Price * (1 + VAT/100), discount fields are consistent excl/incl pair
+        Assert.AreEqual(115, RetailJournalLine."Unit Price", 'Excl. VAT path regressed - Unit Price did not equal Item.Unit Price * (1 + VAT/100) under whole-unit rounding (CORE-339).');
+        Assert.AreEqual(VATPostingSetup."VAT %", RetailJournalLine."VAT %", 'VAT % not propagated from posting setup.');
+        Assert.AreEqual(RetailJournalLine."Discount Type"::Customer, RetailJournalLine."Discount Type", 'Discount Type not Customer.');
+        Assert.AreEqual(LineDiscPct, RetailJournalLine."Discount Pct.", 'Discount % not propagated.');
+        Assert.AreNearlyEqual(ExpectedDiscountPriceExclTax, RetailJournalLine."Discount Price Excl. VAT", 0.01, 'Discount Price Excl. VAT drifted on excl. VAT discounted path (CORE-339).');
+        Assert.AreNearlyEqual(ExpectedDiscountPriceInclTax, RetailJournalLine."Discount Price Incl. Vat", 0.01, 'Discount Price Incl. VAT drifted on excl. VAT discounted path (CORE-339).');
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";

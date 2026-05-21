@@ -45,9 +45,9 @@ codeunit 85188 "NPR APIRestMenu Rounding"
         UnitPrice: Decimal;
     begin
         // [SCENARIO] When GLSetup "Unit-Amount Rounding Precision" = 0.05, the output price is a multiple of 0.05.
-        // Item.Unit Price is VAT-inclusive per LibraryPOSMasterData default. BC internally stores excl-VAT,
-        // so 89.37 incl at 25% VAT is stored as 71.496 excl, rounded to 0.05 = 71.50, re-applied VAT = 89.375,
-        // rounded to 0.05 (nearest, half-up) = 89.40.
+        // Item.Unit Price is VAT-inclusive per LibraryPOSMasterData default. Post-CORE-339, RetailJournalLine
+        // applies the precision directly to the incl-VAT price (no excl-VAT round-trip), matching the live
+        // POS and standard BC sales orders: Round(89.37, 0.05) = 89.35.
         Initialize();
 
         GLSetup.Get();
@@ -58,7 +58,7 @@ codeunit 85188 "NPR APIRestMenu Rounding"
 
         UnitPrice := GetFirstMenuItemUnitPrice();
 
-        Assert.AreEqual(89.40, UnitPrice, 'GLSetup Unit-Amount Rounding Precision 0.05 should yield a multiple of 0.05');
+        Assert.AreEqual(89.35, UnitPrice, 'GLSetup Unit-Amount Rounding Precision 0.05 should yield a multiple of 0.05');
     end;
 
     local procedure Initialize()
