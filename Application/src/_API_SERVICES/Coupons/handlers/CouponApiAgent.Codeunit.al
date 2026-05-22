@@ -14,7 +14,7 @@ codeunit 6248530 "NPR CouponApiAgent"
             exit(Response);
 
         CreateCoupon(Request.ApiVersion(), RequestJson.AsToken(), Json);
-        exit(Response.RespondOK(Json));
+        exit(Response.RespondCreated(Json));
     end;
 
     internal procedure GetCoupon(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
