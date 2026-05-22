@@ -50,19 +50,14 @@ codeunit 85011 "NPR Library - Ticket Module"
         Admission: Record "NPR TM Admission";
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NprMasterData: Codeunit "NPR Library - POS Master Data";
         ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
         AdmissionCode: Code[20];
         ScheduleCode: Code[20];
         ItemNo: Code[20];
         TicketTypeCode: Code[10];
     begin
+        CreateMinimalSetup();
 
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
-
-        CreateNumberSeries();
         TicketSetup.Init();
         if (not TicketSetup.Insert()) then
             TicketSetup.Get();
@@ -94,19 +89,14 @@ codeunit 85011 "NPR Library - Ticket Module"
         Admission: Record "NPR TM Admission";
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NprMasterData: Codeunit "NPR Library - POS Master Data";
         ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
         AdmissionCode: Code[20];
         ScheduleCode: Code[20];
         ItemNo: Code[20];
         TicketTypeCode: Code[10];
     begin
+        CreateMinimalSetup();
 
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
-
-        CreateNumberSeries();
         TicketSetup.Init();
         if (not TicketSetup.Insert()) then
             TicketSetup.Get();
@@ -871,6 +861,31 @@ codeunit 85011 "NPR Library - Ticket Module"
         WorkDate(Today());
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
         CreateNumberSeries();
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        EnableTriStateLockingFeaturesInTicketModule();
+#endif
+    end;
+
+    internal procedure EnableTriStateLockingFeaturesInTicketModule()
+    var
+        FeatureFlag: Record "NPR Feature Flag";
+        Enabled: Boolean;
+    begin
+        // 'enableTriStateLockingFeaturesInTicketModule'
+        if (not FeatureFlag.Get('enableTriStateLockingFeaturesInTicketModule')) then begin
+            FeatureFlag.Name := 'enableTriStateLockingFeaturesInTicketModule';
+            FeatureFlag.value := Format(true);
+            FeatureFlag.Insert();
+            exit;
+        end;
+
+        if (Evaluate(Enabled, FeatureFlag.Value)) then
+            if (Enabled) then
+                exit;
+
+        FeatureFlag.value := Format(true);
+        FeatureFlag.Modify();
     end;
 
     local procedure GetNextNo(): Code[20]

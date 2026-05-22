@@ -3,7 +3,7 @@ permissionset 6014440 "NPR API Channel Mgr"
 {
     Access = Internal;
     Assignable = true;
-    Caption = 'NPR API - Channel Manager';
+    Caption = 'NPR API - OTA Channel Manager';
     IncludedPermissionSets = "NPR API Core";
 }
 #endif

@@ -1,7 +1,7 @@
 table 6059929 "NPR CMOrderLine"
 {
     Access = Internal;
-    Caption = 'Channel Manager Order Line';
+    Caption = 'OTA Channel Manager Order Line';
     DataClassification = CustomerContent;
 
     fields

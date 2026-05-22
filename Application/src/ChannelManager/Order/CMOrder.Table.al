@@ -1,7 +1,7 @@
 table 6059928 "NPR CMOrder"
 {
     Access = Internal;
-    Caption = 'Channel Manager Order';
+    Caption = 'OTA Channel Manager Order';
     DataClassification = CustomerContent;
 
     fields
@@ -11,6 +11,12 @@ table 6059928 "NPR CMOrder"
             DataClassification = CustomerContent;
             Caption = 'Order Id';
             NotBlank = true;
+        }
+
+        field(5; DocumentNo; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Buy-from Order Reference';
         }
 
         field(10; PartnerId; Guid)
@@ -47,7 +53,7 @@ table 6059928 "NPR CMOrder"
             TableRelation = Language.Code;
         }
 
-        field(60; PaymentReference; Code[20])
+        field(60; PaymentReference; Code[50])
         {
             DataClassification = CustomerContent;
             Caption = 'Payment Reference';
@@ -115,6 +121,11 @@ table 6059928 "NPR CMOrder"
         }
 
         key(Key5; JobId)
+        {
+            Clustered = false;
+        }
+
+        key(Key6; Status, ReceivedAt)
         {
             Clustered = false;
         }

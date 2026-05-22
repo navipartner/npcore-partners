@@ -2,30 +2,65 @@ codeunit 6151055 "NPR CMTicketIssuer"
 {
     Access = Internal;
 
-    internal procedure IssueForOrder(var Order: Record "NPR CMOrder"; var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
-    var
-        Token: Text[100];
-        JobId: Code[40];
+    internal procedure ReshapeToTicketImport(
+        var Order: Record "NPR CMOrder";
+        var JobId: Code[40];
+        var TempImportHeader: Record "NPR TM ImportTicketHeader" temporary;
+        var TempImportLine: Record "NPR TM ImportTicketLine" temporary;
+        var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
     begin
-        RunTicketImportWorker(Order, TempOrderWallet, Token, JobId);
-        WrapTicketsIntoWallets(TempOrderWallet, Token);
+        TempImportHeader.DeleteAll();
+        TempImportLine.DeleteAll();
+        JobId := NewJobId();
 
-        Order.JobId := JobId;
-        if (Order.PaymentReference = '') then
-            Order.Status := Order.Status::Draft
-        else begin
-            ConfirmReservationsForToken(Token, Order);
-            Order.Status := Order.Status::Issued;
-        end;
-        Order.Modify();
-
-        if (Order.Status = Order.Status::Issued) then
-            BuildManifestForOrder(Order);
-
-        Commit();
+        BuildTicketImportHeader(Order, JobId, TempImportHeader);
+        BuildTicketImportLines(Order, TempOrderWallet, JobId, TempImportLine);
     end;
 
-    internal procedure ConfirmOrder(var Order: Record "NPR CMOrder")
+    internal procedure RunTicketImport(
+        JobId: Code[40];
+        var TempImportHeader: Record "NPR TM ImportTicketHeader" temporary;
+        var TempImportLine: Record "NPR TM ImportTicketLine" temporary;
+        var FailureMessage: Text): Boolean
+    var
+        ImportTicket: Codeunit "NPR TM ImportTicketWorker";
+    begin
+        ClearLastError();
+        ImportTicket.SetImportBuffer(TempImportHeader, TempImportLine);
+        if (not ImportTicket.Run()) then begin
+            FailureMessage := GetLastErrorText();
+            ImportTicket.CleanUpFailedImport(JobId);
+            exit(false);
+        end;
+
+        // TODO: Capacity hold for draft tickets.
+        //   Mirror the tour-reservation override at TMTicketBOM.Page.al MakeTourTicket
+        //   lines 426-434: close DetTicketAccessEntry rows of type INITIAL_ENTRY so unpaid
+        //   draft tickets count toward admission capacity. The "Initial Entry" flow field
+        //   on Admission Schedule Entry only sums closed entries — without this override a
+        //   draft order does not hold capacity until ConfirmOrder runs and FinalizePayment
+        //   closes the rows naturally.
+        //   Open question: should CM drafts hold capacity at all, or only once confirmed?
+        //   Capacity-limited interactions with OTA/CM partners are non-trivial — settle the
+        //   policy with stakeholders before implementing. Until then a stale draft sitting
+        //   for more than a few hours is the operational worry, not capacity double-booking.
+
+        exit(true);
+    end;
+
+    internal procedure AttachTicketsToWallet(JobId: Code[40]; WalletEntryNo: Integer; LineNo: Integer; SeqNo: Integer)
+    var
+        WalletFacade: Codeunit "NPR AttractionWallet";
+        TicketIds: List of [Guid];
+        Token: Text[100];
+    begin
+        Token := GetTokenForJobId(JobId);
+        CollectTicketIdsForWallet(Token, LineNo, SeqNo, TicketIds);
+        if (TicketIds.Count() > 0) then
+            WalletFacade.AddTicketsToWallet(WalletEntryNo, TicketIds);
+    end;
+
+    internal procedure ConfirmTickets(var Order: Record "NPR CMOrder")
     var
         ImportHeader: Record "NPR TM ImportTicketHeader";
         Token: Text[100];
@@ -37,84 +72,13 @@ codeunit 6151055 "NPR CMTicketIssuer"
 
         ImportHeader.SetCurrentKey(JobId);
         ImportHeader.SetFilter(JobId, '=%1', Order.JobId);
-        ImportHeader.SetLoadFields(TicketRequestToken, PaymentReference);
+        ImportHeader.SetLoadFields(TicketRequestToken);
         if (not ImportHeader.FindFirst()) then
             Error(MissingImportHeaderErr, Order.JobId);
 
         Token := ImportHeader.TicketRequestToken;
 
-        // Propagate the now-known PaymentReference onto the import header for downstream traceability.
-        if (ImportHeader.PaymentReference <> Order.PaymentReference) then begin
-            ImportHeader.PaymentReference := CopyStr(Order.PaymentReference, 1, MaxStrLen(ImportHeader.PaymentReference));
-            ImportHeader.Modify();
-        end;
-
         ConfirmReservationsForToken(Token, Order);
-
-        Order.Status := Order.Status::Issued;
-        Order.Modify();
-
-        BuildManifestForOrder(Order);
-
-        Commit();
-    end;
-
-    local procedure BuildManifestForOrder(var Order: Record "NPR CMOrder")
-    var
-        PartnerSetup: Record "NPR CMPartnerSetup";
-        OrderWallet: Record "NPR CMOrderWallet";
-        Wallet: Record "NPR AttractionWallet";
-        NPDesignerFacade: Codeunit "NPR NPDesignerManifestFacade";
-        WalletAssets: Dictionary of [Guid, Text[100]];
-        NotInsertedAssets: List of [Guid];
-        ManifestId: Guid;
-        ManifestUrl: Text[250];
-        AssetUrl: Text[250];
-        TemplateId: Text[40];
-    begin
-        // Manifest generation is opt-in per partner — the partner setup row carries the design layout id.
-        if (not PartnerSetup.Get(Order.PartnerId)) then
-            exit;
-        TemplateId := PartnerSetup.NPDesignerTemplateId;
-        if (TemplateId = '') then
-            exit;
-
-        // Collect every wallet that belongs to this order. Each wallet is one asset in the manifest.
-        OrderWallet.SetFilter(OrderId, '=%1', Order.OrderId);
-        if (not OrderWallet.FindSet()) then
-            exit;
-
-        repeat
-            if ((OrderWallet.WalletEntryNo <> 0) and Wallet.Get(OrderWallet.WalletEntryNo)) then
-                if (not WalletAssets.ContainsKey(Wallet.SystemId)) then
-                    WalletAssets.Add(Wallet.SystemId, CopyStr(Wallet.ReferenceNumber, 1, 100));
-        until (OrderWallet.Next() = 0);
-
-        if (WalletAssets.Count() = 0) then
-            exit;
-
-        ManifestId := NPDesignerFacade.CreateManifest();
-        if (IsNullGuid(ManifestId)) then
-            exit;
-
-        NPDesignerFacade.AddAssetToManifest(ManifestId, Database::"NPR AttractionWallet", WalletAssets, TemplateId, NotInsertedAssets);
-        NPDesignerFacade.GetManifestUrl(ManifestId, ManifestUrl);
-
-        Order.ManifestId := ManifestId;
-        Order.ManifestUrl := ManifestUrl;
-        Order.Modify();
-
-        OrderWallet.Reset();
-        OrderWallet.SetFilter(OrderId, '=%1', Order.OrderId);
-        if (OrderWallet.FindSet()) then
-            repeat
-                Clear(AssetUrl);
-                if ((OrderWallet.WalletEntryNo <> 0) and Wallet.Get(OrderWallet.WalletEntryNo)) then
-                    if (NPDesignerFacade.GetManifestUrlForAsset(Database::"NPR AttractionWallet", Wallet.SystemId, AssetUrl)) then begin
-                        OrderWallet.ManifestUrl := AssetUrl;
-                        OrderWallet.Modify();
-                    end;
-            until (OrderWallet.Next() = 0);
     end;
 
     local procedure ConfirmReservationsForToken(Token: Text[100]; var Order: Record "NPR CMOrder")
@@ -123,87 +87,16 @@ codeunit 6151055 "NPR CMTicketIssuer"
         ResponseCode: Code[10];
         ResponseMessage: Text;
     begin
+
         if (Token = '') then
             exit;
 
-        TicketRequestManager.SetReservationRequestExtraInfo(Token, Order.SellToEmail, Order.PaymentReference, Order.SellToName, Order.SellToLanguage);
+        TicketRequestManager.SetReservationRequestExtraInfo(Token, Order.SellToEmail, Order.DocumentNo, Order.SellToName, Order.SellToLanguage);
 
         if (not TicketRequestManager.ConfirmReservationRequest(Token, 0, ResponseCode, ResponseMessage)) then
             Error(ResponseMessage);
     end;
 
-    local procedure RunTicketImportWorker(var Order: Record "NPR CMOrder"; var TempOrderWallet: Record "NPR CMOrderWallet" temporary; var Token: Text[100]; var JobId: Code[40])
-    var
-        TempImportHeader: Record "NPR TM ImportTicketHeader" temporary;
-        TempImportLine: Record "NPR TM ImportTicketLine" temporary;
-        Worker: Codeunit "NPR TM ImportTicketWorker";
-        WorkerError: Text;
-    begin
-        JobId := NewJobId();
-        Token := '';
-
-        BuildTicketImportHeader(Order, JobId, TempImportHeader);
-        BuildTicketImportLines(Order, TempOrderWallet, JobId, TempImportLine);
-
-        ClearLastError();
-        Worker.SetImportBuffer(TempImportHeader, TempImportLine);
-
-        Order.Status := Order.Status::Processing;
-        Order.Modify();
-        Commit();
-
-        if (not Worker.Run()) then begin
-            WorkerError := GetLastErrorText();
-
-            Worker.CleanUpFailedImport(JobId);
-            Order.StatusMessage := CopyStr(WorkerError, 1, MaxStrLen(Order.StatusMessage));
-            Order.Status := Order.Status::Error;
-            Order.Modify();
-
-            Commit();
-            Error(WorkerError);
-        end;
-
-        // Worker assigns the Token onto the temp header via Archive() — read it back for phase 2.
-        TempImportHeader.Reset();
-        TempImportHeader.FindFirst();
-        Token := TempImportHeader.TicketRequestToken;
-
-    end;
-
-    // DestroyOrderAssets: hard cascade delete of wallets and assets
-    internal procedure DestroyOrderAssets(var Order: Record "NPR CMOrder")
-    var
-        WalletFacade: Codeunit "NPR AttractionWallet";
-        NPDesignerFacade: Codeunit "NPR NPDesignerManifestFacade";
-        WalletEntryNos: List of [Integer];
-        WalletEntryNo: Integer;
-    begin
-        // Drop the manifest first so the asset references inside it disappear cleanly before wallets are deleted.
-        if (not IsNullGuid(Order.ManifestId)) then
-            NPDesignerFacade.DeleteManifest(Order.ManifestId);
-
-        // Hard-delete every ticket the import job ever minted
-        DeleteTicketImportJob(Order.JobId);
-
-        // Then nuke each wallet shell — the facade owns the 6-table cascade.
-        CollectWallets(Order, WalletEntryNos);
-        foreach WalletEntryNo in WalletEntryNos do
-            WalletFacade.DeleteWallet(WalletEntryNo);
-
-        DeleteOrderWallets(Order.OrderId);
-        DeleteOrderComponents(Order.OrderId);
-        DeleteOrderLines(Order.OrderId);
-
-        Order.StatusMessage := '';
-        Order.Status := Order.Status::Cancelled;
-        Order.JobId := '';
-        Clear(Order.ManifestId);
-        Order.ManifestUrl := '';
-        Order.Modify();
-    end;
-
-    // DeleteTicketImportJob: physical delete of every reservation/ticket artefact ever minted under JobId.
     internal procedure DeleteTicketImportJob(JobId: Code[40])
     var
         ImportHeader: Record "NPR TM ImportTicketHeader";
@@ -294,102 +187,30 @@ codeunit 6151055 "NPR CMTicketIssuer"
                 OrderIds.Add(Header.OrderId);
             until (Header.Next() = 0);
 
-        // Delete(false) skips the OnDelete trigger that would DeleteAll the lines — we already
-        // deleted them point-by-point above.
         foreach OrderId in OrderIds do
             if (InnerHeader.Get(OrderId, JobId)) then
                 InnerHeader.Delete(false);
     end;
 
-    local procedure CollectWallets(var Order: Record "NPR CMOrder"; var WalletEntryNos: List of [Integer])
-    var
-        OrderWallet: Record "NPR CMOrderWallet";
-    begin
-        OrderWallet.SetFilter(OrderId, '=%1', Order.OrderId);
-        OrderWallet.SetLoadFields(WalletEntryNo);
-        if (not OrderWallet.FindSet()) then
-            exit;
-
-        repeat
-            if ((OrderWallet.WalletEntryNo <> 0) and (not WalletEntryNos.Contains(OrderWallet.WalletEntryNo))) then
-                WalletEntryNos.Add(OrderWallet.WalletEntryNo);
-        until (OrderWallet.Next() = 0);
-    end;
-
-    local procedure DeleteOrderWallets(OrderId: Guid)
-    var
-        OrderWallet: Record "NPR CMOrderWallet";
-        InnerWallet: Record "NPR CMOrderWallet";
-        TempKeys: Record "NPR CMOrderWallet" temporary;
-    begin
-        OrderWallet.SetFilter(OrderId, '=%1', OrderId);
-        OrderWallet.SetLoadFields(OrderId, LineNo, SeqNo);
-        if (OrderWallet.FindSet()) then
-            repeat
-                TempKeys := OrderWallet;
-                TempKeys.Insert();
-            until (OrderWallet.Next() = 0);
-
-        TempKeys.Reset();
-        if (TempKeys.FindSet()) then
-            repeat
-                if (InnerWallet.Get(TempKeys.OrderId, TempKeys.LineNo, TempKeys.SeqNo)) then
-                    InnerWallet.Delete(true);
-            until (TempKeys.Next() = 0);
-    end;
-
-    local procedure DeleteOrderComponents(OrderId: Guid)
-    var
-        Component: Record "NPR CMOrderComponent";
-        InnerComponent: Record "NPR CMOrderComponent";
-        TempKeys: Record "NPR CMOrderComponent" temporary;
-    begin
-        Component.SetFilter(OrderId, '=%1', OrderId);
-        Component.SetLoadFields(OrderId, LineNo, ComponentNo);
-        if (Component.FindSet()) then
-            repeat
-                TempKeys := Component;
-                TempKeys.Insert();
-            until (Component.Next() = 0);
-
-        TempKeys.Reset();
-        if (TempKeys.FindSet()) then
-            repeat
-                if (InnerComponent.Get(TempKeys.OrderId, TempKeys.LineNo, TempKeys.ComponentNo)) then
-                    InnerComponent.Delete(true);
-            until (TempKeys.Next() = 0);
-    end;
-
-    local procedure DeleteOrderLines(OrderId: Guid)
-    var
-        Line: Record "NPR CMOrderLine";
-        InnerLine: Record "NPR CMOrderLine";
-        LineNos: List of [Integer];
-        LineNo: Integer;
-    begin
-        Line.SetFilter(OrderId, '=%1', OrderId);
-        Line.SetLoadFields(LineNo);
-        if (Line.FindSet()) then
-            repeat
-                LineNos.Add(Line.LineNo);
-            until (Line.Next() = 0);
-
-        foreach LineNo in LineNos do
-            if (InnerLine.Get(OrderId, LineNo)) then
-                InnerLine.Delete(true);
-    end;
-
-
     local procedure BuildTicketImportHeader(var Order: Record "NPR CMOrder"; JobId: Code[40]; var TempImportHeader: Record "NPR TM ImportTicketHeader" temporary)
     begin
         TempImportHeader.Init();
-        TempImportHeader.OrderId := CopyStr(GuidToShortCode(Order.OrderId), 1, MaxStrLen(TempImportHeader.OrderId));
+        TempImportHeader.OrderId := Order.DocumentNo;
         TempImportHeader.JobId := JobId;
         TempImportHeader.SalesDate := DT2Date(Order.ReceivedAt);
-        TempImportHeader.PaymentReference := CopyStr(Order.PaymentReference, 1, MaxStrLen(TempImportHeader.PaymentReference));
         TempImportHeader.TicketHolderEMail := Order.SellToEmail;
         TempImportHeader.TicketHolderName := Order.SellToName;
         TempImportHeader.TicketHolderPreferredLang := Order.SellToLanguage;
+
+        // If PaymentReference is blank, it means the order is still in draft stage — don't populate the PaymentReference on the import header, 
+        // Actual Payment Reference is the internal and stable DocumentNo, not the one provided by partner 
+        // — this is because we want the payment reference on the TM reservation and Det. entry to be consistent and immutable after the order is created, 
+        // so that we can reliably identify and correlate reconciliation records in TM and ERP via DocumentNo
+        // Also note, payment reference is wider (code 50) to allow for guid-values
+        TempImportHeader.PaymentReference := '';
+        if (Order.PaymentReference <> '') then
+            TempImportHeader.PaymentReference := Order.DocumentNo;
+
         TempImportHeader.Insert();
     end;
 
@@ -528,7 +349,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
         NotificationAddress := OrderLine.NotificationAddress;
 
         TempImportLine.Init();
-        TempImportLine.OrderId := CopyStr(GuidToShortCode(Order.OrderId), 1, MaxStrLen(TempImportLine.OrderId));
+        TempImportLine.OrderId := Order.DocumentNo;
         TempImportLine.JobId := JobId;
         TempImportLine.PreAssignedTicketNumber := GenerateTicketNumber(TicketType."External Ticket Pattern", TicketType."No. Series");
         TempImportLine.TicketRequestTokenLine := TokenLine;
@@ -579,8 +400,6 @@ codeunit 6151055 "NPR CMTicketIssuer"
             TempOrderWallet.CurrencyCode := CurrencyCode;
         TempOrderWallet.Modify();
     end;
-
-
 
 
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
@@ -658,53 +477,6 @@ codeunit 6151055 "NPR CMTicketIssuer"
         exit(Round(AddOnLine.Quantity, 1, '<'));
     end;
 
-    local procedure WrapTicketsIntoWallets(var TempOrderWallet: Record "NPR CMOrderWallet" temporary; Token: Text[100])
-    var
-        OrderLine: Record "NPR CMOrderLine";
-        OrderWallet: Record "NPR CMOrderWallet";
-        WalletFacade: Codeunit "NPR AttractionWallet";
-        TicketIds: List of [Guid];
-        WalletEntryNo: Integer;
-        WalletReferenceNumber: Text[50];
-        WalletName: Text[100];
-    begin
-        TempOrderWallet.Reset();
-        if (not TempOrderWallet.FindSet()) then
-            exit;
-
-        repeat
-            OrderLine.Get(TempOrderWallet.OrderId, TempOrderWallet.LineNo);
-
-            WalletName := TempOrderWallet.WalletName;
-            if (WalletName = '') then
-                WalletName := DeriveDefaultWalletName(OrderLine);
-
-            WalletEntryNo := WalletFacade.CreateWalletFromFacade(
-                OrderLine.ItemNo,
-                WalletName,
-                WalletReferenceNumber,
-                TempOrderWallet.ExternalReferenceNumber);
-
-            Clear(TicketIds);
-            CollectTicketIdsForWallet(Token, OrderLine.LineNo, TempOrderWallet.SeqNo, TicketIds);
-            if (TicketIds.Count() > 0) then
-                WalletFacade.AddTicketsToWallet(WalletEntryNo, TicketIds);
-
-            OrderWallet.Init();
-            OrderWallet.OrderId := TempOrderWallet.OrderId;
-            OrderWallet.LineNo := TempOrderWallet.LineNo;
-            OrderWallet.SeqNo := TempOrderWallet.SeqNo;
-            OrderWallet.WalletEntryNo := WalletEntryNo;
-            OrderWallet.WalletName := WalletName;
-            WalletFacade.GetWalletExternalReferenceNumber(WalletEntryNo, OrderWallet.ExternalReferenceNumber);
-            OrderWallet.UnitPriceExclVat := TempOrderWallet.UnitPriceExclVat;
-            OrderWallet.UnitPriceInclVat := TempOrderWallet.UnitPriceInclVat;
-            OrderWallet.CurrencyCode := TempOrderWallet.CurrencyCode;
-            OrderWallet.IssuedAt := CurrentDateTime();
-            OrderWallet.Insert();
-        until (TempOrderWallet.Next() = 0);
-    end;
-
     local procedure CollectTicketIdsForWallet(Token: Text[100]; LineNo: Integer; SeqNo: Integer; var TicketIds: List of [Guid])
     var
         ReservationReq: Record "NPR TM Ticket Reservation Req.";
@@ -732,16 +504,6 @@ codeunit 6151055 "NPR CMTicketIssuer"
         until (ReservationReq.Next() = 0);
     end;
 
-    local procedure DeriveDefaultWalletName(var OrderLine: Record "NPR CMOrderLine"): Text[100]
-    var
-        Item: Record Item;
-    begin
-        Item.SetLoadFields(Description);
-        if (Item.Get(OrderLine.ItemNo)) then
-            exit(CopyStr(Item.Description, 1, 100));
-        exit(CopyStr(OrderLine.ItemNo, 1, 100));
-    end;
-
     // ---- TokenLine encoding ----
     // Layout: LineNo (multiples of 100000) + SeqNo*10 + ImportIdxWithinSeqNo
     // Valid up to SeqNo<10000 and ImportIdxWithinSeqNo<10 (max 9 tickets per wallet from a package template expansion).
@@ -759,9 +521,16 @@ codeunit 6151055 "NPR CMTicketIssuer"
         exit(CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 40));
     end;
 
-    local procedure GuidToShortCode(Value: Guid): Text
+    local procedure GetTokenForJobId(JobId: Code[40]): Text[100]
+    var
+        ImportHeader: Record "NPR TM ImportTicketHeader";
+        MissingJobErr: Label 'Order with JobId %1 not found. This is a programming bug.';
     begin
-        // First 20 hex chars of the unbraced/undashed GUID — enough uniqueness for the import OrderId field.
-        exit(CopyStr(UpperCase(DelChr(Format(Value), '=', '{}-')), 1, 20));
+        ImportHeader.SetCurrentKey(JobId);
+        ImportHeader.SetFilter(JobId, '=%1', JobId);
+        ImportHeader.SetLoadFields(TicketRequestToken);
+        if (not ImportHeader.FindFirst()) then
+            Error(MissingJobErr, JobId);
+        exit(ImportHeader.TicketRequestToken);
     end;
 }

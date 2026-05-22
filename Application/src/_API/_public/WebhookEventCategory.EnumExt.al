@@ -25,5 +25,9 @@ enumextension 6014420 "NPR Webhook Event Category" extends "EventCategory"
     {
         Caption = 'Restaurant';
     }
+    value(6014425; "NPR OTA Channel Manager")
+    {
+        Caption = 'OTA Channel Manager';
+    }
 }
 #endif

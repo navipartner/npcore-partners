@@ -1,7 +1,7 @@
 table 6059935 "NPR CMOrderWallet"
 {
     Access = Internal;
-    Caption = 'Channel Manager Order Wallet';
+    Caption = 'OTA Channel Manager Order Wallet';
     DataClassification = CustomerContent;
 
     fields
@@ -77,6 +77,12 @@ table 6059935 "NPR CMOrderWallet"
             DataClassification = CustomerContent;
             Caption = 'Manifest URL';
             ExtendedDatatype = URL;
+        }
+
+        field(80; ManifestId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Manifest Id';
         }
     }
 

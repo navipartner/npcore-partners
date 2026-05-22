@@ -11,9 +11,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         TempOrderLine: Record "NPR CMOrderLine" temporary;
         TempOrderComponent: Record "NPR CMOrderComponent" temporary;
         TempOrderWallet: Record "NPR CMOrderWallet" temporary;
-        OrderLine: Record "NPR CMOrderLine";
-        OrderComponent: Record "NPR CMOrderComponent";
-        TicketIssuer: Codeunit "NPR CMTicketIssuer";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
         Body: JsonObject;
     begin
         if (not Request.BodyJson().IsObject()) then
@@ -34,26 +32,13 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         if (not TryParseItems(Body, Order, TempOrderLine, TempOrderComponent, TempOrderWallet, Response)) then
             exit(Response);
 
-        Order.Status := Order.Status::Processing;
-        Order.ReceivedAt := CurrentDateTime();
-        if (not Order.Insert()) then
-            exit(Response.RespondBadRequest(StrSubstNo('An order with sellToOrderReference ''%1'' already exists for partner ''%2''', Order.SellToOrderReference, PartnerSetup.Name)));
+        // Default is async, opt out with ?sync=1.
+        if (IsSyncRequested(Request)) then begin
+            OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+            exit(Response.RespondCreated(BuildOrderResponseJson(Order)));
+        end;
 
-        TempOrderLine.Reset();
-        if (TempOrderLine.FindSet()) then
-            repeat
-                OrderLine := TempOrderLine;
-                OrderLine.Insert();
-            until (TempOrderLine.Next() = 0);
-
-        TempOrderComponent.Reset();
-        if (TempOrderComponent.FindSet()) then
-            repeat
-                OrderComponent := TempOrderComponent;
-                OrderComponent.Insert();
-            until (TempOrderComponent.Next() = 0);
-
-        TicketIssuer.IssueForOrder(Order, TempOrderWallet);
+        OrderIssuer.SubmitOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         exit(Response.RespondCreated(BuildOrderResponseJson(Order)));
     end;
@@ -65,9 +50,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         TempOrderLine: Record "NPR CMOrderLine" temporary;
         TempOrderComponent: Record "NPR CMOrderComponent" temporary;
         TempOrderWallet: Record "NPR CMOrderWallet" temporary;
-        OrderLine: Record "NPR CMOrderLine";
-        OrderComponent: Record "NPR CMOrderComponent";
-        TicketIssuer: Codeunit "NPR CMTicketIssuer";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
         Body: JsonObject;
         OrderId: Guid;
     begin
@@ -97,31 +80,13 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         if (not TryParseItems(Body, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet, Response)) then
             exit(Response);
 
-        // Cascade destroy of the old wallets/lines/components (point-locks, see DestroyOrderAssets).
-        TicketIssuer.DestroyOrderAssets(ExistingOrder);
+        // Default is async, opt out with ?sync=1.
+        if (IsSyncRequested(Request)) then begin
+            OrderIssuer.ReplaceOrder(ExistingOrder, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
+            exit(Response.RespondOk(BuildOrderResponseJson(ExistingOrder)));
+        end;
 
-        // Apply mutable header fields from the new body. PartnerId, SellToOrderReference, OrderId all stay put.
-        ExistingOrder.SellToEmail := ParsedOrder.SellToEmail;
-        ExistingOrder.SellToName := ParsedOrder.SellToName;
-        ExistingOrder.SellToLanguage := ParsedOrder.SellToLanguage;
-        ExistingOrder.PaymentReference := ParsedOrder.PaymentReference;
-        ExistingOrder.Modify();
-
-        TempOrderLine.Reset();
-        if (TempOrderLine.FindSet()) then
-            repeat
-                OrderLine := TempOrderLine;
-                OrderLine.Insert();
-            until (TempOrderLine.Next() = 0);
-
-        TempOrderComponent.Reset();
-        if (TempOrderComponent.FindSet()) then
-            repeat
-                OrderComponent := TempOrderComponent;
-                OrderComponent.Insert();
-            until (TempOrderComponent.Next() = 0);
-
-        TicketIssuer.IssueForOrder(ExistingOrder, TempOrderWallet);
+        OrderIssuer.SubmitReplaceOrder(ExistingOrder, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         exit(Response.RespondOk(BuildOrderResponseJson(ExistingOrder)));
     end;
@@ -129,10 +94,8 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
     internal procedure DeleteOrder(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Order: Record "NPR CMOrder";
-        TicketIssuer: Codeunit "NPR CMTicketIssuer";
-        ResponseJson: Codeunit "NPR JSON Builder";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
         OrderId: Guid;
-        PriorStatus: Enum "NPR CMOrderStatus";
     begin
         if (not TryGetOrderIdFromPath(Request, 2, OrderId, Response)) then
             exit(Response);
@@ -140,18 +103,12 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         if (not Order.Get(OrderId)) then
             exit(Response.RespondResourceNotFound(StrSubstNo('Order ''%1'' not found', OrderId)));
 
-        if (Order.Status = Order.Status::Processing) then
-            exit(Response.RespondBadRequest('Order is currently being processed; retry once it has settled.'));
+        if (Order.Status in [Order.Status::Submitted, Order.Status::Scheduled, Order.Status::Processing]) then
+            exit(Response.RespondBadRequest(StrSubstNo('Order is mid-flight (status %1); retry once it has settled.', Order.Status)));
 
-        PriorStatus := Order.Status;
-        TicketIssuer.DestroyOrderAssets(Order);
+        OrderIssuer.DeleteOrder(Order);
 
-        ResponseJson := BuildOrderResponseJson(Order);
-
-        if (PriorStatus in [Order.Status::Draft, Order.Status::Error]) then
-            Order.Delete();
-
-        exit(Response.RespondOk(ResponseJson));
+        exit(Response.RespondOk(BuildOrderResponseJson(Order)));
     end;
 
     internal procedure GetOrder(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -218,6 +175,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         Fields.Add(Order.FieldNo(OrderId), 'orderId');
         Fields.Add(Order.FieldNo(PartnerId), 'partnerId');
         Fields.Add(Order.FieldNo(SellToOrderReference), 'sellToOrderReference');
+        Fields.Add(Order.FieldNo(DocumentNo), 'buyFromOrderReference');
         Fields.Add(Order.FieldNo(SellToEmail), 'sellToEmail');
         Fields.Add(Order.FieldNo(SellToName), 'sellToName');
         Fields.Add(Order.FieldNo(SellToLanguage), 'sellToLanguage');
@@ -234,7 +192,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
     internal procedure ConfirmOrder(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Order: Record "NPR CMOrder";
-        TicketIssuer: Codeunit "NPR CMTicketIssuer";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
         Body: JsonObject;
         OrderId: Guid;
         PaymentReference: Text;
@@ -262,7 +220,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         Order.PaymentReference := CopyStr(PaymentReference, 1, MaxStrLen(Order.PaymentReference));
         Order.Modify();
 
-        TicketIssuer.ConfirmOrder(Order);
+        OrderIssuer.ConfirmOrder(Order);
 
         exit(Response.RespondOk(BuildOrderResponseJson(Order)));
     end;
@@ -277,8 +235,10 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         ResponseJson.StartObject()
             .AddProperty('orderId', Format(Order.OrderId, 0, 4).ToLower())
             .AddProperty('status', GetStatusAsText(Order.Status))
+            .AddProperty('statusMessage', Order.StatusMessage)
             .AddProperty('partnerId', Format(Order.PartnerId, 0, 4).ToLower())
             .AddProperty('sellToOrderReference', Order.SellToOrderReference)
+            .AddProperty('buyFromOrderReference', Order.DocumentNo)
             .AddProperty('sellToEmail', Order.SellToEmail)
             .AddProperty('sellToName', Order.SellToName)
             .AddProperty('sellToLanguage', Order.SellToLanguage)
@@ -300,6 +260,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         Line: Record "NPR CMOrderLine";
     begin
         ResponseJson.StartArray('items');
+        Line.ReadIsolation := IsolationLevel::ReadCommitted;
         Line.SetFilter(OrderId, '=%1', Order.OrderId);
         if (Line.FindSet()) then
             repeat
@@ -346,6 +307,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
     begin
         Component.SetFilter(OrderId, '=%1', Line.OrderId);
         Component.SetFilter(LineNo, '=%1', Line.LineNo);
+        Component.ReadIsolation := IsolationLevel::ReadCommitted;
         if (Component.IsEmpty()) then
             exit;
 
@@ -366,6 +328,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         OrderWallet: Record "NPR CMOrderWallet";
     begin
         ResponseJson.StartArray('wallets');
+        OrderWallet.ReadIsolation := IsolationLevel::ReadCommitted;
         OrderWallet.SetFilter(OrderId, '=%1', Line.OrderId);
         OrderWallet.SetFilter(LineNo, '=%1', Line.LineNo);
         if (OrderWallet.FindSet()) then
@@ -381,6 +344,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         WalletReferenceNumber: Code[50];
         WalletId: Guid;
     begin
+        Wallet.ReadIsolation := IsolationLevel::ReadCommitted;
         if (Wallet.Get(OrderWallet.WalletEntryNo)) then begin
             WalletReferenceNumber := Wallet.ReferenceNumber;
             WalletId := Wallet.SystemId;
@@ -400,52 +364,93 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         if (OrderWallet.ManifestUrl <> '') then
             ResponseJson.AddProperty('manifestUrl', OrderWallet.ManifestUrl);
 
-        AppendWalletTicketsArray(ResponseJson, OrderWallet.WalletEntryNo, Line.Language);
+        AppendWalletAssetsArray(ResponseJson, OrderWallet.WalletEntryNo, Line.Language);
 
         ResponseJson.EndObject();
     end;
 
-    local procedure AppendWalletTicketsArray(ResponseJson: Codeunit "NPR JSON Builder"; WalletEntryNo: Integer; LanguageCode: Code[10])
+    local procedure AppendWalletAssetsArray(ResponseJson: Codeunit "NPR JSON Builder"; WalletEntryNo: Integer; LanguageCode: Code[10])
     var
-        Ref: Record "NPR WalletAssetLineReference";
+        AssetRef: Record "NPR WalletAssetLineReference";
         AssetLine: Record "NPR WalletAssetLine";
-        Ticket: Record "NPR TM Ticket";
-        Item: Record Item;
-        ItemTranslation: Record "Item Translation";
-        TicketDescription: Text;
     begin
         ResponseJson.StartArray('assets');
         if (WalletEntryNo <> 0) then begin
-            Ref.SetCurrentKey(WalletEntryNo);
-            Ref.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
-            Ref.SetFilter(SupersededBy, '=%1', 0);
-            if (Ref.FindSet()) then
+            AssetLine.ReadIsolation := IsolationLevel::ReadCommitted;
+
+            AssetRef.SetCurrentKey(WalletEntryNo);
+            AssetRef.ReadIsolation := IsolationLevel::ReadCommitted;
+            AssetRef.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+            AssetRef.SetFilter(SupersededBy, '=%1', 0);
+            if (AssetRef.FindSet()) then
                 repeat
-                    if (AssetLine.Get(Ref.WalletAssetLineEntryNo)) then
-                        if (AssetLine.Type = AssetLine.Type::Ticket) then
-                            if (Ticket.GetBySystemId(AssetLine.LineTypeSystemId)) then begin
-                                if (Item.Get(Ticket."Item No.")) then
-                                    if (ItemTranslation.Get(Item."No.", LanguageCode)) then
-                                        TicketDescription := ItemTranslation.Description
-                                    else
-                                        TicketDescription := Item.Description;
-                                ResponseJson.StartObject()
-                                    .AddProperty('id', Format(AssetLine.SystemId, 0, 4).ToLower())
-                                    .AddProperty('type', 'ticket')
-                                    .AddProperty('assetId', Format(Ticket.SystemId, 0, 4).ToLower())
-                                    .AddProperty('referenceNumber', Ticket."External Ticket No.")
-                                    .AddProperty('itemNumber', Ticket."Item No.")
-                                    .AddProperty('description', TicketDescription)
-                                    .EndObject();
-                            end;
-                until (Ref.Next() = 0);
+                    if (AssetLine.Get(AssetRef.WalletAssetLineEntryNo)) then
+                        case AssetLine.Type of
+                            AssetLine.Type::Ticket:
+                                AppendTicket(ResponseJson, AssetLine, LanguageCode);
+                            AssetLine.Type::Coupon:
+                                AppendCoupon(ResponseJson, AssetLine, LanguageCode);
+                        end;
+                until (AssetRef.Next() = 0);
         end;
         ResponseJson.EndArray();
     end;
 
 
-    // ---- Helpers ----
+    local procedure AppendTicket(ResponseJson: Codeunit "NPR JSON Builder"; AssetLine: Record "NPR WalletAssetLine"; LanguageCode: Code[10])
+    var
+        Ticket: Record "NPR TM Ticket";
+        Item: Record Item;
+        ItemTranslation: Record "Item Translation";
+        TicketDescription: Text;
+    begin
+        if (Ticket.GetBySystemId(AssetLine.LineTypeSystemId)) then begin
+            if (Item.Get(Ticket."Item No.")) then
+                if (ItemTranslation.Get(Item."No.", '', LanguageCode)) then
+                    TicketDescription := ItemTranslation.Description
+                else
+                    TicketDescription := Item.Description;
 
+            ResponseJson.StartObject()
+                .AddProperty('id', Format(AssetLine.SystemId, 0, 4).ToLower())
+                .AddProperty('type', 'ticket')
+                .AddProperty('assetId', Format(Ticket.SystemId, 0, 4).ToLower())
+                .AddProperty('referenceNumber', Ticket."External Ticket No.")
+                .AddProperty('itemNumber', Ticket."Item No.")
+                .AddProperty('description', TicketDescription)
+                .EndObject();
+        end;
+    end;
+
+    local procedure AppendCoupon(ResponseJson: Codeunit "NPR JSON Builder"; AssetLine: Record "NPR WalletAssetLine"; LanguageCode: Code[10])
+    var
+        Coupon: Record "NPR NpDc Coupon";
+        CouponSetup: Record "NPR WalletCouponSetup";
+        Item: Record Item;
+        ItemTranslation: Record "Item Translation";
+        CouponDescription: Text;
+    begin
+        if (Coupon.GetBySystemId(AssetLine.LineTypeSystemId)) then begin
+            CouponDescription := Coupon.Description;
+            if (CouponSetup.Get(Coupon."Coupon Type")) then
+                if (Item.Get(CouponSetup.TriggerOnItemNo)) then
+                    if (ItemTranslation.Get(Item."No.", '', LanguageCode)) then
+                        CouponDescription := ItemTranslation.Description
+                    else
+                        CouponDescription := Item.Description;
+
+            ResponseJson.StartObject()
+                .AddProperty('id', Format(AssetLine.SystemId, 0, 4).ToLower())
+                .AddProperty('type', 'coupon')
+                .AddProperty('assetId', Format(Coupon.SystemId, 0, 4).ToLower())
+                .AddProperty('referenceNumber', Coupon."Reference No.")
+                .AddProperty('itemNumber', CouponSetup.TriggerOnItemNo)
+                .AddProperty('description', CouponDescription)
+                .EndObject();
+        end;
+    end;
+
+    // ---- Helpers ----
     local procedure TryParseHeader(Body: JsonObject; var Order: Record "NPR CMOrder"; var Response: Codeunit "NPR API Response"): Boolean
     var
         PartnerIdText: Text;
@@ -494,10 +499,22 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         exit(true);
     end;
 
+    local procedure IsSyncRequested(var Request: Codeunit "NPR API Request"): Boolean
+    var
+        QueryParams: Dictionary of [Text, Text];
+        Value: Text;
+    begin
+        QueryParams := Request.QueryParams();
+        if (not QueryParams.ContainsKey('sync')) then
+            exit(false);
+        Value := QueryParams.Get('sync').ToLower();
+        exit(Value in ['1', 'true']);
+    end;
+
     local procedure IsDuplicateOrder(var Order: Record "NPR CMOrder"): Boolean
     var
         ExistingOrder: Record "NPR CMOrder";
-        TicketIssuer: Codeunit "NPR CMTicketIssuer";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
     begin
         ExistingOrder.ReadIsolation := ExistingOrder.ReadIsolation::ReadUncommitted;
         ExistingOrder.SetFilter(PartnerId, '=%1', Order.PartnerId);
@@ -508,8 +525,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         ExistingOrder.ReadIsolation := ExistingOrder.ReadIsolation::UpdLock;
         ExistingOrder.SetFilter(Status, '=%1', ExistingOrder.Status::Error);
         if (ExistingOrder.FindFirst()) then begin
-            TicketIssuer.DestroyOrderAssets(ExistingOrder);
-            ExistingOrder.Delete();
+            OrderIssuer.DeleteOrder(ExistingOrder);
             exit(false);
         end;
 
@@ -548,6 +564,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
     local procedure TryParseItem(ItemToken: JsonToken; var Order: Record "NPR CMOrder"; LineNo: Integer; var TempOrderLine: Record "NPR CMOrderLine" temporary; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var TempOrderWallet: Record "NPR CMOrderWallet" temporary; var Response: Codeunit "NPR API Response"): Boolean
     var
+        TimeHelper: Codeunit "NPR TM TimeHelper";
         Item: Record Item;
         ItemObj: JsonObject;
         Token: JsonToken;
@@ -559,6 +576,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         VisitTime: Time;
         Quantity: Integer;
         SeqNo: Integer;
+        LocalDateTime: DateTime;
     begin
         if (not ItemToken.IsObject()) then begin
             Response.RespondBadRequest(StrSubstNo('items[%1] must be an object', (LineNo div 100000) - 1));
@@ -587,6 +605,12 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         if (not GetRequiredTimeField(ItemObj, 'visitTime', VisitTime, Response)) then
             exit(false);
+
+        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission('');
+        if (VisitDate < DT2Date(LocalDateTime)) then begin
+            Response.RespondBadRequest(StrSubstNo('items[%1] visitDate must not be in the past (received %2, local today %3)', (LineNo div 100000) - 1, VisitDate, DT2Date(LocalDateTime)));
+            exit(false);
+        end;
 
         NotificationAddressText := Order.SellToEmail;
         if (ItemObj.Get('sellToEmail', Token)) then
@@ -702,10 +726,12 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
     local procedure TryParseComponentScheduleEntry(EntryToken: JsonToken; var TempOrderLine: Record "NPR CMOrderLine" temporary; Item: Record Item; ComponentNo: Integer; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var Response: Codeunit "NPR API Response"): Boolean
     var
+        TimeHelper: Codeunit "NPR TM TimeHelper";
         EntryObj: JsonObject;
         ComponentItemNoText: Text;
         VisitDate: Date;
         VisitTime: Time;
+        LocalDateTime: DateTime;
     begin
         if (not EntryToken.IsObject()) then begin
             Response.RespondBadRequest(StrSubstNo('wallet.componentSchedule entries must be objects (line %1)', TempOrderLine.LineNo));
@@ -725,6 +751,15 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         if (not GetRequiredTimeField(EntryObj, 'visitTime', VisitTime, Response)) then
             exit(false);
+
+        // Same timezone-aware "today" pattern as the line-level check above — never trust Today()
+        // for partner-facing date validation since the BC service may run in UTC.
+        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission('');
+
+        if (VisitDate < DT2Date(LocalDateTime)) then begin
+            Response.RespondBadRequest(StrSubstNo('items[%1].componentSchedule entry ''%2'' visitDate must not be in the past (received %3, local today %4)', (TempOrderLine.LineNo div 100000) - 1, ComponentItemNoText, VisitDate, DT2Date(LocalDateTime)));
+            exit(false);
+        end;
 
         TempOrderComponent.Init();
         TempOrderComponent.OrderId := TempOrderLine.OrderId;
@@ -870,9 +905,13 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         exit(true);
     end;
 
-    local procedure GetStatusAsText(Status: Enum "NPR CMOrderStatus"): Text
+    internal procedure GetStatusAsText(Status: Enum "NPR CMOrderStatus"): Text[50]
     begin
         case Status of
+            Status::Submitted:
+                exit('Submitted');
+            Status::Scheduled:
+                exit('Scheduled');
             Status::Processing:
                 exit('Processing');
             Status::Draft:

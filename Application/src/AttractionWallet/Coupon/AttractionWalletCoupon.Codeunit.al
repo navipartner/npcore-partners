@@ -1,15 +1,24 @@
 codeunit 6185068 "NPR AttractionWalletCoupon"
 {
     Access = Internal;
+
     internal procedure IssueCoupons(CouponType: Code[20]; Quantity: Integer; var TempCoupon: Record "NPR NpDc Coupon" temporary)
     var
         i: Integer;
     begin
         for i := 1 to Quantity do
-            IssueCoupon(CouponType, TempCoupon);
+            IssueCoupon(CouponType, TempCoupon, true);
     end;
 
-    local procedure IssueCoupon(CouponType: Code[20]; var TempCoupon: Record "NPR NpDc Coupon" temporary)
+    internal procedure IssueCoupons(CouponType: Code[20]; Quantity: Integer; var TempCoupon: Record "NPR NpDc Coupon" temporary; PostCouponEntry: Boolean)
+    var
+        i: Integer;
+    begin
+        for i := 1 to Quantity do
+            IssueCoupon(CouponType, TempCoupon, PostCouponEntry);
+    end;
+
+    local procedure IssueCoupon(CouponType: Code[20]; var TempCoupon: Record "NPR NpDc Coupon" temporary; PostCouponEntry: Boolean)
     var
         Coupon: Record "NPR NpDc Coupon";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
@@ -19,7 +28,8 @@ codeunit 6185068 "NPR AttractionWalletCoupon"
         Coupon."No." := '';
         Coupon.Insert(true);
 
-        CouponMgt.PostIssueCoupon(Coupon);
+        if (PostCouponEntry) then
+            CouponMgt.PostIssueCoupon(Coupon);
 
         TempCoupon.Init();
         TempCoupon := Coupon;

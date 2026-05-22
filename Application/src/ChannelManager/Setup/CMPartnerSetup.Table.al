@@ -1,7 +1,7 @@
 table 6059939 "NPR CMPartnerSetup"
 {
     Access = Internal;
-    Caption = 'Channel Manager Partner Setup';
+    Caption = 'OTA Channel Manager Partner Setup';
     DataClassification = CustomerContent;
 
     fields
@@ -10,7 +10,6 @@ table 6059939 "NPR CMPartnerSetup"
         {
             DataClassification = CustomerContent;
             Caption = 'Partner Id';
-            NotBlank = true;
         }
 
         field(10; Name; Text[100])
@@ -51,6 +50,13 @@ table 6059939 "NPR CMPartnerSetup"
                 Designer.ValidateDesignLayouts('attractionWallet', Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
         }
+
+        field(60; DocumentNoSeries; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Buy-from Order Reference No. Series';
+            TableRelation = "No. Series";
+        }
     }
 
     keys
@@ -72,4 +78,26 @@ table 6059939 "NPR CMPartnerSetup"
         {
         }
     }
+
+    trigger OnInsert()
+    var
+        JobQueueSetup: Codeunit "NPR CMJobQueueSetup";
+    begin
+        if (IsNullGuid(PartnerId)) then
+            PartnerId := CreateGuid();
+
+        JobQueueSetup.ShowMissingJobQueueEntryNotification();
+    end;
+
+    trigger OnDelete()
+    var
+        Order: Record "NPR CMOrder";
+        HasOrdersErr: Label 'Cannot delete partner ''%1'': %2 order(s) reference it. Set Active to false to block API access instead.', Comment = '%1 = partner name, %2 = order count';
+        OrderCount: Integer;
+    begin
+        Order.SetFilter(PartnerId, '=%1', PartnerId);
+        OrderCount := Order.Count();
+        if (OrderCount > 0) then
+            Error(HasOrdersErr, Name, OrderCount);
+    end;
 }

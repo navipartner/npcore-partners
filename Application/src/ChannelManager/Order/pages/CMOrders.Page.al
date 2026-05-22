@@ -1,7 +1,7 @@
 page 6150944 "NPR CMOrders"
 {
     Extensible = false;
-    Caption = 'Channel Manager Orders';
+    Caption = 'OTA Channel Manager Orders';
     PageType = List;
     SourceTable = "NPR CMOrder";
     SourceTableView = Sorting(ReceivedAt) Order(Descending);
@@ -46,6 +46,11 @@ page 6150944 "NPR CMOrders"
                     ApplicationArea = NPRRetail;
                     Caption = 'Partner';
                     ToolTip = 'Name of the channel partner that submitted the order.';
+                }
+                field(BuyFromOrderReference; Rec.DocumentNo)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Server-generated order reference returned to the channel partner. This is the reference that the channel partner uses in subsequent interactions regarding this order, such as ticket status inquiries.';
                 }
                 field(SellToOrderReference; Rec.SellToOrderReference)
                 {
@@ -92,6 +97,23 @@ page 6150944 "NPR CMOrders"
     {
         area(Processing)
         {
+            action(ProcessOrder)
+            {
+                Caption = 'Process';
+                Image = Process;
+                ToolTip = 'Process this submitted order now, equivalent to letting the job queue runner pick it up on the next tick. Only enabled while the order is in Submitted status.';
+                ApplicationArea = NPRRetail;
+                Scope = Repeater;
+                Enabled = CanProcess;
+
+                trigger OnAction()
+                var
+                    JQRunner: Codeunit "NPR CMJobQueueRunner";
+                begin
+                    JQRunner.ProcessSingleOrder(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
             action(DeleteOrder)
             {
                 Caption = 'Delete Order';
@@ -102,7 +124,7 @@ page 6150944 "NPR CMOrders"
 
                 trigger OnAction()
                 var
-                    TicketIssuer: Codeunit "NPR CMTicketIssuer";
+                    OrderIssuer: Codeunit "NPR CMOrderIssuer";
                     ConfirmDelete: Label 'Delete order ''%1''? All tickets, wallets and order content will be destroyed.', Comment = '%1 = sell-to order reference';
                     InvalidStatus: Label 'Only orders in Cancelled or Error status can be deleted.';
                 begin
@@ -112,7 +134,7 @@ page 6150944 "NPR CMOrders"
                     if (not Confirm(ConfirmDelete, false, Rec.SellToOrderReference)) then
                         exit;
 
-                    TicketIssuer.DestroyOrderAssets(Rec);
+                    OrderIssuer.DestroyOrderAssets(Rec);
                     Rec.Delete();
                     CurrPage.Update(false);
                 end;
@@ -131,9 +153,11 @@ page 6150944 "NPR CMOrders"
             PartnerName := PartnerSetup.Name;
 
         StatusStyle := Rec.GetStatusStyle();
+        CanProcess := Rec.Status = Rec.Status::Submitted;
     end;
 
     var
         PartnerName: Text[100];
         StatusStyle: Text;
+        CanProcess: Boolean;
 }

@@ -1207,7 +1207,12 @@
                         Changed := false;
 
                         if TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::RESERVED then begin
-                            TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::DIRECT;
+                            if (TicketReservationRequest."External Order No." <> '') then
+                                TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::PREPAID;
+
+                            if (TicketReservationRequest."Receipt No." <> '') then
+                                TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::DIRECT;
+
                             Changed := true;
                         end;
 
@@ -1973,6 +1978,12 @@
                         TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS
                     else
                         TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA;
+
+            if ((TicketReservationRequest."Payment Option" = TicketReservationRequest."Payment Option"::UNPAID) and
+                (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) and
+                (TicketReservationRequest."External Order No." = '') and
+                (ExternalOrderNo <> '')) then
+                TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::RESERVED;
 
             TicketReservationRequest."External Order No." := ExternalOrderNo;
             if (ExternalOrderNo <> '') then

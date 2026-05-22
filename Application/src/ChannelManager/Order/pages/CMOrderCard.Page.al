@@ -1,7 +1,7 @@
 page 6150939 "NPR CMOrderCard"
 {
     Extensible = false;
-    Caption = 'Channel Manager Order';
+    Caption = 'OTA Channel Manager Order';
     PageType = Card;
     SourceTable = "NPR CMOrder";
     UsageCategory = None;
@@ -35,11 +35,7 @@ page 6150939 "NPR CMOrderCard"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'When the order arrived from the channel partner.';
                 }
-                field(JobId; Rec.JobId)
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Ticket import Job Id used to mint the order''s tickets.';
-                }
+
                 field(Manifest; GetManifestLabel())
                 {
                     ApplicationArea = NPRRetail;
@@ -69,10 +65,10 @@ page 6150939 "NPR CMOrderCard"
                     Caption = 'Partner Name';
                     ToolTip = 'Name of the channel partner that submitted the order.';
                 }
-                field(SellToOrderReference; Rec.SellToOrderReference)
+                field(BuyFromOrderReference; Rec.DocumentNo)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Partner''s own order reference.';
+                    ToolTip = 'Server-generated order reference returned to the channel partner. This is the reference that the channel partner uses in subsequent interactions regarding this order, such as ticket status inquiries.';
                 }
                 field(PaymentReference; Rec.PaymentReference)
                 {
@@ -83,7 +79,11 @@ page 6150939 "NPR CMOrderCard"
             group(SellTo)
             {
                 Caption = 'Sell-to';
-
+                field(SellToOrderReference; Rec.SellToOrderReference)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Partner''s own order reference.';
+                }
                 field(SellToName; Rec.SellToName)
                 {
                     ApplicationArea = NPRRetail;
@@ -129,9 +129,50 @@ page 6150939 "NPR CMOrderCard"
                     Page.Run(Page::"NPR CMOrderWallets", OrderWallet);
                 end;
             }
+            action(OpenManifest)
+            {
+                Caption = 'Designer Manifest';
+                Image = SendAsPDF;
+                ToolTip = 'Open the NPDesigner manifest record for this order.';
+                ApplicationArea = NPRRetail;
+                Enabled = HasManifest;
+
+                trigger OnAction()
+                var
+                    Manifest: Record "NPR NPDesignerManifest";
+                begin
+                    if (IsNullGuid(Rec.ManifestId)) then
+                        exit;
+                    Manifest.SetCurrentKey(ManifestId);
+                    Manifest.SetFilter(ManifestId, '=%1', Rec.ManifestId);
+                    Page.Run(Page::"NPR NPDesignerManifestCard", Manifest);
+                end;
+            }
         }
         area(Processing)
         {
+            action(ManuallyConfirm)
+            {
+                Caption = 'Manually Confirm';
+                Image = Confirm;
+                ToolTip = 'Confirm a draft order without an external payment reference. The payment reference is stamped as ''Manually Confirmed''.';
+                ApplicationArea = NPRRetail;
+                Enabled = CanManuallyConfirm;
+
+                trigger OnAction()
+                var
+                    OrderIssuer: Codeunit "NPR CMOrderIssuer";
+                    ConfirmManualQst: Label 'Manually confirm order ''%1''? The order will be marked as Issued with payment reference ''Manually Confirmed''.', Comment = '%1 = sell-to order reference';
+                    ManualPaymentRefLbl: Label 'Manually Confirmed', Locked = true;
+                begin
+                    if (not Confirm(ConfirmManualQst, false, Rec.SellToOrderReference)) then
+                        exit;
+                    Rec.PaymentReference := CopyStr(ManualPaymentRefLbl, 1, MaxStrLen(Rec.PaymentReference));
+                    Rec.Modify();
+                    OrderIssuer.ConfirmOrder(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
             action(CancelOrder)
             {
                 Caption = 'Cancel';
@@ -142,12 +183,12 @@ page 6150939 "NPR CMOrderCard"
 
                 trigger OnAction()
                 var
-                    TicketIssuer: Codeunit "NPR CMTicketIssuer";
+                    OrderIssuer: Codeunit "NPR CMOrderIssuer";
                     ConfirmCancelQst: Label 'Cancel order ''%1''? All tickets, wallets and order content will be destroyed. Only the order header is kept for audit.', Comment = '%1 = sell-to order reference';
                 begin
                     if (not Confirm(ConfirmCancelQst, false, Rec.SellToOrderReference)) then
                         exit;
-                    TicketIssuer.DestroyOrderAssets(Rec);
+                    OrderIssuer.DestroyOrderAssets(Rec);
                     CurrPage.Update(false);
                 end;
             }
@@ -165,6 +206,8 @@ page 6150939 "NPR CMOrderCard"
             PartnerName := PartnerSetup.Name;
 
         CanCancel := Rec.Status = Rec.Status::Issued;
+        CanManuallyConfirm := Rec.Status = Rec.Status::Draft;
+        HasManifest := not IsNullGuid(Rec.ManifestId);
     end;
 
     local procedure GetManifestLabel(): Text[30]
@@ -179,5 +222,7 @@ page 6150939 "NPR CMOrderCard"
     var
         PartnerName: Text[100];
         CanCancel: Boolean;
+        CanManuallyConfirm: Boolean;
+        HasManifest: Boolean;
         StatusStyle: Text;
 }

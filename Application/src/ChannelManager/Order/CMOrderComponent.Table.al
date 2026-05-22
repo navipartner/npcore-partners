@@ -1,7 +1,7 @@
 table 6059930 "NPR CMOrderComponent"
 {
     Access = Internal;
-    Caption = 'Channel Manager Order Component';
+    Caption = 'OTA Channel Manager Order Component';
     DataClassification = CustomerContent;
 
     fields

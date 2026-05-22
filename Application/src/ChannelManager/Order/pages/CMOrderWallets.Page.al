@@ -1,7 +1,7 @@
 page 6150945 "NPR CMOrderWallets"
 {
     Extensible = false;
-    Caption = 'Channel Manager Order Wallets';
+    Caption = 'OTA Channel Manager Order Wallets';
     PageType = List;
     SourceTable = "NPR CMOrderWallet";
     UsageCategory = None;
@@ -117,8 +117,35 @@ page 6150945 "NPR CMOrderWallets"
                     Page.Run(Page::"NPR AttractionWalletCard", Wallet);
                 end;
             }
+            action(OpenManifest)
+            {
+                Caption = 'Designer Manifest';
+                Image = SendAsPDF;
+                ToolTip = 'Open the NPDesigner manifest record for this order.';
+                ApplicationArea = NPRRetail;
+                Enabled = HasManifest;
+
+                trigger OnAction()
+                var
+                    Manifest: Record "NPR NPDesignerManifest";
+                begin
+                    if (IsNullGuid(Rec.ManifestId)) then
+                        exit;
+                    Manifest.SetCurrentKey(ManifestId);
+                    Manifest.SetFilter(ManifestId, '=%1', Rec.ManifestId);
+                    Page.Run(Page::"NPR NPDesignerManifestCard", Manifest);
+                end;
+            }
         }
     }
+
+    var
+        HasManifest: Boolean;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        HasManifest := not IsNullGuid(Rec.ManifestId);
+    end;
 
     local procedure GetManifestLabel(): Text[30]
     var
