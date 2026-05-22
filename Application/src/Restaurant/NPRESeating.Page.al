@@ -33,6 +33,19 @@
                 {
                     ToolTip = 'Specifies the location this seating is created at.';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnValidate()
+                    var
+                        SeatingLocation: Record "NPR NPRE Seating Location";
+                        SeatingLocationMissingRestaurantErr: Label 'Seating location %1 is not linked to a restaurant. Set a Restaurant Code on the location before assigning it to a seating.', Comment = '%1 = Seating Location Code';
+                    begin
+                        if Rec."Seating Location" = '' then
+                            exit;
+                        SeatingLocation.SetLoadFields("Restaurant Code");
+                        if SeatingLocation.Get(Rec."Seating Location") then
+                            if SeatingLocation."Restaurant Code" = '' then
+                                Error(SeatingLocationMissingRestaurantErr, Rec."Seating Location");
+                    end;
                 }
                 field(Blocked; Rec.Blocked)
                 {
@@ -132,4 +145,5 @@
             }
         }
     }
+
 }

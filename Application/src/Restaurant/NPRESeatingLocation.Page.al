@@ -1,4 +1,4 @@
-﻿page 6150667 "NPR NPRE Seating Location"
+page 6150667 "NPR NPRE Seating Location"
 {
     Extensible = False;
     Caption = 'Seating Locations';
@@ -6,8 +6,9 @@
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,Layout';
     SourceTable = "NPR NPRE Seating Location";
+    InsertAllowed = false;
+    ModifyAllowed = false;
     UsageCategory = Administration;
-    PopulateAllFields = true;
     ApplicationArea = NPRRetail;
 
     layout
@@ -64,6 +65,64 @@
 
     actions
     {
+        area(processing)
+        {
+            action(NewSeatingLocation)
+            {
+                Caption = 'New';
+                Image = NewDocument;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                ToolTip = 'Create a new seating location.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    TempSeatingLocation: Record "NPR NPRE Seating Location" temporary;
+                    SeatingLocation: Record "NPR NPRE Seating Location";
+                begin
+                    TempSeatingLocation.Init();
+                    ApplyFiltersAsDefaults(Rec, TempSeatingLocation);
+                    TempSeatingLocation.Insert();
+                    if Page.RunModal(Page::"NPR NPRE Seating Location Card", TempSeatingLocation) = Action::LookupOK then begin
+                        SeatingLocation := TempSeatingLocation;
+                        SeatingLocation.Insert(true);
+                        CurrPage.Update(false);
+                    end;
+                end;
+            }
+            action(EditSeatingLocation)
+            {
+                Caption = 'Edit';
+                Image = Edit;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Scope = Repeater;
+                ToolTip = 'Edit the selected seating location.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    TempSeatingLocation: Record "NPR NPRE Seating Location" temporary;
+                    SeatingLocation: Record "NPR NPRE Seating Location";
+                begin
+                    TempSeatingLocation := Rec;
+                    TempSeatingLocation.Insert();
+                    if Page.RunModal(Page::"NPR NPRE Seating Location Card", TempSeatingLocation) = Action::LookupOK then begin
+                        SeatingLocation.Get(Rec.Code);
+                        if TempSeatingLocation.Code <> SeatingLocation.Code then
+                            SeatingLocation.Rename(TempSeatingLocation.Code);
+                        if Format(TempSeatingLocation) <> Format(SeatingLocation) then begin
+                            SeatingLocation.TransferFields(TempSeatingLocation, false);
+                            SeatingLocation.Modify(true);
+                        end;
+                        CurrPage.Update(false);
+                    end;
+                end;
+            }
+        }
         area(navigation)
         {
             group(Layout)
@@ -82,8 +141,30 @@
                     RunPageLink = "Seating Location" = FIELD(Code);
                     ToolTip = 'View seatings defined at the location.';
                     ApplicationArea = NPRRetail;
+
                 }
             }
         }
     }
+
+    local procedure ApplyFiltersAsDefaults(var SourceRec: Record "NPR NPRE Seating Location"; var TargetRec: Record "NPR NPRE Seating Location")
+    var
+        RecRef: RecordRef;
+        TargetRecRef: RecordRef;
+        FldRef: FieldRef;
+        TargetFldRef: FieldRef;
+        i: Integer;
+    begin
+        RecRef.GetTable(SourceRec);
+        TargetRecRef.GetTable(TargetRec);
+        for i := 1 to RecRef.FieldCount() do begin
+            FldRef := RecRef.FieldIndex(i);
+            if (FldRef.Class = FieldClass::Normal) and (FldRef.GetFilter() <> '') then
+                if FldRef.GetRangeMin() = FldRef.GetRangeMax() then begin
+                    TargetFldRef := TargetRecRef.Field(FldRef.Number);
+                    TargetFldRef.Value := FldRef.GetRangeMin();
+                end;
+        end;
+        TargetRecRef.SetTable(TargetRec);
+    end;
 }

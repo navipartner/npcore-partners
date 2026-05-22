@@ -26,6 +26,7 @@ page 6150884 "NPR Seating Locations Step"
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
+                    NotBlank = true;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                     ApplicationArea = NPRRetail;
 
@@ -78,6 +79,7 @@ page 6150884 "NPR Seating Locations Step"
     begin
         if Rec.FindSet() then
             repeat
+                Rec.TestField("Restaurant Code");
                 SeatingLocation := Rec;
                 if not SeatingLocation.Insert() then
                     SeatingLocation.Modify();

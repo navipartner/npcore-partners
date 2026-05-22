@@ -47,6 +47,7 @@ page 6150885 "NPR Seatings Step"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if Page.RunModal(Page::"NPR NPRE Seating Location", TempSeatingLocation_) = Action::LookupOK then begin
+                            TempSeatingLocation_.TestField("Restaurant Code");
                             Rec."Seating Location" := TempSeatingLocation_.Code;
                         end;
                     end;
@@ -101,9 +102,14 @@ page 6150885 "NPR Seatings Step"
     internal procedure CreateSeatings()
     var
         Seatings: Record "NPR NPRE Seating";
+        SeatingLocation: Record "NPR NPRE Seating Location";
     begin
         if Rec.FindSet() then
             repeat
+                if Rec."Seating Location" <> '' then begin
+                    SeatingLocation.Get(Rec."Seating Location");
+                    SeatingLocation.TestField("Restaurant Code");
+                end;
                 Seatings := Rec;
                 if not Seatings.Insert() then
                     Seatings.Modify();
