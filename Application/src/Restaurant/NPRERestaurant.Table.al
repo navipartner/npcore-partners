@@ -127,6 +127,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Method";
         }
+        field(240; "Seating Setup Last Modified At"; DateTime)
+        {
+            Caption = 'Seating Setup Last Modified At';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

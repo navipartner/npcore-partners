@@ -33,6 +33,8 @@ codeunit 6248641 "NPR API Restaurant"
                 if BackgroundHandler.GetBackgroundUrl(Restaurant.SystemId, Enum::"NPR CloudflareMediaVariants"::ORIGINAL, 57600, BackgroundUrl) then
                     Json.AddProperty('backgroundUrl', BackgroundUrl);
 
+                Json.AddProperty('seatingSetupLastUpdated', Restaurant."Seating Setup Last Modified At");
+
                 Json.EndObject();
             until Restaurant.Next() = 0;
         Json.EndArray();
