@@ -40,6 +40,11 @@ page 6150918 "NPR Digital Notif. Entries"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the document type (Invoice, Credit Memo, or Ecom Sales Document).';
                 }
+                field("Notification Type"; Rec."Notification Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether this entry carries the order confirmation or the digital assets manifest. Only Ecom Sales Document entries can be Order Confirmation.';
+                }
                 field("Source Document Id"; Rec."Source Document Id")
                 {
                     ApplicationArea = NPRRetail;

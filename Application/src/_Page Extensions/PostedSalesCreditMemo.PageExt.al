@@ -265,7 +265,7 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 var
                     DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
                 begin
-                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec);
+                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec, "NPR Dig. Notif. Type"::"Digital Assets");
                 end;
             }
 #endif

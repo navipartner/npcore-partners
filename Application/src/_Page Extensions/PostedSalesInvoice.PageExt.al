@@ -260,7 +260,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 var
                     DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
                 begin
-                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec);
+                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec, "NPR Dig. Notif. Type"::"Digital Assets");
                 end;
             }
 #endif

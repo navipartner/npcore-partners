@@ -89,6 +89,11 @@ table 6248184 "NPR Digital Doc. Header Buffer"
             Caption = 'Bucket Id';
             DataClassification = SystemMetadata;
         }
+        field(140; "Notification Type"; Enum "NPR Dig. Notif. Type")
+        {
+            Caption = 'Notification Type';
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys

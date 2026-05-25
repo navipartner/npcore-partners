@@ -6,11 +6,19 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        CreateEcomOCNotif: Codeunit "NPR Create Ecom OC Notif";
+        Sentry: Codeunit "NPR Sentry";
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
         InsertSalesDocument(Request, EcomSalesHeader);
 
         Commit();
+
+        // OC fires before PreProcessDocument so it isn't delayed/swallowed.
+        // Bucket Id = 0 hides the entry from the bucket-filtered JQ until AssignBucketId stamps it.
+        if not CreateEcomOCNotif.Run(EcomSalesHeader) then
+            Sentry.AddLastErrorIfProgrammingBug();
+
         if not FeatureFlagsManagement.IsEnabled(DisableApiEcomDocumentPreprocessing()) then
             PreProcessDocument(EcomSalesHeader);
 

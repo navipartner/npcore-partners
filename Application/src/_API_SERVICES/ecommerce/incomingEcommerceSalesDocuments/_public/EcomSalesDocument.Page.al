@@ -370,8 +370,8 @@ page 6248188 "NPR Ecom Sales Document"
             }
             action(SendDigitalNotification)
             {
-                Caption = 'Send Digital Notification';
-                ToolTip = 'Send a digital notification email with tickets/vouchers to the customer.';
+                Caption = 'Send Digital Assets Notification';
+                ToolTip = 'Send a Digital Assets notification email (manifest URL with tickets, vouchers, coupons, wallets, member cards) to the customer.';
                 ApplicationArea = NPRRetail;
                 Image = Email;
 
@@ -379,7 +379,22 @@ page 6248188 "NPR Ecom Sales Document"
                 var
                     DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
                 begin
-                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec);
+                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec, "NPR Dig. Notif. Type"::"Digital Assets");
+                    CurrPage.Update(false);
+                end;
+            }
+            action(SendOrderConfirmationNotification)
+            {
+                Caption = 'Send Order Confirmation Notification';
+                ToolTip = 'Send an order confirmation email (full order content, no manifest URL) to the customer.';
+                ApplicationArea = NPRRetail;
+                Image = Email;
+
+                trigger OnAction()
+                var
+                    DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
+                begin
+                    DigitalOrderNotifMgt.SendDigitalOrderNotificationManual(Rec, "NPR Dig. Notif. Type"::"Order Confirmation");
                     CurrPage.Update(false);
                 end;
             }

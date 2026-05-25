@@ -5,7 +5,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
     var
         _DigitalNotifSetup: Record "NPR Digital Notification Setup";
-        _DigitalNotifSetupRead: Boolean;
+        _DigitalNotifSetupLoaded: Boolean;
 
     #region Automatic Notification (Event Subscribers)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
@@ -40,11 +40,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                 exit;
             if not SalesCrMemoHeader.Get(SalesCrMemoHdrNo) then
                 exit;
-            PopulateBuffersFromCrMemo(SalesCrMemoHeader, TempHeaderBuffer, TempLineBuffer);
+            PopulateBuffersFromCrMemo(SalesCrMemoHeader, "NPR Dig. Notif. Type"::"Digital Assets", TempHeaderBuffer, TempLineBuffer);
         end else begin
             if not SalesInvHeader.Get(SalesInvHdrNo) then
                 exit;
-            PopulateBuffersFromInvoice(SalesInvHeader, TempHeaderBuffer, TempLineBuffer);
+            PopulateBuffersFromInvoice(SalesInvHeader, "NPR Dig. Notif. Type"::"Digital Assets", TempHeaderBuffer, TempLineBuffer);
         end;
 
         ProcessSalesDocument(TempHeaderBuffer, TempLineBuffer);
@@ -85,10 +85,36 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         if LockedEcomSalesHeader."Virtual Items Process Status" <> LockedEcomSalesHeader."Virtual Items Process Status"::Processed then
             exit;
 
-        if EcomDigitalNotifEntryExists(LockedEcomSalesHeader.SystemId) then
+        if EcomDigitalNotifEntryExists(LockedEcomSalesHeader.SystemId, "NPR Dig. Notif. Type"::"Digital Assets") then
             exit;
 
-        PopulateBuffersFromEcomDoc(LockedEcomSalesHeader, TempHeaderBuffer, TempLineBuffer);
+        PopulateBuffersFromEcomDoc(LockedEcomSalesHeader, "NPR Dig. Notif. Type"::"Digital Assets", TempHeaderBuffer, TempLineBuffer);
+
+        ProcessSalesDocument(TempHeaderBuffer, TempLineBuffer);
+    end;
+
+    internal procedure TryCreateEcomOrderConfirmationNotification(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        LockedEcomSalesHeader: Record "NPR Ecom Sales Header";
+        TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
+        TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
+    begin
+        if not ValidateOrderConfirmationSetup() then
+            exit;
+
+        // Called synchronously from API doc creation (EcomSalesDocApiAgentV2.CreateIncomingEcomDocument);
+        // there are no concurrent callers for a fresh doc, so the UpdLock alone is sufficient and we
+        // intentionally do not re-check row state under the lock (unlike TryCreateEcomDigitalNotification,
+        // which is called from multiple async virtual-item JQs and re-checks Virtual Items Process Status).
+        // Revisit if this trigger ever moves to a JQ.
+        LockedEcomSalesHeader.ReadIsolation := IsolationLevel::UpdLock;
+        if not LockedEcomSalesHeader.Get(EcomSalesHeader."Entry No.") then
+            exit;
+
+        if EcomDigitalNotifEntryExists(LockedEcomSalesHeader.SystemId, "NPR Dig. Notif. Type"::"Order Confirmation") then
+            exit;
+
+        PopulateBuffersFromEcomDoc(LockedEcomSalesHeader, "NPR Dig. Notif. Type"::"Order Confirmation", TempHeaderBuffer, TempLineBuffer);
 
         ProcessSalesDocument(TempHeaderBuffer, TempLineBuffer);
     end;
@@ -96,22 +122,54 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
     #endregion
 
     #region Manual Notification Sending
-    internal procedure SendDigitalOrderNotificationManual(RecVariant: Variant)
+    internal procedure SendDigitalOrderNotificationManual(RecVariant: Variant; NotificationType: Enum "NPR Dig. Notif. Type")
     var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        RecRef: RecordRef;
         ErrorMessage: Text;
-        SuccessMsgTxt: Label 'Digital notification has been queued for sending. The customer will receive the email shortly.';
+        DigitalAssetsSuccessMsg: Label 'Digital notification has been queued for sending. The customer will receive the email shortly.';
         NoAssetsMsg: Label 'No digital assets (tickets, vouchers) were found in this document. No notification has been created.';
+        OrderConfirmationSuccessMsg: Label 'Order confirmation notification has been queued for sending. The customer will receive the email shortly.';
+        OrderConfirmationFailedMsg: Label 'Order confirmation notification could not be created (recipient email is missing).';
+        OrderConfirmationNotEnabledErr: Label 'Order Confirmation is not enabled in the Digital Notification setup.';
+        OrderConfirmationOnlyForEcomErr: Label 'Order Confirmation notifications can only be sent for %1 documents.', Comment = '%1 = NPR Ecom Sales Header table caption';
+        Success: Boolean;
     begin
-        if not ValidateDigitalNotifSetup(ErrorMessage) then
-            Error(ErrorMessage);
+        // Order Confirmation is only meaningful for Ecom Sales Documents — the JSON shape, manifest URL,
+        // and payment-line block all assume ecom semantics. Reject invalid combinations early before
+        // ProcessSalesDocumentManual creates a stranded OC entry tied to a posted invoice / cr.memo.
+        if NotificationType = NotificationType::"Order Confirmation" then begin
+            RecRef.GetTable(RecVariant);
+            if RecRef.Number <> Database::"NPR Ecom Sales Header" then
+                Error(OrderConfirmationOnlyForEcomErr, EcomSalesHeader.TableCaption);
+        end;
 
-        if ProcessSalesDocumentManual(RecVariant) then
-            Message(SuccessMsgTxt)
-        else
-            Message(NoAssetsMsg);
+        case NotificationType of
+            "NPR Dig. Notif. Type"::"Digital Assets":
+                if not ValidateDigitalNotifSetup(ErrorMessage) then
+                    Error(ErrorMessage);
+            "NPR Dig. Notif. Type"::"Order Confirmation":
+                if not ValidateOrderConfirmationSetup() then
+                    Error(OrderConfirmationNotEnabledErr);
+        end;
+
+        Success := ProcessSalesDocumentManual(RecVariant, NotificationType);
+
+        case NotificationType of
+            "NPR Dig. Notif. Type"::"Digital Assets":
+                if Success then
+                    Message(DigitalAssetsSuccessMsg)
+                else
+                    Message(NoAssetsMsg);
+            "NPR Dig. Notif. Type"::"Order Confirmation":
+                if Success then
+                    Message(OrderConfirmationSuccessMsg)
+                else
+                    Message(OrderConfirmationFailedMsg);
+        end;
     end;
 
-    local procedure ProcessSalesDocumentManual(RecVariant: Variant): Boolean
+    local procedure ProcessSalesDocumentManual(RecVariant: Variant; NotificationType: Enum "NPR Dig. Notif. Type"): Boolean
     var
         TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
@@ -130,34 +188,34 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                 begin
                     SalesInvoiceHeader := RecVariant;
 
-                    if not ConfirmResendNotification(SalesInvoiceHeader.SystemId) then
+                    if not ConfirmResendNotification(SalesInvoiceHeader.SystemId, NotificationType) then
                         Error('');
 
-                    PopulateBuffersFromInvoice(SalesInvoiceHeader, TempHeaderBuffer, TempLineBuffer);
+                    PopulateBuffersFromInvoice(SalesInvoiceHeader, NotificationType, TempHeaderBuffer, TempLineBuffer);
                 end;
 
             Database::"Sales Cr.Memo Header":
                 begin
                     SalesCrMemoHeader := RecVariant;
 
-                    if not ConfirmResendNotification(SalesCrMemoHeader.SystemId) then
+                    if not ConfirmResendNotification(SalesCrMemoHeader.SystemId, NotificationType) then
                         Error('');
 
-                    PopulateBuffersFromCrMemo(SalesCrMemoHeader, TempHeaderBuffer, TempLineBuffer);
+                    PopulateBuffersFromCrMemo(SalesCrMemoHeader, NotificationType, TempHeaderBuffer, TempLineBuffer);
                 end;
 
             Database::"NPR Ecom Sales Header":
                 begin
                     EcomSalesHeader := RecVariant;
 
-                    if not ConfirmResendNotification(EcomSalesHeader.SystemId) then
+                    if not ConfirmResendNotification(EcomSalesHeader.SystemId, NotificationType) then
                         Error('');
 
-                    if HasUnprocessedNotifEntry(EcomSalesHeader.SystemId) then
+                    if HasUnprocessedNotifEntry(EcomSalesHeader.SystemId, NotificationType) then
                         if not Confirm(UnprocessedEntryExistsQst) then
                             Error('');
 
-                    PopulateBuffersFromEcomDoc(EcomSalesHeader, TempHeaderBuffer, TempLineBuffer);
+                    PopulateBuffersFromEcomDoc(EcomSalesHeader, NotificationType, TempHeaderBuffer, TempLineBuffer);
                 end;
             else
                 Error(UnsupportedDocumentTypeErr, RecRef.Name);
@@ -179,7 +237,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         NotifEntry: Record "NPR Digital Notification Entry";
         DigitalNotificationSend: Codeunit "NPR Digital Notification Send";
     begin
-        if not ValidateDigitalNotifSetup(DigitalNotifSetup) then
+        if not ValidateAnyEcomNotifEnabled(DigitalNotifSetup) then
             exit(false);
 
         NotifEntry.SetRange(Sent, false);
@@ -196,11 +254,12 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         exit(true);
     end;
 
-    local procedure ConfirmResendNotification(SourceDocumentId: Guid): Boolean
+    local procedure ConfirmResendNotification(SourceDocumentId: Guid; NotificationType: Enum "NPR Dig. Notif. Type"): Boolean
     var
         DigitalNotifEntry: Record "NPR Digital Notification Entry";
     begin
         DigitalNotifEntry.SetRange("Source Document Id", SourceDocumentId);
+        DigitalNotifEntry.SetRange("Notification Type", NotificationType);
         exit(ConfirmResendIfEntryExists(DigitalNotifEntry));
     end;
 
@@ -214,14 +273,15 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         exit(ConfirmManagement.GetResponseOrDefault(ResendConfirmQst, false));
     end;
 
-    local procedure HasUnprocessedNotifEntry(EcomSalesHeaderId: Guid): Boolean
+    local procedure HasUnprocessedNotifEntry(EcomSalesHeaderId: Guid; NotificationType: Enum "NPR Dig. Notif. Type"): Boolean
     var
         DigitalNotifEntry: Record "NPR Digital Notification Entry";
         DigitalNotifSetup: Record "NPR Digital Notification Setup";
     begin
         DigitalNotifEntry.SetRange("Source Document Id", EcomSalesHeaderId);
+        DigitalNotifEntry.SetRange("Notification Type", NotificationType);
         DigitalNotifEntry.SetRange(Sent, false);
-        if ValidateDigitalNotifSetup(DigitalNotifSetup) and (DigitalNotifSetup."Max Attempts" > 0) then
+        if ValidateAnyEcomNotifEnabled(DigitalNotifSetup) and (DigitalNotifSetup."Max Attempts" > 0) then
             DigitalNotifEntry.SetFilter("Attempt Count", '<%1', DigitalNotifSetup."Max Attempts");
         exit(not DigitalNotifEntry.IsEmpty());
     end;
@@ -245,7 +305,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
     #endregion
 
     #region Document Processing
-    internal procedure ProcessSalesDocument(
+    local procedure ProcessSalesDocument(
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary): Boolean
     var
@@ -255,6 +315,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
     begin
         if TempHeaderBuffer."Recipient E-mail" = '' then
             exit(false);
+
+        if TempHeaderBuffer."Notification Type" = "NPR Dig. Notif. Type"::"Order Confirmation" then begin
+            CreateNotificationEntry(TempHeaderBuffer, NullGuid);
+            exit(true);
+        end;
 
         ManifestId := NPDesignerManifestFacade.CreateManifest();
         if IsNullGuid(ManifestId) then
@@ -273,9 +338,9 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                     ManifestId := NullGuid;
                     exit(false);  // Skip email notification if no digital assets (only send when assets exist)
                 end;
-            1 .. 10: // Single asset or small batch - go directly to asset
+            1 .. 10:
                 NPDesignerManifestFacade.SetShowTableOfContents(ManifestId, false);
-            else // Multiple assets - show table of contents
+            else
                 NPDesignerManifestFacade.SetShowTableOfContents(ManifestId, true);
         end;
 
@@ -330,20 +395,34 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         ManifestId: Guid)
     var
         DigitalNotifEntry: Record "NPR Digital Notification Entry";
+        EmailTemplateId: Code[20];
     begin
-        if not ValidateDigitalNotifSetup() then
-            exit;
+        case TempHeaderBuffer."Notification Type" of
+            "NPR Dig. Notif. Type"::"Digital Assets":
+                begin
+                    if not ValidateDigitalNotifSetup() then
+                        exit;
+                    EmailTemplateId := _DigitalNotifSetup."Email Template Id Order";
+                end;
+            "NPR Dig. Notif. Type"::"Order Confirmation":
+                begin
+                    if not ValidateOrderConfirmationSetup() then
+                        exit;
+                    EmailTemplateId := _DigitalNotifSetup."Ecom Order Confirm Template Id";
+                end;
+        end;
 
         DigitalNotifEntry.Init();
         DigitalNotifEntry."External Order No." := TempHeaderBuffer."External Order No.";
         DigitalNotifEntry."Shopify Order ID" := TempHeaderBuffer."Shopify Order ID";
         DigitalNotifEntry."Document Type" := TempHeaderBuffer."Document Type";
+        DigitalNotifEntry."Notification Type" := TempHeaderBuffer."Notification Type";
         DigitalNotifEntry."Posted Document No." := TempHeaderBuffer."Posted Document No.";
         DigitalNotifEntry."Recipient E-mail" := TempHeaderBuffer."Recipient E-mail";
         DigitalNotifEntry."Recipient Name" := TempHeaderBuffer."Recipient Name";
         DigitalNotifEntry."Language Code" := TempHeaderBuffer."Language Code";
         DigitalNotifEntry."Manifest ID" := ManifestId;
-        DigitalNotifEntry."Email Template Id" := _DigitalNotifSetup."Email Template Id Order";
+        DigitalNotifEntry."Email Template Id" := EmailTemplateId;
         DigitalNotifEntry.Sent := false;
         DigitalNotifEntry."Bucket Id" := TempHeaderBuffer."Bucket Id";
         DigitalNotifEntry."Source Document Id" := TempHeaderBuffer."Source Document Id";
@@ -353,6 +432,25 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
     #endregion
 
     #region Asset Identification and Processing
+    internal procedure IdentifyEcomLineAssetType(IsWallet: Boolean; EcomLineSubtype: Enum "NPR Ecom Sales Line Subtype"): Option None,Voucher,"Member Card",Coupon,Ticket,Wallet
+    var
+        AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
+    begin
+        if IsWallet then
+            exit(AssetType::Wallet);
+
+        case EcomLineSubtype of
+            EcomLineSubtype::Voucher:
+                exit(AssetType::Voucher);
+            EcomLineSubtype::Ticket:
+                exit(AssetType::Ticket);
+            EcomLineSubtype::Coupon:
+                exit(AssetType::Coupon);
+        end;
+
+        exit(AssetType::None);
+    end;
+
     internal procedure IdentifyAssetType(
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary): Option None,Voucher,"Member Card",Coupon,Ticket,Wallet
@@ -363,21 +461,8 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
     begin
-        // Ecom documents use the line subtype directly — no DB lookups needed.
-        // Coupons and wallets are emitted only for ecom documents, so they are not identified in the Magento/Shopify branch below.
-        if TempHeaderBuffer."Document Type" = TempHeaderBuffer."Document Type"::"Ecom Sales Document" then begin
-            if TempLineBuffer."Is Wallet" then
-                exit(AssetType::Wallet);
-            case TempLineBuffer."Ecom Line Subtype" of
-                TempLineBuffer."Ecom Line Subtype"::Voucher:
-                    exit(AssetType::Voucher);
-                TempLineBuffer."Ecom Line Subtype"::Ticket:
-                    exit(AssetType::Ticket);
-                TempLineBuffer."Ecom Line Subtype"::Coupon:
-                    exit(AssetType::Coupon);
-            end;
-            exit(AssetType::None);
-        end;
+        if TempHeaderBuffer."Document Type" = TempHeaderBuffer."Document Type"::"Ecom Sales Document" then
+            exit(IdentifyEcomLineAssetType(TempLineBuffer."Is Wallet", TempLineBuffer."Ecom Line Subtype"));
 
         // Magento / Shopify (Invoice / Credit Memo): identify voucher via voucher entries, member card / ticket via item setup.
         NpRvVoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.");
@@ -760,11 +845,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
     #region Buffer Population
     internal procedure PopulateBuffersFromInvoice(
         SalesInvHeader: Record "Sales Invoice Header";
+        NotificationType: Enum "NPR Dig. Notif. Type";
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary)
     var
         SalesInvoiceLine: Record "Sales Invoice Line";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         RecipientEmail: Text[80];
         RecipientName: Text[100];
         CurrencyCode: Code[10];
@@ -773,13 +858,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
         SalesInvHeader.CalcFields(Amount, "Amount Including VAT", "Invoice Discount Amount");
 
-        // Get currency code, fallback to LCY if empty
-        CurrencyCode := SalesInvHeader."Currency Code";
-        if CurrencyCode = '' then begin
-            GeneralLedgerSetup.SetLoadFields("LCY Code");
-            GeneralLedgerSetup.Get();
-            CurrencyCode := GeneralLedgerSetup."LCY Code";
-        end;
+        CurrencyCode := GetEffectiveCurrencyCode(SalesInvHeader."Currency Code");
 
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := SalesInvHeader."NPR External Order No.";
@@ -790,7 +869,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TempHeaderBuffer."Customer No." := SalesInvHeader."Sell-to Customer No.";
         TempHeaderBuffer."Recipient E-mail" := RecipientEmail;
         TempHeaderBuffer."Recipient Name" := RecipientName;
-        TempHeaderBuffer."Language Code" := SalesInvHeader."Language Code";
+        TempHeaderBuffer."Language Code" := ResolveLanguageCode(
+            SalesInvHeader."Language Code",
+            TempHeaderBuffer."Shopify Order ID",
+            TempHeaderBuffer."External Order No.",
+            TempHeaderBuffer."Customer No.");
         if SalesInvHeader."Order Date" <> 0D then
             TempHeaderBuffer."Document Date" := SalesInvHeader."Order Date"
         else
@@ -799,6 +882,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TempHeaderBuffer."Total Amount Excl. VAT" := SalesInvHeader.Amount;
         TempHeaderBuffer."Total Amount Incl. VAT" := SalesInvHeader."Amount Including VAT";
         TempHeaderBuffer."Invoice Discount Amount" := SalesInvHeader."Invoice Discount Amount";
+        TempHeaderBuffer."Notification Type" := NotificationType;
         TempHeaderBuffer.Insert();
 
         SalesInvoiceLine.SetRange("Document No.", SalesInvHeader."No.");
@@ -823,11 +907,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
     internal procedure PopulateBuffersFromCrMemo(
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        NotificationType: Enum "NPR Dig. Notif. Type";
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary)
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
-        GeneralLedgerSetup: Record "General Ledger Setup";
         RecipientEmail: Text[80];
         RecipientName: Text[100];
         CurrencyCode: Code[10];
@@ -836,12 +920,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
         SalesCrMemoHeader.CalcFields(Amount, "Amount Including VAT", "Invoice Discount Amount");
 
-        CurrencyCode := SalesCrMemoHeader."Currency Code";
-        if CurrencyCode = '' then begin
-            GeneralLedgerSetup.SetLoadFields("LCY Code");
-            GeneralLedgerSetup.Get();
-            CurrencyCode := GeneralLedgerSetup."LCY Code";
-        end;
+        CurrencyCode := GetEffectiveCurrencyCode(SalesCrMemoHeader."Currency Code");
 
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := SalesCrMemoHeader."NPR External Order No.";
@@ -852,12 +931,17 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TempHeaderBuffer."Customer No." := SalesCrMemoHeader."Sell-to Customer No.";
         TempHeaderBuffer."Recipient E-mail" := RecipientEmail;
         TempHeaderBuffer."Recipient Name" := RecipientName;
-        TempHeaderBuffer."Language Code" := SalesCrMemoHeader."Language Code";
+        TempHeaderBuffer."Language Code" := ResolveLanguageCode(
+            SalesCrMemoHeader."Language Code",
+            TempHeaderBuffer."Shopify Order ID",
+            TempHeaderBuffer."External Order No.",
+            TempHeaderBuffer."Customer No.");
         TempHeaderBuffer."Document Date" := SalesCrMemoHeader."Posting Date";
         TempHeaderBuffer."Currency Code" := CurrencyCode;
         TempHeaderBuffer."Total Amount Excl. VAT" := SalesCrMemoHeader.Amount;
         TempHeaderBuffer."Total Amount Incl. VAT" := SalesCrMemoHeader."Amount Including VAT";
         TempHeaderBuffer."Invoice Discount Amount" := SalesCrMemoHeader."Invoice Discount Amount";
+        TempHeaderBuffer."Notification Type" := NotificationType;
         TempHeaderBuffer.Insert();
 
         SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
@@ -882,52 +966,42 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
     internal procedure PopulateBuffersFromEcomDoc(
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        NotificationType: Enum "NPR Dig. Notif. Type";
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary)
     var
-        EcomSalesLine: Record "NPR Ecom Sales Line";
         TempCandidateLine: Record "NPR Ecom Sales Line" temporary;
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        IsWalletByExtLineId: Dictionary of [Text[100], Boolean];
+        WalletExtLineIds: Dictionary of [Text[100], Boolean];
         CurrencyCode: Code[10];
         TotalAmountExclVAT: Decimal;
         TotalAmountInclVAT: Decimal;
     begin
-        CurrencyCode := EcomSalesHeader."Currency Code";
-        if CurrencyCode = '' then begin
-            GeneralLedgerSetup.SetLoadFields("LCY Code");
-            GeneralLedgerSetup.Get();
-            CurrencyCode := GeneralLedgerSetup."LCY Code";
-        end;
+        CurrencyCode := GetEffectiveCurrencyCode(EcomSalesHeader."Currency Code");
 
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := EcomSalesHeader."External No.";
         TempHeaderBuffer."Document Type" := TempHeaderBuffer."Document Type"::"Ecom Sales Document";
         TempHeaderBuffer."Recipient E-mail" := EcomSalesHeader."Sell-to Email";
         TempHeaderBuffer."Recipient Name" := CopyStr(EcomSalesHeader."Sell-to Name", 1, MaxStrLen(TempHeaderBuffer."Recipient Name"));
-        TempHeaderBuffer."Language Code" := EcomSalesHeader."Language Code";
+        TempHeaderBuffer."Customer No." := EcomSalesHeader."Sell-to Customer No.";
+        TempHeaderBuffer."Language Code" := ResolveLanguageCode(
+            EcomSalesHeader."Language Code",
+            EcomSalesHeader."Ticket Reservation Token",
+            '',
+            TempHeaderBuffer."External Order No.",
+            EcomSalesHeader."Sell-to Customer No.");
         TempHeaderBuffer."Document Date" := EcomSalesHeader."Received Date";
         TempHeaderBuffer."Currency Code" := CurrencyCode;
         TempHeaderBuffer."Source Document Id" := EcomSalesHeader.SystemId;
         TempHeaderBuffer."Bucket Id" := EcomSalesHeader."Bucket Id";
+        TempHeaderBuffer."Notification Type" := NotificationType;
         TempHeaderBuffer.Insert();
 
-        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        if EcomSalesLine.FindSet() then
-            repeat
-                if (EcomSalesLine."External Line ID" <> '') and (not IsWalletByExtLineId.ContainsKey(EcomSalesLine."External Line ID")) then
-                    IsWalletByExtLineId.Add(EcomSalesLine."External Line ID", EcomSalesLine."Is Attraction Wallet");
+        CollectEcomLinesAndWalletSet(EcomSalesHeader."Entry No.", TempCandidateLine, WalletExtLineIds);
 
-                if IsAssetCandidateLine(EcomSalesLine) then begin
-                    TempCandidateLine := EcomSalesLine;
-                    TempCandidateLine.Insert();
-                end;
-            until EcomSalesLine.Next() = 0;
-
-        // Emit buffer rows: iterate only candidate lines, skipping wallet-bundle children (resolved via the dictionary).
         if TempCandidateLine.FindSet() then
             repeat
-                if ShouldEmitEcomAssetLine(TempCandidateLine, IsWalletByExtLineId) then begin
+                if ShouldEmitEcomAssetLine(TempCandidateLine, WalletExtLineIds) then begin
                     TempLineBuffer.Init();
                     TempLineBuffer."External Order No." := EcomSalesHeader."External No.";
                     TempLineBuffer."Line No." := TempCandidateLine."Line No.";
@@ -958,35 +1032,35 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TempHeaderBuffer.Modify();
     end;
 
-    local procedure ShouldEmitEcomAssetLine(var TempEcomSalesLine: Record "NPR Ecom Sales Line" temporary; IsWalletByExtLineId: Dictionary of [Text[100], Boolean]): Boolean
+    internal procedure CollectEcomLinesAndWalletSet(
+        DocumentEntryNo: BigInteger;
+        var TempCandidateLine: Record "NPR Ecom Sales Line" temporary;
+        var WalletExtLineIds: Dictionary of [Text[100], Boolean])
     var
-        ParentIsWallet: Boolean;
+        EcomSalesLine: Record "NPR Ecom Sales Line";
     begin
-        if TempEcomSalesLine."Is Attraction Wallet" then
-            exit(true);
+        EcomSalesLine.SetRange("Document Entry No.", DocumentEntryNo);
+        if EcomSalesLine.FindSet() then
+            repeat
+                if EcomSalesLine."Is Attraction Wallet" and (EcomSalesLine."External Line ID" <> '') then
+                    if not WalletExtLineIds.ContainsKey(EcomSalesLine."External Line ID") then
+                        WalletExtLineIds.Add(EcomSalesLine."External Line ID", true);
 
-        if not (TempEcomSalesLine.Subtype in [TempEcomSalesLine.Subtype::Voucher, TempEcomSalesLine.Subtype::Ticket, TempEcomSalesLine.Subtype::Coupon]) then
-            exit(false);
+                TempCandidateLine := EcomSalesLine;
+                TempCandidateLine.Insert();
+            until EcomSalesLine.Next() = 0;
+    end;
 
-        // Bundle-child skip: if the parent (by External Line ID) is a wallet, this line is rendered inside the wallet, not as a standalone asset.
-        if TempEcomSalesLine."Parent Ext. Line ID" <> '' then
-            if IsWalletByExtLineId.Get(TempEcomSalesLine."Parent Ext. Line ID", ParentIsWallet) then
-                if ParentIsWallet then
-                    exit(false);
-
+    internal procedure ShouldEmitEcomAssetLine(EcomSalesLine: Record "NPR Ecom Sales Line"; WalletExtLineIds: Dictionary of [Text[100], Boolean]): Boolean
+    begin
+        // Wallet bundle children are rendered inside the wallet asset, not as standalone JSON lines.
+        if EcomSalesLine."Parent Ext. Line ID" <> '' then
+            if WalletExtLineIds.ContainsKey(EcomSalesLine."Parent Ext. Line ID") then
+                exit(false);
         exit(true);
     end;
 
-    local procedure IsAssetCandidateLine(var EcomSalesLine: Record "NPR Ecom Sales Line"): Boolean
-    begin
-        // Fast candidate filter applied during the single DB scan. Wallet-bundle children are still filtered later
-        // via ShouldEmitEcomAssetLine, which needs the full ancestry dictionary to resolve the parent.
-        if EcomSalesLine."Is Attraction Wallet" then
-            exit(true);
-        exit(EcomSalesLine.Subtype in [EcomSalesLine.Subtype::Voucher, EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Coupon]);
-    end;
-
-    local procedure CalcEcomLineAmounts(LineAmount: Decimal; VATPercent: Decimal; PriceExclVAT: Boolean; var AmountExclVAT: Decimal; var AmountInclVAT: Decimal)
+    internal procedure CalcEcomLineAmounts(LineAmount: Decimal; VATPercent: Decimal; PriceExclVAT: Boolean; var AmountExclVAT: Decimal; var AmountInclVAT: Decimal)
     begin
         if PriceExclVAT then begin
             AmountExclVAT := LineAmount;
@@ -1044,14 +1118,118 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
             end;
         end;
     end;
+
+    internal procedure GetEffectiveCurrencyCode(DocumentCurrencyCode: Code[10]): Code[10]
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        if DocumentCurrencyCode <> '' then
+            exit(DocumentCurrencyCode);
+
+        GeneralLedgerSetup.SetLoadFields("LCY Code");
+        GeneralLedgerSetup.Get();
+        exit(GeneralLedgerSetup."LCY Code");
+    end;
+
+    local procedure ResolveLanguageCode(DocumentLanguageCode: Code[10]; ShopifyOrderId: Text[30]; ExternalOrderNo: Code[20]; SellToCustomerNo: Code[20]): Code[10]
+    begin
+        exit(ResolveLanguageCode(DocumentLanguageCode, '', ShopifyOrderId, ExternalOrderNo, SellToCustomerNo));
+    end;
+
+    local procedure ResolveLanguageCode(InitialLanguageCode: Code[10]; SessionTokenId: Text[100]; ShopifyOrderId: Text[30]; ExternalOrderNo: Code[20]; SellToCustomerNo: Code[20]): Code[10]
+    var
+        Customer: Record Customer;
+    begin
+        if InitialLanguageCode <> '' then
+            exit(InitialLanguageCode);
+
+        if SellToCustomerNo <> '' then begin
+            Customer.SetLoadFields("Language Code");
+            if Customer.Get(SellToCustomerNo) then
+                if Customer."Language Code" <> '' then
+                    exit(Customer."Language Code");
+        end;
+
+        exit(FindReservationLanguage(SessionTokenId, ShopifyOrderId, ExternalOrderNo));
+    end;
+
+    local procedure FindReservationLanguage(SessionTokenId: Text[100]; ShopifyOrderId: Text[30]; ExternalOrderNo: Code[20]): Code[10]
+    var
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        LanguageCode: Code[10];
+        OrderId: Text;
+    begin
+        // Session Token ID matches at OC creation time, before PreProcessDocument stamps External Order No.
+        if SessionTokenId <> '' then begin
+            TicketReservationReq.SetLoadFields(TicketHolderPreferredLanguage);
+            TicketReservationReq.SetRange("Session Token ID", SessionTokenId);
+            LanguageCode := PickReservationLanguage(TicketReservationReq);
+            if LanguageCode <> '' then
+                exit(LanguageCode);
+        end;
+
+        // Mirror ProcessTicketAssets: prefer Shopify Order ID for Shopify-imported orders, else External Order No.
+        OrderId := ExternalOrderNo;
+        if ShopifyOrderId <> '' then
+            OrderId := ShopifyOrderId;
+
+        if OrderId <> '' then begin
+            TicketReservationReq.Reset();
+            TicketReservationReq.SetLoadFields(TicketHolderPreferredLanguage);
+            TicketReservationReq.SetRange("External Order No.", OrderId);
+            LanguageCode := PickReservationLanguage(TicketReservationReq);
+            if LanguageCode <> '' then
+                exit(LanguageCode);
+        end;
+
+        exit('');
+    end;
+
+    local procedure PickReservationLanguage(var TicketReservationReq: Record "NPR TM Ticket Reservation Req."): Code[10]
+    begin
+        TicketReservationReq.SetFilter(TicketHolderPreferredLanguage, '<>%1', '');
+        if TicketReservationReq.IsEmpty() then
+            exit('');
+
+        // Primary request line first for deterministic pick when multiple lines carry a language.
+        TicketReservationReq.SetRange("Primary Request Line", true);
+        if TicketReservationReq.FindFirst() then
+            exit(TicketReservationReq.TicketHolderPreferredLanguage);
+
+        TicketReservationReq.SetRange("Primary Request Line");
+        if TicketReservationReq.FindFirst() then
+            exit(TicketReservationReq.TicketHolderPreferredLanguage);
+
+        exit('');
+    end;
     #endregion
 
     #region Setup, Helpers and Job Queue
-    internal procedure ValidateDigitalNotifSetup(): Boolean
+    local procedure ValidateDigitalNotifSetup(): Boolean
     var
         ErrorMessage: Text;
     begin
         Exit(ValidateDigitalNotifSetup(ErrorMessage));
+    end;
+
+    local procedure LoadDigitalNotifSetup(): Boolean
+    begin
+        if _DigitalNotifSetupLoaded then
+            exit(true);
+
+        _DigitalNotifSetup.SetLoadFields(
+            Enabled,
+            "Email Template Id Order",
+            "Exclude Vouchers From Manifest",
+            "Exclude Tickets From Manifest",
+            "Send Ecom Order Confirmation",
+            "Ecom Order Confirm Template Id",
+            "Max Attempts");
+        if not _DigitalNotifSetup.Get() then
+            exit(false);
+
+        _DigitalNotifSetupLoaded := true;
+        exit(true);
     end;
 
     internal procedure ValidateDigitalNotifSetup(var ErrorMessage: Text): Boolean
@@ -1061,11 +1239,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         NotEnabledErr: Label 'Digital Notification is not enabled in the setup.';
     begin
         ErrorMessage := '';
-        if _DigitalNotifSetupRead then
-            exit(true);
-
-        _DigitalNotifSetup.SetLoadFields(Enabled, "Email Template Id Order", "Exclude Vouchers From Manifest", "Exclude Tickets From Manifest");
-        if not _DigitalNotifSetup.Get() then begin
+        if not LoadDigitalNotifSetup() then begin
             ErrorMessage := NoSetupErr;
             exit(false);
         end;
@@ -1080,13 +1254,40 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
             exit(false);
         end;
 
-        _DigitalNotifSetupRead := true;
         exit(true);
     end;
 
     internal procedure ValidateDigitalNotifSetup(var DigitalNotificationSetup: Record "NPR Digital Notification Setup"): Boolean
     begin
         if not ValidateDigitalNotifSetup() then
+            exit(false);
+        DigitalNotificationSetup := _DigitalNotifSetup;
+        exit(true);
+    end;
+
+    local procedure ValidateOrderConfirmationSetup(): Boolean
+    begin
+        if not LoadDigitalNotifSetup() then
+            exit(false);
+        if not _DigitalNotifSetup."Send Ecom Order Confirmation" then
+            exit(false);
+        exit(_DigitalNotifSetup."Ecom Order Confirm Template Id" <> '');
+    end;
+
+    local procedure ValidateAnyEcomNotifEnabled(): Boolean
+    begin
+        if not LoadDigitalNotifSetup() then
+            exit(false);
+        if _DigitalNotifSetup.Enabled and (_DigitalNotifSetup."Email Template Id Order" <> '') then
+            exit(true);
+        if _DigitalNotifSetup."Send Ecom Order Confirmation" and (_DigitalNotifSetup."Ecom Order Confirm Template Id" <> '') then
+            exit(true);
+        exit(false);
+    end;
+
+    internal procedure ValidateAnyEcomNotifEnabled(var DigitalNotificationSetup: Record "NPR Digital Notification Setup"): Boolean
+    begin
+        if not ValidateAnyEcomNotifEnabled() then
             exit(false);
         DigitalNotificationSetup := _DigitalNotifSetup;
         exit(true);
@@ -1102,11 +1303,12 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         exit(NPDesignerSetup.EnableManifest);
     end;
 
-    local procedure EcomDigitalNotifEntryExists(EcomSalesHeaderId: Guid): Boolean
+    local procedure EcomDigitalNotifEntryExists(EcomSalesHeaderId: Guid; NotificationType: Enum "NPR Dig. Notif. Type"): Boolean
     var
         DigitalNotifEntry: Record "NPR Digital Notification Entry";
     begin
         DigitalNotifEntry.SetRange("Source Document Id", EcomSalesHeaderId);
+        DigitalNotifEntry.SetRange("Notification Type", NotificationType);
         exit(not DigitalNotifEntry.IsEmpty());
     end;
 

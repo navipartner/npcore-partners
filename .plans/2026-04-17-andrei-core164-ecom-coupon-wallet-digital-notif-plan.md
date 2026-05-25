@@ -917,3 +917,130 @@ Plan complete and saved to `.plans/2026-04-17-andrei-core164-ecom-coupon-wallet-
 2. **Inline Execution** — Tasks are executed in this session using the executing-plans skill. Batch execution with review checkpoints.
 
 **Which approach?**
+
+---
+
+# Follow-up (2026-04-30): Order Confirmation notification path
+
+> Extends this CORE-164 work with a second Ecom-only digital-notification flow ("Order Confirmation"), running alongside the existing "Digital Assets" flow. Same entry table, same send codeunit, same ecom JQ. Original Linear case description omitted here — see `.plans/2026-04-30-aolu-ecom-order-confirmation-notification.md` if needed.
+
+## Why a second flow
+
+Product (Martin Akrwawi) split the previously-single ecom email into two independent ones. Trigger timing differs: **Order Confirmation** fires at API ecom-doc creation; **Digital Assets** still fires when virtual items finish processing. Three valid configurations: only Digital Assets (legacy), only Order Confirmation, both (two emails per ecom order). The two setup flags are independent — neither requires the other.
+
+## Data-model deltas (in addition to the original CORE-164 deltas)
+
+| Object | Change | ID |
+|---|---|---|
+| `NPR Dig. Notif. Type` (enum) | **New, public, extensible.** Values `Digital Assets = 0`, `Order Confirmation = 10`. Ordinal 0 deliberately maps to Digital Assets so existing entries materialise correctly without an upgrade codeunit. | `6014634` |
+| `NPR Digital Notification Entry` | +field 140 `Notification Type` (enum). Old `key(SourceDocument; "Source Document Id")` consolidated into one composite key `key(SourceDocument; "Source Document Id", "Notification Type")` — same SQL plan, fewer indexes (leading-column rule covers the single-column lookups in `SyncBucketIdToNotifEntry`). | field 140 |
+| `NPR Digital Doc. Header Buffer` (temp) | +field 140 `Notification Type` (enum). Threaded through buffer population. | field 140 |
+| `NPR Digital Notification Setup` | +field 40 `Send Ecom Order Confirmation` (Boolean), +field 50 `Ecom Order Confirm Template Id` (Code[20], TableRelation `NPR NPEmailTemplate`). Field name truncated to 30 chars (AL0468); Caption keeps the verbose form `Ecom Order Confirmation Template Id`. Cross-validated: enabling the flag requires the template; clearing the template is blocked while the flag is on. Translatable via `Label`+`FieldCaption`. | fields 40, 50 |
+| `NPR Dig. Notif. Events` (codeunit) | **New, public.** 8 integration events (`OnAfter…ContentExample`, `OnAfter…HeaderFieldsToJson`, `OnAfter…LineJson`, `OnAfter…PaymentLineJson` × example/real). All signatures use only `JsonObject` (var) + the public `NPR Dig. Notif. Type` enum + `Guid` primitives — no internal record types exposed. PTE subscribers read entry context (notification_type, source_document_id, etc.) from the JsonObject they're enriching. | `6151156` |
+| `NPR Digital Notification Setup` page | Three fasttabs: **General** (Max Attempts only, applies to both flows), **Digital Assets** (Email Template Id Order, exclude flags, Enabled), **Order Confirmation** (Ecom Order Confirm Template Id, Send Ecom Order Confirmation). | — |
+| `NPR Digital Notif. Entries` page | Surfaces `Notification Type` column. | — |
+
+## Trigger placement (Order Confirmation)
+
+Hooked **inside `EcomSalesDocApiAgentV2.CreateIncomingEcomDocument`** right after `AssignBucketId(EcomSalesHeader)` returns and before `RespondOK`. Deliberately **outside** `AssignBucketId` (single-purpose helper). Scoped to the API-creation path only — Entria importer and other ecom-header-creating callers do **not** trigger Order Confirmation by design (per user direction). Bucket id is set by the time the trigger fires, so `PopulateBuffersFromEcomDoc` reads the persisted bucket and the OC entry inherits the right value for the JQ filter. Order Confirmation fires for **both** `Order` and `Return Order` document types; templates differentiate via the new `ecom_document_type` JSON key.
+
+## Validation model (the codex must-fix from round 1)
+
+`ValidateDigitalNotifSetup` (existing) keeps its semantics — `Enabled = true` AND `Email Template Id Order` set. New helpers in `DigitalOrderNotifMgt`:
+
+- `LoadDigitalNotifSetup` (local) — caches the setup row in `_DigitalNotifSetup` via `_DigitalNotifSetupLoaded` flag. Used by all three validators below. Replaces the old `_DigitalNotifSetupRead` flag, which conflated "row loaded" with "Digital Assets validation passed" and leaked validation state across paths.
+- `ValidateOrderConfirmationSetup` (local) — `Send Ecom Order Confirmation = true` AND `Ecom Order Confirm Template Id` set. No `Enabled` requirement.
+- `ValidateAnyEcomNotifEnabled()` / `ValidateAnyEcomNotifEnabled(var DigitalNotificationSetup)` — true if either flag is fully configured. Used by `EcomDigitalNotifJQ.ProcessRecords` and `SendPendingNotificationsManual` so an OC-only configuration actually delivers (the original `ValidateDigitalNotifSetup` gate would have blocked the JQ when `Enabled = false`). The var-overload returns the cached row to avoid a second `Get()` for `Max Attempts`.
+
+`TryCreateEcomDigitalNotification` (existing) still gates on `ValidateDigitalNotifSetup` + `IsManifestFeatureEnabled` + `Virtual Items Process Status = Processed`. The new sibling **`TryCreateEcomOrderConfirmationNotification`** gates on `ValidateOrderConfirmationSetup` only — no manifest gate, no virtual-items gate. Same UpdLock + per-type dedup pattern.
+
+## Buffer + emit changes
+
+`PopulateBuffersFromEcomDoc(EcomSalesHeader, NotificationType, …)` now takes a type and writes it onto the temp header buffer. The candidate-line filter (`IsAssetCandidateLine`) was **deleted**; every ecom line now flows into `TempLineBuffer`. `ShouldEmitEcomAssetLine` was simplified to keep only the wallet-bundle-child skip — the asset-subtype gate is gone because Order Confirmation needs to render the full order. This is a **deliberate behaviour change** for existing Digital Assets templates as well: header `total_amount_*` and `document_lines` now reflect the full order, not just the asset subset. Confirmed acceptable since the existing Digital Assets template embeds only `manifest_url` and does not iterate `document_lines`.
+
+`ProcessSalesDocument` short-circuits to `CreateNotificationEntry(TempHeaderBuffer, NullGuid)` when `Notification Type = Order Confirmation` — no manifest is created. `CreateNotificationEntry` switches on the buffer's `Notification Type` to pick the template id (`Email Template Id Order` for Digital Assets, `Ecom Order Confirm Template Id` for Order Confirmation) and per-type validation. The template id is stamped onto the entry at creation time so the type-agnostic send codeunit just reads `entry."Email Template Id"`.
+
+`PopulateBuffersFromInvoice` / `PopulateBuffersFromCrMemo` set the buffer's `Notification Type` to `Digital Assets` before insert (Order Confirmation is ecom-only).
+
+## JSON shape additions (data provider)
+
+Both real and example JSON now include:
+- `notification_type` — string enum name (`Digital Assets` / `Order Confirmation`)
+- `source_document_id` — Guid as text
+- `ecom_document_type` — for ecom entries only, string enum name from `NPR Ecom Sales Doc Type` (`Order` / `Return Order`); lets templates render per-type copy
+- `payment_lines` — array, populated only for ecom entries, empty for Sales Invoice / Cr Memo. Per-line fields: `line_no`, `payment_method_type`, `external_payment_type`, `external_payment_method_code`, `description`, `amount` + `amount_formatted`, `captured_amount` + `captured_amount_formatted`, `invoiced_amount` + `invoiced_amount_formatted`, `payment_reference`, `card_brand`, `masked_card_number`. **Excluded for security/PCI**: `PAR Token`, `PSP Token`, `Card Alias Token`, `Card Expiry Date`. `payment_reference` is emitted unconditionally — for vouchers it carries the voucher reference, which is useful customer-facing context per product owner.
+
+`AddPaymentLinesFromEcomDoc(var JArrPaymentLines, NotifEntry)` is the new local procedure that populates `payment_lines`. Filters by `EcomSalesPmtLine."Document Entry No." = EcomSalesHeader."Entry No."` only — no status/amount filters since the table has no payment-status dimension.
+
+## Manual send (UI) changes
+
+`SendDigitalOrderNotificationManual(RecVariant, NotificationType: Enum)` now takes the type. `ProcessSalesDocumentManual`, `ConfirmResendNotification`, `HasUnprocessedNotifEntry` thread the type so dedup dialogs are scoped per type. Per-type success / fail messages.
+
+Page actions:
+- `EcomSalesDocument` page — existing action renamed to `Send Digital Assets Notification` (passes `Digital Assets`); **new** action `Send Order Confirmation Notification` (passes `Order Confirmation`).
+- `PostedSalesInvoice.PageExt`, `PostedSalesCreditMemo.PageExt` — keep their single action, now explicitly passing `Digital Assets`. OC has no UI here (ecom-only).
+
+## Send-side guards
+
+`EcomDigitalNotifJQ.ProcessRecords` and `SendPendingNotificationsManual` use `ValidateAnyEcomNotifEnabled(DigitalNotifSetup)` (var-overload) so an OC-only configuration is not blocked, and `Max Attempts` is loaded in the same call without a redundant `Get`. JQ filters entries on `Document Type = "Ecom Sales Document" + Sent = false` — type-agnostic, sends both Digital Assets and Order Confirmation entries with each entry's stamped template.
+
+## Access surface (manual audit done after implementation)
+
+Procedures in `DigitalOrderNotifMgt.Codeunit.al` that turned out to be only used inside this codeunit were downgraded to `local`: `ProcessSalesDocument`, `ValidateOrderConfirmationSetup`, `ValidateDigitalNotifSetup()` (parameterless overload). The two var-overloads of `ValidateDigitalNotifSetup` stay `internal` (used by `NpRvSalesDocMgt`, posted-doc page extensions).
+
+## Files touched (delta on top of CORE-164)
+
+| File | Action |
+|---|---|
+| `Application/src/Digital Notification/DigitalNotifType.Enum.al` | **New** (public enum) |
+| `Application/src/Digital Notification/_public/DigitalNotifEvents.Codeunit.al` | **New** (public events publisher) |
+| `Application/src/Digital Notification/DigitalNotificationEntry.Table.al` | +field 140, key consolidation |
+| `Application/src/Digital Notification/DigitalNotifEntries.Page.al` | +Notification Type column |
+| `Application/src/Digital Notification/DigitalNotificationSetup.Table.al` | +fields 40, 50 |
+| `Application/src/Digital Notification/DigitalNotificationSetup.Page.al` | 3 fasttabs (General / Digital Assets / Order Confirmation) |
+| `Application/src/Digital Notification/DigitalDocHeaderBuffer.Table.al` | +field 140 |
+| `Application/src/Digital Notification/DigitalOrderNotifMgt.Codeunit.al` | Validation split, type-tagging, dedup-by-type, full-line buffer, manifest skip for OC, new `TryCreateEcomOrderConfirmationNotification`, send-side guard widening, type-aware manual flow |
+| `Application/src/Email/DynamicTemplates/DataProviders/NPEmailDigNotifDataProv.Codeunit.al` | Events fired, JSON keys (`notification_type`, `source_document_id`, `ecom_document_type`), `payment_lines` array + per-line event |
+| `Application/src/_API_SERVICES/ecommerce/incomingEcommerceSalesDocuments/handlers/EcomSalesDocApiAgentV2.Codeunit.al` | OC trigger after `AssignBucketId` |
+| `Application/src/_API_SERVICES/ecommerce/incomingEcommerceSalesDocuments/_fastLine/EcomDigitalNotifJQ.Codeunit.al` | `ValidateAnyEcomNotifEnabled` gate |
+| `Application/src/_Page Extensions/PostedSalesInvoice.PageExt.al` | Pass `Digital Assets` to `SendDigitalOrderNotificationManual` |
+| `Application/src/_Page Extensions/PostedSalesCreditMemo.PageExt.al` | Pass `Digital Assets` to `SendDigitalOrderNotificationManual` |
+
+## Codex review pass-through (3 rounds)
+
+Findings caught by `pal:clink → codex` reviews and resolved during implementation:
+
+1. **Round 1 must-fix** — JQ + `SendPendingNotificationsManual` would have blocked OC-only configurations. Fixed via `ValidateAnyEcomNotifEnabled`.
+2. **Round 1 must-fix** — Initial events codeunit exposed internal record types as parameters (would have forced 3 internal tables to public). Redesigned to use only `JsonObject`+ enum + Guid primitives. Required making the enum `Access = Public` (AL0749).
+3. **Round 1 must-fix** — Original Task 10 missed the data provider's call to `PopulateBuffersFromEcomDoc` (third caller alongside auto + manual paths).
+4. **Round 1 should-fix** — Validation cache flag `_DigitalNotifSetupRead` reused across two validation semantics; split into `_DigitalNotifSetupLoaded` + per-path validators that always re-evaluate.
+5. **Round 2 must-fix** — Initial Order Confirmation gate fired only for `Document Type::Order`, missing return orders. Reverted per product owner; added `ecom_document_type` JSON key so templates can differentiate copy.
+6. **Round 3 should-fix** — `payment_reference` could leak voucher codes; left in unconditionally per product owner (knowing which voucher was used is intended customer-facing context).
+7. **Round 3 should-fix** — `amount` alone is ambiguous for partial-capture flows; added `captured_amount` and `invoiced_amount` for templates that need settlement state.
+8. **Round 3 nit** — Example JSON had mixed shape (`doc_type=Invoice` plus `ecom_document_type` plus populated `payment_lines`). Realigned the example to fully ecom flavour.
+
+Final compile (alc with CodeCop + AppSourceCop + UICop + ruleset): 0 errors, 0 warnings on changed files. Pre-existing AL0432 deprecation warnings in unrelated obsolete code were not touched.
+
+---
+
+## LAL-259 follow-up — language fallback (2026-05-04)
+
+**Why:** Lalandia ticket emails always rendered in Danish because Shopify-imported Sales Invoices/CrMemos and pre-posting Ecom Sales Headers carry an empty `Language Code`. The per-shopper language was already captured upstream on `NPR TM Ticket Reservation Req.TicketHolderPreferredLanguage`; we just needed to plumb it through.
+
+**What:** Three overloads of `ResolveLanguageCode` in `DigitalOrderNotifMgt.Codeunit.al`. The 5-param master walks the priority chain `InitialLanguageCode → Customer."Language Code" → reservation lookup`. Reservation lookup (`FindReservationLanguage`) tries `Session Token ID` first (works at OC-creation time, before `PreProcessDocument` stamps `External Order No.`), then a Shopify-Order-ID-prefer External Order No. lookup mirroring `ProcessTicketAssets`. Deterministic pick via `PickReservationLanguage` (Primary Request Line first). Wired into all three populate paths: Invoice, CrMemo, EcomDoc — the EcomDoc path was also a pre-existing bug where `Language Code` was never assigned at all.
+
+**Files touched:**
+| File | Action |
+|---|---|
+| `Application/src/Digital Notification/DigitalOrderNotifMgt.Codeunit.al` | +3 `ResolveLanguageCode` overloads, +`FindReservationLanguage`, +`PickReservationLanguage`; wired into `PopulateBuffersFromInvoice`, `PopulateBuffersFromCrMemo`, `PopulateBuffersFromEcomDoc` |
+
+**Codex review pass-through (2 rounds) + user investigation:**
+1. **Round 1 HIGH** — OC creation runs before `PreProcessDocument`, so reservation rows have no `External Order No.` yet at that point. Fixed by adding `Session Token ID` lookup as primary attempt for the Ecom path.
+2. **Round 1 MEDIUM** — `FindFirst` non-deterministic when multiple reservation lines carry languages. Fixed via `PickReservationLanguage` preferring `"Primary Request Line" = true`.
+3. **Lalandia investigation** — For Shopify orders the reservation's `External Order No.` holds the **Shopify Order ID** (e.g. `7542089220424`), not the Sales Invoice's `NPR External Order No.` (e.g. `LB-1240`). Lookup now mirrors `ProcessTicketAssets`: prefer Shopify Order ID, fall back to External Order No.
+4. **Refactor pass** — Original 5-param helper with `''` placeholders at each call site collapsed to two thin overloads (one per call shape) delegating to the master.
+
+**Out of scope (long-term follow-ups):**
+- Shopify customer import: write `customer_locale` from the Shopify webhook payload to `Customer."Language Code"` (and/or to the imported Sales Header). Doesn't help Lalandia today (single Shopify Store record covers all languages), but cleans up the source of truth so the reservation fallback rarely needs to fire. Separate small PR.
+- Magento customer import: equivalent locale plumbing if/when it's missing — not investigated here.
+- Non-ticket Shopify orders (voucher-only, coupon-only, plain items) still render in Danish: no fallback signal exists short-term. Only the Shopify-import locale fix above resolves that case.

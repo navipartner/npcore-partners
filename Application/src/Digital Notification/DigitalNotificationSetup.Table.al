@@ -65,6 +65,34 @@ table 6248183 "NPR Digital Notification Setup"
             MinValue = 0;
             ToolTip = 'Specifies the maximum number of attempts to send a failed notification before giving up. Set to 0 for unlimited attempts.';
         }
+        field(40; "Send Ecom Order Confirmation"; Boolean)
+        {
+            Caption = 'Send Ecom Order Confirmation';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                MissingTemplateErr: Label 'You cannot enable %1 before setting %2.', Comment = '%1 = Send Ecom Order Confirmation field caption; %2 = Ecom Order Confirmation Template Id field caption';
+            begin
+                if Rec."Send Ecom Order Confirmation" and (Rec."Ecom Order Confirm Template Id" = '') then
+                    Error(MissingTemplateErr, Rec.FieldCaption("Send Ecom Order Confirmation"), Rec.FieldCaption("Ecom Order Confirm Template Id"));
+            end;
+        }
+        field(50; "Ecom Order Confirm Template Id"; Code[20])
+        {
+            Caption = 'Ecom Order Confirmation Template Id';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate";
+
+            trigger OnValidate()
+            var
+                CannotClearTemplateErr: Label 'Cannot clear %1 while %2 is enabled. Disable the feature first.', Comment = '%1 = Ecom Order Confirmation Template Id field caption; %2 = Send Ecom Order Confirmation field caption';
+            begin
+                if (Rec."Ecom Order Confirm Template Id" = '') and (xRec."Ecom Order Confirm Template Id" <> '') then
+                    if Rec."Send Ecom Order Confirmation" then
+                        Error(CannotClearTemplateErr, Rec.FieldCaption("Ecom Order Confirm Template Id"), Rec.FieldCaption("Send Ecom Order Confirmation"));
+            end;
+        }
     }
 
     keys

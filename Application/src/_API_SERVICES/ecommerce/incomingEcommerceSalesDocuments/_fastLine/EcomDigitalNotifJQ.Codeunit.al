@@ -42,10 +42,15 @@ codeunit 6151116 "NPR EcomDigitalNotifJQ"
         DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
+        DigitalAssetsEnabled, OrderConfirmationEnabled : Boolean;
         BucketFilter: Text;
     begin
-        if not DigitalOrderNotifMgt.ValidateDigitalNotifSetup(DigitalNotifSetup) then
+        if not DigitalOrderNotifMgt.ValidateAnyEcomNotifEnabled(DigitalNotifSetup) then
             exit;
+
+        // Mirror the per-type checks ValidateAnyEcomNotifEnabled uses internally.
+        DigitalAssetsEnabled := DigitalNotifSetup.Enabled and (DigitalNotifSetup."Email Template Id Order" <> '');
+        OrderConfirmationEnabled := DigitalNotifSetup."Send Ecom Order Confirmation" and (DigitalNotifSetup."Ecom Order Confirm Template Id" <> '');
 
         JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
         if JQParamStrMgt.ContainsParam(EcomJobManagement.ParamBucketFilter()) then
@@ -53,6 +58,14 @@ codeunit 6151116 "NPR EcomDigitalNotifJQ"
 
         DigitalNotifEntry.SetRange("Document Type", "NPR Digital Document Type"::"Ecom Sales Document");
         DigitalNotifEntry.SetRange(Sent, false);
+        // Skip leftover entries of a notification type whose toggle is currently off. When both are
+        // enabled, no Notification Type filter is applied.
+        case true of
+            DigitalAssetsEnabled and not OrderConfirmationEnabled:
+                DigitalNotifEntry.SetRange("Notification Type", "NPR Dig. Notif. Type"::"Digital Assets");
+            OrderConfirmationEnabled and not DigitalAssetsEnabled:
+                DigitalNotifEntry.SetRange("Notification Type", "NPR Dig. Notif. Type"::"Order Confirmation");
+        end;
         if DigitalNotifSetup."Max Attempts" > 0 then
             DigitalNotifEntry.SetFilter("Attempt Count", '<%1', DigitalNotifSetup."Max Attempts");
         if BucketFilter <> '' then

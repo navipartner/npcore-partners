@@ -93,6 +93,11 @@ table 6248181 "NPR Digital Notification Entry"
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(140; "Notification Type"; Enum "NPR Dig. Notif. Type")
+        {
+            Caption = 'Notification Type';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -107,7 +112,7 @@ table 6248181 "NPR Digital Notification Entry"
         key(Manifest; "Manifest ID")
         {
         }
-        key(SourceDocument; "Source Document Id")
+        key(SourceDocument; "Source Document Id", "Notification Type")
         {
         }
     }

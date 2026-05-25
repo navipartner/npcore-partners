@@ -18,15 +18,20 @@ page 6150919 "NPR Digital Notification Setup"
             {
                 Caption = 'General';
 
-                field("Email Template Id Order"; Rec."Email Template Id Order")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the email template used for sending order confirmation notifications with manifest URL.';
-                }
                 field("Max Attempts"; Rec."Max Attempts")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the maximum number of attempts to send a failed notification before giving up. Set to 0 for unlimited attempts.';
+                }
+            }
+            group("Digital Assets")
+            {
+                Caption = 'Digital Assets';
+
+                field("Email Template Id Order"; Rec."Email Template Id Order")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the email template used for the Digital Assets notification (manifest URL with vouchers, tickets, coupons, wallets, member cards).';
                 }
                 field("Exclude Vouchers From Manifest"; Rec."Exclude Vouchers From Manifest")
                 {
@@ -41,7 +46,22 @@ page 6150919 "NPR Digital Notification Setup"
                 field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether digital notification sending is enabled.';
+                    ToolTip = 'Specifies whether digital assets notifications are enabled.';
+                }
+            }
+            group("Order Confirmation")
+            {
+                Caption = 'Order Confirmation';
+
+                field("Ecom Order Confirm Template Id"; Rec."Ecom Order Confirm Template Id")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the email template used for the Ecom order confirmation notification (sent when the ecom sales order is created, contains the full order — no manifest URL).';
+                }
+                field("Send Ecom Order Confirmation"; Rec."Send Ecom Order Confirmation")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether to send an order confirmation email when an Ecom Sales Order is created. Requires Ecom Order Confirmation Template Id to be set.';
                 }
             }
         }
