@@ -322,6 +322,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         ReverseSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         SubscrRequest: Record "NPR MM Subscr. Request";
+        DimensionSetID: Integer;
         OriginalAmountLCY: Decimal;
     begin
         SubscrPaymentRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
@@ -338,7 +339,57 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         end;
         SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
         OriginalAmountLCY := Round(CurrExchRate.ExchangeAmtFCYToLCY(SubscrRequest."Posting Date", _ReconciliationLine."Transaction Currency Code", _ReconciliationLine."Amount (TCY)", CurrExchRate.ExchangeRate(SubscrRequest."Posting Date", _ReconciliationLine."Transaction Currency Code")), _Currency."Amount Rounding Precision");
-        PostEntryToGL(0, OriginalAmountLCY);
+        DimensionSetID := GetSubscriptionDimensionSetID(SubscrRequest);
+        PostEntryToGL(DimensionSetID, OriginalAmountLCY);
+    end;
+
+    local procedure GetSubscriptionDimensionSetID(SubscrRequest: Record "NPR MM Subscr. Request"): Integer
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+        Subscription: Record "NPR MM Subscription";
+        DimMgt: Codeunit DimensionManagement;
+        GlobalDim1Code: Code[20];
+        GlobalDim2Code: Code[20];
+#if not (BC17 or BC18 or BC19)
+        DimSource: List of [Dictionary of [Integer, Code[20]]];
+#else
+        TableID: array[10] of Integer;
+        No: array[10] of Code[20];
+#endif
+    begin
+        if not Subscription.Get(SubscrRequest."Subscription Entry No.") then
+            exit(0);
+        if not Membership.Get(Subscription."Membership Entry No.") then
+            exit(0);
+        if Membership."Customer No." = '' then
+            exit(0);
+        if not MembershipSetup.Get(SubscrRequest."Membership Code") then
+            exit(0);
+        if MembershipSetup."Recurring Payment Code" = '' then
+            exit(0);
+        if not RecurringPaymentSetup.Get(MembershipSetup."Recurring Payment Code") then
+            exit(0);
+        if RecurringPaymentSetup."Source Code" = '' then
+            exit(0);
+
+        // Priority resolution between the subscription-domain dim sources (Recurring Payment Setup, Customer) is driven by
+        // RecurringPaymentSetup."Source Code" — same as the renewal flow in MMSubscrRenewPost — so partners can configure
+        // Default Dimension Priorities once and have them apply consistently to both the original renewal posting and the
+        // later reconciliation posting. The reconciliation-domain source code (_AdyenMerchantSetup."Posting Source Code")
+        // is still used by CreatePostGL when stamping the GL entry and overlaying G/L Account default dimensions.
+#if not (BC17 or BC18 or BC19)
+        DimMgt.AddDimSource(DimSource, Database::"NPR MM Recur. Paym. Setup", RecurringPaymentSetup.Code);
+        DimMgt.AddDimSource(DimSource, Database::Customer, Membership."Customer No.");
+        exit(DimMgt.GetDefaultDimID(DimSource, RecurringPaymentSetup."Source Code", GlobalDim1Code, GlobalDim2Code, 0, Database::Customer));
+#else
+        TableID[1] := Database::"NPR MM Recur. Paym. Setup";
+        No[1] := RecurringPaymentSetup.Code;
+        TableID[2] := Database::Customer;
+        No[2] := Membership."Customer No.";
+        exit(DimMgt.GetDefaultDimID(TableID, No, RecurringPaymentSetup."Source Code", GlobalDim1Code, GlobalDim2Code, 0, Database::Customer));
+#endif
     end;
 
     local procedure PostEntryToGL(DimensionSetID: Integer; OriginalAmountLCY: Decimal)
