@@ -552,6 +552,7 @@ table 6151258 "NPR Ecom Sales Header"
         EcomSalesDocUtils.DeleteMagentoPaymentLines(Rec);
         EcomSalesDocUtils.DeleteVoucherSalesLines(Rec);
         EcomSalesDocUtils.DeleteVoucherLinks(Rec);
+        EcomSalesDocUtils.DeleteMembershipLinks(Rec);
     end;
 #endif
 

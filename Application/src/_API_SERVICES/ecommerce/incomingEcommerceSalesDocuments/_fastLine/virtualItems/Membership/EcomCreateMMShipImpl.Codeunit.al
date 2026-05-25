@@ -14,10 +14,11 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         UnknownOperationErr: Label 'Unknown membership operation for line %1.', Comment = '%1 - line number', Locked = true;
     begin
         EcomSalesHeader.Get(EcomSalesLine."Document Entry No.");
-        CheckIfLineCanBeProcessed(EcomSalesLine, EcomSalesHeader);
 
         EcomSalesLine.ReadIsolation := EcomSalesLine.ReadIsolation::UpdLock;
         EcomSalesLine.Get(EcomSalesLine.RecordId);
+
+        CheckIfLineCanBeProcessed(EcomSalesLine, EcomSalesHeader);
 
         EcomMembershipOperation := DetermineMembershipOperation(EcomSalesLine);
         if (EcomSalesLine."Membership Operation" <> EcomMembershipOperation) then begin
@@ -37,33 +38,33 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
             EcomMembershipOperation::CreateMembership:
                 begin
-                    CreateMembership(EcomSalesLine, EcomSalesHeader);
-                    _EcomVirtualItemEvents.OnAfterMembershipCreatedBeforeCommit(EcomSalesLine);
-                    ConfirmMembership(EcomSalesLine, EcomSalesHeader);
-                    _EcomVirtualItemEvents.OnAfterMembershipConfirmedBeforeCommit(EcomSalesLine);
+                    if CreateMembership(EcomSalesLine, EcomSalesHeader) then
+                        _EcomVirtualItemEvents.OnAfterMembershipCreatedBeforeCommit(EcomSalesLine);
+                    if ConfirmAllMembershipsForLine(EcomSalesLine, EcomSalesHeader) then
+                        _EcomVirtualItemEvents.OnAfterMembershipConfirmedBeforeCommit(EcomSalesLine);
                 end;
             EcomMembershipOperation::ConfirmMembership:
                 begin
-                    ConfirmMembership(EcomSalesLine, EcomSalesHeader);
-                    _EcomVirtualItemEvents.OnAfterMembershipConfirmedBeforeCommit(EcomSalesLine);
+                    if ConfirmMembership(EcomSalesLine, EcomSalesHeader) then
+                        _EcomVirtualItemEvents.OnAfterMembershipConfirmedBeforeCommit(EcomSalesLine);
                 end;
 
             EcomMembershipOperation::RenewMembership:
                 begin
-                    ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader);
-                    _EcomVirtualItemEvents.OnAfterMembershipRenewedBeforeCommit(EcomSalesLine);
+                    if ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader) then
+                        _EcomVirtualItemEvents.OnAfterMembershipRenewedBeforeCommit(EcomSalesLine);
                 end;
 
             EcomMembershipOperation::ExtendMembership:
                 begin
-                    ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader);
-                    _EcomVirtualItemEvents.OnAfterMembershipExtendedBeforeCommit(EcomSalesLine);
+                    if ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader) then
+                        _EcomVirtualItemEvents.OnAfterMembershipExtendedBeforeCommit(EcomSalesLine);
                 end;
 
             EcomMembershipOperation::UpgradeMembership:
                 begin
-                    ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader);
-                    _EcomVirtualItemEvents.OnAfterMembershipUpgradedBeforeCommit(EcomSalesLine);
+                    if ProcessMembershipAlteration(EcomSalesLine, EcomSalesHeader) then
+                        _EcomVirtualItemEvents.OnAfterMembershipUpgradedBeforeCommit(EcomSalesLine);
                 end;
 
             else begin
@@ -133,7 +134,9 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         if not EcomSalesLine.Captured then
             EcomSalesLine.FieldError(Captured);
 
-        if (EcomSalesLine.Quantity <> 1) then
+        if EcomSalesLine.Quantity <> Round(EcomSalesLine.Quantity, 1) then
+            EcomSalesLine.FieldError(Quantity);
+        if EcomSalesLine.Quantity < 1 then
             EcomSalesLine.FieldError(Quantity);
 
         if EcomSalesLine."Document Type" = EcomSalesLine."Document Type"::"Return Order" then
@@ -144,7 +147,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     end;
 
-    local procedure ConfirmMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    local procedure ConfirmMembershipById(MembershipSystemId: Guid; AmountForEntry: Decimal; AmountInclVATForEntry: Decimal; EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header") DidFlip: Boolean
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -155,10 +158,9 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MembershipEntryMissingErr: Label 'No active membership entry found for membership %1.';
         AlreadyConfirmedErr: Label 'Membership entry for membership %1 is already confirmed (Document No. is set).';
     begin
-        EcomSalesLine.TestField("Membership Id");
         Membership.ReadIsolation := IsolationLevel::ReadCommitted;
-        if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
-            Error(MembershipMissingErr, EcomSalesLine."Membership Id");
+        if not Membership.GetBySystemId(MembershipSystemId) then
+            Error(MembershipMissingErr, MembershipSystemId);
 
         if Membership.Blocked then
             Error(MembershipBlockedErr, Membership."Entry No.");
@@ -172,22 +174,119 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         if MembershipEntry."Document No." <> '' then begin
             if MembershipEntry."Document No." = EcomSalesHeader."External No." then
-                exit; // already confirmed by this order
+                exit;
             Error(AlreadyConfirmedErr, Membership."Entry No.");
         end;
 
         MembershipEntry."Source Type" := MembershipEntry."Source Type"::SALESHEADER;
         MembershipEntry."Document Type" := SalesHeader."Document Type"::Order;
         MembershipEntry."Document No." := EcomSalesHeader."External No.";
-
-        UpdateMembershipEntryAmounts(MembershipEntry, EcomSalesLine, EcomSalesHeader);
+        ApplyAmountsToEntry(MembershipEntry, AmountForEntry, AmountInclVATForEntry);
         MembershipEntry.Modify();
 
         SponsorshipTicketMgmt.OnMembershipPayment(MembershipEntry);
         CreateMembershipPaymentMethods(EcomSalesHeader, Membership);
+        EnsureMembershipLinkExists(EcomSalesHeader, EcomSalesLine, Membership);
+
+        DidFlip := true;
     end;
 
-    internal procedure CreateMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    local procedure ConfirmMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header") DidConfirmAny: Boolean
+    var
+        WholeAmount: Decimal;
+        WholeAmountInclVAT: Decimal;
+        QuantityErr: Label 'Membership line quantity must be 1.';
+    begin
+        if EcomSalesLine.Quantity <> 1 then
+            Error(QuantityErr);
+        EcomSalesLine.TestField("Membership Id");
+        ComputeWholeLineAmounts(EcomSalesLine, EcomSalesHeader, WholeAmount, WholeAmountInclVAT);
+        DidConfirmAny := ConfirmMembershipById(EcomSalesLine."Membership Id", WholeAmount, WholeAmountInclVAT, EcomSalesLine, EcomSalesHeader);
+    end;
+
+    internal procedure ConfirmAllMembershipsForLine(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header") DidConfirmAny: Boolean
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        WholeAmount: Decimal;
+        WholeAmountInclVAT: Decimal;
+        PerMembershipAmount: Decimal;
+        PerMembershipAmountInclVAT: Decimal;
+        ConsumedAmount: Decimal;
+        ConsumedAmountInclVAT: Decimal;
+        ThisAmount: Decimal;
+        ThisAmountInclVAT: Decimal;
+        QtyToConfirm: Integer;
+        i: Integer;
+    begin
+        QtyToConfirm := EcomSalesLine.Quantity;
+
+        ComputeWholeLineAmounts(EcomSalesLine, EcomSalesHeader, WholeAmount, WholeAmountInclVAT);
+
+        PerMembershipAmount := Round(WholeAmount / QtyToConfirm, 0.01);
+        PerMembershipAmountInclVAT := Round(WholeAmountInclVAT / QtyToConfirm, 0.01);
+        ConsumedAmount := 0;
+        ConsumedAmountInclVAT := 0;
+        i := 0;
+
+        EcomSalesMembershipLink.SetCurrentKey("Source Line System Id", "Entry No.");
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        if EcomSalesMembershipLink.FindSet() then
+            repeat
+                i += 1;
+                if i = QtyToConfirm then begin
+                    ThisAmount := WholeAmount - ConsumedAmount;
+                    ThisAmountInclVAT := WholeAmountInclVAT - ConsumedAmountInclVAT;
+                end else begin
+                    ThisAmount := PerMembershipAmount;
+                    ThisAmountInclVAT := PerMembershipAmountInclVAT;
+                end;
+                ConsumedAmount += ThisAmount;
+                ConsumedAmountInclVAT += ThisAmountInclVAT;
+                if ConfirmMembershipById(EcomSalesMembershipLink."Membership System Id",
+                                         ThisAmount, ThisAmountInclVAT,
+                                         EcomSalesLine, EcomSalesHeader)
+                then
+                    DidConfirmAny := true;
+            until EcomSalesMembershipLink.Next() = 0;
+    end;
+
+    internal procedure CreateMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header") IssuedAnyThisRound: Boolean
+    var
+        QtyToIssue: Integer;
+        AlreadyLinked: Integer;
+        i: Integer;
+        FirstMembership: Record "NPR MM Membership";
+        LinkCountExceedsQtyErr: Label
+            'Internal data inconsistency on membership line %1: %2 membership(s) issued but quantity is %3. Contact support to investigate. This is a programming bug.',
+            Locked = true;
+        PartialLinkStateErr: Label
+            'Internal data inconsistency on membership line %1: %2 of %3 membership(s) issued. Contact support to investigate. This is a programming bug.',
+            Locked = true;
+    begin
+        QtyToIssue := EcomSalesLine.Quantity;
+        AlreadyLinked := CountExistingLinks(EcomSalesHeader, EcomSalesLine);
+
+        case true of
+            AlreadyLinked = QtyToIssue:
+                exit(false);
+            AlreadyLinked > QtyToIssue:
+                Error(LinkCountExceedsQtyErr, EcomSalesLine.RecordId(), AlreadyLinked, QtyToIssue);
+            (AlreadyLinked > 0) and (AlreadyLinked < QtyToIssue):
+                Error(PartialLinkStateErr, EcomSalesLine.RecordId(), AlreadyLinked, QtyToIssue);
+        end;
+
+        for i := 1 to QtyToIssue do
+            IssueSingleMembership(EcomSalesLine, EcomSalesHeader, FirstMembership, i = 1);
+
+        if QtyToIssue = 1 then begin
+            EcomSalesLine."Membership Id" := FirstMembership.SystemId;
+            EcomSalesLine.Modify();
+        end;
+
+        IssuedAnyThisRound := true;
+    end;
+
+    local procedure IssueSingleMembership(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; var IssuedMembership: Record "NPR MM Membership"; CaptureForWriteback: Boolean)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
@@ -202,22 +301,57 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         UpdateMemberInfoCaptureFromLine(MemberInfoCapture, EcomSalesLine);
         SetNotificationMethod(MemberInfoCapture);
+        MemberInfoCapture.AllowMergeOnConflict := true;
         MemberInfoCapture.Modify();
 
         GetMembershipSaleSetup(MembershipSalesSetup, GetItemNoAsCode20(EcomSalesLine));
         MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
 
-        // TODO - Wrong cardinality. Multiple sales interact with the membership over time.
-        // Field will be removed
         Membership.Get(MemberInfoCapture."Membership Entry No.");
-        EcomSalesLine."Membership Id" := Membership.SystemId;
-        EcomSalesLine.Modify();
         MemberInfoCapture.Delete();
+
+        // Invariant: InsertMembershipLink must remain the last DB op — link row is the race-recovery marker.
+        InsertMembershipLink(EcomSalesHeader, EcomSalesLine, Membership);
+
+        if CaptureForWriteback then
+            IssuedMembership := Membership;
     end;
 
-    internal procedure ProcessMembershipAlteration(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    internal procedure ProcessMembershipAlteration(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header") DidAlterThisRound: Boolean
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        Membership: Record "NPR MM Membership";
+        ExistingLinkCount: Integer;
+        QuantityErr: Label 'Membership alteration line quantity must be 1.';
+        AlterationCorruptionErr: Label 'Internal data inconsistency on membership alteration line %1: %2 link row(s) exist for membership %3 but exactly 0 or 1 was expected. Contact support to investigate. This is a programming bug.', Locked = true;
+        AlterationMembershipMismatchErr: Label 'Internal data inconsistency on membership alteration line %1: existing link row points at a different membership than the line''s targeted Membership Id. Contact support to investigate. This is a programming bug.', Locked = true;
     begin
+        if EcomSalesLine.Quantity <> 1 then
+            Error(QuantityErr);
+
+        EcomSalesMembershipLink.SetCurrentKey("Source Line System Id", "Entry No.");
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        ExistingLinkCount := EcomSalesMembershipLink.Count();
+
+        case ExistingLinkCount of
+            0:
+                ;
+            1:
+                begin
+                    EcomSalesMembershipLink.FindFirst();
+                    if EcomSalesMembershipLink."Membership System Id" <> EcomSalesLine."Membership Id" then
+                        Error(AlterationMembershipMismatchErr, EcomSalesLine.RecordId());
+                    exit(false);
+                end;
+            else
+                Error(AlterationCorruptionErr, EcomSalesLine.RecordId(), ExistingLinkCount, EcomSalesLine."Membership Id");
+        end;
+
         ReshapeMembershipDuration(EcomSalesLine, EcomSalesHeader);
+
+        Membership.GetBySystemId(EcomSalesLine."Membership Id");
+        InsertMembershipLink(EcomSalesHeader, EcomSalesLine, Membership);
+        DidAlterThisRound := true;
     end;
 
     local procedure SetNotificationMethod(var MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -259,11 +393,13 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MembershipSetup: Record "NPR MM Membership Setup";
+        Community: Record "NPR MM Member Community";
         ItemNoCode: Code[20];
-        QuantityErr: Label 'Membership line quantity must be 1.';
+        QuantityErr: Label 'Membership line quantity must be a positive whole number.';
         PromptActivationDateRequiredErr: Label 'Membership item %1 is configured with Valid From Base = Prompt. A membershipActivationDate must be provided on the sales line.', Comment = '%1=Item No.', Locked = true;
+        QtyMultiNeedsPermissiveCommunityErr: Label 'Multi-quantity membership lines with identity fields require community ''%1'' to be configured with %2 different than Error. Use Reuse, Merge, or Confirm.', Comment = '%1=Community Code; %2=field caption';
     begin
-        if EcomSalesLine.Quantity <> 1 then
+        if EcomSalesLine.Quantity < 1 then
             Error(QuantityErr);
 
         ItemNoCode := GetItemNoAsCode20(EcomSalesLine);
@@ -277,6 +413,34 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         ValidateMembershipSetup(MembershipSalesSetup, MembershipSetup);
         ValidateMemberIdentityRequirements(EcomSalesLine, MembershipSetup);
         ValidateMemberDataForDirectCreation(EcomSalesLine, MembershipSalesSetup, MembershipSetup);
+
+        if EcomSalesLine.Quantity > 1 then begin
+            Community.Get(MembershipSetup."Community Code");
+            if LineCouldTriggerUniquenessConflict(EcomSalesLine, Community)
+               and (Community."Create Member UI Violation" = Community."Create Member UI Violation"::Error)
+            then
+                Error(QtyMultiNeedsPermissiveCommunityErr, Community.Code, Community.FieldCaption("Create Member UI Violation"));
+        end;
+    end;
+
+    local procedure LineCouldTriggerUniquenessConflict(EcomSalesLine: Record "NPR Ecom Sales Line"; Community: Record "NPR MM Member Community"): Boolean
+    begin
+        case Community."Member Unique Identity" of
+            Community."Member Unique Identity"::NONE:
+                exit(false);
+            Community."Member Unique Identity"::EMAIL:
+                exit(EcomSalesLine."Member Email" <> '');
+            Community."Member Unique Identity"::PHONENO:
+                exit(EcomSalesLine."Member Phone No." <> '');
+            Community."Member Unique Identity"::SSN:
+                exit(false);
+            Community."Member Unique Identity"::EMAIL_AND_PHONE:
+                exit((EcomSalesLine."Member Email" <> '') and (EcomSalesLine."Member Phone No." <> ''));
+            Community."Member Unique Identity"::EMAIL_OR_PHONE:
+                exit((EcomSalesLine."Member Email" <> '') or (EcomSalesLine."Member Phone No." <> ''));
+            Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
+                exit((EcomSalesLine."Member Email" <> '') and (EcomSalesLine."Member First Name" <> ''));
+        end;
     end;
 
     local procedure ValidateMemberIdentityRequirements(EcomSalesLine: Record "NPR Ecom Sales Line"; MembershipSetup: Record "NPR MM Membership Setup")
@@ -463,7 +627,11 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MembershipEntryNotFoundErr: Label 'No active membership entry found for membership %1.', Comment = '%1=External Membership No.', Locked = true;
         MembershipNotActivatedErr: Label 'Membership %1 must be activated before it can be altered.', Comment = '%1=External Membership No.', Locked = true;
         GracePeriodErr: Label 'Membership is outside the grace period for alteration type %1.', Comment = '%1=Alteration Type', Locked = true;
+        QuantityErr: Label 'Membership alteration line quantity must be 1.';
     begin
+        if EcomSalesLine.Quantity <> 1 then
+            Error(QuantityErr);
+
         if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
             Error(MembershipNotFoundErr, EcomSalesLine."Membership Id");
 
@@ -621,15 +789,74 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     internal procedure ShowRelatedMembershipsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
-        EcomSalesLine: Record "NPR Ecom Sales Line";
-        Membership: Record "NPR MM Membership";
         TempMembership: Record "NPR MM Membership" temporary;
+    begin
+        BuildMembershipTempBufferForDoc(EcomSalesHeader, TempMembership);
+        if not TempMembership.IsEmpty() then
+            Page.Run(0, TempMembership);
+    end;
+
+    internal procedure ShowRelatedMembershipsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        TempMembership: Record "NPR MM Membership" temporary;
+        NoMembershipFoundMsg: Label 'No memberships are linked to this line.';
+    begin
+        if not EcomSalesHeader.Get(EcomSalesLine."Document Entry No.") then exit;
+        BuildMembershipTempBufferForLine(EcomSalesHeader, EcomSalesLine, TempMembership);
+        case TempMembership.Count() of
+            0:
+                Message(NoMembershipFoundMsg);
+            1:
+                begin
+                    TempMembership.FindFirst();
+                    OpenMembershipCardForSystemId(TempMembership.SystemId);
+                end;
+            else
+                Page.Run(0, TempMembership);
+        end;
+    end;
+
+    internal procedure BuildMembershipTempBufferForDoc(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempMembership: Record "NPR MM Membership" temporary)
+    var
         EmptyGuid: Guid;
     begin
+        BuildMembershipTempBuffer(EcomSalesHeader, EmptyGuid, TempMembership);
+    end;
+
+    internal procedure BuildMembershipTempBufferForLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var TempMembership: Record "NPR MM Membership" temporary)
+    begin
+        BuildMembershipTempBuffer(EcomSalesHeader, EcomSalesLine.SystemId, TempMembership);
+    end;
+
+    local procedure BuildMembershipTempBuffer(EcomSalesHeader: Record "NPR Ecom Sales Header"; SourceLineSystemIdFilter: Guid; var TempMembership: Record "NPR MM Membership" temporary)
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        EmptyGuid: Guid;
+    begin
+        EcomSalesMembershipLink.SetCurrentKey("Source System Id", "Source Line System Id");
+        EcomSalesMembershipLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        if not IsNullGuid(SourceLineSystemIdFilter) then
+            EcomSalesMembershipLink.SetRange("Source Line System Id", SourceLineSystemIdFilter);
+
+        if EcomSalesMembershipLink.FindSet() then begin
+            repeat
+                if Membership.GetBySystemId(EcomSalesMembershipLink."Membership System Id") then begin
+                    TempMembership := Membership;
+                    if TempMembership.Insert() then;
+                end;
+            until EcomSalesMembershipLink.Next() = 0;
+            exit;
+        end;
+
+        // Fallback for docs without link rows — resolve via the line's Membership Id.
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Membership);
         EcomSalesLine.SetFilter("Membership Id", '<>%1', EmptyGuid);
-        EcomSalesLine.SetLoadFields("Membership Id");
+        if not IsNullGuid(SourceLineSystemIdFilter) then
+            EcomSalesLine.SetRange(SystemId, SourceLineSystemIdFilter);
         if EcomSalesLine.FindSet() then
             repeat
                 if Membership.GetBySystemId(EcomSalesLine."Membership Id") then begin
@@ -637,18 +864,17 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
                     if TempMembership.Insert() then;
                 end;
             until EcomSalesLine.Next() = 0;
-        if not TempMembership.IsEmpty() then
-            PAGE.Run(0, TempMembership);
     end;
 
-    internal procedure ShowRelatedMembershipsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    internal procedure OpenMembershipCardForSystemId(SystemIdParam: Guid)
     var
         Membership: Record "NPR MM Membership";
+        NotAvailableMsg: Label 'This membership is no longer available in the system.';
     begin
-        if IsNullGuid(EcomSalesLine."Membership Id") then
+        if not Membership.GetBySystemId(SystemIdParam) then begin
+            Message(NotAvailableMsg);
             exit;
-        if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
-            exit;
+        end;
         Membership.SetRecFilter();
         Page.Run(Page::"NPR MM Membership Card", Membership);
     end;
@@ -710,15 +936,21 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         until PaymentLine.Next() = 0;
     end;
 
-    local procedure UpdateMembershipEntryAmounts(var MembershipEntry: Record "NPR MM Membership Entry"; EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    local procedure ComputeWholeLineAmounts(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; var WholeAmount: Decimal; var WholeAmountInclVAT: Decimal)
     begin
         if EcomSalesHeader."Price Excl. VAT" then begin
-            MembershipEntry.Amount := EcomSalesLine."Line Amount";
-            MembershipEntry."Amount Incl VAT" := Round(EcomSalesLine."Line Amount" * (1 + EcomSalesLine."VAT %" / 100), 0.01);
+            WholeAmount := EcomSalesLine."Line Amount";
+            WholeAmountInclVAT := Round(EcomSalesLine."Line Amount" * (1 + EcomSalesLine."VAT %" / 100), 0.01);
         end else begin
-            MembershipEntry."Amount Incl VAT" := EcomSalesLine."Line Amount";
-            MembershipEntry.Amount := Round(EcomSalesLine."Line Amount" / (1 + EcomSalesLine."VAT %" / 100), 0.01);
+            WholeAmountInclVAT := EcomSalesLine."Line Amount";
+            WholeAmount := Round(EcomSalesLine."Line Amount" / (1 + EcomSalesLine."VAT %" / 100), 0.01);
         end;
+    end;
+
+    local procedure ApplyAmountsToEntry(var MembershipEntry: Record "NPR MM Membership Entry"; AmountValue: Decimal; AmountInclVATValue: Decimal)
+    begin
+        MembershipEntry.Amount := AmountValue;
+        MembershipEntry."Amount Incl VAT" := AmountInclVATValue;
     end;
 
     local procedure ReshapeMembershipDuration(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
@@ -785,6 +1017,38 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         end;
 
         MemberInfoCapture.Delete();
+    end;
+
+    local procedure InsertMembershipLink(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; Membership: Record "NPR MM Membership")
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+    begin
+        EcomSalesMembershipLink.Init();
+        EcomSalesMembershipLink."Source System Id" := EcomSalesHeader.SystemId;
+        EcomSalesMembershipLink."Source Line System Id" := EcomSalesLine.SystemId;
+        EcomSalesMembershipLink."Membership System Id" := Membership.SystemId;
+        EcomSalesMembershipLink.Insert(true);
+    end;
+
+    local procedure EnsureMembershipLinkExists(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; Membership: Record "NPR MM Membership")
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+    begin
+        EcomSalesMembershipLink.SetCurrentKey("Source Line System Id");
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        EcomSalesMembershipLink.SetRange("Membership System Id", Membership.SystemId);
+        if not EcomSalesMembershipLink.IsEmpty() then exit;
+        InsertMembershipLink(EcomSalesHeader, EcomSalesLine, Membership);
+    end;
+
+    local procedure CountExistingLinks(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"): Integer
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+    begin
+        EcomSalesMembershipLink.SetCurrentKey("Source System Id", "Source Line System Id");
+        EcomSalesMembershipLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        exit(EcomSalesMembershipLink.Count());
     end;
 
     [TryFunction]

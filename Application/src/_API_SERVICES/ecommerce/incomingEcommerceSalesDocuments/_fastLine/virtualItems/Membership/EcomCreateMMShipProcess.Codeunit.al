@@ -7,15 +7,22 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
     trigger OnRun()
     var
         EcomCreateMMShipTryProcess: Codeunit "NPR EcomCreateMMShipTryProcess";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
     begin
         ClearLastError();
         Commit();
+        Sentry.StartSpan(SentrySpan, 'bc.e-com.membership.process');
 
         Clear(EcomCreateMMShipTryProcess);
         _Success := EcomCreateMMShipTryProcess.Run(Rec);
 
+        if not _Success then
+            Sentry.AddLastErrorIfProgrammingBug();
+
         HandleResponse(_Success, Rec, _UpdateRetryCount);
         Commit();
+        SentrySpan.Finish();
 
         if (not _Success) and _ShowError then
             Error(GetLastErrorText);

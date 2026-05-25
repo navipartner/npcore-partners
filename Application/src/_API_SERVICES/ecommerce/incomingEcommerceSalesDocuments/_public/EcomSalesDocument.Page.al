@@ -307,6 +307,12 @@ page 6248188 "NPR Ecom Sales Document"
                 ApplicationArea = NPRRetail;
                 UpdatePropagation = Both;
             }
+            part(MembershipsSubPage; "NPR Ecom Membership Sub")
+            {
+                Caption = 'Memberships';
+                ApplicationArea = NPRRetail;
+                UpdatePropagation = Both;
+            }
         }
         area(factboxes)
         {
@@ -557,7 +563,7 @@ page 6248188 "NPR Ecom Sales Document"
         // doc retries. Future subpages add one helper + one line here.
         AllSubpagesLoaded := PopulateVouchersSubpage(Results);
         // AllSubpagesLoaded := PopulateTicketsSubpage(Results) and AllSubpagesLoaded;
-        // AllSubpagesLoaded := PopulateMembershipsSubpage(Results) and AllSubpagesLoaded;
+        AllSubpagesLoaded := PopulateMembershipsSubpage(Results) and AllSubpagesLoaded;
         if AllSubpagesLoaded then
             _SubpagesLoadedForSystemId := _SubpagesPendingForSystemId
         else
@@ -590,12 +596,24 @@ page 6248188 "NPR Ecom Sales Document"
             CurrPage.VouchersSubPage.Page.ClearContents();
     end;
 
+    local procedure PopulateMembershipsSubpage(Results: Dictionary of [Text, Text]) PayloadPresent: Boolean
+    var
+        EcomDocSubpagesTask: Codeunit "NPR Ecom Doc Subpages Task";
+        PayloadText: Text;
+    begin
+        PayloadPresent := Results.Get(EcomDocSubpagesTask.MembershipsResultKeyTok(), PayloadText);
+        if PayloadPresent then
+            CurrPage.MembershipsSubPage.Page.PopulateFromJsonText(PayloadText)
+        else
+            CurrPage.MembershipsSubPage.Page.ClearContents();
+    end;
+
     local procedure ClearAllSubpages()
     begin
         // Called when we start a new refresh or when the task errors. Future subpages add a line here.
         CurrPage.VouchersSubPage.Page.ClearContents();
         // CurrPage.TicketsSubPage.Page.ClearContents();
-        // CurrPage.MembershipsSubPage.Page.ClearContents();
+        CurrPage.MembershipsSubPage.Page.ClearContents();
     end;
 
     local procedure EnqueueSubpagesRefresh(EcomSalesHeader: Record "NPR Ecom Sales Header")
@@ -605,8 +623,8 @@ page 6248188 "NPR Ecom Sales Document"
         Params: Dictionary of [Text, Text];
         WasDirty: Boolean;
     begin
-        // Single background task feeds all virtual-item subpages for this document. Today only
-        // vouchers; future tickets/coupons/etc. extend the task's OnRun and the completion routing
+        // Single background task feeds all virtual-item subpages for this document.
+        // extend the task's OnRun and the completion routing
         // above without changing this entry point or any subpage's PBT plumbing.
         // If a subpage action (e.g. Process Virtual Item on EcomSalesDocSub) just mutated this
         // doc's data, Sync.ConsumeDirty drops the page-local Loaded cache so the check below
