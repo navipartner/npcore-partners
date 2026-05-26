@@ -31,6 +31,7 @@ codeunit 6185082 "NPR TicketingApiHandler"
     procedure HandleFunction()
     var
         Capacity: Codeunit "NPR TicketingCapacityAgent";
+        TimeSlots: Codeunit "NPR TicketingTimeSlotsAgent";
         Ticket: Codeunit "NPR TicketingTicketAgent";
         Catalog: Codeunit "NPR TicketingCatalogAgent";
         Reservation: Codeunit "NPR TicketingReservationAgent";
@@ -42,6 +43,8 @@ codeunit 6185082 "NPR TicketingApiHandler"
                 _Response := Capacity.GetTimeSlots(_Request);
             _ApiFunction::SCHEDULE_SEARCH:
                 _Response := Capacity.GetSchedules(_Request);
+            _ApiFunction::TIMESLOTS_SEARCH:
+                _Response := TimeSlots.GetTimeSlots(_Request);
 
             _ApiFunction::CATALOG:
                 _Response := Catalog.GetCatalog(_Request);

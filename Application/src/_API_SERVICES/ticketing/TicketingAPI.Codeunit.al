@@ -25,6 +25,9 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Match('GET', '/ticket/capacity/search')) then
             exit(Handle(_ApiFunction::CAPACITY_SEARCH, Request));
 
+        if (Request.Match('GET', '/ticket/timeslots/search')) then
+            exit(Handle(_ApiFunction::TIMESLOTS_SEARCH, Request));
+
         if (Request.Match('GET', '/ticket/reservation/:token')) then
             exit(Handle(_ApiFunction::GET_RESERVATION, Request));
 

@@ -539,6 +539,174 @@ codeunit 85047 "NPR TM Dynamic Price Test"
 
     #endregion RelativeUntil
 
+    #region RuleArithmetic
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EvaluateRule_Percent()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        BasePrice: Decimal;
+        AddonPrice: Decimal;
+    begin
+        // Given: a PERCENT rule with -13% adjustment, default-carrier evaluation, no VAT
+        Rule.Init();
+        Rule.PricingOption := Rule.PricingOption::PERCENT;
+        Rule.Percentage := -13;
+        Rule.AmountIncludesVAT := false;
+        Rule.VatPercentage := 0;
+        Rule.RoundingPrecision := 0.01;
+
+        // When: evaluating against UnitPrice 9.11 with IsDefaultBasePrice = true
+        TicketPrice.EvaluatePriceRule(Rule, 9.11, false, 0, true, BasePrice, AddonPrice);
+
+        // Then: BasePrice carries the unit price; AddonPrice = 9.11 * -13/100 = -1.1843 -> rounds to -1.18
+        Assert.AreEqual(9.11, BasePrice, 'PERCENT default-carrier: BasePrice should equal the input UnitPrice');
+        Assert.AreEqual(-1.18, AddonPrice, 'PERCENT default-carrier: AddonPrice should equal UnitPrice * Percentage / 100, rounded to 0.01');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EvaluateRule_Relative()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        BasePrice: Decimal;
+        AddonPrice: Decimal;
+    begin
+        // Given: a RELATIVE rule adding +7.29, default-carrier evaluation, no VAT
+        Rule.Init();
+        Rule.PricingOption := Rule.PricingOption::RELATIVE;
+        Rule.Amount := 7.29;
+        Rule.AmountIncludesVAT := false;
+        Rule.VatPercentage := 0;
+        Rule.RoundingPrecision := 0.01;
+
+        // When: evaluating against UnitPrice 9.11 with IsDefaultBasePrice = true
+        TicketPrice.EvaluatePriceRule(Rule, 9.11, false, 0, true, BasePrice, AddonPrice);
+
+        // Then: BasePrice carries the unit price; AddonPrice = Rule.Amount = 7.29
+        Assert.AreEqual(9.11, BasePrice, 'RELATIVE default-carrier: BasePrice should equal the input UnitPrice');
+        Assert.AreEqual(7.29, AddonPrice, 'RELATIVE default-carrier: AddonPrice should equal Rule.Amount');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EvaluateRule_Fixed()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        BasePrice: Decimal;
+        AddonPrice: Decimal;
+    begin
+        // Given: a FIXED rule overriding base to 47.13, default-carrier evaluation, no VAT
+        Rule.Init();
+        Rule.PricingOption := Rule.PricingOption::FIXED;
+        Rule.Amount := 47.13;
+        Rule.AmountIncludesVAT := false;
+        Rule.VatPercentage := 0;
+        Rule.RoundingPrecision := 0.01;
+
+        // When: evaluating against UnitPrice 9.11 with IsDefaultBasePrice = true
+        TicketPrice.EvaluatePriceRule(Rule, 9.11, false, 0, true, BasePrice, AddonPrice);
+
+        // Then: BasePrice is overridden to Rule.Amount; AddonPrice stays 0 (FIXED replaces the base, no delta)
+        Assert.AreEqual(47.13, BasePrice, 'FIXED: BasePrice should be overridden to Rule.Amount');
+        Assert.AreEqual(0, AddonPrice, 'FIXED: AddonPrice should be 0 (rule replaces base)');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EvaluateRule_RelativeVatInclusive()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        BasePrice: Decimal;
+        AddonPrice: Decimal;
+    begin
+        // Given: RELATIVE rule with Amount 7.29 ex-VAT; UnitPrice 11.39 inc-VAT @ 25%
+        //   (RELATIVE is the right rule type to exercise VAT here -- for PERCENT, the inc/ex factor
+        //    cancels out and the test wouldn't catch a missing VAT round-trip.)
+        Rule.Init();
+        Rule.PricingOption := Rule.PricingOption::RELATIVE;
+        Rule.Amount := 7.29;
+        Rule.AmountIncludesVAT := false;
+        Rule.VatPercentage := 0;
+        Rule.RoundingPrecision := 0.01;
+
+        // When: UnitPriceIncludesVAT = true, VAT% = 25, IsDefaultBasePrice = true
+        TicketPrice.EvaluatePriceRule(Rule, 11.39, true, 25, true, BasePrice, AddonPrice);
+
+        // Then: outputs are VAT-inclusive.
+        //   BasePrice path: UnitPrice 11.39 inc -> ex 9.112 -> AddVat back -> 11.39
+        //   AddonPrice path: Rule.Amount 7.29 ex -> AddVat -> 9.1125 -> rounds to 9.11 (nearest)
+        Assert.AreEqual(11.39, BasePrice, 'RELATIVE VAT-inc: BasePrice should equal the inc-VAT UnitPrice (round-trip)');
+        Assert.AreEqual(9.11, AddonPrice, 'RELATIVE VAT-inc: AddonPrice should equal Rule.Amount * (1 + VAT%) = 9.1125, rounded to 9.11');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CalculateScheduleEntryPrice_DefaultVsNonDefaultRequired()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        PriceProfileCode: Code[10];
+        ExternalEntryNo: Integer;
+        DefaultBasePrice: Decimal;
+        DefaultAddonPrice: Decimal;
+        NonDefaultBasePrice: Decimal;
+        NonDefaultAddonPrice: Decimal;
+    begin
+        // Given: a clean scenario with no rules applying (clear any seeded rules so we test the no-rule fall-through path)
+        ItemNo := SelectDynamicPriceScenario();
+        AdmissionCode := GetAdmissionCode(ItemNo);
+        PriceProfileCode := GetPriceProfileCode(ItemNo);
+
+        Rule.SetFilter(ProfileCode, '=%1', PriceProfileCode);
+        Rule.DeleteAll();
+
+        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        AdmissionScheduleEntry.FindFirst();
+        ExternalEntryNo := AdmissionScheduleEntry."External Schedule Entry No.";
+
+        // Ensure the BOM is set as default carrier + REQUIRED (the standard "main ticket" config)
+        TicketBom.Get(ItemNo, '', AdmissionCode);
+        TicketBom.Default := true;
+        TicketBom."Admission Inclusion" := TicketBom."Admission Inclusion"::REQUIRED;
+        TicketBom.Modify();
+
+        // When: CalculateScheduleEntryPrice for default-carrier BOM, UnitPrice = 9.11, no rule active
+        TicketPrice.CalculateScheduleEntryPrice(ItemNo, '', AdmissionCode, ExternalEntryNo, 9.11, false, 0, Today(), 0T, DefaultBasePrice, DefaultAddonPrice);
+
+        // Then: BasePrice falls through to the input UnitPrice; no addon
+        Assert.AreEqual(9.11, DefaultBasePrice, 'Default carrier, no rule: BasePrice should equal the input UnitPrice (fall-through)');
+        Assert.AreEqual(0, DefaultAddonPrice, 'Default carrier, no rule: AddonPrice should be 0');
+
+        // Given: flip the BOM to non-default REQUIRED (the "secondary admission" config)
+        TicketBom.Default := false;
+        TicketBom.Modify();
+
+        // When: same call, same inputs, just the Default flag flipped
+        TicketPrice.CalculateScheduleEntryPrice(ItemNo, '', AdmissionCode, ExternalEntryNo, 9.11, false, 0, Today(), 0T, NonDefaultBasePrice, NonDefaultAddonPrice);
+
+        // Then: non-default REQUIRED zeroes out BasePrice (TMDynamicPrice.al:543-544 logic);
+        //       this is the load-bearing rule that lets a package carrier hold the base while other required admissions contribute 0 + their own delta
+        Assert.AreEqual(0, NonDefaultBasePrice, 'Non-default REQUIRED: BasePrice should be zeroed out by the carrier-only logic');
+        Assert.AreEqual(0, NonDefaultAddonPrice, 'Non-default REQUIRED, no rule: AddonPrice should be 0');
+    end;
+
+    #endregion RuleArithmetic
+
     [Normal]
     local procedure SetBookingDate(PriceProfileCode: Code[10]; LineNo: Integer; DateFromFormula: Text; DateUntilFormula: Text)
     var

@@ -17,6 +17,10 @@ enum 6059815 "NPR TicketingApiFunctions"
     {
         Caption = 'Get schedule';
     }
+    value(130; TIMESLOTS_SEARCH)
+    {
+        Caption = 'Get time slots';
+    }
 
     value(200; CATALOG)
     {
