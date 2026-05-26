@@ -1014,9 +1014,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     internal procedure GetCountryCode(NpEcStore: Record "NPR NpEc Store"; Token: JsonToken; Path: Text; MustExistInJson: Boolean) CountryCode: Code[10]
     begin
-#pragma warning disable AA0139
-        CountryCode := JsonHelper.GetJCode(Token, Path, MaxStrLen(CountryCode), MustExistInJson);
-#pragma warning restore AA0139
+        CountryCode := SpfyIntegrationMgt.TranslateCountryCode(JsonHelper.GetJText(Token, Path, MustExistInJson));
         if CountryCode = '' then
             CountryCode := NpEcStore."Spfy Country/Region Code";
     end;

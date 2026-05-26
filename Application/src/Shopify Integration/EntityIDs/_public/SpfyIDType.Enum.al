@@ -16,5 +16,9 @@ enum 6014657 "NPR Spfy ID Type"
     {
         Caption = 'Store Code';
     }
+    value(3; "Default Address ID")
+    {
+        Caption = 'Default Address ID';
+    }
 }
 #endif

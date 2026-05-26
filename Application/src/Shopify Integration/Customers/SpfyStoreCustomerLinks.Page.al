@@ -40,6 +40,12 @@ page 6185101 "NPR Spfy Store-Customer Links"
                     ToolTip = 'Specifies a Shopify Customer ID assigned to the customer.';
                     ApplicationArea = NPRShopify;
                 }
+                field("Shopify Default Address ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Default Address ID"))
+                {
+                    Caption = 'Shopify Default Address ID';
+                    ToolTip = 'Specifies the Shopify address ID of the default customer address synced with this store.';
+                    ApplicationArea = NPRShopify;
+                }
                 field("First Name"; Rec."First Name")
                 {
                     ToolTip = 'Specifies the first name of the customer as it is specified in the Shopify store.';

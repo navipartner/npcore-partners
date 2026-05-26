@@ -135,7 +135,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     local procedure CheckForDuplicates(BCRecID: RecordId; ShopifyIDType: Enum "NPR Spfy ID Type"; NewShopifyID: Text[30])
     var
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
-        IDAlreadyAssigned: Label 'Provided Shopify %1 ''%2'' is already assigned to another record (%3)';
+        IDAlreadyAssigned: Label 'Provided Shopify %1 ‘%2’ is already assigned to another record (%3)';
     begin
         if NewShopifyID = '' then
             exit;

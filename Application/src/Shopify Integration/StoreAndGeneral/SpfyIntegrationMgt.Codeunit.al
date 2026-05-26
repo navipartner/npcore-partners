@@ -533,6 +533,90 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         Error(NotTempErr, ObjectAndProcedureName);
     end;
 
+    #region Country Code Translation - Shopify expects country codes to be in 'ISO 3166-1 alpha-2' format
+    internal procedure TranslateCountryCode(ShopifyCountryCode: Text): Code[10]
+    var
+        Country: Record "Country/Region";
+        Found: Boolean;
+    begin
+        ShopifyCountryCode := ShopifyCountryCode.Trim().ToUpper();
+        if ShopifyCountryCode = '' then
+            exit('');
+
+        Country.SetLoadFields(Code, "ISO Code");
+        if StrLen(ShopifyCountryCode) <= MaxStrLen(Country."ISO Code") then begin
+            Country.SetRange("ISO Code", ShopifyCountryCode);
+            Found := Country.FindFirst();
+            Country.SetRange("ISO Code");
+        end;
+        if not Found then begin
+            if StrLen(ShopifyCountryCode) <= MaxStrLen(Country.Code) then
+                Found := Country.Get(ShopifyCountryCode);
+            if not Found then
+                Country.Code := CopyStr(ShopifyCountryCode, 1, MaxStrLen(Country.Code));
+        end;
+
+        exit(Country.Code);
+    end;
+
+    internal procedure CountryISOCode(CountryCode: Code[10]): Code[2]
+    var
+        Country: Record "Country/Region";
+    begin
+        if CountryCode = '' then
+            exit('');
+
+        Country.SetLoadFields(Code, "ISO Code");
+        if not Country.Get(CountryCode) then begin
+            Clear(Country);
+            Country.Code := CountryCode;
+        end;
+        if Country."ISO Code" = '' then begin
+            if StrLen(CountryCode) <= MaxStrLen(Country."ISO Code") then
+                Country."ISO Code" := CopyStr(CountryCode, 1, MaxStrLen(Country."ISO Code"));
+            Country.TestField("ISO Code");
+        end;
+
+        exit(Country."ISO Code");
+    end;
+    #endregion
+
+    #region Phone number validation
+    /// <summary>
+    /// Minimal sanity check that a phone number is in a shape Shopify will accept (E.164-style).
+    /// Shopify rejects entire requests when the phone is malformed, so we filter rather than send a
+    /// known-bad value.
+    /// Rules enforced:
+    ///   - must start with '+'
+    ///   - after the '+', only digits and the separators ' ', '-', '(', ')' are allowed
+    ///   - 7..15 digits in total after the '+'
+    /// This is intentionally not a full E.164 validator (which would require country-specific rules
+    /// or an external service); it catches the common formatting mistakes that Shopify rejects.
+    /// </summary>
+    internal procedure IsValidShopifyPhoneNo(PhoneNo: Text): Boolean
+    var
+        Trimmed: Text;
+        Ch: Char;
+        DigitCount: Integer;
+        i: Integer;
+    begin
+        Trimmed := PhoneNo.Trim();
+        if (Trimmed = '') or (Trimmed[1] <> '+') then
+            exit(false);
+
+        for i := 2 to StrLen(Trimmed) do begin
+            Ch := Trimmed[i];
+            if (Ch >= '0') and (Ch <= '9') then
+                DigitCount += 1
+            else
+                if not (Ch in [' ', '-', '(', ')']) then
+                    exit(false);
+        end;
+
+        exit((DigitCount >= 7) and (DigitCount <= 15));
+    end;
+    #endregion
+
     #region Azure AD application
     internal procedure RegisterWebhookHandlingAzureEntraApp()
     var

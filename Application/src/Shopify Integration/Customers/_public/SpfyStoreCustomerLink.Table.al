@@ -60,7 +60,9 @@ table 6151228 "NPR Spfy Store-Customer Link"
 
             trigger OnValidate()
             var
+                Customer: Record Customer;
                 SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+                SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
                 ConfirmDisableSyncLbl: Label 'Are you sure you want to disable synchronization for Customer %1 with the Shopify store %2? If you confirm, the customer will be removed from the Shopify store.', Comment = '%1 - Customer No., %2 - Shopify Store Code';
             begin
                 if xRec."Sync. to this Store" and not "Sync. to this Store" then
@@ -68,6 +70,8 @@ table 6151228 "NPR Spfy Store-Customer Link"
                         if not Confirm(ConfirmDisableSyncLbl, false, "No.", "Shopify Store Code") then
                             Error('');
                 if "Sync. to this Store" then begin
+                    if Customer.Get("No.") then
+                        SpfySendCustomers.SeedLinkFromCustomer(Customer, Rec);
                     Modify(true);
                     SpfyMetafieldMgt.InitStoreCustomerLinkMetafields(Rec);
                 end;
@@ -84,6 +88,42 @@ table 6151228 "NPR Spfy Store-Customer Link"
             Editable = false;
             FieldClass = FlowField;
             CalcFormula = lookup("NPR Spfy Store".Enabled where(Code = field("Shopify Store Code")));
+        }
+        field(220; Address; Text[100])
+        {
+            Caption = 'Address';
+            DataClassification = CustomerContent;
+        }
+        field(230; "Address 2"; Text[50])
+        {
+            Caption = 'Address 2';
+            DataClassification = CustomerContent;
+        }
+        field(240; City; Text[30])
+        {
+            Caption = 'City';
+            DataClassification = CustomerContent;
+        }
+        field(250; County; Text[30])
+        {
+            Caption = 'County';
+            DataClassification = CustomerContent;
+        }
+        field(260; "Post Code"; Code[20])
+        {
+            Caption = 'Post Code';
+            DataClassification = CustomerContent;
+        }
+        field(270; "Country/Region Code"; Code[10])
+        {
+            Caption = 'Country/Region Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Country/Region";
+        }
+        field(280; "Address Updated in BC"; Boolean)
+        {
+            Caption = 'Address Updated in BC';
+            DataClassification = CustomerContent;
         }
         field(200; "E-mail Marketing State"; Enum "NPR Spfy EMail Marketing State")
         {
@@ -124,6 +164,7 @@ table 6151228 "NPR Spfy Store-Customer Link"
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Default Address ID");
         SpfyMetafieldMgt.FilterSpfyEntityMetafields(RecordId(), "NPR Spfy Metafield Owner Type"::CUSTOMER, SpfyEntityMetafield);
         if not SpfyEntityMetafield.IsEmpty() then
             SpfyEntityMetafield.DeleteAll();

@@ -1078,7 +1078,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             InventoryItemJObject.Add('sku', SpfyItemMgt.GetProductVariantSku(ItemVariant."Item No.", ItemVariant.Code));
             InventoryItemJObject.Add('tracked', not SpfyItemVariantModifMgt.DoNotTrackInventory(SpfyStoreItemVariantLink));
             if Item."Country/Region of Origin Code" <> '' then
-                InventoryItemJObject.Add('countryCodeOfOrigin', Item."Country/Region of Origin Code");
+                InventoryItemJObject.Add('countryCodeOfOrigin', _SpfyIntegrationMgt.CountryISOCode(Item."Country/Region of Origin Code"));
             if Item."Tariff No." <> '' then
                 InventoryItemJObject.Add('harmonizedSystemCode', Item."Tariff No.");
             AddWeightToInventoryItem(SpfyStoreItemVariantLink, InventoryItemJObject);
@@ -1647,7 +1647,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 TempShopifyLocation."Address 2" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.address2', MaxStrLen(TempShopifyLocation."Address 2"), false);
                 TempShopifyLocation.City := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.city', MaxStrLen(TempShopifyLocation.City), false);
                 TempShopifyLocation."Post Code" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.zip', MaxStrLen(TempShopifyLocation."Post Code"), false);
-                TempShopifyLocation."Country/Region Code" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.countryCode', MaxStrLen(TempShopifyLocation."Country/Region Code"), false);
+                TempShopifyLocation."Country/Region Code" := _SpfyIntegrationMgt.TranslateCountryCode(_JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.countryCode', false));
 #pragma warning restore AA0139
                 TempShopifyLocation.Active := _JsonHelper.GetJBoolean(ReceivedShopifyLocation, 'node.isActive', false);
                 TempShopifyLocation.Insert();

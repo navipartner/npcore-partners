@@ -53,6 +53,10 @@ codeunit 6248540 "NPR Spfy Send Customers"
                 ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyResponse, 'data.customerDelete.deletedCustomerId', true), '/');
         end;
 #pragma warning restore AA0139
+        if NcTask.Type = NcTask.Type::Insert then
+            CaptureCustomerCreateDefaultAddressId(SpfyStoreCustomerLink, ShopifyResponse);
+        if NcTask.Type <> NcTask.Type::Delete then
+            SyncAddressIfPending(SpfyStoreCustomerLink, ShopifyCustomerID, NcTask);
         RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, NcTask.Type = NcTask.Type::Delete, false, false);
     end;
 
@@ -94,7 +98,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         Variables: JsonObject;
         OStream: OutStream;
         EmailMarketingConsentIncluded: Boolean;
-        CustomerCreate_QueryTok: Label 'mutation CreateCustomer($customerInput: CustomerInput!) {customerCreate(input: $customerInput) {customer{id} userErrors {message field}}}', Locked = true;
+        CustomerCreate_QueryTok: Label 'mutation CreateCustomer($customerInput: CustomerInput!) {customerCreate(input: $customerInput) {customer{id defaultAddress{id}} userErrors {message field}}}', Locked = true;
         CustomerDelete_QueryTok: Label 'mutation DeleteCustomer($customerInput: CustomerDeleteInput!) {customerDelete(input: $customerInput) {deletedCustomerId userErrors{field message}}}', Locked = true;
         CustomerUpdate_QueryTok: Label 'mutation UpdateCustomer(%1) {customerUpdate(input: $customerInput) {customer{id} userErrors{field message}}%2}', Locked = true;
         EmailMarketingConsentUpdate_QueryTok: Label 'customerEmailMarketingConsentUpdate(input: $emailMarketingConsentInput) {customer{id defaultEmailAddress{emailAddress marketingState marketingOptInLevel marketingUpdatedAt}} userErrors{field message}}', Locked = true;
@@ -141,10 +145,13 @@ codeunit 6248540 "NPR Spfy Send Customers"
         CustomerJson.Add('email', SpfyStoreCustomerLink."E-Mail");
         if SpfyStoreCustomerLink."Phone No." <> '' then
             if _SpfyIntegrationMgt.IsUpdateCustPhoneNoFromBC(SpfyStoreCustomerLink."Shopify Store Code") then
-                CustomerJson.Add('phone', SpfyStoreCustomerLink."Phone No.");
+                if _SpfyIntegrationMgt.IsValidShopifyPhoneNo(SpfyStoreCustomerLink."Phone No.") then
+                    CustomerJson.Add('phone', SpfyStoreCustomerLink."Phone No.");
         if SpfyStoreCustomerLink."First Name" <> '' then
             CustomerJson.Add('firstName', SpfyStoreCustomerLink."First Name");
         CustomerJson.Add('lastName', SpfyStoreCustomerLink."Last Name");
+        if (NcTaskType = NcTask.Type::Insert) and not AddressIsBlank(SpfyStoreCustomerLink) then
+            CustomerJson.Add('addresses', BuildAddressArray(SpfyStoreCustomerLink));
 
         if ShopifyCustomerID = '' then  // Marketing consent must be sent as a separate request when updating an existing customer
             AddEmailMarketingConsentInfo(SpfyStoreCustomerLink, ShopifyCustomerID, CustomerJson);
@@ -171,6 +178,46 @@ codeunit 6248540 "NPR Spfy Send Customers"
             exit(true);
         end;
         exit(false);
+    end;
+
+    local procedure AddressIsBlank(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean
+    begin
+        exit(
+            (SpfyStoreCustomerLink.Address = '') and
+            (SpfyStoreCustomerLink."Address 2" = '') and
+            (SpfyStoreCustomerLink.City = '') and
+            (SpfyStoreCustomerLink.County = '') and
+            (SpfyStoreCustomerLink."Post Code" = '') and
+            (SpfyStoreCustomerLink."Country/Region Code" = ''));
+    end;
+
+    local procedure BuildAddressArray(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link") AddressesJson: JsonArray
+    var
+        AddressJson: JsonObject;
+    begin
+        BuildAddressInput(SpfyStoreCustomerLink, AddressJson);
+        AddressesJson.Add(AddressJson);
+    end;
+
+    local procedure BuildAddressInput(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; var AddressJson: JsonObject)
+    var
+        ISOCode: Code[2];
+    begin
+        if SpfyStoreCustomerLink."First Name" <> '' then
+            AddressJson.Add('firstName', SpfyStoreCustomerLink."First Name");
+        if SpfyStoreCustomerLink."Last Name" <> '' then
+            AddressJson.Add('lastName', SpfyStoreCustomerLink."Last Name");
+        AddressJson.Add('address1', SpfyStoreCustomerLink.Address);
+        AddressJson.Add('address2', SpfyStoreCustomerLink."Address 2");
+        AddressJson.Add('city', SpfyStoreCustomerLink.City);
+        AddressJson.Add('province', SpfyStoreCustomerLink.County);
+        AddressJson.Add('zip', SpfyStoreCustomerLink."Post Code");
+        ISOCode := _SpfyIntegrationMgt.CountryISOCode(SpfyStoreCustomerLink."Country/Region Code");
+        AddressJson.Add('countryCode', ISOCode);
+        if SpfyStoreCustomerLink."Phone No." <> '' then
+            if _SpfyIntegrationMgt.IsUpdateCustPhoneNoFromBC(SpfyStoreCustomerLink."Shopify Store Code") then
+                if _SpfyIntegrationMgt.IsValidShopifyPhoneNo(SpfyStoreCustomerLink."Phone No.") then
+                    AddressJson.Add('phone', SpfyStoreCustomerLink."Phone No.");
     end;
 
     local procedure SpfyEmailMarketingStateEnumValueName(State: Enum "NPR Spfy EMail Marketing State") Result: Text
@@ -298,6 +345,39 @@ codeunit 6248540 "NPR Spfy Send Customers"
             SpfyStoreCustomerLink."E-Mail" := Customer."E-Mail";
         if SpfyStoreCustomerLink."Phone No." = '' then
             SpfyStoreCustomerLink."Phone No." := Customer."Phone No.";
+        if AddressIsBlank(SpfyStoreCustomerLink) then begin
+            SpfyStoreCustomerLink.Address := Customer.Address;
+            SpfyStoreCustomerLink."Address 2" := Customer."Address 2";
+            SpfyStoreCustomerLink.City := Customer.City;
+            SpfyStoreCustomerLink.County := Customer.County;
+            SpfyStoreCustomerLink."Post Code" := Customer."Post Code";
+            SpfyStoreCustomerLink."Country/Region Code" := Customer."Country/Region Code";
+            if not AddressIsBlank(SpfyStoreCustomerLink) then
+                SpfyStoreCustomerLink."Address Updated in BC" := true;
+        end;
+    end;
+
+    internal procedure SeedLinkFromCustomer(Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    begin
+        ParseCustomerName(Customer, SpfyStoreCustomerLink);
+        SpfyStoreCustomerLink."E-Mail" := Customer."E-Mail";
+        SpfyStoreCustomerLink."Phone No." := Customer."Phone No.";
+        SpfyStoreCustomerLink.Address := Customer.Address;
+        SpfyStoreCustomerLink."Address 2" := Customer."Address 2";
+        SpfyStoreCustomerLink.City := Customer.City;
+        SpfyStoreCustomerLink.County := Customer.County;
+        SpfyStoreCustomerLink."Post Code" := Customer."Post Code";
+        SpfyStoreCustomerLink."Country/Region Code" := Customer."Country/Region Code";
+        SpfyStoreCustomerLink."Address Updated in BC" := true;
+    end;
+
+    internal procedure GetParsedNames(Customer: Record Customer; var FirstName: Text[100]; var LastName: Text[100])
+    var
+        TempLink: Record "NPR Spfy Store-Customer Link" temporary;
+    begin
+        ParseCustomerName(Customer, TempLink);
+        FirstName := TempLink."First Name";
+        LastName := TempLink."Last Name";
     end;
 
     local procedure ParseCustomerName(Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
@@ -380,7 +460,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
-        QueryTok: Label 'query GetCustomer($customerID: ID!) {customer(id: $customerID) {id firstName lastName defaultEmailAddress{emailAddress marketingOptInLevel marketingState marketingUpdatedAt} defaultPhoneNumber{phoneNumber}}}', Locked = true;
+        QueryTok: Label 'query GetCustomer($customerID: ID!) {customer(id: $customerID) {id firstName lastName defaultEmailAddress{emailAddress marketingOptInLevel marketingState marketingUpdatedAt} defaultPhoneNumber{phoneNumber} defaultAddress{id address1 address2 city province zip countryCode}}}', Locked = true;
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         Variables.Add('customerID', 'gid://shopify/Customer/' + ShopifyCustomerID);
@@ -424,6 +504,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         SpfyStoreCustomerLink."E-Mail" := _JsonHelper.GetJText(ShopifyResponse, 'customer.defaultEmailAddress.emailAddress', MaxStrLen(SpfyStoreCustomerLink."E-Mail"), false);
         SpfyStoreCustomerLink."Phone No." := _JsonHelper.GetJText(ShopifyResponse, 'customer.defaultPhoneNumber.phoneNumber', MaxStrLen(SpfyStoreCustomerLink."Phone No."), false);
 #pragma warning restore AA0139
+        ApplyShopifyDefaultAddressToLink(SpfyStoreCustomerLink, ShopifyResponse);
         EmailMarketingState := _JsonHelper.GetJText(ShopifyResponse, 'customer.defaultEmailAddress.marketingState', false);
         if EmailMarketingState <> '' then
             if Evaluate(SpfyStoreCustomerLink."E-mail Marketing State", UpperCase(EmailMarketingState)) then begin
@@ -442,6 +523,8 @@ codeunit 6248540 "NPR Spfy Send Customers"
         if TriggeredExternally and not xSpfyStoreCustomerLink."Sync. to this Store" then
             SpfyMetafieldMgt.InitStoreCustomerLinkMetafields(SpfyStoreCustomerLink);
         UpdateMetafieldsFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID);
+
+        ApplyLinkToCustomerIfMatching(SpfyStoreCustomerLink, xSpfyStoreCustomerLink);
     end;
 
     local procedure UpdateMetafieldsFromShopify(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyOwnerID: Text[30])
@@ -456,6 +539,333 @@ codeunit 6248540 "NPR Spfy Send Customers"
                 exit;
         end;
         SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(SpfyStoreCustomerLink.RecordId(), ShopifyOwnerType, ShopifyOwnerID, SpfyStoreCustomerLink."Shopify Store Code");
+    end;
+
+    local procedure ApplyShopifyDefaultAddressToLink(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyResponse: JsonToken)
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        DefaultAddrJToken: JsonToken;
+        ShopifyAddressID: Text[30];
+        AddressFromShopifyPresent: Boolean;
+    begin
+        // Writes Shopify's default address into the link's address fields. The caller is responsible
+        // for persisting the link via ModifySpfyStoreCustomerLink (with DisableDataLog) so the data
+        // log does not schedule a re-push to Shopify.
+        AddressFromShopifyPresent :=
+            _JsonHelper.GetJsonToken(ShopifyResponse, 'customer.defaultAddress', DefaultAddrJToken) and DefaultAddrJToken.IsObject();
+
+        if AddressFromShopifyPresent then begin
+#pragma warning disable AA0139
+            SpfyStoreCustomerLink.Address := _JsonHelper.GetJText(DefaultAddrJToken, 'address1', MaxStrLen(SpfyStoreCustomerLink.Address), false);
+            SpfyStoreCustomerLink."Address 2" := _JsonHelper.GetJText(DefaultAddrJToken, 'address2', MaxStrLen(SpfyStoreCustomerLink."Address 2"), false);
+            SpfyStoreCustomerLink.City := _JsonHelper.GetJText(DefaultAddrJToken, 'city', MaxStrLen(SpfyStoreCustomerLink.City), false);
+            SpfyStoreCustomerLink.County := _JsonHelper.GetJText(DefaultAddrJToken, 'province', MaxStrLen(SpfyStoreCustomerLink.County), false);
+            SpfyStoreCustomerLink."Post Code" := _JsonHelper.GetJCode(DefaultAddrJToken, 'zip', MaxStrLen(SpfyStoreCustomerLink."Post Code"), false);
+            SpfyStoreCustomerLink."Country/Region Code" := _SpfyIntegrationMgt.TranslateCountryCode(_JsonHelper.GetJText(DefaultAddrJToken, 'countryCode', false));
+#pragma warning restore AA0139
+            ShopifyAddressID := ExtractAddressID(_JsonHelper.GetJText(DefaultAddrJToken, 'id', false));
+        end else begin
+            SpfyStoreCustomerLink.Address := '';
+            SpfyStoreCustomerLink."Address 2" := '';
+            SpfyStoreCustomerLink.City := '';
+            SpfyStoreCustomerLink.County := '';
+            SpfyStoreCustomerLink."Post Code" := '';
+            SpfyStoreCustomerLink."Country/Region Code" := '';
+        end;
+        SpfyStoreCustomerLink."Address Updated in BC" := false;
+
+        if AddressFromShopifyPresent and (ShopifyAddressID <> '') then
+            SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID", ShopifyAddressID, false)
+        else
+            SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID");
+    end;
+
+    local procedure ApplyLinkToCustomerIfMatching(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; xSpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    var
+        Customer: Record Customer;
+        DataLogMgt: Codeunit "NPR Data Log Management";
+        CustomerFirstName: Text[100];
+        CustomerLastName: Text[100];
+        CustomerChanged: Boolean;
+    begin
+        // For each section (name, email, phone, address), apply the link's post-pull value to the
+        // Customer card if either:
+        //   - the link had no prior value AND the link now has a non-blank value (first-time sync;
+        //     Shopify is authoritative — but never clear Customer when Shopify also has nothing); or
+        //   - the Customer card still matches the link's pre-pull value (no BC-side drift).
+        if not Customer.Get(SpfyStoreCustomerLink."No.") then
+            exit;
+
+        GetParsedNames(Customer, CustomerFirstName, CustomerLastName);
+        if (xSpfyStoreCustomerLink."First Name" = '') and (xSpfyStoreCustomerLink."Last Name" = '') then begin
+            if (SpfyStoreCustomerLink."First Name" <> '') or (SpfyStoreCustomerLink."Last Name" <> '') then begin
+                SetCustomerFullName(Customer, BuildFullName(SpfyStoreCustomerLink."First Name", SpfyStoreCustomerLink."Last Name"));
+                CustomerChanged := true;
+            end;
+        end else
+            if (CustomerFirstName = xSpfyStoreCustomerLink."First Name") and
+               (CustomerLastName = xSpfyStoreCustomerLink."Last Name")
+            then begin
+                SetCustomerFullName(Customer, BuildFullName(SpfyStoreCustomerLink."First Name", SpfyStoreCustomerLink."Last Name"));
+                CustomerChanged := true;
+            end;
+
+        if xSpfyStoreCustomerLink."E-Mail" = '' then begin
+            if SpfyStoreCustomerLink."E-Mail" <> '' then begin
+                Customer."E-Mail" := CopyStr(SpfyStoreCustomerLink."E-Mail", 1, MaxStrLen(Customer."E-Mail"));
+                CustomerChanged := true;
+            end;
+        end else
+            if Customer."E-Mail" = xSpfyStoreCustomerLink."E-Mail" then begin
+                Customer."E-Mail" := CopyStr(SpfyStoreCustomerLink."E-Mail", 1, MaxStrLen(Customer."E-Mail"));
+                CustomerChanged := true;
+            end;
+
+        // When xLink.Phone failed Shopify's format validation, we never sent it on the outbound
+        // mutation — so a blank phone in the Shopify response just means "we held it back", not
+        // "Shopify cleared the phone". Preserve Customer's phone in that case.
+        if xSpfyStoreCustomerLink."Phone No." = '' then begin
+            if SpfyStoreCustomerLink."Phone No." <> '' then begin
+                Customer."Phone No." := SpfyStoreCustomerLink."Phone No.";
+                CustomerChanged := true;
+            end;
+        end else
+            if Customer."Phone No." = xSpfyStoreCustomerLink."Phone No." then
+                if (SpfyStoreCustomerLink."Phone No." <> '') or
+                   _SpfyIntegrationMgt.IsValidShopifyPhoneNo(xSpfyStoreCustomerLink."Phone No.")
+                then begin
+                    Customer."Phone No." := SpfyStoreCustomerLink."Phone No.";
+                    CustomerChanged := true;
+                end;
+
+        if AddressIsBlank(xSpfyStoreCustomerLink) then begin
+            if not AddressIsBlank(SpfyStoreCustomerLink) then begin
+                Customer.Address := SpfyStoreCustomerLink.Address;
+                Customer."Address 2" := SpfyStoreCustomerLink."Address 2";
+                Customer.City := SpfyStoreCustomerLink.City;
+                Customer.County := SpfyStoreCustomerLink.County;
+                Customer."Post Code" := SpfyStoreCustomerLink."Post Code";
+                Customer."Country/Region Code" := SpfyStoreCustomerLink."Country/Region Code";
+                CustomerChanged := true;
+            end;
+        end else
+            if (Customer.Address = xSpfyStoreCustomerLink.Address) and
+               (Customer."Address 2" = xSpfyStoreCustomerLink."Address 2") and
+               (Customer.City = xSpfyStoreCustomerLink.City) and
+               (Customer.County = xSpfyStoreCustomerLink.County) and
+               (Customer."Post Code" = xSpfyStoreCustomerLink."Post Code") and
+               (Customer."Country/Region Code" = xSpfyStoreCustomerLink."Country/Region Code")
+            then begin
+                Customer.Address := SpfyStoreCustomerLink.Address;
+                Customer."Address 2" := SpfyStoreCustomerLink."Address 2";
+                Customer.City := SpfyStoreCustomerLink.City;
+                Customer.County := SpfyStoreCustomerLink.County;
+                Customer."Post Code" := SpfyStoreCustomerLink."Post Code";
+                Customer."Country/Region Code" := SpfyStoreCustomerLink."Country/Region Code";
+                CustomerChanged := true;
+            end;
+
+        if CustomerChanged then begin
+            DataLogMgt.DisableDataLog(true);
+            Customer.Modify(true);
+            DataLogMgt.DisableDataLog(false);
+        end;
+    end;
+
+    local procedure BuildFullName(FirstName: Text[100]; LastName: Text[100]) FullName: Text
+    begin
+        FullName := FirstName;
+        if LastName = '' then
+            exit;
+        if FullName <> '' then
+            FullName += ' ';
+        FullName += LastName;
+    end;
+
+    local procedure SetCustomerFullName(var Customer: Record Customer; FullName: Text)
+    begin
+        Customer.Name := CopyStr(FullName, 1, MaxStrLen(Customer.Name));
+        if StrLen(FullName) > MaxStrLen(Customer.Name) then
+            Customer."Name 2" := CopyStr(FullName, MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2"))
+        else
+            Customer."Name 2" := '';
+    end;
+
+    local procedure ExtractAddressID(AddressGID: Text): Text[30]
+    var
+        NumericPart: Text;
+        QPos: Integer;
+    begin
+        NumericPart := _SpfyIntegrationMgt.RemoveUntil(AddressGID, '/');
+        QPos := NumericPart.IndexOf('?');
+        if QPos > 0 then
+            NumericPart := CopyStr(NumericPart, 1, QPos - 1);
+#pragma warning disable AA0139
+        exit(CopyStr(NumericPart, 1, 30));
+#pragma warning restore AA0139
+    end;
+
+    local procedure CaptureCustomerCreateDefaultAddressId(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyResponse: JsonToken)
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        DataLogMgt: Codeunit "NPR Data Log Management";
+        ShopifyAddressID: Text[30];
+    begin
+        ShopifyAddressID := ExtractAddressID(_JsonHelper.GetJText(ShopifyResponse, 'data.customerCreate.customer.defaultAddress.id', false));
+        if ShopifyAddressID <> '' then
+            SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID", ShopifyAddressID, false);
+
+        if SpfyStoreCustomerLink."Address Updated in BC" then begin
+            DataLogMgt.DisableDataLog(true);
+            SpfyStoreCustomerLink."Address Updated in BC" := false;
+            SpfyStoreCustomerLink.Modify();
+            DataLogMgt.DisableDataLog(false);
+        end;
+    end;
+
+    local procedure SyncAddressIfPending(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; var OuterNcTask: Record "NPR Nc Task")
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        DataLogMgt: Codeunit "NPR Data Log Management";
+        ShopifyResponse: JsonToken;
+        ShopifyAddressID: Text[30];
+        NewShopifyAddressID: Text[30];
+    begin
+        if not SpfyStoreCustomerLink."Address Updated in BC" then
+            exit;
+        if ShopifyCustomerID = '' then
+            exit;
+
+        ShopifyAddressID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID");
+
+        if AddressIsBlank(SpfyStoreCustomerLink) then begin
+            if ShopifyAddressID <> '' then begin
+                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, OuterNcTask.Type::Delete, ShopifyResponse, OuterNcTask);
+                SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID");
+            end;
+            // else: blank link + no Shopify address — nothing to sync
+        end else
+            if ShopifyAddressID = '' then begin
+                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, '', OuterNcTask.Type::Insert, ShopifyResponse, OuterNcTask);
+#pragma warning disable AA0139
+                NewShopifyAddressID := ExtractAddressID(_JsonHelper.GetJText(ShopifyResponse, 'data.customerAddressCreate.address.id', true));
+#pragma warning restore AA0139
+                SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID", NewShopifyAddressID, false);
+            end else
+                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, OuterNcTask.Type::Modify, ShopifyResponse, OuterNcTask);
+
+        DataLogMgt.DisableDataLog(true);
+        SpfyStoreCustomerLink."Address Updated in BC" := false;
+        SpfyStoreCustomerLink.Modify();
+        DataLogMgt.DisableDataLog(false);
+    end;
+
+    local procedure ExecuteAddressRequest(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; ShopifyAddressID: Text[30]; TaskType: Option; var ShopifyResponse: JsonToken; var OuterNcTask: Record "NPR Nc Task")
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        NcTask: Record "NPR Nc Task";
+        Success: Boolean;
+    begin
+        PrepareAddressRequest(NcTask, SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, TaskType);
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+        // Append the address request/response to the outer customer NcTask so the user can review
+        // both the customer mutation and the follow-up address mutation in the same NcTask record.
+        // Commit before any Error() so the diagnostic data survives the transaction rollback.
+        AppendNcTaskBlobs(OuterNcTask, NcTask);
+        OuterNcTask.Modify();
+        Commit();
+        if not Success then
+            Error(GetLastErrorText());
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+            Error('');
+    end;
+
+    local procedure AppendNcTaskBlobs(var OuterNcTask: Record "NPR Nc Task"; LocalNcTask: Record "NPR Nc Task")
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStr: InStream;
+        OutStr: OutStream;
+        DataOutputBuilder: TextBuilder;
+        ResponseBuilder: TextBuilder;
+        Separator: Text;
+    begin
+        Separator := TypeHelper.CRLFSeparator() + TypeHelper.CRLFSeparator();
+        OuterNcTask.CalcFields("Data Output", Response);
+
+        if OuterNcTask."Data Output".HasValue() then begin
+            OuterNcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+            DataOutputBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
+        end;
+        if LocalNcTask."Data Output".HasValue() then begin
+            if DataOutputBuilder.Length() > 0 then
+                DataOutputBuilder.Append(Separator);
+            LocalNcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+            DataOutputBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
+        end;
+
+        if OuterNcTask.Response.HasValue() then begin
+            OuterNcTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
+            ResponseBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
+        end;
+        if LocalNcTask.Response.HasValue() then begin
+            if ResponseBuilder.Length() > 0 then
+                ResponseBuilder.Append(Separator);
+            LocalNcTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
+            ResponseBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
+        end;
+
+        Clear(OuterNcTask."Data Output");
+        OuterNcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(DataOutputBuilder.ToText());
+
+        Clear(OuterNcTask.Response);
+        OuterNcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(ResponseBuilder.ToText());
+    end;
+
+    local procedure PrepareAddressRequest(var NcTask: Record "NPR Nc Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; ShopifyAddressID: Text[30]; TaskType: Option)
+    var
+        AddressJson: JsonObject;
+        Variables: JsonObject;
+        Request: JsonObject;
+        OStream: OutStream;
+        CreateAddressQueryTok: Label 'mutation CreateCustomerAddress($address: MailingAddressInput!, $customerId: ID!) {customerAddressCreate(address: $address, customerId: $customerId) {address{id} userErrors{field message}}}', Locked = true;
+        UpdateAddressQueryTok: Label 'mutation UpdateCustomerAddress($address: MailingAddressInput!, $addressId: ID!, $customerId: ID!) {customerAddressUpdate(address: $address, addressId: $addressId, customerId: $customerId) {address{id} userErrors{field message}}}', Locked = true;
+        DeleteAddressQueryTok: Label 'mutation DeleteCustomerAddress($addressId: ID!, $customerId: ID!) {customerAddressDelete(addressId: $addressId, customerId: $customerId) {deletedAddressId userErrors{field message}}}', Locked = true;
+    begin
+        Clear(NcTask);
+        NcTask."Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
+        Variables.Add('customerId', 'gid://shopify/Customer/' + ShopifyCustomerID);
+
+        case TaskType of
+            NcTask.Type::Insert:
+                begin
+                    BuildAddressInput(SpfyStoreCustomerLink, AddressJson);
+                    Variables.Add('address', AddressJson);
+                    Request.Add('query', CreateAddressQueryTok);
+                end;
+            NcTask.Type::Modify:
+                begin
+                    BuildAddressInput(SpfyStoreCustomerLink, AddressJson);
+                    Variables.Add('address', AddressJson);
+                    Variables.Add('addressId', BuildAddressGID(ShopifyAddressID, ShopifyCustomerID));
+                    Request.Add('query', UpdateAddressQueryTok);
+                end;
+            NcTask.Type::Delete:
+                begin
+                    Variables.Add('addressId', BuildAddressGID(ShopifyAddressID, ShopifyCustomerID));
+                    Request.Add('query', DeleteAddressQueryTok);
+                end;
+        end;
+
+        Request.Add('variables', Variables);
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        Request.WriteTo(OStream);
+    end;
+
+    local procedure BuildAddressGID(ShopifyAddressID: Text[30]; ShopifyCustomerID: Text[30]): Text
+    begin
+        exit('gid://shopify/MailingAddress/' + ShopifyAddressID + '?model_name=CustomerAddress&customer_id=' + ShopifyCustomerID);
     end;
 
     procedure EnableIntegrationForCustomersAlreadyOnShopify(ShopifyStoreCode: Code[20]; WithDialog: Boolean)
@@ -511,6 +921,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
                 end;
                 if CreateAtShopify then begin
                     SpfyStoreCustomerLink."Sync. to this Store" := true;
+                    SeedLinkFromCustomer(Customer, SpfyStoreCustomerLink);
                     ModifySpfyStoreCustomerLink(SpfyStoreCustomerLink, false);
                     SpfyMetafieldMgt.InitStoreCustomerLinkMetafields(SpfyStoreCustomerLink);
                 end;
@@ -539,6 +950,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID");
 
         SpfyStoreCustomerLink."Sync. to this Store" := false;
         SpfyStoreCustomerLink."Synchronization Is Enabled" := false;

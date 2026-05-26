@@ -17,8 +17,8 @@ report 6014568 "NPR Spfy Cust. Re-sync Options"
 #if not (BC18 or BC19)
                 BatchProcessingTxt: Label 'Resyncing customers for Shopify store %1.', Comment = '%1 - Shopify store code';
 #endif
-                ConfirmQst: Label 'This function will go through your selected customers in BC and mark those already existing in your Shopify Store ''%1'' as ''Shopify Customers''.';
-                DialogText1Lbl: Label 'Updating customers from Shopify Store ''%1''...\\';
+                ConfirmQst: Label 'This function will go through your selected customers in BC and mark those already existing in your Shopify Store ‘%1’ as ‘Shopify Customers’.';
+                DialogText1Lbl: Label 'Updating customers from Shopify Store ‘%1’...\\';
                 DialogText2Lbl: Label 'Customer No. #1########\';
                 DialogText3Lbl: Label 'Progress @2@@@@@@@@';
                 NothingToDoErr: Label 'There is nothing to do (there are no customers in the system).';
@@ -142,7 +142,7 @@ report 6014568 "NPR Spfy Cust. Re-sync Options"
 
                         trigger OnValidate()
                         var
-                            MustBeTrueErr: Label '"Register in Data Log" must be set to ''true'' when you have selected to create customers in Shopify.';
+                            MustBeTrueErr: Label '"Register in Data Log" must be set to ‘true’ when you have selected to create customers in Shopify.';
                         begin
                             if not RegisterInDataLog and CreateAtShopify then
                                 Error(MustBeTrueErr);

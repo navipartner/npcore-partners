@@ -83,6 +83,7 @@ codeunit 6248665 "NPR Spfy Cust. Webhook Handler" implements "NPR Spfy Webhook N
         IncludeFields.Add('last_name');
         IncludeFields.Add('email');
         IncludeFields.Add('phone');
+        IncludeFields.Add('default_address');
         IncludeFields.Add('updated_at');
     end;
 }

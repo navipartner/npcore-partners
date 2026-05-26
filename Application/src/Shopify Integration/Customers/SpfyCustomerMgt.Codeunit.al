@@ -347,5 +347,134 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
         if CheckCustomerIsSynchronized(Rec) then
             Error(DeleteNotAllowedErr);
     end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeModifyEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Customer, OnBeforeModifyEvent, '', false, false)]
+#endif
+    local procedure RefreshxRec(var Rec: Record Customer; var xRec: Record Customer)
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+#if not (BC18 or BC19 or BC20 or BC21)
+        xRec.ReadIsolation := IsolationLevel::ReadCommitted;
+#endif
+        if not xRec.Find() then
+            Clear(xRec);
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterModifyEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Customer, OnAfterModifyEvent, '', false, false)]
+#endif
+    local procedure Customer_OnAfterModifyEvent_PropagateToLink(var Rec: Record Customer; var xRec: Record Customer; RunTrigger: Boolean)
+    var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+        xParsedFirstName: Text[100];
+        xParsedLastName: Text[100];
+        NewParsedFirstName: Text[100];
+        NewParsedLastName: Text[100];
+        NameChanged: Boolean;
+        EmailChanged: Boolean;
+        PhoneChanged: Boolean;
+        AddressChanged: Boolean;
+        LinkChanged: Boolean;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        NameChanged := (Rec.Name <> xRec.Name) or (Rec."Name 2" <> xRec."Name 2");
+        EmailChanged := Rec."E-Mail" <> xRec."E-Mail";
+        PhoneChanged := Rec."Phone No." <> xRec."Phone No.";
+        AddressChanged :=
+            (Rec.Address <> xRec.Address) or (Rec."Address 2" <> xRec."Address 2") or
+            (Rec.City <> xRec.City) or (Rec.County <> xRec.County) or
+            (Rec."Post Code" <> xRec."Post Code") or (Rec."Country/Region Code" <> xRec."Country/Region Code");
+        if not (NameChanged or EmailChanged or PhoneChanged or AddressChanged) then
+            exit;
+
+        if NameChanged then begin
+            SpfySendCustomers.GetParsedNames(xRec, xParsedFirstName, xParsedLastName);
+            SpfySendCustomers.GetParsedNames(Rec, NewParsedFirstName, NewParsedLastName);
+        end;
+
+        SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
+        SpfyStoreCustomerLink.SetRange("No.", Rec."No.");
+        if not SpfyStoreCustomerLink.FindSet() then
+            exit;
+        repeat
+            LinkChanged := false;
+            if NameChanged then
+                if (SpfyStoreCustomerLink."First Name" in ['', xParsedFirstName]) and
+                   (SpfyStoreCustomerLink."Last Name" in ['', xParsedLastName])
+                then begin
+                    SpfyStoreCustomerLink."First Name" := NewParsedFirstName;
+                    SpfyStoreCustomerLink."Last Name" := NewParsedLastName;
+                    LinkChanged := true;
+                end;
+            if EmailChanged then
+                if SpfyStoreCustomerLink."E-Mail" in ['', xRec."E-Mail"] then begin
+                    SpfyStoreCustomerLink."E-Mail" := Rec."E-Mail";
+                    LinkChanged := true;
+                end;
+            if PhoneChanged then
+                if SpfyStoreCustomerLink."Phone No." in ['', xRec."Phone No."] then begin
+                    SpfyStoreCustomerLink."Phone No." := Rec."Phone No.";
+                    LinkChanged := true;
+                end;
+            if AddressChanged then
+                if (SpfyStoreCustomerLink.Address in ['', xRec.Address]) and
+                   (SpfyStoreCustomerLink."Address 2" in ['', xRec."Address 2"]) and
+                   (SpfyStoreCustomerLink.City in ['', xRec.City]) and
+                   (SpfyStoreCustomerLink.County in ['', xRec.County]) and
+                   (SpfyStoreCustomerLink."Post Code" in ['', xRec."Post Code"]) and
+                   (SpfyStoreCustomerLink."Country/Region Code" in ['', xRec."Country/Region Code"])
+                then begin
+                    SpfyStoreCustomerLink.Address := Rec.Address;
+                    SpfyStoreCustomerLink."Address 2" := Rec."Address 2";
+                    SpfyStoreCustomerLink.City := Rec.City;
+                    SpfyStoreCustomerLink.County := Rec.County;
+                    SpfyStoreCustomerLink."Post Code" := Rec."Post Code";
+                    SpfyStoreCustomerLink."Country/Region Code" := Rec."Country/Region Code";
+                    SpfyStoreCustomerLink."Address Updated in BC" := true;
+                    LinkChanged := true;
+                end;
+            if LinkChanged then
+                SpfyStoreCustomerLink.Modify(true);
+        until SpfyStoreCustomerLink.Next() = 0;
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Phone No.', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Customer, OnAfterValidateEvent, 'Phone No.', false, false)]
+#endif
+    local procedure WarnOnInvalidShopifyPhoneNo(var Rec: Record Customer; var xRec: Record Customer)
+    var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        ConfirmInvalidPhoneLbl: Label 'The phone number %1 does not meet Shopify’s format requirements (must start with ‘+’ followed by the country code and digits, optionally separated by spaces, dashes, or parentheses). The customer is synced to one or more Shopify stores; on the next sync, the phone number on the Customer card will be overwritten with whatever value Shopify currently has for this customer. Continue?', Comment = '%1 - the entered phone number';
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if Rec."Phone No." = xRec."Phone No." then
+            exit;
+        if Rec."Phone No." = '' then
+            exit;
+        if not GuiAllowed() then
+            exit;
+        if SpfyIntegrationMgt.IsValidShopifyPhoneNo(Rec."Phone No.") then
+            exit;
+        SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
+        SpfyStoreCustomerLink.SetRange("No.", Rec."No.");
+        SpfyStoreCustomerLink.SetRange("Sync. to this Store", true);
+        if SpfyStoreCustomerLink.IsEmpty() then
+            exit;
+        if not Confirm(ConfirmInvalidPhoneLbl, false, Rec."Phone No.") then
+            Error('');
+    end;
 }
 #endif

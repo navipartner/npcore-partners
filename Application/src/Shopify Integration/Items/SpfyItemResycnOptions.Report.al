@@ -17,8 +17,8 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
 #if not (BC18 or BC19)
                 BatchProcessingTxt: Label 'Resyncing items for Shopify store %1.', Comment = '%1 - Shopify store code';
 #endif
-                ConfirmQst: Label 'This function will go through your selected items in BC and mark those already existing in your Shopify Store ''%1'' as ''Shopify Items''.';
-                DialogText1Lbl: Label 'Updating items from Shopify Store ''%1''...\\';
+                ConfirmQst: Label 'This function will go through your selected items in BC and mark those already existing in your Shopify Store ‘%1’ as ‘Shopify Items’.';
+                DialogText1Lbl: Label 'Updating items from Shopify Store ‘%1’...\\';
                 DialogText2Lbl: Label 'Item No. #1########\';
                 DialogText3Lbl: Label 'Progress @2@@@@@@@@';
                 NothingToDoErr: Label 'There is nothing to do (there are no items in the system).';
@@ -147,7 +147,7 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
 
                         trigger OnValidate()
                         var
-                            MustBeTrueErr: Label '"Register in Data Log" must be set to ''true'' when you have selected to create products in Shopify.';
+                            MustBeTrueErr: Label '"Register in Data Log" must be set to ‘true’ when you have selected to create products in Shopify.';
                         begin
                             if not RegisterInDataLog and CreateAtShopify then
                                 Error(MustBeTrueErr);

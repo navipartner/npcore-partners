@@ -76,6 +76,42 @@ page 6185092 "NPR Spfy Store-Cust.Links Subp"
                     ToolTip = 'Specifies the customer’s e-mail marketing consent state (i.e. whether the customer is subscribed to the newsletter) at the Shopify store.';
                     ApplicationArea = NPRShopify;
                 }
+                field(Address; Rec.Address)
+                {
+                    ToolTip = 'Specifies the street address of the customer as it is defined in the Shopify store.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Address 2"; Rec."Address 2")
+                {
+                    ToolTip = 'Specifies the second line of the street address of the customer as it is defined in the Shopify store.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field(City; Rec.City)
+                {
+                    ToolTip = 'Specifies the city of the customer as it is defined in the Shopify store.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field(County; Rec.County)
+                {
+                    ToolTip = 'Specifies the county of the customer as it is defined in the Shopify store.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Post Code"; Rec."Post Code")
+                {
+                    ToolTip = 'Specifies the postal code of the customer as it is defined in the Shopify store.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Country/Region Code"; Rec."Country/Region Code")
+                {
+                    ToolTip = 'Specifies the country/region code of the customer as it is defined in the Shopify store.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
                 field("Shopify Customer ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
                 {
                     Caption = 'Shopify Customer ID';
@@ -96,6 +132,31 @@ page 6185092 "NPR Spfy Store-Cust.Links Subp"
 
                         Clear(ChangeShopifyID);
                         ChangeShopifyID.SetOptions(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                        ChangeShopifyID.RunModal();
+
+                        CurrPage.Update(false);
+                    end;
+                }
+                field("Shopify Default Address ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Default Address ID"))
+                {
+                    Caption = 'Shopify Default Address ID';
+                    ToolTip = 'Specifies the Shopify address ID of the default customer address synced with this store.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    var
+                        ChangeShopifyID: Page "NPR Spfy Change Assigned ID";
+                    begin
+                        Rec.TestField(Type, Rec.Type::Customer);
+                        Rec.TestField("No.");
+                        Rec.TestField("Shopify Store Code");
+                        CurrPage.SaveRecord();
+                        Commit();
+
+                        Clear(ChangeShopifyID);
+                        ChangeShopifyID.SetOptions(Rec.RecordId(), "NPR Spfy ID Type"::"Default Address ID");
                         ChangeShopifyID.RunModal();
 
                         CurrPage.Update(false);
