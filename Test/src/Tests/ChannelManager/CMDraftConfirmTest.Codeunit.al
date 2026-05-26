@@ -41,7 +41,7 @@ codeunit 85247 "NPR CM Draft Confirm Test"
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
 
         // [WHEN] CreateOrder is called
-        OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         // [THEN] Order is Draft with DocumentNo + JobId assigned
         Order.Get(OrderId);

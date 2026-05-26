@@ -60,9 +60,9 @@ codeunit 6150986 "NPR CMJobQueueRunner"
         until (Order.Next() = 0);
     end;
 
-    internal procedure ProcessSingleOrder(var Order: Record "NPR CMOrder")
+    internal procedure ReProcessSingleOrder(var Order: Record "NPR CMOrder")
     var
-        NotSubmittedErr: Label 'Order is not in Submitted status (current: %1) and cannot be processed manually.', Comment = '%1 = current status';
+        WrongStatusErr: Label 'Order status %1 is not eligible for manual processing — only Submitted (initial) or Error (retry) are.', Comment = '%1 = current status';
     begin
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         Order.ReadIsolation := IsolationLevel::UpdLock;
@@ -71,10 +71,11 @@ codeunit 6150986 "NPR CMJobQueueRunner"
 #endif
         if (not Order.Find()) then
             exit;
-        if (Order.Status <> Order.Status::Submitted) then
-            Error(NotSubmittedErr, Order.Status);
 
-        Order.Status := Order.Status::Scheduled;
+        if (not (Order.Status in [Order.Status::Submitted, Order.Status::Error])) then
+            Error(WrongStatusErr, Order.Status);
+
+        Order.Status := Order.Status::Processing;
         Order.Modify();
         Commit();
 
@@ -128,8 +129,7 @@ codeunit 6150986 "NPR CMJobQueueRunner"
         else begin
             Sentry.AddLastErrorIfProgrammingBug();
             ErrorMessage := GetLastErrorText();
-
-            if (Order.Get(Order.OrderId) and (Order.Status = Order.Status::Processing)) then begin
+            if (Order.Get(Order.OrderId)) then begin
                 Order.Status := Order.Status::Error;
                 Order.StatusMessage := CopyStr(ErrorMessage, 1, MaxStrLen(Order.StatusMessage));
                 Order.Modify();
@@ -153,8 +153,7 @@ codeunit 6150986 "NPR CMJobQueueRunner"
         if (not Codeunit.Run(Codeunit::"NPR CMOrderIssuer", Order)) then begin
             Sentry.AddLastErrorIfProgrammingBug();
             ErrorMessage := GetLastErrorText();
-
-            if (Order.Get(Order.OrderId) and (Order.Status = Order.Status::Processing)) then begin
+            if (Order.Get(Order.OrderId)) then begin
                 Order.Status := Order.Status::Error;
                 Order.StatusMessage := CopyStr(ErrorMessage, 1, MaxStrLen(Order.StatusMessage));
                 Order.Modify();

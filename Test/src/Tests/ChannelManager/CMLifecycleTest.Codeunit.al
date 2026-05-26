@@ -39,7 +39,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         CMLibrary.AddOrderLine(OrderId, 20000, ItemNo, 1, Today(), Time(), TempOrderLine);
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
         CMLibrary.AddOrderWallet(OrderId, 20000, 1, TempOrderWallet);
-        OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         Order.Get(OrderId);
         DocumentNoBefore := Order.DocumentNo;
@@ -56,7 +56,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         CMLibrary.AddOrderLine(OrderId, 10000, ItemNo, 2, Today(), Time(), TempOrderLine);
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
         CMLibrary.AddOrderWallet(OrderId, 10000, 2, TempOrderWallet);
-        OrderIssuer.ReplaceOrder(Order, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ReplaceOrder(true, Order, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         // [THEN] Order still has same DocumentNo + Partner
         Order.Get(OrderId);
@@ -120,7 +120,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         CMLibrary.AddOrderLine(OrderId, 10000, ItemNo, 2, Today(), Time(), TempOrderLine);
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
         CMLibrary.AddOrderWallet(OrderId, 10000, 2, TempOrderWallet);
-        OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         Order.Get(OrderId);
         DocumentNoBefore := Order.DocumentNo;
@@ -138,7 +138,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         CMLibrary.AddOrderLine(OrderId, 20000, ItemNo, 1, Today(), Time(), TempOrderLine);
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
         CMLibrary.AddOrderWallet(OrderId, 20000, 1, TempOrderWallet);
-        OrderIssuer.ReplaceOrder(Order, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ReplaceOrder(true, Order, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         // [WHEN] Final confirm
         Order.Get(OrderId);
@@ -198,7 +198,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         OrderId := Order.OrderId;
         CMLibrary.AddOrderLine(OrderId, 10000, ItemNo, 1, Today(), Time(), TempOrderLine);
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
-        OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         Order.Get(OrderId);
         Assert.AreEqual(Order.Status::Issued, Order.Status, 'Pre-delete: Status = Issued');
@@ -257,7 +257,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         OrderId := Order.OrderId;
         CMLibrary.AddOrderLine(OrderId, 10000, ItemNo, 1, Today(), Time(), TempOrderLine);
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
-        OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         Order.Get(OrderId);
         Assert.AreEqual(Order.Status::Draft, Order.Status, 'Pre-delete: Status = Draft');
@@ -275,6 +275,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
     procedure CreateOrderWithPastVisitDate_LandsInErrorState()
     var
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        OtaOrderRunner: Codeunit "NPR CMJobQueueRunner";
         CMLibrary: Codeunit "NPR Library Channel Manager";
         OrderIssuer: Codeunit "NPR CMOrderIssuer";
         Assert: Codeunit Assert;
@@ -301,8 +302,21 @@ codeunit 85248 "NPR CM Lifecycle Test"
         CMLibrary.AddOrderLine(OrderId, 10000, ItemNo, 1, CalcDate('<-5D>', Today()), Time(), TempOrderLine);
         CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
 
-        // [WHEN] CreateOrder is called — worker errors out
-        asserterror OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        // [WHEN] order will fail in sync mode - worker errors out
+        asserterror OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+
+        // [THEN] Order header committed with Processing status 
+        Assert.IsTrue(Order.Get(OrderId), 'Header committed despite worker failure');
+        Assert.AreEqual(Order.Status::Processing, Order.Status, 'Status = Processing');
+        Assert.AreEqual('', Order.StatusMessage, 'StatusMessage should be empty');
+
+        // [WHEN] processing is not a terminal state, so the JQ runner will attempt to re-process it and hit a invalid state and fail again
+        asserterror OtaOrderRunner.ReProcessSingleOrder(Order);
+
+        Order.Get(OrderId);
+        Order.Status := Order.Status::Submitted;
+        Order.Modify();
+        OtaOrderRunner.ReProcessSingleOrder(Order);
 
         // [THEN] Order header committed with Error status + StatusMessage
         Assert.IsTrue(Order.Get(OrderId), 'Header committed despite worker failure');

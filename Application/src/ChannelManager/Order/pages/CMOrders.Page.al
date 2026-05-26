@@ -101,7 +101,7 @@ page 6150944 "NPR CMOrders"
             {
                 Caption = 'Process';
                 Image = Process;
-                ToolTip = 'Process this submitted order now, equivalent to letting the job queue runner pick it up on the next tick. Only enabled while the order is in Submitted status.';
+                ToolTip = 'Process this order now, equivalent to letting the job queue runner pick it up on the next tick. Enabled for orders in Submitted status (initial processing) or Error status (retry after a prior failure).';
                 ApplicationArea = NPRRetail;
                 Scope = Repeater;
                 Enabled = CanProcess;
@@ -110,7 +110,10 @@ page 6150944 "NPR CMOrders"
                 var
                     JQRunner: Codeunit "NPR CMJobQueueRunner";
                 begin
-                    JQRunner.ProcessSingleOrder(Rec);
+                    JQRunner.ReProcessSingleOrder(Rec);
+                    Rec.Find();
+                    if (Rec.Status = Rec.Status::Error) then
+                        Message(Rec.StatusMessage);
                     CurrPage.Update(false);
                 end;
             }
@@ -153,7 +156,7 @@ page 6150944 "NPR CMOrders"
             PartnerName := PartnerSetup.Name;
 
         StatusStyle := Rec.GetStatusStyle();
-        CanProcess := Rec.Status = Rec.Status::Submitted;
+        CanProcess := Rec.Status in [Rec.Status::Submitted, Rec.Status::Error];
     end;
 
     var

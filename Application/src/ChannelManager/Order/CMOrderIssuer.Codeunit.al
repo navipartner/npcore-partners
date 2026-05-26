@@ -11,69 +11,36 @@ codeunit 6151056 "NPR CMOrderIssuer"
         if (not Rec.Find()) then
             exit;
 
-        if (Rec.Status <> Rec.Status::Scheduled) then
+        if (not (Rec.Status in [Rec.Status::Scheduled, Rec.Status::Processing])) then
             exit;
 
         OrderWallet.SetFilter(OrderId, '=%1', Rec.OrderId);
-        if (OrderWallet.FindSet()) then begin
+        if (OrderWallet.FindSet()) then
             repeat
                 TempOrderWallet := OrderWallet;
                 TempOrderWallet.Insert();
             until (OrderWallet.Next() = 0);
 
-            OrderWallet.DeleteAll();
-        end;
-
         IssueForOrder(Rec, TempOrderWallet);
     end;
 
     #region Internal Facade
-    internal procedure CreateOrder(var Order: Record "NPR CMOrder"; var TempOrderLine: Record "NPR CMOrderLine" temporary; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
+    internal procedure ProcessNewOrder(
+        Synchronous: Boolean;
+        var Order: Record "NPR CMOrder";
+        var TempOrderLine: Record "NPR CMOrderLine" temporary;
+        var TempOrderComponent: Record "NPR CMOrderComponent" temporary;
+        var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
     var
         DuplicateOrderErr: Label 'An order with sellToOrderReference ''%1'' already exists for the given partner.', Comment = '%1 = sellToOrderReference value';
     begin
         if (Order.DocumentNo = '') then
             Order.DocumentNo := GenerateDocumentNo(Order.PartnerId);
-        Order.Status := Order.Status::Processing;
-        Order.ReceivedAt := CurrentDateTime();
-        if (not Order.Insert()) then
-            Error(DuplicateOrderErr, Order.SellToOrderReference);
 
-        PersistOrderLines(TempOrderLine);
-        PersistOrderComponents(TempOrderComponent);
-
-        IssueForOrder(Order, TempOrderWallet);
-    end;
-
-    internal procedure ReplaceOrder(var ExistingOrder: Record "NPR CMOrder"; var ParsedOrder: Record "NPR CMOrder"; var TempOrderLine: Record "NPR CMOrderLine" temporary; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
-    var
-        InvalidStatusErr: Label 'Order cannot be replaced in status %1.', Comment = '%1 = current order status';
-    begin
-        if (not (ExistingOrder.Status in [ExistingOrder.Status::Draft, ExistingOrder.Status::Error])) then
-            Error(InvalidStatusErr, ExistingOrder.Status);
-
-        DestroyOrderAssets(ExistingOrder);
-
-        // Apply mutable header fields only from the new order.
-        ExistingOrder.SellToEmail := ParsedOrder.SellToEmail;
-        ExistingOrder.SellToName := ParsedOrder.SellToName;
-        ExistingOrder.SellToLanguage := ParsedOrder.SellToLanguage;
-        ExistingOrder.PaymentReference := ParsedOrder.PaymentReference;
-        ExistingOrder.Modify();
-
-        PersistOrderLines(TempOrderLine);
-        PersistOrderComponents(TempOrderComponent);
-
-        IssueForOrder(ExistingOrder, TempOrderWallet);
-    end;
-
-    internal procedure SubmitOrder(var Order: Record "NPR CMOrder"; var TempOrderLine: Record "NPR CMOrderLine" temporary; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
-    var
-        DuplicateOrderErr: Label 'An order with sellToOrderReference ''%1'' already exists for the given partner.', Comment = '%1 = sellToOrderReference value';
-    begin
-        if (Order.DocumentNo = '') then
-            Order.DocumentNo := GenerateDocumentNo(Order.PartnerId);
         Order.Status := Order.Status::Submitted;
+        if (Synchronous) then
+            Order.Status := Order.Status::Scheduled;
+
         Order.ReceivedAt := CurrentDateTime();
         if (not Order.Insert()) then
             Error(DuplicateOrderErr, Order.SellToOrderReference);
@@ -81,9 +48,18 @@ codeunit 6151056 "NPR CMOrderIssuer"
         PersistOrderLines(TempOrderLine);
         PersistOrderComponents(TempOrderComponent);
         PersistWalletShells(TempOrderWallet);
+
+        if (Synchronous) then
+            IssueForOrder(Order, TempOrderWallet);
     end;
 
-    internal procedure SubmitReplaceOrder(var ExistingOrder: Record "NPR CMOrder"; var ParsedOrder: Record "NPR CMOrder"; var TempOrderLine: Record "NPR CMOrderLine" temporary; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
+    internal procedure ReplaceOrder(
+        Synchronous: Boolean;
+        var ExistingOrder: Record "NPR CMOrder";
+        var ParsedOrder: Record "NPR CMOrder";
+        var TempOrderLine: Record "NPR CMOrderLine" temporary;
+        var TempOrderComponent: Record "NPR CMOrderComponent" temporary;
+        var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
     var
         InvalidStatusErr: Label 'Order cannot be replaced in status %1.', Comment = '%1 = current order status';
     begin
@@ -96,12 +72,19 @@ codeunit 6151056 "NPR CMOrderIssuer"
         ExistingOrder.SellToName := ParsedOrder.SellToName;
         ExistingOrder.SellToLanguage := ParsedOrder.SellToLanguage;
         ExistingOrder.PaymentReference := ParsedOrder.PaymentReference;
+
         ExistingOrder.Status := ExistingOrder.Status::Submitted;
+        if (Synchronous) then
+            ExistingOrder.Status := ExistingOrder.Status::Scheduled;
+
         ExistingOrder.Modify();
 
         PersistOrderLines(TempOrderLine);
         PersistOrderComponents(TempOrderComponent);
         PersistWalletShells(TempOrderWallet);
+
+        if (Synchronous) then
+            IssueForOrder(ExistingOrder, TempOrderWallet);
     end;
 
     internal procedure DeleteOrder(var Order: Record "NPR CMOrder") HeaderDeleted: Boolean
@@ -188,33 +171,22 @@ codeunit 6151056 "NPR CMOrderIssuer"
         TempImportLine: Record "NPR TM ImportTicketLine" temporary;
         FailureMessage: Text;
     begin
-        // Idempotency guard
-        if (Order.JobId <> '') then
-            exit;
-
         Order.Status := Order.Status::Processing;
+        Order.StatusMessage := '';
         Order.Modify();
         Commit();
 
-        TicketIssuer.ReshapeToTicketImport(Order, TicketImportJobId, TempImportHeader, TempImportLine, TempOrderWallet);
-        Commit();
-
-        if (not TicketIssuer.RunTicketImport(TicketImportJobId, TempImportHeader, TempImportLine, FailureMessage)) then begin
-            Order.StatusMessage := CopyStr(FailureMessage, 1, MaxStrLen(Order.StatusMessage));
-            Order.Status := Order.Status::Error;
-            Order.Modify();
-
-            // Restore the wallet preset data so the order can be retried
-            PersistWalletShells(TempOrderWallet);
+        if (Order.JobId = '') then begin
+            TicketIssuer.ReshapeToTicketImport(Order, TicketImportJobId, TempImportHeader, TempImportLine, TempOrderWallet);
             Commit();
 
-            Error(FailureMessage);
-        end;
+            if (not TicketIssuer.RunTicketImport(TicketImportJobId, TempImportHeader, TempImportLine, FailureMessage)) then
+                Error(FailureMessage);
 
-        // Ensure JobId is persisted in case wallet creation fails
-        Order.JobId := TicketImportJobId;
-        Order.Modify();
-        Commit();
+            Order.JobId := TicketImportJobId;
+            Order.Modify();
+            Commit();
+        end;
 
         WrapAssetsIntoWallets(Order, TempOrderWallet);
 
@@ -240,6 +212,9 @@ codeunit 6151056 "NPR CMOrderIssuer"
         TempOrderWallet.Reset();
         if (not TempOrderWallet.FindSet()) then
             exit;
+
+        OrderWallet.SetFilter(OrderId, '=%1', Order.OrderId);
+        OrderWallet.DeleteAll();
 
         repeat
             OrderLine.Get(TempOrderWallet.OrderId, TempOrderWallet.LineNo);
@@ -473,14 +448,12 @@ codeunit 6151056 "NPR CMOrderIssuer"
 
     local procedure GenerateDefaultDocumentNo(): Code[20]
     var
-        AlphaNum: Text;
         Suffix: Text[4];
-        Idx: Integer;
     begin
-        Randomize();
-        AlphaNum := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        for Idx := 1 to 4 do
-            Suffix += CopyStr(AlphaNum, Random(36), 1);
+        // 4 hex chars off a fresh Guid = 16 bits of crypto-random; independent across calls
+        // (kernel-RNG, not time-seeded), so within-tick bursts don't collide. Same Guid-to-hex
+        // pattern as NewJobId in CMTicketIssuer.
+        Suffix := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 4);
         exit(CopyStr('CM-' + Format(CurrentDateTime(), 0, '<Year,2><Month,2><Day,2><Hours24,2><Minutes,2><Seconds,2>') + '-' + Suffix, 1, 20));
     end;
 

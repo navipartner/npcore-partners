@@ -34,11 +34,11 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         // Default is async, opt out with ?sync=1.
         if (IsSyncRequested(Request)) then begin
-            OrderIssuer.CreateOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+            OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
             exit(Response.RespondCreated(BuildOrderResponseJson(Order)));
         end;
 
-        OrderIssuer.SubmitOrder(Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ProcessNewOrder(false, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         exit(Response.RespondCreated(BuildOrderResponseJson(Order)));
     end;
@@ -82,11 +82,11 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         // Default is async, opt out with ?sync=1.
         if (IsSyncRequested(Request)) then begin
-            OrderIssuer.ReplaceOrder(ExistingOrder, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
+            OrderIssuer.ReplaceOrder(true, ExistingOrder, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
             exit(Response.RespondOk(BuildOrderResponseJson(ExistingOrder)));
         end;
 
-        OrderIssuer.SubmitReplaceOrder(ExistingOrder, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
+        OrderIssuer.ReplaceOrder(false, ExistingOrder, ParsedOrder, TempOrderLine, TempOrderComponent, TempOrderWallet);
 
         exit(Response.RespondOk(BuildOrderResponseJson(ExistingOrder)));
     end;

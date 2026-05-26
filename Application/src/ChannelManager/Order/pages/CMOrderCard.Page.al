@@ -151,6 +151,26 @@ page 6150939 "NPR CMOrderCard"
         }
         area(Processing)
         {
+            action(ProcessOrder)
+            {
+                Caption = 'Process';
+                Image = Process;
+                ToolTip = 'Process this order now, equivalent to letting the job queue runner pick it up on the next tick. Enabled for orders in Submitted status (initial processing) or Error status (retry after a prior failure).';
+                ApplicationArea = NPRRetail;
+                Enabled = CanProcess;
+
+                trigger OnAction()
+                var
+                    JQRunner: Codeunit "NPR CMJobQueueRunner";
+                begin
+                    JQRunner.ReProcessSingleOrder(Rec);
+                    CurrPage.Update(false);
+                    Rec.Find();
+                    if (Rec.Status = Rec.Status::Error) then
+                        Message(Rec.StatusMessage);
+                    CurrPage.Update(false);
+                end;
+            }
             action(ManuallyConfirm)
             {
                 Caption = 'Manually Confirm';
@@ -207,6 +227,7 @@ page 6150939 "NPR CMOrderCard"
 
         CanCancel := Rec.Status = Rec.Status::Issued;
         CanManuallyConfirm := Rec.Status = Rec.Status::Draft;
+        CanProcess := Rec.Status in [Rec.Status::Submitted, Rec.Status::Error];
         HasManifest := not IsNullGuid(Rec.ManifestId);
     end;
 
@@ -222,6 +243,7 @@ page 6150939 "NPR CMOrderCard"
     var
         PartnerName: Text[100];
         CanCancel: Boolean;
+        CanProcess: Boolean;
         CanManuallyConfirm: Boolean;
         HasManifest: Boolean;
         StatusStyle: Text;
