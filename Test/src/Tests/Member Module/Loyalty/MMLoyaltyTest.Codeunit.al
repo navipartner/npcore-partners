@@ -534,6 +534,188 @@ codeunit 85107 "NPR MM Loyalty Test"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_EarnAndBurn_3SalesLines()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        RequestXmlText: Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+        PointsToEarn, PointsToBurn : Integer;
+        ReservationToken: Text[40];
+        LoyaltyCode: Code[20];
+        TotalNewSalePoints: Integer;
+    begin
+        // Same totals as EarnAndBurn_03 but the burn-phase sale is split across 3 sales lines.
+        // Final membership state must match the 1-line case; divergence reveals a multi-line bug
+        // in earn/burn aggregation (e.g. NotEligible compensation or TotalEarnAmount summing).
+        LoyaltyCode := SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        // Earn points on sale
+        PointsToEarn := 170;
+        SetPointsToEarn(PointsToEarn, TempSalesLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (1).');
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (1).');
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Reserve points to burn
+        PointsToBurn := 47;
+        LibraryLoyalty.CreatePaymentLine(0, PointsToBurn, '', TempPaymentLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_ReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Reserve points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        ReservationToken := TempPointsResponse."Authorization Code";
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Three sales lines whose Quantity/Amount/Points totals match EarnAndBurn_03's single line
+        // (Qty 4, Amount 42.49, Points 55). Splitting must not change the outcome.
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), 1, 10.00, 13, TempSalesLinesRequest);
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), 2, 15.00, 20, TempSalesLinesRequest);
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), 1, 17.49, 22, TempSalesLinesRequest);
+        TotalNewSalePoints := 13 + 20 + 22;
+
+        LibraryLoyalty.CreatePaymentLine(42.49, PointsToBurn, ReservationToken, TempPaymentLinesRequest);
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn and burn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual((PointsToEarn - PointsToBurn), _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (2).');
+        _Assert.AreEqual(PointsToEarn + TotalNewSalePoints, _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (2).');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_EarnAndBurn_3SalesLines_WithReturn()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        RequestXmlText: Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+        PointsToEarn, PointsToBurn : Integer;
+        ReservationToken: Text[40];
+        LoyaltyCode: Code[20];
+        SalePointsLine1, SalePointsLine2, ReturnPointsLine3 : Integer;
+    begin
+        // Same totals as EarnAndBurn_03 but the burn-phase sale is split across 3 lines where
+        // the third line is a return (Type=RETURN with negative qty/amount/points).
+        // Net Amount = 25.00 + 22.49 - 5.00 = 42.49, Net Points = 33 + 29 - 7 = 55, matching _03.
+        // Final membership state must match the 1-line case; divergence reveals a multi-line
+        // return-handling bug in earn/burn aggregation.
+        LoyaltyCode := SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        // Earn points on sale
+        PointsToEarn := 170;
+        SetPointsToEarn(PointsToEarn, TempSalesLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (1).');
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (1).');
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Reserve points to burn
+        PointsToBurn := 47;
+        LibraryLoyalty.CreatePaymentLine(0, PointsToBurn, '', TempPaymentLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_ReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Reserve points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        ReservationToken := TempPointsResponse."Authorization Code";
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Two sales lines + one return line. Net totals match _03 (Amount 42.49, Points 55).
+        SalePointsLine1 := 33;
+        SalePointsLine2 := 29;
+        ReturnPointsLine3 := -7;
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), 2, 25.00, SalePointsLine1, TempSalesLinesRequest);
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), 2, 22.49, SalePointsLine2, TempSalesLinesRequest);
+        LibraryLoyalty.CreateReturnLine(GenerateSafeCode20(), GenerateSafeCode10(), -1, -5.00, ReturnPointsLine3, TempSalesLinesRequest);
+
+        LibraryLoyalty.CreatePaymentLine(42.49, PointsToBurn, ReservationToken, TempPaymentLinesRequest);
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn and burn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        // Remaining must match the 1-line baseline since net totals are identical.
+        _Assert.AreEqual((PointsToEarn - PointsToBurn), _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (2).');
+        // Awarded (Sale) counts only Entry Type=SALE entries; the return line creates a REFUND
+        // entry and is excluded — so we expect 170 + (33 + 29).
+        _Assert.AreEqual(PointsToEarn + SalePointsLine1 + SalePointsLine2, _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (2).');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RemoteMaster_AsYouGo_EarnAndCancelReservation()
     var
         LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";

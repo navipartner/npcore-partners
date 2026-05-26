@@ -587,14 +587,14 @@
 
                 case TmpPaymentLines.Type of
                     TmpPaymentLines.Type::PAYMENT:
-                        if (TmpSaleLines."Total Points" < 0) then begin
+                        if (TmpPaymentLines."Total Points" < 0) then begin
                             ResponseMessage := SALE_1;
                             ResponseMessageId := '-1154';
                             exit(false);
                         end;
 
                     TmpPaymentLines.Type::REFUND:
-                        if (TmpSaleLines."Total Points" > 0) then begin
+                        if (TmpPaymentLines."Total Points" > 0) then begin
                             ResponseMessage := SALE_1;
                             ResponseMessageId := '-1155';
                             exit(false);

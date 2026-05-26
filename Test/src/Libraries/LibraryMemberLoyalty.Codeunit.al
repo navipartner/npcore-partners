@@ -133,6 +133,35 @@ codeunit 85106 "NPR Library MemberLoyalty"
         TmpRegisterSaleLines.Insert();
     end;
 
+    /// <summary>
+    /// Appends a return (refund) line to a register-sale request buffer. The line is typed as
+    /// RETURN so the loyalty server produces a REFUND points entry rather than a SALE entry.
+    /// </summary>
+    /// <param name="ItemNo">Item number for the return line.</param>
+    /// <param name="VariantCode">Variant code for the return line.</param>
+    /// <param name="Qty">Quantity returned — must be negative.</param>
+    /// <param name="TotalAmount">Total amount of the return in LCY — must be negative.</param>
+    /// <param name="TotalPoints">Loyalty points associated with the return — must be negative or zero.</param>
+    /// <param name="TmpRegisterSaleLines">Temporary register-sale buffer the return line is appended to.</param>
+    internal procedure CreateReturnLine(ItemNo: Code[20]; VariantCode: Code[10]; Qty: Decimal; TotalAmount: Decimal; TotalPoints: Integer; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+
+        TmpRegisterSaleLines.Init();
+        TmpRegisterSaleLines."Entry No." := TmpRegisterSaleLines.Count() + 1;
+        TmpRegisterSaleLines.Type := TmpRegisterSaleLines.Type::RETURN;
+        TmpRegisterSaleLines."Item No." := ItemNo;
+        TmpRegisterSaleLines."Variant Code" := VariantCode;
+        TmpRegisterSaleLines.Description := 'Some Item Return Description';
+        TmpRegisterSaleLines.Quantity := Qty;
+        TmpRegisterSaleLines."Total Amount" := TotalAmount;
+        TmpRegisterSaleLines."Total Points" := TotalPoints;
+        TmpRegisterSaleLines."Currency Code" := GeneralLedgerSetup."LCY Code";
+        TmpRegisterSaleLines.Insert();
+    end;
+
     internal procedure CreatePaymentLine(Amount: Decimal; Points: Integer; AuthorizationCode: Text[40]; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
