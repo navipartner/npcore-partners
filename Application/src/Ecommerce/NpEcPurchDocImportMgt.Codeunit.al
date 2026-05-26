@@ -103,7 +103,7 @@
         if NpEcStore."Global Dimension 2 Code" <> '' then
             PurchHeader.Validate("Shortcut Dimension 2 Code", NpEcStore."Global Dimension 2 Code");
 
-        PurchHeader.Validate("Location Code", NpEcStore."Location Code");
+        PurchHeader.Validate("Location Code", NpEcStore.LocationCode);
         if Element.SelectSingleNode('.//currency_code', Node) then
             PurchHeader."Currency Code" := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(PurchHeader."Currency Code"));
 

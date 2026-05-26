@@ -336,6 +336,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR RS Retail Calculation Upg.", 'MatchRemainingQtyToRSRetailValueEntryMapping'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeBCRecordSystemIdInMemberPaymentMethods'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG CRO Customer No.", 'init-customer-no-on-cro-pos-audit-log'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpEc Store Loc. Code", 'CopyLocationCodeToCorrectLengthField'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1279,6 +1280,11 @@
                 case UpgradeStep of
                     'API_NODE_SERVICE_INF_721':
                         exit('NPR-RegisterApiNodeService-20260123');
+                end;
+            Codeunit::"NPR UPG NpEc Store Loc. Code":
+                case UpgradeStep of
+                    'CopyLocationCodeToCorrectLengthField':
+                        exit('NPR-CopyLocationCodeToCorrectLengthField-20260531');
                 end;
         end;
     end;

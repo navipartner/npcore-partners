@@ -852,7 +852,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         Assert.AreEqual(Qty, SalesLine.Quantity, 'Wrong quantity');
         Assert.AreEqual(UnitPrice, SalesLine."Unit Price", 'Wrong unit price');
         Assert.AreEqual(Round(Qty * UnitPrice), SalesLine."Line Amount", 'Wrong line amount');
-        Assert.AreEqual(EcStore."Location Code", SalesLine."Location Code", 'Wrong location');
+        Assert.AreEqual(EcStore.LocationCode, SalesLine."Location Code", 'Wrong location');
 
         // Verify imported description is assigned to sales order line for first item
         Item.Get(ItemNo);
@@ -864,7 +864,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         Assert.AreEqual(Qty2, SalesLine.Quantity, 'Wrong quantity');
         Assert.AreEqual(UnitPrice2, SalesLine."Unit Price", 'Wrong unit price');
         Assert.AreEqual(Round(Qty2 * UnitPrice2), SalesLine."Line Amount", 'Wrong line amount');
-        Assert.AreEqual(EcStore."Location Code", SalesLine."Location Code", 'Wrong location');
+        Assert.AreEqual(EcStore.LocationCode, SalesLine."Location Code", 'Wrong location');
 
         // Verify imported description is assigned to sales order line for second item
         Item.Get(ItemNo2);
@@ -1099,8 +1099,8 @@ codeunit 85008 "NPR E-Commerce Tests"
         // [Given] Increase inventory for imported items
         EcStore.Code := StoreCode;
         EcStore.Find();
-        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo, Qty, EcStore."Location Code");
-        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo2, Qty2, EcStore."Location Code");
+        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo, Qty, EcStore.LocationCode);
+        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo2, Qty2, EcStore.LocationCode);
 
         // [Given] Load xml with NaviConnect for creating order
         LibraryECommerce.InitImportTypeCreateSalesOrder(ImportTypeCreateDoc);
@@ -1199,8 +1199,8 @@ codeunit 85008 "NPR E-Commerce Tests"
         // [Given] Increase inventory for imported items
         EcStore.Code := StoreCode;
         EcStore.Find();
-        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo, Qty, EcStore."Location Code");
-        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo2, Qty2, EcStore."Location Code");
+        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo, Qty, EcStore.LocationCode);
+        LibraryECommerce.IncreaseItemInventoryOnLocation(ItemNo2, Qty2, EcStore.LocationCode);
 
         // [Given] Load xml with NaviConnect for creating and posting
         LibraryECommerce.InitImportTypePostSalesOrder(ImportType);
@@ -1673,7 +1673,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         Assert.AreEqual(Qty, PurchaseLine.Quantity, 'Wrong quantity');
         Assert.AreEqual(UnitPrice, PurchaseLine."Direct Unit Cost", 'Wrong direct unit cose');
         Assert.AreEqual(Round(Qty * UnitPrice), PurchaseLine."Line Amount", 'Wrong line amount');
-        Assert.AreEqual(EcStore."Location Code", PurchaseLine."Location Code", 'Wrong location');
+        Assert.AreEqual(EcStore.LocationCode, PurchaseLine."Location Code", 'Wrong location');
 
         // Verfiy purchase invoice line details imported to purchase invoice for second item
         PurchaseLine.SetRange("No.", ItemNo2);
@@ -1681,7 +1681,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         Assert.AreEqual(Qty2, PurchaseLine.Quantity, 'Wrong quantity');
         Assert.AreEqual(UnitPrice2, PurchaseLine."Direct Unit Cost", 'Wrong direct unit cost');
         Assert.AreEqual(Round(Qty2 * UnitPrice2), PurchaseLine."Line Amount", 'Wrong line amount');
-        Assert.AreEqual(EcStore."Location Code", PurchaseLine."Location Code", 'Wrong location');
+        Assert.AreEqual(EcStore.LocationCode, PurchaseLine."Location Code", 'Wrong location');
 
         // Verify number of g/l accounts imported to sales order
         PurchaseLine.SetRange(Type);

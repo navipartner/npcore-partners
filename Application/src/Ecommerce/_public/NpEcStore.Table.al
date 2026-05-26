@@ -27,9 +27,30 @@
         }
         field(110; "Location Code"; Code[20])
         {
+            Caption = 'Location Code (Obsolete)';
+            DataClassification = CustomerContent;
+            TableRelation = Location.Code;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-05-31';
+            ObsoleteReason = 'Use field 115 LocationCode (Code[10]) instead. Field length corrected to match standard Location Code.';
+
+            trigger OnValidate()
+            var
+                ObsoleteFieldErr: Label 'Field "Location Code" is obsolete. Please use "LocationCode" (field 115) instead.';
+            begin
+                Error(ObsoleteFieldErr);
+            end;
+        }
+        field(115; LocationCode; Code[10])
+        {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             TableRelation = Location.Code;
+
+            trigger OnValidate()
+            begin
+                "Location Code" := LocationCode;
+            end;
         }
         field(120; "Global Dimension 1 Code"; Code[20])
         {

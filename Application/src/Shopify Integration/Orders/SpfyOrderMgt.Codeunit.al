@@ -1731,9 +1731,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if LocationMapping.FindFirst() then
             exit;
 
-        NpEcStore.TestField("Location Code");
+        NpEcStore.TestField(LocationCode);
         Clear(LocationMapping);
-        LocationMapping."Location Code" := CopyStr(NpEcStore."Location Code", 1, MaxStrLen(LocationMapping."Location Code"));
+        LocationMapping."Location Code" := NpEcStore.LocationCode;
     end;
 
     internal procedure InsertComments(Order: JsonToken; SalesHeader: Record "Sales Header")

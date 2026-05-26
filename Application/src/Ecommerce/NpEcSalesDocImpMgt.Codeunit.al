@@ -344,7 +344,7 @@
             SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", NpEcStore."Global Dimension 1 Code");
         if NpEcStore."Global Dimension 2 Code" <> '' then
             SalesHeader.Validate("Shortcut Dimension 2 Code", NpEcStore."Global Dimension 2 Code");
-        SalesHeader.Validate("Location Code", NpEcStore."Location Code");
+        SalesHeader.Validate("Location Code", NpEcStore.LocationCode);
         SalesHeader.Modify(true);
     end;
 
@@ -675,7 +675,7 @@
             SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", NpEcStore."Global Dimension 1 Code");
         if NpEcStore."Global Dimension 2 Code" <> '' then
             SalesHeader.Validate("Shortcut Dimension 2 Code", NpEcStore."Global Dimension 2 Code");
-        SalesHeader.Validate("Location Code", NpEcStore."Location Code");
+        SalesHeader.Validate("Location Code", NpEcStore.LocationCode);
         SalesHeader.Modify(true);
     end;
 

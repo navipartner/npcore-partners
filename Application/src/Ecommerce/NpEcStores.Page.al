@@ -33,7 +33,7 @@
                     ToolTip = 'Specifies the name of the salesperson who is assigned to the e-commerce store.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Location Code"; Rec."Location Code")
+                field("Location Code"; Rec.LocationCode)
                 {
 
                     ToolTip = 'Specifies the location of the e-commerce store.';

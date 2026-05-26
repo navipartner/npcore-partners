@@ -19,7 +19,7 @@ codeunit 85010 "NPR Library - E-Commerce"
         EcStore."Salesperson/Purchaser Code" := Salesperson.Code;
         EcStore."Global Dimension 1 Code" := '';
         EcStore."Global Dimension 2 Code" := '';
-        EcStore."Location Code" := CreateLocationWithCode();
+        EcStore.LocationCode := CreateLocationWithCode();
         EcStore."Customer Mapping" := EcStore."Customer Mapping"::"E-mail";
         EcStore."Customer Config. Template Code" := '';
         EcStore."Allow Create Customers" := false;
