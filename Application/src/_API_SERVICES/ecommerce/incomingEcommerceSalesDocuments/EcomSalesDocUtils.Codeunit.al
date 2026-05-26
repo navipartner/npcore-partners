@@ -46,79 +46,9 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
 
     internal procedure OpenRelatedSalesDocumentsFromEcomDoc(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
-        NoRelatedDocumentsErrorLbl: Label 'No related documents found for %1.', Comment = '%1 - record id of ecom sales header';
+        EcomRelatedDocMgt: Codeunit "NPR Ecom Related Doc Mgt";
     begin
-        if OpenRelatedSalesOrdersFromEcomDoc(EcomSalesHeader) then
-            exit;
-
-        if OpenRelatedSalesInvoicesFromEcomDoc(EcomSalesHeader) then
-            exit;
-
-        if OpenRelatedSalesReturnOrderFromEcomDoc(EcomSalesHeader) then
-            exit;
-
-        if OpenRelatedSalesCrMemosFromEcomDoc(EcomSalesHeader) then
-            exit;
-
-        Error(NoRelatedDocumentsErrorLbl, Format(EcomSalesHeader.RecordId));
-    end;
-
-    local procedure OpenRelatedSalesOrdersFromEcomDoc(EcomSalesHeader: Record "NPR Ecom Sales Header") Success: Boolean;
-    var
-        SalesHeader: Record "Sales Header";
-    begin
-        SalesHeader.Reset();
-        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
-        SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
-        if SalesHeader.IsEmpty then
-            exit;
-
-        Page.Run(Page::"Sales Order List", SalesHeader);
-
-        Success := true;
-    end;
-
-    local procedure OpenRelatedSalesInvoicesFromEcomDoc(EcomSalesHeader: Record "NPR Ecom Sales Header") Success: Boolean;
-    var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-    begin
-        SalesInvoiceHeader.Reset();
-        SalesInvoiceHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
-        if SalesInvoiceHeader.IsEmpty then
-            exit;
-
-        Page.Run(0, SalesInvoiceHeader);
-
-        Success := true;
-    end;
-
-    local procedure OpenRelatedSalesReturnOrderFromEcomDoc(EcomSalesHeader: Record "NPR Ecom Sales Header") Success: Boolean;
-    var
-        SalesHeader: Record "Sales Header";
-    begin
-        SalesHeader.Reset();
-        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
-        SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
-        if SalesHeader.IsEmpty then
-            exit;
-
-        Page.Run(Page::"Sales Return Order List", SalesHeader);
-
-        Success := true;
-    end;
-
-    local procedure OpenRelatedSalesCrMemosFromEcomDoc(EcomSalesHeader: Record "NPR Ecom Sales Header") Success: Boolean;
-    var
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-    begin
-        SalesCrMemoHeader.Reset();
-        SalesCrMemoHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
-        if SalesCrMemoHeader.IsEmpty then
-            exit;
-
-        Page.Run(0, SalesCrMemoHeader);
-
-        Success := true;
+        EcomRelatedDocMgt.OpenRelatedSalesDocumentsFromEcomDoc(EcomSalesHeader);
     end;
 
     internal procedure GetSalesDocLastPaymentLineLineNo(EcomSalesHeader: Record "NPR Ecom Sales Header") LastLineNo: Integer;

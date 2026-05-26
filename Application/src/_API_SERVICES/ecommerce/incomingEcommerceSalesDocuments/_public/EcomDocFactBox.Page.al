@@ -27,12 +27,7 @@ page 6185130 "NPR Ecom Doc FactBox"
                     {
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Created Document No. field.';
-                        trigger OnDrillDown()
-                        var
-                            EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
-                        begin
-                            EcomSalesDocUtils.OpenCreatedDocumentFromEcomSalesHeader(Rec);
-                        end;
+                        Visible = false;
                     }
                     field("Created Date"; Rec."Created Date")
                     {
