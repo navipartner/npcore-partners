@@ -12,8 +12,8 @@
   "logo": "./media/NP-small-logo.png",
   "dependencies": [],
   "screenshots": [],
-  "platform": "17.0.0.0",
-  "application": "17.0.0.0",
+  "platform": "1.0.0.0",
+  "application": "27.0.0.0",
   "idRanges": [
     {
       "from": 6014400,
@@ -54,14 +54,23 @@
     }
   ],
   "contextSensitiveHelpUrl": "https://docs.navipartner.com/",
-  "showMyCode": true,
-  "runtime": "6.0",
-  "target": "OnPrem",
-  "features": [ "TranslationFile", "NoImplicitWith" ],
-  "keyVaultUrls": ["https://npcore.vault.azure.net/"],
-  "applicationInsightsKey": "c65c1bf1-dc3d-47a1-9789-f4334605dd0c",
+  "runtime": "16.0",
+  "target": "Cloud",
+  "features": [
+    "TranslationFile",
+    "NoImplicitWith"
+  ],
+  "keyVaultUrls": [
+    "https://npcore.vault.azure.net/"
+  ],
   "preprocessorSymbols": [
-    "BC17",
-    "BC1700"
-  ]
+    "BC27",
+    "BC2700"
+  ],
+  "resourceExposurePolicy": {
+    "allowDownloadingSource": false,
+    "allowDebugging": true,
+    "includeSourceInSymbolFile": true
+  },
+  "applicationInsightsConnectionString": "instrumentationkey=c65c1bf1-dc3d-47a1-9789-f4334605dd0c;IngestionEndpoint=https://appinsights-proxy-worker.npretail.app"
 }

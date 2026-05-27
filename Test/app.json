@@ -15,24 +15,24 @@
       "id": "992c2309-cca4-43cb-9e41-911f482ec088",
       "publisher": "NaviPartner",
       "name": "NP Retail",
-      "version": "1700.9.228.0"
+      "version": "2700.0.0.0"
     },
     {
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
       "publisher": "Microsoft",
       "name": "Tests-TestLibraries",
-      "version": "17.0.16993.0"
+      "version": "27.0.0.0"
     },
     {
       "id": "23de40a6-dfe8-4f80-80db-d70f83ce8caf",
       "publisher": "Microsoft",
       "name": "Test Runner",
-      "version": "17.0.0.0"
+      "version": "27.0.0.0"
     }
   ],
   "screenshots": [],
-  "platform": "17.0.0.0",
-  "application": "17.0.0.0",
+  "platform": "1.0.0.0",
+  "application": "27.0.0.0",
   "idRanges": [
     {
       "from": 85000,
@@ -40,16 +40,25 @@
     }
   ],
   "internalsVisibleTo": [
-  {
-    "id": "11eea1d7-1a25-47ed-a07e-09b7bf8a1339",
-    "name": "PTE Tests",
-    "publisher": "NaviPartner"
-  }
-],
+    {
+      "id": "11eea1d7-1a25-47ed-a07e-09b7bf8a1339",
+      "name": "PTE Tests",
+      "publisher": "NaviPartner"
+    }
+  ],
   "contextSensitiveHelpUrl": "https://Test.com/help/",
-  "showMyCode": true,
-  "runtime": "6.0",
+  "runtime": "16.0",
   "target": "OnPrem",
-  "keyVaultUrls": ["https://npcore.vault.azure.net/"],
-  "preprocessorSymbols": ["BC17"]
+  "keyVaultUrls": [
+    "https://npcore.vault.azure.net/"
+  ],
+  "preprocessorSymbols": [
+    "BC27",
+    "BC2700"
+  ],
+  "resourceExposurePolicy": {
+    "allowDownloadingSource": true,
+    "allowDebugging": true,
+    "includeSourceInSymbolFile": true
+  }
 }
