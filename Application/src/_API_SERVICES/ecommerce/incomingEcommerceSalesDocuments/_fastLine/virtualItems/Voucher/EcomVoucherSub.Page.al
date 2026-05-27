@@ -123,8 +123,6 @@ page 6150924 "NPR Ecom Voucher Sub"
         VoucherObj: JsonObject;
         FieldToken: JsonToken;
         ParsedSystemId: Guid;
-        DateText: Text;
-        ParsedDateTime: DateTime;
     begin
         foreach VoucherToken in VouchersJson do begin
             VoucherObj := VoucherToken.AsObject();
@@ -137,16 +135,10 @@ page 6150924 "NPR Ecom Voucher Sub"
                 Rec."Voucher Type" := CopyStr(FieldToken.AsValue().AsText(), 1, MaxStrLen(Rec."Voucher Type"));
             if VoucherObj.Get('Desc', FieldToken) then
                 Rec.Description := CopyStr(FieldToken.AsValue().AsText(), 1, MaxStrLen(Rec.Description));
-            if VoucherObj.Get('Start', FieldToken) then begin
-                DateText := FieldToken.AsValue().AsText();
-                if (DateText <> '') and Evaluate(ParsedDateTime, DateText, 9) then
-                    Rec."Starting Date" := ParsedDateTime;
-            end;
-            if VoucherObj.Get('End', FieldToken) then begin
-                DateText := FieldToken.AsValue().AsText();
-                if (DateText <> '') and Evaluate(ParsedDateTime, DateText, 9) then
-                    Rec."Ending Date" := ParsedDateTime;
-            end;
+            if VoucherObj.Get('Start', FieldToken) then
+                Rec."Starting Date" := FieldToken.AsValue().AsDateTime();
+            if VoucherObj.Get('End', FieldToken) then
+                Rec."Ending Date" := FieldToken.AsValue().AsDateTime();
             if VoucherObj.Get('Sid', FieldToken) then
                 if Evaluate(ParsedSystemId, FieldToken.AsValue().AsText()) then
                     Rec.SystemId := ParsedSystemId;

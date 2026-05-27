@@ -165,7 +165,7 @@ page 6248186 "NPR Ecom Sales Lines"
                             Rec."Attr. Wallet Processing Status"::Error:
                                 ShowWalletErrorMessage();
                             Rec."Attr. Wallet Processing Status"::Processed:
-                                EcomCreateWalletMgt.ShowRelatedWallets(Database::"NPR Ecom Sales Line", Rec.SystemId);
+                                EcomCreateWalletMgt.ShowRelatedWalletsAction(Rec);
                         end;
                     end;
                 }

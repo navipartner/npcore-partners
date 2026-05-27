@@ -311,49 +311,87 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         until (TicketRequest.Next() = 0);
     end;
 
-    internal procedure ShowRelatedTicketsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    internal procedure BuildTicketTempBufferForDoc(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempTicket: Record "NPR TM Ticket" temporary)
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketReservReq: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
     begin
         if EcomSalesHeader."Ticket Reservation Token" = '' then
             exit;
+        TicketReservReq.SetCurrentKey("Session Token ID");
+        TicketReservReq.SetRange("Session Token ID", EcomSalesHeader."Ticket Reservation Token");
+        if not TicketReservReq.FindSet() then
+            exit;
+        repeat
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetRange("Ticket Reservation Entry No.", TicketReservReq."Entry No.");
+            if Ticket.FindSet() then
+                repeat
+                    TempTicket := Ticket;
+                    TempTicket.SystemId := Ticket.SystemId;
+                    if TempTicket.Insert(false, true) then;
+                until Ticket.Next() = 0;
+        until TicketReservReq.Next() = 0;
+    end;
 
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', EcomSalesHeader."Ticket Reservation Token");
-        ShowRelatedTicketsAction(TicketReservationRequest);
+    internal procedure BuildTicketTempBufferForLine(EcomSalesLine: Record "NPR Ecom Sales Line"; var TempTicket: Record "NPR TM Ticket" temporary)
+    var
+        TicketReservReq: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        if IsNullGuid(EcomSalesLine."Ticket Reservation Line Id") then
+            exit;
+        if not TicketReservReq.GetBySystemId(EcomSalesLine."Ticket Reservation Line Id") then
+            exit;
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketReservReq."Entry No.");
+        if Ticket.FindSet() then
+            repeat
+                TempTicket := Ticket;
+                TempTicket.SystemId := Ticket.SystemId;
+                if TempTicket.Insert(false, true) then;
+            until Ticket.Next() = 0;
+    end;
+
+    internal procedure OpenTicketCardForSystemId(SystemIdParam: Guid)
+    var
+        Ticket: Record "NPR TM Ticket";
+        NotAvailableMsg: Label 'This ticket is no longer available in the system.';
+    begin
+        if not Ticket.GetBySystemId(SystemIdParam) then begin
+            Message(NotAvailableMsg);
+            exit;
+        end;
+        Ticket.SetRecFilter();
+        Page.Run(Page::"NPR TM Ticket Card", Ticket);
+    end;
+
+    internal procedure ShowRelatedTicketsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        TempTicket: Record "NPR TM Ticket" temporary;
+    begin
+        BuildTicketTempBufferForDoc(EcomSalesHeader, TempTicket);
+        if not TempTicket.IsEmpty() then
+            Page.RunModal(Page::"NPR TM Ticket List", TempTicket);
     end;
 
     internal procedure ShowRelatedTicketsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TempTicket: Record "NPR TM Ticket" temporary;
+        NoTicketFoundMsg: Label 'No tickets are linked to this line.';
     begin
-        if IsNullGuid(EcomSalesLine."Ticket Reservation Line Id") then
-            exit;
-        if not TicketReservationRequest.GetBySystemId(EcomSalesLine."Ticket Reservation Line Id") then
-            exit;
-        TicketReservationRequest.SetRecFilter();
-        ShowRelatedTicketsAction(TicketReservationRequest);
-    end;
-
-    local procedure ShowRelatedTicketsAction(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
-    var
-        Ticket: Record "NPR TM Ticket";
-        TempTickets: Record "NPR TM Ticket" temporary;
-    begin
-        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-        if TicketReservationRequest.FindSet() then
-            repeat
-                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-                if (Ticket.FindSet()) then
-                    repeat
-                        TempTickets.TransferFields(Ticket);
-                        if TempTickets.Insert() then;
-                    until (Ticket.Next() = 0);
-            until (TicketReservationRequest.Next() = 0);
-
-        if not TempTickets.IsEmpty() then
-            Page.Run(Page::"NPR TM Ticket List", TempTickets);
+        BuildTicketTempBufferForLine(EcomSalesLine, TempTicket);
+        case TempTicket.Count() of
+            0:
+                Message(NoTicketFoundMsg);
+            1:
+                begin
+                    TempTicket.FindFirst();
+                    OpenTicketCardForSystemId(TempTicket.SystemId);
+                end;
+            else
+                Page.RunModal(Page::"NPR TM Ticket List", TempTicket);
+        end;
     end;
 
     internal procedure ValidTicketRequest(var EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean

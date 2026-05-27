@@ -313,6 +313,24 @@ page 6248188 "NPR Ecom Sales Document"
                 ApplicationArea = NPRRetail;
                 UpdatePropagation = Both;
             }
+            part(TicketsSubPage; "NPR Ecom Ticket Sub")
+            {
+                Caption = 'Tickets';
+                ApplicationArea = NPRRetail;
+                UpdatePropagation = Both;
+            }
+            part(CouponsSubPage; "NPR Ecom Coupon Sub")
+            {
+                Caption = 'Coupons';
+                ApplicationArea = NPRRetail;
+                UpdatePropagation = Both;
+            }
+            part(WalletsSubPage; "NPR Ecom Wallet Sub")
+            {
+                Caption = 'Wallets';
+                ApplicationArea = NPRRetail;
+                UpdatePropagation = Both;
+            }
         }
         area(factboxes)
         {
@@ -490,7 +508,7 @@ page 6248188 "NPR Ecom Sales Document"
                 var
                     EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
                 begin
-                    EcomCreateWalletMgt.ShowRelatedWallets(Database::"NPR Ecom Sales Header", Rec.SystemId);
+                    EcomCreateWalletMgt.ShowRelatedWalletsAction(Rec);
                 end;
             }
             action(ChangeTicketToken)
@@ -577,8 +595,10 @@ page 6248188 "NPR Ecom Sales Document"
         // Loaded. If any is missing, leave Loaded clear so the next OnAfterGetCurrRecord on the same
         // doc retries. Future subpages add one helper + one line here.
         AllSubpagesLoaded := PopulateVouchersSubpage(Results);
-        // AllSubpagesLoaded := PopulateTicketsSubpage(Results) and AllSubpagesLoaded;
         AllSubpagesLoaded := PopulateMembershipsSubpage(Results) and AllSubpagesLoaded;
+        AllSubpagesLoaded := PopulateTicketsSubpage(Results) and AllSubpagesLoaded;
+        AllSubpagesLoaded := PopulateCouponsSubpage(Results) and AllSubpagesLoaded;
+        AllSubpagesLoaded := PopulateWalletsSubpage(Results) and AllSubpagesLoaded;
         if AllSubpagesLoaded then
             _SubpagesLoadedForSystemId := _SubpagesPendingForSystemId
         else
@@ -623,12 +643,49 @@ page 6248188 "NPR Ecom Sales Document"
             CurrPage.MembershipsSubPage.Page.ClearContents();
     end;
 
+    local procedure PopulateTicketsSubpage(Results: Dictionary of [Text, Text]) PayloadPresent: Boolean
+    var
+        EcomDocSubpagesTask: Codeunit "NPR Ecom Doc Subpages Task";
+        PayloadText: Text;
+    begin
+        PayloadPresent := Results.Get(EcomDocSubpagesTask.TicketsResultKeyTok(), PayloadText);
+        if PayloadPresent then
+            CurrPage.TicketsSubPage.Page.PopulateFromJsonText(PayloadText)
+        else
+            CurrPage.TicketsSubPage.Page.ClearContents();
+    end;
+
+    local procedure PopulateCouponsSubpage(Results: Dictionary of [Text, Text]) PayloadPresent: Boolean
+    var
+        EcomDocSubpagesTask: Codeunit "NPR Ecom Doc Subpages Task";
+        PayloadText: Text;
+    begin
+        PayloadPresent := Results.Get(EcomDocSubpagesTask.CouponsResultKeyTok(), PayloadText);
+        if PayloadPresent then
+            CurrPage.CouponsSubPage.Page.PopulateFromJsonText(PayloadText)
+        else
+            CurrPage.CouponsSubPage.Page.ClearContents();
+    end;
+
+    local procedure PopulateWalletsSubpage(Results: Dictionary of [Text, Text]) PayloadPresent: Boolean
+    var
+        EcomDocSubpagesTask: Codeunit "NPR Ecom Doc Subpages Task";
+        PayloadText: Text;
+    begin
+        PayloadPresent := Results.Get(EcomDocSubpagesTask.WalletsResultKeyTok(), PayloadText);
+        if PayloadPresent then
+            CurrPage.WalletsSubPage.Page.PopulateFromJsonText(PayloadText)
+        else
+            CurrPage.WalletsSubPage.Page.ClearContents();
+    end;
+
     local procedure ClearAllSubpages()
     begin
-        // Called when we start a new refresh or when the task errors. Future subpages add a line here.
         CurrPage.VouchersSubPage.Page.ClearContents();
-        // CurrPage.TicketsSubPage.Page.ClearContents();
         CurrPage.MembershipsSubPage.Page.ClearContents();
+        CurrPage.TicketsSubPage.Page.ClearContents();
+        CurrPage.CouponsSubPage.Page.ClearContents();
+        CurrPage.WalletsSubPage.Page.ClearContents();
     end;
 
     local procedure EnqueueSubpagesRefresh(EcomSalesHeader: Record "NPR Ecom Sales Header")

@@ -203,35 +203,84 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
         EcomSalesHeader.Get(EcomSalesHeader.RecordId());
     end;
 
-    internal procedure ShowRelatedWallets(TableId: Integer; SystemId: Guid)
+    internal procedure BuildWalletTempBufferFor(LinkToTableIdParam: Integer; LinkToSystemIdParam: Guid; var TempWallet: Record "NPR AttractionWallet" temporary)
+    var
+        WalletAssetHeaderReference: Record "NPR WalletAssetHeaderReference";
+        WalletAssetHeader: Record "NPR WalletAssetHeader";
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        AttractionWallet: Record "NPR AttractionWallet";
+    begin
+        WalletAssetHeaderReference.SetCurrentKey(LinkToTableId, LinkToSystemId);
+        WalletAssetHeaderReference.SetRange(LinkToTableId, LinkToTableIdParam);
+        WalletAssetHeaderReference.SetRange(LinkToSystemId, LinkToSystemIdParam);
+        if not WalletAssetHeaderReference.FindSet() then
+            exit;
+        repeat
+            if WalletAssetHeader.Get(WalletAssetHeaderReference.WalletHeaderEntryNo) then begin
+                WalletAssetLine.SetCurrentKey(TransactionId, Type);
+                WalletAssetLine.SetRange(TransactionId, WalletAssetHeader.TransactionId);
+                WalletAssetLine.SetRange(Type, WalletAssetLine.Type::WALLET);
+                if WalletAssetLine.FindSet() then
+                    repeat
+                        if AttractionWallet.GetBySystemId(WalletAssetLine.LineTypeSystemId) then begin
+                            TempWallet := AttractionWallet;
+                            TempWallet.SystemId := AttractionWallet.SystemId;
+                            if TempWallet.Insert(false, true) then;
+                        end;
+                    until WalletAssetLine.Next() = 0;
+            end;
+        until WalletAssetHeaderReference.Next() = 0;
+    end;
+
+    internal procedure BuildWalletTempBufferForDoc(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempWallet: Record "NPR AttractionWallet" temporary)
+    begin
+        BuildWalletTempBufferFor(Database::"NPR Ecom Sales Header", EcomSalesHeader.SystemId, TempWallet);
+    end;
+
+    internal procedure BuildWalletTempBufferForLine(EcomSalesLine: Record "NPR Ecom Sales Line"; var TempWallet: Record "NPR AttractionWallet" temporary)
+    begin
+        BuildWalletTempBufferFor(Database::"NPR Ecom Sales Line", EcomSalesLine.SystemId, TempWallet);
+    end;
+
+    internal procedure OpenWalletCardForSystemId(SystemIdParam: Guid)
+    var
+        AttractionWallet: Record "NPR AttractionWallet";
+        NotAvailableMsg: Label 'This wallet is no longer available in the system.';
+    begin
+        if not AttractionWallet.GetBySystemId(SystemIdParam) then begin
+            Message(NotAvailableMsg);
+            exit;
+        end;
+        AttractionWallet.SetRecFilter();
+        Page.Run(Page::"NPR AttractionWalletCard", AttractionWallet);
+    end;
+
+    internal procedure ShowRelatedWalletsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         TempWallet: Record "NPR AttractionWallet" temporary;
-        Wallet: Record "NPR AttractionWallet";
-        WalletAssetHeader: Record "NPR WalletAssetHeader";
-        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
-        WalletAssetLine: Record "NPR WalletAssetLine";
     begin
-        WalletAssetLine.SetCurrentKey(TransactionId, Type);
-        WalletAssetLine.SetRange(Type, WalletAssetLine.Type::WALLET);
+        BuildWalletTempBufferForDoc(EcomSalesHeader, TempWallet);
+        if not TempWallet.IsEmpty() then
+            Page.RunModal(Page::"NPR AttractionWallets", TempWallet);
+    end;
 
-        WalletAssetHeaderRef.SetCurrentKey(LinkToTableId, LinkToSystemId);
-        WalletAssetHeaderRef.SetRange(LinkToTableId, TableId);
-        WalletAssetHeaderRef.SetRange(LinkToSystemId, SystemId);
-        if WalletAssetHeaderRef.FindSet() then
-            repeat
-                if WalletAssetHeader.Get(WalletAssetHeaderRef.WalletHeaderEntryNo) then begin
-                    WalletAssetLine.SetRange(TransactionId, WalletAssetHeader.TransactionId);
-                    if WalletAssetLine.FindSet() then
-                        repeat
-                            if Wallet.GetBySystemId(WalletAssetLine.LineTypeSystemId) then begin
-                                TempWallet := Wallet;
-                                if TempWallet.Insert() then;
-                            end;
-                        until WalletAssetLine.Next() = 0;
+    internal procedure ShowRelatedWalletsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        TempWallet: Record "NPR AttractionWallet" temporary;
+        NoWalletFoundMsg: Label 'No wallets are linked to this line.';
+    begin
+        BuildWalletTempBufferForLine(EcomSalesLine, TempWallet);
+        case TempWallet.Count() of
+            0:
+                Message(NoWalletFoundMsg);
+            1:
+                begin
+                    TempWallet.FindFirst();
+                    OpenWalletCardForSystemId(TempWallet.SystemId);
                 end;
-            until WalletAssetHeaderRef.Next() = 0;
-
-        Page.RunModal(Page::"NPR AttractionWallets", TempWallet);
+            else
+                Page.RunModal(Page::"NPR AttractionWallets", TempWallet);
+        end;
     end;
 
     internal procedure CreateWalletsForTopLevelParentLineWithCheck(var ParentLine: Record "NPR Ecom Sales Line"; ShowError: Boolean; UpdateRetryCount: Boolean)
