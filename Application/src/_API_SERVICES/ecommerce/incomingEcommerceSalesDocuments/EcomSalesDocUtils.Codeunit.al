@@ -716,6 +716,7 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         if (EcomSalesLine."Barcode No." = '') then
             if (EcomSalesLine."Voucher Type" = '') then
                 Error(MissingVoucherTypeErr, EcomSalesLine."Line No.");
+        EcomSalesLine.TestField("Unit Price");
     end;
 
     local procedure ValidateImportedPaymentLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
