@@ -45,9 +45,16 @@ let main = async ({ workflow, context, parameters, popup, captions }) => {
     toast.memberScanned({
       memberImg: result.MemberScanned.ImageDataUrl,
       memberName: result.MemberScanned.Name,
-      validForAdmission: result.MemberScanned.Valid,
+      validForAdmission: undefined,
       hideAfter: hideAfter,
-      memberExpiry: result.MemberScanned.ExpiryDate,
+      memberExpiry: undefined,
+      memberHeadline: result.MemberScanned.Headline,
+      content: [
+        {
+          caption: result.MemberScanned.MembershipCodeCaption,
+          value: result.MemberScanned.MembershipCodeDescription,
+        },
+      ],
     });
   }
 

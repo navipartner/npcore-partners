@@ -584,7 +584,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             exit;
 
         SpeedGate.Admit(Token, 1);
-        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", 0, AdmittedMemberDetails);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", AdmittedMemberDetails);
     end;
 
     local procedure AdmitWallet(Token: Guid; SystemId: Guid)

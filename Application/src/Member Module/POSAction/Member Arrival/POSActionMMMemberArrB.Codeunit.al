@@ -73,23 +73,23 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
             Error(ResponseMessage);
     end;
 
-    internal procedure AddToastMemberScannedData(MembershipEntryNo: Integer; MemberEntryNo: Integer; Context: Option ARRIVAL,LOYALTY; var Response: JsonObject)
+    internal procedure AddToastMemberScannedData(MembershipEntryNo: Integer; MemberEntryNo: Integer; var Response: JsonObject)
     begin
-        AddToastMemberScannedData(MembershipEntryNo, MemberEntryNo, 0, Context, Response);
+        AddToastMemberScannedData(MembershipEntryNo, MemberEntryNo, 0, Response);
     end;
 
-    internal procedure AddToastMemberScannedData(MemberCardEntryNo: Integer; Context: Option ARRIVAL,LOYALTY; var Response: JsonObject)
+    internal procedure AddToastMemberScannedData(MemberCardEntryNo: Integer; var Response: JsonObject)
     var
         MemberCard: Record "NPR MM Member Card";
     begin
         if (not MemberCard.Get(MemberCardEntryNo)) then
             exit;
 
-        AddToastMemberScannedData(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", Context, Response);
+        AddToastMemberScannedData(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", Response);
     end;
 
 
-    local procedure AddToastMemberScannedData(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; Context: Option ARRIVAL,LOYALTY; var Response: JsonObject)
+    local procedure AddToastMemberScannedData(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; var Response: JsonObject)
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
@@ -101,6 +101,7 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         Valid: Boolean;
         ValidUntilDate: Date;
         MemberScanned: JsonObject;
+        ImageDataUrl: Text;
     begin
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
@@ -110,15 +111,14 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         if (not Member.Get(MemberEntryNo)) then
             exit;
 
-        if (Context = Context::LOYALTY) then
-            exit; // Exit for not - message content is not adopted for loyalty. (Valid arrival instead of redeemable points)
-
         Valid := MemberManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, ValidUntilDate);
         Valid := Valid and (ValidUntilDate >= Today());
         MemberScanned.Add('Valid', Valid);
         MemberScanned.Add('Name', Member."Display Name");
         MemberScanned.Add('ExpiryDate', Format(ValidUntilDate));
-        MemberScanned.Add('ImageDataUrl', GetMemberImageDataUrl(MemberEntryNo));
+        ImageDataUrl := GetMemberImageDataUrl(MemberEntryNo);
+        if (ImageDataUrl <> '') then
+            MemberScanned.Add('ImageDataUrl', ImageDataUrl);
         MemberScanned.Add('MembershipCode', Membership."Membership Code");
         MemberScanned.Add('MembershipCodeCaption', StrSubstNo('%1: ', Membership.FieldCaption("Membership Code")));
         MemberScanned.Add('MembershipCodeDescription', MembershipSetup."Description");
@@ -141,19 +141,17 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         DataUrl: Label 'data:image/jpeg;base64,%1', locked = true;
         HttpUrl: Text;
         MemberMediaCloudflare: Codeunit "NPR MMMemberImageMediaHandler";
-        MediaSvgHelper: Codeunit "NPR CloudflareMediaSvgHelper";
     begin
         if (MemberMediaCloudflare.IsFeatureEnabled()) then begin
             if (MemberManagement.GetMemberImageThumbnailUrl(MemberEntryNo, HttpUrl, 360)) then
                 exit(HttpUrl);
-
-            exit(MediaSvgHelper.NoPictureAvailableImage());
+            exit('');
         end;
 
         if (MemberManagement.GetMemberImageThumbnail(MemberEntryNo, MemberImageBase64)) then
             exit(StrSubstNo(DataUrl, MemberImageBase64));
 
-        exit(MediaSvgHelper.NoPictureAvailableImage());
+        exit('');
     end;
 
 }

@@ -51,7 +51,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionMMMemberLoy.js###
-'let main=async({workflow:i,context:o,parameters:n,popup:s,captions:r})=>{await i.respond("OnBeforeWorkflow");const l=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"];let t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(o.show_dialog=!1);const d=r.LoyaltyWindowTitle.substitute(l[t]);let a="";if(o.show_dialog&&(a=await s.input({caption:r.MemberCardPrompt,title:d}),a===null))return;const e=await i.respond("do_work",{membercard_number:a}),m=n.ToastMessageTimer!==null&&n.ToastMessageTimer!==void 0&&n.ToastMessageTimer!==0?n.ToastMessageTimer:15;e.MemberScanned&&m>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:e.MemberScanned.Valid,hideAfter:m,memberExpiry:e.MemberScanned.ExpiryDate}),e.workflowName!==""&&await i.run(e.workflowName,{parameters:e.parameters})};'
+'let main=async({workflow:i,context:o,parameters:n,popup:s,captions:r})=>{await i.respond("OnBeforeWorkflow");const l=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"];let t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(o.show_dialog=!1);const d=r.LoyaltyWindowTitle.substitute(l[t]);let a="";if(o.show_dialog&&(a=await s.input({caption:r.MemberCardPrompt,title:d}),a===null))return;const e=await i.respond("do_work",{membercard_number:a}),m=n.ToastMessageTimer!==null&&n.ToastMessageTimer!==void 0&&n.ToastMessageTimer!==0?n.ToastMessageTimer:15;e.MemberScanned&&m>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:void 0,hideAfter:m,memberExpiry:void 0,memberHeadline:e.MemberScanned.Headline,content:[{caption:e.MemberScanned.MembershipCodeCaption,value:e.MemberScanned.MembershipCodeDescription}]}),e.workflowName!==""&&await i.run(e.workflowName,{parameters:e.parameters})};'
         )
     end;
 
@@ -73,10 +73,13 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
         POSSalesInfo: Record "NPR MM POS Sales Info";
         SalePOS: Record "NPR POS Sale";
         BusinessLogic: Codeunit "NPR POSAction: MM Member Loy.B";
+        POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
+        MemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         MMMembershipEvents: Codeunit "NPR MM Membership Events";
         FunctionId: Integer;
+        MemberCardEntryNo: Integer;
         MemberCardNumber: Text[50];
         ForeignCommunityCode: Code[20];
         ActionContext: JsonObject;
@@ -103,7 +106,11 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
         MMMembershipEvents.OnAfterPOSActionMemberLoyReadMemberCardNumber(MemberCardNumber);
         case FunctionId of
             0:
-                Response := BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
+                begin
+                    MemberCardEntryNo := BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
+                    MemberArrival.AddToastMemberScannedData(MemberCardEntryNo, Response);
+                    POSActionMemberMgt.AddSelectMembershipToastHeadline(Response);
+                end;
             1:
                 BusinessLogic.ViewPoints(MemberCardNumber, ForeignCommunityCode);
             2:
@@ -111,8 +118,11 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
             3:
                 BusinessLogic.SelectAvailableCoupon(Context, FrontEnd, MemberCardNumber, ForeignCommunityCode, ActionContext);
             4:
-                Response := BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
-
+                begin
+                    MemberCardEntryNo := BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
+                    MemberArrival.AddToastMemberScannedData(MemberCardEntryNo, Response);
+                    POSActionMemberMgt.AddSelectMembershipToastHeadline(Response);
+                end;
         end;
         HandleWorkflowResponse(Response, ActionContext);
         exit(Response);

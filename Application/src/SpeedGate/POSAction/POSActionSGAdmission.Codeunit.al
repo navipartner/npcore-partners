@@ -180,7 +180,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         if not MemberCard.FindFirst() then
             exit;
 
-        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", 0, Response);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", Response);
     end;
 
     procedure AdmissionCodeParamName(): Text[30];

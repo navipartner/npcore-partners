@@ -100,12 +100,14 @@ let main = async ({ workflow, context, popup, captions, parameters }) => {
       ? parameters.ToastMessageTimer
       : 5;
   if (membershipResponse.MemberScanned && hideAfter > 0) {
+    const isSelectMembership = parameters.Function == parameters.Function["Select Membership"];
     toast.memberScanned({
       memberImg: membershipResponse.MemberScanned.ImageDataUrl,
       memberName: membershipResponse.MemberScanned.Name,
-      validForAdmission: membershipResponse.MemberScanned.Valid,
+      validForAdmission: isSelectMembership ? undefined : membershipResponse.MemberScanned.Valid,
       hideAfter: hideAfter,
-      memberExpiry: membershipResponse.MemberScanned.ExpiryDate,
+      memberExpiry: isSelectMembership ? undefined : membershipResponse.MemberScanned.ExpiryDate,
+      memberHeadline: membershipResponse.MemberScanned.Headline,
       content: [
         {
           caption: membershipResponse.MemberScanned.MembershipCodeCaption,
@@ -127,10 +129,6 @@ let main = async ({ workflow, context, popup, captions, parameters }) => {
     
     // Set appropriate success message based on function type
     switch(FunctionNo){
-        case 1: {
-            successMessage = captions.SelectMembershipSuccess; // Select membership
-            break;
-        }
         case 11: {
             successMessage = captions.CancelAutoRenewSuccess; // Cancel auto-renew
             break;
@@ -141,6 +139,7 @@ let main = async ({ workflow, context, popup, captions, parameters }) => {
             break;
         }
         case 0:  // Member Arrival
+        case 1:  // Select Membership - member scanned toast is shown instead
         case 2:  // View Membership Entry - view operation so no toast needed
         case 3:  // Regret Membership - requires payment
         case 4:  // Renew Membership - requires payment

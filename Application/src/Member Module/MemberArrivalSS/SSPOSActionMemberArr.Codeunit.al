@@ -106,7 +106,7 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
             Error('Member Card Number is required for Member Arrival.');
 
         MemberCardEntryNo := POSActionSSMemberArrival.SetMemberArrival(DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
-        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, Response);
     end;
 
     local procedure GetActionScript(): Text

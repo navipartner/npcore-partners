@@ -117,7 +117,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
 
         if (MemberCardEntryNo > 0) then
             POSMemberSession.SetMember(MemberCardEntryNo);
-        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, Response);
     end;
 
     local procedure InitializeWorkflow() Response: JsonObject
@@ -130,7 +130,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
             exit;
 
         MemberCardEntryNo := POSMemberSession.GetMemberCardEntryNo();
-        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, Response);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]

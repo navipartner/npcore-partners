@@ -576,6 +576,24 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
             Result.Add('success', false)
     end;
 
+    internal procedure AddSelectMembershipToastHeadline(var Response: JsonObject)
+    var
+        MembershipSelectedLbl: Label 'Membership Selected', Comment = 'Headline shown on the member-scanned toast after selecting a membership.';
+    begin
+        SetToastHeadline(Response, MembershipSelectedLbl);
+    end;
+
+    local procedure SetToastHeadline(var Response: JsonObject; Headline: Text)
+    var
+        MemberScannedToken: JsonToken;
+    begin
+        if Headline = '' then
+            exit;
+        if not Response.Get('MemberScanned', MemberScannedToken) then
+            exit;
+        MemberScannedToken.AsObject().Add('Headline', Headline);
+    end;
+
     var
         MemberSelectionMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
 }
