@@ -132,5 +132,33 @@ table 6014404 "NPR Report Selection Retail"
         else
             Sequence := '1';
     end;
+
+    internal procedure GetNextSequence(ReportType: Enum "NPR Report Selection Type"): Code[10]
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        HighestSequence: Integer;
+        SequenceNo: Integer;
+    begin
+        ReportSelectionRetail.SetRange("Report Type", ReportType);
+        if ReportSelectionRetail.FindSet() then
+            repeat
+                if Evaluate(SequenceNo, ReportSelectionRetail.Sequence) and (SequenceNo > HighestSequence) then
+                    HighestSequence := SequenceNo;
+            until ReportSelectionRetail.Next() = 0;
+        exit(Format(HighestSequence + 1));
+    end;
+
+    internal procedure CleanupEmptyData()
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+    begin
+        ReportSelectionRetail.CopyFilters(Rec);
+        ReportSelectionRetail.SetRange("Codeunit ID", 0);
+        ReportSelectionRetail.SetRange("Report ID", 0);
+        ReportSelectionRetail.SetRange("Print Template", '');
+        ReportSelectionRetail.SetRange("Register No.", '');
+        ReportSelectionRetail.SetRange(Optional, false);
+        ReportSelectionRetail.DeleteAll();
+    end;
 }
 

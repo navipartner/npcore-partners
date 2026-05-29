@@ -237,6 +237,10 @@ codeunit 6150632 "NPR New Feature Handler"
 
         ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
         ReportSelectionRetail.ModifyAll("Print Template", '');
+        ReportSelectionRetail.CleanupEmptyData();
+
+        NewSalesReceiptExp.InsertReportSelectionRetail(Codeunit::"NPR Static Sales Receipt");
+        NewSalesReceiptExp.InsertReportSelectionRetail(Codeunit::"NPR Static Signature Receipt");
     end;
 
     local procedure NewEFTReceiptExperienceHandle()
@@ -254,6 +258,9 @@ codeunit 6150632 "NPR New Feature Handler"
 
         ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Terminal Receipt");
         ReportSelectionRetail.ModifyAll("Print Template", '');
+        ReportSelectionRetail.CleanupEmptyData();
+
+        NewEFTReceiptExp.InsertStaticEFTReceipt();
     end;
 
     local procedure NewAttractionPrintExperienceHandle()

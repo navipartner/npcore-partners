@@ -49,6 +49,26 @@ codeunit 6248351 "NPR New Sales Receipt Exp" implements "NPR Feature Management"
         exit(FeatureDescriptionLbl);
     end;
 
+    internal procedure InsertReportSelectionRetail(CodeunitId: Integer)
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+    begin
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
+        ReportSelectionRetail.SetRange("Codeunit ID", CodeunitId);
+        ReportSelectionRetail.SetRange("Report ID", 0);
+        ReportSelectionRetail.SetRange("Print Template", '');
+        ReportSelectionRetail.SetRange("Register No.", '');
+        ReportSelectionRetail.SetRange(Optional, false);
+        if not ReportSelectionRetail.IsEmpty() then
+            exit;
+
+        ReportSelectionRetail.Init();
+        ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)";
+        ReportSelectionRetail.Validate("Codeunit ID", CodeunitId);
+        ReportSelectionRetail.Sequence := ReportSelectionRetail.GetNextSequence(ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
+        ReportSelectionRetail.Insert(true);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnBeforeValidateEvent', 'Enabled', false, false)]
     local procedure NPRFeatureOnBeforeValidateEnabled(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature")
     var
@@ -69,10 +89,9 @@ codeunit 6248351 "NPR New Sales Receipt Exp" implements "NPR Feature Management"
         end;
         ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
         ReportSelectionRetail.ModifyAll("Print Template", '');
+        ReportSelectionRetail.CleanupEmptyData();
 
-        if ReportSelectionRetail.FindFirst() then begin
-            ReportSelectionRetail.Validate("Codeunit ID", Codeunit::"NPR Static Sales Receipt");
-            ReportSelectionRetail.Modify();
-        end;
+        InsertReportSelectionRetail(Codeunit::"NPR Static Sales Receipt");
+        InsertReportSelectionRetail(Codeunit::"NPR Static Signature Receipt");
     end;
 }
