@@ -65,6 +65,34 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnCleanupIssueCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnCleanupValidateCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnCleanupApplyDiscountSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    begin
+    end;
+
+    internal procedure CouponListItemSetupInUse(CouponType: Record "NPR NpDc Coupon Type"): Boolean
+    var
+        ModuleValidItemL: Codeunit "NPR NpDc Module Valid. Item L.";
+        ModuleValidItemLMagento: Codeunit "NPR NpDc Mod. Val. Item L. M.";
+        ModuleApplyItemList: Codeunit "NPR NpDc Module Apply ItemList";
+        ModuleApplyActivity: Codeunit "NPR Np Dc Module ApplyActivity";
+        ModuleApplyExtraItemQty: Codeunit "NPR NpDc Apply: Extra ItemQty.";
+    begin
+        if CouponType."Validate Coupon Module" in [ModuleValidItemL.ModuleCode(), ModuleValidItemLMagento.ModuleCode()] then
+            exit(true);
+        exit(CouponType."Apply Discount Module" in [ModuleApplyItemList.ModuleCode(), ModuleApplyActivity.ModuleCode(), ModuleApplyExtraItemQty.ModuleCode()]);
+    end;
+
     [Obsolete('Please use event in codeunit "NPR NpRv Module Mgt." OnAfterSendVoucherSelection instead.', '2025-07-13')]
     [IntegrationEvent(false, false)]
     procedure OnAfterSendVoucherSelection(var VoucherEntry: Record "NPR NpRv Voucher Entry"; SalePOS: Record "NPR POS Sale")

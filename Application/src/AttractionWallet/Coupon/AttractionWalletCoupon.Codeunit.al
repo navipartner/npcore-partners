@@ -94,6 +94,28 @@ codeunit 6185068 "NPR AttractionWalletCoupon"
         Error(Text001);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCleanupIssueCouponSetup', '', true, true)]
+    local procedure OnCleanupIssueCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    var
+        WalletCouponSetup: Record "NPR WalletCouponSetup";
+    begin
+        if OldModuleCode <> ModuleCode() then
+            exit;
+        if WalletCouponSetup.Get(CouponType.Code) then
+            WalletCouponSetup.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnAfterDeleteEvent', '', true, true)]
+    local procedure OnAfterDeleteCouponType(var Rec: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
+    var
+        WalletCouponSetup: Record "NPR WalletCouponSetup";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if WalletCouponSetup.Get(Rec.Code) then
+            WalletCouponSetup.Delete(true);
+    end;
+
     internal procedure ModuleCode(): Code[20]
     begin
         exit('ON-ATTRACTION-WALLET');

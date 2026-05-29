@@ -287,6 +287,17 @@
         exit(SaleLinePOS."Line No." + 10000);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCleanupApplyDiscountSetup', '', true, true)]
+    local procedure OnCleanupApplyDiscountSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    var
+        ExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
+    begin
+        if OldModuleCode <> ModuleCode() then
+            exit;
+        ExtraCouponItem.SetRange("Coupon Type", CouponType.Code);
+        ExtraCouponItem.DeleteAll();
+    end;
+
     local procedure IsSubscriber(CouponType: Record "NPR NpDc Coupon Type"): Boolean
     begin
         exit(CouponType."Apply Discount Module" = ModuleCode());

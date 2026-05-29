@@ -127,18 +127,54 @@
             Caption = 'Issue Coupon Module';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpDc Coupon Module".Code where(Type = const("Issue Coupon"));
+            trigger OnValidate()
+            var
+                CouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+            begin
+                if Rec.IsTemporary() then
+                    exit;
+                if xRec."Issue Coupon Module" = "Issue Coupon Module" then
+                    exit;
+                if xRec."Issue Coupon Module" = '' then
+                    exit;
+                CouponModuleMgt.OnCleanupIssueCouponSetup(Rec, xRec."Issue Coupon Module");
+            end;
         }
         field(110; "Validate Coupon Module"; Code[20])
         {
             Caption = 'Validate Coupon Module';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpDc Coupon Module".Code where(Type = const("Validate Coupon"));
+            trigger OnValidate()
+            var
+                CouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+            begin
+                if Rec.IsTemporary() then
+                    exit;
+                if xRec."Validate Coupon Module" = "Validate Coupon Module" then
+                    exit;
+                if xRec."Validate Coupon Module" = '' then
+                    exit;
+                CouponModuleMgt.OnCleanupValidateCouponSetup(Rec, xRec."Validate Coupon Module");
+            end;
         }
         field(120; "Apply Discount Module"; Code[20])
         {
             Caption = 'Apply Discount Module';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpDc Coupon Module".Code where(Type = const("Apply Discount"));
+            trigger OnValidate()
+            var
+                CouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+            begin
+                if Rec.IsTemporary() then
+                    exit;
+                if xRec."Apply Discount Module" = "Apply Discount Module" then
+                    exit;
+                if xRec."Apply Discount Module" = '' then
+                    exit;
+                CouponModuleMgt.OnCleanupApplyDiscountSetup(Rec, xRec."Apply Discount Module");
+            end;
         }
         field(150; "POS Store Group"; Code[20])
         {

@@ -269,6 +269,24 @@
         exit(NpDcCouponListItem.FindFirst());
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCleanupApplyDiscountSetup', '', true, true)]
+    local procedure OnCleanupApplyDiscountSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    var
+        ExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
+        NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+        NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+    begin
+        if OldModuleCode <> ModuleCode() then
+            exit;
+        ExtraCouponItem.SetRange("Coupon Type", CouponType.Code);
+        if not ExtraCouponItem.IsEmpty() then
+            ExtraCouponItem.DeleteAll();
+        if NpDcCouponModuleMgt.CouponListItemSetupInUse(CouponType) then
+            exit;
+        NpDcCouponListItem.SetRange("Coupon Type", CouponType.Code);
+        NpDcCouponListItem.DeleteAll();
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteCouponType(var Rec: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var

@@ -120,6 +120,29 @@
         ValidateCoupon(SalePOS, Coupon);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCleanupValidateCouponSetup', '', true, true)]
+    local procedure OnCleanupValidateCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    var
+        NpDcValidTimeInterval: Record "NPR NpDc Valid Time Interval";
+    begin
+        if OldModuleCode <> ModuleCode() then
+            exit;
+        NpDcValidTimeInterval.SetRange("Coupon Type", CouponType.Code);
+        NpDcValidTimeInterval.DeleteAll();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnAfterDeleteEvent', '', true, true)]
+    local procedure OnAfterDeleteCouponType(var Rec: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
+    var
+        NpDcValidTimeInterval: Record "NPR NpDc Valid Time Interval";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        NpDcValidTimeInterval.SetRange("Coupon Type", Rec.Code);
+        if not NpDcValidTimeInterval.IsEmpty() then
+            NpDcValidTimeInterval.DeleteAll();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpDc Module Validate: Time");

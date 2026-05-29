@@ -52,5 +52,14 @@
         {
         }
     }
+
+    trigger OnDelete()
+    var
+        NpDcIssueOnSaleSetupLine: Record "NPR NpDc Iss.OnSale Setup Line";
+    begin
+        NpDcIssueOnSaleSetupLine.SetRange("Coupon Type", "Coupon Type");
+        if not NpDcIssueOnSaleSetupLine.IsEmpty() then
+            NpDcIssueOnSaleSetupLine.DeleteAll();
+    end;
 }
 

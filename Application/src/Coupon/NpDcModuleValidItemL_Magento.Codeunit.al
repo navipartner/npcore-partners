@@ -123,6 +123,20 @@
         ValidateCoupon(SalePOS, Coupon);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCleanupValidateCouponSetup', '', true, true)]
+    local procedure OnCleanupValidateCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    var
+        NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+        NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+    begin
+        if OldModuleCode <> ModuleCode() then
+            exit;
+        if NpDcCouponModuleMgt.CouponListItemSetupInUse(CouponType) then
+            exit;
+        NpDcCouponListItem.SetRange("Coupon Type", CouponType.Code);
+        NpDcCouponListItem.DeleteAll();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpDc Mod. Val. Item L. M.");
@@ -219,7 +233,7 @@
         exit(Coupon."Validate Coupon Module" = ModuleCode());
     end;
 
-    local procedure ModuleCode(): Code[20]
+    internal procedure ModuleCode(): Code[20]
     begin
         exit('ITEM_LIST_MAG');
     end;

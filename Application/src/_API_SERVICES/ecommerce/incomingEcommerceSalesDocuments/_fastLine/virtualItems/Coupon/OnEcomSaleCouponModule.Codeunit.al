@@ -82,6 +82,18 @@ codeunit 6151147 "NPR OnEcomSaleCouponModule"
         Error(ManualIssueNotSupported);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCleanupIssueCouponSetup', '', true, true)]
+    local procedure OnCleanupIssueCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    var
+        EcomSalesCouponSetupLine: Record "NPR NpDc Iss.OnEcomSale S.Line";
+    begin
+        if OldModuleCode <> ModuleCode() then
+            exit;
+        EcomSalesCouponSetupLine.SetRange("Coupon Type", CouponType.Code);
+        if not EcomSalesCouponSetupLine.IsEmpty() then
+            EcomSalesCouponSetupLine.DeleteAll();
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", OnAfterDeleteEvent, '', true, true)]
     local procedure OnDeleteCouponType(var Rec: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var

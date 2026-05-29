@@ -453,6 +453,20 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
         ApplyDiscount(SaleLinePOSCoupon);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCleanupApplyDiscountSetup', '', true, true)]
+    local procedure OnCleanupApplyDiscountSetup(CouponType: Record "NPR NpDc Coupon Type"; OldModuleCode: Code[20])
+    var
+        NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+        NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+    begin
+        if OldModuleCode <> ModuleCode() then
+            exit;
+        if NpDcCouponModuleMgt.CouponListItemSetupInUse(CouponType) then
+            exit;
+        NpDcCouponListItem.SetRange("Coupon Type", CouponType.Code);
+        NpDcCouponListItem.DeleteAll();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Np Dc Module ApplyActivity");
