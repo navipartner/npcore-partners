@@ -39,5 +39,9 @@ enum 6059843 "NPR CouponApiFunctions"
     {
         Caption = 'Find coupon';
     }
+    value(18; REDEEM_COUPON)
+    {
+        Caption = 'Redeem coupon';
+    }
 }
 #endif

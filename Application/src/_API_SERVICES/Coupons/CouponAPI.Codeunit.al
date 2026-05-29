@@ -31,6 +31,9 @@ codeunit 6248526 "NPR CouponAPI" implements "NPR API Request Handler"
 
         if (Request.Match('POST', '/coupon/reservation/:documentNo/:couponId')) then
             exit(Handle(_ApiFunction::CANCEL_COUPON_RESERVATION, Request));
+
+        if (Request.Match('POST', '/coupon/redeem')) then
+            exit(Handle(_ApiFunction::REDEEM_COUPON, Request));
     end;
 
     local procedure Handle(ApiFunction: Enum "NPR CouponApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -59,13 +62,13 @@ codeunit 6248526 "NPR CouponAPI" implements "NPR API Request Handler"
         exit(Response);
     end;
 
-    procedure GetTimeDifference(Time1: Time; Time2: Time): Decimal
+    procedure GetTimeDifference(EndTime: Time; StartTime: Time): Decimal
     var
         OneDayInMs: Decimal;
         DiffMs: Decimal;
     begin
         OneDayInMs := 24 * 60 * 60 * 1000;
-        DiffMs := Time2 - Time1;
+        DiffMs := EndTime - StartTime;
 
         if DiffMs < 0 then
             DiffMs := DiffMs + OneDayInMs; // crossed midnight

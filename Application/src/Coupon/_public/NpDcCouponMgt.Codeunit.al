@@ -397,6 +397,60 @@
         ArchiveClosedCoupon(Coupon);
     end;
 
+    internal procedure RedeemCoupon(Coupon: Record "NPR NpDc Coupon"; DocumentNo: Code[50])
+    var
+        CouponEntry: Record "NPR NpDc Coupon Entry";
+        Reservation: Record "NPR NpDc Ext. Coupon Reserv.";
+        LockedErr: Label '%1 ''%2'' is reserved for another %3 (''%4'').', Comment = '%1 = Reference No. field caption, %2 = Reference No. value, %3 = External Document No. field caption, %4 = External Document No. value';
+        ExhaustedErr: Label 'Coupon quantity is %1 but you want to use %2. Action aborted.';
+    begin
+
+        if (Coupon."No." = '') then
+            Error('Coupon No. cannot be empty when redeeming a coupon. This is a programming bug.');
+
+        Coupon.LockTable();
+        Coupon.SetAutoCalcFields("Remaining Quantity");
+        Coupon.Get(Coupon."No.");
+
+        // Exhaustion is a more fundamental state than lock-by-others; check it first
+        if (Coupon."Remaining Quantity" < 1) then
+            Error(ExhaustedErr, Coupon."Remaining Quantity", 1);
+
+        // Block only if other sales hold all the remaining capacity; coexisting reservations across sales are fine.
+        Reservation.SetFilter("Coupon No.", '=%1', Coupon."No.");
+        if (DocumentNo <> '') then
+            Reservation.SetFilter("External Document No.", '<>%1', DocumentNo);
+        if (Reservation.Count() >= Coupon."Remaining Quantity") and (Reservation.FindFirst()) then
+            Error(LockedErr, Coupon.FieldCaption("Reference No."), Coupon."Reference No.", Reservation.FieldCaption("External Document No."), Reservation."External Document No.");
+
+        Reservation.Reset();
+        Reservation.SetRange("Coupon No.", Coupon."No.");
+        Reservation.SetRange("External Document No.", DocumentNo);
+        Reservation.DeleteAll(true);
+
+        CouponEntry.Init();
+        CouponEntry."Entry No." := 0;
+        CouponEntry."Coupon No." := Coupon."No.";
+        CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Discount Application";
+        CouponEntry."Coupon Type" := Coupon."Coupon Type";
+        CouponEntry.Quantity := -1;
+        CouponEntry."Remaining Quantity" := -1;
+        CouponEntry."Amount per Qty." := 0;
+        CouponEntry.Amount := 0;
+        CouponEntry.Positive := false;
+        CouponEntry."Posting Date" := Today();
+        CouponEntry.Open := true;
+        CouponEntry."Register No." := '';
+        CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
+        CouponEntry."External Document No." := DocumentNo;
+        CouponEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(CouponEntry."User ID"));
+        CouponEntry."Closed by Entry No." := 0;
+        CouponEntry.Insert();
+
+        ApplyEntry(CouponEntry);
+        ArchiveClosedCoupon(Coupon);
+    end;
+
     internal procedure PostSaleLinePOS(var SaleLinePos: Record "NPR POS Sale Line")
     var
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";

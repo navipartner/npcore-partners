@@ -51,6 +51,8 @@ codeunit 6248528 "NPR CouponAPIHandler"
                 _Response := CouponApiAgent.ReserveCoupon(_Request);
             _ApiFunction::CANCEL_COUPON_RESERVATION:
                 _Response := CouponApiAgent.CancelCouponReservation(_Request);
+            _ApiFunction::REDEEM_COUPON:
+                _Response := CouponApiAgent.RedeemCoupon(_Request);
         end;
     end;
 }

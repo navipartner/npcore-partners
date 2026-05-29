@@ -27,8 +27,8 @@ codeunit 6248530 "NPR CouponApiAgent"
         if CouponId = '' then
             exit(Response.RespondBadRequest('Missing required path parameter: couponId'));
 
-        if not NPRNpDcCoupon.GetBySystemId(CouponId) then
-            exit(Response.RespondBadRequest('Coupon not found'));
+        if not GetActiveCoupon(CouponId, NPRNpDcCoupon, Response) then
+            exit(Response);
 
         Json.StartObject('');
         CouponToJson(Request.ApiVersion(), NPRNpDcCoupon, 'coupon', Json);
@@ -49,8 +49,8 @@ codeunit 6248530 "NPR CouponApiAgent"
         if CouponId = '' then
             exit(Response.RespondBadRequest('Missing required path parameter: couponId'));
 
-        if not NPRNpDcCoupon.GetBySystemId(CouponId) then
-            exit(Response.RespondBadRequest('Coupon not found'));
+        if not GetActiveCoupon(CouponId, NPRNpDcCoupon, Response) then
+            exit(Response);
 
         RequestJson := Request.BodyJson().AsObject();
 
@@ -165,37 +165,67 @@ codeunit 6248530 "NPR CouponApiAgent"
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
         Json: Codeunit "NPR JSON Builder";
+        State: Enum "NPR NpDc CouponState";
         CouponId: Text;
     begin
         CouponId := Request.Paths().Get(3);
-        if CouponId = '' then
+        if (CouponId = '') then
             exit(Response.RespondBadRequest('Missing required path parameter: couponId'));
 
-        if (not FindCouponById(CouponId, NpDcCoupon, Response)) then
+        if (not GetActiveCoupon(CouponId, NpDcCoupon, Response)) then
             exit(Response);
 
-        BuildCheckCouponResponse(NpDcCoupon, Json);
+        State := InspectCoupon(NpDcCoupon, '');
+        BuildCheckCouponResponse(NpDcCoupon, State, Json);
         exit(Response.RespondOK(Json));
     end;
 
     internal procedure FindCoupons(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
+        NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
         ResponseJson: Codeunit "NPR JSON Builder";
+        CustomerNo: Text;
+        ReferenceNo: Text;
+        HasFilters: Boolean;
+        IncludeArchived: Boolean;
     begin
-        if (Request.QueryParams().ContainsKey('customerNo')) then
-            NpDcCoupon.SetFilter("Customer No.", '=%1', CopyStr(UpperCase(Request.QueryParams().Get('customerNo')), 1, MaxStrLen(NpDcCoupon."Customer No.")));
+        if (Request.QueryParams().ContainsKey('customerNo')) then begin
+            CustomerNo := Request.QueryParams().Get('customerNo').Trim();
+            if CustomerNo = '' then
+                exit(Response.RespondBadRequest('''customerNo'' cannot be blank'));
+            NpDcCoupon.SetFilter("Customer No.", '=%1', CopyStr(UpperCase(CustomerNo), 1, MaxStrLen(NpDcCoupon."Customer No.")));
+            NpDcArchCoupon.SetFilter("Customer No.", '=%1', CopyStr(UpperCase(CustomerNo), 1, MaxStrLen(NpDcArchCoupon."Customer No.")));
+            HasFilters := true;
+        end;
 
-        if (Request.QueryParams().ContainsKey('referenceNo')) then
-            NpDcCoupon.SetFilter("Reference No.", '=%1', CopyStr(Request.QueryParams().Get('referenceNo'), 1, MaxStrLen(NpDcCoupon."Reference No.")));
+        if (Request.QueryParams().ContainsKey('referenceNo')) then begin
+            ReferenceNo := Request.QueryParams().Get('referenceNo').Trim();
+            if ReferenceNo = '' then
+                exit(Response.RespondBadRequest('''referenceNo'' cannot be blank'));
+            NpDcCoupon.SetFilter("Reference No.", '=%1', UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(NpDcCoupon."Reference No."))));
+            NpDcArchCoupon.SetFilter("Reference No.", '=%1', UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(NpDcArchCoupon."Reference No."))));
+            HasFilters := true;
+        end;
+
+        if not HasFilters then
+            exit(Response.RespondBadRequest('At least one filter must be provided.'));
+
+        if (Request.QueryParams().ContainsKey('includeArchived')) then
+            IncludeArchived := UpperCase(Request.QueryParams().Get('includeArchived').Trim()) = 'TRUE';
 
         ResponseJson.StartObject('');
         ResponseJson.StartArray('coupons');
-        if NpDcCoupon.FindSet() then begin
+        if NpDcCoupon.FindSet() then
             repeat
                 CouponToJson(Request.ApiVersion(), NpDcCoupon, 'coupon', ResponseJson);
             until NpDcCoupon.Next() = 0;
-        end;
+
+        if IncludeArchived and NpDcArchCoupon.FindSet() then
+            repeat
+                ArchivedCouponToJson(Request.ApiVersion(), NpDcArchCoupon, 'coupon', ResponseJson);
+            until NpDcArchCoupon.Next() = 0;
+
         ResponseJson.EndArray().EndObject();
         exit(Response.RespondOK(ResponseJson));
     end;
@@ -204,22 +234,82 @@ codeunit 6248530 "NPR CouponApiAgent"
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
         Json: Codeunit "NPR JSON Builder";
+        JsonHelper: Codeunit "NPR Json Helper";
         RequestJson: JsonObject;
+        RequestBody: JsonToken;
         CouponId: Text;
+        DocumentNo: Text;
     begin
         CouponId := Request.Paths().Get(2);
-        if CouponId = '' then
+        if (CouponId = '') then
             exit(Response.RespondBadRequest('Missing required path parameter: couponId'));
 
         RequestJson := Request.BodyJson().AsObject();
-        if not VerifyDocumentNoRequest(RequestJson, Response) then
+        if (not VerifyDocumentNoRequest(RequestJson, Response)) then
             exit(Response);
 
-        if (not FindCouponById(CouponId, NpDcCoupon, Response)) then
+        if (not GetActiveCoupon(CouponId, NpDcCoupon, Response)) then
+            exit(Response);
+
+        RequestBody := Request.BodyJson();
+        DocumentNo := JsonHelper.GetJText(RequestBody, 'documentNo', true);
+
+        if (not IsCouponActive(NpDcCoupon, DocumentNo, Response)) then
             exit(Response);
 
         ReserveCoupon(NpDcCoupon, RequestJson.AsToken(), Json);
 
+        exit(Response.RespondOK(Json));
+    end;
+
+    internal procedure RedeemCoupon(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Coupon: Record "NPR NpDc Coupon";
+        ArchivedCoupon: Record "NPR NpDc Arch. Coupon";
+        CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+        JsonHelper: Codeunit "NPR Json Helper";
+        Json: Codeunit "NPR JSON Builder";
+        RequestJson: JsonObject;
+        RequestBody: JsonToken;
+        ReferenceNo: Text;
+        DocumentNo: Text;
+    begin
+        RequestJson := Request.BodyJson().AsObject();
+        if not VerifyRedeemRequest(RequestJson, Response) then
+            exit(Response);
+
+        RequestBody := Request.BodyJson();
+        ReferenceNo := JsonHelper.GetJText(RequestBody, 'referenceNo', true).Trim();
+        DocumentNo := JsonHelper.GetJText(RequestBody, 'documentNo', true).Trim();
+
+        if (StrLen(ReferenceNo) > MaxStrLen(Coupon."Reference No.")) then
+            exit(Response.RespondBadRequest(StrSubstNo('''referenceNo'' exceeds the maximum length of %1.', MaxStrLen(Coupon."Reference No."))));
+
+        if (StrLen(ReferenceNo) = 0) then
+            exit(Response.RespondBadRequest('''referenceNo'' cannot be blank'));
+
+        if (StrLen(DocumentNo) > MaxStrLen(Coupon."Issue External Document No.")) then
+            exit(Response.RespondBadRequest(StrSubstNo('''documentNo'' exceeds the maximum length of %1.', MaxStrLen(Coupon."Issue External Document No."))));
+
+        if (StrLen(DocumentNo) = 0) then
+            exit(Response.RespondBadRequest('''documentNo'' cannot be blank'));
+
+        Coupon.SetCurrentKey("Reference No.");
+        Coupon.SetFilter("Reference No.", '=%1', UpperCase(ReferenceNo));
+        if (not Coupon.FindFirst()) then begin
+            ArchivedCoupon.SetCurrentKey("Reference No.");
+            ArchivedCoupon.SetFilter("Reference No.", '=%1', UpperCase(ReferenceNo));
+            if (not ArchivedCoupon.IsEmpty()) then
+                exit(Response.RespondBadRequest('Coupon is archived'));
+            exit(Response.RespondBadRequest('Coupon not found'));
+        end;
+
+        if (not IsCouponActive(Coupon, DocumentNo, Response)) then
+            exit(Response);
+
+        CouponMgt.RedeemCoupon(Coupon, CopyStr(DocumentNo, 1, MaxStrLen(Coupon."Issue External Document No.")));
+
+        BuildRedeemResponse(Coupon, DocumentNo, Json);
         exit(Response.RespondOK(Json));
     end;
 
@@ -238,12 +328,13 @@ codeunit 6248530 "NPR CouponApiAgent"
         if CouponId = '' then
             exit(Response.RespondBadRequest('Missing required path parameter: couponId'));
 
-        if (not NpDcCoupon.GetBySystemId(CouponId)) then
-            exit(Response.RespondBadRequest('Coupon Id not found'));
+        if not GetActiveCoupon(CouponId, NpDcCoupon, Response) then
+            exit(Response);
 
         if NpDcCoupon."Reference No." = '' then
             exit(Response.RespondBadRequest('Invalid coupon reference number'));
 
+        // Cancel is idempotent: no-op silently when nothing matches. Callers reconcile via CheckCoupon.
         RemoveCouponReservation(NpDcCoupon, DocumentNo, Json);
 
         exit(Response.RespondOK(Json));
@@ -299,10 +390,9 @@ codeunit 6248530 "NPR CouponApiAgent"
 
     local procedure RemoveReservationForCoupon(var NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv."; ReferenceNo: Text; DocumentNo: Text)
     begin
-        NpDcExtCouponSalesLine.SetRange("External Document No.", DocumentNo);
-        NpDcExtCouponSalesLine.SetRange("Reference No.", ReferenceNo);
-        if NpDcExtCouponSalesLine.FindFirst() then
-            NpDcExtCouponSalesLine.Delete(true);
+        NpDcExtCouponSalesLine.SetFilter("External Document No.", '=%1', DocumentNo);
+        NpDcExtCouponSalesLine.SetFilter("Reference No.", '=%1', ReferenceNo);
+        NpDcExtCouponSalesLine.DeleteAll(true);
     end;
 
     local procedure BuildReserveResponse(TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary; var Json: Codeunit "NPR JSON Builder")
@@ -435,7 +525,9 @@ codeunit 6248530 "NPR CouponApiAgent"
         Json.EndObject();
     end;
 
-    local procedure BuildCheckCouponResponse(NpDcCoupon: Record "NPR NpDc Coupon"; var Json: Codeunit "NPR JSON Builder")
+    local procedure BuildCheckCouponResponse(NpDcCoupon: Record "NPR NpDc Coupon"; State: Enum "NPR NpDc CouponState"; var Json: Codeunit "NPR JSON Builder")
+    var
+        NpDcExtCouponReservation: Record "NPR NpDc Ext. Coupon Reserv.";
     begin
         NpDcCoupon.CalcFields(Open, "Remaining Quantity");
         Json.StartObject('');
@@ -450,7 +542,39 @@ codeunit 6248530 "NPR CouponApiAgent"
         Json.AddProperty('maxUsePerSale', NpDcCoupon."Max Use per Sale");
         Json.AddProperty('remainingQuantity', NpDcCoupon."Remaining Quantity");
         Json.AddProperty('inUseQuantity', NpDcCoupon.CalcInUseQty());
+        Json.AddProperty('state', StateToString(State));
+
+        Json.StartArray('reservedByDocumentNos');
+        NpDcExtCouponReservation.SetFilter("Coupon No.", '=%1', NpDcCoupon."No.");
+        if NpDcExtCouponReservation.FindSet() then
+            repeat
+                Json.AddValue(NpDcExtCouponReservation."External Document No.");
+            until NpDcExtCouponReservation.Next() = 0;
+        Json.EndArray();
+
         Json.EndObject();
+    end;
+
+    local procedure StateToString(State: Enum "NPR NpDc CouponState"): Text
+    begin
+        case State of
+            State::ACTIVE:
+                exit('active');
+            State::NOT_YET_VALID:
+                exit('notYetValid');
+            State::EXPIRED:
+                exit('expired');
+            State::CONSUMED:
+                exit('consumed');
+            State::EXHAUSTED:
+                exit('exhausted');
+            State::RESERVED:
+                exit('reserved');
+            State::MAX_PER_SALE_EXCEEDED:
+                exit('maxPerSaleExceeded');
+            State::TYPE_DISABLED:
+                exit('typeDisabled');
+        end;
     end;
 
     local procedure BuildReserveCouponAsJson(TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
@@ -467,82 +591,104 @@ codeunit 6248530 "NPR CouponApiAgent"
             .AddProperty('inUseQuantity', TempNpDcExtCouponBuffer."In-use Quantity");
     end;
 
-    local procedure FindCouponById(CouponId: Text; var NpDcCoupon: Record "NPR NpDc Coupon"; var Response: Codeunit "NPR API Response"): Boolean
-    begin
-        if not NpDcCoupon.GetBySystemId(CouponId) then begin
-            if not FindAndValidateArchiveCoupon(CouponId, Response) then
-                exit(false);
-        end else begin
-            if not ValidateActiveCoupon(NpDcCoupon, Response) then
-                exit(false);
-        end;
-        exit(true);
-    end;
-
-    internal procedure FindAndValidateArchiveCoupon(CouponId: Text; var Response: Codeunit "NPR API Response"): Boolean
+    local procedure GetActiveCoupon(CouponId: Text; var Coupon: Record "NPR NpDc Coupon"; var Response: Codeunit "NPR API Response"): Boolean
     var
-        NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
+        ArchivedCoupon: Record "NPR NpDc Arch. Coupon";
     begin
-        if not NpDcArchCoupon.GetBySystemId(CouponId) then begin
-            Response.RespondBadRequest('Not found, Invalid Reference number');
+        if (Coupon.GetBySystemId(CouponId)) then
+            exit(true);
+
+        if (ArchivedCoupon.GetBySystemId(CouponId)) then begin
+            if (ArchivedCoupon."Ending Date" < ArchivedCoupon.SystemCreatedAt) and (ArchivedCoupon."Ending Date" <> 0DT) then
+                Response.RespondBadRequest('Coupon is expired and archived')
+            else
+                Response.RespondBadRequest('Coupon is archived');
             exit(false);
         end;
 
-        if (NpDcArchCoupon."Ending Date" < NpDcArchCoupon.SystemCreatedAt) and (NpDcArchCoupon."Ending Date" <> 0DT) then
-            Response.RespondBadRequest('Coupon is expired and archived')
-        else
-            Response.RespondBadRequest('Coupon is archived');
+        Response.RespondBadRequest('Coupon not found');
         exit(false);
     end;
 
-    internal procedure ValidateActiveCoupon(NpDcCoupon: Record "NPR NpDc Coupon"; var Response: Codeunit "NPR API Response"): Boolean
+    internal procedure InspectCoupon(Coupon: Record "NPR NpDc Coupon"; DocumentNo: Text) State: Enum "NPR NpDc CouponState"
     var
-        NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv.";
-        NpDcCouponType: Record "NPR NpDc Coupon Type";
-        CurrSaleCouponCount: Integer;
+        CouponType: Record "NPR NpDc Coupon Type";
+        ExtCouponReservation: Record "NPR NpDc Ext. Coupon Reserv.";
+        CouponEntry: Record "NPR NpDc Coupon Entry";
+        EffectiveInUseQty: Integer;
+        OwnReservationCount: Integer;
     begin
-        NpDcCoupon.CalcFields(Open, "Remaining Quantity");
+        Coupon.CalcFields(Open, "Remaining Quantity");
 
-        if NpDcCouponType.Get(NpDcCoupon."Coupon Type") and (not NpDcCouponType.Enabled) then begin
-            Response.RespondBadRequest('Coupon type is not enabled');
-            exit(false);
+        if (CouponType.Get(Coupon."Coupon Type") and (not CouponType.Enabled)) then
+            exit(State::TYPE_DISABLED);
+
+        if (Coupon."Starting Date" > CurrentDateTime()) then
+            exit(State::NOT_YET_VALID);
+
+        if ((Coupon."Ending Date" < CurrentDateTime()) and (Coupon."Ending Date" <> 0DT)) then
+            exit(State::EXPIRED);
+
+        if (not Coupon.Open) then
+            exit(State::CONSUMED);
+
+        if (Coupon."Remaining Quantity" < 1) then
+            exit(State::EXHAUSTED);
+
+        // Subtract caller's own reservations so they don't conflict with themselves on retry.
+        EffectiveInUseQty := Coupon.CalcInUseQty();
+        if (DocumentNo <> '') then begin
+            ExtCouponReservation.SetFilter("Coupon No.", '=%1', Coupon."No.");
+            ExtCouponReservation.SetFilter("External Document No.", '=%1', DocumentNo);
+            OwnReservationCount := ExtCouponReservation.Count();
+            EffectiveInUseQty -= OwnReservationCount;
+        end;
+        if (EffectiveInUseQty >= Coupon."Remaining Quantity") then
+            exit(State::RESERVED);
+
+        // MaxUsePerSale: count prior redemptions from this sale against the coupon's limit.
+        if (DocumentNo <> '') then begin
+            CouponEntry.SetFilter("Coupon No.", '=%1', Coupon."No.");
+            CouponEntry.SetFilter("External Document No.", '=%1', DocumentNo);
+            CouponEntry.SetFilter("Entry Type", '=%1', CouponEntry."Entry Type"::"Discount Application");
+            if (CouponEntry.Count() >= EffectiveMaxUsePerSale(Coupon)) then
+                exit(State::MAX_PER_SALE_EXCEEDED);
         end;
 
-        if NpDcCoupon."Starting Date" > CurrentDateTime then begin
-            Response.RespondBadRequest('Coupon is not valid yet');
-            exit(false);
-        end;
+        exit(State::ACTIVE);
+    end;
 
-        if (NpDcCoupon."Ending Date" < CurrentDateTime) and (NpDcCoupon."Ending Date" <> 0DT) then begin
-            Response.RespondBadRequest('Coupon is expired');
-            exit(false);
-        end;
+    local procedure EffectiveMaxUsePerSale(Coupon: Record "NPR NpDc Coupon"): Integer
+    begin
+        if (Coupon."Max Use per Sale" < 1) then
+            exit(1);
+        exit(Coupon."Max Use per Sale");
+    end;
 
-        if not NpDcCoupon.Open then begin
-            Response.RespondBadRequest('Coupon is not open');
-            exit(false);
+    local procedure IsCouponActive(Coupon: Record "NPR NpDc Coupon"; DocumentNo: Text; var Response: Codeunit "NPR API Response"): Boolean
+    var
+        State: Enum "NPR NpDc CouponState";
+    begin
+        State := InspectCoupon(Coupon, DocumentNo);
+        case State of
+            State::ACTIVE:
+                exit(true);
+            State::TYPE_DISABLED:
+                Response.RespondBadRequest('Coupon type is not enabled');
+            State::CONSUMED:
+                Response.RespondBadRequest('Coupon is not open');
+            State::NOT_YET_VALID:
+                Response.RespondBadRequest('Coupon is not valid yet');
+            State::EXPIRED:
+                Response.RespondBadRequest('Coupon is expired');
+            State::EXHAUSTED:
+                Response.RespondBadRequest('Coupon has no remaining quantity');
+            State::RESERVED:
+                Response.RespondBadRequest('Coupon is already reserved by a different document number');
+            State::MAX_PER_SALE_EXCEEDED:
+                Response.RespondBadRequest(StrSubstNo('Coupon max use per sale exceeded. Max use per sale is %1', EffectiveMaxUsePerSale(Coupon)));
         end;
-
-        if NpDcCoupon."Remaining Quantity" < 1 then begin
-            Response.RespondBadRequest('Coupon has no remaining quantity');
-            exit(false);
-        end;
-
-        if NpDcCoupon.CalcInUseQty() >= NpDcCoupon."Remaining Quantity" then begin
-            Response.RespondBadRequest('Coupon is being used');
-            exit(false);
-        end;
-
-        NpDcExtCouponSalesLine.SetRange("Coupon No.", NpDcCoupon."No.");
-        CurrSaleCouponCount := NpDcExtCouponSalesLine.Count();
-        if NpDcCoupon."Max Use per Sale" < 1 then
-            NpDcCoupon."Max Use per Sale" := 1;
-        if CurrSaleCouponCount >= NpDcCoupon."Max Use per Sale" then begin
-            Response.RespondBadRequest(StrSubstNo('Coupon max use per sale exceeded. Max use per sale is %1', NpDcCoupon."Max Use per Sale"));
-            exit(false);
-        end;
-
-        exit(true);
+        exit(false);
     end;
 
     local procedure VerifyDocumentNoRequest(RequestJson: JsonObject; var Response: Codeunit "NPR API Response"): Boolean
@@ -552,6 +698,31 @@ codeunit 6248530 "NPR CouponApiAgent"
         if not VerifyRequiredField(RequestJson, 'documentNo', TempText, Response) then
             exit(false);
         exit(true);
+    end;
+
+    local procedure VerifyRedeemRequest(RequestJson: JsonObject; var Response: Codeunit "NPR API Response"): Boolean
+    var
+        TempText: Text;
+    begin
+        if not VerifyRequiredField(RequestJson, 'referenceNo', TempText, Response) then
+            exit(false);
+
+        if not VerifyRequiredField(RequestJson, 'documentNo', TempText, Response) then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure BuildRedeemResponse(NpDcCoupon: Record "NPR NpDc Coupon"; DocumentNo: Text; var Json: Codeunit "NPR JSON Builder")
+    begin
+        Json.StartObject('')
+            .StartObject('redemption')
+            .AddProperty('couponId', Format(NpDcCoupon.SystemId, 0, 4).ToLower())
+            .AddProperty('referenceNo', NpDcCoupon."Reference No.")
+            .AddProperty('documentNo', DocumentNo)
+            .AddProperty('couponType', NpDcCoupon."Coupon Type");
+
+        Json.EndObject().EndObject();
     end;
 
     local procedure CouponToJson(VersionDate: Date; Coupon: Record "NPR NpDc Coupon"; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
@@ -572,6 +743,47 @@ codeunit 6248530 "NPR CouponApiAgent"
             Json.AddProperty('status', 'ACTIVE')
         else
             Json.AddProperty('status', 'CONSUMED');
+
+        if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then
+            Json.AddProperty('discountType', 'PERCENTAGE')
+        else
+            Json.AddProperty('discountType', 'AMOUNT');
+
+        Json.AddProperty('issueDate', Coupon."Issue Date");
+
+        if (Coupon."Starting Date" > 0DT) then
+            Json.AddProperty('validFrom', Coupon."Starting Date");
+
+        if (Coupon."Ending Date" > 0DT) then
+            Json.AddProperty('validUntil', Coupon."Ending Date");
+
+        Json.AddProperty('maxUsesPerSale', Coupon."Max Use per Sale");
+
+        if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then
+            Json.AddProperty('discountPercent', Coupon."Discount %")
+        else
+            Json.AddProperty('discountAmount', Coupon."Discount Amount");
+        Json.AddProperty('maxDiscountAmount', Coupon."Max. Discount Amount");
+
+        Json.AddProperty('customerNo', Coupon."Customer No.");
+        Json.AddProperty('remainingQuantity', Coupon."Remaining Quantity");
+        Json.EndObject();
+    end;
+
+    local procedure ArchivedCouponToJson(VersionDate: Date; Coupon: Record "NPR NpDc Arch. Coupon"; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
+    begin
+        Coupon.CalcFields("Remaining Quantity", "Issue Date");
+        Json.StartObject(JsonObjectName)
+            .AddProperty('id', Format(Coupon.SystemId, 0, 4).ToLower())
+            .AddProperty('no', Coupon."No.")
+            .AddProperty('description', Coupon.Description)
+            .AddProperty('referenceNo', Coupon."Reference No.");
+
+        if (VersionDate <= DMY2DATE(30, 4, 2026)) then
+            Json.AddProperty('coupontype', Format(Coupon."Coupon Type"));
+
+        Json.AddProperty('couponType', Format(Coupon."Coupon Type"));
+        Json.AddProperty('status', 'CONSUMED');
 
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then
             Json.AddProperty('discountType', 'PERCENTAGE')

@@ -143,6 +143,14 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(161; "Issue Date"; Date)
+        {
+            CalcFormula = min("NPR NpDc Arch.Coupon Entry"."Posting Date" where("Arch. Coupon No." = field("No."),
+                                                                    "Entry Type" = const("Issue Coupon")));
+            Caption = 'Issue Date';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
