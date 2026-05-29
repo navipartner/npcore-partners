@@ -415,7 +415,7 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
         EFTTransactionRequestCardNameUpperCase: Text;
         EFTTransactionRequestPaymentNetwork: Text;
         EFTTransactionRequestPaymentType: Text;
-        MaskedCard: Text;
+        CompactCardNo: Text;
         CardLbl: Label 'CARD', Locked = true;
         VISALbl: Label 'VISA', Locked = true;
         MasterCardLbl: Label 'MASTERCARD', Locked = true;
@@ -431,7 +431,7 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
         Clear(EFTTransactionRequestPaymentType);
 
         PaymentTypeJsonObject.Add('name', CardLbl);
-        EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Fiscal No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Document No.");
         EFTTransactionRequest.SetRange("Register No.", POSEntry."POS Unit No.");
         EFTTransactionRequest.SetRange("Sales Line No.", PaymentAmountLine."Line No.");
         EFTTransactionRequest.SetLoadFields("Card Number", Finished, "Processing Type", "Authorisation Number", "Card Application ID", "Hardware ID", "External Transaction ID", "Acquirer ID", Successful, "Card Name");
@@ -464,8 +464,8 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
                 PaymentTransactionDetailsObject.Add('payment_type', RefundPaymentTypeLbl);
             end;
             if EFTTransactionRequest."Card Number" <> '' then begin
-                MaskedCard := CopyStr(EFTTransactionRequest."Card Number", 8, MaxStrLen(EFTTransactionRequest."Card Number"));
-                PaymentTypeJsonObject.Add('payment_identifier', MaskedCard);
+                CompactCardNo := DelChr(EFTTransactionRequest."Card Number", '=', ' ');
+                PaymentTypeJsonObject.Add('payment_identifier', PadStr('', StrLen(CompactCardNo) - 4, '*') + CopyStr(CompactCardNo, StrLen(CompactCardNo) - 3, 4));
             end;
 
             PaymentTransactionDetailsObject.Add('local_date_time', GetUnixTime(EFTTransactionRequest.Finished));
