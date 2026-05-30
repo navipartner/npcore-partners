@@ -201,7 +201,7 @@
 
         if ((Rec."Notification Address" <> '') or (SuggestNotificationMethod <> SuggestNotificationMethod::NA)) then begin
 
-            Rec."Notification Address" := SuggestNotificationAddress;
+            Rec."Notification Address" := Rec.NormalizeNotificationAddress(SuggestNotificationAddress);
 
             case SuggestNotificationMethod of
                 SuggestNotificationMethod::EMAIL:

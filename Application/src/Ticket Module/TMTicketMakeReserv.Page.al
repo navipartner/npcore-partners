@@ -751,7 +751,7 @@
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
 
-                TicketReservationRequest."Notification Address" := _DeliverTicketTo;
+                TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(_DeliverTicketTo);
                 TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (StrPos(_DeliverTicketTo, '@') > 0) then
@@ -845,7 +845,7 @@
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
-                TicketReservationRequest."Notification Address" := _DeliverTicketTo;
+                TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(_DeliverTicketTo);
                 TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(_DeliverTicketTo, '@') > 0) then
@@ -919,7 +919,7 @@
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
-                TicketReservationRequest."Notification Address" := _DeliverTicketTo;
+                TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(_DeliverTicketTo);
                 TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(_DeliverTicketTo, '@') > 0) then

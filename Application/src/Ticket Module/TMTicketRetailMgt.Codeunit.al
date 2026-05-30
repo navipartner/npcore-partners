@@ -451,7 +451,7 @@
             if (TicketReservationRequest2.FindLast()) then begin
                 repeat
                     TicketReservationRequest."Notification Method" := TicketReservationRequest2."Notification Method";
-                    TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
+                    TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(TicketReservationRequest2."Notification Address");
                     TicketReservationRequest.TicketHolderName := TicketReservationRequest2.TicketHolderName;
                     TicketReservationRequest.TicketHolderPreferredLanguage := TicketReservationRequest2.TicketHolderPreferredLanguage;
                     TicketReservationRequest.Modify();

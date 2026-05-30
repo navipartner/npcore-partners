@@ -178,6 +178,11 @@
         {
             Caption = 'Notification Address';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                Rec."Notification Address" := NormalizeNotificationAddress(Rec."Notification Address");
+            end;
         }
         field(82; "Notification Format"; Option)
         {
@@ -360,7 +365,11 @@
     {
     }
 
-
-
+    procedure NormalizeNotificationAddress(Value: Text): Text[100]
+    begin
+        if StrPos(Value, '@') > 0 then
+            Value := LowerCase(Value);
+        exit(CopyStr(Value, 1, MaxStrLen(Rec."Notification Address")));
+    end;
 }
 

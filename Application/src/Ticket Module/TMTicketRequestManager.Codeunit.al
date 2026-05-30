@@ -1966,7 +1966,7 @@
 
         repeat
             if (TicketReservationRequest."Notification Address" = '') then
-                TicketReservationRequest."Notification Address" := NotificationAddress;
+                TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(NotificationAddress);
 
             if (TicketReservationRequest."Notification Address" = '') then
                 TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA
@@ -2078,7 +2078,7 @@
 
         ReservationRequest."Notification Method" := ReservationRequest."Notification Method"::NA;
         if (NotificationAddress <> '') then begin
-            ReservationRequest."Notification Address" := NotificationAddress;
+            ReservationRequest."Notification Address" := ReservationRequest.NormalizeNotificationAddress(NotificationAddress);
             ReservationRequest."Notification Method" := ReservationRequest."Notification Method"::SMS;
             if (StrPos(ReservationRequest."Notification Address", '@') > 1) then
                 ReservationRequest."Notification Method" := ReservationRequest."Notification Method"::EMAIL;

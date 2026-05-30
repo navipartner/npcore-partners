@@ -303,7 +303,7 @@
     begin
         Clear(TicketHolder);
         TicketReservationReq.SetCurrentKey("Notification Address");
-        TicketReservationReq.SetRange("Notification Address", NotificationAddress);
+        TicketReservationReq.SetRange("Notification Address", TicketReservationReq.NormalizeNotificationAddress(NotificationAddress));
         if (TicketReservationReq.FindSet()) then
             repeat
                 // Ensure we only add data once in case we have mulitple admissions/tickets on the same token.
@@ -347,7 +347,7 @@
             TicketReservationReq.FindSet();
             repeat
                 TicketReservationReq."Notification Method" := TicketHolder.NotificationMethod;
-                TicketReservationReq."Notification Address" := TicketHolder.NotificationAddress;
+                TicketReservationReq."Notification Address" := TicketReservationReq.NormalizeNotificationAddress(TicketHolder.NotificationAddress);
                 TicketReservationReq.TicketHolderName := TicketHolder.TicketHolderName;
                 TicketReservationReq.TicketHolderPreferredLanguage := TicketHolder.TicketHolderPreferredLanguage;
                 TicketReservationReq.Modify();
@@ -414,7 +414,7 @@
         TicketReservationRequest.FindSet();
         repeat
             TicketReservationRequest."Notification Method" := TicketReservationRequest2."Notification Method";
-            TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
+            TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(TicketReservationRequest2."Notification Address");
             TicketReservationRequest.TicketHolderName := TicketReservationRequest2.TicketHolderName;
             TicketReservationRequest.TicketHolderPreferredLanguage := TicketReservationRequest2.TicketHolderPreferredLanguage;
             TicketReservationRequest.Modify();

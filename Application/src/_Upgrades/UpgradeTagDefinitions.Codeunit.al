@@ -337,6 +337,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeBCRecordSystemIdInMemberPaymentMethods'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG CRO Customer No.", 'init-customer-no-on-cro-pos-audit-log'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpEc Store Loc. Code", 'CopyLocationCodeToCorrectLengthField'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG TM Notif Address", 'LowercaseEmailNotifAddress'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1285,6 +1286,11 @@
                 case UpgradeStep of
                     'CopyLocationCodeToCorrectLengthField':
                         exit('NPR-CopyLocationCodeToCorrectLengthField-20260531');
+                end;
+            Codeunit::"NPR UPG TM Notif Address":
+                case UpgradeStep of
+                    'LowercaseEmailNotifAddress':
+                        exit('NPR-TM-LowercaseEmailNotifAddress-20260531');
                 end;
         end;
     end;

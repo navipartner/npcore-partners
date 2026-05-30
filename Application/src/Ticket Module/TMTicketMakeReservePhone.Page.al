@@ -571,7 +571,7 @@ page 6151184 "NPR TM TicketMakeReservePhone"
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
 
-                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(gDeliverTicketTo);
                 TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
 
@@ -666,7 +666,7 @@ page 6151184 "NPR TM TicketMakeReservePhone"
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
-                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(gDeliverTicketTo);
                 TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
@@ -740,7 +740,7 @@ page 6151184 "NPR TM TicketMakeReservePhone"
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
-                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(gDeliverTicketTo);
                 TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then

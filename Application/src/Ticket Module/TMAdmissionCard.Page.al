@@ -226,6 +226,11 @@ page 6150765 "NPR TM Admission Card"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the email or phone number of the admission code owner.';
+                    trigger OnValidate()
+                    begin
+                        if StrPos(Rec."Stakeholder (E-Mail/Phone No.)", '@') > 0 then
+                            Rec."Stakeholder (E-Mail/Phone No.)" := LowerCase(Rec."Stakeholder (E-Mail/Phone No.)");
+                    end;
                 }
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
                 field("Stakeholder NP Email Template"; Rec."Stakeholder NP Email Template")

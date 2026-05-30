@@ -130,7 +130,7 @@ xmlport 6060124 "NPR TM Send eTicket"
 
         if (tmpTicketReservationRequest."Notification Address" <> '') then begin
             TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
-            TicketReservationRequest."Notification Address" := tmpTicketReservationRequest."Notification Address";
+            TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(tmpTicketReservationRequest."Notification Address");
             TicketReservationRequest.Modify();
         end;
 

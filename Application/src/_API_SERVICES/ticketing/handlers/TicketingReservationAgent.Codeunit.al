@@ -327,7 +327,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             TicketRequest."External Member No." := CopyStr(GetAsText(LineToken.AsObject(), 'memberNumber', ''), 1, MaxStrLen(TicketRequest."External Member No."));
             TicketRequest."Admission Code" := CopyStr(GetAsText(LineToken.AsObject(), 'admissionCode', ''), 1, MaxStrLen(TicketRequest."Admission Code"));
             TicketRequest."External Adm. Sch. Entry No." := GetAsInteger(LineToken.AsObject(), 'scheduleId', 0);
-            TicketRequest."Notification Address" := CopyStr(GetAsText(LineToken.AsObject(), 'notificationAddress', ''), 1, MaxStrLen(TicketRequest."Notification Address"));
+            TicketRequest."Notification Address" := TicketRequest.NormalizeNotificationAddress(GetAsText(LineToken.AsObject(), 'notificationAddress', ''));
             LanguageCode := CopyStr(GetAsText(LineToken.AsObject(), 'preferredLanguage', ''), 1, MaxStrLen(LanguageCode));
             TicketRequest.Validate(TicketHolderPreferredLanguage, LanguageCode);
 

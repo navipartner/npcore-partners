@@ -150,7 +150,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest.Quantity := 1;
 
         TicketRequest."External Member No." := TempTicketImportLine.MemberNumber;
-        TicketRequest."Notification Address" := TempTicketImportLine.TicketHolderEMail;
+        TicketRequest."Notification Address" := TicketRequest.NormalizeNotificationAddress(TempTicketImportLine.TicketHolderEMail);
         TicketRequest.TicketHolderName := TempTicketImportLine.TicketHolderName;
         TicketRequest.TicketHolderPreferredLanguage := TempTicketImportLine.TicketHolderPreferredLang;
 

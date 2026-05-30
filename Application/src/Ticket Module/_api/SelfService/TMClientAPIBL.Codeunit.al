@@ -377,7 +377,7 @@ codeunit 6151543 "NPR TM Client API BL"
             TicketRequest."External Member No." := CopyStr(GetAsText(Line.AsObject(), 'memberNumber', ''), 1, MaxStrLen(TicketRequest."External Member No."));
             TicketRequest."Admission Code" := CopyStr(GetAsText(Line.AsObject(), 'admissionCode', ''), 1, MaxStrLen(TicketRequest."Admission Code"));
             TicketRequest."External Adm. Sch. Entry No." := GetAsInteger(Line.AsObject(), 'scheduleId', 0);
-            TicketRequest."Notification Address" := CopyStr(GetAsText(Line.AsObject(), 'notificationAddress', ''), 1, MaxStrLen(TicketRequest."Notification Address"));
+            TicketRequest."Notification Address" := TicketRequest.NormalizeNotificationAddress(GetAsText(Line.AsObject(), 'notificationAddress', ''));
             TicketRequest."Admission Created" := TicketRequest."External Adm. Sch. Entry No." > 0;
 
             if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
@@ -771,7 +771,7 @@ codeunit 6151543 "NPR TM Client API BL"
             TicketRequest."External Member No." := CopyStr(GetAsText(Line.AsObject(), 'memberNumber', ''), 1, MaxStrLen(TicketRequest."External Member No."));
             TicketRequest."Admission Code" := CopyStr(GetAsText(Line.AsObject(), 'admissionCode', ''), 1, MaxStrLen(TicketRequest."Admission Code"));
             TicketRequest."External Adm. Sch. Entry No." := GetAsInteger(Line.AsObject(), 'scheduleId', 0);
-            TicketRequest."Notification Address" := CopyStr(GetAsText(Line.AsObject(), 'notificationAddress', ''), 1, MaxStrLen(TicketRequest."Notification Address"));
+            TicketRequest."Notification Address" := TicketRequest.NormalizeNotificationAddress(GetAsText(Line.AsObject(), 'notificationAddress', ''));
 
             if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
                 Error(INVALID_ITEM_REFERENCE, TicketRequest."External Item Code");

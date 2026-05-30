@@ -47,7 +47,7 @@ table 6151179 "NPR TM TicketHolder"
         Rec.ReservationToken := TicketReservationReq."Session Token ID";
         Rec.TicketHolderName := TicketReservationReq.TicketHolderName;
         Rec.NotificationMethod := TicketReservationReq."Notification Method";
-        Rec.NotificationAddress := TicketReservationReq."Notification Address";
+        Rec.NotificationAddress := TicketReservationReq.NormalizeNotificationAddress(TicketReservationReq."Notification Address");
         Rec.TicketHolderPreferredLanguage := TicketReservationReq.TicketHolderPreferredLanguage;
     end;
 }

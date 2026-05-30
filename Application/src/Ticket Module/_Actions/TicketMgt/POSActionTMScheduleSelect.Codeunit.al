@@ -208,12 +208,12 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
                 repeat
                     if ((Email <> '') and (StrPos(Email, '@') > 0)) then begin
                         TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::Email;
-                        TicketReservationRequest."Notification Address" := CopyStr(Email, 1, MaxStrLen(TicketReservationRequest."Notification Address"));
+                        TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(Email);
                     end;
                     // Phone number bias
                     if ((Phone <> '') and (DelChr(Phone, '<=>', '+1234567890 ') = '') and (StrLen(Phone) >= 5)) then begin
                         TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
-                        TicketReservationRequest."Notification Address" := CopyStr(Phone, 1, MaxStrLen(TicketReservationRequest."Notification Address"));
+                        TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(Phone);
                     end;
                     TicketReservationRequest.TicketHolderName := CopyStr(Name, 1, MaxStrLen(TicketReservationRequest.TicketHolderName));
                     TicketReservationRequest.Validate(TicketHolderPreferredLanguage, Language.ToUpper());

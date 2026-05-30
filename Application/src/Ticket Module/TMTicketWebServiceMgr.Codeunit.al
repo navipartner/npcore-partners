@@ -860,7 +860,7 @@
         WaitingListOptInAddress := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, 'waitinglist_opt-in_address', false), 1, MaxStrLen(WaitingListOptInAddress));
         if (WaitingListOptInAddress <> '') then begin
             TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::WAITINGLIST;
-            TicketReservationRequest."Notification Address" := WaitingListOptInAddress;
+            TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(WaitingListOptInAddress);
         end;
 
         TicketReservationRequest.UnitAmount := Abs(GetDecimalAmount(Element, 'unit_amount'));
