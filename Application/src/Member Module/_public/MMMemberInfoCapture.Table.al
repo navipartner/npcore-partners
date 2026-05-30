@@ -59,6 +59,14 @@
         {
             Caption = 'Phone No.';
             DataClassification = CustomerContent;
+#if not BC17
+            trigger OnValidate()
+            var
+                SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+            begin
+                SpfyIntegrationMgt.ConfirmInvalidShopifyPhoneNoOnChange("Phone No.", xRec."Phone No.");
+            end;
+#endif
         }
         field(21; "Social Security No."; Text[30])
         {

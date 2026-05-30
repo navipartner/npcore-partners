@@ -454,27 +454,10 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
     [EventSubscriber(ObjectType::Table, Database::Customer, OnAfterValidateEvent, 'Phone No.', false, false)]
 #endif
     local procedure WarnOnInvalidShopifyPhoneNo(var Rec: Record Customer; var xRec: Record Customer)
-    var
-        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
-        ConfirmInvalidPhoneLbl: Label 'The phone number %1 does not meet Shopify’s format requirements (must start with ‘+’ followed by the country code and digits, optionally separated by spaces, dashes, or parentheses). The customer is synced to one or more Shopify stores; on the next sync, the phone number on the Customer card will be overwritten with whatever value Shopify currently has for this customer. Continue?', Comment = '%1 - the entered phone number';
     begin
         if Rec.IsTemporary() then
             exit;
-        if Rec."Phone No." = xRec."Phone No." then
-            exit;
-        if Rec."Phone No." = '' then
-            exit;
-        if not GuiAllowed() then
-            exit;
-        if SpfyIntegrationMgt.IsValidShopifyPhoneNo(Rec."Phone No.") then
-            exit;
-        SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
-        SpfyStoreCustomerLink.SetRange("No.", Rec."No.");
-        SpfyStoreCustomerLink.SetRange("Sync. to this Store", true);
-        if SpfyStoreCustomerLink.IsEmpty() then
-            exit;
-        if not Confirm(ConfirmInvalidPhoneLbl, false, Rec."Phone No.") then
-            Error('');
+        SpfyIntegrationMgt.ConfirmInvalidShopifyPhoneNoOnChange(Rec."Phone No.", xRec."Phone No.");
     end;
 }
 #endif

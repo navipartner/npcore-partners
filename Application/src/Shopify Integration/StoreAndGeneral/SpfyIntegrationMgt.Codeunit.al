@@ -11,6 +11,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
 #if not (BC18 or BC19 or BC20)
         _BCCustomerTransactionSyncStatus: Option Undefined,Disabled,Enabled;
 #endif
+        _ConfirmedInvalidPhoneNos: List of [Text];
 
     procedure CheckIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20])
     var
@@ -614,6 +615,35 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         end;
 
         exit((DigitCount >= 7) and (DigitCount <= 15));
+    end;
+
+    /// <summary>
+    /// During interactive entry of a phone number, asks the user to confirm a value that Shopify would
+    /// reject. Active only while the Shopify Integration feature is enabled in the environment, regardless
+    /// of whether the edited record is currently synced to any Shopify store. Declining raises a blank
+    /// Error to roll back the field change. No-op when the feature is disabled, the value is unchanged or
+    /// blank, the session is non-interactive, or the value already passes IsValidShopifyPhoneNo.
+    /// </summary>
+    /// <param name="PhoneNo">The newly entered phone number.</param>
+    /// <param name="xPhoneNo">The previous phone number (xRec value); used to skip unchanged values.</param>
+    internal procedure ConfirmInvalidShopifyPhoneNoOnChange(PhoneNo: Text; xPhoneNo: Text)
+    var
+        SpfyIntegrationFeature: Codeunit "NPR Spfy Integration Feature";
+        ConfirmInvalidPhoneLbl: Label 'The phone number %1 does not meet Shopify’s format requirements (it must start with ‘+’ followed by the country code and digits, optionally separated by spaces, dashes, or parentheses). Shopify will reject this value when the record is synchronized. Are you sure you want to continue?', Comment = '%1 - the entered phone number';
+    begin
+        if PhoneNo in ['', xPhoneNo] then
+            exit;
+        if not GuiAllowed() then
+            exit;
+        if not SpfyIntegrationFeature.IsFeatureEnabled() then
+            exit;
+        if IsValidShopifyPhoneNo(PhoneNo) then
+            exit;
+        if _ConfirmedInvalidPhoneNos.Contains(PhoneNo) then
+            exit;
+        if not Confirm(ConfirmInvalidPhoneLbl, false, PhoneNo) then
+            Error('');
+        _ConfirmedInvalidPhoneNos.Add(PhoneNo);
     end;
     #endregion
 
