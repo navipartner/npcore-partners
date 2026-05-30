@@ -36,6 +36,20 @@ table 6151277 "NPR Spfy Inv Item Location"
             Caption = 'Activated';
             DataClassification = CustomerContent;
         }
+        field(6; "Auto-Activation Disabled"; Boolean)
+        {
+            Caption = 'Auto-Activation Disabled';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                //Clearing the activation cache keeps the "disabled => not activated" invariant, so that
+                //re-enabling auto-activation later schedules a fresh activation instead of pushing inventory
+                //to a location where Shopify no longer stocks the variant.
+                if "Auto-Activation Disabled" then
+                    Activated := false;
+            end;
+        }
     }
     keys
     {

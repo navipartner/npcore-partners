@@ -151,6 +151,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     var
         InventoryLevel: Record "NPR Spfy Inventory Level";
         ItemVariant: Record "Item Variant";
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
         SpfyStore: Record "NPR Spfy Store";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
@@ -160,6 +161,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         MaxPerRequest: Integer;
         UpdateLevelItemRequest: Text;
         ShopifyInventoryItemID: Text[30];
+        AutoActivationDisabledLbl: Label 'Auto-activation is disabled for %1 %2 / %3 %4 at Shopify Location ID %5 (%6 store). The inventory update was skipped so the manual Shopify deactivation is preserved.', Comment = '%1 = Item No. caption, %2 = Item No., %3 = Variant Code caption, %4 = Variant Code, %5 = Shopify Location ID, %6 = Shopify Store Code';
         LocInvItemNotActivatedErr: Label 'The specified Shopify Inventory Item ID %1 is not stocked at Shopify Location ID %2 at Shopify Store %3. Awaiting the activation task to complete.', Comment = '%1 =ShopifyInventoryItemID;%2=InventoryLevel."Shopify Location ID";%3=InventoryLevel."Shopify Store Code"';
         UpdateLevelItemRequestOutdated: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",ignoreCompareQuantity:true,quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4}]}){userErrors{field message}}', Locked = true;
         UpdateLevelItemRequest202604: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4,changeFromQuantity:null}]}){userErrors{field message}}', Locked = true;
@@ -207,14 +209,23 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                                 _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(_InventoryItemIDNotFoundErr,
                                     InventoryLevel.FieldCaption("Item No."), InventoryLevel."Item No.", InventoryLevel.FieldCaption("Variant Code"), InventoryLevel."Variant Code", InventoryLevel."Shopify Store Code"))
                             else begin
-                                NcTaskOut."Process Error" := SpfyInvLocationAct.IsInventoryItemActivationRequired(InventoryLevel);
-                                if NcTaskOut."Process Error" then begin
-                                    SpfyInvLocationAct.CreateNcTaskActivateInvLocation(InventoryLevel, false);
-                                    _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(LocInvItemNotActivatedErr, ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel."Shopify Store Code"));
+                                if SpfyInvLocationAct.FindLocationRecord(LocationInvItem, InventoryLevel) and LocationInvItem."Auto-Activation Disabled" then begin
+                                    NcTaskOut.Processed := true;
+                                    _SpfyIntegrationMgt.SetResponse(NcTaskOut,
+                                        StrSubstNo(AutoActivationDisabledLbl,
+                                            InventoryLevel.FieldCaption("Item No."), InventoryLevel."Item No.",
+                                            InventoryLevel.FieldCaption("Variant Code"), InventoryLevel."Variant Code",
+                                            InventoryLevel."Shopify Location ID", InventoryLevel."Shopify Store Code"));
                                 end else begin
-                                    IncludedNcTasks += 1;
-                                    NcTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
-                                    OStream.WriteText(StrSubstNo(UpdateLevelItemRequest, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel.AvailableInventory()));
+                                    NcTaskOut."Process Error" := not LocationInvItem.Activated;
+                                    if NcTaskOut."Process Error" then begin
+                                        SpfyInvLocationAct.CreateNcTaskActivateInvLocation(InventoryLevel, false);
+                                        _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(LocInvItemNotActivatedErr, ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel."Shopify Store Code"));
+                                    end else begin
+                                        IncludedNcTasks += 1;
+                                        NcTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+                                        OStream.WriteText(StrSubstNo(UpdateLevelItemRequest, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel.AvailableInventory()));
+                                    end;
                                 end;
                             end;
                         end;
@@ -373,7 +384,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         DataKey: Text;
         ErrPart: Text;
         RequestErrorText: Text;
+        ManualDeactivationDetected: Boolean;
         Success: Boolean;
+        AutoActivationDisabledByShopifyLbl: Label 'Shopify reports %1 %2 / %3 %4 as not stocked at Shopify Location ID %5 (%6 store), but it was previously activated by Business Central. Assuming a manual deactivation in Shopify Admin: auto-activation has been disabled for this item at this location and the inventory update was skipped.', Comment = '%1 = Item No. caption, %2 = Item No., %3 = Variant Code caption, %4 = Variant Code, %5 = Shopify Location ID, %6 = Shopify Store Code';
         NcTaskNotFoundLbl: Label 'Nc Task %1 was not found in the Shopify response.';
     begin
         if not NcTaskIn.FindSet() then
@@ -413,13 +426,20 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 if not ResponseDictionary.Get(NcTaskIn."Entry No.", RequestErrorText) then
                     MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, false, StrSubstNo(NcTaskNotFoundLbl, NcTaskIn."Entry No."))
                 else begin
+                    ManualDeactivationDetected := false;
                     if RequestErrorText <> '' then
                         if SpfyInvLocationAct.IsNotStockedAtLocationErr(RequestErrorText) then begin
                             RecRef.Get(NcTaskIn."Record ID");
                             RecRef.SetTable(InventoryLevel);
-                            SpfyInvLocationAct.CreateNcTaskActivateInvLocation(InventoryLevel, true);
+                            if SpfyInvLocationAct.HandleNotStockedAtLocation(InventoryLevel) then begin
+                                ManualDeactivationDetected := true;
+                                RequestErrorText := StrSubstNo(AutoActivationDisabledByShopifyLbl,
+                                    InventoryLevel.FieldCaption("Item No."), InventoryLevel."Item No.",
+                                    InventoryLevel.FieldCaption("Variant Code"), InventoryLevel."Variant Code",
+                                    InventoryLevel."Shopify Location ID", InventoryLevel."Shopify Store Code");
+                            end;
                         end;
-                    MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, RequestErrorText = '', RequestErrorText);
+                    MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, (RequestErrorText = '') or ManualDeactivationDetected, RequestErrorText);
                 end;
             until NcTaskIn.Next() = 0;
         end;
