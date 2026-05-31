@@ -51,7 +51,7 @@ table 6059796 "NPR POS Layout Archive"
         }
     }
 
-    procedure GetLayot() Text: Text
+    procedure GetLayout() Text: Text
     begin
         if not "Frontend Properties".HasValue() then
             exit;
@@ -83,5 +83,4 @@ table 6059796 "NPR POS Layout Archive"
         POSLayoutArchive."Frontend Properties".CreateInStream(CurrentInstream, Encoding);
         CurrentInstream.Read(PropertiesString);
     end;
-
 }

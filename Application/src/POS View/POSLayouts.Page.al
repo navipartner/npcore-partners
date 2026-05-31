@@ -54,7 +54,7 @@ page 6060102 "NPR POS Layouts"
 
                     trigger OnControlReady()
                     begin
-                        CurrPage.Editor.Invoke('setJson', Rec.GetLayot(true));
+                        CurrPage.Editor.Invoke('setJson', Rec.GetLayout(true));
                     end;
 
                     trigger OnEvent(Method: Text; EventContent: Text)
