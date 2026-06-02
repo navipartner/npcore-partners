@@ -532,25 +532,45 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketingCatalog: Codeunit "NPR TicketingCatalogAgent";
         BadFilter: Boolean;
         IncludeTicket: Boolean;
+        IsEmail: Boolean;
     begin
         BadFilter := false;
 
-        if (NotificationAddress.Contains('@')) then
-            if (StrLen(NotificationAddress.Replace('@', '')) + 1 <> StrLen(NotificationAddress)) then
-                BadFilter := true;
-
-        if (not NotificationAddress.Contains('@')) then
-            if (NotificationAddress.ToUpper().StartsWith('%2B')) then
-                NotificationAddress := NotificationAddress.ToUpper().Replace('%2B', '+');
-
-        NotificationAddress := DelChr(NotificationAddress, '<=>', '*?|&');
-        NotificationAddress := NotificationAddress.Replace('..', '');
-        NotificationAddress := NotificationAddress.Replace('@', '?');
+        NotificationAddress := NotificationAddress.Trim();
         if (NotificationAddress = '') then
             BadFilter := true;
 
+        IsEmail := NotificationAddress.Contains('@');
+        if (not IsEmail) then
+            if (NotificationAddress.ToUpper().StartsWith('%2B')) then
+                NotificationAddress := NotificationAddress.ToUpper().Replace('%2B', '+');
+
         ReservationRequest.SetCurrentKey("Notification Address");
-        ReservationRequest.SetFilter("Notification Address", '%1', CopyStr('@' + NotificationAddress, 1, MaxStrLen(ReservationRequest."Notification Address")));
+
+        if (IsEmail) then begin
+            // Emails are stored folded to lower case
+            ReservationRequest.SetFilter("Notification Address", '=%1', CopyStr(NotificationAddress.ToLower(), 1, MaxStrLen(ReservationRequest."Notification Address")));
+
+        end else begin
+            if (NotificationAddress.ToUpper() = NotificationAddress.ToLower()) then begin
+                // Phone number (no letters): exact match so '+', spaces, '/' and the like stay literal.
+                ReservationRequest.SetFilter("Notification Address", '=%1', CopyStr(NotificationAddress, 1, MaxStrLen(ReservationRequest."Notification Address")));
+
+            end else begin
+                // The '@' operator is worse than it looks: it makes the comparison case-insensitive, which SQL
+                // cannot satisfy with a plain index seek on "Notification Address". It degrades to an index/table
+                // scan (effectively UPPER(column) = UPPER(value) per row), so cost grows with table size instead
+                // of staying log(n). That is precisely the cost the email and phone branches avoid by folding to a
+                // known case and doing an exact '=%1' match the index can seek. 
+                NotificationAddress := DelChr(NotificationAddress, '<=>', '*?');
+                if (NotificationAddress = '') then
+                    BadFilter := true;
+
+                ReservationRequest.SetFilter("Notification Address", '%1', CopyStr('@' + NotificationAddress, 1, MaxStrLen(ReservationRequest."Notification Address")));
+
+            end;
+        end;
+
         ReservationRequest.SetFilter("Primary Request Line", '=%1', true);
         ReservationRequest.SetLoadFields("Notification Address", "Entry No.", "Primary Request Line", "Item No.", TicketHolderPreferredLanguage, Quantity, "Session Token ID", "Authorization Code", "TicketHolderName");
 
