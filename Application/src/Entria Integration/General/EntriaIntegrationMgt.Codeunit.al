@@ -7,6 +7,8 @@ codeunit 6150987 "NPR Entria Integration Mgt."
     var
         _EntriaSetup: Record "NPR Entria Integration Setup";
         _EntriaStore: Record "NPR Entria Store";
+        _HasEnabledStoreCache: Boolean;
+        _HasEnabledStoreCached: Boolean;
 
     internal procedure CheckIsEnabled(EntriaStoreCode: Code[20])
     var
@@ -19,7 +21,7 @@ codeunit 6150987 "NPR Entria Integration Mgt."
             Error(IntegrationDisabledErr);
 
         if EntriaStoreCode = '' then begin
-            if HasEnabledStore() then
+            if HasEnabledStoreCached() then
                 exit;
             Error(IntegrationDisabledAllStoresErr);
         end;
@@ -45,6 +47,17 @@ codeunit 6150987 "NPR Entria Integration Mgt."
         end;
 
         exit(false);
+    end;
+
+    // Per-session cache; safe only for CheckIsEnabled (JQ-gated lifecycle).
+    // Other callers must use HasEnabledStore() to avoid cross-session staleness.
+    local procedure HasEnabledStoreCached(): Boolean
+    begin
+        if not _HasEnabledStoreCached then begin
+            _HasEnabledStoreCache := HasEnabledStore();
+            _HasEnabledStoreCached := true;
+        end;
+        exit(_HasEnabledStoreCache);
     end;
 
     internal procedure HasEnabledSalesOrderIntegrationStore(): Boolean
@@ -76,6 +89,7 @@ codeunit 6150987 "NPR Entria Integration Mgt."
     begin
         Clear(_EntriaSetup);
         Clear(_EntriaStore);
+        _HasEnabledStoreCached := false;
         SelectLatestVersion();
     end;
 

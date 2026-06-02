@@ -596,6 +596,13 @@ tableextension 6014427 "NPR Item" extends Item
                                                                 "Shopify Store Code" = field("NPR Spfy Store Filter")));
         }
 #endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        field(6151556; "NPR Entria Product"; Boolean)
+        {
+            Caption = 'Entria Product';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
     keys
     {

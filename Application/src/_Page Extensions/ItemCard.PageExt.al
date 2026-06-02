@@ -772,6 +772,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     ToolTip = 'Specifies how tickets on this item will be printed and admitted.';
                     ApplicationArea = NPRRetail;
                 }
+                field("NPR Entria Product"; Rec."NPR Entria Product")
+                {
+                    ToolTip = 'Specifies whether this item is published to the Entria integration.';
+                    ApplicationArea = NPRRetail;
+                    Visible = EntriaIntegrationEnabled;
+                }
             }
         }
         addafter(ItemAttributesFactbox)
@@ -1378,16 +1384,25 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         ShopifyIntegrationIsEnabled_Inventory: Boolean;
         SetupShopifyIntegrationLbl: Label 'Setup Shopify Integration';
 #endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        EntriaIntegrationEnabled: Boolean;
+#endif
 
     trigger OnOpenPage()
 #if not BC17
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+#endif
 #endif
     begin
 #if not BC17
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::" ");
         ShopifyIntegrationIsEnabled_Inventory := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
+#endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        EntriaIntegrationEnabled := EntriaIntegrationMgt.HasEnabledStore();
 #endif
 
         NPR_SetMagentoEnabled();

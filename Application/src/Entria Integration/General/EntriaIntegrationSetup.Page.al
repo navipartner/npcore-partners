@@ -38,6 +38,15 @@ page 6150928 "NPR Entria Integration Setup"
                 Image = Navigate;
                 RunObject = page "NPR Entria Stores";
             }
+            action(Items)
+            {
+                Caption = 'Items';
+                ToolTip = 'View all items flagged as Entria Products.';
+                ApplicationArea = NPRRetail;
+                Image = Item;
+                RunObject = page "Item List";
+                RunPageView = where("NPR Entria Product" = const(true));
+            }
             action(JobQueueEntries)
             {
                 Caption = 'Job Queue Entries';

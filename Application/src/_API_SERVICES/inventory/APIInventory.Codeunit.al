@@ -26,9 +26,11 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
     procedure GetItem(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Item: Record Item;
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
         JsonBuilder: Codeunit "NPR Json Builder";
         ItemId: Text;
         WithAttributes: Boolean;
+        EntriaEnabled: Boolean;
     begin
         ItemId := Request.Paths().Get(3);
         Item.ReadIsolation := IsolationLevel::ReadCommitted;
@@ -39,12 +41,14 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         if (Request.QueryParams().ContainsKey('withAttributes')) then
             WithAttributes := (Request.QueryParams().Get('withAttributes').ToLower() = 'true');
 
-        exit(Response.RespondOK(ItemToJson(JsonBuilder, Item, WithAttributes, true).Build()));
+        EntriaEnabled := EntriaIntegrationMgt.HasEnabledStore();
+        exit(Response.RespondOK(ItemToJson(JsonBuilder, Item, WithAttributes, true, EntriaEnabled).Build()));
     end;
 
     procedure ListItems(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Item: Record "Item";
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
         RecRef: RecordRef;
         JsonBuilder: Codeunit "NPR Json Builder";
         Parameters: Dictionary of [Text, Text];
@@ -57,6 +61,7 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         MoreRecords: Boolean;
         WithAttributes: Boolean;
         Sync: Boolean;
+        EntriaEnabled: Boolean;
     begin
         Parameters := Request.QueryParams();
 
@@ -100,9 +105,10 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         else
             DataFound := Item.Find('-');
 
+        EntriaEnabled := EntriaIntegrationMgt.HasEnabledStore();
         if DataFound then
             repeat
-                JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, false, Sync));
+                JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, false, Sync, EntriaEnabled));
                 EntryCount += 1;
                 if (EntryCount = Limit) then begin
                     RecRef.GetTable(Item);
@@ -121,12 +127,12 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         exit(Response.RespondOK(JsonObject));
     end;
 
-    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean): Codeunit "NPR Json Builder"
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
     begin
-        exit(ItemToJson(JsonBuilder, Item, WithAttributes, SingleItem, true));
+        exit(ItemToJson(JsonBuilder, Item, WithAttributes, SingleItem, true, EntriaEnabled));
     end;
 
-    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean; Sync: Boolean): Codeunit "NPR Json Builder"
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean; Sync: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
     begin
         JsonBuilder.StartObject().AddProperty('id', Format(Item.SystemId, 0, 4).ToLower())
                                  .AddProperty('code', Item."No.")
@@ -139,6 +145,9 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
                                  .AddProperty('unitPrice', Item."Unit Price")
                                  .AddProperty('vendorNo', Item."Vendor No.")
                                  .AddProperty('vendorItemNo', Item."Vendor Item No.");
+
+        if EntriaEnabled then
+            JsonBuilder.AddProperty('entriaProduct', Item."NPR Entria Product");
 
         if SingleItem then
             JsonBuilder.AddProperty('inventory', Item.Inventory)
