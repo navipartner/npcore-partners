@@ -88,6 +88,7 @@
     local procedure NotificationIsValid(MembershipNotification: Record "NPR MM Membership Notific."): Integer
     var
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipEntry: Record "NPR MM Membership Entry";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         Coupon: Record "NPR NpDc Coupon";
         FromDate: Date;
@@ -133,6 +134,11 @@
                     StartDate := MembershipNotification."Date To Notify";
                     if (StartDate < Today()) then
                         StartDate := Today();
+
+                    // Check Membership Entry for any record before creating the notification.
+                    MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipNotification."Membership Entry No.");
+                    if (MembershipEntry.IsEmpty()) then
+                        exit(_NOTIFICATION_ACTION::IGNORE); // Membership Entry not created yet
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
                         exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
@@ -190,6 +196,11 @@
             MembershipNotification."Notification Trigger"::WALLET_CREATE,
             MembershipNotification."Notification Trigger"::WALLET_UPDATE:
                 begin
+                    // Check Membership Entry for any record before creating the notification.
+                    MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipNotification."Membership Entry No.");
+                    if (MembershipEntry.IsEmpty()) then
+                        exit(_NOTIFICATION_ACTION::IGNORE); // Membership Entry not created yet
+
                     // Notification Date is offset from subscription starts
                     StartDate := MembershipNotification."Date To Notify";
                     if (StartDate < Today()) then
