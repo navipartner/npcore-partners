@@ -20,7 +20,9 @@ codeunit 6151001 "NPR NPEmail POS Receipt OnSale" implements "NPR IPOS Workflow"
     local procedure SendReceiptEmailOnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        NPEmailPOSRcptEvents: Codeunit "NPR NPEmail POSRcpt Events";
         POSEntry: Record "NPR POS Entry";
+        IsHandled: Boolean;
     begin
         if not NewEmailExperienceFeature.IsFeatureEnabled() then
             exit;
@@ -33,6 +35,11 @@ codeunit 6151001 "NPR NPEmail POS Receipt OnSale" implements "NPR IPOS Workflow"
             exit;
 
         if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::Other, POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale"]) then
+            exit;
+
+        // External apps may suppress this email per sale.
+        NPEmailPOSRcptEvents.OnBeforeSendReceiptEmail(POSEntry, IsHandled);
+        if IsHandled then
             exit;
 
         SendReceiptEmail(POSEntry);
