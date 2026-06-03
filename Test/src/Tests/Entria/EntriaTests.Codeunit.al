@@ -225,6 +225,48 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsTrue(EntriaIntegrationMgt.HasEnabledStore(), 'Store guard: HasEnabledStore is true');
     end;
 
+    [Test]
+    procedure SentryThrottlePerDocument()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        BaseDT: DateTime;
+    begin
+        BaseDT := CreateDateTime(DMY2Date(1, 1, 2024), 080000T);
+        _Assert.IsTrue(EntriaJQ.ShouldEmitSentryError('ZZTEST', 'ZZ-DOC-1', BaseDT), 'first failure should emit');
+        _Assert.IsFalse(EntriaJQ.ShouldEmitSentryError('ZZTEST', 'ZZ-DOC-1', BaseDT + (59 * 60 * 1000)), 'within hour should be suppressed');
+        _Assert.IsTrue(EntriaJQ.ShouldEmitSentryError('ZZTEST', 'ZZ-DOC-1', BaseDT + (61 * 60 * 1000)), 'after hour should re-emit');
+    end;
+
+    [Test]
+    procedure SentryThrottleSuppressedWhenDocumentNowExists()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        BaseDT: DateTime;
+    begin
+        // [SCENARIO] After the throttle window the Ecom Sales Header for the document
+        //            now exists ("order got fixed") → the re-emit is suppressed instead
+        //            of firing a fresh Sentry error. Covers the EcomDocumentExists branch.
+        BaseDT := CreateDateTime(DMY2Date(1, 1, 2024), 080000T);
+
+        _Assert.IsTrue(EntriaJQ.ShouldEmitSentryError('ZZTEST', 'ZZ-DOC-2', BaseDT), 'first failure should emit');
+        _Assert.IsFalse(EntriaJQ.ShouldEmitSentryError('ZZTEST', 'ZZ-DOC-2', BaseDT + (59 * 60 * 1000)), 'within hour should be suppressed');
+
+        CreateEcomOrderHeader('ZZTEST', 'ZZ-DOC-2');
+
+        _Assert.IsFalse(EntriaJQ.ShouldEmitSentryError('ZZTEST', 'ZZ-DOC-2', BaseDT + (61 * 60 * 1000)), 'after hour the doc now exists → suppressed');
+    end;
+
+    local procedure CreateEcomOrderHeader(StoreCode: Code[20]; ExternalNo: Code[20])
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    begin
+        EcomSalesHeader.Init();
+        EcomSalesHeader."Document Type" := EcomSalesHeader."Document Type"::Order;
+        EcomSalesHeader."Ecommerce Store Code" := StoreCode;
+        EcomSalesHeader."External No." := ExternalNo;
+        EcomSalesHeader.Insert(true);
+    end;
+
     local procedure Initialize()
     begin
         if _Initialized then

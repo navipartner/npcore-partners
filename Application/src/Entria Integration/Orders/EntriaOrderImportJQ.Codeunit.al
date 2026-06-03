@@ -7,24 +7,19 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     trigger OnRun()
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
-        Sentry: Codeunit "NPR Sentry";
-        Span: Codeunit "NPR Sentry Span";
         StartTime: DateTime;
         MaxDuration: Duration;
     begin
         _EntriaIntegrationMgt.CheckIsEnabled('');
-        Sentry.StartSpan(Span, StrSubstNo('bc.entria.orderimport'));
         SetTimeMarkers(StartTime, MaxDuration);
         repeat
-            if ShouldSoftExit(Rec.ID, Span) then
+            if ShouldSoftExit(Rec.ID) then
                 exit;
             ProcessEnabledStores();
             Commit();
             if Rec."Recurring Job" then
                 Sleep(1000);
         until (not Rec."Recurring Job") or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
-
-        Span.Finish();
     end;
 
     local procedure SetTimeMarkers(var StartTime: DateTime; var MaxDuration: Duration)
@@ -36,14 +31,11 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         InitGlobals();
     end;
 
-    local procedure ShouldSoftExit(JobQueueEntryID: Guid; var Span: Codeunit "NPR Sentry Span"): Boolean
+    local procedure ShouldSoftExit(JobQueueEntryID: Guid): Boolean
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
-        if not EcomJobManagement.ShouldSoftExit(JobQueueEntryID) then
-            exit(false);
-        Span.Finish();
-        exit(true);
+        exit(EcomJobManagement.ShouldSoftExit(JobQueueEntryID));
     end;
 
     internal procedure ProcessEnabledStores()
@@ -90,7 +82,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
                 exit;
             ProcessList(OrdersArr, EntriaStore);
             FlushMarker(EntriaStore);
-
             HasMore := OrderCount = Limit;
             Offset += Limit;
         until not HasMore;
@@ -304,17 +295,80 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     end;
 
     local procedure LogError(ErrMsg: Text; StoreCode: Code[20]; DocumentNo: Code[20])
-    var
-        EventIdLbl: Label 'NPR_EntriaAPI_OrderImportFailed', Locked = true;
     begin
         _HasSessionErrors.Set(StoreCode, true);
-        EmitError(ErrMsg, EventIdLbl, DocumentNo);
+        EmitError(ErrMsg, StoreCode, DocumentNo);
     end;
 
-    local procedure EmitError(ErrorText: Text; EventId: Text; DocumentNo: Code[20])
+    local procedure ShouldEmitSentryError(StoreCode: Code[20]; DocumentNo: Code[20]): Boolean
+    begin
+        exit(ShouldEmitSentryError(StoreCode, DocumentNo, CurrentDateTime()));
+    end;
+
+    internal procedure ShouldEmitSentryError(StoreCode: Code[20]; DocumentNo: Code[20]; NowDT: DateTime): Boolean
+    var
+        DKey: Text;
+        LastEmitAt: DateTime;
+        OneHour: Duration;
+    begin
+        OneHour := 60 * 60 * 1000;
+
+        if DocumentNo <> '' then
+            DKey := StrSubstNo('%1|%2', StoreCode, DocumentNo)
+        else
+            DKey := StrSubstNo('%1|<list-fetch>', StoreCode);
+
+        if not _LastErrorEmitAt.ContainsKey(DKey) then begin
+            _LastErrorEmitAt.Add(DKey, NowDT);
+            exit(true);
+        end;
+
+        LastEmitAt := _LastErrorEmitAt.Get(DKey);
+        if NowDT - LastEmitAt < OneHour then
+            exit(false);
+
+        if (DocumentNo <> '') and EcomDocumentExists(StoreCode, DocumentNo) then begin
+            _LastErrorEmitAt.Remove(DKey);
+            exit(false);
+        end;
+
+        _LastErrorEmitAt.Set(DKey, NowDT);
+        exit(true);
+    end;
+
+    local procedure EcomDocumentExists(StoreCode: Code[20]; ExternalNo: Code[20]): Boolean
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    begin
+        EcomSalesHeader.ReadIsolation := IsolationLevel::ReadCommitted;
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("Ecommerce Store Code", StoreCode);
+        EcomSalesHeader.SetRange("External No.", ExternalNo);
+        EcomSalesHeader.SetLoadFields("External No.");
+        exit(not EcomSalesHeader.IsEmpty());
+    end;
+
+    local procedure EmitSentryError(StoreCode: Code[20]; DocumentNo: Code[20])
+    var
+        Sentry: Codeunit "NPR Sentry";
+        TransactionName: Text;
+    begin
+        if DocumentNo <> '' then
+            TransactionName := StrSubstNo('Entria Order import failed: %1', DocumentNo)
+        else
+            TransactionName := StrSubstNo('Entria Order list fetch failed: %1', StoreCode);
+
+        Sentry.InitScopeAndTransaction(TransactionName, 'bc.entria.order.import.error');
+        Sentry.AddTransactionTag('entria.store_code', StoreCode);
+        Sentry.AddLastErrorInEnglish();
+        Sentry.FinalizeScope();
+    end;
+
+    local procedure TelemetryTracking(ErrorText: Text; DocumentNo: Code[20])
     var
         ActiveSession: Record "Active Session";
         CustomDimensions: Dictionary of [Text, Text];
+        EventId: Label 'NPR_EntriaAPI_OrderImportFailed', Locked = true;
     begin
         if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
             Clear(ActiveSession);
@@ -334,11 +388,19 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         Session.LogMessage(EventId, ErrorText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
+    local procedure EmitError(ErrorText: Text; StoreCode: Code[20]; DocumentNo: Code[20])
+    begin
+        if ShouldEmitSentryError(StoreCode, DocumentNo) then
+            EmitSentryError(StoreCode, DocumentNo);
+        TelemetryTracking(ErrorText, DocumentNo);
+    end;
+
     local procedure InitGlobals()
     begin
         Clear(_InitialFromDT);
         Clear(_SessionMaxUpdatedAt);
         Clear(_HasSessionErrors);
+        Clear(_LastErrorEmitAt);
     end;
 
     local procedure GetFromDT(EntriaStore: Record "NPR Entria Store"): DateTime
@@ -394,5 +456,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         _HasSessionErrors: Dictionary of [Code[20], Boolean];
         _InitialFromDT: Dictionary of [Code[20], DateTime];
         _SessionMaxUpdatedAt: Dictionary of [Code[20], DateTime];
+        _LastErrorEmitAt: Dictionary of [Text, DateTime];
 }
 #endif
