@@ -896,6 +896,67 @@
         TicketManagement.CreateAdmissionAccessEntry(Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry, AdmissionOverAllocationConfirmed);
     end;
 
+    internal procedure SyncScheduleEntryFromIssuedAdmission(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; ReservationEntryNo: Integer)
+    var
+        Ticket: Record "NPR TM Ticket";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        DetailedEntry: Record "NPR TM Det. Ticket AccessEntry";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        OriginalEntryNo: Integer;
+        NewScheduledTimeDescription: Text;
+        DateTimeLbl: Label '%1 - %2', Locked = true;
+    begin
+        if (not TicketReservationRequest."Admission Created") then
+            exit;
+
+        OriginalEntryNo := TicketReservationRequest."External Adm. Sch. Entry No.";
+
+        Ticket.SetLoadFields("No.");
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', ReservationEntryNo);
+        if (Ticket.FindFirst()) then begin
+
+            AccessEntry.SetLoadFields("Entry No.");
+            AccessEntry.SetCurrentKey("Ticket No.");
+            AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+            AccessEntry.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
+            if (AccessEntry.FindFirst()) then begin
+
+                DetailedEntry.SetLoadFields("External Adm. Sch. Entry No.");
+                DetailedEntry.SetCurrentKey("Ticket Access Entry No.");
+                DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
+                DetailedEntry.SetFilter(Quantity, '>%1', 0);
+                DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
+                if (not DetailedEntry.FindLast()) then
+                    DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::INITIAL_ENTRY);
+                if (not DetailedEntry.FindLast()) then
+                    DetailedEntry.Init();
+
+                if (DetailedEntry."External Adm. Sch. Entry No." <> 0) then
+                    TicketReservationRequest."External Adm. Sch. Entry No." := DetailedEntry."External Adm. Sch. Entry No.";
+            end;
+        end;
+
+        if (TicketReservationRequest."External Adm. Sch. Entry No." <= 0) then
+            exit;
+
+        ScheduleEntry.SetLoadFields("Admission Start Date", "Admission Start Time");
+        ScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+        ScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (not ScheduleEntry.FindFirst()) then
+            exit;
+
+        NewScheduledTimeDescription := StrSubstNo(DateTimeLbl, ScheduleEntry."Admission Start Date", ScheduleEntry."Admission Start Time");
+
+        if ((TicketReservationRequest."External Adm. Sch. Entry No." = OriginalEntryNo) and
+            (TicketReservationRequest."Scheduled Time Description" = NewScheduledTimeDescription)) then
+            exit;
+
+        TicketReservationRequest."Scheduled Time Description" := CopyStr(NewScheduledTimeDescription, 1, MaxStrLen(TicketReservationRequest."Scheduled Time Description"));
+        TicketReservationRequest.Modify();
+    end;
+
     local procedure ValidateWaitingListReferenceCode(WaitingListReferenceCode: Code[10]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
     var
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
@@ -2085,7 +2146,7 @@
         end;
 
         if (ExternalAdmissionScheduleEntryNo = 0) then begin
-            case TicketManagement.GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode) of
+            case TicketManagement.GetAdmissionSchedule(TicketAdmissionBOM, Admission) of
                 Admission."Default Schedule"::TODAY,
                 Admission."Default Schedule"::NEXT_AVAILABLE:
                     begin

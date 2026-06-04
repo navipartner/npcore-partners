@@ -129,8 +129,10 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         Item: Record Item;
         Admission: Record "NPR TM Admission";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
         ResolvingTable: Integer;
         INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
+        ScheduleSelection: Option;
     begin
         TicketRequest.Init();
         if (SalesDatetime = 0DT) then
@@ -176,6 +178,8 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest."Admission Code" := TicketBOM."Admission Code";
         Admission.Get(TicketBOM."Admission Code");
 
+        ScheduleSelection := TicketManagement.GetAdmissionSchedule(TicketBOM, Admission);
+
         TicketRequest.Default := TicketBOM.Default;
         TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion";
         if (TicketBOM."Admission Inclusion" <> TicketBOM."Admission Inclusion"::REQUIRED) then
@@ -185,8 +189,9 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
             TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::NOT_SELECTED;
 
         TicketRequest."Admission Description" := Admission.Description;
-        TicketRequest."External Adm. Sch. Entry No." := GetAdmissionTimeSlot(TicketRequest."Admission Code", Admission."Default Schedule", TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
-        TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
+        TicketRequest."External Adm. Sch. Entry No." := GetAdmissionTimeSlot(TicketRequest."Admission Code", ScheduleSelection, TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
+        if (TicketRequest."External Adm. Sch. Entry No." <> 0) then
+            TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
 
         // System calculates prices based on unit amounts and quantities
         TicketRequestManager.SetListPriceForRequestEntry(TicketRequest);
@@ -209,6 +214,9 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest.Insert();
 
         TicketRequestManager.IssueTicketFromReservation(TicketRequest);
+
+        TicketRequest.Get(TicketRequest."Entry No.");
+        TicketRequestManager.SyncScheduleEntryFromIssuedAdmission(TicketRequest, TicketRequest."Entry No.");
     end;
 
     local procedure Archive(Token: Text[100]; TokenLine: Integer; var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary)
@@ -238,15 +246,31 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
         NoTimeSlot: Label 'Admission Code %1 has no available time slots for expected visit date %2.';
+        VisitDateInPast: Label 'Expected visit date %1 for admission code %2 is in the past.';
         TimeDifference, MinTimeDifference : Integer;
         EntryNo: Integer;
     begin
+
+        // The expected visit date is when the guest wants to visit, expressed in the admission's local time - it can never be in the past. 
+        if (ExpectedVisitDate < DT2Date(TimeHelper.GetLocalTimeAtAdmission(AdmissionCode))) then
+            Error(VisitDateInPast, ExpectedVisitDate, AdmissionCode);
+
+        // NONE; means no schedule binding
+        // Defer to the issuance-time resolver, which picks the current/next open slot relative to now.
+        if (DefaultSchedule in [Admission."Default Schedule"::NONE,
+                                Admission."Default Schedule"::TODAY,
+                                Admission."Default Schedule"::NEXT_AVAILABLE]) then
+            exit(0);
+
+        // Only SCHEDULE_ENTRY binds the imported slot here. 
         ScheduleEntry.Reset();
         ScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
         ScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         ScheduleEntry.SetFilter("Admission Start Date", '=%1', ExpectedVisitDate);
         ScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        ScheduleEntry.SetFilter("Admission Is", '=%1', ScheduleEntry."Admission Is"::OPEN);
         if (ScheduleEntry.FindSet()) then begin
             repeat
                 case true of
@@ -270,8 +294,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         end;
 
         if (EntryNo = 0) then
-            if (DefaultSchedule in [Admission."Default Schedule"::TODAY, Admission."Default Schedule"::SCHEDULE_ENTRY]) then
-                Error(NoTimeSlot, AdmissionCode, ExpectedVisitDate); // blow up if expected visit date does not have a valid time slot for that entire date
+            Error(NoTimeSlot, AdmissionCode, ExpectedVisitDate);
 
         ScheduleEntry.Get(EntryNo);
         exit(ScheduleEntry."External Schedule Entry No.");

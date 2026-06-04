@@ -165,6 +165,9 @@ codeunit 85174 "NPR TM ImportTicketTest"
         EventTime: Time;
         Assert: Codeunit Assert;
     begin
+        // [SCENARIO] A visit date in the past is rejected by the past-date guard in GetAdmissionTimeSlot (a guest
+        // cannot want to visit in the past), so the import fails. The guard fires up front - before any slot
+        // matching - so this no longer depends on there being no schedule entry on that date.
         ItemNo := SelectImportTestScenario_Reservation(Schedules);
         Schedules.Get('PM', EventTime);
 
@@ -630,7 +633,177 @@ codeunit 85174 "NPR TM ImportTicketTest"
 
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScheduleSelection_NextAvailableAndNoneDeferDownstream()
+    var
+        Admission: Record "NPR TM Admission";
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+    begin
+        AdmissionCode := 'ADMISSION1';
+        PrepareSelectTimeslot(AdmissionCode);
 
+        AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 090000T, 110000T);
+
+        // Import binds a concrete slot only for TODAY / SCHEDULE_ENTRY. For NEXT_AVAILABLE and NONE it must return 0
+        // and let the issuance-time resolver pick the slot - even when a matching slot exists for the date/time.
+        Assert.AreEqual(0, SelectTimeslot(AdmissionCode, Admission."Default Schedule"::TODAY, Today(), 100000T), 'TODAY must not bind a slot at import');
+        Assert.AreEqual(0, SelectTimeslot(AdmissionCode, Admission."Default Schedule"::NEXT_AVAILABLE, Today(), 100000T), 'NEXT_AVAILABLE must not bind a slot at import');
+        Assert.AreEqual(0, SelectTimeslot(AdmissionCode, Admission."Default Schedule"::NONE, Today(), 100000T), 'NONE must not bind a slot at import');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScheduleSelection_PastVisitDateRejected()
+    var
+        Admission: Record "NPR TM Admission";
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+    begin
+        // [SCENARIO] A visit date in the past is rejected for the deferred modes (a guest cannot visit yesterday).
+        // The guard is date-only: a same-day earlier time is a valid late arrival and still defers (returns 0).
+        AdmissionCode := 'ADMISSION1';
+        PrepareSelectTimeslot(AdmissionCode);
+
+        asserterror SelectTimeslot(AdmissionCode, Admission."Default Schedule"::TODAY, CalcDate('<-1D>', Today()), 120000T);
+        asserterror SelectTimeslot(AdmissionCode, Admission."Default Schedule"::NEXT_AVAILABLE, CalcDate('<-1D>', Today()), 120000T);
+
+        Assert.AreEqual(0, SelectTimeslot(AdmissionCode, Admission."Default Schedule"::TODAY, Today(), 000001T), 'Same-day early time must still defer, not be rejected');
+        Assert.AreEqual(0, SelectTimeslot(AdmissionCode, Admission."Default Schedule"::NEXT_AVAILABLE, Today(), 000001T), 'Same-day early time must still defer, not be rejected');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScheduleSelection_ClosedEntryNotSelected()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Admission: Record "NPR TM Admission";
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+        OpenSlot: Integer;
+    begin
+        // [SCENARIO] SCHEDULE_ENTRY only binds OPEN slots. The CLOSED slot is the closer time match for 10:00, so
+        // if it were selectable it would win - selecting the OPEN slot instead proves the closed one is filtered out.
+        AdmissionCode := 'ADMISSION1';
+        PrepareSelectTimeslot(AdmissionCode);
+
+        AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 090000T, 110000T, ScheduleEntry."Admission Is"::CLOSED); // 10:00 falls inside this closed slot
+        OpenSlot := AddScheduleEntry(AdmissionCode, 'SCHEDULE1', Today(), 110000T, 130000T, ScheduleEntry."Admission Is"::OPEN);
+
+        Assert.AreEqual(OpenSlot, SelectTimeslot(AdmissionCode, Admission."Default Schedule"::SCHEDULE_ENTRY, Today(), 100000T), 'Must select the OPEN slot, not the closer closed one');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ImportTodayResolvesAndSyncsBack()
+    var
+        ItemNo: Code[20];
+        Import: Codeunit "NPR TM Import Ticket Facade";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        ResponseMessage: Text;
+        Success: Boolean;
+        JobId: Code[40];
+        TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        Schedules: Dictionary of [Code[20], Time];
+        EventTime: Time;
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] TODAY ignores the imported slot and resolves to a valid open slot for today at issuance, and the
+        // resolved slot + description are synced back onto the reservation request (not left for a later API read).
+        ItemNo := SelectImportTestScenario(Schedules); // ALL_DAY open schedule today
+        Schedules.Get('ALL_DAY', EventTime);
+
+        // The admission resolves as TODAY
+        TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBOM.FindFirst();
+        TicketBOM."Ticket Schedule Selection" := TicketBOM."Ticket Schedule Selection"::TODAY;
+        TicketBOM.Modify();
+        Commit();
+
+        CreateTicketsToImport(ItemNo, Today(), Today(), EventTime, 1, 1, true, TempTicketImport, TempTicketImportLine);
+        Success := Import.ImportTicketsFromJson(GenerateJson(TempTicketImport, TempTicketImportLine), false, ResponseMessage, JobId);
+        Assert.AreEqual(true, Success, ResponseMessage);
+
+        ValidateTickets(JobId);
+        AssertRequestSyncedToDate(JobId, Today());
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ImportTodayNoSlotTodayFails()
+    var
+        ItemNo: Code[20];
+        Import: Codeunit "NPR TM Import Ticket Facade";
+        Admission: Record "NPR TM Admission";
+        ResponseMessage: Text;
+        Success: Boolean;
+        JobId: Code[40];
+        TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] TODAY cannot resolve when no open slot exists today (schedule starts tomorrow) -> import fails.
+        ItemNo := SelectImportTestScenario_FutureSchedule(Admission."Default Schedule"::TODAY);
+
+        CreateTicketsToImport(ItemNo, Today(), Today(), 120000T, 1, 1, true, TempTicketImport, TempTicketImportLine);
+        Success := Import.ImportTicketsFromJson(GenerateJson(TempTicketImport, TempTicketImportLine), false, ResponseMessage, JobId);
+        Assert.AreEqual(false, Success, 'TODAY with no open slot today must fail');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ImportNextAvailableRollsOverToFutureSlot()
+    var
+        ItemNo: Code[20];
+        Import: Codeunit "NPR TM Import Ticket Facade";
+        Admission: Record "NPR TM Admission";
+        ResponseMessage: Text;
+        Success: Boolean;
+        JobId: Code[40];
+        TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] NEXT_AVAILABLE rolls over: no slot today (schedule starts tomorrow), so issuance resolves to the
+        // first future open slot (tomorrow) and syncs it back onto the request. The imported date is not bindable.
+        ItemNo := SelectImportTestScenario_FutureSchedule(Admission."Default Schedule"::NEXT_AVAILABLE);
+
+        CreateTicketsToImport(ItemNo, Today(), Today(), 120000T, 1, 1, true, TempTicketImport, TempTicketImportLine);
+        Success := Import.ImportTicketsFromJson(GenerateJson(TempTicketImport, TempTicketImportLine), false, ResponseMessage, JobId);
+        Assert.AreEqual(true, Success, ResponseMessage);
+
+        ValidateTickets(JobId);
+        AssertRequestSyncedToDate(JobId, CalcDate('<+1D>', Today())); // resolved to tomorrow's slot
+    end;
+
+    local procedure AssertRequestSyncedToDate(JobIdTest: Code[40]; ExpectedDate: Date)
+    var
+        TicketImportLine: Record "NPR TM ImportTicketLine";
+        Ticket: Record "NPR TM Ticket";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TimeSlot: Record "NPR TM Admis. Schedule Entry";
+        Assert: Codeunit Assert;
+    begin
+        TicketImportLine.SetFilter(JobId, '=%1', JobIdTest);
+        TicketImportLine.FindSet();
+        repeat
+            Ticket.SetFilter("External Ticket No.", '=%1', TicketImportLine.PreAssignedTicketNumber);
+            Ticket.FindFirst();
+            TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
+
+            // The sync-back populated the request with the resolved slot and its description.
+            Assert.AreNotEqual(0, TicketRequest."External Adm. Sch. Entry No.", 'Request synced with resolved schedule entry');
+            Assert.AreNotEqual('', TicketRequest."Scheduled Time Description", 'Request synced with scheduled time description');
+
+            TimeSlot.SetFilter("External Schedule Entry No.", '=%1', TicketRequest."External Adm. Sch. Entry No.");
+            TimeSlot.SetFilter(Cancelled, '=%1', false);
+            TimeSlot.FindFirst();
+            Assert.AreEqual(ExpectedDate, TimeSlot."Admission Start Date", 'Synced schedule entry date');
+
+        until (TicketImportLine.Next() = 0);
+    end;
 
     local procedure ValidateLog(JobIdTest: Code[40]; Success: Boolean; TotalTicketCount: Integer; ResponseMessage: Text)
     var
@@ -670,11 +843,19 @@ codeunit 85174 "NPR TM ImportTicketTest"
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin
+        exit(AddScheduleEntry(AdmissionCode, ScheduleCode, StartDate, StartTime, EndTime, ScheduleEntry."Admission Is"::OPEN));
+    end;
+
+    local procedure AddScheduleEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; StartDate: Date; StartTime: Time; EndTime: Time; AdmissionIs: Option): Integer
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
         ScheduleEntry."Admission Code" := AdmissionCode;
         ScheduleEntry."Schedule Code" := ScheduleCode;
         ScheduleEntry."Admission Start Date" := StartDate;
         ScheduleEntry."Admission Start Time" := StartTime;
         ScheduleEntry."Admission End Time" := EndTime;
+        ScheduleEntry."Admission Is" := AdmissionIs;
         ScheduleEntry.Insert();
         ScheduleEntry."External Schedule Entry No." := ScheduleEntry."Entry No.";
         ScheduleEntry.Modify();
@@ -1013,6 +1194,14 @@ codeunit 85174 "NPR TM ImportTicketTest"
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
     begin
         ItemNo := TicketLibrary.CreateScenario_ImportTicketTest(Schedules);
+        Commit();
+    end;
+
+    internal procedure SelectImportTestScenario_FutureSchedule(DefaultSchedule: Option) ItemNo: Code[20]
+    var
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+    begin
+        ItemNo := TicketLibrary.CreateScenario_ImportTicketTest_FutureSchedule(DefaultSchedule);
         Commit();
     end;
 

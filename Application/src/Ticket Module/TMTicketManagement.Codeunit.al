@@ -2189,19 +2189,25 @@
         if (not Admission.Get(AdmissionCode)) then
             exit(Admission."Default Schedule"::NONE);
 
-        if (TicketAdmissionBOM.Get(ItemNo, VariantCode, AdmissionCode)) then begin
-            case TicketAdmissionBom."Ticket Schedule Selection" of
-                TicketAdmissionBom."Ticket Schedule Selection"::ADMISSION:
-                    exit(Admission."Default Schedule");
-                TicketAdmissionBom."Ticket Schedule Selection"::TODAY:
-                    exit(Admission."Default Schedule"::TODAY);
-                TicketAdmissionBom."Ticket Schedule Selection"::NEXT_AVAILABLE:
-                    exit(Admission."Default Schedule"::NEXT_AVAILABLE);
-                TicketAdmissionBom."Ticket Schedule Selection"::SCHEDULE_ENTRY:
-                    exit(Admission."Default Schedule"::SCHEDULE_ENTRY);
-                TicketAdmissionBom."Ticket Schedule Selection"::"NONE":
-                    exit(Admission."Default Schedule"::"NONE")
-            end;
+        if (not TicketAdmissionBOM.Get(ItemNo, VariantCode, AdmissionCode)) then
+            exit(Admission."Default Schedule");
+
+        exit(GetAdmissionSchedule(TicketAdmissionBOM, Admission));
+    end;
+
+    internal procedure GetAdmissionSchedule(TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM"; Admission: Record "NPR TM Admission"): Option
+    begin
+        case TicketAdmissionBOM."Ticket Schedule Selection" of
+            TicketAdmissionBOM."Ticket Schedule Selection"::ADMISSION:
+                exit(Admission."Default Schedule");
+            TicketAdmissionBOM."Ticket Schedule Selection"::TODAY:
+                exit(Admission."Default Schedule"::TODAY);
+            TicketAdmissionBOM."Ticket Schedule Selection"::NEXT_AVAILABLE:
+                exit(Admission."Default Schedule"::NEXT_AVAILABLE);
+            TicketAdmissionBOM."Ticket Schedule Selection"::SCHEDULE_ENTRY:
+                exit(Admission."Default Schedule"::SCHEDULE_ENTRY);
+            TicketAdmissionBOM."Ticket Schedule Selection"::"NONE":
+                exit(Admission."Default Schedule"::"NONE")
         end;
 
         exit(Admission."Default Schedule");

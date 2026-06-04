@@ -285,10 +285,6 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
-        AccessEntry: Record "NPR TM Ticket Access Entry";
-        DetailedEntry: Record "NPR TM Det. Ticket AccessEntry";
-        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
         LanguageCode: Code[10];
         LineToken: JsonToken;
@@ -370,22 +366,6 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketResponse.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
         TicketResponse.SetLoadFields("Request Entry No.", Status, "Response Message");
 
-        Ticket.Reset();
-        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-        Ticket.SetLoadFields("No.");
-
-        AccessEntry.Reset();
-        AccessEntry.SetCurrentKey("Ticket No.");
-        AccessEntry.SetLoadFields("Entry No.");
-
-        DetailedEntry.Reset();
-        DetailedEntry.SetCurrentKey("Ticket Access Entry No.");
-        DetailedEntry.SetLoadFields("External Adm. Sch. Entry No.");
-
-        ScheduleEntry.Reset();
-        ScheduleEntry.SetCurrentKey("External Schedule Entry No.");
-        ScheduleEntry.SetLoadFields("Admission Start Date", "Admission Start Time");
-
         TicketRequest.Reset();
         TicketRequest.ReadIsolation := TicketRequest.ReadIsolation::UpdLock;
         TicketRequest.SetCurrentKey("Session Token ID");
@@ -394,43 +374,11 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketRequest.FindSet();
         repeat
             if (TicketRequest."Admission Created") then begin
-
                 TicketResponse.SetFilter("Session Token ID", '=%1', Token);
                 TicketResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
-                if (TicketResponse.FindFirst()) then begin
-
-                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketResponse."Request Entry No.");
-                    if (Ticket.FindFirst()) then begin
-
-                        AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-                        AccessEntry.SetFilter("Admission Code", '=%1', TicketRequest."Admission Code");
-                        if (AccessEntry.FindFirst()) then begin
-
-                            DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
-                            DetailedEntry.SetFilter(Quantity, '>%1', 0);
-                            DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
-                            if (not DetailedEntry.FindLast()) then
-                                DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::INITIAL_ENTRY);
-                            if (not DetailedEntry.FindLast()) then
-                                DetailedEntry.init();
-
-                            if (DetailedEntry."External Adm. Sch. Entry No." <> 0) then
-                                TicketRequest."External Adm. Sch. Entry No." := DetailedEntry."External Adm. Sch. Entry No.";
-                        end;
-                    end;
-                end;
-
-                if (TicketRequest."External Adm. Sch. Entry No." > 0) then begin
-                    ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketRequest."External Adm. Sch. Entry No.");
-                    ScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                    if (ScheduleEntry.FindFirst()) then begin
-                        TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', ScheduleEntry."Admission Start Date", ScheduleEntry."Admission Start Time");
-                        TicketRequest.Modify();
-                    end;
-                end;
-
+                if (TicketResponse.FindFirst()) then
+                    TicketRequestManager.SyncScheduleEntryFromIssuedAdmission(TicketRequest, TicketResponse."Request Entry No.");
             end;
-
         until (TicketRequest.Next() = 0);
 
         // there is only one token, so only one response

@@ -287,10 +287,9 @@ codeunit 85248 "NPR CM Lifecycle Test"
         PartnerId: Guid;
         ItemNo: Code[20];
     begin
-        // [SCENARIO] A visit date before the admission schedule's start date has no matching
-        // schedule entry, so the TM import worker fails. The CMOrderIssuer should catch the
-        // failure, commit Status = Error + StatusMessage, and re-raise. The header row should
-        // persist with the error state for the partner to inspect and replace.
+        // [SCENARIO] A visit date in the past is rejected by the TM import worker (a guest cannot want to
+        // visit in the past). The CMOrderIssuer should catch the failure, commit Status = Error + StatusMessage,
+        // and re-raise. The header row should persist with the error state for the partner to inspect and replace.
 
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
         PartnerId := CMLibrary.CreatePartner();
@@ -325,6 +324,112 @@ codeunit 85248 "NPR CM Lifecycle Test"
 
         // [THEN] No JobId persisted (worker cleaned up its import buffers before re-raising)
         Assert.AreEqual('', Order.JobId, 'JobId not set after failure');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateOrderTodaySchedule_ResolvesToCurrentSlot()
+    var
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        CMLibrary: Codeunit "NPR Library Channel Manager";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
+        Assert: Codeunit Assert;
+        Order: Record "NPR CMOrder";
+        TempOrderLine: Record "NPR CMOrderLine" temporary;
+        TempOrderComponent: Record "NPR CMOrderComponent" temporary;
+        TempOrderWallet: Record "NPR CMOrderWallet" temporary;
+        OrderId: Guid;
+        PartnerId: Guid;
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] A TODAY admission is "now"-based: the imported visit date is not used to pick the slot.
+        // An order with a future visit date still mints, and the admission resolves to today's slot - not the
+        // future date the partner sent.
+
+        ItemNo := TicketLibrary.CreateScenario_SmokeTest(); // TODAY admission, all-day schedule
+        PartnerId := CMLibrary.CreatePartner();
+        CMLibrary.InitWalletSetup();
+
+        // [GIVEN] A paid order whose visit date is 5 days in the future
+        CMLibrary.InitOrder(PartnerId, 'TEST-TODAY', 'PAY-TODAY', Order);
+        OrderId := Order.OrderId;
+        CMLibrary.AddOrderLine(OrderId, 10000, ItemNo, 1, CalcDate('<+5D>', Today()), Time(), TempOrderLine);
+        CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
+
+        // [WHEN] Processed (paid-at-create -> issued)
+        OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+
+        // [THEN] Issued, and the admission resolved to today - the future visit date was ignored for selection
+        Order.Get(OrderId);
+        Assert.AreEqual(Order.Status::Issued, Order.Status, 'Status = Issued');
+        AssertTicketResolvedToDate(Order.DocumentNo, Today());
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateOrderScheduleEntry_BindsProvidedSlot()
+    var
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        CMLibrary: Codeunit "NPR Library Channel Manager";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
+        Assert: Codeunit Assert;
+        Order: Record "NPR CMOrder";
+        TempOrderLine: Record "NPR CMOrderLine" temporary;
+        TempOrderComponent: Record "NPR CMOrderComponent" temporary;
+        TempOrderWallet: Record "NPR CMOrderWallet" temporary;
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        OrderId: Guid;
+        PartnerId: Guid;
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] A SCHEDULE_ENTRY (manual) admission uses the provided visit date/time to bind the matching
+        // schedule entry, rather than resolving to "now".
+
+        ItemNo := TicketLibrary.CreateScenario_SmokeTest();
+
+        // [GIVEN] The admission requires a manually selected schedule entry
+        TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBOM.FindFirst();
+        TicketBOM."Ticket Schedule Selection" := TicketBOM."Ticket Schedule Selection"::SCHEDULE_ENTRY;
+        TicketBOM.Modify();
+
+        PartnerId := CMLibrary.CreatePartner();
+        CMLibrary.InitWalletSetup();
+
+        // [GIVEN] A paid order for a future slot
+        CMLibrary.InitOrder(PartnerId, 'TEST-MANUAL', 'PAY-MANUAL', Order);
+        OrderId := Order.OrderId;
+        CMLibrary.AddOrderLine(OrderId, 10000, ItemNo, 1, CalcDate('<+2D>'), 120000T, TempOrderLine);
+        CMLibrary.AddOrderWallet(OrderId, 10000, 1, TempOrderWallet);
+
+        // [WHEN] Processed
+        OrderIssuer.ProcessNewOrder(true, Order, TempOrderLine, TempOrderComponent, TempOrderWallet);
+
+        // [THEN] Issued, and the admission bound the schedule entry for the provided date
+        Order.Get(OrderId);
+        Assert.AreEqual(Order.Status::Issued, Order.Status, 'Status = Issued');
+        AssertTicketResolvedToDate(Order.DocumentNo, CalcDate('<+2D>'));
+    end;
+
+    local procedure AssertTicketResolvedToDate(SalesHeaderNo: Code[20]; ExpectedDate: Date)
+    var
+        Ticket: Record "NPR TM Ticket";
+        DetAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Assert: Codeunit Assert;
+    begin
+        Ticket.SetCurrentKey("Sales Header Type", "Sales Header No.");
+        Ticket.SetFilter("Sales Header No.", '=%1', SalesHeaderNo);
+        Assert.IsTrue(Ticket.FindFirst(), 'Ticket exists for order');
+
+        DetAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetAccessEntry.SetFilter("External Adm. Sch. Entry No.", '<>%1', 0);
+        Assert.IsTrue(DetAccessEntry.FindFirst(), 'Admission entry with a resolved schedule slot exists');
+
+        ScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetAccessEntry."External Adm. Sch. Entry No.");
+        Assert.IsTrue(ScheduleEntry.FindFirst(), 'Resolved schedule entry exists');
+        Assert.AreEqual(ExpectedDate, ScheduleEntry."Admission Start Date", 'Resolved admission start date');
     end;
 }
 #endif
