@@ -101,6 +101,9 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             EcomSalesHeader."Ticket Holder Preferred Lang" := JsonHelper.GetJText(RequestBody, 'ticketHolderLanguage', MaxStrLen(EcomSalesHeader."Ticket Holder Preferred Lang"), true, false);
 #pragma warning restore AL0432
         end;
+        EcomSalesHeader."Language Tag" := JsonHelper.GetJText(RequestBody, 'languageTag', MaxStrLen(EcomSalesHeader."Language Tag"), true, false);
+        EcomSalesDocUtils.ValidateLanguageTag(EcomSalesHeader."Language Tag");
+        EcomSalesHeader."Language Code" := EcomSalesDocUtils.LanguageTagToLanguageCode(EcomSalesHeader."Language Tag");
         //Sell-to
         SellToCustomerJsonToken := JsonHelper.GetJsonToken(RequestBody, 'sellToCustomer');
         EcomSalesHeader."Sell-to Customer No." := JsonHelper.GetJText(RequestBody, 'sellToCustomer.no', MaxStrLen(EcomSalesHeader."Sell-to Customer No."), true, false);
@@ -677,6 +680,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                  .AddProperty('currencyExchangeRate', Format(EcomSalesHeader."Currency Exchange Rate", 0, 9))
                                  .AddProperty('externalDocumentNo', EcomSalesHeader."External Document No.")
                                  .AddProperty('yourReference', EcomSalesHeader."Your Reference")
+                                 .AddProperty('languageTag', EcomSalesHeader."Language Tag")
                                  .AddProperty('locationCode', EcomSalesHeader."Location Code")
                                  .AddProperty('pricesExcludingVat', EcomSalesHeader."Price Excl. VAT")
                                  .AddProperty('ticketReservationToken', EcomSalesHeader."Ticket Reservation Token")
