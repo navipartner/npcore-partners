@@ -549,7 +549,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
                 _NumberType::DOC_LX_CITY_CARD:
                     if (PermitCityCard) then
-                        NumberPermitted := CheckForDocLXCityCard(CityCardProfileId, ValidationRequest.ReferenceNo, ValidationRequest.ScannerId, EntityId);
+                        NumberPermitted := CheckForDocLXCityCard(CityCardProfileId, ValidationRequest, EntityId);
 
                 _NumberType::NOT_WHITELISTED:
                     begin
@@ -704,7 +704,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
     end;
 
-    local procedure CheckForDocLXCityCard(CityCardProfileId: Guid; Number: Text[100]; ScannerId: Code[10]; var EntityId: Guid): Boolean
+    local procedure CheckForDocLXCityCard(CityCardProfileId: Guid; var ValidationRequest: Record "NPR SGEntryLog"; var EntityId: Guid): Boolean
     var
         DocLXCityCard: Codeunit "NPR DocLXCityCard";
         CityCardLocation: Record "NPR DocLXCityCardLocation";
@@ -718,8 +718,8 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (not CityCardLocation.GetBySystemId(CityCardProfileId)) then
             exit(false);
 
-        CityCardNo := CopyStr(Number, 1, MaxStrLen(CityCardNo));
-        DocLXCityCard.ValidateCityCard(CityCardNo, CityCardLocation.CityCode, CityCardLocation.Code, ScannerId, LogEntryNo);
+        CityCardNo := CopyStr(ValidationRequest.ReferenceNo, 1, MaxStrLen(CityCardNo));
+        DocLXCityCard.ValidateCityCard(CityCardNo, CityCardLocation.CityCode, CityCardLocation.Code, ValidationRequest.ScannerId, LogEntryNo);
 
         if (not LogEntry.Get(LogEntryNo)) then
             exit(false);
@@ -727,8 +727,11 @@ codeunit 6185130 "NPR SG SpeedGate"
         EntityId := LogEntry.SystemId;
 
         // Requires the whitelist to precisely match the city card numbers
-        if (not (LogEntry.ValidationResultCode = '200')) then
+        if (not (LogEntry.ValidationResultCode = '200')) then begin
+            // Surface the provider's reason 
+            ValidationRequest.ApiErrorMessage := CopyStr(StrSubstNo('(%1) %2', LogEntry.ValidationResultCode, LogEntry.ValidationResultMessage), 1, MaxStrLen(ValidationRequest.ApiErrorMessage));
             exit(SetApiError(_ApiErrors::city_card_not_valid));
+        end;
 
         exit(true);
     end;

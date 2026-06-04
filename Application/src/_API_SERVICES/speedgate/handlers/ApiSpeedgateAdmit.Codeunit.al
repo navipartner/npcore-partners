@@ -490,6 +490,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         ResponseJson: Codeunit "NPR JSON Builder";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        ErrorMessage: Text;
     begin
         Sentry.StartSpan(Span, 'bc.speedgate.try-admit.check-number');
         SpeedGateMgr.CheckNumberAtGate(LogEntryNo);
@@ -498,7 +499,11 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
         if (not (ValidationRequest.EntryStatus = ValidationRequest.EntryStatus::PERMITTED_BY_GATE)) then begin
             ApiError := Enum::"NPR API Error Code".FromInteger(ValidationRequest.ApiErrorNumber);
-            exit(Response.CreateErrorResponse(ApiError, Format(ApiError, 0, 1), Enum::"NPR API HTTP Status Code"::"Bad Request"));
+            ErrorMessage := Format(ApiError, 0, 1);
+            // Append the specific reason captured during validation (e.g. the city card provider's expiry text).
+            if (ValidationRequest.ApiErrorMessage <> '') then
+                ErrorMessage := StrSubstNo('%1 Details: %2', ErrorMessage, ValidationRequest.ApiErrorMessage);
+            exit(Response.CreateErrorResponse(ApiError, ErrorMessage, Enum::"NPR API HTTP Status Code"::"Bad Request"));
         end;
 
         ResponseJson

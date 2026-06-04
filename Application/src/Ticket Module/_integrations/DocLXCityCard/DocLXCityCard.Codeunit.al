@@ -360,16 +360,18 @@ codeunit 6184830 "NPR DocLXCityCard"
             LogEntry.ValidationResultMessage := CopyStr(Get(State.AsObject(), 'message').AsText(), 1, MaxStrLen(LogEntry.ValidationResultMessage));
         end;
 
-        if (Result.Get('data', DataToken)) then begin
-            DataObject := DataToken.AsObject();
-            LogEntry.ArticleName := CopyStr(Get(DataObject, 'article_name').AsText(), 1, MaxStrLen(LogEntry.ArticleName));
-            LogEntry.ArticleId := CopyStr(Get(DataObject, 'article_id').AsText(), 1, MaxStrLen(LogEntry.ArticleId));
-            LogEntry.ShopKey := CopyStr(Get(DataObject, 'shop_key').AsCode(), 1, MaxStrLen(LogEntry.ShopKey));
-            LogEntry.CategoryName := CopyStr(Get(DataObject, 'category_name').AsText(), 1, MaxStrLen(LogEntry.CategoryName));
-            LogEntry.ActivationDate := CopyStr(Get(DataObject, 'activation_date').AsText(), 1, MaxStrLen(LogEntry.ActivationDate));
-            LogEntry.ValidUntilDate := CopyStr(Get(DataObject, 'valid_until').AsText(), 1, MaxStrLen(LogEntry.ValidUntilDate));
-            LogEntry.ValidTimeSpan := Get(DataObject, 'valid_time_span').AsInteger();
-        end;
+        // The data block must be read defensively.
+        if (Result.Get('data', DataToken)) then
+            if (DataToken.IsObject()) then begin
+                DataObject := DataToken.AsObject();
+                LogEntry.ArticleName := CopyStr(GetText(DataObject, 'article_name'), 1, MaxStrLen(LogEntry.ArticleName));
+                LogEntry.ArticleId := CopyStr(GetText(DataObject, 'article_id'), 1, MaxStrLen(LogEntry.ArticleId));
+                LogEntry.ShopKey := CopyStr(GetText(DataObject, 'shop_key'), 1, MaxStrLen(LogEntry.ShopKey));
+                LogEntry.CategoryName := CopyStr(GetText(DataObject, 'category_name'), 1, MaxStrLen(LogEntry.CategoryName));
+                LogEntry.ActivationDate := CopyStr(GetText(DataObject, 'activation_date'), 1, MaxStrLen(LogEntry.ActivationDate));
+                LogEntry.ValidUntilDate := CopyStr(GetText(DataObject, 'valid_until'), 1, MaxStrLen(LogEntry.ValidUntilDate));
+                LogEntry.ValidTimeSpan := GetInteger(DataObject, 'valid_time_span');
+            end;
         LogEntry.Modify();
 
     end;
@@ -465,6 +467,26 @@ codeunit 6184830 "NPR DocLXCityCard"
     begin
         if (Obj.Get(KeyName, JToken)) then
             exit(JToken.AsValue());
+    end;
+
+    internal procedure GetText(Obj: JsonObject; KeyName: Text): Text
+    var
+        JToken: JsonToken;
+    begin
+        if (Obj.Get(KeyName, JToken)) then
+            if (JToken.IsValue()) then
+                if (not JToken.AsValue().IsNull()) then
+                    exit(JToken.AsValue().AsText());
+    end;
+
+    internal procedure GetInteger(Obj: JsonObject; KeyName: Text): Integer
+    var
+        JToken: JsonToken;
+    begin
+        if (Obj.Get(KeyName, JToken)) then
+            if (JToken.IsValue()) then
+                if (not JToken.AsValue().IsNull()) then
+                    exit(JToken.AsValue().AsInteger());
     end;
 
     [TryFunction]
