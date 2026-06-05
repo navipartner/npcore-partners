@@ -141,7 +141,12 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
         TempSaleLinePOS."No." := AdmCapacityPriceBuffer.ItemNumber;
         TempSaleLinePOS."Variant Code" := AdmCapacityPriceBuffer.VariantCode;
-        TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.Quantity;
+        // DecimalQuantity carries a fractional quantity (e.g. non-ticket components); the integer Quantity takes
+        // precedence so existing callers are unaffected, and DecimalQuantity is the fallback when it is not set.
+        if (AdmCapacityPriceBuffer.Quantity <> 0) then
+            TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.Quantity
+        else
+            TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.DecimalQuantity;
         TempSaleLinePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
         TempSaleLinePOS."Allow Line Discount" := true;
         TempSaleLinePOS.Insert();

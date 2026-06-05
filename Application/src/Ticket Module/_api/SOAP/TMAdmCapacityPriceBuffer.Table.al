@@ -47,6 +47,10 @@ table 6060016 "NPR TM AdmCapacityPriceBuffer"
         {
             DataClassification = CustomerContent;
         }
+        field(136; DecimalQuantity; Decimal)
+        {
+            DataClassification = CustomerContent;
+        }
         field(200; UnitPrice; Decimal)
         {
             DataClassification = CustomerContent;
