@@ -88,13 +88,16 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomDocManualSubs: Codeunit "NPR Ecom Doc Manual Subs";
         LocationCode: Code[10];
         RecordRef: RecordRef;
         PaymentMethodCodeUpdated: Boolean;
     begin
-        if not IsShopifyDocument then
-            InsertCustomer(EcomSalesHeader, Customer)
-        else
+        if not IsShopifyDocument then begin
+            BindSubscription(EcomDocManualSubs);
+            InsertCustomer(EcomSalesHeader, Customer);
+            UnbindSubscription(EcomDocManualSubs);
+        end else
             Customer.Get(EcomSalesHeader."Sell-to Customer No.");
 
         SalesHeader.Init();
