@@ -859,8 +859,9 @@
     begin
 
         if ((POSSalesLine.Quantity < 0) and (POSSalesLine."Return Sale Sales Ticket No." <> '')) then begin
-            // When in refund by receipt number, we regret the membership entry (item number would represent the original membership item)
-            BlockMembershipEntryFromEndOfSaleWorker(POSSalesLine."Return Sale Sales Ticket No.", POSSalesLine."Line No.", Abs(POSSalesLine.Quantity));
+            // When refunding, we regret the membership entry. 
+            // Match on receipt + line + item: the line aligns for refund-by-receipt;
+            BlockMembershipEntryFromEndOfSaleWorker(POSSalesLine."Return Sale Sales Ticket No.", POSSalesLine."Line No.", POSSalesLine."No.", Abs(POSSalesLine.Quantity));
             exit;
         end;
 
@@ -895,7 +896,7 @@
         if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
             exit;
 
-        CheckForMembershipRefundEligibility(SaleLinePOS."Return Sale Sales Ticket No.", SaleLinePOS."Line No.", ListOfEntriesToRefund, IsMembership, ReasonText);
+        CheckForMembershipRefundEligibility(SaleLinePOS."Return Sale Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."No.", ListOfEntriesToRefund, IsMembership, ReasonText);
         if (not IsMembership) then
             exit; // Not a membership entry, nothing to do here
 
@@ -972,7 +973,7 @@
         CreateMembership.Run(MemberInfoCapture);
     end;
 
-    internal procedure BlockMembershipEntryFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; MemberCount: Decimal)
+    internal procedure BlockMembershipEntryFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; ItemNo: Code[20]; MemberCount: Decimal)
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -982,7 +983,7 @@
         ListOfEntriesToBlock: List of [Integer];
         EntryNo: Integer;
     begin
-        CheckForMembershipRefundEligibility(ReceiptNo, ReceiptLine, ListOfEntriesToBlock, IsMembership, ReasonText);
+        CheckForMembershipRefundEligibility(ReceiptNo, ReceiptLine, ItemNo, ListOfEntriesToBlock, IsMembership, ReasonText);
         if (not IsMembership) then
             exit; // Not a membership entry, nothing to do here
 
@@ -999,7 +1000,7 @@
 
     end;
 
-    internal procedure CheckForMembershipRefundEligibility(ReceiptNo: Code[20]; ReceiptLine: Integer; var ListOfEntriesToBlock: List of [Integer]; var IsMembership: Boolean; var LastReasonText: Text)
+    internal procedure CheckForMembershipRefundEligibility(ReceiptNo: Code[20]; ReceiptLine: Integer; ItemNo: Code[20]; var ListOfEntriesToBlock: List of [Integer]; var IsMembership: Boolean; var LastReasonText: Text)
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         ReasonText: Text;
@@ -1011,8 +1012,9 @@
         MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
         MembershipEntry.SetFilter("Receipt No.", '=%1', ReceiptNo);
         MembershipEntry.SetFilter("Line No.", '=%1', ReceiptLine);
+        MembershipEntry.SetFilter("Item No.", '=%1', ItemNo);
         if (not MembershipEntry.FindSet()) then
-            exit; // No membership entries on this receipt line
+            exit; // No membership entries for this item on this receipt line
 
         IsMembership := true;
         repeat
