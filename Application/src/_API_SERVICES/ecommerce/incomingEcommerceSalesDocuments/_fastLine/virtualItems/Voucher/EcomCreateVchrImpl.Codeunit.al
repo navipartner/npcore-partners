@@ -82,6 +82,9 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
                 Error(PartialLinkStateErr, EcomSalesLine.RecordId(), AlreadyLinked, QtyToIssue);
         end;
 
+        if TryConsumePreReservedVouchers(EcomSalesLine, EcomSalesHeader, QtyToIssue) then
+            exit;
+
         if EcomSalesLine."Barcode No." <> '' then begin
             IssueOrTopUpSingleVoucher(EcomSalesLine, EcomSalesHeader, EcomSalesLine."Barcode No.", IssuedVoucher);
             EcomSalesLine."No." := IssuedVoucher."No.";
@@ -105,6 +108,44 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
             EcomSalesLine."Voucher Type" := FirstVoucherTypeOfLine;
             EcomSalesLine.Modify(true);
         end;
+    end;
+
+    local procedure TryConsumePreReservedVouchers(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; QtyToIssue: Integer): Boolean
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        IssuedVoucher: Record "NPR NpRv Voucher";
+        ReservationCount: Integer;
+        ReservationCountMismatchErr: Label 'Internal data inconsistency on voucher line %1: %2 pre-reserved voucher(s) found but quantity is %3. Contact support to investigate. This is a programming bug.', Locked = true;
+    begin
+        // Pre-reservations exist only for the Shopify import path: the import reserves one NpRv Sales
+        // Line per gift card up front (each carrying its Shopify-supplied Reference No. + Gift Card ID),
+        // all tied to this single line. Consume those reservations instead of generating new references.
+        if not IsShopifyDocument then
+            exit(false);
+        NpRvSalesLine.SetCurrentKey("NPR Inc Ecom Sales Line Id");
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("NPR Inc Ecom Sales Line Id", EcomSalesLine.SystemId);
+        NpRvSalesLine.SetRange(Posted, false);
+        NpRvSalesLine.SetFilter(Type, '%1|%2', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up");
+        if NpRvSalesLine.IsEmpty() then
+            exit(false);
+
+        ReservationCount := NpRvSalesLine.Count();
+        if ReservationCount <> QtyToIssue then
+            Error(ReservationCountMismatchErr, EcomSalesLine.RecordId(), ReservationCount, QtyToIssue);
+
+        NpRvSalesLine.FindSet();
+        repeat
+            IssueOrTopUpSingleVoucher(EcomSalesLine, EcomSalesHeader, NpRvSalesLine."Reference No.", IssuedVoucher);
+        until NpRvSalesLine.Next() = 0;
+
+        if QtyToIssue = 1 then begin
+            EcomSalesLine."Barcode No." := IssuedVoucher."Reference No.";
+            EcomSalesLine."No." := IssuedVoucher."No.";
+            EcomSalesLine."Voucher Type" := IssuedVoucher."Voucher Type";
+            EcomSalesLine.Modify(true);
+        end;
+        exit(true);
     end;
 
     local procedure IssueOrTopUpSingleVoucher(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; BarcodeNoParam: Text[50]; var NpRvVoucherOut: Record "NPR NpRv Voucher")

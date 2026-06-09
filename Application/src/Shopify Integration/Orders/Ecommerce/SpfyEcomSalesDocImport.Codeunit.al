@@ -803,18 +803,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         LineType: Enum "NPR Ecom Sales Line Type";
     begin
         LineType := EvaluateLineType(SalesLineJsonToken);
-        if LineType = LineType::Voucher then
-            SplitEcommerceSalesLine(SalesLineJsonToken, EcomSalesHeader, LogEntry, LineType)
-        else
-            InsertEcommerceSalesLine(SalesLineJsonToken, EcomSalesHeader, LogEntry, LineType);
-    end;
-
-    local procedure SplitEcommerceSalesLine(SalesLineJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; LogEntry: Record "NPR Spfy Event Log Entry"; LineType: Enum "NPR Ecom Sales Line Type")
-    var
-        i: Integer;
-    begin
-        for i := 1 to JsonHelper.GetJInteger(SalesLineJsonToken, 'currentQuantity', true) do
-            InsertEcommerceSalesLine(SalesLineJsonToken, EcomSalesHeader, LogEntry, LineType);
+        InsertEcommerceSalesLine(SalesLineJsonToken, EcomSalesHeader, LogEntry, LineType);
     end;
 
     local procedure IsProductRemoved(SalesLineJsonToken: JsonToken): Boolean
@@ -824,13 +813,14 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     begin
         SpfyIntegrationEvents.OnCheckIfSkipLine(SalesLineJsonToken, Skip, Handled);
         if not Handled then
-            Skip := (JsonHelper.GetJDecimal(SalesLineJsonToken, 'currentQuantity', false) = 0) and (JsonHelper.GetJInteger(SalesLineJsonToken, 'unfulfilledQuantity', false) = 0);
+            Skip := (JsonHelper.GetJInteger(SalesLineJsonToken, 'currentQuantity', false) = 0) and (JsonHelper.GetJInteger(SalesLineJsonToken, 'unfulfilledQuantity', false) = 0);
         exit(Skip);
     end;
 
     local procedure InsertEcommerceSalesLine(SalesLineJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; LogEntry: Record "NPR Spfy Event Log Entry"; LineType: enum "NPR Ecom Sales Line Type")
     var
         IncEcomSalesLine: Record "NPR Ecom Sales Line";
+        PropertyDict: Dictionary of [Text, Text];
     begin
         IncEcomSalesLine.Init();
         IncEcomSalesLine."Document Type" := EcomSalesHeader."Document Type";
@@ -838,26 +828,11 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         IncEcomSalesLine."Document Entry No." := EcomSalesHeader."Entry No.";
         IncEcomSalesLine.Type := LineType;
         IncEcomSalesLine."Line No." := _IncEcomSalesDocUtils.GetSalesDocLastSalesLineLineNo(EcomSalesHeader) + 10000;
-        ParseEcommerceSalesLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+        ParseEcommerceSalesLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry, PropertyDict);
         SpfyIntegrationEvents.OnBeforeInsertEcommerceSalesLine(SalesLineJsonToken, EcomSalesHeader, IncEcomSalesLine);
         IncEcomSalesLine.Insert(true);
-    end;
-
-    local procedure PopulateVoucherLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
-    var
-        VoucherType: Record "NPR NpRv Voucher Type";
-        PropertyDict: Dictionary of [Text, Text];
-        GiftCardId: Text[30];
-    begin
-        OrderMgt.GetOrderLineProperties(SalesLineJsonToken, PropertyDict, 'customAttributes', 'key');
-        OrderMgt.GetVoucherType(LogEntry."Store Code", PropertyDict, VoucherType);
-        VoucherType.TestField("Reference No. Pattern");
-        IncEcomSalesLine."Voucher Type" := VoucherType.Code;
-        _SpfyFulfillmentCache.GetVocherReferenceNo(IncEcomSalesLine."Shopify ID", IncEcomSalesLine."Barcode No.", GiftCardId);
-        IncEcomSalesLine.Description := CopyStr(JsonHelper.GetJText(SalesLineJsonToken, 'name', MaxStrLen(IncEcomSalesLine.Description), false), 1, MaxStrLen(IncEcomSalesLine.Description));
-        IncEcomSalesLine.Quantity := 1;
-        PopulateAmounts(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
-        ReserveVoucher(EcomSalesHeader, IncEcomSalesLine, VoucherType, PropertyDict, GiftCardId);
+        if IncEcomSalesLine.Type = IncEcomSalesLine.Type::Voucher then
+            ReserveVouchers(EcomSalesHeader, IncEcomSalesLine, PropertyDict);
     end;
 
     local procedure PopulateItemLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
@@ -957,28 +932,63 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         RecordLink.Modify(true);
     end;
 
-    local procedure ParseEcommerceSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
+    local procedure ParseEcommerceSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry"; var PropertyDict: Dictionary of [Text, Text])
     var
-        NotSupportedLineTypeErr: Label '%1 %2 is not suported', Comment = '%1=IncEcomSalesLine.FieldCaption(Type);%2=IncEcomSalesLine.Type';
+        NotSupportedLineTypeErr: Label '%1 %2 is not supported', Comment = '%1=IncEcomSalesLine.FieldCaption(Type);%2=IncEcomSalesLine.Type';
     begin
         IncEcomSalesLine."Shopify ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(SalesLineJsonToken, 'id', true));
+
         case IncEcomSalesLine.Type of
-            IncEcomSalesLine.Type::Voucher:
-                begin
-                    PopulateVoucherLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
-                    IncEcomSalesLine.Subtype := IncEcomSalesLine.Subtype::Voucher;
-                end;
             IncEcomSalesLine.Type::Item:
                 begin
                     PopulateItemLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
                     IncEcomSalesLine.Subtype := IncEcomSalesLine.Subtype::Item;
                 end;
+            IncEcomSalesLine.Type::Voucher:
+                PopulateVoucherLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry, PropertyDict);
             IncEcomSalesLine.Type::"Shipment Fee":
                 PopulateShipmentFeeLine(SalesLineJsonToken, IncEcomSalesLine);
             else
                 Error(NotSupportedLineTypeErr, IncEcomSalesLine.FieldCaption(Type), Format(IncEcomSalesLine.Type));
         end;
+
         SpfyIntegrationEvents.OnAfterParseEcommerceSalesLine(SalesLineJsonToken, IncEcomSalesLine);
+    end;
+
+    local procedure PopulateVoucherLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry"; var PropertyDict: Dictionary of [Text, Text])
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        OrderMgt.GetOrderLineProperties(SalesLineJsonToken, PropertyDict, 'customAttributes', 'key');
+        OrderMgt.GetVoucherType(LogEntry."Store Code", PropertyDict, VoucherType);
+        VoucherType.TestField("Reference No. Pattern");
+        IncEcomSalesLine.Subtype := IncEcomSalesLine.Subtype::Voucher;
+        IncEcomSalesLine."Voucher Type" := VoucherType.Code;
+        IncEcomSalesLine.Description := CopyStr(JsonHelper.GetJText(SalesLineJsonToken, 'name', MaxStrLen(IncEcomSalesLine.Description), false), 1, MaxStrLen(IncEcomSalesLine.Description));
+        IncEcomSalesLine.Quantity := JsonHelper.GetJInteger(SalesLineJsonToken, 'currentQuantity', true);
+        PopulateAmounts(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+    end;
+
+    local procedure ReserveVouchers(EcomSalesHeader: Record "NPR Ecom Sales Header"; IncEcomSalesLine: Record "NPR Ecom Sales Line"; PropertyDict: Dictionary of [Text, Text])
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        ReferenceNo: Code[50];
+        GiftCardId: Text[30];
+        Qty: Integer;
+        i: Integer;
+    begin
+        if IncEcomSalesLine."Voucher Type" = '' then
+            exit;
+
+        VoucherType.Get(IncEcomSalesLine."Voucher Type");
+        Qty := IncEcomSalesLine.Quantity;
+
+        for i := 1 to Qty do begin
+            Clear(ReferenceNo);
+            Clear(GiftCardId);
+            _SpfyFulfillmentCache.GetVocherReferenceNo(IncEcomSalesLine."Shopify ID", ReferenceNo, GiftCardId);
+            ReserveVoucher(EcomSalesHeader, IncEcomSalesLine, VoucherType, PropertyDict, ReferenceNo, GiftCardId);
+        end;
     end;
 
     local procedure EvaluateLineType(SalesLineJsonToken: JsonToken) LineType: Enum "NPR Ecom Sales Line Type";
@@ -989,7 +999,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         exit(LineType::Item);
     end;
 
-    local procedure ReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; GiftCardId: Text[30])
+    local procedure ReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; IncEcomSalesLine: Record "NPR Ecom Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; ReferenceNo: Code[50]; GiftCardId: Text[30])
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
@@ -999,7 +1009,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     begin
         VoucherMgt.CheckVoucherTypeQty(VoucherType);
         BindSubscription(SpfySuspendVouchRefVal);
-        VoucherMgt.InitVoucher(VoucherType, '', IncEcomSalesLine."Barcode No.", 0DT, false, TempVoucher);
+        VoucherMgt.InitVoucher(VoucherType, '', ReferenceNo, 0DT, false, TempVoucher);
         UnbindSubscription(SpfySuspendVouchRefVal);
 
         NpRvSalesLine.Init();
@@ -1008,13 +1018,15 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
         NpRvSalesLine."Voucher Type" := VoucherType.Code;
         NpRvSalesLine."Voucher No." := TempVoucher."No.";
-        if IncEcomSalesLine."Barcode No." = '' then
-            IncEcomSalesLine."Barcode No." := TempVoucher."Reference No.";
-        NpRvSalesLine."Reference No." := IncEcomSalesLine."Barcode No.";
+        NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
+        NpRvSalesLine."NPR Inc Ecom Sales Line Id" := IncEcomSalesLine.SystemId;
 #pragma warning disable AA0139
         NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
 #pragma warning restore AA0139
-        NpRvSalesLine.Amount := IncEcomSalesLine."Line Amount";
+        if EcomSalesHeader."Price Excl. VAT" and (IncEcomSalesLine."VAT %" > 0) then
+            NpRvSalesLine.Amount := IncEcomSalesLine."Unit Price" * (1 + IncEcomSalesLine."VAT %" / 100)
+        else
+            NpRvSalesLine.Amount := IncEcomSalesLine."Unit Price";
         NpRvSalesLine.Description := CopyStr(IncEcomSalesLine.Description, 1, MaxStrLen(NpRvSalesLine.Description));
         NpRvSalesLine."Spfy Initiated in Shopify" := not CheckIsNpGiftCard(PropertyDict);
         NpRvSalesLine."Spfy Gift Card ID" := GiftCardId;
@@ -1311,7 +1323,6 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         EcomSalesHeader."Ship-to Address 2" := EcomSalesHeader."Sell-to Address 2";
         EcomSalesHeader."Ship-to Post Code" := EcomSalesHeader."Sell-to Post Code";
         EcomSalesHeader."Ship-to City" := EcomSalesHeader."Sell-to City";
-        EcomSalesHeader."Ship-to Post Code" := EcomSalesHeader."Sell-to Post Code";
 
         if not Order.SelectToken('shippingAddress', ShippingAddress) or not ShippingAddress.IsObject() then
             exit;

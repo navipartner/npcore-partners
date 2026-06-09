@@ -276,7 +276,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     begin
         case OrderStatus of
             OrderStatus::Open:
-                exit(SpfyIntegrationMgt.IsAllowedFinancialStatus(JsonHelper.GetJText(Order, 'displayFinancialStatus', true).ToLower(), ShopifyStore.Code));
+                exit(SpfyIntegrationMgt.IsAllowedFinancialStatus(JsonHelper.GetJText(Order, 'displayFinancialStatus', false).ToLower(), ShopifyStore.Code));
             OrderStatus::Closed:
                 exit(
                     (JsonHelper.GetJDate(Order, 'closedAt', false) >= DT2Date(GetDefaultFromDT(ShopifyStore))) and

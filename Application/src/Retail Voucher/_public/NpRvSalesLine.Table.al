@@ -392,6 +392,9 @@
         key(Key6; "Voucher No.", "Type", "Reservation Line Id")
         {
         }
+        key(Key7; "NPR Inc Ecom Sales Line Id")
+        {
+        }
     }
 
     trigger OnDelete()
