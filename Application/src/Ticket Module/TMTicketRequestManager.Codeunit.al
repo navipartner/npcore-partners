@@ -1669,8 +1669,11 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
+        AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        ScheduleEntryNo: Integer;
         TOKEN_NOT_FOUND: Label 'The ticket-token %1 with status confirmed, was not found.';
+        RESERVED_SCH_ENTRY_GONE: Label 'The reserved %1 (%2) for %3 ''%4'' is no longer available.', Comment = '%1 = External Schedule Entry No. caption, %2 = external schedule entry no., %3 = Admission Code caption, %4 = admission code';
     begin
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -1696,8 +1699,20 @@
                     TicketReservationRequest2.SetFilter("Item No.", '=%1', TicketReservationRequest."Item No.");
                     TicketReservationRequest2.SetFilter("Variant Code", '=%1', TicketReservationRequest."Variant Code");
                     TicketReservationRequest2.FindSet();
+
                     repeat
-                        TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, Ticket."No.", TicketReservationRequest2."Admission Code", TicketReservationRequest2."External Adm. Sch. Entry No.", PosUnitNo, '', false);
+                        ScheduleEntryNo := 0;
+                        if (TicketReservationRequest2."External Adm. Sch. Entry No." <> 0) then begin
+                            AdmSchEntry.SetCurrentKey("External Schedule Entry No.");
+                            AdmSchEntry.SetRange("External Schedule Entry No.", TicketReservationRequest2."External Adm. Sch. Entry No.");
+                            AdmSchEntry.SetRange("Admission Code", TicketReservationRequest2."Admission Code");
+                            AdmSchEntry.SetRange(Cancelled, false);
+                            if (not AdmSchEntry.FindFirst()) then
+                                Error(RESERVED_SCH_ENTRY_GONE, AdmSchEntry.FieldCaption("External Schedule Entry No."), TicketReservationRequest2."External Adm. Sch. Entry No.", AdmSchEntry.FieldCaption("Admission Code"), TicketReservationRequest2."Admission Code");
+                            ScheduleEntryNo := AdmSchEntry."Entry No.";
+                        end;
+
+                        TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, Ticket."No.", TicketReservationRequest2."Admission Code", ScheduleEntryNo, PosUnitNo, '', false);
                     until (TicketReservationRequest2.Next() = 0);
 
                 until (Ticket.Next() = 0);
