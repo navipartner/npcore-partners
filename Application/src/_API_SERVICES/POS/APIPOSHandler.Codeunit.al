@@ -61,6 +61,8 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
                 exit(APIPOSEFTAdyen.BuildEFTRequest(Request));
             Request.Match('POST', '/pos/sale/:saleId/eft/:transactionId/local/parseResponse'):
                 exit(APIPOSEFTAdyen.ParseEFTResponse(Request));
+            Request.Match('POST', '/pos/sale/:saleId/eft/local/generateBoardingToken'):
+                exit(APIPOSEFTAdyen.GenerateBoardingToken(Request));
             Request.Match('POST', '/pos/sale/:saleId/eft/:transactionId/cloud/start'):
                 exit(APIPOSEFTAdyen.StartEFTPayment(Request));
             Request.Match('GET', '/pos/sale/:saleId/eft/:transactionId/cloud/status'):
@@ -96,11 +98,12 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
                 exit(APIExternalPOSSale.ListSales(Request));
             Request.Match('POST', '/pos/externalsale'):
                 exit(APIExternalPOSSale.CreateSale(Request));
-
             Request.Match('GET', '/pos/entry/:entryId/print/salesreceipt'):
                 exit(APIPOSEntry.PrintPosEntry(Request, Enum::"NPR Report Selection Type"::"Sales Receipt (POS Entry)"));
             Request.Match('GET', '/pos/entry/:entryId/print/terminalreceipt'):
                 exit(APIPOSEntry.PrintPosEntry(Request, Enum::"NPR Report Selection Type"::"Terminal Receipt"));
+            Request.Match('POST', '/pos/entry/:entryId/issuedigitalreceipt'):
+                exit(APIPOSEntry.IssueDigitalReceipt(Request));
             Request.Match('GET', '/pos/entry/:entryId'):
                 exit(APIPOSEntry.GetEntry(Request));
             Request.Match('GET', '/pos/entry'):

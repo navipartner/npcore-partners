@@ -212,6 +212,79 @@ codeunit 6248620 "NPR API POS Entry"
         exit(Response.RespondOK(EntryToJson(Json, POSEntry, true, false)));
     end;
 
+    internal procedure IssueDigitalReceipt(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+        DigitalReceiptSetup: Record "NPR Digital Rcpt. Setup";
+        POSSaleDigReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
+        POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
+        Json: Codeunit "NPR Json Builder";
+        entryId: Text;
+        DigitalRcptNotEnabledErr: Label 'Digital receipt is not enabled for the POS Unit''s receipt profile.';
+        GlobalDigitalRcptNotEnabledErr: Label 'Global Digital Receipt Setup is not enabled.';
+        InvalidEntryTypeErr: Label 'Digital receipt can only be issued for Direct Sale or Cancelled Sale entries.';
+        MissingPOSUnitErr: Label 'POS Unit or Receipt Profile not found for this POS Entry.';
+        NoReceiptEntryCreatedErr: Label 'Digital receipt creation returned no entry.';
+    begin
+        entryId := Request.Paths().Get(3);
+        if (entryId = '') then
+            exit(Response.RespondBadRequest('Missing required path parameter: entryId'));
+
+        Request.SkipCacheIfNonStickyRequest(GetTableIds());
+
+        POSEntry.ReadIsolation := IsolationLevel::ReadCommitted;
+        if (not POSEntry.GetBySystemId(entryId)) then
+            exit(Response.RespondResourceNotFound());
+
+        if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Cancelled Sale"]) then
+            exit(Response.RespondBadRequest(InvalidEntryTypeErr));
+
+        DigitalReceiptSetup.SetLoadFields("Enable");
+        if (not DigitalReceiptSetup.Get()) or (not DigitalReceiptSetup."Enable") then
+            exit(Response.RespondBadRequest(GlobalDigitalRcptNotEnabledErr));
+
+        POSUnit.SetLoadFields("POS Receipt Profile");
+        if not POSUnit.Get(POSEntry."POS Unit No.") then
+            exit(Response.RespondBadRequest(MissingPOSUnitErr));
+        POSReceiptProfile.SetLoadFields("Enable Digital Receipt");
+        if not POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
+            exit(Response.RespondBadRequest(MissingPOSUnitErr));
+        if not POSReceiptProfile."Enable Digital Receipt" then
+            exit(Response.RespondBadRequest(DigitalRcptNotEnabledErr));
+
+        POSSaleDigReceiptEntry.SetCurrentKey("POS Entry No.");
+        POSSaleDigReceiptEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if not POSSaleDigReceiptEntry.FindLast() then begin
+            ClearLastError();
+            if not TryCreateDigitalReceipt(POSEntry) then
+                Error(GetLastErrorText());
+            POSSaleDigReceiptEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
+            if not POSSaleDigReceiptEntry.FindLast() then
+                exit(Response.RespondBadRequest(NoReceiptEntryCreatedErr));
+        end;
+
+        Json.StartObject()
+            .AddProperty('entryId', Format(POSEntry.SystemId, 0, 4).ToLower())
+            .AddProperty('entryNo', POSEntry."Entry No.")
+            .AddProperty('documentNo', POSEntry."Document No.")
+            .AddProperty('digitalReceiptUrl', POSSaleDigReceiptEntry."QR Code Link")
+            .AddProperty('pdfUrl', POSSaleDigReceiptEntry.PDFLink)
+            .AddProperty('footerText', POSActionIssueDigRcptB.SetFooterText())
+            .AddProperty('issuedAt', POSSaleDigReceiptEntry.SystemCreatedAt)
+            .EndObject();
+        exit(Response.RespondOK(Json));
+    end;
+
+    [TryFunction]
+    local procedure TryCreateDigitalReceipt(POSEntry: Record "NPR POS Entry")
+    var
+        POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
+    begin
+        POSActionIssueDigRcptB.CreateDigitalReceipt(POSEntry);
+    end;
+
     #region JSON serialization
     internal procedure EntryToJson(var Json: Codeunit "NPR Json Builder"; POSEntry: Record "NPR POS Entry"; WithLines: Boolean; SyncMode: Boolean): Codeunit "NPR Json Builder"
     var
