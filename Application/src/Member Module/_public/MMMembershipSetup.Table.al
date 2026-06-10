@@ -431,6 +431,13 @@
                         Error(JobQueueEntryMissingErr);
             end;
         }
+        field(820; "Guest Cardinality Pooling"; Option)
+        {
+            Caption = 'Guest Cardinality Pooling';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Per Member,Cross-Membership (Combined),Cross-Membership (Highest)';
+            OptionMembers = PER_MEMBER,PER_MEMBER_CROSS_MEMBERSHIP_SUM,PER_MEMBER_CROSS_MEMBERSHIP_MAX;
+        }
     }
 
     keys

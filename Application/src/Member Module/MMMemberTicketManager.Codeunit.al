@@ -14,11 +14,11 @@
         MEMBERSHIP_NOT_ACTIVE: Label 'Membership for member %1, is not active.';
         INVALID_EXTERNAL_ITEM: Label 'The ticket item %1 is not valid in context of membership %2, admission code %3.';
         NOT_SAME_MEMBER: Label 'All request lines need to have the same member number.';
-        MEMBERGUEST_TICKET: Label 'Setup for %1 has an invalid entry for membership code %2, admission code %3, item %4. Setup does not match setup in %5.';
-        MISSING_CROSSREF: Label 'The external number %1 does not translate to an item. Check Item Reference for setup.';
+        MEMBER_GUEST_TICKET: Label 'Setup for %1 has an invalid entry for membership code %2, admission code %3, item %4. Setup does not match setup in %5.';
+        MISSING_CROSS_REF: Label 'The external number %1 does not translate to an item. Check Item Reference for setup.';
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
 
-    procedure ValidateMemberAssignedTickets(Token: Text[100]; FailWithError: Boolean) Success: Boolean
+    procedure ValidateMemberAssignedTickets(Token: Text[100]; FailWithError: Boolean): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
@@ -35,16 +35,14 @@
         exit(PreValidateMemberGuestTicketRequest(TempTicketReservationRequest, FailWithError));
     end;
 
-    procedure PreValidateMemberGuestTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; FailWithError: Boolean) Success: Boolean
+    procedure PreValidateMemberGuestTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; FailWithError: Boolean): Boolean
     var
         MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
-        MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         MembershipEntryNo: Integer;
-        Membership: Record "NPR MM Membership";
-        TotalTickets: Integer;
-        ExternalMemberNo: Code[20];
-        FoundSetup: Boolean;
+        MemberEntryNo: Integer;
     begin
+        // Token / web-service entry: no swiped card in context, so derive the member's membership the same way as before
+        // (first active role). The prompt flow has the authoritative swiped membership and calls the worker directly.
         TmpTicketReservationRequest.Reset();
         TmpTicketReservationRequest.FindSet();
 
@@ -56,6 +54,33 @@
         end;
 
         MembershipEntryNo := MemberManagement.GetMembershipFromExtMemberNo(TmpTicketReservationRequest."External Member No.");
+        MemberEntryNo := MemberManagement.GetMemberFromExtMemberNo(TmpTicketReservationRequest."External Member No.");
+        exit(PreValidateMemberGuestTicketRequest(TmpTicketReservationRequest, MembershipEntryNo, MemberEntryNo, FailWithError));
+    end;
+
+    local procedure PreValidateMemberGuestTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; MembershipEntryNo: Integer; MemberEntryNo: Integer; FailWithError: Boolean): Boolean
+    var
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
+        Membership: Record "NPR MM Membership";
+        AdmTotals: Dictionary of [Code[20], Integer];
+        ExternalMemberNo: Code[20];
+        AdmissionCode: Code[20];
+        FoundSetup: Boolean;
+        PooledAllowance: Integer;
+        AdmissionTotal: Integer;
+        GuestsUnlimited: Boolean;
+    begin
+        TmpTicketReservationRequest.Reset();
+        TmpTicketReservationRequest.FindSet();
+
+        if (TmpTicketReservationRequest."External Member No." = '') then begin
+            // Not a member guest request
+            if (not (FailWithError)) then
+                exit(false);
+            Error(NO_MEMBER);
+        end;
+
         if (not (MemberManagement.IsMembershipActive(MembershipEntryNo, WorkDate(), true))) then begin
             if (not (FailWithError)) then
                 exit(false);
@@ -107,31 +132,38 @@
             end;
 
             if (MembershipAdmissionSetup."Cardinality Type" = MembershipAdmissionSetup."Cardinality Type"::LIMITED) then begin
-                if (TmpTicketReservationRequest.Quantity > MembershipAdmissionSetup."Max Cardinality") then begin
+                PooledAllowance := GetPooledGuestAllowance(MembershipEntryNo, MemberEntryNo, TmpTicketReservationRequest."Admission Code", MembershipAdmissionSetup."Ticket No.", GuestsUnlimited);
+                if ((not GuestsUnlimited) and (TmpTicketReservationRequest.Quantity > PooledAllowance)) then begin
                     if (not (FailWithError)) then
                         exit(false);
-                    Error(TICKET_COUNT_EXCEEDED, MembershipAdmissionSetup."Max Cardinality", TmpTicketReservationRequest."Item No.", Membership."Membership Code", TmpTicketReservationRequest."Admission Code");
+                    Error(TICKET_COUNT_EXCEEDED, PooledAllowance, TmpTicketReservationRequest."Item No.", Membership."Membership Code", TmpTicketReservationRequest."Admission Code");
                 end;
             end;
 
-            TotalTickets += TmpTicketReservationRequest.Quantity;
+            if (not AdmTotals.Get(TmpTicketReservationRequest."Admission Code", AdmissionTotal)) then
+                AdmissionTotal := 0;
+            AdmTotals.Set(TmpTicketReservationRequest."Admission Code", AdmissionTotal + TmpTicketReservationRequest.Quantity);
 
         until (TmpTicketReservationRequest.Next() = 0);
 
-        MembershipAdmissionSetup.Reset();
-        MembershipAdmissionSetup.SetFilter("Membership  Code", '=%1', Membership."Membership Code");
-        MembershipAdmissionSetup.SetFilter("Admission Code", '=%1', TmpTicketReservationRequest."Admission Code");
-        MembershipAdmissionSetup.SetFilter("Ticket No. Type", '=%1', MembershipAdmissionSetup."Ticket No. Type"::NA);
-        MembershipAdmissionSetup.SetFilter("Ticket No.", '=%1', '');
-        if (MembershipAdmissionSetup.FindFirst()) then begin
-            if (MembershipAdmissionSetup."Cardinality Type" = MembershipAdmissionSetup."Cardinality Type"::LIMITED) then begin
-                if (TotalTickets > MembershipAdmissionSetup."Max Cardinality") then begin
-                    if (not (FailWithError)) then
-                        exit(false);
-                    Error(TOTAL_TICKETS_EXCEEDED, MembershipAdmissionSetup."Max Cardinality", Membership."Membership Code", TmpTicketReservationRequest."Admission Code");
+        foreach AdmissionCode in AdmTotals.Keys() do begin
+            MembershipAdmissionSetup.Reset();
+            MembershipAdmissionSetup.SetFilter("Membership  Code", '=%1', Membership."Membership Code");
+            MembershipAdmissionSetup.SetFilter("Admission Code", '=%1', AdmissionCode);
+            MembershipAdmissionSetup.SetFilter("Ticket No. Type", '=%1', MembershipAdmissionSetup."Ticket No. Type"::NA);
+            MembershipAdmissionSetup.SetFilter("Ticket No.", '=%1', '');
+            if (MembershipAdmissionSetup.FindFirst()) then
+                if (MembershipAdmissionSetup."Cardinality Type" = MembershipAdmissionSetup."Cardinality Type"::LIMITED) then begin
+                    PooledAllowance := GetPooledGuestAllowance(MembershipEntryNo, MemberEntryNo, AdmissionCode, '', GuestsUnlimited);
+                    if ((not GuestsUnlimited) and (AdmTotals.Get(AdmissionCode) > PooledAllowance)) then begin
+                        if (not (FailWithError)) then
+                            exit(false);
+                        Error(TOTAL_TICKETS_EXCEEDED, PooledAllowance, Membership."Membership Code", AdmissionCode);
+                    end;
                 end;
-            end;
         end;
+
+        exit(true);
     end;
 
     procedure PromptForMemberGuestArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; var TicketToken: Text[100]): Boolean
@@ -173,17 +205,19 @@
 
         ReusedToken: Text[100];
         PlaceHolderLbl: Label '%1 [%2;%3]', Locked = true;
+        GuestMax: Dictionary of [Integer, Integer];
     begin
 
         Membership.Get(MembershipEntryNo);
         Member.Get(MemberEntryNo);
 
-        if (not BuildMemberGuestRequest(MembershipEntryNo, MemberEntryNo, TempTicketReservationRequest)) then
+        if (not BuildMemberGuestRequest(MembershipEntryNo, MemberEntryNo, TempTicketReservationRequest, GuestMax)) then
             exit;
 
         // Let user specify guest count for each ticket type
         Commit();
         TicketRequestMini.FillRequestTable(TempTicketReservationRequest);
+        TicketRequestMini.SetGuestMax(GuestMax);
         TicketRequestMini.LookupMode(true);
         PageAction := TicketRequestMini.RunModal();
 
@@ -200,7 +234,7 @@
         if (TempTicketReservationRequest.IsEmpty()) then
             exit(false); // all lines deleted - no guests
 
-        PreValidateMemberGuestTicketRequest(TempTicketReservationRequest, true);
+        PreValidateMemberGuestTicketRequest(TempTicketReservationRequest, MembershipEntryNo, MemberEntryNo, true);
 
         Commit();
         if (TicketAttemptCreate.AttemptValidateRequestForTicketReuse(TempTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
@@ -233,7 +267,7 @@
                 until (TicketAdmissionBOM.Next() = 0);
 
             end else begin
-                Error(MEMBERGUEST_TICKET, MembershipAdmissionSetup.TableCaption,
+                Error(MEMBER_GUEST_TICKET, MembershipAdmissionSetup.TableCaption,
                   MembershipAdmissionSetup."Membership  Code", TempTicketReservationRequest."Admission Code",
                   StrSubstNo(PlaceHolderLbl, TempTicketReservationRequest."External Item Code", TempTicketReservationRequest."Item No.", TempTicketReservationRequest."Variant Code"),
 
@@ -348,7 +382,7 @@
         if (not TicketIsReused) then begin
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then begin
                 ErrorCode := -11;
-                ErrorReason := StrSubstNo(MISSING_CROSSREF, ExternalItemNo);
+                ErrorReason := StrSubstNo(MISSING_CROSS_REF, ExternalItemNo);
                 exit(false);
             end;
 
@@ -405,7 +439,7 @@
         // Create new ticket - only possible when ExternalItemNo <> ''
         if (not TicketIsReused) then begin
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
-                Error(MISSING_CROSSREF, ExternalItemNo);
+                Error(MISSING_CROSS_REF, ExternalItemNo);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
@@ -455,7 +489,7 @@
         if (not TicketIsReused) then begin
             Sentry.StartSpan(Span, 'bc.membership.fast-check-in-no-print.issue-ticket');
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
-                Error(MISSING_CROSSREF, ExternalItemNo);
+                Error(MISSING_CROSS_REF, ExternalItemNo);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
@@ -498,7 +532,7 @@
         // Create new ticket - only possible when ExternalItemNo <> ''
         if (not TicketIsReused) then begin
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
-                Error(MISSING_CROSSREF, ExternalItemNo);
+                Error(MISSING_CROSS_REF, ExternalItemNo);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
@@ -508,8 +542,78 @@
         ExternalTicketNo := Ticket."External Ticket No.";
     end;
 
+    internal procedure GetPooledGuestAllowance(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; GuestTicketNo: Code[50]; var IsUnlimited: Boolean) Allowance: Integer
+    var
+        Membership: Record "NPR MM Membership";
+        RoleMembership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipRole: Record "NPR MM Membership Role";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+        SeenMemberships: List of [Integer];
+        UseMax: Boolean;
+        HasLine: Boolean;
+    begin
+        IsUnlimited := false;
+        Allowance := 0;
+        HasLine := false;
 
-    local procedure BuildMemberGuestRequest(MembershipEntryNo: Integer; MemberEntryNo: Integer; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary): Boolean
+        if (not Membership.Get(MembershipEntryNo)) then
+            exit(0);
+        if (not MembershipSetup.Get(Membership."Membership Code")) then
+            MembershipSetup.Init();
+
+        if (MembershipSetup."Guest Cardinality Pooling" = MembershipSetup."Guest Cardinality Pooling"::PER_MEMBER) then begin
+            AggregateBandAllowance(Membership."Membership Code", AdmissionCode, GuestTicketNo, false, IsUnlimited, Allowance, HasLine);
+            exit(Allowance);
+        end;
+
+        // CROSS_MEMBERSHIP_SUM / _MAX: pool the band across the member's active memberships.
+        UseMax := (MembershipSetup."Guest Cardinality Pooling" = MembershipSetup."Guest Cardinality Pooling"::PER_MEMBER_CROSS_MEMBERSHIP_MAX);
+
+        // Always count the swiped membership itself. 
+        SeenMemberships.Add(MembershipEntryNo);
+        AggregateBandAllowance(Membership."Membership Code", AdmissionCode, GuestTicketNo, UseMax, IsUnlimited, Allowance, HasLine);
+
+        // Pool the member's other active memberships - skipped for anonymous memberships (no member to resolve roles for).
+        if (MemberEntryNo <> 0) then begin
+            MembershipRole.SetCurrentKey("Member Entry No.");
+            MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+            if (MembershipRole.FindSet()) then
+                repeat
+                    if (not SeenMemberships.Contains(MembershipRole."Membership Entry No.")) then begin
+                        SeenMemberships.Add(MembershipRole."Membership Entry No.");
+                        if (MemberManagement.IsMembershipActive(MembershipRole."Membership Entry No.", WorkDate(), true)) then
+                            if (RoleMembership.Get(MembershipRole."Membership Entry No.")) then
+                                AggregateBandAllowance(RoleMembership."Membership Code", AdmissionCode, GuestTicketNo, UseMax, IsUnlimited, Allowance, HasLine);
+                    end;
+                until (MembershipRole.Next() = 0);
+        end;
+    end;
+
+    local procedure AggregateBandAllowance(MembershipCode: Code[20]; AdmissionCode: Code[20]; GuestTicketNo: Code[50]; UseMax: Boolean; var IsUnlimited: Boolean; var Allowance: Integer; var HasLine: Boolean)
+    var
+        AdmissionSetup: Record "NPR MM Members. Admis. Setup";
+    begin
+        AdmissionSetup.SetRange("Membership  Code", MembershipCode);
+        AdmissionSetup.SetRange("Admission Code", AdmissionCode);
+        AdmissionSetup.SetRange("Ticket No.", GuestTicketNo);
+        if (not AdmissionSetup.FindFirst()) then
+            exit; // this membership doesn't grant this band
+
+        if (AdmissionSetup."Cardinality Type" = AdmissionSetup."Cardinality Type"::UNLIMITED) then begin
+            IsUnlimited := true;
+            exit;
+        end;
+
+        if (UseMax) then begin
+            if ((not HasLine) or (AdmissionSetup."Max Cardinality" > Allowance)) then
+                Allowance := AdmissionSetup."Max Cardinality";
+        end else
+            Allowance += AdmissionSetup."Max Cardinality";
+        HasLine := true;
+    end;
+
+    local procedure BuildMemberGuestRequest(MembershipEntryNo: Integer; MemberEntryNo: Integer; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var GuestMax: Dictionary of [Integer, Integer]): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
@@ -517,6 +621,8 @@
         ItemNo, PrevItemNo : Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
+        PooledMax: Integer;
+        GuestsUnlimited: Boolean;
     begin
 
         Membership.Get(MembershipEntryNo);
@@ -539,6 +645,13 @@
                 TmpTicketReservationRequest."Admission Description" := CopyStr(MembershipAdmissionSetup.Description, 1, MaxStrLen(TmpTicketReservationRequest."Admission Description"));
 
             TmpTicketReservationRequest."Entry No." += 1;
+
+            PooledMax := GetPooledGuestAllowance(MembershipEntryNo, MemberEntryNo, MembershipAdmissionSetup."Admission Code", MembershipAdmissionSetup."Ticket No.", GuestsUnlimited);
+            if (GuestsUnlimited) then
+                GuestMax.Set(TmpTicketReservationRequest."Entry No.", -1)
+            else
+                GuestMax.Set(TmpTicketReservationRequest."Entry No.", PooledMax);
+
             if (PrevItemNo <> ItemNo) then begin
                 PrevItemNo := ItemNo;
                 TmpTicketReservationRequest."Ext. Line Reference No." := TmpTicketReservationRequest."Entry No."; // Separate different items as different ticket requests within the token.

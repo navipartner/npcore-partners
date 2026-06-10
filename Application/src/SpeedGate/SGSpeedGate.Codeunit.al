@@ -354,11 +354,14 @@ codeunit 6185130 "NPR SG SpeedGate"
         Ticket: Record "NPR TM Ticket";
         LogEntryNo: Integer;
         TicketCount: Integer;
+        EffectiveGuestMax: Integer;
+        GuestsUnlimited: Boolean;
         ValidFromDate, ValidUntilDate : Date;
         InvalidRequest: Label 'Invalid Validation Request';
         NoTimeFramesError: Label 'Membership is not valid, it has no timeframes. Please contact the support team for assistance.';
         NotValidForTodayError: Label 'Membership is not valid for today, it is valid from %1 until %2.';
         GuestCardinalityError: Label 'The number of guests requested (%1) exceeds the maximum number of guests in setup (%2)';
+        AdmissionNoGuestsError: Label 'Admission %1 does not allow any guests.', Comment = '%1 = admission code';
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
     begin
@@ -413,9 +416,12 @@ codeunit 6185130 "NPR SG SpeedGate"
             Database::"NPR MM Members. Admis. Setup": // Guests
                 begin
                     MembershipAdmissionSetup.GetBySystemId(ValidationRequest.ExtraEntityId);
-                    if (MembershipAdmissionSetup."Cardinality Type" = MembershipAdmissionSetup."Cardinality Type"::LIMITED) then
-                        if (Quantity > MembershipAdmissionSetup."Max Cardinality") then
-                            Error(GuestCardinalityError, Quantity, MembershipAdmissionSetup."Max Cardinality");
+                    EffectiveGuestMax := MemberTicketManager.GetPooledGuestAllowance(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, MembershipAdmissionSetup."Ticket No.", GuestsUnlimited);
+                    if ((not GuestsUnlimited) and (Quantity > EffectiveGuestMax)) then begin
+                        if (EffectiveGuestMax <= 0) then
+                            Error(AdmissionNoGuestsError, ValidationRequest.AdmissionCode);
+                        Error(GuestCardinalityError, Quantity, EffectiveGuestMax);
+                    end;
 
                     for TicketCount := 2 to Quantity do begin
                         ExtraGuestValidationRequest := ValidationRequest;

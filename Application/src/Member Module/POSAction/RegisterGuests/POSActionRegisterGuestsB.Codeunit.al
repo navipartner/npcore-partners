@@ -12,9 +12,11 @@ codeunit 6248458 "NPR POSActionRegisterGuestsB"
         MembershipGuest: Record "NPR MM Members. Admis. Setup";
         Speedgate: Codeunit "NPR SG SpeedGate";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         ItemNumber: Code[20];
         ItemVariantCode: Code[10];
-        Resolver, TicketsCreatedToday : Integer;
+        Resolver, TicketsCreatedToday, PooledMaxGuests : Integer;
+        GuestsUnlimited: Boolean;
         AdmitToken: Guid;
         TempJValue: JsonValue;
         GuestArray: JsonArray;
@@ -47,8 +49,9 @@ codeunit 6248458 "NPR POSActionRegisterGuestsB"
 
             AdmitToken := Speedgate.CreateMemberGuestAdmissionToken(Entry, MembershipGuest);
 
-            if (MembershipGuest."Cardinality Type" = MembershipGuest."Cardinality Type"::UNLIMITED) then
-                MembershipGuest."Max Cardinality" := -1;
+            PooledMaxGuests := MemberTicketManager.GetPooledGuestAllowance(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MembershipGuest."Admission Code", MembershipGuest."Ticket No.", GuestsUnlimited);
+            if (GuestsUnlimited) then
+                PooledMaxGuests := -1;
 
             if (Member.Get(MemberCard."Member Entry No.")) then begin
 
@@ -70,8 +73,11 @@ codeunit 6248458 "NPR POSActionRegisterGuestsB"
 
             TempJObject.Add('token', Format(AdmitToken, 0, 4).ToLower());
             TempJObject.Add('admissionCode', MembershipGuest."Admission Code");
-            TempJObject.Add('description', MembershipGuest.Description);
-            TempJObject.Add('maxNumberOfGuests', MembershipGuest."Max Cardinality");
+            if (PooledMaxGuests > -1) then
+                TempJObject.Add('description', StrSubstNo('%1 (admitted: %2 / max: %3)', MembershipGuest.Description, TicketsCreatedToday, PooledMaxGuests))
+            else
+                TempJObject.Add('description', MembershipGuest.Description);
+            TempJObject.Add('maxNumberOfGuests', PooledMaxGuests);
             TempJObject.Add('guestsAdmittedToday', TicketsCreatedToday);
             GuestArray.Add(TempJObject);
         until MembershipGuest.Next() = 0;

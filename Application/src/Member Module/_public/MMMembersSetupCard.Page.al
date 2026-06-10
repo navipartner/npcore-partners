@@ -344,7 +344,11 @@
                     ToolTip = 'Specifies the value of the Ticket Item Barcode field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
-
+                field("Guest Cardinality Pooling"; Rec."Guest Cardinality Pooling")
+                {
+                    ToolTip = 'Controls how a guest band''s allowance is pooled for a member who belongs to several memberships. Per Member uses only this membership''s own guest band. Cross-Membership (Combined) sums the same band across all the member''s active memberships. Cross-Membership (Highest) uses the highest single band among them.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
             group(GDPR)
             {

@@ -1015,6 +1015,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         ShowGuests: Boolean;
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
         Speedgate: Codeunit "NPR SG SpeedGate";
+        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
+        PooledMaxGuests: Integer;
+        GuestsUnlimited: Boolean;
     begin
         ResponseJson.StartArray('guests');
 
@@ -1052,15 +1055,16 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 end;
 
                 AdmitToken := Speedgate.CreateMemberGuestAdmissionToken(SourceValidationRequest, MembershipGuest);
-                if (MembershipGuest."Cardinality Type" = MembershipGuest."Cardinality Type"::UNLIMITED) then
-                    MembershipGuest."Max Cardinality" := -1;
+                PooledMaxGuests := MemberTicketManager.GetPooledGuestAllowance(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MembershipGuest."Admission Code", MembershipGuest."Ticket No.", GuestsUnlimited);
+                if (GuestsUnlimited) then
+                    PooledMaxGuests := -1;
 
                 ResponseJson
                     .StartObject()
                     .AddProperty('token', Format(AdmitToken, 0, 4).ToLower())
                     .AddProperty('admissionCode', MembershipGuest."Admission Code")
                     .AddProperty('description', MembershipGuest.Description)
-                    .AddProperty('maxNumberOfGuests', MembershipGuest."Max Cardinality")
+                    .AddProperty('maxNumberOfGuests', PooledMaxGuests)
                     .AddProperty('guestsAdmittedToday', TicketsCreatedToday)
                     .EndObject();
             until (MembershipGuest.Next() = 0);

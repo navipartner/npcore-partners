@@ -29,9 +29,21 @@
                     ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
+                    var
+                        MaxGuests: Integer;
                     begin
+                        if (_GuestMax.Get(Rec."Entry No.", MaxGuests)) then
+                            if ((MaxGuests >= 0) and (Rec.Quantity > MaxGuests)) then
+                                Error(GuestCountExceededErr, MaxGuests);
                         CurrPage.Update(true);
                     end;
+                }
+                field(MaxGuestsText; _MaxGuestsText)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Max';
+                    Editable = false;
+                    ToolTip = 'Specifies the maximum number of guests allowed for this line.';
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
@@ -58,6 +70,29 @@
             }
         }
     }
+
+    var
+        _GuestMax: Dictionary of [Integer, Integer];
+        _MaxGuestsText: Text;
+        UnlimitedLbl: Label 'Unlimited';
+        GuestCountExceededErr: Label 'You can register at most %1 guest(s) for this line.', Comment = '%1 = maximum guest count';
+
+    trigger OnAfterGetRecord()
+    var
+        MaxGuests: Integer;
+    begin
+        _MaxGuestsText := '';
+        if (_GuestMax.Get(Rec."Entry No.", MaxGuests)) then
+            if (MaxGuests < 0) then
+                _MaxGuestsText := UnlimitedLbl
+            else
+                _MaxGuestsText := Format(MaxGuests);
+    end;
+
+    internal procedure SetGuestMax(GuestMax: Dictionary of [Integer, Integer])
+    begin
+        _GuestMax := GuestMax;
+    end;
 
     internal procedure FillRequestTable(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     begin
