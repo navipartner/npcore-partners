@@ -336,7 +336,7 @@
         SaleLinePOS."Order No. from Web" := WaiterPadLine."Order No. from Web";
         SaleLinePOS."Order Line No. from Web" := WaiterPadLine."Order Line No. from Web";
         if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then
-            SaleLinePOS.Validate("Unit of Measure Code");
+            SaleLinePOS.Validate("Unit of Measure Code", WaiterPadLine."Unit of Measure Code");
 
         SaleLinePOS.SetSkipUpdateDependantQuantity(false);
 
