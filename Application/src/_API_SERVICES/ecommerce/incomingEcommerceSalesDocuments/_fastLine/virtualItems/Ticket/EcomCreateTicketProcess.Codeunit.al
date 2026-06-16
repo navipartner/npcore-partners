@@ -6,15 +6,30 @@ codeunit 6248548 "NPR EcomCreateTicketProcess"
     trigger OnRun()
     var
         EcomCreateTicketTryProcess: Codeunit "NPR EcomCreateTicketTryProcess";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        OwnsTransaction: Boolean;
     begin
         ClearLastError();
         Commit();
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then begin
+            Sentry.InitScopeAndTransaction('E-com Ticket Process', 'bc.e-com.ticket.process');
+            Sentry.AddTransactionTag('e-com.externalNo', Rec."External No.");
+        end;
+        Sentry.StartSpan(SentrySpan, 'bc.e-com.ticket.process');
 
         Clear(EcomCreateTicketTryProcess);
         _Success := EcomCreateTicketTryProcess.Run(Rec);
 
+        if not _Success then
+            Sentry.AddLastErrorIfProgrammingBug();
+
         HandleResponse(_Success, Rec, _UpdateRetryCount);
         Commit();
+        SentrySpan.Finish();
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
 
         if (not _Success) and _ShowError then
             Error(GetLastErrorText);

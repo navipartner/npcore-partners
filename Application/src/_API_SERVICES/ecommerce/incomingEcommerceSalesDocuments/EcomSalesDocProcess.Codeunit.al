@@ -7,17 +7,32 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
     trigger OnRun()
     var
         EcomSalesDocTryProcess: Codeunit "NPR EcomSalesDocTryProcess";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        OwnsTransaction: Boolean;
     begin
         ClearLastError();
         Commit();
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then begin
+            Sentry.InitScopeAndTransaction('E-com Sales Document Process', 'bc.e-com.salesdoc.process');
+            Sentry.AddTransactionTag('e-com.externalNo', Rec."External No.");
+        end;
+        Sentry.StartSpan(SentrySpan, 'bc.e-com.salesdoc.process');
 
         Clear(EcomSalesDocTryProcess);
         _Success := EcomSalesDocTryProcess.Run(Rec);
         Rec.ReadIsolation := Rec.ReadIsolation::UpdLock;
         Rec.Get(Rec.RecordId);
 
+        if not _Success then
+            Sentry.AddLastErrorIfProgrammingBug();
+
         HandleResponse(_Success, Rec, _UpdateRetryCount);
         Commit();
+        SentrySpan.Finish();
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
         if (not _Success) and _ShowError then
             Error(GetLastErrorText);
     end;

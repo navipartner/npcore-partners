@@ -6,12 +6,21 @@ codeunit 6248514 "NPR EcomCreateVchrProcess"
     trigger OnRun()
     var
         EcomCreateVchrTryProcess: Codeunit "NPR EcomCreateVchrTryProcess";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
         Sentry: Codeunit "NPR Sentry";
         SentrySpan: Codeunit "NPR Sentry Span";
+        OwnsTransaction: Boolean;
     begin
 
         ClearLastError();
         Commit();
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then begin
+            Sentry.InitScopeAndTransaction('E-com Voucher Process', 'bc.e-com.voucher.process');
+            EcomSalesHeader.SetLoadFields("External No.");
+            if EcomSalesHeader.Get(Rec."Document Entry No.") then
+                Sentry.AddTransactionTag('e-com.externalNo', EcomSalesHeader."External No.");
+        end;
         Sentry.StartSpan(SentrySpan, 'bc.e-com.voucher.process');
 
         Clear(EcomCreateVchrTryProcess);
@@ -23,6 +32,8 @@ codeunit 6248514 "NPR EcomCreateVchrProcess"
         HandleResponse(_Success, Rec, _UpdateRetryCount);
         Commit();
         SentrySpan.Finish();
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
 
         if (not _Success) and _ShowError then
             Error(GetLastErrorText);

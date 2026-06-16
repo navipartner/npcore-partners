@@ -305,6 +305,9 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
         ErrorText: Text;
         Success: Boolean;
         VirtualItemProcessingFailed: Boolean;
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        OwnsTransaction: Boolean;
         BundleComponentsFailedErr: Label 'Cannot create wallet: one or more wallet virtual components failed to process. Line ID: %1.', Comment = '%1 - Parent external line ID';
     begin
         Success := AllBundleVirtualComponentsProcessed(ParentLine, VirtualItemProcessingFailed);
@@ -323,12 +326,23 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
 
         ClearLastError();
         Commit();
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then begin
+            Sentry.InitScopeAndTransaction('E-com Wallet Process', 'bc.e-com.wallet.process');
+            Sentry.AddTransactionTag('e-com.externalNo', EcomSalesHeader."External No.");
+        end;
+        Sentry.StartSpan(SentrySpan, 'bc.e-com.wallet.process');
 
         Success := Codeunit.Run(Codeunit::"NPR EcomCreateWalletMgt", ParentLine);
-        if not Success then
+        if not Success then begin
             ErrorText := GetLastErrorText();
+            Sentry.AddLastErrorIfProgrammingBug();
+        end;
         HandleResponse(Success, EcomSalesHeader, ParentLine, UpdateRetryCount, ErrorText);
         Commit();
+        SentrySpan.Finish();
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
 
         if not Success and ShowError then
             Error(ErrorText);

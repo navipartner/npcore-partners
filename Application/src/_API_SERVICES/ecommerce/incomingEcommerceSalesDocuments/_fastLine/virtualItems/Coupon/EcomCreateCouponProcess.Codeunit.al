@@ -12,15 +12,33 @@ codeunit 6151122 "NPR EcomCreateCouponProcess"
     trigger OnRun()
     var
         EcomCreateCouponTryProcess: Codeunit "NPR EcomCreateCouponTryProcess";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        OwnsTransaction: Boolean;
     begin
         ClearLastError();
         Commit();
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then begin
+            Sentry.InitScopeAndTransaction('E-com Coupon Process', 'bc.e-com.coupon.process');
+            EcomSalesHeader.SetLoadFields("External No.");
+            if EcomSalesHeader.Get(Rec."Document Entry No.") then
+                Sentry.AddTransactionTag('e-com.externalNo', EcomSalesHeader."External No.");
+        end;
+        Sentry.StartSpan(SentrySpan, 'bc.e-com.coupon.process');
 
         Clear(EcomCreateCouponTryProcess);
         _Success := EcomCreateCouponTryProcess.Run(Rec);
 
+        if not _Success then
+            Sentry.AddLastErrorIfProgrammingBug();
+
         HandleResponse(_Success, Rec, _UpdateRetryCount);
         Commit();
+        SentrySpan.Finish();
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
 
         if (not _Success) and _ShowError then
             Error(GetLastErrorText);

@@ -7,11 +7,20 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
     trigger OnRun()
     var
         EcomCreateMMShipTryProcess: Codeunit "NPR EcomCreateMMShipTryProcess";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
         Sentry: Codeunit "NPR Sentry";
         SentrySpan: Codeunit "NPR Sentry Span";
+        OwnsTransaction: Boolean;
     begin
         ClearLastError();
         Commit();
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then begin
+            Sentry.InitScopeAndTransaction('E-com Membership Process', 'bc.e-com.membership.process');
+            EcomSalesHeader.SetLoadFields("External No.");
+            if EcomSalesHeader.Get(Rec."Document Entry No.") then
+                Sentry.AddTransactionTag('e-com.externalNo', EcomSalesHeader."External No.");
+        end;
         Sentry.StartSpan(SentrySpan, 'bc.e-com.membership.process');
 
         Clear(EcomCreateMMShipTryProcess);
@@ -23,6 +32,8 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
         HandleResponse(_Success, Rec, _UpdateRetryCount);
         Commit();
         SentrySpan.Finish();
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
 
         if (not _Success) and _ShowError then
             Error(GetLastErrorText);
