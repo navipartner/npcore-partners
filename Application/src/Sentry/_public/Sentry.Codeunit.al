@@ -160,6 +160,11 @@ codeunit 6248497 "NPR Sentry"
 #endif
     end;
 
+    internal procedure GetLastErrorInEnglish(var ErrorText: Text; var ErrorCallStack: Text)
+    begin
+        SentryScope.GetLastErrorInEnglish(ErrorText, ErrorCallStack);
+    end;
+
     procedure AddLastErrorIfProgrammingBug()
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
     var

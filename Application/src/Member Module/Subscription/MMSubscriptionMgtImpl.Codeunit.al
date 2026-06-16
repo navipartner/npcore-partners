@@ -725,4 +725,70 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         RefundPmtRequest.Insert(true);
         exit(true);
     end;
+
+    /// <summary>
+    /// Reports a terminal payment-request error to Sentry with a caller-supplied cause (English text + callstack).
+    /// Use this when the originating error is no longer the live last error at report time (e.g. the JQ crash
+    /// path, which must snapshot the cause before a later TryFunction).
+    /// </summary>
+    internal procedure ReportPaymentRequestTerminalError(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; CauseText: Text; CauseCallStack: Text)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        TransactionName: Text;
+        EffectiveMessage: Text;
+        TerminalErrorMsgLbl: Label 'Subscription payment request reached terminal Error status', Locked = true;
+        TransactionNameLbl: Label 'Subscription payment request %1 failed', Locked = true, Comment = '%1 = entry no.';
+        OperationTok: Label 'bc.membership.subscription.error', Locked = true;
+    begin
+        EffectiveMessage := CauseText;
+        if EffectiveMessage = '' then
+            EffectiveMessage := TerminalErrorMsgLbl;
+
+        TransactionName := CopyStr(StrSubstNo(TransactionNameLbl, SubscrPaymentRequest."Entry No."), 1, 250);
+
+        Sentry.InitScopeAndTransaction(TransactionName, OperationTok);
+        AddPaymentRequestTags(Sentry, SubscrPaymentRequest);
+        Sentry.AddError(EffectiveMessage, CauseCallStack);
+        Sentry.FinalizeScope();
+    end;
+
+    /// <summary>
+    /// Reports a terminal payment-request error to Sentry from the live last error (English text + callstack).
+    /// Use when the failure is still the last error at report time (e.g. the Adyen ProcessResponse path).
+    /// Falls back to FallbackMessage when there is no AL error (e.g. webhook success=false carries only a reason).
+    /// </summary>
+    internal procedure ReportPaymentRequestTerminalErrorFromLastError(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; FallbackMessage: Text)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        ErrorText: Text;
+        ErrorCallStack: Text;
+    begin
+        Sentry.GetLastErrorInEnglish(ErrorText, ErrorCallStack);
+        if ErrorText = '' then
+            ErrorText := FallbackMessage;
+        ReportPaymentRequestTerminalError(SubscrPaymentRequest, ErrorText, ErrorCallStack);
+    end;
+
+    /// <summary>
+    /// Reports a terminal payment-request failure to Sentry only when the last error is a genuine programming bug.
+    /// Used by the manual Process path, where the admin already sees the thrown error.
+    /// </summary>
+    internal procedure ReportPaymentRequestTerminalProgrammingBugFromLastError(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        SentryErrorHandling: Codeunit "NPR Sentry Error Handling";
+    begin
+        // Gate before opening the scope: the core transaction always samples, so a non-bug error would emit an empty transaction.
+        if not SentryErrorHandling.IsLastErrorAProgrammingBug() then
+            exit;
+
+        ReportPaymentRequestTerminalErrorFromLastError(SubscrPaymentRequest, '');
+    end;
+
+    local procedure AddPaymentRequestTags(var Sentry: Codeunit "NPR Sentry"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    begin
+        Sentry.AddTransactionTag('subscription_payment.entry_no', Format(SubscrPaymentRequest."Entry No.", 0, 9));
+        Sentry.AddTransactionTag('subscription_payment.psp_reference', SubscrPaymentRequest."PSP Reference");
+        Sentry.AddTransactionTag('subscription_payment.psp', Format(SubscrPaymentRequest.PSP));
+        Sentry.AddTransactionTag('subscription_payment.request_type', Format(SubscrPaymentRequest.Type));
+    end;
 }

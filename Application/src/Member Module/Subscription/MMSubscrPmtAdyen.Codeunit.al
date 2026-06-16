@@ -152,7 +152,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -176,7 +177,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -200,7 +202,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -224,7 +227,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -248,7 +252,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -273,7 +278,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -304,7 +310,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -345,7 +352,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -368,7 +376,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         '',
                         '',
                         0DT,
-                        0);
+                        0,
+                        Manual);
 
         Success := true;
     end;
@@ -421,7 +430,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -445,7 +455,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -469,7 +480,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -493,7 +505,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -517,7 +530,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -541,7 +555,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                            '',
                            '',
                            0DT,
-                           0);
+                           0,
+                           Manual);
             exit;
         end;
 
@@ -566,7 +581,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -596,7 +612,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -634,7 +651,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                     '',
                     '',
                     0DT,
-                    0);
+                    0,
+                    Manual);
 
         Success := true;
     end;
@@ -682,7 +700,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -706,7 +725,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -736,7 +756,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            0);
+                            0,
+                            Manual);
             exit;
         end;
 
@@ -774,7 +795,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                          PayByLinkID,
                          PayByLinkUrl,
                          PayByLinkExpiresAt,
-                         0);
+                         0,
+                         Manual);
 
         CreatePaymentCollectionNotification(SubscrPaymentRequest);
         Success := true;
@@ -857,7 +879,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                              SubscrPaymentRequest."Pay by Link ID",
                              SubscrPaymentRequest."Pay by Link URL",
                              SubscrPaymentRequest."Pay By Link Expires At",
-                             0);
+                             0,
+                             Manual);
             exit;
         end;
 
@@ -888,7 +911,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                              SubscrPaymentRequest."Pay by Link ID",
                              SubscrPaymentRequest."Pay by Link URL",
                              SubscrPaymentRequest."Pay By Link Expires At",
-                             0);
+                             0,
+                             Manual);
             exit;
         end;
 
@@ -913,7 +937,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                 SubscrPaymentRequest."Pay by Link ID",
                                 SubscrPaymentRequest."Pay by Link URL",
                                 SubscrPaymentRequest."Pay By Link Expires At",
-                                0);
+                                0,
+                                Manual);
                 exit;
             end;
 
@@ -940,7 +965,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                 SubscrPaymentRequest."Pay by Link ID",
                                 SubscrPaymentRequest."Pay by Link URL",
                                 SubscrPaymentRequest."Pay By Link Expires At",
-                                0);
+                                0,
+                                Manual);
                 PayByLinkSubscrPaymentRequest.Validate(Status, PayByLinkSubscrPaymentRequest.Status::Cancelled);
                 PayByLinkSubscrPaymentRequest.Modify(true);
                 exit;
@@ -966,7 +992,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Pay by Link ID",
                         SubscrPaymentRequest."Pay by Link URL",
                         SubscrPaymentRequest."Pay By Link Expires At",
-                        0);
+                        0,
+                        Manual);
 
         Success := true;
     end;
@@ -1055,7 +1082,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Pay by Link ID",
                         SubscrPaymentRequest."Pay by Link URL",
                         SubscrPaymentRequest."Pay By Link Expires At",
-                        0);
+                        0,
+                        Manual);
 
     end;
 
@@ -1102,7 +1130,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Pay by Link ID",
                         SubscrPaymentRequest."Pay by Link URL",
                         SubscrPaymentRequest."Pay By Link Expires At",
-                        0);
+                        0,
+                        Manual);
     end;
 
     [TryFunction]
@@ -1147,7 +1176,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Pay by Link ID",
                         SubscrPaymentRequest."Pay by Link URL",
                         SubscrPaymentRequest."Pay By Link Expires At",
-                        0);
+                        0,
+                        Manual);
     end;
 
     procedure ProcessRefundWebhook(var JsonObjectToken: JsonToken; var MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; Success: Text; WebhookEntryNo: Integer) Processed: Boolean;
@@ -1190,7 +1220,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             0DT,
-                            WebhookEntryNo);
+                            WebhookEntryNo,
+                            false);
             exit;
         end;
 
@@ -1227,7 +1258,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                 '',
                 '',
                 0DT,
-                WebhookEntryNo);
+                WebhookEntryNo,
+                false);
 
         Processed := true;
     end;
@@ -1278,7 +1310,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             MMSubscrPaymentRequest."Pay by Link ID",
                             MMSubscrPaymentRequest."Pay by Link URL",
                             MMSubscrPaymentRequest."Pay By Link Expires At",
-                            AdyenWebhook."Entry No.");
+                            AdyenWebhook."Entry No.",
+                            false);
             exit;
         end;
 
@@ -1325,7 +1358,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         MMSubscrPaymentRequest."Pay by Link ID",
                         MMSubscrPaymentRequest."Pay by Link URL",
                         MMSubscrPaymentRequest."Pay By Link Expires At",
-                        AdyenWebhook."Entry No.");
+                        AdyenWebhook."Entry No.",
+                        false);
 
         Processed := true;
     end;
@@ -1637,11 +1671,13 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                                            PaymentPSPReference: Text[16];
                                                            PayByLinkId: Code[50];
                                                            PayByLinkURL: Text[2048];
-                                                           PayByLinkExpiresAt: DateTime)
+                                                           PayByLinkExpiresAt: DateTime) EnteredErrorStatus: Boolean
     var
         UpdatedStatus: Enum "NPR MM Payment Request Status";
+        PriorStatus: Enum "NPR MM Payment Request Status";
         IsModified: Boolean;
     begin
+        PriorStatus := SubscrPaymentRequest.Status;
         if not SkipTryCountUpdate then begin
             SubscrPaymentRequest."Process Try Count" += 1;
             IsModified := true;
@@ -1651,6 +1687,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         if UpdatedStatus in [UpdatedStatus::Error, UpdatedStatus::Rejected] then
             if SubscrPaymentRequest."Process Try Count" < MaxProcessTryCount then
                 UpdatedStatus := SubscrPaymentRequest.Status;
+
+        EnteredErrorStatus := (PriorStatus <> PriorStatus::Error) and (UpdatedStatus = UpdatedStatus::Error);
 
         if SubscrPaymentRequest.Status <> UpdatedStatus then begin
             SubscrPaymentRequest.Validate(Status, UpdatedStatus);
@@ -1859,7 +1897,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             SubscrPaymentRequest."Pay by Link ID",
                             SubscrPaymentRequest."Pay by Link URL",
                             SubscrPaymentRequest."Pay By Link Expires At",
-                            0);
+                            0,
+                            Manual);
 
             Success := true;
             exit;
@@ -1887,7 +1926,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                              SubscrPaymentRequest."Pay by Link ID",
                              SubscrPaymentRequest."Pay by Link URL",
                              SubscrPaymentRequest."Pay By Link Expires At",
-                             0);
+                             0,
+                             Manual);
             exit;
         end;
 
@@ -1911,7 +1951,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                              SubscrPaymentRequest."Pay by Link ID",
                              SubscrPaymentRequest."Pay by Link URL",
                              SubscrPaymentRequest."Pay By Link Expires At",
-                             0);
+                             0,
+                             Manual);
             exit;
         end;
 
@@ -1938,7 +1979,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                              SubscrPaymentRequest."Pay by Link ID",
                              SubscrPaymentRequest."Pay by Link URL",
                              SubscrPaymentRequest."Pay By Link Expires At",
-                             0);
+                             0,
+                             Manual);
             exit;
         end;
 
@@ -1961,7 +2003,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                              SubscrPaymentRequest."Pay by Link ID",
                              SubscrPaymentRequest."Pay by Link URL",
                              SubscrPaymentRequest."Pay By Link Expires At",
-                             0);
+                             0,
+                             Manual);
             exit;
         end;
 
@@ -1986,7 +2029,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Pay by Link ID",
                         SubscrPaymentRequest."Pay by Link URL",
                         SubscrPaymentRequest."Pay By Link Expires At",
-                        0);
+                        0,
+                        Manual);
 
         Success := true;
     end;
@@ -2244,12 +2288,14 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                     PayByLinkId: Code[50];
                                     PayByLinkURL: Text[2048];
                                     PayByLinkExpiresAt: DateTime;
-                                    WebhookEntryNo: Integer)
+                                    WebhookEntryNo: Integer;
+                                    Manual: Boolean)
     var
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
-
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        EnteredError: Boolean;
     begin
-        UpdateSubscriptionPaymentRequestStatus(SubscrPaymentRequest,
+        EnteredError := UpdateSubscriptionPaymentRequestStatus(SubscrPaymentRequest,
                                                Status,
                                                PSPReference,
                                                MaxProcessTryCount,
@@ -2288,8 +2334,15 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                 end;
 
         end;
-    end;
 
+        // Manual Process is logged only when the error is a programming bug (the admin already sees it); automated paths log every terminal error.
+        if EnteredError then begin
+            if Manual then
+                SubscriptionMgtImpl.ReportPaymentRequestTerminalProgrammingBugFromLastError(SubscrPaymentRequest)
+            else
+                SubscriptionMgtImpl.ReportPaymentRequestTerminalErrorFromLastError(SubscrPaymentRequest, ErrorMessage);
+        end;
+    end;
 
     local procedure CreatePayByLinkSubscriptionRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var PayByLinkSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var PayByLinkSubscriptionRequest: Record "NPR MM Subscr. Request") Success: Boolean
     var

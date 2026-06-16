@@ -30,13 +30,20 @@ codeunit 6185111 "NPR MM Subscr. Pay Req Proc JQ"
         SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
         RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        Sentry: Codeunit "NPR Sentry";
         ErrorText: Text;
+        SentryCauseText: Text;
+        SentryCauseCallStack: Text;
         MaxProcessTryCount: Integer;
         UpdatedStatus: Enum "NPR MM Payment Request Status";
     begin
         ErrorText := GetLastErrorText();
         if ErrorText = '' then
             exit;
+
+        // Snapshot the crash cause (in English) now: the TryGetRecurringPaymentSetup call below is a TryFunction, and if it fails it replaces the last error with its own.
+        Sentry.GetLastErrorInEnglish(SentryCauseText, SentryCauseCallStack);
 
         if not SubscrPmtRequest.Get(SubscrPaymentRequest."Entry No.") then
             exit;
@@ -69,6 +76,9 @@ codeunit 6185111 "NPR MM Subscr. Pay Req Proc JQ"
                                        0);
 
         Commit();
+
+        if UpdatedStatus = SubscrPmtRequest.Status::Error then
+            SubscriptionMgtImpl.ReportPaymentRequestTerminalError(SubscrPmtRequest, SentryCauseText, SentryCauseCallStack);
     end;
 
     [TryFunction]

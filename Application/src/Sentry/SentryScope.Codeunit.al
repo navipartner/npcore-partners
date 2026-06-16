@@ -497,17 +497,23 @@ codeunit 6150994 "NPR Sentry Scope"
 
     internal procedure AddLastErrorInEnglish()
     var
-        PreviousLanguageId: Integer;
         ErrorCallstack: Text;
         ErrorText: Text;
     begin
+        GetLastErrorInEnglish(ErrorText, ErrorCallstack);
+        AddError(ErrorText, ErrorCallstack)
+    end;
+
+    internal procedure GetLastErrorInEnglish(var ErrorText: Text; var ErrorCallStack: Text)
+    var
+        PreviousLanguageId: Integer;
+    begin
+        // Call while the wanted error is still the last error: a failing TryFunction replaces it with its own
         PreviousLanguageId := GlobalLanguage();
         GlobalLanguage(1033); //english
         ErrorText := GetLastErrorText();
-        ErrorCallstack := GetLastErrorCallStack();
+        ErrorCallStack := GetLastErrorCallStack();
         GlobalLanguage(PreviousLanguageId);
-
-        AddError(ErrorText, ErrorCallstack)
     end;
 
     local procedure FormatDbQuery(RecRef: RecordRef; Operation: Text): Text
