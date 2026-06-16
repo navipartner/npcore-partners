@@ -361,7 +361,8 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
 #if not (BC18 or BC19 or BC20 or BC21)
         xRec.ReadIsolation := IsolationLevel::ReadCommitted;
 #endif
-        if not xRec.Find() then
+        xRec.SetLoadFields();
+        if not xRec.Get(Rec."No.") then
             Clear(xRec);
     end;
 
