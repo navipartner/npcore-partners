@@ -1,6 +1,10 @@
 let main = async ({workflow, context, popup, parameters, captions}) => {
     let ReturnReasonCode;    
     let saleLines = runtime.getData("BUILTIN_SALELINE");
+    if (!saleLines._current) {
+        popup.error(captions.NoActiveSaleLine);
+        return;
+    }
     let currentQty = parseFloat(saleLines._current[12]);
     if (
         parameters.Constraint ==

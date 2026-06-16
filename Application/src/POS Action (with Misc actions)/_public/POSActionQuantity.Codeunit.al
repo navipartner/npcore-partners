@@ -32,6 +32,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         PriceCaptionLbl: Label 'Enter Unit Price';
         QtyCaptionLbl: Label 'Enter Quantity';
         MustBeNegativeErr: Label 'Quantity must be negative.';
+        NoActiveSaleLineErr: Label 'No active sale line selected.';
         TakePhotoLbl: Label 'Take photo';
         TakePhotoDesc: Label 'Specifies if the user has to insert photo.';
     begin
@@ -66,6 +67,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('MustBePositive', MustBePositiveErr);
         WorkflowConfig.AddLabel('MustBeNegative', MustBeNegativeErr);
         WorkflowConfig.AddLabel('CannotExceedMaxQty', CannotExceedMaxQtyErr);
+        WorkflowConfig.AddLabel('NoActiveSaleLine', NoActiveSaleLineErr);
         WorkflowConfig.AddBooleanParameter(TakePhotoParLbl, false, TakePhotoLbl, TakePhotoDesc);
     end;
 
@@ -269,7 +271,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionQuantity.Codeunit.js###
-'let main=async({workflow:a,context:n,popup:i,parameters:t,captions:e})=>{let o,r=runtime.getData("BUILTIN_SALELINE"),u=parseFloat(r._current[12]);if(t.Constraint==t.Constraint["Positive Quantity Only"]&&u<0){i.error(e.MustBePositive);return}if(t.Constraint==t.Constraint["Negative Quantity Only"]&&u>0){i.error(e.MustBeNegative);return}if(n.PromptQuantity=t.InputType==0?await i.numpad({caption:e.QtyCaption,value:u}):t.InputType==1?t.ChangeToQuantity:t.InputType==2?u+t.IncrementQuantity:null,!n.PromptQuantity)return;if(t.MaxQuantityAllowed&&t.MaxQuantityAllowed!=0&&Math.abs(n.PromptQuantity)>t.MaxQuantityAllowed){i.error(e.CannotExceedMaxQty+" "+t.MaxQuantityAllowed);return}if(t.TakePhoto&&await a.respond("TakePhoto"),t.PromptUnitPriceOnNegativeInput&&(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)&&(n.PromptUnitPrice=await i.numpad({caption:e.PriceCaption,value:r._current[15]}),!n.PromptUnitPrice))return;(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)?o=await a.respond("AskForReturnReason"):(n.PromptForReason=!1,o="");let{postWorkflows:y}=await a.respond("ChangeQty",o);await processWorkflows(y)};async function processWorkflows(a){if(a)for(const[n,{mainParameters:i,customParameters:t}]of Object.entries(a))await workflow.run(n,{context:{customParameters:t},parameters:i})}'
+'let main=async({workflow:e,context:n,popup:i,parameters:t,captions:a})=>{let u,o=runtime.getData("BUILTIN_SALELINE");if(!o._current){i.error(a.NoActiveSaleLine);return}let r=parseFloat(o._current[12]);if(t.Constraint==t.Constraint["Positive Quantity Only"]&&r<0){i.error(a.MustBePositive);return}if(t.Constraint==t.Constraint["Negative Quantity Only"]&&r>0){i.error(a.MustBeNegative);return}if(n.PromptQuantity=t.InputType==0?await i.numpad({caption:a.QtyCaption,value:r}):t.InputType==1?t.ChangeToQuantity:t.InputType==2?r+t.IncrementQuantity:null,!n.PromptQuantity)return;if(t.MaxQuantityAllowed&&t.MaxQuantityAllowed!=0&&Math.abs(n.PromptQuantity)>t.MaxQuantityAllowed){i.error(a.CannotExceedMaxQty+" "+t.MaxQuantityAllowed);return}if(t.TakePhoto&&await e.respond("TakePhoto"),t.PromptUnitPriceOnNegativeInput&&(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)&&(n.PromptUnitPrice=await i.numpad({caption:a.PriceCaption,value:o._current[15]}),!n.PromptUnitPrice))return;(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)?u=await e.respond("AskForReturnReason"):(n.PromptForReason=!1,u="");let{postWorkflows:y}=await e.respond("ChangeQty",u);await processWorkflows(y)};async function processWorkflows(e){if(e)for(const[n,{mainParameters:i,customParameters:t}]of Object.entries(e))await workflow.run(n,{context:{customParameters:t},parameters:i})}'
           );
     end;
 
