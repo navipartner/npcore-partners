@@ -112,6 +112,7 @@ codeunit 6184796 "NPR Adyen Management"
         ResponseText: Text;
         ResponseObject: JsonObject;
         JsonToken: JsonToken;
+        InvalidFieldsToken: JsonToken;
         RequestText: Text;
         EventCode: Record "NPR Adyen Webhook Event Code";
         EventCodesArray: JsonArray;
@@ -150,16 +151,14 @@ codeunit 6184796 "NPR Adyen Management"
             Success := true
         else begin
             if ResponseObject.Get('title', JsonToken) then begin
-                if ResponseObject.Get('invalidFields', JsonToken) then begin
-                    JsonToken.AsArray().Get(0, JsonToken);
-                    if JsonToken.AsObject().Get('message', JsonToken) then
-                        Error(JsonToken.AsValue().AsText())
-                    else begin
-                        ResponseObject.Get('title', JsonToken);
+                if ResponseObject.Get('invalidFields', InvalidFieldsToken) and InvalidFieldsToken.IsArray() and (InvalidFieldsToken.AsArray().Count() > 0) then begin
+                    InvalidFieldsToken.AsArray().Get(0, InvalidFieldsToken);
+                    if InvalidFieldsToken.IsObject() and InvalidFieldsToken.AsObject().Get('message', InvalidFieldsToken) then
+                        Error(InvalidFieldsToken.AsValue().AsText())
+                    else
                         Error(JsonToken.AsValue().AsText());
-                    end;
                 end else
-                    Error(JsonToken.AsValue().AsText())
+                    Error(JsonToken.AsValue().AsText());
             end else
                 Error(NoResponseLbl);
         end;
@@ -607,6 +606,19 @@ codeunit 6184796 "NPR Adyen Management"
     [NonDebuggable]
     internal procedure SuggestAFWebServiceURL(var Rec: Record "NPR Adyen Webhook Setup")
     var
+        NewWebServiceURL: Text;
+    begin
+        NewWebServiceURL := BuildAFWebServiceURL(Rec);
+        if NewWebServiceURL = '' then
+            exit;
+
+        Rec."Web Service URL" := CopyStr(NewWebServiceURL, 1, MaxStrLen(Rec."Web Service URL"));
+        Rec.Modify(Rec.ID <> '');
+    end;
+
+    [NonDebuggable]
+    internal procedure BuildAFWebServiceURL(Rec: Record "NPR Adyen Webhook Setup") WebServiceURL: Text
+    var
         EnvironmentInformation: Codeunit "Environment Information";
         AzureADTenant: Codeunit "Azure AD Tenant";
         TypeHelper: Codeunit "Type Helper";
@@ -626,7 +638,7 @@ codeunit 6184796 "NPR Adyen Management"
             ModeTxt := 'onprem';
 
             if not PromptOnPremWebhookInput(UserNameInput, PasswordInput, BaseUrl) then
-                exit;
+                exit('');
 
             TypeHelper.UrlEncode(BaseUrl);
 
@@ -648,10 +660,12 @@ codeunit 6184796 "NPR Adyen Management"
                 URLEncodedCompanyName);
         end;
         if EnvironmentInformation.IsProduction() then
-            Rec."Web Service URL" := WebhookBaseURLProd + QueryString
+            WebServiceURL := WebhookBaseURLProd + QueryString
         else
-            Rec."Web Service URL" := WebhookBaseURLPrelive + QueryString;
-        Rec.Modify(Rec.ID <> '');
+            WebServiceURL := WebhookBaseURLPrelive + QueryString;
+
+        if Rec.ID <> '' then
+            WebServiceURL += '&webhookRef=' + Rec.ID;
     end;
 
 

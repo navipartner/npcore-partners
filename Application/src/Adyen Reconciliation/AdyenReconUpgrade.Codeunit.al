@@ -22,6 +22,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         UpgradeMerchantAccountSetups();
         FixUnreconciledMagentoRefundPaymentLines();
         RecreateForeignCurrencyDocuments();
+        FixDeprecatedWebhookURL();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -364,5 +365,123 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure FixDeprecatedWebhookURL()
+    var
+        WebhookSetup: Record "NPR Adyen Webhook Setup";
+        WebhookSetup2: Record "NPR Adyen Webhook Setup";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        NewWebServiceURL: Text;
+        FailedWebhooks: Text;
+    begin
+        UpgradeStep := 'FixDeprecatedWebhookURL';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
+
+        if EnvironmentInformation.IsOnPrem() then begin
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        WebhookSetup.SetFilter(ID, '<>%1', '');
+        WebhookSetup.SetFilter("Web Service URL", StrSubstNo('@*%1*', 'nppaywebhook.azurewebsites.net'));
+        if WebhookSetup.FindSet() then begin
+            AdyenManagement.RefreshWebhookEventCodes();
+            repeat
+                if IsDeprecatedWebhookForCurrentEnvironment(WebhookSetup."Web Service URL") then begin
+                    WebhookSetup2.Get(WebhookSetup."Primary Key");
+                    NewWebServiceURL := AdyenManagement.BuildAFWebServiceURL(WebhookSetup2);
+                    WebhookSetup2."Web Service URL" := CopyStr(NewWebServiceURL, 1, MaxStrLen(WebhookSetup2."Web Service URL"));
+                    if TryPushWebhookToAdyen(WebhookSetup2) then begin
+                        WebhookSetup2.Modify(false);
+                        Commit();
+                    end else begin
+                        FailedWebhooks += StrSubstNo('%1 (%2); ', WebhookSetup2.ID, GetLastErrorText());
+                        ClearLastError();
+                    end;
+                end;
+            until WebhookSetup.Next() = 0;
+        end;
+
+        if FailedWebhooks <> '' then
+            LogMessageStopwatch.SetError(StrSubstNo('Could not resolve the Web Service URL in NP Pay for the following webhooks: %1', FailedWebhooks))
+        else
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    [TryFunction]
+    local procedure TryPushWebhookToAdyen(var WebhookSetup: Record "NPR Adyen Webhook Setup")
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        PartialCredentialsErr: Label 'Webhook %1 has only one of Web Service User/Password set — Adyen URL cannot be updated automatically.', Comment = '%1 = Adyen webhook ID';
+    begin
+        if (WebhookSetup."Web Service User" <> '') <> (WebhookSetup."Web Service Password" <> '') then
+            Error(PartialCredentialsErr, WebhookSetup.ID);
+        AdyenManagement.ModifyWebhook(WebhookSetup);
+    end;
+
+    local procedure IsDeprecatedWebhookForCurrentEnvironment(WebServiceURL: Text): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        TypeHelper: Codeunit "Type Helper";
+        PathSegments: List of [Text];
+        QueryParams: List of [Text];
+        ParamParts: List of [Text];
+        QueryParam: Text;
+        PathAndQuery: Text;
+        PathPart: Text;
+        QueryPart: Text;
+        UrlTenant: Text;
+        UrlEnvironment: Text;
+        UrlCompanyName: Text;
+        URLEncodedCompanyName: Text;
+        Marker: Label '/api/NPPayCloud/', Locked = true;
+        MarkerPos: Integer;
+        QuestionMarkPos: Integer;
+    begin
+        // Deprecated URL shape: <base>/api/NPPayCloud/{tenant}/{environment}/{webhookRef}?code=...&CompanyName=...
+        // tenant/environment live in the path; CompanyName in the query (url-encoded the same way as SuggestAFWebServiceURL).
+        MarkerPos := WebServiceURL.IndexOf(Marker);
+        if (MarkerPos = 0) or (MarkerPos + StrLen(Marker) > StrLen(WebServiceURL)) then
+            exit(false);
+
+        PathAndQuery := WebServiceURL.Substring(MarkerPos + StrLen(Marker));
+        QuestionMarkPos := PathAndQuery.IndexOf('?');
+        if QuestionMarkPos = 0 then
+            PathPart := PathAndQuery
+        else begin
+            PathPart := PathAndQuery.Substring(1, QuestionMarkPos - 1);
+            if QuestionMarkPos < StrLen(PathAndQuery) then
+                QueryPart := PathAndQuery.Substring(QuestionMarkPos + 1);
+        end;
+
+        PathSegments := PathPart.Split('/');
+        if PathSegments.Count() < 2 then
+            exit(false);
+        UrlTenant := PathSegments.Get(1);
+        UrlEnvironment := PathSegments.Get(2);
+
+        QueryParams := QueryPart.Split('&');
+        foreach QueryParam in QueryParams do begin
+            ParamParts := QueryParam.Split('=');
+            if ParamParts.Count() = 2 then
+                if ParamParts.Get(1) = 'CompanyName' then
+                    UrlCompanyName := ParamParts.Get(2);
+        end;
+
+        URLEncodedCompanyName := CompanyName();
+        TypeHelper.UrlEncode(URLEncodedCompanyName);
+
+        exit(
+            (UrlTenant = AzureADTenant.GetAadTenantId()) and
+            (UrlEnvironment = EnvironmentInformation.GetEnvironmentName()) and
+            (UrlCompanyName = URLEncodedCompanyName));
     end;
 }
