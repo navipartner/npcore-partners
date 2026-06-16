@@ -41,6 +41,7 @@ codeunit 6185033 "NPR MM Subscr. Renew Req. JQ"
         RenewalSchedLine: Record "NPR MM Renewal Sched Line";
         Subscription: Record "NPR MM Subscription";
         RequestSubscrRenewal: Codeunit "NPR MM Subscr. Renew: Request";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         RenewalDate: Date;
     begin
         if RecurPaymentSetup."Subscr. Auto-Renewal On" <> RecurPaymentSetup."Subscr. Auto-Renewal On"::Schedule then
@@ -75,7 +76,7 @@ codeunit 6185033 "NPR MM Subscr. Renew Req. JQ"
                         RequestSubscrRenewal.SetRenewalSchedLine(RenewalSchedLine);
                         if not RequestSubscrRenewal.Run(Subscription) then begin
                             Subscription.Find();
-                            //TODO: log error
+                            SubscriptionMgtImpl.ReportSubscriptionRenewalCreationErrorFromLastError(Subscription, '');
                         end;
                     until Subscription.Next() = 0;
             until RenewalSchedLine.Next() = 0;
@@ -85,6 +86,7 @@ codeunit 6185033 "NPR MM Subscr. Renew Req. JQ"
     var
         Subscription: Record "NPR MM Subscription";
         RequestSubscrRenewal: Codeunit "NPR MM Subscr. Renew: Request";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
         if not (RecurPaymentSetup."Subscr. Auto-Renewal On" in [RecurPaymentSetup."Subscr. Auto-Renewal On"::"Expiry Date", RecurPaymentSetup."Subscr. Auto-Renewal On"::"Next Start Date"]) then
             exit;
@@ -103,7 +105,7 @@ codeunit 6185033 "NPR MM Subscr. Renew Req. JQ"
             repeat
                 if not RequestSubscrRenewal.Run(Subscription) then begin
                     Subscription.Find();
-                    //TODO: log error
+                    SubscriptionMgtImpl.ReportSubscriptionRenewalCreationErrorFromLastError(Subscription, '');
                 end;
             until Subscription.Next() = 0;
     end;

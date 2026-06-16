@@ -31,7 +31,7 @@ codeunit 6185036 "NPR MM Subscr. Renew: Process"
         if not Success then begin
             //Refresh record
             SubscriptionRequest.Get(SubscriptionRequest.RecordId);
-            ProcessErrorResponse(SubscriptionRequest, SubsReqLogEntry, NpPaySetup."Max Sub Req Process Try Count");
+            ProcessErrorResponse(SubscriptionRequest, SubsReqLogEntry, NpPaySetup."Max Sub Req Process Try Count", Manual);
         end;
         Commit();
     end;
@@ -47,16 +47,26 @@ codeunit 6185036 "NPR MM Subscr. Renew: Process"
         end;
     end;
 
-    local procedure ProcessErrorResponse(var SubscrRequest: Record "NPR MM Subscr. Request"; var SubsReqLogEntry: Record "NPR MM Subs Req Log Entry"; MaxProcessTryCount: Integer)
+    local procedure ProcessErrorResponse(var SubscrRequest: Record "NPR MM Subscr. Request"; var SubsReqLogEntry: Record "NPR MM Subs Req Log Entry"; MaxProcessTryCount: Integer; Manual: Boolean)
     var
         SubsReqLogUtils: Codeunit "NPR MM Subs Req Log Utils";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        EnteredError: Boolean;
     begin
-        UpdateSubscriptionRequestErrorProcessingStatus(SubscrRequest, MaxProcessTryCount);
+        EnteredError := UpdateSubscriptionRequestErrorProcessingStatus(SubscrRequest, MaxProcessTryCount);
 
         SubsReqLogUtils.UpdateEntry(SubsReqLogEntry, SubsReqLogEntry."Processing Status"::Error, GetLastErrorText());
+
+        // Manual Process is logged only when the error is a programming bug (the admin already sees it); automated paths log every terminal error.
+        if EnteredError then begin
+            if Manual then
+                SubscriptionMgtImpl.ReportSubscriptionRequestTerminalProgrammingBugFromLastError(SubscrRequest)
+            else
+                SubscriptionMgtImpl.ReportSubscriptionRequestTerminalErrorFromLastError(SubscrRequest, '');
+        end;
     end;
 
-    local procedure UpdateSubscriptionRequestErrorProcessingStatus(var SubscrRequest: Record "NPR MM Subscr. Request"; MaxProcessTryCount: Integer)
+    local procedure UpdateSubscriptionRequestErrorProcessingStatus(var SubscrRequest: Record "NPR MM Subscr. Request"; MaxProcessTryCount: Integer) EnteredError: Boolean
     begin
         if SubscrRequest."Processing Status" = SubscrRequest."Processing Status"::Success then
             exit;
@@ -69,5 +79,6 @@ codeunit 6185036 "NPR MM Subscr. Renew: Process"
 
         SubscrRequest.Validate("Processing Status", SubscrRequest."Processing Status"::Error);
         SubscrRequest.Modify(true);
+        EnteredError := true;
     end;
 }

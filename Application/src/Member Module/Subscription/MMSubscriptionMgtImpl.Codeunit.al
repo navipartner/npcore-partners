@@ -127,12 +127,20 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     var
         ConfirmManagement: Codeunit "Confirm Management";
         SubscrRenewRequest: Codeunit "NPR MM Subscr. Renew: Request";
+        CreationErrorText: Text;
         NewSubscriptionRequestConfirmLbl: Label 'Are you sure you want to create a new subscription request for subscription no. %1?', Comment = '%1 - Subscription entry no.';
     begin
         if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(NewSubscriptionRequestConfirmLbl, Subscription."Entry No."), true) then
             exit;
 
-        SubscrRenewRequest.Run(Subscription);
+        ClearLastError();
+        if not SubscrRenewRequest.Run(Subscription) then begin
+            // Manual Create surfaces the error to the admin directly, so log to Sentry only when it's a programming bug.
+            // Capture the cause before reporting: Sentry's FinalizeScope is a TryFunction and could replace the last error.
+            CreationErrorText := GetLastErrorText();
+            ReportSubscriptionRenewalCreationProgrammingBugFromLastError(Subscription);
+            Error(CreationErrorText);
+        end;
     end;
 
     internal procedure GetSubscriptionsJobQueueCategoryCode() JobQueueCategoryCode: Code[10]
@@ -733,23 +741,15 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     /// </summary>
     internal procedure ReportPaymentRequestTerminalError(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; CauseText: Text; CauseCallStack: Text)
     var
-        Sentry: Codeunit "NPR Sentry";
-        TransactionName: Text;
-        EffectiveMessage: Text;
-        TerminalErrorMsgLbl: Label 'Subscription payment request reached terminal Error status', Locked = true;
+        Tags: Dictionary of [Text, Text];
         TransactionNameLbl: Label 'Subscription payment request %1 failed', Locked = true, Comment = '%1 = entry no.';
-        OperationTok: Label 'bc.membership.subscription.error', Locked = true;
+        PaymentTerminalErrorMsgLbl: Label 'Subscription payment request reached terminal Error status', Locked = true;
     begin
-        EffectiveMessage := CauseText;
-        if EffectiveMessage = '' then
-            EffectiveMessage := TerminalErrorMsgLbl;
-
-        TransactionName := CopyStr(StrSubstNo(TransactionNameLbl, SubscrPaymentRequest."Entry No."), 1, 250);
-
-        Sentry.InitScopeAndTransaction(TransactionName, OperationTok);
-        AddPaymentRequestTags(Sentry, SubscrPaymentRequest);
-        Sentry.AddError(EffectiveMessage, CauseCallStack);
-        Sentry.FinalizeScope();
+        // Preserve the CORE-775 payment-specific fallback text (the generic core default would otherwise change observable behavior).
+        if CauseText = '' then
+            CauseText := PaymentTerminalErrorMsgLbl;
+        BuildPaymentRequestTags(SubscrPaymentRequest, Tags);
+        ReportSubscriptionTerminalError(StrSubstNo(TransactionNameLbl, SubscrPaymentRequest."Entry No."), Tags, CauseText, CauseCallStack);
     end;
 
     /// <summary>
@@ -759,14 +759,14 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     /// </summary>
     internal procedure ReportPaymentRequestTerminalErrorFromLastError(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; FallbackMessage: Text)
     var
-        Sentry: Codeunit "NPR Sentry";
-        ErrorText: Text;
-        ErrorCallStack: Text;
+        Tags: Dictionary of [Text, Text];
+        TransactionNameLbl: Label 'Subscription payment request %1 failed', Locked = true, Comment = '%1 = entry no.';
+        PaymentTerminalErrorMsgLbl: Label 'Subscription payment request reached terminal Error status', Locked = true;
     begin
-        Sentry.GetLastErrorInEnglish(ErrorText, ErrorCallStack);
-        if ErrorText = '' then
-            ErrorText := FallbackMessage;
-        ReportPaymentRequestTerminalError(SubscrPaymentRequest, ErrorText, ErrorCallStack);
+        if FallbackMessage = '' then
+            FallbackMessage := PaymentTerminalErrorMsgLbl;
+        BuildPaymentRequestTags(SubscrPaymentRequest, Tags);
+        ReportSubscriptionTerminalErrorFromLastError(StrSubstNo(TransactionNameLbl, SubscrPaymentRequest."Entry No."), Tags, FallbackMessage);
     end;
 
     /// <summary>
@@ -775,20 +775,132 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     /// </summary>
     internal procedure ReportPaymentRequestTerminalProgrammingBugFromLastError(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
     var
+        Tags: Dictionary of [Text, Text];
+        TransactionNameLbl: Label 'Subscription payment request %1 failed', Locked = true, Comment = '%1 = entry no.';
+    begin
+        BuildPaymentRequestTags(SubscrPaymentRequest, Tags);
+        ReportSubscriptionTerminalProgrammingBugFromLastError(StrSubstNo(TransactionNameLbl, SubscrPaymentRequest."Entry No."), Tags);
+    end;
+
+    local procedure BuildPaymentRequestTags(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var Tags: Dictionary of [Text, Text])
+    begin
+        Tags.Add('subscription_payment.entry_no', Format(SubscrPaymentRequest."Entry No.", 0, 9));
+        Tags.Add('subscription_payment.psp_reference', SubscrPaymentRequest."PSP Reference");
+        Tags.Add('subscription_payment.psp', Format(SubscrPaymentRequest.PSP));
+        Tags.Add('subscription_payment.request_type', Format(SubscrPaymentRequest.Type));
+    end;
+
+    /// <summary>
+    /// Reports a terminal subscription-request processing failure to Sentry from the live last error.
+    /// Use in the automated processing path (Renew Proc JQ), which logs every request that reaches terminal Error.
+    /// </summary>
+    internal procedure ReportSubscriptionRequestTerminalErrorFromLastError(SubscrRequest: Record "NPR MM Subscr. Request"; FallbackMessage: Text)
+    var
+        Tags: Dictionary of [Text, Text];
+        TransactionNameLbl: Label 'Subscription request %1 failed', Locked = true, Comment = '%1 = entry no.';
+        DefaultMessageLbl: Label 'Subscription request reached terminal Error status', Locked = true;
+    begin
+        if FallbackMessage = '' then
+            FallbackMessage := DefaultMessageLbl;
+        BuildSubscriptionRequestTags(SubscrRequest, Tags);
+        ReportSubscriptionTerminalErrorFromLastError(StrSubstNo(TransactionNameLbl, SubscrRequest."Entry No."), Tags, FallbackMessage);
+    end;
+
+    /// <summary>
+    /// Reports a terminal subscription-request processing failure to Sentry only when the last error is a genuine
+    /// programming bug. Used by the manual Process button, where the admin already sees the thrown error.
+    /// </summary>
+    internal procedure ReportSubscriptionRequestTerminalProgrammingBugFromLastError(SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        Tags: Dictionary of [Text, Text];
+        TransactionNameLbl: Label 'Subscription request %1 failed', Locked = true, Comment = '%1 = entry no.';
+    begin
+        BuildSubscriptionRequestTags(SubscrRequest, Tags);
+        ReportSubscriptionTerminalProgrammingBugFromLastError(StrSubstNo(TransactionNameLbl, SubscrRequest."Entry No."), Tags);
+    end;
+
+    local procedure BuildSubscriptionRequestTags(SubscrRequest: Record "NPR MM Subscr. Request"; var Tags: Dictionary of [Text, Text])
+    begin
+        Tags.Add('subscription_request.entry_no', Format(SubscrRequest."Entry No.", 0, 9));
+        Tags.Add('subscription_request.subscription_entry_no', Format(SubscrRequest."Subscription Entry No.", 0, 9));
+        Tags.Add('subscription_request.type', Format(SubscrRequest.Type));
+        Tags.Add('subscription_request.membership_code', SubscrRequest."Membership Code");
+    end;
+
+    /// <summary>
+    /// Reports a renewal-request creation failure to Sentry from the live last error.
+    /// Use in the automated creation path (Renew Req JQ), which logs every failed creation attempt.
+    /// </summary>
+    internal procedure ReportSubscriptionRenewalCreationErrorFromLastError(Subscription: Record "NPR MM Subscription"; FallbackMessage: Text)
+    var
+        Tags: Dictionary of [Text, Text];
+        TransactionNameLbl: Label 'Subscription renewal creation for subscription %1 failed', Locked = true, Comment = '%1 = subscription entry no.';
+        DefaultMessageLbl: Label 'Subscription renewal request creation failed', Locked = true;
+    begin
+        if FallbackMessage = '' then
+            FallbackMessage := DefaultMessageLbl;
+        BuildSubscriptionTags(Subscription, Tags);
+        ReportSubscriptionTerminalErrorFromLastError(StrSubstNo(TransactionNameLbl, Subscription."Entry No."), Tags, FallbackMessage);
+    end;
+
+    /// <summary>
+    /// Reports a renewal-request creation failure to Sentry only when the last error is a genuine programming bug.
+    /// Used by the manual Create button, where the admin already sees the thrown error.
+    /// </summary>
+    internal procedure ReportSubscriptionRenewalCreationProgrammingBugFromLastError(Subscription: Record "NPR MM Subscription")
+    var
+        Tags: Dictionary of [Text, Text];
+        TransactionNameLbl: Label 'Subscription renewal creation for subscription %1 failed', Locked = true, Comment = '%1 = subscription entry no.';
+    begin
+        BuildSubscriptionTags(Subscription, Tags);
+        ReportSubscriptionTerminalProgrammingBugFromLastError(StrSubstNo(TransactionNameLbl, Subscription."Entry No."), Tags);
+    end;
+
+    local procedure BuildSubscriptionTags(Subscription: Record "NPR MM Subscription"; var Tags: Dictionary of [Text, Text])
+    begin
+        Tags.Add('subscription.entry_no', Format(Subscription."Entry No.", 0, 9));
+        Tags.Add('subscription.membership_entry_no', Format(Subscription."Membership Entry No.", 0, 9));
+        Tags.Add('subscription.membership_code', Subscription."Membership Code");
+    end;
+
+    local procedure ReportSubscriptionTerminalError(TransactionName: Text; var Tags: Dictionary of [Text, Text]; CauseText: Text; CauseCallStack: Text)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        EffectiveMessage: Text;
+        TagKey: Text;
+        TerminalErrorMsgLbl: Label 'Subscription operation failed', Locked = true;
+        OperationTok: Label 'bc.membership.subscription.error', Locked = true;
+    begin
+        EffectiveMessage := CauseText;
+        if EffectiveMessage = '' then
+            EffectiveMessage := TerminalErrorMsgLbl;
+
+        Sentry.InitScopeAndTransaction(CopyStr(TransactionName, 1, 250), OperationTok);
+        foreach TagKey in Tags.Keys() do
+            Sentry.AddTransactionTag(TagKey, Tags.Get(TagKey));
+        Sentry.AddError(EffectiveMessage, CauseCallStack);
+        Sentry.FinalizeScope();
+    end;
+
+    local procedure ReportSubscriptionTerminalErrorFromLastError(TransactionName: Text; var Tags: Dictionary of [Text, Text]; FallbackMessage: Text)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        ErrorText: Text;
+        ErrorCallStack: Text;
+    begin
+        Sentry.GetLastErrorInEnglish(ErrorText, ErrorCallStack);
+        if ErrorText = '' then
+            ErrorText := FallbackMessage;
+        ReportSubscriptionTerminalError(TransactionName, Tags, ErrorText, ErrorCallStack);
+    end;
+
+    local procedure ReportSubscriptionTerminalProgrammingBugFromLastError(TransactionName: Text; var Tags: Dictionary of [Text, Text])
+    var
         SentryErrorHandling: Codeunit "NPR Sentry Error Handling";
     begin
         // Gate before opening the scope: the core transaction always samples, so a non-bug error would emit an empty transaction.
         if not SentryErrorHandling.IsLastErrorAProgrammingBug() then
             exit;
-
-        ReportPaymentRequestTerminalErrorFromLastError(SubscrPaymentRequest, '');
-    end;
-
-    local procedure AddPaymentRequestTags(var Sentry: Codeunit "NPR Sentry"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
-    begin
-        Sentry.AddTransactionTag('subscription_payment.entry_no', Format(SubscrPaymentRequest."Entry No.", 0, 9));
-        Sentry.AddTransactionTag('subscription_payment.psp_reference', SubscrPaymentRequest."PSP Reference");
-        Sentry.AddTransactionTag('subscription_payment.psp', Format(SubscrPaymentRequest.PSP));
-        Sentry.AddTransactionTag('subscription_payment.request_type', Format(SubscrPaymentRequest.Type));
+        ReportSubscriptionTerminalErrorFromLastError(TransactionName, Tags, '');
     end;
 }
