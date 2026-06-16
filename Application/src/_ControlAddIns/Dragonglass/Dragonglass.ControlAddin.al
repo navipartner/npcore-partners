@@ -2,7 +2,7 @@ controladdin "NPR Dragonglass"
 {
     Scripts =
         'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js',
-        'https://posassets.npretail.app/release/2.61.0/bundle.js';
+        'https://posassets.npretail.app/release/2.62.0/bundle.js';
 
     RequestedHeight = 1;
     RequestedWidth = 1;
