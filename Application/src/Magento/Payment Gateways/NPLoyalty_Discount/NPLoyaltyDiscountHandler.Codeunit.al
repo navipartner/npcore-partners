@@ -243,8 +243,11 @@ codeunit 6248662 "NPR NPLoyalty Discount Handler" implements "NPR IPaymentGatewa
         ReserveLoyaltyStoreLedger.SetRange("Entry Type", ReserveLoyaltyStoreLedger."Entry Type"::RESERVE);
         if not ReserveLoyaltyStoreLedger.FindFirst() then
             UpsertLoyaltyStoreLedger(LoyaltyStoreLedger, MembershipPointsEntry, EcomSaleId)
-        else
+        else begin
             UpsertLoyaltyStoreLedgerWithReserve(LoyaltyStoreLedger, ReserveLoyaltyStoreLedger, MembershipPointsEntry, EcomSaleId);
+            if MembershipPointsEntry."POS Store Code" = '' then
+                MembershipPointsEntry."POS Store Code" := ReserveLoyaltyStoreLedger."POS Store Code";
+        end;
         MembershipPointsEntry."Awarded Points" := MembershipPointsEntry.Points;
         MembershipPointsEntry.Modify();
         Membership.CalcFields("Remaining Points");
