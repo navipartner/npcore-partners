@@ -232,6 +232,39 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         exit(SelectionFilterManagement.GetSelectionFilterForLocation(Location));
     end;
 
+    internal procedure GetShopifyLocationIDFilter(LocationCodeFilter: Text; ShopifyStoreFilter: Text) ShopifyLocationIDFilter: Text
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyLocationIDs: List of [Text[30]];
+        ShopifyLocationID: Text[30];
+    begin
+        if LocationCodeFilter = '' then
+            exit('');
+
+        if ShopifyStoreFilter <> '' then
+            ShopifyStore.SetFilter(Code, ShopifyStoreFilter);
+        ShopifyStore.SetRange(Enabled, true);
+        if not ShopifyStore.FindSet() then
+            exit('');
+
+        SpfyStoreLocationLink.SetFilter("Location Code", LocationCodeFilter);
+        repeat
+            SpfyStoreLocationLink.SetRange("Shopify Store Code", ShopifyStore.Code);
+            if SpfyStoreLocationLink.FindSet() then
+                repeat
+                    ShopifyLocationID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreLocationLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                    if (ShopifyLocationID <> '') and not ShopifyLocationIDs.Contains(ShopifyLocationID) then begin
+                        ShopifyLocationIDs.Add(ShopifyLocationID);
+                        if ShopifyLocationIDFilter <> '' then
+                            ShopifyLocationIDFilter += '|';
+                        ShopifyLocationIDFilter += ShopifyLocationID;
+                    end;
+                until SpfyStoreLocationLink.Next() = 0;
+        until ShopifyStore.Next() = 0;
+    end;
+
     local procedure SafetyStockQuantity(var Item: Record Item): Decimal
     var
         SKU: Record "Stockkeeping Unit";
