@@ -622,7 +622,7 @@ codeunit 6184796 "NPR Adyen Management"
         URLEncodedCompanyName := CompanyName();
         TypeHelper.UrlEncode(URLEncodedCompanyName);
 
-        if EnvironmentInformation.IsOnPrem() then begin
+        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
             ModeTxt := 'onprem';
 
             if not PromptOnPremWebhookInput(UserNameInput, PasswordInput, BaseUrl) then
