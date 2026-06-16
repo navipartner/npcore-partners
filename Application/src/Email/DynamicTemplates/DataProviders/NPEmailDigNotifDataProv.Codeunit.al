@@ -177,7 +177,7 @@ codeunit 6248185 "NPR NPEmailDigNotifDataProv" implements "NPR IDynamicTemplateD
         DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         WalletExtLineIds: Dictionary of [Text[100], Boolean];
         JObjectLine: JsonObject;
-        AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
+        AssetType: Enum "NPR Dig. Notif. Asset Type";
         LineAmountExclVAT, LineAmountInclVAT : Decimal;
     begin
         DigitalOrderNotifMgt.CollectEcomLinesAndWalletSet(EcomSalesHeader."Entry No.", TempCandidateLine, WalletExtLineIds);
@@ -281,7 +281,7 @@ codeunit 6248185 "NPR NPEmailDigNotifDataProv" implements "NPR IDynamicTemplateD
     var
         DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         JObjectLine: JsonObject;
-        AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
+        AssetType: Enum "NPR Dig. Notif. Asset Type";
     begin
         if not TempLineBuffer.FindSet() then
             exit;
@@ -352,23 +352,10 @@ codeunit 6248185 "NPR NPEmailDigNotifDataProv" implements "NPR IDynamicTemplateD
         until EcomSalesPmtLine.Next() = 0;
     end;
 
-    local procedure GetAssetTypeName(AssetTypeOrdinal: Integer): Text[20]
+    local procedure GetAssetTypeName(AssetType: Enum "NPR Dig. Notif. Asset Type"): Text
     begin
-        case AssetTypeOrdinal of
-            0:
-                exit('None');
-            1:
-                exit('Voucher');
-            2:
-                exit('Member Card');
-            3:
-                exit('Coupon');
-            4:
-                exit('Ticket');
-            5:
-                exit('Wallet');
-        end;
-        exit('None');
+        // Return the (untranslated) enum value name, not the caption, so the JSON asset_type stays stable across languages.
+        exit(AssetType.Names().Get(AssetType.Ordinals().IndexOf(AssetType.AsInteger())));
     end;
 
     local procedure GetManifestUrl(ManifestId: Guid) Url: Text[250]

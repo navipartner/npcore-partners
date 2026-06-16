@@ -310,8 +310,8 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary): Boolean
     var
         NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
+        Context: Codeunit "NPR DigNotif Manifest Context";
         ManifestId, NullGuid : Guid;
-        AssetsAdded: Integer;
     begin
         if TempHeaderBuffer."Recipient E-mail" = '' then
             exit(false);
@@ -328,15 +328,15 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         if TempHeaderBuffer."Language Code" <> '' then
             NPDesignerManifestFacade.SetPreferredRenderingLanguage(ManifestId, TempHeaderBuffer."Language Code");
 
-        AssetsAdded := 0;
-        ProcessSalesDocumentLines(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
+        Context.Initialize(ManifestId, _DigitalNotifSetup);
+        ProcessSalesDocumentLines(TempHeaderBuffer, TempLineBuffer, Context);
 
-        case AssetsAdded of
+        case Context.AssetsAdded() of
             0:
                 begin
                     NPDesignerManifestFacade.DeleteManifest(ManifestId);
                     ManifestId := NullGuid;
-                    exit(false);  // Skip email notification if no digital assets (only send when assets exist)
+                    exit(false);
                 end;
             1 .. 10:
                 NPDesignerManifestFacade.SetShowTableOfContents(ManifestId, false);
@@ -351,43 +351,25 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
     local procedure ProcessSalesDocumentLines(
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        ManifestId: Guid;
-        var AssetsAdded: Integer)
-    var
-        ProcessedTicketReqEntryNos: List of [Integer];
+        var Context: Codeunit "NPR DigNotif Manifest Context")
     begin
         if TempLineBuffer.FindSet() then
             repeat
-                ProcessLineAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded, ProcessedTicketReqEntryNos);
+                ProcessLineAssets(TempHeaderBuffer, TempLineBuffer, Context);
             until TempLineBuffer.Next() = 0;
     end;
 
     local procedure ProcessLineAssets(
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
         var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        ManifestId: Guid;
-        var AssetsAdded: Integer;
-        var ProcessedTicketReqEntryNos: List of [Integer])
+        var Context: Codeunit "NPR DigNotif Manifest Context")
     var
-        AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
+        DigitalAssetType: Enum "NPR Dig. Notif. Asset Type";
+        DigitalAssetProcessor: Interface "NPR IDigNotifAssetProcessor";
     begin
-        AssetType := IdentifyAssetType(TempHeaderBuffer, TempLineBuffer);
-
-        if not (AssetType in [AssetType::Voucher, AssetType::Ticket, AssetType::Coupon, AssetType::Wallet]) then
-            exit;
-
-        case AssetType of
-            AssetType::Voucher:
-                ProcessVoucherAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
-            AssetType::"Member Card":
-                ProcessMemberCardAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
-            AssetType::Coupon:
-                ProcessCouponAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
-            AssetType::Ticket:
-                ProcessTicketAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded, ProcessedTicketReqEntryNos);
-            AssetType::Wallet:
-                ProcessWalletAssets(TempHeaderBuffer, TempLineBuffer, ManifestId, AssetsAdded);
-        end;
+        DigitalAssetType := IdentifyAssetType(TempHeaderBuffer, TempLineBuffer);
+        DigitalAssetProcessor := DigitalAssetType;
+        DigitalAssetProcessor.ProcessAsset(TempHeaderBuffer, TempLineBuffer, Context);
     end;
 
     local procedure CreateNotificationEntry(
@@ -432,9 +414,9 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
     #endregion
 
     #region Asset Identification and Processing
-    internal procedure IdentifyEcomLineAssetType(IsWallet: Boolean; EcomLineSubtype: Enum "NPR Ecom Sales Line Subtype"): Option None,Voucher,"Member Card",Coupon,Ticket,Wallet
+    internal procedure IdentifyEcomLineAssetType(IsWallet: Boolean; EcomLineSubtype: Enum "NPR Ecom Sales Line Subtype"): Enum "NPR Dig. Notif. Asset Type"
     var
-        AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
+        AssetType: Enum "NPR Dig. Notif. Asset Type";
     begin
         if IsWallet then
             exit(AssetType::Wallet);
@@ -446,6 +428,8 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
                 exit(AssetType::Ticket);
             EcomLineSubtype::Coupon:
                 exit(AssetType::Coupon);
+            EcomLineSubtype::Membership:
+                exit(AssetType::Membership);
         end;
 
         exit(AssetType::None);
@@ -453,13 +437,13 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
     internal procedure IdentifyAssetType(
         var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
-        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary): Option None,Voucher,"Member Card",Coupon,Ticket,Wallet
+        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary): Enum "NPR Dig. Notif. Asset Type"
     var
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         Item: Record Item;
         TicketBOM: Record "NPR TM Ticket Admission BOM";
-        AssetType: Option None,Voucher,"Member Card",Coupon,Ticket,Wallet;
+        AssetType: Enum "NPR Dig. Notif. Asset Type";
     begin
         if TempHeaderBuffer."Document Type" = TempHeaderBuffer."Document Type"::"Ecom Sales Document" then
             exit(IdentifyEcomLineAssetType(TempLineBuffer."Is Wallet", TempLineBuffer."Ecom Line Subtype"));
@@ -490,7 +474,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         MembershipSalesSetup.SetRange(Type, MembershipSalesSetup.Type::ITEM);
         MembershipSalesSetup.SetRange("No.", TempLineBuffer."No.");
         if not MembershipSalesSetup.IsEmpty() then
-            exit(AssetType::"Member Card");
+            exit(AssetType::Membership);
 
         // Check if this line is a ticket
         Item.SetLoadFields("No.", "NPR Ticket Type");
@@ -504,342 +488,6 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         exit(AssetType::None);
     end;
 
-    local procedure ProcessVoucherAssets(
-        var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
-        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        ManifestId: Guid;
-        var AssetsAdded: Integer)
-    var
-        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
-        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
-    begin
-        if _DigitalNotifSetup."Exclude Vouchers From Manifest" then
-            exit;
-
-        if TempHeaderBuffer."Document Type" = TempHeaderBuffer."Document Type"::"Ecom Sales Document" then begin
-            EcomSalesVoucherLink.SetCurrentKey("Source System Id", "Source Line System Id");
-            EcomSalesVoucherLink.SetRange("Source System Id", TempHeaderBuffer."Source Document Id");
-            EcomSalesVoucherLink.SetRange("Source Line System Id", TempLineBuffer."Source Line System Id");
-            EcomSalesVoucherLink.SetRange("Voucher State", EcomSalesVoucherLink."Voucher State"::Active);
-            if EcomSalesVoucherLink.FindSet() then begin
-                repeat
-                    if NpRvVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then begin
-                        NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
-                        if NpRvVoucherType.Get(NpRvVoucher."Voucher Type") and (NpRvVoucherType.PDFDesignerTemplateId <> '') then begin
-                            NPDesignerManifestFacade.AddAssetToManifest(
-                                ManifestId,
-                                Database::"NPR NpRv Voucher",
-                                NpRvVoucher.SystemId,
-                                EcomSalesVoucherLink."Reference No.",
-                                NpRvVoucherType.PDFDesignerTemplateId);
-                            AssetsAdded += 1;
-                        end;
-                    end;
-                until EcomSalesVoucherLink.Next() = 0;
-                exit;
-            end;
-            // Legacy fallback for ecom docs created before the link table existed.
-            // Active-only by design — archived legacy vouchers are intentionally skipped from the manifest.
-            NpRvVoucher.SetLoadFields("Voucher Type", SystemId, "Reference No.");
-            if NpRvVoucher.Get(TempLineBuffer."No.") then begin
-                NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
-                if NpRvVoucherType.Get(NpRvVoucher."Voucher Type") and (NpRvVoucherType.PDFDesignerTemplateId <> '') then begin
-                    NPDesignerManifestFacade.AddAssetToManifest(
-                        ManifestId,
-                        Database::"NPR NpRv Voucher",
-                        NpRvVoucher.SystemId,
-                        NpRvVoucher."Reference No.",
-                        NpRvVoucherType.PDFDesignerTemplateId);
-                    AssetsAdded += 1;
-                end;
-            end;
-            exit;
-        end;
-
-        // Invoice / Credit Memo: find vouchers via voucher entries
-        NpRvVoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.");
-        NpRvVoucherEntry.SetFilter("Entry Type", '%1|%2',
-            NpRvVoucherEntry."Entry Type"::"Issue Voucher",
-            NpRvVoucherEntry."Entry Type"::"Top-up");
-
-        case TempHeaderBuffer."Document Type" of
-            TempHeaderBuffer."Document Type"::Invoice:
-                NpRvVoucherEntry.SetRange("Document Type", NpRvVoucherEntry."Document Type"::Invoice);
-            TempHeaderBuffer."Document Type"::"Credit Memo":
-                NpRvVoucherEntry.SetRange("Document Type", NpRvVoucherEntry."Document Type"::"Credit Memo");
-        end;
-
-        NpRvVoucherEntry.SetRange("Document No.", TempHeaderBuffer."Posted Document No.");
-        NpRvVoucherEntry.SetRange("Document Line No.", TempLineBuffer."Line No.");
-        if not NpRvVoucherEntry.FindSet() then
-            exit;
-
-        repeat
-            NpRvVoucher.SetLoadFields("Voucher Type", SystemId, "Reference No.");
-            if NpRvVoucher.Get(NpRvVoucherEntry."Voucher No.") then begin
-                NpRvVoucherType.SetLoadFields(PDFDesignerTemplateId);
-                if NpRvVoucherType.Get(NpRvVoucher."Voucher Type") and (NpRvVoucherType.PDFDesignerTemplateId <> '') then begin
-                    NPDesignerManifestFacade.AddAssetToManifest(
-                        ManifestId,
-                        Database::"NPR NpRv Voucher",
-                        NpRvVoucher.SystemId,
-                        NpRvVoucher."Reference No.",
-                        NpRvVoucherType.PDFDesignerTemplateId
-                    );
-                    AssetsAdded += 1;
-                end;
-            end;
-        until NpRvVoucherEntry.Next() = 0;
-    end;
-
-    local procedure ProcessMemberCardAssets(
-        var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
-        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        ManifestId: Guid;
-        var AssetsAdded: Integer)
-    var
-        MembershipEntry: Record "NPR MM Membership Entry";
-        MemberCard: Record "NPR MM Member Card";
-        Membership: Record "NPR MM Membership";
-        MemberNotificSetup: Record "NPR MM Member Notific. Setup";
-        NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
-    begin
-        // Find membership entry for this order line (should be only one per line)
-        // For Shopify orders use the Shopify Order ID (the canonical identifier used when creating the membership)
-        if TempHeaderBuffer."Shopify Order ID" <> '' then
-            MembershipEntry.SetRange("Document No.", TempHeaderBuffer."Shopify Order ID")
-        else
-            MembershipEntry.SetRange("Document No.", TempHeaderBuffer."External Order No.");
-        MembershipEntry.SetRange("Item No.", TempLineBuffer."No.");
-        if not MembershipEntry.FindLast() then
-            exit;
-
-        // Process the member card if it exists
-        if MembershipEntry."Member Card Entry No." = 0 then
-            exit;
-
-        MemberCard.SetLoadFields(SystemId, "External Card No.");
-        if not MemberCard.Get(MembershipEntry."Member Card Entry No.") then
-            exit;
-
-        Membership.SetLoadFields("Community Code", "Membership Code");
-        if not Membership.Get(MembershipEntry."Membership Entry No.") then
-            exit;
-
-        // Find notification setup for this membership
-        MemberNotificSetup.SetLoadFields(NPDesignerTemplateId);
-        MemberNotificSetup.SetRange(Type, MemberNotificSetup.Type::WELCOME);
-        MemberNotificSetup.SetRange("Community Code", Membership."Community Code");
-        MemberNotificSetup.SetRange("Membership Code", Membership."Membership Code");
-        if not MemberNotificSetup.FindFirst() then
-            exit;
-
-        if MemberNotificSetup.NPDesignerTemplateId = '' then
-            exit;
-
-        // Add member card to manifest
-        NPDesignerManifestFacade.AddAssetToManifest(
-            ManifestId,
-            Database::"NPR MM Member Card",
-            MemberCard.SystemId,
-            MemberCard."External Card No.",
-            MemberNotificSetup.NPDesignerTemplateId
-        );
-        AssetsAdded += 1;
-    end;
-
-    local procedure ProcessCouponAssets(
-        var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
-        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        ManifestId: Guid;
-        var AssetsAdded: Integer)
-    var
-        EcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link";
-        Coupon: Record "NPR NpDc Coupon";
-        CouponType: Record "NPR NpDc Coupon Type";
-        NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
-    begin
-        // Coupon asset emission is Ecom-exclusive.
-        // For Magento/Shopify, coupons are not part of the digital notification manifest by product decision.
-        if TempHeaderBuffer."Document Type" <> TempHeaderBuffer."Document Type"::"Ecom Sales Document" then
-            exit;
-
-        EcomSalesCouponLink.SetCurrentKey("Source", "Source System Id", "Source Line System Id");
-        EcomSalesCouponLink.SetRange("Source", EcomSalesCouponLink."Source"::"Ecom Sales Document");
-        EcomSalesCouponLink.SetRange("Source System Id", TempHeaderBuffer."Source Document Id");
-        EcomSalesCouponLink.SetRange("Source Line System Id", TempLineBuffer."Source Line System Id");
-        if not EcomSalesCouponLink.FindSet() then
-            exit;
-
-        repeat
-            if Coupon.GetBySystemId(EcomSalesCouponLink."Coupon System Id") then begin
-                CouponType.SetLoadFields(NPDesignerTemplateId);
-                if CouponType.Get(Coupon."Coupon Type") and (CouponType.NPDesignerTemplateId <> '') then begin
-                    NPDesignerManifestFacade.AddAssetToManifest(
-                        ManifestId,
-                        Database::"NPR NpDc Coupon",
-                        Coupon.SystemId,
-                        Coupon."Reference No.",
-                        CouponType.NPDesignerTemplateId);
-                    AssetsAdded += 1;
-                end;
-            end;
-        until EcomSalesCouponLink.Next() = 0;
-    end;
-
-    local procedure ProcessTicketAssets(
-        var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
-        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        ManifestId: Guid;
-        var AssetsAdded: Integer;
-        var ProcessedTicketReqEntryNos: List of [Integer])
-    var
-        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
-        OrderID: Text;
-    begin
-        if _DigitalNotifSetup."Exclude Tickets From Manifest" then
-            exit;
-
-        // 1. Ecom direct link: use Ticket Reservation Line Id (Guid) for precise 1:1 match
-        if not IsNullGuid(TempLineBuffer."Ticket Reservation Line Id") then begin
-            if TicketReservationReq.GetBySystemId(TempLineBuffer."Ticket Reservation Line Id") then
-                if TicketReservationReq."Request Status" = TicketReservationReq."Request Status"::CONFIRMED then
-                    AddTicketsFromReservation(TicketReservationReq, ManifestId, AssetsAdded, ProcessedTicketReqEntryNos);
-            exit;
-        end;
-
-        // 2. Filter by External Order No. (or Shopify Order ID if available) + line reference / item fallback
-        OrderID := TempHeaderBuffer."External Order No.";
-        // For Shopify orders use the Shopify Order ID (the canonical identifier used when creating the reservation)
-        if TempHeaderBuffer."Shopify Order ID" <> '' then
-            OrderID := TempHeaderBuffer."Shopify Order ID";
-
-        FilterTicketReservations(OrderID, TempLineBuffer, TicketReservationReq);
-        if not TicketReservationReq.FindSet() then
-            exit;
-
-        repeat
-            AddTicketsFromReservation(TicketReservationReq, ManifestId, AssetsAdded, ProcessedTicketReqEntryNos);
-        until TicketReservationReq.Next() = 0;
-    end;
-
-    local procedure FilterTicketReservations(
-        OrderID: Text;
-        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        var TicketReservationReq: Record "NPR TM Ticket Reservation Req.")
-    begin
-        TicketReservationReq.Reset();
-        TicketReservationReq.SetRange("External Order No.", OrderID);
-        TicketReservationReq.SetRange("Request Status", TicketReservationReq."Request Status"::CONFIRMED);
-
-        // Try precise match first: Ext. Line Reference No.
-        TicketReservationReq.SetRange("Ext. Line Reference No.", TempLineBuffer."Line No.");
-        if not TicketReservationReq.IsEmpty() then
-            exit;
-
-        // Fallback: match by Item No. + Variant Code
-        // Process ALL matching reservations to handle multiple timeslots for the same item
-        TicketReservationReq.SetRange("Ext. Line Reference No.");
-        TicketReservationReq.SetRange("Item No.", TempLineBuffer."No.");
-        TicketReservationReq.SetRange("Variant Code", TempLineBuffer."Variant Code");
-    end;
-
-
-    local procedure AddTicketsFromReservation(
-        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
-        ManifestId: Guid;
-        var AssetsAdded: Integer;
-        var ProcessedTicketReqEntryNos: List of [Integer])
-    var
-        Ticket: Record "NPR TM Ticket";
-        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
-    begin
-        if ProcessedTicketReqEntryNos.Contains(TicketReservationReq."Entry No.") then
-            exit;
-
-        ProcessedTicketReqEntryNos.Add(TicketReservationReq."Entry No.");
-
-        Ticket.SetLoadFields("Item No.", "Variant Code", "External Ticket No.", SystemId);
-        Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationReq."Entry No.");
-        if Ticket.FindSet() then
-            repeat
-                TicketAdmissionBOM.SetLoadFields(NPDesignerTemplateId);
-                if TicketAdmissionBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketReservationReq."Admission Code") then
-                    if TicketAdmissionBOM.NPDesignerTemplateId <> '' then begin
-                        NPDesignerManifestFacade.AddAssetToManifest(
-                            ManifestId,
-                            Database::"NPR TM Ticket",
-                            Ticket.SystemId,
-                            Ticket."External Ticket No.",
-                            TicketAdmissionBOM.NPDesignerTemplateId
-                        );
-                        AssetsAdded += 1;
-                    end;
-            until Ticket.Next() = 0;
-    end;
-
-    local procedure ProcessWalletAssets(
-        var TempHeaderBuffer: Record "NPR Digital Doc. Header Buffer" temporary;
-        var TempLineBuffer: Record "NPR Digital Doc. Line Buffer" temporary;
-        ManifestId: Guid;
-        var AssetsAdded: Integer)
-    var
-        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
-        WalletAssetHeader: Record "NPR WalletAssetHeader";
-        WalletAssetLine: Record "NPR WalletAssetLine";
-        Wallet: Record "NPR AttractionWallet";
-    begin
-        // Wallet asset emission is Ecom-exclusive.
-        // For Magento/Shopify, wallets are not part of the digital notification manifest by product decision.
-        if TempHeaderBuffer."Document Type" <> TempHeaderBuffer."Document Type"::"Ecom Sales Document" then
-            exit;
-
-        WalletAssetHeaderRef.SetCurrentKey(LinkToTableId, LinkToSystemId);
-        WalletAssetHeaderRef.SetRange(LinkToTableId, Database::"NPR Ecom Sales Line");
-        WalletAssetHeaderRef.SetRange(LinkToSystemId, TempLineBuffer."Source Line System Id");
-        if not WalletAssetHeaderRef.FindSet() then
-            exit;
-
-        repeat
-            if WalletAssetHeader.Get(WalletAssetHeaderRef.WalletHeaderEntryNo) then begin
-                WalletAssetLine.SetCurrentKey(TransactionId);
-                WalletAssetLine.SetRange(TransactionId, WalletAssetHeader.TransactionId);
-                WalletAssetLine.SetRange(Type, WalletAssetLine.Type::WALLET);
-                if WalletAssetLine.FindSet() then
-                    repeat
-                        if Wallet.GetBySystemId(WalletAssetLine.LineTypeSystemId) then
-                            TryAddWalletAssetToManifest(Wallet, ManifestId, AssetsAdded);
-                    until WalletAssetLine.Next() = 0;
-            end;
-        until WalletAssetHeaderRef.Next() = 0;
-    end;
-
-    local procedure TryAddWalletAssetToManifest(
-        Wallet: Record "NPR AttractionWallet";
-        ManifestId: Guid;
-        var AssetsAdded: Integer): Boolean
-    var
-        AttractionWallet: Codeunit "NPR AttractionWallet";
-        NPDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
-        TemplateLabel: Text[80];
-        TemplateId: Text[40];
-    begin
-        if not AttractionWallet.GetDesignerTemplate(Wallet.EntryNo, TemplateLabel, TemplateId) then
-            exit(false);
-
-        NPDesignerManifestFacade.AddAssetToManifest(
-            ManifestId,
-            Database::"NPR AttractionWallet",
-            Wallet.SystemId,
-            Wallet.ReferenceNumber,
-            TemplateId);
-        AssetsAdded += 1;
-        exit(true);
-    end;
     #endregion
 
     #region Buffer Population
