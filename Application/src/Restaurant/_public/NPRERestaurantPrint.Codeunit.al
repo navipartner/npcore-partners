@@ -205,7 +205,7 @@
         end;
 
         Commit();  //Print routine requires transaction to be ended
-        SendToPrint(TempPrintTemplateBuffer, PrintType);
+        SendToPrint(TempPrintTemplateBuffer);
         exit(true);
     end;
 
@@ -469,7 +469,7 @@
     begin
         TempPrintTemplateBuffer.DeleteAll();
         if FindPrintTemplates(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep, TempPrintTemplateBuffer) then begin
-            SendToPrint(TempPrintTemplateBuffer, PrintType);
+            SendToPrint(TempPrintTemplateBuffer);
             exit(true);
         end;
         exit(false);
@@ -529,6 +529,7 @@
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
     begin
         if PrintTemplateBuffer.FindFirst() then
             repeat
@@ -552,7 +553,7 @@
                             repeat
                                 WaiterPadLine.Get(PrintTemplateBuffer."Waiter Pad No.", PrintTemplateBuffer."Waiter Pad Line No.");
                                 WaiterPadLine.Mark(true);
-                                AddComments(WaiterPadLine);
+                                KitchenPrintMgt.AddComments(WaiterPadLine);
                             until PrintTemplateBuffer.Next() = 0;
                             WaiterPadLine.SetRange("Waiter Pad No.", PrintTemplateBuffer."Waiter Pad No.");
                             WaiterPadLine.SetRange("Print Category Filter", PrintTemplateBuffer."Print Category Code");
@@ -566,10 +567,9 @@
             until not PrintTemplateBuffer.FindFirst();
     end;
 
-    local procedure SendToPrint(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; PrintType: Integer)
+    local procedure SendToPrint(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
     var
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        TempJobBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
     begin
         if not PrintTemplateBuffer.FindFirst() then
             exit;
@@ -581,30 +581,14 @@
             PrintTemplateBuffer.SetRange("Print Category Code", PrintTemplateBuffer."Print Category Code");
             PrintTemplateBuffer.SetRange("Waiter Pad Line No.");
 
-            case PrintType of
-                _PrintTemplate."Print Type"::"Pre Receipt":
-                    begin
-                        WaiterPad.Get(PrintTemplateBuffer."Waiter Pad No.");
-                        WaiterPad.SetRecFilter();
-                        Codeunit.Run(PrintTemplateBuffer."Codeunit ID", WaiterPad);
-                    end;
-                _PrintTemplate."Print Type"::"Kitchen Order",
-                _PrintTemplate."Print Type"::"Serving Request":
-                    begin
-                        WaiterPadLine.Reset();
-                        PrintTemplateBuffer.FindSet();
-                        repeat
-                            if WaiterPadLine.Get(PrintTemplateBuffer."Waiter Pad No.", PrintTemplateBuffer."Waiter Pad Line No.") then begin
-                                WaiterPadLine.Mark(true);
-                                AddComments(WaiterPadLine);
-                            end;
-                        until PrintTemplateBuffer.Next() = 0;
-                        WaiterPadLine.SetRange("Waiter Pad No.", PrintTemplateBuffer."Waiter Pad No.");
-                        WaiterPadLine.SetRange("Print Category Filter", PrintTemplateBuffer."Print Category Code");
-                        WaiterPadLine.MarkedOnly(true);
-                        Codeunit.Run(PrintTemplateBuffer."Codeunit ID", WaiterPadLine);
-                    end;
-            end;
+            TempJobBuffer.Reset();
+            TempJobBuffer.DeleteAll();
+            if PrintTemplateBuffer.FindSet() then
+                repeat
+                    TempJobBuffer := PrintTemplateBuffer;
+                    TempJobBuffer.Insert();
+                until PrintTemplateBuffer.Next() = 0;
+            Codeunit.Run(PrintTemplateBuffer."Codeunit ID", TempJobBuffer);
 
             PrintTemplateBuffer.DeleteAll();
             PrintTemplateBuffer.Reset();
@@ -942,18 +926,6 @@
             WaiterPad.Validate("Serving Step Code", NewFlowStatusCode);
         WaiterPad."Last Req. Serving Step Code" := NewFlowStatusCode;
         WaiterPad.Modify();
-    end;
-
-    local procedure AddComments(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
-    var
-        WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
-    begin
-        WaiterPadLine2.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
-        WaiterPadLine2 := WaiterPadLine;
-        while (WaiterPadLine2.Next() <> 0) and (WaiterPadLine2."Line Type" = WaiterPadLine2."Line Type"::Comment) do begin
-            WaiterPadLine := WaiterPadLine2;
-            WaiterPadLine.Mark := true;
-        end;
     end;
 
     internal procedure InitTempPrintCategoryList(var PrintCategoryTmp: Record "NPR NPRE Print/Prod. Cat.")

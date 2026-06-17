@@ -1,6 +1,5 @@
 table 6151292 "NPR NPRE W.Pad.Line Out.Buffer"
 {
-    Access = Internal;
     Caption = 'Waiter Pad Line Output Buffer';
     DataClassification = CustomerContent;
 
@@ -46,7 +45,56 @@ table 6151292 "NPR NPRE W.Pad.Line Out.Buffer"
         {
             Caption = 'Waiter Pad Line No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NPRE Waiter Pad Line"."Line No." WHERE("Waiter Pad No." = FIELD("Waiter Pad No."));
+        }
+        field(70; "Line Type"; Enum "NPR NPRE Kitchen PrintLineType")
+        {
+            Caption = 'Line Type';
+            DataClassification = CustomerContent;
+        }
+        field(80; "No."; Code[20])
+        {
+            Caption = 'No.';
+            DataClassification = CustomerContent;
+        }
+        field(90; Description; Text[100])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
+        field(100; Quantity; Decimal)
+        {
+            Caption = 'Quantity';
+            DataClassification = CustomerContent;
+        }
+        field(110; "Variant Code"; Code[10])
+        {
+            Caption = 'Variant Code';
+            DataClassification = CustomerContent;
+        }
+        field(120; "Unit of Measure Code"; Code[10])
+        {
+            Caption = 'Unit of Measure Code';
+            DataClassification = CustomerContent;
+        }
+        field(130; "Attached to Line No."; Integer)
+        {
+            Caption = 'Attached to Line No.';
+            DataClassification = CustomerContent;
+        }
+        field(140; Indentation; Integer)
+        {
+            Caption = 'Indentation';
+            DataClassification = CustomerContent;
+        }
+        field(150; "Amount Excl. VAT"; Decimal)
+        {
+            Caption = 'Amount Excl. VAT';
+            DataClassification = CustomerContent;
+        }
+        field(160; "Amount Incl. VAT"; Decimal)
+        {
+            Caption = 'Amount Incl. VAT';
+            DataClassification = CustomerContent;
         }
     }
 
