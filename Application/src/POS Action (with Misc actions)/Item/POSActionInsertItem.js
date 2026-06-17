@@ -146,8 +146,12 @@ const getButtonCaption = async ({ workflow, context }) => {
       }
     }
 
-    const { currentItemPrice, nextUpdateTime } =
-      await workflow.respondInNewSession("getCaption");
+    const response = await workflow.respondInNewSession("getCaption");
+    if (!response) {
+      return context.currentCaptions;
+    }
+
+    const { currentItemPrice, nextUpdateTime } = response;
 
     if (!nextUpdateTime) {
       return context.currentCaptions;
