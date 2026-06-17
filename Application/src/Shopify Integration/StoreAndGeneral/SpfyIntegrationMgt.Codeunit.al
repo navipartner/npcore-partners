@@ -12,6 +12,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         _BCCustomerTransactionSyncStatus: Option Undefined,Disabled,Enabled;
 #endif
         _ConfirmedInvalidPhoneNos: List of [Text];
+        _ApplyingConfigPackage: Boolean;
 
     procedure CheckIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20])
     var
@@ -717,6 +718,43 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             SpfyWebhookSubscription.ChangeCompany(NewCompanyName);
         SpfyWebhookSubscription.DeleteAll();
     end;
+    #endregion
+
+    #region Suppress per-record confirmations during RapidStart configuration package apply
+    internal procedure ApplyingConfigPackage(): Boolean
+    begin
+        exit(_ApplyingConfigPackage);
+    end;
+
+    internal procedure ResetConfigPackageApplyState()
+    begin
+        _ApplyingConfigPackage := false;
+    end;
+
+#if not BC18
+    // OnBeforeApplyPackageRecords / OnAfterApplyPackageRecords arrived with the parallel RapidStart apply in BC19, so
+    // they do not exist on Config. Package Management in BC18 (BC17 is already excluded module-wide). On BC18 the flag
+    // stays false and the confirmation keeps its previous behaviour - acceptable for that out-of-support version.
+#if BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. Package Management", 'OnBeforeApplyPackageRecords', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. Package Management", OnBeforeApplyPackageRecords, '', false, false)]
+#endif
+    local procedure SetApplyingConfigPackageOnBeforeApplyPackageRecords()
+    begin
+        _ApplyingConfigPackage := true;
+    end;
+
+#if BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. Package Management", 'OnAfterApplyPackageRecords', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. Package Management", OnAfterApplyPackageRecords, '', false, false)]
+#endif
+    local procedure ClearApplyingConfigPackageOnAfterApplyPackageRecords()
+    begin
+        _ApplyingConfigPackage := false;
+    end;
+#endif
     #endregion
 #endif
 }

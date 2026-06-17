@@ -253,6 +253,7 @@ page 6185092 "NPR Spfy Store-Cust.Links Subp"
 
     trigger OnOpenPage()
     begin
+        SpfyIntegrationMgt.ResetConfigPackageApplyState();
         CustomerListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
     end;
 

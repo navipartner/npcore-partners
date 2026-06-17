@@ -61,12 +61,13 @@ table 6151228 "NPR Spfy Store-Customer Link"
             trigger OnValidate()
             var
                 Customer: Record Customer;
+                SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
                 SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
                 SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
                 ConfirmDisableSyncLbl: Label 'Are you sure you want to disable synchronization for Customer %1 with the Shopify store %2? If you confirm, the customer will be removed from the Shopify store.', Comment = '%1 - Customer No., %2 - Shopify Store Code';
             begin
                 if xRec."Sync. to this Store" and not "Sync. to this Store" then
-                    if GuiAllowed() then
+                    if GuiAllowed() and not SpfyIntegrationMgt.ApplyingConfigPackage() then
                         if not Confirm(ConfirmDisableSyncLbl, false, "No.", "Shopify Store Code") then
                             Error('');
                 if "Sync. to this Store" then begin

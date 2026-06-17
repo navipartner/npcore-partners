@@ -367,6 +367,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
 
     trigger OnOpenPage()
     begin
+        SpfyIntegrationMgt.ResetConfigPackageApplyState();
         ItemListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
     end;
 
