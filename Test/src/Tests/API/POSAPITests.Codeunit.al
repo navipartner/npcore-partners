@@ -1262,6 +1262,118 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure WaiterPad_DeletePOSBilledLine_ReducesWaiterPadLineQtyToBilled()
+    var
+        Assert: Codeunit Assert;
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSale: Record "NPR POS Sale";
+        POSSaleLineToDelete: Record "NPR POS Sale Line";
+        OrphanLineNo: Integer;
+    begin
+        // [SCENARIO] A partly billed waiter pad line, loaded to POS and then deleted on the POS,
+        // must have its quantity reduced to the billed quantity when the sale is saved back.
+        InitializeRestaurant();
+
+        // [GIVEN] A waiter-pad-linked POS sale with two item lines, the first of them partly billed
+        SetupWaiterPadLinkedSale(POSSale, WaiterPad, WaiterPadLine, POSSaleLineToDelete);
+        OrphanLineNo := WaiterPadLine."Line No.";
+        WaiterPadLine."Billed Quantity" := 1;
+        WaiterPadLine.Modify();
+
+        // [WHEN] The POS line is deleted and the sale is saved back to the waiter pad
+        POSSaleLineToDelete.Delete(true);
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(POSSale, WaiterPad, false);
+
+        // [THEN] The orphaned waiter pad line quantity is reduced to the billed quantity
+        WaiterPadLine.Get(WaiterPad."No.", OrphanLineNo);
+        Assert.AreEqual(1, WaiterPadLine.Quantity, 'Deleting the POS line should reduce the orphaned waiter pad line qty to its billed quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure WaiterPad_DeleteKitchenSentPOSLine_ZeroesWaiterPadLineQty()
+    var
+        Assert: Codeunit Assert;
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSale: Record "NPR POS Sale";
+        POSSaleLineToDelete: Record "NPR POS Sale Line";
+        OrphanLineNo: Integer;
+    begin
+        // [SCENARIO] A waiter pad line already sent to the kitchen, loaded to POS and then deleted on the
+        // POS, must have its quantity zeroed when the sale is saved back (so the kitchen request is cancelled).
+        InitializeRestaurant();
+
+        // [GIVEN] A waiter-pad-linked POS sale with two item lines (the restaurant setup auto-sends lines to the kitchen)
+        SetupWaiterPadLinkedSale(POSSale, WaiterPad, WaiterPadLine, POSSaleLineToDelete);
+        OrphanLineNo := WaiterPadLine."Line No.";
+
+        // [WHEN] The POS line is deleted and the sale is saved back to the waiter pad
+        POSSaleLineToDelete.Delete(true);
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(POSSale, WaiterPad, false);
+
+        // [THEN] The orphaned waiter pad line quantity is zeroed (nothing billed)
+        WaiterPadLine.Get(WaiterPad."No.", OrphanLineNo);
+        Assert.AreEqual(0, WaiterPadLine.Quantity, 'Deleting the kitchen-sent POS line should zero the orphaned waiter pad line qty');
+    end;
+
+    local procedure SetupWaiterPadLinkedSale(var POSSale: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineToOrphan: Record "NPR NPRE Waiter Pad Line"; var POSSaleLineToDelete: Record "NPR POS Sale Line")
+    var
+        POSSaleLineToKeep: Record "NPR POS Sale Line";
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        CustomerDetails: Dictionary of [Text, Text];
+    begin
+        // Creates a POS sale tied to a waiter pad with two item lines and moves it to the pad once,
+        // so both waiter pad lines carry the "Sale Retail ID"/"Sale Line Retail ID" links a real
+        // load-to-POS would set. Returns the waiter pad line linked to POSSaleLineToDelete; a second
+        // line is kept so the sale is non-empty when it is later saved back.
+        POSSale.Init();
+        POSSale."Register No." := _POSUnit."No.";
+        // Unique ticket per call so the two tests sharing this helper don't collide on committed data
+        // when the whole codeunit runs in a single test-isolation session (MoveSaleFromPOSToWaiterPad commits).
+        POSSale."Sales Ticket No." := CopyStr('WP' + DelChr(Format(CreateGuid()), '=', '{}-'), 1, MaxStrLen(POSSale."Sales Ticket No."));
+        POSSale."POS Store Code" := _POSStore.Code;
+        POSSale.Date := Today;
+        POSSale.Insert(true);
+
+        InsertPOSItemSaleLine(POSSale, POSSaleLineToDelete, 10000, 3);
+        InsertPOSItemSaleLine(POSSale, POSSaleLineToKeep, 20000, 1);
+
+        WaiterPadMgt.CreateNewWaiterPad(_Seating.Code, 1, '', CustomerDetails, WaiterPad);
+        POSSale."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
+        POSSale."NPRE Pre-Set Seating Code" := _Seating.Code;
+        POSSale.Modify();
+
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(POSSale, WaiterPad, false);
+        Commit();
+
+        WaiterPadLineToOrphan.SetRange("Waiter Pad No.", WaiterPad."No.");
+        WaiterPadLineToOrphan.SetRange("Sale Line Retail ID", POSSaleLineToDelete.SystemId);
+        WaiterPadLineToOrphan.FindFirst();
+    end;
+
+    local procedure InsertPOSItemSaleLine(POSSale: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; LineNo: Integer; Qty: Decimal)
+    begin
+        SaleLinePOS.Init();
+        SaleLinePOS."Register No." := POSSale."Register No.";
+        SaleLinePOS."Sales Ticket No." := POSSale."Sales Ticket No.";
+        SaleLinePOS."Line No." := LineNo;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
+        SaleLinePOS."No." := _Item."No.";
+        SaleLinePOS.Description := _Item.Description;
+        SaleLinePOS.Quantity := Qty;
+        SaleLinePOS."Quantity (Base)" := Qty;
+        SaleLinePOS."Unit Price" := _Item."Unit Price";
+        SaleLinePOS."Amount Including VAT" := _Item."Unit Price" * Qty;
+        SaleLinePOS.Insert(true);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CompleteSale_WithKitchenRequest_TransfersCustomerDetails()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";

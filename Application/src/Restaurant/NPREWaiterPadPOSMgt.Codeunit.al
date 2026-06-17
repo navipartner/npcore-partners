@@ -785,7 +785,10 @@
         if not IgnoreParkedSale then
             if IsParkedSaleLine(SaleLinePOS.SystemId) then
                 exit;
-        WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
+        // Only clear the line-level link. The header-level "Sale Retail ID" must stay, otherwise
+        // MoveSaleFromPOSToWaiterPad can no longer detect this line as deleted and clean it up
+        // (zero out / cancel the kitchen request). The header link is cleared on sale-header /
+        // parked-entry delete instead - see ClearWPLineSaleHdrLinks / ClearWPadLinksOnParkedSaleEntryDelete.
         WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
