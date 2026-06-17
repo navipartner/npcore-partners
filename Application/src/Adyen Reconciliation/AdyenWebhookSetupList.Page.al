@@ -68,25 +68,30 @@ page 6184551 "NPR Adyen Webhook Setup List"
 
                 trigger OnAction()
                 var
-                    AdyenManagement: Codeunit "NPR Adyen Management";
+                    Sentry: Codeunit "NPR Sentry";
+                    AdyenImportScope: Label 'NP Pay Import Webhooks', Locked = true;
                     WebhookImportSuccess: Label 'Successfully imported %1 Webhook Setups.';
                     WebhookImportFail: Label 'No Webhook Setups were imported.';
-                    MerchantAccounts: Record "NPR Adyen Merchant Account";
                     ImportedWebhooks: Integer;
+                    MerchantsFound: Boolean;
+                    ImportError: Text;
                 begin
-                    AdyenManagement.UpdateMerchantList(0);
-                    if MerchantAccounts.FindSet() then begin
-                        Clear(ImportedWebhooks);
-                        repeat
-                            AdyenManagement.ImportWebhooks(0, MerchantAccounts.Name);
-                        until MerchantAccounts.Next() = 0;
+                    Sentry.InitScopeAndTransaction(AdyenImportScope, 'bc.nppay.webhook.import');
 
-                        ImportedWebhooks := AdyenManagement.GetImportedWebhooksAmount();
+                    if not TryImportWebhooks(MerchantsFound, ImportedWebhooks) then begin
+                        ImportError := GetLastErrorText();
+                        Sentry.AddLastErrorIfProgrammingBug();
+                    end;
+                    Sentry.FinalizeScope();
+
+                    if ImportError <> '' then
+                        Error(ImportError);
+
+                    if MerchantsFound then
                         if ImportedWebhooks > 0 then
                             Message(StrSubstNo(WebhookImportSuccess, Format(ImportedWebhooks)))
                         else
                             Message(WebhookImportFail);
-                    end;
                 end;
             }
         }
@@ -101,5 +106,24 @@ page 6184551 "NPR Adyen Webhook Setup List"
             if Confirm(ConfirmDelete) then begin
                 AdyenManagement.DeleteWebhook(Rec);
             end;
+    end;
+
+    [TryFunction]
+    local procedure TryImportWebhooks(var MerchantsFound: Boolean; var ImportedWebhooks: Integer)
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        MerchantAccounts: Record "NPR Adyen Merchant Account";
+    begin
+        AdyenManagement.UpdateMerchantList(0);
+
+        MerchantsFound := MerchantAccounts.FindSet();
+        if not MerchantsFound then
+            exit;
+
+        repeat
+            AdyenManagement.ImportWebhooks(0, MerchantAccounts.Name);
+        until MerchantAccounts.Next() = 0;
+
+        ImportedWebhooks := AdyenManagement.GetImportedWebhooksAmount();
     end;
 }

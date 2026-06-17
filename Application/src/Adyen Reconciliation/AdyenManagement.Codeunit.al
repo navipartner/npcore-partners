@@ -245,6 +245,7 @@ codeunit 6184796 "NPR Adyen Management"
         RequestUrl: Text;
         ResponseText: Text;
         JsonToken: JsonToken;
+        UrlToken: JsonToken;
         JsonObject: JsonObject;
         PagesTotal: Integer;
         WebhooksArray: JsonArray;
@@ -252,8 +253,14 @@ codeunit 6184796 "NPR Adyen Management"
         EventCodeArray: JsonArray;
         EventCodeToken: JsonToken;
         i: Integer;
+        TypeIndex: Integer;
+        WebhookTypeName: Text;
+        WebhookURL: Text;
     begin
         InitiateAdyenManagement();
+
+        if pageNumber = 0 then
+            Clear(_UnknownWebhookTypes);
 
         RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetAllWebhooksEndpoint, MerchantAccount) + '?pageSize=100';
         if pageNumber > 0 then
@@ -282,7 +289,12 @@ codeunit 6184796 "NPR Adyen Management"
             foreach JsonToken in WebhooksArray do begin
                 if JsonToken.IsObject() then begin
                     WebhookObject := JsonToken.AsObject();
-                    if WebhookObject.Get('id', JsonToken) then begin
+
+                    WebhookURL := '';
+                    if WebhookObject.Get('url', UrlToken) then
+                        WebhookURL := UrlToken.AsValue().AsText();
+
+                    if IsWebhookForCurrentEnvironment(WebhookURL) and WebhookObject.Get('id', JsonToken) then begin
                         WebhookSetup.Reset();
                         WebhookSetup.SetRange(ID, JsonToken.AsValue().AsCode());
                         if WebhookSetup.IsEmpty() then begin
@@ -290,35 +302,40 @@ codeunit 6184796 "NPR Adyen Management"
                             WebhookSetup."Primary Key" := 0;
                             WebhookSetup.ID := CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(WebhookSetup.ID));
                             WebhookObject.Get('type', JsonToken);
-                            WebhookSetup.Type := Enum::"NPR Adyen Webhook Type".FromInteger(WebhookType.Ordinals().Get(WebhookType.Names().IndexOf(JsonToken.AsValue().AsText())));
-                            WebhookObject.Get('url', JsonToken);
-                            WebhookSetup."Web Service URL" := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Web Service URL"));
-                            if WebhookObject.Get('description', JsonToken) then
-                                WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup.Description));
-                            if WebhookObject.Get('username', JsonToken) then
-                                if JsonToken.AsValue().AsText() <> '' then begin
-                                    WebhookSetup."Web Service Security" := WebhookSetup."Web Service Security"::"Basic authentication";
-                                    WebhookSetup."Web Service User" := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Web Service User"));
-                                end;
-                            WebhookObject.Get('active', JsonToken);
-                            WebhookSetup.Active := JsonToken.AsValue().AsBoolean();
-                            WebhookSetup."Merchant Account" := MerchantAccount;
-                            if WebhookSetup.Type = WebhookSetup.Type::standard then begin
-                                if WebhookObject.Get('additionalSettings', JsonToken) then begin
-                                    if JsonToken.AsObject().Get('includeEventCodes', JsonToken) then begin
-                                        if JsonToken.IsArray() then begin
-                                            EventCodeArray := JsonToken.AsArray();
-                                            foreach EventCodeToken in EventCodeArray do
-                                                WebhookSetup."Include Events Filter" += CopyStr(EventCodeToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Include Events Filter")) + '|';
-                                            if WebhookSetup."Include Events Filter".Contains('|') then
-                                                WebhookSetup."Include Events Filter" := DelChr(WebhookSetup."Include Events Filter", '>', '|');
+                            WebhookTypeName := JsonToken.AsValue().AsText();
+                            TypeIndex := WebhookType.Names().IndexOf(WebhookTypeName);
+                            if TypeIndex > 0 then begin
+                                WebhookSetup.Type := Enum::"NPR Adyen Webhook Type".FromInteger(WebhookType.Ordinals().Get(TypeIndex));
+                                WebhookSetup."Web Service URL" := CopyStr(WebhookURL, 1, MaxStrLen(WebhookSetup."Web Service URL"));
+                                if WebhookObject.Get('description', JsonToken) then
+                                    WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup.Description));
+                                if WebhookObject.Get('username', JsonToken) then
+                                    if JsonToken.AsValue().AsText() <> '' then begin
+                                        WebhookSetup."Web Service Security" := WebhookSetup."Web Service Security"::"Basic authentication";
+                                        WebhookSetup."Web Service User" := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Web Service User"));
+                                    end;
+                                WebhookObject.Get('active', JsonToken);
+                                WebhookSetup.Active := JsonToken.AsValue().AsBoolean();
+                                WebhookSetup."Merchant Account" := MerchantAccount;
+                                if WebhookSetup.Type = WebhookSetup.Type::standard then begin
+                                    if WebhookObject.Get('additionalSettings', JsonToken) then begin
+                                        if JsonToken.AsObject().Get('includeEventCodes', JsonToken) then begin
+                                            if JsonToken.IsArray() then begin
+                                                EventCodeArray := JsonToken.AsArray();
+                                                foreach EventCodeToken in EventCodeArray do
+                                                    WebhookSetup."Include Events Filter" += CopyStr(EventCodeToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Include Events Filter")) + '|';
+                                                if WebhookSetup."Include Events Filter".Contains('|') then
+                                                    WebhookSetup."Include Events Filter" := DelChr(WebhookSetup."Include Events Filter", '>', '|');
+                                            end;
                                         end;
                                     end;
                                 end;
-                            end;
-                            WebhookSetup.Insert();
-                            _ImportedWebhooks += 1;
-                            Commit();
+                                WebhookSetup.Insert();
+                                _ImportedWebhooks += 1;
+                                Commit();
+                            end else
+                                if not _UnknownWebhookTypes.Contains(WebhookTypeName) then
+                                    _UnknownWebhookTypes.Add(WebhookTypeName);
                         end;
                     end;
                 end;
@@ -328,11 +345,83 @@ codeunit 6184796 "NPR Adyen Management"
                     ImportWebhooks(i, MerchantAccount);
                 end;
         end;
+        if pageNumber = 0 then
+            LogSkippedWebhookTypesToSentry(MerchantAccount);
+    end;
+
+    local procedure IsWebhookForCurrentEnvironment(WebServiceURL: Text): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        TypeHelper: Codeunit "Type Helper";
+        Parameters: List of [Text];
+        ParamParts: List of [Text];
+        Parameter: Text;
+        QueryString: Text;
+        URLEncodedCompanyName: Text;
+        UrlTenant: Text;
+        UrlEnvironment: Text;
+        UrlCompanyName: Text;
+        QuestionMarkPos: Integer;
+    begin
+        QuestionMarkPos := WebServiceURL.IndexOf('?');
+        if (QuestionMarkPos = 0) or (QuestionMarkPos >= StrLen(WebServiceURL)) then
+            exit(false);
+
+        QueryString := WebServiceURL.Substring(QuestionMarkPos + 1);
+        Parameters := QueryString.Split('&');
+        foreach Parameter in Parameters do begin
+            ParamParts := Parameter.Split('=');
+            if ParamParts.Count() = 2 then
+                case ParamParts.Get(1) of
+                    'tenant':
+                        UrlTenant := ParamParts.Get(2);
+                    'environment':
+                        UrlEnvironment := ParamParts.Get(2);
+                    'companyName':
+                        UrlCompanyName := ParamParts.Get(2);
+                end;
+        end;
+
+        URLEncodedCompanyName := CompanyName();
+        TypeHelper.UrlEncode(URLEncodedCompanyName);
+
+        exit(
+            (UrlTenant = AzureADTenant.GetAadTenantId()) and
+            (UrlEnvironment = EnvironmentInformation.GetEnvironmentName()) and
+            (UrlCompanyName = URLEncodedCompanyName));
     end;
 
     internal procedure GetImportedWebhooksAmount(): Integer
     begin
         exit(_ImportedWebhooks);
+    end;
+
+    local procedure LogSkippedWebhookTypesToSentry(MerchantAccount: Text[80])
+    var
+        Sentry: Codeunit "NPR Sentry";
+        WebhookTypeName: Text;
+        JoinedTypes: Text;
+    begin
+        if _UnknownWebhookTypes.Count() = 0 then
+            exit;
+
+        foreach WebhookTypeName in _UnknownWebhookTypes do begin
+            if JoinedTypes <> '' then
+                JoinedTypes += ', ';
+            JoinedTypes += WebhookTypeName;
+        end;
+
+        if not TryErrorSkippedWebhookTypes(MerchantAccount, JoinedTypes) then
+            Sentry.AddLastErrorIfProgrammingBug();
+    end;
+
+    [TryFunction]
+    local procedure TryErrorSkippedWebhookTypes(MerchantAccount: Text[80]; JoinedTypes: Text)
+    var
+        SkippedTypesMsg: Label 'Adyen Management API returned webhook type(s) that are not mapped in enum "NPR Adyen Webhook Type" for merchant account ''%1'': %2. These webhooks were skipped during import - the enum is likely missing the value(s). This is a programming bug.', Locked = true;
+    begin
+        Error(SkippedTypesMsg, MerchantAccount, JoinedTypes);
     end;
 
     local procedure CreateWebhookHttpRequestObject(WebhookSetup: Record "NPR Adyen Webhook Setup") RequestText: Text;
@@ -1579,4 +1668,5 @@ codeunit 6184796 "NPR Adyen Management"
     var
         _AdyenSetup: Record "NPR Adyen Setup";
         _ImportedWebhooks: Integer;
+        _UnknownWebhookTypes: List of [Text];
 }

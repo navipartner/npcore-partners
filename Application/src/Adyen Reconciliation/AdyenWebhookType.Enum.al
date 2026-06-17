@@ -48,4 +48,20 @@ enum 6014649 "NPR Adyen Webhook Type"
     {
         Caption = 'rreq-notification';
     }
+    value(110; "direct-debit-notice-of-change-notification")
+    {
+        Caption = 'direct-debit-notice-of-change-notification';
+    }
+    value(120; "terminal-api-notification")
+    {
+        Caption = 'terminal-api-notification';
+    }
+    value(130; "terminal-settings")
+    {
+        Caption = 'terminal-settings';
+    }
+    value(140; "terminal-boarding")
+    {
+        Caption = 'terminal-boarding';
+    }
 }
