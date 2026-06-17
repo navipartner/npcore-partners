@@ -32,6 +32,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         {
             column(CRO_Bill_DateTime; StrSubstNo(DateTimeFormatLbl, FormatDate("Entry Date"), FormatTime(("Log Timestamp")))) { }
             column(CRO_BillNo; StrSubstNo(BillLbl, "Bill No.", "POS Store Code", "POS Unit No.")) { }
+            column(CRO_SourceDocumentNo; GetSourceDocumentNo("Source Document No.")) { }
             column(CRO_ZKICode; "ZKI Code") { }
             column(CRO_JIRCode; "JIR Code") { }
             column(CRO_TotalAmount; "Total Amount") { }
@@ -529,6 +530,13 @@ report 6014554 "NPR CRO Fiscal Bill A4"
             AppendNewLineText(ReturnText, CompanyInformation."E-Mail");
     end;
 
+    local procedure GetSourceDocumentNo(SourceDocumentNo: Code[20]): Text
+    begin
+        if SourceDocumentNo = '' then
+            exit('');
+        exit(StrSubstNo(SourceDocumentNoLbl, SourceDocumentNo));
+    end;
+
     local procedure GetPaymentMethodDescription(PaymentMethodCode: Code[10]): Text
     var
         PaymentMethod: Record "Payment Method";
@@ -623,6 +631,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         VATRegNoLbl: Label 'OIB: %1', Comment = '%1 = VAT Registration No.', Locked = true;
         PhoneNoLbl: Label 'Tel.: %1', Comment = '%1 = Phone No.', Locked = true;
         SalespersonLbl: Label 'Izdao: %1', Comment = '%1 = Salesperson Name or Code', Locked = true;
+        SourceDocumentNoLbl: Label 'Broj dokumenta: %1', Comment = '%1 = Source Document No.', Locked = true;
         BillLbl: Label 'RAČUN %1/%2/%3', Comment = '%1 = Receipt No., %2 = POS Store Code, %3 = POS Unit No.', Locked = true;
         CompanyInformationBlock: Text;
         CustomerInformationBlock: Text;
