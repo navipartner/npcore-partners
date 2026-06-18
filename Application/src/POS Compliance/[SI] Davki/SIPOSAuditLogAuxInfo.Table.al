@@ -159,6 +159,17 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
             Caption = 'Refund Amount';
             DataClassification = CustomerContent;
         }
+        field(28; "Customer No."; Code[20])
+        {
+            Caption = 'Customer No.';
+            DataClassification = CustomerContent;
+            TableRelation = Customer;
+        }
+        field(29; "Customer Name"; Text[100])
+        {
+            Caption = 'Customer Name';
+            DataClassification = CustomerContent;
+        }
         field(30; "Customer VAT Number"; Text[20])
         {
             Caption = 'Customer VAT Number';

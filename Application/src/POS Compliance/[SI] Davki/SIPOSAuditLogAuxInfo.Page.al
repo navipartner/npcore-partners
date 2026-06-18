@@ -56,6 +56,17 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                     ApplicationArea = NPRSIFiscal;
                     ToolTip = 'Specifies the value of the Salesperson Code field.';
                 }
+                field("Customer Name"; Rec."Customer Name")
+                {
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the Customer Name related to this record.';
+                }
+                field("Customer VAT Number"; Rec."Customer VAT Number")
+                {
+                    Caption = 'Customer Tax Number';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the Customer Tax Number (davčna številka) related to this record.';
+                }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRSIFiscal;

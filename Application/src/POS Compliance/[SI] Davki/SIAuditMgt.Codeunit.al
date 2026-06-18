@@ -849,6 +849,8 @@ codeunit 6151546 "NPR SI Audit Mgt."
             exit;
         if not Customer.Get(CustomerNo) then
             exit;
+        SIPOSAuditLogAuxInfo."Customer No." := Customer."No.";
+        SIPOSAuditLogAuxInfo."Customer Name" := Customer.Name;
         SIPOSAuditLogAuxInfo."Customer VAT Number" := Customer."VAT Registration No.";
         SIPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
     end;
