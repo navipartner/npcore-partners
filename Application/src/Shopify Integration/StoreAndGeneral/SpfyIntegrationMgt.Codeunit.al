@@ -386,6 +386,17 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifyStore."Update Cust. Phone No. from BC");
     end;
 
+    local procedure IsUpdateCustPhoneNoFromBCForAnyStore(): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+#if not (BC18 or BC19 or BC20 or BC21)
+        ShopifyStore.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
+        ShopifyStore.SetRange("Update Cust. Phone No. from BC", true);
+        exit(not ShopifyStore.IsEmpty());
+    end;
+
     procedure DefaultWeightUnit(ShopifyStoreCode: Code[20]): Enum "NPR Spfy Weight Unit"
     begin
         GetStore(ShopifyStoreCode);
@@ -620,10 +631,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
 
     /// <summary>
     /// During interactive entry of a phone number, asks the user to confirm a value that Shopify would
-    /// reject. Active only while the Shopify Integration feature is enabled in the environment, regardless
-    /// of whether the edited record is currently synced to any Shopify store. Declining raises a blank
-    /// Error to roll back the field change. No-op when the feature is disabled, the value is unchanged or
-    /// blank, the session is non-interactive, or the value already passes IsValidShopifyPhoneNo.
+    /// reject. Active only while the Shopify Integration feature is enabled in the environment and at
+    /// least one Shopify store has "Update Cust. Phone No. from BC" enabled, regardless of whether the
+    /// edited record is currently synced to any Shopify store. Declining raises a blank Error to roll
+    /// back the field change. No-op when the feature is disabled, no store updates customer phone numbers
+    /// from BC, the value is unchanged or blank, the session is non-interactive, or the value already
+    /// passes IsValidShopifyPhoneNo.
     /// </summary>
     /// <param name="PhoneNo">The newly entered phone number.</param>
     /// <param name="xPhoneNo">The previous phone number (xRec value); used to skip unchanged values.</param>
@@ -639,6 +652,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         if not SpfyIntegrationFeature.IsFeatureEnabled() then
             exit;
         if IsValidShopifyPhoneNo(PhoneNo) then
+            exit;
+        if not IsUpdateCustPhoneNoFromBCForAnyStore() then
             exit;
         if _ConfirmedInvalidPhoneNos.Contains(PhoneNo) then
             exit;
