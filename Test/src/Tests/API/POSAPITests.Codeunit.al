@@ -272,6 +272,199 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure UpdateSale_ChangesVATAndGenOnHeaderAndLines()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryRandom: Codeunit "Library - Random";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        NewVATPostingSetup: Record "VAT Posting Setup";
+        NewGenBusPostingGroup: Record "Gen. Business Posting Group";
+        POSSaleRec: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+        IdToken: JsonToken;
+        RefreshedLines: JsonArray;
+        LineToken: JsonToken;
+        FoundLine: Boolean;
+    begin
+        // [SCENARIO] PATCH /pos/sale with vat+gen business posting groups updates BOTH the header AND existing sale lines.
+        //            Regression: PATCH used to validate only the header VAT field (leaving lines stale) and ignored gen entirely.
+        Initialize();
+
+        // [GIVEN] A sale with one item line
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+
+        Body.Add('posUnit', _POSUnit."No.");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        // [GIVEN] A new VAT Bus. Posting Group (with a VAT Posting Setup for the item's VAT Prod group) and a new Gen Bus. Posting Group
+        LibraryERM.CreateVATPostingSetupWithAccounts(NewVATPostingSetup, NewVATPostingSetup."VAT Calculation Type"::"Normal VAT", LibraryRandom.RandDecInDecimalRange(10, 25, 0));
+        LibraryERM.CreateGenBusPostingGroup(NewGenBusPostingGroup);
+        NPRLibraryPOSMasterData.CreateVATPostingSetupForSaleItem(NewVATPostingSetup."VAT Bus. Posting Group", _Item."VAT Prod. Posting Group");
+        Commit();
+
+        // [WHEN] PATCH the sale with both groups
+        Clear(Body);
+        Body.Add('vatBusinessPostingGroup', NewVATPostingSetup."VAT Bus. Posting Group");
+        Body.Add('genBusinessPostingGroup', NewGenBusPostingGroup.Code);
+        Response := LibraryNPRetailAPI.CallApi('PATCH', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Patch sale should succeed');
+
+        // [THEN] The PATCH delta response reports the patched line as refreshed (proves line-level delta capture, not just DB state)
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('refreshedSaleLines', JToken), 'PATCH response should contain refreshedSaleLines');
+        RefreshedLines := JToken.AsArray();
+        foreach LineToken in RefreshedLines do
+            if LineToken.AsObject().Get('id', IdToken) then
+                if IdToken.AsValue().AsText() = FormatGuid(SaleLineId) then
+                    FoundLine := true;
+        Assert.IsTrue(FoundLine, 'refreshedSaleLines should contain the patched item line');
+
+        // [THEN] The header carries both new groups
+        Assert.IsTrue(POSSaleRec.GetBySystemId(SaleId), 'Sale header should exist');
+        Assert.AreEqual(NewVATPostingSetup."VAT Bus. Posting Group", POSSaleRec."VAT Bus. Posting Group", 'Header VAT Bus. Posting Group should be updated');
+        Assert.AreEqual(NewGenBusPostingGroup.Code, POSSaleRec."Gen. Bus. Posting Group", 'Header Gen. Bus. Posting Group should be updated');
+
+        // [THEN] The exact item line (fetched by its SystemId = SaleLineId) ALSO carries both new groups — this is what was broken before the fix
+        Assert.IsTrue(SaleLinePOS.GetBySystemId(SaleLineId), 'Item sale line should exist');
+        Assert.AreEqual(SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type", 'Fetched line should be the item line');
+        Assert.AreEqual(NewVATPostingSetup."VAT Bus. Posting Group", SaleLinePOS."VAT Bus. Posting Group", 'Line VAT Bus. Posting Group should be updated');
+        Assert.AreEqual(NewGenBusPostingGroup.Code, SaleLinePOS."Gen. Bus. Posting Group", 'Line Gen. Bus. Posting Group should be updated');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateSale_AppliesGenBusinessPostingGroup()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryERM: Codeunit "Library - ERM";
+        Assert: Codeunit Assert;
+        NewGenBusPostingGroup: Record "Gen. Business Posting Group";
+        POSSaleRec: Record "NPR POS Sale";
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] POST /pos/sale with body.genBusinessPostingGroup applies it to the sale header and echoes it back.
+        //            Regression: the API used to ignore genBusinessPostingGroup entirely.
+        Initialize();
+
+        LibraryERM.CreateGenBusPostingGroup(NewGenBusPostingGroup);
+        Commit();
+
+        SaleId := CreateGuid();
+        Body.Add('posUnit', _POSUnit."No.");
+        Body.Add('genBusinessPostingGroup', NewGenBusPostingGroup.Code);
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [THEN] Response echoes the gen group
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('genBusinessPostingGroup', JToken), 'Response should contain genBusinessPostingGroup');
+        Assert.AreEqual(NewGenBusPostingGroup.Code, JToken.AsValue().AsText(), 'Response should echo the requested genBusinessPostingGroup');
+
+        // [THEN] Header record carries the gen group
+        Assert.IsTrue(POSSaleRec.GetBySystemId(SaleId), 'Sale header should exist');
+        Assert.AreEqual(NewGenBusPostingGroup.Code, POSSaleRec."Gen. Bus. Posting Group", 'Header Gen. Bus. Posting Group should be set');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UpdateSale_WithCustomerAndGroups_PreservesCustomerAndAppliesGroups()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryRandom: Codeunit "Library - Random";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        NewVATPostingSetup: Record "VAT Posting Setup";
+        NewGenBusPostingGroup: Record "Gen. Business Posting Group";
+        Customer: Record Customer;
+        POSSaleRec: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] PATCH /pos/sale with customerNo AND explicit posting groups in the SAME body must keep the new customer
+        //            on the header AND apply the explicit groups. Regression: delegating the group change to the VAT helper
+        //            (which reads/writes the POS Sale codeunit's cached record) wrote stale pre-customer header state back,
+        //            reverting the just-applied Customer No.
+        Initialize();
+
+        // [GIVEN] A sale with one item line, created without a customer
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        Body.Add('posUnit', _POSUnit."No.");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        // [GIVEN] A customer (whose VAT group has a setup for the item, so the customer-validate cascade can re-VAT the line)
+        //         plus explicit VAT and Gen groups to send alongside the customer
+        LibraryERM.CreateVATPostingSetupWithAccounts(NewVATPostingSetup, NewVATPostingSetup."VAT Calculation Type"::"Normal VAT", LibraryRandom.RandDecInDecimalRange(10, 25, 0));
+        LibraryERM.CreateGenBusPostingGroup(NewGenBusPostingGroup);
+        NPRLibraryPOSMasterData.CreateVATPostingSetupForSaleItem(NewVATPostingSetup."VAT Bus. Posting Group", _Item."VAT Prod. Posting Group");
+        LibrarySales.CreateCustomer(Customer);
+        Customer."VAT Bus. Posting Group" := NewVATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        Commit();
+
+        // [WHEN] PATCH with customerNo AND both posting groups together
+        Clear(Body);
+        Body.Add('customerNo', Customer."No.");
+        Body.Add('vatBusinessPostingGroup', NewVATPostingSetup."VAT Bus. Posting Group");
+        Body.Add('genBusinessPostingGroup', NewGenBusPostingGroup.Code);
+        Response := LibraryNPRetailAPI.CallApi('PATCH', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Patch sale should succeed');
+
+        // [THEN] The header keeps the new customer (regression guard) AND carries the explicit groups
+        Assert.IsTrue(POSSaleRec.GetBySystemId(SaleId), 'Sale header should exist');
+        Assert.AreEqual(Customer."No.", POSSaleRec."Customer No.", 'Header Customer No. must survive the combined customer+groups patch');
+        Assert.AreEqual(NewVATPostingSetup."VAT Bus. Posting Group", POSSaleRec."VAT Bus. Posting Group", 'Header VAT Bus. Posting Group should be the explicit group');
+        Assert.AreEqual(NewGenBusPostingGroup.Code, POSSaleRec."Gen. Bus. Posting Group", 'Header Gen. Bus. Posting Group should override the customer default');
+
+        // [THEN] The existing line also carries the explicit groups
+        Assert.IsTrue(SaleLinePOS.GetBySystemId(SaleLineId), 'Item sale line should exist');
+        Assert.AreEqual(NewVATPostingSetup."VAT Bus. Posting Group", SaleLinePOS."VAT Bus. Posting Group", 'Line VAT Bus. Posting Group should be the explicit group');
+        Assert.AreEqual(NewGenBusPostingGroup.Code, SaleLinePOS."Gen. Bus. Posting Group", 'Line Gen. Bus. Posting Group should override the customer default');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetSale_NonExistent_ReturnsNotFound()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";

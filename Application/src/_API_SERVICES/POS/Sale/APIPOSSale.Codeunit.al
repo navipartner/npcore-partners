@@ -55,7 +55,7 @@ codeunit 6248632 "NPR API POS Sale"
             Evaluate(WithLines, Request.QueryParams().Get('withLines'));
 
         POSSale.ReadIsolation := IsolationLevel::ReadCommitted;
-        POSSale.SetLoadFields(SystemId, "Sales Ticket No.", "Register No.", "Customer No.", "SystemCreatedAt", Date, "POS Store Code", "Salesperson Code", "VAT Bus. Posting Group");
+        POSSale.SetLoadFields(SystemId, "Sales Ticket No.", "Register No.", "Customer No.", "SystemCreatedAt", Date, "POS Store Code", "Salesperson Code", "VAT Bus. Posting Group", "Gen. Bus. Posting Group");
         POSSale.SetFilter("Register No.", '=%1', POSUnitFilter);
 
         if (Request.Paths().Count() = 3) and (Request.Paths().Get(2) = 'search') then begin
@@ -88,6 +88,7 @@ codeunit 6248632 "NPR API POS Sale"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleRec: Record "NPR POS Sale";
         VATBusinessPostingGroup: Text;
+        GenBusinessPostingGroup: Text;
         POSSession: Codeunit "NPR POS Session";
         UserSetup: Record "User Setup";
         POSUnit: Record "NPR POS Unit";
@@ -111,6 +112,9 @@ codeunit 6248632 "NPR API POS Sale"
         if GetJsonText(Body, 'vatBusinessPostingGroup', TempText) then
             VATBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(VATBusinessPostingGroup));
 
+        if GetJsonText(Body, 'genBusinessPostingGroup', TempText) then
+            GenBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(GenBusinessPostingGroup));
+
         if not UserSetup.Get(UserId) then
             exit(Response.RespondBadRequest('API user has no User Setup record. Add the API user to User Setup (with a POS Unit assigned) before calling the POS Sale API.'));
         if UserSetup."NPR POS Unit No." = '' then
@@ -126,11 +130,13 @@ codeunit 6248632 "NPR API POS Sale"
         CreateSale(SaleSystemId, POSUnitNo);
         POSSession.GetSale(POSSale);
 
-        if (CustomerNo <> '') or (VATBusinessPostingGroup <> '') then begin
+        if (CustomerNo <> '') or (VATBusinessPostingGroup <> '') or (GenBusinessPostingGroup <> '') then begin
             POSSale.GetCurrentSale(POSSaleRec);
             POSSaleRec.GetBySystemId(POSSaleRec.SystemId);
             if CustomerNo <> '' then
                 POSSaleRec.Validate("Customer No.", CustomerNo);
+            if GenBusinessPostingGroup <> '' then
+                POSSaleRec.Validate("Gen. Bus. Posting Group", GenBusinessPostingGroup);
             if VATBusinessPostingGroup <> '' then
                 POSSaleRec.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup);
             POSSaleRec.Modify(true);
@@ -149,11 +155,14 @@ codeunit 6248632 "NPR API POS Sale"
         Body: JsonToken;
         CustomerNo: Code[20];
         VATBusinessPostingGroup: Code[20];
+        GenBusinessPostingGroup: Code[20];
         TempText: Text;
         POSSaleRec: Record "NPR POS Sale";
         DeltaBuilder: Codeunit "NPR API POS Delta Builder";
         POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
+        SetSaleVATB: Codeunit "NPR POS Action-Set Sale VAT-B.";
     begin
         Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
 
@@ -180,13 +189,16 @@ codeunit 6248632 "NPR API POS Sale"
             POSSale.GetCurrentSale(POSSaleRec);
             POSSaleRec.Validate("Customer No.", CustomerNo);
             POSSaleRec.Modify(true);
+            POSSale.RefreshCurrent();
         end;
 
-        if GetJsonText(Body, 'vatBusinessPostingGroup', TempText) then begin
+        if GetJsonText(Body, 'genBusinessPostingGroup', TempText) then
+            GenBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(GenBusinessPostingGroup));
+        if GetJsonText(Body, 'vatBusinessPostingGroup', TempText) then
             VATBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(VATBusinessPostingGroup));
-            POSSale.GetCurrentSale(POSSaleRec);
-            POSSaleRec.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup);
-            POSSaleRec.Modify(true);
+        if (GenBusinessPostingGroup <> '') or (VATBusinessPostingGroup <> '') then begin
+            POSSession.GetSaleLine(POSSaleLine);
+            SetSaleVATB.ChangeSaleVATBusPostingGroup(POSSale, POSSaleLine, GenBusinessPostingGroup, VATBusinessPostingGroup, false);
         end;
 
         exit(Response.RespondOK(DeltaBuilder.BuildDeltaResponse()));
@@ -386,7 +398,8 @@ codeunit 6248632 "NPR API POS Sale"
             .AddProperty('startTime', Format(POSSale.SystemCreatedAt, 0, 9))
             .AddProperty('customerNo', POSSale."Customer No.")
             .AddProperty('salespersonCode', POSSale."Salesperson Code")
-            .AddProperty('vatBusinessPostingGroup', POSSale."VAT Bus. Posting Group");
+            .AddProperty('vatBusinessPostingGroup', POSSale."VAT Bus. Posting Group")
+            .AddProperty('genBusinessPostingGroup', POSSale."Gen. Bus. Posting Group");
 
         if not WithLines then begin
             Json.EndObject();
