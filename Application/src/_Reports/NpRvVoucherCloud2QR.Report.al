@@ -167,7 +167,7 @@ report 6014517 "NPR NpRv Voucher Cloud 2 QR"
                 Language: Codeunit Language;
             begin
                 BarCodeText := "NpRv Voucher"."Reference No.";
-                BarCodeEncodedText := BarcodeFontProviderMgt.GenerateQRCodeAZ(BarCodeText, 'M', 'UTF8', true, true, 2);
+                BarCodeEncodedText := BarcodeFontProviderMgt.GenerateQRCodeAZ(BarCodeText, 'M', 'UTF8', true, IncludeUTF8EncodingMarker, 2);
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
@@ -178,7 +178,28 @@ report 6014517 "NPR NpRv Voucher Cloud 2 QR"
     requestpage
     {
         SaveValues = true;
+        layout
+        {
+            area(content)
+            {
+                group(options)
+                {
+                    Caption = 'Options';
+                    field(_IncludeUTF8EncodingMarker; IncludeUTF8EncodingMarker)
+                    {
+                        Caption = 'Include UTF-8 Encoding Marker';
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies whether a UTF-8 byte order mark (BOM) is added to the start of the QR code payload. Enable this only if your scanners require the marker. Disable it if scanners read the leading marker bytes as part of the voucher Reference No., which prevents the voucher from being found when scanned.';
+                    }
+                }
+            }
+        }
     }
+
+    trigger OnInitReport()
+    begin
+        IncludeUTF8EncodingMarker := true;
+    end;
 
     var
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
@@ -187,5 +208,6 @@ report 6014517 "NPR NpRv Voucher Cloud 2 QR"
         EndingDate: Text;
         IssuedDate: Text;
         StartingDate: Text;
+        IncludeUTF8EncodingMarker: Boolean;
 }
 #endif
