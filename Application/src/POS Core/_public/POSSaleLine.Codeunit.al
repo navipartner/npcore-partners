@@ -154,6 +154,13 @@
         SaleLinePOS.Copy(Rec);
     end;
 
+    procedure SetDeferPriceCalculation(Defer: Boolean)
+    begin
+        // _DeferPriceCalculation is a single-owner, build-scoped flag (see the table). Exposed so the owner can open
+        // its scope, and so the session accessor can reset it to the resting state (false) on handoff.
+        Rec.SetDeferPriceCalculation(Defer);
+    end;
+
     procedure InsertLine(var Line: Record "NPR POS Sale Line") Return: Boolean
     begin
         exit(InsertLine(Line, true));
@@ -171,6 +178,11 @@
             Rec."Line No." := Line."Line No.";
 
         Rec.SetSkipPOSInfo(SkipPOSInfo);
+        // Caller's defer state is only active during Validate("No.") below — it gates FindItemSalesPrice/UpdateAmounts
+        // during item init, letting callers that already priced the line skip the price engine.
+        // InsertLine always finalizes amounts before insert (defer is reset to true after Validate("No."),
+        // then to false before InsertLineInternal). Callers cannot defer finalization across InsertLine.
+        Rec.SetDeferPriceCalculation(Line.GetDeferPriceCalculation());
 
         InitLine();
 
@@ -189,8 +201,16 @@
             Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
         end;
 
+        // Pre-assign fields that Validate("No.") reads as context during item setup and price lookup.
+        // This ensures InitFromItem, FindItemSalesPrice and the internal Validate(Quantity) chain
+        // all operate with the correct values from the start, avoiding a second price recalculation later.
         Rec."Variant Code" := Line."Variant Code";
+        Rec.Quantity := Line.Quantity;
+        Rec."Unit of Measure Code" := Line."Unit of Measure Code";
+
         Rec.Validate("No.", Line."No.");
+        Rec.SetDeferPriceCalculation(true);
+
         Rec."Voucher Category" := Line."Voucher Category";
         if Line."Unit of Measure Code" <> '' then
             Rec.Validate("Unit of Measure Code", Line."Unit of Measure Code");
@@ -203,7 +223,7 @@
         if Line."Description 2" <> '' then
             Rec."Description 2" := Line."Description 2";
 
-        Rec.Validate(Quantity, Line.Quantity);
+        Rec.Validate(Quantity, Line.Quantity); // Still needed for non-item lines.
 
         Rec.Validate("NPRE Seating Code", Line."NPRE Seating Code");
 
@@ -257,6 +277,7 @@
         Rec."Store Ship Profile Code" := Line."Store Ship Profile Code";
         Rec."Store Ship Profile Line No." := Line."Store Ship Profile Line No.";
         Rec.Indentation := Line.Indentation;
+        Rec.SetDeferPriceCalculation(false);
 
         Return := InsertLineInternal(Rec, true);
 
@@ -704,6 +725,7 @@
         PreProcessingSpan: Codeunit "NPR Sentry Span";
     begin
         Rec := Line;
+        Rec.SetDeferPriceCalculation(false);   // build phase is over; finalization must always compute
 
         Sentry.StartSpan(PreProcessingSpan, 'bc.pos.line.insert.pre-processing');
         CheckMandatoryFields(Line);

@@ -85,6 +85,45 @@ codeunit 85233 "NPR TM Dynamic Price POS Test"
             'Discount amount did not match expected amount on line'
         );
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CalculatePrice_FacadeMatchesPosSale()
+    var
+        ItemNo: Code[20];
+        Item: Record Item;
+        Salesperson: Record "Salesperson/Purchaser";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleLine: Record "NPR POS Sale Line";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ErpUnitPrice, ErpDiscountPct, ErpUnitPriceVatPercentage : Decimal;
+        ErpUnitPriceIncludesVat: Boolean;
+        TicketUnitPrice: Decimal;
+    begin
+        // "Quote == checkout" guard: the TMDynamicPrice facade CalculatePrice (ERP base via the rerouted single-line
+        // quote, plus the dynamic delta) must produce the same ticket price a real POS sale charges - that is the price
+        // the API agents/web expose. If the facade and the real sale ever diverge, this breaks.
+        ItemNo := SelectDynamicPriceScenario();
+        Item.Get(ItemNo);
+
+        // Real POS ticket sale (dynamic -10 applied).
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, Salesperson, POSSale);
+        LibraryPOSMock.CreateItemLine(POSSession, ItemNo, 1);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(POSSaleLine);
+
+        // Facade price for the same item, priced into a real schedule slot so the dynamic rule is consulted.
+        AdmScheduleEntry.SetFilter("Admission Code", '=%1', GetAdmissionCode(ItemNo));
+        AdmScheduleEntry.SetFilter("Admission Start Date", '=%1', Today());
+        AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        AdmScheduleEntry.FindFirst();
+        TicketUnitPrice := TicketPrice.CalculatePrice(ItemNo, '', '', AdmScheduleEntry."Admission Start Date", AdmScheduleEntry."Admission Start Time", 1, ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
+
+        Assert.AreEqual(Item."Unit Price", ErpUnitPrice, 'Facade ERP base should be the list price (the rerouted single-line quote).');
+        Assert.AreEqual(POSSaleLine."Unit Price", TicketUnitPrice, 'Facade total price (ERP base + dynamic) should match the real POS ticket sale.');
+    end;
     #endregion
 
     #region Aux functions

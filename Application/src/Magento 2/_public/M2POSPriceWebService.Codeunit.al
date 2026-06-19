@@ -21,6 +21,17 @@
 
     [TryFunction]
     internal procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
+    begin
+        TryPosQuoteRequestWorker(TmpSalePOS, TmpSaleLinePOS, TempNPRTotalDiscBenItemBuffer, false);
+    end;
+
+    [TryFunction]
+    internal procedure TryFindErpBasePrice(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
+    begin
+        TryPosQuoteRequestWorker(TmpSalePOS, TmpSaleLinePOS, TempNPRTotalDiscBenItemBuffer, true);
+    end;
+
+    local procedure TryPosQuoteRequestWorker(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary; DeferPriceCalculation: Boolean)
     var
         Customer: Record Customer;
         VATBusPostingGroup: Code[20];
@@ -74,9 +85,11 @@
                     TmpSaleLinePOS."Item Disc. Group" := Item."Item Disc. Group";
                     TmpSaleLinePOS.SetSkipUpdateDependantQuantity(true);
 
+                    TmpSaleLinePOS.SetDeferPriceCalculation(DeferPriceCalculation);
                     POSSalesPriceCalcMgt.FindItemPrice(TmpSalePOS, TmpSaleLinePOS);
-                    TmpSaleLinePOS.UpdateAmounts(TmpSaleLinePOS);
+                    TmpSaleLinePOS.SetDeferPriceCalculation(false);
 
+                    TmpSaleLinePOS.UpdateAmounts(TmpSaleLinePOS);
                 end else begin
                     TmpSaleLinePOS."Line Type" := TmpSaleLinePOS."Line Type"::Comment;
 

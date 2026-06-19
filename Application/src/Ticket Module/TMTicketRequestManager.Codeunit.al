@@ -1356,6 +1356,7 @@
         Session.LogMessage('NPR_TM_RequestManager', MessageText, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
+
     procedure ConfirmReservationRequestWithValidate(Token: Text[100])
     var
         ResponseMessage: Text;

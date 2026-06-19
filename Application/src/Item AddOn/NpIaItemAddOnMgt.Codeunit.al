@@ -526,6 +526,7 @@
         PrevRec: Text;
         MasterLineQuantityBase: Decimal;
         BaseLineIndent: Integer;
+        UnitPrice: Decimal;
     begin
         if not FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, SaleLinePOS) then begin
             if ItemAddOnLine.Quantity = 0 then
@@ -553,24 +554,41 @@
             ItemAddOn.BeforeInsertPOSAddOnLine(SalePOS, AppliesToLineNo, ItemAddOnLine);
             SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
             SaleLinePOS."Variant Code" := ItemAddOnLine."Variant Code";
+
+            SaleLinePOS.Quantity := ItemAddOnLine.Quantity; // Prime the quantity to ensure correct price calculation in case of per unit add-on line
             SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
+            SaleLinePOS.SetDeferPriceCalculation(true);
+
             SaleLinePOS.Description := ItemAddOnLine.Description;
-            SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
+
+            Item.Get(ItemAddOnLine."Item No.");
             if (ItemAddOnLine."Unit Price" <> 0) or (ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) then begin
+                UnitPrice := ItemAddOnLine."Unit Price";
+                if (Item."Price Includes VAT") then begin
+                    Item.TestField("VAT Bus. Posting Gr. (Price)");
+                    Item.TestField("VAT Prod. Posting Group");
+                end;
+                POSSaleLine.ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", SaleLinePOS, UnitPrice);
+
                 SaleLinePOS."Manual Item Sales Price" := true;
-                SaleLinePOS.Validate("Unit Price", ItemAddOnLine."Unit Price");
+                SaleLinePOS.Validate("Unit Price", UnitPrice);
             end;
+
             if (ItemAddOnLine."Per Unit" and ItemAddOnLine.Mandatory) and (not ItemAddOnLine."Fixed Quantity") then
                 SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity * MasterLineQuantityBase)
             else
                 SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
+
             if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
                 SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
             if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
                 SaleLinePOS.Validate("Discount Amount", ItemAddOnLine.DiscountAmount);
 
-            SaleLinePOS."Serial No." := ItemAddOnLine."Serial No.";
-            SaleLinePOS."Lot No." := ItemAddOnLine."Lot No.";
+            if (ItemAddOnLine."Serial No." <> '') then
+                SaleLinePOS.Validate("Serial No.", ItemAddOnLine."Serial No.");
+            if (ItemAddOnLine."Lot No." <> '') then
+                SaleLinePOS.Validate("Lot No.", ItemAddOnLine."Lot No.");
+
             SaleLinePOS.Indentation := BaseLineIndent + 1;
 
             FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
@@ -600,16 +618,17 @@
             POSSaleLine.SetUseCustomSystemId(true);
             SaleLinePOS.SystemId := NewLineSystemId;
             POSSaleLine.SetSkipPOSInfo(true);
-            SaleLinePOS.SetSkipCalcDiscount(true);
 
-            POSSaleLine.InsertLine(SaleLinePOS);
+            SaleLinePOS.SetSkipCalcDiscount(true);
+            SaleLinePOS.SetDeferPriceCalculation(false);
+
+            POSSaleLine.InsertLineRaw(SaleLinePOS, true);
 
             POSSaleLine.SetUseCustomSystemId(false);
             SaleLinePOS.SetSkipCalcDiscount(false);
             POSSaleLine.SetUsePresetLineNo(false);
 
-            if Item.Get(SaleLinePOS."No.") then
-                POSActionInsertItemB.AddAccessories(Item, POSSaleLine);
+            POSActionInsertItemB.AddAccessories(Item, POSSaleLine);
 
             if not IsAutoSplitKeyRecord then
                 IsAutoSplitKeyRecord := POSSaleLine.InsertedWithAutoSplitKey();

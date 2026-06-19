@@ -87,8 +87,10 @@
                         begin
                             InitFromItem();
                             UpdateVATSetup();
+
                             "Unit Price" := FindItemSalesPrice();
-                            Validate(Quantity);
+                            ValidateQuantityWithDeferredAmounts();
+
                             POSSaleTranslation.AssignTranslationOnPOSSaleLine(Rec, SalePOS);
                             if "No." <> xRec."No." then
                                 GetDefaultBin();
@@ -169,16 +171,18 @@
                     "Line Type"::"GL Payment", "Line Type"::"Issue VOucher", "Line Type"::Rounding, "Line Type"::"Issue Voucher", "Line Type"::"Customer Deposit":
                         begin
                             "Qty. per Unit of Measure" := 1;
+                            UpdateAmounts(Rec);
                         end;
                     else begin
                         GetItem();
                         NPRPOSIUOMUtils.CheckIfUnitOfMeasureBlocked(Rec);
                         "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(_Item, "Unit of Measure Code");
                         "Quantity (Base)" := CalcBaseQty(Quantity);
-                        "Unit Price" := FindItemSalesPrice();
+
+                        "Unit Price" := FindItemSalesPrice(("Unit of Measure Code" <> xRec."Unit of Measure Code"));
+                        ValidateQuantityWithDeferredAmounts();
                     end;
                 end;
-                UpdateAmounts(Rec);
             end;
         }
         field(12; Quantity; Decimal)
@@ -193,7 +197,6 @@
                 SaleLinePOS: Record "NPR POS Sale Line";
                 Err001: Label 'Quantity at %2 %1 can only be 1 or -1';
                 Err003: Label 'A quantity must be specified on the line';
-                OldUnitPrice: Decimal;
             begin
                 if ("Serial No." <> '') and
                     (Abs(Quantity) <> 1) then
@@ -224,15 +227,14 @@
                                 Validate("Discount %");
 
                             CalculateCostPrice();
-                            UpdateAmounts(Rec);
 
-                            if not _Item."NPR Group sale" then begin
-                                OldUnitPrice := "Unit Price";
-                                "Unit Price" := Rec.FindItemSalesPrice();
-                                if OldUnitPrice <> "Unit Price" then
-                                    UpdateAmounts(Rec);
-                            end;
+                            // Group sale items sets a manual price and we can skip the price engine calculation entirely on quantity change
+                            if (not _Item."NPR Group sale") then
+                                "Unit Price" := FindItemSalesPrice(("Quantity" <> xRec."Quantity"));
+
+                            UpdateAmounts(Rec);
                         end;
+
                     "Line Type"::"Item Category":
                         begin
                             if Quantity = 0 then
@@ -2042,6 +2044,7 @@
         TotalAuditRollQuantity: Decimal;
         _IgnoreCustomerCurrency: Boolean;
         SkipCalcDiscount: Boolean;
+        _DeferPriceCalculation: Boolean;
         Text002: Label '%1 %2 is used more than once. Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
         SkipDependantQuantityUpdate: Boolean;
@@ -2097,6 +2100,17 @@
 
     procedure FindItemSalesPrice(): Decimal
     begin
+        if (_DeferPriceCalculation) then
+            exit("Unit Price");
+
+        exit(FindItemSalesPrice(Rec));
+    end;
+
+    procedure FindItemSalesPrice(ForceCalculation: Boolean): Decimal
+    begin
+        if (_DeferPriceCalculation and not ForceCalculation) then
+            exit("Unit Price");
+
         exit(FindItemSalesPrice(Rec));
     end;
 
@@ -2107,6 +2121,7 @@
     begin
         if "Manual Item Sales Price" then
             exit("Unit Price");
+
         GetPOSHeader();
         TempSaleLinePOS := Rec;
         TempSaleLinePOS."Currency Code" := '';
@@ -2695,11 +2710,33 @@
 
     procedure UpdateAmounts(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
+
         SaleLinePOS.UpdateLineVatAmounts(SaleLinePOS);
 
         SaleLinePOS."Discount %" := Abs(SaleLinePOS."Discount %");
-
     end;
+
+    internal procedure SetDeferPriceCalculation(Defer: Boolean)
+    begin
+        _DeferPriceCalculation := Defer;
+    end;
+
+    internal procedure GetDeferPriceCalculation(): Boolean
+    begin
+        exit(_DeferPriceCalculation);
+    end;
+
+    internal procedure ValidateQuantityWithDeferredAmounts()
+    begin
+        if (not GetDeferPriceCalculation()) then begin
+            SetDeferPriceCalculation(true);
+            Validate(Quantity);
+            SetDeferPriceCalculation(false);
+            UpdateAmounts(Rec);
+        end else
+            Validate(Quantity);
+    end;
+
 
     procedure CalculateTax()
     var
@@ -2714,6 +2751,9 @@
 
     procedure UpdateLineVatAmounts(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
+        if (SaleLinePOS.GetDeferPriceCalculation()) then
+            exit;
+
         SaleLinePOS.CalculateTax();
     end;
 
@@ -3446,4 +3486,5 @@
     local procedure OnExplodeBOMBeforeValidateDiscount(var Rec: Record "NPR POS Sale Line"; ItemNo: Code[20]; FromLineNo: Integer; ToLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+
 }

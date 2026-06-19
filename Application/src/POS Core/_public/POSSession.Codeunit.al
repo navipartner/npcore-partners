@@ -619,6 +619,7 @@
     begin
         ErrorIfNotInitialized();
         _Sale.GetContext(SaleLineOut, PaymentLineOut);
+        SaleLineOut.SetDeferPriceCalculation(false);
     end;
 
     procedure GetPaymentLine(var PaymentLineOut: Codeunit "NPR POS Payment Line")

@@ -33,13 +33,13 @@ codeunit 6014559 "NPR TM Dynamic Price"
         Span: Codeunit "NPR Sentry Span";
     begin
 
-        if (not IsTicketSalesLine(SaleLinePOS)) then
+        if (SaleLinePOS.GetDeferPriceCalculation()) then
             exit;
 
-        // A price request with a receipt number of __NONE__ indicates that the caller has explicitly indicated that there is no 
-        // dynamic ticket price associated with this ticket request and only ERP price should be considered.
-        // It originates from CalculateErpPrice() function above.
-        if (SaleLinePOS."Sales Ticket No." = '__NONE__') or (SaleLinePOS."Sales Ticket No." = '') then
+        if (SaleLinePOS."Sales Ticket No." = '') then
+            exit;
+
+        if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
         Sentry.StartSpan(Span, 'bc.ticket.calc-dynamic-price');
@@ -131,7 +131,6 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TempTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
         OriginalWorkDate: Date;
     begin
-        TempSalePOS."Sales Ticket No." := '__NONE__'; // allow fast exit in Dynamic Price calculation when there is no Ticket Request - no need to check.
         TempSalePOS."Customer No." := AdmCapacityPriceBuffer.CustomerNo;
         TempSalePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
         TempSalePOS.Insert();
@@ -141,8 +140,6 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
         TempSaleLinePOS."No." := AdmCapacityPriceBuffer.ItemNumber;
         TempSaleLinePOS."Variant Code" := AdmCapacityPriceBuffer.VariantCode;
-        // DecimalQuantity carries a fractional quantity (e.g. non-ticket components); the integer Quantity takes
-        // precedence so existing callers are unaffected, and DecimalQuantity is the fallback when it is not set.
         if (AdmCapacityPriceBuffer.Quantity <> 0) then
             TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.Quantity
         else
@@ -153,7 +150,8 @@ codeunit 6014559 "NPR TM Dynamic Price"
 
         OriginalWorkDate := WorkDate();
         WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
-        ValidErpPrice := M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS, TempTotalDiscBenItemBuffer);
+
+        ValidErpPrice := M2PriceService.TryFindErpBasePrice(TempSalePOS, TempSaleLinePOS, TempTotalDiscBenItemBuffer);
         if (ValidErpPrice) then begin
             AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
             AdmCapacityPriceBuffer.DiscountPct := TempSaleLinePOS."Discount %";

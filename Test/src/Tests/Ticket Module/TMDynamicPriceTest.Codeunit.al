@@ -707,6 +707,130 @@ codeunit 85047 "NPR TM Dynamic Price Test"
 
     #endregion RuleArithmetic
 
+    #region EngineWiring
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CalculateErpPrice_FractionalQuantityMatchesUnit()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        UnitBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        FractionalBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        ItemNo: Code[20];
+    begin
+        // The timeslots agent prices fractional quantities via DecimalQuantity (TicketingTimeSlotsAgent:419).
+        // CalculateErpPrice -> ErpBasePrice must price that path and return the same per-unit ERP price
+        // as the integer-quantity path (the scenario has no quantity break).
+        ItemNo := SelectDynamicPriceScenario();
+        Rule.SetFilter(ProfileCode, '=%1', GetPriceProfileCode(ItemNo));
+        Rule.DeleteAll();
+
+        Clear(UnitBuffer);
+        UnitBuffer.EntryNo := 1;
+        UnitBuffer.ItemNumber := ItemNo;
+        UnitBuffer.ReferenceDate := Today();
+        UnitBuffer.Quantity := 1;
+        Assert.IsTrue(TicketPrice.CalculateErpPrice(UnitBuffer), 'CalculateErpPrice should succeed for the integer-quantity path.');
+
+        Clear(FractionalBuffer);
+        FractionalBuffer.EntryNo := 1;
+        FractionalBuffer.ItemNumber := ItemNo;
+        FractionalBuffer.ReferenceDate := Today();
+        FractionalBuffer.Quantity := 0;
+        FractionalBuffer.DecimalQuantity := 0.5;
+        Assert.IsTrue(TicketPrice.CalculateErpPrice(FractionalBuffer), 'CalculateErpPrice should succeed for the fractional (DecimalQuantity) path.');
+
+        Assert.AreEqual(UnitBuffer.UnitPrice, FractionalBuffer.UnitPrice, 'Fractional-quantity ERP unit price should match the integer-quantity unit price (no quantity break).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CalculatePrice_NoRule_FacadeReturnsErpBase()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        ItemNo: Code[20];
+        ErpUnitPrice, ErpDiscountPct, ErpUnitPriceVatPercentage : Decimal;
+        ErpUnitPriceIncludesVat: Boolean;
+        TicketUnitPrice: Decimal;
+    begin
+        // With no dynamic rule the facade hands the rerouted ERP price straight through. Verifies the
+        // CalculateErpPrice -> CalculatePrice wiring: the ERP base reaches the facade output unchanged.
+        ItemNo := SelectDynamicPriceScenario();
+        Rule.SetFilter(ProfileCode, '=%1', GetPriceProfileCode(ItemNo));
+        Rule.DeleteAll();
+
+        TicketUnitPrice := TicketPrice.CalculatePrice(ItemNo, '', '', Today(), 0T, 1, ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
+
+        Assert.IsTrue(ErpUnitPrice > 0, 'ERP unit price should be computed (non-zero) through the rerouted single-line path.');
+        Assert.AreEqual(ErpUnitPrice, TicketUnitPrice, 'With no rule, CalculatePrice should return the ERP base unchanged (dynamic layer is a no-op).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CalculatePrice_FixedRule_FacadeAppliesDynamic()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Assert: Codeunit "Assert";
+        Rule: Record "NPR TM Dynamic Price Rule";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        PriceProfileCode: Code[10];
+        ReferenceDate: Date;
+        ReferenceTime: Time;
+        ErpUnitPrice, ErpDiscountPct, ErpUnitPriceVatPercentage : Decimal;
+        ErpUnitPriceIncludesVat: Boolean;
+        TicketUnitPrice: Decimal;
+    begin
+        // A FIXED rule overrides the base. The facade should compute the ERP base (rerouted) independently AND apply the
+        // dynamic override on top - confirming both layers wire together. (Exact FIXED arithmetic is covered by
+        // EvaluateRule_Fixed; here we only assert the dynamic layer engaged via CalculatePrice, which keeps it VAT-robust.)
+        ItemNo := SelectDynamicPriceScenario();
+        AdmissionCode := GetAdmissionCode(ItemNo);
+        PriceProfileCode := GetPriceProfileCode(ItemNo);
+
+        // Default-carrier REQUIRED so the FIXED override lands on the base (mirrors the CalculateScheduleEntryPrice test).
+        TicketBom.Get(ItemNo, '', AdmissionCode);
+        TicketBom.Default := true;
+        TicketBom."Admission Inclusion" := TicketBom."Admission Inclusion"::REQUIRED;
+        TicketBom.Modify();
+
+        // Price into a real schedule slot - CalculateTicketBomListPrice only consults the rule when the reference
+        // date+time fall inside an open schedule entry (its time-window filter), so 0T would never match a timed slot.
+        AdmScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        AdmScheduleEntry.SetRange(Cancelled, false);
+        AdmScheduleEntry.FindFirst();
+        ReferenceDate := AdmScheduleEntry."Admission Start Date";
+        ReferenceTime := AdmScheduleEntry."Admission Start Time";
+
+        // Single FIXED rule with an unconstrained event window so it is always selected.
+        Rule.SetFilter(ProfileCode, '=%1', PriceProfileCode);
+        Rule.DeleteAll();
+        Rule.Init();
+        Rule.ProfileCode := PriceProfileCode;
+        Rule.LineNo := 1;
+        Rule.PricingOption := Rule.PricingOption::FIXED;
+        Rule.Amount := 123.45;
+        Rule.AmountIncludesVAT := false;
+        Rule.VatPercentage := 0;
+        Rule.RoundingPrecision := 0.01;
+        Rule.BookingDateFrom := CalcDate('<-10Y>');
+        Rule.BookingDateUntil := CalcDate('<+10Y>');
+        Rule.Insert();
+
+        TicketUnitPrice := TicketPrice.CalculatePrice(ItemNo, '', '', ReferenceDate, ReferenceTime, 1, ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
+
+        Assert.IsTrue(ErpUnitPrice > 0, 'ERP base should still be computed independently of the dynamic override.');
+        Assert.AreNotEqual(ErpUnitPrice, TicketUnitPrice, 'FIXED rule should override the ERP base via the facade (dynamic layer engaged).');
+    end;
+
+    #endregion EngineWiring
+
     [Normal]
     local procedure SetBookingDate(PriceProfileCode: Code[10]; LineNo: Integer; DateFromFormula: Text; DateUntilFormula: Text)
     var
