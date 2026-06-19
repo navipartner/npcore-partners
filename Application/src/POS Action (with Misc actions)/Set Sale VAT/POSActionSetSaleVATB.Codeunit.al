@@ -58,6 +58,7 @@ codeunit 6060102 "NPR POS Action-Set Sale VAT-B."
 
         POSSale.GetCurrentSale(SalePOS);
 
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if SaleLinePOS.FindSet() then
             repeat
