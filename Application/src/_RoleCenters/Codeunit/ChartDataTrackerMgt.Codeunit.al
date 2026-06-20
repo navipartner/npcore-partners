@@ -110,10 +110,10 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
         MarginKeyTxtLbl: Label 'Margin', Locked = true;
         TurnoverKeyTxtLbl: Label 'Turnover', Locked = true;
     begin
-        if not "Key".Contains(MarginKeyTxtLbl) or "Key".Contains(TurnoverKeyTxtLbl) then
+        if not ("Key".Contains(MarginKeyTxtLbl) or "Key".Contains(TurnoverKeyTxtLbl)) then
             exit(Input);
 
-        if Evaluate(ConvertVar, Input) then
+        if Evaluate(ConvertVar, Input, 9) then
             exit(Format(ConvertVar, 0, 9));
 
         exit(Input);
