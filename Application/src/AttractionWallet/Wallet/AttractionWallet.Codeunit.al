@@ -1669,6 +1669,36 @@ codeunit 6185062 "NPR AttractionWallet"
 
         exit(TemplateId <> '');
     end;
+
+    // returns wallets with an active (non-superseded) reference; does not filter expired/blocked — caller applies validity
+    internal procedure GetWalletsHoldingAsset(LineType: Enum "NPR WalletLineType"; AssetSystemId: Guid; var ListOfWallets: List of [Integer]): Boolean
+    var
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        WalletAssetLineReference: Record "NPR WalletAssetLineReference";
+    begin
+        Clear(ListOfWallets);
+        if (not IsWalletEnabled()) then
+            exit(false);
+
+        WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
+        WalletAssetLine.SetFilter(Type, '=%1', LineType);
+        WalletAssetLine.SetFilter(LineTypeSystemId, '=%1', AssetSystemId);
+        if (WalletAssetLine.FindSet()) then begin
+            repeat
+                WalletAssetLineReference.SetCurrentKey(WalletAssetLineEntryNo, SupersededBy);
+                WalletAssetLineReference.SetFilter(WalletAssetLineEntryNo, '=%1', WalletAssetLine.EntryNo);
+                WalletAssetLineReference.SetFilter(SupersededBy, '=%1', 0);
+                if (WalletAssetLineReference.FindSet()) then begin
+                    repeat
+                        if (not ListOfWallets.Contains(WalletAssetLineReference.WalletEntryNo)) then
+                            ListOfWallets.Add(WalletAssetLineReference.WalletEntryNo);
+                    until (WalletAssetLineReference.Next()) = 0;
+                end;
+            until (WalletAssetLine.Next()) = 0;
+        end;
+
+        exit(ListOfWallets.Count() > 0);
+    end;
     #endregion
 
 }
