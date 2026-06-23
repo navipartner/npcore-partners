@@ -36,4 +36,11 @@ codeunit 6059844 "NPR Retail Print"
     begin
         exit(RPTemplateMgt.GetDataItemTableId(Code, Level));
     end;
+
+    procedure PrintBytesLocal(PrinterName: Text; PrintJobBase64: Text)
+    var
+        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
+    begin
+        PrintMethodMgt.PrintBytesLocal(PrinterName, PrintJobBase64);
+    end;
 }
