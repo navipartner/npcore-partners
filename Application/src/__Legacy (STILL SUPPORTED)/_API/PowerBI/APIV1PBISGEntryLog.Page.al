@@ -28,6 +28,10 @@ page 6150852 "NPR API V1 PBI SGEntryLog"
                 {
                     Caption = 'Admitted At', Locked = true;
                 }
+                field(attemptedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'Attempted At', Locked = true;
+                }
                 field(admittedReferenceNo; Rec.AdmittedReferenceNo)
                 {
                     Caption = 'Admitted Reference No', Locked = true;
@@ -39,6 +43,10 @@ page 6150852 "NPR API V1 PBI SGEntryLog"
                 field(apiErrorNumber; Rec.ApiErrorNumber)
                 {
                     Caption = 'Api Error Number', Locked = true;
+                }
+                field(apiErrorMessage; Rec.ApiErrorMessage)
+                {
+                    Caption = 'Api Error Message', Locked = true;
                 }
                 field(entityId; Rec.EntityId)
                 {
