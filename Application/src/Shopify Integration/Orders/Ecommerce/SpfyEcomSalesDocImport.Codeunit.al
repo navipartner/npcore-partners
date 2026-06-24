@@ -1306,8 +1306,8 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if EcomSalesHeader."Sell-to Contact" = '' then
             EcomSalesHeader."Sell-to Contact" := CopyStr(EcomSalesHeader."Sell-to Name", 1, MaxStrLen(EcomSalesHeader."Sell-to Contact"));
 #pragma warning disable AA0139
-        EcomSalesHeader."Sell-to Invoice Email" := JsonHelper.GetJText(Order, 'email', MaxStrLen(Customer."E-Mail"), false);
-        EcomSalesHeader."Sell-to Invoice Phone No." := JsonHelper.GetJText(Order, 'phone', MaxStrLen(Customer."Phone No."), false);
+        EcomSalesHeader."Sell-to Invoice Email" := OrderMgt.GetJTextWithFallback(Order, 'email', 'customer.defaultEmailAddress.emailAddress', MaxStrLen(EcomSalesHeader."Sell-to Invoice Email"));
+        EcomSalesHeader."Sell-to Invoice Phone No." := OrderMgt.GetJTextWithFallback(Order, 'phone', 'customer.defaultPhoneNumber.phoneNumber', MaxStrLen(EcomSalesHeader."Sell-to Invoice Phone No."));
 #pragma warning restore AA0139
     end;
 
@@ -1347,6 +1347,13 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         EcomSalesHeader."Ship-to City" := JsonHelper.GetJText(ShippingAddress, 'city', MaxStrLen(EcomSalesHeader."Ship-to City"), false);
 #pragma warning restore AA0139
         EcomSalesHeader."Ship-to Country Code" := OrderMgt.GetCountryCode(NpEcStore, ShippingAddress, 'countryCodeV2', false);
+#pragma warning disable AA0139
+        EcomSalesHeader."Ship-to Phone No." := JsonHelper.GetJText(ShippingAddress, 'phone', MaxStrLen(EcomSalesHeader."Ship-to Phone No."), false);
+        if EcomSalesHeader."Ship-to Phone No." = '' then
+            EcomSalesHeader."Ship-to Phone No." := JsonHelper.GetJText(Order, 'phone', MaxStrLen(EcomSalesHeader."Ship-to Phone No."), false);
+#pragma warning restore AA0139
+        if EcomSalesHeader."Ship-to Phone No." = '' then
+            EcomSalesHeader."Ship-to Phone No." := EcomSalesHeader."Sell-to Invoice Phone No.";
     end;
 
     local procedure ClearCache()

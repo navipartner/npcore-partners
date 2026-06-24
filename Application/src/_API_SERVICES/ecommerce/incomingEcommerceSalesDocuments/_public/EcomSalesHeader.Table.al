@@ -300,6 +300,11 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Ship-to Contact';
         }
+        field(3090; "Ship-to Phone No."; Text[30])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Ship-to Phone No.';
+        }
         field(4000; "Shipment Method Code"; Text[50])
         {
             DataClassification = CustomerContent;

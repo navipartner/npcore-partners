@@ -947,8 +947,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesHeader."Bill-to City" := SalesHeader."Sell-to City";
         SalesHeader.Validate("Bill-to Country/Region Code", SalesHeader."Sell-to Country/Region Code");
 #pragma warning disable AA0139
-        SalesHeader."NPR Bill-to E-mail" := JsonHelper.GetJText(Order, 'customer.email', MaxStrLen(SalesHeader."NPR Bill-to E-mail"), false);
-        SalesHeader."NPR Bill-to Phone No." := JsonHelper.GetJText(Order, 'customer.phone', MaxStrLen(SalesHeader."NPR Bill-to Phone No."), false);
+        SalesHeader."NPR Bill-to E-mail" := GetJTextWithFallback(Order, 'email', 'customer.email', MaxStrLen(SalesHeader."NPR Bill-to E-mail"));
+        SalesHeader."NPR Bill-to Phone No." := GetJTextWithFallback(Order, 'phone', 'customer.phone', MaxStrLen(SalesHeader."NPR Bill-to Phone No."));
 #pragma warning restore AA0139
     end;
 
@@ -1278,6 +1278,13 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 ShopifyId := SpfyIntegrationMgt.RemoveUntil(ShopifyId, '/');
         ValidateMaxLength(ShopifyId, MaxStrLen(ShopifyCustomerID), ShopifyCustomerIDLbl);
         ShopifyCustomerID := CopyStr(ShopifyId, 1, MaxStrLen(ShopifyCustomerID));
+    end;
+
+    internal procedure GetJTextWithFallback(Token: JsonToken; PrimaryPath: Text; FallbackPath: Text; MaxLength: Integer) Value: Text
+    begin
+        Value := JsonHelper.GetJText(Token, PrimaryPath, MaxLength, false);
+        if Value = '' then
+            Value := JsonHelper.GetJText(Token, FallbackPath, MaxLength, false);
     end;
 
     internal procedure TryFindCustomer(NpEcStore: Record "NPR NpEc Store"; Order: JsonToken; ShopifyCustomerID: Text[30]; Email: Text; Phone: Text; FirstName: Text; LastName: Text; var Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean

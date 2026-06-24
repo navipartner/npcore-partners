@@ -178,6 +178,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             SalesHeader."Ship-to City" := EcomSalesHeader."Ship-to City";
             SalesHeader."Ship-to Country/Region Code" := EcomSalesHeader."Ship-to Country Code";
             SalesHeader."Ship-to Contact" := EcomSalesHeader."Ship-to Contact";
+#if not (BC23 or BC24)
+            if EcomSalesHeader."Ship-to Phone No." <> '' then
+                SalesHeader."Ship-to Phone No." := EcomSalesHeader."Ship-to Phone No.";
+#endif
         end else begin
             SalesHeader."Ship-to Name" := SalesHeader."Sell-to Customer Name";
             SalesHeader."Ship-to Name 2" := SalesHeader."Sell-to Customer Name 2";
