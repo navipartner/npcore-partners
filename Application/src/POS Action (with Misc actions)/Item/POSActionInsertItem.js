@@ -108,7 +108,9 @@ let main = async ({
       context: { BaseLineNo: baseLineNo },
       parameters: { SkipItemAvailabilityCheck: true },
     });
-    await workflow.respond("checkAvailability");
+    if (!parameters.SkipItemAvailabilityCheck) {
+      await workflow.respond("checkAvailability");
+    }
   }
 
   if (postAddWorkflows) {
