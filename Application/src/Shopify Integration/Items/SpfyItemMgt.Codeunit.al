@@ -902,14 +902,34 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(ParseItem(Sku, ItemVariant));
     end;
 
+    procedure ParseItem(ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Item: Record Item; var Sku: Text): Boolean
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
+        Sku := UpperCase(JsonHelper.GetJCode(ShopifyJToken, 'sku', 0, false));
+        exit(ParseItem(Sku, ItemVariant, Item));
+    end;
+
     procedure ParseItem(Sku: Text; var ItemVariant: Record "Item Variant"): Boolean
     var
         Item: Record Item;
+    begin
+        exit(ResolveSkuToItem(Sku, ItemVariant, Item, false));
+    end;
+
+    procedure ParseItem(Sku: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item): Boolean
+    begin
+        exit(ResolveSkuToItem(Sku, ItemVariant, Item, true));
+    end;
+
+    local procedure ResolveSkuToItem(Sku: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item; LoadItemForVariant: Boolean): Boolean
+    var
         ItemNo: Text;
         VariantCode: Text;
         Position: Integer;
     begin
         Clear(ItemVariant);
+        Clear(Item);
         if Sku = '' then
             exit(false);
         if StrLen(Sku) <= MaxStrLen(Item."No.") then
@@ -923,8 +943,12 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             ItemNo := CopyStr(Sku, 1, Position - 1);
             VariantCode := CopyStr(Sku, Position + 1);
             if StrLen(VariantCode) <= MaxStrLen(ItemVariant.Code) then
-                if ItemVariant.Get(ItemNo, VariantCode) then
+                if ItemVariant.Get(ItemNo, VariantCode) then begin
+                    if LoadItemForVariant then
+                        if not Item.Get(ItemVariant."Item No.") then
+                            Clear(Item);
                     exit(true);
+                end;
             if Item.Get(ItemNo) then begin
                 ItemVariant."Item No." := Item."No.";
                 exit(true);

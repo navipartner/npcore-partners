@@ -835,21 +835,61 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             ReserveVouchers(EcomSalesHeader, IncEcomSalesLine, PropertyDict);
     end;
 
-    local procedure PopulateItemLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
+    local procedure SetTicketReservationLineId(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
+        TicketReservationLineId: Guid;
+        ShopifyLineItemGid: Text;
+        MissingReservationLineErr: Label 'No ticket reservation line was found for Shopify line item "%1". The order cannot be imported until ticket processing provides a reservation line for every ticket line.', Comment = '%1 = Shopify line item GID';
+    begin
+        ShopifyLineItemGid := JsonHelper.GetJText(SalesLineJsonToken, 'id', true);
+
+        if not _TicketReservationLineIds.Get(ShopifyLineItemGid, TicketReservationLineId) then
+            Error(MissingReservationLineErr, ShopifyLineItemGid);
+
+        EcomSalesLine."Ticket Reservation Line Id" := TicketReservationLineId;
+    end;
+
+    local procedure PopulateItemLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
+    begin
+        ResolveItem(SalesLineJsonToken, IncEcomSalesLine);
+
+        case IncEcomSalesLine.Subtype of
+            IncEcomSalesLine.Subtype::Item:
+                DeserializeItemLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+            IncEcomSalesLine.Subtype::Ticket:
+                DeserializeTicketLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
+        end;
+    end;
+
+    local procedure ResolveItem(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        Item: Record Item;
         ItemVariant: Record "Item Variant";
-        TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
-        SpfyFulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         Sku: Text;
         UnknownIdErr: Label 'Unknown %1: %2%3';
     begin
+        if not SpfyItemMgt.ParseItem(SalesLineJsonToken, ItemVariant, Item, Sku) then
+            Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', EcomSalesLine."Shopify ID", JsonHelper.GetJText(SalesLineJsonToken, 'name', false)));
+
+        EcomSalesLine."No." := ItemVariant."Item No.";
+        EcomSalesLine."Variant Code" := ItemVariant.Code;
+        EcomSalesLine.Subtype := DetermineItemSubtype(Item);
+    end;
+
+    local procedure DeserializeTicketLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
+    begin
+        DeserializeItemLine(EcomSalesHeader, SalesLineJsonToken, EcomSalesLine, LogEntry);
+        SetTicketReservationLineId(SalesLineJsonToken, EcomSalesLine);
+    end;
+
+    local procedure DeserializeItemLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
+    var
+        TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
+        SpfyFulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
+    begin
         if not SpfyFulfillmentCache.GetLineFromCache(IncEcomSalesLine."Shopify ID", TempSpfyFulfillmentBuffer) then
             TempSpfyFulfillmentBuffer.Init();
-        if not SpfyItemMgt.ParseItem(SalesLineJsonToken, ItemVariant, Sku) then
-            Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', IncEcomSalesLine."Shopify ID", JsonHelper.GetJText(SalesLineJsonToken, 'name', false)));
-        IncEcomSalesLine."No." := ItemVariant."Item No.";
-        IncEcomSalesLine."Variant Code" := ItemVariant.Code;
 #pragma warning disable AA0139
         IncEcomSalesLine.Quantity := JsonHelper.GetJDecimal(SalesLineJsonToken, 'unfulfilledQuantity', true) + TempSpfyFulfillmentBuffer."Fulfilled Quantity";
         IncEcomSalesLine.Description := JsonHelper.GetJText(SalesLineJsonToken, 'title', MaxStrLen(IncEcomSalesLine.Description), true);
@@ -940,10 +980,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
         case IncEcomSalesLine.Type of
             IncEcomSalesLine.Type::Item:
-                begin
-                    PopulateItemLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
-                    IncEcomSalesLine.Subtype := IncEcomSalesLine.Subtype::Item;
-                end;
+                PopulateItemLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
             IncEcomSalesLine.Type::Voucher:
                 PopulateVoucherLine(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry, PropertyDict);
             IncEcomSalesLine.Type::"Shipment Fee":
@@ -997,6 +1034,16 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             exit(LineType::Voucher);
 
         exit(LineType::Item);
+    end;
+
+    local procedure DetermineItemSubtype(Item: Record Item) Subtype: Enum "NPR Ecom Sales Line Subtype"
+    var
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+    begin
+        if (Item."No." <> '') and EcomVirtualItemMgt.IsTicketLine(Item) then
+            exit(Subtype::Ticket);
+
+        exit(Subtype::Item);
     end;
 
     local procedure ReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; IncEcomSalesLine: Record "NPR Ecom Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; ReferenceNo: Code[50]; GiftCardId: Text[30])
@@ -1212,7 +1259,65 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             if (LocationMapping."Location Code" <> '') and not IsShpmtMappingLocation then
                 EcomSalesHeader."Location Code" := LocationMapping."Location Code";
         end;
+        ParseTicketMetafields(HeaderToken, EcomSalesHeader);
         SpfyIntegrationEvents.OnAfterParseEcommerceSalesHeader(EcomSalesHeader, HeaderToken);
+    end;
+
+    local procedure ParseTicketMetafields(OrderToken: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        Clear(_TicketReservationLineIds);
+
+        EcomSalesHeader."Ticket Reservation Token" := CopyStr(JsonHelper.GetJText(OrderToken, 'reservationToken.value', false), 1, MaxStrLen(EcomSalesHeader."Ticket Reservation Token"));
+        if EcomSalesHeader."Ticket Reservation Token" = '' then
+            exit;
+
+        ParseTicketLineItemsData(JsonHelper.GetJText(OrderToken, 'lineItemsData.value', false));
+    end;
+
+    local procedure ParseTicketLineItemsData(LineItemsDataText: Text)
+    var
+        LineItemsData: JsonObject;
+        ShopifyLineItemGid: Text;
+        InvalidLineItemsDataErr: Label 'The Ticket line item data is not valid JSON.';
+    begin
+        if LineItemsDataText = '' then
+            exit;
+
+        if not LineItemsData.ReadFrom(LineItemsDataText) then
+            Error(InvalidLineItemsDataErr);
+
+        foreach ShopifyLineItemGid in LineItemsData.Keys() do
+            ParseTicketLineItemData(LineItemsData, ShopifyLineItemGid);
+    end;
+
+    local procedure ParseTicketLineItemData(LineItemsData: JsonObject; ShopifyLineItemGid: Text)
+    var
+        LineItemDataToken: JsonToken;
+        LineIdToken: JsonToken;
+        TicketReservationLineId: Guid;
+        LineIdText: Text;
+        MissingReservationLineIdErr: Label 'The Ticket line item data for Shopify line item "%1" does not contain a reservation line ID.', Comment = '%1 = Shopify line item GID';
+        InvalidReservationLineIdErr: Label 'The ticket reservation line ID "%1" for Shopify line item "%2" is invalid.', Comment = '%1 = reservation line ID, %2 = Shopify line item GID';
+    begin
+        if not LineItemsData.Get(ShopifyLineItemGid, LineItemDataToken) then
+            exit;
+
+        if not LineItemDataToken.IsObject() then
+            Error(MissingReservationLineIdErr, ShopifyLineItemGid);
+        if not LineItemDataToken.AsObject().Get('lineId', LineIdToken) then
+            Error(MissingReservationLineIdErr, ShopifyLineItemGid);
+        if not LineIdToken.IsValue() then
+            Error(MissingReservationLineIdErr, ShopifyLineItemGid);
+        if LineIdToken.AsValue().IsNull() then
+            Error(MissingReservationLineIdErr, ShopifyLineItemGid);
+
+        LineIdText := LineIdToken.AsValue().AsText();
+        if LineIdText = '' then
+            Error(MissingReservationLineIdErr, ShopifyLineItemGid);
+        if not Evaluate(TicketReservationLineId, LineIdText) then
+            Error(InvalidReservationLineIdErr, LineIdText, ShopifyLineItemGid);
+
+        _TicketReservationLineIds.Set(ShopifyLineItemGid, TicketReservationLineId);
     end;
 
     local procedure GetCustomerAndPostingDate(NpEcStore: Record "NPR NpEc Store"; var EcomSalesHeader: Record "NPR Ecom Sales Header"; HeaderToken: JsonToken)
@@ -1413,6 +1518,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        _TicketReservationLineIds: Dictionary of [Text, Guid];
 
         GLSetupRetrived: Boolean;
         NoArrayErr: Label 'The %1 property is not an array.', Locked = true;
