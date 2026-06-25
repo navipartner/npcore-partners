@@ -79,6 +79,8 @@
         EFTTransactionRequest."User ID" := ExternalPOSSale."User ID";
         EFTTransactionRequest."Sales Ticket No." := ExternalPOSSale."Sales Ticket No.";
         EFTTransactionRequest."Sales ID" := ExternalPOSSale."External Pos Sale Id";
+        EFTTransactionRequest."Sales Line No." := ExternalPOSSaleLine."Line No.";
+        EFTTransactionRequest."Sales Line ID" := ExternalPOSSaleLine.SystemId;
         EFTTransactionRequest."Register No." := ExternalPOSSale."Register No.";
         EFTTransactionRequest."POS Payment Type Code" := ExternalPOSSaleLine."No.";
         EFTTransactionRequest."Original POS Payment Type Code" := ExternalPOSSaleLine."No.";
@@ -102,6 +104,8 @@
         end;
         EftTransactionRequest."Result Processed" := true;
         EftTransactionRequest.Finished := CurrentDateTime();
+        if (not EftTransactionRequest."Financial Impact") and EftTransactionRequest.Successful and (EftTransactionRequest."Result Amount" <> 0) then
+            EftTransactionRequest."Financial Impact" := true;
         EftTransactionRequest.Modify();
     end;
 
