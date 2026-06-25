@@ -1424,8 +1424,6 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if EcomSalesLine.FindFirst() then
             Error(SubtypeNotSetErr, EcomSalesLine."Line No.");
 
-        EcomSalesDocUtils.CheckFCYDocumentHasNoVouchers(EcomSalesHeader);
-
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         EcomVirtualItemMgt.SetVirtualItemSubtypeFilter(EcomSalesLine);

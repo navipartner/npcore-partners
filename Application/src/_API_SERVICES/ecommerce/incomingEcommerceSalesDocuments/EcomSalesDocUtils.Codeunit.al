@@ -613,6 +613,7 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
     begin
         EcomSalesHeader.TestField("External No.");
+        CheckFCYDocumentHasNoVouchers(EcomSalesHeader);
         if EcomSalesHeader."Ticket Reservation Token" <> '' then
             EcomCreateTicketImpl.ValidateTicketRequest(EcomSalesHeader);
         ValidateLanguage(EcomSalesHeader);
