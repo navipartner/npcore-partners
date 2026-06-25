@@ -87,4 +87,45 @@ enum 6014610 "NPR MMTimelineEventType" implements "NPR MMTimelineTypeInterface"
         Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
     }
 
+    value(300; SUBSCRIPTION_INITIAL_SALE)
+    {
+        Caption = 'Subscription Initial Sale';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+    value(301; SUBSCRIPTION_RENEW)
+    {
+        Caption = 'Subscription Renew';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+    value(302; SUBSCRIPTION_REGRET)
+    {
+        Caption = 'Subscription Regret';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+    value(303; SUBSCRIPTION_PARTIAL_REGRET)
+    {
+        Caption = 'Subscription Partial Regret';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+    value(304; SUBSCRIPTION_PAYMENT_METHOD)
+    {
+        Caption = 'Subscription Payment Method Change';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+    value(305; SUBSCRIPTION_TERMINATE)
+    {
+        Caption = 'Subscription Terminate';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+    value(306; SUBSCRIPTION_ENABLE)
+    {
+        Caption = 'Subscription Enable';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+    value(307; SUBSCRIPTION_DISABLE)
+    {
+        Caption = 'Subscription Disable';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+
 }

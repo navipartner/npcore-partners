@@ -81,6 +81,7 @@ codeunit 6151092 "NPR MMTimelineHandler"
         CollectedMembershipEvents(MembershipEntryNo, TimelineEvents);
         CollectedMemberEvents(MembershipEntryNo, TimelineEvents);
         CollectedMemberCardEvents(MembershipEntryNo, TimelineEvents);
+        CollectedSubscriptionEvents(MembershipEntryNo, TimelineEvents);
 
     end;
 
@@ -261,6 +262,58 @@ codeunit 6151092 "NPR MMTimelineHandler"
                 TimelineEvents.EventCreatedBy := GetUserName(MemberCard.SystemCreatedBy);
                 TimelineEvents.Insert();
             until MemberCard.Next() = 0;
+    end;
+
+    local procedure CollectedSubscriptionEvents(MembershipEntryNo: Integer; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        EventType: Enum "NPR MMTimelineEventType";
+    begin
+        Subscription.SetRange("Membership Entry No.", MembershipEntryNo);
+        if not Subscription.FindSet() then
+            exit;
+        repeat
+            SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+            SubscriptionRequest.SetRange(Reversed, false);
+            if SubscriptionRequest.FindSet() then
+                repeat
+                    if (GetSubscriptionEventType(SubscriptionRequest.Type, EventType)) then begin
+                        TimelineEvents.EntryNo := TimelineEvents.EntryNo + 1;
+                        TimelineEvents.EventType := EventType;
+                        TimelineEvents.EventDateTime := SubscriptionRequest.SystemCreatedAt;
+                        TimelineEvents.SourceTableId := Database::"NPR MM Subscr. Request";
+                        TimelineEvents.SourceSystemId := SubscriptionRequest.SystemId;
+                        TimelineEvents.EventCreatedBy := GetUserName(SubscriptionRequest.SystemCreatedBy);
+                        TimelineEvents.Insert();
+                    end;
+                until SubscriptionRequest.Next() = 0;
+        until Subscription.Next() = 0;
+    end;
+
+    local procedure GetSubscriptionEventType(RequestType: Enum "NPR MM Subscr. Request Type"; var EventType: Enum "NPR MMTimelineEventType"): Boolean
+    begin
+        case RequestType of
+            RequestType::"Initial Sale":
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_INITIAL_SALE;
+            RequestType::Renew:
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_RENEW;
+            RequestType::Regret:
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_REGRET;
+            RequestType::"Partial Regret":
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_PARTIAL_REGRET;
+            RequestType::"Payment Method Collection":
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_PAYMENT_METHOD;
+            RequestType::Terminate:
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_TERMINATE;
+            RequestType::Enable:
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_ENABLE;
+            RequestType::Disable:
+                EventType := "NPR MMTimelineEventType"::SUBSCRIPTION_DISABLE;
+            else
+                exit(false);
+        end;
+        exit(true);
     end;
 
 }
