@@ -338,6 +338,27 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     CurrPage.Update(false);
                 end;
             }
+            action(ReorderVariants)
+            {
+                Caption = 'Update Variant Sorting Order';
+                ToolTip = 'Re-sequences the product variant options in Shopify so that the variants are displayed in the variety value sort order defined in Business Central. Use this after changing the variety value sort order, or if variants were added in the wrong order.';
+                ApplicationArea = NPRShopify;
+                Image = Order;
+                Visible = ProductVariantSortingEnabled;
+
+                trigger OnAction()
+                var
+                    Item: Record Item;
+                    SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
+                begin
+                    CurrPage.SaveRecord();
+                    Rec.TestField("Item No.");
+                    Rec.TestField("Shopify Store Code");
+                    Item.Get(Rec."Item No.");
+                    SendItemAndInventory.ReorderVariantsInShopify(Item, Rec."Shopify Store Code");
+                    CurrPage.Update(false);
+                end;
+            }
             action(InventoryLocations)
             {
                 Caption = 'Inventory Locations';
@@ -363,12 +384,14 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
         AllowBackorder: Boolean;
         DoNotTrackInventory: Boolean;
         ItemListIntegrationIsEnabled: Boolean;
+        ProductVariantSortingEnabled: Boolean;
         ItemIntegrIsNotEnabledErr: Label 'Item integration is not enabled for the store. You cannot adjust this parameter.';
 
     trigger OnOpenPage()
     begin
         SpfyIntegrationMgt.ResetConfigPackageApplyState();
         ItemListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
+        ProductVariantSortingEnabled := SpfyIntegrationMgt.ProductVariantSortingEnabled();
     end;
 
     trigger OnAfterGetRecord()

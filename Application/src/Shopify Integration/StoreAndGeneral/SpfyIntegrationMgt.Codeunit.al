@@ -539,6 +539,11 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifySetup."Max Doc Process Retry Count");
     end;
 #endif
+    internal procedure ProductVariantSortingEnabled(): Boolean
+    begin
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Enable Product Variant Sorting");
+    end;
     procedure FunctionCallOnNonTempVarErr(ObjectAndProcedureName: Text)
     var
         NotTempErr: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.', Comment = '%1 - object and procedure names';

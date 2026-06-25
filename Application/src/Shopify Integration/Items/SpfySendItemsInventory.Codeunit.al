@@ -43,6 +43,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     local procedure SendItem(var NcTask: Record "NPR Nc Task")
     var
+        Item: Record Item;
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         ShopifyProductID: Text[30];
@@ -53,7 +54,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ClearLastError();
         Success := true;
 
-        PrepareItemUpdateRequest(NcTask);
+        PrepareItemUpdateRequest(NcTask, Item);
         Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
         NcTask.Modify();
         Commit();
@@ -74,6 +75,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         end;
 #pragma warning restore AA0139
         RetrieveShopifyProductAndUpdateItemWithDataFromShopify(NcTask, ShopifyProductID, false, false);
+
+        if NcTask.Type = NcTask.Type::Insert then
+            if _SpfyIntegrationMgt.ProductVariantSortingEnabled() then
+                ReorderProductVariantsBestEffort(Item, NcTask."Store Code", ShopifyProductID);
     end;
 
     local procedure SendTags(var NcTask: Record "NPR Nc Task")
@@ -103,28 +108,48 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     local procedure BulkSendItemVariants(var NcTask: Record "NPR Nc Task")
     var
+        Item: Record Item;
         TempIncomingNcTasks: Record "NPR Nc Task" temporary;
         TempNcTaskToProcess: Record "NPR Nc Task" temporary;
         TempRequestedVariantBuffer: Record "NPR Spfy ID/Task Buffer" temporary;
         ShopifyRequest: JsonObject;
+        ItemsToReorder: Dictionary of [Code[20], Text[30]];
+        ItemNoToReorder: Code[20];
+        ShopifyStoreCode: Code[20];
         ShopifyProductID: Text[30];
         RequestType: Integer;
+        VariantInsertProcessed: Boolean;
     begin
         if not NcTask.FindSet() then
             exit;
-        RefreshIntegrationStatus(NcTask."Store Code");
+        ShopifyStoreCode := NcTask."Store Code";
+        RefreshIntegrationStatus(ShopifyStoreCode);
         repeat
             TempIncomingNcTasks := NcTask;
             TempIncomingNcTasks.Insert();
         until NcTask.Next() = 0;
 
-        while PrepareBulkItemVariantUpdateRequest(TempIncomingNcTasks, TempNcTaskToProcess, ShopifyProductID) do
+        while PrepareBulkItemVariantUpdateRequest(TempIncomingNcTasks, TempNcTaskToProcess, ShopifyProductID, Item) do begin
+            VariantInsertProcessed := false;
             for RequestType := NcTask.Type::Insert to NcTask.Type::Delete do begin
                 TempNcTaskToProcess.SetRange(Type, RequestType);
                 if not TempNcTaskToProcess.IsEmpty() then
-                    if GenerateRequestAndSetNcTaskPostponed(TempNcTaskToProcess, ShopifyProductID, TempRequestedVariantBuffer, ShopifyRequest) then
+                    if GenerateRequestAndSetNcTaskPostponed(TempNcTaskToProcess, ShopifyProductID, TempRequestedVariantBuffer, ShopifyRequest) then begin
                         ProcessAndUpdateNCTasksWithDataFromShopify(TempNcTaskToProcess, TempRequestedVariantBuffer, ShopifyRequest);
+                        if RequestType = NcTask.Type::Insert then
+                            VariantInsertProcessed := true;
+                    end;
             end;
+            if VariantInsertProcessed and (ShopifyProductID <> '') and (Item."No." <> '') then
+                if not ItemsToReorder.ContainsKey(Item."No.") then
+                    ItemsToReorder.Add(Item."No.", ShopifyProductID);
+        end;
+
+        if not _SpfyIntegrationMgt.ProductVariantSortingEnabled() then
+            exit;
+        foreach ItemNoToReorder in ItemsToReorder.Keys() do
+            if Item.Get(ItemNoToReorder) then
+                ReorderProductVariantsBestEffort(Item, ShopifyStoreCode, ItemsToReorder.Get(ItemNoToReorder));
     end;
 
     local procedure BulkSendShopifyInventoryUpdate(var NcTask: Record "NPR Nc Task")
@@ -631,9 +656,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         exit(true);
     end;
 
-    local procedure PrepareItemUpdateRequest(var NcTask: Record "NPR Nc Task")
+    local procedure PrepareItemUpdateRequest(var NcTask: Record "NPR Nc Task"; var Item: Record Item)
     var
-        Item: Record Item;
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
@@ -718,9 +742,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     end;
 
     [TryFunction]
-    local procedure PrepareBulkItemVariantUpdateRequest(var NcTaskIn: Record "NPR Nc Task"; var NcTaskOut: Record "NPR Nc Task"; var ShopifyProductID: Text[30])
+    local procedure PrepareBulkItemVariantUpdateRequest(var NcTaskIn: Record "NPR Nc Task"; var NcTaskOut: Record "NPR Nc Task"; var ShopifyProductID: Text[30]; var Item: Record Item)
     var
-        Item: Record Item;
         ItemVariant: Record "Item Variant";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -743,6 +766,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if not (NcTaskIn.IsTemporary() and NcTaskOut.IsTemporary()) then
             FunctionCallOnNonTempVarErr('PrepareBulkItemVariantUpdateRequest');
 
+        Clear(Item);
         NcTaskOut.Reset();
         if not NcTaskOut.IsEmpty() then
             NcTaskOut.DeleteAll();
@@ -1278,6 +1302,256 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     local procedure ProductOptionValue(VarietyValue: Text) Result: JsonObject
     begin
         Result.Add('name', VarietyValue);
+    end;
+
+    internal procedure ReorderVariantsInShopify(Item: Record Item; ShopifyStoreCode: Code[20])
+    var
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyProductID: Text[30];
+        Reordered: Boolean;
+        NotSyncedErr: Label 'Item %1 has not been synced with Shopify store %2 yet. The variant sorting order can only be updated after the product exists in Shopify.', Comment = '%1 - Item No., %2 - Shopify Store Code';
+        SortingDisabledErr: Label 'Product variant sorting is disabled. Enable "%1" in the %2 to use this function.', Comment = '%1 - field caption, %2 - setup table caption';
+        ReorderedMsg: Label 'The variant sorting order in Shopify has been updated to match the variety value sort order in Business Central.';
+        AlreadyInOrderMsg: Label 'The variant sorting order in Shopify already matches the variety value sort order in Business Central.';
+    begin
+        if not _SpfyIntegrationMgt.ProductVariantSortingEnabled() then
+            Error(SortingDisabledErr, SpfyIntegrationSetup.FieldCaption("Enable Product Variant Sorting"), SpfyIntegrationSetup.TableCaption());
+        GetStoreItemLink(Item."No.", ShopifyStoreCode, SpfyStoreItemLink);
+        ShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if ShopifyProductID = '' then
+            ShopifyProductID := GetShopifyProductID(SpfyStoreItemLink, false);
+        if ShopifyProductID = '' then
+            Error(NotSyncedErr, Item."No.", ShopifyStoreCode);
+
+        Reordered := ReorderProductVariants(Item, ShopifyStoreCode, ShopifyProductID);
+        if not GuiAllowed() then
+            exit;
+        if Reordered then
+            Message(ReorderedMsg)
+        else
+            Message(AlreadyInOrderMsg);
+    end;
+
+    local procedure ReorderProductVariantsBestEffort(Item: Record Item; ShopifyStoreCode: Code[20]; ShopifyProductID: Text[30])
+    var
+        Sentry: Codeunit "NPR Sentry";
+    begin
+        if TryReorderProductVariants(Item, ShopifyStoreCode, ShopifyProductID) then
+            exit;
+        Sentry.AddLastErrorIfProgrammingBug();
+        ClearLastError();
+    end;
+
+    [TryFunction]
+    local procedure TryReorderProductVariants(Item: Record Item; ShopifyStoreCode: Code[20]; ShopifyProductID: Text[30])
+    begin
+        ReorderProductVariants(Item, ShopifyStoreCode, ShopifyProductID);
+    end;
+
+    local procedure ReorderProductVariants(Item: Record Item; ShopifyStoreCode: Code[20]; ShopifyProductID: Text[30]): Boolean
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        OptionReorderJObject: JsonObject;
+        OptionValueJObject: JsonObject;
+        OptionsJArray: JsonArray;
+        ValuesJArray: JsonArray;
+        CurrentValuesToken: JsonToken;
+        OptionsToken: JsonToken;
+        OptionToken: JsonToken;
+        ShopifyResponse: JsonToken;
+        UserErrors: JsonToken;
+        ValueToken: JsonToken;
+        CurrentValueIDs: List of [Text];
+        OrderedValueIDs: List of [Text];
+        OptionID: Text;
+        OptionName: Text;
+        UserErrorsTxt: Text;
+        ValueID: Text;
+        ChangedAny: Boolean;
+        ReorderFailedErr: Label 'Shopify could not reorder the product options: %1', Comment = '%1 - Shopify user error text';
+        ProductOptionsNotFoundErr: Label 'The product with Shopify Product ID %1 could not be found in Shopify, or it has no options. The variant sorting order was not updated.', Comment = '%1 - Shopify Product ID';
+    begin
+        if ShopifyProductID = '' then
+            exit(false);
+        if not GetProductOptionsFromShopify(ShopifyProductID, ShopifyStoreCode, ShopifyResponse) then
+            Error(GetLastErrorText());
+        if not (ShopifyResponse.SelectToken('data.product.options', OptionsToken) and OptionsToken.IsArray()) then
+            Error(ProductOptionsNotFoundErr, ShopifyProductID);
+
+        foreach OptionToken in OptionsToken.AsArray() do begin
+            OptionID := _JsonHelper.GetJText(OptionToken, 'id', true);
+            OptionName := _JsonHelper.GetJText(OptionToken, 'name', false);
+
+            Clear(OptionReorderJObject);
+            OptionReorderJObject.Add('id', OptionID);
+
+            if OptionToken.SelectToken('optionValues', CurrentValuesToken) and CurrentValuesToken.IsArray() then begin
+                Clear(CurrentValueIDs);
+                foreach ValueToken in CurrentValuesToken.AsArray() do
+                    CurrentValueIDs.Add(_JsonHelper.GetJText(ValueToken, 'id', true));
+
+                if BuildReorderedOptionValueIDs(Item, OptionName, CurrentValuesToken.AsArray(), OrderedValueIDs) then
+                    if not SameStringList(CurrentValueIDs, OrderedValueIDs) then begin
+                        Clear(ValuesJArray);
+                        foreach ValueID in OrderedValueIDs do begin
+                            Clear(OptionValueJObject);
+                            OptionValueJObject.Add('id', ValueID);
+                            ValuesJArray.Add(OptionValueJObject);
+                        end;
+                        OptionReorderJObject.Add('values', ValuesJArray);
+                        ChangedAny := true;
+                    end;
+            end;
+            OptionsJArray.Add(OptionReorderJObject);
+        end;
+
+        if not ChangedAny then
+            exit(false);
+
+        Clear(ShopifyResponse);
+        if not SendProductOptionsReorder(ShopifyProductID, ShopifyStoreCode, OptionsJArray, ShopifyResponse) then
+            Error(GetLastErrorText());
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse, UserErrors) then begin
+            UserErrors.WriteTo(UserErrorsTxt);
+            Error(ReorderFailedErr, UserErrorsTxt);
+        end;
+        exit(true);
+    end;
+
+    local procedure BuildReorderedOptionValueIDs(Item: Record Item; OptionName: Text; CurrentValues: JsonArray; var OrderedValueIDs: List of [Text]): Boolean
+    var
+        VRTValue: Record "NPR Variety Value";
+        NameToID: Dictionary of [Text, Text];
+        AddedIDs: Dictionary of [Text, Boolean];
+        ValueToken: JsonToken;
+        Variety: Code[20];
+        VarietyTable: Code[40];
+        ValueID: Text;
+        ValueName: Text;
+        VarietyDescription: Text;
+        VarietyName: Text;
+    begin
+        Clear(OrderedValueIDs);
+        if not FindItemVarietyByOptionName(Item, OptionName, Variety, VarietyTable) then
+            exit(false);
+
+        foreach ValueToken in CurrentValues do begin
+            ValueName := _JsonHelper.GetJText(ValueToken, 'name', false);
+            ValueID := _JsonHelper.GetJText(ValueToken, 'id', true);
+            if (ValueName <> '') and not NameToID.ContainsKey(ValueName) then
+                NameToID.Add(ValueName, ValueID);
+        end;
+
+        VRTValue.SetCurrentKey(Type, "Table", "Sort Order");
+        VRTValue.SetRange(Type, Variety);
+        VRTValue.SetRange("Table", VarietyTable);
+        if VRTValue.FindSet() then
+            repeat
+                if GetVarietyDescription(Variety, VarietyTable, VRTValue.Value, VarietyName, VarietyDescription) then
+                    if NameToID.ContainsKey(VarietyDescription) then begin
+                        ValueID := NameToID.Get(VarietyDescription);
+                        if not AddedIDs.ContainsKey(ValueID) then begin
+                            OrderedValueIDs.Add(ValueID);
+                            AddedIDs.Add(ValueID, true);
+                        end;
+                    end;
+            until VRTValue.Next() = 0;
+
+        foreach ValueToken in CurrentValues do begin
+            ValueID := _JsonHelper.GetJText(ValueToken, 'id', true);
+            if not AddedIDs.ContainsKey(ValueID) then begin
+                OrderedValueIDs.Add(ValueID);
+                AddedIDs.Add(ValueID, true);
+            end;
+        end;
+        exit(true);
+    end;
+
+    local procedure FindItemVarietyByOptionName(Item: Record Item; OptionName: Text; var Variety: Code[20]; var VarietyTable: Code[40]): Boolean
+    begin
+        // If the option is renamed in Shopify admin so it no longer resembles the variety description, it becomes
+        // unmappable and its value order is left untouched (graceful degradation) - re-syncing the item restores
+        // the expected name.
+        if MatchVarietyOptionName(Item."NPR Variety 1", Item."NPR Variety 1 Table", OptionName, Variety, VarietyTable) then
+            exit(true);
+        if MatchVarietyOptionName(Item."NPR Variety 2", Item."NPR Variety 2 Table", OptionName, Variety, VarietyTable) then
+            exit(true);
+        if MatchVarietyOptionName(Item."NPR Variety 3", Item."NPR Variety 3 Table", OptionName, Variety, VarietyTable) then
+            exit(true);
+        if MatchVarietyOptionName(Item."NPR Variety 4", Item."NPR Variety 4 Table", OptionName, Variety, VarietyTable) then
+            exit(true);
+        exit(false);
+    end;
+
+    local procedure MatchVarietyOptionName(VarietyParam: Code[20]; VarietyTableParam: Code[40]; OptionName: Text; var Variety: Code[20]; var VarietyTable: Code[40]): Boolean
+    var
+        VRTTable: Record "NPR Variety Table";
+    begin
+        if (VarietyParam = '') or (VarietyTableParam = '') then
+            exit(false);
+        if not VRTTable.Get(VarietyParam, VarietyTableParam) then
+            exit(false);
+        if not SameOptionName(VRTTable.Description, OptionName) then
+            exit(false);
+        Variety := VarietyParam;
+        VarietyTable := VarietyTableParam;
+        exit(true);
+    end;
+
+    local procedure SameOptionName(VarietyDescription: Text; OptionName: Text): Boolean
+    begin
+        exit(UpperCase(DelChr(VarietyDescription, '<>', ' ')) = UpperCase(DelChr(OptionName, '<>', ' ')));
+    end;
+
+    local procedure SameStringList(ListA: List of [Text]; ListB: List of [Text]): Boolean
+    var
+        Index: Integer;
+    begin
+        if ListA.Count() <> ListB.Count() then
+            exit(false);
+        for Index := 1 to ListA.Count() do
+            if ListA.Get(Index) <> ListB.Get(Index) then
+                exit(false);
+        exit(true);
+    end;
+
+    local procedure GetProductOptionsFromShopify(ShopifyProductID: Text[30]; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        QueryStream: OutStream;
+        Request: JsonObject;
+        Variables: JsonObject;
+        QueryTok: Label 'query GetProductOptions($productID: ID!) {product(id: $productID) {id options{id name optionValues{id name}}}}', Locked = true;
+    begin
+        NcTask."Store Code" := ShopifyStoreCode;
+        Variables.Add('productID', 'gid://shopify/Product/' + ShopifyProductID);
+        Request.Add('query', QueryTok);
+        Request.Add('variables', Variables);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        Request.WriteTo(QueryStream);
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse));
+    end;
+
+    local procedure SendProductOptionsReorder(ShopifyProductID: Text[30]; ShopifyStoreCode: Code[20]; OptionsJArray: JsonArray; var ShopifyResponse: JsonToken): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        QueryStream: OutStream;
+        Request: JsonObject;
+        Variables: JsonObject;
+        QueryTok: Label 'mutation ReorderProductOptions($productId: ID!, $options: [OptionReorderInput!]!) {productOptionsReorder(productId: $productId, options: $options) {userErrors{field message}}}', Locked = true;
+    begin
+        NcTask."Store Code" := ShopifyStoreCode;
+        Variables.Add('productId', 'gid://shopify/Product/' + ShopifyProductID);
+        Variables.Add('options', OptionsJArray);
+        Request.Add('query', QueryTok);
+        Request.Add('variables', Variables);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        Request.WriteTo(QueryStream);
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
     end;
 
     local procedure GetItemReference(ItemVariant: Record "Item Variant"): Code[50]

@@ -34,6 +34,11 @@ page 6184553 "NPR Spfy Integration Setup"
                     ToolTip = 'Specifies a code used by the system to identify the import types, task processor and data log subscribers associated with the Shopify integration.';
                     ApplicationArea = NPRShopify;
                 }
+                field("Enable Product Variant Sorting"; Rec."Enable Product Variant Sorting")
+                {
+                    ToolTip = 'Specifies whether the system re-sequences the product variant options in Shopify to match the variety value sort order defined in Business Central. When enabled, the order is applied automatically after products and variants are synced, and the manual "Update Variant Sorting Order" action becomes available on the item. When disabled, no reordering is performed.';
+                    ApplicationArea = NPRShopify;
+                }
             }
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
             group(Processing)

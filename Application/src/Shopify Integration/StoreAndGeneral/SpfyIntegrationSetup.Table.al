@@ -230,6 +230,11 @@ table 6150807 "NPR Spfy Integration Setup"
             InitValue = 5;
         }
 #endif
+        field(160; "Enable Product Variant Sorting"; Boolean)
+        {
+            Caption = 'Enable Product Variant Sorting';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
