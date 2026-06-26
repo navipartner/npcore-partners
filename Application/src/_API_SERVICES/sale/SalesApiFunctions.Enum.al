@@ -11,5 +11,9 @@ enum 6059873 "NPR SalesApiFunctions"
     {
         Caption = 'get sales invoice as PDF';
     }
+    value(20; GET_SALES_CREDIT_MEMO_PDF)
+    {
+        Caption = 'get sales credit memo as PDF';
+    }
 }
 #endif

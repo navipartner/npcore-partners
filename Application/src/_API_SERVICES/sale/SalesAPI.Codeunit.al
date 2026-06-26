@@ -11,6 +11,8 @@ codeunit 6248369 "NPR SalesAPI" implements "NPR API Request Handler"
         case true of
             Request.Match('GET', '/sale/invoice/:documentNo/pdf'):
                 exit(Handle(_ApiFunction::GET_SALES_INVOICE_PDF, Request));
+            Request.Match('GET', '/sale/creditMemo/:documentNo/pdf'):
+                exit(Handle(_ApiFunction::GET_SALES_CREDIT_MEMO_PDF, Request));
         end;
     end;
 

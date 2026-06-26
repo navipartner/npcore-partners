@@ -34,6 +34,8 @@ codeunit 6248376 "NPR SalesApiHandler"
         case _ApiFunction of
             _ApiFunction::GET_SALES_INVOICE_PDF:
                 _Response := SalesApiAgent.GetInvoiceByDocumentNoAsPdf(_Request);
+            _ApiFunction::GET_SALES_CREDIT_MEMO_PDF:
+                _Response := SalesApiAgent.GetCrMemoByDocumentNoAsPdf(_Request);
         end;
     end;
 }

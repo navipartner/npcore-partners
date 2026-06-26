@@ -7,10 +7,12 @@ codeunit 6248182 "NPR SalesApiAgent"
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
         ReportSelections: Record "Report Selections";
+        TempBlob: Codeunit "Temp Blob";
+        Base64Codeunit: Codeunit "Base64 Convert";
         DocumentNoText: Text;
         PdfSalesInvoice: Text;
-        ReportId: Integer;
-        RecRef: RecordRef;
+        ReportUsage: Enum "Report Selection Usage";
+        InStr: InStream;
     begin
         Request.SkipCacheIfNonStickyRequest(GetSalesInvoiceTableIds());
         if (not Request.Paths().Get(3, DocumentNoText)) then
@@ -20,39 +22,57 @@ codeunit 6248182 "NPR SalesApiAgent"
         if (not SalesInvoiceHeader.Get(DocumentNoText)) then
             exit(Response.RespondResourceNotFound());
 
-        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
-        ReportSelections.SetFilter("Report ID", '<>%1', 0);
-        if not ReportSelections.FindFirst() then
-            exit(Response.RespondBadRequest('No report configured in Report Selections for usage "S.Invoice"'));
-        ReportId := ReportSelections."Report ID";
+        SalesInvoiceHeader.SetRange("No.", SalesInvoiceHeader."No.");
+        ReportUsage := "Report Selection Usage"::"S.Invoice";
+        ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, SalesInvoiceHeader, SalesInvoiceHeader."Sell-to Customer No.");
 
-        SalesInvoiceHeader.SetRecFilter();
-        RecRef.GetTable(SalesInvoiceHeader);
-        PdfSalesInvoice := ReportToBase64(ReportId, RecRef);
+        TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
+        PdfSalesInvoice := Base64Codeunit.ToBase64(InStr);
 
         exit(Response.RespondOK(PdfSalesInvoice));
     end;
 
-#region Private Methods
+    internal procedure GetCrMemoByDocumentNoAsPdf(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        ReportSelections: Record "Report Selections";
+        Base64Codeunit: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        DocumentNoText: Text;
+        PdfSalesCrMemo: Text;
+        ReportUsage: Enum "Report Selection Usage";
+        InStr: InStream;
+    begin
+        Request.SkipCacheIfNonStickyRequest(GetSalesCrMemoTableIds());
+        if (not Request.Paths().Get(3, DocumentNoText)) then
+            exit(Response.RespondBadRequest('Missing required parameter: documentNo'));
+
+        SalesCrMemoHeader.ReadIsolation := SalesCrMemoHeader.ReadIsolation::ReadCommitted;
+        if (not SalesCrMemoHeader.Get(DocumentNoText)) then
+            exit(Response.RespondResourceNotFound());
+
+        SalesCrMemoHeader.SetRange("No.", SalesCrMemoHeader."No.");
+        ReportUsage := "Report Selection Usage"::"S.Cr.Memo";
+        ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, SalesCrMemoHeader, SalesCrMemoHeader."Sell-to Customer No.");
+
+        TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
+        PdfSalesCrMemo := Base64Codeunit.ToBase64(InStr);
+
+        exit(Response.RespondOK(PdfSalesCrMemo));
+    end;
+
+    #region Private Methods
     local procedure GetSalesInvoiceTableIds() TableIds: List of [Integer]
     begin
         TableIds.Add(Database::"Sales Invoice Header");
         TableIds.Add(Database::"Sales Invoice Line");
     end;
 
-    local procedure ReportToBase64(ReportID: Integer; RecRef: RecordRef): Text
-    var
-        Base64Codeunit: Codeunit "Base64 Convert";
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
-        InStr: InStream;
+    local procedure GetSalesCrMemoTableIds() TableIds: List of [Integer]
     begin
-        TempBlob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
-        Report.SaveAs(ReportID, '', ReportFormat::Pdf, OutStr, RecRef);
-        TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
-
-        exit(Base64Codeunit.ToBase64(InStr));
+        TableIds.Add(Database::"Sales Cr.Memo Header");
+        TableIds.Add(Database::"Sales Cr.Memo Line");
     end;
-#endregion Private Methods
+    #endregion Private Methods
 }
 #endif
