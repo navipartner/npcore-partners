@@ -1515,7 +1515,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
         if LogEntry."Posting Status" <> LogEntry."Posting Status"::Invoiced then
             if OrderMgt.CheckThereAreLinesToPost(SalesHeader) then
-                if not PostSalesOrder(SalesHeader) then
+                if not PostSalesDocument(SalesHeader) then
                     Error(GetLastErrorText());
 
         if SpfyIntegrationMgt.DeleteAfterFinalPosting(LogEntry."Store Code") then begin
@@ -1524,15 +1524,24 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         end;
     end;
 
-    local procedure PostSalesOrder(var SalesHeader: Record "Sales Header") Success: Boolean
+    local procedure PostSalesDocument(var SalesHeader: Record "Sales Header") Success: Boolean
     var
         SalesPost: Codeunit "Sales-Post";
     begin
-        if SalesHeader."Document Type" <> SalesHeader."Document Type"::Order then
-            exit;
-
-        SalesHeader.Ship := true;
-        SalesHeader.Invoice := true;
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                begin
+                    SalesHeader.Ship := true;
+                    SalesHeader.Invoice := true;
+                end;
+            SalesHeader."Document Type"::"Return Order":
+                begin
+                    SalesHeader.Receive := true;
+                    SalesHeader.Invoice := true;
+                end;
+            else
+                exit;
+        end;
         Commit();
         Clear(SalesPost);
         Success := SalesPost.Run(SalesHeader);
