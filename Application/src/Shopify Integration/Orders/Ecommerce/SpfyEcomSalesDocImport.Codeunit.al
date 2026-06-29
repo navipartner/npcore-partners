@@ -1198,7 +1198,9 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         EcomSalesHeader."External No." := LogEntry."Shopify ID";
 #pragma warning restore AA0139
         EcomSalesHeader."Ecommerce Store Code" := FindNpEcStore(LogEntry."Store Code", OrderToken);
-        EcomSalesHeader."External Document No." := CopyStr((LogEntry."Store Code" + '-' + _SpfyAPIOrderHelper.GetOrderNo(OrderToken)), 1, MaxStrLen(EcomSalesHeader."External Document No."));
+        EcomSalesHeader."External Document No." := LogEntry."Store Code" + '-';
+        EcomSalesHeader."External Document No." := CopyStr(EcomSalesHeader."External Document No." +
+            _SpfyAPIOrderHelper.GetOrderNo(OrderToken, MaxStrLen(EcomSalesHeader."External Document No.") - StrLen(EcomSalesHeader."External Document No.")), 1, MaxStrLen(EcomSalesHeader."External Document No."));
         EcomSalesHeader."Document Source" := EcomSalesHeader."Document Source"::"Shopify";
 
         if SpfyPaymentGatewayHdlr.IsLCY(LogEntry."Presentment Currency Code") then begin

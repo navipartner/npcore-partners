@@ -15,21 +15,16 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
 
     internal procedure GetOrderDetails(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var ShopifyResponse: JsonToken)
     var
-        FulfilmentsArr: JsonArray;
-        LineItemsArr: JsonArray;
-        ShippingLinesArr: JsonArray;
-        HeaderResponse: JsonObject;
         OutStr: OutStream;
         JsonText: Text;
-        OrderGID: Text;
         WrongJSONFormatErr: Label 'Unable to serialize Shopify JSON response.';
     begin
-        OrderGID := 'gid://shopify/Order/' + SpfyEventLogEntry."Shopify ID";
-
-        if not TryGetOrderDetails(OrderGID, SpfyEventLogEntry, LineItemsArr, HeaderResponse, FulfilmentsArr, ShippingLinesArr) then
-            Error(GetLastErrorText());
-
-        ShopifyResponse := BuildUnifiedOrderJson(HeaderResponse, LineItemsArr, FulfilmentsArr, ShippingLinesArr);
+        if SpfyEventLogEntry."Document Type" = SpfyEventLogEntry."Document Type"::"Return Order" then begin
+            if not TryGetReturnDetails(SpfyEventLogEntry, ShopifyResponse) then
+                Error(GetLastErrorText());
+        end else
+            if not TryGetOrderDetails(SpfyEventLogEntry, ShopifyResponse) then
+                Error(GetLastErrorText());
 
         if ShouldSkipEcommerceDocumentImport(SpfyEventLogEntry, ShopifyResponse) then
             Error(GetLastErrorText());
@@ -76,13 +71,174 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         exit(RootObj.AsToken());
     end;
 
-    local procedure TryGetOrderDetails(OrderGID: Text; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var LineItemsArr: JsonArray; var HeaderResponse: JsonObject; var FulfilmentsArr: JsonArray; var ShippingLinesArr: JsonArray): Boolean
+    local procedure TryGetReturnDetails(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var ShopifyResponse: JsonToken): Boolean
+    var
+        ReturnResponse: JsonToken;
+        ReturnGID: Text;
+    begin
+        ClearLastError();
+        ReturnGID := 'gid://shopify/Return/' + SpfyEventLogEntry."Shopify ID";
+        if not GetReturn(ReturnGID, SpfyEventLogEntry."Store Code", ReturnResponse) then
+            exit(false);
+        exit(BuildUnifiedReturnJson(ReturnResponse, ShopifyResponse));
+    end;
+
+    local procedure GetReturn(ReturnGID: Text; ShopifyStoreCode: Code[20]; var ReturnResponse: JsonToken): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        ReturnRequest: Label 'query GetReturn($OrderId: ID!) { return(id: $OrderId) { id name status order { id name email phone note sourceName taxesIncluded currencyCode presentmentCurrencyCode customer { id firstName lastName defaultAddress { phone } } billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 } } refunds(first: 50) { pageInfo { hasNextPage } edges { node { id totalRefundedSet { presentmentMoney { amount } shopMoney { amount currencyCode } } refundLineItems(first: 100) { pageInfo { hasNextPage } edges { node { quantity subtotalSet { presentmentMoney { amount } } totalTaxSet { presentmentMoney { amount } } lineItem { id sku name title variantTitle taxLines { ratePercentage priceSet { presentmentMoney { amount } } } } } } } transactions(first: 100) { pageInfo { hasNextPage } edges { node { id kind status gateway processedAt createdAt authorizationExpiresAt amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentId paymentDetails { ... on CardPaymentDetails { company expirationMonth expirationYear name number paymentMethodName } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } } } } } } }', Locked = true;
+    begin
+        ClearLastError();
+        Clear(NcTask);
+        SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, '', ShopifyStoreCode, ReturnRequest, ReturnGID, false);
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ReturnResponse));
+    end;
+
+    // Reshapes the Shopify return/refund response into the same unified order JSON shape the importer consumes:
+    // data.order { ...header..., lineItems[] (edges, built from refundLineItems), shippingLines[] (empty), transactions[] (refund transactions) }.
+    [TryFunction]
+    local procedure BuildUnifiedReturnJson(ReturnResponse: JsonToken; var ShopifyResponse: JsonToken)
+    var
+        RootObj: JsonObject;
+        DataObj: JsonObject;
+        OrderObj: JsonObject;
+        LineItemsArr: JsonArray;
+        ShippingLinesArr: JsonArray;
+        TransactionsArr: JsonArray;
+        OrderToken: JsonToken;
+        RefundsToken: JsonToken;
+        RefundEdge: JsonToken;
+        RefundNode: JsonToken;
+        SuccessfulRefundTransactions: Integer;
+        IncompleteReturnErr: Label 'The Shopify return has more refunds, refunded lines or refund transactions than the import can retrieve in a single request, so it cannot be imported without risking an incorrect credit memo.';
+        MissingOrderLbl: Label 'Invalid Shopify response: missing "data.return.order" node.', Locked = true;
+        NoLinesErr: Label 'The Shopify return has no refunded line items to import.';
+        NoRefundTransactionErr: Label 'The Shopify return has no successful refund transaction to import.';
+    begin
+        if not ReturnResponse.SelectToken('data.return.order', OrderToken) then
+            Error(MissingOrderLbl);
+        OrderObj := OrderToken.AsObject();
+
+        if JsonHelper.GetJBoolean(ReturnResponse, 'data.return.refunds.pageInfo.hasNextPage', false) then
+            Error(IncompleteReturnErr);
+        if ReturnResponse.SelectToken('data.return.refunds.edges', RefundsToken) and RefundsToken.IsArray() then
+            foreach RefundEdge in RefundsToken.AsArray() do begin
+                RefundEdge.SelectToken('node', RefundNode);
+                if RefundDataTruncated(RefundNode) then
+                    Error(IncompleteReturnErr);
+                AddReturnLineItems(LineItemsArr, RefundNode);
+                AddReturnTransactions(TransactionsArr, RefundNode, SuccessfulRefundTransactions);
+            end;
+
+        if LineItemsArr.Count() = 0 then
+            Error(NoLinesErr);
+        if SuccessfulRefundTransactions = 0 then
+            Error(NoRefundTransactionErr);
+
+        OrderObj.Add('lineItems', LineItemsArr);
+        OrderObj.Add('shippingLines', ShippingLinesArr);
+        OrderObj.Add('transactions', TransactionsArr);
+
+        Clear(DataObj);
+        DataObj.Add('order', OrderObj);
+        Clear(RootObj);
+        RootObj.Add('data', DataObj);
+        ShopifyResponse := RootObj.AsToken();
+    end;
+
+    local procedure RefundDataTruncated(RefundNode: JsonToken): Boolean
+    begin
+        exit(
+            JsonHelper.GetJBoolean(RefundNode, 'refundLineItems.pageInfo.hasNextPage', false) or
+            JsonHelper.GetJBoolean(RefundNode, 'transactions.pageInfo.hasNextPage', false));
+    end;
+
+    local procedure AddReturnLineItems(var LineItemsArr: JsonArray; RefundNode: JsonToken)
+    var
+        RefundLineItemsToken: JsonToken;
+        RefundLineItemEdge: JsonToken;
+        RefundLineItemNode: JsonToken;
+    begin
+        if not (RefundNode.SelectToken('refundLineItems.edges', RefundLineItemsToken) and RefundLineItemsToken.IsArray()) then
+            exit;
+        foreach RefundLineItemEdge in RefundLineItemsToken.AsArray() do begin
+            RefundLineItemEdge.SelectToken('node', RefundLineItemNode);
+            LineItemsArr.Add(BuildReturnLineItemEdge(RefundLineItemNode));
+        end;
+    end;
+
+    local procedure BuildReturnLineItemEdge(RefundLineItemNode: JsonToken) EdgeObj: JsonObject
+    var
+        LineItemNode: JsonObject;
+        OriginalUnitPriceSet: JsonObject;
+        PresentmentMoney: JsonObject;
+        EmptyArray: JsonArray;
+        LineItemToken: JsonToken;
+        TaxLinesToken: JsonToken;
+        Quantity: Decimal;
+        UnitPrice: Decimal;
+    begin
+        RefundLineItemNode.SelectToken('lineItem', LineItemToken);
+        Quantity := JsonHelper.GetJDecimal(RefundLineItemNode, 'quantity', true);
+        if Quantity <> 0 then
+            UnitPrice := JsonHelper.GetJDecimal(RefundLineItemNode, 'subtotalSet.presentmentMoney.amount', false) / Quantity;
+
+        LineItemNode.Add('id', JsonHelper.GetJText(LineItemToken, 'id', false));
+        LineItemNode.Add('sku', JsonHelper.GetJText(LineItemToken, 'sku', false));
+        LineItemNode.Add('name', JsonHelper.GetJText(LineItemToken, 'name', false));
+        LineItemNode.Add('title', JsonHelper.GetJText(LineItemToken, 'title', false));
+        LineItemNode.Add('variantTitle', JsonHelper.GetJText(LineItemToken, 'variantTitle', false));
+        LineItemNode.Add('quantity', Quantity);
+        LineItemNode.Add('unfulfilledQuantity', Quantity);
+        LineItemNode.Add('currentQuantity', Quantity);
+        LineItemNode.Add('nonFulfillableQuantity', 0);
+        LineItemNode.Add('isGiftCard', false);
+
+        PresentmentMoney.Add('amount', UnitPrice);
+        OriginalUnitPriceSet.Add('presentmentMoney', PresentmentMoney);
+        LineItemNode.Add('originalUnitPriceSet', OriginalUnitPriceSet);
+
+        if LineItemToken.SelectToken('taxLines', TaxLinesToken) and TaxLinesToken.IsArray() then
+            LineItemNode.Add('taxLines', TaxLinesToken.AsArray())
+        else
+            LineItemNode.Add('taxLines', EmptyArray);
+        LineItemNode.Add('discountAllocations', EmptyArray);
+
+        EdgeObj.Add('node', LineItemNode);
+    end;
+
+    local procedure AddReturnTransactions(var TransactionsArr: JsonArray; RefundNode: JsonToken; var SuccessfulRefundTransactions: Integer)
+    var
+        TransactionsToken: JsonToken;
+        TransactionEdge: JsonToken;
+        TransactionNode: JsonToken;
+    begin
+        if not (RefundNode.SelectToken('transactions.edges', TransactionsToken) and TransactionsToken.IsArray()) then
+            exit;
+        foreach TransactionEdge in TransactionsToken.AsArray() do begin
+            TransactionEdge.SelectToken('node', TransactionNode);
+            // Only successful refund transactions are real refunds; FAILURE/PENDING/ERROR must not become payment lines downstream.
+            if JsonHelper.GetJText(TransactionNode, 'status', false).ToUpper() = 'SUCCESS' then begin
+                TransactionsArr.Add(TransactionNode);
+                SuccessfulRefundTransactions += 1;
+            end;
+        end;
+    end;
+
+    local procedure TryGetOrderDetails(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var ShopifyResponse: JsonToken): Boolean
     var
         TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
+        LineItemsArr: JsonArray;
+        HeaderResponse: JsonObject;
+        FulfilmentsArr: JsonArray;
+        ShippingLinesArr: JsonArray;
+        OrderGID: Text;
         HeaderRequest: Label 'query GetHeader($OrderId: ID!) { order(id: $OrderId) { id taxesIncluded displayFinancialStatus createdAt reservationToken: metafield(namespace: "np-ticket", key: "reservation_token") { value } lineItemsData: metafield(namespace: "np-ticket", key: "line_items_data") { value } email phone note sourceName customer{id firstName lastName defaultEmailAddress{emailAddress} defaultPhoneNumber{phoneNumber} defaultAddress{phone}} billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 phone } number note sourceName createdAt closedAt cancelledAt totalPriceSet { presentmentMoney { amount } shopMoney { amount } } currencyCode presentmentCurrencyCode capturable transactions(first: 250) { id kind status amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } authorizationCode authorizationExpiresAt processedAt createdAt gateway multiCapturable parentTransaction { id kind } paymentId processedAt status totalUnsettledSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentDetails { ... on CardPaymentDetails { avsResultCode bin company expirationMonth expirationYear name number paymentMethodName wallet } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } }', Locked = true;
         ItemLinesRequest: Label 'query GetOrderLines($OrderId: ID!, $afterCursor:String) { order(id: $OrderId) { lineItems(after:$afterCursor, first: 50) { pageInfo { hasNextPage endCursor } edges { node { id sku  taxLines{ratePercentage priceSet{presentmentMoney{amount}}} originalUnitPriceSet { presentmentMoney { amount } shopMoney { amount } } customAttributes {key value} isGiftCard product {id productType} name title variant{price} quantity variantTitle unfulfilledQuantity currentQuantity nonFulfillableQuantity discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } } } } } }', Locked = true;
         ShippingLinesRequest: Label 'query GetShippingLines($OrderId: ID!, $afterCursor:String) { order(id: $OrderId) { shippingLines(first: 10, after:$afterCursor) { pageInfo { endCursor hasNextPage } edges { node { id code title taxLines{ratePercentage priceSet{presentmentMoney{amount}}} discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } code originalPriceSet { presentmentMoney { amount } } } } } } }', Locked = true;
     begin
+        OrderGID := 'gid://shopify/Order/' + SpfyEventLogEntry."Shopify ID";
+
         if not TryGetOrderLines(OrderGID, SpfyEventLogEntry."Store Code", 'lineItems', ItemLinesRequest, LineItemsArr) then
             exit(false);
 
@@ -105,7 +261,11 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
                 if not TryGetOrderGiftCards(OrderGID, SpfyEventLogEntry."Store Code", TempTempSpfyFulfillmentBuffer) then
                     exit(false);
 
-        exit(TryGetOrderLines(OrderGID, SpfyEventLogEntry."Store Code", 'shippingLines', ShippingLinesRequest, ShippingLinesArr));
+        if not TryGetOrderLines(OrderGID, SpfyEventLogEntry."Store Code", 'shippingLines', ShippingLinesRequest, ShippingLinesArr) then
+            exit(false);
+
+        ShopifyResponse := BuildUnifiedOrderJson(HeaderResponse, LineItemsArr, FulfilmentsArr, ShippingLinesArr);
+        exit(true);
     end;
 
     local procedure HandleAnonymizedCustomerOrder(HeaderResponse: JsonObject; SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
@@ -497,8 +657,6 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         OrdersArr := ResponseBody.AsArray();
     end;
 
-    // Fetches a further page of an order's CLOSED returns. Used when the inline returns connection in GetReturnList
-    // reports hasNextPage (an order with more closed returns than the page size); the caller loops until exhausted.
     [TryFunction]
     internal procedure GetOrderReturns(ShopifyStore: Record "NPR Spfy Store"; OrderGID: Text; var Cursor: Text; var HasNext: Boolean; var ReturnsArr: JsonArray)
     var
@@ -651,15 +809,15 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         Status.Names().Get(Status.Ordinals().IndexOf(Status.AsInteger()), Result);
     end;
 
-    internal procedure GetOrderNo(Order: JsonToken) OrderNo: Text[50]
+    internal procedure GetOrderNo(Order: JsonToken; MaxLen: Integer) OrderNo: Text
     var
-        FullOrderNo: Text;
         OrderNoLbl: Label 'order number';
     begin
-        FullOrderNo := JsonHelper.GetJText(Order, 'number', true);
-        if StrLen(FullOrderNo) > MaxStrLen(OrderNo) then
-            Error(TooLongValueErr, OrderNoLbl, FullOrderNo, MaxStrLen(OrderNo));
-        OrderNo := CopyStr(FullOrderNo, 1, MaxStrLen(OrderNo));
+        OrderNo := JsonHelper.GetJText(Order, 'number', true);
+        if MaxLen <= 0 then
+            exit;
+        if StrLen(OrderNo) > MaxLen then
+            Error(TooLongValueErr, OrderNoLbl, OrderNo, MaxLen);
     end;
 
     internal procedure GetNumericId(GlobalId: Text) ShopifyId: Text[30]
