@@ -98,6 +98,13 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Get Orders Starting From';
             DataClassification = CustomerContent;
         }
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        field(45; "Get Returns Starting From"; DateTime)
+        {
+            Caption = 'Get Returns Starting From';
+            DataClassification = CustomerContent;
+        }
+#endif
         field(50; "Last Orders Imported At"; DateTime)
         {
             Caption = 'Last Orders Imported At';
@@ -113,6 +120,15 @@ table 6150810 "NPR Spfy Store"
             FieldClass = FlowField;
             CalcFormula = lookup("NPR Spfy Data Sync. Pointer"."Last Orders Imported At" where("Shopify Store Code" = field(Code)));
         }
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        field(55; "Last Returns Imported At (FF)"; DateTime)
+        {
+            Caption = 'Last Returns Imported At';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Data Sync. Pointer"."Last Returns Imported At" where("Shopify Store Code" = field(Code)));
+        }
+#endif
         field(60; "Item List Integration"; Boolean)
         {
             Caption = 'Item List Integration';
@@ -291,6 +307,28 @@ table 6150810 "NPR Spfy Store"
                     TestField("Sales Order Integration");
             end;
         }
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        field(95; "Sales Return Order Integration"; Boolean)
+        {
+            Caption = 'Sales Return Order Integration';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+                ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+                FeatureEnabled: Boolean;
+                FeatureNotEnabledErr: Label 'Please enable %1 first before enabling %2.', Comment = '%1 = Shopify Ecommerce Order Experience feature description, %2 = Sales Return Order Integration field caption';
+            begin
+                FeatureEnabled := ShopifyEcommOrderExp.IsFeatureEnabled();
+                if "Sales Return Order Integration" and not FeatureEnabled then
+                    Error(FeatureNotEnabledErr, ShopifyEcommOrderExp.GetFeatureDescription(), FieldCaption("Sales Return Order Integration"));
+                Modify();
+                if FeatureEnabled then
+                    SpfyEcomSalesDocPrcssr.SetupJobQueues();
+            end;
+        }
+#endif
         field(100; "Send Payment Capture Requests"; Boolean)
         {
             Caption = 'Send Payment Capture Requests';
@@ -690,6 +728,17 @@ table 6150810 "NPR Spfy Store"
         SpfyDataSyncPointer."Last Orders Imported At" := NewDateTime;
         SpfyDataSyncPointer.Modify();
     end;
+
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+    internal procedure SetLastReturnsImportedAt(NewDateTime: DateTime)
+    var
+        SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
+    begin
+        FindDataSyncPointer(SpfyDataSyncPointer);
+        SpfyDataSyncPointer."Last Returns Imported At" := NewDateTime;
+        SpfyDataSyncPointer.Modify();
+    end;
+#endif
 
 #if not (BC18 or BC19 or BC20)
     internal procedure SetLastPOSRowVersion(NewRowVersion: BigInteger)

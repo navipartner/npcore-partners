@@ -19,6 +19,13 @@ table 6151261 "NPR Spfy Data Sync. Pointer"
             Caption = 'Last Orders Imported At';
             DataClassification = CustomerContent;
         }
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        field(15; "Last Returns Imported At"; DateTime)
+        {
+            Caption = 'Last Returns Imported At';
+            DataClassification = CustomerContent;
+        }
+#endif
 #if not (BC18 or BC19 or BC20)
         field(20; "Last POS Entry Row Version"; BigInteger)
         {

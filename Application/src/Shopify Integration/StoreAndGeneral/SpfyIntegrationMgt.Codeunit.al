@@ -76,6 +76,10 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 exit(ShopifyStore."Item Category as Metafield");
             IntegrationArea::"Sales Orders":
                 exit(ShopifyStore."Sales Order Integration");
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+            IntegrationArea::"Sales Returns":
+                exit(ShopifyStore."Sales Return Order Integration");
+#endif
             IntegrationArea::"Order Fulfillments":
                 exit(ShopifyStore."Send Order Fulfillments");
             IntegrationArea::"Payment Capture Requests":

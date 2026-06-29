@@ -6,12 +6,11 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
     procedure AddFeature()
     var
         Feature: Record "NPR Feature";
-        FeatureDescriptionLbl: Label 'Shopify Ecommerce Order Experience', MaxLength = 2048;
     begin
         Feature.Init();
         Feature.Id := GetFeatureId();
         Feature.Enabled := false;
-        Feature.Description := FeatureDescriptionLbl;
+        Feature.Description := GetFeatureDescription();
         Feature.Validate(Feature, "NPR Feature"::"Shopify Ecommerce Order Experience");
         Feature.Insert();
     end;
@@ -49,6 +48,13 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
 #pragma warning disable AA0139
     end;
 
+    internal procedure GetFeatureDescription(): Text[2048]
+    var
+        FeatureDescriptionLbl: Label 'Shopify Ecommerce Order Experience', MaxLength = 2048;
+    begin
+        exit(FeatureDescriptionLbl);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnBeforeValidateEvent', 'Enabled', false, false)]
     local procedure NPRFeatureOnBeforeValidateEnabled(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature"; CurrFieldNo: Integer)
     var
@@ -56,10 +62,24 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
     begin
         if not (Rec.Id = GetFeatureId()) or (CurrFieldNo = 0) then
             exit;
-        if Rec.Enabled then
+        if Rec.Enabled then begin
             if not SpfyIntegrationFeature.IsFeatureEnabled() then
                 RaiseError(StrSubstNo(SpfyIntNotEnabledErr, SpfyIntegrationFeature.GetFeatureDescription()));
+        end else
+            DisableSalesReturnIntegrationOnStores();
         HandleJobQueues(Rec);
+    end;
+
+    local procedure DisableSalesReturnIntegrationOnStores()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        ReturnsNotSupportedOnLegacyQst: Label 'Sales return integration is enabled on one or more Shopify stores. Sales returns are not supported on the legacy order import, so disabling the %1 feature will also disable sales return integration on those stores. Do you want to continue?', Comment = '%1 = Shopify Ecommerce Order Experience feature description';
+    begin
+        ShopifyStore.SetRange("Sales Return Order Integration", true);
+        if ShopifyStore.IsEmpty() then
+            exit;
+        if GetUserResponse(StrSubstNo(ReturnsNotSupportedOnLegacyQst, GetFeatureDescription())) then
+            ShopifyStore.ModifyAll("Sales Return Order Integration", false, false);
     end;
 
     local procedure HandleJobQueues(Rec: Record "NPR Feature")

@@ -40,6 +40,12 @@ enum 6014656 "NPR Spfy Integration Area"
     {
         Caption = 'Order Ready for Pickup';
     }
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+    value(25; "Sales Returns")
+    {
+        Caption = 'Sales Returns';
+    }
+#endif
     value(30; "Retail Vouchers")
     {
         Caption = 'Retail Vouchers';

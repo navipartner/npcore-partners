@@ -186,9 +186,13 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyEcomSalesImportJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
+        EnableJobQueues: Boolean;
     begin
         SpfyIntegrationMgt.SetRereadSetup();
-        if SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders") then begin
+        EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
+        if not EnableJobQueues then
+            EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns");
+        if EnableJobQueues then begin
             SpfyOrderImportJQ.SetupJobQueue(true);
             SpfyEcomSalesImportJQ.SetupJobQueue(true);
         end;

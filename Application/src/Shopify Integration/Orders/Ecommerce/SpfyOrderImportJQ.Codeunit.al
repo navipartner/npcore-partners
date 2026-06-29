@@ -337,9 +337,14 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     end;
 
     internal procedure SetupJobQueues()
+    var
+        EnableJobQueues: Boolean;
     begin
         SpfyIntegrationMgt.SetRereadSetup();
-        SetupJobQueue(SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders"));
+        EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
+        if not EnableJobQueues then
+            EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns");
+        SetupJobQueue(EnableJobQueues);
     end;
 
     internal procedure SetupJobQueue(Enable: Boolean)
