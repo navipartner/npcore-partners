@@ -147,7 +147,7 @@ codeunit 6184805 "NPR Spfy Integration Public"
     /// <param name="RequestQueryString">GraphQL query text.</param>
     /// <param name="OrderGID">Shopify GraphQL global ID (e.g. gid://shopify/Order/...).</param>
     /// <param name="IncludeCursor">Specifies whether the paging cursor should be included in the request as Header-level queries do not support pagination parameters.</param>
-    procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; endCursor: Text; ShopifyStoreCode: Code[20]; RequestQueryString: Text; OrderGID: Text[100]; IncludeCursor: Boolean)
+    procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; endCursor: Text; ShopifyStoreCode: Code[20]; RequestQueryString: Text; OrderGID: Text; IncludeCursor: Boolean)
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
     begin

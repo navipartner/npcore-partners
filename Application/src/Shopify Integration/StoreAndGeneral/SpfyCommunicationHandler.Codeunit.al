@@ -133,7 +133,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
     end;
 
-    internal procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; Cursor: Text; ShopifyStoreCode: Code[20]; RequestString: Text; OrderGID: Text[100]; IncludeCursor: Boolean)
+    internal procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; Cursor: Text; ShopifyStoreCode: Code[20]; RequestString: Text; OrderGID: Text; IncludeCursor: Boolean)
     var
         VariablesJson: JsonObject;
     begin

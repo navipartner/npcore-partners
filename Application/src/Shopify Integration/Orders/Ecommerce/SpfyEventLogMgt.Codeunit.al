@@ -25,13 +25,14 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         SpfyEventLogEntry."Event Date-Time" := JsonHelper.GetJDT(OrderTkn, 'createdAt', true);
         SpfyEventLogEntry."Document Name" := CopyStr(JsonHelper.GetJText(OrderTkn, 'name', false), 1, MaxStrLen(SpfyEventLogEntry."Document Name"));
         SpfyEventLogEntry."Bucket Id" := Random(100);
-        SetCurrencyCode(OrderTkn, SpfyEventLogEntry);
+        if SpfyEventLogEntry."Document Type" = SpfyEventLogEntry."Document Type"::Order then
+            SetCurrencyCode(OrderTkn, SpfyEventLogEntry);
         SetDates(SpfyEventLogEntry, SpfyEventLogEntry."Document Status", OrderTkn);
-        If LogEntryExist(SpfyEventLogEntry."Shopify ID", SpfyEventLogEntry."Document Status", SpfyEventLogEntry."Store Code") then
+        If LogEntryExist(SpfyEventLogEntry."Shopify ID", SpfyEventLogEntry."Document Status", SpfyEventLogEntry."Store Code", SpfyEventLogEntry."Document Type") then
             Error(AlreadyExistsErr, SpfyEventLogEntry."Shopify ID", SpfyEventLogEntry."Document Status");
     end;
 
-    internal procedure LogEntryExist(OrderId: Text; OrderStatus: enum "NPR SpfyAPIDocumentStatus"; StoreCode: code[20]): Boolean
+    internal procedure LogEntryExist(OrderId: Text[30]; OrderStatus: enum "NPR SpfyAPIDocumentStatus"; StoreCode: code[20]; DocType: enum "NPR SpfyEventLogDocType"): Boolean
     var
         LogEntry: Record "NPR Spfy Event Log Entry";
     begin
@@ -40,7 +41,7 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         LogEntry.SetRange(Type, LogEntry.Type::"Incoming Sales Order");
         LogEntry.SetRange("Store Code", StoreCode);
         LogEntry.SetRange("Shopify ID", OrderId);
-        LogEntry.SetRange("Document Type", LogEntry."Document Type"::Order);
+        LogEntry.SetRange("Document Type", DocType);
         LogEntry.SetFilter("Document Status", '%1|%2', OrderStatus, OrderStatus::" ");
         exit(LogEntry.FindFirst());
     end;

@@ -3,7 +3,7 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
 {
     Access = Internal;
     SingleInstance = true;
-    internal procedure GetVocherReferenceNo(OrderLineId: Text; var ReferenceNo: Code[50]; var GiftCardId: Text[30])
+    internal procedure GetVocherReferenceNo(OrderLineId: Text[30]; var ReferenceNo: Code[50]; var GiftCardId: Text[30])
     var
         TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
     begin
@@ -26,7 +26,7 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
         end;
     end;
 
-    internal procedure RemoveLineFromCache(OrderLineId: Text)
+    internal procedure RemoveLineFromCache(OrderLineId: Text[30])
     var
         OrderLineErr: Label 'Shopify Order Line Id filter is blank,this is a programming issue.', Locked = true;
     begin
@@ -39,7 +39,7 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
             Temp_SpfyFulfillmentBuffer.Delete();
     end;
 
-    internal procedure GetExpectedGiftCardCount(GCLineId: Text[100]): Integer
+    internal procedure GetExpectedGiftCardCount(GCLineId: Text[30]): Integer
     var
         TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
         Count: Integer;
@@ -112,7 +112,7 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
         exit(true);
     end;
 
-    internal procedure AddGiftCardDetails(GCOrderLineId: Text[100]; GiftCardGID: Text[100]; LastCharacters: Text)
+    internal procedure AddGiftCardDetails(GCOrderLineId: Text[30]; GiftCardGID: Text; LastCharacters: Text)
     var
         TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
@@ -128,9 +128,9 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
                 Temp_SpfyFulfillmEntryDetailBuffer.Init();
                 Temp_SpfyFulfillmEntryDetailBuffer."Entry No." := GetLastEntryNo() + 1;
                 Temp_SpfyFulfillmEntryDetailBuffer."Parent Entry No." := TempBuffer."Entry No.";
-#pragma warning disable AA0139
-                Temp_SpfyFulfillmEntryDetailBuffer."Gift Card ID" := CopyStr(GiftCardId, 1, MaxStrLen(Temp_SpfyFulfillmEntryDetailBuffer."Gift Card ID"));
+                Temp_SpfyFulfillmEntryDetailBuffer."Gift Card ID" := GiftCardId;
                 Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No." := CopyStr(LastCharacters, 1, MaxStrLen(Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No."));
+#pragma warning disable AA0139
                 if StrLen(Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No.") > 4 then
                     Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No." := CopyStr(Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No.", StrLen(Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No.") - 3);
                 Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No." := StrSubstNo('%1/%2', Temp_SpfyFulfillmEntryDetailBuffer."Gift Card ID", Temp_SpfyFulfillmEntryDetailBuffer."Gift Card Reference No.");

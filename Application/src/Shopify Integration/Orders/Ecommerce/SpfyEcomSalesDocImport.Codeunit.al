@@ -526,9 +526,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             Error(WrongFormatErr);
         if (ReceiptJText = '{}') then
             Error(NotSupportedPayMethodErr, EcomSalesPmtLine."External Payment Gateway");
-#pragma warning disable AA0139
-        ShopifyGiftCardID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ReceiptJson, 'gift_card_id', false), '/');
-#pragma warning restore AA0139
+        ShopifyGiftCardID := OrderMgt.GetNumericId(JsonHelper.GetJText(ReceiptJson, 'gift_card_id', false));
         if ShopifyGiftCardID = '' then
             exit(false);
         SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR NpRv Voucher", "NPR Spfy ID Type"::"Entry ID", ShopifyGiftCardID, ShopifyAssignedID);
