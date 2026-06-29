@@ -966,7 +966,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         exit(TransactionKind = 'SALE');
     end;
 
-    local procedure IsRefundTransaction(TransactionKind: Text): Boolean
+    internal procedure IsRefundTransaction(TransactionKind: Text): Boolean
     begin
         exit(TransactionKind = 'REFUND');
     end;

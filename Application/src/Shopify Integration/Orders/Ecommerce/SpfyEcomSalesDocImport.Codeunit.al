@@ -407,7 +407,9 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             foreach PaymentLineJsonToken in PaymentLinesJsonToken.AsArray() do begin
                 ShopifyTransactionKind := JsonHelper.GetJText(PaymentLineJsonToken, 'kind', false).ToUpper();
                 If JsonHelper.GetJText(PaymentLineJsonToken, 'status', true).ToUpper() = 'SUCCESS' then
-                    if SpfyCapturePayment.IsAuthorizationTransaction(ShopifyTransactionKind) or SpfyCapturePayment.IsSaleTransaction(ShopifyTransactionKind) then
+                    if SpfyCapturePayment.IsAuthorizationTransaction(ShopifyTransactionKind) or SpfyCapturePayment.IsSaleTransaction(ShopifyTransactionKind) or
+                       ((EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::"Return Order") and SpfyCapturePayment.IsRefundTransaction(ShopifyTransactionKind))
+                    then
                         InsertEcommerceSalesPaymentLine(PaymentLineJsonToken, EcomSalesHeader, LogEntry);
             end;
         IsHandled := false;
