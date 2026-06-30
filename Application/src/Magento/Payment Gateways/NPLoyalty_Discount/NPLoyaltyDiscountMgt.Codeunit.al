@@ -7,6 +7,7 @@ codeunit 6248623 "NPR NP Loyalty Discount Mgt"
     var
         LoyaltyServerStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         SalesLine: Record "Sales Line";
+        NPLoyaltyDiscEvents: Codeunit "NPR NP Loyalty Disc. Events";
         LineNo: Integer;
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -29,7 +30,7 @@ codeunit 6248623 "NPR NP Loyalty Discount Mgt"
         SalesLine."NPR CreatedfrmPointsPmntLineId" := PaymentLine.SystemId;
         SalesLine.Modify();
 
-        OnAfterCreateSalesDiscountLine(SalesLine, PaymentLine);
+        NPLoyaltyDiscEvents.OnAfterCreateSalesDiscountLine(SalesLine, PaymentLine);
 
         LoyaltyServerStoreLedger.SetCurrentKey("Authorization Code");
         LoyaltyServerStoreLedger.SetRange("Authorization Code", CopyStr(PaymentLine."Transaction ID", 1, MaxStrLen(LoyaltyServerStoreLedger."Authorization Code")));
@@ -47,10 +48,5 @@ codeunit 6248623 "NPR NP Loyalty Discount Mgt"
         Membership.SetRange(Blocked, false);
         if Membership.FindFirst() then
             exit(Membership.SystemId);
-    end;
-
-    [IntegrationEvent(false, false)]
-    procedure OnAfterCreateSalesDiscountLine(var SalesLine: Record "Sales Line"; PaymentLine: Record "NPR Magento Payment Line")
-    begin
     end;
 }
