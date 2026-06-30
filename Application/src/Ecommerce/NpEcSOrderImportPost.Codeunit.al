@@ -69,7 +69,11 @@
     end;
 
     local procedure PostSalesOrder(var SalesHeader: Record "Sales Header")
+    var
+        WebPostDateCheck: Codeunit "NPR Web Post Date Check";
     begin
+        WebPostDateCheck.UpdatePostingDateIfWebOrder(SalesHeader);
+
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;
         CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);

@@ -32,12 +32,15 @@ codeunit 6151210 "NPR NpCs Post Document"
     var
         SalesHeader: Record "Sales Header";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+        WebPostDateCheck: Codeunit "NPR Web Post Date Check";
         PostingErrorMessage: Text;
     begin
         if SkipPosting(NpCsDocument) then
             exit;
 
         SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.");
+
+        WebPostDateCheck.UpdatePostingDateIfWebOrder(SalesHeader);
 
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;

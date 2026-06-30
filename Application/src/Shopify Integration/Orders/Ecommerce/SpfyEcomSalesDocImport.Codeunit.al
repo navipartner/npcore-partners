@@ -1514,9 +1514,11 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             exit;
 
         if LogEntry."Posting Status" <> LogEntry."Posting Status"::Invoiced then
-            if OrderMgt.CheckThereAreLinesToPost(SalesHeader) then
+            if OrderMgt.CheckThereAreLinesToPost(SalesHeader) then begin
+                Commit();
                 if not PostSalesDocument(SalesHeader) then
                     Error(GetLastErrorText());
+            end;
 
         if SpfyIntegrationMgt.DeleteAfterFinalPosting(LogEntry."Store Code") then begin
             Commit();
@@ -1527,7 +1529,10 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     local procedure PostSalesDocument(var SalesHeader: Record "Sales Header") Success: Boolean
     var
         SalesPost: Codeunit "Sales-Post";
+        WebPostDateCheck: Codeunit "NPR Web Post Date Check";
     begin
+        WebPostDateCheck.UpdatePostingDateIfWebOrder(SalesHeader);
+
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Order:
                 begin

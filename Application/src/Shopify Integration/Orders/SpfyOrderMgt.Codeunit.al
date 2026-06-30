@@ -1776,10 +1776,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     procedure PostOrder(var SalesHeader: Record "Sales Header"): Boolean
     var
         SalesPost: Codeunit "Sales-Post";
+        WebPostDateCheck: Codeunit "NPR Web Post Date Check";
     begin
         if not CheckThereAreLinesToPost(SalesHeader) then
             exit(false);
-        Commit();
+
+        WebPostDateCheck.UpdatePostingDateIfWebOrder(SalesHeader);
 
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;

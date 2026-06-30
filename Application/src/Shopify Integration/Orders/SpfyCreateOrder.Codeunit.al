@@ -36,6 +36,8 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
 
         OrderMgt.HandleClickCollectOrder(ShopifyStoreCode, SalesHeader);
 
+        Commit();
+
         if not OrderMgt.PostOrder(SalesHeader) then begin
             OrderMgt.SetMaxQtyToShipAndInvoice(SalesHeader);
             ReleaseOrder(SalesHeader);
