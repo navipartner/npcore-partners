@@ -53,12 +53,16 @@ table 6150807 "NPR Spfy Integration Setup"
             trigger OnValidate()
             var
                 ShopifySetup2: Record "NPR Spfy Integration Setup";
+                ConfirmApiVersionChangeQst: Label 'The recommended %1 is ‘%3’, which this integration has been tested against. Changing it to ‘%2’ is not recommended and could cause some Shopify data exchange procedures to stop working or malfunction. Do you want to change the %1 anyway?', Comment = '%1 = Shopify Api Version field caption, %2 = the API version being entered, %3 = the recommended API version';
             begin
-                if "Shopify Api Version" = '' then begin
-                    ShopifySetup2.Init();
-                    if ShopifySetup2."Shopify Api Version" <> '' then
+                ShopifySetup2.Init();
+                if "Shopify Api Version" = '' then
+                    "Shopify Api Version" := ShopifySetup2."Shopify Api Version"
+                else
+                    CheckApiVersionFormat("Shopify Api Version");
+                if not ("Shopify Api Version" in ['', ShopifySetup2."Shopify Api Version"]) then
+                    if not Confirm(ConfirmApiVersionChangeQst, false, FieldCaption("Shopify Api Version"), "Shopify Api Version", ShopifySetup2."Shopify Api Version") then
                         "Shopify Api Version" := ShopifySetup2."Shopify Api Version";
-                end;
             end;
         }
         field(40; "Item List Integration"; Boolean)
@@ -266,6 +270,34 @@ table 6150807 "NPR Spfy Integration Setup"
             Insert(true);
         end;
         RecordHasBeenRead := true;
+    end;
+
+    local procedure CheckApiVersionFormat(ApiVersion: Text[10])
+    var
+        Year: Integer;
+        Month: Integer;
+        Index: Integer;
+        ValidFormat: Boolean;
+        InvalidFormatErr: Label 'The %1 ‘%2’ is not a valid Shopify API version. Shopify API versions use the YYYY-MM format, for example ‘%3’.', Comment = '%1 = Shopify Api Version field caption, %2 = the entered value, %3 = an example of a valid version';
+        ExampleVersionTok: Label '2025-10', Locked = true;
+    begin
+        ValidFormat := StrLen(ApiVersion) = 7;
+        if ValidFormat then
+            ValidFormat := ApiVersion[5] = '-';
+        if ValidFormat then
+            for Index := 1 to 7 do
+                if (Index <> 5) and not (ApiVersion[Index] in ['0' .. '9']) then
+                    ValidFormat := false;
+        if ValidFormat then begin
+            Evaluate(Year, CopyStr(ApiVersion, 1, 4));
+            Evaluate(Month, CopyStr(ApiVersion, 6, 2));
+            // Shopify introduced dated API versions in 2019-04; allow next year too for versions Shopify pre-releases ahead of time.
+            ValidFormat :=
+                (Year >= 2019) and (Year <= Date2DMY(Today(), 3) + 1) and
+                (Month >= 1) and (Month <= 12);
+        end;
+        if not ValidFormat then
+            Error(InvalidFormatErr, FieldCaption("Shopify Api Version"), ApiVersion, ExampleVersionTok);
     end;
 
     var

@@ -189,7 +189,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         AutoActivationDisabledLbl: Label 'Auto-activation is disabled for %1 %2 / %3 %4 at Shopify Location ID %5 (%6 store). The inventory update was skipped so the manual Shopify deactivation is preserved.', Comment = '%1 = Item No. caption, %2 = Item No., %3 = Variant Code caption, %4 = Variant Code, %5 = Shopify Location ID, %6 = Shopify Store Code';
         LocInvItemNotActivatedErr: Label 'The specified Shopify Inventory Item ID %1 is not stocked at Shopify Location ID %2 at Shopify Store %3. Awaiting the activation task to complete.', Comment = '%1 =ShopifyInventoryItemID;%2=InventoryLevel."Shopify Location ID";%3=InventoryLevel."Shopify Store Code"';
         UpdateLevelItemRequestOutdated: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",ignoreCompareQuantity:true,quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4}]}){userErrors{field message}}', Locked = true;
-        UpdateLevelItemRequest202604: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4,changeFromQuantity:null}]}){userErrors{field message}}', Locked = true;
+        UpdateLevelItemRequest202604: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4,changeFromQuantity:null}]}) @idempotent(key: "%5") {userErrors{field message}}', Locked = true;
         VariantNotAvailErr: Label 'The variant is marked as not available in Shopify. The request is no longer applicable.';
     begin
         if not (NcTaskIn.IsTemporary() and NcTaskOut.IsTemporary()) then
@@ -249,7 +249,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                                     end else begin
                                         IncludedNcTasks += 1;
                                         NcTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
-                                        OStream.WriteText(StrSubstNo(UpdateLevelItemRequest, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel.AvailableInventory()));
+                                        OStream.WriteText(StrSubstNo(UpdateLevelItemRequest, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel.AvailableInventory(), Format(NcTaskIn.SystemId, 0, 4)));
                                     end;
                                 end;
                             end;
