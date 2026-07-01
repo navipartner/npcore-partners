@@ -15,6 +15,12 @@
         Rec."Min. Count For Async Import" := 2147483647;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. XML Exchange", 'OnBeforeEvaluateMinCountForAsyncImport', '', false, false)]
+    local procedure ForceMinCountForAsyncImport(var IsHandled: Boolean)
+    begin
+        IsHandled := true;
+    end;
+
     procedure GetLegacyNPRTableFieldName(NewName: Text[250]): Text[250]
     begin
         if (CopyStr(NewName, 1, 4) <> 'NPR ') or (StrLen(NewName) < 5) then
