@@ -1732,7 +1732,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         foreach ShopifyVariant in ShopifyVariants.AsArray() do begin
             Cursor := _JsonHelper.GetJText(ShopifyVariant, 'cursor', false);
             if ShopifyVariant.SelectToken('node', ShopifyVariant) then
-                if SpfyItemMgt.ParseItem(ShopifyVariant, ItemVariant, VariantSku) then begin
+                if SpfyItemMgt.ParseItem(NcTask."Store Code", ShopifyVariant, ItemVariant, VariantSku) then begin
                     if (FirstPage and FirstVariant) or (ItemVariant.Code = '') then begin
                         SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
                         SpfyStoreItemLink."Item No." := ItemVariant."Item No.";
@@ -1788,8 +1788,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         VariantSku: Text;
     begin
-        SpfyItemMgt.ParseItem(ShopifyVariant, ItemVariant, VariantSku);
-        UpdateItemVariant(ShopifyStoreCode, ShopifyVariant, ItemVariant, false, false);
+        if SpfyItemMgt.ParseItem(ShopifyStoreCode, ShopifyVariant, ItemVariant, VariantSku) then
+            UpdateItemVariant(ShopifyStoreCode, ShopifyVariant, ItemVariant, false, false);
     end;
 
     local procedure UpdateItemVariant(ShopifyStoreCode: Code[20]; ShopifyVariant: JsonToken; ItemVariant: Record "Item Variant"; TriggeredExternally: Boolean; SkipRecalc: Boolean)

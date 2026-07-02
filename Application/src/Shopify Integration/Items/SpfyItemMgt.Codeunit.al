@@ -889,41 +889,46 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             (ItemReference."Reference No." <> '') and not ItemReference."NPR Discontinued Barcode");
     end;
 
-    procedure ParseItem(ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
+    procedure ParseItem(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
     begin
-        exit(ParseItem(ShopifyJToken, 'sku', ItemVariant, Sku));
+        exit(ParseItem(ShopifyStoreCode, ShopifyJToken, 'sku', ItemVariant, Sku));
     end;
 
-    procedure ParseItem(ShopifyJToken: JsonToken; SkuKeyPath: Text; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
+    procedure ParseItem(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; SkuKeyPath: Text; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
     var
         JsonHelper: Codeunit "NPR Json Helper";
     begin
         Sku := UpperCase(JsonHelper.GetJCode(ShopifyJToken, SkuKeyPath, 0, false));
-        exit(ParseItem(Sku, ItemVariant));
+        exit(ParseItem(ShopifyStoreCode, Sku, ItemVariant));
     end;
 
-    procedure ParseItem(ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Item: Record Item; var Sku: Text): Boolean
+    procedure ParseItem(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Item: Record Item; var Sku: Text): Boolean
     var
         JsonHelper: Codeunit "NPR Json Helper";
     begin
         Sku := UpperCase(JsonHelper.GetJCode(ShopifyJToken, 'sku', 0, false));
-        exit(ParseItem(Sku, ItemVariant, Item));
+        exit(ParseItem(ShopifyStoreCode, Sku, ItemVariant, Item));
     end;
 
-    procedure ParseItem(Sku: Text; var ItemVariant: Record "Item Variant"): Boolean
+    procedure ParseItem(ShopifyStoreCode: Code[20]; Sku: Text; var ItemVariant: Record "Item Variant"): Boolean
     var
         Item: Record Item;
     begin
-        exit(ResolveSkuToItem(Sku, ItemVariant, Item, false));
+        exit(ResolveSkuToItem(ShopifyStoreCode, Sku, ItemVariant, Item));
     end;
 
-    procedure ParseItem(Sku: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item): Boolean
+    procedure ParseItem(ShopifyStoreCode: Code[20]; Sku: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item): Boolean
     begin
-        exit(ResolveSkuToItem(Sku, ItemVariant, Item, true));
+        if not ResolveSkuToItem(ShopifyStoreCode, Sku, ItemVariant, Item) then
+            exit(false);
+        if Item."No." = '' then
+            exit(Item.Get(ItemVariant."Item No."));
+        exit(true);
     end;
 
-    local procedure ResolveSkuToItem(Sku: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item; LoadItemForVariant: Boolean): Boolean
+    local procedure ResolveSkuToItem(ShopifyStoreCode: Code[20]; Sku: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item): Boolean
     var
+        ItemReference: Record "Item Reference";
         ItemNo: Text;
         VariantCode: Text;
         Position: Integer;
@@ -943,15 +948,30 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             ItemNo := CopyStr(Sku, 1, Position - 1);
             VariantCode := CopyStr(Sku, Position + 1);
             if StrLen(VariantCode) <= MaxStrLen(ItemVariant.Code) then
-                if ItemVariant.Get(ItemNo, VariantCode) then begin
-                    if LoadItemForVariant then
-                        if not Item.Get(ItemVariant."Item No.") then
-                            Clear(Item);
+                if ItemVariant.Get(ItemNo, VariantCode) then
                     exit(true);
-                end;
             if Item.Get(ItemNo) then begin
                 ItemVariant."Item No." := Item."No.";
                 exit(true);
+            end;
+        end;
+
+        if (ShopifyStoreCode <> '') and (StrLen(Sku) <= MaxStrLen(ItemReference."Reference No.")) then begin
+            ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Customer);
+            ItemReference.SetRange("Reference Type No.", SpfyIntegrationMgt.GetShopifyCustomerNoPrice(ShopifyStoreCode));
+            ItemReference.SetRange("Reference No.", CopyStr(Sku, 1, MaxStrLen(ItemReference."Reference No.")));
+            ItemReference.SetFilter("Item No.", '<>%1', '');
+            ItemReference.SetRange("Starting Date", 0D, Today());
+            ItemReference.SetFilter("Ending Date", '%1|>=%2', 0D, Today());
+            ItemReference.SetLoadFields("Item No.", "Variant Code");
+            if ItemReference.FindFirst() then begin
+                if ItemReference."Variant Code" <> '' then
+                    exit(ItemVariant.Get(ItemReference."Item No.", ItemReference."Variant Code"));
+                if Item.Get(ItemReference."Item No.") then begin
+                    ItemVariant."Item No." := Item."No.";
+                    exit(true);
+                end;
             end;
         end;
 

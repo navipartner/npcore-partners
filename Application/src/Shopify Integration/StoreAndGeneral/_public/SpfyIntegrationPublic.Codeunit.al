@@ -62,11 +62,31 @@ codeunit 6184805 "NPR Spfy Integration Public"
     /// <param name="ItemVariant">Resolved Item Variant. Untouched when the lookup fails.</param>
     /// <param name="Sku">Out: the uppercased SKU that was looked up.</param>
     /// <returns>True if the SKU resolved to a BC Item Variant.</returns>
+    [Obsolete('This method does not pass the Shopify store code to the underlying item lookup. Use ParseItem(ShopifyStoreCode, ShopifyJToken, SkuKeyPath, ItemVariant, Sku) instead.', '2026-07-01')]
     procedure ParseItem(ShopifyJToken: JsonToken; SkuKeyPath: Text; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
     var
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
     begin
-        exit(SpfyItemMgt.ParseItem(ShopifyJToken, SkuKeyPath, ItemVariant, Sku));
+        exit(SpfyItemMgt.ParseItem('', ShopifyJToken, SkuKeyPath, ItemVariant, Sku));
+    end;
+
+    /// <summary>
+    /// Reads the SKU from the given Shopify JSON node and resolves the BC Item Variant it points to.
+    /// The SKU is read from the dotted path specified by SkuKeyPath (e.g. 'sku', 'variant.sku', or
+    /// 'lineItems.edges[0].node.sku') and looked up case-insensitively against Item.No. and
+    /// Item Variant.Code.
+    /// </summary>
+    /// <param name="ShopifyStoreCode">The code of the Shopify store as registered in Business Central.</param>
+    /// <param name="ShopifyJToken">JSON token containing the SKU.</param>
+    /// <param name="SkuKeyPath">Dotted path inside ShopifyJToken that yields the SKU.</param>
+    /// <param name="ItemVariant">Resolved Item Variant. Untouched when the lookup fails.</param>
+    /// <param name="Sku">Out: the uppercased SKU that was looked up.</param>
+    /// <returns>True if the SKU resolved to a BC Item Variant.</returns>
+    procedure ParseItem(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; SkuKeyPath: Text; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
+    var
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+    begin
+        exit(SpfyItemMgt.ParseItem(ShopifyStoreCode, ShopifyJToken, SkuKeyPath, ItemVariant, Sku));
     end;
 
     /// <summary>

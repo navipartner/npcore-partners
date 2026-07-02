@@ -293,7 +293,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Line No." := _IncEcomSalesDocUtils.GetInternalSalesDocumentLastLineNo(SalesHeader) + 10000;
         SalesLine.Insert(true);
-        if not SpfyItemMgt.ParseItem(SalesLineJsonToken, ItemVariant, Sku) then
+        if not SpfyItemMgt.ParseItem(LogEntry."Store Code", SalesLineJsonToken, ItemVariant, Sku) then
             Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', TempSpfyFulfillmentBuffer."Order Line ID", JsonHelper.GetJText(SalesLineJsonToken, 'name', false)));
         SalesLine.Validate(Type, SalesLine.Type::Item);
         SalesLine.Validate("No.", ItemVariant."Item No.");
@@ -851,7 +851,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
     local procedure PopulateItemLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
     begin
-        ResolveItem(SalesLineJsonToken, IncEcomSalesLine);
+        ResolveItem(LogEntry."Store Code", SalesLineJsonToken, IncEcomSalesLine);
 
         case IncEcomSalesLine.Subtype of
             IncEcomSalesLine.Subtype::Item:
@@ -861,7 +861,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         end;
     end;
 
-    local procedure ResolveItem(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    local procedure ResolveItem(ShopifyStoreCode: Code[20]; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -869,7 +869,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         Sku: Text;
         UnknownIdErr: Label 'Unknown %1: %2%3';
     begin
-        if not SpfyItemMgt.ParseItem(SalesLineJsonToken, ItemVariant, Item, Sku) then
+        if not SpfyItemMgt.ParseItem(ShopifyStoreCode, SalesLineJsonToken, ItemVariant, Item, Sku) then
             Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', EcomSalesLine."Shopify ID", JsonHelper.GetJText(SalesLineJsonToken, 'name', false)));
 
         EcomSalesLine."No." := ItemVariant."Item No.";

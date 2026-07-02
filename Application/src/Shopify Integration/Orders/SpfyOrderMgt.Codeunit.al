@@ -1139,7 +1139,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if IsGiftCard then
             GetVoucherType(ShopifyStoreCode, PropertyDict, VoucherType)
         else
-            if not SpfyItemMgt.ParseItem(OrderLine, ItemVariant, Sku) then
+            if not SpfyItemMgt.ParseItem(ShopifyStoreCode, OrderLine, ItemVariant, Sku) then
                 Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', OrderLineID, JsonHelper.GetJText(OrderLine, 'name', false)));
 
         UnitPrice := JsonHelper.GetJDecimal(OrderLine, 'price_set.presentment_money.amount', true);
