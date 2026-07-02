@@ -3778,6 +3778,374 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckIfZeroValueBenefitItemWithCatalogPriceIsAddedAtZeroAmount()
+    var
+        BenefitItem: Record Item;
+        FilterItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        BenefitSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CalculateDiscountsB: Codeunit "NPR POS Action Calc DiscountsB";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
+    begin
+        // [SCENARIO] A benefit item configured as a free gift (Type = Item, Value = 0) that also has a catalog price
+        // in an active price list must be added to the sale free of charge: the persisted sale line must have both
+        // Unit Price and amounts of 0.
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] No Discounts
+        DeleteDiscounts();
+
+        // [GIVEN] Enable discount
+        EnableDiscount(Format(TotalDiscountManagement.DiscSourceTableId()));
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Trigger item
+        CreateItem(FilterItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        FilterItem."Unit Price" := 1000;
+        FilterItem."Price Includes VAT" := true;
+        FilterItem.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::Item, FilterItem."No.", '', NPRTotalDiscountLine);
+
+        // [GIVEN] Benefit item that has its own catalog price in an active price list
+        CreateItem(BenefitItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        NPRLibraryPOSMasterData.CreatePriceListLine(Enum::"Price Source Type"::"All Customers", '', BenefitItem."No.", 25.99, VATPostingSetup."VAT Bus. Posting Group");
+
+        // [GIVEN] Free gift benefit line: Type = Item, Value = 0
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 1000, Enum::"NPR Total Disc. Benefit Type"::Item, BenefitItem."No.", '', 1, Enum::"NPR Total Disc Ben Value Type"::Amount, 0, true, NPRTotalDiscountBenefit);
+
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+
+        // [GIVEN] Active POS session & sale with the trigger item sold above the step amount
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        LibraryPOSMock.CreateItemLine(POSSession, FilterItem."No.", 1);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [WHEN] Total pressed and the benefit item added to the sale
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        Assert.IsTrue(CalculateDiscountsB.GetTotalDiscountBenefitItems(SalePOS, Enum::"NPR Benefit Items Collection"::"No Input Needed", TempNPRTotalDiscBenItemBuffer), 'Benefit items were not collected for the sale.');
+        CalculateDiscountsB.AddBenefitItems(SalePOS, TempNPRTotalDiscBenItemBuffer, FrontEnd);
+
+        // [THEN] The persisted benefit line is free of charge
+        BenefitSaleLinePOS.Reset();
+        BenefitSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        BenefitSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        BenefitSaleLinePOS.SetRange("Benefit Item", true);
+        BenefitSaleLinePOS.SetRange("No.", BenefitItem."No.");
+        Assert.IsTrue(BenefitSaleLinePOS.FindFirst(), 'Benefit item was not added to the sale.');
+
+        Assert.AreEqual(0, BenefitSaleLinePOS."Unit Price", 'Unit Price of the free gift benefit item must be 0.');
+        Assert.AreEqual(0, BenefitSaleLinePOS."Amount Including VAT", 'Amount Including VAT of the free gift benefit item must be 0.');
+        Assert.AreEqual(0, BenefitSaleLinePOS.Amount, 'Amount of the free gift benefit item must be 0.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckIfZeroValueBenefitItemWithItemCardPriceIsAddedAtZeroAmount()
+    var
+        BenefitItem: Record Item;
+        FilterItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        BenefitSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        CalculateDiscountsB: Codeunit "NPR POS Action Calc DiscountsB";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
+    begin
+        // [SCENARIO] A benefit item configured as a free gift (Type = Item, Value = 0) that has a catalog price on the
+        // item card (no price list entry - the price engine falls back to Item."Unit Price") must be added to the sale
+        // free of charge: the persisted sale line must have both Unit Price and amounts of 0.
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] No Discounts
+        DeleteDiscounts();
+
+        // [GIVEN] Enable discount
+        EnableDiscount(Format(TotalDiscountManagement.DiscSourceTableId()));
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Trigger item
+        CreateItem(FilterItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        FilterItem."Unit Price" := 1000;
+        FilterItem."Price Includes VAT" := true;
+        FilterItem.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::Item, FilterItem."No.", '', NPRTotalDiscountLine);
+
+        // [GIVEN] Benefit item that has its own catalog price on the item card
+        CreateItem(BenefitItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        BenefitItem."Unit Price" := 25.99;
+        BenefitItem."Price Includes VAT" := true;
+        BenefitItem.Modify();
+
+        // [GIVEN] Free gift benefit line: Type = Item, Value = 0
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 1000, Enum::"NPR Total Disc. Benefit Type"::Item, BenefitItem."No.", '', 1, Enum::"NPR Total Disc Ben Value Type"::Amount, 0, true, NPRTotalDiscountBenefit);
+
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+
+        // [GIVEN] Active POS session & sale with the trigger item sold above the step amount
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        LibraryPOSMock.CreateItemLine(POSSession, FilterItem."No.", 1);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [WHEN] Total pressed and the benefit item added to the sale
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        Assert.IsTrue(CalculateDiscountsB.GetTotalDiscountBenefitItems(SalePOS, Enum::"NPR Benefit Items Collection"::"No Input Needed", TempNPRTotalDiscBenItemBuffer), 'Benefit items were not collected for the sale.');
+        CalculateDiscountsB.AddBenefitItems(SalePOS, TempNPRTotalDiscBenItemBuffer, FrontEnd);
+
+        // [THEN] The persisted benefit line is free of charge
+        BenefitSaleLinePOS.Reset();
+        BenefitSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        BenefitSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        BenefitSaleLinePOS.SetRange("Benefit Item", true);
+        BenefitSaleLinePOS.SetRange("No.", BenefitItem."No.");
+        Assert.IsTrue(BenefitSaleLinePOS.FindFirst(), 'Benefit item was not added to the sale.');
+
+        Assert.AreEqual(0, BenefitSaleLinePOS."Unit Price", 'Unit Price of the free gift benefit item must be 0.');
+        Assert.AreEqual(0, BenefitSaleLinePOS."Amount Including VAT", 'Amount Including VAT of the free gift benefit item must be 0.');
+        Assert.AreEqual(0, BenefitSaleLinePOS.Amount, 'Amount of the free gift benefit item must be 0.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckIfNonZeroValueBenefitItemWithCatalogPriceIsAddedAtBenefitValue()
+    var
+        BenefitItem: Record Item;
+        FilterItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        BenefitSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CalculateDiscountsB: Codeunit "NPR POS Action Calc DiscountsB";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
+    begin
+        // [SCENARIO] A benefit item with a non-zero Value (e.g. 5) on an item whose catalog price differs (25.99) must be
+        // added to the sale at the benefit value, with the persisted amounts matching it. Control case for the zero-value
+        // gift scenario: guards the post-insert amount finalization that keeps price and amounts in sync.
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] No Discounts
+        DeleteDiscounts();
+
+        // [GIVEN] Enable discount
+        EnableDiscount(Format(TotalDiscountManagement.DiscSourceTableId()));
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Trigger item
+        CreateItem(FilterItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        FilterItem."Unit Price" := 1000;
+        FilterItem."Price Includes VAT" := true;
+        FilterItem.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::Item, FilterItem."No.", '', NPRTotalDiscountLine);
+
+        // [GIVEN] Benefit item that has its own catalog price in an active price list
+        CreateItem(BenefitItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        NPRLibraryPOSMasterData.CreatePriceListLine(Enum::"Price Source Type"::"All Customers", '', BenefitItem."No.", 25.99, VATPostingSetup."VAT Bus. Posting Group");
+
+        // [GIVEN] Benefit line: Type = Item, Value = 5
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 1000, Enum::"NPR Total Disc. Benefit Type"::Item, BenefitItem."No.", '', 1, Enum::"NPR Total Disc Ben Value Type"::Amount, 5, true, NPRTotalDiscountBenefit);
+
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+
+        // [GIVEN] Active POS session & sale with the trigger item sold above the step amount
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        LibraryPOSMock.CreateItemLine(POSSession, FilterItem."No.", 1);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [WHEN] Total pressed and the benefit item added to the sale
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        Assert.IsTrue(CalculateDiscountsB.GetTotalDiscountBenefitItems(SalePOS, Enum::"NPR Benefit Items Collection"::"No Input Needed", TempNPRTotalDiscBenItemBuffer), 'Benefit items were not collected for the sale.');
+        CalculateDiscountsB.AddBenefitItems(SalePOS, TempNPRTotalDiscBenItemBuffer, FrontEnd);
+
+        // [THEN] The persisted benefit line is priced at the benefit value, not the catalog price
+        BenefitSaleLinePOS.Reset();
+        BenefitSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        BenefitSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        BenefitSaleLinePOS.SetRange("Benefit Item", true);
+        BenefitSaleLinePOS.SetRange("No.", BenefitItem."No.");
+        Assert.IsTrue(BenefitSaleLinePOS.FindFirst(), 'Benefit item was not added to the sale.');
+
+        Assert.AreEqual(5, BenefitSaleLinePOS."Unit Price", 'Unit Price of the benefit item must be the benefit value.');
+        Assert.AreEqual(5, BenefitSaleLinePOS."Amount Including VAT", 'Amount Including VAT of the benefit item must match the benefit value.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckIfNonZeroValueBenefitItemWithItemCardPriceIsAddedAtBenefitValue()
+    var
+        BenefitItem: Record Item;
+        FilterItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        BenefitSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        CalculateDiscountsB: Codeunit "NPR POS Action Calc DiscountsB";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
+    begin
+        // [SCENARIO] A benefit item with a non-zero Value (e.g. 5) on an item whose catalog price (25.99) comes from the
+        // item card (no price list entry - the price engine falls back to Item."Unit Price") must be added to the sale
+        // at the benefit value, with the persisted amounts matching it.
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] No Discounts
+        DeleteDiscounts();
+
+        // [GIVEN] Enable discount
+        EnableDiscount(Format(TotalDiscountManagement.DiscSourceTableId()));
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Trigger item
+        CreateItem(FilterItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        FilterItem."Unit Price" := 1000;
+        FilterItem."Price Includes VAT" := true;
+        FilterItem.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::Item, FilterItem."No.", '', NPRTotalDiscountLine);
+
+        // [GIVEN] Benefit item that has its own catalog price on the item card
+        CreateItem(BenefitItem, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        BenefitItem."Unit Price" := 25.99;
+        BenefitItem."Price Includes VAT" := true;
+        BenefitItem.Modify();
+
+        // [GIVEN] Benefit line: Type = Item, Value = 5
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 1000, Enum::"NPR Total Disc. Benefit Type"::Item, BenefitItem."No.", '', 1, Enum::"NPR Total Disc Ben Value Type"::Amount, 5, true, NPRTotalDiscountBenefit);
+
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+
+        // [GIVEN] Active POS session & sale with the trigger item sold above the step amount
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        LibraryPOSMock.CreateItemLine(POSSession, FilterItem."No.", 1);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [WHEN] Total pressed and the benefit item added to the sale
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        Assert.IsTrue(CalculateDiscountsB.GetTotalDiscountBenefitItems(SalePOS, Enum::"NPR Benefit Items Collection"::"No Input Needed", TempNPRTotalDiscBenItemBuffer), 'Benefit items were not collected for the sale.');
+        CalculateDiscountsB.AddBenefitItems(SalePOS, TempNPRTotalDiscBenItemBuffer, FrontEnd);
+
+        // [THEN] The persisted benefit line is priced at the benefit value, not the catalog price
+        BenefitSaleLinePOS.Reset();
+        BenefitSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        BenefitSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        BenefitSaleLinePOS.SetRange("Benefit Item", true);
+        BenefitSaleLinePOS.SetRange("No.", BenefitItem."No.");
+        Assert.IsTrue(BenefitSaleLinePOS.FindFirst(), 'Benefit item was not added to the sale.');
+
+        Assert.AreEqual(5, BenefitSaleLinePOS."Unit Price", 'Unit Price of the benefit item must be the benefit value.');
+        Assert.AreEqual(5, BenefitSaleLinePOS."Amount Including VAT", 'Amount Including VAT of the benefit item must match the benefit value.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CheckTotalDiscountResetOnTransactionChange()
     var
         Item: Record Item;

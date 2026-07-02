@@ -258,6 +258,8 @@
                     end;
                     ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", Rec, Line."Unit Price");
                 end;
+
+        Rec.SetDeferPriceCalculation(false);
         if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" or Line."Benefit Item" or Line."Shipment Fee" then
             Rec.Validate("Unit Price", Line."Unit Price");
 
@@ -277,7 +279,6 @@
         Rec."Store Ship Profile Code" := Line."Store Ship Profile Code";
         Rec."Store Ship Profile Line No." := Line."Store Ship Profile Line No.";
         Rec.Indentation := Line.Indentation;
-        Rec.SetDeferPriceCalculation(false);
 
         Return := InsertLineInternal(Rec, true);
 
