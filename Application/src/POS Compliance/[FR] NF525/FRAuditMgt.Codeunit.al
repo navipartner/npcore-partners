@@ -1395,6 +1395,10 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure HasRelevantCompanyDataChanges(CompanyInformation: Record "Company Information"; xCompanyInformation: Record "Company Information"; var FieldsChanged: List of [Text]): Boolean
     var
+        RecRef: RecordRef;
+        xRecRef: RecordRef;
+        APEFieldRef: FieldRef;
+        xAPEFieldRef: FieldRef;
         ChangeLbl: Label '%1:%2 to %3', Comment = '%1 - Field Name, %2 - Old Value, %3 - New Value';
     begin
         Clear(FieldsChanged);
@@ -1421,6 +1425,15 @@ codeunit 6184850 "NPR FR Audit Mgt."
             FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("E-Mail"), xCompanyInformation."E-Mail", CompanyInformation."E-Mail"));
         if CompanyInformation."Registration No." <> xCompanyInformation."Registration No." then
             FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("Registration No."), xCompanyInformation."Registration No.", CompanyInformation."Registration No."));
+        // APE is a French localization field (field 10802) — guard with FieldExist for cross-version compatibility
+        RecRef.GetTable(CompanyInformation);
+        if RecRef.FieldExist(10802) then begin
+            xRecRef.GetTable(xCompanyInformation);
+            APEFieldRef := RecRef.Field(10802);
+            xAPEFieldRef := xRecRef.Field(10802);
+            if Format(APEFieldRef.Value) <> Format(xAPEFieldRef.Value) then
+                FieldsChanged.Add(StrSubstNo(ChangeLbl, APEFieldRef.Caption, Format(xAPEFieldRef.Value), Format(APEFieldRef.Value)));
+        end;
         exit(FieldsChanged.Count > 0);
     end;
 
