@@ -1510,4 +1510,18 @@
             AttributeSetID := AttributeKey."Attribute Set ID";
         end;
     end;
+
+    // Inverse of GetAttributeSetID: resolves the owning record (Table ID + raw "MDR Code PK")
+    // for a given Attribute Set ID. Lets a facade hand the owner context to dependent apps
+    // without exposing the internal "NPR Attribute Key" table.
+    internal procedure GetAttributeKeyOwner(AttributeSetID: Integer; var OwnerTableID: Integer; var OwnerPKCode: Code[20]): Boolean
+    var
+        AttributeKey: Record "NPR Attribute Key";
+    begin
+        if not AttributeKey.Get(AttributeSetID) then
+            exit(false);
+        OwnerTableID := AttributeKey."Table ID";
+        OwnerPKCode := AttributeKey."MDR Code PK";
+        exit(true);
+    end;
 }
