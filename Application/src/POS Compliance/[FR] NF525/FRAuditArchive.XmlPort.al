@@ -710,6 +710,10 @@
                         {
                             XmlName = 'JETSignature';
                         }
+                        textelement(jprevioussignature)
+                        {
+                            XmlName = 'PreviousJETSignature';
+                        }
 
                         trigger OnAfterGetRecord()
                         var
@@ -718,6 +722,7 @@
                             POSAuditLog := jet_entry;
                             POSAuditLog.SetRecFilter();
                             JSignature := GetAuditSignature(POSAuditLog);
+                            jprevioussignature := GetPreviousAuditSignature(POSAuditLog);
                             jetentrytimestamp := Format(jet_entry."Log Timestamp", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
                         end;
 
@@ -806,6 +811,21 @@
     begin
         POSAuditLog.CalcFields("Electronic Signature");
         POSAuditLog."Electronic Signature".CreateInStream(InStream);
+        while (not InStream.EOS) do begin
+            InStream.Read(SignatureChunk);
+            Signature += SignatureChunk;
+        end;
+        exit(Signature);
+    end;
+
+    local procedure GetPreviousAuditSignature(var POSAuditLog: Record "NPR POS Audit Log"): Text
+    var
+        InStream: InStream;
+        Signature: Text;
+        SignatureChunk: Text;
+    begin
+        POSAuditLog.CalcFields("Previous Electronic Signature");
+        POSAuditLog."Previous Electronic Signature".CreateInStream(InStream);
         while (not InStream.EOS) do begin
             InStream.Read(SignatureChunk);
             Signature += SignatureChunk;
