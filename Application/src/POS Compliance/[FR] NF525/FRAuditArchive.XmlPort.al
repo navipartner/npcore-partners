@@ -715,7 +715,7 @@
                         begin
                             jet_entry.SetRange("Entry No.", _FromPOSAuditLogEntryNo, _ToPOSAuditLogEntryNo);
                             jet_entry.SetRange("Acted on POS Unit No.", _POSUnitNo);
-                            jet_entry.SetFilter("Action Type", '%1|%2|%3|%4|%5|%6|%7|%8|%9|%10|%11',
+                            jet_entry.SetFilter("Action Type", '%1|%2|%3|%4|%5|%6|%7|%8|%9|%10|%11|%12|%13',
                                 jet_entry."Action Type"::ARCHIVE_ATTEMPT,
                                 jet_entry."Action Type"::SIGN_IN,
                                 jet_entry."Action Type"::WORKSHIFT_END,
@@ -726,7 +726,9 @@
                                 jet_entry."Action Type"::CANCEL_SALE_END,
                                 jet_entry."Action Type"::SIGN_OUT,
                                 jet_entry."Action Type"::ITEM_RMA,
-                                jet_entry."Action Type"::CUSTOM);
+                                jet_entry."Action Type"::CUSTOM,
+                                jet_entry."Action Type"::COMPANY_INFO_CHANGE,
+                                jet_entry."Action Type"::VAT_REG_CHANGE);
                         end;
                     }
                 }
