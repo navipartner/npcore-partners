@@ -647,10 +647,19 @@
                         {
                             XmlName = 'GrandTotalSignature';
                         }
+                        textelement(grandtotaltaxbreakdownincltax)
+                        {
+                            XmlName = 'TaxBreakdownInclTax';
+                        }
+                        textelement(grandtotaltaxbreakdownexcltax)
+                        {
+                            XmlName = 'TaxBreakdownExclTax';
+                        }
 
                         trigger OnAfterGetRecord()
                         var
                             POSAuditLog: Record "NPR POS Audit Log";
+                            FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
                         begin
                             POSAuditLog := grandtotal;
                             POSAuditLog.SetRecFilter();
@@ -659,6 +668,7 @@
                             perpetualabsolutegrandtotal := GetSplitStringValue(grandtotal."Additional Information", '|', 2);
                             perpetualgrandtotal := GetSplitStringValue(grandtotal."Additional Information", '|', 3);
                             grandtotalcreatedat := Format(grandtotal."Log Timestamp", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
+                            FRAuditMgt.GetGrandTotalTaxBreakdown(grandtotal, grandtotaltaxbreakdownincltax, grandtotaltaxbreakdownexcltax);
                         end;
 
                         trigger OnPreXmlItem()

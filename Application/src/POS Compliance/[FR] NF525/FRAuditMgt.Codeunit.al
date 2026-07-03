@@ -1016,6 +1016,72 @@ codeunit 6184850 "NPR FR Audit Mgt."
         exit(Perpetual);
     end;
 
+    internal procedure GetGrandTotalTaxBreakdown(POSAuditLog: Record "NPR POS Audit Log"; var TaxBreakdownInclTax: Text; var TaxBreakdownExclTax: Text)
+    var
+        WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
+        TempTaxByRate: Record "NPR POS Worksh. Tax Checkp." temporary;
+        RecRef: RecordRef;
+        VATIDFilter: Text;
+        NextEntryNo: Integer;
+        VentilationPairLbl: Label '%1:%2', Locked = true;
+    begin
+        Clear(TaxBreakdownInclTax);
+        Clear(TaxBreakdownExclTax);
+
+        if not RecRef.Get(POSAuditLog."Record ID") then
+            exit;
+        if RecRef.Number <> Database::"NPR POS Workshift Checkpoint" then
+            exit;
+        RecRef.SetTable(WorkshiftCheckpoint);
+
+        //Implied only include item amounts as per audit requirements - matches the signed ventilation scope.
+        if not _FRCertificationSetup.Get() then
+            exit;
+        VATIDFilter := _FRCertificationSetup.GetItemVATIDFilter();
+
+        //Aggregate amounts per distinct VAT rate in a single pass over the checkpoint tax lines.
+        POSWorkshiftTaxCheckpoint.SetLoadFields("Tax %", "Amount Including Tax", "Tax Base Amount");
+        POSWorkshiftTaxCheckpoint.SetRange("Workshift Checkpoint Entry No.", WorkshiftCheckpoint."Entry No.");
+        POSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", VATIDFilter);
+        if POSWorkshiftTaxCheckpoint.FindSet() then
+            repeat
+                TempTaxByRate.SetRange("Tax %", POSWorkshiftTaxCheckpoint."Tax %");
+                if not TempTaxByRate.FindFirst() then begin
+                    NextEntryNo += 1;
+                    TempTaxByRate.Init();
+                    TempTaxByRate."Entry No." := NextEntryNo;
+                    TempTaxByRate."Tax %" := POSWorkshiftTaxCheckpoint."Tax %";
+                    TempTaxByRate.Insert();
+                end;
+                TempTaxByRate."Amount Including Tax" += POSWorkshiftTaxCheckpoint."Amount Including Tax";
+                TempTaxByRate."Tax Base Amount" += POSWorkshiftTaxCheckpoint."Tax Base Amount";
+                TempTaxByRate.Modify();
+            until POSWorkshiftTaxCheckpoint.Next() = 0;
+
+        //Ventilate as Amount:Rate (amount incl. tax for TTC, base amount for HT) per the NF525 archive format.
+        TempTaxByRate.Reset();
+        if TempTaxByRate.FindSet() then
+            repeat
+                if TaxBreakdownInclTax <> '' then
+                    TaxBreakdownInclTax += '|';
+                TaxBreakdownInclTax += StrSubstNo(VentilationPairLbl,
+                    FormatVentilationDecimal(TempTaxByRate."Amount Including Tax"),
+                    FormatVentilationDecimal(TempTaxByRate."Tax %"));
+
+                if TaxBreakdownExclTax <> '' then
+                    TaxBreakdownExclTax += '|';
+                TaxBreakdownExclTax += StrSubstNo(VentilationPairLbl,
+                    FormatVentilationDecimal(TempTaxByRate."Tax Base Amount"),
+                    FormatVentilationDecimal(TempTaxByRate."Tax %"));
+            until TempTaxByRate.Next() = 0;
+    end;
+
+    local procedure FormatVentilationDecimal(Value: Decimal): Text
+    begin
+        exit(Format(Value, 0, '<Precision,2:2><Standard Format,9>'));
+    end;
+
     local procedure GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint") TaxBreakdown: Text
     var
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
