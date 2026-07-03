@@ -43,6 +43,9 @@ codeunit 6151091 "NPR MMTimelineDescribeEvent" implements "NPR MMTimelineTypeInt
             "NPR MMTimelineEventType"::SUBSCRIPTION_ENABLE,
             "NPR MMTimelineEventType"::SUBSCRIPTION_DISABLE:
                 DescribeSubscriptionEvent(TimelineEvent);
+
+            "NPR MMTimelineEventType"::MEMBER_INFO_CHANGED:
+                DescribeMemberInfoChangeEvent(TimelineEvent);
         end;
 
     end;
@@ -233,5 +236,37 @@ codeunit 6151091 "NPR MMTimelineDescribeEvent" implements "NPR MMTimelineTypeInt
             "NPR MMTimelineEventType"::SUBSCRIPTION_DISABLE:
                 TimelineEvent.Details := StrSubstNo(DisableDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest.Status);
         end;
+    end;
+
+    local procedure DescribeMemberInfoChangeEvent(var TimelineEvent: Record "NPR MMTimelineEventBuffer")
+    var
+        ChangeLogEntry: Record "Change Log Entry";
+        FieldRec: Record Field;
+        RecRef: RecordRef;
+        TitleLabel: Label 'Member Info Changed';
+        DetailsLabel: Label '%1 - %2 changed from ''%3'' to ''%4''.', Comment = '%1 = table name, %2 = field name, %3 = old value, %4 = new value';
+        ChangedLabel: Label '%1 - %2 changed.', Comment = '%1 = table name, %2 = field name';
+        FieldCaptionText: Text;
+        TableCaptionText: Text;
+        FieldIsBinary: Boolean;
+    begin
+        if (not ChangeLogEntry.GetBySystemId(TimelineEvent.SourceSystemId)) then
+            exit;
+        TimelineEvent.Title := TitleLabel;
+
+        RecRef.Open(ChangeLogEntry."Table No.");
+        TableCaptionText := RecRef.Caption();
+        RecRef.Close();
+
+        if (FieldRec.Get(ChangeLogEntry."Table No.", ChangeLogEntry."Field No.")) then begin
+            FieldCaptionText := FieldRec."Field Caption";
+            FieldIsBinary := FieldRec.Type in [FieldRec.Type::Media, FieldRec.Type::MediaSet, FieldRec.Type::BLOB];
+        end else
+            FieldCaptionText := Format(ChangeLogEntry."Field No.");
+
+        if (FieldIsBinary) then
+            TimelineEvent.Details := StrSubstNo(ChangedLabel, TableCaptionText, FieldCaptionText)
+        else
+            TimelineEvent.Details := StrSubstNo(DetailsLabel, TableCaptionText, FieldCaptionText, ChangeLogEntry."Old Value", ChangeLogEntry."New Value");
     end;
 }

@@ -67,6 +67,9 @@ enum 6014610 "NPR MMTimelineEventType" implements "NPR MMTimelineTypeInterface"
     {
         Caption = 'Member Last Updated';
         Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+        ObsoleteState = Pending;
+        ObsoleteTag = '2026-06-30';
+        ObsoleteReason = 'No longer maintained. Member info changes are now surfaced on the timeline from the standard BC Change Log.';
     }
 
     value(130; MEMBER_IMAGE_ADDED)
@@ -125,6 +128,12 @@ enum 6014610 "NPR MMTimelineEventType" implements "NPR MMTimelineTypeInterface"
     value(307; SUBSCRIPTION_DISABLE)
     {
         Caption = 'Subscription Disable';
+        Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
+    }
+
+    value(310; MEMBER_INFO_CHANGED)
+    {
+        Caption = 'Member Info Changed';
         Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
     }
 

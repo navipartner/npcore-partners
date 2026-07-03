@@ -82,6 +82,7 @@ codeunit 6151092 "NPR MMTimelineHandler"
         CollectedMemberEvents(MembershipEntryNo, TimelineEvents);
         CollectedMemberCardEvents(MembershipEntryNo, TimelineEvents);
         CollectedSubscriptionEvents(MembershipEntryNo, TimelineEvents);
+        CollectedMemberInfoChangeEvents(MembershipEntryNo, TimelineEvents);
 
     end;
 
@@ -203,14 +204,6 @@ codeunit 6151092 "NPR MMTimelineHandler"
                     TimelineEvents.EventCreatedBy := GetUserName(Member.SystemCreatedBy);
                     TimelineEvents.Insert();
 
-                    TimelineEvents.EntryNo := TimelineEvents.EntryNo + 1;
-                    TimelineEvents.EventType := "NPR MMTimelineEventType"::MEMBER_LAST_UPDATED;
-                    TimelineEvents.EventDateTime := Member.SystemModifiedAt + 100; // add 100 ms to ensure member added event shows after membership issued event;
-                    TimelineEvents.SourceTableId := Database::"NPR MM Member";
-                    TimelineEvents.SourceSystemId := Member.SystemId;
-                    TimelineEvents.EventCreatedBy := GetUserName(Member.SystemModifiedBy);
-                    TimelineEvents.Insert();
-
                     if (Member.Blocked) then begin
                         TimelineEvents.EntryNo := TimelineEvents.EntryNo + 1;
                         TimelineEvents.EventType := "NPR MMTimelineEventType"::MEMBER_LAST_BLOCKED;
@@ -314,6 +307,50 @@ codeunit 6151092 "NPR MMTimelineHandler"
                 exit(false);
         end;
         exit(true);
+    end;
+
+    local procedure CollectedMemberInfoChangeEvents(MembershipEntryNo: Integer; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        MemberCard: Record "NPR MM Member Card";
+    begin
+        AddChangeLogEvents(Database::"NPR MM Membership", Format(MembershipEntryNo), TimelineEvents);
+
+        MembershipRole.SetLoadFields("Member Entry No.");
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        if MembershipRole.FindSet() then
+            repeat
+                AddChangeLogEvents(Database::"NPR MM Member", Format(MembershipRole."Member Entry No."), TimelineEvents);
+            until MembershipRole.Next() = 0;
+
+        MemberCard.SetLoadFields("Entry No.");
+        MemberCard.SetCurrentKey("Membership Entry No.");
+        MemberCard.SetRange("Membership Entry No.", MembershipEntryNo);
+        if MemberCard.FindSet() then
+            repeat
+                AddChangeLogEvents(Database::"NPR MM Member Card", Format(MemberCard."Entry No."), TimelineEvents);
+            until MemberCard.Next() = 0;
+    end;
+
+    local procedure AddChangeLogEvents(TableId: Integer; PrimaryKeyValue: Text; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
+    var
+        ChangeLogEntry: Record "Change Log Entry";
+    begin
+        ChangeLogEntry.SetLoadFields("Date and Time", "User ID");
+        ChangeLogEntry.SetRange("Table No.", TableId);
+        ChangeLogEntry.SetRange("Primary Key Field 1 Value", PrimaryKeyValue);
+        ChangeLogEntry.SetRange("Type of Change", ChangeLogEntry."Type of Change"::Modification);
+        if not ChangeLogEntry.FindSet() then
+            exit;
+        repeat
+            TimelineEvents.EntryNo := TimelineEvents.EntryNo + 1;
+            TimelineEvents.EventType := "NPR MMTimelineEventType"::MEMBER_INFO_CHANGED;
+            TimelineEvents.EventDateTime := ChangeLogEntry."Date and Time";
+            TimelineEvents.SourceTableId := Database::"Change Log Entry";
+            TimelineEvents.SourceSystemId := ChangeLogEntry.SystemId;
+            TimelineEvents.EventCreatedBy := GetUserName(ChangeLogEntry."User ID");
+            TimelineEvents.Insert();
+        until ChangeLogEntry.Next() = 0;
     end;
 
 }

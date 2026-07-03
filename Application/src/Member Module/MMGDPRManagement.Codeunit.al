@@ -343,6 +343,7 @@
         Member."Block Reason" := Member."Block Reason"::ANONYMIZED;
 
         Member.Modify(true);
+        DeleteChangeLogForRecord(Database::"NPR MM Member", Format(Member."Entry No."));
 
         MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
@@ -354,6 +355,7 @@
                 MemberCard."Blocked By" := GetUserId();
                 MemberCard."Block Reason" := MemberCard."Block Reason"::ANONYMIZED;
                 MemberCard.Modify();
+                DeleteChangeLogForRecord(Database::"NPR MM Member Card", Format(MemberCard."Entry No."));
             until (MemberCard.Next() = 0);
         end;
 
@@ -411,6 +413,17 @@
         Membership."Block Reason" := Membership."Block Reason"::ANONYMIZED;
 
         Membership.Modify(true); // This will cause a customer sync.
+        DeleteChangeLogForRecord(Database::"NPR MM Membership", Format(Membership."Entry No."));
+    end;
+
+    local procedure DeleteChangeLogForRecord(TableId: Integer; PrimaryKeyValue: Text)
+    var
+        ChangeLogEntry: Record "Change Log Entry";
+    begin
+        ChangeLogEntry.SetRange("Table No.", TableId);
+        ChangeLogEntry.SetRange("Primary Key Field 1 Value", PrimaryKeyValue);
+        if not ChangeLogEntry.IsEmpty() then
+            ChangeLogEntry.DeleteAll();
     end;
 
     local procedure ValidateAnonymizeMemberRole(MembershipEntryNo: Integer; MemberEntryNo: Integer; AgreementCheck: Boolean; var ReasonText: Text): Boolean
