@@ -103,6 +103,12 @@
             Caption = 'Item VAT Identifier Filter';
             DataClassification = CustomerContent;
         }
+        field(70; "Cash Transaction Limit"; Decimal)
+        {
+            Caption = 'Cash Transaction Limit';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
     }
 
     keys

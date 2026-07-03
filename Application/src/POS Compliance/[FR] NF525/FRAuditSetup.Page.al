@@ -61,6 +61,11 @@
                     ToolTip = 'Specifies the value of the Yearly Workshift Duration field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Cash Transaction Limit"; Rec."Cash Transaction Limit")
+                {
+                    ToolTip = 'Specifies the maximum total cash payment allowed per transaction. Set to 0 to disable the check.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Item VAT Identifier Filter"; VATIDFilter)
                 {
 

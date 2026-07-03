@@ -292,6 +292,42 @@ codeunit 6184890 "NPR FR Audit Subscribers"
             ProcessingValue := Format(POSEntryOutputLog2.Count() - 1);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterValidateSaleBeforeEnd', '', false, false)]
+    local procedure CheckCashTransactionLimit(var SalePOS: Record "NPR POS Sale")
+    var
+        POSUnit: Record "NPR POS Unit";
+        FRAuditSetup: Record "NPR FR Audit Setup";
+        SaleLine: Record "NPR POS Sale Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
+        TotalCash: Decimal;
+        CashLimitExceededLbl: Label 'The total cash payment of %1 exceeds the maximum allowed cash payment limit of %2 per transaction.', Comment = '%1 = total cash amount, %2 = cash transaction limit';
+    begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+        if not FRAuditMgt.IsEnabled(POSUnit."POS Audit Profile") then
+            exit;
+        if not FRAuditSetup.Get() then
+            exit;
+        if FRAuditSetup."Cash Transaction Limit" = 0 then
+            exit;
+
+        SaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        SaleLine.SetRange("Register No.", SalePOS."Register No.");
+        SaleLine.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLine.SetRange("Line Type", SaleLine."Line Type"::"POS Payment");
+        SaleLine.SetLoadFields("No.", "Amount Including VAT");
+        if SaleLine.FindSet() then
+            repeat
+                if POSPaymentMethod.Get(SaleLine."No.") then
+                    if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH then
+                        TotalCash += SaleLine."Amount Including VAT";
+            until SaleLine.Next() = 0;
+
+        if TotalCash > FRAuditSetup."Cash Transaction Limit" then
+            Error(CashLimitExceededLbl, TotalCash, FRAuditSetup."Cash Transaction Limit");
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Company Information", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyCompanyInformation(var Rec: Record "Company Information"; var xRec: Record "Company Information"; RunTrigger: Boolean)
     var
