@@ -74,7 +74,7 @@ page 6248219 "NPR Job Queue Runner Users"
                 ApplicationArea = NPRRetail;
                 Caption = 'Reset Failed Attempts';
                 Image = ResetStatus;
-                Tooltip = 'Reset the "Failed Attempts" counter for the selected job queue runner.';
+                Tooltip = 'Reset the "Failed Attempts" counter for the selected job queue runners. Select multiple rows to reset them all at once.';
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
@@ -82,14 +82,16 @@ page 6248219 "NPR Job Queue Runner Users"
 
                 trigger OnAction()
                 var
+                    SelectedJQRunnerUser: Record "NPR Job Queue Runner User";
                     ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
-                    SuccessfulResetLbl: Label 'Successfully reset Failed Attempts value for Entra App "%1"';
+                    ResultMessage: Text;
                 begin
-                    if Rec."Failed Attempts" = 0 then
-                        exit;
-                    ExternalJQRefresherMgt.ResetJQRunnerUserFailedAttempts(Rec);
+                    SelectedJQRunnerUser.Copy(Rec, true);
+                    CurrPage.SetSelectionFilter(SelectedJQRunnerUser);
+                    ResultMessage := ExternalJQRefresherMgt.ResetJQRunnerUserFailedAttempts(SelectedJQRunnerUser);
                     CurrPage.Update(false);
-                    Message(SuccessfulResetLbl, Rec."Client ID");
+                    if ResultMessage <> '' then
+                        Message(ResultMessage);
                 end;
             }
             action("Show Last Error Text")

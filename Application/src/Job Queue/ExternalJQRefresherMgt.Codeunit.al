@@ -443,21 +443,70 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         exit(not JQRunnerUser.IsEmpty());
     end;
 
-    internal procedure ResetJQRunnerUserFailedAttempts(var JQRunnerUser: Record "NPR Job Queue Runner User")
+    internal procedure ResetJQRunnerUserFailedAttempts(var JQRunnerUser: Record "NPR Job Queue Runner User"): Text
+    var
+        SuccessfullyResetEntryNos: List of [Integer];
+        Window: Dialog;
+        EntryNo: Integer;
+        ResetSuccessCount: Integer;
+        RecordsWithFailedAttempts: Integer;
+        FailureCount: Integer;
+        FailuresShown: Integer;
+        FailedResetDetails: Text;
+        MaxFailuresShown: Integer;
+        QueryingDialog: Label 'Querying refresher service...';
+        NoFailedAttemptsToResetLbl: Label 'None of the selected records have a %1 value to reset.', Comment = '%1 = "Failed Attempts" field caption';
+        ResetResultLbl: Label 'Reset %1 for %2 of %3 %4 records that had failed attempts.', Comment = '%1 = "Failed Attempts" field caption, %2 = number successfully reset, %3 = number of records that had failed attempts, %4 = table caption';
+        FailedResetLineLbl: Label '\Failed to reset Entra App ''%1'':\%2', Comment = '%1 = Client ID, %2 = external error text';
+        MoreFailuresLbl: Label '\...and %1 more could not be reset. The full request/response for each attempt is available in the refresher service logs.', Comment = '%1 = number of additional failures not shown';
+    begin
+        MaxFailuresShown := 5;
+
+        JQRunnerUser.SetFilter("Failed Attempts", '>%1', 0);
+        if not JQRunnerUser.FindSet() then
+            exit(StrSubstNo(NoFailedAttemptsToResetLbl, JQRunnerUser.FieldCaption("Failed Attempts")));
+
+        Window.Open(QueryingDialog);
+        repeat
+            if TryResetSingleJQRunnerUserFailedAttempts(JQRunnerUser."Client Id") then
+                SuccessfullyResetEntryNos.Add(JQRunnerUser."Entry No.")
+            else begin
+                FailureCount += 1;
+                if FailuresShown < MaxFailuresShown then begin
+                    FailedResetDetails += StrSubstNo(FailedResetLineLbl, JQRunnerUser."Client Id", GetLastErrorText());
+                    FailuresShown += 1;
+                end;
+            end;
+        until JQRunnerUser.Next() = 0;
+        Window.Close();
+
+        foreach EntryNo in SuccessfullyResetEntryNos do
+            if JQRunnerUser.Get(EntryNo) then begin
+                JQRunnerUser."Failed Attempts" := 0;
+                JQRunnerUser.Modify();
+            end;
+
+        if FailureCount > FailuresShown then
+            FailedResetDetails += StrSubstNo(MoreFailuresLbl, FailureCount - FailuresShown);
+
+        ResetSuccessCount := SuccessfullyResetEntryNos.Count();
+        RecordsWithFailedAttempts := ResetSuccessCount + FailureCount;
+        exit(StrSubstNo(ResetResultLbl, JQRunnerUser.FieldCaption("Failed Attempts"), ResetSuccessCount, RecordsWithFailedAttempts, JQRunnerUser.TableCaption()) + FailedResetDetails);
+    end;
+
+    [TryFunction]
+    local procedure TryResetSingleJQRunnerUserFailedAttempts(ClientId: Guid)
     var
         JsonHelper: Codeunit "NPR Json Helper";
         HttpResponseMessage: HttpResponseMessage;
         ResponseToken: JsonToken;
         ChangedToken: JsonToken;
-        Window: Dialog;
         ChangedCount: Integer;
         ReasonText: Text;
         ResponseText: Text;
-        QueryingDialog: Label 'Querying refresher service...';
         FailedToResetJQRunnerUserFailedAttemptsLbl: Label 'Failed to reset job queue runner user Failed Attempts value.\External response:\%1';
     begin
-        Window.Open(QueryingDialog);
-        ManageJQRefresherUser(JQRunnerUser."Client Id", '', Enum::"NPR Ext. JQ Refresher Options"::resetFailedAttempts, HttpResponseMessage);
+        ManageJQRefresherUser(ClientId, '', Enum::"NPR Ext. JQ Refresher Options"::resetFailedAttempts, HttpResponseMessage);
         HttpResponseMessage.Content().ReadAs(ResponseText);
         if not HttpResponseMessage.IsSuccessStatusCode() then
             Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
@@ -501,10 +550,6 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
             else
                 Error(FailedToResetJQRunnerUserFailedAttemptsLbl, ResponseText);
         end;
-
-        JQRunnerUser."Failed Attempts" := 0;
-        JQRunnerUser.Modify();
-        Window.Close();
     end;
 
     internal procedure ValidateExternalJQRefresherEntraAppManager(var JQRefreshSetup: Record "NPR Job Queue Refresh Setup"; var EntraAppCleared: Boolean; var JobQueueRunnerUser: Record "NPR Job Queue Runner User") ValidEntraAppExists: Boolean
