@@ -27,6 +27,27 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
             SetReceiptLogo(RestaurantPrintHeader);
     end;
 
+    procedure GetRelatedPOSEntries(WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; var POSEntry: Record "NPR POS Entry"): Boolean
+    var
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+    begin
+        POSEntry.Reset();
+        POSEntryWaiterPadLink.SetCurrentKey("Waiter Pad No.", "Waiter Pad Line No.");
+        POSEntryWaiterPadLink.SetRange("Waiter Pad No.", WPadLineOutBuffer."Waiter Pad No.");
+        POSEntryWaiterPadLink.SetRange("Waiter Pad Line No.", WPadLineOutBuffer."Waiter Pad Line No.");
+        POSEntryWaiterPadLink.SetLoadFields("POS Entry No.");
+        if not POSEntryWaiterPadLink.FindSet() then
+            exit(false);
+
+        repeat
+            POSEntry."Entry No." := POSEntryWaiterPadLink."POS Entry No.";
+            POSEntry.Mark(true);
+        until POSEntryWaiterPadLink.Next() = 0;
+
+        POSEntry.MarkedOnly(true);
+        exit(true);
+    end;
+
     procedure GetPrintLines(WaiterPadNo: Code[20]; var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary)
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
