@@ -430,10 +430,18 @@ codeunit 6059925 "NPR POS Layout Assistant"
 
     local procedure GetUserCultureName(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
+#if BC27 or BC28
         TypeHelper: Codeunit "Type Helper";
+#else
+        LanguageMgt: Codeunit Language;
+#endif
         Response: JsonObject;
     begin
+#if BC27 or BC28
         Response.Add('userCultureName', TypeHelper.GetCultureName());
+#else
+        Response.Add('userCultureName', LanguageMgt.GetCurrentCultureName());
+#endif
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 

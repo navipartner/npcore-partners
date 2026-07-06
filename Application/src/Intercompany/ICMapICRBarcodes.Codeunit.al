@@ -4,6 +4,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::ICInboxOutboxMgt, 'OnInsertICOutboxSalesDocTransaction', '', false, false)]
     local procedure OnICOutboxTransactionCreated(var ICOutboxTransaction: Record "IC Outbox Transaction")
     begin
+#if BC27
         case ICOutboxTransaction."Source Type" of
             ICOutboxTransaction."Source Type"::"Journal Line":
                 begin
@@ -18,6 +19,22 @@
                     FindTransactionLinesSale(ICOutboxTransaction);
                 end;
         end;
+#else
+        case ICOutboxTransaction."IC Source Type" of
+            ICOutboxTransaction."IC Source Type"::Journal:
+                begin
+                    exit; //doesn't have anything to do with Items (no ICR support)
+                end;
+            ICOutboxTransaction."IC Source Type"::"Purchase Document":
+                begin
+                    FindTransactionLinesPurchase(ICOutboxTransaction);
+                end;
+            ICOutboxTransaction."IC Source Type"::"Sales Document":
+                begin
+                    FindTransactionLinesSale(ICOutboxTransaction);
+                end;
+        end;
+#endif
     end;
 
     local procedure FindTransactionLinesSale(ICOutboxTransaction: Record "IC Outbox Transaction")
