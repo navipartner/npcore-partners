@@ -60,6 +60,14 @@ codeunit 6060102 "NPR POS Action-Set Sale VAT-B."
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        // Only the taxable goods lines carry the sale's VAT; settlement lines (POS Payment, GL Payment,
+        // Rounding, Issue Voucher, Customer Deposit) and Comment lines must not be recalculated here.
+        // Doing so zeroes a payment line's "Amount Including VAT" (Quantity is 0 on payment lines), which
+        // hides it from balance validation yet still skews G/L posting. See CORE-1196.
+        SaleLinePOS.SetFilter("Line Type", '%1|%2|%3',
+            SaleLinePOS."Line Type"::Item,
+            SaleLinePOS."Line Type"::"Item Category",
+            SaleLinePOS."Line Type"::"BOM List");
         if SaleLinePOS.FindSet() then
             repeat
                 BaseSaleLinePOS := SaleLinePOS;

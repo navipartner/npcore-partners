@@ -47,6 +47,55 @@ codeunit 85116 "NPR POS Act. Set SaleVAT Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure ChangeSaleVATBusPostingGroupDoesNotZeroPaymentLines()
+    var
+        GenBusinessPostingGroup: Record "Gen. Business Posting Group";
+        Item: Record Item;
+        PaymentSaleLinePOS: Record "NPR POS Sale Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryRandom: Codeunit "Library - Random";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRPOSSetSaleVATB: Codeunit "NPR POS Action-Set Sale VAT-B.";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        PaymentAmountBefore: Decimal;
+    begin
+        // [GIVEN] Active POS session & sale with an item line
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 100;
+        Item.Modify();
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+
+        // [GIVEN] A partial payment line exists on the sale (payment started but sale not ended)
+        NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
+        LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, 40, '', false);
+
+        PaymentSaleLinePOS.SetRange("Register No.", POSUnit."No.");
+        PaymentSaleLinePOS.SetRange("Line Type", PaymentSaleLinePOS."Line Type"::"POS Payment");
+        PaymentSaleLinePOS.FindFirst();
+        PaymentAmountBefore := PaymentSaleLinePOS."Amount Including VAT";
+        Assert.AreNotEqual(0, PaymentAmountBefore, 'Test setup failed: payment line should have a non-zero amount.');
+
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", LibraryRandom.RandDecInDecimalRange(10, 25, 0));
+        LibraryERM.CreateGenBusPostingGroup(GenBusinessPostingGroup);
+        NPRLibraryPOSMasterData.CreateVATPostingSetupForSaleItem(VATPostingSetup."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
+
+        // [WHEN] The Set Sale VAT action changes the VAT Bus. Posting Group of the sale
+        POSSession.GetSaleLine(POSSaleLine);
+        NPRPOSSetSaleVATB.ChangeSaleVATBusPostingGroup(POSSale, POSSaleLine, GenBusinessPostingGroup.Code, VATPostingSetup."VAT Bus. Posting Group", false);
+
+        // [THEN] The existing payment line amount is left untouched (not recalculated to 0)
+        PaymentSaleLinePOS.FindFirst();
+        Assert.AreEqual(PaymentAmountBefore, PaymentSaleLinePOS."Amount Including VAT", 'Payment line Amount Including VAT must not be changed by Set Sale VAT.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeSaleVATBusPostingGroupRecalculatesCustomPrice()
     var
         Item: Record Item;
