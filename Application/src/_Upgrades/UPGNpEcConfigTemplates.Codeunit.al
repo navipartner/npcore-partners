@@ -67,7 +67,8 @@ codeunit 6248442 "NPR UPG NpEc Config. Templates"
         ConfigTemplateHeader: Record "Config. Template Header";
         CustomerTempl: Record "Customer Templ.";
     begin
-        ConfigTemplateHeader.Get(Template);
+        if not ConfigTemplateHeader.Get(Template) then
+            exit;
         CustomerTempl.Init();
         CustomerTempl.Code := ConfigTemplateHeader.Code;
         CustomerTempl.Description := ConfigTemplateHeader.Description;
