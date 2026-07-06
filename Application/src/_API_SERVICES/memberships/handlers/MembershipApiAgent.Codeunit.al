@@ -223,10 +223,49 @@ codeunit 6185123 "NPR MembershipApiAgent"
     begin
         ResponseJson.StartObject('membership')
             .AddObject(MembershipDTO(ResponseJson, Membership))
+            .AddArray(MembershipTimeFramesDTO(ResponseJson, Membership))
             .AddArray(MembershipToMembersDTO(ResponseJson, Membership, IncludeMembers))
         .EndObject();
 
         exit(ResponseJson);
+    end;
+
+    local procedure MembershipTimeFramesDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"): Codeunit "NPR JSON Builder"
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Translation: Codeunit "NPR MembershipApiTranslation";
+    begin
+        ResponseJson.StartArray('timeFrames');
+
+        // Perpetual membership: single open-ended frame
+        if (MembershipSetup.Get(Membership."Membership Code")) then
+            if (MembershipSetup.Perpetual) then begin
+                ResponseJson.StartObject()
+                    .AddProperty('validFromDate')
+                    .AddProperty('validUntilDate', DMY2Date(31, 12, 9999))
+                    .AddProperty('lifecycleAction', Translation.MembershipEntryContextToText(MembershipEntry.Context::NEW))
+                    .AddProperty('membershipCode', Membership."Membership Code")
+                    .AddProperty('blocked', false)
+                    .AddProperty('activateOnFirstUse', false)
+                    .EndObject();
+                exit(ResponseJson.EndArray());
+            end;
+
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        if (MembershipEntry.FindSet()) then
+            repeat
+                ResponseJson.StartObject()
+                    .AddObject(AddRequiredProperty(ResponseJson, 'validFromDate', MembershipEntry."Valid From Date"))
+                    .AddObject(AddRequiredProperty(ResponseJson, 'validUntilDate', MembershipEntry."Valid Until Date"))
+                    .AddProperty('lifecycleAction', Translation.MembershipEntryContextToText(MembershipEntry.Context))
+                    .AddProperty('membershipCode', MembershipEntry."Membership Code")
+                    .AddProperty('blocked', MembershipEntry.Blocked)
+                    .AddProperty('activateOnFirstUse', MembershipEntry."Activate On First Use")
+                    .EndObject();
+            until (MembershipEntry.Next() = 0);
+
+        exit(ResponseJson.EndArray());
     end;
 
     internal procedure MembershipDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"): Codeunit "NPR JSON Builder"

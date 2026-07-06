@@ -860,12 +860,8 @@ codeunit 6248220 "NPR MemberApiAgent"
 
     local procedure MembershipDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"; MemberEntryNo: Integer; IncludeCards: Boolean): Codeunit "NPR JSON Builder"
     var
-        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
-        ValidFrom, ValidUntil : Date;
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
     begin
-
-        MembershipMgt.GetConsecutiveTimeFrame(Membership."Entry No.", Today(), ValidFrom, ValidUntil);
 
         ResponseJson.StartObject('membership')
             .AddObject(MembershipApiAgent.MembershipDTO(ResponseJson, Membership))
