@@ -79,6 +79,25 @@
         ImportFromFile(TextEncoding::MSDos);
     end;
 
+    procedure ImportFromText(JsonText: Text; Encoding: TextEncoding)
+    var
+        JObject: JsonObject;
+        JToken: JsonToken;
+        Handled: Boolean;
+        PrimaryPackageTable: Integer;
+    begin
+        JObject.ReadFrom(JsonText);
+        JObject.Get('Primary Package Table', JToken);
+        PrimaryPackageTable := JToken.AsValue().AsInteger();
+        JObject.Get('Data', JToken);
+
+        OnLoadPackage(Handled, PrimaryPackageTable, JToken, 0);
+        if Handled then
+            exit;
+
+        LoadPackage(JToken, Encoding);
+    end;
+
     procedure ImportFromBlob(var TempBlob: Codeunit "Temp Blob")
     var
         JObject: JsonObject;
