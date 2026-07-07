@@ -89,10 +89,14 @@ codeunit 6184846 "NPR POS Action: Drawer Status" implements "NPR IPOS Workflow"
     var
         HwcResponse: JsonObject;
         SuccessJson: JsonToken;
+        ErrorMessageJson: JsonToken;
     begin
         // HWC data
         HwcResponse := Context.GetJsonObject('hwcResponse');
         HwcResponse.Get('Success', SuccessJson);
+
+        if HwcResponse.Get('ErrorMessage', ErrorMessageJson) then
+            Result.Add('Message', ErrorMessageJson.AsValue().AsText());
 
         Result.Add('ShowSuccessMessage', false);
         Result.Add('Success', SuccessJson.AsValue().AsBoolean());
@@ -122,11 +126,23 @@ codeunit 6184846 "NPR POS Action: Drawer Status" implements "NPR IPOS Workflow"
             Workflow.Add('CASH_DRAWER_STATUS', ActionParameters);
     end;
 
+    procedure AddCashDrawerStatusWorkflowAfterSale(var Workflow: JsonObject; Setup: Codeunit "NPR POS Setup"; Sale: Codeunit "NPR POS Sale")
+    var
+        POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
+        SalePOS: Record "NPR POS Sale";
+    begin
+        Sale.GetCurrentSale(SalePOS);
+        if not POSPaymentBinInvokeMgt.IsDrawerOpenRequiredPOSEntry(SalePOS) then
+            exit;
+
+        AddCashDrawerStatusWorkflow(Workflow, Setup);
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDrawerStatus.js###
-'let main=async({workflow:o,hwc:a,popup:n,context:r,captions:t})=>{let e,i,s={Success:!1};await o.respond("SetValuesToContext"),r.showSpinner&&(e=await n.spinner({caption:t.workflowTitle,abortEnabled:!1}));try{return i=a.registerResponseHandler(async l=>{if(l.Success)try{console.log("[Cash Drawer HWC] ",l),e&&e.updateCaption(t.statusProcessing),s=await o.respond("Process",{hwcResponse:l}),a.unregisterResponseHandler(i),s.Success?s.ShowSuccessMessage&&n.message({caption:s.Message,title:t.workflowTitle}):n.error({caption:s.Message,title:t.workflowTitle})}catch(c){a.unregisterResponseHandler(i,c)}}),e&&e.updateCaption(t.statusExecuting),await a.invoke(r.hwcRequest.HwcName,r.hwcRequest,i),await a.waitForContextCloseAsync(i),{success:s.Success}}finally{e&&e.close(),e=null}};'
+'let main=async({workflow:o,hwc:a,popup:n,context:r,captions:t})=>{let e,i,s={Success:!1};await o.respond("SetValuesToContext"),r.showSpinner&&(e=await n.spinner({caption:t.workflowTitle,abortEnabled:!1}));try{return i=a.registerResponseHandler(async l=>{try{console.log("[Cash Drawer HWC] ",l),e&&e.updateCaption(t.statusProcessing),s=await o.respond("Process",{hwcResponse:l}),a.unregisterResponseHandler(i),s.Success?s.ShowSuccessMessage&&n.message({caption:s.Message,title:t.workflowTitle}):n.error({caption:s.Message||l.ErrorMessage,title:t.workflowTitle})}catch(c){a.unregisterResponseHandler(i,c)}}),e&&e.updateCaption(t.statusExecuting),await a.invoke(r.hwcRequest.HwcName,r.hwcRequest,i),await a.waitForContextCloseAsync(i),{success:s.Success}}finally{e&&e.close(),e=null}};'
         );
     end;
 }

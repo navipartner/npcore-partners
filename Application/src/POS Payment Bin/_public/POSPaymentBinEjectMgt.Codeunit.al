@@ -104,7 +104,7 @@
     end;
 
 
-    local procedure IsDrawerOpenRequiredPOSEntry(SalePOS: Record "NPR POS Sale"): Boolean
+    internal procedure IsDrawerOpenRequiredPOSEntry(SalePOS: Record "NPR POS Sale"): Boolean
     var
         POSEntry: Record "NPR POS Entry";
         POSPaymentLine: Record "NPR POS Entry Payment Line";

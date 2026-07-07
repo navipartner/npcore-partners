@@ -99,7 +99,7 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         if EndSaleSuccess then begin
             MemberAdmitAfterEOS.AddPostEndOfSaleWorkflow(Sale, PostWorkflows);
             AddDigitalReceiptWorkflow(Sale, PostWorkflows);
-            DrawerStatus.AddCashDrawerStatusWorkflow(PostWorkflows, Setup);
+            DrawerStatus.AddCashDrawerStatusWorkflowAfterSale(PostWorkflows, Setup, Sale);
         end;
         EndSaleEvents.OnAddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, EndSaleSuccess, PostWorkflows);
     end;

@@ -11,27 +11,25 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
 
     try {
         _contextId = hwc.registerResponseHandler(async (hwcResponse) => {
-            if (hwcResponse.Success) {
-                    try {
-                        console.log("[Cash Drawer HWC] ", hwcResponse);
+            try {
+                console.log("[Cash Drawer HWC] ", hwcResponse);
 
-                        if (_dialogRef) _dialogRef.updateCaption(captions.statusProcessing);
+                if (_dialogRef) _dialogRef.updateCaption(captions.statusProcessing);
 
-                        _bcResponse = await workflow.respond("Process", { hwcResponse: hwcResponse });
-                        
-                        hwc.unregisterResponseHandler(_contextId);
+                _bcResponse = await workflow.respond("Process", { hwcResponse: hwcResponse });
 
-                        if (_bcResponse.Success) {
-                            if (_bcResponse.ShowSuccessMessage) {
-                                popup.message({ caption: _bcResponse.Message, title: captions.workflowTitle });
-                            }
-                        } else {
-                            popup.error({ caption: _bcResponse.Message, title: captions.workflowTitle });
-                        }
+                hwc.unregisterResponseHandler(_contextId);
+
+                if (_bcResponse.Success) {
+                    if (_bcResponse.ShowSuccessMessage) {
+                        popup.message({ caption: _bcResponse.Message, title: captions.workflowTitle });
                     }
-                    catch (e) { 
-                        hwc.unregisterResponseHandler(_contextId, e);
-                    }
+                } else {
+                    popup.error({ caption: _bcResponse.Message || hwcResponse.ErrorMessage, title: captions.workflowTitle });
+                }
+            }
+            catch (e) {
+                hwc.unregisterResponseHandler(_contextId, e);
             }
         });
 
