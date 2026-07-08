@@ -1,7 +1,7 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 codeunit 85205 "NPR APIPOSSale Resume"
 {
-    // [FEATURE] POST /pos/sale/:saleId/resume — restores a parked sale to an active POS Sale on the requested unit
+    // [FEATURE] POST /pos/sale/:saleId/resume — restores a parked sale to an active POS Sale on the API user's User Setup POS unit
 
     Subtype = Test;
 
@@ -33,7 +33,6 @@ codeunit 85205 "NPR APIPOSSale Resume"
         Initialize();
         ParkedSaleId := CreateParkedSale();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(ParkedSaleId) + '/resume', Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Resume should succeed');
 
@@ -64,7 +63,6 @@ codeunit 85205 "NPR APIPOSSale Resume"
         Initialize();
         UnknownId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(UnknownId) + '/resume', Body, QueryParams, Headers);
         Response.Get('statusCode', JToken);
         StatusCode := JToken.AsValue().AsInteger();
@@ -73,7 +71,7 @@ codeunit 85205 "NPR APIPOSSale Resume"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure ResumeSale_Returns400WhenPosUnitMissing()
+    procedure ResumeSale_NoPOSUnitInUserSetup_ReturnsBadRequest()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
         Assert: Codeunit Assert;
@@ -81,17 +79,34 @@ codeunit 85205 "NPR APIPOSSale Resume"
         Body: JsonObject;
         QueryParams: Dictionary of [Text, Text];
         Headers: Dictionary of [Text, Text];
+        UserSetup: Record "User Setup";
         ParkedSaleId: Guid;
         JToken: JsonToken;
         StatusCode: Integer;
     begin
+        // [SCENARIO] Resume returns 400 when the API user's User Setup has no POS Unit assigned
         Initialize();
         ParkedSaleId := CreateParkedSale();
 
+        // [GIVEN] API user's User Setup has no POS Unit
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := '';
+        UserSetup.Modify();
+        Commit();
+
+        // [WHEN] Resume
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(ParkedSaleId) + '/resume', Body, QueryParams, Headers);
+
+        // [CLEANUP] Restore User Setup before asserting so later test methods are unaffected
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := _POSUnit."No.";
+        UserSetup.Modify();
+        Commit();
+
+        // [THEN] 400
         Response.Get('statusCode', JToken);
         StatusCode := JToken.AsValue().AsInteger();
-        Assert.AreEqual(400, StatusCode, 'Missing posUnit body field should return 400');
+        Assert.AreEqual(400, StatusCode, 'No POS Unit in User Setup should return 400');
     end;
 
     [Test]
@@ -116,7 +131,6 @@ codeunit 85205 "NPR APIPOSSale Resume"
         _POSUnit.Modify();
         Commit();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(ParkedSaleId) + '/resume', Body, QueryParams, Headers);
         Response.Get('statusCode', JToken);
         StatusCode := JToken.AsValue().AsInteger();
@@ -135,8 +149,9 @@ codeunit 85205 "NPR APIPOSSale Resume"
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit Assert;
-        OtherPOSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
+        OtherPOSUnit: Record "NPR POS Unit";
+        UserSetup: Record "User Setup";
         Response: JsonObject;
         ResponseBody: JsonObject;
         Body: JsonObject;
@@ -148,9 +163,9 @@ codeunit 85205 "NPR APIPOSSale Resume"
         ResumedSaleSystemId: Guid;
         POSSaleRec: Record "NPR POS Sale";
     begin
-        // [SCENARIO] A sale parked on POS Unit A can be resumed on POS Unit B (cross-unit hand-off).
+        // [SCENARIO] A parked sale can be resumed onto a different POS Unit by reassigning the API user's User Setup POS Unit
         Initialize();
-        ParkedSaleId := CreateParkedSale();
+        ParkedSaleId := CreateParkedSale(); // parked on _POSUnit (the User Setup unit)
 
         POSPostingProfile.FindFirst();
         LibraryPOSMasterData.CreatePOSUnit(OtherPOSUnit, _POSStore.Code, POSPostingProfile.Code);
@@ -158,21 +173,31 @@ codeunit 85205 "NPR APIPOSSale Resume"
         OtherPOSUnit."POS Type" := OtherPOSUnit."POS Type"::UNATTENDED;
         OtherPOSUnit.Status := OtherPOSUnit.Status::OPEN;
         OtherPOSUnit.Modify();
-        Commit();
-
         Assert.AreNotEqual(_POSUnit."No.", OtherPOSUnit."No.", 'Test setup must use two distinct POS Units');
 
-        Body.Add('posUnit', OtherPOSUnit."No.");
-        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(ParkedSaleId) + '/resume', Body, QueryParams, Headers);
-        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Resume on different POS Unit should succeed');
+        // [GIVEN] API user's User Setup now points at the OTHER unit
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := OtherPOSUnit."No.";
+        UserSetup.Modify();
+        Commit();
 
+        // [WHEN] Resume (unit resolved from User Setup)
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(ParkedSaleId) + '/resume', Body, QueryParams, Headers);
+
+        // [CLEANUP] Restore User Setup before asserting so later test methods are unaffected
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := _POSUnit."No.";
+        UserSetup.Modify();
+        Commit();
+
+        // [THEN] The sale resumed onto the User-Setup unit (OtherPOSUnit)
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Resume on different POS Unit should succeed');
         ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
         ResponseBody.Get('saleId', JToken);
         ResumedSaleIdText := JToken.AsValue().AsText();
         Evaluate(ResumedSaleSystemId, ResumedSaleIdText);
-
         Assert.IsTrue(POSSaleRec.GetBySystemId(ResumedSaleSystemId), 'Active POS Sale should exist after cross-unit resume');
-        Assert.AreEqual(OtherPOSUnit."No.", POSSaleRec."Register No.", 'Resumed sale should be on the NEW requested POS Unit, not the original one');
+        Assert.AreEqual(OtherPOSUnit."No.", POSSaleRec."Register No.", 'Resumed sale should be on the User-Setup POS Unit');
     end;
 
     local procedure Initialize()
@@ -225,7 +250,6 @@ codeunit 85205 "NPR APIPOSSale Resume"
         ActiveSaleId: Guid;
     begin
         ActiveSaleId := CreateGuid();
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(ActiveSaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 

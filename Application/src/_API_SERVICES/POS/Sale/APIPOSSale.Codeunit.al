@@ -325,8 +325,6 @@ codeunit 6248632 "NPR API POS Sale"
         POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
         POSUnitNo: Code[10];
-        Body: JsonToken;
-        TempText: Text;
         OriginalTicketNo: Code[20];
     begin
         Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
@@ -340,15 +338,11 @@ codeunit 6248632 "NPR API POS Sale"
         if not POSQuoteEntry.GetBySystemId(SaleSystemId) then
             exit(Response.RespondResourceNotFound());
 
-        Body := Request.BodyJson();
-        if not GetJsonText(Body, 'posUnit', TempText) then
-            exit(Response.RespondBadRequest('Missing required field: posUnit'));
-        POSUnitNo := CopyStr(TempText, 1, MaxStrLen(POSUnitNo));
-
         if not UserSetup.Get(UserId) then
             exit(Response.RespondBadRequest('API user has no User Setup record. Add the API user to User Setup (with a POS Unit assigned) before calling the POS Sale API.'));
         if UserSetup."NPR POS Unit No." = '' then
             exit(Response.RespondBadRequest('API user has no POS Unit assigned in User Setup. Assign a POS Unit to the API user in User Setup before calling the POS Sale API.'));
+        POSUnitNo := UserSetup."NPR POS Unit No.";
 
         if not AssertPOSUnitOpenForSale(POSUnitNo) then
             exit(Response.RespondBadRequest('POS Unit is not open for sales'));
