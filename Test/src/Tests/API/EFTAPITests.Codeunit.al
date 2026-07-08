@@ -534,7 +534,6 @@ codeunit 85169 "NPR EFT API Tests"
         SaleLineId := CreateGuid();
 
         // Create sale
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -592,7 +591,6 @@ codeunit 85169 "NPR EFT API Tests"
         PaymentLineId := CreateGuid();
 
         // Create sale
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 

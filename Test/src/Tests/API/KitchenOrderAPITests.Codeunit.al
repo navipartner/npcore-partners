@@ -533,7 +533,6 @@ codeunit 85159 "NPR Kitchen Order API Tests"
         JToken: JsonToken;
     begin
         // Create sale
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 

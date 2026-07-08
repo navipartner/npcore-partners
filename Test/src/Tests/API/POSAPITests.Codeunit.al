@@ -52,7 +52,6 @@ codeunit 85157 "NPR POS API Tests"
         PaymentLineId := CreateGuid();
 
         // [WHEN] Create a new sale
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
 
         // [THEN] Sale created successfully
@@ -127,7 +126,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -194,7 +192,7 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CreateSale_MissingPosUnit_ReturnsBadRequest()
+    procedure CreateSale_NoPOSUnitInUserSetup_ReturnsBadRequest()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
         Assert: Codeunit Assert;
@@ -203,19 +201,30 @@ codeunit 85157 "NPR POS API Tests"
         SaleId: Guid;
         QueryParams: Dictionary of [Text, Text];
         Headers: Dictionary of [Text, Text];
+        UserSetup: Record "User Setup";
         JToken: JsonToken;
         StatusCode: Integer;
     begin
-        // [SCENARIO] Create sale without posUnit returns Bad Request
+        // [SCENARIO] Create sale returns 400 when the API user's User Setup has no POS Unit assigned
         Initialize();
 
-        // [GIVEN] A new sale ID with empty body (missing posUnit)
-        SaleId := CreateGuid();
+        // [GIVEN] API user's User Setup has no POS Unit
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := '';
+        UserSetup.Modify();
+        Commit();
 
-        // [WHEN] Create a sale without posUnit
+        // [WHEN] Create a sale
+        SaleId := CreateGuid();
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
 
-        // [THEN] Should return Bad Request
+        // [CLEANUP] Restore User Setup before asserting
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := _POSUnit."No.";
+        UserSetup.Modify();
+        Commit();
+
+        // [THEN] 400 Bad Request
         Assert.IsTrue(Response.Get('statusCode', JToken), 'Response should contain statusCode');
         StatusCode := JToken.AsValue().AsInteger();
         Assert.AreEqual(400, StatusCode, 'Should return 400 Bad Request');
@@ -256,7 +265,6 @@ codeunit 85157 "NPR POS API Tests"
         Commit();
 
         SaleId := CreateGuid();
-        Body.Add('posUnit', _POSUnit."No.");
         Body.Add('vatBusinessPostingGroup', AltVATBusGroup.Code);
         Body.Add('customerNo', Customer."No.");
 
@@ -304,7 +312,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleId := CreateGuid();
         SaleLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -375,7 +382,6 @@ codeunit 85157 "NPR POS API Tests"
         Commit();
 
         SaleId := CreateGuid();
-        Body.Add('posUnit', _POSUnit."No.");
         Body.Add('genBusinessPostingGroup', NewGenBusPostingGroup.Code);
 
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
@@ -422,7 +428,6 @@ codeunit 85157 "NPR POS API Tests"
         // [GIVEN] A sale with one item line, created without a customer
         SaleId := CreateGuid();
         SaleLineId := CreateGuid();
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -514,7 +519,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleId := CreateGuid();
         SaleLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -559,7 +563,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -613,7 +616,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -683,7 +685,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId1 := CreateGuid();
         SaleLineId2 := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -794,7 +795,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleId := CreateGuid();
         SaleLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -844,7 +844,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         AddonLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -925,7 +924,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         AddonLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1004,7 +1002,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         AddonLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1077,7 +1074,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleId := CreateGuid();
         SaleLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1134,7 +1130,6 @@ codeunit 85157 "NPR POS API Tests"
         AddonLineId1 := CreateGuid();
         AddonLineId2 := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1599,7 +1594,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1683,7 +1677,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1730,13 +1723,11 @@ codeunit 85157 "NPR POS API Tests"
         // [GIVEN] A sale is created with a specific ID
         SaleId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'First create sale should succeed');
 
         // [WHEN] Try to create another sale with the same ID
         Clear(Body);
-        Body.Add('posUnit', _POSUnit."No.");
 
         // [THEN] Should fail with duplicate ID error
         asserterror Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
@@ -1757,28 +1748,35 @@ codeunit 85157 "NPR POS API Tests"
         Headers: Dictionary of [Text, Text];
         NonUnattendedUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
+        UserSetup: Record "User Setup";
         JToken: JsonToken;
         StatusCode: Integer;
     begin
-        // [SCENARIO] Creating a sale on a non-UNATTENDED POS unit should fail
+        // [SCENARIO] Creating a sale when the API user's User Setup points at a non-UNATTENDED POS unit should fail
         Initialize();
 
-        // [GIVEN] A POS Unit explicitly set to MPOS type (not UNATTENDED)
+        // [GIVEN] A non-UNATTENDED (MPOS) POS Unit assigned to the API user in User Setup
         POSPostingProfile.FindFirst();
         NPRLibraryPOSMasterData.CreatePOSUnit(NonUnattendedUnit, _POSStore.Code, POSPostingProfile.Code);
         NonUnattendedUnit."POS Type" := NonUnattendedUnit."POS Type"::MPOS;
         NonUnattendedUnit.Status := NonUnattendedUnit.Status::OPEN;
         NonUnattendedUnit.Modify();
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := NonUnattendedUnit."No.";
+        UserSetup.Modify();
         Commit();
 
-        // [GIVEN] A new sale ID
+        // [WHEN] Create a sale (unit resolved from User Setup)
         SaleId := CreateGuid();
-
-        // [WHEN] Try to create a sale on non-UNATTENDED unit
-        Body.Add('posUnit', NonUnattendedUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
 
-        // [THEN] Should return 400 because POS Unit type is not UNATTENDED
+        // [CLEANUP] Restore User Setup before asserting so later test methods are unaffected
+        UserSetup.Get(UserId);
+        UserSetup."NPR POS Unit No." := _POSUnit."No.";
+        UserSetup.Modify();
+        Commit();
+
+        // [THEN] 400, because the User Setup POS Unit is not UNATTENDED
         Response.Get('statusCode', JToken);
         StatusCode := JToken.AsValue().AsInteger();
         Assert.AreEqual(400, StatusCode, 'Non-UNATTENDED unit should return 400');
@@ -1822,7 +1820,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         AddonLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1888,7 +1885,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleId := CreateGuid();
         SaleLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1936,7 +1932,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -1989,7 +1984,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -2044,7 +2038,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleId := CreateGuid();
         SaleLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
@@ -2100,7 +2093,6 @@ codeunit 85157 "NPR POS API Tests"
         SaleLineId := CreateGuid();
         PaymentLineId := CreateGuid();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 

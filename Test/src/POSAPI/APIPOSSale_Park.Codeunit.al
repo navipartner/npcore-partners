@@ -158,7 +158,6 @@ codeunit 85204 "NPR APIPOSSale Park"
         Headers: Dictionary of [Text, Text];
     begin
         SaleId := CreateGuid();
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 

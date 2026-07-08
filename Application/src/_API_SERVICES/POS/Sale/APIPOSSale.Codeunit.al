@@ -100,25 +100,21 @@ codeunit 6248632 "NPR API POS Sale"
         if not Evaluate(SaleSystemId, SaleId) then
             exit(Response.RespondBadRequest('Invalid saleId format'));
 
-        Body := Request.BodyJson();
-
-        if not GetJsonText(Body, 'posUnit', TempText) then
-            exit(Response.RespondBadRequest('Missing required field: posUnit'));
-        POSUnitNo := CopyStr(TempText, 1, MaxStrLen(POSUnitNo));
-
-        if GetJsonText(Body, 'customerNo', TempText) then
-            CustomerNo := CopyStr(TempText, 1, MaxStrLen(CustomerNo));
-
-        if GetJsonText(Body, 'vatBusinessPostingGroup', TempText) then
-            VATBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(VATBusinessPostingGroup));
-
-        if GetJsonText(Body, 'genBusinessPostingGroup', TempText) then
-            GenBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(GenBusinessPostingGroup));
-
         if not UserSetup.Get(UserId) then
             exit(Response.RespondBadRequest('API user has no User Setup record. Add the API user to User Setup (with a POS Unit assigned) before calling the POS Sale API.'));
         if UserSetup."NPR POS Unit No." = '' then
             exit(Response.RespondBadRequest('API user has no POS Unit assigned in User Setup. Assign a POS Unit to the API user in User Setup before calling the POS Sale API.'));
+        POSUnitNo := UserSetup."NPR POS Unit No.";
+
+        Body := Request.BodyJson();
+        if Body.IsObject then begin
+            if GetJsonText(Body, 'customerNo', TempText) then
+                CustomerNo := CopyStr(TempText, 1, MaxStrLen(CustomerNo));
+            if GetJsonText(Body, 'vatBusinessPostingGroup', TempText) then
+                VATBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(VATBusinessPostingGroup));
+            if GetJsonText(Body, 'genBusinessPostingGroup', TempText) then
+                GenBusinessPostingGroup := CopyStr(TempText, 1, MaxStrLen(GenBusinessPostingGroup));
+        end;
 
         if not AssertPOSUnitOpenForSale(POSUnitNo) then
             exit(Response.RespondBadRequest(StrSubstNo('POS Unit ''%1'' is not open for sales.', POSUnitNo)));

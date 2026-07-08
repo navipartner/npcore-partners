@@ -134,7 +134,6 @@ codeunit 85222 "NPR APIPOSUnit Open"
         _POSUnit.Modify();
         Commit();
 
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
         Response.Get('statusCode', JToken);
         StatusCode := JToken.AsValue().AsInteger();
@@ -234,7 +233,6 @@ codeunit 85222 "NPR APIPOSUnit Open"
         Commit();
 
         SaleId := CreateGuid();
-        Body.Add('posUnit', _POSUnit."No.");
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
     end;
