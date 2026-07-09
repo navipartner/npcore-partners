@@ -88,6 +88,11 @@ codeunit 6248560 "NPR Ecom Job Management"
         MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(false, true, JobQueueEntry);
     end;
 
+    internal procedure GetTargetJobTimeout(): Duration
+    begin
+        exit(7 * 60 * 60 * 1000);
+    end;
+
     internal procedure DurationLimitReached(StartDateTime: DateTime; DurationLimit: Duration): Boolean
     begin
         exit(CurrentDateTime - StartDateTime >= DurationLimit);

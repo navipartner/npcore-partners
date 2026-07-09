@@ -16,6 +16,8 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         UpgradeBucketId();
         UpdateJobTimeout();
         UpdateLastOrdersImportedAt();
+        FixMonitoredJQEcomSalesDoc();
+        FixMonitoredJQEcomSalesRetDoc();
     end;
 
     local procedure UpgradeEcomJQs()
@@ -126,7 +128,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         EcomSalesHeader.Modify();
     end;
 
-    local procedure SetBucketParameterString(JobQueueEntry: Record "Job Queue Entry")
+    local procedure SetBucketParameterString(var JobQueueEntry: Record "Job Queue Entry")
     var
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
         BucketFilterLbl: Label '1..100', Locked = true;
@@ -140,13 +142,14 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
     local procedure UpdateJobTimeout()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         NewTimeout: Duration;
     begin
         UpgradeStep := 'UpdateJobTimeout';
         if HasUpgradeTag() then
             exit;
 
-        NewTimeout := 7 * 60 * 60 * 1000;//7h
+        NewTimeout := EcomJobManagement.GetTargetJobTimeout();
         JobQueueEntry.SetCurrentKey("Object Type to Run", "Object ID to Run");
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetFilter("Object ID to Run", '%1|%2', Codeunit::"NPR EcomSalesOrderProcJQ", Codeunit::"NPR EcomSalesRetOrderProcJQ");
@@ -162,6 +165,87 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
             until JobQueueEntry.Next() = 0;
 
         SetUpgradeTag();
+    end;
+
+    local procedure FixMonitoredJQEcomSalesDoc()
+    var
+        EcomSalesOrderProcJQ: Codeunit "NPR EcomSalesOrderProcJQ";
+    begin
+        UpgradeStep := 'FixMonitoredJQEcomSalesDoc';
+        if HasUpgradeTag() then
+            exit;
+        FixEcomJQEntry(EcomSalesOrderProcJQ.GetCodeunitId());
+        SetUpgradeTag();
+    end;
+
+    local procedure FixMonitoredJQEcomSalesRetDoc()
+    var
+        EcomSalesRetOrderProcJQ: Codeunit "NPR EcomSalesRetOrderProcJQ";
+    begin
+        UpgradeStep := 'FixMonitoredJQEcomSalesRetDoc';
+        if HasUpgradeTag() then
+            exit;
+        FixEcomJQEntry(EcomSalesRetOrderProcJQ.GetCodeunitId());
+        SetUpgradeTag();
+    end;
+
+    local procedure FixEcomJQEntry(CodeunitId: Integer)
+    var
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        JobQueueEntry: Record "Job Queue Entry";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
+        ExpectedParamString: Text[250];
+        ExpectedTimeout: Duration;
+        Modified: Boolean;
+    begin
+        ExpectedParamString := CopyStr(EcomJobManagement.CreateParameterSting(), 1, MaxStrLen(MonitoredJQEntry."Parameter String"));
+        ExpectedTimeout := EcomJobManagement.GetTargetJobTimeout();
+
+        MonitoredJQEntry.SetCurrentKey("Object ID to Run", "Object Type to Run");
+        MonitoredJQEntry.SetRange("Object ID to Run", CodeunitId);
+        MonitoredJQEntry.SetRange("Object Type to Run", MonitoredJQEntry."Object Type to Run"::Codeunit);
+        if MonitoredJQEntry.FindSet(true) then
+            repeat
+                Modified := false;
+                if BucketParamIsBroken(MonitoredJQEntry."Parameter String") then begin
+                    MonitoredJQEntry."Parameter String" := ExpectedParamString;
+                    Modified := true;
+                end;
+                if MonitoredJQEntry."Job Timeout" < ExpectedTimeout then begin
+                    MonitoredJQEntry."Job Timeout" := ExpectedTimeout;
+                    Modified := true;
+                end;
+                if Modified then
+                    MonitoredJQEntry.Modify();
+            until MonitoredJQEntry.Next() = 0;
+
+        JobQueueEntry.SetCurrentKey("Object Type to Run", "Object ID to Run");
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", CodeunitId);
+        if JobQueueEntry.FindSet() then
+            repeat
+                if BucketParamIsBroken(JobQueueEntry."Parameter String") or (JobQueueEntry."Job Timeout" < ExpectedTimeout) then begin
+                    JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+                    if BucketParamIsBroken(JobQueueEntry."Parameter String") then
+                        JobQueueEntry."Parameter String" := ExpectedParamString;
+                    if JobQueueEntry."Job Timeout" < ExpectedTimeout then
+                        JobQueueEntry."Job Timeout" := ExpectedTimeout;
+                    JobQueueEntry.Modify();
+                    if not JobQueueEntry."NPR Manually Set On Hold" then
+                        JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
+                end;
+            until JobQueueEntry.Next() = 0;
+    end;
+
+    local procedure BucketParamIsBroken(ParamString: Text): Boolean
+    var
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
+    begin
+        JQParamStrMgt.Parse(ParamString);
+        if not JQParamStrMgt.ContainsParam(EcomJobManagement.ParamBucketFilter()) then
+            exit(true);
+        exit(JQParamStrMgt.GetParamValueAsText(EcomJobManagement.ParamBucketFilter()) = '');
     end;
 
     local procedure HasUpgradeTag(): Boolean
