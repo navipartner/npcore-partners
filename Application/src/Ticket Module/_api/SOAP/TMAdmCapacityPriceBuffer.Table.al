@@ -88,6 +88,23 @@ table 6060016 "NPR TM AdmCapacityPriceBuffer"
             OptionCaption = 'Required,Optional and Selected,Optional and not Selected';
             OptionMembers = REQUIRED,SELECTED,NOT_SELECTED;
         }
+        field(232; TicketScheduleSelection; Option)
+        {
+            Caption = 'Ticket Schedule Selection';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Same As Admission,Today,Next Available,Schedule Entry Required,None';
+            OptionMembers = ADMISSION,TODAY,NEXT_AVAILABLE,SCHEDULE_ENTRY,"NONE";
+            InitValue = ADMISSION;
+        }
+
+        field(233; AdmissionScheduleSelection; Option)
+        {
+            Caption = 'Admission Schedule Selection';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Today,Next Available,Schedule Entry Required,None';
+            OptionMembers = TODAY,NEXT_AVAILABLE,SCHEDULE_ENTRY,"NONE";
+        }
+
         field(240; RequestItemNumber; Code[20])
         {
             DataClassification = CustomerContent;

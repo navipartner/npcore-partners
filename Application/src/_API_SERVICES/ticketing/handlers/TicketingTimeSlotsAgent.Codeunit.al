@@ -186,12 +186,14 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
     local procedure AppendBomToBuffer(TicketItemNo: Code[20]; TicketVariantCode: Code[10]; Quantity: Integer; var TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var EntryNo: Integer): Boolean
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
     begin
         TicketBom.SetFilter("Item No.", '=%1', TicketItemNo);
         TicketBom.SetFilter("Variant Code", '=%1', TicketVariantCode);
         TicketBom.SetFilter("Admission Inclusion", '=%1', TicketBom."Admission Inclusion"::REQUIRED);
         if (not TicketBom.FindSet()) then
             exit(false);
+
         repeat
             TicketBuffer.Reset();
             TicketBuffer.SetFilter(RequestItemNumber, '=%1', TicketItemNo);
@@ -202,6 +204,8 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                 TicketBuffer.Modify();
             end else begin
                 Clear(TicketBuffer);
+                Admission.Get(TicketBom."Admission Code");
+
                 EntryNo += 1;
                 TicketBuffer.EntryNo := EntryNo;
                 TicketBuffer.RequestItemNumber := TicketItemNo;
@@ -212,6 +216,8 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                 TicketBuffer.AdmissionCode := TicketBom."Admission Code";
                 TicketBuffer.AdmissionInclusion := TicketBom."Admission Inclusion";
                 TicketBuffer.DefaultAdmission := TicketBom.Default;
+                TicketBuffer.TicketScheduleSelection := TicketBom."Ticket Schedule Selection";
+                TicketBuffer.AdmissionScheduleSelection := Admission."Default Schedule";
                 if (not TicketBuffer.Insert()) then;
             end;
         until (TicketBom.Next() = 0);
@@ -250,6 +256,7 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                     .AddProperty('admissionCode', TicketBuffer.AdmissionCode)
                     .AddProperty('inclusion', _EnumEncoder.EncodeInclusion(TicketBuffer.AdmissionInclusion))
                     .AddProperty('default', TicketBuffer.DefaultAdmission)
+                    .AddProperty('scheduleSelection', _EnumEncoder.EncodeScheduleSelection(TicketBuffer.TicketScheduleSelection, TicketBuffer.AdmissionScheduleSelection))
                 .EndObject();
             until (TicketBuffer.Next() = 0);
 
