@@ -1572,5 +1572,152 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
         SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::New;
         SubscrPaymentRequest.Insert(true);
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogNoOpModifyCreatesNoEntry()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        Assert: Codeunit Assert;
+        MemberEntryNo: Integer;
+    begin
+        MemberEntryNo := LibraryMemberGDPR.CreateMember();
+        ResetMemberChangeLog(MemberEntryNo);
+
+        Member.Get(MemberEntryNo);
+        Member.Modify(true);
+
+        Assert.AreEqual(0, MemberChangeLogCount(MemberEntryNo, 0), 'A member modify with no field change must not create a change log entry.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogFieldChangeCreatesOneEntry()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        MemberChangeLog: Record "NPR MM Member Change Log";
+        Assert: Codeunit Assert;
+        MemberEntryNo: Integer;
+    begin
+        MemberEntryNo := LibraryMemberGDPR.CreateMember();
+
+        Member.Get(MemberEntryNo);
+        Member."First Name" := 'Alice';
+        Member.Modify(true);
+        ResetMemberChangeLog(MemberEntryNo);
+
+        Member.Get(MemberEntryNo);
+        Member."First Name" := 'Bob';
+        Member.Modify(true);
+
+        MemberChangeLog.SetRange("Member Entry No.", MemberEntryNo);
+        Assert.AreEqual(1, MemberChangeLog.Count(), 'Exactly one change log entry is expected for a single tracked field change.');
+        MemberChangeLog.FindFirst();
+        Assert.AreEqual(Member.FieldNo("First Name"), MemberChangeLog."Field No.", 'The First Name field should be the logged field.');
+        Assert.AreEqual('Alice', MemberChangeLog."Old Value", 'Old value should be the previous first name.');
+        Assert.AreEqual('Bob', MemberChangeLog."New Value", 'New value should be the updated first name.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogSameImageCreatesNoEntry()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Assert: Codeunit Assert;
+        MemberEntryNo: Integer;
+    begin
+        SetMemberImageFeature(false);
+        MemberEntryNo := LibraryMemberGDPR.CreateMember();
+
+        SetMemberImage(MemberEntryNo, 'MEMBER-PICTURE-AAA');
+        ResetMemberChangeLog(MemberEntryNo);
+
+        SetMemberImage(MemberEntryNo, 'MEMBER-PICTURE-AAA');
+
+        Assert.AreEqual(0, MemberChangeLogCount(MemberEntryNo, 0), 'Re-importing the same image bytes must not create a change log entry.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogDifferentImageCreatesOneEntry()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        Assert: Codeunit Assert;
+        MemberEntryNo: Integer;
+    begin
+        SetMemberImageFeature(false);
+        MemberEntryNo := LibraryMemberGDPR.CreateMember();
+
+        SetMemberImage(MemberEntryNo, 'MEMBER-PICTURE-AAA');
+        ResetMemberChangeLog(MemberEntryNo);
+
+        SetMemberImage(MemberEntryNo, 'MEMBER-PICTURE-BBB');
+
+        Assert.AreEqual(1, MemberChangeLogCount(MemberEntryNo, Member.FieldNo(Image)), 'Different image bytes must create exactly one change log entry.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogImageNotTrackedWhenCloudflare()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        Assert: Codeunit Assert;
+        MemberEntryNo: Integer;
+    begin
+        SetMemberImageFeature(true);
+        MemberEntryNo := LibraryMemberGDPR.CreateMember();
+        ResetMemberChangeLog(MemberEntryNo);
+
+        SetMemberImage(MemberEntryNo, 'MEMBER-PICTURE-AAA');
+
+        Assert.AreEqual(0, MemberChangeLogCount(MemberEntryNo, Member.FieldNo(Image)), 'Image must not be tracked in the change log while Cloudflare member media is enabled.');
+    end;
+
+    local procedure ResetMemberChangeLog(MemberEntryNo: Integer)
+    var
+        MemberChangeLog: Record "NPR MM Member Change Log";
+    begin
+        MemberChangeLog.SetRange("Member Entry No.", MemberEntryNo);
+        MemberChangeLog.DeleteAll();
+    end;
+
+    local procedure MemberChangeLogCount(MemberEntryNo: Integer; FieldNo: Integer): Integer
+    var
+        MemberChangeLog: Record "NPR MM Member Change Log";
+    begin
+        MemberChangeLog.SetRange("Member Entry No.", MemberEntryNo);
+        if (FieldNo <> 0) then
+            MemberChangeLog.SetRange("Field No.", FieldNo);
+        exit(MemberChangeLog.Count());
+    end;
+
+    local procedure SetMemberImage(MemberEntryNo: Integer; Content: Text)
+    var
+        Member: Record "NPR MM Member";
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
+        InStr: InStream;
+    begin
+        TempBlob.CreateOutStream(OutStr);
+        OutStr.WriteText(Content);
+        TempBlob.CreateInStream(InStr);
+
+        Member.Get(MemberEntryNo);
+        Clear(Member.Image);
+        Member.Image.ImportStream(InStr, 'member-picture.img');
+        Member.Modify(true);
+    end;
+
+    local procedure SetMemberImageFeature(Enabled: Boolean)
+    var
+        MemberImageMediaFeature: Codeunit "NPR MemberImageMediaFeature";
+    begin
+        MemberImageMediaFeature.AddFeature();
+        MemberImageMediaFeature.SetFeatureEnabled(Enabled);
+    end;
 }
 #endif

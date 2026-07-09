@@ -312,45 +312,41 @@ codeunit 6151092 "NPR MMTimelineHandler"
     local procedure CollectedMemberInfoChangeEvents(MembershipEntryNo: Integer; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
     var
         MembershipRole: Record "NPR MM Membership Role";
-        MemberCard: Record "NPR MM Member Card";
+        MemberEntryNoFilter: TextBuilder;
     begin
-        AddChangeLogEvents(Database::"NPR MM Membership", Format(MembershipEntryNo), TimelineEvents);
-
         MembershipRole.SetLoadFields("Member Entry No.");
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        if MembershipRole.FindSet() then
-            repeat
-                AddChangeLogEvents(Database::"NPR MM Member", Format(MembershipRole."Member Entry No."), TimelineEvents);
-            until MembershipRole.Next() = 0;
+        if not MembershipRole.FindSet() then
+            exit;
+        repeat
+            if (MemberEntryNoFilter.Length() > 0) then
+                MemberEntryNoFilter.Append('|');
+            MemberEntryNoFilter.Append(Format(MembershipRole."Member Entry No."));
+        until MembershipRole.Next() = 0;
 
-        MemberCard.SetLoadFields("Entry No.");
-        MemberCard.SetCurrentKey("Membership Entry No.");
-        MemberCard.SetRange("Membership Entry No.", MembershipEntryNo);
-        if MemberCard.FindSet() then
-            repeat
-                AddChangeLogEvents(Database::"NPR MM Member Card", Format(MemberCard."Entry No."), TimelineEvents);
-            until MemberCard.Next() = 0;
+        AddMemberChangeEvents(MemberEntryNoFilter.ToText(), TimelineEvents);
     end;
 
-    local procedure AddChangeLogEvents(TableId: Integer; PrimaryKeyValue: Text; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
+    local procedure AddMemberChangeEvents(MemberEntryNoFilter: Text; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
     var
-        ChangeLogEntry: Record "Change Log Entry";
+        MemberChangeLog: Record "NPR MM Member Change Log";
     begin
-        ChangeLogEntry.SetLoadFields("Date and Time", "User ID");
-        ChangeLogEntry.SetRange("Table No.", TableId);
-        ChangeLogEntry.SetRange("Primary Key Field 1 Value", PrimaryKeyValue);
-        ChangeLogEntry.SetRange("Type of Change", ChangeLogEntry."Type of Change"::Modification);
-        if not ChangeLogEntry.FindSet() then
+        if (MemberEntryNoFilter = '') then
+            exit;
+
+        MemberChangeLog.SetCurrentKey("Member Entry No.");
+        MemberChangeLog.SetFilter("Member Entry No.", MemberEntryNoFilter);
+        if not MemberChangeLog.FindSet() then
             exit;
         repeat
             TimelineEvents.EntryNo := TimelineEvents.EntryNo + 1;
             TimelineEvents.EventType := "NPR MMTimelineEventType"::MEMBER_INFO_CHANGED;
-            TimelineEvents.EventDateTime := ChangeLogEntry."Date and Time";
-            TimelineEvents.SourceTableId := Database::"Change Log Entry";
-            TimelineEvents.SourceSystemId := ChangeLogEntry.SystemId;
-            TimelineEvents.EventCreatedBy := GetUserName(ChangeLogEntry."User ID");
+            TimelineEvents.EventDateTime := MemberChangeLog.SystemCreatedAt;
+            TimelineEvents.SourceTableId := Database::"NPR MM Member Change Log";
+            TimelineEvents.SourceSystemId := MemberChangeLog.SystemId;
+            TimelineEvents.EventCreatedBy := GetUserName(MemberChangeLog.SystemCreatedBy);
             TimelineEvents.Insert();
-        until ChangeLogEntry.Next() = 0;
+        until MemberChangeLog.Next() = 0;
     end;
 
 }

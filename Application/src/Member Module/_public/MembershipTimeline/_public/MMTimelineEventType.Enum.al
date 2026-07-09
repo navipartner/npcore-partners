@@ -69,7 +69,7 @@ enum 6014610 "NPR MMTimelineEventType" implements "NPR MMTimelineTypeInterface"
         Implementation = "NPR MMTimelineTypeInterface" = "NPR MMTimelineDescribeEvent";
         ObsoleteState = Pending;
         ObsoleteTag = '2026-06-30';
-        ObsoleteReason = 'No longer maintained. Member info changes are now surfaced on the timeline from the standard BC Change Log.';
+        ObsoleteReason = 'No longer maintained. Member info changes are now surfaced on the timeline as individual field-level change events.';
     }
 
     value(130; MEMBER_IMAGE_ADDED)
