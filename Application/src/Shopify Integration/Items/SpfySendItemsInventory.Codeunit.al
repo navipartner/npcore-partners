@@ -188,7 +188,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ShopifyInventoryItemID: Text[30];
         AutoActivationDisabledLbl: Label 'Auto-activation is disabled for %1 %2 / %3 %4 at Shopify Location ID %5 (%6 store). The inventory update was skipped so the manual Shopify deactivation is preserved.', Comment = '%1 = Item No. caption, %2 = Item No., %3 = Variant Code caption, %4 = Variant Code, %5 = Shopify Location ID, %6 = Shopify Store Code';
         LocInvItemNotActivatedErr: Label 'The specified Shopify Inventory Item ID %1 is not stocked at Shopify Location ID %2 at Shopify Store %3. Awaiting the activation task to complete.', Comment = '%1 =ShopifyInventoryItemID;%2=InventoryLevel."Shopify Location ID";%3=InventoryLevel."Shopify Store Code"';
-        UpdateLevelItemRequestOutdated: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",ignoreCompareQuantity:true,quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4}]}){userErrors{field message}}', Locked = true;
+        UpdateLevelItemRequestLegacy: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",ignoreCompareQuantity:true,quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4}]}){userErrors{field message}}', Locked = true;
         UpdateLevelItemRequest202604: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4,changeFromQuantity:null}]}) @idempotent(key: "%5") {userErrors{field message}}', Locked = true;
         VariantNotAvailErr: Label 'The variant is marked as not available in Shopify. The request is no longer applicable.';
     begin
@@ -203,7 +203,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if _SpfyIntegrationMgt.ShopifyApiVersionIsAtLeast('2026-04') then
             UpdateLevelItemRequest := UpdateLevelItemRequest202604
         else
-            UpdateLevelItemRequest := UpdateLevelItemRequestOutdated;
+            UpdateLevelItemRequest := UpdateLevelItemRequestLegacy;
 
         repeat
             Clear(ShopifyInventoryItemID);
@@ -2489,13 +2489,18 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         VariablesJObject: JsonObject;
         OStream: OutStream;
         ShopifyInventoryItemID: Text[30];
-        ActivateItemRequest: Label 'mutation ActivateInventoryItem($inventoryItemId: ID!, $locationId: ID!, $available: Int) { inventoryActivate(inventoryItemId: $inventoryItemId, locationId: $locationId, available: $available) { userErrors { message } } }', Locked = true;
+        ActivateItemRequestLegacy: Label 'mutation ActivateInventoryItem($inventoryItemId: ID!, $locationId: ID!, $available: Int) {inventoryActivate(inventoryItemId: $inventoryItemId, locationId: $locationId, available: $available) {userErrors {message}}}', Locked = true;
+        ActivateItemRequest202604: Label 'mutation ActivateInventoryItem($inventoryItemId: ID!, $locationId: ID!, $available: Int, $idempotencyKey: String!) {inventoryActivate(inventoryItemId: $inventoryItemId, locationId: $locationId, available: $available) @idempotent(key: $idempotencyKey) {userErrors {message}}}', Locked = true;
     begin
         If not ValidateInventoryItem(NcTask, InventoryLocation, ShopifyInventoryItemID) then
             exit(false);
         VariablesJObject.Add('inventoryItemId', StrSubstNo('gid://shopify/InventoryItem/%1', ShopifyInventoryItemID));
         VariablesJObject.Add('locationId', StrSubstNo('gid://shopify/Location/%1', InventoryLocation."Shopify Location ID"));
-        RequestJObject.Add('query', ActivateItemRequest);
+        if _SpfyIntegrationMgt.ShopifyApiVersionIsAtLeast('2026-04') then begin
+            VariablesJObject.Add('idempotencyKey', Format(NcTask.SystemId, 0, 4));
+            RequestJObject.Add('query', ActivateItemRequest202604);
+        end else
+            RequestJObject.Add('query', ActivateItemRequestLegacy);
         RequestJObject.Add('variables', VariablesJObject);
         NcTask."Store Code" := InventoryLocation."Shopify Store Code";
         NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
