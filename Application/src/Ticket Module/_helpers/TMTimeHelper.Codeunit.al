@@ -54,6 +54,14 @@ codeunit 6184773 "NPR TM TimeHelper"
     #region Service
 
 
+    internal procedure GetLocalTimeForService() LocalDateTime: DateTime
+    var
+        TimeZoneCode: Code[20];
+        IsDaylightSavingsTime: Boolean;
+    begin
+        LocalDateTime := GetLocalTimeForService(TimeZoneCode, IsDaylightSavingsTime);
+    end;
+
     internal procedure GetLocalTimeForService(var TimeZoneCode: Code[20]; var IsDaylightSavingsTime: Boolean) LocalDateTime: DateTime
     var
         TicketSetup: Record "NPR TM Ticket Setup";
