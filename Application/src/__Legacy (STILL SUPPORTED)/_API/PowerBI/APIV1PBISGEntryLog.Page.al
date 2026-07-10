@@ -125,4 +125,13 @@ page 6150852 "NPR API V1 PBI SGEntryLog"
             }
         }
     }
+    trigger OnAfterGetRecord()
+    var
+        ApiError: Enum "NPR API Error Code";
+    begin
+        if (Rec.ApiErrorMessage = '') and (Rec.ApiErrorNumber <> 0) then begin
+            ApiError := Enum::"NPR API Error Code".FromInteger(Rec.ApiErrorNumber);
+            Rec.ApiErrorMessage := CopyStr(Format(ApiError, 0, 1), 1, MaxStrLen(Rec.ApiErrorMessage));
+        end;
+    end;
 }
