@@ -93,6 +93,10 @@
         key(Key2; "Restaurant Code", "Order Status", Priority, "Created Date-Time")
         {
         }
+        key(Key3; "Order Status")
+        {
+            IncludedFields = Priority, "Created Date-Time", "Expected Dine Date-Time", "Finished Date-Time";
+        }
     }
 
     trigger OnDelete()

@@ -295,7 +295,10 @@
     {
         key(Key1; "Request No.") { }
         key(Key2; "Order ID") { }
-        key(Key3; "Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time") { }
+        key(Key3; "Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time")
+        {
+            IncludedFields = "Production Status", "Serving Step", "Line Type", "No.", "Variant Code", Description, "Unit of Measure Code";
+        }
         key(Key4; "Parent Request No.", "Line Status") { }
     }
 
