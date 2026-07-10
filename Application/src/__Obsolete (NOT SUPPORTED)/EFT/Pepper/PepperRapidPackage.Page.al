@@ -150,7 +150,7 @@ page 6060030 "NPR PepperRapidPackage"
 
             rapidstartBaseDataMgt.ImportPackage(
                 BaseUri + '/pepperpackage/' + RapidPackage
-                + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName, AdjustTableNames);
+                + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName, AdjustTableNames, false);
         end;
 
         CurrPage.Close();

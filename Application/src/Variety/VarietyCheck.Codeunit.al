@@ -19,7 +19,14 @@
         p: Record "NPR POS Entry";
         ConfirmMgt: Codeunit "Confirm Management";
         POSVariantLineCheck: Query "NPR POS Entry Line Variant";
+        IsHandled: Boolean;
     begin
+        // Internal-only skip hook - handled by the RapidStart package import, where variant
+        // reconciliation must not run (see the event declaration below for details).
+        OnBeforeChangeItemVariety(Item, XRecItem, IsHandled);
+        if IsHandled then
+            exit;
+
         p."Amount Incl. Tax" := 1;
         //no variants created. Do what you want
         ItemVar.SetRange("Item No.", Item."No.");
@@ -267,6 +274,16 @@
                 end;
             until ItemVar.Next() = 0;
         exit(true);
+    end;
+
+    // Internal-only event (the codeunit is Access = Internal, so it cannot be subscribed to from other apps).
+    // It exists solely to let our RapidStart package import skip this function: during package apply, item
+    // variants exist as key-only records until their own fields have been applied, so reconciling them from
+    // the item's variety fields would fail on the blank variety values.
+    // Subscriber: "NPR RapidStart Base Data Mgt." (manually bound while a package import is running).
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeChangeItemVariety(Item: Record Item; xItem: Record Item; var IsHandled: Boolean)
+    begin
     end;
 
     local procedure UpdateVariants(Item: Record Item)

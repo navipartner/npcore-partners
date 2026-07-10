@@ -32,6 +32,12 @@
                 ToolTip = 'Specifies whether table names in the package should be adjusted. The option should be enabled if the package contains NPRetail tables, and it was created in NAV/BC version prior to BC16';
                 ApplicationArea = NPRRetail;
             }
+            field("Respect Processing Order"; RespectProcessingOrder)
+            {
+                Caption = 'Respect Package Processing Order';
+                ToolTip = 'Specifies whether the package is applied in the Processing Order declared in the package. Disable to let Business Central recompute the apply order from table relationships.';
+                ApplicationArea = NPRRetail;
+            }
         }
     }
 
@@ -94,7 +100,7 @@
         packageName := package.Replace('.rapidstart', '');
 
         BindSubscription(rapidStartBaseDataMgt);
-        rapidstartBaseDataMgt.ImportPackage('https://npretailbasedata.blob.core.windows.net/pos-test-data/' + package, packageName, AdjustTableNames);
+        rapidstartBaseDataMgt.ImportPackage('https://npretailbasedata.blob.core.windows.net/pos-test-data/' + package, packageName, AdjustTableNames, RespectProcessingOrder);
 
         CurrPage.Close();
     end;
@@ -138,6 +144,7 @@
 
     var
         AdjustTableNames: Boolean;
+        RespectProcessingOrder: Boolean;
         currentStep: Integer;
         package: Text;
 }

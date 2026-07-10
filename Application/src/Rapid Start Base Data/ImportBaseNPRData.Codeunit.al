@@ -79,6 +79,7 @@
         RapidStartBaseDataMgt.ImportPackage(
             BaseUri + '/pos-test-data/' + PackageName + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret,
             CleanPackageName,
+            false,
             false);
 
         AutoRapidstartImportLog."Package Name" := CopyStr(CleanPackageName, 1, MaxStrLen(AutoRapidstartImportLog."Package Name"));

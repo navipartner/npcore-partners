@@ -15,14 +15,12 @@
         end;
     end;
 
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Wrapper", 'OnBeforeCheckModifyAllowed', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Wrapper", OnBeforeCheckModifyAllowed, '', true, false)]
-#endif
-    local procedure SkipVarietyCheckDuringConfigPackageImport(var IsAllowed: Boolean; var IsHandled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Check", OnBeforeChangeItemVariety, '', true, false)]
+    local procedure SkipVariantSyncDuringConfigPackageImport(var IsHandled: Boolean)
     begin
-        IsAllowed := true;
+        // While a package is being applied, item variants exist as key-only records until their own
+        // fields have been applied, so reconciling them from the item's variety fields would fail on
+        // the blank variety values. The package data is authoritative - apply it as-is.
         IsHandled := true;
     end;
 
@@ -97,7 +95,7 @@
     end;
 
     [NonDebuggable]
-    procedure ImportPackage(URL: Text; PackageCode: Text; AdjustPackageTableNames: Boolean)
+    procedure ImportPackage(URL: Text; PackageCode: Text; AdjustPackageTableNames: Boolean; RespectDeclaredProcessingOrder: Boolean)
     var
         configPackage: Record "Config. Package";
         configPackageTable: Record "Config. Package Table";
@@ -141,7 +139,7 @@
 
         RemoveObsoleteTables(configPackageTable);
 
-        ConfigPackageManagement.ApplyPackage(ConfigPackage, ConfigPackageTable, TRUE);
+        ConfigPackageManagement.ApplyPackage(ConfigPackage, ConfigPackageTable, not RespectDeclaredProcessingOrder);
     end;
 
     local procedure RemoveObsoleteTables(var ConfigPackageTable: Record "Config. Package Table")
