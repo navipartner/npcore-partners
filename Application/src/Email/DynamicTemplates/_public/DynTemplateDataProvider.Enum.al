@@ -1,4 +1,3 @@
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
 enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataProvider"
 {
     Access = public;
@@ -34,5 +33,9 @@ enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataP
         Caption = 'POS Receipt email';
         Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailPOSRcptDataProv";
     }
+    value(6; POST_SALES_DOC_NOTIFICATION)
+    {
+        Caption = 'Posted Sales Document Notification';
+        Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailPostSalesDataProv";
+    }
 }
-#endif
