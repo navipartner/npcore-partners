@@ -8,9 +8,9 @@ codeunit 6059769 "NPR HashSet of [Integer]"
     var
         _dictionary: Dictionary of [Integer, Boolean];
 
-    procedure Add(Value: Integer)
+    procedure Add(Value: Integer): Boolean
     begin
-        _dictionary.Add(Value, true);
+        exit(_dictionary.Add(Value, true));
     end;
 
     procedure Contains(Value: Integer): Boolean
@@ -33,4 +33,8 @@ codeunit 6059769 "NPR HashSet of [Integer]"
         Clear(_dictionary);
     end;
 
+    procedure Values(): List of [Integer]
+    begin
+        exit(_dictionary.Keys());
+    end;
 }
