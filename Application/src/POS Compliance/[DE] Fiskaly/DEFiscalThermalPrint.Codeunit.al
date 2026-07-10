@@ -21,7 +21,6 @@ codeunit 6248729 "NPR DE Fiscal Thermal Print"
     local procedure PrintFiscalReceipt(POSEntry: Record "NPR POS Entry")
     var
         DEPOSAuditLogAuxInfo: Record "NPR DE POS Audit Log Aux. Info";
-        QRData: Text;
         AuditLogFound: Boolean;
     begin
         AuditLogFound := DEPOSAuditLogAuxInfo.Get(POSEntry."Entry No.");
@@ -37,25 +36,15 @@ codeunit 6248729 "NPR DE Fiscal Thermal Print"
             exit;
         end;
 
-        QRData := DEPOSAuditLogAuxInfo.GetQRData();
-        if IsFiscalizationFailed(DEPOSAuditLogAuxInfo, QRData) then begin
+        if DEPOSAuditLogAuxInfo.IsFiscalizationFailed() then begin
             AddTSEOutageWarning();
             AddPapercutCommand();
             exit;
         end;
 
-        AddFiskalyQRCode(QRData);
+        AddFiskalyQRCode(DEPOSAuditLogAuxInfo.GetQRData());
         AddFiskalyTextBlock(DEPOSAuditLogAuxInfo);
         AddPapercutCommand();
-    end;
-
-    local procedure IsFiscalizationFailed(DEPOSAuditLogAuxInfo: Record "NPR DE POS Audit Log Aux. Info"; QRData: Text): Boolean
-    begin
-        if DEPOSAuditLogAuxInfo."Has Error" then
-            exit(true);
-        if DEPOSAuditLogAuxInfo."Fiscalization Status" <> DEPOSAuditLogAuxInfo."Fiscalization Status"::Fiscalized then
-            exit(true);
-        exit(QRData = '');
     end;
 
     local procedure AddTSEOutageWarning()

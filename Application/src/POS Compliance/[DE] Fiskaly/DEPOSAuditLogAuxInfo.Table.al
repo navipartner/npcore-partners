@@ -184,4 +184,13 @@
         Rec."QR Data".CreateInStream(InStream, TextEncoding::UTF8);
         InStream.ReadText(QRData);
     end;
+
+    internal procedure IsFiscalizationFailed(): Boolean
+    begin
+        if Rec."Has Error" then
+            exit(true);
+        if Rec."Fiscalization Status" <> Rec."Fiscalization Status"::Fiscalized then
+            exit(true);
+        exit(GetQRData() = '');
+    end;
 }
