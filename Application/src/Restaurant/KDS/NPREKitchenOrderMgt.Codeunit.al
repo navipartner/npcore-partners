@@ -709,6 +709,7 @@
     var
         ChildKitchenRequest: Record "NPR NPRE Kitchen Request";
     begin
+        ChildKitchenRequest.SetCurrentKey("Parent Request No.", "Line Status");
         ChildKitchenRequest.SetRange("Parent Request No.", KitchenRequest."Request No.");
         if KitchenRequest."Line Status" = KitchenRequest."Line Status"::"Ready for Serving" then
             ChildKitchenRequest.SetRange("Line Status", ChildKitchenRequest."Line Status"::"Serving Requested", ChildKitchenRequest."Line Status"::Planned)
@@ -818,6 +819,7 @@
     procedure SetRequestLinesAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request")
     var
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
+        TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
     begin
         if KitchenRequest.IsEmpty() then
             exit;
@@ -827,13 +829,23 @@
         if KitchenRequest.FindSet() then
             repeat
                 KitchenRequest2 := KitchenRequest;
-                SetRequestLineAsServed(KitchenRequest2);
+                SetRequestLineAsServed(KitchenRequest2, TouchedKitchenOrders);
             until KitchenRequest.Next() = 0;
+
+        UpdateOrderStatuses(TouchedKitchenOrders);
     end;
 
     procedure SetRequestLineAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
     begin
-        SetChildRequestLinesAsServed(KitchenRequest);
+        SetRequestLineAsServed(KitchenRequest, TouchedKitchenOrders);
+        UpdateOrderStatuses(TouchedKitchenOrders);
+    end;
+
+    local procedure SetRequestLineAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request"; TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
+    begin
+        SetChildRequestLinesAsServed(KitchenRequest, TouchedKitchenOrders);
         if KitchenRequest."Line Status" in [KitchenRequest."Line Status"::Served, KitchenRequest."Line Status"::Cancelled] then
             KitchenRequest.FieldError("Line Status");
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::Served;
@@ -841,45 +853,67 @@
         KitchenRequest.Modify();
 
         CancelKitchenStationRequests(KitchenRequest, true);
-        UpdateOrderStatus(KitchenRequest."Order ID");
+        TouchedKitchenOrders.Add(KitchenRequest."Order ID");
         AttemptToCloseSourceDocument(KitchenRequest);
     end;
 
-    local procedure SetChildRequestLinesAsServed(KitchenRequest: Record "NPR NPRE Kitchen Request")
+    local procedure SetChildRequestLinesAsServed(KitchenRequest: Record "NPR NPRE Kitchen Request"; TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
     var
         ChildKitchenRequest: Record "NPR NPRE Kitchen Request";
+        ChildKitchenRequest2: Record "NPR NPRE Kitchen Request";
     begin
+        ChildKitchenRequest.SetCurrentKey("Parent Request No.", "Line Status");
         ChildKitchenRequest.SetRange("Parent Request No.", KitchenRequest."Request No.");
         ChildKitchenRequest.SetRange("Line Status", ChildKitchenRequest."Line Status"::"Ready for Serving", ChildKitchenRequest."Line Status"::Planned);
         if ChildKitchenRequest.FindSet(true) then
             repeat
-                SetRequestLineAsServed(ChildKitchenRequest);
+                ChildKitchenRequest2 := ChildKitchenRequest;
+                SetRequestLineAsServed(ChildKitchenRequest2, TouchedKitchenOrders);
             until ChildKitchenRequest.Next() = 0;
     end;
 
     procedure RevokeServingForRequestLine(var KitchenRequest: Record "NPR NPRE Kitchen Request"; RefreshOrderStatus: Boolean)
+    var
+        TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
     begin
-        RevokeServingForChildRequestLines(KitchenRequest, RefreshOrderStatus);
+        RevokeServingForRequestLine(KitchenRequest, TouchedKitchenOrders);
+        if RefreshOrderStatus then
+            UpdateOrderStatuses(TouchedKitchenOrders);
+    end;
+
+    local procedure RevokeServingForRequestLine(var KitchenRequest: Record "NPR NPRE Kitchen Request"; TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
+    begin
+        RevokeServingForChildRequestLines(KitchenRequest, TouchedKitchenOrders);
         KitchenRequest.TestField("Line Status", KitchenRequest."Line Status"::Served);
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::"Ready for Serving";
         KitchenRequest."Served Date-Time" := 0DT;
         KitchenRequest.Modify();
 
-        if RefreshOrderStatus then
-            UpdateOrderStatus(KitchenRequest."Order ID");
+        TouchedKitchenOrders.Add(KitchenRequest."Order ID");
         ReopenSourceDocument(KitchenRequest);
     end;
 
-    local procedure RevokeServingForChildRequestLines(KitchenRequest: Record "NPR NPRE Kitchen Request"; RefreshOrderStatus: Boolean)
+    local procedure RevokeServingForChildRequestLines(KitchenRequest: Record "NPR NPRE Kitchen Request"; TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
     var
         ChildKitchenRequest: Record "NPR NPRE Kitchen Request";
+        ChildKitchenRequest2: Record "NPR NPRE Kitchen Request";
     begin
+        ChildKitchenRequest.SetCurrentKey("Parent Request No.", "Line Status");
         ChildKitchenRequest.SetRange("Parent Request No.", KitchenRequest."Request No.");
         ChildKitchenRequest.SetRange("Line Status", ChildKitchenRequest."Line Status"::Served);
         if ChildKitchenRequest.FindSet(true) then
             repeat
-                RevokeServingForRequestLine(ChildKitchenRequest, RefreshOrderStatus);
+                ChildKitchenRequest2 := ChildKitchenRequest;
+                RevokeServingForRequestLine(ChildKitchenRequest2, TouchedKitchenOrders);
             until ChildKitchenRequest.Next() = 0;
+    end;
+
+    local procedure UpdateOrderStatuses(TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
+    var
+        TouchedKitchenOrderID: BigInteger;
+    begin
+        foreach TouchedKitchenOrderID in TouchedKitchenOrders.Values() do
+            UpdateOrderStatus(TouchedKitchenOrderID);
     end;
 
     local procedure CheckLineStatusesBeforeServing(var KitchenRequest: Record "NPR NPRE Kitchen Request")
