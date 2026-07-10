@@ -10,6 +10,7 @@
         dataitem(KitchenOrder; "NPR NPRE Kitchen Order")
         {
             column(Order_ID; "Order ID") { }
+            column(Order_Restaurant_Code; "Restaurant Code") { }
             column(Order_Status; "Order Status") { }
             column(Created_DateTime; "Created Date-Time") { }
             column(Expected_Dine_DateTime; "Expected Dine Date-Time") { }
@@ -20,7 +21,7 @@
                 DataItemLink = "Order ID" = KitchenOrder."Order ID";
                 SqlJoinType = InnerJoin;
                 column(Request_No; "Request No.") { }
-                column(Restaurant_Code; "Restaurant Code") { }
+                column(Request_Restaurant_Code; "Restaurant Code") { }
                 column(Serving_Step; "Serving Step") { }
                 column(Line_Status; "Line Status") { }
                 column(Production_Status; "Production Status")

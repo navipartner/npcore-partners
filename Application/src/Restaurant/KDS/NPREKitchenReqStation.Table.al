@@ -87,7 +87,7 @@
     keys
     {
         key(Key1; "Request No.", "Line No.") { }
-        key(Key2; "Production Restaurant Code", "Kitchen Station") { }
+        key(Key2; "Production Restaurant Code", "Kitchen Station", "Production Status") { }
         key(Key3; "Request No.", "Production Step") { }
         key(Key4; "Request No.", "Production Status") { }
         key(Key5; "Parent Request No.", "Production Status") { }

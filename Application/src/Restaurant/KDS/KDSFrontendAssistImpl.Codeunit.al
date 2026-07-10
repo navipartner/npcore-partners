@@ -206,8 +206,12 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
             KitchenReqStationsQry.SetFilter(Kitchen_Station, KitchenStationFilter);
             if not (IncludeFinished or FinishedOnly) then
                 KitchenReqStationsQry.SetRange(Station_Production_Status, "NPR NPRE K.Req.L. Prod.Status"::"Not Started", "NPR NPRE K.Req.L. Prod.Status"::"On Hold");
-        end else
-            KitchenReqStationsQry.SetRange(Restaurant_Code, RestaurantCode);
+        end else begin
+            KitchenReqStationsQry.SetRange(Request_Restaurant_Code, RestaurantCode);
+            //Also constrain the order by restaurant so SQL can seek the Kitchen Order "Restaurant Code","Order Status" key
+            //instead of scanning all historical orders. An order's Restaurant Code always matches its requests'.
+            KitchenReqStationsQry.SetRange(Order_Restaurant_Code, RestaurantCode);
+        end;
         KitchenReqStationsQry.SetFilter(Line_Status, '<>%1', "NPR NPRE K.Request Line Status"::Cancelled);
         KitchenReqStationsQry.Open();
 
@@ -228,7 +232,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                 Clear(KitchenRequests);
                 Clear(CustomerDetailsDic);
                 OrderHdr.Add('orderId', KitchenReqStationsQry.Order_ID);
-                OrderHdr.Add('restaurantId', KitchenReqStationsQry.Restaurant_Code);
+                OrderHdr.Add('restaurantId', KitchenReqStationsQry.Request_Restaurant_Code);
                 OrderHdr.Add('orderStatus', KitchenReqStationsQry.Order_Status.AsInteger());
                 OrderHdr.Add('orderStatusName', StatusEnumValueName(KitchenReqStationsQry.Order_Status));
                 OrderHdr.Add('priority', KitchenReqStationsQry.Order_Priority);
