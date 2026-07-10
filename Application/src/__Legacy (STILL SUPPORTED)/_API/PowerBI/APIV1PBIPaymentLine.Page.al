@@ -66,6 +66,14 @@ page 6185076 "NPR APIV1 PBI Payment Line"
                 {
                     Caption = 'Masked PAN', Locked = true;
                 }
+                field(transactionId; Rec."Transaction ID")
+                {
+                    Caption = 'Transaction ID', Locked = true;
+                }
+                field(paymentGatewayCode; Rec."Payment Gateway Code")
+                {
+                    Caption = 'Payment Gateway Code', Locked = true;
+                }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
                 {
