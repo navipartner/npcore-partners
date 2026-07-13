@@ -524,6 +524,71 @@ codeunit 85246 "NPR Ecom Voucher Tests"
     // Covered by the existing API ingest tests in this test app.
     #endregion
 
+    #region GET issuedAssets — end-to-end resolvability
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetSalesDocument_IssuedAssets_VoucherIdResolvesToRealVoucher()
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+        RootObject: JsonObject;
+        LineObject: JsonObject;
+        AssetObject: JsonObject;
+        LinesArray: JsonArray;
+        AssetsArray: JsonArray;
+        JToken: JsonToken;
+        LineToken: JsonToken;
+        AssetToken: JsonToken;
+        AssetId: Guid;
+        AssetCount: Integer;
+    begin
+        // [Scenario] A processed qty=1 voucher line issues a voucher + link row. The GET response must
+        // emit that voucher under salesDocumentLines[].issuedAssets[], and the emitted id must round-trip:
+        // GetBySystemId resolves it to a real voucher whose referenceNo matches. This guards the hoisted
+        // per-doc link buffer path (LoadDocVoucherLinks + the in-memory per-line filter) end-to-end.
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        CreateCapturedVoucherLine(EcomSalesLine, EcomSalesHeader, VoucherType.Code, 1, 100);
+        VchrImpl.Process(EcomSalesLine);
+
+        // [When] the document is read back through the GET handler
+        RootObject.ReadFrom(ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader).BuildAsText());
+
+        // [Then] there is exactly one line with exactly one issued asset (StartObject('salesDocument') is
+        // ignored at the root, so salesDocumentLines sits directly on the root object).
+        RootObject.Get('salesDocumentLines', JToken);
+        LinesArray := JToken.AsArray();
+        _Assert.AreEqual(1, LinesArray.Count(), 'Expected exactly one sales document line.');
+
+        LinesArray.Get(0, LineToken);
+        LineObject := LineToken.AsObject();
+        LineObject.Get('issuedAssets', JToken);
+        AssetsArray := JToken.AsArray();
+        _Assert.AreEqual(1, AssetsArray.Count(), 'Expected exactly one issued asset for the qty=1 voucher line.');
+
+        foreach AssetToken in AssetsArray do begin
+            AssetObject := AssetToken.AsObject();
+
+            AssetObject.Get('type', JToken);
+            _Assert.AreEqual('voucher', JToken.AsValue().AsText(), 'Issued asset type should be voucher.');
+
+            AssetObject.Get('id', JToken);
+            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid.');
+
+            _Assert.IsTrue(NpRvVoucher.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a real voucher.');
+            AssetObject.Get('referenceNo', JToken);
+            _Assert.AreEqual(NpRvVoucher."Reference No.", JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved voucher.');
+
+            AssetCount += 1;
+        end;
+        _Assert.AreEqual(1, AssetCount, 'Exactly one issued asset should have been asserted.');
+    end;
+    #endregion
+
     #region Helpers
     local procedure CreateCapturedVoucherLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherTypeCode: Code[20]; Qty: Decimal; UnitPrice: Decimal)
     begin

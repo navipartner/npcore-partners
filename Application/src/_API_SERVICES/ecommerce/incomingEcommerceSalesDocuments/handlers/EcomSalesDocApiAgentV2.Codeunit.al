@@ -752,7 +752,13 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesLine: Record "NPR Ecom Sales Line";
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
         RecordLink: Record "Record Link";
+        TempEcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link" temporary;
+        TempEcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link" temporary;
+        TempEcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link" temporary;
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        CouponImpl: Codeunit "NPR EcomCreateCouponImpl";
+        MMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
         PaymentLineJsonObject: Codeunit "NPR Json Builder";
         SalesLineJsonObject: Codeunit "NPR Json Builder";
         CommentJsonObject: Codeunit "NPR Json Builder";
@@ -839,9 +845,13 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesLine.Reset();
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         if EcomSalesLine.FindSet() then begin
+            VchrImpl.LoadDocVoucherLinks(EcomSalesHeader, TempEcomSalesVoucherLink);
+            CouponImpl.LoadDocCouponLinks(EcomSalesHeader, TempEcomSalesCouponLink);
+            MMShipImpl.LoadDocMembershipLinks(EcomSalesHeader, TempEcomSalesMembershipLink);
+
             IncSalesDocumentJsonObject.StartArray('salesDocumentLines');
             repeat
-                SalesLineJsonObject := CreateAddSalesLineDetailsJsonObject(EcomSalesLine, IncSalesDocumentJsonObject);
+                SalesLineJsonObject := CreateAddSalesLineDetailsJsonObject(EcomSalesHeader, EcomSalesLine, TempEcomSalesVoucherLink, TempEcomSalesCouponLink, TempEcomSalesMembershipLink, IncSalesDocumentJsonObject);
                 IncSalesDocumentJsonObject.AddObject(SalesLineJsonObject);
             until EcomSalesLine.Next() = 0;
             IncSalesDocumentJsonObject.EndArray();
@@ -899,7 +909,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         CommentDocumentDetailsJsonObject.EndObject();
     end;
 
-    internal procedure CreateAddSalesLineDetailsJsonObject(EcomSalesLine: Record "NPR Ecom Sales Line"; var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    internal procedure CreateAddSalesLineDetailsJsonObject(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var TempEcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link" temporary; var TempEcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link" temporary; var TempEcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link" temporary; var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
     var
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         SalesLineDetailsCustomFieldsJsonObject: Codeunit "NPR Json Builder";
@@ -942,6 +952,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('memberGdprApproval', EcomSalesLine."Member GDPR Approval")
                                   .AddProperty('membershipActivationDate', Format(EcomSalesLine."Membership Activation Date", 0, 9));
 
+        AppendIssuedAssetsArray(EcomSalesHeader, EcomSalesLine, TempEcomSalesVoucherLink, TempEcomSalesCouponLink, TempEcomSalesMembershipLink, SalesLineDetailsJsonObject);
+
         if (EcomSalesLine."External Line ID" <> '') or (EcomSalesLine."Parent Ext. Line ID" <> '') then begin
             SalesLineDetailsJsonObject.AddProperty('externalLineId', EcomSalesLine."External Line ID");
             if EcomSalesLine."Parent Ext. Line ID" <> '' then
@@ -952,6 +964,87 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then
             SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
         SalesLineDetailsJsonObject.EndObject();
+    end;
+
+    local procedure AppendIssuedAssetsArray(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var TempEcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link" temporary; var TempEcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link" temporary; var TempEcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link" temporary; var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder")
+    var
+        WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+        TicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        CouponImpl: Codeunit "NPR EcomCreateCouponImpl";
+        MMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        TempWallet: Record "NPR AttractionWallet" temporary;
+        TempTicket: Record "NPR TM Ticket" temporary;
+        TempVoucher: Record "NPR NpRv Voucher" temporary;
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        TempMembership: Record "NPR MM Membership" temporary;
+    begin
+        SalesLineDetailsJsonObject.StartArray('issuedAssets');
+
+        if EcomSalesLine."Is Attraction Wallet" then begin
+            WalletMgt.BuildWalletTempBufferForLine(EcomSalesLine, TempWallet);
+            if TempWallet.FindSet() then
+                repeat
+                    SalesLineDetailsJsonObject.StartObject()
+                                              .AddProperty('id', Format(TempWallet.SystemId, 0, 4).ToLower())
+                                              .AddProperty('type', 'wallet')
+                                              .AddProperty('referenceNo', TempWallet.ReferenceNumber)
+                                              .EndObject();
+                until TempWallet.Next() = 0;
+        end;
+
+        case EcomSalesLine.Subtype of
+            EcomSalesLine.Subtype::Ticket:
+                begin
+                    TicketImpl.BuildTicketTempBufferForLine(EcomSalesLine, TempTicket);
+                    if TempTicket.FindSet() then
+                        repeat
+                            SalesLineDetailsJsonObject.StartObject()
+                                                      .AddProperty('id', Format(TempTicket.SystemId, 0, 4).ToLower())
+                                                      .AddProperty('type', 'ticket')
+                                                      .AddProperty('referenceNo', TempTicket."External Ticket No.")
+                                                      .EndObject();
+                        until TempTicket.Next() = 0;
+                end;
+            EcomSalesLine.Subtype::Voucher:
+                begin
+                    VchrImpl.BuildVoucherTempBufferForLine(EcomSalesHeader, EcomSalesLine, TempEcomSalesVoucherLink, TempVoucher);
+                    if TempVoucher.FindSet() then
+                        repeat
+                            SalesLineDetailsJsonObject.StartObject()
+                                                      .AddProperty('id', Format(TempVoucher.SystemId, 0, 4).ToLower())
+                                                      .AddProperty('type', 'voucher')
+                                                      .AddProperty('referenceNo', TempVoucher."Reference No.")
+                                                      .EndObject();
+                        until TempVoucher.Next() = 0;
+                end;
+            EcomSalesLine.Subtype::Coupon:
+                begin
+                    CouponImpl.BuildCouponTempBufferForLine(EcomSalesLine, TempEcomSalesCouponLink, TempCoupon);
+                    if TempCoupon.FindSet() then
+                        repeat
+                            SalesLineDetailsJsonObject.StartObject()
+                                                      .AddProperty('id', Format(TempCoupon.SystemId, 0, 4).ToLower())
+                                                      .AddProperty('type', 'coupon')
+                                                      .AddProperty('referenceNo', TempCoupon."Reference No.")
+                                                      .EndObject();
+                        until TempCoupon.Next() = 0;
+                end;
+            EcomSalesLine.Subtype::Membership:
+                begin
+                    MMShipImpl.BuildMembershipTempBufferForLine(EcomSalesHeader, EcomSalesLine, TempEcomSalesMembershipLink, TempMembership);
+                    if TempMembership.FindSet() then
+                        repeat
+                            SalesLineDetailsJsonObject.StartObject()
+                                                      .AddProperty('id', Format(TempMembership.SystemId, 0, 4).ToLower())
+                                                      .AddProperty('type', 'membership')
+                                                      .AddProperty('referenceNo', TempMembership."External Membership No.")
+                                                      .EndObject();
+                        until TempMembership.Next() = 0;
+                end;
+        end;
+
+        SalesLineDetailsJsonObject.EndArray();
     end;
 
     local procedure GetPaymentMethodTypeJsonValue(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line") PaymentMethodTypeJsonValue: Text

@@ -8,6 +8,9 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         _MemberModuleLib: Codeunit "NPR Library - Member Module";
         _LibEcommerce: Codeunit "NPR Library Ecommerce";
         _MemberApiLib: Codeunit "NPR Library - Member XML API";
+        _LibPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        _LibCoupon: Codeunit "NPR Library Coupon";
+        _LibInventory: Codeunit "NPR Library - Inventory";
         _Assert: Codeunit Assert;
 
     [Test]
@@ -1293,6 +1296,247 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
     procedure ConfirmYesHandler(Question: Text[1024]; var Reply: Boolean)
     begin
         Reply := true;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetSalesDocument_IssuedAssets_MembershipIdResolvesToRealMembership()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+        RootObject: JsonObject;
+        LineObject: JsonObject;
+        AssetObject: JsonObject;
+        LinesArray: JsonArray;
+        AssetsArray: JsonArray;
+        JToken: JsonToken;
+        LineToken: JsonToken;
+        AssetToken: JsonToken;
+        AssetId: Guid;
+        AssetCount: Integer;
+    begin
+        // [Scenario] A processed qty=1 create-membership line issues a membership + link row. The GET
+        // response must emit it under salesDocumentLines[].issuedAssets[], and the emitted id must
+        // round-trip: GetBySystemId resolves a real membership whose referenceNo matches its External
+        // Membership No. Guards the hoisted per-doc membership link buffer path end-to-end.
+        Initialize();
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedCreateMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM', 1, 100);
+        Commit();
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+
+        RootObject.ReadFrom(ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader).BuildAsText());
+
+        RootObject.Get('salesDocumentLines', JToken);
+        LinesArray := JToken.AsArray();
+        _Assert.AreEqual(1, LinesArray.Count(), 'Expected exactly one sales document line.');
+
+        LinesArray.Get(0, LineToken);
+        LineObject := LineToken.AsObject();
+        LineObject.Get('issuedAssets', JToken);
+        AssetsArray := JToken.AsArray();
+        _Assert.AreEqual(1, AssetsArray.Count(), 'Expected exactly one issued asset for the qty=1 membership line.');
+
+        foreach AssetToken in AssetsArray do begin
+            AssetObject := AssetToken.AsObject();
+
+            AssetObject.Get('type', JToken);
+            _Assert.AreEqual('membership', JToken.AsValue().AsText(), 'Issued asset type should be membership.');
+
+            AssetObject.Get('id', JToken);
+            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid.');
+
+            _Assert.IsTrue(Membership.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a real membership.');
+            AssetObject.Get('referenceNo', JToken);
+            _Assert.AreEqual(Membership."External Membership No.", JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved membership.');
+
+            AssetCount += 1;
+        end;
+        _Assert.AreEqual(1, AssetCount, 'Exactly one issued asset should have been asserted.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetSalesDocument_IssuedAssets_MixedTypes_EachLineResolvesToOwnAsset()
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        CouponType: Record "NPR NpDc Coupon Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        VoucherLine: Record "NPR Ecom Sales Line";
+        CouponLine: Record "NPR Ecom Sales Line";
+        MembershipLine: Record "NPR Ecom Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpDcCoupon: Record "NPR NpDc Coupon";
+        Membership: Record "NPR MM Membership";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        CouponImpl: Codeunit "NPR EcomCreateCouponImpl";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+        RootObject: JsonObject;
+        LineObject: JsonObject;
+        AssetObject: JsonObject;
+        LinesArray: JsonArray;
+        AssetsArray: JsonArray;
+        JToken: JsonToken;
+        LineToken: JsonToken;
+        VoucherLineId: Text;
+        CouponLineId: Text;
+        MembershipLineId: Text;
+        LineIdText: Text;
+        AssetType: Text;
+        AssetId: Guid;
+        AssetsSeen: Integer;
+    begin
+        // [Scenario] One document carries a voucher line, a coupon line, and a membership line. After each is
+        // processed, the GET response must group issued assets correctly per line: the voucher line exposes
+        // only its voucher, the coupon line only its coupon, the membership line only its membership — each
+        // resolvable via GetBySystemId. This is the integration guard for the hoist: the three doc-wide link
+        // buffers are loaded once and filtered in memory per line; a grouping bug would cross-wire assets.
+        Initialize();
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        CreateCapturedVoucherLine(VoucherLine, EcomSalesHeader, VoucherType.Code, 1, 100);
+        CreateCapturedCouponLine(CouponLine, EcomSalesHeader, CreateEcomCouponType(CouponType), 1, 100);
+        CreateCapturedCreateMembershipLine(MembershipLine, EcomSalesHeader, 'T-ECOM-ITEM', 1, 100);
+        Commit();
+
+        VchrImpl.Process(VoucherLine);
+        CouponImpl.Process(CouponLine);
+        EcomCreateMMShipImpl.Process(MembershipLine);
+
+        VoucherLineId := Format(VoucherLine.SystemId, 0, 4).ToLower();
+        CouponLineId := Format(CouponLine.SystemId, 0, 4).ToLower();
+        MembershipLineId := Format(MembershipLine.SystemId, 0, 4).ToLower();
+
+        RootObject.ReadFrom(ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader).BuildAsText());
+        RootObject.Get('salesDocumentLines', JToken);
+        LinesArray := JToken.AsArray();
+        _Assert.AreEqual(3, LinesArray.Count(), 'Expected exactly three sales document lines.');
+
+        foreach LineToken in LinesArray do begin
+            LineObject := LineToken.AsObject();
+            LineObject.Get('id', JToken);
+            LineIdText := JToken.AsValue().AsText();
+            LineObject.Get('issuedAssets', JToken);
+            AssetsArray := JToken.AsArray();
+            _Assert.AreEqual(1, AssetsArray.Count(), StrSubstNo('Each asset-issuing line must expose exactly one issued asset. Line %1', LineIdText));
+
+            AssetsArray.Get(0, JToken);
+            AssetObject := JToken.AsObject();
+            AssetObject.Get('type', JToken);
+            AssetType := JToken.AsValue().AsText();
+            AssetObject.Get('id', JToken);
+            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid.');
+
+            if LineIdText = VoucherLineId then begin
+                _Assert.AreEqual('voucher', AssetType, 'Voucher line must expose a voucher asset.');
+                _Assert.IsTrue(NpRvVoucher.GetBySystemId(AssetId), 'Voucher issuedAssets id must resolve to a real voucher.');
+            end else
+                if LineIdText = CouponLineId then begin
+                    _Assert.AreEqual('coupon', AssetType, 'Coupon line must expose a coupon asset.');
+                    _Assert.IsTrue(NpDcCoupon.GetBySystemId(AssetId), 'Coupon issuedAssets id must resolve to a real coupon.');
+                end else
+                    if LineIdText = MembershipLineId then begin
+                        _Assert.AreEqual('membership', AssetType, 'Membership line must expose a membership asset.');
+                        _Assert.IsTrue(Membership.GetBySystemId(AssetId), 'Membership issuedAssets id must resolve to a real membership.');
+                    end else
+                        Error('Unexpected sales document line id in response: %1', LineIdText);
+
+            AssetsSeen += 1;
+        end;
+        _Assert.AreEqual(3, AssetsSeen, 'All three lines must have been asserted.');
+    end;
+
+    local procedure CreateCapturedVoucherLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherTypeCode: Code[20]; Qty: Decimal; UnitPrice: Decimal)
+    begin
+        EcomSalesLine.Init();
+        EcomSalesLine."Document Entry No." := EcomSalesHeader."Entry No.";
+        EcomSalesLine."Document Type" := EcomSalesHeader."Document Type";
+        EcomSalesLine."External Document No." := CopyStr(EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesLine."External Document No."));
+        EcomSalesLine."Line No." := GetNextLineNo(EcomSalesHeader);
+        EcomSalesLine.Type := EcomSalesLine.Type::Voucher;
+        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Voucher;
+        EcomSalesLine."Voucher Type" := VoucherTypeCode;
+        EcomSalesLine.Quantity := Qty;
+        EcomSalesLine."Unit Price" := UnitPrice;
+        EcomSalesLine."Line Amount" := Qty * UnitPrice;
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Insert(true);
+    end;
+
+    local procedure CreateCapturedCouponLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20]; Qty: Decimal; UnitPrice: Decimal)
+    begin
+        EcomSalesLine.Init();
+        EcomSalesLine."Document Entry No." := EcomSalesHeader."Entry No.";
+        EcomSalesLine."Document Type" := EcomSalesHeader."Document Type";
+        EcomSalesLine."External Document No." := CopyStr(EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesLine."External Document No."));
+        EcomSalesLine."Line No." := GetNextLineNo(EcomSalesHeader);
+        EcomSalesLine.Type := EcomSalesLine.Type::Item;
+        EcomSalesLine.Subtype := EcomSalesLine.Subtype::Coupon;
+#pragma warning disable AA0139
+        EcomSalesLine."No." := ItemNo;
+#pragma warning restore
+        EcomSalesLine.Quantity := Qty;
+        EcomSalesLine."Unit Price" := UnitPrice;
+        EcomSalesLine."Line Amount" := Qty * UnitPrice;
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Insert(true);
+    end;
+
+    /// <summary>
+    /// Creates a coupon type with the ON-ECOM-SALE issue module + an item linked to it via
+    /// NPR NpDc Iss.OnEcomSale S.Line, mirroring the setup in the dedicated coupon test codeunit.
+    /// Returns the item no. to use as EcomSalesLine."No." for a coupon line.
+    /// </summary>
+    local procedure CreateEcomCouponType(var CouponType: Record "NPR NpDc Coupon Type"): Code[20]
+    var
+        CouponModule: Record "NPR NpDc Coupon Module";
+        OnEcomSaleCouponModule: Codeunit "NPR OnEcomSaleCouponModule";
+    begin
+        _LibCoupon.CreateCouponSetup();
+
+        if not CouponModule.Get(CouponModule.Type::"Issue Coupon", OnEcomSaleCouponModule.ModuleCode()) then begin
+            CouponModule.Init();
+            CouponModule.Type := CouponModule.Type::"Issue Coupon";
+            CouponModule.Code := OnEcomSaleCouponModule.ModuleCode();
+            CouponModule.Description := 'Issue Coupon - Ecommerce Sale';
+            CouponModule.Insert();
+        end;
+
+        _LibCoupon.CreateDiscountAmountCouponType('ECOM-COUPON', CouponType, 10);
+        CouponType."Issue Coupon Module" := OnEcomSaleCouponModule.ModuleCode();
+        CouponType.Modify();
+
+        exit(CreateCouponItemSetup(CouponType.Code));
+    end;
+
+    local procedure CreateCouponItemSetup(CouponTypeCode: Code[20]) ItemNo: Code[20]
+    var
+        EcomSalesCouponSetupLine: Record "NPR NpDc Iss.OnEcomSale S.Line";
+    begin
+        ItemNo := _LibInventory.CreateItemNo();
+
+        EcomSalesCouponSetupLine.SetRange(Type, EcomSalesCouponSetupLine.Type::Item);
+        EcomSalesCouponSetupLine.SetRange("No.", ItemNo);
+        EcomSalesCouponSetupLine.SetRange("Variant Code", '');
+        EcomSalesCouponSetupLine.SetRange("Coupon Type", CouponTypeCode);
+        if EcomSalesCouponSetupLine.IsEmpty() then begin
+            EcomSalesCouponSetupLine.Reset();
+            EcomSalesCouponSetupLine.SetRange("Coupon Type", CouponTypeCode);
+            if not EcomSalesCouponSetupLine.FindLast() then
+                EcomSalesCouponSetupLine."Line No." := 0;
+
+            EcomSalesCouponSetupLine.Init();
+            EcomSalesCouponSetupLine."Coupon Type" := CouponTypeCode;
+            EcomSalesCouponSetupLine."Line No." += 10000;
+            EcomSalesCouponSetupLine.Type := EcomSalesCouponSetupLine.Type::Item;
+            EcomSalesCouponSetupLine."No." := ItemNo;
+            EcomSalesCouponSetupLine.Insert();
+        end;
     end;
 
     local procedure CreateCapturedCreateMembershipLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20]; Qty: Decimal; UnitPrice: Decimal)

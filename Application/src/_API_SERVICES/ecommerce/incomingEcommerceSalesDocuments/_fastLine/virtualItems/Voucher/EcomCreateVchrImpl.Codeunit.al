@@ -498,12 +498,43 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         BuildVoucherTempBuffer(EcomSalesHeader, EcomSalesLine.SystemId, TempVoucher);
     end;
 
+    internal procedure LoadDocVoucherLinks(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempEcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link" temporary)
+    var
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+    begin
+        TempEcomSalesVoucherLink.Reset();
+        if not TempEcomSalesVoucherLink.IsEmpty() then
+            TempEcomSalesVoucherLink.DeleteAll();
+
+        EcomSalesVoucherLink.SetCurrentKey("Source System Id", "Source Line System Id");
+        EcomSalesVoucherLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        if EcomSalesVoucherLink.FindSet() then
+            repeat
+                TempEcomSalesVoucherLink := EcomSalesVoucherLink;
+                if TempEcomSalesVoucherLink.Insert() then;
+            until EcomSalesVoucherLink.Next() = 0;
+    end;
+
+    internal procedure BuildVoucherTempBufferForLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var TempEcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link" temporary; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        HasLinkRows: Boolean;
+    begin
+        TempEcomSalesVoucherLink.Reset();
+        TempEcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        if TempEcomSalesVoucherLink.FindSet() then
+            repeat
+                HasLinkRows := true;
+                ResolveVoucherLink(TempEcomSalesVoucherLink, TempVoucher);
+            until TempEcomSalesVoucherLink.Next() = 0;
+        TempEcomSalesVoucherLink.Reset();
+
+        if not HasLinkRows then
+            BuildVoucherTempBufferFallback(EcomSalesHeader, EcomSalesLine.SystemId, TempVoucher);
+    end;
+
     local procedure BuildVoucherTempBuffer(EcomSalesHeader: Record "NPR Ecom Sales Header"; SourceLineSystemIdFilter: Guid; var TempVoucher: Record "NPR NpRv Voucher" temporary)
     var
         EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
-        EcomSalesLine: Record "NPR Ecom Sales Line";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
     begin
         EcomSalesVoucherLink.SetCurrentKey("Source System Id", "Source Line System Id");
         EcomSalesVoucherLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
@@ -512,20 +543,37 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
         if EcomSalesVoucherLink.FindSet() then begin
             repeat
-                case EcomSalesVoucherLink."Voucher State" of
-                    EcomSalesVoucherLink."Voucher State"::Active:
-                        if NpRvVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then begin
-                            TempVoucher := NpRvVoucher;
-                            if TempVoucher.Insert() then;
-                        end;
-                    EcomSalesVoucherLink."Voucher State"::Archived:
-                        if NpRvArchVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then
-                            InsertArchivedAsTempVoucher(NpRvArchVoucher, TempVoucher);
-                end;
+                ResolveVoucherLink(EcomSalesVoucherLink, TempVoucher);
             until EcomSalesVoucherLink.Next() = 0;
             exit;
         end;
 
+        BuildVoucherTempBufferFallback(EcomSalesHeader, SourceLineSystemIdFilter, TempVoucher);
+    end;
+
+    local procedure ResolveVoucherLink(var EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+    begin
+        case EcomSalesVoucherLink."Voucher State" of
+            EcomSalesVoucherLink."Voucher State"::Active:
+                if NpRvVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then begin
+                    TempVoucher := NpRvVoucher;
+                    if TempVoucher.Insert() then;
+                end;
+            EcomSalesVoucherLink."Voucher State"::Archived:
+                if NpRvArchVoucher.GetBySystemId(EcomSalesVoucherLink."Voucher System Id") then
+                    InsertArchivedAsTempVoucher(NpRvArchVoucher, TempVoucher);
+        end;
+    end;
+
+    local procedure BuildVoucherTempBufferFallback(EcomSalesHeader: Record "NPR Ecom Sales Header"; SourceLineSystemIdFilter: Guid; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+    begin
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Voucher);
         EcomSalesLine.SetRange("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::Processed);

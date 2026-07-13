@@ -829,12 +829,43 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         BuildMembershipTempBuffer(EcomSalesHeader, EcomSalesLine.SystemId, TempMembership);
     end;
 
+    internal procedure LoadDocMembershipLinks(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempEcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link" temporary)
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+    begin
+        TempEcomSalesMembershipLink.Reset();
+        if not TempEcomSalesMembershipLink.IsEmpty() then
+            TempEcomSalesMembershipLink.DeleteAll();
+
+        EcomSalesMembershipLink.SetCurrentKey("Source System Id", "Source Line System Id");
+        EcomSalesMembershipLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        if EcomSalesMembershipLink.FindSet() then
+            repeat
+                TempEcomSalesMembershipLink := EcomSalesMembershipLink;
+                if TempEcomSalesMembershipLink.Insert() then;
+            until EcomSalesMembershipLink.Next() = 0;
+    end;
+
+    internal procedure BuildMembershipTempBufferForLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var TempEcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link" temporary; var TempMembership: Record "NPR MM Membership" temporary)
+    var
+        HasLinkRows: Boolean;
+    begin
+        TempEcomSalesMembershipLink.Reset();
+        TempEcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        if TempEcomSalesMembershipLink.FindSet() then
+            repeat
+                HasLinkRows := true;
+                ResolveMembershipLink(TempEcomSalesMembershipLink, TempMembership);
+            until TempEcomSalesMembershipLink.Next() = 0;
+        TempEcomSalesMembershipLink.Reset();
+
+        if not HasLinkRows then
+            BuildMembershipTempBufferFallback(EcomSalesHeader, EcomSalesLine.SystemId, TempMembership);
+    end;
+
     local procedure BuildMembershipTempBuffer(EcomSalesHeader: Record "NPR Ecom Sales Header"; SourceLineSystemIdFilter: Guid; var TempMembership: Record "NPR MM Membership" temporary)
     var
         EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
-        EcomSalesLine: Record "NPR Ecom Sales Line";
-        Membership: Record "NPR MM Membership";
-        EmptyGuid: Guid;
     begin
         EcomSalesMembershipLink.SetCurrentKey("Source System Id", "Source Line System Id");
         EcomSalesMembershipLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
@@ -843,14 +874,30 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         if EcomSalesMembershipLink.FindSet() then begin
             repeat
-                if Membership.GetBySystemId(EcomSalesMembershipLink."Membership System Id") then begin
-                    TempMembership := Membership;
-                    if TempMembership.Insert() then;
-                end;
+                ResolveMembershipLink(EcomSalesMembershipLink, TempMembership);
             until EcomSalesMembershipLink.Next() = 0;
             exit;
         end;
 
+        BuildMembershipTempBufferFallback(EcomSalesHeader, SourceLineSystemIdFilter, TempMembership);
+    end;
+
+    local procedure ResolveMembershipLink(var EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link"; var TempMembership: Record "NPR MM Membership" temporary)
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        if Membership.GetBySystemId(EcomSalesMembershipLink."Membership System Id") then begin
+            TempMembership := Membership;
+            if TempMembership.Insert() then;
+        end;
+    end;
+
+    local procedure BuildMembershipTempBufferFallback(EcomSalesHeader: Record "NPR Ecom Sales Header"; SourceLineSystemIdFilter: Guid; var TempMembership: Record "NPR MM Membership" temporary)
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        EmptyGuid: Guid;
+    begin
         // Fallback for docs without link rows — resolve via the line's Membership Id.
         EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Membership);

@@ -127,10 +127,37 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
         BuildCouponTempBuffer(EcomSalesHeader, EcomSalesLine.SystemId, TempCoupon);
     end;
 
+    internal procedure LoadDocCouponLinks(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempEcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link" temporary)
+    var
+        EcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link";
+    begin
+        TempEcomSalesCouponLink.Reset();
+        if not TempEcomSalesCouponLink.IsEmpty() then
+            TempEcomSalesCouponLink.DeleteAll();
+
+        EcomSalesCouponLink.SetRange("Source", EcomSalesCouponLink.Source::"Ecom Sales Document");
+        EcomSalesCouponLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        if EcomSalesCouponLink.FindSet() then
+            repeat
+                TempEcomSalesCouponLink := EcomSalesCouponLink;
+                if TempEcomSalesCouponLink.Insert() then;
+            until EcomSalesCouponLink.Next() = 0;
+    end;
+
+    internal procedure BuildCouponTempBufferForLine(EcomSalesLine: Record "NPR Ecom Sales Line"; var TempEcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link" temporary; var TempCoupon: Record "NPR NpDc Coupon" temporary)
+    begin
+        TempEcomSalesCouponLink.Reset();
+        TempEcomSalesCouponLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        if TempEcomSalesCouponLink.FindSet() then
+            repeat
+                ResolveCouponLink(TempEcomSalesCouponLink, TempCoupon);
+            until TempEcomSalesCouponLink.Next() = 0;
+        TempEcomSalesCouponLink.Reset();
+    end;
+
     local procedure BuildCouponTempBuffer(EcomSalesHeader: Record "NPR Ecom Sales Header"; SourceLineSystemIdFilter: Guid; var TempCoupon: Record "NPR NpDc Coupon" temporary)
     var
         EcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link";
-        NpDcCoupon: Record "NPR NpDc Coupon";
     begin
         EcomSalesCouponLink.SetRange("Source", EcomSalesCouponLink.Source::"Ecom Sales Document");
         EcomSalesCouponLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
@@ -138,12 +165,19 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
             EcomSalesCouponLink.SetRange("Source Line System Id", SourceLineSystemIdFilter);
         if EcomSalesCouponLink.FindSet() then
             repeat
-                if NpDcCoupon.GetBySystemId(EcomSalesCouponLink."Coupon System Id") then begin
-                    TempCoupon := NpDcCoupon;
-                    TempCoupon.SystemId := NpDcCoupon.SystemId;
-                    if TempCoupon.Insert(false, true) then;
-                end;
+                ResolveCouponLink(EcomSalesCouponLink, TempCoupon);
             until EcomSalesCouponLink.Next() = 0;
+    end;
+
+    local procedure ResolveCouponLink(var EcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link"; var TempCoupon: Record "NPR NpDc Coupon" temporary)
+    var
+        NpDcCoupon: Record "NPR NpDc Coupon";
+    begin
+        if NpDcCoupon.GetBySystemId(EcomSalesCouponLink."Coupon System Id") then begin
+            TempCoupon := NpDcCoupon;
+            TempCoupon.SystemId := NpDcCoupon.SystemId;
+            if TempCoupon.Insert(false, true) then;
+        end;
     end;
 
     internal procedure OpenCouponCardForSystemId(SystemIdParam: Guid)
