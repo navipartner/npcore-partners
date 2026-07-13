@@ -103,6 +103,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         DataLogRecord: Record "NPR Data Log Record";
         DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
+        RecRef: RecordRef;
         TimeStamp: DateTime;
     begin
         if DataLogSetup."Table ID" <> 0 then
@@ -121,18 +122,77 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         end;
 
         DataLogProcessingEntry.SetFilter(SystemCreatedAt, '<%1', TimeStamp);
-        if not DataLogProcessingEntry.IsEmpty() then
-            DataLogProcessingEntry.DeleteAll();
+        if not DataLogProcessingEntry.IsEmpty() then begin
+            RecRef.GetTable(DataLogProcessingEntry);
+            BatchDeleteExpiredRecords(RecRef);
+            RecRef.Close();
+        end;
 
         DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
-        if not DataLogField.IsEmpty() then
-            DataLogField.DeleteAll();
+        if not DataLogField.IsEmpty() then begin
+            RecRef.GetTable(DataLogField);
+            BatchDeleteExpiredRecords(RecRef);
+            RecRef.Close();
+        end;
 
         DataLogRecord.SetFilter(SystemCreatedAt, '<%1', TimeStamp);
-        if not DataLogRecord.IsEmpty() then
-            DataLogRecord.DeleteAll();
+        if not DataLogRecord.IsEmpty() then begin
+            RecRef.GetTable(DataLogRecord);
+            BatchDeleteExpiredRecords(RecRef);
+            RecRef.Close();
+        end;
 
         Commit();
+    end;
+
+    local procedure BatchDeleteExpiredRecords(var RecRef: RecordRef)
+    var
+        BatchRecRef: RecordRef;
+        EntryNoFieldRef: FieldRef;
+        BaseView: Text;
+        BoundaryEntryNo: BigInteger;
+        StepsMoved: Integer;
+    begin
+        // Delete in small, separately-committed batches to avoid a single bulk DeleteAll escalating to a table
+        // lock that blocks concurrent inserters (e.g. Shopify order processing) for the length of the transaction.
+        //
+        // Preconditions (met by the three log tables this is called for - "NPR Data Log Field",
+        // "NPR Data Log Record" and "NPR Data Log Processing Entry"):
+        //   1. Field 1 is a unique, ascending key ("Entry No."). This is NOT true for the other tables in this
+        //      module (field 1 is "Table ID" in the Data Log Setup tables and "Code" in the subscriber table),
+        //      so do not reuse this helper for those without revisiting the boundary logic below.
+        //   2. The incoming view is sorted by field 1 ascending. This is the default primary-key sort, so the
+        //      call sites must NOT SetCurrentKey - do not "optimize" them onto the Retention/Retention2 (Log Date /
+        //      SystemCreatedAt) keys, or the boundary "Entry No." stops being the BatchSize-th smallest and a single
+        //      "<=" batch can match far more than BatchSize rows, reintroducing the lock escalation this avoids.
+        // Given those, paging by "Entry No." keeps each batch exactly BatchSize rows regardless of how many
+        // records share the same timestamp.
+        BatchRecRef.Open(RecRef.Number());
+        BatchRecRef.SetView(RecRef.GetView());
+        BaseView := BatchRecRef.GetView();
+        EntryNoFieldRef := BatchRecRef.Field(1);
+
+        repeat
+            BatchRecRef.SetView(BaseView);
+            if not BatchRecRef.FindSet() then
+                exit;
+
+            StepsMoved := BatchRecRef.Next(BatchSize() - 1);
+            if StepsMoved = BatchSize() - 1 then begin
+                BoundaryEntryNo := EntryNoFieldRef.Value;
+                EntryNoFieldRef.SetFilter('<=%1', BoundaryEntryNo);
+            end;
+
+            BatchRecRef.DeleteAll();
+            Commit();
+        until StepsMoved < BatchSize() - 1;
+
+        BatchRecRef.Close();
+    end;
+
+    internal procedure BatchSize(): Integer
+    begin
+        exit(1000);
     end;
 
     internal procedure GetNewRecords(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; var MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean

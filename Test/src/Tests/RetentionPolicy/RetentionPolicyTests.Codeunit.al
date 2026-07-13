@@ -240,6 +240,101 @@ codeunit 85241 "NPR Retention Policy Tests"
 
     [Test]
     [TestPermissions(TestPermissions::InheritFromTestCodeunit)]
+    procedure DataLogRetentionPolicyDeletesAcrossMultipleBatches()
+    // [SCENARIO] Data Log retention drains the whole expired backlog even when it spans several delete batches, while preserving another table's non-expired entries
+    var
+        DataLogField: Record "NPR Data Log Field";
+        RetentionPolicy: Record "NPR Retention Policy";
+        DataLogSubMgt: Codeunit "NPR Data Log Sub. Mgt.";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
+        ExpiringTableID: Integer;
+        NonExpiringTableID: Integer;
+        ExpiredEntryCount: Integer;
+        i: Integer;
+    begin
+        // [GIVEN] Default Retention Policy for table "NPR Data Log Record"
+        Initialize();
+        InitializeDataLogData();
+        RetentionPolicy.DeleteAll();
+        RetentionPolicy.Init();
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Data Log Record";
+        RetentionPolicy.Insert();
+
+        // [GIVEN] An expiring table (40 day retention) and a non-expiring table (50 day retention)
+        ExpiringTableID := Database::Customer;
+        CreateDataLogSetup(ExpiringTableID, JobQueueManagement.DaysToDuration(40));
+        NonExpiringTableID := Database::Vendor;
+        CreateDataLogSetup(NonExpiringTableID, JobQueueManagement.DaysToDuration(50));
+
+        // [GIVEN] More expired entries than one batch (derived from BatchSize() so it stays multi-batch if retuned),
+        // plus a non-expiring guard row at the lowest Entry No. 1 - inside the first batch window, so the
+        // preservation assertion also catches a table-filter regression in the boundary-filtered branch. Expiring
+        // entries start at 2 because "Entry No." is the whole primary key and must not collide with the guard's 1.
+        ExpiredEntryCount := DataLogSubMgt.BatchSize() * 5 div 2;  // 2.5 batches
+        InsertDataLogField(NonExpiringTableID, 1);
+        for i := 1 to ExpiredEntryCount do
+            InsertDataLogField(ExpiringTableID, i + 1);
+
+        // [WHEN] Retention Policy is applied after 45 days
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
+        IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(45));
+
+        // [THEN] The entire expired backlog is deleted across all delete batches
+        DataLogField.SetRange("Table ID", ExpiringTableID);
+        Assert.IsTrue(DataLogField.IsEmpty(), 'All expired Data Log Field entries should be deleted, even when spanning multiple delete batches.');
+
+        // [THEN] Non-expired entries of another table are preserved
+        DataLogField.SetRange("Table ID", NonExpiringTableID);
+        Assert.IsTrue(not DataLogField.IsEmpty(), 'Non-expired Data Log Field entries should be preserved.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::InheritFromTestCodeunit)]
+    procedure DataLogRetentionPolicyDeletesExactMultipleOfBatchSize()
+    // [SCENARIO] Data Log retention drains a backlog that is an exact multiple of the delete batch size, exercising the empty-FindSet loop exit
+    var
+        DataLogField: Record "NPR Data Log Field";
+        RetentionPolicy: Record "NPR Retention Policy";
+        DataLogSubMgt: Codeunit "NPR Data Log Sub. Mgt.";
+        IRetentionPolicy: Interface "NPR IRetention Policy V2";
+        EntryNoBase: BigInteger;
+        TableID: Integer;
+        ExpiredEntryCount: Integer;
+        i: Integer;
+    begin
+        // [GIVEN] Default Retention Policy for table "NPR Data Log Record"
+        Initialize();
+        InitializeDataLogData();
+        RetentionPolicy.DeleteAll();
+        RetentionPolicy.Init();
+        RetentionPolicy."Implementation V2" := RetentionPolicy."Implementation V2"::"NPR Data Log Record";
+        RetentionPolicy.Insert();
+
+        // [GIVEN] Data Log Setup for a specific table ID
+        TableID := Database::Customer;
+        CreateDataLogSetup(TableID, JobQueueManagement.DaysToDuration(40));
+
+        // [GIVEN] Exactly BatchSize expired entries, so the backlog is an exact multiple of the batch size and the
+        // loop exits via its empty-FindSet branch (the partial-final-batch path is covered by the multi-batch test).
+        // Entry No. values are seeded above 2^31 so the BigInteger boundary path is exercised at production
+        // magnitudes - a boundary narrowed to Integer would pass small-value tests but fail mid-run in production.
+        EntryNoBase := 2000000000; // < 2^31 (fits an Integer literal)...
+        EntryNoBase += EntryNoBase; // ...doubled to 4,000,000,000 in BigInteger arithmetic
+        ExpiredEntryCount := DataLogSubMgt.BatchSize();
+        for i := 1 to ExpiredEntryCount do
+            InsertDataLogField(TableID, EntryNoBase + i);
+
+        // [WHEN] Retention Policy is applied after 45 days
+        IRetentionPolicy := RetentionPolicy."Implementation V2";
+        IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime() + JobQueueManagement.DaysToDuration(45));
+
+        // [THEN] The entire backlog is deleted
+        DataLogField.SetRange("Table ID", TableID);
+        Assert.IsTrue(DataLogField.IsEmpty(), 'All expired Data Log Field entries should be deleted when the backlog is an exact multiple of the batch size.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::InheritFromTestCodeunit)]
     procedure ExceedingDataLogRetentionPolicy()
     // [SCENARIO] Application of Data Log Record retention policy on both table-specific and orphaned data log entries exceeding 90 day retention period
     var
