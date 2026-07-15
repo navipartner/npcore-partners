@@ -280,7 +280,11 @@
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
         POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        LineSpan: Codeunit "NPR Sentry Span";
+        StepSpan: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(LineSpan, 'bc.pos.endsale.create-entry.create-lines.sales-line');
         POSEntrySalesLine.Reset();
         POSEntrySalesLine."POS Entry No." := POSEntry."Entry No.";
         POSEntrySalesLine."Line No." := POSSaleLine."Line No.";
@@ -438,11 +442,26 @@
         end;
         POSEntrySalesLine."POS Sale Line Created At" := POSSaleLine."Created At";
         POSEntrySalesLine."Return Sale Sales Ticket No." := POSSaleLine."Return Sale Sales Ticket No.";
+
+        Sentry.StartSpan(StepSpan, 'bc.pos.endsale.create-entry.create-lines.sales-line.subscribers-before');
         OnBeforeInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
+        StepSpan.Finish();
+
+        Sentry.StartSpan(StepSpan, 'bc.pos.endsale.create-entry.create-lines.sales-line.insert');
         POSEntrySalesLine.Insert(false, true);
-        if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::Comment then
+        StepSpan.Finish();
+
+        if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::Comment then begin
+            Sentry.StartSpan(StepSpan, 'bc.pos.endsale.create-entry.create-lines.sales-line.add-ons');
             ManageAddOns(POSSaleLine, POSEntrySalesLine);
+            StepSpan.Finish();
+        end;
+
+        Sentry.StartSpan(StepSpan, 'bc.pos.endsale.create-entry.create-lines.sales-line.subscribers-after');
         OnAfterInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
+        StepSpan.Finish();
+
+        LineSpan.Finish();
     end;
 
     local procedure InsertBufferPOSSaleLine(POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry")
@@ -765,7 +784,11 @@
     local procedure InsertPOSPaymentLine(POSSale: Record "NPR POS Sale"; POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSEntryPaymentLine: Record "NPR POS Entry Payment Line")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
+        Sentry: Codeunit "NPR Sentry";
+        LineSpan: Codeunit "NPR Sentry Span";
+        StepSpan: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(LineSpan, 'bc.pos.endsale.create-entry.create-lines.payment-line');
         POSEntryPaymentLine.Init();
         POSEntryPaymentLine."POS Entry No." := POSEntry."Entry No.";
         POSEntryPaymentLine."POS Period Register No." := POSEntry."POS Period Register No.";
@@ -832,10 +855,19 @@
         POSEntryPaymentLine."POS Payment Line Created At" := POSSaleLine."Created At";
         CreatePaymentLineBinEntry(POSEntryPaymentLine);
 
+        Sentry.StartSpan(StepSpan, 'bc.pos.endsale.create-entry.create-lines.payment-line.subscribers-before');
         OnBeforeInsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
+        StepSpan.Finish();
 
+        Sentry.StartSpan(StepSpan, 'bc.pos.endsale.create-entry.create-lines.payment-line.insert');
         POSEntryPaymentLine.Insert(false, true);
+        StepSpan.Finish();
+
+        Sentry.StartSpan(StepSpan, 'bc.pos.endsale.create-entry.create-lines.payment-line.subscribers-after');
         OnAfterInsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
+        StepSpan.Finish();
+
+        LineSpan.Finish();
     end;
 
     local procedure InsertPOSBalancingLine(PaymentBinEntryNo: Integer; POSEntry: Record "NPR POS Entry"; LineNo: Integer; IsBinTransfer: Boolean)
@@ -1985,15 +2017,23 @@
     local procedure InsertPOSTaxAmount(SystemId: Guid; POSEntry: Record "NPR POS Entry")
     var
         POSEntryTaxCalc: Codeunit "NPR POS Entry Tax Calc.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.create-lines.tax-calc');
         POSEntryTaxCalc.PostPOSTaxAmountCalculation(POSEntry."Entry No.", SystemId);
+        Span.Finish();
     end;
 
     local procedure InsertPOSTaxAmountReverseSign(SystemId: Guid; POSEntry: Record "NPR POS Entry")
     var
         POSEntryTaxCalc: Codeunit "NPR POS Entry Tax Calc.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.pos.endsale.create-entry.create-lines.tax-calc');
         POSEntryTaxCalc.PostPOSTaxAmountCalculationReverseSign(POSEntry."Entry No.", SystemId);
+        Span.Finish();
     end;
 
     internal procedure GetCreatedPOSEntry(var POSEntryOut: Record "NPR POS Entry")
