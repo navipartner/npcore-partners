@@ -386,7 +386,6 @@ codeunit 6248540 "NPR Spfy Send Customers"
         LastSpacePosition: Integer;
     begin
         FullName := GetFullName(Customer.Name, Customer."Name 2");
-        FullName := FullName.Trim();
         LastSpacePosition := FullName.LastIndexOf(' ');
         if LastSpacePosition > 1 then begin
             SpfyStoreCustomerLink."First Name" := CopyStr(FullName.Substring(1, LastSpacePosition - 1), 1, MaxStrLen(SpfyStoreCustomerLink."First Name"));
@@ -397,14 +396,17 @@ codeunit 6248540 "NPR Spfy Send Customers"
         end;
     end;
 
-    internal procedure GetFullName(Name: Text; Name2: Text) FullName: Text
+    internal procedure GetFullName(Name: Text; Name2: Text): Text
+    var
+        FullName: Text;
     begin
         FullName := Name;
-        if Name2 = '' then
-            exit;
-        if Name2.StartsWith(Name2.Substring(1, 1).ToUpper()) then
-            FullName += ' ';
-        FullName += Name2;
+        if Name2 <> '' then begin
+            if Name2.StartsWith(Name2.Substring(1, 1).ToUpper()) then
+                FullName += ' ';
+            FullName += Name2;
+        end;
+        exit(FullName.Trim());
     end;
 
     internal procedure GetStoreCustomerLink(CustomerNo: Code[20]; ShopifyStoreCode: Code[20]; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")

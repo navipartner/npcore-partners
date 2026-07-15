@@ -243,6 +243,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
         VoucherJson: JsonObject;
+        RecipientPreferredName: Text;
         ShopifyBillToCustGID: Text;
         ShopifyShipToCustGID: Text;
         CreateQueryTok: Label 'mutation CreateGiftCard($input: GiftCardCreateInput!) {giftCardCreate(input: $input) {giftCard {id} userErrors {message field code}}}', Locked = true;
@@ -290,7 +291,9 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 RecipientAttributesJson.Add('id', ShopifyShipToCustGID);
                 if Voucher."Voucher Message" <> '' then
                     RecipientAttributesJson.Add('message', Voucher."Voucher Message");
-                RecipientAttributesJson.Add('preferredName', SpfySendCustomers.GetFullName(Customer.Name, Customer."Name 2"));
+                RecipientPreferredName := SpfySendCustomers.GetFullName(Customer.Name, Customer."Name 2");
+                if RecipientPreferredName <> '' then
+                    RecipientAttributesJson.Add('preferredName', RecipientPreferredName);
                 if Voucher."Spfy Send on" <> 0DT then
                     if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
                         RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
