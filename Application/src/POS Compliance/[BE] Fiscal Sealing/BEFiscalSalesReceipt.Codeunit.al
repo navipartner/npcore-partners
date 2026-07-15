@@ -53,9 +53,12 @@ codeunit 6248349 "NPR BE Fiscal Sales Receipt"
         QuantityLbl: Label 'Quantity';
         AmountLbl: Label 'Amount';
         LineDiscountLbl: Label 'Line Discount';
-        IncludingVATLbl: Label 'Including VAT';
         TotalLbl: Label 'Total';
-        SealNoLbl: Label 'Seal No.: %1', Comment = '%1 = Belgian fiscal seal number';
+        SealNoLbl: Label 'Seal No.: %1  (Ticket %2)', Comment = '%1 = Belgian fiscal seal number, %2 = per-terminal ticket counter';
+        VATReceiptHeadingLbl: Label 'VAT Receipt';
+        VATPctHeaderLbl: Label 'VAT %';
+        VATBaseHeaderLbl: Label 'Base';
+        VATAmountHeaderLbl: Label 'VAT';
     begin
         Printer.SetFont(A11FontLbl);
 
@@ -70,6 +73,11 @@ codeunit 6248349 "NPR BE Fiscal Sales Receipt"
             Printer.AddLine(ReceiptLogoLbl, 1);
             Printer.SetFont(A11FontLbl);
         end;
+
+        // VAT Receipt heading (Belgian VAT receipt content requirement) - printed in large letters
+        Printer.SetFont(B21FontLbl);
+        Printer.AddLine(VATReceiptHeadingLbl, 1);
+        Printer.SetFont(A11FontLbl);
 
         // POS Store information
         if POSStore.Get(POSEntry."POS Store Code") then begin
@@ -200,19 +208,23 @@ codeunit 6248349 "NPR BE Fiscal Sales Receipt"
         Printer.SetPadChar('-');
         Printer.AddLine('', 0);
 
-        // Tax lines
-        POSEntryTaxLine.SetLoadFields("VAT Identifier", "Tax Amount");
+        // VAT breakdown per rate (rate %, taxable base, VAT amount) - Belgian VAT receipt content requirement
+        POSEntryTaxLine.SetLoadFields("Tax %", "Tax Base Amount", "Tax Amount");
         POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSEntryTaxLine.FindSet() then
             repeat
-                if POSEntryTaxLine."Tax Amount" <> 0 then begin
-                    if POSEntryTaxLine."VAT Identifier" <> '' then
-                        Printer.AddTextField(1, 0, POSEntryTaxLine."VAT Identifier")
-                    else
-                        Printer.AddTextField(1, 0, IncludingVATLbl);
-                    Printer.AddTextField(2, 0, '');
+                if (POSEntryTaxLine."Tax Amount" <> 0) or (POSEntryTaxLine."Tax Base Amount" <> 0) then begin
+                    if not EntryTaxLineAdded then begin
+                        Printer.SetBold(true);
+                        Printer.AddTextField(1, 0, VATPctHeaderLbl);
+                        Printer.AddTextField(2, 0, VATBaseHeaderLbl);
+                        Printer.AddTextField(3, 2, VATAmountHeaderLbl);
+                        Printer.SetBold(false);
+                        EntryTaxLineAdded := true;
+                    end;
+                    Printer.AddTextField(1, 0, Format(POSEntryTaxLine."Tax %", 0, '<Precision,0:2><Standard Format,2>') + '%');
+                    Printer.AddTextField(2, 0, Format(POSEntryTaxLine."Tax Base Amount", 0, '<Precision,2:2><Standard Format,2>'));
                     Printer.AddTextField(3, 2, Format(POSEntryTaxLine."Tax Amount", 0, '<Precision,2:2><Standard Format,2>'));
-                    EntryTaxLineAdded := true;
                 end;
             until POSEntryTaxLine.Next() = 0;
 
@@ -277,7 +289,7 @@ codeunit 6248349 "NPR BE Fiscal Sales Receipt"
 
         // Belgian fiscal seal — printed if the POS Unit is on a BE audit profile and the seal has been recorded for this POS entry
         if BEPOSAuditLogAuxInfo.Get(POSEntry."Entry No.") then
-            Printer.AddLine(StrSubstNo(SealNoLbl, BEPOSAuditLogAuxInfo."Seal No."), 1);
+            Printer.AddLine(StrSubstNo(SealNoLbl, BEPOSAuditLogAuxInfo."Seal No.", BEPOSAuditLogAuxInfo."Seal Serial No."), 1);
 
         // Salesperson info
         if SalespersonPurchaser.Get(POSEntry."Salesperson Code") then
