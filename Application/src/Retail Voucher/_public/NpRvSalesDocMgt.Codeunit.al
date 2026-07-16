@@ -363,6 +363,7 @@
             MagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
             MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
             MagentoPaymentLine.SetFilter("Payment Type", '<>%1', MagentoPaymentLine."Payment Type"::Voucher);
+            MagentoPaymentLine.SetRange("Points Payment", false);
 
             if VoucherAmount >= TotalAmtInclVat then begin
                 if MagentoPaymentLine.FindSet() then

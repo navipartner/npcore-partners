@@ -372,6 +372,162 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
                 Membership."Remaining Points"));
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemVoucherExcludesPointsPaymentWhenAdjustingCardPayment()
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PaymentLine: Record "NPR Magento Payment Line";
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
+        LibrarySales: Codeunit "Library - Sales";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        ReleaseSalesDocument: Codeunit "Release Sales Document";
+        CardPaymentAmount: Decimal;
+        ItemAmount: Decimal;
+        PointsPaymentAmount: Decimal;
+        VoucherAmount: Decimal;
+        VoucherReferenceNo: Text[50];
+    begin
+        // [SCENARIO] Points already represented by a loyalty discount line must not reduce the adjusted card payment
+        Initialize();
+        ItemAmount := 1000;
+        PointsPaymentAmount := 300;
+        VoucherAmount := 200;
+        CardPaymentAmount := ItemAmount - PointsPaymentAmount - VoucherAmount;
+
+        // [GIVEN] A sales order whose total already includes the negative loyalty discount line
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        UpdateVATPostingSetup(SalesHeader);
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::"G/L Account", GLAccountNo, 1);
+        SalesLine.Validate("Unit Price", ItemAmount);
+        SalesLine.Modify(true);
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::"G/L Account", GLAccountNo, 1);
+        SalesLine.Validate("Unit Price", -PointsPaymentAmount);
+        SalesLine."NPR Loyalty Discount" := true;
+        SalesLine.Modify(true);
+
+        // [GIVEN] A points payment line and a card payment line for the order
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := Database::"Sales Header";
+        PaymentLine."Document Type" := SalesHeader."Document Type";
+        PaymentLine."Document No." := SalesHeader."No.";
+        PaymentLine."Line No." := 10000;
+        PaymentLine.Amount := PointsPaymentAmount;
+        PaymentLine."Requested Amount" := PointsPaymentAmount;
+        PaymentLine."Points Payment" := true;
+        PaymentLine.Insert(true);
+
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := Database::"Sales Header";
+        PaymentLine."Document Type" := SalesHeader."Document Type";
+        PaymentLine."Document No." := SalesHeader."No.";
+        PaymentLine."Line No." := 20000;
+        PaymentLine.Amount := CardPaymentAmount + VoucherAmount;
+        PaymentLine."Requested Amount" := CardPaymentAmount + VoucherAmount;
+        PaymentLine.Insert(true);
+
+        // [GIVEN] A voucher to redeem against the same order
+        VoucherReferenceNo := CopyStr(LibraryRandom.RandText(MaxStrLen(NpRvVoucher."Reference No.")), 1, MaxStrLen(NpRvVoucher."Reference No."));
+        NpRvVoucherMgt.IssueVoucher(_VoucherTypePartial.Code, VoucherReferenceNo, VoucherAmount);
+        NpRvVoucher.SetRange("Reference No.", VoucherReferenceNo);
+        NpRvVoucher.FindFirst();
+
+        // [WHEN] The voucher is redeemed and the order is released
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+        ReleaseSalesDocument.PerformManualRelease(SalesHeader);
+
+        // [THEN] Points are ignored because they have already reduced the order total through the loyalty discount line
+        PaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", 10000);
+        Assert.AreEqual(PointsPaymentAmount, PaymentLine.Amount, 'Points payment amount must remain unchanged.');
+        PaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", 20000);
+        Assert.AreEqual(CardPaymentAmount, PaymentLine.Amount, 'Points payment must not reduce the adjusted card payment amount.');
+
+        SalesHeader.CalcFields("Amount Including VAT");
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.CalcSums(Amount);
+        Assert.AreEqual(PointsPaymentAmount, PaymentLine.Amount - SalesHeader."Amount Including VAT", 'Difference between total payment lines and order amount must equal the points payment amount.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemFullAmountVoucherDoesNotZeroPointsPayment()
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PaymentLine: Record "NPR Magento Payment Line";
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
+        LibrarySales: Codeunit "Library - Sales";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        ReleaseSalesDocument: Codeunit "Release Sales Document";
+        ItemAmount: Decimal;
+        PointsPaymentAmount: Decimal;
+        VoucherAmount: Decimal;
+        VoucherReferenceNo: Text[50];
+    begin
+        // [SCENARIO] A voucher covering the order total must not zero the points payment line
+        Initialize();
+        ItemAmount := 1000;
+        PointsPaymentAmount := 300;
+        VoucherAmount := ItemAmount - PointsPaymentAmount;
+
+        // [GIVEN] A sales order whose total is fully covered by a voucher
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        UpdateVATPostingSetup(SalesHeader);
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::"G/L Account", GLAccountNo, 1);
+        SalesLine.Validate("Unit Price", ItemAmount);
+        SalesLine.Modify(true);
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::"G/L Account", GLAccountNo, 1);
+        SalesLine.Validate("Unit Price", -PointsPaymentAmount);
+        SalesLine."NPR Loyalty Discount" := true;
+        SalesLine.Modify(true);
+
+        // [GIVEN] A points payment line and another payment line for the order
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := Database::"Sales Header";
+        PaymentLine."Document Type" := SalesHeader."Document Type";
+        PaymentLine."Document No." := SalesHeader."No.";
+        PaymentLine."Line No." := 10000;
+        PaymentLine.Amount := PointsPaymentAmount;
+        PaymentLine."Requested Amount" := PointsPaymentAmount;
+        PaymentLine."Points Payment" := true;
+        PaymentLine.Insert(true);
+
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := Database::"Sales Header";
+        PaymentLine."Document Type" := SalesHeader."Document Type";
+        PaymentLine."Document No." := SalesHeader."No.";
+        PaymentLine."Line No." := 20000;
+        PaymentLine.Amount := VoucherAmount;
+        PaymentLine."Requested Amount" := VoucherAmount;
+        PaymentLine.Insert(true);
+
+        // [GIVEN] A voucher equal to the order total
+        VoucherReferenceNo := CopyStr(LibraryRandom.RandText(MaxStrLen(NpRvVoucher."Reference No.")), 1, MaxStrLen(NpRvVoucher."Reference No."));
+        NpRvVoucherMgt.IssueVoucher(_VoucherTypePartial.Code, VoucherReferenceNo, VoucherAmount);
+        NpRvVoucher.SetRange("Reference No.", VoucherReferenceNo);
+        NpRvVoucher.FindFirst();
+
+        // [WHEN] The voucher is applied and the order is released
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+        ReleaseSalesDocument.PerformManualRelease(SalesHeader);
+
+        // [THEN] The points payment remains unchanged while the other payment line is zeroed
+        PaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", 10000);
+        Assert.AreEqual(PointsPaymentAmount, PaymentLine.Amount, 'Points payment amount must remain unchanged.');
+        PaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", 20000);
+        Assert.AreEqual(0, PaymentLine.Amount, 'The other payment line must be zeroed when the voucher covers the order total.');
+    end;
+
     local procedure CreateEcomDocRestAPIandProcess(var SalesHeader: Record "Sales Header")
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -430,11 +586,28 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
 
     procedure Initialize()
     begin
+        EnableNewVoucherCalculationOnSalesOrderRelease();
         if not Initialized then begin
             PrepareDataForJson();
             CreateSetupData();
             Initialized := true;
         end;
+    end;
+
+    local procedure EnableNewVoucherCalculationOnSalesOrderRelease()
+    var
+        FeatureFlag: Record "NPR Feature Flag";
+        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
+    begin
+        if not FeatureFlag.Get(NewVoucherCalculationFeatureFlagToken) then begin
+            FeatureFlag.Name := NewVoucherCalculationFeatureFlagToken;
+            FeatureFlag.Value := Format(true);
+            FeatureFlag.Insert();
+            exit;
+        end;
+
+        FeatureFlag.Value := Format(true);
+        FeatureFlag.Modify();
     end;
 
     local procedure CreateSetupData()
