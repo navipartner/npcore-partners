@@ -64,6 +64,13 @@ table 6150921 "NPR MM Subscr. Payment Request"
             AutoFormatType = 1;
             AutoFormatExpression = "Currency Code";
         }
+        field(65; "Amount (LCY)"; Decimal)
+        {
+            Caption = 'Amount (LCY)';
+            DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            Editable = false;
+        }
         field(70; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
@@ -247,6 +254,41 @@ table 6150921 "NPR MM Subscr. Payment Request"
         key(Key6; "PSP Reference", PSP, Reconciled, Reversed) { }
         key(Key7; "Pay by Link ID", Status) { }
     }
+
+    trigger OnInsert()
+    begin
+        if "Amount (LCY)" = 0 then
+            UpdateAmountLCY(0D);
+    end;
+
+    internal procedure UpdateAmountLCY(ConversionDate: Date)
+    var
+        Sentry: Codeunit "NPR Sentry";
+    begin
+        if not TryCalcAmountLCY(ConversionDate) then begin
+            Sentry.AddLastErrorIfProgrammingBug(); // no-op for the missing-rate user-setup error; surfaces genuine bugs (overflow, /0)
+            Clear("Amount (LCY)");
+        end;
+    end;
+
+    [TryFunction]
+    local procedure TryCalcAmountLCY(ConversionDate: Date)
+    var
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        if "Currency Code" = '' then begin
+            "Amount (LCY)" := Amount;
+            exit;
+        end;
+        if ConversionDate = 0D then
+            ConversionDate := WorkDate();
+        Currency.InitRoundingPrecision();
+        "Amount (LCY)" := Round(
+            CurrencyExchangeRate.ExchangeAmtFCYToLCY(
+                ConversionDate, "Currency Code", Amount, CurrencyExchangeRate.ExchangeRate(ConversionDate, "Currency Code")),
+            Currency."Amount Rounding Precision");
+    end;
 
     internal procedure CheckSubscrPaymentRequestStatusCanBeChanged()
     var

@@ -152,7 +152,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";
         SubscrPaymentRequest."Masked PAN" := MemberPaymentMethod."Masked PAN";
         SubsPayReqUtils.TrySetPaymentContactFromUserAcc(SubscrPaymentRequest, MemberPaymentMethod);
-        SubscrPaymentRequest.Insert();
+        SubscrPaymentRequest.Insert(true);
     end;
 
     Internal procedure CreatePaymentMethodCollectionSubscPaymentRequest(Subscription: Record "NPR MM Subscription"; SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; PSP: Enum "NPR MM Subscription PSP"; AutoRenew: Boolean)
@@ -172,7 +172,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
         if not SubsPayReqUtils.TrySetPaymentContactFromPaymentMethod(Subscription, SubscrPaymentRequest) then
             SubsPayReqUtils.TrySetPaymentContactFromMember(Subscription, SubscrPaymentRequest);
-        SubscrPaymentRequest.Insert();
+        SubscrPaymentRequest.Insert(true);
     end;
 
     internal procedure GetBatchNo(): Integer

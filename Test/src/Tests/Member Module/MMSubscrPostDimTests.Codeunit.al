@@ -659,6 +659,78 @@ codeunit 85223 "NPR MM Subscr.Post.Dim.Tests"
         exit(PaymentAccountNo);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SubscrPaymentAmountLCYMatchesBookedGLEntry()
+    var
+        Membership: Record "NPR MM Membership";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        GLEntry: Record "G/L Entry";
+    begin
+        // [SCENARIO] Posting a captured subscription payment freezes "Amount (LCY)" to the LCY actually booked to the payment G/L entry
+        // [GIVEN] A posted renewal subscription request with a captured payment request
+        Initialize();
+        SetupAdyenPaymentGateway();
+        CreateMembershipWithSubscription(Membership);
+        CreateRenewalSubscriptionRequest(Membership, SubscriptionRequest);
+        PostSubscriptionRequest(SubscriptionRequest, Membership);
+        CreateCapturedPaymentRequest(SubscriptionRequest, SubscrPaymentRequest);
+
+        // [WHEN] Posting the payment request to the general ledger
+        PostPaymentRequest(SubscriptionRequest);
+
+        // [THEN] "Amount (LCY)" is frozen to the LCY booked to the payment G/L entry (the basis reconciliation later uses)
+        SubscrPaymentRequest.Get(SubscrPaymentRequest."Entry No.");
+        Assert.IsTrue(SubscrPaymentRequest.Posted, 'Payment request should be posted.');
+        GLEntry.Get(SubscrPaymentRequest."G/L Entry No.");
+        Assert.AreEqual(GLEntry.Amount, SubscrPaymentRequest."Amount (LCY)", 'Amount (LCY) should equal the LCY booked to the payment G/L entry.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SubscrPaymentAmountLCYForForeignCurrency()
+    var
+        Membership: Record "NPR MM Membership";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        GLEntry: Record "G/L Entry";
+    begin
+        // [SCENARIO] For a foreign-currency payment, "Amount (LCY)" is the LCY booked to the G/L (Amount converted), not the FCY Amount.
+        //            This pins that PostPayment writes GenJnlLine."Amount (LCY)" and not GenJnlLine.Amount / SubscrPaymentRequest.Amount.
+        // [GIVEN] A renewal subscription in a foreign currency at an explicit non-1:1 rate (1 FCY = 2 LCY). Set directly
+        //         because LibraryERM.CreateExchangeRate mirrors the rate amounts and can only express 1:1.
+        Initialize();
+        SetupAdyenPaymentGateway();
+        LibraryERM.CreateCurrency(Currency);
+        CurrencyExchangeRate.Init();
+        CurrencyExchangeRate."Currency Code" := Currency.Code;
+        CurrencyExchangeRate."Starting Date" := Today();
+        CurrencyExchangeRate."Exchange Rate Amount" := 1;
+        CurrencyExchangeRate."Relational Exch. Rate Amount" := 2;
+        CurrencyExchangeRate."Adjustment Exch. Rate Amount" := 1;
+        CurrencyExchangeRate."Relational Adjmt Exch Rate Amt" := 2;
+        CurrencyExchangeRate.Insert();
+        CreateMembershipWithSubscription(Membership);
+        CreateRenewalSubscriptionRequest(Membership, SubscriptionRequest);
+        SubscriptionRequest."Currency Code" := Currency.Code;
+        SubscriptionRequest.Modify();
+        PostSubscriptionRequest(SubscriptionRequest, Membership);
+        CreateCapturedPaymentRequest(SubscriptionRequest, SubscrPaymentRequest);
+
+        // [WHEN] Posting the payment request to the general ledger
+        PostPaymentRequest(SubscriptionRequest);
+
+        // [THEN] The stored Amount (LCY) equals the LCY booked to the payment G/L entry - and differs from the FCY Amount
+        SubscrPaymentRequest.Get(SubscrPaymentRequest."Entry No.");
+        Assert.IsTrue(SubscrPaymentRequest.Posted, 'Payment request should be posted.');
+        GLEntry.Get(SubscrPaymentRequest."G/L Entry No.");
+        Assert.AreEqual(GLEntry.Amount, SubscrPaymentRequest."Amount (LCY)", 'Amount (LCY) should equal the LCY booked to the payment G/L entry.');
+        Assert.AreNotEqual(SubscrPaymentRequest.Amount, SubscrPaymentRequest."Amount (LCY)", 'For a foreign currency the booked LCY must differ from the FCY Amount.');
+    end;
+
     local procedure CreateCapturedPaymentRequest(SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
     begin
         SubscrPaymentRequest.Init();

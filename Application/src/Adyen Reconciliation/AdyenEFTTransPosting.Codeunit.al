@@ -318,14 +318,27 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
     local procedure PostSubscription()
     var
-        CurrExchRate: Record "Currency Exchange Rate";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         ReverseSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         SubscrRequest: Record "NPR MM Subscr. Request";
         DimensionSetID: Integer;
         OriginalAmountLCY: Decimal;
+        CannotDetermineAmountLCYLbl: Label 'Cannot determine %1 for %2 %3 in currency ''%4'' at posting date %5. Set up the currency exchange rate for that date and post the reconciliation again.', Comment = '%1 = "Amount (LCY)" field caption, %2 = Subscription Payment Request table caption, %3 = entry no., %4 = currency code, %5 = posting date';
     begin
         SubscrPaymentRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
+        SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+
+        OriginalAmountLCY := SubscrPaymentRequest."Amount (LCY)";
+        if (OriginalAmountLCY = 0) and (SubscrPaymentRequest.Amount <> 0) then begin
+            SubscrPaymentRequest.UpdateAmountLCY(SubscrRequest."Posting Date");
+            OriginalAmountLCY := SubscrPaymentRequest."Amount (LCY)";
+            if OriginalAmountLCY <> 0 then
+                SubscrPaymentRequest.Modify(); // persist the recomputed basis - and do it before any reversal below seeds from it
+        end;
+
+        if IsCrossCurrency() and (OriginalAmountLCY = 0) and (SubscrPaymentRequest.Amount <> 0) then
+            Error(CannotDetermineAmountLCYLbl, SubscrPaymentRequest.FieldCaption("Amount (LCY)"), SubscrPaymentRequest.TableCaption(), SubscrPaymentRequest."Entry No.", SubscrPaymentRequest."Currency Code", SubscrRequest."Posting Date");
+
         case _ReconciliationLine."Transaction Type" of
             _ReconciliationLine."Transaction Type"::Chargeback,
             _ReconciliationLine."Transaction Type"::SecondChargeback,
@@ -337,10 +350,19 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     _NewReversedSystemId := ReverseSubscrPaymentRequest.SystemId;
                 end;
         end;
-        SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
-        OriginalAmountLCY := Round(CurrExchRate.ExchangeAmtFCYToLCY(SubscrRequest."Posting Date", _ReconciliationLine."Transaction Currency Code", _ReconciliationLine."Amount (TCY)", CurrExchRate.ExchangeRate(SubscrRequest."Posting Date", _ReconciliationLine."Transaction Currency Code")), _Currency."Amount Rounding Precision");
+
+        // Matching is sign-agnostic, so the line can bind to an opposite-signed request (e.g. a chargeback line matches the
+        // original payment); follow the line's sign so the clearing pair posts in the right direction.
+        if (SubscrPaymentRequest.Amount <> 0) and (_ReconciliationLine."Amount (TCY)" * SubscrPaymentRequest.Amount < 0) then
+            OriginalAmountLCY := -OriginalAmountLCY;
+
         DimensionSetID := GetSubscriptionDimensionSetID(SubscrRequest);
         PostEntryToGL(DimensionSetID, OriginalAmountLCY);
+    end;
+
+    local procedure IsCrossCurrency(): Boolean
+    begin
+        exit((_ReconciliationLine."Transaction Currency Code" <> '') and (_ReconciliationLine."Adyen Acc. Currency Code" <> _ReconciliationLine."Transaction Currency Code"));
     end;
 
     local procedure GetSubscriptionDimensionSetID(SubscrRequest: Record "NPR MM Subscr. Request"): Integer
@@ -398,7 +420,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         TransactionAmountToPost: Decimal;
         GLEntryNo: Integer;
     begin
-        if (_ReconciliationLine."Transaction Currency Code" <> '') and (_ReconciliationLine."Adyen Acc. Currency Code" <> _ReconciliationLine."Transaction Currency Code") then begin
+        if IsCrossCurrency() then begin
             TransactionAmountToPost := OriginalAmountLCY;
             _ReconciliationLine."Realized Gains or Losses" := Round(_ReconciliationLine."Exchange Rate" * _ReconciliationLine."Amount (TCY)", _Currency."Amount Rounding Precision") - TransactionAmountToPost;
             _RealizedGLAmount := _ReconciliationLine."Realized Gains or Losses";

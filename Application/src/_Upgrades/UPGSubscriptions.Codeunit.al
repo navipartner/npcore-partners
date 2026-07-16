@@ -24,6 +24,7 @@ codeunit 6185060 "NPR UPG Subscriptions"
         UpgradeTerminationSubsRequest();
         UpgradePaymentSubscriptionRequests();
         UpgradePaymentSubscriptionRequestCardDetails();
+        BackfillSubscrPaymentRequestAmountLCY();
     end;
 
     internal procedure CreateSubscriptions()
@@ -367,6 +368,38 @@ codeunit 6185060 "NPR UPG Subscriptions"
             SubscriptionPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
             Modi := true;
         end;
+    end;
+
+    local procedure BackfillSubscrPaymentRequestAmountLCY()
+    var
+        SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        GLEntry: Record "G/L Entry";
+    begin
+        UpgradeStep := 'BackfillSubscrPaymentRequestAmountLCY';
+        if HasUpgradeTag() then
+            exit;
+
+        SubscriptionPaymentRequest.SetRange("Amount (LCY)", 0);
+        SubscriptionPaymentRequest.SetFilter(Amount, '<>%1', 0);
+        if SubscriptionPaymentRequest.FindSet(true) then
+            repeat
+                if (SubscriptionPaymentRequest."G/L Entry No." <> 0) and GLEntry.Get(SubscriptionPaymentRequest."G/L Entry No.") then
+                    SubscriptionPaymentRequest."Amount (LCY)" := GLEntry.Amount
+                else
+                    SubscriptionPaymentRequest.UpdateAmountLCY(GetAmountLCYBackfillDate(SubscriptionPaymentRequest));
+                SubscriptionPaymentRequest.Modify();
+            until SubscriptionPaymentRequest.Next() = 0;
+
+        SetUpgradeTag();
+    end;
+
+    local procedure GetAmountLCYBackfillDate(SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request"): Date
+    begin
+        if SubscriptionPaymentRequest."Posting Date" <> 0D then
+            exit(SubscriptionPaymentRequest."Posting Date");
+        if SubscriptionPaymentRequest."Status Change Date" <> 0D then
+            exit(SubscriptionPaymentRequest."Status Change Date");
+        exit(WorkDate());
     end;
 
     local procedure UpgradePaymentSubscriptionRequestCardDetails()

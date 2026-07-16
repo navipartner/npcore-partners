@@ -164,6 +164,8 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
             DimensionSetID, GlobalDim1Code, GlobalDim2Code, RecurringPaymentSetup."Source Code", PostingDescription);
         SubscrPaymentRequest."G/L Entry No." := GenJnlPostLine.RunWithCheck(GenJnlLine);
         SubscrPaymentRequest.Posted := SubscrPaymentRequest."G/L Entry No." <> 0;
+        if not SubscrPaymentRequest.Reconciled then
+            SubscrPaymentRequest."Amount (LCY)" := GenJnlLine."Amount (LCY)";
 
         //Customer account
         InitGenJnlLine(GenJnlLine,

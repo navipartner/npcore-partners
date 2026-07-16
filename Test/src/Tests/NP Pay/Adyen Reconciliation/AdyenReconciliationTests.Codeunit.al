@@ -347,6 +347,125 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         end;
     end;
 
+    [Test]
+    procedure PostingProcess_SubscriptionRealizedGL()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        PSPReference: Code[16];
+        TransactionCurrency: Code[10];
+        Amount: Decimal;
+        BookedAmountLCY: Decimal;
+        ExchangeRate: Decimal;
+        ExpectedRealizedGL: Decimal;
+        BaselineLogId: Integer;
+    begin
+        // [Scenario] A matched cross-currency subscription line bases Realized Gains/Losses on the payment's stored
+        //            "Amount (LCY)", not a re-conversion of the settlement Amount (TCY): booked LCY 90 vs rate*TCY 120 => 30.
+        Initialize();
+        EnsureSubscriptionAdyenGateway();
+        TransactionCurrency := 'NPSUBFX'; // synthetic currency this test controls; guarantees direct-postable realized accounts
+        EnsureCurrencyWithRealizedAccounts(TransactionCurrency);
+
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 100;
+        ExchangeRate := 1.2;
+        BookedAmountLCY := 90;
+        ExpectedRealizedGL := Round(ExchangeRate * Amount) - BookedAmountLCY;
+
+        // [Given] A captured Adyen subscription payment whose stored Amount (LCY) differs from its transaction Amount
+        CreateSubscrRequestForPayment(SubscrRequest);
+        CreateSubscrPaymentRequestWithLCY(SubscrPaymentRequest, SubscrRequest, PSPReference, Amount, TransactionCurrency, BookedAmountLCY);
+
+        // [Given] A cross-currency settled recon line (Transaction Currency <> Acquirer Currency), matched to that payment
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYSettledReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, TransactionCurrency, ExchangeRate);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField("Matching Table Name", ReconciliationLine."Matching Table Name"::"Subscription Payment");
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Matched);
+
+        // [When] Posting the reconciliation document
+        BaselineLogId := LastReconLogId();
+        AdyenTransMatching.PostEntries(ReconciliationHeader);
+
+        // [Then] The line posts and Realized G/L = Round(rate x Amount(TCY)) - the stored booked LCY
+        ReconciliationLine.Find();
+        _Assert.AreEqual(ReconciliationLine.Status::Posted, ReconciliationLine.Status, StrSubstNo('Subscription line was not posted. Root-cause reconciliation-log error: %1', GetFirstReconErrorSince(BaselineLogId)));
+        _Assert.AreEqual(ExpectedRealizedGL, ReconciliationLine."Realized Gains or Losses", 'Realized G/L must use the stored Amount (LCY) as basis, not a re-conversion of Amount (TCY).');
+
+        // [Then] The matched Subscription Payment Request is reconciled
+        SubscrPaymentRequest.Find();
+        SubscrPaymentRequest.TestField(Reconciled, true);
+    end;
+
+    [Test]
+    procedure PostingProcess_SubscriptionChargebackRealizedGL()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        ReverseSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        PSPReference: Code[16];
+        TransactionCurrency: Code[10];
+        Amount: Decimal;
+        BookedAmountLCY: Decimal;
+        ExchangeRate: Decimal;
+        ExpectedRealizedGL: Decimal;
+        BaselineLogId: Integer;
+    begin
+        // [Scenario] A cross-currency chargeback line (negative Amount(TCY)) matches the original positive payment, so the
+        //            sign-flip must follow the line: Realized G/L = Round(rate*-100) + 90 = -30, and the created reversal
+        //            inherits the negated booked LCY (-90). This is the branch every cross-currency chargeback hits.
+        Initialize();
+        EnsureSubscriptionAdyenGateway();
+        TransactionCurrency := 'NPSUBFX';
+        EnsureCurrencyWithRealizedAccounts(TransactionCurrency);
+
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 100;
+        ExchangeRate := 1.2;
+        BookedAmountLCY := 90;
+        ExpectedRealizedGL := Round(ExchangeRate * -Amount) + BookedAmountLCY; // rate*(-TCY) - (-bookedLCY) = -120 + 90 = -30
+
+        // [Given] A captured Adyen subscription payment (positive, already settled) with a known booked LCY.
+        //         Reconciled = true both mirrors reality and stops CreateReverseSubscrPaymentRequest from mistaking the
+        //         original for a pre-existing reverse (its lookup excludes reconciled rows) - the chargeback matcher only
+        //         filters on Reversed, so the row still matches.
+        CreateSubscrRequestForPayment(SubscrRequest);
+        CreateSubscrPaymentRequestWithLCY(SubscrPaymentRequest, SubscrRequest, PSPReference, Amount, TransactionCurrency, BookedAmountLCY);
+        SubscrPaymentRequest.Reconciled := true;
+        SubscrPaymentRequest.Modify();
+
+        // [Given] A cross-currency chargeback settlement line (negative) matched to that payment
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYChargebackReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, TransactionCurrency, ExchangeRate);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField("Matching Table Name", ReconciliationLine."Matching Table Name"::"Subscription Payment");
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Matched);
+
+        // [When] Posting the reconciliation document
+        BaselineLogId := LastReconLogId();
+        AdyenTransMatching.PostEntries(ReconciliationHeader);
+
+        // [Then] Sign-flip applied: realized G/L follows the settlement line's (negative) sign
+        ReconciliationLine.Find();
+        _Assert.AreEqual(ReconciliationLine.Status::Posted, ReconciliationLine.Status, StrSubstNo('Chargeback line was not posted. Root-cause reconciliation-log error: %1', GetFirstReconErrorSince(BaselineLogId)));
+        _Assert.AreEqual(ExpectedRealizedGL, ReconciliationLine."Realized Gains or Losses", 'Chargeback Realized G/L must follow the settlement line sign (booked LCY negated).');
+
+        // [Then] The original is reversed and the created reversal inherited the negated booked LCY
+        SubscrPaymentRequest.Find();
+        SubscrPaymentRequest.TestField(Reversed, true);
+        ReverseSubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID");
+        _Assert.AreEqual(-BookedAmountLCY, ReverseSubscrPaymentRequest."Amount (LCY)", 'The reversal should inherit the negated booked Amount (LCY).');
+    end;
+
     local procedure AssertFeePostingPostsToFeeAccount()
     var
         ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
@@ -1102,6 +1221,140 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         SubscrPaymentRequest.Reconciled := false;
         SubscrPaymentRequest.Reversed := false;
         SubscrPaymentRequest.Insert();
+    end;
+
+    local procedure LastReconLogId(): Integer
+    var
+        ReconciliationLog: Record "NPR Adyen Reconciliation Log";
+    begin
+        if ReconciliationLog.FindLast() then
+            exit(ReconciliationLog.ID);
+        exit(0);
+    end;
+
+    local procedure GetFirstReconErrorSince(AfterLogId: Integer): Text
+    var
+        ReconciliationLog: Record "NPR Adyen Reconciliation Log";
+    begin
+        // First failure of the run: the specific cause is logged before the generic "Couldn't post N entries" summary.
+        ReconciliationLog.SetFilter(ID, '>%1', AfterLogId);
+        ReconciliationLog.SetRange(Success, false);
+        if ReconciliationLog.FindFirst() then
+            exit(ReconciliationLog.Description);
+        exit('(no failed reconciliation-log entry found)');
+    end;
+
+    local procedure EnsureSubscriptionAdyenGateway()
+    var
+        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
+        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
+    begin
+        if not SubsPaymentGateway.Get('ADYEN-TEST') then begin
+            SubsPaymentGateway.Init();
+            SubsPaymentGateway.Code := 'ADYEN-TEST';
+            SubsPaymentGateway.Description := 'Test Adyen Gateway';
+            SubsPaymentGateway."Integration Type" := SubsPaymentGateway."Integration Type"::Adyen;
+            SubsPaymentGateway.Status := SubsPaymentGateway.Status::Enabled;
+            SubsPaymentGateway.Insert();
+        end;
+        if not SubsAdyenPGSetup.Get('ADYEN-TEST') then begin
+            SubsAdyenPGSetup.Init();
+            SubsAdyenPGSetup.Code := 'ADYEN-TEST';
+            SubsAdyenPGSetup."Payment Account Type" := SubsAdyenPGSetup."Payment Account Type"::"G/L Account";
+            SubsAdyenPGSetup."Payment Account No." := _LibraryERM.CreateGLAccountNo();
+            SubsAdyenPGSetup.Environment := SubsAdyenPGSetup.Environment::Test;
+            SubsAdyenPGSetup."Merchant Name" := 'TestMerchant';
+            SubsAdyenPGSetup.Insert();
+        end else begin
+            // Refresh to a fresh account: the sibling MMSubscrPostDimTests stamps a mandatory dimension on its account, which
+            // this test (DimensionSetID = 0) cannot satisfy - reusing it would make the outcome depend on test run order.
+            SubsAdyenPGSetup."Payment Account No." := _LibraryERM.CreateGLAccountNo();
+            SubsAdyenPGSetup.Modify();
+        end;
+    end;
+
+    local procedure EnsureCurrencyWithRealizedAccounts(CurrencyCode: Code[10])
+    var
+        Currency: Record Currency;
+    begin
+        EnsureCurrencyWithExchangeRate(CurrencyCode);
+        Currency.Get(CurrencyCode);
+        Currency."Realized Gains Acc." := EnsureDirectPostingAccount(Currency."Realized Gains Acc.");
+        Currency."Realized Losses Acc." := EnsureDirectPostingAccount(Currency."Realized Losses Acc.");
+        Currency.Modify();
+    end;
+
+    local procedure EnsureDirectPostingAccount(AccountNo: Code[20]): Code[20]
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        if (AccountNo <> '') and GLAccount.Get(AccountNo) and GLAccount."Direct Posting" then
+            exit(AccountNo);
+        exit(_LibraryERM.CreateGLAccountNo());
+    end;
+
+    local procedure CreateSubscrRequestForPayment(var SubscrRequest: Record "NPR MM Subscr. Request")
+    begin
+        SubscrRequest.Init();
+        SubscrRequest."Entry No." := 0;
+        SubscrRequest."Posting Date" := Today();
+        SubscrRequest.Insert(true);
+    end;
+
+    local procedure CreateSubscrPaymentRequestWithLCY(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SubscrRequest: Record "NPR MM Subscr. Request"; PSPReference: Code[16]; Amount: Decimal; CurrencyCode: Code[10]; AmountLCY: Decimal)
+    begin
+        SubscrPaymentRequest.Init();
+        SubscrPaymentRequest."Entry No." := 0;
+        SubscrPaymentRequest."Batch No." := 0;
+        SubscrPaymentRequest."Subscr. Request Entry No." := SubscrRequest."Entry No.";
+        SubscrPaymentRequest.Type := SubscrPaymentRequest.Type::Payment;
+        SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::Captured;
+        SubscrPaymentRequest.PSP := SubscrPaymentRequest.PSP::Adyen;
+        SubscrPaymentRequest."PSP Reference" := PSPReference;
+        SubscrPaymentRequest.Amount := Amount;
+        SubscrPaymentRequest."Currency Code" := CurrencyCode;
+        SubscrPaymentRequest."Amount (LCY)" := AmountLCY; // Insert() below (not Insert(true)) so the OnInsert trigger keeps this test-set value
+        SubscrPaymentRequest.Reconciled := false;
+        SubscrPaymentRequest.Reversed := false;
+        SubscrPaymentRequest.Insert();
+    end;
+
+    local procedure InsertFCYSettledReconLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; PSPReference: Code[16]; Amount: Decimal; TransactionCurrency: Code[10]; ExchangeRate: Decimal)
+    begin
+        InitReconLineForHeader(ReconciliationLine, ReconciliationHeader);
+        ReconciliationLine."PSP Reference" := PSPReference;
+        ReconciliationLine."Merchant Reference" := CopyStr('REF-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
+        ReconciliationLine."Merchant Order Reference" := CopyStr('ORD-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
+        ReconciliationLine."Transaction Date" := CreateDateTime(Today(), Time());
+        ReconciliationLine."Transaction Currency Code" := TransactionCurrency;
+        ReconciliationLine."Adyen Acc. Currency Code" := _NetCurrency;
+        ReconciliationLine.Validate("Gross Credit", Amount);
+        ReconciliationLine.Validate("Net Credit", Amount);
+        ReconciliationLine."Exchange Rate" := ExchangeRate;
+        ReconciliationLine."Amount (LCY)" := ReconciliationLine."Amount(AAC)";
+        ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::Settled;
+        ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"To Be Determined";
+        ReconciliationLine.Status := ReconciliationLine.Status::" ";
+        ReconciliationLine.Insert();
+    end;
+
+    local procedure InsertFCYChargebackReconLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; PSPReference: Code[16]; Amount: Decimal; TransactionCurrency: Code[10]; ExchangeRate: Decimal)
+    begin
+        InitReconLineForHeader(ReconciliationLine, ReconciliationHeader);
+        ReconciliationLine."PSP Reference" := PSPReference;
+        ReconciliationLine."Merchant Reference" := CopyStr('CB-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
+        ReconciliationLine."Merchant Order Reference" := CopyStr('CBORD-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
+        ReconciliationLine."Transaction Date" := CreateDateTime(Today(), Time());
+        ReconciliationLine."Transaction Currency Code" := TransactionCurrency;
+        ReconciliationLine."Adyen Acc. Currency Code" := _NetCurrency;
+        ReconciliationLine.Validate("Gross Debit", Amount); // debit => negative Amount(TCY), i.e. money charged back
+        ReconciliationLine.Validate("Net Debit", Amount);
+        ReconciliationLine."Exchange Rate" := ExchangeRate;
+        ReconciliationLine."Amount (LCY)" := ReconciliationLine."Amount(AAC)";
+        ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::Chargeback;
+        ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"To Be Determined";
+        ReconciliationLine.Status := ReconciliationLine.Status::" ";
+        ReconciliationLine.Insert();
     end;
 
     local procedure GenerateUniquePSPReference(): Code[16]

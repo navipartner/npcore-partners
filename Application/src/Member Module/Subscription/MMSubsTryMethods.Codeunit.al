@@ -102,7 +102,7 @@ codeunit 6248294 "NPR MM Subs Try Methods"
         PayByLinkSubscriptionPaymentRequest."External Membership No." := OriginalSubscriptionPaymentRequest."External Membership No.";
         PayByLinkSubscriptionPaymentRequest."Payment E-mail" := OriginalSubscriptionPaymentRequest."Payment E-mail";
         PayByLinkSubscriptionPaymentRequest."Payment Phone No." := OriginalSubscriptionPaymentRequest."Payment Phone No.";
-        PayByLinkSubscriptionPaymentRequest.Insert();
+        PayByLinkSubscriptionPaymentRequest.Insert(true);
     end;
 
     var

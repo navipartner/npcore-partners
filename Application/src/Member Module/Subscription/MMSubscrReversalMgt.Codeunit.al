@@ -173,6 +173,10 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrPmtReversalRequest."Payment Token" := SubscrPaymentRequest."Payment Token";
         SubscrPmtReversalRequest.Amount := -SubscrPaymentRequest.Amount;
         SubscrPmtReversalRequest."Currency Code" := SubscrPaymentRequest."Currency Code";
+        // Seed the reversal's LCY as the exact negation of the original's booked LCY. This is the value used if the reversal
+        // is reconciled before being posted; once it is posted, PostPayment refines it to the LCY actually booked at the
+        // refund's posting date (which nets against its own G/L entry).
+        SubscrPmtReversalRequest."Amount (LCY)" := -SubscrPaymentRequest."Amount (LCY)";
         SubscrPmtReversalRequest.Description := CopyStr(StrSubstNo(DescrLbl, SubscrPaymentRequest.Description), 1, MaxStrLen(SubscrPmtReversalRequest.Description));
         SubscrPmtReversalRequest."Subscription Payment Reference" := CopyStr(SubsPayRequestUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPmtReversalRequest."Subscription Payment Reference"));
         SubscrPmtReversalRequest."External Membership No." := SubscrPaymentRequest."External Membership No.";

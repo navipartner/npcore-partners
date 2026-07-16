@@ -48,6 +48,11 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     ToolTip = 'Specifies the value of the Amount field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Amount (LCY)"; Rec."Amount (LCY)")
+                {
+                    ToolTip = 'Specifies the Amount converted to the local currency (LCY), frozen at the exchange rate when the payment was recognized.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Currency Code"; Rec."Currency Code")
                 {
                     ToolTip = 'Specifies the value of the Currency Code field.';
