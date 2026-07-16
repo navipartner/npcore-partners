@@ -606,6 +606,31 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         ValidateImportedHeader(EcomSalesHeader);
         ValidateImportedLines(EcomSalesHeader);
         ValidateImportedPaymentLines(EcomSalesHeader);
+        ValidateSubscriptionDocumentRequirements(EcomSalesHeader);
+    end;
+
+    internal procedure ValidateSubscriptionDocumentRequirements(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        MissingEmailErr: Label 'Line %1 has %2 enabled, which requires a customer email, but %3 is empty on document %4.', Comment = '%1 = line no., %2 = Subscription field caption, %3 = Sell-to Email field caption, %4 = external document no.';
+        MissingTokenPaymentErr: Label 'Line %1 has %2 enabled, which requires a card payment with a payment token, gateway shopper reference and a positive amount, but document %3 has no such payment line.', Comment = '%1 = line no., %2 = Subscription field caption, %3 = external document no.';
+    begin
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subscription, true);
+        if not EcomSalesLine.FindFirst() then
+            exit;
+
+        if EcomSalesHeader."Sell-to Email" = '' then
+            Error(MissingEmailErr, EcomSalesLine."Line No.", EcomSalesLine.FieldCaption(Subscription), EcomSalesHeader.FieldCaption("Sell-to Email"), EcomSalesHeader."External No.");
+
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesPmtLine.SetRange("Payment Method Type", EcomSalesPmtLine."Payment Method Type"::"Payment Method");
+        EcomSalesPmtLine.SetFilter("PSP Token", '<>%1', '');
+        EcomSalesPmtLine.SetFilter("PAR Token", '<>%1', '');
+        EcomSalesPmtLine.SetFilter(Amount, '>%1', 0);
+        if EcomSalesPmtLine.IsEmpty() then
+            Error(MissingTokenPaymentErr, EcomSalesLine."Line No.", EcomSalesLine.FieldCaption(Subscription), EcomSalesHeader."External No.");
     end;
 
     local procedure ValidateImportedHeader(EcomSalesHeader: Record "NPR Ecom Sales Header")

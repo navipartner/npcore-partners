@@ -211,6 +211,11 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Membership Operation field.';
                 }
+                field(Subscription; Rec.Subscription)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether the membership line was sold as a subscription. When enabled, the customer''s card is stored as the default member payment method and the membership is enrolled in auto-renewal.';
+                }
                 field("Membership Id"; Rec."Membership Id")
                 {
                     ApplicationArea = NPRRetail;

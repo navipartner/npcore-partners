@@ -275,6 +275,7 @@ codeunit 6151027 "NPR Entria Order Impl."
 #pragma warning disable AA0139
         GetMembershipRoutingInformation(SalesLineJsonToken, EcomSalesLine);
         EcomSalesLine."Membership Operation" := EcomCreateMMShipImpl.DetermineMembershipOperation(EcomSalesLine);
+        EcomSalesLine.Subscription := _JsonHelper.GetJBoolean(SalesLineJsonToken, 'metadata.subscription', false);
         EcomSalesLine."Member Birthday" := _JsonHelper.GetJDate(SalesLineJsonToken, 'metadata.birthdate', false);
         EcomSalesLine."Membership Activation Date" := _JsonHelper.GetJDate(SalesLineJsonToken, 'metadata.activation_date', false);
         EcomSalesLine."Member First Name" := _JsonHelper.GetJText(SalesLineJsonToken, 'metadata.member_first_name', MaxStrLen(EcomSalesLine."Member First Name"), false, false);

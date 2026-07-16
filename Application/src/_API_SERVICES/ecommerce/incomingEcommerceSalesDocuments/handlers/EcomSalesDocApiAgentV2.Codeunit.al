@@ -52,12 +52,14 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         RequestBody: JsonToken;
         RequestedApiVersion: Date;
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
     begin
         RequestBody := Request.BodyJson();
         RequestedApiVersion := Request.ApiVersion();
         ProcessIncomingSalesHeader(RequestBody, EcomSalesHeader, RequestedApiVersion);
         ProcessIncomingSalesLines(RequestBody, EcomSalesHeader);
         ProcessIncomingSalesPaymentLines(RequestBody, EcomSalesHeader);
+        EcomSalesDocUtils.ValidateSubscriptionDocumentRequirements(EcomSalesHeader);
         ProcessIncomingSalesDocumentComments(RequestBody, EcomSalesHeader);
         EcomVirtualItemMgt.UpdateVirtualItemInformationInHeader(EcomSalesHeader);
     end;
@@ -401,6 +403,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                 GetMembershipRoutingInformation(SalesLineJsonToken, EcomSalesLine);
                                 EcomSalesLine."Membership Operation" := EcomCreateMMShipImpl.DetermineMembershipOperation(EcomSalesLine);
                                 EcomSalesLine."Membership Activation Date" := JsonHelper.GetJDate(SalesLineJsonToken, 'membershipActivationDate', false);
+                                EcomSalesLine.Subscription := JsonHelper.GetJBoolean(SalesLineJsonToken, 'subscription', false);
                                 if EcomSalesLine."Membership Operation" = EcomSalesLine."Membership Operation"::CreateMembership then
                                     ParseMemberFields(SalesLineJsonToken, EcomSalesLine);
                                 EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
@@ -950,7 +953,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('memberPostCode', EcomSalesLine."Member Post Code")
                                   .AddProperty('memberNewsletter', EcomSalesLine."Member Newsletter")
                                   .AddProperty('memberGdprApproval', EcomSalesLine."Member GDPR Approval")
-                                  .AddProperty('membershipActivationDate', Format(EcomSalesLine."Membership Activation Date", 0, 9));
+                                  .AddProperty('membershipActivationDate', Format(EcomSalesLine."Membership Activation Date", 0, 9))
+                                  .AddProperty('subscription', EcomSalesLine.Subscription);
 
         AppendIssuedAssetsArray(EcomSalesHeader, EcomSalesLine, TempEcomSalesVoucherLink, TempEcomSalesCouponLink, TempEcomSalesMembershipLink, SalesLineDetailsJsonObject);
 

@@ -282,6 +282,11 @@ table 6151259 "NPR Ecom Sales Line"
             DataClassification = CustomerContent;
             Caption = 'Membership Activation Date';
         }
+        field(5057; Subscription; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Subscription';
+        }
         field(5098; "Alteration Option System Id"; Guid)
         {
             DataClassification = CustomerContent;

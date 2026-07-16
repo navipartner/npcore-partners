@@ -785,7 +785,8 @@
 
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
         PostPaymentLines(SalesHeader, SalesInvoiceHeader."No.");
-        CreateMembershipPaymentMethods(SalesInvoiceHeader);
+        if IsNullGuid(SalesInvoiceHeader."NPR Inc Ecom Sale Id") then
+            CreateMembershipPaymentMethods(SalesInvoiceHeader);
 
         OnAfterPostMagentoPayment(SalesInvoiceHeader);
     end;
@@ -1564,16 +1565,22 @@
 
     local procedure CreateInitialSaleSubscrRequestFromMagento(Membership: Record "NPR MM Membership"; MemberPaymentMethod: Record "NPR MM Member Payment Method"; var TempMagentoPaymentLine: Record "NPR Magento Payment Line" temporary)
     var
-        Subscription: Record "NPR MM Subscription";
-        MembershipEntry: Record "NPR MM Membership Entry";
         PaymentLine: Record "NPR Magento Payment Line";
-        TempEFTTransactionRequest: Record "NPR EFT Transaction Request" temporary;
-        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
         PaymentLine.SetLoadFields("Transaction ID", Amount, "Document Table No.", "Document Type", "Document No.");
         if not PaymentLine.GetBySystemId(TempMagentoPaymentLine.SystemId) then
             exit;
 
+        CreateInitialSaleSubscrRequestFromPaymentLine(Membership, MemberPaymentMethod, PaymentLine);
+    end;
+
+    internal procedure CreateInitialSaleSubscrRequestFromPaymentLine(Membership: Record "NPR MM Membership"; MemberPaymentMethod: Record "NPR MM Member Payment Method"; PaymentLine: Record "NPR Magento Payment Line")
+    var
+        Subscription: Record "NPR MM Subscription";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        TempEFTTransactionRequest: Record "NPR EFT Transaction Request" temporary;
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
         Subscription.SetCurrentKey("Membership Entry No.");
         Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
         if not Subscription.FindFirst() then
