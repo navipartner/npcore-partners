@@ -6,6 +6,7 @@ codeunit 85155 "NPR Job Queue Refresher Tests"
     var
         _Assert: Codeunit Assert;
         _CreateMissingHelper: Codeunit "NPR JQ Refresher Test Helper";
+        _SkipNPProtectionHelper: Codeunit "NPR JQ Skip Protection Helper";
         _TestParameterPrefix: Label 'NPR-JQR-TEST-', Locked = true;
 
     #region [AddJobQueueToMonitored]
@@ -88,26 +89,82 @@ codeunit 85155 "NPR Job Queue Refresher Tests"
     end;
 
     [Test]
-    procedure AddJobQueueToMonitored_NPProtected_OmitsManagedByAppRow()
+    procedure AddJobQueueToMonitored_NPProtected_ManagedByAppRowFollowsProtectionDecision()
     var
         JobQueueEntry: Record "Job Queue Entry";
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         ManagedByApp: Record "NPR Managed By App Job Queue";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NPProtectionDisabledBySubscriber: Boolean;
     begin
-        // [Scenario] Protected jobs (NP-owned, immutable from the GUI) are still added to monitored but the
-        //            Managed-By-App row is intentionally skipped — that table tracks customer-managed jobs only
+        // [Scenario] Protected jobs (NP-owned, immutable from the GUI) are always added to monitored, but whether
+        //            the Managed-By-App row is created is NOT a fixed constant — it follows the effective
+        //            NP-protection decision. Core deliberately exposes the OnBeforeUpdateNPMonitoredJobs
+        //            integration event (surfaced via SkipUpdateNPManagedMonitoredJobs), so a PTE subscriber can
+        //            turn NP protection off globally. When a PTE sets Skip := true, an NP-flagged job is treated
+        //            as customer-managed and DOES get a Managed-By-App row. The test therefore stays correct in
+        //            both pure-Core runs and merged (Core + PTE) runs.
         Initialize();
         CreateRecurringJQEntry(JobQueueEntry, true);
 
-        // [When] AddJobQueueToMonitored is invoked for the protected JQE
+        // [Given] The ONE environment-owned fact that can legitimately flip the outcome: has a subscriber globally
+        //         disabled NP protection? We read this directly rather than the full JobQueueIsNPProtected
+        //         decision, so the oracle stays independent of the production logic under test. If the NP-flag
+        //         guard or the SetProtected persistence chain were to regress, JobQueueIsNPProtected would wrongly
+        //         return false and production would create the row — but Skip is still false here, so the "no row"
+        //         assertion below still fails and catches the regression.
+        NPProtectionDisabledBySubscriber := JobQueueMgt.SkipUpdateNPManagedMonitoredJobs();
+
+        // [When] AddJobQueueToMonitored is invoked for the NP-flagged JQE
         RunAddJobQueueToMonitored(JobQueueEntry);
 
-        // [Then] The monitored row is created normally
+        // [Then] The monitored row is created normally, regardless of the protection decision
         MonitoredJQEntry.SetRange("Job Queue Entry ID", JobQueueEntry.ID);
         _Assert.IsTrue(MonitoredJQEntry.FindFirst(), 'Expected a monitored entry to be inserted even for an NP-protected JQ entry.');
 
-        // [Then] But no Managed-By-App row is created (protected guard in AssignJobQueueEntryToManagedAndMonitored)
-        _Assert.IsFalse(ManagedByApp.Get(JobQueueEntry.ID), 'Expected no Managed-By-App row to be inserted for an NP-protected JQ entry.');
+        // [Then] The Managed-By-App row is present iff a subscriber disabled NP protection: with protection active
+        //        (default Core) the protected guard in AssignJobQueueEntryToManagedAndMonitored skips it; with
+        //        protection disabled the job is treated as customer-managed and the row is created + flagged.
+        if NPProtectionDisabledBySubscriber then begin
+            _Assert.IsTrue(ManagedByApp.Get(JobQueueEntry.ID), 'With NP protection disabled by a subscriber, expected the NP-flagged job to be treated as customer-managed and get a Managed-By-App row.');
+            _Assert.IsTrue(ManagedByApp."Managed by App", 'Expected the customer-managed Managed-By-App row to be flagged Managed by App = true.');
+        end else
+            _Assert.IsFalse(ManagedByApp.Get(JobQueueEntry.ID), 'With NP protection in effect (default Core), expected no Managed-By-App row for the NP-protected JQ entry.');
+    end;
+
+    [Test]
+    procedure AddJobQueueToMonitored_NPProtected_ProtectionDisabledBySubscriber_CreatesManagedByAppRow()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        ManagedByApp: Record "NPR Managed By App Job Queue";
+        AddJQToMonitored: Codeunit "NPR Add Job Queue To Monitored";
+    begin
+        // [Scenario] Deterministic pure-Core coverage of the "protection disabled by PTE" branch. With a subscriber
+        //            that sets Skip := true bound (what a PTE does in a merged build, but bound manually so this
+        //            runs green in pure-Core CI too), JobQueueIsNPProtected returns false for an NP-flagged job, so
+        //            AddJobQueueToMonitored treats it as customer-managed and DOES create the Managed-By-App row.
+        //            This drives the protection-disabled (row-created) path — the IF branch of
+        //            AddJobQueueToMonitored_NPProtected_ManagedByAppRowFollowsProtectionDecision — which would
+        //            otherwise only ever run in a merged build.
+        Initialize();
+        CreateRecurringJQEntry(JobQueueEntry, true);
+
+        // [When] AddJobQueueToMonitored is invoked while NP protection is disabled by a bound subscriber
+        BindSubscription(_SkipNPProtectionHelper);
+        if not AddJQToMonitored.Run(JobQueueEntry) then begin
+            UnbindSubscription(_SkipNPProtectionHelper);
+            Error('AddJobQueueToMonitored failed: %1', GetLastErrorText());
+        end;
+        UnbindSubscription(_SkipNPProtectionHelper);
+
+        // [Then] The monitored row is created normally
+        MonitoredJQEntry.SetRange("Job Queue Entry ID", JobQueueEntry.ID);
+        _Assert.IsTrue(MonitoredJQEntry.FindFirst(), 'Expected a monitored entry to be inserted for the NP-flagged JQ entry.');
+
+        // [Then] Because protection was disabled, the NP-flagged job is treated as customer-managed
+        _Assert.IsTrue(ManagedByApp.Get(JobQueueEntry.ID), 'With NP protection disabled by a subscriber, expected the NP-flagged job to get a Managed-By-App row.');
+        _Assert.IsTrue(ManagedByApp."Managed by App", 'Expected the customer-managed Managed-By-App row to be flagged Managed by App = true.');
     end;
 
     #endregion
