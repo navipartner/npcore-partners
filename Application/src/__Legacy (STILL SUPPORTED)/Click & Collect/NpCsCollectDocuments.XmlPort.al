@@ -212,6 +212,11 @@ xmlport 6151196 "NPR NpCs Collect Documents"
         NpCsDocument."E-mail Template (Confirmed)" := NpCsArchDocument."E-mail Template (Confirmed)";
         NpCsDocument."E-mail Template (Rejected)" := NpCsArchDocument."E-mail Template (Rejected)";
         NpCsDocument."E-mail Template (Expired)" := NpCsArchDocument."E-mail Template (Expired)";
+        NpCsDocument."Enable NP Email" := NpCsArchDocument."Enable NP Email";
+        NpCsDocument."NP E-mail Template (Pending)" := NpCsArchDocument."NP E-mail Template (Pending)";
+        NpCsDocument."NP E-mail Template (Confirmed)" := NpCsArchDocument."NP E-mail Template (Confirmed)";
+        NpCsDocument."NP E-mail Template (Rejected)" := NpCsArchDocument."NP E-mail Template (Rejected)";
+        NpCsDocument."NP E-mail Template (Expired)" := NpCsArchDocument."NP E-mail Template (Expired)";
         NpCsDocument."Notify Customer via Sms" := NpCsArchDocument."Notify Customer via Sms";
         NpCsDocument."Sms Template (Pending)" := NpCsArchDocument."Sms Template (Pending)";
         NpCsDocument."Sms Template (Confirmed)" := NpCsArchDocument."Sms Template (Confirmed)";

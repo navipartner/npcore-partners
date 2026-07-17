@@ -94,6 +94,11 @@ table 6151198 "NPR NpCs Document"
                 "E-mail Template (Confirmed)" := NpCsStoreWorkflowRelation."E-mail Template (Confirmed)";
                 "E-mail Template (Rejected)" := NpCsStoreWorkflowRelation."E-mail Template (Rejected)";
                 "E-mail Template (Expired)" := NpCsStoreWorkflowRelation."E-mail Template (Expired)";
+                "Enable NP Email" := NpCsStoreWorkflowRelation."Enable NP Email";
+                "NP E-mail Template (Pending)" := NpCsStoreWorkflowRelation."NP E-mail Template (Pending)";
+                "NP E-mail Template (Confirmed)" := NpCsStoreWorkflowRelation."NP E-mail Template (Confirmed)";
+                "NP E-mail Template (Rejected)" := NpCsStoreWorkflowRelation."NP E-mail Template (Rejected)";
+                "NP E-mail Template (Expired)" := NpCsStoreWorkflowRelation."NP E-mail Template (Expired)";
                 "Notify Customer via Sms" := NpCsStoreWorkflowRelation."Notify Customer via Sms";
                 "Sms Template (Pending)" := NpCsStoreWorkflowRelation."Sms Template (Pending)";
                 "Sms Template (Confirmed)" := NpCsStoreWorkflowRelation."Sms Template (Confirmed)";
@@ -312,6 +317,35 @@ table 6151198 "NPR NpCs Document"
             Caption = 'E-mail Template (Expired)';
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
+        }
+        field(500; "Enable NP Email"; Boolean)
+        {
+            Caption = 'Enable NP Email';
+            DataClassification = CustomerContent;
+        }
+        field(501; "NP E-mail Template (Pending)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(502; "NP E-mail Template (Confirmed)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Confirmed)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(503; "NP E-mail Template (Rejected)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Rejected)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(504; "NP E-mail Template (Expired)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
         }
         field(155; "Notify Customer via Sms"; Boolean)
         {
@@ -754,6 +788,31 @@ table 6151198 "NPR NpCs Document"
         NpCsDocumentLogEntry.SetRange("Document Entry No.", "Entry No.");
         if NpCsDocumentLogEntry.FindLast() then
             exit(NpCsDocumentLogEntry.GetErrorMessage());
+    end;
+
+    internal procedure ResolveCustomerNo(): Code[20]
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        case "Document Type" of
+            "Document Type"::Quote,
+            "Document Type"::Order,
+            "Document Type"::Invoice,
+            "Document Type"::"Credit Memo",
+            "Document Type"::"Blanket Order",
+            "Document Type"::"Return Order":
+                if SalesHeader.Get("Document Type", "Document No.") then
+                    exit(SalesHeader."Sell-to Customer No.");
+            "Document Type"::"Posted Invoice":
+                if SalesInvoiceHeader.Get("Document No.") then
+                    exit(SalesInvoiceHeader."Sell-to Customer No.");
+            "Document Type"::"Posted Credit Memo":
+                if SalesCrMemoHeader.Get("Document No.") then
+                    exit(SalesCrMemoHeader."Sell-to Customer No.");
+        end;
+        exit("Customer No.");
     end;
 
     local procedure UpdateDocumentInfo()

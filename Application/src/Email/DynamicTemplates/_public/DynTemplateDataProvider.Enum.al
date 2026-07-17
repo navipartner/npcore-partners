@@ -38,4 +38,9 @@ enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataP
         Caption = 'Posted Sales Document Notification';
         Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailPostSalesDataProv";
     }
+    value(7; CLICK_COLLECT_NOTIFICATION)
+    {
+        Caption = 'Click & Collect Notification';
+        Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailCnCDataProvider";
+    }
 }

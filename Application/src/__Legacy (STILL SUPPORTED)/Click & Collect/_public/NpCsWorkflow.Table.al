@@ -141,6 +141,35 @@ table 6151196 "NPR NpCs Workflow"
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
         }
+        field(500; "Enable NP Email"; Boolean)
+        {
+            Caption = 'Enable NP Email';
+            DataClassification = CustomerContent;
+        }
+        field(501; "NP E-mail Template (Pending)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(502; "NP E-mail Template (Confirmed)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Confirmed)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(503; "NP E-mail Template (Rejected)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Rejected)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(504; "NP E-mail Template (Expired)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
         field(230; "Notify Customer via Sms"; Boolean)
         {
             Caption = 'Notify Customer via Sms';

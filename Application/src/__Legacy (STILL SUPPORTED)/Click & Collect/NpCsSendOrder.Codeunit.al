@@ -133,6 +133,11 @@ codeunit 6151197 "NPR NpCs Send Order"
                       '<email_template_confirmed>' + Escape(NpCsDocument."E-mail Template (Confirmed)") + '</email_template_confirmed>' +
                       '<email_template_rejected>' + Escape(NpCsDocument."E-mail Template (Rejected)") + '</email_template_rejected>' +
                       '<email_template_expired>' + Escape(NpCsDocument."E-mail Template (Expired)") + '</email_template_expired>' +
+                      '<enable_np_email>' + Format(NpCsDocument."Enable NP Email", 0, 9) + '</enable_np_email>' +
+                      '<np_email_template_pending>' + Escape(NpCsDocument."NP E-mail Template (Pending)") + '</np_email_template_pending>' +
+                      '<np_email_template_confirmed>' + Escape(NpCsDocument."NP E-mail Template (Confirmed)") + '</np_email_template_confirmed>' +
+                      '<np_email_template_rejected>' + Escape(NpCsDocument."NP E-mail Template (Rejected)") + '</np_email_template_rejected>' +
+                      '<np_email_template_expired>' + Escape(NpCsDocument."NP E-mail Template (Expired)") + '</np_email_template_expired>' +
                       '<notify_customer_via_sms>' + Format(NpCsDocument."Notify Customer via Sms", 0, 9) + '</notify_customer_via_sms>' +
                       '<sms_template_pending>' + Escape(NpCsDocument."Sms Template (Pending)") + '</sms_template_pending>' +
                       '<sms_template_confirmed>' + Escape(NpCsDocument."Sms Template (Confirmed)") + '</sms_template_confirmed>' +

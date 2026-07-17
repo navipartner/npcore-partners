@@ -88,6 +88,11 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
         NpCsArchDocument."E-mail Template (Confirmed)" := NpCsDocument."E-mail Template (Confirmed)";
         NpCsArchDocument."E-mail Template (Rejected)" := NpCsDocument."E-mail Template (Rejected)";
         NpCsArchDocument."E-mail Template (Expired)" := NpCsDocument."E-mail Template (Expired)";
+        NpCsArchDocument."Enable NP Email" := NpCsDocument."Enable NP Email";
+        NpCsArchDocument."NP E-mail Template (Pending)" := NpCsDocument."NP E-mail Template (Pending)";
+        NpCsArchDocument."NP E-mail Template (Confirmed)" := NpCsDocument."NP E-mail Template (Confirmed)";
+        NpCsArchDocument."NP E-mail Template (Rejected)" := NpCsDocument."NP E-mail Template (Rejected)";
+        NpCsArchDocument."NP E-mail Template (Expired)" := NpCsDocument."NP E-mail Template (Expired)";
         NpCsArchDocument."Notify Customer via Sms" := NpCsDocument."Notify Customer via Sms";
         NpCsArchDocument."Sms Template (Pending)" := NpCsDocument."Sms Template (Pending)";
         NpCsArchDocument."Sms Template (Confirmed)" := NpCsDocument."Sms Template (Confirmed)";

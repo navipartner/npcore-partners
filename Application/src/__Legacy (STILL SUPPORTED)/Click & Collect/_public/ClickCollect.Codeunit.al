@@ -163,4 +163,9 @@ codeunit 6059847 "NPR Click & Collect"
     internal procedure OnNotifyCustomerViaEmailOnBeforeSendEmailTemplate(RecRef: RecordRef; CustomerEmail: Text[80]; EmailTemplateHeader: Record "NPR E-mail Template Header"; var CustomerNotified: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnNotifyCustomerViaNPEmailOnBeforeSendEmail(RecRef: RecordRef; CustomerEmail: Text[80]; NPEmailTemplate: Record "NPR NPEmailTemplate"; var CustomerNotified: Boolean)
+    begin
+    end;
 }

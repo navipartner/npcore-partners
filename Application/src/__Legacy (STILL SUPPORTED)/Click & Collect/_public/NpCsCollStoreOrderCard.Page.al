@@ -341,33 +341,77 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                         ToolTip = 'Specifies the value of the Customer E-mail field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("E-mail Template (Pending)"; Rec."E-mail Template (Pending)")
+                    field("Enable NP Email"; Rec."Enable NP Email")
                     {
-
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the E-mail Template (Pending) field';
                         ApplicationArea = NPRRetail;
+                        Visible = _NPEmailFeatureEnabled;
+                        ToolTip = 'When enabled, customer notifications use the modern NP E-mail templates instead of the legacy e-mail templates.';
+
+                        trigger OnValidate()
+                        begin
+                            _NPEmailEnabled := Rec."Enable NP Email" and _NPEmailFeatureEnabled;
+                            CurrPage.Update(true);
+                        end;
                     }
-                    field("E-mail Template (Confirmed)"; Rec."E-mail Template (Confirmed)")
+                    group(LegacyCustomerEmailTemplates)
                     {
+                        ShowCaption = false;
+                        Visible = not _NPEmailEnabled;
 
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the E-mail Template (Confirmed) field';
-                        ApplicationArea = NPRRetail;
+                        field("E-mail Template (Pending)"; Rec."E-mail Template (Pending)")
+                        {
+                            Importance = Additional;
+                            ToolTip = 'Specifies the value of the E-mail Template (Pending) field';
+                            ApplicationArea = NPRRetail;
+                        }
+                        field("E-mail Template (Confirmed)"; Rec."E-mail Template (Confirmed)")
+                        {
+                            Importance = Additional;
+                            ToolTip = 'Specifies the value of the E-mail Template (Confirmed) field';
+                            ApplicationArea = NPRRetail;
+                        }
+                        field("E-mail Template (Rejected)"; Rec."E-mail Template (Rejected)")
+                        {
+                            Importance = Additional;
+                            ToolTip = 'Specifies the value of the E-mail Template (Rejected) field';
+                            ApplicationArea = NPRRetail;
+                        }
+                        field("E-mail Template (Expired)"; Rec."E-mail Template (Expired)")
+                        {
+                            Importance = Additional;
+                            ToolTip = 'Specifies the value of the E-mail Template (Expired) field';
+                            ApplicationArea = NPRRetail;
+                        }
                     }
-                    field("E-mail Template (Rejected)"; Rec."E-mail Template (Rejected)")
+                    group(NPCustomerEmailTemplates)
                     {
+                        ShowCaption = false;
+                        Visible = _NPEmailEnabled;
 
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the E-mail Template (Rejected) field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("E-mail Template (Expired)"; Rec."E-mail Template (Expired)")
-                    {
-
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the E-mail Template (Expired) field';
-                        ApplicationArea = NPRRetail;
+                        field("NP E-mail Template (Pending)"; Rec."NP E-mail Template (Pending)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Importance = Additional;
+                            ToolTip = 'Specifies the NP E-mail Template used for the Pending state.';
+                        }
+                        field("NP E-mail Template (Confirmed)"; Rec."NP E-mail Template (Confirmed)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Importance = Additional;
+                            ToolTip = 'Specifies the NP E-mail Template used for the Confirmed state.';
+                        }
+                        field("NP E-mail Template (Rejected)"; Rec."NP E-mail Template (Rejected)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Importance = Additional;
+                            ToolTip = 'Specifies the NP E-mail Template used for the Rejected state.';
+                        }
+                        field("NP E-mail Template (Expired)"; Rec."NP E-mail Template (Expired)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Importance = Additional;
+                            ToolTip = 'Specifies the NP E-mail Template used for the Expired state.';
+                        }
                     }
                 }
                 group(Control6014440)
@@ -649,9 +693,23 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
         Rec.Type := Rec.Type::"Collect in Store";
     end;
 
+    trigger OnOpenPage()
+    begin
+        _NPEmailFeatureEnabled := _NPEmailFeature.IsFeatureEnabled() and _NewEmailExpFeature.IsFeatureEnabled();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        _NPEmailEnabled := Rec."Enable NP Email" and _NPEmailFeatureEnabled;
+    end;
+
     var
         ConfirmOrderQst: Label 'Confirm Order %1?', Comment = '%1 = Document no.';
         RejectOrderQst: Label 'Reject Order %1?', Comment = '%1 = Document no.';
         WarningLbl: Label 'Do not pick from Store Stock';
+        _NPEmailEnabled: Boolean;
+        _NPEmailFeatureEnabled: Boolean;
+        _NPEmailFeature: Codeunit "NPR NP Email Feature";
+        _NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
 }
 

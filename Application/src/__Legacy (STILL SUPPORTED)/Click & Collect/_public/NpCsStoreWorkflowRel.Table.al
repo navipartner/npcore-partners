@@ -36,6 +36,11 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 "E-mail Template (Confirmed)" := NpCsWorkflow."E-mail Template (Confirmed)";
                 "E-mail Template (Rejected)" := NpCsWorkflow."E-mail Template (Rejected)";
                 "E-mail Template (Expired)" := NpCsWorkflow."E-mail Template (Expired)";
+                "Enable NP Email" := NpCsWorkflow."Enable NP Email";
+                "NP E-mail Template (Pending)" := NpCsWorkflow."NP E-mail Template (Pending)";
+                "NP E-mail Template (Confirmed)" := NpCsWorkflow."NP E-mail Template (Confirmed)";
+                "NP E-mail Template (Rejected)" := NpCsWorkflow."NP E-mail Template (Rejected)";
+                "NP E-mail Template (Expired)" := NpCsWorkflow."NP E-mail Template (Expired)";
                 "Notify Customer via Sms" := NpCsWorkflow."Notify Customer via Sms";
                 "Sms Template (Pending)" := NpCsWorkflow."Sms Template (Pending)";
                 "Sms Template (Confirmed)" := NpCsWorkflow."Sms Template (Confirmed)";
@@ -152,6 +157,99 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 EmailTemplateHeader.SetRange("Table No.", DATABASE::"NPR NpCs Document");
                 if PAGE.RunModal(0, EmailTemplateHeader) = ACTION::LookupOK then
                     Validate("E-mail Template (Expired)", EmailTemplateHeader.Code);
+            end;
+        }
+        field(500; "Enable NP Email"; Boolean)
+        {
+            Caption = 'Enable NP Email';
+            DataClassification = CustomerContent;
+        }
+        field(501; "NP E-mail Template (Pending)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+
+            // NP Email templates are per-company and a C&C store can live in another company (the notification is
+            // sent in the destination company). Look them up in the store's company, as the legacy e-mail/SMS fields
+            // above do, so a destination-company template can be referenced.
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NPEmailTemplate: Record "NPR NPEmailTemplate";
+                NpCsStore: Record "NPR NpCs Store";
+            begin
+                NpCsStore.Get("Store Code");
+                if NPEmailTemplate.ChangeCompany(NpCsStore."Company Name") then;
+
+                if NPEmailTemplate.Get("NP E-mail Template (Pending)") then;
+                NPEmailTemplate.SetRange(DataProvider, NPEmailTemplate.DataProvider::CLICK_COLLECT_NOTIFICATION);
+                if PAGE.RunModal(0, NPEmailTemplate) = ACTION::LookupOK then
+                    Validate("NP E-mail Template (Pending)", NPEmailTemplate.TemplateId);
+            end;
+        }
+        field(502; "NP E-mail Template (Confirmed)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Confirmed)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NPEmailTemplate: Record "NPR NPEmailTemplate";
+                NpCsStore: Record "NPR NpCs Store";
+            begin
+                NpCsStore.Get("Store Code");
+                if NPEmailTemplate.ChangeCompany(NpCsStore."Company Name") then;
+
+                if NPEmailTemplate.Get("NP E-mail Template (Confirmed)") then;
+                NPEmailTemplate.SetRange(DataProvider, NPEmailTemplate.DataProvider::CLICK_COLLECT_NOTIFICATION);
+                if PAGE.RunModal(0, NPEmailTemplate) = ACTION::LookupOK then
+                    Validate("NP E-mail Template (Confirmed)", NPEmailTemplate.TemplateId);
+            end;
+        }
+        field(503; "NP E-mail Template (Rejected)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Rejected)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NPEmailTemplate: Record "NPR NPEmailTemplate";
+                NpCsStore: Record "NPR NpCs Store";
+            begin
+                NpCsStore.Get("Store Code");
+                if NPEmailTemplate.ChangeCompany(NpCsStore."Company Name") then;
+
+                if NPEmailTemplate.Get("NP E-mail Template (Rejected)") then;
+                NPEmailTemplate.SetRange(DataProvider, NPEmailTemplate.DataProvider::CLICK_COLLECT_NOTIFICATION);
+                if PAGE.RunModal(0, NPEmailTemplate) = ACTION::LookupOK then
+                    Validate("NP E-mail Template (Rejected)", NPEmailTemplate.TemplateId);
+            end;
+        }
+        field(504; "NP E-mail Template (Expired)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NPEmailTemplate: Record "NPR NPEmailTemplate";
+                NpCsStore: Record "NPR NpCs Store";
+            begin
+                NpCsStore.Get("Store Code");
+                if NPEmailTemplate.ChangeCompany(NpCsStore."Company Name") then;
+
+                if NPEmailTemplate.Get("NP E-mail Template (Expired)") then;
+                NPEmailTemplate.SetRange(DataProvider, NPEmailTemplate.DataProvider::CLICK_COLLECT_NOTIFICATION);
+                if PAGE.RunModal(0, NPEmailTemplate) = ACTION::LookupOK then
+                    Validate("NP E-mail Template (Expired)", NPEmailTemplate.TemplateId);
             end;
         }
         field(155; "Notify Customer via Sms"; Boolean)

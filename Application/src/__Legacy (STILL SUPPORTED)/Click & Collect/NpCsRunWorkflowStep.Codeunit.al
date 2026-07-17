@@ -347,12 +347,21 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
         ErrorText: Text;
         NotifSentLbl: Label 'E-mail Notification (%3) sent to Customer %1 (%2)';
         CustomerNotified: Boolean;
+        NPEmailFeature: Codeunit "NPR NP Email Feature";
+        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
     begin
         if not NpCsDocument."Notify Customer via E-mail" then
             exit(false);
 
         LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."Sell-to Customer Name", NpCsDocument."Customer E-mail", NpCsDocument."Processing Status");
         NpCsDocument.TestField("Customer E-mail");
+
+        // Gate the NP Email path on the feature flags, not just the per-workflow toggle: the NP connector only
+        // exposes an account while "NP Email" is enabled (NPEmailConnector.GetAccounts), so with the feature off
+        // TrySendEmail falls back to the tenant default account and mails the raw template JSON. AND both flags
+        // (as DocumentSendingProfile does) so it falls through to the legacy path instead.
+        if NpCsDocument."Enable NP Email" and NPEmailFeature.IsFeatureEnabled() and NewEmailExpFeature.IsFeatureEnabled() then
+            exit(NotifyCustomerNPEmail(NpCsDocument, LogMessage));
 
         if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Expired then begin
             if NpCsDocument."E-mail Template (Expired)" = '' then
@@ -500,5 +509,91 @@ codeunit 6151212 "NPR NpCs Run Workflow Step"
         end;
 
         exit('noreply');
+    end;
+
+    local procedure NotifyCustomerNPEmail(NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text): Boolean
+    var
+        NPEmailTemplate: Record "NPR NPEmailTemplate";
+        Customer: Record Customer;
+        NPEmail: Codeunit "NPR NP Email";
+        ClickCollect: Codeunit "NPR Click & Collect";
+        NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
+        RecRef: RecordRef;
+        CustomerNotified: Boolean;
+        LanguageCode: Code[10];
+        TemplateCode: Code[20];
+        NotifSentLbl: Label 'E-mail Notification (%3) sent to Customer %1 (%2)';
+        NoNPTemplateConfiguredLbl: Label 'NP E-mail is enabled but no NP E-mail template is configured on the document.';
+        TemplateNotFoundLbl: Label 'NP E-mail Template %1 does not exist.', Comment = '%1 = template code';
+        TemplateWrongProviderLbl: Label 'NP E-mail Template %1 is for data provider %2, but %3 is required.', Comment = '%1 = template code, %2 = the template''s data provider, %3 = the required data provider';
+    begin
+        NpCsDocument.CalcFields("Order Status Module");
+        NpCsWorkflowModule.Init();
+        NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
+        NpCsWorkflowModule.Code := NpCsDocument."Order Status Module";
+        if NpCsWorkflowModule.Get(NpCsWorkflowModule.Type, NpCsWorkflowModule.Code) then;
+
+        TemplateCode := ResolveNPTemplateCode(NpCsDocument);
+        if TemplateCode = '' then begin
+            if not HasAnyNPTemplate(NpCsDocument) then
+                NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, NoNPTemplateConfiguredLbl);
+            exit(false);
+        end;
+
+        if not NPEmailTemplate.Get(TemplateCode) then begin
+            NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, StrSubstNo(TemplateNotFoundLbl, TemplateCode));
+            exit(false);
+        end;
+
+        if NPEmailTemplate.DataProvider <> "NPR DynTemplateDataProvider"::CLICK_COLLECT_NOTIFICATION then begin
+            NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, StrSubstNo(TemplateWrongProviderLbl, TemplateCode, Format(NPEmailTemplate.DataProvider), Format("NPR DynTemplateDataProvider"::CLICK_COLLECT_NOTIFICATION)));
+            exit(false);
+        end;
+
+        if Customer.Get(NpCsDocument.ResolveCustomerNo()) then
+            LanguageCode := Customer."Language Code";
+
+        if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Expired then
+            LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."Sell-to Customer Name", NpCsDocument."Customer E-mail", NpCsDocument."Delivery Status");
+
+        RecRef.GetTable(NpCsDocument);
+        RecRef.SetRecFilter();
+
+        ClickCollect.OnNotifyCustomerViaNPEmailOnBeforeSendEmail(RecRef, NpCsDocument."Customer E-mail", NPEmailTemplate, CustomerNotified);
+        if CustomerNotified then
+            exit(true);
+
+        if not NPEmail.TrySendEmail(TemplateCode, NpCsDocument, NpCsDocument."Customer E-mail", LanguageCode) then begin
+            NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, CopyStr(GetLastErrorText(), 1, 1020));
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
+    local procedure HasAnyNPTemplate(NpCsDocument: Record "NPR NpCs Document"): Boolean
+    begin
+        exit((NpCsDocument."NP E-mail Template (Pending)" <> '') or
+             (NpCsDocument."NP E-mail Template (Confirmed)" <> '') or
+             (NpCsDocument."NP E-mail Template (Rejected)" <> '') or
+             (NpCsDocument."NP E-mail Template (Expired)" <> ''));
+    end;
+
+    local procedure ResolveNPTemplateCode(NpCsDocument: Record "NPR NpCs Document"): Code[20]
+    begin
+        if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Expired then
+            exit(NpCsDocument."NP E-mail Template (Expired)");
+
+        case NpCsDocument."Processing Status" of
+            NpCsDocument."Processing Status"::Pending:
+                exit(NpCsDocument."NP E-mail Template (Pending)");
+            NpCsDocument."Processing Status"::Confirmed:
+                exit(NpCsDocument."NP E-mail Template (Confirmed)");
+            NpCsDocument."Processing Status"::Rejected:
+                exit(NpCsDocument."NP E-mail Template (Rejected)");
+            NpCsDocument."Processing Status"::Expired:
+                exit(NpCsDocument."NP E-mail Template (Expired)");
+        end;
+        exit('');
     end;
 }

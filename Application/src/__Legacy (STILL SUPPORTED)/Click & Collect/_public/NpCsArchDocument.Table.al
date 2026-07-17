@@ -189,6 +189,35 @@ table 6151202 "NPR NpCs Arch. Document"
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code where("Table No." = const(6151198));
         }
+        field(500; "Enable NP Email"; Boolean)
+        {
+            Caption = 'Enable NP Email';
+            DataClassification = CustomerContent;
+        }
+        field(501; "NP E-mail Template (Pending)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(502; "NP E-mail Template (Confirmed)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Confirmed)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(503; "NP E-mail Template (Rejected)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Rejected)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(504; "NP E-mail Template (Expired)"; Code[20])
+        {
+            Caption = 'NP E-mail Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CLICK_COLLECT_NOTIFICATION));
+        }
         field(155; "Notify Customer via Sms"; Boolean)
         {
             Caption = 'Notify Customer via Sms';

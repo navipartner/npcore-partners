@@ -59,7 +59,7 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
         }
         field(6014403; "NPR NP Email Templ"; Boolean)
         {
-            Caption = 'NaviPartenr NP Email Templates';
+            Caption = 'NaviPartner NP Email Templates';
             DataClassification = CustomerContent;
         }
         field(6060109; "NPR RS Local"; Boolean)
