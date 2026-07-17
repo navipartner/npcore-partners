@@ -25,6 +25,9 @@ query 6014505 "NPR APIV1 PBI AttrWalletExtRef"
             column(expiresAt; ExpiresAt)
             {
             }
+            column(externalReferenceRowVersion; SystemRowVersion)
+            {
+            }
 
             dataitem(AttractionWallet; "NPR AttractionWallet")
             {
@@ -37,6 +40,9 @@ query 6014505 "NPR APIV1 PBI AttrWalletExtRef"
                 {
                 }
                 column(description; Description)
+                {
+                }
+                column(walletRowVersion; SystemRowVersion)
                 {
                 }
             }

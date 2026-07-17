@@ -35,6 +35,9 @@ query 6014503 "NPR APIV1 PBI POSEntrSLinAddOn"
             column(addOnItemNo; AddOnItemNo)
             {
             }
+            column(addOnRowVersion; SystemRowVersion)
+            {
+            }
             dataitem(NpIa_POSEntryLineBundleId; "NPR NpIa POSEntryLineBundleId")
             {
                 DataItemLink = POSEntrySaleLineId = NpIa_POSEntrySaleLineAddOn.AppliesToSaleLineId;

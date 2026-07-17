@@ -14,6 +14,9 @@ query 6014504 "NPR APIV1 PBI AttrWltAssets"
         dataitem(Wallet; "NPR AttractionWallet")
         {
 
+            column(walletRowVersion; SystemRowVersion)
+            {
+            }
             column(walletEntryNo; EntryNo)
             {
             }
