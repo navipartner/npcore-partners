@@ -22,6 +22,7 @@ page 6150891 "NPR Job Queue Refresh Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether refreshing the list of NP Retail related job queue entries should be enabled. Default value is true.';
+                    Visible = not _ExtJQRefresherOnly;
                 }
                 field("Use External JQ Refresher"; Rec."Use External JQ Refresher")
                 {
@@ -213,8 +214,11 @@ page 6150891 "NPR Job Queue Refresh Setup"
         DisablingExternalJQWorkerLbl: Label 'Disabling External JQ Refresher.';
         EntraAppFieldClearedLbl: Label 'Entra App is not registered in the External Refresher database - therefore it was removed from Job Queue Refresher Setup.';
         NoValidEntraAppsLbl: Label 'No valid Entra Apps were found. ';
+        ExternalRefresherRequiredNotification: Notification;
+        ExternalRefresherRequiredLbl: Label 'The External Job Queue Refresher is required but currently disabled, so no job queue entries are being refreshed. Use ''Enable External JQ Refresher'' to restore refreshing.';
     begin
         Rec.GetSetup();
+        _ExtJQRefresherOnly := _ExtJQRefresherOnlyFeat.IsFeatureEnabled();
         if Rec."Use External JQ Refresher" then begin
             ClearLastError();
             if not _ExternalJQRefresherMgt.ValidateExternalJQRefresherTenantManager() then
@@ -246,6 +250,17 @@ page 6150891 "NPR Job Queue Refresh Setup"
                 ConfigurationsValidationNotification.Send();
             end;
         end;
+
+        // When the external refresher is the only allowed setup but the web-service gate ("Use External JQ Refresher"
+        // AND Enabled) is not fully satisfied - fresh tenant not yet configured, the Disable action was used, the
+        // auto-disable above fired on a transient worker/network failure, or a legacy setup left Enabled off with the
+        // now-hidden master field - nothing refreshes. Surface a persistent warning on every page open so the dead
+        // state is not silent.
+        if _ExtJQRefresherOnly and not (Rec."Use External JQ Refresher" and Rec.Enabled) then begin
+            ExternalRefresherRequiredNotification.Message(ExternalRefresherRequiredLbl);
+            ExternalRefresherRequiredNotification.Scope := NotificationScope::LocalScope;
+            ExternalRefresherRequiredNotification.Send();
+        end;
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -266,6 +281,8 @@ page 6150891 "NPR Job Queue Refresh Setup"
     var
         _JQRunnerUser: Record "NPR Job Queue Runner User";
         _ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+        _ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
         _StyleExprTxt: Text[50];
         _ExternalJQRefresherIsEnabled: Boolean;
+        _ExtJQRefresherOnly: Boolean;
 }

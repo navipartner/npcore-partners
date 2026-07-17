@@ -145,4 +145,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Voucher Reservation';
         Implementation = "NPR Feature Management" = "NPR New Voucher Reservation";
     }
+    value(220; "External JQ Refresher Only")
+    {
+        Caption = 'External Job Queue Refresher Only';
+        Implementation = "NPR Feature Management" = "NPR Ext JQ Refresher Only Feat";
+    }
 }

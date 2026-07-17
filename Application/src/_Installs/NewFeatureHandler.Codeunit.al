@@ -331,6 +331,41 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+    internal procedure HandleExtJQRefresherOnly()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'ExtJQRefresherOnlyHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ExtJQRefresherOnlyHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        ExtJQRefresherOnlyHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ExtJQRefresherOnlyHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure ExtJQRefresherOnlyHandle()
+    var
+        Feature: Record "NPR Feature";
+        ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        if EnvironmentInformation.IsOnPrem() then
+            exit;
+        if not Feature.Get(ExtJQRefresherOnlyFeat.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR New Feature Handler");

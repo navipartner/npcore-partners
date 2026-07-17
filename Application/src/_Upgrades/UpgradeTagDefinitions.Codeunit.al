@@ -263,6 +263,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewRestaurantPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewVoucherReservationHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'ExtJQRefresherOnlyHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSEditorFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSStatisticsDashboardFeatureHandle'));
@@ -271,6 +272,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewRestaurantPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewVoucherReservationHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ExtJQRefresherOnlyHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Update Wizards", 'UpdateWizardFiscalization'));
@@ -1025,6 +1027,8 @@
                         exit('NPR-NewRestaurantPrintExperienceHandle-20251207');
                     'NewVoucherReservationHandle':
                         exit('NPR-NewVoucherReservationHandle-20260315');
+                    'ExtJQRefresherOnlyHandle':
+                        exit('NPR-ExtJQRefresherOnlyHandle-20260717');
                 end;
             Codeunit::"NPR UPG New Feature Handler":
                 case UpgradeStep of
@@ -1044,6 +1048,8 @@
                         exit('NPR-NewRestaurantPrintExperienceHandle-20251207');
                     'NewVoucherReservationHandle':
                         exit('NPR-NewVoucherReservationHandle-20260315');
+                    'ExtJQRefresherOnlyHandle':
+                        exit('NPR-ExtJQRefresherOnlyHandle-20260717');
                 end;
             Codeunit::"NPR UPG Pay By Link Setup":
                 case UpgradeStep of

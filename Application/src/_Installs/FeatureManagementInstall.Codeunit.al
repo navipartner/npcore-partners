@@ -11,8 +11,11 @@ codeunit 6151434 "NPR Feature Management Install"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
     local procedure HandleOnCompanyInitialize()
+    var
+        ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
     begin
         InitFeatures();
+        ExtJQRefresherOnlyFeat.EnableForNewCompany();
         RefreshExperienceTierCurrentCompany();
     end;
 
@@ -74,6 +77,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"New Attraction Print Exerience");
         AddFeature(Feature::"New Restaurant Print Experience");
         AddFeature(Feature::"New Voucher Reservation");
+        AddFeature(Feature::"External JQ Refresher Only");
 
         if ExistingFeature.FindSet() then
             repeat
@@ -107,6 +111,7 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleNewAttractionPrintExperience();
         NewFeatureHandler.HandleNewRestaurantPrintExperience();
         NewFeatureHandler.HandleNewVoucherReservation();
+        NewFeatureHandler.HandleExtJQRefresherOnly();
         RefreshExperienceTierCurrentCompany();
     end;
 

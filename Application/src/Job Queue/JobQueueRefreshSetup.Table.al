@@ -61,6 +61,7 @@ table 6059870 "NPR Job Queue Refresh Setup"
                 if "Use External JQ Refresher" then begin
                     "Ext. JQ Refresher Enabled at" := CurrentDateTime();
                     InitWebserviceTimeZone();
+                    ForceEnabledForExtJQRefresherOnly();
                 end else
                     "Ext. JQ Refresher Enabled at" := 0DT;
                 Modify();
@@ -148,6 +149,20 @@ table 6059870 "NPR Job Queue Refresh Setup"
             Insert();
             Commit();
         end;
+    end;
+
+    // When the external refresher is the only allowed setup, the master "Enabled" switch is hidden and auto-managed:
+    // enabling external must also satisfy the web service gate ("Use External" and "Enabled") and bootstrap the
+    // "Default Job Time Zone" that RefreshNPRJobQueueList requires. Extracted so it can be exercised in isolation
+    // (the OnValidate that calls it makes live HTTP calls and errors on OnPrem/<BC22, so it is not directly testable).
+    internal procedure ForceEnabledForExtJQRefresherOnly()
+    var
+        ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
+    begin
+        if not ExtJQRefresherOnlyFeat.IsFeatureEnabled() then
+            exit;
+        Enabled := true;
+        InitTimeZone();
     end;
 
     internal procedure InitTimeZone()

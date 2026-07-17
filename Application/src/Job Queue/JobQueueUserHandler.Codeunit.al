@@ -52,9 +52,20 @@ codeunit 6151058 "NPR Job Queue User Handler"
         TaskScheduler.CreateTask(Codeunit::"NPR Job Queue User Handler", 0, true, CompanyName(), CurrentDateTime() + 2000); // Add 2s
     end;
 
-    local procedure IsRefreshJobQueueEntriesEnabled(var JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup"): Boolean
+    internal procedure IsRefreshJobQueueEntriesEnabled(var JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup"): Boolean
     begin
         JobQueueRefreshSetup.GetSetup();
+        exit(IsLegacyRefreshAllowed(JobQueueRefreshSetup));
+    end;
+
+    // Takes the setup record by value and reads only the feature flag from the DB (never the setup table), so the
+    // whole feature-on/off x Enabled x external matrix is unit-testable with an in-memory setup record.
+    internal procedure IsLegacyRefreshAllowed(JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup"): Boolean
+    var
+        ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
+    begin
+        if ExtJQRefresherOnlyFeat.IsFeatureEnabled() then // legacy logon-triggered refresher is disabled when only the external refresher is allowed
+            exit(false);
         exit(JobQueueRefreshSetup.Enabled and not JobQueueRefreshSetup."Use External JQ Refresher");
     end;
 
