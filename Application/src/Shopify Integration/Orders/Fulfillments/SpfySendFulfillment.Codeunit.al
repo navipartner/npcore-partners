@@ -72,7 +72,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean)
     var
         TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer" temporary;
-        FulfillmentOrderIds: List of [Text];
+        FulfillmentOrderIds: List of [Text[30]];
         FulfillmentOrderId: Text[30];
     begin
         TempAvailableFulfillmentLines.Reset();
@@ -90,12 +90,12 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines, SendToShopify);
     end;
 
-    local procedure CollectFulfillmentOrders(var NcTask: Record "NPR Nc Task"; var FulfillmentOrderIds: List of [Text])
+    local procedure CollectFulfillmentOrders(var NcTask: Record "NPR Nc Task"; var FulfillmentOrderIds: List of [Text[30]])
     var
         FulfillmentOrder: JsonToken;
         ShopifyResponse: JsonToken;
         Cursor: Text;
-        FulfillmentOrderID: Text;
+        FulfillmentOrderID: Text[30];
         HasNext: Boolean;
         RequestString: Label 'query GetFulfillmentOrders($OrderId: ID!,$afterCursor: String){order(id:$OrderId){fulfillmentOrders(after:$afterCursor,first:50){pageInfo{hasNextPage endCursor} edges{node{id status}}}}}', Locked = true;
     begin
@@ -116,14 +116,16 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         until not HasNext;
     end;
 
-    local procedure LoadFulfillmentOrderLines(var NcTask: Record "NPR Nc Task"; FulfillmentOrderId: Text; var TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
+    local procedure LoadFulfillmentOrderLines(var NcTask: Record "NPR Nc Task"; FulfillmentOrderId: Text[30]; var TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
     var
         FulfillmentOrderLine: JsonToken;
         FulfillmentOrderLines: JsonToken;
         ShopifyResponse: JsonToken;
         Cursor: Text;
+        FulfillmentOrderLocationId: Text[30];
         HasNext: Boolean;
-        RequestString: Label 'query GetFulfilmentOrder($OrderId:ID!,$afterCursor:String){fulfillmentOrder(id:$OrderId){lineItems(first:50,after:$afterCursor){pageInfo{hasNextPage endCursor} edges{node{id remainingQuantity lineItem{id}}}}}}', Locked = true;
+        LocationCaptured: Boolean;
+        RequestString: Label 'query GetFulfilmentOrder($OrderId:ID!,$afterCursor:String){fulfillmentOrder(id:$OrderId){assignedLocation{location{id}} lineItems(first:50,after:$afterCursor){pageInfo{hasNextPage endCursor} edges{node{id remainingQuantity lineItem{id}}}}}}', Locked = true;
     begin
         SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         repeat
@@ -133,16 +135,19 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
                 Error(GetLastErrorText());
             if not ParsePageInfo(ShopifyResponse, 'data.fulfillmentOrder.lineItems', HasNext, Cursor) then
                 Error(GetLastErrorText());
+            if not LocationCaptured then begin
+                FulfillmentOrderLocationId := OrderMgt.GetNumericId(JsonHelper.GetJText(ShopifyResponse, 'data.fulfillmentOrder.assignedLocation.location.id', false));
+                LocationCaptured := true;
+            end;
             ShopifyResponse.SelectToken('data.fulfillmentOrder.lineItems.edges', FulfillmentOrderLines);
             foreach FulfillmentOrderLine in FulfillmentOrderLines.AsArray() do begin
                 TempAvailableFulfillmentLines.Init();
                 TempAvailableFulfillmentLines."Fulfillable Quantity" := JsonHelper.GetJDecimal(FulfillmentOrderLine, 'node.remainingQuantity', false);
                 if TempAvailableFulfillmentLines."Fulfillable Quantity" > 0 then begin
-#pragma warning disable AA0139
+                    TempAvailableFulfillmentLines."Location ID" := FulfillmentOrderLocationId;
                     TempAvailableFulfillmentLines."Fulfillment Order ID" := FulfillmentOrderId;
                     TempAvailableFulfillmentLines."Fulfillment Order Line ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(FulfillmentOrderLine, 'node.id', true));
                     TempAvailableFulfillmentLines."Order Line ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(FulfillmentOrderLine, 'node.lineItem.id', true));
-#pragma warning restore AA0139
                     TempAvailableFulfillmentLines."Entry No." += 1;
                     TempAvailableFulfillmentLines.Insert();
                 end;
@@ -284,7 +289,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         FulfillmentOrderObj: JsonObject;
         LineObj: JsonObject;
         OutStr: OutStream;
-        CurrentFulfillmentOrderId: Text;
+        CurrentFulfillmentOrderId: Text[30];
         MutationTxt: Label 'mutation fulfillmentCreate($fulfillment: FulfillmentInput!) {fulfillmentCreate(fulfillment: $fulfillment) {fulfillment { id status } userErrors { field message }}}', Locked = true;
         NoFulfillmentAvailableErr: Label 'There are no Shopify fulfillment order lines available to process. Everything may have already been fulfilled. Please check fulfillment status in Shopify.';
     begin

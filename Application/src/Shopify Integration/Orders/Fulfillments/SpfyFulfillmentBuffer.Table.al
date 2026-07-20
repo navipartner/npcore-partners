@@ -23,6 +23,11 @@ table 6150815 "NPR Spfy Fulfillment Buffer"
             DataClassification = CustomerContent;
             Caption = 'BC Record ID';
         }
+        field(4; "Location ID"; Text[30])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Location ID';
+        }
         field(10; "Fulfillment Order ID"; Text[30])
         {
             DataClassification = CustomerContent;
@@ -83,6 +88,7 @@ table 6150815 "NPR Spfy Fulfillment Buffer"
         key(RelationFromBCTables; "Table No.", "BC Record ID") { }
         key(ByFulfillmentOrder; "Fulfillment Order ID", "Fulfillment Order Line ID") { }
         key(OrderLindId; "Order Line ID") { }
+        key(ByLocation; "Location ID", "Fulfillment Order ID", "Fulfillment Order Line ID") { }
     }
 }
 #endif

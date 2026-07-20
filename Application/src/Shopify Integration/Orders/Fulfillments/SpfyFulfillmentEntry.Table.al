@@ -23,6 +23,11 @@ table 6151144 "NPR Spfy Fulfillment Entry"
             DataClassification = CustomerContent;
             Caption = 'BC Record ID';
         }
+        field(4; "Location ID"; Text[30])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Location ID';
+        }
         field(10; "Fulfillment Order ID"; Text[30])
         {
             DataClassification = CustomerContent;
