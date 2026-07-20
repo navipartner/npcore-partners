@@ -29,6 +29,7 @@ table 6150987 "NPR SGEntryLog"
         {
             DataClassification = CustomerContent;
             Caption = 'Reference No';
+            OptimizeForTextSearch = true;
         }
 
         field(30; ScannerId; Code[10])
@@ -57,6 +58,7 @@ table 6150987 "NPR SGEntryLog"
         {
             DataClassification = CustomerContent;
             Caption = 'Admitted Reference No';
+            OptimizeForTextSearch = true;
         }
         field(56; AdmittedReferenceId; Guid)
         {
