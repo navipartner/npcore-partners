@@ -410,6 +410,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                             end;
                     end;
                     EcomSalesLine."Is Attraction Wallet" := EcomCreateWalletMgt.IsAttractionWallet(EcomSalesLine);
+                    EcomSalesLine."Line Discount Amount" := CalcLineDiscountAmount(EcomSalesLine, EcomSalesHeader."Currency Code");
 
                     if EcomSalesLine.Subtype in [EcomSalesLine.Subtype::Coupon, EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Membership] then
                         if EcomSalesLine.Quantity <> Round(EcomSalesLine.Quantity, 1) then  // quantity must be a whole number
@@ -427,6 +428,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesLine.Quantity := JsonHelper.GetJDecimal(SalesLineJsonToken, 'quantity', true);
                     EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
+                    EcomSalesLine."Line Discount Amount" := CalcLineDiscountAmount(EcomSalesLine, EcomSalesHeader."Currency Code");
                 end;
             EcomSalesLine.Type::Voucher:
                 begin
@@ -448,6 +450,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                         Error(BarcodeNoQtyMustBeOneErr, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'quantity'), EcomSalesLine.Quantity);
                     EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
+                    EcomSalesLine."Line Discount Amount" := CalcLineDiscountAmount(EcomSalesLine, EcomSalesHeader."Currency Code");
                 end;
         end;
         EcomSalesLine."External Line ID" := JsonHelper.GetJText(SalesLineJsonToken, 'externalLineId', MaxStrLen(EcomSalesLine."External Line ID"), true, false);
@@ -455,6 +458,18 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 
         EcomSalesDocApiEvents.OnAfterDeserializeIncomingEcomSalesLine(SalesLineJsonToken, EcomSalesLine);
 #pragma warning restore AA0139
+    end;
+
+    local procedure CalcLineDiscountAmount(EcomSalesLine: Record "NPR Ecom Sales Line"; CurrencyCode: Code[10]): Decimal
+    var
+        Currency: Record Currency;
+        LineDiscountAmount: Decimal;
+    begin
+        Currency.Initialize(CurrencyCode);
+        LineDiscountAmount := Round(EcomSalesLine."Unit Price" * EcomSalesLine.Quantity - EcomSalesLine."Line Amount", Currency."Amount Rounding Precision");
+        if LineDiscountAmount < 0 then
+            exit(0);
+        exit(LineDiscountAmount);
     end;
 
     local procedure SetSubtype(var EcomSalesLine: Record "NPR Ecom Sales Line")

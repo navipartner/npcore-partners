@@ -528,10 +528,149 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         Assert.AreEqual(0, PaymentLine.Amount, 'The other payment line must be zeroed when the voucher covers the order total.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LineDiscountAmountPopulatedOnEcomSalesLine()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
+        LineDiscountAmount: Decimal;
+    begin
+        //[Scenario] Line Discount Amount is populated on Ecom Sales Line when the document is created from the API with a discounted line amount
+        Initialize();
+        //[GIVEN] Ecom Document No and a line discount
+        ExternalNo := LibraryRandom.RandText(20);
+        LineDiscountAmount := Round(UnitPrice * Qty / 3, 0.0001);
+
+        //[WHEN] Create Ecom Document with lineAmount = unitPrice * quantity - discount
+        CreateEcomDocRestAPIandProcess(SalesHeader, LineDiscountAmount);
+
+        //[THEN] Line Discount Amount on the Ecom Sales Line equals the discount, rounded to the amount rounding precision
+        FindEcomItemSalesLine(SalesHeader, EcomSalesLine);
+        Assert.AreEqual(Round(LineDiscountAmount, GetAmountRoundingPrecision()), EcomSalesLine."Line Discount Amount", 'Line Discount Amount should be populated on Ecom Sales Line');
+        Assert.AreEqual(UnitPrice * Qty - LineDiscountAmount, EcomSalesLine."Line Amount", 'Line Amount should equal Unit Price * Quantity - Line Discount Amount');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LineDiscountAmountZeroOnEcomSalesLineWithoutDiscount()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        //[Scenario] Line Discount Amount is zero on Ecom Sales Line when the document is created from the API without a discount
+        Initialize();
+        //[GIVEN] Ecom Document No
+        ExternalNo := LibraryRandom.RandText(20);
+
+        //[WHEN] Create Ecom Document with lineAmount = unitPrice * quantity
+        CreateEcomDocRestAPIandProcess(SalesHeader);
+
+        //[THEN] Line Discount Amount on the Ecom Sales Line is zero
+        FindEcomItemSalesLine(SalesHeader, EcomSalesLine);
+        Assert.AreEqual(0, EcomSalesLine."Line Discount Amount", 'Line Discount Amount should be zero when no discount is given');
+        Assert.AreEqual(UnitPrice * Qty, EcomSalesLine."Line Amount", 'Line Amount should equal Unit Price * Quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LineDiscountAmountPopulatedOnEcomSalesLineWithFullDiscount()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
+        LineDiscountAmount: Decimal;
+    begin
+        //[Scenario] Line Discount Amount is populated on Ecom Sales Line when the line is fully discounted (lineAmount = 0)
+        Initialize();
+        //[GIVEN] Ecom Document No and a discount equal to the full line amount
+        ExternalNo := LibraryRandom.RandText(20);
+        LineDiscountAmount := UnitPrice * Qty;
+
+        //[WHEN] Create Ecom Document with lineAmount = 0
+        CreateEcomDocRestAPIandProcess(SalesHeader, LineDiscountAmount);
+
+        //[THEN] Line Discount Amount on the Ecom Sales Line equals the full line amount, rounded to the amount rounding precision
+        FindEcomItemSalesLine(SalesHeader, EcomSalesLine);
+        Assert.AreEqual(Round(LineDiscountAmount, GetAmountRoundingPrecision()), EcomSalesLine."Line Discount Amount", 'Line Discount Amount should equal Unit Price * Quantity for a fully discounted line');
+        Assert.AreEqual(0, EcomSalesLine."Line Amount", 'Line Amount should be zero for a fully discounted line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LineDiscountAmountZeroOnEcomSalesLineWithNegativeDiscount()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryRandom: Codeunit "Library - Random";
+        LineDiscountAmount: Decimal;
+    begin
+        //[Scenario] Line Discount Amount stays zero when lineAmount exceeds unitPrice * quantity (surcharge), instead of storing a negative discount
+        Initialize();
+        //[GIVEN] Ecom Document No and a negative discount (lineAmount above unitPrice * quantity)
+        ExternalNo := LibraryRandom.RandText(20);
+        LineDiscountAmount := -Round(UnitPrice * Qty / 3, 0.0001);
+
+        //[WHEN] Create Ecom Document with lineAmount = unitPrice * quantity - discount (> unitPrice * quantity)
+        CreateEcomDocRestAPI(EcomSalesHeader, LineDiscountAmount);
+
+        //[THEN] Line Discount Amount on the Ecom Sales Line is zero and Line Amount is stored as sent
+        FindEcomItemSalesLine(EcomSalesHeader, EcomSalesLine);
+        Assert.AreEqual(0, EcomSalesLine."Line Discount Amount", 'Line Discount Amount should be zero when the calculated discount is negative');
+        Assert.AreEqual(UnitPrice * Qty - LineDiscountAmount, EcomSalesLine."Line Amount", 'Line Amount should be stored as sent');
+    end;
+
+    local procedure GetAmountRoundingPrecision(): Decimal
+    var
+        Currency: Record Currency;
+    begin
+        Currency.Initialize('');
+        exit(Currency."Amount Rounding Precision");
+    end;
+
+    local procedure FindEcomItemSalesLine(SalesHeader: Record "Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    begin
+        if not EcomSalesHeader.GetBySystemId(SalesHeader."NPR Inc Ecom Sale Id") then
+            Error('Ecom Sales Header not found for sales order %1', SalesHeader."No.");
+        FindEcomItemSalesLine(EcomSalesHeader, EcomSalesLine);
+    end;
+
+    local procedure FindEcomItemSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Item);
+        if not EcomSalesLine.FindFirst() then
+            Error('Ecom Sales Line not found for ecom document %1', EcomSalesHeader."Entry No.");
+    end;
+
     local procedure CreateEcomDocRestAPIandProcess(var SalesHeader: Record "Sales Header")
+    begin
+        CreateEcomDocRestAPIandProcess(SalesHeader, 0);
+    end;
+
+    local procedure CreateEcomDocRestAPIandProcess(var SalesHeader: Record "Sales Header"; LineDiscountAmount: Decimal)
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
+    begin
+        CreateEcomDocRestAPI(EcomSalesHeader, LineDiscountAmount);
+
+        EcomSalesDocApiAgentV2.PreProcessDocument(EcomSalesHeader);
+
+        if not SalesHeader.Get(SalesHeader."Document Type"::Order, EcomSalesHeader."Created Doc No.") then
+            error('sales header not created');
+    end;
+
+    local procedure CreateEcomDocRestAPI(var EcomSalesHeader: Record "NPR Ecom Sales Header"; LineDiscountAmount: Decimal)
+    var
         Headers: Dictionary of [Text, Text];
         QueryParameters: Dictionary of [Text, Text];
         GuidValue: Guid;
@@ -542,7 +681,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         ErrorResponse: Text;
     begin
         LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Ecom');
-        Body := BuildEcomDocJsonObject('order');
+        Body := BuildEcomDocWithLineDiscountJson('order', LineDiscountAmount);
         Headers.Add('x-api-version', Format(Today, 0, 9));
         Response := LibraryNPRetailAPI.CallApi('POST', 'ecommerce/documents', Body, QueryParameters, Headers);
         ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
@@ -557,11 +696,6 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
                 Error('Ecom document not found');
         end else
             Error('id missing from response');
-
-        EcomSalesDocApiAgentV2.PreProcessDocument(EcomSalesHeader);
-
-        if not SalesHeader.Get(SalesHeader."Document Type"::Order, EcomSalesHeader."Created Doc No.") then
-            error('sales header not created');
     end;
 
     local procedure FindNegativeSalesLine(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"): Boolean
@@ -792,7 +926,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         NewCountryCode := LibraryERM.CreateCountryRegion();
     end;
 
-    local procedure BuildEcomDocJsonObject(DocType: Text[11]): JsonObject
+    local procedure BuildEcomDocWithLineDiscountJson(DocType: Text[11]; LineDiscountAmount: Decimal): JsonObject
     var
         IncSalesDocumentJsonObject: Codeunit "NPR Json Builder";
         PaymentLineJsonObject: Codeunit "NPR Json Builder";
@@ -823,7 +957,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         IncSalesDocumentJsonObject.EndArray();
 
         IncSalesDocumentJsonObject.StartArray('salesDocumentLines');
-        SalesLineJsonObject := CreateAddSalesLineDetailsJsonObject(IncSalesDocumentJsonObject);
+        SalesLineJsonObject := CreateAddSalesLineDetailsJsonObject(IncSalesDocumentJsonObject, LineDiscountAmount);
         IncSalesDocumentJsonObject.AddObject(SalesLineJsonObject);
         IncSalesDocumentJsonObject.EndArray();
 
@@ -842,7 +976,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
         PaymentDocumentDetailsJsonObject.EndObject();
     end;
 
-    local procedure CreateAddSalesLineDetailsJsonObject(var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    local procedure CreateAddSalesLineDetailsJsonObject(var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder"; LineDiscountAmount: Decimal): Codeunit "NPR Json Builder"
     var
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         ItemNo: Code[20];
@@ -858,7 +992,7 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
                                   .AddProperty('quantity', Format(Qty, 0, 9))
                                   .AddProperty('unitOfMeasure', Format('', 0, 9))
                                   .AddProperty('vatPercent', Format(25, 0, 9))
-                                  .AddProperty('lineAmount', Format(UnitPrice * Qty, 0, 9));
+                                  .AddProperty('lineAmount', Format(UnitPrice * Qty - LineDiscountAmount, 0, 9));
         SalesLineDetailsJsonObject.EndObject();
     end;
 
