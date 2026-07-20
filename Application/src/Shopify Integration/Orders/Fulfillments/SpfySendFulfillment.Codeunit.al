@@ -21,6 +21,25 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         JsonHelper: Codeunit "NPR Json Helper";
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
+        _GraphQLClientSet: Boolean;
+
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
 
     local procedure SendShopifyFulfillment(var NcTask: Record "NPR Nc Task")
     var
@@ -36,7 +55,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
 
         Success := PrepareFulfillment(NcTask, TempCalculatedFulfillmentLines, SendToShopify);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse);
 
         if SendToShopify and Success then
             SaveFulfillmentEntries(TempCalculatedFulfillmentLines);
@@ -84,7 +103,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         repeat
             SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, NcTask."Store Code", RequestString, 'gid://shopify/Order/' + NcTask."Record Value", true);
-            if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+            if not GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse) then
                 Error(GetLastErrorText());
             if not ParsePageInfo(ShopifyResponse, 'data.order.fulfillmentOrders', HasNext, Cursor) then
                 Error(GetLastErrorText());
@@ -110,7 +129,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         repeat
             Clear(NcTask."Data Output");
             SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, NcTask."Store Code", RequestString, 'gid://shopify/FulfillmentOrder/' + FulfillmentOrderId, true);
-            if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+            if not GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse) then
                 Error(GetLastErrorText());
             if not ParsePageInfo(ShopifyResponse, 'data.fulfillmentOrder.lineItems', HasNext, Cursor) then
                 Error(GetLastErrorText());
