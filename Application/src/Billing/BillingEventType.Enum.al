@@ -24,5 +24,21 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'Ecommerce Shopify Orders Amount Shop', Locked = true;
     }
+    value(5; HOSPITALITY_SELFSERVICE_ORDERS_COUNT)
+    {
+        Caption = 'Hospitality Self-Service Orders Count', Locked = true;
+    }
+    value(6; HOSPITALITY_SELFSERVICE_ORDERS_AMOUNT_LCY)
+    {
+        Caption = 'Hospitality Self-Service Orders Amount LCY', Locked = true;
+    }
+    value(7; RETAIL_SELFSERVICE_ORDERS_COUNT)
+    {
+        Caption = 'Retail Self-Service Orders Count', Locked = true;
+    }
+    value(8; RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY)
+    {
+        Caption = 'Retail Self-Service Orders Amount LCY', Locked = true;
+    }
 }
 #endif

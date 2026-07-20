@@ -42,6 +42,7 @@ codeunit 85157 "NPR POS API Tests"
         JToken: JsonToken;
         ReceiptNo: Text;
         POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
         // [SCENARIO] Happy path - Create sale, add item line, pay with cash, complete sale
         Initialize();
@@ -94,6 +95,21 @@ codeunit 85157 "NPR POS API Tests"
         POSEntry.SetRange("Document No.", ReceiptNo);
         Assert.IsTrue(POSEntry.FindFirst(), 'POS Entry should be created');
         Assert.AreEqual(_POSUnit."No.", POSEntry."POS Unit No.", 'POS Entry should have correct POS Unit');
+        Assert.AreEqual(_Item."Unit Price", POSEntry."Amount Incl. Tax & Round", 'POS Entry should have the fully paid total');
+
+        POSEntrySalesLine.SetCurrentKey("POS Entry No.", "Line No.");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        Assert.IsTrue(POSEntrySalesLine.FindFirst(), 'POS Entry sales line should be created');
+        Assert.AreEqual(SaleLineId, POSEntrySalesLine.SystemId, 'First POS Entry sales line should preserve the API sale line ID');
+
+        AssertBillingEvent(
+            POSEntry.SystemId,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT,
+            1);
+        AssertAmountBillingEvent(
+            POSEntrySalesLine.SystemId,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY,
+            POSEntry."Amount Incl. Tax & Round");
     end;
 
     [Test]
@@ -589,6 +605,77 @@ codeunit 85157 "NPR POS API Tests"
         Assert.IsTrue(Response.Get('statusCode', JToken), 'Response should contain statusCode');
         StatusCode := JToken.AsValue().AsInteger();
         Assert.AreEqual(400, StatusCode, 'Should return 400 Bad Request when underpaid by 1');
+        AssertBillingEventNotRegistered(SaleId);
+        AssertBillingEventNotRegistered(SaleLineId);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_BalancedExchangeWithoutPayment_RegistersBillingEvents()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        ReturnSaleLineId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        Initialize();
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        ReturnSaleLineId := CreateGuid();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create positive sale line should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', -1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(ReturnSaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create return sale line should succeed');
+
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Balanced exchange should complete without payment');
+
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('entryNo', JToken), 'Response should contain entryNo');
+        Assert.IsTrue(POSEntry.Get(JToken.AsValue().AsInteger()), 'POS Entry should be created');
+        Assert.AreEqual(0, POSEntry."Amount Incl. Tax & Round", 'Balanced exchange should have zero rounded total');
+
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        Assert.IsTrue(POSEntryPaymentLine.IsEmpty(), 'Balanced exchange should not require a POS Entry payment line');
+
+        POSEntrySalesLine.SetCurrentKey("POS Entry No.", "Line No.");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        Assert.IsTrue(POSEntrySalesLine.FindFirst(), 'POS Entry sales line should be created');
+        Assert.AreEqual(SaleLineId, POSEntrySalesLine.SystemId, 'First POS Entry sales line should preserve the first API sale line ID');
+
+        AssertBillingEvent(
+            POSEntry.SystemId,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT,
+            1);
+        AssertAmountBillingEvent(
+            POSEntrySalesLine.SystemId,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY,
+            POSEntry."Amount Incl. Tax & Round");
     end;
 
     [Test]
@@ -1582,6 +1669,8 @@ codeunit 85157 "NPR POS API Tests"
         KitchenOrderNoText: Text;
         KitchenOrderNo: BigInteger;
         WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
         // [SCENARIO] Complete sale with kitchenRequest transfers customer details to kitchen order
         InitializeRestaurant();
@@ -1629,6 +1718,22 @@ codeunit 85157 "NPR POS API Tests"
 
         // [THEN] Response contains kitchenOrderNo
         ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('entryNo', JToken), 'Response should contain entryNo');
+        POSEntry.Get(JToken.AsValue().AsInteger());
+        POSEntrySalesLine.SetCurrentKey("POS Entry No.", "Line No.");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        Assert.IsTrue(POSEntrySalesLine.FindFirst(), 'POS Entry sales line should be created');
+        Assert.AreEqual(SaleLineId, POSEntrySalesLine.SystemId, 'First POS Entry sales line should preserve the API sale line ID');
+
+        AssertBillingEvent(
+            POSEntry.SystemId,
+            Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_COUNT,
+            1);
+        AssertAmountBillingEvent(
+            POSEntrySalesLine.SystemId,
+            Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_AMOUNT_LCY,
+            POSEntry."Amount Incl. Tax & Round");
+
         Assert.IsTrue(ResponseBody.Get('kitchenOrderNo', JToken), 'Response should contain kitchenOrderNo');
         KitchenOrderNoText := JToken.AsValue().AsText();
         Evaluate(KitchenOrderNo, KitchenOrderNoText);
@@ -2355,6 +2460,49 @@ codeunit 85157 "NPR POS API Tests"
 
         _EFTMappingInitialized := true;
         Commit();
+    end;
+
+    local procedure AssertBillingEvent(EventId: Guid; EventType: Enum "NPR Billing Event Type"; ExpectedQuantity: Decimal)
+    var
+        Assert: Codeunit Assert;
+        BillingQueueEntry: Record "NPR Billing Queue Entry";
+    begin
+        BillingQueueEntry.SetRange("Event ID", EventId);
+        Assert.IsTrue(
+            BillingQueueEntry.FindFirst(),
+            StrSubstNo('Billing event %1 with ID %2 should be registered.', EventType, Format(EventId, 0, 4)));
+        Assert.AreEqual(EventType.AsInteger(), BillingQueueEntry."Feature ID", 'Billing event type should match');
+        Assert.AreEqual(ExpectedQuantity, BillingQueueEntry.Quantity, 'Billing event quantity should match');
+    end;
+
+    local procedure AssertAmountBillingEvent(EventId: Guid; EventType: Enum "NPR Billing Event Type"; ExpectedQuantity: Decimal)
+    var
+        Assert: Codeunit Assert;
+        BillingQueueEntry: Record "NPR Billing Queue Entry";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        MetadataJson: JsonObject;
+        CurrencyToken: JsonToken;
+    begin
+        AssertBillingEvent(EventId, EventType, ExpectedQuantity);
+
+        BillingQueueEntry.SetRange("Event ID", EventId);
+        BillingQueueEntry.FindFirst();
+        Assert.IsTrue(MetadataJson.ReadFrom(BillingQueueEntry.GetMetadata()), 'Billing event metadata should be valid JSON');
+        Assert.IsTrue(MetadataJson.Get('currency', CurrencyToken), 'Amount billing event metadata should contain currency');
+
+        GeneralLedgerSetup.Get();
+        Assert.AreEqual(GeneralLedgerSetup."LCY Code", CurrencyToken.AsValue().AsText(), 'Amount billing event currency should match LCY');
+    end;
+
+    local procedure AssertBillingEventNotRegistered(EventId: Guid)
+    var
+        Assert: Codeunit Assert;
+        BillingQueueEntry: Record "NPR Billing Queue Entry";
+    begin
+        BillingQueueEntry.SetRange("Event ID", EventId);
+        Assert.IsTrue(
+            BillingQueueEntry.IsEmpty(),
+            StrSubstNo('Billing event with ID %1 should not be registered.', Format(EventId, 0, 4)));
     end;
 
     local procedure FormatGuid(Id: Guid): Text

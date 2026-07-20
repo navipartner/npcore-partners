@@ -242,6 +242,7 @@ codeunit 6248632 "NPR API POS Sale"
         POSSale: Codeunit "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         KitchenOrder: JsonToken;
+        IsHospitalitySelfServiceOrder: Boolean;
     begin
         Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
 
@@ -264,6 +265,7 @@ codeunit 6248632 "NPR API POS Sale"
         if Request.BodyJson().IsObject then begin
             if Request.BodyJson().AsObject().Get('kitchenRequest', KitchenOrder) then begin
                 CreateKitchenOrder(KitchenOrder.AsObject());
+                IsHospitalitySelfServiceOrder := true;
             end;
         end;
 
@@ -271,6 +273,7 @@ codeunit 6248632 "NPR API POS Sale"
             exit(Response.RespondBadRequest('Sale failed to complete. Ensure payments add up to full or higher than sales total.'));
 
         POSSale.GetLastSalePOSEntry(POSEntry);
+        RegisterSelfServiceBillingEvents(POSEntry, IsHospitalitySelfServiceOrder);
         exit(Response.RespondCreated(POSEntryAsJson(POSEntry)));
     end;
 
@@ -470,6 +473,40 @@ codeunit 6248632 "NPR API POS Sale"
         end;
 
         Json.EndObject();
+    end;
+
+    local procedure RegisterSelfServiceBillingEvents(POSEntry: Record "NPR POS Entry"; IsHospitalitySelfServiceOrder: Boolean)
+    var
+        BillingClient: Codeunit "NPR Event Billing Client";
+        Sentry: Codeunit "NPR Sentry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        CountEventType: Enum "NPR Billing Event Type";
+        AmountEventType: Enum "NPR Billing Event Type";
+        MetadataJson: JsonObject;
+    begin
+        POSEntrySalesLine.SetCurrentKey("POS Entry No.", "Line No.");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+
+        if IsHospitalitySelfServiceOrder then begin
+            CountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_COUNT;
+            AmountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_AMOUNT_LCY;
+        end else begin
+            CountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT;
+            AmountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY;
+        end;
+
+        BillingClient.RegisterEvent(POSEntry.SystemId, CountEventType, 1);
+
+        if not POSEntrySalesLine.FindFirst() then begin
+            Sentry.AddError(StrSubstNo('Finished POS Entry %1 (%2) has no sales lines, so the self-service amount billing event was not registered. This is a programming bug.', POSEntry."Entry No.", Format(POSEntry.SystemId, 0, 4)));
+            exit;
+        end;
+
+        GeneralLedgerSetup.Get();
+        MetadataJson.Add('currency', GeneralLedgerSetup."LCY Code");
+
+        BillingClient.RegisterEvent(POSEntrySalesLine.SystemId, AmountEventType, POSEntry."Amount Incl. Tax & Round", MetadataJson.AsToken());
     end;
 
     local procedure CreateKitchenOrder(Request: JsonObject)

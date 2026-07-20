@@ -62,14 +62,18 @@ codeunit 6248217 "NPR Event Billing Client"
     var
         ExistingBillingQueueEntry: Record "NPR Billing Queue Entry";
         BillingQueueEntry: Record "NPR Billing Queue Entry";
+        Sentry: Codeunit "NPR Sentry";
         BillingQueueEntryNo: BigInteger;
     begin
         InitSessionVars();
 
         // Idempotency Check (returning just true and nothing else but maybe we will want to change a subsequent logic somehow, e.g. for error situations):
         BillingQueueEntryNo := GetQueueEntryStatusForEvent(EventId, ExistingBillingQueueEntry);
-        if (BillingQueueEntryNo <> 0) then
+        if (BillingQueueEntryNo <> 0) then begin
+            if ExistingBillingQueueEntry."Feature ID" <> EventType.AsInteger() then
+                Sentry.AddError(StrSubstNo('Billing event %1 already exists with feature ID %2 but was reused for feature ID %3. This is a programming bug.', Format(EventId, 0, 4), ExistingBillingQueueEntry."Feature ID", EventType.AsInteger()));
             exit(BillingQueueEntryNo);
+        end;
 
         exit(CreateBillingQueueEntry(BillingQueueEntry, EventId, EventType, Qty, Metadata));
     end;
@@ -108,7 +112,6 @@ codeunit 6248217 "NPR Event Billing Client"
         BillingQueueEntry.ReadIsolation := BillingQueueEntry.ReadIsolation::ReadCommitted;
 
         BillingQueueEntry.Reset();
-        BillingQueueEntry.SetLoadFields(Status, SystemId);
         BillingQueueEntry.SetCurrentKey("Event ID", "Is Production Environment");
         BillingQueueEntry.SetRange("Event ID", EventIdParam);
         BillingQueueEntry.SetRange("Is Production Environment", IsProductionEnvironment);
