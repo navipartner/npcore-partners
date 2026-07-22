@@ -150,4 +150,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'External Job Queue Refresher Only';
         Implementation = "NPR Feature Management" = "NPR Ext JQ Refresher Only Feat";
     }
+    value(230; "New Z-Report Experience")
+    {
+        Caption = 'New Z-Report Experience';
+        Implementation = "NPR Feature Management" = "NPR New Z-Report Exp";
+    }
 }

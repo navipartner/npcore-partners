@@ -140,6 +140,7 @@
     var
         NewSalesReceiptExp: Codeunit "NPR New Sales Receipt Exp";
         NewEFTReceiptExp: Codeunit "NPR New EFT Receipt Exp";
+        NewZReportExp: Codeunit "NPR New Z-Report Exp";
         OldExperienceUsageLbl: Label 'Templates are not supported in new experience usage. Please use Codeunit ID field to specify the template.';
     begin
         if Rec."Print Template" <> '' then
@@ -149,6 +150,9 @@
                         Error(OldExperienceUsageLbl);
                 Enum::"NPR Report Selection Type"::"Terminal Receipt":
                     if NewEFTReceiptExp.IsFeatureEnabled() then
+                        Error(OldExperienceUsageLbl);
+                Enum::"NPR Report Selection Type"::"Balancing (POS Entry)":
+                    if NewZReportExp.IsFeatureEnabled() then
                         Error(OldExperienceUsageLbl);
             end;
     end;

@@ -263,6 +263,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewRestaurantPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewVoucherReservationHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewZReportExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'ExtJQRefresherOnlyHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSEditorFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
@@ -272,6 +273,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewRestaurantPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewVoucherReservationHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewZReportExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ExtJQRefresherOnlyHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
@@ -1027,6 +1029,8 @@
                         exit('NPR-NewRestaurantPrintExperienceHandle-20251207');
                     'NewVoucherReservationHandle':
                         exit('NPR-NewVoucherReservationHandle-20260315');
+                    'NewZReportExperienceHandle':
+                        exit('NPR-NewZReportExperienceHandle-20260621');
                     'ExtJQRefresherOnlyHandle':
                         exit('NPR-ExtJQRefresherOnlyHandle-20260717');
                 end;
@@ -1048,6 +1052,8 @@
                         exit('NPR-NewRestaurantPrintExperienceHandle-20251207');
                     'NewVoucherReservationHandle':
                         exit('NPR-NewVoucherReservationHandle-20260315');
+                    'NewZReportExperienceHandle':
+                        exit('NPR-NewZReportExperienceHandle-20260621');
                     'ExtJQRefresherOnlyHandle':
                         exit('NPR-ExtJQRefresherOnlyHandle-20260717');
                 end;

@@ -446,21 +446,16 @@
 
                 trigger OnAction()
                 var
-                    PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
                     POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-                    ReportSelectionRetail: Record "NPR Report Selection Retail";
+                    RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
+                    RecRef: RecordRef;
                 begin
-
                     POSWorkshiftCheckpoint.Get(Rec."Entry No.");
                     POSWorkshiftCheckpoint.SetRecFilter();
+                    RecRef.GetTable(POSWorkshiftCheckpoint);
 
-                    ReportSelectionRetail.SetFilter("Report Type", '=%1', ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
-                    if (ReportSelectionRetail.FindSet()) then begin
-                        repeat
-                            ReportSelectionRetail.TestField("Print Template");
-                            PrintTemplateMgt.PrintTemplate(ReportSelectionRetail."Print Template", POSWorkshiftCheckpoint, 0);
-                        until (ReportSelectionRetail.Next() = 0);
-                    end;
+                    RetailReportSelectionMgt.SetRegisterNo(POSWorkshiftCheckpoint."POS Unit No.");
+                    RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Balancing (POS Entry)".AsInteger());
                 end;
             }
         }

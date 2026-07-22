@@ -331,6 +331,45 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+    internal procedure HandleNewZReportExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewZReportExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewZReportExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewZReportExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewZReportExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure NewZReportExperienceHandle()
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        Feature: Record "NPR Feature";
+        NewZReportExp: Codeunit "NPR New Z-Report Exp";
+    begin
+        if not Feature.Get(NewZReportExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
+        ReportSelectionRetail.ModifyAll("Print Template", '');
+        ReportSelectionRetail.CleanupEmptyData();
+
+        NewZReportExp.InsertReportSelectionRetail();
+    end;
+
     internal procedure HandleExtJQRefresherOnly()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
