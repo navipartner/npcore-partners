@@ -17,4 +17,11 @@ codeunit 6151074 "NPR MM GDPR Mgt. Wrapper"
     begin
         exit(GDPRMgt.DeleteMembership(MembershipEntryNo));
     end;
+
+    procedure SetApprovalState(AgreementNo: Code[20]; DataSubjectId: Text[35]; ApprovalState: Option NA,PENDING,ACCEPTED,REJECTED)
+    var
+        MMGDPRManagement: Codeunit "NPR MM GDPR Management";
+    begin
+        MMGDPRManagement.SetApprovalState(AgreementNo, DataSubjectId, ApprovalState);
+    end;
 }
