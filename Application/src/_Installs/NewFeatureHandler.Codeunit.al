@@ -437,6 +437,45 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+    internal procedure HandleNewSalesDocConfirmationExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewSalesDocConfirmationExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewSalesDocConfirmationExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewSalesDocConfirmationExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewSalesDocConfirmationExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure NewSalesDocConfirmationExperienceHandle()
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        Feature: Record "NPR Feature";
+        NewSalesDocConfExp: Codeunit "NPR New Sales Doc Conf. Exp";
+    begin
+        if not Feature.Get(NewSalesDocConfExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)");
+        ReportSelectionRetail.ModifyAll("Print Template", '');
+        ReportSelectionRetail.CleanupEmptyData();
+
+        NewSalesDocConfExp.InsertReportSelectionRetail();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR New Feature Handler");

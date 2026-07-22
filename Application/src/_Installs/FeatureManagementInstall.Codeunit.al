@@ -81,6 +81,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"Customer GDPR V2");
         AddFeature(Feature::"External JQ Refresher Only");
         AddFeature(Feature::"New Z-Report Experience");
+        AddFeature(Feature::"New Sales Doc Confirmation Experience");
 
         if ExistingFeature.FindSet() then
             repeat
@@ -117,6 +118,7 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleNewNpRvPrintExperience();
         NewFeatureHandler.HandleExtJQRefresherOnly();
         NewFeatureHandler.HandleNewZReportExperience();
+        NewFeatureHandler.HandleNewSalesDocConfirmationExperience();
         RefreshExperienceTierCurrentCompany();
     end;
 
