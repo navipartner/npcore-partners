@@ -23,6 +23,28 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 ToolTip = 'Specifies the date on which customer information has been anonymized.';
                 ApplicationArea = NPRRetail;
             }
+            group("NPR Privacy")
+            {
+                Caption = 'Privacy';
+                field("NPR Last Activity Source"; Rec."NPR Last Activity Source")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the source of Customers last activity.';
+                }
+                field("NPR Last Activity"; Rec."NPR Last Activity")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies date of Customers last activity.';
+                }
+                field("NPR Estimated Cleanup Date"; Rec."NPR Estimated Cleanup Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies date when Customer will be anonymized.';
+                }
+            }
+
         }
         addafter("Address & Contact")
         {
@@ -322,11 +344,30 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     GDPRManagement: Codeunit "NPR NP GDPR Management";
                 begin
                     Rec.TestField("NPR Anonymized", false);
-                    if (GDPRManagement.DoAnonymization(Rec."No.", ReasonText)) then
-                        if (not Confirm(Text000, false)) then
-                            Error('');
 
+                    // Force route: a force-permitted user erasing a customer blocked ONLY by the retention
+                    // schedule (not yet due) gets a single, force-specific confirmation instead of the generic
+                    // one. Nested ifs (AL does not short-circuit) keep the multi-table IsBlockedByRetentionOnly
+                    // scan to force-permitted users, and taking this branch skips the normal failure-logging path
+                    // so the audit log gets a single accurate entry. Hard integrity gates (open documents, ledger
+                    // entries, active membership, journal lines, Bill-to) are never bypassed.
+                    if UserSetup.Get(UserId()) then
+                        if UserSetup."NPR Force Anonymize Customers" then
+                            if GDPRManagement.IsBlockedByRetentionOnly(Rec."No.") then begin
+                                if Confirm(ForceAnonymizeQst, false) then begin
+                                    GDPRManagement.ForceAnonymization(Rec."No.", ReasonText);
+                                    Message(ReasonText);
+                                end;
+                                CurrPage.Update(false);
+                                exit;
+                            end;
+
+                    // Normal route.
+                    if (not Confirm(Text000, false)) then
+                        Error('');
+                    GDPRManagement.DoAnonymization(Rec."No.", ReasonText);
                     Message(ReasonText);
+                    CurrPage.Update(false);
                 end;
             }
         }
@@ -360,7 +401,8 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         CustSalesLCY: Decimal;
         MagentoVersion: Decimal;
         ReasonText: Text;
-        Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
+        Text000: Label 'This will anonymize the customer and cannot be undone. The customer is anonymized only when it has no open documents, no recent transactions, no active membership and no pending journal lines. Otherwise it is left unchanged and the reason is shown. Do you want to continue?';
+        ForceAnonymizeQst: Label 'This customer is not yet due for anonymization under the retention policy, but has no blocking documents, ledger entries, membership or journal lines. Force anonymization now to honour an erasure request? This cannot be undone.';
         ToAnonymizeEditable: Boolean;
         ITAuxCustomer: Record "NPR IT Aux Customer";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)

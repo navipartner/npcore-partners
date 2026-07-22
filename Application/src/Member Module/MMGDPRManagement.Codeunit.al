@@ -5,24 +5,55 @@
     trigger OnRun()
     var
         Membership: Record "NPR MM Membership";
+        CustomerGDPRV2: Codeunit "NPR Customer GDPR V2";
+        AnonRunner: Codeunit "NPR MM GDPR Anon. Runner";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        MembershipEntryNos: List of [Integer];
+        MembershipEntryNo: Integer;
         ReasonText: Text;
     begin
 
         // For automation of anonymize process
         Membership.SetCurrentKey("Entry No.");
-        if (Membership.FindSet()) then begin
-            repeat
-                if (Membership."Block Reason" <> Membership."Block Reason"::ANONYMIZED) then begin
-                    AnonymizeMembership(Membership."Entry No.", true, ReasonText);
-                    Commit();
-                end;
 
-                if (Membership."Block Reason" = Membership."Block Reason"::ANONYMIZED) then begin
-                    DeleteMembership(Membership."Entry No.");
-                    Commit();
-                end;
+        if CustomerGDPRV2.IsFeatureEnabled() then begin
+            // With the feature on, the OnBeforeAnonymizeMembership subscriber throws for a customer that is not
+            // yet due. A direct call here would abort the whole batch and starve every later membership.
+            // Snapshot the entry numbers first (the per-item guarded Run must not run while the batch's own read
+            // cursor is open across the per-item Commit), then process each through the runner's guarded Run and
+            // Commit after each so the next iteration starts on a clean transaction.
+            Sentry.StartSpan(SentrySpan, 'mm-gdpr-anonymize-batch');
+            Membership.SetLoadFields("Entry No.");
+            if Membership.FindSet() then
+                repeat
+                    MembershipEntryNos.Add(Membership."Entry No.");
+                until Membership.Next() = 0;
+            Commit();
 
-            until (Membership.Next() = 0);
+            foreach MembershipEntryNo in MembershipEntryNos do begin
+                AnonRunner.SetMembershipEntryNo(MembershipEntryNo);
+                if not AnonRunner.Run() then
+                    Sentry.AddLastErrorIfProgrammingBug();
+                Commit();
+            end;
+
+            SentrySpan.Finish();
+        end else begin
+            if (Membership.FindSet()) then begin
+                repeat
+                    if (Membership."Block Reason" <> Membership."Block Reason"::ANONYMIZED) then begin
+                        AnonymizeMembership(Membership."Entry No.", true, ReasonText);
+                        Commit();
+                    end;
+
+                    if (Membership."Block Reason" = Membership."Block Reason"::ANONYMIZED) then begin
+                        DeleteMembership(Membership."Entry No.");
+                        Commit();
+                    end;
+
+                until (Membership.Next() = 0);
+            end;
         end;
     end;
 
@@ -409,7 +440,6 @@
         Membership."Blocked At" := CurrentDateTime();
         Membership."Blocked By" := GetUserId();
         Membership."Block Reason" := Membership."Block Reason"::ANONYMIZED;
-
         Membership.Modify(true); // This will cause a customer sync.
     end;
 

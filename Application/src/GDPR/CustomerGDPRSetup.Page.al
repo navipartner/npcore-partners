@@ -1,7 +1,7 @@
 ﻿page 6151150 "NPR Customer GDPR Setup"
 {
     Extensible = False;
-    Caption = 'Customer GDPR Setup';
+    Caption = 'Customer Data Anonymization Setup';
     ContextSensitiveHelpPage = 'docs/retail/gdpr/intro/';
     DeleteAllowed = false;
     InsertAllowed = false;

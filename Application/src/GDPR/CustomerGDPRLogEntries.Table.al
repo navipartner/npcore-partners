@@ -4,7 +4,7 @@
     // NPR5.52/ZESO/20190925 CASE 358656 Object Created
     // NPR5.55/ZESO/20200427 CASE 401981 Added field 10 Open Journal Entries/Statement
 
-    Caption = 'Customer GDPR Log Entries';
+    Caption = 'Customer Data Anonymization Log Entries';
     DataClassification = CustomerContent;
 
     fields
@@ -59,6 +59,11 @@
         field(10; "Open Journal Entries/Statement"; Boolean)
         {
             Caption = 'Open Journal Entries/Statement';
+            DataClassification = CustomerContent;
+        }
+        field(11; Reason; Text[250])
+        {
+            Caption = 'Reason';
             DataClassification = CustomerContent;
         }
     }

@@ -281,6 +281,45 @@ tableextension 6014423 "NPR Customer" extends Customer
                                                                 "Sync. to this Store" = const(true)));
         }
 #endif
+        field(6151555; "NPR Last Activity Source"; Enum "NPR Last Activity Source")
+        {
+            Caption = 'Last Activity Source';
+            DataClassification = CustomerContent;
+        }
+        field(6151556; "NPR Last Activity"; Date)
+        {
+            Caption = 'Last Activity';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                GDPRSetup: Record "NPR Customer GDPR SetUp";
+            begin
+                // An anonymized customer must not get a fresh cleanup date stamped from an external write.
+                if Rec."NPR Anonymized" then
+                    exit;
+
+                // Keep the cleanup date in sync whenever the activity date changes - including writes
+                // from external systems via the API, which the anonymization routine gates on.
+                if Rec."NPR Last Activity" = 0D then begin
+                    Rec."NPR Estimated Cleanup Date" := 0D;
+                    exit;
+                end;
+
+                if not GDPRSetup.Get() then
+                    exit;
+                if Format(GDPRSetup."Anonymize After") = '' then
+                    exit;
+
+                Rec."NPR Estimated Cleanup Date" := CalcDate(GDPRSetup."Anonymize After", Rec."NPR Last Activity");
+            end;
+        }
+        field(6151557; "NPR Estimated Cleanup Date"; Date)
+        {
+            Caption = 'Estimated Cleanup Date';
+            Editable = false;
+            DataClassification = CustomerContent;
+        }
         modify("Sales (LCY)")
         {
             Caption = 'Sales ERP (LCY)';

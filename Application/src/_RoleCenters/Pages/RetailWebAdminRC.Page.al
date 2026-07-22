@@ -228,11 +228,11 @@ page 6059871 "NPR Retail Web Admin RC"
                 }
                 action("Customer GDPR")
                 {
-                    Caption = 'Customer GDPR';
+                    Caption = 'Customer Data Anonymization';
                     Image = List;
                     RunObject = page "NPR Customer GDPR Setup";
                     ApplicationArea = NPRMagento;
-                    ToolTip = 'View or edit the Customer GDPR';
+                    ToolTip = 'View or edit Customer Data Anonymization';
                 }
             }
             group("Magento Sales")

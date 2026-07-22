@@ -42,6 +42,11 @@ pageextension 6014401 "NPR User Setup" extends "User Setup"
                 ToolTip = 'Specifies if the user is allowed to anonymize customer information in the customer page.';
                 ApplicationArea = NPRRetail;
             }
+            field("NPR Force Anonymize Customers"; Rec."NPR Force Anonymize Customers")
+            {
+                ToolTip = 'Specifies if the user may force customer anonymization past the retention period (for example to honour a right-to-erasure request). Hard blockers - open documents, ledger entries, active membership, journal lines and Bill-to references - are never bypassed.';
+                ApplicationArea = NPRRetail;
+            }
             field("NPR MM Allow MS Entry Edit"; Rec."NPR MM Allow MS Entry Edit")
             {
                 ToolTip = 'Specifies if the user can modify Membership Entries.';

@@ -1,7 +1,7 @@
-﻿page 6151153 "NPR GDPR Anonymization Req."
+page 6151153 "NPR GDPR Anonymization Req."
 {
     Extensible = False;
-    Caption = 'GDPR Anonymization Request';
+    Caption = 'Customer Data Anonymization Request';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
@@ -103,7 +103,6 @@
                 var
                     GDPRAnonymizationRequest: Record "NPR GDPR Anonymization Request";
                 begin
-
                     CurrPage.SetSelectionFilter(GDPRAnonymizationRequest);
                     AnonymizeCustomer(GDPRAnonymizationRequest);
                     CurrPage.Update(false);
@@ -113,6 +112,11 @@
     }
 
 
+    var
+        FailedToCancelMembershipErr: Label 'Failed to cancel membership.';
+        CustomerNotFoundErr: Label 'Customer not found.';
+        PersonNotAuthorizedErr: Label 'Contact of type person does not have authority to request anonymization.';
+
     trigger OnOpenPage()
     begin
         Rec.SetFilter(Status, '<>%1', Rec.Status::ANONYMIZED);
@@ -120,69 +124,147 @@
 
     local procedure AnonymizeCustomer(var GDPRAnonymizationRequest: Record "NPR GDPR Anonymization Request")
     var
+        CustomerGDPRV2: Codeunit "NPR Customer GDPR V2";
+    begin
+        if CustomerGDPRV2.IsFeatureEnabled() then
+            AnonymizeRequestsV2(GDPRAnonymizationRequest)
+        else
+            AnonymizeRequestsLegacy(GDPRAnonymizationRequest);
+    end;
+
+    local procedure AnonymizeRequestsV2(var GDPRAnonymizationRequest: Record "NPR GDPR Anonymization Request")
+    var
+        MemberCustRunner: Codeunit "NPR GDPR Cust-Member Anon Run";
+        NPGDPRAnonRunner: Codeunit "NPR NP GDPR Anon. Runner";
+        Sentry: Codeunit "NPR Sentry";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        RequestEntryNos: List of [Integer];
+        RequestEntryNo: Integer;
+        MembershipEntryNo: Integer;
+        ReasonTxt: Text;
+    begin
+        // Snapshot the entry numbers of the requests to process, keeping the read cursor separate from the
+        // per-request write/commit cycle (a guarded Codeunit.Run below must not run while a FindSet cursor is
+        // open across the per-request Commit). Then process each request through a guarded runner and Commit
+        // after each, so a mid-operation error rolls back only that request and the loop continues.
+        GDPRAnonymizationRequest.SetFilter(Status, '=%1|=%2', GDPRAnonymizationRequest.Status::NEW, GDPRAnonymizationRequest.Status::PENDING);
+        if not GDPRAnonymizationRequest.FindSet() then
+            exit;
+        repeat
+            RequestEntryNos.Add(GDPRAnonymizationRequest."Entry No.");
+        until GDPRAnonymizationRequest.Next() = 0;
+
+        Sentry.StartSpan(SentrySpan, 'gdpr-anonymize-requests');
+        foreach RequestEntryNo in RequestEntryNos do
+            if GDPRAnonymizationRequest.Get(RequestEntryNo) then begin
+                ReasonTxt := '';
+                GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::PENDING;
+                GDPRAnonymizationRequest."Processed At" := CurrentDateTime();
+
+                case GDPRAnonymizationRequest.Type of
+                    GDPRAnonymizationRequest.Type::PERSON:
+                        begin
+                            ReasonTxt := PersonNotAuthorizedErr;
+                            GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                        end;
+                    GDPRAnonymizationRequest.Type::COMPANY:
+                        case IsMember(GDPRAnonymizationRequest."Customer No.", MembershipEntryNo) of
+                            true:
+                                begin
+                                    MemberCustRunner.SetCustomer(GDPRAnonymizationRequest."Customer No.");
+                                    MemberCustRunner.SetMembership(MembershipEntryNo);
+                                    if MemberCustRunner.Run() then begin
+                                        ReasonTxt := MemberCustRunner.GetReason();
+                                        GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::ANONYMIZED;
+                                        InsertLogEntry(GDPRAnonymizationRequest."Customer No.");
+                                    end else begin
+                                        ReasonTxt := GetLastErrorText();
+                                        Sentry.AddLastErrorIfProgrammingBug();
+                                        GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                                    end;
+                                end;
+                            false:
+                                begin
+                                    NPGDPRAnonRunner.SetCheckPeriod(false);
+                                    NPGDPRAnonRunner.SetCustomer(GDPRAnonymizationRequest."Customer No.");
+                                    if NPGDPRAnonRunner.Run() then begin
+                                        ReasonTxt := NPGDPRAnonRunner.GetReason();
+                                        if NPGDPRAnonRunner.WasAnonymized() then
+                                            GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::ANONYMIZED
+                                        else
+                                            GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                                    end else begin
+                                        ReasonTxt := GetLastErrorText();
+                                        Sentry.AddLastErrorIfProgrammingBug();
+                                        GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                                    end;
+                                end;
+                        end;
+                end;
+
+                GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                GDPRAnonymizationRequest.Modify();
+                Commit();
+            end;
+        SentrySpan.Finish();
+    end;
+
+    local procedure AnonymizeRequestsLegacy(var GDPRAnonymizationRequest: Record "NPR GDPR Anonymization Request")
+    var
         Customer: Record Customer;
         GDPRManagement: Codeunit "NPR MM GDPR Management";
         NPGDPRManagement: Codeunit "NPR NP GDPR Management";
+        MemberCustRunner: Codeunit "NPR GDPR Cust-Member Anon Run";
         ReasonTxt: Text;
         MembershipEntryNo: Integer;
     begin
-
         GDPRAnonymizationRequest.SetFilter(Status, '=%1|=%2', GDPRAnonymizationRequest.Status::NEW, GDPRAnonymizationRequest.Status::PENDING);
+        if not GDPRAnonymizationRequest.FindSet() then
+            exit;
 
-        if (GDPRAnonymizationRequest.FindSet()) then begin
-            repeat
-                ReasonTxt := '';
-                GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::PENDING;
-                GDPRAnonymizationRequest."Processed At" := CURRENTDATETIME();
+        repeat
+            ReasonTxt := '';
+            GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::PENDING;
+            GDPRAnonymizationRequest."Processed At" := CurrentDateTime();
 
-                if (GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::COMPANY) then begin
-
-                    case IsMember(GDPRAnonymizationRequest."Customer No.", MembershipEntryNo) OF
-                        true:
-                            begin
-                                if (CancelMembership(MembershipEntryNo)) then
-                                    if (GDPRManagement.AnonymizeMembership(MembershipEntryNo, false, ReasonTxt)) then begin
-                                        GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
-                                        InsertLogEntry(Rec."Customer No.");
-                                    end;
-                                GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
-                                GDPRAnonymizationRequest.Modify();
-                            end;
-
-                        false:
-                            begin
-
-                                if (Customer.Get(GDPRAnonymizationRequest."Customer No.")) then begin
-                                    if (NPGDPRManagement.DoAnonymization(GDPRAnonymizationRequest."Customer No.", ReasonTxt)) then begin
-                                        GDPRAnonymizationRequest.Status := Rec.Status::ANONYMIZED;
-                                    end;
-                                    GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
-                                    GDPRAnonymizationRequest.Modify();
-                                end else begin
-                                    Rec.Reason := 'Customer not found.';
-                                    GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
-                                    GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
-                                    GDPRAnonymizationRequest.Modify();
+            if GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::COMPANY then
+                case IsMember(GDPRAnonymizationRequest."Customer No.", MembershipEntryNo) of
+                    true:
+                        begin
+                            if MemberCustRunner.CancelMembership(MembershipEntryNo) then begin
+                                if GDPRManagement.AnonymizeMembership(MembershipEntryNo, false, ReasonTxt) then begin
+                                    GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::ANONYMIZED;
+                                    InsertLogEntry(GDPRAnonymizationRequest."Customer No.");
                                 end;
+                            end else
+                                ReasonTxt := FailedToCancelMembershipErr;
 
-                            end;
-                    end;
+                            if GDPRAnonymizationRequest.Status <> GDPRAnonymizationRequest.Status::ANONYMIZED then
+                                GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
 
+                            GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                            GDPRAnonymizationRequest.Modify();
+                        end;
+                    false:
+                        if Customer.Get(GDPRAnonymizationRequest."Customer No.") then begin
+                            if NPGDPRManagement.DoAnonymization(GDPRAnonymizationRequest."Customer No.", ReasonTxt) then
+                                GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::ANONYMIZED;
+                            GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                            GDPRAnonymizationRequest.Modify();
+                        end else begin
+                            GDPRAnonymizationRequest.Reason := CopyStr(CustomerNotFoundErr, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                            GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                            GDPRAnonymizationRequest.Modify();
+                        end;
                 end;
 
-                if (GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::PERSON) then begin
-                    ReasonTxt := 'Contact of type person does not have authority to request anonymization.';
-
-                    GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
-                    GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
-
-                    GDPRAnonymizationRequest.Modify();
-
-                end;
-            until (GDPRAnonymizationRequest.NEXT() = 0);
-
-        end;
-
+            if GDPRAnonymizationRequest.Type = GDPRAnonymizationRequest.Type::PERSON then begin
+                ReasonTxt := PersonNotAuthorizedErr;
+                GDPRAnonymizationRequest.Reason := CopyStr(ReasonTxt, 1, MaxStrLen(GDPRAnonymizationRequest.Reason));
+                GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::REJECTED;
+                GDPRAnonymizationRequest.Modify();
+            end;
+        until GDPRAnonymizationRequest.Next() = 0;
     end;
 
     local procedure IsMember(CustomerNo: Code[20]; var MembershipEntryNo: Integer): Boolean
@@ -200,61 +282,15 @@
 
     end;
 
-    local procedure CancelMembership(MembershipEntryNo: Integer): Boolean
-    var
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
-        Membership: Record "NPR MM Membership";
-        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
-        MembershipStartDate: Date;
-        MembershipUntilDate: Date;
-    begin
-
-        if (Membership.Get(MembershipEntryNo)) then begin
-            Membership.VALIDATE(Blocked, true);
-            Membership."Block Reason" := Membership."Block Reason"::ANONYMIZED;
-            Membership.Modify(true);
-
-            MemberInfoCapture.Init();
-            MemberInfoCapture."Entry No." := 0;
-            MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
-            MemberInfoCapture."External Membership No." := Membership."External Membership No.";
-            MemberInfoCapture."Membership Code" := Membership."Membership Code";
-            MemberInfoCapture."Item No." := GetItemNo(Membership."Membership Code");
-            MemberInfoCapture.Insert();
-
-            MemberManagement.CancelMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
-            exit(true);
-        end;
-        exit(false);
-
-    end;
-
-    local procedure GetItemNo(MembershipCode: Code[20]): Code[20]
-    var
-        AlterationSetup: Record "NPR MM Members. Alter. Setup";
-    begin
-
-        if (MembershipCode = '') then
-            exit;
-
-        AlterationSetup.Reset();
-        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::CANCEL);
-        AlterationSetup.SetRange("From Membership Code", MembershipCode);
-        if (AlterationSetup.FindFirst()) then
-            exit(AlterationSetup."Sales Item No.");
-
-    end;
-
     local procedure InsertLogEntry(CustNo: Code[20])
     var
         GDPRLogEntry: Record "NPR Customer GDPR Log Entries";
         EntryNo: Integer;
     begin
-
         if (GDPRLogEntry.FindLast()) then
-            EntryNo := GDPRLogEntry."Entry No" + 1
+            EntryNo := GDPRLogEntry."Entry No"
         else
-            EntryNo := 1;
+            EntryNo := 0;
 
         GDPRLogEntry.Init();
         GDPRLogEntry."Entry No" := EntryNo + 1;
@@ -263,8 +299,5 @@
         GDPRLogEntry."Log Entry Date Time" := CURRENTDATETIME;
         GDPRLogEntry."Anonymized By" := CopyStr(USERID, 1, MaxStrLen(GDPRLogEntry."Anonymized By"));
         GDPRLogEntry.Insert();
-
     end;
-
 }
-

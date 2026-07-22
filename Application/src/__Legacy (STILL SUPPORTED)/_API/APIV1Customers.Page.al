@@ -734,6 +734,19 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'systemRowVersion', Locked = true;
                 }
 #ENDIF
+                field(lastActivitySource; Rec."NPR Last Activity Source")
+                {
+                    Caption = 'Last Activity Source', Locked = true;
+                }
+                field(lastActivity; Rec."NPR Last Activity")
+                {
+                    Caption = 'Last Activity', Locked = true;
+                }
+                field(estimatedCleanupDate; Rec."NPR Estimated Cleanup Date")
+                {
+                    Caption = 'Estimated Cleanup Date', Locked = true;
+                    Editable = false;
+                }
                 part(customerFinancialDetails; "NPR APIV1 - Cust Fin Details")
                 {
 #IF BC17            // Multiplicity can be used only with platform version 6.3;

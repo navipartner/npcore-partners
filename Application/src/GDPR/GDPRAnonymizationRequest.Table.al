@@ -4,7 +4,7 @@
     // NPR5.54/TSA /20200324 CASE 389817 Initial Version
     // NPR5.55/TSA /20200715 CASE 388813 Added status Approved, Declined, Rejected
 
-    Caption = 'GDPR Anonymization Request';
+    Caption = 'Customer Data Anonymization Request';
     DataClassification = CustomerContent;
 
     fields

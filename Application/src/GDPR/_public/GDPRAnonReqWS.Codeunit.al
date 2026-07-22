@@ -34,9 +34,9 @@
         GDPRAnonymizationRequest.Get(RequestEntryNo);
 
         if (Evaluate(LimitingDateformula, '-' + Format(GDPRSetup."Anonymize After"))) then begin
-            OkToAnonymize := NPGDPRManagement.IsCustomerValidForAnonymization(CustomerNo, true, LimitingDateformula, ResponseCode);
+            OkToAnonymize := NPGDPRManagement.IsCustomerValidForAnonymization(CustomerNo, true, LimitingDateformula, false, ResponseCode);
         end else begin
-            OkToAnonymize := NPGDPRManagement.IsCustomerValidForAnonymization(CustomerNo, false, LimitingDateformula, ResponseCode);
+            OkToAnonymize := NPGDPRManagement.IsCustomerValidForAnonymization(CustomerNo, false, LimitingDateformula, false, ResponseCode);
         end;
 
         GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::APPROVED;

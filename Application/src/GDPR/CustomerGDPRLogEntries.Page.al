@@ -4,7 +4,7 @@
     // NPR5.52/JAKUBV/20191022  CASE 358656 Transport NPR5.52 - 22 October 2019
     // NPR5.55/ZESO/20200427 CASE Added field Open Journal Entries/Statement
 
-    Caption = 'Customer GDPR Log Entries';
+    Caption = 'Customer Data Anonymization Log Entries';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
@@ -36,6 +36,11 @@
                 {
 
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Reason; Rec.Reason)
+                {
+                    ToolTip = 'Specifies the value of the Reason field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Open Sales Documents"; Rec."Open Sales Documents")

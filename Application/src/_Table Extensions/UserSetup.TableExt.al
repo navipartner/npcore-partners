@@ -79,6 +79,11 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
             DataClassification = CustomerContent;
             Description = 'NPR5.52';
         }
+        field(6014402; "NPR Force Anonymize Customers"; Boolean)
+        {
+            Caption = 'Force Anonymize Customers';
+            DataClassification = CustomerContent;
+        }
         field(6151070; "NPR Block Role Center"; Boolean)
         {
             Caption = 'Block Role Center';
