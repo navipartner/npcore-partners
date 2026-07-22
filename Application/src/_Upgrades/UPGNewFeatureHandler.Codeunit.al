@@ -13,6 +13,7 @@ codeunit 6150638 "NPR UPG New Feature Handler"
         NewAttractionPrintExperienceHandleUpgradeStepLbl: Label 'NewAttractionPrintExperienceHandle', Locked = true;
         NewRestaurantPrintExperienceHandleUpgradeStepLbl: Label 'NewRestaurantPrintExperienceHandle', Locked = true;
         NewVoucherReservationHandleUpgradeStepLbl: Label 'NewVoucherReservationHandle', Locked = true;
+        NewNpRvPrintExperienceHandleUpgradeStepLbl: Label 'NewNpRvPrintExperienceHandle', Locked = true;
         NewZReportExperienceHandleUpgradeStepLbl: Label 'NewZReportExperienceHandle', Locked = true;
         ExtJQRefresherOnlyHandleUpgradeStepLbl: Label 'ExtJQRefresherOnlyHandle', Locked = true;
     begin
@@ -24,6 +25,7 @@ codeunit 6150638 "NPR UPG New Feature Handler"
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewAttractionPrintExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewRestaurantPrintExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewVoucherReservationHandleUpgradeStepLbl);
+        AddUpgradeTagIfNotExist(CurrCodeunitId(), NewNpRvPrintExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewZReportExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), ExtJQRefresherOnlyHandleUpgradeStepLbl);
     end;

@@ -77,6 +77,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"New Attraction Print Exerience");
         AddFeature(Feature::"New Restaurant Print Experience");
         AddFeature(Feature::"New Voucher Reservation");
+        AddFeature(Feature::"New NpRv Print Experience");
         AddFeature(Feature::"Customer GDPR V2");
         AddFeature(Feature::"External JQ Refresher Only");
         AddFeature(Feature::"New Z-Report Experience");
@@ -113,6 +114,7 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleNewAttractionPrintExperience();
         NewFeatureHandler.HandleNewRestaurantPrintExperience();
         NewFeatureHandler.HandleNewVoucherReservation();
+        NewFeatureHandler.HandleNewNpRvPrintExperience();
         NewFeatureHandler.HandleExtJQRefresherOnly();
         NewFeatureHandler.HandleNewZReportExperience();
         RefreshExperienceTierCurrentCompany();

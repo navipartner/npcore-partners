@@ -165,7 +165,7 @@
         exit(VoucherType."Apply Payment Module" = ModuleCode());
     end;
 
-    local procedure ModuleCode(): Code[20]
+    internal procedure ModuleCode(): Code[20]
     begin
         exit('PARTIAL');
     end;

@@ -331,6 +331,38 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+    internal procedure HandleNewNpRvPrintExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewNpRvPrintExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewNpRvPrintExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewNpRvPrintExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewNpRvPrintExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure NewNpRvPrintExperienceHandle()
+    var
+        Feature: Record "NPR Feature";
+        NewNpRvPrintExp: Codeunit "NPR New NpRv Print Exp.";
+    begin
+        if not Feature.Get(NewNpRvPrintExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+    end;
+
     internal procedure HandleNewZReportExperience()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";

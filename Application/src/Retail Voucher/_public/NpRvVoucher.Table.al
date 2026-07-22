@@ -84,6 +84,22 @@
             Caption = 'Print Object Type';
             DataClassification = CustomerContent;
             InitValue = Template;
+
+            trigger OnValidate()
+            var
+                VoucherType: Record "NPR NpRv Voucher Type";
+                NewNpRvPrintExp: Codeunit "NPR New NpRv Print Exp.";
+                ModulePayDefault: Codeunit "NPR NpRv Module Pay.: Default";
+                ModulePayPartial: Codeunit "NPR NpRv Module Pay. - Partial";
+                TemplateNotAllowedErr: Label 'Template printing cannot be selected because the New NpRv Print Experience feature is enabled.';
+            begin
+                if (Rec."Print Object Type" <> Rec."Print Object Type"::Template) or not NewNpRvPrintExp.IsFeatureEnabled() then
+                    exit;
+                if not VoucherType.Get(Rec."Voucher Type") then
+                    exit;
+                if VoucherType."Apply Payment Module" in [ModulePayDefault.ModuleCode(), ModulePayPartial.ModuleCode()] then
+                    Error(TemplateNotAllowedErr);
+            end;
         }
         field(64; "Print Object ID"; Integer)
         {

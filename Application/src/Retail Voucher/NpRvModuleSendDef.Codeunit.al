@@ -238,7 +238,9 @@
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         RPTemplateHeader: Record "NPR RP Template Header";
         SMSTemplateHeader: Record "NPR SMS Template Header";
+        NewNpRvPrintExp: Codeunit "NPR New NpRv Print Exp.";
         Selection: Integer;
+        TemplateSetupNotApplicableMsg: Label 'Print template setup is only applicable when %1 is %2.', Comment = '%1 = Print Object Type field caption, %2 = Template option caption';
     begin
         if not IsSubscriber(VoucherType) then
             exit;
@@ -253,7 +255,9 @@
                     VoucherType.TestField("Print Template Code");
                     RPTemplateHeader.Get(VoucherType."Print Template Code");
                     PAGE.Run(PAGE::"NPR RP Template Card", RPTemplateHeader);
-                end;
+                end else
+                    if NewNpRvPrintExp.IsFeatureEnabled() then
+                        Message(TemplateSetupNotApplicableMsg, VoucherType.FieldCaption("Print Object Type"), Format(VoucherType."Print Object Type"::Template));
             VoucherType."Send Method via POS"::"E-mail":
                 begin
                     if not SetupNewEmailExperience(VoucherType) then begin
@@ -338,10 +342,12 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
 #endif
-
+        NewNpRvPrintExp: Codeunit "NPR New NpRv Print Exp.";
     begin
         Selection := 0;
-        if VoucherType."Print Template Code" <> '' then begin
+        if ((VoucherType."Print Object Type" in [VoucherType."Print Object Type"::Codeunit, VoucherType."Print Object Type"::Report]) and NewNpRvPrintExp.IsFeatureEnabled()) or
+           (VoucherType."Print Template Code" <> '')
+        then begin
             SelectionStr := Format(VoucherType."Send Method via POS"::Print);
             Selection := 1;
         end;

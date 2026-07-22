@@ -75,6 +75,20 @@
             Caption = 'Print Object Type';
             DataClassification = CustomerContent;
             InitValue = Template;
+
+            trigger OnValidate()
+            var
+                NewNpRvPrintExp: Codeunit "NPR New NpRv Print Exp.";
+                ModulePayDefault: Codeunit "NPR NpRv Module Pay.: Default";
+                ModulePayPartial: Codeunit "NPR NpRv Module Pay. - Partial";
+                TemplateNotAllowedErr: Label 'Template printing cannot be selected because the New NpRv Print Experience feature is enabled.';
+            begin
+                if (Rec."Print Object Type" = Rec."Print Object Type"::Template) and
+                   (Rec."Apply Payment Module" in [ModulePayDefault.ModuleCode(), ModulePayPartial.ModuleCode()]) and
+                   NewNpRvPrintExp.IsFeatureEnabled()
+                then
+                    Error(TemplateNotAllowedErr);
+            end;
         }
         field(64; "Print Object ID"; Integer)
         {
@@ -325,6 +339,16 @@
         {
         }
     }
+
+    trigger OnInsert()
+    var
+        NewNpRvPrintExp: Codeunit "NPR New NpRv Print Exp.";
+    begin
+        if (Rec."Print Object Type" = Rec."Print Object Type"::Template) and (Rec."Print Template Code" = '') and NewNpRvPrintExp.IsFeatureEnabled() then begin
+            Rec."Print Object Type" := Rec."Print Object Type"::Codeunit;
+            Rec."Print Object ID" := Codeunit::"NPR Static Retail Voucher";
+        end;
+    end;
 
     internal procedure DrilldownCalculatedFields(FieldNo: Integer)
     var
