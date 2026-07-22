@@ -55,7 +55,6 @@ codeunit 6184889 "NPR FR Setup Check"
 #ENDIF
         FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
         ERROR_JET_INIT: Label 'JET has not been initialized for %1 %2. This must be done to comply with french NF525 regulations.';
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
         BigInt: BigInteger;
         NumberValue: Text;
     begin
@@ -267,13 +266,5 @@ codeunit 6184889 "NPR FR Setup Check"
             FieldRef := RecRef.Field(10802);
             FieldRef.TestField();
         end;
-
-        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
-        ReportSelectionRetail.SetRange("Print Template", 'EPSON_RECEIPT_FR');
-        ReportSelectionRetail.FindFirst();
-
-        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
-        ReportSelectionRetail.SetRange("Print Template", 'EPSON_Z_REPORT_FR');
-        ReportSelectionRetail.FindFirst();
     end;
 }
