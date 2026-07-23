@@ -381,6 +381,12 @@ codeunit 6184866 "NPR ES Audit Mgt."
             Error(SameSignErr);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Post Entries", 'OnCheckPostingRestrictions', '', false, false)]
+    local procedure CheckVATCustomerOnPOSPostingRestrictions(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
+    begin
+        CheckESVATCustomerRequirement(POSEntry);
+    end;
+
     #endregion
 
     #region Subscribers - Fiskaly Communication
@@ -709,6 +715,32 @@ codeunit 6184866 "NPR ES Audit Mgt."
     #endregion
 
     #region Procedures - Validations
+    internal procedure CheckESVATCustomerRequirement(POSEntry: Record "NPR POS Entry")
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
+        VATCustomerRequiredErr: Label 'Posting a sale in Spain requires a customer for SII VAT reporting. Set %1 on %2 %3, or assign a customer to the sale before posting.', Comment = '%1 = VAT Customer No. field caption, %2 = POS Posting Profile table caption, %3 = POS Posting Profile Code';
+    begin
+        if not IsESFiscalizationEnabled() then
+            exit;
+
+        if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Cancelled Sale"]) then
+            exit;
+
+        if POSEntry."Customer No." <> '' then
+            exit;
+
+        if not POSStore.Get(POSEntry."POS Store Code") then
+            exit;
+        if not POSStore.GetProfile(POSPostingProfile) then
+            exit;
+
+        if POSPostingProfile."VAT Customer No." <> '' then
+            exit;
+
+        Error(VATCustomerRequiredErr, POSPostingProfile.FieldCaption("VAT Customer No."), POSPostingProfile.TableCaption(), POSPostingProfile.Code);
+    end;
+
     local procedure TestIsProfileSetAccordingToCompliance(POSAuditProfileCode: Code[20])
     var
         POSAuditProfile: Record "NPR POS Audit Profile";

@@ -18,6 +18,27 @@ codeunit 85207 "NPR Library ES Fiscal"
 
         SetVATPctOnVATPostingSetup(VATPostingSetup, 21);
         InsertESReturnReasonMapping();
+        SetGenericVATCustomerOnPostingProfile(POSUnit);
+    end;
+
+    local procedure SetGenericVATCustomerOnPostingProfile(POSUnit: Record "NPR POS Unit")
+    var
+        Customer: Record Customer;
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
+        LibrarySales: Codeunit "Library - Sales";
+    begin
+        // Spain requires a generic "cash customer" as VAT Customer No. on the posting profile so anonymous POS sales
+        // can be posted under the ES localization (see "NPR ES Audit Mgt.".CheckESVATCustomerRequirement).
+        if not POSStore.Get(POSUnit."POS Store Code") then
+            exit;
+        if not POSStore.GetProfile(POSPostingProfile) then
+            exit;
+        if POSPostingProfile."VAT Customer No." <> '' then
+            exit;
+        LibrarySales.CreateCustomer(Customer);
+        POSPostingProfile."VAT Customer No." := Customer."No.";
+        POSPostingProfile.Modify();
     end;
 
     local procedure InsertPOSAuditProfile(var POSAuditProfile: Record "NPR POS Audit Profile")
