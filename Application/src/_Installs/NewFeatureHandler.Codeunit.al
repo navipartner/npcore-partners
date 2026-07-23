@@ -476,6 +476,45 @@ codeunit 6150632 "NPR New Feature Handler"
         NewSalesDocConfExp.InsertReportSelectionRetail();
     end;
 
+    internal procedure HandleNewBeginWorkshiftExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewBeginWorkshiftExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewBeginWorkshiftExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewBeginWorkshiftExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewBeginWorkshiftExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure NewBeginWorkshiftExperienceHandle()
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        Feature: Record "NPR Feature";
+        NewBeginWorkshiftExp: Codeunit "NPR New Begin Workshift Exp";
+    begin
+        if not Feature.Get(NewBeginWorkshiftExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
+        ReportSelectionRetail.ModifyAll("Print Template", '');
+        ReportSelectionRetail.CleanupEmptyData();
+
+        NewBeginWorkshiftExp.InsertReportSelectionRetail();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR New Feature Handler");

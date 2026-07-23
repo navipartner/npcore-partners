@@ -82,6 +82,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"External JQ Refresher Only");
         AddFeature(Feature::"New Z-Report Experience");
         AddFeature(Feature::"New Sales Doc Confirmation Experience");
+        AddFeature(Feature::"New Begin Workshift Experience");
 
         if ExistingFeature.FindSet() then
             repeat
@@ -119,6 +120,7 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleExtJQRefresherOnly();
         NewFeatureHandler.HandleNewZReportExperience();
         NewFeatureHandler.HandleNewSalesDocConfirmationExperience();
+        NewFeatureHandler.HandleNewBeginWorkshiftExperience();
         RefreshExperienceTierCurrentCompany();
     end;
 

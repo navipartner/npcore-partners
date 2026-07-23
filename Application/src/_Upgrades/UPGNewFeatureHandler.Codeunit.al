@@ -17,6 +17,7 @@ codeunit 6150638 "NPR UPG New Feature Handler"
         NewZReportExperienceHandleUpgradeStepLbl: Label 'NewZReportExperienceHandle', Locked = true;
         ExtJQRefresherOnlyHandleUpgradeStepLbl: Label 'ExtJQRefresherOnlyHandle', Locked = true;
         NewSalesDocConfirmationExperienceHandleUpgradeStepLbl: Label 'NewSalesDocConfirmationExperienceHandle', Locked = true;
+        NewBeginWorkshiftExperienceHandleUpgradeStepLbl: Label 'NewBeginWorkshiftExperienceHandle', Locked = true;
     begin
         AddUpgradeTagIfNotExist(CurrCodeunitId(), POSEditorFeatureHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), ScenarioObsoletedFeatureUpgradeStepLbl);
@@ -30,6 +31,7 @@ codeunit 6150638 "NPR UPG New Feature Handler"
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewZReportExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), ExtJQRefresherOnlyHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewSalesDocConfirmationExperienceHandleUpgradeStepLbl);
+        AddUpgradeTagIfNotExist(CurrCodeunitId(), NewBeginWorkshiftExperienceHandleUpgradeStepLbl);
     end;
 
     local procedure AddUpgradeTagIfNotExist(UpgradeCodeunitId: Integer; UpgradeStep: Text)
