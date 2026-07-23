@@ -1333,6 +1333,52 @@ codeunit 85160 "NPR Ecommerce Ticket Tests"
         end;
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_FCYDocument_TicketAmountsInLCY()
+    var
+        Currency: Record Currency;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        LibTicket: Codeunit "NPR Library - Ticket Module";
+        ItemNo: Code[20];
+    begin
+        // [Scenario] Ticket amounts issued from an FCY document are stored in LCY (unit price 100 FCY at factor 0.1
+        // -> 1000 LCY excl. VAT, 1250 incl. 25% VAT), matching the POS convention, not the raw FCY line amount.
+        _Lib.CreateFCYCurrency(Currency, 0.1);
+
+        ItemNo := LibTicket.CreateScenario_SmokeTest();
+        _Lib.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Price Excl. VAT" := true;
+        EcomSalesHeader."Currency Code" := Currency.Code;
+        EcomSalesHeader."Currency Exchange Rate" := 0.1;
+        EcomSalesHeader."Received Date" := WorkDate();
+        EcomSalesHeader.Modify();
+
+        _Lib.CreateTicketLine(EcomSalesLine, EcomSalesHeader, ItemNo, 1, 100);
+        EcomSalesLine."VAT %" := 25;
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Modify();
+
+        EcomCreateTicketImpl.CreateRequestsForTicketLines(EcomSalesHeader);
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        TicketRequest.SetRange("Session Token ID", EcomSalesHeader."Ticket Reservation Token");
+        TicketRequest.SetRange("Request Status", TicketRequest."Request Status"::Confirmed);
+        TicketRequest.FindFirst();
+
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
+        Ticket.FindSet();
+        repeat
+            Assert.AreEqual(1000, Ticket.AmountExclVat, 'AmountExclVat must be the LCY amount (100 FCY / 0.1 = 1000), not the FCY line amount.');
+            Assert.AreEqual(1250, Ticket.AmountInclVat, 'AmountInclVat must be the LCY amount grossed up by 25% VAT (1250), not the FCY line amount.');
+        until Ticket.Next() = 0;
+    end;
+
     var
         _Lib: Codeunit "NPR Library Ecommerce";
         _LibTicket: Codeunit "NPR Library - Ticket Module";

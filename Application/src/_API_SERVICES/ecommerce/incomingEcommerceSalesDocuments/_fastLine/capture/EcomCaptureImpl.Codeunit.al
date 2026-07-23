@@ -284,12 +284,15 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         EcomVirtualItemEvents: Codeunit "NPR EcomVirtualItemEvents";
         NpRvGlobalVoucherWebservice: Codeunit "NPR NpRv Global Voucher WS";
         ProcessVoucher: Boolean;
+        Precalculated: Boolean;
         InvalidVoucherLbl: Label 'Invalid Voucher Reference No. %1';
         VirtualItemSalesAmount: Decimal;
         VirtualItemPaidAmount: Decimal;
         AvailableAmountToCapture: Decimal;
+        AvailableAmountToCaptureLCY: Decimal;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        AvailableVoucherAmount: Decimal;
+        AvailableVoucherAmountLCY: Decimal;
+        DocCurrencyFactor: Decimal;
     begin
         if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
             exit;
@@ -320,9 +323,11 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         if AvailableAmountToCapture > TotalAmountToCapture then
             AvailableAmountToCapture := TotalAmountToCapture;
 
-        if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, AvailableAmountToCapture, AvailableVoucherAmount) then
-            if AvailableAmountToCapture > AvailableVoucherAmount then
-                AvailableAmountToCapture := AvailableVoucherAmount;
+        DocCurrencyFactor := DocumentCurrencyFactor(EcomSalesHeader);
+        AvailableAmountToCaptureLCY := EcomSalesDocUtils.ConvertTransactionCurrencyAmtToLCY(AvailableAmountToCapture, EcomSalesHeader."Currency Code", DocCurrencyFactor, EcomSalesHeader."Received Date", Precalculated);
+        if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, AvailableAmountToCaptureLCY, AvailableVoucherAmountLCY) then
+            if Precalculated or (Abs(AvailableVoucherAmountLCY - AvailableAmountToCaptureLCY) > NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference()) then
+                AvailableAmountToCapture := EcomSalesDocUtils.ConvertLCYAmtToTransactionCurrency(AvailableVoucherAmountLCY, EcomSalesHeader."Currency Code", DocCurrencyFactor);
 
         ProcessVoucher := AvailableAmountToCapture <> 0;
         EcomVirtualItemEvents.OnCalculateVoucherCaptureAmountCanProcessVoucher(EcomSalesHeader, EcomSalesPmtLine, VoucherType, NpRvVoucher, TotalAmountToCapture, AvailableAmountToCapture, ProcessVoucher);
@@ -373,7 +378,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
 
             NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
             NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
-            NpRvSalesLine.Amount := PaymentLine.Amount;
+            NpRvSalesLine.Amount := EcomSalesDocUtils.ConvertTransactionCurrencyAmtToLCY(PaymentLine.Amount, EcomSalesHeader."Currency Code", DocCurrencyFactor, EcomSalesHeader."Received Date", Precalculated);
             NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
             if IsShopifyDocument then
                 SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherSalesLineFields(NpRvSalesLine);
@@ -389,7 +394,10 @@ codeunit 6248646 "NPR EcomCaptureImpl"
             ReservedRvSalesLine.SetRange("Document Line No.", 0);
             if ReservedRvSalesLine.FindFirst() then begin
                 ReservedRvSalesLine.Amount -= NpRvSalesLine.Amount;
-                if ReservedRvSalesLine.Amount <= 0 then
+                // Partial captures each round to the currency precision, so the rounded parts may not re-sum to the whole and can
+                // leave a sub-cent residual. Clear it within the currency-rounding tolerance so it doesn't permanently inflate the
+                // voucher's "Reserved Amount"; a genuine remaining reservation is well above the tolerance and is still kept.
+                if ReservedRvSalesLine.Amount <= NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference() then
                     ReservedRvSalesLine.Delete(true)
                 else
                     ReservedRvSalesLine.Modify(true);
@@ -397,6 +405,20 @@ codeunit 6248646 "NPR EcomCaptureImpl"
 
             TotalAmountToCapture -= PaymentLine.Amount;
         end;
+    end;
+
+    local procedure DocumentCurrencyFactor(EcomSalesHeader: Record "NPR Ecom Sales Header"): Decimal
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+    begin
+        if EcomSalesDocUtils.IsLCY(EcomSalesHeader."Currency Code") then
+            exit(0);
+        if EcomSalesHeader."Currency Exchange Rate" > 0 then
+            exit(EcomSalesHeader."Currency Exchange Rate");
+        if EcomSalesHeader."Received Date" = 0D then
+            EcomSalesHeader."Received Date" := WorkDate();
+        exit(CurrencyExchangeRate.ExchangeRate(EcomSalesHeader."Received Date", EcomSalesHeader."Currency Code"));
     end;
 
     local procedure CalculateAmountToCapture(EcomSalesHeader: Record "NPR Ecom Sales Header") AmountToCapture: Decimal

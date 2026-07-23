@@ -672,5 +672,24 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     begin
         EcomSalesLine.SetFilter(Subtype, '%1|%2|%3|%4', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.SubType::Membership, EcomSalesLine.Subtype::Coupon);
     end;
+
+    internal procedure ConvertLineAmountToLCY(EcomSalesHeader: Record "NPR Ecom Sales Header"; AmountTCY: Decimal): Decimal
+    var
+        Currency: Record Currency;
+        CurrExchRate: Record "Currency Exchange Rate";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        Precalculated: Boolean;
+    begin
+        if EcomSalesDocUtils.IsLCY(EcomSalesHeader."Currency Code") then begin
+            Currency.InitRoundingPrecision();
+            exit(Round(AmountTCY, Currency."Amount Rounding Precision"));
+        end;
+
+        if EcomSalesHeader."Received Date" = 0D then
+            EcomSalesHeader."Received Date" := WorkDate();
+        if (EcomSalesHeader."Currency Code" <> '') and (EcomSalesHeader."Currency Exchange Rate" <= 0) then
+            EcomSalesHeader."Currency Exchange Rate" := CurrExchRate.ExchangeRate(EcomSalesHeader."Received Date", EcomSalesHeader."Currency Code");
+        exit(EcomSalesDocUtils.ConvertTransactionCurrencyAmtToLCY(AmountTCY, EcomSalesHeader."Currency Code", EcomSalesHeader."Currency Exchange Rate", EcomSalesHeader."Received Date", Precalculated));
+    end;
 }
 #endif

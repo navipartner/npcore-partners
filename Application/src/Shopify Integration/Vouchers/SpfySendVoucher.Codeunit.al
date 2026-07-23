@@ -437,17 +437,23 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         exit(NoteLbl);
     end;
 
-    local procedure SalesOrderReservedAmount(Voucher: Record "NPR NpRv Voucher"): Decimal
+    local procedure SalesOrderReservedAmount(Voucher: Record "NPR NpRv Voucher") ReservedAmountLCY: Decimal
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        CurrencyCode: Code[10];
+        CurrencyFactor: Decimal;
     begin
         MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
         MagentoPaymentLine.SetRange("No.", Voucher."Reference No.");
         MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         MagentoPaymentLine.SetRange("Document Type", MagentoPaymentLine."Document Type"::Order);
         MagentoPaymentLine.SetRange(Posted, false);
-        MagentoPaymentLine.CalcSums(Amount);
-        exit(MagentoPaymentLine.Amount);
+        // The voucher balance is in LCY, so each reservation must be converted from its document currency before summing (FCY sales orders carry document-currency amounts).
+        if MagentoPaymentLine.FindSet() then
+            repeat
+                MagentoPaymentLine.TransactionCurrencyCodeAndFactor(true, CurrencyCode, CurrencyFactor);
+                ReservedAmountLCY += MagentoPaymentLine.AmountLCY(CurrencyCode, CurrencyFactor);
+            until MagentoPaymentLine.Next() = 0;
     end;
 
     local procedure OutstandingVoucherRequestsExist(NcTask: Record "NPR Nc Task"; TableNo: Integer): Boolean

@@ -427,6 +427,8 @@
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        ExchangeRateDate: Date;
         DocumentFound: Boolean;
     begin
         CurrencyCode := '';
@@ -462,11 +464,18 @@
                 end;
             Database::"NPR Ecom Sales Header":
                 begin
-                    EcomSalesHeader.SetLoadFields("Currency Code", "Currency Exchange Rate");
+                    EcomSalesHeader.SetLoadFields("Currency Code", "Currency Exchange Rate", "Received Date");
                     DocumentFound := EcomSalesHeader.GetBySystemId(Rec."NPR Inc Ecom Sale Id");
                     if DocumentFound then begin
                         CurrencyCode := EcomSalesHeader."Currency Code";
                         CurrencyFactor := EcomSalesHeader."Currency Exchange Rate";
+                        // The ecom header can carry an FCY currency without an exchange rate
+                        if (CurrencyFactor = 0) and not IsLCY(CurrencyCode) then begin
+                            ExchangeRateDate := EcomSalesHeader."Received Date";
+                            if ExchangeRateDate = 0D then
+                                ExchangeRateDate := WorkDate();
+                            CurrencyFactor := CurrencyExchangeRate.ExchangeRate(ExchangeRateDate, CurrencyCode);
+                        end;
                     end;
                 end;
         end;

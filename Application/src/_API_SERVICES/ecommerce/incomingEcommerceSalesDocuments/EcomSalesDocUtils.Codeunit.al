@@ -523,41 +523,6 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         EcomSalesMembershipLink.DeleteAll(false);
     end;
 
-    local procedure IsFCYDocument(CurrencyCode: Code[10]): Boolean
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        if CurrencyCode = '' then
-            exit(false);
-        GLSetup.Get();
-        exit(CurrencyCode <> GLSetup."LCY Code");
-    end;
-
-    internal procedure ErrorIfFCYDocument(CurrencyCode: Code[10])
-    var
-        VouchersNotSupportedInFCYDocumentLbl: Label 'Vouchers are not supported in documents with a foreign currency. Currency Code: %1', Comment = '%1 - currency code', Locked = true;
-    begin
-        if IsFCYDocument(CurrencyCode) then
-            Error(VouchersNotSupportedInFCYDocumentLbl, CurrencyCode);
-    end;
-
-    internal procedure CheckFCYDocumentHasNoVouchers(EcomSalesHeader: Record "NPR Ecom Sales Header")
-    var
-        EcomSalesLine: Record "NPR Ecom Sales Line";
-        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
-    begin
-        if not IsFCYDocument(EcomSalesHeader."Currency Code") then
-            exit;
-        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Voucher);
-        if not EcomSalesLine.IsEmpty() then
-            ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
-        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        EcomSalesPmtLine.SetRange("Payment Method Type", EcomSalesPmtLine."Payment Method Type"::Voucher);
-        if not EcomSalesPmtLine.IsEmpty() then
-            ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
-    end;
-
     internal procedure CheckPartialVoucherAllowed(var EcomSalesLine: Record "NPR Ecom Sales Line"; SalesLineJsonToken: JsonToken; VoucherModuleCode: Code[20])
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -638,7 +603,6 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
     begin
         EcomSalesHeader.TestField("External No.");
-        CheckFCYDocumentHasNoVouchers(EcomSalesHeader);
         if EcomSalesHeader."Ticket Reservation Token" <> '' then
             EcomCreateTicketImpl.ValidateTicketRequest(EcomSalesHeader);
         ValidateLanguage(EcomSalesHeader);
@@ -1031,8 +995,109 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         exit(WindowsLanguage.Get(LanguageId));
     end;
 
+    internal procedure IsLCY(CurrencyCode: Code[10]): Boolean
+    begin
+        if CurrencyCode = '' then
+            exit(true);
+        GetGLSetup();
+        exit(CurrencyCode = _GLSetup."LCY Code");
+    end;
+
+    internal procedure AdjustCurrencyCode(CurrencyCode: Code[10]): Code[10]
+    begin
+        if CurrencyCode <> '' then
+            exit(CurrencyCode);
+        GetGLSetup();
+        exit(_GLSetup."LCY Code");
+    end;
+
+    // Rounding precision for amounts already expressed in LCY (e.g. a VAT gross-up/split done after ConvertLineAmountToLCY).
+    // Use this instead of a hardcoded 0.01 so the split matches the precision the conversion rounded to.
+    internal procedure LCYAmountRoundingPrecision(): Decimal
+    begin
+        GetGLSetup();
+        exit(_GLSetup."Amount Rounding Precision");
+    end;
+
+    internal procedure ConvertTransactionCurrencyAmtToLCY(AmountTCY: Decimal; CurrencyCode: Code[10]; CurrencyFactor: Decimal; PostingDate: Date; var Precalculated: Boolean): Decimal
     var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        Precalculated := true;
+        if AmountTCY = 0 then
+            exit(0);
+
+        if IsLCY(CurrencyCode) then
+            exit(AmountTCY);
+
+        Precalculated := false;
+        exit(
+            Round(
+                CurrencyExchangeRate.ExchangeAmtFCYToLCY(PostingDate, CurrencyCode, AmountTCY, CurrencyFactor),
+                _GLSetup."Amount Rounding Precision"));
+    end;
+
+    internal procedure CheckSuppliedRateMatchesFixedBothRate(CurrencyCode: Code[10]; PostingDate: Date; SuppliedCurrencyFactor: Decimal)
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        ConfiguredFactor: Decimal;
+        RateMismatchErr: Label 'The supplied exchange rate %1 for %2 %3 does not match the fixed exchange rate %4 configured in %5. Update the document rate or the exchange rate setup.', Comment = '%1 = supplied currency factor, %2 = Currency Code field caption, %3 = currency code, %4 = configured currency factor, %5 = Currency Exchange Rate table caption';
+    begin
+        if SuppliedCurrencyFactor <= 0 then
+            exit;
+        if PostingDate = 0D then
+            exit;
+
+        CurrencyExchangeRate.SetRange("Currency Code", CurrencyCode);
+        CurrencyExchangeRate.SetRange("Starting Date", 0D, PostingDate);
+        if not CurrencyExchangeRate.FindLast() then
+            exit;
+        if CurrencyExchangeRate."Fix Exchange Rate Amount" <> CurrencyExchangeRate."Fix Exchange Rate Amount"::Both then
+            exit;
+
+        ConfiguredFactor := CurrencyExchangeRate.ExchangeRate(PostingDate, CurrencyCode);
+        if Abs(ConfiguredFactor - SuppliedCurrencyFactor) <= 0.000001 then
+            exit;
+
+        Error(RateMismatchErr, SuppliedCurrencyFactor, CurrencyExchangeRate.FieldCaption("Currency Code"), CurrencyCode, ConfiguredFactor, CurrencyExchangeRate.TableCaption());
+    end;
+
+    internal procedure ConvertLCYAmtToTransactionCurrency(AmountLCY: Decimal; CurrencyCode: Code[10]; CurrencyFactor: Decimal): Decimal
+    var
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        if AmountLCY = 0 then
+            exit(0);
+
+        if IsLCY(CurrencyCode) then
+            exit(AmountLCY);
+
+        // Round to the transaction (foreign) currency's own precision, not LCY's.
+        Currency.Get(CurrencyCode);
+        if Currency."Amount Rounding Precision" = 0 then
+            Currency.InitRoundingPrecision();
+        exit(
+            Round(
+                CurrencyExchangeRate.ExchangeAmtLCYToFCYOnlyFactor(AmountLCY, CurrencyFactor),
+                Currency."Amount Rounding Precision"));
+    end;
+
+    local procedure GetGLSetup()
+    begin
+        if _GLSetupRetrieved then
+            exit;
+        _GLSetup.Get();
+        _GLSetup.TestField("LCY Code");
+        if _GLSetup."Amount Rounding Precision" <= 0 then
+            _GLSetup."Amount Rounding Precision" := 0.01;
+        _GLSetupRetrieved := true;
+    end;
+
+    var
+        _GLSetup: Record "General Ledger Setup";
         _EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         _EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
+        _GLSetupRetrieved: Boolean;
 }
 #endif

@@ -75,6 +75,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         SellToCustomerJsonToken: JsonToken;
         ShipmentJsonToken: JsonToken;
         ShipToJsonToken: JsonToken;
+        NegativeExchangeRateErr: Label 'The %1 cannot be negative.', Comment = '%1 = Currency Exchange Rate field caption';
     begin
 #pragma warning disable AA0139
         SalesDocToJsonToken := RequestBody;
@@ -85,9 +86,14 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesHeader."Currency Code" := JsonHelper.GetJText(RequestBody, 'currencyCode', MaxStrLen(EcomSalesHeader."Currency Code"), true, false);
 
         if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then begin
-            if EcomSalesHeader."Currency Code" <> '' then
+            if EcomSalesHeader."Currency Code" <> '' then begin
                 EcomSalesHeader."Currency Exchange Rate" := JsonHelper.GetJDecimal(RequestBody, 'currencyExchangeRate', false);
+                if EcomSalesHeader."Currency Exchange Rate" < 0 then
+                    Error(NegativeExchangeRateErr, EcomSalesHeader.FieldCaption("Currency Exchange Rate"));
+                EcomSalesDocUtils.CheckSuppliedRateMatchesFixedBothRate(EcomSalesHeader."Currency Code", Today(), EcomSalesHeader."Currency Exchange Rate");
+            end;
         end;
+
 
         EcomSalesHeader."External Document No." := JsonHelper.GetJText(RequestBody, 'externalDocumentNo', MaxStrLen(EcomSalesHeader."External Document No."), true, false);
         EcomSalesHeader."Your Reference" := JsonHelper.GetJText(RequestBody, 'yourReference', MaxStrLen(EcomSalesHeader."Your Reference"), true, false);
@@ -303,11 +309,14 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         Voucher: Record "NPR NpRv Voucher";
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        ReservedAmountLCY: Decimal;
     begin
         if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
             exit;
 
         EcomVirtualItemMgt.FindVoucher(EcomSalesPmtLine, Voucher);
+
+        ReservedAmountLCY := EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, EcomSalesPmtLine.Amount);
 
         if not FindOrValidateVoucherSalesLine(EcomSalesHeader, Voucher, VoucherSalesLine) then begin
             VoucherSalesLine.Init();
@@ -321,12 +330,12 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             VoucherSalesLine.Description := Voucher.Description;
             VoucherSalesLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
             VoucherSalesLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
-            VoucherSalesLine.Amount := EcomSalesPmtLine.Amount;
+            VoucherSalesLine.Amount := ReservedAmountLCY;
             VoucherSalesLine.Insert();
         end else begin
             VoucherSalesLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
             VoucherSalesLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
-            VoucherSalesLine.Amount := EcomSalesPmtLine.Amount;
+            VoucherSalesLine.Amount := ReservedAmountLCY;
             VoucherSalesLine.Modify();
         end;
 
@@ -358,7 +367,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     local procedure DeserializeIncomingEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
-        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
         EcomCreateWalletMgt: Codeunit "NPR EcomCreateWalletMgt";
         JsonHelper: Codeunit "NPR Json Helper";
@@ -432,7 +440,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 end;
             EcomSalesLine.Type::Voucher:
                 begin
-                    EcomSalesDocUtils.ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
                     EcomSalesLine.Subtype := EcomSalesLine.Subtype::Voucher;
                     EcomSalesLine."Voucher Type" := JsonHelper.GetJText(SalesLineJsonToken, 'voucherType', MaxStrLen(EcomSalesLine."Voucher Type"), true, false);
                     EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
@@ -641,7 +648,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 
     local procedure DeserializeIncomingEcomSalesPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
     var
-        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         JsonHelper: Codeunit "NPR Json Helper";
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         LineTypeText: Text;
@@ -669,7 +675,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 end;
             EcomSalesPmtLine."Payment Method Type"::Voucher:
                 begin
-                    EcomSalesDocUtils.ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
 #pragma warning disable AA0139
                     EcomSalesPmtLine."Payment Reference" := JsonHelper.GetJText(PaymentLineJsonToken, 'paymentReference', MaxStrLen(EcomSalesPmtLine."Payment Reference"), true, true);
                     EcomSalesPmtLine.Amount := JsonHelper.GetJDecimal(PaymentLineJsonToken, 'paymentAmount', true);

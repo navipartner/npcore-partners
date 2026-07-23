@@ -20,8 +20,6 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
     end;
 
     internal procedure CheckIfLineCanBeProcessed(EcommSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
-    var
-        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
     begin
         if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
             EcomSalesHeader.FieldError("Creation Status");
@@ -49,8 +47,6 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
         if EcommSalesLine."Virtual Item Process Status" = EcommSalesLine."Virtual Item Process Status"::Processed then
             EcommSalesLine.FieldError(EcommSalesLine."Virtual Item Process Status");
-
-        EcomSalesDocUtils.ErrorIfFCYDocument(EcomSalesHeader."Currency Code");
     end;
 
     local procedure CreateVoucher(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
@@ -355,30 +351,17 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         VoucherEntry.Insert();
     end;
 
-    local procedure CalculateVoucherFaceValueLCY(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: record "NPR Ecom Sales Line"): Decimal
+    internal procedure CalculateVoucherFaceValueLCY(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: record "NPR Ecom Sales Line"): Decimal
     var
-        Currency: Record Currency;
-        CurrExchRate: Record "Currency Exchange Rate";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         FaceValueTCY: Decimal;
-        Precalculated: Boolean;
     begin
         if EcomSalesHeader."Price Excl. VAT" and (EcomSalesLine."VAT %" > 0) then
             FaceValueTCY := EcomSalesLine."Unit Price" * (1 + EcomSalesLine."VAT %" / 100)
         else
             FaceValueTCY := EcomSalesLine."Unit Price";
 
-        if NpRvSalesDocMgt.IsLCY(EcomSalesHeader."Currency Code") then begin
-            Currency.InitRoundingPrecision();
-            exit(Round(FaceValueTCY, Currency."Amount Rounding Precision"));
-        end;
-
-        if EcomSalesHeader."Received Date" = 0D then
-            EcomSalesHeader."Received Date" := WorkDate();
-        if (EcomSalesHeader."Currency Code" <> '') and (EcomSalesHeader."Currency Exchange Rate" = 0) then
-            EcomSalesHeader."Currency Exchange Rate" := CurrExchRate.ExchangeRate(EcomSalesHeader."Received Date", EcomSalesHeader."Currency Code");
-        exit(
-            NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(
-                FaceValueTCY, EcomSalesHeader."Currency Code", EcomSalesHeader."Currency Exchange Rate", EcomSalesHeader."Received Date", Precalculated));
+        exit(EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, FaceValueTCY));
     end;
 
     local procedure VoucherAlreadyExist(VoucherNo: Code[20]): Boolean

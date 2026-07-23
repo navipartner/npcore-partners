@@ -608,37 +608,70 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
     local procedure UpdateTicketOnConfirm(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; TicketRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
-        AmountExclVat: Decimal;
-        AmountInclVat: Decimal;
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        WholeAmountExclVat: Decimal;
+        WholeAmountInclVat: Decimal;
+        RemainingExclVat: Decimal;
+        RemainingInclVat: Decimal;
+        PerTicketExclVat: Decimal;
+        PerTicketInclVat: Decimal;
+        LCYPrecision: Decimal;
+        TicketCount: Integer;
+        Index: Integer;
     begin
-        CalculateTicketAmounts(EcomSalesHeader, EcomSalesLine, AmountExclVat, AmountInclVat);
+        // Convert the whole line once, then allocate it across the tickets with the rounding remainder placed on the last ticket,
+        // so the per-ticket amounts re-sum exactly to the converted line total (converting per-unit and multiplying can drift).
+        CalculateTicketLineAmounts(EcomSalesHeader, EcomSalesLine, WholeAmountExclVat, WholeAmountInclVat);
+
         Ticket.Reset();
         Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
+        TicketCount := Ticket.Count();
+        if TicketCount = 0 then
+            exit;
+
+        LCYPrecision := EcomSalesDocUtils.LCYAmountRoundingPrecision();
+        PerTicketExclVat := Round(WholeAmountExclVat / TicketCount, LCYPrecision);
+        PerTicketInclVat := Round(WholeAmountInclVat / TicketCount, LCYPrecision);
+        RemainingExclVat := WholeAmountExclVat;
+        RemainingInclVat := WholeAmountInclVat;
+
         Ticket.SetLoadFields(AmountExclVat, AmountInclVat, "Sales Header No.");
         if Ticket.FindSet(true) then
             repeat
+                Index += 1;
                 if Ticket."Sales Header No." = '' then
                     Ticket."Sales Header No." := TicketRequest."External Order No.";
-                Ticket.AmountInclVat := AmountInclVat;
-                Ticket.AmountExclVat := AmountExclVat;
+                if Index = TicketCount then begin
+                    Ticket.AmountExclVat := RemainingExclVat;
+                    Ticket.AmountInclVat := RemainingInclVat;
+                end else begin
+                    Ticket.AmountExclVat := PerTicketExclVat;
+                    Ticket.AmountInclVat := PerTicketInclVat;
+                    RemainingExclVat -= PerTicketExclVat;
+                    RemainingInclVat -= PerTicketInclVat;
+                end;
                 Ticket.Modify();
             until Ticket.Next() = 0;
     end;
 
-    local procedure CalculateTicketAmounts(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var AmountExclVat: Decimal; var AmountInclVat: Decimal)
+    local procedure CalculateTicketLineAmounts(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var AmountExclVat: Decimal; var AmountInclVat: Decimal)
     var
-        QtyZeroErr: Label 'Invalid Ecommerce ticket line %1 (Quantity=0). This is a programming bug.', Comment = '%1 = EcomSalesLine.Line No.';
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        LineAmountLCY: Decimal;
+        LCYPrecision: Decimal;
     begin
         AmountExclVat := 0;
         AmountInclVat := 0;
-        if EcomSalesLine.Quantity = 0 then
-            Error(QtyZeroErr, Format(EcomSalesLine."Line No."));
+
+        LineAmountLCY := EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, EcomSalesLine."Line Amount");
+        LCYPrecision := EcomSalesDocUtils.LCYAmountRoundingPrecision(); // Amounts are LCY here, so split VAT at LCY precision, not a hardcoded 0.01.
         if EcomSalesHeader."Price Excl. VAT" then begin
-            AmountExclVat := EcomSalesLine."Line Amount" / EcomSalesLine.Quantity;
-            AmountInclVat := AmountExclVat * (1 + EcomSalesLine."VAT %" / 100);
+            AmountExclVat := LineAmountLCY;
+            AmountInclVat := Round(LineAmountLCY * (1 + EcomSalesLine."VAT %" / 100), LCYPrecision);
         end else begin
-            AmountInclVat := EcomSalesLine."Line Amount" / EcomSalesLine.Quantity;
-            AmountExclVat := AmountInclVat / (1 + EcomSalesLine."VAT %" / 100);
+            AmountInclVat := LineAmountLCY;
+            AmountExclVat := Round(LineAmountLCY / (1 + EcomSalesLine."VAT %" / 100), LCYPrecision);
         end;
     end;
 

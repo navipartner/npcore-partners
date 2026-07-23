@@ -757,12 +757,7 @@
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
-#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
-        VoucherWebhook: Codeunit "NPR Retail Voucher Webhooks";
-#endif
-        AvailableAmountLCY: Decimal;
         VoucherPaymentAmountLCY: Decimal;
-        Precalculated: Boolean;
     begin
         Voucher.Get(NpRvSalesLine."Voucher No.");
 
@@ -780,12 +775,7 @@
             VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
         VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
 
-        VoucherPaymentAmountLCY := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor, Precalculated);
-        if not Precalculated then begin
-            ValidateAmount(Voucher, MagentoPaymentLine.SystemId, VoucherPaymentAmountLCY, AvailableAmountLCY);
-            if Abs(AvailableAmountLCY - VoucherPaymentAmountLCY) <= AllowedCurrencyConversionRoundingDifference() then
-                VoucherPaymentAmountLCY := AvailableAmountLCY; // In case of rounding differences, take the available amount as the payment amount to avoid leaving small open amounts on the voucher
-        end;
+        VoucherPaymentAmountLCY := CalcVoucherPaymentAmountLCY(Voucher, MagentoPaymentLine, DocumentCurrencyCode, DocumentCurrencyFactor);
         if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
             VoucherEntry.Amount := VoucherPaymentAmountLCY
         else
@@ -803,6 +793,30 @@
         VoucherEntry."Reservation Line Id" := NpRvSalesLine."Reservation Line Id";
         VoucherEntry.Insert();
 
+        FinalizePostedVoucherPayment(VoucherEntry, Voucher, NpRvSalesLine);
+    end;
+
+    local procedure CalcVoucherPaymentAmountLCY(Voucher: Record "NPR NpRv Voucher"; MagentoPaymentLine: Record "NPR Magento Payment Line"; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal): Decimal
+    var
+        AvailableAmountLCY: Decimal;
+        VoucherPaymentAmountLCY: Decimal;
+        Precalculated: Boolean;
+    begin
+        VoucherPaymentAmountLCY := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor, Precalculated);
+        if not Precalculated then begin
+            ValidateAmount(Voucher, MagentoPaymentLine.SystemId, VoucherPaymentAmountLCY, AvailableAmountLCY);
+            if Abs(AvailableAmountLCY - VoucherPaymentAmountLCY) <= AllowedCurrencyConversionRoundingDifference() then
+                VoucherPaymentAmountLCY := AvailableAmountLCY; // In case of rounding differences, take the available amount as the payment amount to avoid leaving small open amounts on the voucher
+        end;
+        exit(VoucherPaymentAmountLCY);
+    end;
+
+    local procedure FinalizePostedVoucherPayment(var VoucherEntry: Record "NPR NpRv Voucher Entry"; var Voucher: Record "NPR NpRv Voucher"; NpRvSalesLine: Record "NPR NpRv Sales Line")
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+    var
+        VoucherWebhook: Codeunit "NPR Retail Voucher Webhooks";
+#endif
+    begin
         RedeemVoucher(VoucherEntry, Voucher);
         RedeemPartnerVouchers(VoucherEntry, Voucher);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
@@ -858,10 +872,15 @@
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
         EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
-        VoucherWebhook: Codeunit "NPR Retail Voucher Webhooks";
 #endif
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        CurrencyCode: Code[10];
+        CurrencyFactor: Decimal;
+        ExchangeRateDate: Date;
+        VoucherPaymentAmountLCY: Decimal;
     begin
         Voucher.Get(NpRvSalesLine."Voucher No.");
 
@@ -877,10 +896,19 @@
         else
             VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
         VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
+
+        MagentoPaymentLine.TransactionCurrencyCodeAndFactor(true, CurrencyCode, CurrencyFactor);
+        if (CurrencyFactor = 0) and not NpRvSalesDocMgt.IsLCY(CurrencyCode) then begin
+            ExchangeRateDate := MagentoPaymentLine."Posting Date";
+            if ExchangeRateDate = 0D then
+                ExchangeRateDate := WorkDate();
+            CurrencyFactor := CurrencyExchangeRate.ExchangeRate(ExchangeRateDate, CurrencyCode);
+        end;
+        VoucherPaymentAmountLCY := CalcVoucherPaymentAmountLCY(Voucher, MagentoPaymentLine, CurrencyCode, CurrencyFactor);
         if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
-            VoucherEntry.Amount := MagentoPaymentLine.Amount
+            VoucherEntry.Amount := VoucherPaymentAmountLCY
         else
-            VoucherEntry.Amount := -MagentoPaymentLine.Amount;
+            VoucherEntry.Amount := -VoucherPaymentAmountLCY;
         if POSUnit.Get(NpRvSalesLine."Register No.") then
             VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
         VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
@@ -893,15 +921,7 @@
         VoucherEntry."Reservation Line Id" := NpRvSalesLine."Reservation Line Id";
         VoucherEntry.Insert();
 
-        RedeemVoucher(VoucherEntry, Voucher);
-        RedeemPartnerVouchers(VoucherEntry, Voucher);
-#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
-        Voucher.CalcFields("Initial Amount", Amount);
-        VoucherWebhook.OnVoucherPayment(Voucher.SystemId, Voucher."Voucher Type", Voucher."Initial Amount", Voucher.Amount, Voucher."Customer No.");
-#endif
-        ApplyEntry(VoucherEntry);
-        ArchiveClosedVoucher(Voucher);
-        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
+        FinalizePostedVoucherPayment(VoucherEntry, Voucher, NpRvSalesLine);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
         EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(MagentoPaymentLine);
 #endif

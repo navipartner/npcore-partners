@@ -589,6 +589,372 @@ codeunit 85246 "NPR Ecom Voucher Tests"
     end;
     #endregion
 
+    #region FCY vouchers (CORE-1158 - voucher processing in foreign currencies)
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure FaceValueLCY_LCYDocument_NoConversion()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        FaceValueLCY: Decimal;
+    begin
+        // [Scenario] Document without a currency code (LCY) → face value is the unit price, no conversion.
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        InitVoucherLineForCalc(EcomSalesLine, 50, 0);
+
+        FaceValueLCY := VchrImpl.CalculateVoucherFaceValueLCY(EcomSalesHeader, EcomSalesLine);
+
+        _Assert.AreEqual(50, FaceValueLCY, 'LCY document: face value must equal the unit price (no conversion).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure FaceValueLCY_FCYDocument_ConvertsUsingHeaderRate()
+    var
+        Currency: Record Currency;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        FaceValueLCY: Decimal;
+    begin
+        // [Scenario] FCY document with the exchange-rate factor carried on the ecom header (factor 0.1: AmountLCY = AmountFCY / factor)
+        //            → 50 FCY becomes 500 LCY. The exchange-rate table is deliberately seeded with a DIFFERENT rate (0.2) so the
+        //            assertion fails if the header factor is ignored and the table is used instead (that would give 250, not 500).
+        _LibEcom.CreateFCYCurrency(Currency, 0.2);
+        CreateFCYEcomSalesHeader(EcomSalesHeader, Currency.Code, 0.1);
+        InitVoucherLineForCalc(EcomSalesLine, 50, 0);
+
+        FaceValueLCY := VchrImpl.CalculateVoucherFaceValueLCY(EcomSalesHeader, EcomSalesLine);
+
+        _Assert.AreEqual(500, FaceValueLCY, 'FCY document: the header factor 0.1 must take precedence (500 LCY), not the table rate 0.2 (which would give 250).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure FaceValueLCY_FCYDocument_PriceExclVAT_GrossedUpThenConverted()
+    var
+        Currency: Record Currency;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        FaceValueLCY: Decimal;
+    begin
+        // [Scenario] Price Excl. VAT document: face value is grossed up by VAT % before conversion.
+        //            50 FCY * 1.25 = 62.5 FCY → / 0.1 = 625 LCY.
+        _LibEcom.CreateFCYCurrency(Currency, 0.1);
+        CreateFCYEcomSalesHeader(EcomSalesHeader, Currency.Code, 0.1);
+        EcomSalesHeader."Price Excl. VAT" := true;
+        EcomSalesHeader.Modify();
+        InitVoucherLineForCalc(EcomSalesLine, 50, 25);
+
+        FaceValueLCY := VchrImpl.CalculateVoucherFaceValueLCY(EcomSalesHeader, EcomSalesLine);
+
+        _Assert.AreEqual(625, FaceValueLCY, 'Price Excl. VAT: 50 FCY grossed up by 25% VAT then converted at factor 0.1 must be 625 LCY.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure FaceValueLCY_FCYDocument_MissingHeaderRate_FallsBackToExchRateTable()
+    var
+        Currency: Record Currency;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        FaceValueLCY: Decimal;
+    begin
+        // [Scenario] FCY document whose header carries no exchange-rate factor (0) → the calculation
+        //            falls back to the BC Currency Exchange Rate table on the Received Date.
+        _LibEcom.CreateFCYCurrency(Currency, 0.1);
+        CreateFCYEcomSalesHeader(EcomSalesHeader, Currency.Code, 0);
+        InitVoucherLineForCalc(EcomSalesLine, 50, 0);
+
+        FaceValueLCY := VchrImpl.CalculateVoucherFaceValueLCY(EcomSalesHeader, EcomSalesLine);
+
+        _Assert.AreEqual(500, FaceValueLCY, 'Missing header rate: conversion must fall back to the exchange-rate table (0.1 → 500 LCY).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VoucherProcess_FCYDocument_VoucherEntryInLCY()
+    var
+        Currency: Record Currency;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+    begin
+        // [Scenario] Voucher issued from an FCY ecom document (unit price 50 FCY, factor 0.1) →
+        //            the voucher entry and the NpRv sales line both carry the LCY amount (500),
+        //            never the FCY unit price. Retail vouchers are an LCY instrument.
+        _LibEcom.CreateFCYCurrency(Currency, 0.1);
+        CreateFCYEcomSalesHeader(EcomSalesHeader, Currency.Code, 0.1);
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        CreateCapturedVoucherLine(EcomSalesLine, EcomSalesHeader, VoucherType.Code, 1, 50);
+
+        VchrImpl.Process(EcomSalesLine);
+
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.IsTrue(EcomSalesVoucherLink.FindFirst(), 'Voucher link row expected for the FCY voucher line.');
+
+        NpRvVoucherEntry.SetRange("Voucher No.", EcomSalesVoucherLink."Voucher No.");
+        _Assert.IsTrue(NpRvVoucherEntry.FindFirst(), 'Issue voucher entry expected.');
+        _Assert.AreEqual(500, NpRvVoucherEntry.Amount, 'Voucher entry amount must be in LCY (50 FCY / 0.1 = 500), not the FCY unit price.');
+
+        NpRvSalesLine.SetRange("Voucher No.", EcomSalesVoucherLink."Voucher No.");
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
+        _Assert.IsTrue(NpRvSalesLine.FindFirst(), 'NpRv sales line expected.');
+        _Assert.AreEqual(500, NpRvSalesLine.Amount, 'NpRv sales line amount must be in LCY (500), not the FCY unit price.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VoucherProcess_FCYDocument_Qty3_EachVoucherEntryInLCY()
+    var
+        Currency: Record Currency;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+    begin
+        // [Scenario] qty=3 on an FCY document → 3 vouchers, each with the per-unit LCY face value (500).
+        _LibEcom.CreateFCYCurrency(Currency, 0.1);
+        CreateFCYEcomSalesHeader(EcomSalesHeader, Currency.Code, 0.1);
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        CreateCapturedVoucherLine(EcomSalesLine, EcomSalesHeader, VoucherType.Code, 3, 50);
+
+        VchrImpl.Process(EcomSalesLine);
+
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.AreEqual(3, EcomSalesVoucherLink.Count(), 'Expected 3 vouchers for qty=3 FCY line.');
+        EcomSalesVoucherLink.FindSet();
+        repeat
+            NpRvVoucherEntry.SetRange("Voucher No.", EcomSalesVoucherLink."Voucher No.");
+            _Assert.IsTrue(NpRvVoucherEntry.FindFirst(), 'Issue voucher entry expected for each issued voucher.');
+            _Assert.AreEqual(500, NpRvVoucherEntry.Amount, 'Each voucher entry must carry the per-unit LCY face value (500).');
+        until EcomSalesVoucherLink.Next() = 0;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CaptureRedemption_FCYDocument_PostsLCYVoucherEntry()
+    var
+        Currency: Record Currency;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        IssueEcomSalesHeader: Record "NPR Ecom Sales Header";
+        RedeemEcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        PaymentLine: Record "NPR Magento Payment Line";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        // [Scenario] Fastlane capture redemption of a voucher used as payment on a FCY document
+        _LibEcom.CreateFCYCurrency(Currency, 0.1);
+        CreateFCYEcomSalesHeader(IssueEcomSalesHeader, Currency.Code, 0.1);
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        CreateCapturedVoucherLine(EcomSalesLine, IssueEcomSalesHeader, VoucherType.Code, 1, 50);
+        VchrImpl.Process(EcomSalesLine);
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.IsTrue(EcomSalesVoucherLink.FindFirst(), 'Voucher expected from the FCY issuance document.');
+        NpRvVoucher.Get(EcomSalesVoucherLink."Voucher No.");
+
+        CreateFCYEcomSalesHeader(RedeemEcomSalesHeader, Currency.Code, 0.1);
+
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := Database::"NPR Ecom Sales Header";
+        PaymentLine."Document Type" := PaymentLine."Document Type"::Order;
+        PaymentLine."Document No." := CopyStr(RedeemEcomSalesHeader."External No.", 1, MaxStrLen(PaymentLine."Document No."));
+        PaymentLine."Line No." := 10000;
+        PaymentLine."Payment Type" := PaymentLine."Payment Type"::Voucher;
+        PaymentLine."No." := NpRvVoucher."Reference No.";
+        PaymentLine."Posting Date" := WorkDate();
+        PaymentLine."Source Table No." := Database::"NPR NpRv Voucher";
+        PaymentLine."Source No." := NpRvVoucher."No.";
+        PaymentLine.Amount := 20; // Document (foreign) currency - partial payment (20 FCY = 200 LCY of the 500 LCY balance)
+        PaymentLine."NPR Inc Ecom Sale Id" := RedeemEcomSalesHeader.SystemId;
+        PaymentLine.Insert();
+
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
+        NpRvSalesLine."External Document No." := RedeemEcomSalesHeader."External No.";
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
+        NpRvSalesLine."Document Type" := NpRvSalesLine."Document Type"::Order;
+        NpRvSalesLine."Document No." := CopyStr(RedeemEcomSalesHeader."External No.", 1, MaxStrLen(NpRvSalesLine."Document No."));
+        NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
+        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+        NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+        NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+        NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+        NpRvSalesLine.Amount := PaymentLine.Amount;
+        NpRvSalesLine."NPR Inc Ecom Sale Id" := RedeemEcomSalesHeader.SystemId;
+        NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
+        NpRvSalesLine.Insert(true);
+
+        NpRvVoucherMgt.PostIncEcomPayment(NpRvSalesLine, PaymentLine);
+
+        NpRvVoucherEntry.SetRange("Voucher No.", NpRvVoucher."No.");
+        NpRvVoucherEntry.SetRange("Entry Type", NpRvVoucherEntry."Entry Type"::Payment);
+        _Assert.IsTrue(NpRvVoucherEntry.FindFirst(), 'Payment voucher entry expected after capture redemption.');
+        _Assert.AreEqual(-200, NpRvVoucherEntry.Amount, 'Capture redemption must post the LCY amount (20 FCY / 0.1 = -200), not the raw FCY payment amount.');
+
+        NpRvVoucher.CalcFields(Amount);
+        _Assert.AreEqual(300, NpRvVoucher.Amount, 'Voucher balance must be 300 LCY (500 issued - 200 redeemed).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ReserveVoucher_FCYDocument_ReservedAmountInLCY()
+    var
+        Currency: Record Currency;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        IssueEcomSalesHeader: Record "NPR Ecom Sales Header";
+        ReserveEcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+        OtherConsumerReservationId: Guid;
+    begin
+        // [Scenario] A voucher reserved as payment on an FCY document must store the reservation in LCY, so the voucher
+        //            "Reserved Amount" flowfield (LCY) stays consistent for concurrent consumers: a 20 FCY reservation at
+        //            factor 0.1 reserves 200 LCY of the 500 LCY voucher, not the raw FCY 20.
+        _LibEcom.CreateFCYCurrency(Currency, 0.1);
+        CreateFCYEcomSalesHeader(IssueEcomSalesHeader, Currency.Code, 0.1);
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        VoucherType."Apply Payment Module" := ''; // Partial-payment voucher: usable as ecommerce payment (a full-payment module - DEFAULT/LIMIT - is blocked at reservation)
+        VoucherType.Modify();
+        CreateCapturedVoucherLine(EcomSalesLine, IssueEcomSalesHeader, VoucherType.Code, 1, 50);
+        VchrImpl.Process(EcomSalesLine);
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.IsTrue(EcomSalesVoucherLink.FindFirst(), 'Voucher expected from the FCY issuance document.');
+        NpRvVoucher.Get(EcomSalesVoucherLink."Voucher No.");
+
+        // [Given] A voucher payment line on a second FCY order (20 FCY payment)
+        CreateFCYEcomSalesHeader(ReserveEcomSalesHeader, Currency.Code, 0.1);
+        EcomSalesPmtLine.Init();
+        EcomSalesPmtLine."Document Entry No." := ReserveEcomSalesHeader."Entry No.";
+        EcomSalesPmtLine."Line No." := 10000;
+        EcomSalesPmtLine."Payment Method Type" := EcomSalesPmtLine."Payment Method Type"::Voucher;
+        EcomSalesPmtLine."Payment Reference" := NpRvVoucher."Reference No.";
+        EcomSalesPmtLine.Amount := 20; // Document (foreign) currency
+        EcomSalesPmtLine.Insert();
+
+        // [When] Reserve the voucher for that payment line
+        ApiAgent.ReserveVoucher(ReserveEcomSalesHeader, EcomSalesPmtLine);
+
+        // [Then] The reservation line carries the LCY amount (20 FCY / 0.1 = 200), not the raw FCY amount
+        NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
+        _Assert.IsTrue(NpRvSalesLine.FindFirst(), 'Reservation line expected after ReserveVoucher.');
+        _Assert.AreEqual(200, NpRvSalesLine.Amount, 'Reservation must be stored in LCY (200), not the FCY payment amount.');
+
+        // [Then] The voucher "Reserved Amount" flowfield (as a concurrent consumer sees it) reflects the LCY reservation
+        OtherConsumerReservationId := CreateGuid();
+        NpRvVoucher.SetFilter("Reservation Line Id Filter", '<>%1', OtherConsumerReservationId);
+        NpRvVoucher.CalcFields("Reserved Amount");
+        _Assert.AreEqual(200, NpRvVoucher."Reserved Amount", 'Voucher "Reserved Amount" must be LCY (200), keeping availability consistent for concurrent consumers.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Capture_FCYDocument_ClearsReservationInLCY()
+    var
+        Currency: Record Currency;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        IssueEcomSalesHeader: Record "NPR Ecom Sales Header";
+        CaptureEcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        CaptureItemLine: Record "NPR Ecom Sales Line";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        ReservationLine: Record "NPR NpRv Sales Line";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+        EcomCaptureImpl: Codeunit "NPR EcomCaptureImpl";
+        OtherConsumerReservationId: Guid;
+        Success: Boolean;
+        ErrorText: Text;
+    begin
+        // [Scenario] Full fastlane capture (EcomCaptureImpl.Process -> InsertPaymentLineVoucherPmt) of a voucher paying an FCY
+        //            document must settle the reservation in LCY: a 20 FCY payment at factor 0.1 clears the 200 LCY reservation
+        //            exactly, leaving no phantom "Reserved Amount". Currency mixing here (TCY vs the LCY reservation) previously
+        //            left a residual reservation and understated the voucher balance.
+        _LibEcom.CreateFCYCurrency(Currency, 0.1);
+
+        // [Given] A 500 LCY voucher issued from an FCY document, usable as (partial) ecommerce payment
+        CreateFCYEcomSalesHeader(IssueEcomSalesHeader, Currency.Code, 0.1);
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        VoucherType."Apply Payment Module" := ''; // Partial-payment voucher: usable as ecommerce payment
+        VoucherType.Modify();
+        CreateCapturedVoucherLine(EcomSalesLine, IssueEcomSalesHeader, VoucherType.Code, 1, 50);
+        VchrImpl.Process(EcomSalesLine);
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.IsTrue(EcomSalesVoucherLink.FindFirst(), 'Voucher expected from the FCY issuance document.');
+        NpRvVoucher.Get(EcomSalesVoucherLink."Voucher No.");
+
+        // [Given] A second FCY order with a virtual-item line to capture (20 FCY) paid by the voucher (20 FCY), with the voucher reserved
+        CreateFCYEcomSalesHeader(CaptureEcomSalesHeader, Currency.Code, 0.1);
+        CaptureItemLine.Init();
+        CaptureItemLine."Document Entry No." := CaptureEcomSalesHeader."Entry No.";
+        CaptureItemLine."Document Type" := CaptureEcomSalesHeader."Document Type";
+        CaptureItemLine."Line No." := 10000;
+        CaptureItemLine.Type := CaptureItemLine.Type::Item;
+        CaptureItemLine.Subtype := CaptureItemLine.Subtype::Ticket; // a virtual item so there is an amount to capture (CalculateAmountToCapture)
+        CaptureItemLine.Quantity := 1;
+        CaptureItemLine."Unit Price" := 20;
+        CaptureItemLine."Line Amount" := 20; // document (foreign) currency
+        CaptureItemLine.Captured := true;
+        CaptureItemLine.Insert(true);
+
+        EcomSalesPmtLine.Init();
+        EcomSalesPmtLine."Document Entry No." := CaptureEcomSalesHeader."Entry No.";
+        EcomSalesPmtLine."Line No." := 10000;
+        EcomSalesPmtLine."Payment Method Type" := EcomSalesPmtLine."Payment Method Type"::Voucher;
+        EcomSalesPmtLine."Payment Reference" := NpRvVoucher."Reference No.";
+        EcomSalesPmtLine.Amount := 20; // document (foreign) currency
+        EcomSalesPmtLine.Insert();
+
+        ApiAgent.ReserveVoucher(CaptureEcomSalesHeader, EcomSalesPmtLine);
+        ReservationLine.SetRange("Voucher No.", NpRvVoucher."No.");
+        ReservationLine.SetRange(Type, ReservationLine.Type::Payment);
+        ReservationLine.SetRange("Document Source", ReservationLine."Document Source"::"Sales Document");
+        ReservationLine.SetRange("Document Line No.", 0);
+        _Assert.IsTrue(ReservationLine.FindFirst(), 'Reservation line expected after ReserveVoucher.');
+        _Assert.AreEqual(200, ReservationLine.Amount, 'Reservation must be 200 LCY (20 FCY / 0.1).');
+
+        // [When] The document is captured
+        EcomCaptureImpl.Process(CaptureEcomSalesHeader, Success, ErrorText);
+        _Assert.IsTrue(Success, ErrorText);
+
+        // [Then] The reservation is cleared exactly (no phantom residual), so the voucher balance is fully available again
+        ReservationLine.Reset();
+        ReservationLine.SetRange("Voucher No.", NpRvVoucher."No.");
+        ReservationLine.SetRange(Type, ReservationLine.Type::Payment);
+        ReservationLine.SetRange("Document Source", ReservationLine."Document Source"::"Sales Document");
+        ReservationLine.SetRange("Document Line No.", 0);
+        _Assert.IsFalse(ReservationLine.FindFirst(), 'The ingest reservation must be deleted after full capture (200 LCY reservation - 200 LCY captured = 0).');
+
+        OtherConsumerReservationId := CreateGuid();
+        NpRvVoucher.SetFilter("Reservation Line Id Filter", '<>%1', OtherConsumerReservationId);
+        NpRvVoucher.CalcFields("Reserved Amount");
+        _Assert.AreEqual(0, NpRvVoucher."Reserved Amount", 'No phantom reservation must survive the completed capture (Reserved Amount = 0).');
+    end;
+    #endregion
+
     #region Helpers
     local procedure CreateCapturedVoucherLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherTypeCode: Code[20]; Qty: Decimal; UnitPrice: Decimal)
     begin
@@ -640,6 +1006,77 @@ codeunit 85246 "NPR Ecom Voucher Tests"
         if ExistingLine.FindLast() then
             exit(ExistingLine."Line No." + 10000);
         exit(10000);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure FaceValueLCY_FCYDocument_FixedBothRate_HeaderRateMatchesTable_ConvertsViaTable()
+    var
+        Currency: Record Currency;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        CurrExchRate: Record "Currency Exchange Rate";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        FaceValueLCY: Decimal;
+    begin
+        // [Scenario] Exchange-rate row is Fix Exchange Rate Amount = Both (100 FCY = 1000 LCY → 50 FCY = 500 LCY). The header
+        //            carries the SAME effective factor as the table, so the conversion proceeds and uses the table (Both) amounts.
+        _LibEcom.CreateFCYCurrencyFixedBoth(Currency, 100, 1000);
+        CreateFCYEcomSalesHeader(EcomSalesHeader, Currency.Code, CurrExchRate.ExchangeRate(WorkDate(), Currency.Code));
+        InitVoucherLineForCalc(EcomSalesLine, 50, 0);
+
+        FaceValueLCY := VchrImpl.CalculateVoucherFaceValueLCY(EcomSalesHeader, EcomSalesLine);
+
+        _Assert.AreEqual(500, FaceValueLCY, 'Both rate with a matching header factor must convert via the table (50 FCY at 100=1000 → 500 LCY).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure FixedBothRate_SuppliedRateDiffersFromTable_RejectedAtIngest()
+    var
+        Currency: Record Currency;
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+    begin
+        // [Scenario] Exchange-rate row is Fix Exchange Rate Amount = Both (effective factor 0.1), but the document supplies a
+        //            different rate (0.5). Because Both makes the platform ignore the supplied factor on posting, ingest must reject
+        //            the document instead of persisting a rate the posting will not use.
+        _LibEcom.CreateFCYCurrencyFixedBoth(Currency, 100, 1000);
+
+        asserterror EcomSalesDocUtils.CheckSuppliedRateMatchesFixedBothRate(Currency.Code, WorkDate(), 0.5);
+
+        _Assert.ExpectedError('does not match the fixed exchange rate');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure FixedBothRate_SuppliedRateMatchesTable_PassesIngest()
+    var
+        Currency: Record Currency;
+        CurrExchRate: Record "Currency Exchange Rate";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+    begin
+        // [Scenario] Both-configured rate; the supplied factor equals the table's effective factor → ingest guard passes (no error).
+        _LibEcom.CreateFCYCurrencyFixedBoth(Currency, 100, 1000);
+
+        EcomSalesDocUtils.CheckSuppliedRateMatchesFixedBothRate(Currency.Code, WorkDate(), CurrExchRate.ExchangeRate(WorkDate(), Currency.Code));
+        // No error expected: a supplied rate that agrees with the Both row must be accepted at ingest.
+    end;
+
+    local procedure CreateFCYEcomSalesHeader(var EcomSalesHeader: Record "NPR Ecom Sales Header"; CurrencyCode: Code[10]; CurrencyExchangeRate: Decimal)
+    begin
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Currency Code" := CurrencyCode;
+        EcomSalesHeader."Currency Exchange Rate" := CurrencyExchangeRate;
+        EcomSalesHeader."Received Date" := WorkDate();
+        EcomSalesHeader.Modify();
+    end;
+
+    local procedure InitVoucherLineForCalc(var EcomSalesLine: Record "NPR Ecom Sales Line"; UnitPrice: Decimal; VatPct: Decimal)
+    begin
+        // Calculation-only line: CalculateVoucherFaceValueLCY reads "Unit Price" and "VAT %" — no insert needed.
+        EcomSalesLine.Init();
+        EcomSalesLine."Unit Price" := UnitPrice;
+        EcomSalesLine."VAT %" := VatPct;
     end;
     #endregion
 }

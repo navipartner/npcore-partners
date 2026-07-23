@@ -815,6 +815,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         RecRef: RecordRef;
         ReceiptJson: JsonToken;
         ShopifyGiftCardID: Text[30];
+        CurrencyCode: Code[10];
+        CurrencyFactor: Decimal;
         VoucherNotFoundErr: Label 'System could not find a retail voucher with Shopify gift card ID %1';
     begin
         if not ReceiptJson.ReadFrom(JsonHelper.GetJText(Transaction, 'receiptJson', false)) then
@@ -867,7 +869,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
         NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
-        NpRvSalesLine.Amount := PaymentLine.Amount;
+        PaymentLineParam.TransactionCurrencyCodeAndFactor(true, CurrencyCode, CurrencyFactor);
+        NpRvSalesLine.Amount := PaymentLine.AmountLCY(CurrencyCode, CurrencyFactor);
         NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
         NpRvSalesLine.Modify(true);
 

@@ -310,5 +310,45 @@ codeunit 85161 "NPR Library Ecommerce"
         EcomSalesHeader.SetRange("External No.", ExternalNo);
         EcomSalesHeader.FindFirst();
     end;
+
+    procedure CreateFCYCurrency(var Currency: Record Currency; ExchangeRate: Decimal)
+    var
+        GLSetup: Record "General Ledger Setup";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        GLSetup.Get();
+        repeat
+            LibraryERM.CreateCurrency(Currency);
+        until Currency.Code <> GLSetup."LCY Code"; // Ensure the created currency differs from LCY
+        Currency.InitRoundingPrecision();
+        Currency.Modify();
+
+        LibraryERM.CreateExchangeRate(Currency.Code, WorkDate(), ExchangeRate, ExchangeRate);
+    end;
+
+    procedure CreateFCYCurrencyFixedBoth(var Currency: Record Currency; ExchRateAmount: Decimal; RelationalExchRateAmount: Decimal)
+    var
+        GLSetup: Record "General Ledger Setup";
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        GLSetup.Get();
+        repeat
+            LibraryERM.CreateCurrency(Currency);
+        until Currency.Code <> GLSetup."LCY Code"; // Ensure the created currency differs from LCY
+        Currency.InitRoundingPrecision();
+        Currency.Modify();
+
+        // Seed a Currency Exchange Rate row with Fix Exchange Rate Amount = Both so the platform's ExchangeAmtFCYToLCY computes
+        // the amount from the row's fixed amounts and ignores any factor passed in - the case the conversion guard must catch.
+        LibraryERM.CreateExchangeRate(Currency.Code, WorkDate(), ExchRateAmount, RelationalExchRateAmount);
+        CurrencyExchangeRate.Get(Currency.Code, WorkDate());
+        CurrencyExchangeRate."Fix Exchange Rate Amount" := CurrencyExchangeRate."Fix Exchange Rate Amount"::Both;
+        CurrencyExchangeRate."Exchange Rate Amount" := ExchRateAmount;
+        CurrencyExchangeRate."Relational Exch. Rate Amount" := RelationalExchRateAmount;
+        CurrencyExchangeRate."Adjustment Exch. Rate Amount" := ExchRateAmount;
+        CurrencyExchangeRate."Relational Adjmt Exch Rate Amt" := RelationalExchRateAmount;
+        CurrencyExchangeRate.Modify(true);
+    end;
 }
 #endif

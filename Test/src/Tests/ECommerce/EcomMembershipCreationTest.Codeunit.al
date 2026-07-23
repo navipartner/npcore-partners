@@ -110,6 +110,110 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmMembership_FCYDocument_EntryAmountInLCY()
+    // Test: A membership confirmed from an FCY ecom document stores the LCY amount on the membership entry
+    // (Line Amount 100 FCY at factor 0.1 -> 1000 LCY), matching the POS/retail convention, not the raw FCY line amount.
+    var
+        Assert: Codeunit Assert;
+        Currency: Record Currency;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MemberApiLib: Codeunit "NPR Library - Member XML API";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        Initialize();
+
+        // [Given] An FCY currency with exchange-rate factor 0.1 (AmountLCY = AmountFCY / factor)
+        _LibEcommerce.CreateFCYCurrency(Currency, 0.1);
+
+        // [Given] A membership pre-created via the membership API
+        Assert.IsTrue(MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        // [Given] An FCY ecom sales order carrying the exchange-rate factor, with a captured membership line at Line Amount 100 FCY
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Currency Code" := Currency.Code;
+        EcomSalesHeader."Currency Exchange Rate" := 0.1;
+        EcomSalesHeader."Received Date" := WorkDate();
+        EcomSalesHeader.Modify();
+        _LibEcommerce.CreateCapturedMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM', Membership);
+        Commit();
+
+        // [When] Process the membership line
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+
+        // [Then] The membership entry carries the LCY amount (100 FCY / 0.1 = 1000), not the raw FCY line amount (100)
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.FindFirst();
+        Assert.AreEqual(EcomSalesHeader."External No.", MembershipEntry."Document No.", 'MembershipEntry."Document No." must match EcomSalesHeader."External No."');
+        Assert.AreEqual(1000, MembershipEntry.Amount, 'MembershipEntry.Amount must be the LCY amount (1000), not the FCY line amount.');
+        Assert.AreEqual(1000, MembershipEntry."Amount Incl VAT", 'MembershipEntry."Amount Incl VAT" must be the LCY amount (1000), not the FCY line amount.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_FCYDocument_EntryAmountInLCY()
+    // Test: A membership created directly from an FCY ecom document (no pre-existing token) stores the LCY amount
+    // on the membership entry - unit price 100 FCY at factor 0.1, Price Excl. VAT with 25% VAT -> 1000 LCY excl, 1250 LCY incl.
+    var
+        Assert: Codeunit Assert;
+        Currency: Record Currency;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        UniqueEmail: Text[80];
+    begin
+        Initialize();
+
+        // [Given] An FCY currency with exchange-rate factor 0.1 (AmountLCY = AmountFCY / factor)
+        _LibEcommerce.CreateFCYCurrency(Currency, 0.1);
+#pragma warning disable AA0139
+        UniqueEmail := CopyStr(DelChr(Format(CreateGuid()), '=', '{}') + '@test.example.com', 1, MaxStrLen(UniqueEmail));
+#pragma warning restore
+
+        // [Given] An FCY ecom order with a captured membership line for direct creation (no token), Price Excl. VAT with 25% VAT
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Currency Code" := Currency.Code;
+        EcomSalesHeader."Currency Exchange Rate" := 0.1;
+        EcomSalesHeader."Received Date" := WorkDate();
+        EcomSalesHeader."Price Excl. VAT" := true;
+        EcomSalesHeader.Modify();
+
+        _LibEcommerce.CreateCapturedMembershipLineNoToken(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM');
+        EcomSalesLine."Member First Name" := 'Jane';
+        EcomSalesLine."Member Last Name" := 'Doe';
+#pragma warning disable AA0139
+        EcomSalesLine."Member Email" := UniqueEmail;
+#pragma warning restore
+        EcomSalesLine."VAT %" := 25;
+        EcomSalesLine.Modify();
+        Commit();
+
+        // [When] Process the membership line (direct creation path: CreateMembership + ConfirmAllMembershipsForLine)
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+
+        // [Then] Membership was created and the entry carries LCY amounts (100 FCY / 0.1 = 1000 excl, +25% VAT = 1250 incl)
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        Assert.IsFalse(IsNullGuid(EcomSalesLine."Membership Id"), 'Membership Id must be set after direct creation.');
+        Membership.GetBySystemId(EcomSalesLine."Membership Id");
+
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.FindFirst();
+        Assert.AreEqual(EcomSalesHeader."External No.", MembershipEntry."Document No.", 'MembershipEntry."Document No." must match EcomSalesHeader."External No.".');
+        Assert.AreEqual(1000, MembershipEntry.Amount, 'MembershipEntry.Amount must be the LCY amount (1000), not the FCY line amount.');
+        Assert.AreEqual(1250, MembershipEntry."Amount Incl VAT", 'MembershipEntry."Amount Incl VAT" must be the LCY amount grossed up by 25% VAT (1250).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ConfirmMembership_SameOrderIsIdempotent()
     // Test: Calling Process a second time for the same ecom order is idempotent — no error is raised.
     var
@@ -1635,5 +1739,6 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
             exit(ExistingLine."Line No." + 10000);
         exit(10000);
     end;
+
 }
 #endif

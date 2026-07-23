@@ -219,15 +219,16 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         ConsumedAmountInclVAT: Decimal;
         ThisAmount: Decimal;
         ThisAmountInclVAT: Decimal;
+        LCYPrecision: Decimal;
         QtyToConfirm: Integer;
         i: Integer;
     begin
         QtyToConfirm := EcomSalesLine.Quantity;
 
-        ComputeWholeLineAmounts(EcomSalesLine, EcomSalesHeader, WholeAmount, WholeAmountInclVAT);
+        ComputeWholeLineAmounts(EcomSalesLine, EcomSalesHeader, WholeAmount, WholeAmountInclVAT, LCYPrecision);
 
-        PerMembershipAmount := Round(WholeAmount / QtyToConfirm, 0.01);
-        PerMembershipAmountInclVAT := Round(WholeAmountInclVAT / QtyToConfirm, 0.01);
+        PerMembershipAmount := Round(WholeAmount / QtyToConfirm, LCYPrecision);
+        PerMembershipAmountInclVAT := Round(WholeAmountInclVAT / QtyToConfirm, LCYPrecision);
         ConsumedAmount := 0;
         ConsumedAmountInclVAT := 0;
         i := 0;
@@ -1069,13 +1070,27 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     end;
 
     local procedure ComputeWholeLineAmounts(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; var WholeAmount: Decimal; var WholeAmountInclVAT: Decimal)
+    var
+        LCYPrecision: Decimal;
     begin
+        ComputeWholeLineAmounts(EcomSalesLine, EcomSalesHeader, WholeAmount, WholeAmountInclVAT, LCYPrecision);
+    end;
+
+    local procedure ComputeWholeLineAmounts(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; var WholeAmount: Decimal; var WholeAmountInclVAT: Decimal; var LCYPrecision: Decimal)
+    var
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        LineAmountLCY: Decimal;
+    begin
+        LCYPrecision := EcomSalesDocUtils.LCYAmountRoundingPrecision();
+        LineAmountLCY := EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, EcomSalesLine."Line Amount");
+
         if EcomSalesHeader."Price Excl. VAT" then begin
-            WholeAmount := EcomSalesLine."Line Amount";
-            WholeAmountInclVAT := Round(EcomSalesLine."Line Amount" * (1 + EcomSalesLine."VAT %" / 100), 0.01);
+            WholeAmount := LineAmountLCY;
+            WholeAmountInclVAT := Round(LineAmountLCY * (1 + EcomSalesLine."VAT %" / 100), LCYPrecision);
         end else begin
-            WholeAmountInclVAT := EcomSalesLine."Line Amount";
-            WholeAmount := Round(EcomSalesLine."Line Amount" / (1 + EcomSalesLine."VAT %" / 100), 0.01);
+            WholeAmountInclVAT := LineAmountLCY;
+            WholeAmount := Round(LineAmountLCY / (1 + EcomSalesLine."VAT %" / 100), LCYPrecision);
         end;
     end;
 
@@ -1092,9 +1107,13 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
 
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         UnitPrice: Decimal;
+        LineAmountLCY: Decimal;
+        LCYPrecision: Decimal;
     begin
         MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
@@ -1107,14 +1126,15 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberInfoCapture."Document No." := EcomSalesHeader."External No.";
         MemberInfoCapture."Document Line No." := EcomSalesLine."Line No.";
 
+        // Membership entry amounts are stored in LCY, so convert the document-currency line amount before splitting VAT.
+        LineAmountLCY := EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, EcomSalesLine."Line Amount");
+        LCYPrecision := EcomSalesDocUtils.LCYAmountRoundingPrecision(); // Amounts are LCY here, so split VAT at LCY precision, not a hardcoded 0.01.
         if (EcomSalesHeader."Price Excl. VAT") then begin
-            // TODO   MemberInfoCapture."Unit Price" := EcomSalesLine."Unit Price";
-            MemberInfoCapture.Amount := EcomSalesLine."Line Amount";
-            MemberInfoCapture."Amount Incl VAT" := Round(EcomSalesLine."Line Amount" * (1 + EcomSalesLine."VAT %" / 100), 0.01);
+            MemberInfoCapture.Amount := LineAmountLCY;
+            MemberInfoCapture."Amount Incl VAT" := Round(LineAmountLCY * (1 + EcomSalesLine."VAT %" / 100), LCYPrecision);
         end else begin
-            MemberInfoCapture."Amount Incl VAT" := EcomSalesLine."Line Amount";
-            //  TODO MemberInfoCapture."Unit Price" := EcomSalesLine."Unit Price"; 
-            MemberInfoCapture.Amount := Round(EcomSalesLine."Line Amount" / (1 + EcomSalesLine."VAT %" / 100), 0.01);
+            MemberInfoCapture."Amount Incl VAT" := LineAmountLCY;
+            MemberInfoCapture.Amount := Round(LineAmountLCY / (1 + EcomSalesLine."VAT %" / 100), LCYPrecision);
         end;
 
         MemberInfoCapture."Document Date" := Today();

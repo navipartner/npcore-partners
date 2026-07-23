@@ -1090,6 +1090,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
+        EcomCreateVchrImpl: Codeunit "NPR EcomCreateVchrImpl";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         SpfySuspendVouchRefVal: Codeunit "NPR Spfy Suspend Vouch.Ref.Val";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
@@ -1110,10 +1111,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 #pragma warning disable AA0139
         NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
 #pragma warning restore AA0139
-        if EcomSalesHeader."Price Excl. VAT" and (IncEcomSalesLine."VAT %" > 0) then
-            NpRvSalesLine.Amount := IncEcomSalesLine."Unit Price" * (1 + IncEcomSalesLine."VAT %" / 100)
-        else
-            NpRvSalesLine.Amount := IncEcomSalesLine."Unit Price";
+        NpRvSalesLine.Amount := EcomCreateVchrImpl.CalculateVoucherFaceValueLCY(EcomSalesHeader, IncEcomSalesLine);
         NpRvSalesLine.Description := CopyStr(IncEcomSalesLine.Description, 1, MaxStrLen(NpRvSalesLine.Description));
         NpRvSalesLine."Spfy Initiated in Shopify" := not CheckIsNpGiftCard(PropertyDict);
         NpRvSalesLine."Spfy Gift Card ID" := GiftCardId;

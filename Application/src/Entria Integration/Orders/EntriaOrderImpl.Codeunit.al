@@ -571,12 +571,12 @@ codeunit 6151027 "NPR Entria Order Impl."
             VoucherSalesLine.Description := Voucher.Description;
             VoucherSalesLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
             VoucherSalesLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
-            VoucherSalesLine.Amount := EcomSalesPmtLine.Amount;
+            VoucherSalesLine.Amount := _EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, EcomSalesPmtLine.Amount); // reservation feeds the voucher's LCY "Reserved Amount" flowfield
             VoucherSalesLine.Insert();
         end else begin
             VoucherSalesLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
             VoucherSalesLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
-            VoucherSalesLine.Amount := EcomSalesPmtLine.Amount;
+            VoucherSalesLine.Amount := _EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, EcomSalesPmtLine.Amount); // reservation feeds the voucher's LCY "Reserved Amount" flowfield
             VoucherSalesLine.Modify();
         end;
 

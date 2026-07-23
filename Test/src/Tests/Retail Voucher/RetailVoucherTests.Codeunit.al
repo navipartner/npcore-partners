@@ -1215,10 +1215,15 @@ codeunit 85024 "NPR Retail Voucher Tests"
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure RedeemFullVoucherOnEcommerceForeignCurrencySalesOrderWithRounding()
-    // [SCENARIO] Voucher redemption on an ecommerce sales order in a foreign currency should be blocked
+    // [SCENARIO] Fully redeem a retail voucher as payment on an ecommerce sales order in a
+    // foreign currency. The redemption must be recorded in LCY on the voucher entries (retail vouchers
+    // are an LCY instrument), and the voucher fully redeemed despite the FCY→LCY rounding difference.
     var
         Currency: Record Currency;
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         Assert: Codeunit "Assert";
         CurrencyExchangeRate: Decimal;
         OrderAmountFCY: Decimal;
@@ -1232,13 +1237,21 @@ codeunit 85024 "NPR Retail Voucher Tests"
         // [GIVEN] A foreign currency with exchange rate 0.132345
         CurrencyExchangeRate := 0.132345;
         CreateCurrencyWithExchangeRate(Currency, CurrencyExchangeRate);
-        OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision");
+        OrderAmountFCY := Round(VoucherAmountLCY * CurrencyExchangeRate, Currency."Amount Rounding Precision"); // 26.47 FCY (= 200.01 LCY when converted back)
 
-        // [WHEN] Attempting to create an ecommerce sales order with voucher redemption in FCY
-        asserterror CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher, Currency.Code, OrderAmountFCY);
+        // [WHEN] The voucher pays the FCY ecommerce order in full and the resulting sales order is posted
+        CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher, Currency.Code, OrderAmountFCY, VoucherAmountLCY);
 
-        // [THEN] Error is raised because vouchers are not supported in FCY documents
-        Assert.ExpectedError('Vouchers are not supported in documents with a foreign currency');
+        // [THEN] The voucher is fully redeemed and archived (0.01 LCY rounding difference is absorbed)
+        Assert.IsFalse(NpRvVoucher.Find(), 'Voucher should no longer exist after full redemption');
+        Assert.IsTrue(NpRvVoucherMgt.FindArchivedVoucher(NpRvVoucher."Voucher Type", NpRvVoucher."Reference No.", NpRvArchVoucher), 'Archived voucher should exist after full redemption');
+
+        // [THEN] The redemption entry is stored in LCY (approx. -200), never the FCY payment amount (-26.47)
+        NpRvArchVoucherEntry.SetCurrentKey("Arch. Voucher No.");
+        NpRvArchVoucherEntry.SetRange("Arch. Voucher No.", NpRvArchVoucher."No.");
+        NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
+        Assert.IsTrue(NpRvArchVoucherEntry.FindLast(), 'Redemption (Payment) entry should exist on the archived voucher');
+        Assert.AreNearlyEqual(-VoucherAmountLCY, NpRvArchVoucherEntry.Amount, 0.02, 'Redemption entry amount must be in LCY (approx. -200), not the FCY payment amount (-26.47)');
     end;
 #endif
 
@@ -7047,16 +7060,19 @@ codeunit 85024 "NPR Retail Voucher Tests"
     end;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-    local procedure CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher: Record "NPR NpRv Voucher"; CurrencyCode: Code[10]; OrderAmountFCY: Decimal)
+    local procedure CreateAndProcessEcommerceSalesOrderWithVoucherRedemption(NpRvVoucher: Record "NPR NpRv Voucher"; CurrencyCode: Code[10]; OrderAmountFCY: Decimal; ExpectedReservationAmountLCY: Decimal)
     var
         Customer: Record Customer;
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
         SalesHeader: Record "Sales Header";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
         LibEcommerce: Codeunit "NPR Library Ecommerce";
         LibraryRandom: Codeunit "Library - Random";
         LibrarySales: Codeunit "Library - Sales";
         SalesPost: Codeunit "Sales-Post";
+        Assert: Codeunit "Assert";
         ExternalNo: Code[20];
     begin
         if not IncEcomSalesDocSetup.Get() then begin
@@ -7073,10 +7089,23 @@ codeunit 85024 "NPR Retail Voucher Tests"
         ExternalNo := CopyStr(StrSubStNo('TEST-VOUCHER-%1', LibraryRandom.RandIntInRange(100000, 999999)), 1, 20);
         LibEcommerce.InsertEcomDocumentWithVoucherPayment(ExternalNo, _Item."No.", Customer."No.", CurrencyCode, NpRvVoucher, OrderAmountFCY, EcomSalesHeader);
 
+        EcomSalesHeader.Find();
+        if EcomSalesHeader."Creation Status" <> EcomSalesHeader."Creation Status"::Created then begin
+            EcomSalesDocProcess.SetShowError(true);
+            EcomSalesDocProcess.Run(EcomSalesHeader);
+        end;
+
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
-        if not SalesHeader.FindFirst() then
-            exit;
+        Assert.IsTrue(SalesHeader.FindFirst(), 'A sales order should have been created from the ecom document.');
+
+        // [THEN] While the order is open, the voucher reservation/payment line is stored in LCY (~200), never the FCY payment amount.
+        // Pins the InsertPaymentLineVoucher invariant: the voucher "Reserved Amount" flowfield stays LCY, so it cannot be over-redeemed concurrently.
+        NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.SetRange(Posted, false);
+        Assert.IsTrue(NpRvSalesLine.FindFirst(), 'An open voucher reservation/payment line should exist on the created sales order.');
+        Assert.AreNearlyEqual(ExpectedReservationAmountLCY, NpRvSalesLine.Amount, 0.02, 'The voucher reservation must be stored in LCY (~200), not the FCY payment amount.');
 
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;

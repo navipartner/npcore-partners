@@ -1125,7 +1125,6 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMngt: Codeunit "NPR NpRv Voucher Mgt.";
-        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
@@ -1189,23 +1188,25 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherFields(PaymentLine, EcomSalesHeader, EcomSalesPmtLine, EcomSalesPmtLine.Amount);
         PaymentLine.Insert();
 
+        // The voucher "Reserved Amount" flowfield is in LCY, so store the converted amount on the reservation line.
+        PaymentAmountLCY := EcomSalesDocUtils.ConvertTransactionCurrencyAmtToLCY(PaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date", Precalculated);
+
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
         NpRvSalesLine."Document Type" := SalesHeader."Document Type";
         NpRvSalesLine."Document No." := SalesHeader."No.";
         NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
-        NpRvSalesLine.Amount := PaymentLine.Amount;
+        NpRvSalesLine.Amount := PaymentAmountLCY;
         NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
         if IsShopifyDocument then
             SpfyEcomSalesDocPrcssr.RefreshShopifyPaymentLineVoucherSalesLineFields(NpRvSalesLine);
         NpRvSalesLine.Modify(true);
 
-        PaymentAmountLCY := NpRvSalesDocMgt.ConvertTransactionCurrencyAmtToLCY(PaymentLine.Amount, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date", Precalculated);
         AmountValidated := NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY);
         if not AmountValidated and not Precalculated then
             AmountValidated := Abs(AvailableAmountLCY - PaymentAmountLCY) <= NpRvVoucherMngt.AllowedCurrencyConversionRoundingDifference(); //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
         if not AmountValidated then begin
-            AvailableAmount := NpRvSalesDocMgt.ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
-            Error(VoucherPaymentAmountError, PaymentLine.Amount, NpRvSalesDocMgt.AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
+            AvailableAmount := EcomSalesDocUtils.ConvertLCYAmtToTransactionCurrency(AvailableAmountLCY, SalesHeader."Currency Code", SalesHeader."Currency Factor");
+            Error(VoucherPaymentAmountError, PaymentLine.Amount, EcomSalesDocUtils.AdjustCurrencyCode(SalesHeader."Currency Code"), AvailableAmount);
         end;
 
         EcomSalesDocImplEvents.OnAfterInsertPaymentLineVoucher(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine, NpRvSalesLine);
