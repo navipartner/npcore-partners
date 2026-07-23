@@ -13,7 +13,6 @@
     var
         SMSSetup: Record "NPR SMS Setup";
         ServiceCalc: Codeunit "NPR Service Calculation";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         HttpCont: HttpContent;
         HttpResp: HttpResponseMessage;
         ForeignPhone: Boolean;
@@ -42,7 +41,8 @@
 
         if ServiceCalc.useService(ServiceCode) then begin
             CreateHttpContent(HttpCont, SenderNo, PhoneNo, Message);
-            if not SendHttpRequest(HttpResp, HttpCont, AzureKeyVaultMgt.GetAzureKeyVaultSecret('SMSMgtHTTPRequestUrl'), 'POST') then
+            // SMS provider: Link Mobility
+            if not SendHttpRequest(HttpResp, HttpCont, 'https://wsx.sp247.net/sms/send', 'POST') then
                 Error(ErrorSendSMS, GetLastErrorText);
         end else
             Error(NotAllowedServiceErr, ServiceCode);
