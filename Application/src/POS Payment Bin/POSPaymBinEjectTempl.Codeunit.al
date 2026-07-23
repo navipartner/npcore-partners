@@ -46,18 +46,36 @@
         Ejected := true;
     end;
 
+    internal procedure DefaultCashDrawerTemplate(): Code[20]
+    var
+        PrintTemplateCodeLbl: Label 'EPSON_CASH_DRAWER', Locked = true;
+    begin
+        exit(PrintTemplateCodeLbl);
+    end;
+
+    internal procedure ResolveEffectiveTemplate(POSPaymentBin: Record "NPR POS Payment Bin"): Code[20]
+    var
+        POSPaymentBinEjectParam: Record "NPR POS Paym. Bin Eject Param.";
+        Template: Code[20];
+    begin
+        if POSPaymentBinEjectParam.Get(POSPaymentBin."No.", CopyStr(InvokeParameterName(), 1, MaxStrLen(POSPaymentBinEjectParam.Name))) then
+            Template := CopyStr(POSPaymentBinEjectParam.Value, 1, MaxStrLen(Template));
+        if Template = '' then
+            SelectDefaultPrintTemplate(POSPaymentBin, Template);
+        exit(Template);
+    end;
+
     local procedure SelectDefaultPrintTemplate(POSPaymentBin: Record "NPR POS Payment Bin"; var DefaultPrintTemplateCode: Code[20])
     var
         IsHandled: Boolean;
         POSPaymBinEjectPublic: Codeunit "NPR POS Paym. Bin Eject Public";
-        PrintTemplateCodeLbl: Label 'EPSON_CASH_DRAWER', Locked = true;
     begin
         POSPaymBinEjectPublic.OnSelectDefaultPrintTemplate(DefaultPrintTemplateCode, InvokeParameterName(), POSPaymentBin, IsHandled);
 
         if IsHandled then
             exit;
 
-        DefaultPrintTemplateCode := PrintTemplateCodeLbl;
+        DefaultPrintTemplateCode := DefaultCashDrawerTemplate();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Bin Eject Mgt.", 'OnLookupBinInvokeMethods', '', false, false)]

@@ -175,4 +175,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Begin Workshift Experience';
         Implementation = "NPR Feature Management" = "NPR New Begin Workshift Exp";
     }
+    value(270; "New Cash Drawer Open Experience")
+    {
+        Caption = 'New Cash Drawer Open Experience';
+        Implementation = "NPR Feature Management" = "NPR New Cash Drawer Open Exp";
+    }
 }

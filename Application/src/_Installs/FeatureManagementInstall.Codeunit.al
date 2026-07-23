@@ -83,6 +83,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"New Z-Report Experience");
         AddFeature(Feature::"New Sales Doc Confirmation Experience");
         AddFeature(Feature::"New Begin Workshift Experience");
+        AddFeature(Feature::"New Cash Drawer Open Experience");
 
         if ExistingFeature.FindSet() then
             repeat
@@ -121,6 +122,7 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleNewZReportExperience();
         NewFeatureHandler.HandleNewSalesDocConfirmationExperience();
         NewFeatureHandler.HandleNewBeginWorkshiftExperience();
+        NewFeatureHandler.HandleNewCashDrawerOpenExperience();
         RefreshExperienceTierCurrentCompany();
     end;
 

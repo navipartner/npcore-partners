@@ -331,6 +331,39 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+    internal procedure HandleNewCashDrawerOpenExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewCashDrawerOpenExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewCashDrawerOpenExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewCashDrawerOpenExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewCashDrawerOpenExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure NewCashDrawerOpenExperienceHandle()
+    var
+        Feature: Record "NPR Feature";
+        NewCashDrawerOpenExp: Codeunit "NPR New Cash Drawer Open Exp";
+    begin
+        if not Feature.Get(NewCashDrawerOpenExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+        NewCashDrawerOpenExp.MigrateBins();
+    end;
+
     internal procedure HandleNewNpRvPrintExperience()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
