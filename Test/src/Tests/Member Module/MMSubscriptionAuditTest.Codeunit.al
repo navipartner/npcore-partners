@@ -945,6 +945,151 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         Assert.AreEqual(1, SubscriptionRequest.Count(), 'Exactly 1 Partial Regret should exist after calling twice.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ResumeSubscriptionCancelsPendingTerminationRequest()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+    begin
+        // [SCENARIO] Resuming a subscription (Auto-Renew -> YES_INTERNAL) while a termination request is
+        // pending must cancel the pending termination request instead of leaving it stuck as pending
+        Initialize();
+
+        // [GIVEN] A membership with a subscription that has a pending termination request
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+        Membership.GetBySystemId(MembershipId);
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.FindLast();
+
+        Assert.IsTrue(SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription), 'Subscription should exist after membership creation.');
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Modify(true);
+
+        Assert.IsTrue(
+            SubscriptionMgtImpl.RequestTermination(Membership, CalcDate('<+7D>'), Enum::"NPR MM Subs Termination Reason"::CUSTOMER_INITIATED),
+            'RequestTermination should succeed.');
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        Assert.IsTrue(SubscriptionRequest.FindFirst(), 'A pending termination request should exist.');
+        Assert.AreEqual(SubscriptionRequest."Processing Status"::Pending, SubscriptionRequest."Processing Status", 'Termination request should be Pending before resume.');
+
+        // [WHEN] The membership is resumed the same way the subscription resume API does it
+        Membership.Get(Membership."Entry No.");
+        Membership.Validate("Auto-Renew", Membership."Auto-Renew"::YES_INTERNAL);
+        Membership.Modify();
+
+        // [THEN] The pending termination request is cancelled, not left dangling
+        SubscriptionRequest.Get(SubscriptionRequest."Entry No.");
+        Assert.AreEqual(SubscriptionRequest.Status::Cancelled, SubscriptionRequest.Status, 'Termination request should be Cancelled after resume.');
+        Assert.AreEqual(SubscriptionRequest."Processing Status"::Success, SubscriptionRequest."Processing Status", 'Termination request Processing Status should be Success (not left Pending) after resume.');
+
+        // [THEN] The subscription itself reflects the resumed state
+        Subscription.Get(Subscription."Entry No.");
+        Assert.AreEqual(Subscription."Auto-Renew"::YES_INTERNAL, Subscription."Auto-Renew", 'Subscription Auto-Renew should be YES_INTERNAL after resume.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ResumeSubscriptionCancelsErroredTerminationRequest()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+    begin
+        // [SCENARIO] Resuming a subscription must also cancel a termination request whose processing has
+        // ended in Error (not only Pending ones), so it doesn't remain stuck and later affect the membership.
+        Initialize();
+
+        // [GIVEN] A membership with a subscription that has an errored termination request
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+        Membership.GetBySystemId(MembershipId);
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.FindLast();
+
+        Assert.IsTrue(SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription), 'Subscription should exist after membership creation.');
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Modify(true);
+
+        Assert.IsTrue(
+            SubscriptionMgtImpl.RequestTermination(Membership, CalcDate('<+7D>'), Enum::"NPR MM Subs Termination Reason"::CUSTOMER_INITIATED),
+            'RequestTermination should succeed.');
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        Assert.IsTrue(SubscriptionRequest.FindFirst(), 'A termination request should exist.');
+
+        // Force the termination request into an Error processing state (simulating a failed processing attempt)
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Error;
+        SubscriptionRequest.Modify(true);
+
+        // [WHEN] The membership is resumed
+        Membership.Get(Membership."Entry No.");
+        Membership.Validate("Auto-Renew", Membership."Auto-Renew"::YES_INTERNAL);
+        Membership.Modify();
+
+        // [THEN] The errored termination request is cancelled, not left dangling
+        SubscriptionRequest.Get(SubscriptionRequest."Entry No.");
+        Assert.AreEqual(SubscriptionRequest.Status::Cancelled, SubscriptionRequest.Status, 'Errored termination request should be Cancelled after resume.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UnprocessedPartialRegretExists_DetectsPendingErrorButNotProcessed()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        PartialRegretRequest: Record "NPR MM Subscr. Request";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+    begin
+        // [SCENARIO] UnprocessedPartialRegretExists returns true for a Pending or Error partial regret
+        // request, and false when there is none or the only one is already processed (Success).
+        Initialize();
+
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+        Membership.GetBySystemId(MembershipId);
+        Assert.IsTrue(SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription), 'Subscription should exist after membership creation.');
+
+        // [THEN] No partial regret request -> false
+        Assert.IsFalse(MembershipMgtInternal.UnprocessedPartialRegretExists(Membership), 'Should be false when no partial regret request exists.');
+
+        // [GIVEN] A Pending partial regret request -> true
+        CreatePartialRegretRequest(PartialRegretRequest, Subscription, PartialRegretRequest."Processing Status"::Pending);
+        Assert.IsTrue(MembershipMgtInternal.UnprocessedPartialRegretExists(Membership), 'Should be true for a Pending partial regret request.');
+
+        // [GIVEN] The request moves to Error -> still true
+        PartialRegretRequest."Processing Status" := PartialRegretRequest."Processing Status"::Error;
+        PartialRegretRequest.Modify(true);
+        Assert.IsTrue(MembershipMgtInternal.UnprocessedPartialRegretExists(Membership), 'Should be true for an Error partial regret request.');
+
+        // [GIVEN] The request is processed (Processing Status Success) -> false
+        PartialRegretRequest."Processing Status" := PartialRegretRequest."Processing Status"::Success;
+        PartialRegretRequest.Modify(true);
+        Assert.IsFalse(MembershipMgtInternal.UnprocessedPartialRegretExists(Membership), 'Should be false when the only partial regret request is already processed.');
+    end;
+
     // === Context Guard Tests (CORE-227) ===
 
     [Test]
@@ -1148,6 +1293,19 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         Subscription."Auto-Renew" := AutoRenew;
         Subscription."Started At" := CurrentDateTime();
         Subscription.Insert(true);
+    end;
+
+    local procedure CreatePartialRegretRequest(var PartialRegretRequest: Record "NPR MM Subscr. Request"; Subscription: Record "NPR MM Subscription"; ProcessingStatus: Enum "NPR MM Subs Req Proc Status")
+    begin
+        PartialRegretRequest.Init();
+        PartialRegretRequest."Entry No." := 0;
+        PartialRegretRequest.Type := PartialRegretRequest.Type::"Partial Regret";
+        PartialRegretRequest.Status := PartialRegretRequest.Status::New;
+        PartialRegretRequest."Processing Status" := ProcessingStatus;
+        PartialRegretRequest."Subscription Entry No." := Subscription."Entry No.";
+        PartialRegretRequest."Membership Code" := Subscription."Membership Code";
+        PartialRegretRequest."Terminate At" := CalcDate('<+7D>');
+        PartialRegretRequest.Insert(true);
     end;
 
     local procedure CreateMemberPaymentMethod(var MemberPaymentMethod: Record "NPR MM Member Payment Method")

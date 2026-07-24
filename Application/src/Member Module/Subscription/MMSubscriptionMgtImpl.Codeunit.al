@@ -340,6 +340,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         Subscription: Record "NPR MM Subscription";
         TerminationRequest: Record "NPR MM Subscr. Request";
         MemberNotification: Codeunit "NPR MM Member Notification";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
     begin
         Subscription.SetCurrentKey("Membership Entry No.");
         Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
@@ -358,6 +359,8 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
                         SetCommitmentPeriod(Membership, Subscription);
                     end;
 
+                    // Resuming into an internal subscription - cancel any pending/errored termination request so it doesn't remain stuck and later affect the membership.
+                    SubscrRequestUtils.CancelPendingTerminationRequests(Subscription."Entry No.");
                 end;
             "NPR MM MembershipAutoRenew"::TERMINATION_REQUESTED:
                 begin

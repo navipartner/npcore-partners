@@ -1010,7 +1010,7 @@
         AddMembershipChangeNotificationWorker(MembershipLedgerEntry, MembershipSetup, CommunitySetup);
     end;
 
-    local procedure CancelPendingNotification(MembershipEntryNo: Integer; NotificationTrigger: Enum "NPR MM NotificationTrigger")
+    internal procedure CancelPendingNotification(MembershipEntryNo: Integer; NotificationTrigger: Enum "NPR MM NotificationTrigger")
     var
         MembershipNotificationRead: Record "NPR MM Membership Notific.";
         MembershipNotification: Record "NPR MM Membership Notific.";

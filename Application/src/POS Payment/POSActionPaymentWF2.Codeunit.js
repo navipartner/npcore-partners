@@ -27,6 +27,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     amountPrompt,
     forceAmount,
     mmPaymentMethodAssigned,
+    mmUnprocessedRefundMessage,
     collectReturnInformation,
     EnableMemberSubscPayerEmail,
     membershipEmail,
@@ -35,6 +36,10 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
 
   if (mmPaymentMethodAssigned) {
     if (!(await popup.confirm(captions.paymentMethodAssignedCaption)))
+      return {};
+  }
+  if (mmUnprocessedRefundMessage) {
+    if (!(await popup.confirm(mmUnprocessedRefundMessage)))
       return {};
   }
   if (EnableMemberSubscPayerEmail) {

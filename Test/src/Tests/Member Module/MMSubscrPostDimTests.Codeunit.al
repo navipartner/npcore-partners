@@ -408,6 +408,79 @@ codeunit 85223 "NPR MM Subscr.Post.Dim.Tests"
             'Dimension value should be from Recurring Payment Setup (priority 1) not Customer (priority 2).');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PartialRegretSkipsMembershipCancelWhenTerminationCancelled()
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        TerminationRequest: Record "NPR MM Subscr. Request";
+        PartialRegretRequest: Record "NPR MM Subscr. Request";
+        SubsTryRenewProcess: Codeunit "NPR MM Subs Try Renew Process";
+        OriginalValidUntilDate: Date;
+    begin
+        // [SCENARIO] A Partial Regret refund that settles after its related termination request was
+        // already cancelled (member resumed) must not cancel the membership or disable auto-renew, but
+        // must still cut off access at the refunded date (no free extension) and complete/post normally.
+        Initialize();
+
+        // [GIVEN] A membership with subscription, Auto-Renew = YES_INTERNAL
+        CreateMembershipWithSubscription(Membership);
+        Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
+        Membership.Modify(true);
+
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.FindLast();
+        OriginalValidUntilDate := MembershipEntry."Valid Until Date";
+
+        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+        Subscription.FindFirst();
+
+        // [GIVEN] A Terminate request that has since been Cancelled (the member resumed)
+        TerminationRequest.Init();
+        TerminationRequest.Type := TerminationRequest.Type::Terminate;
+        TerminationRequest.Status := TerminationRequest.Status::Cancelled;
+        TerminationRequest."Processing Status" := TerminationRequest."Processing Status"::Success;
+        TerminationRequest."Subscription Entry No." := Subscription."Entry No.";
+        TerminationRequest."Membership Code" := _MembershipCode;
+        TerminationRequest.Insert(true);
+
+        // [GIVEN] A Partial Regret refund linked to that (now cancelled) termination, ready to be processed
+        PartialRegretRequest.Init();
+        PartialRegretRequest.Type := PartialRegretRequest.Type::"Partial Regret";
+        PartialRegretRequest.Status := PartialRegretRequest.Status::Confirmed;
+        PartialRegretRequest."Processing Status" := PartialRegretRequest."Processing Status"::Pending;
+        PartialRegretRequest."Subscription Entry No." := Subscription."Entry No.";
+        PartialRegretRequest."Membership Code" := _MembershipCode;
+        PartialRegretRequest."Related Termination Req. No." := TerminationRequest."Entry No.";
+        PartialRegretRequest."Membership Entry To Cancel" := MembershipEntry."Entry No.";
+        PartialRegretRequest."New Valid From Date" := MembershipEntry."Valid From Date";
+        PartialRegretRequest."New Valid Until Date" := CalcDate('<-1M>', OriginalValidUntilDate);
+        PartialRegretRequest.Amount := -50;
+        PartialRegretRequest."Currency Code" := '';
+        PartialRegretRequest.Insert(true);
+
+        // [WHEN] The Partial Regret is processed (simulating the refund having settled at the PSP)
+        SubsTryRenewProcess.ProcessConfirmedStatus(PartialRegretRequest);
+
+        // [THEN] The membership entry's refunded period is ended (Valid Until Date cut off at the refunded date,
+        // entry marked cancelled) - it does not keep the original (already-refunded) Valid Until Date for free.
+        MembershipEntry.Get(MembershipEntry."Entry No.");
+        Assert.IsTrue(MembershipEntry.Cancelled, 'Membership entry period should be marked cancelled at the refunded date.');
+        Assert.AreEqual(PartialRegretRequest."New Valid Until Date", MembershipEntry."Valid Until Date", 'Membership entry Valid Until Date should be cut off at the refunded date, not left at the original date.');
+        Assert.AreNotEqual(OriginalValidUntilDate, MembershipEntry."Valid Until Date", 'Membership entry should not keep the original Valid Until Date - that period was already refunded.');
+
+        // [THEN] The membership stays on internal auto-renewal (customer resumed), so billing continues from the refunded date.
+        Membership.Get(Membership."Entry No.");
+        Assert.AreEqual(Membership."Auto-Renew"::YES_INTERNAL, Membership."Auto-Renew", 'Membership Auto-Renew should remain YES_INTERNAL (not disabled).');
+
+        // [THEN] The reversal request itself still completes normally (processed and posted)
+        PartialRegretRequest.Get(PartialRegretRequest."Entry No.");
+        Assert.AreEqual(PartialRegretRequest."Processing Status"::Success, PartialRegretRequest."Processing Status", 'Partial Regret should still be marked Success.');
+        Assert.IsTrue(PartialRegretRequest.Posted, 'Partial Regret should still be posted to G/L.');
+    end;
+
     local procedure Initialize()
     begin
         if _IsInitialized then

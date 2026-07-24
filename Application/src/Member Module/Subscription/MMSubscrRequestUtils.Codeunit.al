@@ -300,6 +300,20 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, false, false);
     end;
 
+    internal procedure CancelPendingTerminationRequests(SubscriptionEntryNo: Integer)
+    var
+        SubscrRequest: Record "NPR MM Subscr. Request";
+    begin
+        SubscrRequest.SetRange("Subscription Entry No.", SubscriptionEntryNo);
+        SubscrRequest.SetRange(Type, SubscrRequest.Type::Terminate);
+        SubscrRequest.SetFilter("Processing Status", '%1|%2', SubscrRequest."Processing Status"::Error, SubscrRequest."Processing Status"::Pending);
+        if not SubscrRequest.FindSet() then
+            exit;
+        repeat
+            SetSubscriptionRequestStatusCancelled(SubscrRequest, true);
+        until SubscrRequest.Next() = 0;
+    end;
+
     internal procedure ResetProcessTryCountWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request")
     var
         ConfirmManagement: Codeunit "Confirm Management";

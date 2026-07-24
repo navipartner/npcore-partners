@@ -96,6 +96,63 @@ codeunit 6059778 "NPR POS Action: Payment WF2 BL"
         exit(false);
     end;
 
+    internal procedure GetUnprocessedPartialRegretConfirmation(SalePOS: Record "NPR POS Sale"; PosPaymentMethod: Record "NPR POS Payment Method"): Text
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Membership: Record "NPR MM Membership";
+        ProcessedEntryNos: List of [Integer];
+        MembershipNumbers: Text;
+        ConfirmMsgLbl: Label 'Membership(s) %1 have a pending termination with a refund in progress. If you continue, the termination will be cancelled and the subscription will continue to renew - but the refund will still be paid out, and the membership period will be cut off at the refunded date. Do you want to continue?', Comment = '%1 - comma-separated external membership numbers';
+    begin
+        if not IsEFTSubscriptionPayment(PosPaymentMethod, SalePOS) then
+            exit('');
+
+        MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
+        MemberInfoCapture.SetRange("Receipt No.", SalePOS."Sales Ticket No.");
+        MemberInfoCapture.SetLoadFields("Membership Entry No.");
+        if MemberInfoCapture.FindSet() then
+            repeat
+                AddMembershipWithUnprocessedPartialRegret(MemberInfoCapture."Membership Entry No.", ProcessedEntryNos, MembershipNumbers);
+            until MemberInfoCapture.Next() = 0;
+
+        if SalePOS."Customer No." <> '' then begin
+            Membership.SetCurrentKey("Customer No.");
+            Membership.SetRange("Customer No.", SalePOS."Customer No.");
+            Membership.SetLoadFields("Entry No.");
+            if Membership.FindSet() then
+                repeat
+                    AddMembershipWithUnprocessedPartialRegret(Membership."Entry No.", ProcessedEntryNos, MembershipNumbers);
+                until Membership.Next() = 0;
+        end;
+
+        if MembershipNumbers = '' then
+            exit('');
+
+        exit(StrSubstNo(ConfirmMsgLbl, MembershipNumbers));
+    end;
+
+    local procedure AddMembershipWithUnprocessedPartialRegret(MembershipEntryNo: Integer; var ProcessedEntryNos: List of [Integer]; var MembershipNumbers: Text)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        if MembershipEntryNo = 0 then
+            exit;
+        if ProcessedEntryNos.Contains(MembershipEntryNo) then
+            exit;
+        ProcessedEntryNos.Add(MembershipEntryNo);
+
+        Membership.SetLoadFields("Entry No.", "External Membership No.");
+        if not Membership.Get(MembershipEntryNo) then
+            exit;
+        if not MembershipMgtInternal.UnprocessedPartialRegretExists(Membership) then
+            exit;
+
+        if MembershipNumbers <> '' then
+            MembershipNumbers += ', ';
+        MembershipNumbers += Membership."External Membership No.";
+    end;
+
     internal procedure CheckMembershipSubscription(SalePOS: Record "NPR POS Sale"; PosPaymentMethod: Record "NPR POS Payment Method"; var MembershipEmail: Text): Boolean
     var
         NpPaySetup: Record "NPR Adyen Setup";

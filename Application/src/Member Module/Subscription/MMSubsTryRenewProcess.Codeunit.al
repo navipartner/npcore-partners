@@ -197,6 +197,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         Subscription: Record "NPR MM Subscription";
         SubscrRenewPost: Codeunit "NPR MM Subscr. Renew: Post";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        MemberNotification: Codeunit "NPR MM Member Notification";
     begin
         SubscriptionReversalRequest.TestField(Type, SubscriptionReversalRequest.Type::"Partial Regret");
 
@@ -208,12 +209,51 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, SubscriptionReversalRequest, SubscriptionReversalRequest."New Valid Until Date");
         MembershipMgt.CarryOutMembershipCancel(Membership, MembershipEntry, SubscriptionReversalRequest."New Valid Until Date");
 
+        if RelatedTerminationWasCancelled(SubscriptionReversalRequest) then begin
+            Membership.Validate("Auto-Renew", Membership."Auto-Renew"::YES_INTERNAL);
+            Membership.Modify(true);
+            MemberNotification.CancelPendingNotification(Membership."Entry No.", Enum::"NPR MM NotificationTrigger"::AUTORENEWAL_DISABLED);
+        end else
+            CloseRedundantTerminationRequest(SubscriptionReversalRequest);
+
         SubscrRenewPost.PostInvoiceToGL(SubscriptionReversalRequest, Membership, MembershipSetup);
         if (SubscriptionReversalRequest.Posted) then
             SubscrRenewPost.PostPaymentsToGL(SubscriptionReversalRequest, '');
 
         SubscriptionReversalRequest.Validate("Processing Status", SubscriptionReversalRequest."Processing Status"::Success);
         SubscriptionReversalRequest.Modify(true);
+    end;
+
+    local procedure RelatedTerminationWasCancelled(SubscriptionReversalRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
+        TerminationRequest: Record "NPR MM Subscr. Request";
+    begin
+        if SubscriptionReversalRequest."Related Termination Req. No." = 0 then
+            exit(false);
+
+        TerminationRequest.SetLoadFields(Type, Status);
+        if not TerminationRequest.Get(SubscriptionReversalRequest."Related Termination Req. No.") then
+            exit(false);
+
+        if TerminationRequest.Type <> TerminationRequest.Type::Terminate then
+            exit(false);
+
+        exit(TerminationRequest.Status = TerminationRequest.Status::Cancelled);
+    end;
+
+    local procedure CloseRedundantTerminationRequest(SubscriptionReversalRequest: Record "NPR MM Subscr. Request")
+    var
+        TerminationRequest: Record "NPR MM Subscr. Request";
+    begin
+        if SubscriptionReversalRequest."Related Termination Req. No." = 0 then
+            exit;
+        if not TerminationRequest.Get(SubscriptionReversalRequest."Related Termination Req. No.") then
+            exit;
+        if TerminationRequest.Type <> TerminationRequest.Type::Terminate then
+            exit;
+        if TerminationRequest."Processing Status" = TerminationRequest."Processing Status"::Success then
+            exit;
+        ProcessTermination(TerminationRequest);
     end;
 
     local procedure ProcessRequestedErrorStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")

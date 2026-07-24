@@ -6967,6 +6967,32 @@
         MemberNotification.AddMembershipAutoRenewalEnableNotification(Membership."Entry No.", TargetMembershipCode);
     end;
 
+    internal procedure UnprocessedPartialRegretExists(Membership: Record "NPR MM Membership"): Boolean
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionMgtIml: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        if not SubscriptionMgtIml.GetSubscriptionFromMembership(Membership."Entry No.", Subscription) then
+            exit(false);
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetFilter("Processing Status", '%1|%2', SubscriptionRequest."Processing Status"::Pending, SubscriptionRequest."Processing Status"::Error);
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::"Partial Regret");
+        exit(not SubscriptionRequest.IsEmpty());
+    end;
+
+    internal procedure ConfirmEnableAutoRenewalWithUnprocessedRefund(Membership: Record "NPR MM Membership"): Boolean
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        UnprocessedPartialRegretQst: Label 'Membership %1 has a pending termination with a refund in progress. If you continue, the termination will be cancelled and the subscription will continue to renew - but the refund will still be paid out, and the membership period will be cut off at the refunded date.\Do you want to continue?', Comment = '%1 - External Membership No.';
+    begin
+        if not UnprocessedPartialRegretExists(Membership) then
+            exit(true);
+
+        exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(UnprocessedPartialRegretQst, Membership."External Membership No."), true));
+    end;
+
     internal procedure CheckIfCanEnableAutoRenewal(Membership: Record "NPR MM Membership")
     var
         Subscription: Record "NPR MM Subscription";
@@ -7055,6 +7081,9 @@
         SubscriptionMgtIml: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
         if (not SubscriptionMgtIml.CheckIfPendingSubscriptionRequestExist(Membership."Entry No.", SubscriptionRequest)) then
+            exit;
+
+        if (SubscriptionRequest.Type = SubscriptionRequest.Type::"Partial Regret") then
             exit;
 
         CancelSubscription(SubscriptionRequest);

@@ -23,6 +23,7 @@ codeunit 6248482 "NPR MembershipSubscrAgent"
     var
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
         Subscription: Record "NPR MM Subscription";
     begin
@@ -31,7 +32,10 @@ codeunit 6248482 "NPR MembershipSubscrAgent"
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
 
         if (not SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription)) then
-            SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(Membership); // This will create the subscription record.
+            SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(Membership) // This will create the subscription record.
+        else
+            if (MembershipMgtInternal.UnprocessedPartialRegretExists(Membership)) and (not PendingRefundConfirmed(Request)) then
+                exit(Response.RespondBadRequest('The subscription has an unprocessed refund (partial regret) that might be processed at a later point and affect the membership. Pass query parameter confirmPendingRefund=true to resume anyway.'));
 
         Membership.Validate("Auto-Renew", Membership."Auto-Renew"::YES_INTERNAL);
         Membership.Modify();
@@ -39,6 +43,15 @@ codeunit 6248482 "NPR MembershipSubscrAgent"
         SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription);
 
         exit(Response.RespondOK(SubscriptionDto(Subscription)));
+    end;
+
+    local procedure PendingRefundConfirmed(var Request: Codeunit "NPR API Request"): Boolean
+    var
+        ParamValue: Text;
+    begin
+        if (not Request.QueryParams().Get('confirmPendingRefund', ParamValue)) then
+            exit(false);
+        exit(ParamValue.ToLower() = 'true');
     end;
 
     internal procedure TerminateSubscription(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
