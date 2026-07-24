@@ -2,6 +2,9 @@
 enum 6059948 "NPR POS Lic. Bill. User Status"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-06-05';
+    ObsoleteReason = 'Replaced by NPR Module Licensing (enum "NPR License User Status").';
     Extensible = false;
     Caption = 'POS License Billing User Status';
 

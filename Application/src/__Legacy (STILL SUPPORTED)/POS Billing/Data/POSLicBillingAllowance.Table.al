@@ -2,6 +2,9 @@
 table 6151278 "NPR POS Lic. Billing Allowance"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-06-05';
+    ObsoleteReason = 'Replaced by NPR Module Licensing (table "NPR License Pool").';
     Caption = 'NPR POS License Billing Allowance';
     DataClassification = SystemMetadata;
 
@@ -78,12 +81,18 @@ table 6151278 "NPR POS Lic. Billing Allowance"
             Caption = 'Valid Since';
             DataClassification = SystemMetadata;
             ToolTip = 'Specifies the date and time from which the license pool is valid.';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-06-01';
+            ObsoleteReason = 'Replaced by field "Valid Since Date".';
         }
         field(13; "Valid Until"; DateTime)
         {
             Caption = 'Valid Until';
             DataClassification = SystemMetadata;
             ToolTip = 'Specifies the date and time until which the license pool is valid.';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-06-01';
+            ObsoleteReason = 'Replaced by field "Valid Until Date".';
         }
         field(14; "Created At"; DateTime)
         {
@@ -96,6 +105,18 @@ table 6151278 "NPR POS Lic. Billing Allowance"
             Caption = 'Updated At';
             DataClassification = SystemMetadata;
             ToolTip = 'Specifies when the license pool was last updated.';
+        }
+        field(16; "Valid Since Date"; Date)
+        {
+            Caption = 'Valid Since Date';
+            DataClassification = SystemMetadata;
+            ToolTip = 'Specifies the date from which the license pool is valid.';
+        }
+        field(17; "Valid Until Date"; Date)
+        {
+            Caption = 'Valid Until Date';
+            DataClassification = SystemMetadata;
+            ToolTip = 'Specifies the date until which the license pool is valid.';
         }
     }
 

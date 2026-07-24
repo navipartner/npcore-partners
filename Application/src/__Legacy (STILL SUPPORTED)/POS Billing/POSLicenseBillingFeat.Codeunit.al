@@ -2,6 +2,9 @@
 codeunit 6248537 "NPR POS License Billing Feat." implements "NPR Feature Management"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-06-05';
+    ObsoleteReason = 'Replaced by NPR Module Licensing (NPR License User / NPR License Pool / NPR License Mgt.).';
 
     var
         FeatureIdTok: Label 'POSLicenseBilling', Locked = true, MaxLength = 50;

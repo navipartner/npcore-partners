@@ -2,6 +2,9 @@
 codeunit 6248524 "NPR POS License Billing Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-06-05';
+    ObsoleteReason = 'Replaced by NPR Module Licensing (NPR License User / NPR License Pool / NPR License Mgt.).';
     SingleInstance = true;
 
     // The POS_BILLING_INTEGRATION_DEV compiler symbol is used to switch between the production and development versions of the POS Billing API.
@@ -11,9 +14,7 @@ codeunit 6248524 "NPR POS License Billing Mgt."
     // To use it, define POS_BILL_ING_INTEGRATION_DEV in the 'preprocessorSymbols' setting in the 'app.json' file.
 
     var
-        UserNotLicensedErr: Label 'You are not a licensed POS user. Please contact your administrator.';
         NotEnoughLicensesBuyMoreLicensesErr: Label 'Not enough licenses (%1 purchased for license type %2). Visit %3 to buy more.', Comment = '%1 = number of licensed sessions. %2 = License Type, %3 = License Portal Url';
-        UserLicenseNotActiveErr: Label 'The license for user %1 is not active. Try to activate it or contact your administrator.';
         ApiResponseErr: Label 'License verification service returned an error (Status: %1). Please contact your administrator.';
         ApiCallFailedErr: Label 'Failed to send %1 request to API endpoint %2.', Comment = '%1 = HTTP method, %2 = endpoint';
         ApiResponseReadErr: Label 'Failed to read response content from API.';
@@ -31,7 +32,6 @@ codeunit 6248524 "NPR POS License Billing Mgt."
         CustomerPortalAppUrlTok: Label 'TODO: Define the URL once we have it!', Locked = true;
         AkvNpPosBillingLicenseApiKeyTok: Label 'NpPosBillingLicenseApiKey', Locked = true;
         POSLicBillingAllowanceLoaded: Boolean;
-        LicenseValidationDone: Boolean;
         TenantId: Text;
         ApiSecretToken: SecretText;
         HttpClient: HttpClient;
@@ -332,36 +332,29 @@ codeunit 6248524 "NPR POS License Billing Mgt."
     local procedure PersistLicenseAllowance(var POSLicBillingAllowanceTemp: Record "NPR POS Lic. Billing Allowance" temporary)
     var
         POSLicBillingAllowance: Record "NPR POS Lic. Billing Allowance";
-        SyncRecord: Boolean;
     begin
         POSLicBillingAllowance.Reset();
-        if (POSLicBillingAllowance.FindSet()) then
+        if POSLicBillingAllowance.FindSet() then
             repeat
                 POSLicBillingAllowance.Mark(true);
-            until (POSLicBillingAllowance.Next() = 0);
+            until POSLicBillingAllowance.Next() = 0;
 
-
-        POSLicBillingAllowance.Reset();
-        if (POSLicBillingAllowance.FindSet()) then
+        POSLicBillingAllowanceTemp.Reset();
+        if POSLicBillingAllowanceTemp.FindSet() then
             repeat
-                SyncRecord := false;
-                if (POSLicBillingAllowance.Get(POSLicBillingAllowanceTemp."Pool Id", POSLicBillingAllowanceTemp."License Type")) then begin
+                if POSLicBillingAllowance.Get(POSLicBillingAllowanceTemp."Pool Id", POSLicBillingAllowanceTemp."License Type") then begin
                     POSLicBillingAllowance.Mark(false);
 
-                    if (POSLicBillingAllowance."Updated At" <> POSLicBillingAllowanceTemp."Updated At") then begin
-                        SyncRecord := true;
+                    if POSLicBillingAllowance."Updated At" <> POSLicBillingAllowanceTemp."Updated At" then begin
+                        POSLicBillingAllowance.TransferFields(POSLicBillingAllowanceTemp, true);
+                        POSLicBillingAllowance.Modify();
                     end;
                 end else begin
-                    SyncRecord := true;
-                end;
-
-                if (SyncRecord) then begin
                     POSLicBillingAllowance.Init();
                     POSLicBillingAllowance.TransferFields(POSLicBillingAllowanceTemp, true);
-                    if (not POSLicBillingAllowance.Insert()) then
-                        POSLicBillingAllowance.Modify();
+                    POSLicBillingAllowance.Insert();
                 end;
-            until (POSLicBillingAllowanceTemp.Next() = 0);
+            until POSLicBillingAllowanceTemp.Next() = 0;
 
         // Delete license allowances that are not valid anymore:
         POSLicBillingAllowance.MarkedOnly(true);
@@ -496,8 +489,8 @@ codeunit 6248524 "NPR POS License Billing Mgt."
                     .GetProperty('renewalMonth', POSLicBillingAllowanceTemp."Renewal Month")
                     .GetProperty('renewalDay', POSLicBillingAllowanceTemp."Renewal Day")
                     .GetProperty('periodMonths', POSLicBillingAllowanceTemp."Period Months")
-                    .GetProperty('validSince', POSLicBillingAllowanceTemp."Valid Since")
-                    .GetProperty('validUntil', POSLicBillingAllowanceTemp."Valid Until")
+                    .GetProperty('validSince', POSLicBillingAllowanceTemp."Valid Since Date")
+                    .GetProperty('validUntil', POSLicBillingAllowanceTemp."Valid Until Date")
                     .GetProperty('createdAt', POSLicBillingAllowanceTemp."Created At")
                     .GetProperty('updatedAt', POSLicBillingAllowanceTemp."Updated At")
 #pragma warning restore AA0139
@@ -516,7 +509,8 @@ codeunit 6248524 "NPR POS License Billing Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", OnInitialize, '', false, false)]
     local procedure OnPOSSessionInitialize(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        ProceedLicenseValidationFromPOS();
+        // Retired: POS licensing enforcement moved to codeunit "NPR License Mgt." (NPR Module Licensing).
+        // Kept as a no-op so there is never a double gate (prod or any dev build); the legacy logic below stays dormant.
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS License Billing User", OnAfterValidateEvent, Status, false, false)]
@@ -535,75 +529,21 @@ codeunit 6248524 "NPR POS License Billing Mgt."
         end;
     end;
 
-    local procedure ProceedLicenseValidationFromPOS()
-    var
-        TempPOSLicBillingAllowance: Record "NPR POS Lic. Billing Allowance" temporary;
-        POSLicBillingUser: Record "NPR POS License Billing User";
-        RemoteValidationSuccessful: Boolean;
-        UserIdentifier: Text;
-    begin
-        if (LicenseValidationDone) then
-            exit;
-
-        if (not IsPosLicenseBillingFeatureEnabled()) then begin
-            LicenseValidationDone := true;
-            exit;
-        end;
-
-        if ((IsControlledEnvironment()) and (not IsDelegatedUser(UserSecurityId()))) then begin
-            InitGlobalVars();
-
-            RemoteValidationSuccessful := GetCurrentLicenseAllowanceFromApi(TempPOSLicBillingAllowance);
-
-            if (RemoteValidationSuccessful) then begin
-                PersistLicenseAllowance(TempPOSLicBillingAllowance);
-                InvalidateLicensedUsers();
-            end;
-
-            if (not POSLicBillingUser.Get(UserSecurityId())) then
-                Error(UserNotLicensedErr);
-
-            if (not (POSLicBillingUser.Status in [POSLicBillingUser.Status::Active])) then begin
-                POSLicBillingUser.CalcFields("User Name");
-
-                if (POSLicBillingUser."User Name" <> '') then
-                    UserIdentifier := POSLicBillingUser."User Name"
-                else
-                    UserIdentifier := POSLicBillingUser."User Security ID";
-
-                Error(UserLicenseNotActiveErr, UserIdentifier);
-            end;
-
-            UpdateLastLogin();
-        end;
-
-        LicenseValidationDone := true;
-    end;
-
-    local procedure IsPosLicenseBillingFeatureEnabled(): Boolean
-    var
-        POSLicenseBillingFeat: Codeunit "NPR POS License Billing Feat.";
-    begin
-#if POS_BILLING_INTEGRATION_DEV
-        exit(true);
-#endif
-        exit(POSLicenseBillingFeat.IsFeatureEnabled());
-    end;
-
     local procedure IsControlledEnvironment(): Boolean
     var
         EnvInfo: Codeunit "Environment Information";
+        Result: Boolean;
     begin
+        Result := false;
 #if POS_BILLING_INTEGRATION_DEV
-        exit(true);
+        Result := true;
+        EnvInfo := EnvInfo;
+#else
+        if EnvInfo.IsSaaSInfrastructure() then
+            if EnvInfo.IsProduction() then
+                Result := true;
 #endif
-        if not EnvInfo.IsSaaSInfrastructure() then
-            exit(false);
-
-        if not EnvInfo.IsProduction() then
-            exit(false);
-
-        exit(true);
+        exit(Result);
     end;
 
     local procedure InitGlobalVars()
@@ -614,28 +554,7 @@ codeunit 6248524 "NPR POS License Billing Mgt."
         if (EnvInfo.IsSaaSInfrastructure()) then
             TenantId := AzureADTenant.GetAadTenantId();
 
-#if POS_BILLING_INTEGRATION_DEV
-        TenantId := '4386a841-4785-4918-a23f-a1eaaa5fa614';
-#endif
         TenantId := DelChr(TenantId, '<>', '{}');
-    end;
-
-    local procedure UpdateLastLogin()
-    var
-        POSLicBillingUser: Record "NPR POS License Billing User";
-        TypeHelper: Codeunit "Type Helper";
-        CurrentDateTimeInUTC: DateTime;
-        MarginDuration: Duration;
-    begin
-        CurrentDateTimeInUTC := TypeHelper.GetCurrUTCDateTime();
-        MarginDuration := 5 * 60000; // Update max. every 5 minutes to avoid excessive writes e.g. for WS calls.
-
-        if (POSLicBillingUser.Get(UserSecurityId())) then begin
-            if (POSLicBillingUser."Last Login (DateTime)" < CurrentDateTimeInUTC - MarginDuration) then begin
-                POSLicBillingUser."Last Login (DateTime)" := CurrentDateTimeInUTC;
-                POSLicBillingUser.Modify(true);
-            end;
-        end;
     end;
 
     [TryFunction()]
@@ -769,14 +688,6 @@ codeunit 6248524 "NPR POS License Billing Mgt."
         end;
 
         exit(ApiSecretToken);
-    end;
-
-    local procedure IsDelegatedUser(UserSecID: Guid): Boolean
-    var
-        EntraIDUserMgt: Codeunit "Azure AD User Management";
-    begin
-        // Not sure if testing for IsUserTenantAdmin() also makes sense or not.
-        exit(EntraIDUserMgt.IsUserDelegated(UserSecID));
     end;
 }
 #endif

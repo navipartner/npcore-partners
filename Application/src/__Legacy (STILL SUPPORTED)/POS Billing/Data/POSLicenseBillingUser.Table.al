@@ -2,6 +2,9 @@
 table 6151229 "NPR POS License Billing User"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-06-05';
+    ObsoleteReason = 'Replaced by NPR Module Licensing (table "NPR License User").';
     Caption = 'POS License Billing User';
     DataClassification = CustomerContent;
     LookupPageId = "NPR POS License Billing Users";

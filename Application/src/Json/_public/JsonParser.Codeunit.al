@@ -412,6 +412,45 @@ codeunit 6150648 "NPR Json Parser"
         exit(true);
     end;
 
+    procedure GetProperty(PropertyName: Text; var Value: Date): Codeunit "NPR JSON Parser"
+    var
+        hasProperty: Boolean;
+    begin
+        exit(GetProperty(PropertyName, Value, hasProperty));
+    end;
+
+    procedure GetProperty(PropertyName: Text; var Value: Date; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
+    begin
+        InitcurrCodeunit();
+        HasProperty := TryGetProperty(PropertyName, Value);
+        exit(CurrCodeunit);
+    end;
+
+    procedure TryGetProperty(PropertyName: Text; var Value: Date): Boolean
+    var
+        valueJsonToken: JsonToken;
+        textValue: Text;
+    begin
+        Clear(Value);
+        if not CurrentObject.Get(PropertyName, valueJsonToken) then
+            exit(false);
+
+        if not valueJsonToken.IsValue then
+            exit(false);
+
+        textValue := valueJsonToken.AsValue().AsText();
+        // JSON dates are ISO-8601: parse with format 9 (XML), locale-independent. Default Evaluate is region-dependent.
+        if Evaluate(Value, textValue, 9) then
+            exit(true);
+
+        // Fallback: a JSON datetime ("2026-01-01T00:00:00.000Z"). Take the calendar date as written - going
+        // through DT2Date would shift it by the session's UTC offset. Format 9 (XML) keeps Evaluate locale-independent.
+        if textValue.Contains('T') then
+            exit(Evaluate(Value, CopyStr(textValue, 1, StrPos(textValue, 'T') - 1), 9));
+
+        exit(false);
+    end;
+
     #region Fluent Interface
     local procedure InitcurrCodeunit()
     var

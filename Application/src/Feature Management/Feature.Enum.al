@@ -180,4 +180,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Cash Drawer Open Experience';
         Implementation = "NPR Feature Management" = "NPR New Cash Drawer Open Exp";
     }
+    value(280; "NPR Module Licensing")
+    {
+        Caption = 'NPR Module Licensing', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR Module Licensing Feat.";
+    }
 }

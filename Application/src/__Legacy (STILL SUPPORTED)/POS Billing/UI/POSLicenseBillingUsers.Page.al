@@ -1,15 +1,17 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 page 6185094 "NPR POS License Billing Users"
 {
-    Caption = 'NPR Licensed Users';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-06-05';
+    ObsoleteReason = 'Replaced by NPR Module Licensing (page "NPR Licensed Users").';
+    Caption = 'NPR Licensed Users (Deprecated)';
     PageType = List;
     SourceTable = "NPR POS License Billing User";
     Extensible = false;
     ApplicationArea = NPRRetail;
-    UsageCategory = Lists;
+    UsageCategory = None; // deprecated page: keep functional but hide from Tell Me / search (use "NPR Licensed Users")
     AboutText = '<p>This page displays all users with a valid POS license.</p>';
     AboutTitle = 'NPR Licensed Users';
-    AdditionalSearchTerms = 'POS, License, User, Licensed users';
     DelayedInsert = true;
 
     layout

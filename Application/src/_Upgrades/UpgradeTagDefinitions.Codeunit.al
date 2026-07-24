@@ -345,6 +345,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Customer Input", 'UpgradePOSCustomerInputEntryInputTransfer'));
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS License Billing Upgrd.", 'AddPOSBillingFeature'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS License Billing Upgrd.", 'MigrateValidDates'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Module Licensing Upgrd.", 'RegisterModuleLicensingFeature'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Module Licensing Upgrd.", 'DisableLegacyPosBilling'));
 #endif
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Digital Notif. Entr.", 'UpgradeSourceDocumentIdOnDigitalNotifEntries'));
@@ -1303,6 +1306,15 @@
                 case UpgradeStep of
                     'AddPOSBillingFeature':
                         exit('NPR-AddPOSBillingFeature-20250911');
+                    'MigrateValidDates':
+                        exit('NPR-MigrateValidDates-20260601');
+                end;
+            Codeunit::"NPR Module Licensing Upgrd.":
+                case UpgradeStep of
+                    'RegisterModuleLicensingFeature':
+                        exit('NPR-RegisterModuleLicensingFeature-20260605');
+                    'DisableLegacyPosBilling':
+                        exit('NPR-DisableLegacyPosBilling-20260605');
                 end;
 #endif
             Codeunit::"NPR RS Retail Calculation Upg.":

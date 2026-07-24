@@ -2,6 +2,9 @@
 enum 6059949 "NPR POS Lic. Billing Lic. Type"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-06-05';
+    ObsoleteReason = 'Replaced by NPR Module Licensing (enum "NPR License Term").';
     Extensible = false;
     Caption = 'POS License Billing License Type';
 
