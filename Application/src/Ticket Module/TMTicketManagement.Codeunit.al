@@ -122,13 +122,21 @@
     procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10]; UnitAmountInclVat: Decimal; UnitAmountExclVat: Decimal; UnitPriceInclVat: Decimal; UnitPriceExclVat: Decimal)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        ResponseCode: Code[10];
         Ticket: Record "NPR TM Ticket";
+        ReservationExpired: Label 'The reservation for receipt %1, line %2 has expired. Delete line and register again.', Comment = '%1 = Sales receipt number, %2 = Sales line number';
+        ReservationNotValid: Label 'The reservation for receipt %1, line %2 has no valid reservations to confirm. Delete line and register again.', Comment = '%1 = Sales receipt number, %2 = Sales line number';
+        ReservationGeneralError: Label 'Expected to find tickets for receipt %1, line %2 but none was found. Delete line and register again.', Comment = '%1 = Sales receipt number, %2 = Sales line number';
+        ReservationConfirmError: Label 'An error occurred when confirming the reservation for receipt %1, line %2. [%3]. Delete line and register again.', Comment = '%1 = Sales receipt number, %2 = Sales line number, %3 = Error Response Code';
+        ReservationTryAgain: Label 'The reservation for receipt %1, line %2 is not valid at this time. Please try again.', Comment = '%1 = Sales receipt number, %2 = Sales line number';
         ResponseMessage: Text;
         IsCheckedBySubscriber: Boolean;
         IsValid: Boolean;
         AdmitMethod: Enum "NPR TM AdmitTicketOnEoSMethod";
         TicketsRejectedArray: JsonArray;
         JToken: JsonToken;
+        FoundTickets: Boolean;
     begin
 
 #if (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -141,36 +149,59 @@
 
         if (TicketRequestManager.IsReservationRequest(Token)) then begin
 
+            if (not TicketRequestManager.ConfirmReservationRequest(Token, TokenLineNumber, ResponseCode, ResponseMessage)) then begin
+                if (ResponseCode = '-1205') then
+                    Error(ReservationTryAgain, SalesReceiptNo, SalesLineNo);
+                if (ResponseCode = '-1204') then
+                    Error(ReservationExpired, SalesReceiptNo, SalesLineNo);
+                if (ResponseCode = '-1203') then
+                    Error(ReservationNotValid, SalesReceiptNo, SalesLineNo);
+                Error(ReservationConfirmError, SalesReceiptNo, SalesLineNo, ResponseCode);
+            end;
+
+            // Token already confirmed by a sibling sale-line
+            if (ResponseCode = '-1206') then
+                exit; // the OPTIONAL_SELECTED admission was already confirmed by a sibling sale-line, so we must skip the rest of the process
+
             AdmitMethod := SelectEndOfSaleAdmitMethod(PosUnitNo);
 
-            Ticket.Reset();
-            Ticket.SetCurrentKey("Sales Receipt No.");
-            Ticket.SetFilter("Sales Receipt No.", '=%1', SalesReceiptNo);
-            Ticket.SetFilter("Line No.", '=%1', SalesLineNo);
-            if (Ticket.FindSet()) then begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetCurrentKey("Session Token ID");
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            if (TokenLineNumber <> 0) then
+                TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+            TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
 
-                TicketRequestManager.ConfirmReservationRequestWithValidate(Token, TokenLineNumber);
-
+            FoundTickets := false;
+            if (TicketReservationRequest.FindSet()) then
                 repeat
-                    Ticket.AmountInclVat := UnitAmountInclVat;
-                    Ticket.AmountExclVat := UnitAmountExclVat;
-                    Ticket.ListPriceInclVat := UnitPriceInclVat;
-                    Ticket.ListPriceExclVat := UnitPriceExclVat;
-                    Ticket.Modify();
+                    Ticket.Reset();
+                    Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                    if (Ticket.FindSet()) then
+                        repeat
+                            FoundTickets := true;
+                            Ticket.AmountInclVat := UnitAmountInclVat;
+                            Ticket.AmountExclVat := UnitAmountExclVat;
+                            Ticket.ListPriceInclVat := UnitPriceInclVat;
+                            Ticket.ListPriceExclVat := UnitPriceExclVat;
+                            Ticket.Modify();
 
-                    if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::LEGACY) then
-                        AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo);
+                            if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::LEGACY) then
+                                AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo);
+                        until (Ticket.Next() = 0);
+                until (TicketReservationRequest.Next() = 0);
 
-                until (Ticket.Next() = 0);
+            if (not FoundTickets) then
+                Error(ReservationGeneralError, SalesReceiptNo, SalesLineNo);
 
-                if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::INLINE_SPEED_GATE) then begin
-                    AdmitTicketSpeedGate(Token, PosUnitNo, TicketsRejectedArray);
-                    if (TicketsRejectedArray.Count() > 0) then begin
-                        ResponseMessage := 'There was one or more error when admitting ticket(s): <br>';
-                        foreach JToken in TicketsRejectedArray do
-                            ResponseMessage += JToken.AsValue().AsText() + '<br>';
-                        Error(ResponseMessage);
-                    end;
+            if (AdmitMethod = Enum::"NPR TM AdmitTicketOnEoSMethod"::INLINE_SPEED_GATE) then begin
+                AdmitTicketSpeedGate(Token, PosUnitNo, TicketsRejectedArray);
+                if (TicketsRejectedArray.Count() > 0) then begin
+                    ResponseMessage := 'There was one or more error when admitting ticket(s): <br>';
+                    foreach JToken in TicketsRejectedArray do
+                        ResponseMessage += JToken.AsValue().AsText() + '<br>';
+                    Error(ResponseMessage);
                 end;
             end;
         end;
@@ -1645,7 +1676,8 @@
     end;
 
 
-    internal procedure CheckTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; var Reason: Text) IsValid: Boolean
+    internal procedure CheckTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
+                                                                      AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; var Reason: Text) IsValid: Boolean
     begin
         Clear(Reason);
         IsValid := TryValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
@@ -1655,18 +1687,21 @@
         exit(IsValid);
     end;
 
-    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
+    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
+                                                                         AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
     begin
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
     end;
 
     [TryFunction]
-    local procedure TryValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
+    local procedure TryValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
+                                                                         AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     begin
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, SkipPaymentCheck);
     end;
 
-    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
+    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
+                                                                         AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     var
         Ticket: Record "NPR TM Ticket";
     begin

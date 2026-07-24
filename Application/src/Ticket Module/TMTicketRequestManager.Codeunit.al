@@ -1013,6 +1013,7 @@
                 // This might not be true here - reservation request is expanded with all admission codes and so there could only be the one specified admission code, but we will keep it like this just in case and to keep the code simpler
                 AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
                 AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+                AdmissionBOM.SetFilter("Admission Inclusion", '=%1', AdmissionBOM."Admission Inclusion"::REQUIRED);
                 AdmissionBOM.FindSet();
                 repeat
                     ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code", AdmissionBOM.DeferRevenue);
@@ -1058,6 +1059,7 @@
                 // Find the admission code for the ticket, we will need it to link the payment entry to the admission when the admission is required
                 AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
                 AdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+                AdmissionBOM.SetFilter("Admission Inclusion", '=%1', AdmissionBOM."Admission Inclusion"::REQUIRED);
                 AdmissionBOM.FindSet();
                 repeat
                     ListOfAdmissionCodes.Add(AdmissionBOM."Admission Code", AdmissionBOM.DeferRevenue);
