@@ -328,11 +328,15 @@
         POSPostEntries: Codeunit "NPR POS Post Entries";
         PostingDescription: Text;
         DeferralLineNo: Integer;
+        NALocalization: Boolean;
         PostingDescriptionLbl: Label '%1: %2';
     begin
+        NALocalization := NALocalizationEnabled();
         POSSalesLineToBeCompressed.SetRange(Type, POSSalesLineToBeCompressed.Type::Item);
         if POSSalesLineToBeCompressed.FindSet() then begin
             repeat
+                if NALocalization then
+                    POSEntry.Get(POSSalesLineToBeCompressed."POS Entry No.");
                 if POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"] then begin
                     POSPostingBuffer.Init();
                     POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Sales;
@@ -395,6 +399,8 @@
         POSSalesLineToBeCompressed.SetFilter(Type, '<>%1', POSSalesLineToBeCompressed.Type::Item);
         if POSSalesLineToBeCompressed.FindSet() then
             repeat
+                if NALocalization then
+                    POSEntry.Get(POSSalesLineToBeCompressed."POS Entry No.");
                 if POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"] then begin
                     POSPostingBuffer.Init();
                     POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Sales;
@@ -488,16 +494,37 @@
 
     procedure CreateGenJournalLinesFromSalesTax(var POSPostingBuffer: Record "NPR POS Posting Buffer"; var GenJnlLine: Record "Gen. Journal Line"; POSEntry: Record "NPR POS Entry"; var LineNumber: Integer)
     var
+        TempPOSEntryToProcess: Record "NPR POS Entry" temporary;
+        NALocalization: Boolean;
+    begin
+        NALocalization := NALocalizationEnabled();
+        if not NALocalization then begin
+            CreateGenJournalLinesFromSalesTaxForEntry(POSEntry."Entry No.", NALocalization, GenJnlLine, LineNumber);
+            exit;
+        end;
+
+        CollectSalesPOSEntriesFromBuffer(POSPostingBuffer, POSEntry, TempPOSEntryToProcess);
+        if TempPOSEntryToProcess.FindSet() then
+            repeat
+                CreateGenJournalLinesFromSalesTaxForEntry(TempPOSEntryToProcess."Entry No.", NALocalization, GenJnlLine, LineNumber);
+            until TempPOSEntryToProcess.Next() = 0;
+    end;
+
+    local procedure CreateGenJournalLinesFromSalesTaxForEntry(POSEntryNo: Integer; NALocalization: Boolean; var GenJnlLine: Record "Gen. Journal Line"; var LineNumber: Integer)
+    var
+        POSEntry: Record "NPR POS Entry";
         POSEntryTaxLine: Record "NPR POS Entry Tax Line";
         TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
+        if not POSEntry.Get(POSEntryNo) then
+            exit;
         POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
         if not POSEntryTaxLine.FindSet() then
             exit;
         GetPOSPostingProfile(POSEntry, POSPostingProfile);
-        if not NALocalizationEnabled() then begin
+        if not NALocalization then begin
             GroupPOSEntryTaxLine(POSEntryTaxLine, TempPOSEntryTaxLine);
             TempPOSEntryTaxLine.Reset();
             TempPOSEntryTaxLine.FindSet();
@@ -510,6 +537,34 @@
             repeat
                 CreateGenJournalLinesFromSalesTax(POSEntry, POSEntryTaxLine, GenJnlLine, POSPostingProfile, LineNumber);
             until POSEntryTaxLine.Next() = 0;
+        end;
+    end;
+
+    local procedure CollectSalesPOSEntriesFromBuffer(var POSPostingBuffer: Record "NPR POS Posting Buffer"; FallbackPOSEntry: Record "NPR POS Entry"; var TempPOSEntry: Record "NPR POS Entry" temporary)
+    var
+        SavedLineTypeFilter: Text;
+    begin
+        TempPOSEntry.Reset();
+        TempPOSEntry.DeleteAll();
+
+        SavedLineTypeFilter := POSPostingBuffer.GetFilter("Line Type");
+        POSPostingBuffer.SetRange("Line Type", POSPostingBuffer."Line Type"::Sales);
+        if POSPostingBuffer.FindSet() then
+            repeat
+                if (POSPostingBuffer."POS Entry No." <> 0) and not TempPOSEntry.Get(POSPostingBuffer."POS Entry No.") then begin
+                    TempPOSEntry.Init();
+                    TempPOSEntry."Entry No." := POSPostingBuffer."POS Entry No.";
+                    TempPOSEntry.Insert();
+                end;
+            until POSPostingBuffer.Next() = 0;
+        POSPostingBuffer.SetFilter("Line Type", SavedLineTypeFilter);
+
+        if TempPOSEntry.IsEmpty() and (FallbackPOSEntry."Entry No." <> 0) and
+           (FallbackPOSEntry."Post Entry Status" in [FallbackPOSEntry."Post Entry Status"::Unposted, FallbackPOSEntry."Post Entry Status"::"Error while Posting"])
+        then begin
+            TempPOSEntry.Init();
+            TempPOSEntry."Entry No." := FallbackPOSEntry."Entry No.";
+            TempPOSEntry.Insert();
         end;
     end;
 
