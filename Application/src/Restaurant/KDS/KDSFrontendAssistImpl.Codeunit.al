@@ -11,9 +11,15 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         TempRestaurant: Record "NPR NPRE Restaurant" temporary;
+        Sentry: Codeunit "NPR Sentry";
         KitchenOrderList: JsonArray;
         KitchenOrderContent: JsonObject;
+        OwnsTransaction: Boolean;
     begin
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('KDS: RefreshCustomerDisplay', 'bc.restaurant.kds.customer-display', 0.01); // polled frequently by KDS - low sampling
+
         CheckServerID(lastServerId);
         GetRestaurantList(restaurantId, TempRestaurant);
 
@@ -38,32 +44,64 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 
         Response.Add('orders', KitchenOrderList);
         AddServerIDToResponse(Response);
+
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     internal procedure RefreshKDSData(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime; lastServerId: Text) Response: JsonObject
+    var
+        Sentry: Codeunit "NPR Sentry";
+        OwnsTransaction: Boolean;
     begin
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('KDS: RefreshKDSData', 'bc.restaurant.kds.refresh-board', 0.01); // polled frequently by KDS - low sampling
+
         CheckServerID(lastServerId);
         Response.Add('orders', GenerateKDSData(CopyStr(restaurantId, 1, 20), stationId, includeFinished, false, startingFrom));
         AddServerIDToResponse(Response);
+
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     internal procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime; lastServerId: Text) Response: JsonObject
+    var
+        Sentry: Codeunit "NPR Sentry";
+        OwnsTransaction: Boolean;
     begin
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('KDS: GetFinishedOrders', 'bc.restaurant.kds.finished-orders', 0.01); // polled frequently by KDS - low sampling
+
         CheckServerID(lastServerId);
         Response.Add('orders', GenerateKDSData(CopyStr(restaurantId, 1, 20), '', true, true, startingFrom));
         AddServerIDToResponse(Response);
+
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     internal procedure GetSetups(lastServerId: Text) Response: JsonObject
     var
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+        Sentry: Codeunit "NPR Sentry";
+        OwnsTransaction: Boolean;
     begin
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('KDS: GetSetups', 'bc.restaurant.kds.get-setups');
+
         CheckServerID(lastServerId);
         if not RestaurantSetup.Get() then
             RestaurantSetup.Init();
         Response.Add('warningAfterMinutes', RestaurantSetup."Delayed Ord. Threshold 1 (min)");
         Response.Add('errorAfterMinutes', RestaurantSetup."Delayed Ord. Threshold 2 (min)");
         AddServerIDToResponse(Response);
+
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     internal procedure RunKitchenAction(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; KitchenActionToRun: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving"; lastServerId: Text) Response: JsonObject
@@ -73,11 +111,18 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
         KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+        Sentry: Codeunit "NPR Sentry";
         RestaurantCode: Code[20];
+        OwnsTransaction: Boolean;
         MissingContextParamErr: label 'Either ''kitchenRequestId'' or ''orderId'' must be specified.';
     begin
         if (orderId = 0) and (kitchenRequestId = 0) then
             Error(MissingContextParamErr);
+
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('KDS: RunKitchenAction', 'bc.restaurant.kds.run-action.' + Format(KitchenActionToRun).ToLower().Replace(' ', '-'));
+
         CheckServerID(lastServerId);
         RestaurantCode := CopyStr(restaurantId, 1, MaxStrLen(RestaurantCode));
 
@@ -86,6 +131,8 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         if (KitchenActionToRun In [KitchenActionToRun::"Set OnHold", KitchenActionToRun::"Resume"]) and (KitchenRequestId = 0) and (stationId = '') then begin
             KitchenOrder.Get(OrderID);
             KitchenOrderMgt.SetKitchenOrderOnHold(KitchenOrder, KitchenActionToRun = KitchenActionToRun::"Set OnHold");
+            if OwnsTransaction then
+                Sentry.FinalizeScope();
             exit;
         end;
 
@@ -143,17 +190,29 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                 end;
             until KitchenRequest.Next() = 0;
         AddServerIDToResponse(Response);
+
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     internal procedure CreateOrderReadyNotifications(orderId: BigInteger; lastServerId: Text) Response: JsonObject
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
+        Sentry: Codeunit "NPR Sentry";
+        OwnsTransaction: Boolean;
     begin
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('KDS: CreateOrderReadyNotifications', 'bc.restaurant.kds.create-ready-notif');
+
         CheckServerID(lastServerId);
         KitchenOrder.Get(orderId);
         NotificationHandler.CreateOrderNotifications(KitchenOrder, "NPR NPRE Notification Trigger"::KDS_ORDER_READY_FOR_SERVING, 0DT);
         AddServerIDToResponse(Response);
+
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     local procedure GetRestaurantList(restaurantId: Text; var TempRestaurant: Record "NPR NPRE Restaurant")
@@ -182,6 +241,8 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
         KitchenReqStationsQry: Query "NPR NPRE Kitchen Req. Stations";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         CustomerDetailsDic: Dictionary of [Text, List of [Text]];
         KitchenRequests: JsonArray;
         KitchenStations: JsonArray;
@@ -192,6 +253,8 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         LastOrderID: BigInteger;
         LastRequestNo: BigInteger;
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.generate-board-data');
+
         if IncludeFinished or FinishedOnly then begin
             if StartingFromDT = 0DT then
                 StartingFromDT := CurrentDateTime() - JobQueueMgt.DaysToDuration(3);
@@ -293,6 +356,8 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                 FinishKitchenRequest(KitchenRequest, KitchenStations, KitchenRequests);
             FinishOrder(OrderHdr, KitchenRequests, CustomerDetailsDic, Orders);
         end;
+
+        Span.Finish();
     end;
 
     local procedure AddItemAddonsAndComments(KitchenRequestNo: BigInteger) LineModifiers: JsonArray

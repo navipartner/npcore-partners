@@ -92,6 +92,17 @@ codeunit 6248497 "NPR Sentry"
     end;
 
     /// <summary>
+    /// For core use with an explicit sampling rate (0.0 = never .. 1.0 = always). Goes to our core project in sentry.
+    /// Use a low rate for high-frequency transactions (polled APIs, frequently scheduled job queues) to keep telemetry volume down.
+    /// </summary>
+    internal procedure InitScopeAndTransaction(Name: Text; Operation: Text; SamplingRate: Decimal)
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        SentryScope.InitScopeAndTransaction(Name, Operation, SamplingRate);
+#endif
+    end;
+
+    /// <summary>
     /// For core use, goes to our core project in sentry with a centralized sample rate. With StartTime parameter to capture earlier processing.
     /// </summary>
     internal procedure InitScopeAndTransaction(Name: Text; Operation: Text; StartTime: DateTime)

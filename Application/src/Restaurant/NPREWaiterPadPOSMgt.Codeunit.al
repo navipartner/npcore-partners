@@ -76,8 +76,13 @@
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+        LinesSpan: Codeunit "NPR Sentry Span";
         SaleLinesExist: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.save-from-pos');
+
         FilterSupportedSaleLines(SalePOS, SaleLinePOS);
         SaleLinesExist := not SaleLinePOS.IsEmpty();
 
@@ -86,11 +91,13 @@
             UpdateWPHdrFromSaleHdr(SalePOS, WaiterPad);
             SaleLinePOS.FindSet(CleanupSale);
             CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
+            Sentry.StartSpan(LinesSpan, 'bc.restaurant.waiterpad.save-from-pos.move-lines');
             repeat
                 MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, TempLineRelation);
                 TempTouchedWaiterPadLine := WaiterPadLine;
                 TempTouchedWaiterPadLine.Insert();
             until SaleLinePOS.Next() = 0;
+            LinesSpan.Finish();
 
             WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
             WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
@@ -113,8 +120,10 @@
                 RemoveSaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
                 SaleCleanupSuccessful := true;
             end;
-        if not SaleLinesExist then
+        if not SaleLinesExist then begin
+            Span.Finish();
             exit;
+        end;
 
         WaiterPadLine.SetRange("Sale Retail ID");
         WaiterPadLine.MarkedOnly(true);
@@ -124,6 +133,8 @@
 
         Commit();
         RestaurantPrint.LinesAddedToWaiterPad(WaiterPad);
+
+        Span.Finish();
     end;
 
     procedure CleanupWaiterPadOnSaleCancel(SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -215,7 +226,7 @@
         WaiterPad.Modify();
     end;
 
-    procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var LineRelation: Record "Line Number Buffer")
+    local procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var LineRelation: Record "Line Number Buffer")
     var
         WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
         NewLine: Boolean;
@@ -283,8 +294,13 @@
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        Sentry: Codeunit "NPR Sentry";
+        LoadSpan: Codeunit "NPR Sentry Span";
+        CopyLinesSpan: Codeunit "NPR Sentry Span";
         ConfirmMsg: Text;
     begin
+        Sentry.StartSpan(LoadSpan, 'bc.restaurant.waiterpad.load-to-pos');
+
         WaiterPad.CalcFields("Current Seating FF");
 
         POSSession.GetSale(POSSale);
@@ -298,8 +314,10 @@
                 ConfirmMsg := WPInParkedSale
             else
                 ConfirmMsg := WPInAnotherSale;
-            if not Confirm(ConfirmMsg, false, WaiterPad."No.", WaiterPad."Current Seating FF") then
+            if not Sentry.Confirm(StrSubstNo(ConfirmMsg, WaiterPad."No.", WaiterPad."Current Seating FF"), false) then begin
+                LoadSpan.Finish();
                 Error('');
+            end;
         end;
 
         SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
@@ -312,13 +330,18 @@
         POSSession.GetSaleLine(POSSaleLine);
 
         WaiterPadLine.SetRange("Sale Retail ID", GetNullGuid());
-        if WaiterPadLine.FindSet(true) then
+        if WaiterPadLine.FindSet(true) then begin
+            Sentry.StartSpan(CopyLinesSpan, 'bc.restaurant.waiterpad.load-to-pos.copy-lines');
             repeat
                 POSSaleLine.GetNewSaleLine(SaleLinePOS);
                 GetSaleLineFromWaiterPadToPOS(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, POSSaleLine, TempLineRelation);
             until (0 = WaiterPadLine.Next());
+            CopyLinesSpan.Finish();
+        end;
 
         CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", false);
+
+        LoadSpan.Finish();
     end;
 
     local procedure GetSaleLineFromWaiterPadToPOS(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var POSSaleLine: Codeunit "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")
@@ -1110,12 +1133,15 @@
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if IsNullGuid(POSSalesLine.SystemId) then
             exit;
         WaiterPadLine.SetCurrentKey("Sale Line Retail ID");
         WaiterPadLine.SetRange("Sale Line Retail ID", POSSalesLine.SystemId);
         if WaiterPadLine.FindFirst() then begin
+            Sentry.StartSpan(Span, 'bc.restaurant.endsale.update-billed-qty');
             if POSSalesLine."Quantity (Base)" <> 0 then begin
                 if WaiterPadLine."Qty. per Unit of Measure" = POSSalesLine."Qty. per Unit of Measure" then
                     WaiterPadLine.Validate("Billed Quantity", WaiterPadLine."Billed Quantity" + POSSalesLine.Quantity)
@@ -1127,6 +1153,8 @@
 
             if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
                 WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
+
+            Span.Finish();
         end;
     end;
 
@@ -1134,11 +1162,16 @@
     local procedure AttemptToCloseWaiterPadOnSaleFinish(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.endsale.close-waiterpad-on-finish');
         if WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.") then
             WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
+        Span.Finish();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnBeforeLoadFromPOSQuote', '', true, false)]

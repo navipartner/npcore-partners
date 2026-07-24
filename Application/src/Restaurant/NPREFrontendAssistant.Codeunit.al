@@ -219,11 +219,15 @@
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         Request: Codeunit "NPR Front-End: Generic";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         WaiterPadList: JsonArray;
         WaiterPadContent: JsonObject;
         WaiterPadSeatingList: JsonArray;
         WaiterPadSeatingContent: JsonObject;
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.refresh-wp-data');
+
         Request.SetMethod('UpdateWaiterPadData');
 
         if RestaurantCode <> '' then begin
@@ -276,9 +280,10 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
 
         Seating.MarkedOnly(true);
-        if Seating.IsEmpty() then
-            exit;
-        RefreshStatus(FrontEnd, RestaurantCode, '', Seating.GetSelectionFilter());
+        if not Seating.IsEmpty() then
+            RefreshStatus(FrontEnd, RestaurantCode, '', Seating.GetSelectionFilter());
+
+        Span.Finish();
     end;
 
     local procedure RefreshRestaurantLayout(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
@@ -292,6 +297,8 @@
         UserSetup: Record "User Setup";
         Request: Codeunit "NPR Front-End: Generic";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         ComponentList: JsonArray;
         LocationList: JsonArray;
         RestaurantList: JsonArray;
@@ -307,6 +314,8 @@
         AddToList: Boolean;
         IsTable: Boolean;
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.refresh-layout');
+
         if not UserSetup.Get(UserId()) then
             Clear(UserSetup);
         if RestaurantCode <> '' then begin
@@ -435,19 +444,27 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
 
         RefreshStatus(FrontEnd, RestaurantCode, '', '');
+
+        Span.Finish();
     end;
 
     local procedure GetRestaurantLayoutType(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         Response: JsonObject;
         RestLayoutType: Enum "NPR NPRE Restaur. Layout Type";
         RestLayoutTypeText: Text;
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.get-layout-type');
+
         RestLayoutType := SetupProxy.GetRestaurantLayoutType();
         RestLayoutType.Names().Get(RestLayoutType.Ordinals().IndexOf(RestLayoutType.AsInteger()), RestLayoutTypeText);
         Response.Add('restaurantLayoutType', RestLayoutTypeText);
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+
+        Span.Finish();
     end;
 
     internal procedure RefreshWaiterPadContent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -631,25 +648,36 @@
     local procedure RefreshCustomerDisplayKitchenOrders(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.frontend-assistant.obsolete.refresh-customer-display');
         KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
         FrontEnd.RespondToFrontEndMethod(Context, KDSFrontendAssistImpl.RefreshCustomerDisplayKitchenOrders(GetRestaurantCode(Context, false), ''), FrontEnd);
+        Span.Finish();
     end;
 
     [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure GetSetups(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.frontend-assistant.obsolete.get-setups');
         KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
         FrontEnd.RespondToFrontEndMethod(Context, KDSFrontendAssistImpl.GetSetups(''), FrontEnd);
+        Span.Finish();
     end;
 
     [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure RefreshKDSData(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.frontend-assistant.obsolete.refresh-kds-data');
         KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
         FrontEnd.RespondToFrontEndMethod(
             Context,
@@ -660,18 +688,22 @@
                 _JsonHelper.GetJDT(Context.AsToken(), 'startingFrom', false),
                 ''),
             FrontEnd);
+        Span.Finish();
     end;
 
     [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure RunKitchenAction(Context: JsonObject; ActionToRun: Option)
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         RestaurantCode: Code[20];
         KitchenStationFilter: Text;
         KitchenRequestId: BigInteger;
         OrderID: BigInteger;
         KitchenRequestIdTok: label 'kitchenRequestId', Locked = true;
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.frontend-assistant.obsolete.run-kitchen-action');
         KitchenRequestId := _JsonHelper.GetJBigInteger(Context.AsToken(), KitchenRequestIdTok, false);
         OrderID := _JsonHelper.GetJBigInteger(Context.AsToken(), _OrderIdTok, KitchenRequestId = 0);
         KitchenStationFilter := GetKitchenStationIDFilter(Context);
@@ -679,6 +711,7 @@
 
         KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
         KDSFrontendAssistImpl.RunKitchenAction(RestaurantCode, KitchenStationFilter, KitchenRequestId, OrderID, ActionToRun, '');
+        Span.Finish();
     end;
 
     [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
@@ -686,10 +719,14 @@
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         OrderID: BigInteger;
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.frontend-assistant.obsolete.create-order-ready-notifications');
         OrderID := _JsonHelper.GetJBigInteger(Context.AsToken(), _OrderIdTok, true);
         KitchenOrder.Get(OrderID);
         NotificationHandler.CreateOrderNotifications(KitchenOrder, "NPR NPRE Notification Trigger"::KDS_ORDER_READY_FOR_SERVING, 0DT);
+        Span.Finish();
     end;
 }

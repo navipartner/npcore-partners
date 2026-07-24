@@ -22,6 +22,7 @@
 
     internal procedure LinesAddedToWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
     var
+        Sentry: Codeunit "NPR Sentry";
         Confirmed: Boolean;
         PrintKitchOderConfMsg: Label 'Do you want to send the order to the kitchen now?';
     begin
@@ -32,7 +33,7 @@
             Enum::"NPR NPRE Auto Send Kitch.Order"::Yes:
                 Confirmed := true;
             Enum::"NPR NPRE Auto Send Kitch.Order"::Ask:
-                Confirmed := Confirm(PrintKitchOderConfMsg, true);
+                Confirmed := Sentry.Confirm(PrintKitchOderConfMsg, true);
         end;
         if Confirmed then
             PrintWaiterPadToKitchen(WaiterPad, _PrintTemplate."Print Type"::"Kitchen Order", '', false, false);
@@ -50,11 +51,19 @@
     internal procedure PrintWaiterPadLinesToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
     var
         NewRestaurantPrintExp: Codeunit "NPR New Restaurant Print Exp.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+        Result: Boolean;
     begin
-        if NewRestaurantPrintExp.IsFeatureEnabled() then
-            exit(PrintWaiterPadLinesToKitchenNew(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr))
-        else
-            exit(PrintWaiterPadLinesToKitchenOld(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr));
+        if NewRestaurantPrintExp.IsFeatureEnabled() then begin
+            Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen');
+            Result := PrintWaiterPadLinesToKitchenNew(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr)
+        end else begin
+            Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen-legacy');
+            Result := PrintWaiterPadLinesToKitchenOld(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr);
+        end;
+        Span.Finish();
+        exit(Result);
     end;
 
     local procedure PrintWaiterPadLinesToKitchenOld(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
@@ -213,6 +222,8 @@
     var
         TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         OutputType: Integer;
         AskResendConfirmation: Boolean;
         OutputTypeIsActive: Boolean;
@@ -234,6 +245,8 @@
                 ForceResend := _SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Yes;
         end;
 
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen.buffer-legacy');
+
         WPadLineBuffer.Reset();
         WPadLineBuffer.DeleteAll();
 
@@ -251,6 +264,7 @@
                   WaiterPadLine, OutputType, PrintType, FlowStatus, TempPrintCategory, ForceResend, AskResendConfirmation, WPadLineBuffer);
         end;
 
+        Span.Finish();
         exit(not WPadLineBuffer.IsEmpty());
     end;
 
@@ -258,11 +272,15 @@
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         PrintCategoryFilter: Text;
         SelectedSendOption: Option Cancel,"Only New",All;
     begin
-        if WaiterPadLine.IsEmpty or FlowStatus.IsEmpty or PrintCategory.IsEmpty then
+        if WaiterPadLine.IsEmpty() or FlowStatus.IsEmpty() or PrintCategory.IsEmpty() then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.buffer-eligible-lines-legacy');
 
         FlowStatus.SetCurrentKey("Status Object", "Flow Order");
         FlowStatus.FindSet();
@@ -284,7 +302,7 @@
                                 then begin
                                     AskResendConfirmation := false;
                                     SelectedSendOption :=
-                                      StrMenu(ResendOptions, 1,
+                                      Sentry.StrMenu(ResendOptions, 1,
                                         StrSubstNo(LinesHaveAlreadyBeenSent, WaiterPad.FieldCaption("Serving Step Code"), FlowStatus.Code, PrintCategory.TableCaption, PrintCategory.Code));
                                     if SelectedSendOption = SelectedSendOption::Cancel then
                                         Error('');
@@ -306,12 +324,16 @@
                     until PrintCategory.Next() = 0;
             until WaiterPadLine.Next() = 0;
         until FlowStatus.Next() = 0;
+
+        Span.Finish();
     end;
 
     local procedure BufferWPadLinesForSending(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; ForceResend: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"): Boolean
     var
         TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         OutputType: Integer;
         AskResendConfirmation: Boolean;
         OutputTypeIsActive: Boolean;
@@ -333,6 +355,8 @@
                 ForceResend := _SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Yes;
         end;
 
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen.buffer');
+
         WPadLineBuffer.Reset();
         WPadLineBuffer.DeleteAll();
 
@@ -350,6 +374,7 @@
                   WaiterPadLine, OutputType, PrintType, FlowStatus, TempPrintCategory, ForceResend, AskResendConfirmation, WPadLineBuffer);
         end;
 
+        Span.Finish();
         exit(not WPadLineBuffer.IsEmpty());
     end;
 
@@ -357,12 +382,16 @@
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         PrintCategoryFilter: Text;
         SelectedSendOption: Option Cancel,"Only New",All;
         NextEntryNo: Integer;
     begin
-        if WaiterPadLine.IsEmpty or FlowStatus.IsEmpty or PrintCategory.IsEmpty then
+        if WaiterPadLine.IsEmpty() or FlowStatus.IsEmpty() or PrintCategory.IsEmpty() then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.buffer-eligible-lines');
 
         if WPadLineBuffer.FindLast() then
             NextEntryNo := WPadLineBuffer."Entry No." + 1
@@ -389,7 +418,7 @@
                                 then begin
                                     AskResendConfirmation := false;
                                     SelectedSendOption :=
-                                      StrMenu(ResendOptions, 1,
+                                      Sentry.StrMenu(ResendOptions, 1,
                                         StrSubstNo(LinesHaveAlreadyBeenSent, WaiterPad.FieldCaption("Serving Step Code"), FlowStatus.Code, PrintCategory.TableCaption, PrintCategory.Code));
                                     if SelectedSendOption = SelectedSendOption::Cancel then
                                         Error('');
@@ -412,6 +441,8 @@
                     until PrintCategory.Next() = 0;
             until WaiterPadLine.Next() = 0;
         until FlowStatus.Next() = 0;
+
+        Span.Finish();
     end;
 
     local procedure WPadLineIsInScopeForSending(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; OutputType: Integer; ServingStepCode: Code[10]; PrintCategoryCode: Code[20]): Boolean
@@ -530,7 +561,10 @@
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.send-to-print-legacy');
         if PrintTemplateBuffer.FindFirst() then
             repeat
                 PrintTemplateBuffer.SetRecFilter();
@@ -565,14 +599,19 @@
                 PrintTemplateBuffer.DeleteAll();
                 PrintTemplateBuffer.Reset();
             until not PrintTemplateBuffer.FindFirst();
+        Span.Finish();
     end;
 
     local procedure SendToPrint(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
     var
         TempJobBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if not PrintTemplateBuffer.FindFirst() then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.send-to-print');
         repeat
             PrintTemplateBuffer.SetRange("Output Type", PrintTemplateBuffer."Output Type");
             PrintTemplateBuffer.SetRange("Waiter Pad No.", PrintTemplateBuffer."Waiter Pad No.");
@@ -593,6 +632,7 @@
             PrintTemplateBuffer.DeleteAll();
             PrintTemplateBuffer.Reset();
         until not PrintTemplateBuffer.FindFirst();
+        Span.Finish();
     end;
 
     local procedure FindPrintTemplates(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]; var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer") TemplateFound: Boolean

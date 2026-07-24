@@ -181,7 +181,11 @@
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.merge');
+
         SetPartySize(MergeToWaiterPad, MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests");
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";
         if MergeToWaiterPad."Customer No." = '' then
@@ -207,12 +211,16 @@
         end;
 
         TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
+
+        Span.Finish();
         exit(true);
     end;
 
     procedure TryCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; ForceClose: Boolean; CloseReason: Enum "NPR NPRE W/Pad Closing Reason")
     var
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         IsServed: Option Undefined,No,Yes;
         Handled: Boolean;
         OK: Boolean;
@@ -220,11 +228,15 @@
         if WaiterPad.Closed then
             exit;
 
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.close');
+
         SetupProxy.InitializeUsingWaiterPad(WaiterPad);
 
         OnBeforeCloseWaiterPad(WaiterPad, SetupProxy, ForceClose, Handled);
-        if Handled then
+        if Handled then begin
+            Span.Finish();
             exit;
+        end;
 
         CleanupWaiterPad(WaiterPad);
         OK := ForceClose;
@@ -249,6 +261,8 @@
 
         if OK then
             OnAfterCloseWaiterPad(WaiterPad);
+
+        Span.Finish();
     end;
 
     procedure ReopenWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -268,14 +282,20 @@
     procedure CloseWaiterPadSeatings(var WaiterPad: Record "NPR NPRE Waiter Pad"; Close: Boolean)
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
         SeatingWaiterPadLink.SetRange(Closed, not Close);
-        if SeatingWaiterPadLink.FindSet() then
-            repeat
-                CloseWaiterPadSeatingLink(SeatingWaiterPadLink, Close);
-            until SeatingWaiterPadLink.Next() = 0;
+        if not SeatingWaiterPadLink.FindSet() then
+            exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.close-seatings');
+        repeat
+            CloseWaiterPadSeatingLink(SeatingWaiterPadLink, Close);
+        until SeatingWaiterPadLink.Next() = 0;
+        Span.Finish();
     end;
 
     local procedure CloseWaiterPadSeatingLink(SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"; Close: Boolean)

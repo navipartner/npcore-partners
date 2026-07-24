@@ -15,6 +15,7 @@ codeunit 6184778 "NPR NPRE Create Notifics JQ"
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
+        Sentry: Codeunit "NPR Sentry";
         NotifTrigger: Enum "NPR NPRE Notification Trigger";
         ResendDelay: Duration;
         Threshold1: DateTime;
@@ -23,6 +24,8 @@ codeunit 6184778 "NPR NPRE Create Notifics JQ"
     begin
         if not RestaurantSetup.Get() or ((RestaurantSetup."Delayed Ord. Threshold 1 (min)" <= 0) and (RestaurantSetup."Delayed Ord. Threshold 2 (min)" <= 0)) then
             exit;
+
+        Sentry.InitScopeAndTransaction('NPRE Create Delayed Notifications JQ', 'bc.restaurant.notif.create-delayed', 0.1); // runs every minute - low sampling
 
         ResendDelay := JobQueueMgt.MinutesToDuration(RestaurantSetup."Notif. Resend Delay (min)");
 
@@ -58,5 +61,7 @@ codeunit 6184778 "NPR NPRE Create Notifics JQ"
                     end;
                 end;
             until KitchenOrder.Next() = 0;
+
+        Sentry.FinalizeScope();
     end;
 }

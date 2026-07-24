@@ -49,23 +49,28 @@ codeunit 6150994 "NPR Sentry Scope"
     end;
 
     internal procedure InitScopeAndTransaction(Name: Text; Operation: Text; ExternalTraceId: Text; ExternalSpanId: Text; ExternalSampled: Boolean; StartTime: DateTime)
-    var
-        ModuleInfo: ModuleInfo;
-        ReleaseVersion: Text;
     begin
         if HasActiveTransaction() then
             if FinalizeScope() then;
 
         ResetState();
 
-        NavApp.GetCurrentModuleInfo(ModuleInfo);
-        if (ModuleInfo.AppVersion.Major < 9999) then begin
-            ReleaseVersion := StrSubstNo('npretail@%1', ModuleInfo.AppVersion);
-        end else begin
-            ReleaseVersion := 'npretail@dev';
-        end;
+        InitScopeAndTransaction(Name, Operation, '', GetReleaseVersion(), 1.0, ExternalTraceId, ExternalSpanId, ExternalSampled, StartTime);
+    end;
 
-        InitScopeAndTransaction(Name, Operation, '', ReleaseVersion, 1.0, ExternalTraceId, ExternalSpanId, ExternalSampled, StartTime);
+    internal procedure InitScopeAndTransaction(Name: Text; Operation: Text; SamplingRate: Decimal)
+    begin
+        InitScopeAndTransaction(Name, Operation, '', GetReleaseVersion(), SamplingRate, '', '', false, CurrentDateTime());
+    end;
+
+    local procedure GetReleaseVersion(): Text
+    var
+        ModuleInfo: ModuleInfo;
+    begin
+        NavApp.GetCurrentModuleInfo(ModuleInfo);
+        if ModuleInfo.AppVersion.Major < 9999 then
+            exit(StrSubstNo('npretail@%1', ModuleInfo.AppVersion));
+        exit('npretail@dev');
     end;
 
     local procedure ResetState()

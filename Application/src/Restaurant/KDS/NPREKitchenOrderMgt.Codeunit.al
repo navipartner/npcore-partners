@@ -12,11 +12,15 @@
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         LastUpdatedKitchenOrderID: BigInteger;
         Success: Boolean;
     begin
         if not (RequestType in [RequestType::Order, RequestType::"Serving Request"]) then
             exit(false);
+
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.send-lines-to-kitchen');
 
         if SentDateTime = 0DT then
             SentDateTime := CurrentDateTime();
@@ -30,6 +34,7 @@
                 end;
             until WaiterPadLine.Next() = 0;
 
+        Span.Finish();
         exit(Success);
     end;
 
@@ -41,10 +46,17 @@
         KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link";
         KitchenStation: Record "NPR NPRE Kitchen Station";
         TempKitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
+        Sentry: Codeunit "NPR Sentry";
+        RouteSpan: Codeunit "NPR Sentry Span";
+        CreateSpan: Codeunit "NPR Sentry Span";
         TouchedKitchenOrderList: List of [BigInteger];
         TouchedKitchenOrderID: BigInteger;
+        StationsFound: Boolean;
     begin
-        if not FindApplicableWPLineKitchenStations(TempKitchenStationBuffer, WaiterPadLine, FlowStatusCode, PrintCategoryCode) then
+        Sentry.StartSpan(RouteSpan, 'bc.restaurant.kds.send-lines-to-kitchen.route-stations');
+        StationsFound := FindApplicableWPLineKitchenStations(TempKitchenStationBuffer, WaiterPadLine, FlowStatusCode, PrintCategoryCode);
+        RouteSpan.Finish();
+        if not StationsFound then
             exit(false);
 
         WaiterPad.CalcFields("Current Seating FF");
@@ -62,6 +74,8 @@
 
         if KitchenRequest.IsEmpty() then
             exit(false);
+
+        Sentry.StartSpan(CreateSpan, 'bc.restaurant.kds.send-lines-to-kitchen.create-station-requests');
         KitchenRequest.FindSet(RequestType = RequestType::"Serving Request");
         repeat
             KitchenRequest2 := KitchenRequest;
@@ -82,6 +96,7 @@
             if not TouchedKitchenOrderList.Contains(KitchenRequest2."Order ID") then
                 TouchedKitchenOrderList.Add(KitchenRequest2."Order ID");
         until KitchenRequest.Next() = 0;
+        CreateSpan.Finish();
 
         foreach TouchedKitchenOrderID in TouchedKitchenOrderList do
             UpdateOrderStatus(TouchedKitchenOrderID);
@@ -523,9 +538,14 @@
     end;
 
     procedure SetProductionNotStarted(var KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if KitchenRequestStation."Production Status" in [KitchenRequestStation."Production Status"::Pending, KitchenRequestStation."Production Status"::"Not Started"] then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.set-production-not-started');
         CheckCurrentStatusAndConfirmChange(KitchenRequest, KitchenRequestStation);
         ConfirmAndRevokeServingIfServed(KitchenRequest);
 
@@ -537,6 +557,7 @@
         KitchenRequestStation.Modify();
         ForwardKitchenStationRequestStatuses(KitchenRequestStation, 0);
         UpdateRequestStatusesFromStation(KitchenRequestStation, true);
+        Span.Finish();
     end;
 
     procedure StartProduction(var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
@@ -548,9 +569,14 @@
     end;
 
     procedure StartProduction(var KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::Started then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.start-production');
         CheckCurrentStatusAndConfirmChange(KitchenRequest, KitchenRequestStation);
         ConfirmAndRevokeServingIfServed(KitchenRequest);
 
@@ -562,10 +588,13 @@
         KitchenRequestStation.Modify();
         ForwardKitchenStationRequestStatuses(KitchenRequestStation, 0);
         UpdateRequestStatusesFromStation(KitchenRequestStation, true);
+        Span.Finish();
     end;
 
     procedure EndProduction(var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
     var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
         NotStartedMsg: Label 'Production of the item hasn’t started yet. Are you sure you want to mark it as finished now?';
     begin
         if KitchenRequestStation."Production Status" in
@@ -581,7 +610,9 @@
                 if not Confirm(NotStartedMsg, true) then
                     Error('');
 
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.end-production');
         SetKitchenRequestStationFinished(KitchenRequestStation);
+        Span.Finish();
     end;
 
     procedure AcceptQtyChange(var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
@@ -629,7 +660,12 @@
     end;
 
     local procedure UpdateRequestStatuses(var KitchenRequest: Record "NPR NPRE Kitchen Request"; RefreshOrderStatus: Boolean)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.update-request-statuses');
+
         UpdateRequestProdStatus(KitchenRequest);
         UpdateRequestLineStatus(KitchenRequest);
         KitchenRequest.Modify();
@@ -642,6 +678,8 @@
                     SetRequestLineAsServed(KitchenRequest);
             end;
         end;
+
+        Span.Finish();
     end;
 
     local procedure UpdateRequestProdStatus(var KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -723,10 +761,14 @@
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         xKitchenOrder: Record "NPR NPRE Kitchen Order";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         NPRERestaurantWebhook: Codeunit "NPR NPRE Restaurant Webhooks";
 #endif
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.update-order-status');
+
         KitchenOrder.Get(OrderID);
         xKitchenOrder := KitchenOrder;
         UpdateOrderStatus(KitchenOrder);
@@ -739,6 +781,8 @@
                 NPRERestaurantWebhook.InvokeOrderReadyForServingWebhook(KitchenOrder.SystemId);
 #endif
             end;
+
+        Span.Finish();
     end;
 
     internal procedure UpdateOrderStatus(var KitchenOrder: Record "NPR NPRE Kitchen Order")
@@ -820,10 +864,13 @@
     var
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
         TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if KitchenRequest.IsEmpty() then
             exit;
 
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.set-served-batch');
         CheckLineStatusesBeforeServing(KitchenRequest);
 
         if KitchenRequest.FindSet() then
@@ -833,14 +880,19 @@
             until KitchenRequest.Next() = 0;
 
         UpdateOrderStatuses(TouchedKitchenOrders);
+        Span.Finish();
     end;
 
     procedure SetRequestLineAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request")
     var
         TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.set-served');
         SetRequestLineAsServed(KitchenRequest, TouchedKitchenOrders);
         UpdateOrderStatuses(TouchedKitchenOrders);
+        Span.Finish();
     end;
 
     local procedure SetRequestLineAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request"; TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
@@ -875,10 +927,14 @@
     procedure RevokeServingForRequestLine(var KitchenRequest: Record "NPR NPRE Kitchen Request"; RefreshOrderStatus: Boolean)
     var
         TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.revoke-serving');
         RevokeServingForRequestLine(KitchenRequest, TouchedKitchenOrders);
         if RefreshOrderStatus then
             UpdateOrderStatuses(TouchedKitchenOrders);
+        Span.Finish();
     end;
 
     local procedure RevokeServingForRequestLine(var KitchenRequest: Record "NPR NPRE Kitchen Request"; TouchedKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
@@ -1011,7 +1067,10 @@
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.cancel-order');
         KitchenRequest.SetCurrentKey("Order ID");
         KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
         if KitchenRequest.FindSet() then
@@ -1022,6 +1081,8 @@
 
         UpdateOrderStatus(KitchenOrder);
         KitchenOrder.Modify();
+
+        Span.Finish();
     end;
 
     procedure CancelKitchenRequest(var KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -1096,9 +1157,13 @@
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
         KitchenRequestStation2: Record "NPR NPRE Kitchen Req. Station";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if KitchenOrder."On Hold" = NewOnHold then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.set-order-on-hold');
 
         KitchenRequest.SetCurrentKey("Order ID");
         KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
@@ -1117,9 +1182,14 @@
         KitchenOrder."On Hold" := NewOnHold;
         UpdateOrderStatus(KitchenOrder);
         KitchenOrder.Modify();
+
+        Span.Finish();
     end;
 
     procedure SetKitchenRequestStationOnHold(var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station"; NewOnHold: Boolean; RefreshOrderStatus: Boolean)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         if KitchenRequestStation."On Hold" = NewOnHold then
             exit;
@@ -1130,9 +1200,11 @@
         then
             exit;
 
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.set-station-on-hold');
         KitchenRequestStation."On Hold" := NewOnHold;
         KitchenRequestStation.Modify();
         UpdateRequestStatusesFromStation(KitchenRequestStation, RefreshOrderStatus);
+        Span.Finish();
     end;
 
     local procedure AttemptToCloseSourceDocument(KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -1140,11 +1212,15 @@
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         KitchReqSrcbyDoc: Query "NPR NPRE Kitch.Req.Src. by Doc";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         KitchReqSrcbyDoc.SetRange(Request_No_, KitchenRequest."Request No.");
         KitchReqSrcbyDoc.SetFilter(QuantityBase, '<>%1', 0);
         if not KitchReqSrcbyDoc.Open() then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.close-source-document');
         while KitchReqSrcbyDoc.Read() do
             case KitchReqSrcbyDoc.Source_Document_Type of
                 KitchReqSrcbyDoc.Source_Document_Type::"Waiter Pad":
@@ -1152,6 +1228,7 @@
                         WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
             end;
         KitchReqSrcbyDoc.Close();
+        Span.Finish();
     end;
 
     local procedure ReopenSourceDocument(KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -1159,11 +1236,15 @@
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         KitchReqSrcbyDoc: Query "NPR NPRE Kitch.Req.Src. by Doc";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
     begin
         KitchReqSrcbyDoc.SetRange(Request_No_, KitchenRequest."Request No.");
         KitchReqSrcbyDoc.SetFilter(QuantityBase, '<>%1', 0);
         if not KitchReqSrcbyDoc.Open() then
             exit;
+
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.reopen-source-document');
         while KitchReqSrcbyDoc.Read() do
             case KitchReqSrcbyDoc.Source_Document_Type of
                 KitchReqSrcbyDoc.Source_Document_Type::"Waiter Pad":
@@ -1171,6 +1252,7 @@
                         WaiterPadMgt.ReopenWaiterPad(WaiterPad);
             end;
         KitchReqSrcbyDoc.Close();
+        Span.Finish();
     end;
 
     procedure UpdateKitchenReqSourceSeating(SourceDocType: Enum "NPR NPRE K.Req.Source Doc.Type"; SourceDocSubtype: Integer; SourceDocNo: Code[20]; SourceDocLinNo: Integer; NewSeatingCode: Code[20])
