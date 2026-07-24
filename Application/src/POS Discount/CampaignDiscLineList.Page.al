@@ -112,5 +112,11 @@ page 6059878 "NPR Campaign Disc. Line List"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        Rec.SetVariantCodeFilter();
+        Rec.CalcFields(Inventory, "Quantity On Purchase Order");
+    end;
 }
 

@@ -187,4 +187,10 @@ page 6014476 "NPR APIV1 - Camp. Disc. Lines"
 #ENDIF
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        Rec.SetVariantCodeFilter();
+        Rec.CalcFields(Inventory, "Quantity On Purchase Order", "Quantity Sold", Turnover);
+    end;
+
 }

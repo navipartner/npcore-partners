@@ -143,5 +143,11 @@
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        Rec.SetVariantCodeFilter();
+        Rec.CalcFields(Inventory, "Quantity On Purchase Order");
+    end;
 }
 

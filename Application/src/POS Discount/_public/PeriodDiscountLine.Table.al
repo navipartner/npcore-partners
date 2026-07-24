@@ -22,7 +22,7 @@
 
             trigger OnValidate()
             begin
-               CalcFields(Description, "Unit Price");
+                CalcFields(Description, "Unit Price");
 
                 Item.Get("Item No.");
                 "Vendor No." := Item."Vendor No.";
@@ -243,6 +243,12 @@
             Caption = 'Location Filter';
             FieldClass = FlowFilter;
         }
+        field(34; "Variant Filter"; Code[10])
+        {
+            Caption = 'Variant Filter';
+            FieldClass = FlowFilter;
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+        }
         field(35; "Starting Time"; Time)
         {
             Caption = 'Starting Date';
@@ -261,7 +267,8 @@
                                                                   "Posting Date" = FIELD("Date Filter"),
                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                  "Location Code" = FIELD("Location Filter")));
+                                                                  "Location Code" = FIELD("Location Filter"),
+                                                                  "Variant Code" = FIELD("Variant Filter")));
             Caption = 'Inventory Quantity';
             Editable = false;
             FieldClass = FlowField;
@@ -274,7 +281,8 @@
                                                                                "Order Date" = FIELD("Date Filter"),
                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Location Code" = FIELD("Location Filter")));
+                                                                               "Location Code" = FIELD("Location Filter"),
+                                                                               "Variant Code" = FIELD("Variant Filter")));
             Caption = 'Quantity in Purchase Order';
             Editable = false;
             FieldClass = FlowField;
@@ -290,7 +298,8 @@
                                     "Entry Date" = FIELD("Date Filter"),
                                     "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                     "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                    "Location Code" = FIELD("Location Filter")));
+                                    "Location Code" = FIELD("Location Filter"),
+                                    "Variant Code" = FIELD("Variant Filter")));
             Caption = 'Sold Quantity';
             Editable = false;
             FieldClass = FlowField;
@@ -306,7 +315,8 @@
                                 "Posting Date" = FIELD("Date Filter"),
                                 "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                 "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                "Location Code" = FIELD("Location Filter")));
+                                "Location Code" = FIELD("Location Filter"),
+                                "Variant Code" = FIELD("Variant Filter")));
             Caption = 'Turnover';
             Editable = false;
             FieldClass = FlowField;
@@ -506,6 +516,14 @@
         Text1060005: Label 'This items includes multi unit prices, which will be controlled by period discounts';
         VATPostingSetup: Record "VAT Posting Setup";
         VATPct: Decimal;
+
+    internal procedure SetVariantCodeFilter()
+    begin
+        if "Variant Code" <> '' then
+            SetRange("Variant Filter", "Variant Code")
+        else
+            SetRange("Variant Filter");
+    end;
 
     internal procedure ShowComment()
     var
