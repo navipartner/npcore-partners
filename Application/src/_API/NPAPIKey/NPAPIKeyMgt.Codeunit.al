@@ -203,6 +203,9 @@ codeunit 6248565 "NPR NP API Key Mgt."
     begin
         EntraApp.Reset();
         EntraApp.SetRange("NPR NaviPartner API Key Id", NPAPIKey.Id);
+        // Guard order matters: RemoveApiKeyMetadata relies on this exiting before the permission
+        // check below during the environment-cleanup wipe (the AAD links are nulled first, so this
+        // always misses and exits, even though the permission rows are still being deleted).
         if (not EntraApp.FindFirst()) then
             exit;
 
@@ -551,11 +554,19 @@ codeunit 6248565 "NPR NP API Key Mgt."
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NaviPartner API Key Perm.", OnAfterDeleteEvent, '', false, false)]
     local procedure NPRNPAPIKeyPermissionOnAfterDeleteEvent(var Rec: Record "NPR NaviPartner API Key Perm.")
+    var
+        NPAPIKey: Record "NPR NaviPartner API Key";
     begin
         if (Rec.IsTemporary()) then
             exit;
 
-        SynchronizeApiKeyPermissionsToEntraApps(Rec."NPR NP API Key Id");
+        // Tolerant on purpose: deleting a permission row must survive a missing parent key
+        // (restore-carried orphan rows during the environment-cleanup wipe). The insert/rename
+        // subscribers keep the loud Get in the Guid overload so an orphaned reference rolls back.
+        if (not NPAPIKey.Get(Rec."NPR NP API Key Id")) then
+            exit;
+
+        SynchronizeApiKeyPermissionsToEntraApps(NPAPIKey);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NaviPartner API Key Perm.", OnAfterRenameEvent, '', false, false)]
@@ -565,6 +576,73 @@ codeunit 6248565 "NPR NP API Key Mgt."
             exit;
 
         SynchronizeApiKeyPermissionsToEntraApps(Rec."NPR NP API Key Id");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", OnClearDatabaseConfig, '', false, false)]
+    local procedure NPRNPAPIKeyOnClearDatabaseConfig(SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    begin
+        if (DestinationEnv <> DestinationEnv::Sandbox) then
+            exit;
+
+        RemoveApiKeyMetadata();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", OnClearCompanyConfig, '', false, false)]
+    local procedure NPRNPAPIKeyOnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    begin
+        if (DestinationEnv <> DestinationEnv::Sandbox) then
+            exit;
+
+        RemoveObsoleteApiKeyMetadata(CompanyName);
+    end;
+
+    // Removes the cross-company API key metadata (DataPerCompany = false) when an environment copy
+    // or restore lands in a sandbox. No worker calls are made on purpose: the actual keys live in the
+    // Cloudflare worker and stay owned by the source environment.
+    // The formerly linked Entra applications are intentionally left enabled here (with their users and
+    // permission-set assignments). This wipe only detaches the API key metadata; restricting the
+    // inherited service-to-service access in a sandbox is a separate environment-hardening concern.
+    // ORDER IS REQUIRED, do not reorder: the Entra application links must be cleared BEFORE deleting the
+    // permission rows. The permission table's OnAfterDelete subscriber fires per row even with
+    // RunTrigger = false, and only because the links are already cleared does it exit early (no Entra
+    // app is linked to the key anymore) instead of erroring / attempting a permission sync mid-wipe.
+    local procedure RemoveApiKeyMetadata()
+    var
+        AADApplication: Record "AAD Application";
+        NPAPIKey: Record "NPR NaviPartner API Key";
+        NPAPIKeyPermission: Record "NPR NaviPartner API Key Perm.";
+        NullGuid: Guid;
+    begin
+        AADApplication.SetFilter("NPR NaviPartner API Key Id", '<>%1', NullGuid);
+        if (not AADApplication.IsEmpty()) then
+            AADApplication.ModifyAll("NPR NaviPartner API Key Id", NullGuid, false);
+
+#pragma warning disable AL0432
+        AADApplication.Reset();
+        AADApplication.SetFilter("NPR NP API Key Id", '<>%1', NullGuid);
+        if (not AADApplication.IsEmpty()) then
+            AADApplication.ModifyAll("NPR NP API Key Id", NullGuid, false);
+#pragma warning restore AL0432
+
+        NPAPIKeyPermission.DeleteAll(false);
+        NPAPIKey.DeleteAll(false);
+    end;
+
+    // Removes the obsolete per-company predecessor tables that a restore may still carry data in.
+    local procedure RemoveObsoleteApiKeyMetadata(CompanyNameParam: Text)
+#pragma warning disable AL0432
+    var
+        ObsoleteNPAPIKey: Record "NPR NP API Key";
+        ObsoleteNPAPIKeyPermission: Record "NPR NP API Key Permission";
+    begin
+        if (CompanyNameParam = '') then
+            exit;
+
+        ObsoleteNPAPIKey.ChangeCompany(CompanyNameParam);
+        ObsoleteNPAPIKeyPermission.ChangeCompany(CompanyNameParam);
+        ObsoleteNPAPIKeyPermission.DeleteAll(false);
+        ObsoleteNPAPIKey.DeleteAll(false);
+#pragma warning restore AL0432
     end;
 }
 #endif
