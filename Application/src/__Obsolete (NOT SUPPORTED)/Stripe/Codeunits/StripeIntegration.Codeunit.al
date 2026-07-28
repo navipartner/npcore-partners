@@ -25,19 +25,6 @@ codeunit 6059807 "NPR Stripe Integration"
         Handled := not UsingRegularInvoicing;
     end;
 
-    // following areas are restricting app usage if the app subscription is not active or user is not defined as app user
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Conf./Personalization Mgt.", 'OnRoleCenterOpen', '', true, true)]
-    local procedure CheckSubscriptionStatus_OnOpenRoleCenter()
-    begin
-        OnCheckSubscriptionStatus(false);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Stripe Subs Usage Check", 'OnAfterRunCheck', '', false, false)]
-    local procedure CheckSubscriptionStatus_OnAfterRunCheck()
-    begin
-        OnCheckSubscriptionStatus(true);
-    end;
-
     local procedure UpdateStripeSetup(UsingRegularInvoicing: Boolean)
     var
         StripeSetup: Record "NPR Stripe Setup";
@@ -83,10 +70,5 @@ codeunit 6059807 "NPR Stripe Integration"
                 exit(false);
 
         exit(true);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckSubscriptionStatus(ThrowSubscriptionIsNotValidErr: Boolean)
-    begin
     end;
 }
