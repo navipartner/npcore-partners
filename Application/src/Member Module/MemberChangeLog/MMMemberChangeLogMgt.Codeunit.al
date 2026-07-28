@@ -30,6 +30,13 @@ codeunit 6151252 "NPR MM Member Change Log Mgt"
         if (DatabaseTriggersDisabled()) then
             exit;
 
+        RecRef.SetTable(Member);
+        // Anonymized members are not tracked; the anonymization process purges their change log separately.
+        // Both flags are required because "Block Reason" is sticky (never cleared on unblock), so an unblocked and
+        // reused member must resume tracking - the anonymizing Modify sets both flags in one write, so it stays suppressed.
+        if (Member.Blocked and (Member."Block Reason" = Member."Block Reason"::ANONYMIZED)) then
+            exit;
+
         xRecRef.Open(RecRef.Number, false, RecRef.CurrentCompany());
         xRecRef.ReadIsolation := IsolationLevel::ReadCommitted;
         xRecRef.SecurityFiltering := SecurityFilter::Filtered;
@@ -39,7 +46,6 @@ codeunit 6151252 "NPR MM Member Change Log Mgt"
                 exit;
         end;
 
-        RecRef.SetTable(Member);
         xRecRef.SetTable(xMember);
 
         foreach FieldNo in TrackedFieldNumbers() do begin
@@ -65,6 +71,16 @@ codeunit 6151252 "NPR MM Member Change Log Mgt"
         RecRef.SetTable(Member);
         MemberChangeLog.SetRange("Member Entry No.", Member."Entry No.");
         if (not MemberChangeLog.IsEmpty()) then
+            MemberChangeLog.DeleteAll();
+    end;
+
+    internal procedure DeleteMemberChangeLogForMember(MemberEntryNo: Integer) DeletedCount: Integer
+    var
+        MemberChangeLog: Record "NPR MM Member Change Log";
+    begin
+        MemberChangeLog.SetRange("Member Entry No.", MemberEntryNo);
+        DeletedCount := MemberChangeLog.Count();
+        if (DeletedCount > 0) then
             MemberChangeLog.DeleteAll();
     end;
 

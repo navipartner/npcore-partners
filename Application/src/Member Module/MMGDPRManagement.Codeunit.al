@@ -344,6 +344,7 @@
         DummyEMailAddressLbl: Label '%1@anon.%2.navipartner.com', Locked = true;
 #pragma warning restore
         MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+        MemberChangeLogMgt: Codeunit "NPR MM Member Change Log Mgt";
     begin
 
         Member.Get(MemberEntryNo);
@@ -374,6 +375,8 @@
         Member."Block Reason" := Member."Block Reason"::ANONYMIZED;
 
         Member.Modify(true);
+
+        MemberChangeLogMgt.DeleteMemberChangeLogForMember(MemberEntryNo);
 
         MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);

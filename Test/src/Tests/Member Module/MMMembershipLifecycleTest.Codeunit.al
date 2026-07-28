@@ -1677,6 +1677,196 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
         Assert.AreEqual(0, MemberChangeLogCount(MemberEntryNo, Member.FieldNo(Image)), 'Image must not be tracked in the change log while Cloudflare member media is enabled.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogPurgedOnMemberAnonymize()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        Assert: Codeunit Assert;
+        MembershipEntryNo, MemberEntryNo : Integer;
+    begin
+        // [SCENARIO] Anonymizing a member removes its change log entries, which hold pre-anonymization PII.
+        MembershipEntryNo := LibraryMemberGDPR.CreatePlainMembership(CalcDate('<-10D>'));
+        MemberEntryNo := LibraryMemberGDPR.AddAdminMember(MembershipEntryNo);
+
+        // [GIVEN] A member with tracked field changes recorded in the change log
+        Member.Get(MemberEntryNo);
+        Member."First Name" := 'Alice';
+        Member."E-Mail Address" := 'alice@example.com';
+        Member.Modify(true);
+        Assert.IsTrue(MemberChangeLogCount(MemberEntryNo, 0) > 0, 'Change log entries were expected before anonymization.');
+
+        // [WHEN] The membership, and thus the member, is anonymized
+        LibraryMemberGDPR.AnonymizeMembership(MembershipEntryNo);
+
+        // [THEN] The member is anonymized and its change log is empty
+        LibraryMemberGDPR.Assert_MemberIsAnonymized(MemberEntryNo);
+        Assert.AreEqual(0, MemberChangeLogCount(MemberEntryNo, 0), 'Change log must be empty after member anonymization.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogNotTrackedForAnonymizedMember()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        Assert: Codeunit Assert;
+        MembershipEntryNo, MemberEntryNo : Integer;
+    begin
+        // [SCENARIO] Once a member is anonymized, later changes to tracked fields must not be logged.
+        MembershipEntryNo := LibraryMemberGDPR.CreatePlainMembership(CalcDate('<-10D>'));
+        MemberEntryNo := LibraryMemberGDPR.AddAdminMember(MembershipEntryNo);
+
+        LibraryMemberGDPR.AnonymizeMembership(MembershipEntryNo);
+        LibraryMemberGDPR.Assert_MemberIsAnonymized(MemberEntryNo);
+        ResetMemberChangeLog(MemberEntryNo);
+
+        // [WHEN] A tracked field is changed on the already-anonymized member
+        Member.Get(MemberEntryNo);
+        Member."First Name" := 'Bob';
+        Member.Modify(true);
+
+        // [THEN] No change log entry is created
+        Assert.AreEqual(0, MemberChangeLogCount(MemberEntryNo, 0), 'Changes on an anonymized member must not be tracked.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogTrackedAfterUnblockingAnonymizedMember()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        Assert: Codeunit Assert;
+        MembershipEntryNo, MemberEntryNo : Integer;
+    begin
+        // [SCENARIO] Unblocking does not clear "Block Reason", so a member unblocked after anonymization and reused must be tracked again.
+        MembershipEntryNo := LibraryMemberGDPR.CreatePlainMembership(CalcDate('<-10D>'));
+        MemberEntryNo := LibraryMemberGDPR.AddAdminMember(MembershipEntryNo);
+
+        LibraryMemberGDPR.AnonymizeMembership(MembershipEntryNo);
+        LibraryMemberGDPR.Assert_MemberIsAnonymized(MemberEntryNo);
+
+        // [GIVEN] The anonymized member is unblocked again, keeping "Block Reason" = ANONYMIZED
+        Member.Get(MemberEntryNo);
+        Member.Blocked := false;
+        Member.Modify(true);
+        Assert.IsTrue(Member."Block Reason" = Member."Block Reason"::ANONYMIZED, 'The unblock is expected to leave "Block Reason" untouched.');
+        ResetMemberChangeLog(MemberEntryNo);
+
+        // [WHEN] A tracked field is changed on the unblocked member
+        Member."First Name" := 'Bob';
+        Member.Modify(true);
+
+        // [THEN] The change is tracked again
+        Assert.AreEqual(1, MemberChangeLogCount(MemberEntryNo, Member.FieldNo("First Name")), 'Changes on an unblocked member must be tracked again.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberChangeLogTrackedForBlockedNonAnonymizedMember()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        Member: Record "NPR MM Member";
+        Assert: Codeunit Assert;
+        MemberEntryNo: Integer;
+    begin
+        // [SCENARIO] Only anonymization stops tracking - a member blocked for any other reason is still tracked.
+        MemberEntryNo := LibraryMemberGDPR.CreateMember();
+
+        // [GIVEN] A member blocked for a reason other than anonymization
+        Member.Get(MemberEntryNo);
+        Member.Blocked := true;
+        Member."Block Reason" := Member."Block Reason"::USER_REQUEST;
+        Member.Modify(true);
+        ResetMemberChangeLog(MemberEntryNo);
+
+        // [WHEN] A tracked field is changed
+        Member."First Name" := 'Bob';
+        Member.Modify(true);
+
+        // [THEN] The change is tracked
+        Assert.AreEqual(1, MemberChangeLogCount(MemberEntryNo, Member.FieldNo("First Name")), 'Changes on a blocked non-anonymized member must be tracked.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DeleteChangeLogCleanupPurgesAnonymizedAndOrphaned()
+    var
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        UPGMemberChgLogGDPR: Codeunit "NPR UPG Member Chg Log GDPR";
+        Member: Record "NPR MM Member";
+        MemberChangeLog: Record "NPR MM Member Change Log";
+        Assert: Codeunit Assert;
+        AnonymizedMemberEntryNo, ActiveMemberEntryNo, OrphanMemberEntryNo, BlockedMemberEntryNo, UnblockedMemberEntryNo : Integer;
+    begin
+        // [SCENARIO] The one-time cleanup purges change log rows for anonymized and no-longer-existing members, but keeps active, blocked (non-anonymized) and unblocked ones.
+        AnonymizedMemberEntryNo := LibraryMemberGDPR.CreateMember();
+        ActiveMemberEntryNo := LibraryMemberGDPR.CreateMember();
+        BlockedMemberEntryNo := LibraryMemberGDPR.CreateMember();
+        UnblockedMemberEntryNo := LibraryMemberGDPR.CreateMember();
+
+        // [GIVEN] The members have change log rows
+        Member.Get(AnonymizedMemberEntryNo);
+        Member."First Name" := 'Alice';
+        Member.Modify(true);
+
+        Member.Get(ActiveMemberEntryNo);
+        Member."First Name" := 'Charlie';
+        Member.Modify(true);
+
+        Member.Get(BlockedMemberEntryNo);
+        Member."First Name" := 'Dave';
+        Member.Modify(true);
+
+        Member.Get(UnblockedMemberEntryNo);
+        Member."First Name" := 'Erin';
+        Member.Modify(true);
+
+        // [GIVEN] One member is already anonymized but its legacy change log rows still exist
+        Member.Get(AnonymizedMemberEntryNo);
+        Member.Blocked := true;
+        Member."Block Reason" := Member."Block Reason"::ANONYMIZED;
+        Member.Modify(true);
+        Assert.IsTrue(MemberChangeLogCount(AnonymizedMemberEntryNo, 0) > 0, 'Legacy change log rows were expected for the anonymized member.');
+
+        // [GIVEN] A member that is blocked but NOT anonymized - its history must be kept
+        Member.Get(BlockedMemberEntryNo);
+        Member.Blocked := true;
+        Member."Block Reason" := Member."Block Reason"::USER_REQUEST;
+        Member.Modify(true);
+        Assert.IsTrue(MemberChangeLogCount(BlockedMemberEntryNo, 0) > 0, 'Change log rows were expected for the blocked non-anonymized member.');
+
+        // [GIVEN] A member that was unblocked again - "Block Reason" stays ANONYMIZED, so its history must be kept too
+        Member.Get(UnblockedMemberEntryNo);
+        Member.Blocked := false;
+        Member."Block Reason" := Member."Block Reason"::ANONYMIZED;
+        Member.Modify(true);
+        Assert.IsTrue(MemberChangeLogCount(UnblockedMemberEntryNo, 0) > 0, 'Change log rows were expected for the unblocked member.');
+
+        // [GIVEN] An orphaned change log row exists for a member that no longer exists
+        Member.Reset();
+        if (Member.FindLast()) then
+            OrphanMemberEntryNo := Member."Entry No." + 1000000
+        else
+            OrphanMemberEntryNo := 1000000;
+        MemberChangeLog.Init();
+        MemberChangeLog."Member Entry No." := OrphanMemberEntryNo;
+        MemberChangeLog."Field No." := Member.FieldNo("First Name");
+        MemberChangeLog."Old Value" := 'Ghost';
+        MemberChangeLog.Insert(true);
+
+        // [WHEN] The one-time cleanup runs
+        UPGMemberChgLogGDPR.DeleteChangeLogForAnonymizedMembers();
+
+        // [THEN] The anonymized and orphaned rows are purged, the active member's rows are kept
+        Assert.AreEqual(0, MemberChangeLogCount(AnonymizedMemberEntryNo, 0), 'Anonymized member change log must be purged by the cleanup.');
+        Assert.AreEqual(0, MemberChangeLogCount(OrphanMemberEntryNo, 0), 'Orphaned change log rows for a missing member must be purged by the cleanup.');
+        Assert.IsTrue(MemberChangeLogCount(ActiveMemberEntryNo, 0) > 0, 'Active member change log must be left intact by the cleanup.');
+        Assert.IsTrue(MemberChangeLogCount(BlockedMemberEntryNo, 0) > 0, 'Blocked non-anonymized member change log must be left intact by the cleanup.');
+        Assert.IsTrue(MemberChangeLogCount(UnblockedMemberEntryNo, 0) > 0, 'Unblocked member change log must be left intact by the cleanup.');
+    end;
+
     local procedure ResetMemberChangeLog(MemberEntryNo: Integer)
     var
         MemberChangeLog: Record "NPR MM Member Change Log";
