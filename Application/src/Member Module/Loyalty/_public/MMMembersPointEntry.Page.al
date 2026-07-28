@@ -60,6 +60,9 @@
                 }
                 field("Document Type"; Rec."Document Type")
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2026-04-06';
+                    ObsoleteReason = 'The Document Type field cannot always have 100% correct value. At the moment it is being used in receiptList API only. (Which is still in BETA phase)';
                     ToolTip = 'Specifies the value of the Document Type field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Visible = false;
