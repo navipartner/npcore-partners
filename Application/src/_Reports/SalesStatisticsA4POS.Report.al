@@ -519,7 +519,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
                     column(POSEntry2_AmtInclTax; POSEntry2."Amount Excl. Tax")
                     {
                     }
-                    column(Name_SalesPerson; Salesperson.Name)
+                    column(Name_SalesPerson; SalespersonName)
                     {
                     }
                     dataitem("POS Tax Amount Line"; "NPR POS Entry Tax Line")
@@ -604,7 +604,10 @@ report 6014462 "NPR Sales Statistics A4 POS"
 
                     trigger OnAfterGetRecord()
                     begin
-                        Salesperson.Get(POSEntry2."Salesperson Code");
+                        if Salesperson.Get(POSEntry2."Salesperson Code") then
+                            SalespersonName := Salesperson.Name
+                        else
+                            SalespersonName := '';
                         SalesPersonSalesCount := POSSalesLineValue."Quantity";
                     end;
 
@@ -987,6 +990,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
         VATTaxSummarylbl: Label 'VAT & TAX Summary';
         Voucherslbl: Label 'Vouchers';
         Workshiftlbl: Label 'Workshift';
+        SalespersonName: Text;
         VarReportTitle: Text;
 
     [Obsolete('Not used anymore.', '2023-08-28')]
