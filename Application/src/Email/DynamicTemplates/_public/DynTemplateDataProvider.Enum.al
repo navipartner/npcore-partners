@@ -43,4 +43,9 @@ enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataP
         Caption = 'Click & Collect Notification';
         Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailCnCDataProvider";
     }
+    value(8; JOB_QUEUE_NOTIFICATION)
+    {
+        Caption = 'Job Queue Notification';
+        Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailJobQueueDataProv";
+    }
 }

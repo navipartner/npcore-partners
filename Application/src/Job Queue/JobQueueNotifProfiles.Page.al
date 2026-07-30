@@ -38,12 +38,20 @@ page 6059842 "NPR Job Queue Notif. Profiles"
                 }
                 field("E-mail Template Code"; Rec."E-mail Template Code")
                 {
+                    Visible = not _NewEmailExperienceEnabled;
                     ToolTip = 'Specifies a template, which will be used for creation and sending notification e-mails.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("E-mail Template Id"; Rec."E-mail Template Id")
+                {
+                    Visible = _NewEmailExperienceEnabled;
+                    ToolTip = 'Specifies the NP Email template, which will be used for creation and sending notification e-mails.';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail"; Rec."E-Mail")
                 {
-                    ToolTip = 'Specifies an e-mail address notification e-mails are to be sent to. Leave this field blank if you want to use the default address defined on the e-mail template.';
+                    ShowMandatory = _NewEmailExperienceEnabled;
+                    ToolTip = 'Specifies an e-mail address notification e-mails are to be sent to. When the legacy e-mail system is active you can leave this blank to use the default address defined on the e-mail template.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Send Sms"; Rec."Send Sms")
@@ -64,4 +72,14 @@ page 6059842 "NPR Job Queue Notif. Profiles"
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+    begin
+        _NewEmailExperienceEnabled := NewEmailExperienceFeature.IsFeatureEnabled();
+    end;
+
+    var
+        _NewEmailExperienceEnabled: Boolean;
 }

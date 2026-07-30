@@ -36,6 +36,12 @@ table 6014632 "NPR Job Queue Notif. Profile"
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header" WHERE("Table No." = field("Table No."));
         }
+        field(215; "E-mail Template Id"; Code[20])
+        {
+            Caption = 'E-mail Template Id';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate" where(DataProvider = const("NPR DynTemplateDataProvider"::JOB_QUEUE_NOTIFICATION));
+        }
         field(220; "E-Mail"; Text[80])
         {
             Caption = 'Email';
