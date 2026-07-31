@@ -341,6 +341,15 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifyStore."Delete After Final Post");
     end;
 
+    procedure BuildExternalDocumentNo(ShopifyStoreCode: Code[20]; OrderNo: Text; MaxLen: Integer): Text
+    var
+        SpfyNoStorePrefixFeature: Codeunit "NPR Spfy No Store Code Prefix";
+    begin
+        if SpfyNoStorePrefixFeature.IsFeatureEnabled() then
+            exit(CopyStr(OrderNo, 1, MaxLen));
+        exit(CopyStr(ShopifyStoreCode + '-' + OrderNo, 1, MaxLen));
+    end;
+
     procedure GetLanguageCode(ShopifyStoreCode: Code[20]): Code[10]
     begin
         GetStore(ShopifyStoreCode);

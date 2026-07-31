@@ -615,7 +615,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
         SetSellToCustomer(NpEcStore, Order, SalesHeader);
         SetShipToCustomer(NpEcStore, Order, SalesHeader);
-        SalesHeader."External Document No." := CopyStr(ShopifyStoreCode + '-' + OrderNo, 1, MaxStrLen(SalesHeader."External Document No."));
+        SalesHeader."External Document No." := CopyStr(
+            SpfyIntegrationMgt.BuildExternalDocumentNo(ShopifyStoreCode, OrderNo, MaxStrLen(SalesHeader."External Document No.")),
+            1, MaxStrLen(SalesHeader."External Document No."));
         SalesHeader."NPR External Order No." := CopyStr(SalesHeader."External Document No.", 1, MaxStrLen(SalesHeader."NPR External Order No."));
         SalesHeader."Prices Including VAT" := true;
 

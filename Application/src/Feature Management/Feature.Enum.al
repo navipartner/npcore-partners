@@ -185,4 +185,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'NPR Module Licensing', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR Module Licensing Feat.";
     }
+    value(290; "Shopify Order No. Without Prefix")
+    {
+        Caption = 'Shopify Order No. Without Store Code Prefix';
+        Implementation = "NPR Feature Management" = "NPR Spfy No Store Code Prefix";
+    }
 }

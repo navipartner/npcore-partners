@@ -548,6 +548,38 @@ codeunit 6150632 "NPR New Feature Handler"
         NewBeginWorkshiftExp.InsertReportSelectionRetail();
     end;
 
+    internal procedure HandleShopifyOrderNoWithoutPrefix()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'ShopifyOrderNoWithoutPrefixHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ShopifyOrderNoWithoutPrefixHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        ShopifyOrderNoWithoutPrefixHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ShopifyOrderNoWithoutPrefixHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure ShopifyOrderNoWithoutPrefixHandle()
+    var
+        Feature: Record "NPR Feature";
+        NoStorePrefixFeature: Codeunit "NPR Spfy No Store Code Prefix";
+    begin
+        if not Feature.Get(NoStorePrefixFeature.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR New Feature Handler");
