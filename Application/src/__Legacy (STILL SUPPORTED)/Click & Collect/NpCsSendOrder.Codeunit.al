@@ -63,7 +63,7 @@ codeunit 6151197 "NPR NpCs Send Order"
         end;
     end;
 
-    local procedure InitReqBody(NpCsDocument: Record "NPR NpCs Document"; var Content: Text)
+    internal procedure InitReqBody(NpCsDocument: Record "NPR NpCs Document"; var Content: Text)
     var
         Customer: Record Customer;
         NpCsStore: Record "NPR NpCs Store";
