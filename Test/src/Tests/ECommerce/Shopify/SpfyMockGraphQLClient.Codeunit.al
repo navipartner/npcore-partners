@@ -32,6 +32,12 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
         AddResponse(RequestMatch, '', '', true);
     end;
 
+    /// <summary>As above, but only for requests whose body contains both patterns (e.g. a specific location's mutation).</summary>
+    procedure AddFailure(RequestMatch1: Text; RequestMatch2: Text)
+    begin
+        AddResponse(RequestMatch1, RequestMatch2, '', true);
+    end;
+
     procedure AddResponse(RequestMatch1: Text; RequestMatch2: Text; ResponseBody: Text; Fail: Boolean)
     begin
         _Match1.Add(RequestMatch1);
@@ -103,11 +109,17 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
 
     /// <summary>First recorded request whose body contains Pattern, or '' if none.</summary>
     procedure GetRequestContaining(Pattern: Text): Text
+    begin
+        exit(GetRequestContaining(Pattern, ''));
+    end;
+
+    /// <summary>First recorded request whose body contains both Pattern1 and Pattern2 (use '' to skip a matcher), or '' if none.</summary>
+    procedure GetRequestContaining(Pattern1: Text; Pattern2: Text): Text
     var
         Request: Text;
     begin
         foreach Request in _RecordedRequests do
-            if Request.Contains(Pattern) then
+            if IsMatch(Request, Pattern1, Pattern2) then
                 exit(Request);
         exit('');
     end;

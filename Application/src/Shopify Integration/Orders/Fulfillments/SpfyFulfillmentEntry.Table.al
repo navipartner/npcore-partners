@@ -43,6 +43,13 @@ table 6151144 "NPR Spfy Fulfillment Entry"
             DataClassification = CustomerContent;
             Caption = 'Order Line ID';
         }
+        field(13; "Fulfillment ID"; Text[30])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Fulfillment ID';
+            // Shopify Fulfillment id (not the fulfillment ORDER) returned by fulfillmentCreate; kept so the
+            // fulfillment can later be targeted by fulfillmentCancel.
+        }
         field(20; "Fulfillable Quantity"; Decimal)
         {
             DataClassification = CustomerContent;

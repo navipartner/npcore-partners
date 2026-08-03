@@ -86,7 +86,6 @@ table 6150815 "NPR Spfy Fulfillment Buffer"
             Clustered = true;
         }
         key(RelationFromBCTables; "Table No.", "BC Record ID") { }
-        key(ByFulfillmentOrder; "Fulfillment Order ID", "Fulfillment Order Line ID") { }
         key(OrderLindId; "Order Line ID") { }
         key(ByLocation; "Location ID", "Fulfillment Order ID", "Fulfillment Order Line ID") { }
     }
