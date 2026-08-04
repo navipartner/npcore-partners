@@ -41,7 +41,7 @@ page 6150919 "NPR Digital Notification Setup"
                 field("Exclude Tickets From Manifest"; Rec."Exclude Tickets From Manifest")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether ticket assets should be excluded from the digital notification manifest. Enable this when the legacy welcome-ticket email is active and you want to avoid duplicate ticket delivery. Tickets inside attraction wallets are not affected by this flag — they remain rendered inside the wallet asset.';
+                    ToolTip = 'Specifies whether ticket assets should be excluded from the digital notification manifest. Enable this when the legacy welcome-ticket email is active and you want to avoid delivering the same ticket through the manifest as well. Tickets inside attraction wallets are not affected by this flag — they remain rendered inside the wallet asset. This flag controls the manifest only: ticket data stays available to email templates, so an order confirmation can still list the purchased tickets.';
                 }
                 field(Enabled; Rec.Enabled)
                 {
