@@ -511,6 +511,8 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := SalesInvHeader."NPR External Order No.";
         TempHeaderBuffer."Shopify Order ID" := GetShopifyOrderID(SalesInvHeader.RecordId());
+        if (TempHeaderBuffer."Shopify Order ID" <> '') and (SalesInvHeader."External Document No." <> '') then
+            TempHeaderBuffer."External Order No." := CopyStr(SalesInvHeader."External Document No.", 1, MaxStrLen(TempHeaderBuffer."External Order No."));
         TempHeaderBuffer."Document Type" := TempHeaderBuffer."Document Type"::Invoice;
         TempHeaderBuffer."Posted Document No." := SalesInvHeader."No.";
         TempHeaderBuffer."Source Document Id" := SalesInvHeader.SystemId;
@@ -537,7 +539,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         if SalesInvoiceLine.FindSet() then
             repeat
                 TempLineBuffer.Init();
-                TempLineBuffer."External Order No." := SalesInvHeader."NPR External Order No.";
+                TempLineBuffer."External Order No." := TempHeaderBuffer."External Order No.";
                 TempLineBuffer."Line No." := SalesInvoiceLine."Line No.";
                 TempLineBuffer.Type := SalesInvoiceLine.Type;
                 TempLineBuffer."No." := SalesInvoiceLine."No.";
@@ -573,6 +575,8 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := SalesCrMemoHeader."NPR External Order No.";
         TempHeaderBuffer."Shopify Order ID" := GetShopifyOrderID(SalesCrMemoHeader.RecordId());
+        if (TempHeaderBuffer."Shopify Order ID" <> '') and (SalesCrMemoHeader."External Document No." <> '') then
+            TempHeaderBuffer."External Order No." := CopyStr(SalesCrMemoHeader."External Document No.", 1, MaxStrLen(TempHeaderBuffer."External Order No."));
         TempHeaderBuffer."Document Type" := TempHeaderBuffer."Document Type"::"Credit Memo";
         TempHeaderBuffer."Posted Document No." := SalesCrMemoHeader."No.";
         TempHeaderBuffer."Source Document Id" := SalesCrMemoHeader.SystemId;
@@ -596,7 +600,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         if SalesCrMemoLine.FindSet() then
             repeat
                 TempLineBuffer.Init();
-                TempLineBuffer."External Order No." := SalesCrMemoHeader."NPR External Order No.";
+                TempLineBuffer."External Order No." := TempHeaderBuffer."External Order No.";
                 TempLineBuffer."Line No." := SalesCrMemoLine."Line No.";
                 TempLineBuffer.Type := SalesCrMemoLine.Type;
                 TempLineBuffer."No." := SalesCrMemoLine."No.";
@@ -628,6 +632,11 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
 
         TempHeaderBuffer.Init();
         TempHeaderBuffer."External Order No." := EcomSalesHeader."External No.";
+        if EcomSalesHeader."Document Source" = EcomSalesHeader."Document Source"::Shopify then begin
+            TempHeaderBuffer."Shopify Order ID" := EcomSalesHeader."External No.";
+            if EcomSalesHeader."External Document No." <> '' then
+                TempHeaderBuffer."External Order No." := CopyStr(EcomSalesHeader."External Document No.", 1, MaxStrLen(TempHeaderBuffer."External Order No."));
+        end;
         TempHeaderBuffer."Document Type" := TempHeaderBuffer."Document Type"::"Ecom Sales Document";
         TempHeaderBuffer."Recipient E-mail" := EcomSalesHeader."Sell-to Email";
         TempHeaderBuffer."Recipient Name" := CopyStr(EcomSalesHeader."Sell-to Name", 1, MaxStrLen(TempHeaderBuffer."Recipient Name"));
@@ -635,7 +644,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
         TempHeaderBuffer."Language Code" := ResolveLanguageCode(
             EcomSalesHeader."Language Code",
             EcomSalesHeader."Ticket Reservation Token",
-            '',
+            TempHeaderBuffer."Shopify Order ID",
             TempHeaderBuffer."External Order No.",
             EcomSalesHeader."Sell-to Customer No.");
         TempHeaderBuffer."Document Date" := EcomSalesHeader."Received Date";
@@ -651,7 +660,7 @@ codeunit 6150961 "NPR Digital Order Notif. Mgt."
             repeat
                 if ShouldEmitEcomAssetLine(TempCandidateLine, WalletExtLineIds) then begin
                     TempLineBuffer.Init();
-                    TempLineBuffer."External Order No." := EcomSalesHeader."External No.";
+                    TempLineBuffer."External Order No." := TempHeaderBuffer."External Order No.";
                     TempLineBuffer."Line No." := TempCandidateLine."Line No.";
                     if TempCandidateLine.Subtype = TempCandidateLine.Subtype::Voucher then
                         TempLineBuffer.Type := TempLineBuffer.Type::" "

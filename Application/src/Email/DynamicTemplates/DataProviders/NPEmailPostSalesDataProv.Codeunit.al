@@ -142,7 +142,7 @@ codeunit 6151095 "NPR NPEmailPostSalesDataProv" implements "NPR IDynamicTemplate
         JObject.Add('document_no', SalesInvoiceHeader."No.");
         JObject.Add('order_no', SalesInvoiceHeader."Order No.");
         JObject.Add('external_document_no', SalesInvoiceHeader."External Document No.");
-        JObject.Add('external_order_no', SalesInvoiceHeader."NPR External Order No.");
+        JObject.Add('external_order_no', GetExternalOrderNo(SalesInvoiceHeader));
         JObject.Add('posting_date', SalesInvoiceHeader."Posting Date");
         JObject.Add('posting_date_formatted', DataProviderHelper.FormatToTextFromLanguage(SalesInvoiceHeader."Posting Date", LanguageCode));
         JObject.Add('document_date', SalesInvoiceHeader."Document Date");
@@ -183,6 +183,21 @@ codeunit 6151095 "NPR NPEmailPostSalesDataProv" implements "NPR IDynamicTemplate
         JObject.Add('amount_including_vat_formatted', DataProviderHelper.FormatToTextFromLanguage(SalesInvoiceHeader."Amount Including VAT", LanguageCode));
 
         PostSalesDocEmailEvents.OnAfterAddSalesInvoiceHeaderJson(SalesInvoiceHeader, JObject);
+    end;
+
+    local procedure GetExternalOrderNo(SalesInvoiceHeader: Record "Sales Invoice Header"): Code[35]
+#if not BC17
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+#endif
+    begin
+#if not BC17
+        if (SalesInvoiceHeader."External Document No." <> '') and
+            (SpfyAssignedIDMgt.GetAssignedShopifyID(SalesInvoiceHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '')
+        then
+            exit(SalesInvoiceHeader."External Document No.");
+#endif
+        exit(SalesInvoiceHeader."NPR External Order No.");
     end;
 
     local procedure AddExampleLines(var JObject: JsonObject)

@@ -497,6 +497,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         RecRef: RecordRef;
         IStream: InStream;
         Transaction: JsonToken;
+        DisplayReference: Code[50];
         AlreadyAssigned: Boolean;
         GiftCardTransaction: Boolean;
     begin
@@ -514,6 +515,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                     PaymentLineParam."Posting Date" := SalesHeader."Posting Date";
                     PaymentLineParam."External Reference No." := SalesHeader."NPR External Order No.";
                     PaymentLineParam.Amount := SalesHeader."Amount Including VAT";
+                    DisplayReference := GetDisplayReference(SalesHeader."External Document No.", SalesHeader."NPR External Order No.", PaymentLineParam."External Reference No.");
                 end;
 
             Database::"Sales Invoice Header":
@@ -524,6 +526,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                     PaymentLineParam."Posting Date" := SalesInvHeader."Posting Date";
                     PaymentLineParam."External Reference No." := SalesInvHeader."NPR External Order No.";
                     PaymentLineParam.Amount := SalesInvHeader."Amount Including VAT";
+                    DisplayReference := GetDisplayReference(SalesInvHeader."External Document No.", SalesInvHeader."NPR External Order No.", PaymentLineParam."External Reference No.");
                 end;
             else
                 SpfyIntegrationMgt.UnsupportedIntegrationTable(NcTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Capture Payment"), 'UpdatePmtLinesAndScheduleCapture'));
@@ -570,7 +573,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                     if IsSaleTransaction(SpfyTransactionBuffer.Kind) then
                         GiftCardTransaction := AddGiftCardPaymentLine(Transaction, PaymentLineParam, PaymentLine);
                     if not GiftCardTransaction then begin
-                        InitCreditCardPaymentLine(Transaction, PaymentLineParam, PaymentLine);
+                        InitCreditCardPaymentLine(Transaction, PaymentLineParam, PaymentLine, DisplayReference);
                         PaymentLine."No." := SpfyTransactionBuffer."Transaction ID";
                         PaymentLine.Insert(true);
                     end;
@@ -649,7 +652,15 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         end;
     end;
 
-    local procedure InitCreditCardPaymentLine(Transaction: JsonToken; PaymentLineParam: Record "NPR Magento Payment Line"; var PaymentLine: Record "NPR Magento Payment Line")
+    local procedure GetDisplayReference(ExternalDocumentNo: Code[35]; ExternalOrderNo: Code[20]; ExternalReferenceNo: Code[50]): Code[50]
+    begin
+        // Prefer the human-readable Shopify order number
+        if (ExternalDocumentNo <> '') and (ExternalDocumentNo <> ExternalOrderNo) then
+            exit(ExternalDocumentNo);
+        exit(ExternalReferenceNo);
+    end;
+
+    local procedure InitCreditCardPaymentLine(Transaction: JsonToken; PaymentLineParam: Record "NPR Magento Payment Line"; var PaymentLine: Record "NPR Magento Payment Line"; DisplayReference: Code[50])
     var
         PaymentMapping: Record "NPR Magento Payment Mapping";
         PaymentMethod: Record "Payment Method";
@@ -660,7 +671,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
         PaymentLine.Init();
         PaymentLine."Line No." := PaymentLine."Line No." + 10000;
-        PaymentLine.Description := CopyStr(PaymentMethod.Description + ' ' + PaymentLineParam."External Reference No.", 1, MaxStrLen(PaymentLine.Description));
+        PaymentLine.Description := CopyStr(PaymentMethod.Description + ' ' + DisplayReference, 1, MaxStrLen(PaymentLine.Description));
         PaymentLine."Payment Type" := PaymentLine."Payment Type"::"Payment Method";
         PaymentLine."Account Type" := PaymentMethod."Bal. Account Type";
         PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
