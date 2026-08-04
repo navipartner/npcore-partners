@@ -1202,6 +1202,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             SpfyIntegrationMgt.BuildExternalDocumentNo(
                 LogEntry."Store Code",
                 _SpfyAPIOrderHelper.GetOrderNo(OrderToken, 0),
+                _SpfyAPIOrderHelper.GetOrderName(OrderToken, MaxStrLen(EcomSalesHeader."External Document No.")),
                 MaxStrLen(EcomSalesHeader."External Document No.")),
             1, MaxStrLen(EcomSalesHeader."External Document No."));
         EcomSalesHeader."Document Source" := EcomSalesHeader."Document Source"::"Shopify";

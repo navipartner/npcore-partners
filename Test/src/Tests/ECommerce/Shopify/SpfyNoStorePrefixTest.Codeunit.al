@@ -91,32 +91,35 @@ codeunit 85302 "NPR Spfy No Store Prefix Test"
         NoStorePrefixFeature: Codeunit "NPR Spfy No Store Code Prefix";
         OriginalEnabled: Boolean;
     begin
-        // [Scenario] Disabled = legacy behavior: the store code is prepended. Pins backward compatibility for every
-        //            existing Shopify tenant - a regression in this branch silently changes document referencing.
+        // [Scenario] Disabled = legacy behavior: the store code is prepended to the order number and the Shopify
+        //            order name is ignored. Pins backward compatibility for every existing Shopify tenant - a
+        //            regression in this branch silently changes document referencing.
         EnsureFeaturePresent();
         OriginalEnabled := NoStorePrefixFeature.IsFeatureEnabled();
         NoStorePrefixFeature.SetFeatureEnabled(false);
 
-        _Assert.AreEqual('MYSTORE-1001', SpfyIntegrationMgt.BuildExternalDocumentNo('MYSTORE', '1001', 35),
+        _Assert.AreEqual('MYSTORE-1001', SpfyIntegrationMgt.BuildExternalDocumentNo('MYSTORE', '1001', '#1001', 35),
             'With the feature disabled the store code must be prepended.');
 
         NoStorePrefixFeature.SetFeatureEnabled(OriginalEnabled);
     end;
 
     [Test]
-    procedure ExternalDocumentNo_RawWhenEnabled()
+    procedure ExternalDocumentNo_OrderNameWhenEnabled()
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         NoStorePrefixFeature: Codeunit "NPR Spfy No Store Code Prefix";
         OriginalEnabled: Boolean;
     begin
-        // [Scenario] Enabled: the Shopify order number is used as-is, with no BC-added prefix.
+        // [Scenario] Enabled: the Shopify order name (which carries the prefix/suffix configured in Shopify and is
+        //            therefore unique across stores) is used as-is, with no BC-added prefix. The callers read the name
+        //            as a required value, so there is no blank-name case to fall back from.
         EnsureFeaturePresent();
         OriginalEnabled := NoStorePrefixFeature.IsFeatureEnabled();
         NoStorePrefixFeature.SetFeatureEnabled(true);
 
-        _Assert.AreEqual('1001', SpfyIntegrationMgt.BuildExternalDocumentNo('MYSTORE', '1001', 35),
-            'With the feature enabled the order number must be used without the store-code prefix.');
+        _Assert.AreEqual('#1001', SpfyIntegrationMgt.BuildExternalDocumentNo('MYSTORE', '1001', '#1001', 35),
+            'With the feature enabled the Shopify order name must be used without the store-code prefix.');
 
         NoStorePrefixFeature.SetFeatureEnabled(OriginalEnabled);
     end;
@@ -128,13 +131,18 @@ codeunit 85302 "NPR Spfy No Store Prefix Test"
         NoStorePrefixFeature: Codeunit "NPR Spfy No Store Code Prefix";
         OriginalEnabled: Boolean;
     begin
-        // [Scenario] The built value is truncated to the target field length: 'MYSTORE-1001' (12) at MaxLen 10 -> 'MYSTORE-10'.
+        // [Scenario] The built value is truncated to the target field length in both feature states:
+        //            disabled 'MYSTORE-1001' (12) at MaxLen 10 -> 'MYSTORE-10'; enabled '#1001' at MaxLen 3 -> '#10'.
         EnsureFeaturePresent();
         OriginalEnabled := NoStorePrefixFeature.IsFeatureEnabled();
-        NoStorePrefixFeature.SetFeatureEnabled(false);
 
-        _Assert.AreEqual('MYSTORE-10', SpfyIntegrationMgt.BuildExternalDocumentNo('MYSTORE', '1001', 10),
+        NoStorePrefixFeature.SetFeatureEnabled(false);
+        _Assert.AreEqual('MYSTORE-10', SpfyIntegrationMgt.BuildExternalDocumentNo('MYSTORE', '1001', '#1001', 10),
             'The built External Document No. must be truncated to MaxLen.');
+
+        NoStorePrefixFeature.SetFeatureEnabled(true);
+        _Assert.AreEqual('#10', SpfyIntegrationMgt.BuildExternalDocumentNo('MYSTORE', '1001', '#1001', 3),
+            'The Shopify order name must be truncated to MaxLen.');
 
         NoStorePrefixFeature.SetFeatureEnabled(OriginalEnabled);
     end;
@@ -163,22 +171,23 @@ codeunit 85302 "NPR Spfy No Store Prefix Test"
     end;
 
     [Test]
-    procedure EcomImport_ExtDocNo_RawWhenEnabled()
+    procedure EcomImport_ExtDocNo_OrderNameWhenEnabled()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         NoStorePrefixFeature: Codeunit "NPR Spfy No Store Code Prefix";
         SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
         OriginalEnabled: Boolean;
     begin
-        // [Scenario] With the feature enabled the ecom import keeps the Shopify order number as-is.
+        // [Scenario] With the feature enabled the ecom import uses the Shopify order name (Shopify's own
+        //            prefix/suffix identifier) instead of the order number.
         EnsureFeaturePresent();
         OriginalEnabled := NoStorePrefixFeature.IsFeatureEnabled();
         NoStorePrefixFeature.SetFeatureEnabled(true);
 
         SpfyEcomSalesDocImport.InitEcommerceHeader(EcomImportLogEntry(), EcomSalesHeader, EcomOrderResponse('1001'));
 
-        _Assert.AreEqual('1001', EcomSalesHeader."External Document No.",
-            'With the feature enabled the ecom import must keep the Shopify order number without the store-code prefix.');
+        _Assert.AreEqual('#1001', EcomSalesHeader."External Document No.",
+            'With the feature enabled the ecom import must use the Shopify order name without the store-code prefix.');
 
         NoStorePrefixFeature.SetFeatureEnabled(OriginalEnabled);
     end;
@@ -220,7 +229,8 @@ codeunit 85302 "NPR Spfy No Store Prefix Test"
 
     local procedure EcomOrderResponse(OrderNo: Text) Response: JsonToken
     begin
-        Response.ReadFrom(StrSubstNo('{"data":{"order":{"sourceName":"web","number":"%1"}}}', OrderNo));
+        // "name" mirrors Shopify's default order naming: '#' + order number.
+        Response.ReadFrom(StrSubstNo('{"data":{"order":{"sourceName":"web","number":"%1","name":"#%1"}}}', OrderNo));
     end;
 
     local procedure StoreCode(): Code[20]

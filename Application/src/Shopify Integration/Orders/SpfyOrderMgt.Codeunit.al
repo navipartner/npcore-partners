@@ -538,6 +538,19 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         OrderNo := CopyStr(FullOrderNo, 1, MaxStrLen(OrderNo));
     end;
 
+    local procedure GetOrderName(Order: JsonToken; MaxLen: Integer) OrderName: Text[50]
+    var
+        SpfyNoStorePrefixFeature: Codeunit "NPR Spfy No Store Code Prefix";
+        FullOrderName: Text;
+        OrderNameLbl: Label 'order name';
+    begin
+        if not SpfyNoStorePrefixFeature.IsFeatureEnabled() then
+            exit('');
+        FullOrderName := JsonHelper.GetJText(Order, 'name', true);
+        ValidateMaxLength(FullOrderName, MaxLen, OrderNameLbl);
+        OrderName := CopyStr(FullOrderName, 1, MaxStrLen(OrderName));
+    end;
+
     internal procedure ValidateMaxLength(Value: Text; MaxLength: Integer; FieldCaption: Text)
     var
         TooLongValueErr: Label '%1 value "%2" exceeds maximum length of %3 characters.', Locked = true;
@@ -616,7 +629,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SetSellToCustomer(NpEcStore, Order, SalesHeader);
         SetShipToCustomer(NpEcStore, Order, SalesHeader);
         SalesHeader."External Document No." := CopyStr(
-            SpfyIntegrationMgt.BuildExternalDocumentNo(ShopifyStoreCode, OrderNo, MaxStrLen(SalesHeader."External Document No.")),
+            SpfyIntegrationMgt.BuildExternalDocumentNo(ShopifyStoreCode, OrderNo, GetOrderName(Order, MaxStrLen(SalesHeader."External Document No.")), MaxStrLen(SalesHeader."External Document No.")),
             1, MaxStrLen(SalesHeader."External Document No."));
         SalesHeader."NPR External Order No." := CopyStr(SalesHeader."External Document No.", 1, MaxStrLen(SalesHeader."NPR External Order No."));
         SalesHeader."Prices Including VAT" := true;

@@ -51,7 +51,7 @@ codeunit 6151181 "NPR Spfy No Store Code Prefix" implements "NPR Feature Managem
     local procedure NPRFeatureOnBeforeValidateEnabled(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature")
     var
         ConfirmManagement: Codeunit "Confirm Management";
-        WarningLbl: Label 'WARNING: Enabling this feature is an irreversible action. Shopify order imports will stop prefixing the External Document No. with the store code. Are you sure you want to continue?';
+        WarningLbl: Label 'WARNING: Enabling this feature is an irreversible action. Shopify order imports will stop prefixing the External Document No. with the store code and will use the Shopify order name (including any prefix/suffix configured in Shopify) instead of the order number. Are you sure you want to continue?';
         CannotRevertErr: Label 'This feature cannot be disabled once it is enabled.';
     begin
         if Rec.Id <> GetFeatureId() then

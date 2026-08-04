@@ -538,7 +538,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     begin
         OrderId := OrderMgt.GetNumericId(JsonHelper.GetJText(Order, 'id', true));
 #pragma warning disable AA0139
-        DocName := JsonHelper.GetJText(Order, 'number', true);
+        DocName := JsonHelper.GetJText(Order, 'name', true);
 #pragma warning restore AA0139
     end;
 
