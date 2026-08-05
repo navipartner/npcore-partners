@@ -3,9 +3,9 @@ query 6014426 "NPR Department/Item Category"
     Access = Internal;
     Caption = 'Department/Item Category';
     QueryType = Normal;
+    DataAccessIntent = ReadOnly;
 
-    // This Query is specifically made for report 6014420 "NPR Item Category Top" and new columns should not be added
-    // because groupings will be changed in resulting SQL query
+    // Purpose-built for report 6014420 "NPR Item Category Top" (its only consumer): do not add columns - the SQL grouping would change.
 
     elements
     {
@@ -19,21 +19,27 @@ query 6014426 "NPR Department/Item Category"
             column(Item_Category_Code; "Item Category Code")
             {
             }
-            column(Quantity; Quantity)
-            {
-                Method = Sum;
-            }
-            column(Sales_Amount_Actual; "Sales Amount (Actual)")
-            {
-                ColumnFilter = Sales_Amount_Actual = filter(> 0);
-                Method = Sum;
-            }
-            column(Cost_Amount_Actual; "Cost Amount (Actual)")
-            {
-                Method = Sum;
-            }
             filter(Filter_Posting_Date; "Posting Date")
             {
+            }
+            dataitem(Value_Entry; "Value Entry")
+            {
+                DataItemLink = "Item Ledger Entry No." = Item_Ledger_Entry."Entry No.";
+                SqlJoinType = InnerJoin;
+
+                column(Quantity; "Item Ledger Entry Quantity")
+                {
+                    Method = Sum;
+                }
+                column(Sales_Amount_Actual; "Sales Amount (Actual)")
+                {
+                    ColumnFilter = Sales_Amount_Actual = filter(> 0);
+                    Method = Sum;
+                }
+                column(Cost_Amount_Actual; "Cost Amount (Actual)")
+                {
+                    Method = Sum;
+                }
             }
         }
     }

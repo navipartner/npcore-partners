@@ -59,7 +59,6 @@ report 6014420 "NPR Item Category Top"
             var
                 TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
                 TempItemCategoryBuffer2: Record "NPR Item Category Buffer" temporary;
-                DepartmentItemCategory: Query "NPR Department/Item Category";
                 CalcFieldsDict: Dictionary of [Integer, Decimal];
                 DetailFieldsDict: Dictionary of [Integer, Text[100]];
                 ProfitLCY: Decimal;
@@ -78,47 +77,32 @@ report 6014420 "NPR Item Category Top"
                 if not TempDimensionValue.FindFirst() then
                     CurrReport.Skip();
 
-                DepartmentItemCategory.SetRange(Global_Dimension_1_Code, DimensionValue.Code);
-                DepartmentItemCategory.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+                TempDeptCategoryGroup.Reset();
+                TempDeptCategoryGroup.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                if TempDeptCategoryGroup.FindSet() then
+                    repeat
+                        ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
 
-                DepartmentItemCategory.Open();
-                while DepartmentItemCategory.Read() do begin
-                    ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+                        ProfitLCY := TempDeptCategoryGroup."Calc Field 2" + TempDeptCategoryGroup."Calc Field 3"; // Cost Amount (Actual) is stored with a minus sign
+                        ProfitPercentage := ProfitLCY / TempDeptCategoryGroup."Calc Field 2"; // never zero: the query's ColumnFilter > 0 excludes such groups
 
-                    ProfitLCY := DepartmentItemCategory.Sales_Amount_Actual + DepartmentItemCategory.Cost_Amount_Actual; // Cost Amount Actual field from Item Ledger Entry is saved with minus sign
-                    ProfitPercentage := ProfitLCY / DepartmentItemCategory.Sales_Amount_Actual;
+                        CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), TempDeptCategoryGroup."Calc Field 1" * (-1));
+                        CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), TempDeptCategoryGroup."Calc Field 2");
+                        CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitLCY);
+                        CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), ProfitPercentage);
 
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), DepartmentItemCategory.Quantity * (-1));
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), DepartmentItemCategory.Sales_Amount_Actual);
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitLCY);
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), ProfitPercentage);
+                        if TempDeptCategoryGroup.Code = '' then
+                            ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer('-', NotInItemCategoryLbl, ItemCategoryBuffer, '', TempDeptCategoryGroup."Global Dimension 1 Code", '', CalcFieldsDict, DetailFieldsDict)
+                        else
+                            ItemCategoryMgt.InsertItemCategoryToBuffer(TempDeptCategoryGroup.Code, ItemCategoryBuffer, '', TempDeptCategoryGroup."Global Dimension 1 Code", '', CalcFieldsDict, DetailFieldsDict);
+                    until TempDeptCategoryGroup.Next() = 0;
 
-                    ItemCategoryMgt.InsertItemCategoryToBuffer(DepartmentItemCategory.Item_Category_Code, ItemCategoryBuffer, '', DepartmentItemCategory.Global_Dimension_1_Code, '', CalcFieldsDict, DetailFieldsDict);
+                ItemCategoryBuffer.Reset();
+                ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                if ItemCategoryBuffer.IsEmpty() then begin
+                    ItemCategoryBuffer.Reset();
+                    CurrReport.Skip();
                 end;
-                DepartmentItemCategory.Close();
-
-
-                DepartmentItemCategory.SetRange(Global_Dimension_1_Code, DimensionValue.Code);
-                DepartmentItemCategory.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
-
-                DepartmentItemCategory.SetRange(Item_Category_Code, '');
-                DepartmentItemCategory.Open();
-                while DepartmentItemCategory.Read() do begin
-                    ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
-                    ProfitLCY := 0;
-                    ProfitPercentage := 0;
-
-                    ProfitLCY := DepartmentItemCategory.Sales_Amount_Actual + DepartmentItemCategory.Cost_Amount_Actual; // Cost Amount Actial field from Item Ledger Entry is saved with minus sign
-                    ProfitPercentage := ProfitLCY / DepartmentItemCategory.Sales_Amount_Actual;
-
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), DepartmentItemCategory.Quantity * (-1));
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), DepartmentItemCategory.Sales_Amount_Actual);
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitLCY);
-                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), ProfitPercentage);
-
-                    ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer('-', NotInItemCategoryLbl, ItemCategoryBuffer, DepartmentItemCategory.Global_Dimension_1_Code, '', '', CalcFieldsDict, DetailFieldsDict);
-                end;
-                DepartmentItemCategory.Close();
 
                 ItemCategoryBuffer.Reset();
                 ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
@@ -307,20 +291,32 @@ report 6014420 "NPR Item Category Top"
     end;
 
     trigger OnPreReport()
+    begin
+        CompanyInformation.Get();
+        CollectDeptCategoryGroups();
+        ApplyLedgerQuantities();
+        FiltersText := ItemCategoryFilter.GetFilters();
+    end;
+
+    local procedure CollectDeptCategoryGroups()
     var
         DepartmentItemCategory: Query "NPR Department/Item Category";
+        GroupEntryNo: Integer;
     begin
-
-        CompanyInformation.Get();
-
-        TempDimensionValue.Reset();
-
         DepartmentItemCategory.SetFilter(Global_Dimension_1_Code, ItemCategoryFilter.GetFilter("NPR Global Dimension 1 Filter"));
         DepartmentItemCategory.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
-
         DepartmentItemCategory.Open();
-
         while DepartmentItemCategory.Read() do begin
+            GroupEntryNo += 1;
+            TempDeptCategoryGroup.Init();
+            TempDeptCategoryGroup."Entry No." := GroupEntryNo;
+            TempDeptCategoryGroup.Code := DepartmentItemCategory.Item_Category_Code;
+            TempDeptCategoryGroup."Global Dimension 1 Code" := DepartmentItemCategory.Global_Dimension_1_Code;
+            TempDeptCategoryGroup."Calc Field 1" := DepartmentItemCategory.Quantity;
+            TempDeptCategoryGroup."Calc Field 2" := DepartmentItemCategory.Sales_Amount_Actual;
+            TempDeptCategoryGroup."Calc Field 3" := DepartmentItemCategory.Cost_Amount_Actual;
+            TempDeptCategoryGroup.Insert();
+
             TempDimensionValue.Reset();
             TempDimensionValue.SetFilter(Code, DepartmentItemCategory.Global_Dimension_1_Code);
             if TempDimensionValue.IsEmpty() then begin
@@ -329,8 +325,26 @@ report 6014420 "NPR Item Category Top"
                 TempDimensionValue.Insert();
             end;
         end;
+        DepartmentItemCategory.Close();
+    end;
 
-        FiltersText := ItemCategoryFilter.GetFilters();
+    local procedure ApplyLedgerQuantities()
+    var
+        DepartmentItemCategoryQty: Query "NPR Department/Item Cat. Qty";
+    begin
+        DepartmentItemCategoryQty.SetFilter(Global_Dimension_1_Code, ItemCategoryFilter.GetFilter("NPR Global Dimension 1 Filter"));
+        DepartmentItemCategoryQty.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+        DepartmentItemCategoryQty.Open();
+        while DepartmentItemCategoryQty.Read() do begin
+            TempDeptCategoryGroup.Reset();
+            TempDeptCategoryGroup.SetRange("Global Dimension 1 Code", DepartmentItemCategoryQty.Global_Dimension_1_Code);
+            TempDeptCategoryGroup.SetRange(Code, DepartmentItemCategoryQty.Item_Category_Code);
+            if TempDeptCategoryGroup.FindFirst() then begin
+                TempDeptCategoryGroup."Calc Field 1" := DepartmentItemCategoryQty.Quantity;
+                TempDeptCategoryGroup.Modify();
+            end;
+        end;
+        DepartmentItemCategoryQty.Close();
     end;
 
     local procedure CalculateProfitPercentage(var ItemCategoryBuffer: Record "NPR Item Category Buffer")
@@ -351,6 +365,7 @@ report 6014420 "NPR Item Category Top"
         CompanyInformation: Record "Company Information";
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
         TempDimensionValue: Record "Dimension Value" temporary;
+        TempDeptCategoryGroup: Record "NPR Item Category Buffer" temporary;
         NumberOfCategories: Integer;
         NumberOfLevels: Integer;
         SortByFieldNo: Integer;
