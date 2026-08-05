@@ -37,7 +37,7 @@ codeunit 6014624 "NPR Job Queue - Send Notif."
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         JQNotifProfile: Record "NPR Job Queue Notif. Profile";
         EmailManagement: Codeunit "NPR E-mail Management";
-        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        JQNotifNPEmailFeature: Codeunit "NPR JQNotifNPEmailFeature";
         NPEmail: Codeunit "NPR NP Email";
         Sentry: Codeunit "NPR Sentry";
         RecRef: RecordRef;
@@ -46,7 +46,7 @@ codeunit 6014624 "NPR Job Queue - Send Notif."
         if not (JQNotifProfile.Get(JobQueueEntry."NPR Notif. Profile on Error") and JQNotifProfile."Send E-mail") then
             exit;
 
-        if NewEmailExperienceFeature.IsFeatureEnabled() then begin
+        if JQNotifNPEmailFeature.IsFeatureEnabled() then begin
             JQNotifProfile.TestField("E-mail Template Id");
             if not NPEmail.TrySendEmail(JQNotifProfile."E-mail Template Id", JobQueueEntry, JQNotifProfile."E-Mail") then begin
                 OwnsTransaction := not Sentry.HasActiveTransaction();

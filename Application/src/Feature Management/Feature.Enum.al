@@ -190,4 +190,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'Shopify Order No. Without Store Code Prefix';
         Implementation = "NPR Feature Management" = "NPR Spfy No Store Code Prefix";
     }
+    value(300; "JQ Notifications via NP Email")
+    {
+        Caption = 'Job Queue Notifications via NP Email';
+        Implementation = "NPR Feature Management" = "NPR JQNotifNPEmailFeature";
+    }
 }

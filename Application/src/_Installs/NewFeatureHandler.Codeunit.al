@@ -580,6 +580,32 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+    internal procedure HandleJQNotifNPEmail()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'JQNotifNPEmailHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'JQNotifNPEmailHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        JQNotifNPEmailHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'JQNotifNPEmailHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure JQNotifNPEmailHandle()
+    var
+        JQNotifNPEmailFeature: Codeunit "NPR JQNotifNPEmailFeature";
+    begin
+        JQNotifNPEmailFeature.EnableIfNoLegacySetupInUse();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR New Feature Handler");
