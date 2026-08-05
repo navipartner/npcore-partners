@@ -26,7 +26,7 @@ page 6184553 "NPR Spfy Integration Setup"
                 }
                 field("Shopify Api Version"; Rec."Shopify Api Version")
                 {
-                    ToolTip = 'Specifies the Shopify Api version. Default value is "2024-07"';
+                    ToolTip = 'Specifies the Shopify API version used when exchanging data with Shopify. Leave this at the recommended version, which the integration has been tested against, unless you have a specific reason to change it.';
                     ApplicationArea = NPRShopify;
                 }
                 field("Data Processing Handler ID"; Rec."Data Processing Handler ID")

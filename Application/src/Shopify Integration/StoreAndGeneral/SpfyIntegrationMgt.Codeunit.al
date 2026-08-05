@@ -237,6 +237,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 OrderFinancialStatus := OrderFinancialStatus::Authorized;
             'paid':
                 OrderFinancialStatus := OrderFinancialStatus::Paid;
+            'partially_paid':
+                OrderFinancialStatus := OrderFinancialStatus::"Partially Paid";
             else
                 exit(false);
         end;

@@ -45,16 +45,45 @@ codeunit 6184802 "NPR Spfy App Upgrade"
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
         ShopifySetup2: Record "NPR Spfy Integration Setup";
+        DroppedBaseline: Text[10];
+        NewApiVersion: Text[10];
     begin
         if not ShopifySetup.Get() then
             exit;
         ShopifySetup2.Init();
         if ShopifySetup2."Shopify Api Version" = '' then
             exit;
-        if ShopifySetup."Shopify Api Version" >= ShopifySetup2."Shopify Api Version" then
+
+        //An admin deliberately confirmed an api version other than the recommended one. Honour that choice until we ship a
+        //new recommended version, at which point the override is dropped. A blank baseline cannot match here, as we have
+        //already exited when the recommended version is blank.
+        if ShopifySetup."Api Version Override Baseline" = ShopifySetup2."Shopify Api Version" then
             exit;
-        ShopifySetup."Shopify Api Version" := ShopifySetup2."Shopify Api Version";
+
+        //Never move a tenant backwards. A baseline that no longer matches the recommended version is stale either way, so
+        //it is dropped; the stored version is raised to the recommended one only when it is lower, which leaves a version
+        //deliberately pinned above the recommended one as it is.
+        NewApiVersion := ShopifySetup."Shopify Api Version";
+        if NewApiVersion < ShopifySetup2."Shopify Api Version" then
+            NewApiVersion := ShopifySetup2."Shopify Api Version";
+        DroppedBaseline := ShopifySetup."Api Version Override Baseline";
+        if (NewApiVersion = ShopifySetup."Shopify Api Version") and (DroppedBaseline = '') then
+            exit;
+
+        //Unlike the other steps this one has no upgrade tag, as it must re-evaluate the api version on every deployment.
+        //It is logged only when it actually changes something, so support can tell what a deployment did to a tenant that
+        //was running a pinned version.
+        _UpgradeStep :=
+            StrSubstNo(
+                'UpdateShopifySetup (api version ''%1'' -> ''%2'', dropped override baseline ''%3'')',
+                ShopifySetup."Shopify Api Version", NewApiVersion, DroppedBaseline);
+        LogStart();
+
+        ShopifySetup."Shopify Api Version" := NewApiVersion;
+        ShopifySetup."Api Version Override Baseline" := '';
         ShopifySetup.Modify();
+
+        LogFinish();
     end;
 
     internal procedure RegisterShopifyAppRequestListenerWebservice()

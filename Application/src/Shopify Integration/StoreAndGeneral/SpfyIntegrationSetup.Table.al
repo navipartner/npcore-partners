@@ -48,11 +48,12 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Shopify Api Version';
             DataClassification = CustomerContent;
-            InitValue = '2025-10';
+            InitValue = '2026-04';
 
             trigger OnValidate()
             var
                 ShopifySetup2: Record "NPR Spfy Integration Setup";
+                PreviousApiVersion: Text[10];
                 ConfirmApiVersionChangeQst: Label 'The recommended %1 is ‘%3’, which this integration has been tested against. Changing it to ‘%2’ is not recommended and could cause some Shopify data exchange procedures to stop working or malfunction. Do you want to change the %1 anyway?', Comment = '%1 = Shopify Api Version field caption, %2 = the API version being entered, %3 = the recommended API version';
             begin
                 ShopifySetup2.Init();
@@ -61,9 +62,31 @@ table 6150807 "NPR Spfy Integration Setup"
                 else
                     CheckApiVersionFormat("Shopify Api Version");
                 if not ("Shopify Api Version" in ['', ShopifySetup2."Shopify Api Version"]) then
-                    if not Confirm(ConfirmApiVersionChangeQst, false, FieldCaption("Shopify Api Version"), "Shopify Api Version", ShopifySetup2."Shopify Api Version") then
-                        "Shopify Api Version" := ShopifySetup2."Shopify Api Version";
+                    if not Confirm(ConfirmApiVersionChangeQst, false, FieldCaption("Shopify Api Version"), "Shopify Api Version", ShopifySetup2."Shopify Api Version") then begin
+                        PreviousApiVersion := xRec."Shopify Api Version";
+                        if PreviousApiVersion = '' then
+                            PreviousApiVersion := ShopifySetup2."Shopify Api Version";
+                        "Shopify Api Version" := PreviousApiVersion;
+                    end;
+
+                if "Shopify Api Version" = ShopifySetup2."Shopify Api Version" then
+                    "Api Version Override Baseline" := ''
+                else
+                    "Api Version Override Baseline" := ShopifySetup2."Shopify Api Version";
             end;
+        }
+        field(31; "Api Version Override Baseline"; Text[10])
+        {
+            Caption = 'Api Version Override Baseline';
+            DataClassification = CustomerContent;
+            Editable = false;
+            // Records the recommended (InitValue) api version that was in effect when an admin deliberately confirmed a
+            // different "Shopify Api Version". While it still matches the recommended version, the upgrade codeunit leaves
+            // their choice alone. Once a new recommended version ships the baseline is dropped, and the stored version is
+            // raised to the new recommended one only if it is lower - a version pinned above it keeps its value.
+            // Blank therefore means "the upgrade routine tracks this tenant forward-only", NOT "the tenant runs the
+            // recommended version": a legacy override predating this field, or one left pinned above a newer recommended
+            // version, also has no baseline.
         }
         field(40; "Item List Integration"; Boolean)
         {

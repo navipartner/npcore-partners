@@ -484,6 +484,11 @@ codeunit 6248540 "NPR Spfy Send Customers"
         ShopifyCustomerID: Text[30];
         LinkExists: Boolean;
     begin
+        //The Shopify round-trip that produced ShopifyResponse can take long enough for another session - the customer
+        //webhook, order import or Nc task processing all reach this - to have created the store-customer link in the
+        //meantime. Drop the session data cache so the Find() below sees those committed writes instead of missing the
+        //link and trying to insert a duplicate.
+        SelectLatestVersion();
 #pragma warning disable AA0139
         ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyResponse, 'customer.id', true), '/');
 #pragma warning restore AA0139

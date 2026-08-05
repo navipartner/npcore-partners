@@ -490,6 +490,37 @@ page 6184704 "NPR Spfy Store Card"
                 }
 #endif
             }
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+            group(SalesReturnIntegrationArea)
+            {
+                Caption = 'Sales Return Order Integration';
+
+                field("Sales Return Order Integration"; Rec."Sales Return Order Integration")
+                {
+                    Caption = 'Enabled';
+                    ToolTip = 'Specifies whether the system imports completed (closed) sales returns from the Shopify store. Imported returns are created as sales return orders in Business Central and posted automatically, producing posted sales credit memos, with the Shopify refund recorded as a payment line.';
+                    ApplicationArea = NPRShopify;
+                }
+                field("Get Returns Starting From"; Rec."Get Returns Starting From")
+                {
+                    ToolTip = 'Specifies the date and time from which completed returns are imported from the Shopify store on the first run. Returns are located by scanning Shopify orders updated since this point, so the value filters on when an order was last updated, not on when a return was closed.';
+                    ApplicationArea = NPRShopify;
+                    ShowMandatory = true;
+                }
+                field("Last Returns Imported At"; _LastReturnsImportedAt)
+                {
+                    Caption = 'Last Returns Imported At';
+                    ToolTip = 'Specifies the date and time returns were last imported from the Shopify store. On the next run, the system scans Shopify orders updated after this point and imports their closed returns.';
+                    ApplicationArea = NPRShopify;
+                    Importance = Additional;
+
+                    trigger OnValidate()
+                    begin
+                        Rec.SetLastReturnsImportedAt(_LastReturnsImportedAt);
+                    end;
+                }
+            }
+#endif
             group(Connection)
             {
                 Caption = 'Connection Parameters';
@@ -733,6 +764,10 @@ page 6184704 "NPR Spfy Store Card"
         _LastPOSEntryRowVersion := Rec."Last POS Entry Row Version";
 #endif
         _LastOrdersImportedAt := Rec."Last Orders Imported At (FF)";
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        Rec.CalcFields("Last Returns Imported At (FF)");
+        _LastReturnsImportedAt := Rec."Last Returns Imported At (FF)";
+#endif
 
         if _SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::" ", Rec.Code) then begin
             Parameters.Add('StoreCode', Rec.Code);
@@ -851,6 +886,9 @@ page 6184704 "NPR Spfy Store Card"
         _ItemCategoryMetafieldID: Text[30];
         _LoyaltyPointsMetafieldID: Text[30];
         _LastOrdersImportedAt: DateTime;
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        _LastReturnsImportedAt: DateTime;
+#endif
 #if not (BC18 or BC19 or BC20)
         _LastPOSEntryRowVersion: BigInteger;
 #endif

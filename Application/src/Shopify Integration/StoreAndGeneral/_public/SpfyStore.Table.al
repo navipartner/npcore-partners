@@ -323,6 +323,8 @@ table 6150810 "NPR Spfy Store"
                 FeatureEnabled := ShopifyEcommOrderExp.IsFeatureEnabled();
                 if "Sales Return Order Integration" and not FeatureEnabled then
                     Error(FeatureNotEnabledErr, ShopifyEcommOrderExp.GetFeatureDescription(), FieldCaption("Sales Return Order Integration"));
+                if "Sales Return Order Integration" then
+                    TestField("Get Returns Starting From");
                 Modify();
                 if FeatureEnabled then
                     SpfyEcomSalesDocPrcssr.SetupJobQueues();

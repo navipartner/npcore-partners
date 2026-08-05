@@ -12,6 +12,10 @@ enum 6059862 "NPR Spfy Order FinancialStatus"
     {
         Caption = 'Paid';
     }
+    value(25; "Partially Paid")
+    {
+        Caption = 'Partially Paid';
+    }
     value(30; Pending)
     {
         Caption = 'Pending';
