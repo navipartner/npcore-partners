@@ -62,12 +62,12 @@ codeunit 6151091 "NPR MMTimelineDescribeEvent" implements "NPR MMTimelineTypeInt
         CancelLabel: Label 'Cancelled';
         AutoRenewLabel: Label 'Auto-Renewed';
         ForeignLabel: Label 'Foreign Membership';
-        ActivatedDetailsLabel: Label 'The membership was activated on %1. The valid from date is %2 until %3.';
+        ActivatedDetailsLabel: Label 'The membership was activated on %1. The valid from date is %2 until %3. Amount %4.', Comment = '%1 = date, %2 = valid from, %3 = valid until, %4 = amount incl. VAT';
         CreatedDetailsLabel: Label 'The membership was issued on %1 with a valid from date %2.';
-        RenewedDetailsLabel: Label 'The membership was renewed on %1. The new valid from date is %2 until %3.';
-        UpgradeDetailsLabel: Label 'The membership was upgraded on %1. The valid from date was %2 until %3.';
-        ExtendDetailsLabel: Label 'The membership was extended on %1. The valid from date was %2 until %3.';
-        AutoRenewDetailsLabel: Label 'The membership was auto-renewed on %1. The valid from date was %2 until %3.';
+        RenewedDetailsLabel: Label 'The membership was renewed on %1. The new valid from date is %2 until %3. Amount %4.', Comment = '%1 = date, %2 = valid from, %3 = valid until, %4 = amount incl. VAT';
+        UpgradeDetailsLabel: Label 'The membership was upgraded on %1. The valid from date was %2 until %3. Amount %4.', Comment = '%1 = date, %2 = valid from, %3 = valid until, %4 = amount incl. VAT';
+        ExtendDetailsLabel: Label 'The membership was extended on %1. The valid from date was %2 until %3. Amount %4.', Comment = '%1 = date, %2 = valid from, %3 = valid until, %4 = amount incl. VAT';
+        AutoRenewDetailsLabel: Label 'The membership was auto-renewed on %1. The valid from date was %2 until %3. Amount %4.', Comment = '%1 = date, %2 = valid from, %3 = valid until, %4 = amount incl. VAT';
         ForeignDetailsLabel: Label 'The membership was marked as foreign membership on %1. The valid from date was %2 until %3.';
 
         CancelDetailsLabel: Label 'The membership was cancelled on %1. New valid until date is %2.';
@@ -87,31 +87,31 @@ codeunit 6151091 "NPR MMTimelineDescribeEvent" implements "NPR MMTimelineTypeInt
                 begin
                     MembershipEntry.GetBySystemId(TimelineEvent.SourceSystemId);
                     TimelineEvent.Title := ActivatedLabel;
-                    TimelineEvent.Details := StrSubstNo(ActivatedDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
+                    TimelineEvent.Details := StrSubstNo(ActivatedDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", FormatAmount(MembershipEntry."Amount Incl VAT"));
                 end;
             "NPR MMTimelineEventType"::MEMBERSHIP_RENEWED:
                 begin
                     MembershipEntry.GetBySystemId(TimelineEvent.SourceSystemId);
                     TimelineEvent.Title := RenewedLabel;
-                    TimelineEvent.Details := StrSubstNo(RenewedDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
+                    TimelineEvent.Details := StrSubstNo(RenewedDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", FormatAmount(MembershipEntry."Amount Incl VAT"));
                 end;
             "NPR MMTimelineEventType"::MEMBERSHIP_UPGRADE:
                 begin
                     MembershipEntry.GetBySystemId(TimelineEvent.SourceSystemId);
                     TimelineEvent.Title := UpgradeLabel;
-                    TimelineEvent.Details := StrSubstNo(UpgradeDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
+                    TimelineEvent.Details := StrSubstNo(UpgradeDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", FormatAmount(MembershipEntry."Amount Incl VAT"));
                 end;
             "NPR MMTimelineEventType"::MEMBERSHIP_EXTEND:
                 begin
                     MembershipEntry.GetBySystemId(TimelineEvent.SourceSystemId);
                     TimelineEvent.Title := ExtendLabel;
-                    TimelineEvent.Details := StrSubstNo(ExtendDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
+                    TimelineEvent.Details := StrSubstNo(ExtendDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", FormatAmount(MembershipEntry."Amount Incl VAT"));
                 end;
             "NPR MMTimelineEventType"::MEMBERSHIP_AUTORENEW:
                 begin
                     MembershipEntry.GetBySystemId(TimelineEvent.SourceSystemId);
                     TimelineEvent.Title := AutoRenewLabel;
-                    TimelineEvent.Details := StrSubstNo(AutoRenewDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
+                    TimelineEvent.Details := StrSubstNo(AutoRenewDetailsLabel, MembershipEntry.SystemCreatedAt, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", FormatAmount(MembershipEntry."Amount Incl VAT"));
                 end;
             "NPR MMTimelineEventType"::MEMBERSHIP_FOREIGN:
                 begin
@@ -209,8 +209,8 @@ codeunit 6151091 "NPR MMTimelineDescribeEvent" implements "NPR MMTimelineTypeInt
         SubscriptionRequest: Record "NPR MM Subscr. Request";
         InitialSaleDetailsLabel: Label 'Subscription initial sale on %1. Amount %2 %3. Status: %4.', Comment = '%1 = date, %2 = amount, %3 = currency, %4 = status';
         RenewDetailsLabel: Label 'Subscription renewal on %1. New valid period %2 to %3. Amount %4 %5. Status: %6.', Comment = '%1 = date, %2 = valid from, %3 = valid until, %4 = amount, %5 = currency, %6 = status';
-        RegretDetailsLabel: Label 'Subscription regret on %1. Status: %2.', Comment = '%1 = date, %2 = status';
-        PartialRegretDetailsLabel: Label 'Subscription partial regret on %1. New valid until date %2. Status: %3.', Comment = '%1 = date, %2 = new valid until date, %3 = status';
+        RegretDetailsLabel: Label 'Subscription regret on %1. Amount %2 %3. Status: %4.', Comment = '%1 = date, %2 = amount, %3 = currency, %4 = status';
+        PartialRegretDetailsLabel: Label 'Subscription partial regret on %1. New valid until date %2. Amount %3 %4. Status: %5.', Comment = '%1 = date, %2 = new valid until date, %3 = amount, %4 = currency, %5 = status';
         PaymentMethodDetailsLabel: Label 'Payment method change on %1. Status: %2.', Comment = '%1 = date, %2 = status';
         TerminateDetailsLabel: Label 'Subscription termination requested on %1, effective %2. Status: %3.', Comment = '%1 = date, %2 = terminate at date, %3 = status';
         EnableDetailsLabel: Label 'Subscription enabled on %1. Status: %2.', Comment = '%1 = date, %2 = status';
@@ -220,13 +220,13 @@ codeunit 6151091 "NPR MMTimelineDescribeEvent" implements "NPR MMTimelineTypeInt
         TimelineEvent.Title := CopyStr(Format(TimelineEvent.EventType), 1, MaxStrLen(TimelineEvent.Title));
         case TimelineEvent.EventType of
             "NPR MMTimelineEventType"::SUBSCRIPTION_INITIAL_SALE:
-                TimelineEvent.Details := StrSubstNo(InitialSaleDetailsLabel, SubscriptionRequest.SystemCreatedAt, Format(SubscriptionRequest.Amount, 0, '<Precision,2:2><Standard Format,0>'), SubscriptionRequest."Currency Code", SubscriptionRequest.Status);
+                TimelineEvent.Details := StrSubstNo(InitialSaleDetailsLabel, SubscriptionRequest.SystemCreatedAt, FormatAmount(SubscriptionRequest.Amount), SubscriptionRequest."Currency Code", SubscriptionRequest.Status);
             "NPR MMTimelineEventType"::SUBSCRIPTION_RENEW:
-                TimelineEvent.Details := StrSubstNo(RenewDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date", Format(SubscriptionRequest.Amount, 0, '<Precision,2:2><Standard Format,0>'), SubscriptionRequest."Currency Code", SubscriptionRequest.Status);
+                TimelineEvent.Details := StrSubstNo(RenewDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date", FormatAmount(SubscriptionRequest.Amount), SubscriptionRequest."Currency Code", SubscriptionRequest.Status);
             "NPR MMTimelineEventType"::SUBSCRIPTION_REGRET:
-                TimelineEvent.Details := StrSubstNo(RegretDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest.Status);
+                TimelineEvent.Details := StrSubstNo(RegretDetailsLabel, SubscriptionRequest.SystemCreatedAt, FormatAmount(SubscriptionRequest.Amount), SubscriptionRequest."Currency Code", SubscriptionRequest.Status);
             "NPR MMTimelineEventType"::SUBSCRIPTION_PARTIAL_REGRET:
-                TimelineEvent.Details := StrSubstNo(PartialRegretDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest."New Valid Until Date", SubscriptionRequest.Status);
+                TimelineEvent.Details := StrSubstNo(PartialRegretDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest."New Valid Until Date", FormatAmount(SubscriptionRequest.Amount), SubscriptionRequest."Currency Code", SubscriptionRequest.Status);
             "NPR MMTimelineEventType"::SUBSCRIPTION_PAYMENT_METHOD:
                 TimelineEvent.Details := StrSubstNo(PaymentMethodDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest.Status);
             "NPR MMTimelineEventType"::SUBSCRIPTION_TERMINATE:
@@ -236,6 +236,11 @@ codeunit 6151091 "NPR MMTimelineDescribeEvent" implements "NPR MMTimelineTypeInt
             "NPR MMTimelineEventType"::SUBSCRIPTION_DISABLE:
                 TimelineEvent.Details := StrSubstNo(DisableDetailsLabel, SubscriptionRequest.SystemCreatedAt, SubscriptionRequest.Status);
         end;
+    end;
+
+    local procedure FormatAmount(Amount: Decimal): Text
+    begin
+        exit(Format(Amount, 0, '<Precision,2:2><Standard Format,0>'));
     end;
 
     local procedure DescribeMemberInfoChangeEvent(var TimelineEvent: Record "NPR MMTimelineEventBuffer")
