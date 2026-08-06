@@ -195,4 +195,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'Job Queue Notifications via NP Email';
         Implementation = "NPR Feature Management" = "NPR JQNotifNPEmailFeature";
     }
+    value(310; "Pay by Link Notif. via NP Email")
+    {
+        Caption = 'Pay by Link Notifications via NP Email';
+        Implementation = "NPR Feature Management" = "NPR PayByLinkNPEmailFeature";
+    }
 }

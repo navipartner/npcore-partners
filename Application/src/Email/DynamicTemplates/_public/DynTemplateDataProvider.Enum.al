@@ -48,4 +48,9 @@ enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataP
         Caption = 'Job Queue Notification';
         Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailJobQueueDataProv";
     }
+    value(9; PAY_BY_LINK)
+    {
+        Caption = 'Pay by Link';
+        Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailPayByLinkDataProv";
+    }
 }

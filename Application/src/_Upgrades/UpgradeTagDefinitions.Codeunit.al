@@ -271,6 +271,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewCashDrawerOpenExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'ShopifyOrderNoWithoutPrefixHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'JQNotifNPEmailHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'PayByLinkNPEmailHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSEditorFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSStatisticsDashboardFeatureHandle'));
@@ -287,6 +288,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewCashDrawerOpenExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ShopifyOrderNoWithoutPrefixHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG JQ Notif NP Email", 'JQNotifNPEmailHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PayByLink NP Email", 'PayByLinkNPEmailHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Update Wizards", 'UpdateWizardFiscalization'));
@@ -1061,6 +1063,8 @@
                         exit('NPR-ShopifyOrderNoWithoutPrefixHandle-20260725');
                     'JQNotifNPEmailHandle':
                         exit('NPR-JQNotifNPEmailHandle-20260804');
+                    'PayByLinkNPEmailHandle':
+                        exit('NPR-PayByLinkNPEmailHandle-20260805');
                 end;
             Codeunit::"NPR UPG New Feature Handler":
                 case UpgradeStep of
@@ -1099,6 +1103,11 @@
                 case UpgradeStep of
                     'JQNotifNPEmailHandle':
                         exit('NPR-JQNotifNPEmailHandle-20260804');
+                end;
+            Codeunit::"NPR UPG PayByLink NP Email":
+                case UpgradeStep of
+                    'PayByLinkNPEmailHandle':
+                        exit('NPR-PayByLinkNPEmailHandle-20260805');
                 end;
             Codeunit::"NPR UPG Pay By Link Setup":
                 case UpgradeStep of

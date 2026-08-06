@@ -87,6 +87,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"New Cash Drawer Open Experience");
         AddFeature(Feature::"Shopify Order No. Without Prefix");
         AddFeature(Feature::"JQ Notifications via NP Email");
+        AddFeature(Feature::"Pay by Link Notif. via NP Email");
 
         if ExistingFeature.FindSet() then
             repeat
@@ -128,6 +129,7 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleNewCashDrawerOpenExperience();
         NewFeatureHandler.HandleShopifyOrderNoWithoutPrefix();
         NewFeatureHandler.HandleJQNotifNPEmail();
+        NewFeatureHandler.HandlePayByLinkNPEmail();
         RefreshExperienceTierCurrentCompany();
     end;
 

@@ -178,6 +178,12 @@ table 6150801 "NPR Adyen Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header".Code;
         }
+        field(155; "Pay By Link NP Email Template"; Code[20])
+        {
+            Caption = 'Pay By Link NP Email Template';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const("NPR DynTemplateDataProvider"::PAY_BY_LINK));
+        }
         field(160; "Pay By Link Account Type"; Enum "Payment Balance Account Type")
         {
             Caption = 'Pay By Link Account Type';

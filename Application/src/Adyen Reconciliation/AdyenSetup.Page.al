@@ -148,6 +148,14 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Pay By Link E-Mail Template field.';
                     Caption = 'E-Mail Template';
+                    Visible = not _PayByLinkNPEmailEnabled;
+                }
+                field("NP Email Template"; Rec."Pay By Link NP Email Template")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the NP Email template, which will be used for creation and sending of Pay by Link e-mails.';
+                    Caption = 'NP Email Template';
+                    Visible = _PayByLinkNPEmailEnabled;
                 }
                 field("SMS Template"; Rec."Pay By Link SMS Template")
                 {
@@ -334,6 +342,7 @@ page 6184531 "NPR Adyen Setup"
     var
         EnvironmentInformation: Codeunit "Environment Information";
         AdyenSetupInit: Record "NPR Adyen Setup";
+        PayByLinkNPEmailFeature: Codeunit "NPR PayByLinkNPEmailFeature";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -353,6 +362,7 @@ page 6184531 "NPR Adyen Setup"
         _AdyenGenericSetup := Rec;
         Rec.CalcFields("Active Webhooks");
         _IsSaaS := not EnvironmentInformation.IsOnPrem();
+        _PayByLinkNPEmailEnabled := PayByLinkNPEmailFeature.IsFeatureEnabled();
 
         if (Rec.HasDownloadReportAPIKey()) then
             _APIDownloadReportSecretKey := '***';
@@ -377,6 +387,7 @@ page 6184531 "NPR Adyen Setup"
         _AdyenManagement: Codeunit "NPR Adyen Management";
         _ManagementAPIKeyNotValidNotification: Notification;
         _IsSaaS: Boolean;
+        _PayByLinkNPEmailEnabled: Boolean;
         _APIManagementSecretKey: Text;
         _APIDownloadReportSecretKey: Text;
 }

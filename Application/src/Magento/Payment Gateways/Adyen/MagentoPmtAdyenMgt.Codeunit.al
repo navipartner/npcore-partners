@@ -725,9 +725,30 @@
         RecRef: RecordRef;
         EmailManagement: Codeunit "NPR E-mail Management";
         EmailTemplateHeader: Record "NPR E-mail Template Header";
+        NPEmail: Codeunit "NPR NP Email";
+        PayByLinkNPEmailFeature: Codeunit "NPR PayByLinkNPEmailFeature";
+        Sentry: Codeunit "NPR Sentry";
         MailErrorMsg: Text;
+        OwnsTransaction: Boolean;
         EmailSentLbl: Label 'E-mail has been successfully sent.';
     begin
+        if PayByLinkNPEmailFeature.IsFeatureEnabled() then begin
+            GetPayByLinkSetup();
+            AdyenPayByLinkSetup.TestField("Pay By Link NP Email Template");
+            if not NPEmail.TrySendEmail(AdyenPayByLinkSetup."Pay By Link NP Email Template", MagentoPaymentLine, Email, GetDocumentLanguageCode(MagentoPaymentLine)) then begin
+                MailErrorMsg := GetLastErrorText();
+                OwnsTransaction := not Sentry.HasActiveTransaction();
+                if OwnsTransaction then
+                    Sentry.InitScopeAndTransaction('Pay by Link notification email', 'bc.magento.paybylink.notification.email');
+                Sentry.AddLastErrorIfProgrammingBug();
+                if OwnsTransaction then
+                    Sentry.FinalizeScope();
+                Error(MailErrorMsg);
+            end;
+            Message(EmailSentLbl);
+            exit;
+        end;
+
         RecRef.GetTable(MagentoPaymentLine);
         RecRef.SetRecFilter();
 
@@ -742,6 +763,41 @@
             Message(EmailSentLbl)
         else
             Error(MailErrorMsg);
+    end;
+
+    local procedure GetDocumentLanguageCode(MagentoPaymentLine: Record "NPR Magento Payment Line"): Code[10]
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    begin
+        case MagentoPaymentLine."Document Table No." of
+            Database::"Sales Header":
+                begin
+                    SalesHeader.SetLoadFields("Language Code");
+                    if SalesHeader.Get(MagentoPaymentLine."Document Type", MagentoPaymentLine."Document No.") then
+                        exit(SalesHeader."Language Code");
+                end;
+            Database::"Sales Invoice Header":
+                begin
+                    SalesInvoiceHeader.SetLoadFields("Language Code");
+                    if SalesInvoiceHeader.Get(MagentoPaymentLine."Document No.") then
+                        exit(SalesInvoiceHeader."Language Code");
+                end;
+            Database::"Sales Cr.Memo Header":
+                begin
+                    SalesCrMemoHeader.SetLoadFields("Language Code");
+                    if SalesCrMemoHeader.Get(MagentoPaymentLine."Document No.") then
+                        exit(SalesCrMemoHeader."Language Code");
+                end;
+            Database::"NPR Ecom Sales Header":
+                begin
+                    EcomSalesHeader.SetLoadFields("Language Code");
+                    if EcomSalesHeader.GetBySystemId(MagentoPaymentLine."NPR Inc Ecom Sale Id") then
+                        exit(EcomSalesHeader."Language Code");
+                end;
+        end;
     end;
 
     local procedure GetPayByLinkSetup()
