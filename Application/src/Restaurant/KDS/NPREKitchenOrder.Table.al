@@ -90,12 +90,16 @@
         key(Key1; "Order ID")
         {
         }
+        // Covers the KDS board and customer-display polls that filter the order's restaurant
         key(Key2; "Restaurant Code", "Order Status", Priority, "Created Date-Time")
         {
+            IncludedFields = "Expected Dine Date-Time", "Finished Date-Time";
         }
+        // Serves the readers that filter status with no restaurant filter on the order:
+        // the station-filtered KDS branch, delayed-order notifications, the retention policy
         key(Key3; "Order Status")
         {
-            IncludedFields = Priority, "Created Date-Time", "Expected Dine Date-Time", "Finished Date-Time";
+            IncludedFields = "On Hold", "Created Date-Time";
         }
     }
 
