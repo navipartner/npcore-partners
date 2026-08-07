@@ -96,27 +96,9 @@ codeunit 6184940 "NPR POSActionEFTDocPayRsrv" implements "NPR IPOS Workflow"
 
     local procedure ReserverPayment(Sale: Codeunit "NPR POS Sale"): JsonObject
     var
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SalesHeader: Record "Sales Header";
         POSActEFTDocPayRsrvB: Codeunit "NPR POSActionEFTDocPayRsrvB";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
     begin
-        Sale.GetCurrentSale(SalePOS);
-
-        if not POSActEFTDocPayRsrvB.GetSalesHeaderFromPOSSale(SalePOS, SalesHeader) then
-            exit;
-
-        POSActEFTDocPayRsrvB.CreateDocumentPaymentReservationLines(SalePOS);
-
-        POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, false, false, SalesHeader."Print Posted Documents", false, false);
-
-        SaleLinePOS.DeleteAll();
-        SalePOS.Delete();
-        Sale.SetEnded(true);
-        Commit();
-
-        Sale.SelectViewForEndOfSale();
+        POSActEFTDocPayRsrvB.FinalizeReservation(Sale);
     end;
 
     local procedure DeletePaymentLines()

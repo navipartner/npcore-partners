@@ -182,6 +182,34 @@
         until SaleLinePOS.Next() = 0;
     end;
 
+    internal procedure FinalizeReservation(Sale: Codeunit "NPR POS Sale")
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalesHeader: Record "Sales Header";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+    begin
+        Sale.GetCurrentSale(SalePOS);
+
+        if not GetSalesHeaderFromPOSSale(SalePOS, SalesHeader) then
+            exit;
+
+        CreateDocumentPaymentReservationLines(SalePOS);
+
+        POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, false, false, SalesHeader."Print Posted Documents", false, false);
+
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if not SaleLinePOS.IsEmpty() then
+            SaleLinePOS.DeleteAll();
+
+        SalePOS.Delete();
+        Sale.SetEnded(true);
+        Commit();
+
+        Sale.SelectViewForEndOfSale();
+    end;
+
     internal procedure ReservePOSPaymentLine(SaleLinePOS: Record "NPR POS Sale Line"; SalesHeader: Record "Sales Header"; var MagentoPaymentLine: Record "NPR Magento Payment Line") Reserved: Boolean;
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
