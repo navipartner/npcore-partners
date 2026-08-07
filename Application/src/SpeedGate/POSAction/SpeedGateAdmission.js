@@ -40,14 +40,17 @@ let main = async ({ workflow, parameters, context, popup, captions }) => {
       });
     } else {
       if (actionResponse.confirmedGroup) {
-        toast.success(`Welcome group of ${actionResponse.qtyToAdmit} people`, {
-          title: windowTitle,
-        });
+        let msg = `Welcome group of ${actionResponse.qtyToAdmit} people`;
+        if (actionResponse.item_description) {
+          msg += ` - ${actionResponse.item_description}`;
+        }
+        toast.success(msg, { title: windowTitle });
       } else {
-        toast.success(
-          `Welcome ${actionResponse.table_capt} ${actionResponse.reference_no}`,
-          { title: windowTitle }
-        );
+        let msg = `Welcome ${actionResponse.table_capt} ${actionResponse.reference_no}`;
+        if (actionResponse.item_description) {
+          msg += ` - ${actionResponse.item_description}`;
+        }
+        toast.success(msg, { title: windowTitle });
       }
     }
   }

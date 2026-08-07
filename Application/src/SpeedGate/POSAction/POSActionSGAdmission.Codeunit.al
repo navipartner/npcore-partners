@@ -39,7 +39,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:SpeedGateAdmission.js###
-'let main=async({workflow:a,parameters:r,context:n,popup:m,captions:i})=>{let e;if(windowTitle=i.Welcome,r.input_reference_no)n.input_reference_no=r.input_reference_no;else if(n.input_reference_no=await m.input({title:i.InputReferenceNoTitle,caption:i.InputReferenceNo}),!n.input_reference_no)return;const o=await a.respond("try_admit");o.isUnconfirmedGroup?n.quantityToAdmUnconfirmedGroup=await m.numpad({caption:i.QuantityAdmitLbl,title:i.QuantityAdmitLbl,value:o.defaultQuantity}):n.quantityToAdmUnconfirmedGroup=0;const t=await a.respond("admit_token");e=await a.respond("membercard_validation"),t.success&&(e.MemberScanned?toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:e.MemberScanned.Valid,memberExpiry:e.MemberScanned.ExpiryDate,content:[{caption:e.MemberScanned.MembershipCodeCaption,value:e.MemberScanned.MembershipCodeDescription}]}):t.confirmedGroup?toast.success(`Welcome group of ${t.qtyToAdmit} people`,{title:windowTitle}):toast.success(`Welcome ${t.table_capt} ${t.reference_no}`,{title:windowTitle}))};'
+'let main=async({workflow:a,parameters:m,context:n,popup:o,captions:t})=>{let i;if(windowTitle=t.Welcome,m.input_reference_no)n.input_reference_no=m.input_reference_no;else if(n.input_reference_no=await o.input({title:t.InputReferenceNoTitle,caption:t.InputReferenceNo}),!n.input_reference_no)return;const d=await a.respond("try_admit");d.isUnconfirmedGroup?n.quantityToAdmUnconfirmedGroup=await o.numpad({caption:t.QuantityAdmitLbl,title:t.QuantityAdmitLbl,value:d.defaultQuantity}):n.quantityToAdmUnconfirmedGroup=0;const e=await a.respond("admit_token");if(i=await a.respond("membercard_validation"),e.success)if(i.MemberScanned)toast.memberScanned({memberImg:i.MemberScanned.ImageDataUrl,memberName:i.MemberScanned.Name,validForAdmission:i.MemberScanned.Valid,memberExpiry:i.MemberScanned.ExpiryDate,content:[{caption:i.MemberScanned.MembershipCodeCaption,value:i.MemberScanned.MembershipCodeDescription}]});else if(e.confirmedGroup){let r=`Welcome group of ${e.qtyToAdmit} people`;e.item_description&&(r+=` - ${e.item_description}`),toast.success(r,{title:windowTitle})}else{let r=`Welcome ${e.table_capt} ${e.reference_no}`;e.item_description&&(r+=` - ${e.item_description}`),toast.success(r,{title:windowTitle})}};'
 );
     end;
 
@@ -146,6 +146,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
             Response.Add('success', true);
             Response.Add('reference_no', ReferenceNo);
             Response.Add('table_capt', GetTableCaption(ReferenceNo));
+            Response.Add('item_description', GetItemDescription(AdmitToken));
             Response.Add('welcome_message', WelcomeMsg);
             Response.Add('confirmedGroup', ConfirmedGroup);
             Response.Add('qtyToAdmit', QtyToAdmit);
@@ -215,6 +216,30 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         AttractionWallet.SetRange(ReferenceNumber, CopyStr(ReferenceNo, 1, MaxStrLen(AttractionWallet.ReferenceNumber)));
         if not AttractionWallet.IsEmpty() then
             exit(AttractionWallet.TableCaption);
+    end;
+
+    internal procedure GetItemDescription(AdmitToken: Guid): Text
+    var
+        ValidationRequest: Record "NPR SGEntryLog";
+        Ticket: Record "NPR TM Ticket";
+        Item: Record Item;
+    begin
+        ValidationRequest.SetCurrentKey(Token);
+        ValidationRequest.SetFilter(Token, '=%1', AdmitToken);
+        ValidationRequest.SetFilter(EntryStatus, '=%1', ValidationRequest.EntryStatus::ADMITTED);
+        ValidationRequest.SetLoadFields(AdmittedReferenceId);
+        if not ValidationRequest.FindFirst() then
+            exit('');
+
+        Ticket.SetLoadFields("Item No.");
+        if not Ticket.GetBySystemId(ValidationRequest.AdmittedReferenceId) then
+            exit('');
+
+        Item.SetLoadFields(Description);
+        if not Item.Get(Ticket."Item No.") then
+            exit('');
+
+        exit(Item.Description);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
