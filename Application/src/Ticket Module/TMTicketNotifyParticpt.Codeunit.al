@@ -4,7 +4,11 @@
     trigger OnRun()
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        NowAtService: DateTime;
     begin
+        NowAtService := TimeHelper.GetLocalTimeForService();
+
         TicketNotificationEntry.Reset();
         TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::STAKEHOLDER);
         TicketNotificationEntry.SetFilter("Notification Process Method", '=%1', TicketNotificationEntry."Notification Process Method"::BATCH);
@@ -18,13 +22,13 @@
         TicketNotificationEntry.Reset();
         TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::REMINDER);
         TicketNotificationEntry.SetFilter("Notification Process Method", '=%1', TicketNotificationEntry."Notification Process Method"::BATCH);
-        TicketNotificationEntry.SetFilter("Date To Notify", '=%1', Today());
-        TicketNotificationEntry.SetFilter("Time To Notify", '<=%1', Time());
+        TicketNotificationEntry.SetFilter("Date To Notify", '=%1', DT2Date(NowAtService));
+        TicketNotificationEntry.SetFilter("Time To Notify", '<=%1', DT2Time(NowAtService));
         SendGeneralNotification(TicketNotificationEntry);
 
         // this will catch those reminders that are scheduled closer to midnight than the frequency of the schedular
-        if (Time < 010000T) then begin
-            TicketNotificationEntry.SetFilter("Date To Notify", '=%1', CalcDate('<-1D>', TODAY));
+        if (DT2Time(NowAtService) < 010000T) then begin
+            TicketNotificationEntry.SetFilter("Date To Notify", '=%1', CalcDate('<-1D>', DT2Date(NowAtService)));
             TicketNotificationEntry.SetFilter("Time To Notify", '>%1', 230000T);
             SendGeneralNotification(TicketNotificationEntry);
         end;
@@ -992,8 +996,12 @@
         Item: Record Item;
         NpDesignerSetup: Record "NPR NPDesignerSetup";
         Manifest: Codeunit "NPR NPDesignerManifestFacade";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        NowAtService: DateTime;
+        CreatedAtService: DateTime;
     begin
 #pragma warning disable AA0217
+        NowAtService := TimeHelper.GetLocalTimeForService();
         Ticket.Get(DetTicketAccessEntry."Ticket No.");
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
@@ -1023,7 +1031,7 @@
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::WELCOME) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::WELCOME;
             // Schedule based on today
-            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, Today(), Time());
+            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, DT2Date(NowAtService), DT2Time(NowAtService));
         end;
 
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::RESERVATION) then begin
@@ -1040,24 +1048,25 @@
 
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::ON_EACH_ADMISSION) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADMIT;
-            // Schedule after admission occurred
-            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, DT2Date(DetTicketAccessEntry."Created Datetime"), DT2Time(DetTicketAccessEntry."Created Datetime"));
+            // Schedule after admission occurred, shifting the raw "Created Datetime" into service local time
+            CreatedAtService := DetTicketAccessEntry."Created Datetime" + (NowAtService - CurrentDateTime());
+            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, DT2Date(CreatedAtService), DT2Time(CreatedAtService));
         end;
 
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::REVOKE) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::CANCEL_RESERVE;
             // Schedule after NOW
-            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, Today(), Time());
+            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, DT2Date(NowAtService), DT2Time(NowAtService));
         end;
 
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::RESERVATION) then
-            if (CreateDateTime(NotificationEntry."Date To Notify", NotificationEntry."Time To Notify") < CurrentDateTime()) then
-                if (CreateDateTime(AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time") > CurrentDateTime()) then begin
-                    NotificationEntry."Date To Notify" := Today();
-                    NotificationEntry."Time To Notify" := Time();
+            if (CreateDateTime(NotificationEntry."Date To Notify", NotificationEntry."Time To Notify") < NowAtService) then
+                if (CreateDateTime(AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time") > NowAtService) then begin
+                    NotificationEntry."Date To Notify" := DT2Date(NowAtService);
+                    NotificationEntry."Time To Notify" := DT2Time(NowAtService);
                 end;
 
-        if (NotificationEntry."Date To Notify" < Today()) then
+        if (NotificationEntry."Date To Notify" < DT2Date(NowAtService)) then
             exit(0);
 
         if (not TicketNotProfileLine."Shared Detention Queue") then
