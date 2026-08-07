@@ -260,4 +260,44 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         exit(WalletManagement.GetWalletsHoldingAsset("NPR WalletLineType"::VOUCHER, AssetSystemId, ListOfWallets));
     end;
 
+    /// <summary>Returns the system ids of the tickets (NPR TM Ticket) the wallet currently holds via an
+    /// active (non-superseded) reference. Validity is NOT applied — blocked/expired tickets are still returned;
+    /// the caller decides usability. ListOfTickets is cleared on entry. Returns true if any tickets are found.</summary>
+    procedure GetTicketsInWallet(WalletEntryNo: Integer; var ListOfTickets: List of [Guid]): Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.GetAssetsInWallet("NPR WalletLineType"::TICKET, WalletEntryNo, ListOfTickets));
+    end;
+
+    /// <summary>Returns the system ids of the membership cards (NPR MM Member Card) the wallet currently holds
+    /// via an active (non-superseded) reference. Validity is NOT applied — blocked/expired cards are still
+    /// returned; the caller decides usability. ListOfMemberCards is cleared on entry. Returns true if any membership cards are found.</summary>
+    procedure GetMembershipsInWallet(WalletEntryNo: Integer; var ListOfMemberCards: List of [Guid]): Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.GetAssetsInWallet("NPR WalletLineType"::MEMBERSHIP, WalletEntryNo, ListOfMemberCards));
+    end;
+
+    /// <summary>Returns the system ids of the coupons the wallet currently holds via an active
+    /// (non-superseded) reference. Validity is NOT applied — blocked/expired coupons are still returned;
+    /// the caller decides usability. ListOfCoupons is cleared on entry. Returns true if any coupons are found.</summary>
+    procedure GetCouponsInWallet(WalletEntryNo: Integer; var ListOfCoupons: List of [Guid]): Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.GetAssetsInWallet("NPR WalletLineType"::COUPON, WalletEntryNo, ListOfCoupons));
+    end;
+
+    /// <summary>Returns the system ids of the vouchers the wallet currently holds via an active
+    /// (non-superseded) reference. Validity is NOT applied — blocked/expired vouchers are still returned;
+    /// the caller decides usability. ListOfVouchers is cleared on entry. Returns true if any vouchers are found.</summary>
+    procedure GetVouchersInWallet(WalletEntryNo: Integer; var ListOfVouchers: List of [Guid]): Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.GetAssetsInWallet("NPR WalletLineType"::VOUCHER, WalletEntryNo, ListOfVouchers));
+    end;
+
 }
