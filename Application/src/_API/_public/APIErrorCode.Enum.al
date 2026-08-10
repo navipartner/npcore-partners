@@ -294,4 +294,8 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'Membership is not valid for today', Locked = true;
     }
+    value(6060159; member_operation_in_progress)
+    {
+        Caption = 'A concurrent operation is modifying the same member. Retry shortly.', Locked = true;
+    }
 }

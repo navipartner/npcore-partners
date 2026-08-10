@@ -54,6 +54,7 @@
         AGE_VERIFICATION_NO: Label '-127007';
         ALLOW_MEMBER_MERGE_NOT_SET_NO: Label '-127008';
         MEMBER_WITH_UID_EXISTS_NO: Label '-127009';
+        CONCURRENT_ADD_MEMBER_DUPLICATE_NO: Label '-127010';
         NO_LEDGER_ENTRY: Label 'The membership %1 is not valid.\\It must be activated, but there is no ledger entry associated with that membership that can be activated.';
         _NOT_ACTIVATED: Label 'The membership is marked as activate on first use, but has not been activated yet. Retry the action after the membership has been activated.';
         NOT_FOUND: Label '%1 not found. %2';
@@ -65,6 +66,7 @@
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
         ALLOW_MEMBER_MERGE_NOT_SET: Label 'This request violates the community’s unique member identity rules. See the API documentation for merge options.';
         MEMBER_WITH_UID_EXISTS: Label 'Member with unique ID [%1] with name: %2 is already in use.';
+        CONCURRENT_MEMBER_UPDATE: Label 'A member with the same unique ID is being handled by another process. Please try again later.';
 
     internal procedure CreateMembershipInteractive(var MemberInfoCapture: Record "NPR MM Member Info Capture") ExternalCardNumber: Text[100];
     var
@@ -361,6 +363,9 @@
         MemberCount: Integer;
         GuardianMemberEntryNo: Integer;
         ReuseExistingMember: Boolean;
+        ClaimTokens: List of [Text];
+        ClaimToken: Text;
+        Claim: Record "NPR MM MemberIdClaim";
     begin
         Sentry.StartSpan(Span, 'bc.membership.addnamedmember');
         Membership.Get(MembershipEntryNo);
@@ -369,17 +374,18 @@
         ReuseExistingMember := false;
 
         Member.Init();
+
+        GetMemberIdClaimTokens(Community, MembershipInfoCapture, ClaimTokens);
+        foreach ClaimToken in ClaimTokens do
+            if (not Claim.Acquire(ClaimToken, SessionId())) then
+                exit(RaiseError(ReasonText, CONCURRENT_MEMBER_UPDATE, CONCURRENT_ADD_MEMBER_DUPLICATE_NO) = 0);
+
         if (Member.Get(CheckMemberUniqueId(Community.Code, MembershipInfoCapture))) then begin
             SetMemberFields(Member, MembershipInfoCapture);
             ValidateMemberFields(Membership."Entry No.", Member, ErrorText);
             Member.Modify();
             MemberEntryNo := Member."Entry No.";
-
-            ReuseExistingMember := (Community."Create Member UI Violation" = Community."Create Member UI Violation");
-            if (not ReuseExistingMember) then begin
-                Span.Finish();
-                exit(MemberEntryNo <> 0);
-            end;
+            ReuseExistingMember := true;
         end;
 
         if (not ReuseExistingMember) then begin
@@ -453,6 +459,7 @@
 
         MemberEntryNo := Member."Entry No.";
         Span.Finish();
+
         exit(MemberEntryNo <> 0);
     end;
 
@@ -996,6 +1003,10 @@
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
+        Community: Record "NPR MM Member Community";
+        Claim: Record "NPR MM MemberIdClaim";
+        ClaimTokens: List of [Text];
+        ClaimToken: Text;
         ErrorText: Text;
         CommunityCode: Code[20];
     begin
@@ -1006,9 +1017,17 @@
         if (not Membership.Get(MembershipEntryNo)) then
             exit(false);
 
-        if (CurrentClientType <> ClientType::SOAP) then // To not disturb the SOAP service that uses the same function 
-            if (GetMemberCommunityCode(MemberEntryNo, CommunityCode)) then
+        if (CurrentClientType <> ClientType::SOAP) then // To not disturb the SOAP service that uses the same function
+            if (GetMemberCommunityCode(MemberEntryNo, CommunityCode)) then begin
+                Community.Get(CommunityCode);
+
+                GetMemberIdClaimTokens(Community, MembershipInfoCapture, ClaimTokens);
+                foreach ClaimToken in ClaimTokens do
+                    if (not Claim.Acquire(ClaimToken, SessionId())) then
+                        exit(RaiseError(ErrorText, CONCURRENT_MEMBER_UPDATE, CONCURRENT_ADD_MEMBER_DUPLICATE_NO) = 0);
+
                 CheckMemberUniqueId(CommunityCode, MembershipInfoCapture);
+            end;
 
         Member.Get(MemberEntryNo);
         SetMemberFields(Member, MembershipInfoCapture);
@@ -1513,6 +1532,9 @@
         end;
 
         SetMemberUniqueIdFilter(Community, MemberInfoCapture, Member);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        Member.ReadIsolation(IsolationLevel::ReadUncommitted);
+#endif
         ConflictingMemberExists := Member.FindFirst();
 
         MembershipEvents.OnCheckMemberUniqueIdViolation(Community, MemberInfoCapture, Member, ConflictingMemberExists);
@@ -1569,11 +1591,20 @@
 
     internal procedure SetMemberUniqueIdFilter(Community: Record "NPR MM Member Community"; MemberInfoCapture: Record "NPR MM Member Info Capture"; var Member: Record "NPR MM Member")
     var
+        UniqueKeys: List of [Text];
+    begin
+        SetMemberUniqueIdFilter(Community, MemberInfoCapture, Member, UniqueKeys);
+    end;
+
+    internal procedure SetMemberUniqueIdFilter(Community: Record "NPR MM Member Community"; MemberInfoCapture: Record "NPR MM Member Info Capture"; var Member: Record "NPR MM Member"; var UniqueKeys: List of [Text])
+    var
         RequireField: Label '%1 is required.';
         RequireFieldOrField: Label 'Either %1 or %2 is required.';
         RequireFieldAndField: Label 'Both %1 and %2 are required.';
         FiltersAreSet: Boolean;
     begin
+        Clear(UniqueKeys);
+
         Member.FilterGroup(240);
         Member.SetFilter(Blocked, '=%1', false);
         if (MemberInfoCapture."Member Entry No" <> 0) then
@@ -1583,6 +1614,9 @@
         FiltersAreSet := false;
         MembershipEvents.OnSetMemberUniqueIdFilter(Community, MemberInfoCapture, Member, FiltersAreSet);
         if (FiltersAreSet) then
+            // A subscriber has taken over the uniqueness decision - this hook exists to BYPASS uniqueness, e.g.
+            // anonymous memberships that deliberately let many members share one address ("anonymous@...").
+            // With the built-in rule bypassed there is no invariant for the mutex to protect so emit no key: no lock.
             exit;
 
         case Community."Member Unique Identity" of
@@ -1593,18 +1627,21 @@
                     if (MemberInfoCapture."E-Mail Address" = '') then
                         Error(RequireField, MemberInfoCapture.FieldCaption("E-Mail Address"));
                     Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
+                    UniqueKeys.Add(EmailKey(MemberInfoCapture."E-Mail Address"));
                 end;
             Community."Member Unique Identity"::PHONENO:
                 begin
                     if (MemberInfoCapture."Phone No." = '') then
                         Error(RequireField, MemberInfoCapture.FieldCaption("Phone No."));
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+                    UniqueKeys.Add(PhoneKey(MemberInfoCapture."Phone No."));
                 end;
             Community."Member Unique Identity"::SSN:
                 begin
                     if (MemberInfoCapture."Social Security No." = '') then
                         Error(RequireField, MemberInfoCapture.FieldCaption("Social Security No."));
                     Member.SetFilter("Social Security No.", '=%1', MemberInfoCapture."Social Security No.");
+                    UniqueKeys.Add(SsnKey(MemberInfoCapture."Social Security No."));
                 end;
             Community."Member Unique Identity"::EMAIL_AND_PHONE:
                 begin
@@ -1613,22 +1650,30 @@
                     Member.SetCurrentKey("E-Mail Address");
                     Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+                    UniqueKeys.Add('EAP:' + EmailKey(MemberInfoCapture."E-Mail Address") + '|' + PhoneKey(MemberInfoCapture."Phone No."));
                 end;
             Community."Member Unique Identity"::EMAIL_OR_PHONE:
                 begin
                     if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." = '')) then
                         Error(RequireFieldOrField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("Phone No."));
 
-                    if ((MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." = '')) then
+                    if ((MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." = '')) then begin
                         Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
+                        UniqueKeys.Add(EmailKey(MemberInfoCapture."E-Mail Address"));
+                    end;
 
-                    if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '')) then
+                    if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '')) then begin
                         Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+                        UniqueKeys.Add(PhoneKey(MemberInfoCapture."Phone No."));
+                    end;
 
                     if ((MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '')) then begin
+                        // OR uniqueness: a member collides on EITHER field, so each present field is its own lock key.
                         Member.FilterGroup(-1);
                         Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
                         Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+                        UniqueKeys.Add(EmailKey(MemberInfoCapture."E-Mail Address"));
+                        UniqueKeys.Add(PhoneKey(MemberInfoCapture."Phone No."));
                     end;
                 end;
             Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
@@ -1638,10 +1683,50 @@
                     Member.SetCurrentKey("E-Mail Address");
                     Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
                     Member.SetFilter("First Name", '%1', '@' + MemberInfoCapture."First Name");
+                    // First Name filter is case-insensitive ('@'), so the key lowercases it to match.
+                    UniqueKeys.Add('EAF:' + EmailKey(MemberInfoCapture."E-Mail Address") + '|' + LowerCase(MemberInfoCapture."First Name"));
                 end;
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
         end;
+    end;
+
+    local procedure EmailKey(Email: Text): Text
+    begin
+        exit('EMAIL:' + LowerCase(Email));
+    end;
+
+    local procedure PhoneKey(Phone: Text): Text
+    begin
+        exit('PHONE:' + LowerCase(Phone));
+    end;
+
+    local procedure SsnKey(Ssn: Text): Text
+    begin
+        exit('SSN:' + LowerCase(Ssn));
+    end;
+
+    internal procedure GetMemberIdClaimTokens(Community: Record "NPR MM Member Community"; MembershipInfoCapture: Record "NPR MM Member Info Capture"; var ClaimTokens: List of [Text])
+    var
+        MemberFilter: Record "NPR MM Member";
+        ClaimFeature: Codeunit "NPR MemberUniqueIdGuardFeature";
+    begin
+        Clear(ClaimTokens);
+
+        if (not ClaimFeature.IsFeatureEnabled()) then
+            exit;
+
+        if (Community."Create Member UI Violation" = Community."Create Member UI Violation"::Confirm) then
+            if (GuiAllowed()) then
+                exit;
+
+        if (MembershipInfoCapture."Information Context" = MembershipInfoCapture."Information Context"::FOREIGN) then begin
+            if (MembershipInfoCapture."External Member No" <> '') then
+                ClaimTokens.Add('EXT-NO:' + MembershipInfoCapture."External Member No");
+            exit;
+        end;
+
+        SetMemberUniqueIdFilter(Community, MembershipInfoCapture, MemberFilter, ClaimTokens);
     end;
 
     internal procedure BlockMembership(MembershipEntryNo: Integer; Block: Boolean)

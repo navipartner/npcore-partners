@@ -113,6 +113,23 @@
     end;
 
 
+    /// <summary>
+    /// Lets a subscriber take over the member-uniqueness decision for a community: set FilterSet to true and apply your
+    /// own filter on ConflictingMember (a matching record is treated as a conflict). This hook exists primarily to BYPASS
+    /// uniqueness - e.g. communities that deliberately let many named members share one placeholder e-mail - by applying a
+    /// never-match filter such as ConflictingMember.SetRange("Entry No.", -1). When you take over, the built-in identity
+    /// rule is skipped.
+    /// Concurrency: AddNamedMember and (non-SOAP) UpdateMember serialize the built-in uniqueness rule with a per-identity
+    /// mutex. A subscriber-handled rule is intentionally NOT locked - there is no server-owned invariant to protect, and
+    /// locking a bypass would serialize exactly the shared-address create path this hook enables. If a subscriber ever needs its own
+    /// custom uniqueness serialized under concurrency, that requires a dedicated key-emitting event, not this hook: the
+    /// filter set here cannot be reverse-engineered into a stable lock key (it may use any filter group, and its text is
+    /// locale-dependent).
+    /// </summary>
+    /// <param name="Community">The community whose uniqueness rule is being resolved.</param>
+    /// <param name="MemberInfoCapture">The member data being created or updated.</param>
+    /// <param name="ConflictingMember">Apply your uniqueness filter here; a matching record is treated as a conflict.</param>
+    /// <param name="FilterSet">Set to true to signal you have taken over the uniqueness decision (skips the built-in rule).</param>
     [IntegrationEvent(false, false)]
     [CommitBehavior(CommitBehavior::Error)]
     internal procedure OnSetMemberUniqueIdFilter(Community: Record "NPR MM Member Community"; MemberInfoCapture: Record "NPR MM Member Info Capture"; var ConflictingMember: Record "NPR MM Member"; var FilterSet: Boolean)

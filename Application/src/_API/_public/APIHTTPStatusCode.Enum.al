@@ -52,6 +52,11 @@ enum 6059813 "NPR API HTTP Status Code"
         Caption = 'Not Found', Locked = true;
     }
 
+    value(409; "Conflict")
+    {
+        Caption = 'Conflict', Locked = true;
+    }
+
     value(500; "Internal Server Error")
     {
         Caption = 'Internal Server Error', Locked = true;

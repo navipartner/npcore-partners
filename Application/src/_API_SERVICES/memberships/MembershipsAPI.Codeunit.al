@@ -249,7 +249,10 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         ResponseMessage := GetLastErrorText();
         ApiError := ErrorToEnum(ResponseMessage);
 
-        Response.CreateErrorResponse(ApiError, ResponseMessage);
+        if (ApiError = Enum::"NPR API Error Code"::member_operation_in_progress) then
+            Response.CreateErrorResponse(ApiError, ResponseMessage, Enum::"NPR API HTTP Status Code"::Conflict)
+        else
+            Response.CreateErrorResponse(ApiError, ResponseMessage);
         LogMessage(Request, ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
         Span.Finish();
         exit(Response);
@@ -289,6 +292,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
         if (ErrorMessage.StartsWith('[-127101]')) then
             exit(Enum::"NPR API Error Code"::invalid_national_identifier_value);
+
+        if (ErrorMessage.StartsWith('[-127010]')) then
+            exit(Enum::"NPR API Error Code"::member_operation_in_progress);
 
         exit(Enum::"NPR API Error Code"::generic_error);
 

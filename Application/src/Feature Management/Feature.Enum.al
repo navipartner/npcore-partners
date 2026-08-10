@@ -130,6 +130,11 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'BC Media in Cloudflare R2 Storage', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR MemberImageMediaFeature";
     }
+    value(186; "MemberUniqueIDConcurrencyGuard")
+    {
+        Caption = 'Member Unique ID Concurrency Guard', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR MemberUniqueIdGuardFeature";
+    }
     value(190; "New Attraction Print Exerience")
     {
         Caption = 'New Attraction Print Experience';
