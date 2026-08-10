@@ -110,11 +110,7 @@ page 6151294 "NPR TM Ticket Card"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the POS Receipt No. field';
                 }
-                field("Salesperson Code"; Rec."Salesperson Code")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
-                }
+
                 field("Ticket Type Code"; Rec."Ticket Type Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
@@ -141,7 +137,98 @@ page 6151294 "NPR TM Ticket Card"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
+
+                group(SoldBy)
+                {
+                    Caption = 'Sold By';
+                    Editable = false;
+                    field("Salesperson Code"; Rec."Salesperson Code")
+                    {
+                        Caption = 'Code';
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Salesperson Code field';
+                    }
+
+                    field(SoldByName; _SoldByName)
+                    {
+                        Caption = 'Name';
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Salesperson Name field';
+                    }
+
+                }
+                group(CreatedBy)
+                {
+                    Caption = 'Created By';
+                    Editable = false;
+                    field(CreatedByCode; _SystemCreatedByCode)
+                    {
+                        Caption = 'Code';
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Created By Code field';
+                    }
+
+                    field(CreatedByName; _SystemCreatedByName)
+                    {
+                        Caption = 'Name';
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Created By Name field';
+                    }
+                }
+
+
             }
         }
     }
+
+    var
+
+        _SystemCreatedByName: Text[100];
+        _SystemCreatedByCode: Code[50];
+        _SoldByName: Text[100];
+
+
+    trigger OnAfterGetRecord()
+    begin
+        _SystemCreatedByCode := GetUserCode(Rec.SystemCreatedBy);
+        _SystemCreatedByName := GetUserName(Rec.SystemCreatedBy);
+
+        if (Rec."Salesperson Code" <> _SystemCreatedByCode) then
+            _SoldByName := GetSoldByName(Rec."Salesperson Code")
+        else
+            _SoldByName := _SystemCreatedByName;
+    end;
+
+    local procedure GetUserName(UserId: Guid): Text[100]
+    var
+        User: Record User;
+    begin
+        if (User.Get(UserId)) then begin
+            if (User."Full Name" <> '') then
+                exit(User."Full Name");
+            exit(User."User Name");
+        end;
+
+        exit('--');
+    end;
+
+    local procedure GetUserCode(UserId: Guid): Code[50]
+    var
+        User: Record User;
+    begin
+        if (User.Get(UserId)) then
+            exit(User."User Name");
+
+        exit('--');
+    end;
+
+    local procedure GetSoldByName(SalespersonCode: Code[20]): Text[100]
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        if (Salesperson.Get(SalespersonCode)) then
+            exit(Salesperson.Name);
+
+        exit('--');
+    end;
 }

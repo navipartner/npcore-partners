@@ -123,6 +123,14 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
+
+                field(CreatedByCode; _SystemCreatedByCode)
+                {
+                    Caption = 'Created By Code';
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Created By Code field';
+                }
+
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -604,6 +612,23 @@
         ETICKET_SENT: Label 'eTicket sent.';
         CONFIRM_ETICKET: Label 'Are you sure you want to create and send %1 eTickets?';
         _TurboSearch: Code[100];
+        _SystemCreatedByCode: Code[50];
+
+
+    trigger OnAfterGetRecord()
+    begin
+        _SystemCreatedByCode := GetUserCode(Rec.SystemCreatedBy);
+    end;
+
+    local procedure GetUserCode(UserId: Guid): Code[50]
+    var
+        User: Record User;
+    begin
+        if (User.Get(UserId)) then
+            exit(User."User Name");
+
+        exit('--');
+    end;
 
     local procedure ChangeTicketHolder()
     var

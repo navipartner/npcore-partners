@@ -3779,6 +3779,8 @@
     local procedure InsertTicket(ItemNo: Code[20]; VariantCode: Code[10]; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var Ticket: Record "NPR TM Ticket"; var TicketManagement: Codeunit "NPR TM Ticket Management")
     var
         UserSetup: Record "User Setup";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         Ticket.Init();
         Ticket."No." := '';
@@ -3799,8 +3801,14 @@
         Ticket.ListPriceInclVat := ReservationRequest.TicketListPriceInclVat;
         Ticket.ListPriceExclVat := ReservationRequest.TicketListPriceExclVat;
 
-        if (UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID")))) then
-            Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";
+        if (POSSession.IsInitialized()) then begin
+            POSSession.GetSetup(POSSetup);
+            Ticket."Salesperson Code" := POSSetup.Salesperson();
+        end;
+
+        if (Ticket."Salesperson Code" = '') then
+            if (UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID")))) then
+                Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";
 
         if (Ticket."Salesperson Code" = '') then
             Ticket."Salesperson Code" := CopyStr(UserId(), 1, MaxStrLen(Ticket."Salesperson Code"));
