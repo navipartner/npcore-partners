@@ -136,6 +136,9 @@
         {
             SumIndexFields = Amount, Quantity;
         }
+        key(Key3; "Document No.", "Document Type")
+        {
+        }
     }
 }
 
