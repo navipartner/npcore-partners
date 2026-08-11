@@ -851,6 +851,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         Member: Record "NPR MM Member";
         MemberCardSwipe: Record "NPR MM Member Arr. Log Entry";
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
+        MembershipSetup: Record "NPR MM Membership Setup";
         TimeZoneHelper: Codeunit "NPR TM TimeHelper";
         HavePicture: Boolean;
     begin
@@ -867,6 +868,10 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
         if (not Member.Get(MemberCard."Member Entry No.")) then
             exit(ResponseJson.AddProperty('member', 'not found'));
+
+        MembershipSetup.SetLoadFields(Code, Description);
+        if (not MembershipSetup.Get(Membership."Membership Code")) then
+            MembershipSetup.Init();
 
         MemberCardSwipe.SetCurrentKey("External Membership No.", "External Member No.");
         MemberCardSwipe.SetFilter("External Membership No.", '=%1', Membership."External Membership No.");
@@ -886,6 +891,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('memberCardId', Format(MemberCard.SystemId, 0, 4).ToLower())
             .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
             .AddProperty('membershipCode', Membership."Membership Code")
+            .AddProperty('membershipDescription', MembershipSetup.Description)
             .StartObject('previousScan')
                 .AddObject(AddRequiredProperty(ResponseJson, 'scannedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone(MemberCardSwipe."Admission Code", TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime(MemberCardSwipe."Admission Code", MemberCardSwipe."Created At"))))
                 .AddProperty('scannerId', MemberCardSwipe."Scanner Station Id")
