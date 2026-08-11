@@ -494,6 +494,14 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Open the Environment Information page';
                     ApplicationArea = NPRRetail;
                 }
+                action("NPR Licensed Users")
+                {
+                    Caption = 'NPR Licensed Users';
+                    RunObject = page "NPR Licensed Users";
+
+                    ToolTip = 'View and configure which users are licensed for the NP Retail modules';
+                    ApplicationArea = NPRRetail;
+                }
 
             }
 
