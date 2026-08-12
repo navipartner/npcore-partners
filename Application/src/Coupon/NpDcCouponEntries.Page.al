@@ -16,6 +16,18 @@
         {
             repeater(Group)
             {
+                field("Coupon No."; Rec."Coupon No.")
+                {
+
+                    ToolTip = 'Specifies the value of the Coupon No. field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Coupon Type"; Rec."Coupon Type")
+                {
+
+                    ToolTip = 'Specifies the value of the Coupon Type field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Entry Type"; Rec."Entry Type")
                 {
 
