@@ -315,6 +315,23 @@ page 6248186 "NPR Ecom Sales Lines"
                 end;
             }
         }
+        area(Navigation)
+        {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                ApplicationArea = NPRRetail;
+                ToolTip = 'View the dimension set assigned to this line.';
+                trigger OnAction()
+                var
+                    DimMgt: Codeunit DimensionManagement;
+                    DimSetIdLbl: Label '%1 %2 %3', Locked = true;
+                begin
+                    DimMgt.ShowDimensionSet(Rec."Dimension Set ID", StrSubstNo(DimSetIdLbl, CurrPage.Caption(), Rec."External Document No.", Rec."Line No."));
+                end;
+            }
+        }
         area(Promoted)
         {
             group(Home)

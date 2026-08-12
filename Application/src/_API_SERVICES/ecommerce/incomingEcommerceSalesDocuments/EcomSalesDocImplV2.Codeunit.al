@@ -267,6 +267,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesDocImplEvents.OnAfterInsertSalesHeader(EcomSalesHeader, SalesHeader);
     end;
 
+    // Combines two dimension sets into one. Order matters: later entries in the array replace
+    // earlier ones per dimension code, so the ecom set passed second wins any conflict.
     local procedure MergeEcomDimSetID(BaseDimSetID: Integer; EcomDimSetID: Integer): Integer
     var
         DimSetIDArr: array[10] of Integer;
@@ -276,6 +278,18 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         DimSetIDArr[1] := BaseDimSetID;
         DimSetIDArr[2] := EcomDimSetID;
         exit(DimMgt.GetCombinedDimensionSetID(DimSetIDArr, ShortcutDim1Code, ShortcutDim2Code));
+    end;
+
+    // Merges the ecom line's dimensions onto the sales line created from it: the ecom line wins
+    // where both carry the same dimension code, everything else is combined. Must be called last
+    // in each insert path - every Validate can recreate the default dimensions and would discard
+    // this, and running after the BeforeFinalize event keeps a subscriber's work intact.
+    local procedure ApplyEcomSalesLineDimensions(EcomSalesLine: Record "NPR Ecom Sales Line"; var SalesLine: Record "Sales Line")
+    begin
+        if EcomSalesLine."Dimension Set ID" = 0 then
+            exit;
+        SalesLine."Dimension Set ID" := MergeEcomDimSetID(SalesLine."Dimension Set ID", EcomSalesLine."Dimension Set ID");
+        DimMgt.UpdateGlobalDimFromDimSetID(SalesLine."Dimension Set ID", SalesLine."Shortcut Dimension 1 Code", SalesLine."Shortcut Dimension 2 Code");
     end;
 
     local procedure InsertCustomer(EcomSalesHeader: Record "NPR Ecom Sales Header"; var Customer: Record Customer) Success: Boolean
@@ -570,6 +584,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         SalesLine."NPR Inc Ecom Sales Line Id" := EcomSalesLine.SystemId;
         EcomSalesDocCrtImplEvents.OnInsertSalesLineItemBeforeFinalizeSalesLine(EcomSalesHeader, SalesHeader, EcomSalesLine, SalesLine);
+        ApplyEcomSalesLineDimensions(EcomSalesLine, SalesLine);
         SalesLine.Modify(true);
     end;
 
@@ -590,6 +605,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         PopulateSalesLineDescriptionFromEcomSalesLine(EcomSalesLine, SalesLine);
         SalesLine."NPR Inc Ecom Sales Line Id" := EcomSalesLine.SystemId;
         EcomSalesDocImplEvents.OnInsertSalesLineCommentBeforeFinalizeSalesLine(EcomSalesHeader, SalesHeader, EcomSalesLine, SalesLine);
+        ApplyEcomSalesLineDimensions(EcomSalesLine, SalesLine);
         SalesLine.Modify(true);
     end;
 
@@ -647,6 +663,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         SalesLine."NPR Inc Ecom Sales Line Id" := EcomEcomSalesLine.SystemId;
         EcomSalesDocImplEvents.OnInsertSalesLineShipmentFeeBeforeFinalizeLine(EcomSalesHeader, SalesHeader, EcomEcomSalesLine, SalesLine);
+        ApplyEcomSalesLineDimensions(EcomEcomSalesLine, SalesLine);
         SalesLine.Modify(true);
     end;
 
@@ -715,6 +732,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             until NpRvSalesLine.Next() = 0;
 
         EcomSalesDocImplEvents.OnInsertSalesLineVoucherBeforeFinalizeLine(EcomSalesHeader, SalesHeader, EcomSalesLine, SalesLine);
+        ApplyEcomSalesLineDimensions(EcomSalesLine, SalesLine);
         SalesLine.Modify(true);
     end;
 

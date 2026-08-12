@@ -297,6 +297,11 @@ table 6151259 "NPR Ecom Sales Line"
             DataClassification = CustomerContent;
             Caption = 'Membership Operation';
         }
+        field(5230; "Dimension Set ID"; Integer)
+        {
+            Caption = 'Dimension Set ID';
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys

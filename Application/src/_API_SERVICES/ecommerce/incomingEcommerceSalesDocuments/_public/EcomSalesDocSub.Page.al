@@ -337,6 +337,20 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     CurrPage.Update(true);
                 end;
             }
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                ApplicationArea = NPRRetail;
+                ToolTip = 'View the dimension set assigned to this line.';
+                trigger OnAction()
+                var
+                    DimMgt: Codeunit DimensionManagement;
+                    DimSetIdLbl: Label '%1 %2 %3', Locked = true;
+                begin
+                    DimMgt.ShowDimensionSet(Rec."Dimension Set ID", StrSubstNo(DimSetIdLbl, CurrPage.Caption(), Rec."External Document No.", Rec."Line No."));
+                end;
+            }
         }
     }
 

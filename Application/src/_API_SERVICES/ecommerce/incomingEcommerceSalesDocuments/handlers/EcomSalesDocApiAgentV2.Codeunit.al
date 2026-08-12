@@ -158,30 +158,22 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 #pragma warning restore AA0139
     end;
 
+    // Reads the document-level dimensions of the request onto the ecom sales header.
     local procedure ProcessIncomingDimensions(RequestBody: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
-        TempDimSetEntry: Record "Dimension Set Entry" temporary;
-        JsonHelper: Codeunit "NPR Json Helper";
-        DimensionsJsonToken: JsonToken;
-        DimensionJsonToken: JsonToken;
-        SeenCodes: List of [Code[20]];
-        DimensionsNoArrayErr: Label 'The dimensions property is not an array.', Locked = true;
+        DimSetID: Integer;
     begin
-        if not JsonHelper.GetJsonToken(RequestBody, 'dimensions', DimensionsJsonToken) then
+        DimSetID := BuildIncomingDimensionSetID(RequestBody);
+        if DimSetID = 0 then
             exit;
 
-        if not DimensionsJsonToken.IsArray() then
-            Error(DimensionsNoArrayErr);
-
-        foreach DimensionJsonToken in DimensionsJsonToken.AsArray() do
-            AddIncomingDimension(TempDimSetEntry, DimensionJsonToken, SeenCodes);
-
-        if TempDimSetEntry.IsEmpty() then
-            exit;
-
-        UpdateHeaderDimensions(EcomSalesHeader, TempDimSetEntry);
+        UpdateHeaderDimensions(EcomSalesHeader, DimSetID);
     end;
 
+    // Validates one {code, valueCode} entry and adds it to the set being built. A dimension code
+    // may appear only once per set, since a dimension can hold a single value, so a repeat is a
+    // request error rather than an overwrite. CheckDimValue rejects unknown, blocked and heading
+    // values in one call.
     local procedure AddIncomingDimension(var TempDimSetEntry: Record "Dimension Set Entry" temporary; DimensionJsonToken: JsonToken; var SeenDimCodes: List of [Code[20]])
     var
         DimensionValue: Record "Dimension Value";
@@ -192,8 +184,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         DuplicateDimErr: Label 'Property %1 has duplicate dimension code: %2.', Comment = '%1 - absolute path, %2 - code', Locked = true;
     begin
 #pragma warning disable AA0139
-        DimensionCode := JsonHelper.GetJText(DimensionJsonToken, 'code', MaxStrLen(DimensionCode), true, true).ToUpper();
-        DimensionValueCode := JsonHelper.GetJText(DimensionJsonToken, 'valueCode', MaxStrLen(DimensionValueCode), true, true).ToUpper();
+        DimensionCode := NormalizeDimensionCode(DimensionJsonToken, 'code', MaxStrLen(DimensionCode));
+        DimensionValueCode := NormalizeDimensionCode(DimensionJsonToken, 'valueCode', MaxStrLen(DimensionValueCode));
 #pragma warning restore AA0139
         if SeenDimCodes.Contains(DimensionCode) then
             Error(DuplicateDimErr, JsonHelper.GetAbsolutePath(DimensionJsonToken, 'code'), DimensionCode);
@@ -207,6 +199,20 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         AddDimensionSetEntry(TempDimSetEntry, DimensionValue."Dimension Code", DimensionValue.Code, DimensionValue."Dimension Value ID");
     end;
 
+    // Trims before testing the length: a padded value must not be reported as too long, and a
+    // genuinely oversized code must not be silently truncated into a different dimension.
+    local procedure NormalizeDimensionCode(DimensionJsonToken: JsonToken; PropertyName: Text; MaxLength: Integer): Text
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        Value: Text;
+        LengthErr: Label 'Property %1 has incorrect length: %2. Max length: %3', Comment = '%1 - absolute path, %2 - length, %3 - max length', Locked = true;
+    begin
+        Value := JsonHelper.GetJText(DimensionJsonToken, PropertyName, true).Trim().ToUpper();
+        if StrLen(Value) > MaxLength then
+            Error(LengthErr, JsonHelper.GetAbsolutePath(DimensionJsonToken, PropertyName), StrLen(Value), MaxLength);
+        exit(Value);
+    end;
+
     local procedure AddDimensionSetEntry(var TempDimSetEntry: Record "Dimension Set Entry" temporary; DimensionCode: Code[20]; DimensionValueCode: Code[20]; DimensionValueId: Integer)
     begin
         TempDimSetEntry.Init();
@@ -216,22 +222,73 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         TempDimSetEntry.Insert();
     end;
 
-    local procedure UpdateHeaderDimensions(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempDimSetEntry: Record "Dimension Set Entry" temporary)
+    // Stores the header's dimension set and derives the two global dimension codes shown on the
+    // document, which the header keeps as its own fields.
+    local procedure UpdateHeaderDimensions(var EcomSalesHeader: Record "NPR Ecom Sales Header"; DimSetID: Integer)
     var
         DimMgt: Codeunit DimensionManagement;
     begin
-        EcomSalesHeader."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+        EcomSalesHeader."Dimension Set ID" := DimSetID;
         DimMgt.UpdateGlobalDimFromDimSetID(EcomSalesHeader."Dimension Set ID", EcomSalesHeader."Global Dimension 1 Code", EcomSalesHeader."Global Dimension 2 Code");
     end;
 
-    local procedure EmitDimensions(EcomSalesHeader: Record "NPR Ecom Sales Header"; var IncSalesDocumentJsonObject: Codeunit "NPR Json Builder")
+    // Turns a `dimensions` array into a dimension set, shared by the document header and every
+    // sales line so both validate identically. Returns 0 when the caller supplied none, which is
+    // how both callers recognise "nothing to store". Each entry is validated against the
+    // dimension setup here, at capture, rather than at document processing: the request is
+    // rejected while the caller is still on the line to fix it.
+    local procedure BuildIncomingDimensionSetID(SourceJsonToken: JsonToken): Integer
+    var
+        TempDimSetEntry: Record "Dimension Set Entry" temporary;
+        DimMgt: Codeunit DimensionManagement;
+        JsonHelper: Codeunit "NPR Json Helper";
+        DimensionsJsonToken: JsonToken;
+        DimensionJsonToken: JsonToken;
+        SeenCodes: List of [Code[20]];
+        DimensionsNoArrayErr: Label 'Property %1 is not an array.', Comment = '%1 - absolute path', Locked = true;
+    begin
+        if not JsonHelper.GetJsonToken(SourceJsonToken, 'dimensions', DimensionsJsonToken) then
+            exit(0);
+
+        // Clients modelling header and lines from one DTO serialize an unset collection as
+        // null rather than omitting it, so null means "no dimensions", not a bad request.
+        if DimensionsJsonToken.IsValue() then
+            if DimensionsJsonToken.AsValue().IsNull() then
+                exit(0);
+
+        if not DimensionsJsonToken.IsArray() then
+            Error(DimensionsNoArrayErr, JsonHelper.GetAbsolutePath(SourceJsonToken, 'dimensions'));
+
+        foreach DimensionJsonToken in DimensionsJsonToken.AsArray() do
+            AddIncomingDimension(TempDimSetEntry, DimensionJsonToken, SeenCodes);
+
+        if TempDimSetEntry.IsEmpty() then
+            exit(0);
+
+        exit(DimMgt.GetDimensionSetID(TempDimSetEntry));
+    end;
+
+    // Reads the dimensions of one sales line object onto the ecom sales line. Unlike the header,
+    // the line keeps only the set: a sales line derives its shortcut dimension codes when the
+    // dimensions are merged onto it during document processing.
+    local procedure ProcessIncomingLineDimensions(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+        EcomSalesLine."Dimension Set ID" := BuildIncomingDimensionSetID(SalesLineJsonToken);
+    end;
+
+    // Writes a dimension set back out as the `dimensions` array, for the document header and for
+    // each sales line. This returns what was stored, not the effective set of the created sales
+    // document, so a client reads back what it sent. Nothing is written when there are none, which
+    // keeps the response of a document without dimensions unchanged.
+    local procedure EmitDimensions(DimSetID: Integer; var IncSalesDocumentJsonObject: Codeunit "NPR Json Builder")
     var
         DimSetEntry: Record "Dimension Set Entry";
     begin
-        if EcomSalesHeader."Dimension Set ID" = 0 then
+        if DimSetID = 0 then
             exit;
 
-        DimSetEntry.SetRange("Dimension Set ID", EcomSalesHeader."Dimension Set ID");
+        DimSetEntry.SetRange("Dimension Set ID", DimSetID);
+        DimSetEntry.SetLoadFields("Dimension Code", "Dimension Value Code");
         if not DimSetEntry.FindSet() then
             exit;
 
@@ -462,6 +519,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         end;
         EcomSalesLine."External Line ID" := JsonHelper.GetJText(SalesLineJsonToken, 'externalLineId', MaxStrLen(EcomSalesLine."External Line ID"), true, false);
         EcomSalesLine."Parent Ext. Line ID" := JsonHelper.GetJText(SalesLineJsonToken, 'parentExternalLineId', MaxStrLen(EcomSalesLine."Parent Ext. Line ID"), true, false);
+
+        ProcessIncomingLineDimensions(SalesLineJsonToken, EcomSalesLine);
 
         EcomSalesDocApiEvents.OnAfterDeserializeIncomingEcomSalesLine(SalesLineJsonToken, EcomSalesLine);
 #pragma warning restore AA0139
@@ -834,7 +893,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                     .AddProperty('shipmentService', EcomSalesHeader."Shipment Service")
                                 .EndObject();
 
-        EmitDimensions(EcomSalesHeader, IncSalesDocumentJsonObject);
+        EmitDimensions(EcomSalesHeader."Dimension Set ID", IncSalesDocumentJsonObject);
 
         EcomSalesDocApiEvents.OnGetSalesDocumentCustomFieldsJsonObject(EcomSalesHeader, EcomSalesHeaderCustomFieldsObject);
         if EcomSalesHeaderCustomFieldsObject.IsInitialized() then
@@ -983,6 +1042,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             if EcomSalesLine."Parent Ext. Line ID" <> '' then
                 SalesLineDetailsJsonObject.AddProperty('parentExternalLineId', EcomSalesLine."Parent Ext. Line ID");
         end;
+
+        EmitDimensions(EcomSalesLine."Dimension Set ID", SalesLineDetailsJsonObject);
 
         EcomSalesDocApiEvents.OnCreateAddSalesLineDetailsCustomFieldsJsonObject(EcomSalesLine, SalesLineDetailsCustomFieldsJsonObject);
         if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then

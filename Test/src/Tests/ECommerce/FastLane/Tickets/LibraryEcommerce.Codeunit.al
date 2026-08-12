@@ -311,6 +311,60 @@ codeunit 85161 "NPR Library Ecommerce"
         EcomSalesHeader.FindFirst();
     end;
 
+    // Header of a create-document request, without lines, so a test can compose its own line
+    // objects. Pass a customer no. to have processing reuse that customer instead of creating one
+    // from the customer templates.
+    procedure BuildEcomDocumentBody(ExternalNo: Code[20]; DocumentTypeText: Text; CustomerNo: Code[20]): JsonObject
+    var
+        Body: JsonObject;
+    begin
+        Body.Add('externalNo', ExternalNo);
+        Body.Add('documentType', DocumentTypeText);
+        if CustomerNo <> '' then
+            AddSellToWithCustomerNo(Body, CustomerNo)
+        else
+            AddDefaultSellTo(Body);
+        exit(Body);
+    end;
+
+    // Posts a hand-composed request body to the V2 create endpoint. The payments array is
+    // required by the endpoint, so an empty one is supplied when the test did not add it.
+    procedure SubmitEcomDocumentBody(Body: JsonObject; ExternalNo: Code[20]; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Payments: JsonArray;
+    begin
+        if not Body.Contains('payments') then
+            Body.Add('payments', Payments);
+        ProcessEcomDocument(Body, ExternalNo, EcomSalesHeader);
+    end;
+
+    // Creates a single-item document, optionally carrying dimensions on the header, on the line,
+    // or on both. An empty array is left out of the request entirely, so a caller can ask for a
+    // document with no dimensions at all.
+    procedure InsertEcomDocumentWithDimensions(ExternalNo: Code[20]; DocumentTypeText: Text; ItemNo: Code[20]; CustomerNo: Code[20]; HeaderDimensions: JsonArray; LineDimensions: JsonArray; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Body: JsonObject;
+        Lines: JsonArray;
+        Line: JsonObject;
+    begin
+        Body := BuildEcomDocumentBody(ExternalNo, DocumentTypeText, CustomerNo);
+        if HeaderDimensions.Count() > 0 then
+            Body.Add('dimensions', HeaderDimensions);
+
+        Line.Add('type', 'item');
+        Line.Add('no', ItemNo);
+        Line.Add('quantity', 1);
+        Line.Add('unitPrice', 100);
+        Line.Add('vatPercent', 0);
+        Line.Add('lineAmount', 100);
+        if LineDimensions.Count() > 0 then
+            Line.Add('dimensions', LineDimensions);
+        Lines.Add(Line);
+        Body.Add('salesDocumentLines', Lines);
+
+        SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+    end;
+
     procedure CreateFCYCurrency(var Currency: Record Currency; ExchangeRate: Decimal)
     var
         GLSetup: Record "General Ledger Setup";
