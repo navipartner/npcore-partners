@@ -41,9 +41,14 @@ codeunit 6248632 "NPR API POS Sale"
     procedure SearchSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         POSUnitFilter: Text;
+        UserIdFilter: Text;
         POSSale: Record "NPR POS Sale";
         WithLines: Boolean;
+        FilterToCurrentUserId: Boolean;
         JsonArray: JsonArray;
+        UserFiltersMutuallyExclusiveErr: Label 'Query parameters userId and filterToCurrentUserId are mutually exclusive.', Locked = true;
+        InvalidCurrentUserFilterErr: Label 'Query parameter filterToCurrentUserId must be a valid boolean.', Locked = true;
+        UserIdTooLongErr: Label 'Query parameter userId cannot exceed %1 characters.', Comment = '%1 = Maximum number of characters.', Locked = true;
     begin
         Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
 
@@ -51,28 +56,38 @@ codeunit 6248632 "NPR API POS Sale"
             exit(Response.RespondBadRequest('Missing required query parameter: posunit'));
         POSUnitFilter := Request.QueryParams().Get('posunit');
 
+        if Request.QueryParams().ContainsKey('userId') and Request.QueryParams().ContainsKey('filterToCurrentUserId') then
+            exit(Response.RespondBadRequest(UserFiltersMutuallyExclusiveErr));
+
+        if Request.QueryParams().ContainsKey('userId') then begin
+            UserIdFilter := Request.QueryParams().Get('userId');
+            if StrLen(UserIdFilter) > MaxStrLen(POSSale."User ID") then
+                exit(Response.RespondBadRequest(StrSubstNo(UserIdTooLongErr, MaxStrLen(POSSale."User ID"))));
+        end;
+
+        if Request.QueryParams().ContainsKey('filterToCurrentUserId') then
+            if not Evaluate(FilterToCurrentUserId, Request.QueryParams().Get('filterToCurrentUserId')) then
+                exit(Response.RespondBadRequest(InvalidCurrentUserFilterErr));
+
         if Request.QueryParams().ContainsKey('withLines') then
             Evaluate(WithLines, Request.QueryParams().Get('withLines'));
 
         POSSale.ReadIsolation := IsolationLevel::ReadCommitted;
         POSSale.SetLoadFields(SystemId, "Sales Ticket No.", "Register No.", "Customer No.", "SystemCreatedAt", Date, "POS Store Code", "Salesperson Code", "VAT Bus. Posting Group", "Gen. Bus. Posting Group");
         POSSale.SetFilter("Register No.", '=%1', POSUnitFilter);
+        if Request.QueryParams().ContainsKey('userId') then
+            POSSale.SetRange("User ID", CopyStr(UserIdFilter, 1, MaxStrLen(POSSale."User ID")))
+        else
+            if FilterToCurrentUserId then
+                POSSale.SetRange("User ID", CopyStr(UserId, 1, MaxStrLen(POSSale."User ID")));
 
-        if (Request.Paths().Count() = 3) and (Request.Paths().Get(2) = 'search') then begin
-            //backwards compatibility
-            if not POSSale.FindLast() then
-                exit(Response.RespondResourceNotFound());
+        if not POSSale.FindSet() then
+            exit(Response.RespondResourceNotFound());
 
-            exit(Response.RespondOK(POSSaleAsJson(POSSale, WithLines)));
-        end else begin
-            if not POSSale.FindSet() then
-                exit(Response.RespondResourceNotFound());
-
-            repeat
-                JsonArray.Add(POSSaleAsJson(POSSale, WithLines).Build());
-            until POSSale.Next() = 0;
-            exit(Response.RespondOK(JsonArray));
-        end;
+        repeat
+            JsonArray.Add(POSSaleAsJson(POSSale, WithLines).Build());
+        until POSSale.Next() = 0;
+        exit(Response.RespondOK(JsonArray));
 
     end;
 

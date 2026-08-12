@@ -55,6 +55,25 @@ codeunit 85235 "NPR Library - NPRetail API"
         exit(Body);
     end;
 
+    internal procedure GetResponseBodyAsArray(Response: JsonObject) Body: JsonArray
+    var
+        FeatureFlag: Codeunit "NPR Feature Flags Management";
+        Base64Convert: Codeunit "Base64 Convert";
+        JToken: JsonToken;
+    begin
+        if not Response.Get('body', JToken) then
+            exit(Body);
+        if FeatureFlag.IsEnabled('bcRestApiProxyRawJsonStringTransfer') then begin
+            if JToken.IsArray then
+                exit(JToken.AsArray());
+        end else begin
+            if not JToken.IsValue then
+                exit(Body);
+            if Body.ReadFrom(Base64Convert.FromBase64(JToken.AsValue().AsText())) then;
+        end;
+        exit(Body);
+    end;
+
     internal procedure CreateAPIPermission(UserSecurityId: Guid; Company: Text; RoleId: Code[20])
     var
         AccessControl: Record "Access Control";

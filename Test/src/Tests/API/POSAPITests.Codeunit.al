@@ -208,6 +208,213 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleSearchAliases_ReturnAllSalesAsArrays()
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        SearchPOSUnit: Record "NPR POS Unit";
+        Response: JsonObject;
+        Body: JsonObject;
+        ResponseBody: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        Endpoints: List of [Text];
+        Endpoint: Text;
+    begin
+        // [SCENARIO] The two POS sale search routes are array-returning aliases
+        Initialize();
+
+        NPRLibraryPOSMasterData.CreatePOSUnit(SearchPOSUnit, _POSStore.Code, _POSStore."POS Posting Profile");
+        InsertPOSSaleForUser(SearchPOSUnit."No.", 'CORE1089-A', 'CORE1089-USER-A');
+        InsertPOSSaleForUser(SearchPOSUnit."No.", 'CORE1089-Z', 'CORE1089-USER-Z');
+        Commit();
+
+        Endpoints.Add('/pos/sale/search');
+        Endpoints.Add('/pos/sale');
+        foreach Endpoint in Endpoints do begin
+            Clear(QueryParams);
+            QueryParams.Add('posunit', SearchPOSUnit."No.");
+
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+
+            Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), Endpoint + ' should succeed');
+            ResponseBody := LibraryNPRetailAPI.GetResponseBodyAsArray(Response);
+            Assert.AreEqual(2, ResponseBody.Count(), Endpoint + ' should return every matching sale as an array');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleSearchAliases_UserFiltersReturnMatchingSaleArrays()
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        SearchPOSUnit: Record "NPR POS Unit";
+        Response: JsonObject;
+        ResponseBody: JsonArray;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        Endpoints: List of [Text];
+        Endpoint: Text;
+        ExplicitUserSaleId: Guid;
+        CurrentUserSaleId: Guid;
+        CurrentUserId: Code[50];
+    begin
+        // [SCENARIO] Both aliases apply explicit-user and current-user filters
+        Initialize();
+
+        CurrentUserId := CopyStr(UserId, 1, MaxStrLen(CurrentUserId));
+        NPRLibraryPOSMasterData.CreatePOSUnit(SearchPOSUnit, _POSStore.Code, _POSStore."POS Posting Profile");
+        ExplicitUserSaleId := InsertPOSSaleForUser(SearchPOSUnit."No.", 'CORE1089-A', 'CORE1089-EXPLICIT');
+        CurrentUserSaleId := InsertPOSSaleForUser(SearchPOSUnit."No.", 'CORE1089-B', CurrentUserId);
+        InsertPOSSaleForUser(SearchPOSUnit."No.", 'CORE1089-Z', 'CORE1089-OTHER');
+        Commit();
+
+        Endpoints.Add('/pos/sale/search');
+        Endpoints.Add('/pos/sale');
+        foreach Endpoint in Endpoints do begin
+            Clear(QueryParams);
+            QueryParams.Add('posunit', SearchPOSUnit."No.");
+            QueryParams.Add('userId', 'CORE1089-EXPLICIT');
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            AssertSingleSaleArray(Response, ExplicitUserSaleId, Endpoint + ' explicit-user filter');
+
+            QueryParams.Remove('userId');
+            QueryParams.Add('filterToCurrentUserId', 'true');
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            AssertSingleSaleArray(Response, CurrentUserSaleId, Endpoint + ' current-user filter');
+
+            QueryParams.Set('filterToCurrentUserId', 'TRUE');
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            AssertSingleSaleArray(Response, CurrentUserSaleId, Endpoint + ' uppercase current-user filter');
+
+            QueryParams.Set('filterToCurrentUserId', 'false');
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), Endpoint + ' false filter should succeed');
+            ResponseBody := LibraryNPRetailAPI.GetResponseBodyAsArray(Response);
+            Assert.AreEqual(3, ResponseBody.Count(), Endpoint + ' false filter should preserve the unfiltered array');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SearchSale_BothUserFilters_ReturnsBadRequest()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+        Endpoints: List of [Text];
+        Endpoint: Text;
+    begin
+        Initialize();
+        QueryParams.Add('posunit', _POSUnit."No.");
+        QueryParams.Add('userId', 'CORE1089-EXPLICIT');
+        QueryParams.Add('filterToCurrentUserId', 'true');
+
+        Endpoints.Add('/pos/sale/search');
+        Endpoints.Add('/pos/sale');
+        foreach Endpoint in Endpoints do begin
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            Assert.IsTrue(Response.Get('statusCode', JToken), Endpoint + ' response should contain statusCode');
+            Assert.AreEqual(400, JToken.AsValue().AsInteger(), Endpoint + ' should return Bad Request');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SearchSale_InvalidCurrentUserFilter_ReturnsBadRequest()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+        Endpoints: List of [Text];
+        Endpoint: Text;
+    begin
+        Initialize();
+        QueryParams.Add('posunit', _POSUnit."No.");
+        QueryParams.Add('filterToCurrentUserId', 'not-a-boolean');
+
+        Endpoints.Add('/pos/sale/search');
+        Endpoints.Add('/pos/sale');
+        foreach Endpoint in Endpoints do begin
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            Assert.IsTrue(Response.Get('statusCode', JToken), Endpoint + ' response should contain statusCode');
+            Assert.AreEqual(400, JToken.AsValue().AsInteger(), Endpoint + ' should return Bad Request');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SearchSale_UserIdTooLong_ReturnsBadRequest()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+        Endpoints: List of [Text];
+        Endpoint: Text;
+    begin
+        Initialize();
+        QueryParams.Add('posunit', _POSUnit."No.");
+        QueryParams.Add('userId', PadStr('', 51, 'X'));
+
+        Endpoints.Add('/pos/sale/search');
+        Endpoints.Add('/pos/sale');
+        foreach Endpoint in Endpoints do begin
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            Assert.IsTrue(Response.Get('statusCode', JToken), Endpoint + ' response should contain statusCode');
+            Assert.AreEqual(400, JToken.AsValue().AsInteger(), Endpoint + ' should return Bad Request');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SearchSale_UserIdWithNoMatch_ReturnsNotFound()
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        SearchPOSUnit: Record "NPR POS Unit";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+        Endpoints: List of [Text];
+        Endpoint: Text;
+    begin
+        Initialize();
+        NPRLibraryPOSMasterData.CreatePOSUnit(SearchPOSUnit, _POSStore.Code, _POSStore."POS Posting Profile");
+        InsertPOSSaleForUser(SearchPOSUnit."No.", 'CORE1089-A', 'CORE1089-EXISTING');
+        Commit();
+        QueryParams.Add('posunit', SearchPOSUnit."No.");
+        QueryParams.Add('userId', 'CORE1089-NO-MATCH');
+
+        Endpoints.Add('/pos/sale/search');
+        Endpoints.Add('/pos/sale');
+        foreach Endpoint in Endpoints do begin
+            Response := LibraryNPRetailAPI.CallApi('GET', Endpoint, Body, QueryParams, Headers);
+            Assert.IsTrue(Response.Get('statusCode', JToken), Endpoint + ' response should contain statusCode');
+            Assert.AreEqual(404, JToken.AsValue().AsInteger(), Endpoint + ' should return Not Found');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSale_NoPOSUnitInUserSetup_ReturnsBadRequest()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
@@ -2503,6 +2710,39 @@ codeunit 85157 "NPR POS API Tests"
         Assert.IsTrue(
             BillingQueueEntry.IsEmpty(),
             StrSubstNo('Billing event with ID %1 should not be registered.', Format(EventId, 0, 4)));
+    end;
+
+    local procedure AssertSingleSaleArray(Response: JsonObject; ExpectedSaleId: Guid; AssertionContext: Text)
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        ResponseBody: JsonArray;
+        SaleToken: JsonToken;
+        SaleObject: JsonObject;
+        SaleIdToken: JsonToken;
+    begin
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), AssertionContext + ' should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBodyAsArray(Response);
+        Assert.AreEqual(1, ResponseBody.Count(), AssertionContext + ' should return one sale');
+        Assert.IsTrue(ResponseBody.Get(0, SaleToken), AssertionContext + ' should contain a sale');
+        SaleObject := SaleToken.AsObject();
+        Assert.IsTrue(SaleObject.Get('saleId', SaleIdToken), AssertionContext + ' should contain saleId');
+        Assert.AreEqual(FormatGuid(ExpectedSaleId), SaleIdToken.AsValue().AsText(), AssertionContext + ' should return the expected sale');
+    end;
+
+    local procedure InsertPOSSaleForUser(POSUnitNo: Code[10]; SalesTicketNo: Code[20]; SaleUserId: Code[50]) SaleId: Guid
+    var
+        POSSale: Record "NPR POS Sale";
+    begin
+        POSSale.Init();
+        POSSale."Register No." := POSUnitNo;
+        POSSale."Sales Ticket No." := SalesTicketNo;
+        POSSale."POS Store Code" := _POSStore.Code;
+        POSSale.Date := Today;
+        POSSale.Insert(true);
+        POSSale."User ID" := SaleUserId;
+        POSSale.Modify();
+        exit(POSSale.SystemId);
     end;
 
     local procedure FormatGuid(Id: Guid): Text
