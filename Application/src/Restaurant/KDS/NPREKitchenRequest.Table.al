@@ -311,6 +311,7 @@
             KitchenReqStation.DeleteAll();
 
         DeleteSourceLinks();
+        DeleteModifiers();
     end;
 
     local procedure TestChangesAllowed()
@@ -394,6 +395,15 @@
         KitchenReqSourceLink.SetRange("Request No.", "Request No.");
         if not KitchenReqSourceLink.IsEmpty() then
             KitchenReqSourceLink.DeleteAll();
+    end;
+
+    local procedure DeleteModifiers()
+    var
+        KitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif.";
+    begin
+        KitchenRequestModifier.SetRange("Request No.", "Request No.");
+        if not KitchenRequestModifier.IsEmpty() then
+            KitchenRequestModifier.DeleteAll();
     end;
 
     internal procedure SetSourceDocLinkFilter(KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link")

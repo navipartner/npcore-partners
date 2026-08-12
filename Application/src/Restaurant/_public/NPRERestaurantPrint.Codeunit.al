@@ -50,20 +50,30 @@
 
     internal procedure PrintWaiterPadLinesToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
     var
+        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         NewRestaurantPrintExp: Codeunit "NPR New Restaurant Print Exp.";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        ModifiersUpdated: Boolean;
         Result: Boolean;
     begin
+        //A dish whose add-on lines changed is not eligible for sending itself, and removing its last add-on line leaves nothing
+        //eligible at all. Reconcile the kitchen's copy before the routines below decide there is nothing to send: telling the
+        //waiter "Nothing to send." rolls this back, so what was updated has to count as something sent.
+        //Only for kitchen orders: the serving request flows read this return value as "the serving step was requested", and a
+        //modifier reconcile is not a serving request.
+        if PrintType = _PrintTemplate."Print Type"::"Kitchen Order" then
+            ModifiersUpdated := KitchenOrderMgt.RefreshWaiterPadKitchenRequestModifiers(WaiterPad);
+
         if NewRestaurantPrintExp.IsFeatureEnabled() then begin
             Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen');
-            Result := PrintWaiterPadLinesToKitchenNew(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr)
+            Result := PrintWaiterPadLinesToKitchenNew(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr and not ModifiersUpdated)
         end else begin
             Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen-legacy');
-            Result := PrintWaiterPadLinesToKitchenOld(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr);
+            Result := PrintWaiterPadLinesToKitchenOld(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr and not ModifiersUpdated);
         end;
         Span.Finish();
-        exit(Result);
+        exit(Result or ModifiersUpdated);
     end;
 
     local procedure PrintWaiterPadLinesToKitchenOld(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean

@@ -12,6 +12,7 @@
         CFRM_Merge: Label 'Do you want to move lines from waiter pad %1 %2 into waiter pad %3 %4.';
         WPInAnotherSale: Label 'Waiter pad %1 (seating %2) is being processed in another sale at the moment. If you continue, you will get only lines, which were not copied to the other sale.\Are you sure you want to continue?';
         WPInParkedSale: Label 'Waiter pad %1 (seating %2) is currently held in a parked sale. If you continue, you will get only the lines that are not being held by the parked sale.\Are you sure you want to continue?';
+        _MovedWaiterPadLineMap: Dictionary of [Text, Integer];
 
     procedure SplitWaiterPadLine(var FromWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad")
     var
@@ -46,6 +47,7 @@
             NewWaiterPadLine."Discount Amount" := 0;
         end;
         NewWaiterPadLine.Insert(true);
+        RelinkMovedWaiterPadLine(FromWaiterPadLine, ToWaiterPad, NewWaiterPadLine);
 
         WaiterPadMgt.CopyAssignedPrintCategories(FromWaiterPadLine.RecordId, NewWaiterPadLine.RecordId);
         WaiterPadMgt.CopyAssignedFlowStatuses(FromWaiterPadLine.RecordId, NewWaiterPadLine.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
@@ -67,12 +69,63 @@
         end;
     end;
 
+    internal procedure ClearMovedWaiterPadLineMap()
+    begin
+        //Line numbers are reused as lines are deleted and re-added, so an entry left over from an earlier split or merge could
+        //re-attach a line to whatever reused that number. Whoever moves lines starts an operation by clearing the map.
+        Clear(_MovedWaiterPadLineMap);
+    end;
+
+    local procedure RelinkMovedWaiterPadLine(FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var NewWaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    var
+        ParentWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        NewParentLineNo: Integer;
+    begin
+        //The target waiter pad renumbers the line, so an add-on line moved along with its main item has to be re-pointed at
+        //the main item's new line number. Whoever moves the lines keeps this codeunit instance for the whole operation, which
+        //is what makes the main item's new line number available here.
+        _MovedWaiterPadLineMap.Set(
+            MovedWaiterPadLineKey(FromWaiterPadLine."Waiter Pad No.", FromWaiterPadLine."Line No.", ToWaiterPad."No."), NewWaiterPadLine."Line No.");
+
+        if NewWaiterPadLine."Attached to Line No." = 0 then
+            exit;
+
+        if _MovedWaiterPadLineMap.Get(
+            MovedWaiterPadLineKey(FromWaiterPadLine."Waiter Pad No.", FromWaiterPadLine."Attached to Line No.", ToWaiterPad."No."), NewParentLineNo)
+        then
+            if ParentWaiterPadLine.Get(ToWaiterPad."No.", NewParentLineNo) then begin
+                NewWaiterPadLine."Attached to Line No." := NewParentLineNo;
+                NewWaiterPadLine.Indentation := ParentWaiterPadLine.Indentation + 1;
+                NewWaiterPadLine.Modify();
+                exit;
+            end;
+
+        //The main item is not on the target waiter pad, so the line becomes a plain line there. Keeping the old line number would
+        //silently point it at whatever line happens to carry that number. Callers move main items before their add-on lines, so
+        //this is reached for an add-on genuinely moved on its own, not for one whose main item follows later.
+        NewWaiterPadLine."Attached to Line No." := 0;
+        NewWaiterPadLine."AddOn No." := '';
+        NewWaiterPadLine."AddOn Line No." := 0;
+        NewWaiterPadLine."Fixed Quantity" := false;
+        NewWaiterPadLine."Per Unit" := false;
+        NewWaiterPadLine.Mandatory := false;
+        NewWaiterPadLine."Copy Serial No." := false;
+        NewWaiterPadLine.Indentation := 0;
+        NewWaiterPadLine.Modify();
+    end;
+
+    local procedure MovedWaiterPadLineKey(FromWaiterPadNo: Code[20]; FromLineNo: Integer; ToWaiterPadNo: Code[20]): Text
+    begin
+        exit(FromWaiterPadNo + '|' + Format(FromLineNo) + '|' + ToWaiterPadNo);
+    end;
+
     procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean) SaleCleanupSuccessful: Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempLineRelation: Record "Line Number Buffer" temporary;
         TempTouchedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -108,6 +161,8 @@
                     if not TempTouchedWaiterPadLine.Find() then
                         CleanupWaiterPadLine(WaiterPadLine, true);
                 until WaiterPadLine.Next() = 0;
+
+            KitchenOrderMgt.RefreshWaiterPadKitchenRequestModifiers(WaiterPad);
         end;
 
         if CleanupSale then

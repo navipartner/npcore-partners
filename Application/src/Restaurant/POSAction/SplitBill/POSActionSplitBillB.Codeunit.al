@@ -2,6 +2,9 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
 {
     Access = Internal;
 
+    var
+        _WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+
     procedure GetPresetValues(Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup"; var RestaurantCode: Code[20]; var SeatingCode: Code[20]; var WaiterPadNo: Code[20])
     var
         SalePOS: Record "NPR POS Sale";
@@ -176,43 +179,47 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         CurrWaiterPad: Record "NPR NPRE Waiter Pad";
         FromWaiterPad: Record "NPR NPRE Waiter Pad";
         FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        TempAttachedBillLine: Record "NPR NPRE Waiter Pad Line" temporary;
         ToWaiterPad: Record "NPR NPRE Waiter Pad";
         JsonHelper: Codeunit "NPR Json Helper";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
-        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         Bill: JsonToken;
         BillLine: JsonToken;
         BillLines: JsonToken;
         TouchedFromWaiterPadList: List of [Code[20]];
         TouchedToWaiterPadList: List of [Code[20]];
         TouchedWaiterPadNo: Code[20];
-        MoveQty: Decimal;
     begin
         if not Bills.IsArray() then
             exit;
         CurrWaiterPad.Get(WaiterPadNo);
+        _WaiterPadPOSMgt.ClearMovedWaiterPadLineMap();
         foreach Bill in Bills.AsArray() do
             if Bill.SelectToken('items', BillLines) and BillLines.IsArray() then
                 if BillLines.AsArray().Count > 0 then begin
                     ToWaiterPad."No." := CopyStr(JsonHelper.GetJCode(Bill, 'id', true), 1, MaxStrLen(ToWaiterPad."No."));
                     FindWaiterPad(CurrWaiterPad, ToWaiterPad);
-                    foreach BillLine in BillLines.AsArray() do begin
-                        MoveQty := JsonHelper.GetJDecimal(BillLine, 'qty', true);
-                        if MoveQty > 0 then begin
-                            FromWaiterPadLine.SetPosition(JsonHelper.GetJText(BillLine, 'key', true));
-                            if FromWaiterPadLine."Waiter Pad No." <> ToWaiterPad."No." then begin
-                                FromWaiterPad.Get(FromWaiterPadLine."Waiter Pad No.");
-                                FromWaiterPadLine.Find();
-                                WaiterPadPOSMgt.SplitWaiterPadLine(FromWaiterPad, FromWaiterPadLine, MoveQty, ToWaiterPad);
-                                if not TouchedFromWaiterPadList.Contains(FromWaiterPad."No.") then
-                                    TouchedFromWaiterPadList.Add(FromWaiterPad."No.");
-                                if not TouchedToWaiterPadList.Contains(ToWaiterPad."No.") then
-                                    TouchedToWaiterPadList.Add(ToWaiterPad."No.");
-                                ChangesFound := true;
-                            end;
-                        end;
-                    end;
+                    //The bill lists main items and their add-on lines in whatever order the front end sends them. Move the main
+                    //items first, so an add-on that follows its main item onto this bill can be re-attached to it there.
+                    foreach BillLine in BillLines.AsArray() do
+                        if MoveBillLineToWaiterPad(BillLine, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList) then
+                            ChangesFound := true;
+
+                    //Then the add-on lines, in source line number order. Line numbers only ever grow, so an add-on applied to
+                    //another add-on is moved after the one it hangs off and can be re-attached to it.
+                    TempAttachedBillLine.Reset();
+                    TempAttachedBillLine.DeleteAll();
+                    foreach BillLine in BillLines.AsArray() do
+                        BufferAttachedBillLine(BillLine, ToWaiterPad, TempAttachedBillLine);
+                    if TempAttachedBillLine.FindSet() then
+                        repeat
+                            if FromWaiterPadLine.Get(TempAttachedBillLine."Waiter Pad No.", TempAttachedBillLine."Line No.") then
+                                if MoveWaiterPadLineToBill(
+                                    FromWaiterPadLine, TempAttachedBillLine.Quantity, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList)
+                                then
+                                    ChangesFound := true;
+                        until TempAttachedBillLine.Next() = 0;
                 end;
 
         foreach TouchedWaiterPadNo in TouchedFromWaiterPadList do begin
@@ -231,6 +238,69 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
             ChooseBill = ChooseBill::FirstNew:
                 WaiterPadNo := FirstNewWaiterPad(CurrWaiterPad, TouchedToWaiterPadList);
         end;
+    end;
+
+    local procedure MoveBillLineToWaiterPad(BillLine: JsonToken; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TouchedFromWaiterPadList: List of [Code[20]]; var TouchedToWaiterPadList: List of [Code[20]]): Boolean
+    var
+        FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        MoveQty: Decimal;
+    begin
+        if not ResolveBillLine(BillLine, ToWaiterPad, FromWaiterPadLine, MoveQty) then
+            exit(false);
+        FromWaiterPadLine.Find();
+        if FromWaiterPadLine."Attached to Line No." <> 0 then
+            exit(false);
+
+        exit(MoveWaiterPadLineToBill(FromWaiterPadLine, MoveQty, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList));
+    end;
+
+    local procedure BufferAttachedBillLine(BillLine: JsonToken; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TempAttachedBillLine: Record "NPR NPRE Waiter Pad Line" temporary)
+    var
+        FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        MoveQty: Decimal;
+    begin
+        if not ResolveBillLine(BillLine, ToWaiterPad, FromWaiterPadLine, MoveQty) then
+            exit;
+        //The main items have moved by now, and a fully moved one no longer exists on the source waiter pad
+        if not FromWaiterPadLine.Find() then
+            exit;
+        if FromWaiterPadLine."Attached to Line No." = 0 then
+            exit;
+
+        //A bill listing the same line twice moves the combined quantity, the way it did when both passes read the bill directly
+        if TempAttachedBillLine.Get(FromWaiterPadLine."Waiter Pad No.", FromWaiterPadLine."Line No.") then begin
+            TempAttachedBillLine.Quantity += MoveQty;
+            TempAttachedBillLine.Modify();
+        end else begin
+            TempAttachedBillLine := FromWaiterPadLine;
+            TempAttachedBillLine.Quantity := MoveQty;
+            TempAttachedBillLine.Insert();
+        end;
+    end;
+
+    local procedure ResolveBillLine(BillLine: JsonToken; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var MoveQty: Decimal): Boolean
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
+        MoveQty := JsonHelper.GetJDecimal(BillLine, 'qty', true);
+        if MoveQty <= 0 then
+            exit(false);
+
+        FromWaiterPadLine.SetPosition(JsonHelper.GetJText(BillLine, 'key', true));
+        exit(FromWaiterPadLine."Waiter Pad No." <> ToWaiterPad."No.");
+    end;
+
+    local procedure MoveWaiterPadLineToBill(var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TouchedFromWaiterPadList: List of [Code[20]]; var TouchedToWaiterPadList: List of [Code[20]]): Boolean
+    var
+        FromWaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        FromWaiterPad.Get(FromWaiterPadLine."Waiter Pad No.");
+        _WaiterPadPOSMgt.SplitWaiterPadLine(FromWaiterPad, FromWaiterPadLine, MoveQty, ToWaiterPad);
+        if not TouchedFromWaiterPadList.Contains(FromWaiterPad."No.") then
+            TouchedFromWaiterPadList.Add(FromWaiterPad."No.");
+        if not TouchedToWaiterPadList.Contains(ToWaiterPad."No.") then
+            TouchedToWaiterPadList.Add(ToWaiterPad."No.");
+        exit(true);
     end;
 
     local procedure FindWaiterPad(var CurrentWaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPad: Record "NPR NPRE Waiter Pad")

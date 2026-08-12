@@ -185,6 +185,7 @@
         Span: Codeunit "NPR Sentry Span";
     begin
         Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.merge');
+        _WaiterPadPOSMgt.ClearMovedWaiterPadLineMap();
 
         SetPartySize(MergeToWaiterPad, MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests");
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";

@@ -270,6 +270,8 @@
     end;
 
     local procedure CreateKitchenRequest(var KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenRequestParam: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
+    var
+        TempAttachedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
     begin
         KitchenRequest := KitchenRequestParam;
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::Planned;
@@ -280,7 +282,10 @@
         KitchenRequest.Insert(true);
 
         CreateKitchenRequestSourceLink(KitchenRequest, KitchenReqSourceParam);
-        CreateKitchenrequestModifiers(KitchenRequest, KitchenReqSourceParam);
+
+        BufferAttachedWaiterPadLines(
+            KitchenReqSourceParam."Source Document No.", KitchenReqSourceParam."Source Document Line No.", TempAttachedWaiterPadLine);
+        SyncKitchenRequestModifiers(KitchenRequest, KitchenReqSourceParam, TempAttachedWaiterPadLine, false);
     end;
 
     local procedure CreateKitchenRequestSourceLink(KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
@@ -293,34 +298,179 @@
         KitchenReqSourceLink.Insert();
     end;
 
-    local procedure CreateKitchenrequestModifiers(KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
+    internal procedure RefreshWaiterPadKitchenRequestModifiers(WaiterPad: Record "NPR NPRE Waiter Pad") ModifiersUpdated: Boolean
     var
-        KitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif.";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+        TempAttachedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+        SyncedRequestNos: List of [BigInteger];
+    begin
+        KitchenReqSourceLink.SetCurrentKey(
+            "Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.");
+        KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
+        KitchenReqSourceLink.SetRange("Source Document Subtype", 0);
+        KitchenReqSourceLink.SetRange("Source Document No.", WaiterPad."No.");
+        if not KitchenReqSourceLink.FindSet() then
+            exit(false);
+
+        Sentry.StartSpan(Span, 'bc.restaurant.kds.refresh-request-modifiers');
+
+        BufferAttachedWaiterPadLines(WaiterPad."No.", 0, TempAttachedWaiterPadLine);
+        repeat
+            if not SyncedRequestNos.Contains(KitchenReqSourceLink."Request No.") then begin
+                SyncedRequestNos.Add(KitchenReqSourceLink."Request No.");
+                if KitchenRequest.Get(KitchenReqSourceLink."Request No.") then
+                    if KitchenRequest."Line Status" <> KitchenRequest."Line Status"::Cancelled then
+                        if SyncKitchenRequestModifiers(KitchenRequest, KitchenReqSourceLink, TempAttachedWaiterPadLine, true) then
+                            ModifiersUpdated := true;
+            end;
+        until KitchenReqSourceLink.Next() = 0;
+
+        Span.Finish();
+    end;
+
+    local procedure SyncKitchenRequestModifiers(KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link"; var TempAttachedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary; NotifyKitchenOnChange: Boolean): Boolean
+    var
+        TempKitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif." temporary;
+    begin
+        if KitchenReqSourceParam."Source Document Type" <> KitchenReqSourceParam."Source Document Type"::"Waiter Pad" then
+            exit(false);
+        if KitchenReqSourceParam."Source Document Line No." = 0 then
+            exit(false);
+
+        BuildKitchenRequestModifiers(
+            TempKitchenRequestModifier, TempAttachedWaiterPadLine, KitchenRequest."Request No.", KitchenReqSourceParam."Source Document Line No.");
+        if KitchenRequestModifiersAreUpToDate(TempKitchenRequestModifier, KitchenRequest."Request No.") then
+            exit(false);
+
+        //A partially split dish is sourced from more than one waiter pad line at a time - on another pad, or on this one after
+        //the split was merged back - and each of those lines holds only its own share of the add-on lines. None of them can
+        //describe the request on its own, so while a request is shared its modifiers stay as they were rather than being
+        //rewritten from one share and flip-flopping as each pad is sent. This applies to every write, which is also why the
+        //caller can stop at the first source link of a request without hiding a reconcile that another link would have done.
+        if RequestIsSourcedFromOtherWaiterPadLines(
+            KitchenRequest."Request No.", KitchenReqSourceParam."Source Document No.", KitchenReqSourceParam."Source Document Line No.")
+        then
+            exit(false);
+
+        ReplaceKitchenRequestModifiers(TempKitchenRequestModifier, KitchenRequest."Request No.");
+        if NotifyKitchenOnChange then
+            SetQtyChanged(KitchenRequest);
+        exit(true);
+    end;
+
+    local procedure RequestIsSourcedFromOtherWaiterPadLines(RequestNo: BigInteger; WaiterPadNo: Code[20]; WaiterPadLineNo: Integer): Boolean
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+    begin
+        //Several links to the same waiter pad line are normal - a quantity change adds one - so compare the line, not the count
+        KitchenReqSourceLink.SetCurrentKey("Request No.");
+        KitchenReqSourceLink.SetRange("Request No.", RequestNo);
+        KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
+        if not KitchenReqSourceLink.FindSet() then
+            exit(false);
+        repeat
+            if (KitchenReqSourceLink."Source Document No." <> WaiterPadNo) or
+               (KitchenReqSourceLink."Source Document Line No." <> WaiterPadLineNo)
+            then
+                exit(true);
+        until KitchenReqSourceLink.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure BufferAttachedWaiterPadLines(WaiterPadNo: Code[20]; AttachedToLineNo: Integer; var TempAttachedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
+    var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        case KitchenReqSourceParam."Source Document Type" of
-            KitchenReqSourceParam."Source Document Type"::"Waiter Pad":
-                begin
-                    WaiterPadLine.SetRange("Waiter Pad No.", KitchenReqSourceParam."Source Document No.");
-                    WaiterPadLine.SetRange("Attached to Line No.", KitchenReqSourceParam."Source Document Line No.");
-                    if WaiterPadLine.FindSet() then
-                        repeat
-                            KitchenRequestModifier.Init();
-                            KitchenRequestModifier."Request No." := KitchenRequest."Request No.";
-                            KitchenRequestModifier."Line No." += 10000;
-                            KitchenRequestModifier."Line Type" := WaiterPadLine."Line Type";
-                            KitchenRequestModifier."No." := WaiterPadLine."No.";
-                            KitchenRequestModifier.Description := WaiterPadLine.Description;
-                            KitchenRequestModifier."Description 2" := WaiterPadLine."Description 2";
-                            KitchenRequestModifier.Indentation := WaiterPadLine.Indentation;
-                            KitchenRequestModifier.Quantity := WaiterPadLine.Quantity;
-                            KitchenRequestModifier."Quantity (Base)" := WaiterPadLine."Quantity (Base)";
-                            KitchenRequestModifier."Qty. per Unit of Measure" := WaiterPadLine."Qty. per Unit of Measure";
-                            KitchenRequestModifier."Unit of Measure Code" := WaiterPadLine."Unit of Measure Code";
-                            KitchenRequestModifier.Insert();
-                        until WaiterPadLine.Next() = 0;
-                end;
+        //Reconciling a whole waiter pad reads its add-on lines once (AttachedToLineNo = 0) instead of once per kitchen request,
+        //since waiter pad save is a hot path. Creating a single request only needs that one dish's add-on lines.
+        if not TempAttachedWaiterPadLine.IsTemporary() then
+            SetupProxy.ThrowNonTempException('CU6150674.BufferAttachedWaiterPadLines');
+
+        TempAttachedWaiterPadLine.Reset();
+        TempAttachedWaiterPadLine.DeleteAll();
+
+        WaiterPadLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        if AttachedToLineNo = 0 then
+            WaiterPadLine.SetFilter("Attached to Line No.", '<>%1', 0)
+        else
+            WaiterPadLine.SetRange("Attached to Line No.", AttachedToLineNo);
+        if not WaiterPadLine.FindSet() then
+            exit;
+        repeat
+            TempAttachedWaiterPadLine := WaiterPadLine;
+            TempAttachedWaiterPadLine.Insert();
+        until WaiterPadLine.Next() = 0;
+    end;
+
+    local procedure BuildKitchenRequestModifiers(var TempKitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif." temporary; var TempAttachedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary; RequestNo: BigInteger; WaiterPadLineNo: Integer)
+    var
+        LineNo: Integer;
+    begin
+        if not TempKitchenRequestModifier.IsTemporary() then
+            SetupProxy.ThrowNonTempException('CU6150674.BuildKitchenRequestModifiers');
+
+        TempKitchenRequestModifier.Reset();
+        TempKitchenRequestModifier.DeleteAll();
+
+        TempAttachedWaiterPadLine.Reset();
+        TempAttachedWaiterPadLine.SetRange("Attached to Line No.", WaiterPadLineNo);
+        if not TempAttachedWaiterPadLine.FindSet() then
+            exit;
+        repeat
+            LineNo += 10000;
+            TempKitchenRequestModifier.Init();
+            TempKitchenRequestModifier."Request No." := RequestNo;
+            TempKitchenRequestModifier."Line No." := LineNo;
+            TempKitchenRequestModifier."Line Type" := TempAttachedWaiterPadLine."Line Type";
+            TempKitchenRequestModifier."No." := TempAttachedWaiterPadLine."No.";
+            TempKitchenRequestModifier."Variant Code" := TempAttachedWaiterPadLine."Variant Code";
+            TempKitchenRequestModifier.Description := TempAttachedWaiterPadLine.Description;
+            TempKitchenRequestModifier."Description 2" := TempAttachedWaiterPadLine."Description 2";
+            TempKitchenRequestModifier.Indentation := TempAttachedWaiterPadLine.Indentation;
+            TempKitchenRequestModifier.Quantity := TempAttachedWaiterPadLine.Quantity;
+            TempKitchenRequestModifier."Quantity (Base)" := TempAttachedWaiterPadLine."Quantity (Base)";
+            TempKitchenRequestModifier."Qty. per Unit of Measure" := TempAttachedWaiterPadLine."Qty. per Unit of Measure";
+            TempKitchenRequestModifier."Unit of Measure Code" := TempAttachedWaiterPadLine."Unit of Measure Code";
+            TempKitchenRequestModifier.Insert();
+        until TempAttachedWaiterPadLine.Next() = 0;
+    end;
+
+    local procedure KitchenRequestModifiersAreUpToDate(var TempKitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif." temporary; RequestNo: BigInteger): Boolean
+    var
+        KitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif.";
+        MoreExisting: Boolean;
+        MoreWanted: Boolean;
+    begin
+        KitchenRequestModifier.SetRange("Request No.", RequestNo);
+        MoreExisting := KitchenRequestModifier.FindSet();
+        MoreWanted := TempKitchenRequestModifier.FindSet();
+        while MoreExisting and MoreWanted do begin
+            if Format(KitchenRequestModifier) <> Format(TempKitchenRequestModifier) then
+                exit(false);
+            MoreExisting := KitchenRequestModifier.Next() <> 0;
+            MoreWanted := TempKitchenRequestModifier.Next() <> 0;
         end;
+        exit(MoreExisting = MoreWanted);
+    end;
+
+    local procedure ReplaceKitchenRequestModifiers(var TempKitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif." temporary; RequestNo: BigInteger)
+    var
+        KitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif.";
+    begin
+        KitchenRequestModifier.SetRange("Request No.", RequestNo);
+        if not KitchenRequestModifier.IsEmpty() then
+            KitchenRequestModifier.DeleteAll();
+
+        if not TempKitchenRequestModifier.FindSet() then
+            exit;
+        repeat
+            KitchenRequestModifier := TempKitchenRequestModifier;
+            KitchenRequestModifier.Insert();
+        until TempKitchenRequestModifier.Next() = 0;
     end;
 
     local procedure CreateKitchenStationRequest(KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenStation: Record "NPR NPRE Kitchen Station"; ProductionStep: Integer)
