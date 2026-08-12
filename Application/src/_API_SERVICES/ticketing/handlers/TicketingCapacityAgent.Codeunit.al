@@ -154,14 +154,14 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                 .AddProperty('code', AdmCapacityPriceBuffer.AdmissionCode)
                 .AddProperty('default', AdmCapacityPriceBuffer.DefaultAdmission)
                 .AddProperty('included', EnumEncoder.EncodeInclusion(TicketBom."Admission Inclusion"))
-                .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(Admission."Capacity Control"))
+                .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(EffectiveCapacityControl(Admission, '')))
                 .AddProperty('referenceDate', AdmCapacityPriceBuffer.ReferenceDate)
                 .AddProperty('quantity', AdmCapacityPriceBuffer.Quantity)
                 .AddProperty('unitPrice', AdmCapacityPriceBuffer.UnitPrice)
                 .AddProperty('discountPct', AdmCapacityPriceBuffer.DiscountPct)
                 .AddProperty('unitPriceIncludesVat', AdmCapacityPriceBuffer.UnitPriceIncludesVat)
                 .AddProperty('vatPct', AdmCapacityPriceBuffer.UnitPriceVatPercentage)
-                .AddArray(ScheduleEntryDTO(AdmCapacityPriceBuffer, ResponseJson, LocalDate, LocalTime, (Admission."Capacity Control" = Admission."Capacity Control"::"NONE"), AdmCapacityPriceBuffer.Quantity))
+                .AddArray(ScheduleEntryDTO(AdmCapacityPriceBuffer, ResponseJson, LocalDate, LocalTime, AdmCapacityPriceBuffer.Quantity))
             .EndObject();
 
         until (AdmCapacityPriceBuffer.Next() = 0);
@@ -188,25 +188,48 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
 
         ResponseJson.StartObject()
             .AddProperty('admissionCode', Admission."Admission Code")
-            .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(Admission."Capacity Control"))
-            .AddArray(ScheduleEntrySimple(Admission, LocalDate, LocalTime, StartDate, EndDate, ScheduleCode, (Admission."Capacity Control" = Admission."Capacity Control"::"NONE"), ResponseJson))
+            .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(EffectiveCapacityControl(Admission, ScheduleCode)))
+            .AddArray(ScheduleEntrySimple(Admission, LocalDate, LocalTime, StartDate, EndDate, ScheduleCode, ResponseJson))
         .EndObject();
 
         ResponseJson.EndObject();
         Response.RespondOK(ResponseJson.Build());
     end;
 
-    local procedure ScheduleEntryDTO(AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder"; LocalDate: Date; LocalTime: Time; AdmissionCapacityControlNone: Boolean; RequestedQuantity: Integer): Codeunit "NPR JSON Builder"
+    local procedure EffectiveCapacityControl(Admission: Record "NPR TM Admission"; ScheduleCode: Code[20]) CapacityControl: Option
+    var
+        AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        MaxCapacity: Integer;
+    begin
+        CapacityControl := Admission."Capacity Control";
+        if (ScheduleCode = '') then
+            exit(CapacityControl);
+
+        AdmissionScheduleLines.SetCurrentKey("Admission Code", "Process Order");
+        AdmissionScheduleLines.SetLoadFields("Schedule Code");
+        AdmissionScheduleLines.SetFilter("Admission Code", '=%1', Admission."Admission Code");
+        AdmissionScheduleLines.SetFilter("Schedule Code", '=%1', ScheduleCode);
+        AdmissionScheduleLines.SetFilter(Blocked, '=%1', false);
+        if (AdmissionScheduleLines.FindFirst()) then
+            TicketManagement.GetAdmissionCapacity(Admission."Admission Code", AdmissionScheduleLines."Schedule Code", 0, MaxCapacity, CapacityControl);
+    end;
+
+    local procedure ScheduleEntryDTO(AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder"; LocalDate: Date; LocalTime: Time; RequestedQuantity: Integer): Codeunit "NPR JSON Builder"
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Admission: Record "NPR TM Admission";
 
         EnumEncoder: Codeunit "NPR TicketingApiTranslations";
         CapacityStatusCode: Option;
         BlockSaleReason: Enum "NPR TM Sch. Block Sales Reason";
+        CapacityControl: Option;
         RemainingCapacity: Integer;
         CalendarExceptionText: Text;
         IsNonWorking: Boolean;
+        UnlimitedCapacity: Boolean;
+        OpenForSales: Boolean;
     begin
         ResponseJson.StartArray('schedules');
 
@@ -218,26 +241,40 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
             repeat
                 CapacityStatusCode := _CapacityStatusCodeOption::OK;
                 BlockSaleReason := BlockSaleReason::OpenForSales;
+                RemainingCapacity := 0;
 
-                if (not TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry,
+                // The capacity control in effect is the admission's, the schedule's or the schedule line's,
+                // depending on Admission."Capacity Limits By". 
+                OpenForSales := TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry,
                     AdmCapacityPriceBuffer.RequestItemNumber,
                     AdmCapacityPriceBuffer.RequestVariantCode,
                     LocalDate, LocalTime,
-                    BlockSaleReason, RemainingCapacity)) then begin
+                    BlockSaleReason, RemainingCapacity, CapacityControl);
 
+                if (not OpenForSales) then begin
                     CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
-                    if (BlockSaleReason = BlockSaleReason::ScheduleExceedTicketDuration) then
-                        exit;
+                    if (BlockSaleReason = BlockSaleReason::ScheduleExceedTicketDuration) then begin
+                        ResponseJson.EndArray();
+                        exit(ResponseJson);
+                    end;
                 end;
 
-                if (RemainingCapacity < 1) then begin
-                    CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
-                    BlockSaleReason := BlockSaleReason::RemainingCapacityZeroOrLess;
-                end;
+                UnlimitedCapacity := (OpenForSales and (CapacityControl = Admission."Capacity Control"::"NONE"));
 
-                if (AdmissionCapacityControlNone) then begin
-                    CapacityStatusCode := _CapacityStatusCodeOption::UNLIMITED_CAPACITY;
-                    BlockSaleReason := BlockSaleReason::OpenForSales;
+                if (RemainingCapacity < 0) then
+                    RemainingCapacity := 0;
+
+                // An unlimited schedule has no numeric capacity to exceed, but it does not lift the
+                // non-capacity sales blocks (sales window, arrival window, concurrency) reported above.
+                if (OpenForSales) then begin
+                    if (UnlimitedCapacity) then begin
+                        CapacityStatusCode := _CapacityStatusCodeOption::UNLIMITED_CAPACITY;
+                    end else begin
+                        if (RemainingCapacity < 1) then begin
+                            CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
+                            BlockSaleReason := BlockSaleReason::RemainingCapacityZeroOrLess;
+                        end;
+                    end;
                 end;
 
                 TicketManagement.CheckTicketBaseCalendar(AdmCapacityPriceBuffer.AdmissionCode,
@@ -253,7 +290,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                 if ((CapacityStatusCode = _CapacityStatusCodeOption::OK) and (CalendarExceptionText <> '')) then
                     CapacityStatusCode := _CapacityStatusCodeOption::CALENDAR_WARNING;
 
-                if (CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::UNLIMITED_CAPACITY]) then begin
+                if (CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING, _CapacityStatusCodeOption::UNLIMITED_CAPACITY]) then begin
                     if (AdmissionScheduleEntry."Admission Is" = AdmissionScheduleEntry."Admission Is"::CLOSED) then
                         CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
                     if (AdmissionScheduleEntry."Admission End Date" < LocalDate) then
@@ -262,18 +299,16 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                         CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
                 end;
 
-                if (RemainingCapacity < 0) then
-                    RemainingCapacity := 0;
-
-                if (not AdmissionCapacityControlNone) then
-                    if ((RequestedQuantity > RemainingCapacity) and (CapacityStatusCode = _CapacityStatusCodeOption::OK)) then begin
-                        CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
-                        BlockSaleReason := BlockSaleReason::RequestedQuantityExceedsRemainingCapacity;
-                    end;
+                if ((not UnlimitedCapacity) and (RequestedQuantity > RemainingCapacity) and
+                    (CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING])) then begin
+                    CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
+                    BlockSaleReason := BlockSaleReason::RequestedQuantityExceedsRemainingCapacity;
+                end;
 
                 ResponseJson.StartObject()
                     .AddProperty('allocatable', CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING, _CapacityStatusCodeOption::UNLIMITED_CAPACITY])
                     .AddProperty('allocationModel', EnumEncoder.EncodeAllocationBy(AdmissionScheduleEntry."Allocation By"))
+                    .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(CapacityControl))
                     .AddProperty('remainingCapacity', RemainingCapacity)
                     .AddProperty('explanation', GetMessageText(CapacityStatusCode, CalendarExceptionText, BlockSaleReason.AsInteger()))
                     .AddObject(ScheduleDTO(ResponseJson, AdmissionScheduleEntry))
@@ -288,7 +323,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
         exit(ResponseJson);
     end;
 
-    local procedure ScheduleEntrySimple(Admission: Record "NPR TM Admission"; LocalDate: Date; LocalTime: Time; StartDate: Date; EndDate: Date; ScheduleCode: Code[20]; AdmissionCapacityControlNone: Boolean; var ResponseJson: Codeunit "NPR JSON Builder"): Codeunit "NPR JSON Builder"
+    local procedure ScheduleEntrySimple(Admission: Record "NPR TM Admission"; LocalDate: Date; LocalTime: Time; StartDate: Date; EndDate: Date; ScheduleCode: Code[20]; var ResponseJson: Codeunit "NPR JSON Builder"): Codeunit "NPR JSON Builder"
     var
         CalendarManagement: Codeunit "NPR TMBaseCalendarManager";
         TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
@@ -318,11 +353,6 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                 CapacityStatusCode := _CapacityStatusCodeOption::OK;
                 BlockSaleReason := BlockSaleReason::OpenForSales;
 
-                if (AdmissionCapacityControlNone) then begin
-                    CapacityStatusCode := _CapacityStatusCodeOption::UNLIMITED_CAPACITY;
-                    BlockSaleReason := BlockSaleReason::OpenForSales;
-                end;
-
                 CalendarManagement.CheckTicketBomAdmissionIsNonWorking(Admission, AdmissionScheduleEntry."Admission Start Date", TempCustomizedCalendarChange);
                 IsNonWorking := TempCustomizedCalendarChange.Nonworking;
                 CalendarDesc := TempCustomizedCalendarChange.Description;
@@ -333,7 +363,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                 if ((CapacityStatusCode = _CapacityStatusCodeOption::OK) and (CalendarDesc <> '')) then
                     CapacityStatusCode := _CapacityStatusCodeOption::CALENDAR_WARNING;
 
-                if (CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::UNLIMITED_CAPACITY]) then begin
+                if (CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING]) then begin
                     if (AdmissionScheduleEntry."Admission Is" = AdmissionScheduleEntry."Admission Is"::CLOSED) then
                         CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
                     if (AdmissionScheduleEntry."Admission End Date" < LocalDate) then
@@ -352,7 +382,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                     .AddProperty('endDate', AdmissionScheduleEntry."Admission End Date")
                     .AddProperty('endTime', AdmissionScheduleEntry."Admission End Time")
                     .AddProperty('duration', DurationAsInt)
-                    .AddProperty('allocatable', CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING, _CapacityStatusCodeOption::UNLIMITED_CAPACITY])
+                    .AddProperty('allocatable', CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING])
                     .AddProperty('allocationModel', EnumEncoder.EncodeAllocationBy(AdmissionScheduleEntry."Allocation By"))
                     .AddProperty('initialCapacity', AdmissionScheduleEntry."Max Capacity Per Sch. Entry")
                     .AddProperty('explanation', GetMessageText(CapacityStatusCode, CalendarDesc, BlockSaleReason.AsInteger()))

@@ -3163,6 +3163,8 @@
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingTemplate: Record "NPR TM Seating Template";
     begin
+        if (AdmissionCode = '') then
+            exit(false);
         if (not Admission.Get(AdmissionCode)) then
             exit(false);
 
@@ -3174,20 +3176,29 @@
                 end;
             Admission."Capacity Limits By"::SCHEDULE:
                 begin
+                    if (ScheduleCode = '') then
+                        exit(false);
                     if (not Schedule.Get(ScheduleCode)) then
                         exit(false);
+
                     CapacityControl := Schedule."Capacity Control";
                     MaxCapacity := Schedule."Max Capacity Per Sch. Entry";
                 end;
             Admission."Capacity Limits By"::OVERRIDE:
                 begin
+                    if (ScheduleCode = '') then
+                        exit(false);
                     if (not AdmissionSchedule.Get(AdmissionCode, ScheduleCode)) then
                         exit(false);
+
                     CapacityControl := AdmissionSchedule."Capacity Control";
                     MaxCapacity := AdmissionSchedule."Max Capacity Per Sch. Entry";
-                    if (AdmissionScheduleEntry.Get(AdmissionScheduleEntryNo)) then begin
-                        if (AdmissionScheduleEntry."Max Capacity Per Sch. Entry" <> 0) then
-                            MaxCapacity := AdmissionScheduleEntry."Max Capacity Per Sch. Entry";
+
+                    if (AdmissionScheduleEntryNo <> 0) then begin
+                        if (AdmissionScheduleEntry.Get(AdmissionScheduleEntryNo)) then begin
+                            if (AdmissionScheduleEntry."Max Capacity Per Sch. Entry" <> 0) then
+                                MaxCapacity := AdmissionScheduleEntry."Max Capacity Per Sch. Entry";
+                        end;
                     end;
                 end;
             else
@@ -3207,23 +3218,34 @@
 
     procedure ValidateAdmSchEntryForSales(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10]; ReferenceDate: Date; ReferenceTime: Time; var ReasonCode: Enum "NPR TM Sch. Block Sales Reason"; var RemainingQuantityOut: Integer): Boolean
     var
+        CapacityControl: Option;
+    begin
+        exit(ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, ReferenceDate, ReferenceTime, ReasonCode, RemainingQuantityOut, CapacityControl));
+    end;
+
+    procedure ValidateAdmSchEntryForSales(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10]; ReferenceDate: Date; ReferenceTime: Time; var ReasonCode: Enum "NPR TM Sch. Block Sales Reason"; var RemainingQuantityOut: Integer; var CapacityControlOut: Option): Boolean
+    var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
         MaxCapacity: Integer;
-        CapacityControl: Option;
         ActivateOnSales: Boolean;
         IsReservation: Boolean;
         ConcurrentQuantity: Integer;
         ConcurrentMaxQty: Integer;
         DurationFormula: DateFormula;
     begin
+        Clear(CapacityControlOut);
+
         if (not Admission.Get(AdmissionScheduleEntry."Admission Code")) then
             Admission.Init();
 
         if (not TicketBOM.Get(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code")) then
             TicketBOM.Init();
+
+        // Resolve capacity control for valid return value
+        GetTicketCapacity(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControlOut);
 
         // Should this time slot be listed? 
         ActivateOnSales := false;
@@ -3320,15 +3342,14 @@
             end;
         end;
 
-        // Check the numeric capacity, this is expensive so do it last.
+        // Count the capacity in use, this is expensive so do it last.
         if (CalculateConcurrentCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Admission Start Date", ConcurrentQuantity, ConcurrentMaxQty)) then
             if (ConcurrentQuantity >= ConcurrentMaxQty) then begin
                 ReasonCode := ReasonCode::ConcurrentCapacityExceeded;
                 exit(false);
             end;
 
-        GetTicketCapacity(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
-        RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntry."Entry No.");
+        RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity(CapacityControlOut, AdmissionScheduleEntry."Entry No.");
 
         ReasonCode := ReasonCode::OpenForSales;
         exit(true);
