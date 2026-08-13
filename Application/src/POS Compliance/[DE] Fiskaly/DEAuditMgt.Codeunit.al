@@ -422,13 +422,36 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
     local procedure OnAfterEndWorkshiftDeFiscaly(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     begin
-        DoEndWorkshiftDeFiscaly(UnitNo, Successful, PosEntryNo);
+        RunEndWorkshiftDeFiscaly(UnitNo, Successful, PosEntryNo);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR End Of Day UI Handler", 'OnAfterZReport', '', true, true)]
     local procedure NPREndOfDayUIHandlerOnAfterZReport(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     begin
-        DoEndWorkshiftDeFiscaly(UnitNo, Successful, PosEntryNo);
+        RunEndWorkshiftDeFiscaly(UnitNo, Successful, PosEntryNo);
+    end;
+
+    local procedure RunEndWorkshiftDeFiscaly(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
+    var
+        POSUnit: Record "NPR POS Unit";
+        DEEndWorkshiftRunner: Codeunit "NPR DE End Workshift Runner";
+        Sentry: Codeunit "NPR Sentry";
+    begin
+        //Filter out non-DE installations before the Codeunit.Run() savepoint is opened. DoEndWorkshiftDeFiscaly repeats these checks as it is also reachable directly.
+        if not Successful then
+            exit;
+        if not POSUnit.Get(UnitNo) then
+            exit;
+        if not IsAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        ClearLastError();
+
+        DEEndWorkshiftRunner.SetParameters(UnitNo, Successful, PosEntryNo);
+        if DEEndWorkshiftRunner.Run() then
+            exit;
+
+        Sentry.AddLastErrorIfProgrammingBug();
     end;
 
     local procedure CheckTssJobQueue()
@@ -491,7 +514,7 @@
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
-    local procedure DoEndWorkshiftDeFiscaly(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
+    internal procedure DoEndWorkshiftDeFiscaly(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     var
         ConnectionParameters: Record "NPR DE Audit Setup";
         DSFINVKClosing: Record "NPR DSFINVK Closing";
@@ -537,6 +560,8 @@
             DSFINVKClosing."POS Entry No." := PosEntryNo;
             DSFINVKClosing."Closing Date" := WorkDate();
             DSFINVKClosing.Insert();
+
+            Commit();
         end
         else
             if DSFINVKClosing.State <> DSFINVKClosing.State::" " then

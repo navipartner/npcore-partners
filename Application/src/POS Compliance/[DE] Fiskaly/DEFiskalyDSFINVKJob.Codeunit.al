@@ -16,13 +16,12 @@
     var
         DSFINVKClosing: Record "NPR DSFINVK Closing";
     begin
-        DSFINVKClosing.SetCurrentKey(State, "Has Error");
-        DSFINVKClosing.SetLoadFields("POS Unit No.", "Closing Date", "Closing ID");
         DSFINVKClosing.SetRange(State, DSFINVKClosing.State::" ");
         DSFINVKClosing.SetRange("Has Error", true);
-        if DSFINVKClosing.FindSet(true) then
+        if DSFINVKClosing.FindSet() then
             repeat
                 SendDataWithError(DSFINVKClosing);
+                Commit();
             until DSFINVKClosing.Next() = 0;
     end;
 
@@ -98,7 +97,7 @@
         UpdateClosingState();
         DSFINVKClosing.SetCurrentKey(State);
         DSFINVKClosing.SetRange(State, DSFINVKClosing.State::COMPLETED);
-        if DSFINVKClosing.FindSet(true) then
+        if DSFINVKClosing.FindSet() then
             repeat
                 Clear(DSFINVKJson);
                 DSFINVKClosing2 := DSFINVKClosing;
@@ -119,6 +118,7 @@
                     Clear(DSFINVKClosing2."Error Message");
                     DSFINVKClosing2.Modify();
                 end;
+                Commit();
             until DSFINVKClosing.Next() = 0;
     end;
 
@@ -133,9 +133,8 @@
         DSFINVKJson: JsonObject;
         DSFINVKResponseJson: JsonToken;
     begin
-        DSFINVKClosing.SetCurrentKey(State);
         DSFINVKClosing.SetFilter(State, '%1|%2', DSFINVKClosing.State::PENDING, DSFINVKClosing.State::WORKING);
-        if DSFINVKClosing.FindSet(true) then
+        if DSFINVKClosing.FindSet() then
             repeat
                 DSFINVKClosing2 := DSFINVKClosing;
 
@@ -149,6 +148,7 @@
                     DSFINVKClosing2.State := GetClosingState(DSFINVKResponseJson);
                     DSFINVKClosing2.Modify();
                 end;
+                Commit();
             until DSFINVKClosing.Next() = 0;
     end;
 
