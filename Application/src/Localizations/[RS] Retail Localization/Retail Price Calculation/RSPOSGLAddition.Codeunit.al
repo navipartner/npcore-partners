@@ -268,7 +268,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
             GLEntry.Amount := 0;
         end;
         InitVAT(GenJnlLine, GLEntry);
-        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, true);
+        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, false);
         PostJob(GenJnlLine, GLEntry);
         GLEntry.Insert();
     end;
@@ -762,23 +762,14 @@ codeunit 6151363 "NPR RS POS GL Addition"
     #region Retail Price Calculation
 
     local procedure GetRSAccountNoFromSetup(RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
-    var
-        LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        LocalizationSetup.Get();
         case RSRetailCalculationType of
             RSRetailCalculationType::VAT:
-                begin
-                    LocalizationSetup.TestField("RS Calc. VAT GL Account");
-                    exit(LocalizationSetup."RS Calc. VAT GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcVATAccount(TempPOSEntrySalesLines."No.", TempPOSEntrySalesLines."Location Code"));
             RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Counter COGS Correction", RSRetailCalculationType::"Counter Std Correction":
                 exit(RSRLocalizationMgt.GetInventoryAccountFromInvPostingSetup(TempPOSEntrySalesLines."No.", TempPOSEntrySalesLines."Location Code"));
             RSRetailCalculationType::Margin:
-                begin
-                    LocalizationSetup.TestField("RS Calc. Margin GL Account");
-                    exit(LocalizationSetup."RS Calc. Margin GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcMarginAccount(TempPOSEntrySalesLines."No.", TempPOSEntrySalesLines."Location Code"));
             RSRetailCalculationType::"COGS Correction", RSRetailCalculationType::"Standard Correction":
                 exit(GetCOGSAccountFromGenPostingSetup());
         end;

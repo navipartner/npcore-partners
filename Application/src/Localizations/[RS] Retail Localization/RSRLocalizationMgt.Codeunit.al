@@ -5,18 +5,18 @@ codeunit 6151490 "NPR RS R Localization Mgt."
                   tabledata "Item Application Entry" = r;
 
     var
-        HasRSLocalizationSetup: Boolean;
+        _RSRetLocalizationSetup: Record "NPR RS R Localization Setup";
+        _HasRSLocalizationSetup: Boolean;
 
     internal procedure IsRSLocalizationActive(): Boolean
-    var
-        RSRetLocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        if not HasRSLocalizationSetup then
-            if not RSRetLocalizationSetup.Get() then
+        if not _HasRSLocalizationSetup then begin
+            if not _RSRetLocalizationSetup.Get() then
                 exit(false);
+            _HasRSLocalizationSetup := true;
+        end;
 
-        HasRSLocalizationSetup := true;
-        exit(RSRetLocalizationSetup."Enable RS Retail Localization");
+        exit(_RSRetLocalizationSetup."Enable RS Retail Localization");
     end;
 
     #region RS Retail Lcl. Mgt. - Posted Purch. Invoice Action Mgt.
@@ -207,12 +207,45 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         Item: Record Item;
         InvPostingSetupNotFoundErr: Label '%1 for %2 : %3 and %4 : %5 not found.', Comment = '%1 = Inventory Posting Setup Table Caption, %2 = Location Code Field Caption %3 = Location Code, %4 = Invt. Posting Group Code Field Caption, %5 = Inventory Posting Group';
     begin
+        Item.SetLoadFields("Inventory Posting Group");
         Item.Get(ItemNo);
         if not InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
             Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), InventoryPostingSetup.FieldCaption("Location Code"), LocationCode,
                     InventoryPostingSetup.FieldCaption("Invt. Posting Group Code"), Item."Inventory Posting Group");
         InventoryPostingSetup.TestField("Inventory Account");
         exit(InventoryPostingSetup."Inventory Account");
+    end;
+
+    internal procedure GetCalcVATAccount(ItemNo: Code[20]; LocationCode: Code[10]): Code[20]
+    var
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+        Item: Record Item;
+        LocalizationSetup: Record "NPR RS R Localization Setup";
+    begin
+        Item.SetLoadFields("Inventory Posting Group");
+        Item.Get(ItemNo);
+        if InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
+            if InventoryPostingSetup."NPR RS Calc. VAT Account" <> '' then
+                exit(InventoryPostingSetup."NPR RS Calc. VAT Account");
+        LocalizationSetup.Get();
+        LocalizationSetup.TestField("RS Calc. VAT GL Account");
+        exit(LocalizationSetup."RS Calc. VAT GL Account");
+    end;
+
+    internal procedure GetCalcMarginAccount(ItemNo: Code[20]; LocationCode: Code[10]): Code[20]
+    var
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+        Item: Record Item;
+        LocalizationSetup: Record "NPR RS R Localization Setup";
+    begin
+        Item.SetLoadFields("Inventory Posting Group");
+        Item.Get(ItemNo);
+        if InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
+            if InventoryPostingSetup."NPR RS Calc. Margin Account" <> '' then
+                exit(InventoryPostingSetup."NPR RS Calc. Margin Account");
+        LocalizationSetup.Get();
+        LocalizationSetup.TestField("RS Calc. Margin GL Account");
+        exit(LocalizationSetup."RS Calc. Margin GL Account");
     end;
 
     internal procedure InsertGLItemLedgerRelation(GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; GLEntryNo: Integer; ValueEntryNo: Integer)

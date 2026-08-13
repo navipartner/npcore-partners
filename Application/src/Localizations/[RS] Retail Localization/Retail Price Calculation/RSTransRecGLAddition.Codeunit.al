@@ -29,7 +29,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        if RSRLocalizationMgt.IsRetailLocation(TransferReceiptHeader."Transfer-from Code") or (not RSRLocalizationMgt.IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
+        if not RSRLocalizationMgt.IsRetailLocation(TransferReceiptHeader."Transfer-to Code") then
             exit;
 
         TempTransferReceiptLine.Reset();
@@ -173,7 +173,6 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     local procedure PostGLAcc(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry")
     var
         GLAcc: Record "G/L Account";
-        VATPostingSetup: Record "VAT Posting Setup";
     begin
         GLAcc.Get(GenJnlLine."Account No.");
         InitGLEntry(GenJnlLine, GLEntry,
@@ -192,8 +191,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             GLEntry."Additional-Currency Amount" := GenJnlLine.Amount;
             GLEntry.Amount := 0;
         end;
-        GenJnlPostLine.InitVAT(GenJnlLine, GLEntry, VATPostingSetup);
-        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, true);
+        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, false);
         PostJob(GenJnlLine, GLEntry);
         GLEntry.Insert();
     end;
@@ -308,8 +306,12 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
+    var
+        Item: Record Item;
     begin
-        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."VAT Prod. Posting Group"));
+        Item.SetLoadFields("VAT Prod. Posting Group");
+        Item.Get(TempTransferReceiptLine."Item No.");
+        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group"));
     end;
 
     local procedure GetItemLedgerQuantityFromCalcEntry(CalculationValueEntry: Record "Value Entry"): Decimal
@@ -321,23 +323,14 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     end;
 
     local procedure GetRSAccountNoFromSetup(RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
-    var
-        LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        LocalizationSetup.Get();
         case RSRetailCalculationType of
             RSRetailCalculationType::VAT:
-                begin
-                    LocalizationSetup.TestField("RS Calc. VAT GL Account");
-                    exit(LocalizationSetup."RS Calc. VAT GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcVATAccount(TempTransferReceiptLine."Item No.", TempTransferReceiptLine."Transfer-to Code"));
             RSRetailCalculationType::"Margin with VAT":
                 exit(RSRLocalizationMgt.GetInventoryAccountFromInvPostingSetup(TempTransferReceiptLine."Item No.", TempTransferReceiptLine."Transfer-to Code"));
             RSRetailCalculationType::Margin:
-                begin
-                    LocalizationSetup.TestField("RS Calc. Margin GL Account");
-                    exit(LocalizationSetup."RS Calc. Margin GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcMarginAccount(TempTransferReceiptLine."Item No.", TempTransferReceiptLine."Transfer-to Code"));
         end;
     end;
 

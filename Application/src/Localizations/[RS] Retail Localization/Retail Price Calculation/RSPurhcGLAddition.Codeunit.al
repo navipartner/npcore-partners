@@ -191,7 +191,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             GLEntry."Additional-Currency Amount" := GenJnlLine.Amount;
             GLEntry.Amount := 0;
         end;
-        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, true);
+        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, false);
         PostJob(GenJnlLine, GLEntry);
         GLEntry.Insert();
     end;
@@ -279,41 +279,42 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
     #region Retail Price Calculation
 
     local procedure CalculatePurchLineItemTypeAmounts(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    var
+        MarkupAmountInclVAT: Decimal;
+        VATAmount: Decimal;
     begin
+        MarkupAmountInclVAT := RSRLocalizationMgt.RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Amount (Actual)", GenJournalLine."Currency Code");
+        VATAmount := RSRLocalizationMgt.RoundAmountToCurrencyRounding(CalculateRSGLVATAmount(), GenJournalLine."Currency Code");
+
         case RSRetailCalculationType of
             RSRetailCalculationType::"Margin with VAT":
-                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Amount (Actual)");
+                GenJournalLine.Validate("Debit Amount", MarkupAmountInclVAT);
             RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", MarkupAmountInclVAT - VATAmount);
             RSRetailCalculationType::VAT:
-                GenJournalLine.Validate("Credit Amount", CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", VATAmount);
         end;
     end;
 
     local procedure GetRSAccountNoFromSetup(RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
-    var
-        LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        LocalizationSetup.Get();
         case RSRetailCalculationType of
             RSRetailCalculationType::VAT:
-                begin
-                    LocalizationSetup.TestField("RS Calc. VAT GL Account");
-                    exit(LocalizationSetup."RS Calc. VAT GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcVATAccount(TempPurchInvLine."No.", TempPurchInvLine."Location Code"));
             RSRetailCalculationType::"Margin with VAT":
                 exit(GetInventoryAccountFromInvPostingSetup(TempPurchInvLine."Location Code"));
             RSRetailCalculationType::Margin:
-                begin
-                    LocalizationSetup.TestField("RS Calc. Margin GL Account");
-                    exit(LocalizationSetup."RS Calc. Margin GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcMarginAccount(TempPurchInvLine."No.", TempPurchInvLine."Location Code"));
         end;
     end;
 
     local procedure CalculateRSGLVATAmount(): Decimal
+    var
+        Item: Record Item;
     begin
-        exit((PriceListLine."Unit Price" * TempPurchInvLine.Quantity) * RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."VAT Prod. Posting Group"));
+        Item.SetLoadFields("VAT Prod. Posting Group");
+        Item.Get(TempPurchInvLine."No.");
+        exit((PriceListLine."Unit Price" * TempPurchInvLine.Quantity) * RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group"));
     end;
 
     #endregion
@@ -443,6 +444,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         Item: Record Item;
         InvPostingSetupNotFoundErr: Label '%1 for %2 : %3 and %4 : %5 not found.', Comment = '%1 = Inventory Posting Setup Table Caption, %2 = Location Code Field Caption %3 = Location Code, %4 = Invt. Posting Group Code Field Caption, %5 = Inventory Posting Group';
     begin
+        Item.SetLoadFields("Inventory Posting Group");
         Item.Get(TempPurchInvLine."No.");
         if not InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
             Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), InventoryPostingSetup.FieldCaption("Location Code"), LocationCode,

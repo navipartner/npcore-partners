@@ -117,7 +117,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
             GLEntry."Additional-Currency Amount" := GenJnlLine.Amount;
             GLEntry.Amount := 0;
         end;
-        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, true);
+        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, false);
         PostJob(GenJnlLine, GLEntry);
         GLEntry.Insert();
     end;
@@ -195,23 +195,14 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
 
     #region Retail Price Calculation
     local procedure GetRSAccountNoFromSetup(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT): Code[20]
-    var
-        LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        LocalizationSetup.Get();
         case RSGLEntryType of
             RSGLEntryType::VAT:
-                begin
-                    LocalizationSetup.TestField("RS Calc. VAT GL Account");
-                    exit(LocalizationSetup."RS Calc. VAT GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcVATAccount(PostedNivelationLines."Item No.", PostedNivelationLines."Location Code"));
             RSGLEntryType::Margin:
                 exit(GetInventoryAccountFromInvPostingSetup(PostedNivelationLines));
             RSGLEntryType::MarginNoVAT:
-                begin
-                    LocalizationSetup.TestField("RS Calc. Margin GL Account");
-                    exit(LocalizationSetup."RS Calc. Margin GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcMarginAccount(PostedNivelationLines."Item No.", PostedNivelationLines."Location Code"));
         end;
     end;
 

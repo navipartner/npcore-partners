@@ -13,7 +13,10 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Transfer Shipment", 'OnBeforeModifyTransShptLine', '', false, false)]
     local procedure OnBeforeModifyTransShptLine(TransferShipmentLine: Record "Transfer Shipment Line")
     begin
-        if (not RSRLocalizationMgt.IsRetailLocation(TransferShipmentLine."Transfer-from Code")) or RSRLocalizationMgt.IsRetailLocation(TransferShipmentLine."Transfer-to Code") then
+        if not RSRLocalizationMgt.IsRSLocalizationActive() then
+            exit;
+
+        if not RSRLocalizationMgt.IsRetailLocation(TransferShipmentLine."Transfer-from Code") then
             exit;
 
         PostRetailCalculationEntries(TransferShipmentLine);
@@ -404,7 +407,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
             GLEntry."Additional-Currency Amount" := GenJnlLine.Amount;
             GLEntry.Amount := 0;
         end;
-        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, true);
+        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, false);
         PostJob(GenJnlLine, GLEntry);
         GLEntry.Insert();
     end;
@@ -566,21 +569,12 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     end;
 
     local procedure GetRSAccountNoFromSetup(CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
-    var
-        LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        LocalizationSetup.Get();
         case RSRetailCalculationType of
             RSRetailCalculationType::VAT:
-                begin
-                    LocalizationSetup.TestField("RS Calc. VAT GL Account");
-                    exit(LocalizationSetup."RS Calc. VAT GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcVATAccount(CalculationValueEntry."Item No.", CalculationValueEntry."Location Code"));
             RSRetailCalculationType::Margin:
-                begin
-                    LocalizationSetup.TestField("RS Calc. Margin GL Account");
-                    exit(LocalizationSetup."RS Calc. Margin GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcMarginAccount(CalculationValueEntry."Item No.", CalculationValueEntry."Location Code"));
             RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Transit Adjustment":
                 exit(RSRLocalizationMgt.GetInventoryAccountFromInvPostingSetup(CalculationValueEntry."Item No.", CalculationValueEntry."Location Code"));
         end;
@@ -606,8 +600,12 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
+    var
+        Item: Record Item;
     begin
-        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."VAT Prod. Posting Group"));
+        Item.SetLoadFields("VAT Prod. Posting Group");
+        Item.Get(PriceListLine."Asset No.");
+        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group"));
     end;
 
     local procedure SetGlobalLineQty(Quantity: Decimal)

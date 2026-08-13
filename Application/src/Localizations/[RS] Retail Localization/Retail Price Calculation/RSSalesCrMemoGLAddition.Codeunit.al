@@ -253,7 +253,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             GLEntry.Amount := 0;
         end;
         InitVAT(GenJnlLine, GLEntry);
-        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, true);
+        GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, false);
         PostJob(GenJnlLine, GLEntry);
         GLEntry.Insert();
     end;
@@ -665,8 +665,11 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         RetailValueEntry."Cost per Unit" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(RetailValueEntry."Cost per Unit", SalesCrMemoHeader."Currency Code");
 
         if PriceListLine."Unit Price" * Abs(StdValueEntry."Invoiced Quantity") <> (StdValueEntry."Cost Amount (Actual)" + StdCorrectionValueEntry."Cost Amount (Actual)" + SumOfCOGSCostAmtAct) then begin
-            RetailValueEntry."Cost Amount (Actual)" := RetailValueEntry."Cost per Unit" * StdValueEntry."Item Ledger Entry Quantity";
-            RetailValueEntry."Cost Amount (Actual)" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(RetailValueEntry."Cost Amount (Actual)", SalesCrMemoHeader."Currency Code");
+            RetailValueEntry."Cost Amount (Actual)" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(
+                (PriceListLine."Unit Price" * Abs(StdValueEntry."Invoiced Quantity")) - SumOfCOGSCostAmtAct - Abs(TempSalesCrMemoLine."Line Discount Amount" + TempSalesCrMemoLine."Inv. Discount Amount"),
+                SalesCrMemoHeader."Currency Code");
+            if StdValueEntry."Item Ledger Entry Quantity" <> 0 then
+                RetailValueEntry."Cost per Unit" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(RetailValueEntry."Cost Amount (Actual)" / StdValueEntry."Item Ledger Entry Quantity", SalesCrMemoHeader."Currency Code");
         end;
 
         if PriceListLine."Unit Price" * Abs(StdValueEntry."Invoiced Quantity") <> StdValueEntry."Sales Amount (Actual)" then
@@ -687,23 +690,14 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     #region Retail Price Calculation
 
     local procedure GetRSAccountNoFromSetup(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
-    var
-        LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        LocalizationSetup.Get();
         case RSRetailCalculationType of
             RSRetailCalculationType::VAT:
-                begin
-                    LocalizationSetup.TestField("RS Calc. VAT GL Account");
-                    exit(LocalizationSetup."RS Calc. VAT GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcVATAccount(TempSalesCrMemoLine."No.", TempSalesCrMemoLine."Location Code"));
             RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Counter COGS Correction", RSRetailCalculationType::"Counter Std Correction":
                 exit(RSRLocalizationMgt.GetInventoryAccountFromInvPostingSetup(TempSalesCrMemoLine."No.", TempSalesCrMemoLine."Location Code"));
             RSRetailCalculationType::Margin:
-                begin
-                    LocalizationSetup.TestField("RS Calc. Margin GL Account");
-                    exit(LocalizationSetup."RS Calc. Margin GL Account");
-                end;
+                exit(RSRLocalizationMgt.GetCalcMarginAccount(TempSalesCrMemoLine."No.", TempSalesCrMemoLine."Location Code"));
             RSRetailCalculationType::"COGS Correction", RSRetailCalculationType::"Standard Correction":
                 exit(GetCOGSAccountFromGenPostingSetup(SalesCrMemoHeader))
         end;
