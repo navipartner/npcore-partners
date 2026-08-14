@@ -9,8 +9,6 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         _Assert: Codeunit "Assert";
         _LibEcom: Codeunit "NPR Library Ecommerce";
         _LibraryDimension: Codeunit "Library - Dimension";
-        _LibraryInventory: Codeunit "Library - Inventory";
-        _LibrarySales: Codeunit "Library - Sales";
         _LibraryRandom: Codeunit "Library - Random";
         _SubscriberDimSetID: Integer;
 
@@ -29,7 +27,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
 
         // [When] the document is created through the API
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
         // [Then] the ecom sales line carries a dimension set holding that value
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
@@ -51,7 +49,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         ExternalNo := NextExternalNo();
         Body := _LibEcom.BuildEcomDocumentBody(ExternalNo, 'order', '');
         Line.Add('type', 'item');
-        Line.Add('no', CreateItem());
+        Line.Add('no', _LibEcom.CreateItem());
         Line.Add('quantity', 1);
         Line.Add('unitPrice', 100);
         Line.Add('vatPercent', 0);
@@ -84,7 +82,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJsonText(' ' + DimensionValue."Dimension Code" + ' ', ' ' + DimensionValue.Code + ' '));
 
         // [When] the document is created through the API
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
         // [Then] the padding is ignored and the dimension resolves
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
@@ -110,7 +108,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         Body := _LibEcom.BuildEcomDocumentBody(ExternalNo, 'order', '');
         Body.Add('dimensions', NullValue);
         Line.Add('type', 'item');
-        Line.Add('no', CreateItem());
+        Line.Add('no', _LibEcom.CreateItem());
         Line.Add('quantity', 1);
         Line.Add('unitPrice', 100);
         Line.Add('vatPercent', 0);
@@ -145,7 +143,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue2.Code));
 
         // [When] the document is created through the API
-        asserterror _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        asserterror _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
         // [Then] the duplicate is rejected
         _Assert.ExpectedError('duplicate dimension code');
@@ -165,7 +163,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJson(DimensionValue."Dimension Code", 'NONEXISTINGVAL'));
 
         // [When] the document is created through the API
-        asserterror _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        asserterror _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
         // [Then] the value is rejected
         _Assert.ExpectedError('NONEXISTINGVAL');
@@ -182,7 +180,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         // [Scenario] A request that sends no dimensions is untouched by this feature - the guard against regressing existing integrations.
         // [Given] a document that supplies no dimensions at all
         // [When] it is created through the API
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
         // [Then] the line is stored without a dimension set, exactly as before the feature
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
@@ -207,7 +205,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
 
         // [When] the document is created through the API
         BindSubscription(EcomSalesDocDimTests);
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
         UnbindSubscription(EcomSalesDocDimTests);
 
         // [Then] the dimension set the subscriber assigned survives the insert
@@ -235,7 +233,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         // [Given] a document created with a dimension on its sales line
         CreateDimensionWithValue(DimensionValue);
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
         // [When] the document is serialized for the API response
         JsonBuilder := ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader);
@@ -267,7 +265,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         // [Scenario] The dimensions of a line are merged onto the created sales line: the line wins where it conflicts with a default dimension, and header dimensions are still inherited for the codes it does not mention.
         // [Given] an item with a default dimension, and a line supplying a different value for
         //         that same dimension, plus a header dimension the line does not mention
-        ItemNo := CreateItem();
+        ItemNo := _LibEcom.CreateItem();
 
         CreateDimensionWithValue(ConflictDimValueItem);
         _LibraryDimension.CreateDimensionValue(ConflictDimValueLine, ConflictDimValueItem."Dimension Code");
@@ -278,7 +276,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJson(ConflictDimValueLine."Dimension Code", ConflictDimValueLine.Code));
 
         // [When] the document is created and processed into a sales document
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', ItemNo, CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', ItemNo, _LibEcom.CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
         ProcessToSalesDocument(EcomSalesHeader);
         GetCreatedSalesLine(EcomSalesHeader, EcomSalesLine, SalesLine);
@@ -308,9 +306,9 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         CreateDimensionWithValue(DimensionValue);
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
 
-        Body := _LibEcom.BuildEcomDocumentBody(ExternalNo, 'order', CreateCustomer());
+        Body := _LibEcom.BuildEcomDocumentBody(ExternalNo, 'order', _LibEcom.CreateCustomer());
         ItemLine.Add('type', 'item');
-        ItemLine.Add('no', CreateItem());
+        ItemLine.Add('no', _LibEcom.CreateItem());
         ItemLine.Add('quantity', 1);
         ItemLine.Add('unitPrice', 100);
         ItemLine.Add('vatPercent', 0);
@@ -365,9 +363,9 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         CreateDimensionWithValue(DimensionValue);
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
 
-        Body := _LibEcom.BuildEcomDocumentBody(ExternalNo, 'order', CreateCustomer());
+        Body := _LibEcom.BuildEcomDocumentBody(ExternalNo, 'order', _LibEcom.CreateCustomer());
         ItemLine.Add('type', 'item');
-        ItemLine.Add('no', CreateItem());
+        ItemLine.Add('no', _LibEcom.CreateItem());
         ItemLine.Add('quantity', 1);
         ItemLine.Add('unitPrice', 100);
         ItemLine.Add('vatPercent', 0);
@@ -413,7 +411,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
 
         // [When] the document is created and processed into a sales document
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'returnOrder', CreateItem(), CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'returnOrder', _LibEcom.CreateItem(), _LibEcom.CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
         ProcessToSalesDocument(EcomSalesHeader);
         GetCreatedSalesLine(EcomSalesHeader, EcomSalesLine, SalesLine);
@@ -438,8 +436,8 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         // [Scenario] A voucher line reaches the sales document through its own insert path, which
         //             must apply dimensions too. The document is built from direct records rather
         //             than through the API, because the voucher API path requires the full voucher
-        //             issuing pipeline and API-create preprocessing would process the document
-        //             before the voucher line exists; the merge path under test is the same one.
+        //             issuing pipeline to have issued the voucher first; the merge path under test
+        //             is the same one either way.
 
         // [Given] a voucher type posting to a G/L account, and an issued voucher
         NpRvVoucherType.Init();
@@ -453,7 +451,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
 
         // [Given] an ecom document routed to the V2 implementation
         _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
-        EcomSalesHeader."Sell-to Customer No." := CreateCustomer();
+        EcomSalesHeader."Sell-to Customer No." := _LibEcom.CreateCustomer();
         EcomSalesHeader."API Version Date" := EcomSalesDocImplV2.GetApiVersion();
         EcomSalesHeader.Modify(true);
 
@@ -499,7 +497,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         // [Given] an order created with a dimension on its line, processed into a sales order
         CreateDimensionWithValue(DimensionValue);
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), _LibEcom.CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
         ProcessToSalesDocument(EcomSalesHeader);
 
@@ -531,7 +529,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         // [Given] a return order created with a dimension on its line, processed into a sales return order
         CreateDimensionWithValue(DimensionValue);
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'returnOrder', CreateItem(), CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'returnOrder', _LibEcom.CreateItem(), _LibEcom.CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
         ProcessToSalesDocument(EcomSalesHeader);
 
@@ -575,7 +573,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         DimensionCombination.Insert();
 
         // [When] the document is created and processed - both succeed
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), _LibEcom.CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
         ProcessToSalesDocument(EcomSalesHeader);
 
         // [Then] posting fails, naming one of the two blocked dimensions, so an unrelated
@@ -602,7 +600,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         HeaderDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
 
         // [When] the document is created through the API
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
         // [Then] the ecom sales header carries a dimension set holding that value
         _Assert.AreNotEqual(0, EcomSalesHeader."Dimension Set ID", 'Header dimension set should be assigned');
@@ -624,7 +622,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         HeaderDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
 
         // [When] the document is created and processed into a sales document
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), _LibEcom.CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
         ProcessToSalesDocument(EcomSalesHeader);
 
         // [Then] the sales header carries the dimension
@@ -655,7 +653,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
 
         // [When] the document is created and processed into a sales document
-        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', CreateItem(), CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
+        _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), _LibEcom.CreateCustomer(), HeaderDims, LineDims, EcomSalesHeader);
         GetEcomLine(EcomSalesHeader, EcomSalesLine);
         ProcessToSalesDocument(EcomSalesHeader);
         GetCreatedSalesLine(EcomSalesHeader, EcomSalesLine, SalesLine);
@@ -718,38 +716,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
 
     local procedure NextExternalNo(): Code[20]
     begin
-        exit(CopyStr('DIM' + _LibraryRandom.RandText(10), 1, 20));
-    end;
-
-    local procedure CreateItem(): Code[20]
-    var
-        Item: Record Item;
-    begin
-        _LibraryInventory.CreateItem(Item);
-        exit(Item."No.");
-    end;
-
-    local procedure CreateCustomer(): Code[20]
-    var
-        Customer: Record Customer;
-    begin
-        // Processing must reuse this customer, which has complete posting groups, instead of
-        // creating a bare one from the (missing) customer templates.
-        SetCustomerMappingByCustomerNo();
-        _LibrarySales.CreateCustomer(Customer);
-        exit(Customer."No.");
-    end;
-
-    local procedure SetCustomerMappingByCustomerNo()
-    var
-        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
-    begin
-        if not IncEcomSalesDocSetup.Get() then begin
-            IncEcomSalesDocSetup.Init();
-            IncEcomSalesDocSetup.Insert();
-        end;
-        IncEcomSalesDocSetup."Customer Mapping" := IncEcomSalesDocSetup."Customer Mapping"::"Customer No.";
-        IncEcomSalesDocSetup.Modify();
+        exit(_LibEcom.NextExternalNo('DIM'));
     end;
 
     local procedure GetEcomLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line")
@@ -771,15 +738,11 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
     var
         EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
     begin
-        // Feature flag 'disableApiEcomDocumentPreprocessing' decides whether the API create call
-        // already processed the document, so only process here when it has not happened yet.
+        // The API create call never converts, so the document always still needs processing here.
+        Commit();
+        EcomSalesDocProcess.SetShowError(true);
+        EcomSalesDocProcess.Run(EcomSalesHeader);
         EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
-        if EcomSalesHeader."Created Doc No." = '' then begin
-            Commit();
-            EcomSalesDocProcess.SetShowError(true);
-            EcomSalesDocProcess.Run(EcomSalesHeader);
-            EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
-        end;
         _Assert.AreNotEqual('', EcomSalesHeader."Created Doc No.", 'Sales document should have been created');
     end;
 

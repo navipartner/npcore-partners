@@ -5,6 +5,7 @@ codeunit 85238 "NPR Ecom Wallet Tests"
 
     var
         _Assert: Codeunit "Assert";
+        _LibEcom: Codeunit "NPR Library Ecommerce";
 
     #region CreateWallets — guard conditions (header exits early without processing)
     [Test]
@@ -167,7 +168,7 @@ codeunit 85238 "NPR Ecom Wallet Tests"
         WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
     begin
         // [Scenario] Wallet creation failure below max retry does not set Error status on wallet line
-        DisableWallets();
+        _LibEcom.EnableAttractionWallets(false);
         SetupHeaderForWalletProcessing(EcomSalesHeader);
         CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
         // Default Max Wallet Retry Count = 3; wallet retry count starts at 0
@@ -191,7 +192,7 @@ codeunit 85238 "NPR Ecom Wallet Tests"
         WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
     begin
         // [Scenario] Wallet creation failure at max retry sets Error status on wallet line and header
-        DisableWallets();
+        _LibEcom.EnableAttractionWallets(false);
 
         // Set max wallet retry count to 1 so a single failure with UpdateRetryCount=true triggers Error
         if not IncEcomSetup.Get() then
@@ -233,7 +234,7 @@ codeunit 85238 "NPR Ecom Wallet Tests"
         WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
     begin
         // [Scenario] Wallet creation succeeds: wallet line and header status become Processed and a wallet record is linked
-        EnableWallets();
+        _LibEcom.EnableAttractionWallets(true);
         SetupHeaderForWalletProcessing(EcomSalesHeader);
         CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
         // No virtual item components → all component checks pass
@@ -267,7 +268,7 @@ codeunit 85238 "NPR Ecom Wallet Tests"
         WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
     begin
         // [Scenario] All wallet lines are processed → header status becomes Processed
-        EnableWallets();
+        _LibEcom.EnableAttractionWallets(true);
         SetupHeaderForWalletProcessing(EcomSalesHeader);
         CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
         CreateWalletParentLine(ParentLine2, EcomSalesHeader, 'LINE-002');
@@ -295,7 +296,7 @@ codeunit 85238 "NPR Ecom Wallet Tests"
         WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
     begin
         // [Scenario] One wallet line is processed → header status becomes Partially Processed
-        EnableWallets();
+        _LibEcom.EnableAttractionWallets(true);
         SetupHeaderForWalletProcessing(EcomSalesHeader);
         CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
         CreateWalletParentLine(ParentLine2, EcomSalesHeader, 'LINE-002');
@@ -327,7 +328,7 @@ codeunit 85238 "NPR Ecom Wallet Tests"
         WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
     begin
         // [Scenario] One wallet line has a failed component → that wallet line becomes Error → header becomes Error
-        EnableWallets();
+        _LibEcom.EnableAttractionWallets(true);
         SetupHeaderForWalletProcessing(EcomSalesHeader);
         CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
         CreateWalletParentLine(ParentLine2, EcomSalesHeader, 'LINE-002');
@@ -346,31 +347,9 @@ codeunit 85238 "NPR Ecom Wallet Tests"
     #endregion
 
     #region Helpers
-    local procedure EnableWallets()
-    var
-        WalletSetup: Record "NPR WalletAssetSetup";
-    begin
-        if not WalletSetup.Get() then
-            WalletSetup.Insert();
-        WalletSetup.Enabled := true;
-        WalletSetup.Modify();
-    end;
-
-    local procedure DisableWallets()
-    var
-        WalletSetup: Record "NPR WalletAssetSetup";
-    begin
-        if not WalletSetup.Get() then
-            WalletSetup.Insert();
-        WalletSetup.Enabled := false;
-        WalletSetup.Modify();
-    end;
-
     local procedure SetupHeaderForWalletProcessing(var EcomSalesHeader: Record "NPR Ecom Sales Header")
-    var
-        LibEcom: Codeunit "NPR Library Ecommerce";
     begin
-        LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
         EcomSalesHeader."Capture Processing Status" := EcomSalesHeader."Capture Processing Status"::Processed;
         EcomSalesHeader."Attr. Wallet Processing Status" := EcomSalesHeader."Attr. Wallet Processing Status"::Pending;
         EcomSalesHeader."Attraction Wallets Exist" := true;

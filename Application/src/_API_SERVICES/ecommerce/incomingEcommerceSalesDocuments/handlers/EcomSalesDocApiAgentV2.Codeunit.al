@@ -5,7 +5,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     internal procedure CreateIncomingEcomDocument(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         CreateEcomOCNotif: Codeunit "NPR Create Ecom OC Notif";
         Sentry: Codeunit "NPR Sentry";
     begin
@@ -14,14 +13,12 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
 
         Commit();
 
-        // OC fires before PreProcessDocument so it isn't delayed/swallowed.
         // Bucket Id = 0 hides the entry from the bucket-filtered JQ until AssignBucketId stamps it.
         if not CreateEcomOCNotif.Run(EcomSalesHeader) then
             Sentry.AddLastErrorIfProgrammingBug();
 
-        if not FeatureFlagsManagement.IsEnabled(DisableApiEcomDocumentPreprocessing()) then
-            PreProcessDocument(EcomSalesHeader);
-
+        // The document is deliberately left Pending: conversion and virtual-item processing are
+        // the job queues' work. Nothing here may convert it, or the request would block on it.
         AssignBucketId(EcomSalesHeader);
         exit(Response.RespondOK(GetSalesDocumentCreateResponse(EcomSalesHeader)));
     end;
@@ -1236,11 +1233,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             EcomCreateWalletMgt.CreateWallets(EcomSalesHeader, false, false);
         end;
         CreateDocument(EcomSalesHeader)
-    end;
-
-    internal procedure DisableApiEcomDocumentPreprocessing(): Text[50]
-    begin
-        exit('disableApiEcomDocumentPreprocessing');
     end;
 
     local procedure CreateDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")

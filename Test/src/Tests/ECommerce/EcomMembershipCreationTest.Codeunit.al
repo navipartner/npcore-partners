@@ -9,8 +9,6 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         _LibEcommerce: Codeunit "NPR Library Ecommerce";
         _MemberApiLib: Codeunit "NPR Library - Member XML API";
         _LibPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        _LibCoupon: Codeunit "NPR Library Coupon";
-        _LibInventory: Codeunit "NPR Library - Inventory";
         _Assert: Codeunit Assert;
 
     [Test]
@@ -1504,7 +1502,7 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
 
         _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
         CreateCapturedVoucherLine(VoucherLine, EcomSalesHeader, VoucherType.Code, 1, 100);
-        CreateCapturedCouponLine(CouponLine, EcomSalesHeader, CreateEcomCouponType(CouponType), 1, 100);
+        CreateCapturedCouponLine(CouponLine, EcomSalesHeader, _LibEcommerce.CreateEcomCouponItem(CouponType), 1, 100);
         CreateCapturedCreateMembershipLine(MembershipLine, EcomSalesHeader, 'T-ECOM-ITEM', 1, 100);
         Commit();
 
@@ -1589,58 +1587,6 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         EcomSalesLine."Line Amount" := Qty * UnitPrice;
         EcomSalesLine.Captured := true;
         EcomSalesLine.Insert(true);
-    end;
-
-    /// <summary>
-    /// Creates a coupon type with the ON-ECOM-SALE issue module + an item linked to it via
-    /// NPR NpDc Iss.OnEcomSale S.Line, mirroring the setup in the dedicated coupon test codeunit.
-    /// Returns the item no. to use as EcomSalesLine."No." for a coupon line.
-    /// </summary>
-    local procedure CreateEcomCouponType(var CouponType: Record "NPR NpDc Coupon Type"): Code[20]
-    var
-        CouponModule: Record "NPR NpDc Coupon Module";
-        OnEcomSaleCouponModule: Codeunit "NPR OnEcomSaleCouponModule";
-    begin
-        _LibCoupon.CreateCouponSetup();
-
-        if not CouponModule.Get(CouponModule.Type::"Issue Coupon", OnEcomSaleCouponModule.ModuleCode()) then begin
-            CouponModule.Init();
-            CouponModule.Type := CouponModule.Type::"Issue Coupon";
-            CouponModule.Code := OnEcomSaleCouponModule.ModuleCode();
-            CouponModule.Description := 'Issue Coupon - Ecommerce Sale';
-            CouponModule.Insert();
-        end;
-
-        _LibCoupon.CreateDiscountAmountCouponType('ECOM-COUPON', CouponType, 10);
-        CouponType."Issue Coupon Module" := OnEcomSaleCouponModule.ModuleCode();
-        CouponType.Modify();
-
-        exit(CreateCouponItemSetup(CouponType.Code));
-    end;
-
-    local procedure CreateCouponItemSetup(CouponTypeCode: Code[20]) ItemNo: Code[20]
-    var
-        EcomSalesCouponSetupLine: Record "NPR NpDc Iss.OnEcomSale S.Line";
-    begin
-        ItemNo := _LibInventory.CreateItemNo();
-
-        EcomSalesCouponSetupLine.SetRange(Type, EcomSalesCouponSetupLine.Type::Item);
-        EcomSalesCouponSetupLine.SetRange("No.", ItemNo);
-        EcomSalesCouponSetupLine.SetRange("Variant Code", '');
-        EcomSalesCouponSetupLine.SetRange("Coupon Type", CouponTypeCode);
-        if EcomSalesCouponSetupLine.IsEmpty() then begin
-            EcomSalesCouponSetupLine.Reset();
-            EcomSalesCouponSetupLine.SetRange("Coupon Type", CouponTypeCode);
-            if not EcomSalesCouponSetupLine.FindLast() then
-                EcomSalesCouponSetupLine."Line No." := 0;
-
-            EcomSalesCouponSetupLine.Init();
-            EcomSalesCouponSetupLine."Coupon Type" := CouponTypeCode;
-            EcomSalesCouponSetupLine."Line No." += 10000;
-            EcomSalesCouponSetupLine.Type := EcomSalesCouponSetupLine.Type::Item;
-            EcomSalesCouponSetupLine."No." := ItemNo;
-            EcomSalesCouponSetupLine.Insert();
-        end;
     end;
 
     local procedure CreateCapturedCreateMembershipLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20]; Qty: Decimal; UnitPrice: Decimal)
