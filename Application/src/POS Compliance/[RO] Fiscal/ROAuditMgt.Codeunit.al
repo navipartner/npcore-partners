@@ -45,18 +45,18 @@ codeunit 6248727 "NPR RO Audit Mgt."
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if not Initialized then begin
-            if not POSAuditProfile.Get(POSAuditProfileCode) then
-                exit(false);
+        if not POSAuditProfile.Get(POSAuditProfileCode) then
+            exit(false);
 
-            if POSAuditProfile."Audit Handler" <> HandlerCode() then
-                exit(false);
+        if POSAuditProfile."Audit Handler" <> HandlerCode() then
+            exit(false);
 
-            Initialized := true;
-            Enabled := true;
-        end;
+        if Initialized then
+            exit(Enabled);
 
-        exit(Enabled);
+        Initialized := true;
+        Enabled := true;
+        exit(true);
     end;
 
     local procedure HandleOnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")

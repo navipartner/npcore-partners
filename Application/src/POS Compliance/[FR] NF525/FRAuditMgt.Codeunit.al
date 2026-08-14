@@ -58,17 +58,17 @@ codeunit 6184850 "NPR FR Audit Mgt."
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if not _Initialized then begin
-            if not POSAuditProfile.Get(POSAuditProfileCode) then
-                exit(false);
-            if POSAuditProfile."Audit Handler" <> HandlerCode() then
-                exit(false);
-            _FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
-            _FRCertificationSetup.Get();
-            _Initialized := true;
-            _Enabled := true;
-        end;
-        exit(_Enabled);
+        if not POSAuditProfile.Get(POSAuditProfileCode) then
+            exit(false);
+        if POSAuditProfile."Audit Handler" <> HandlerCode() then
+            exit(false);
+        if _Initialized then
+            exit(_Enabled);
+        _FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
+        _FRCertificationSetup.Get();
+        _Initialized := true;
+        _Enabled := true;
+        exit(true);
     end;
 
 #if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
