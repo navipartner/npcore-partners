@@ -460,14 +460,39 @@ codeunit 6151027 "NPR Entria Order Impl."
         PaymentsArrayToken: JsonToken;
         PaymentToken: JsonToken;
         LastLineNo: Integer;
+        NonZeroAmount: Boolean;
+        PaymentsInserted: Boolean;
+        MissingCollectionsErr: Label 'Document %1 cannot be imported because payment collections are not available yet (%2).', Comment = '%1 = document external no., %2 = absolute JSON path';
+        MissingPaymentsErr: Label 'Document %1 cannot be imported because payment information is not available yet (%2).', Comment = '%1 = document external no., %2 = absolute JSON path';
     begin
         LastLineNo := _EcomSalesDocUtils.GetSalesDocLastPaymentLineLineNo(EcomSalesHeader);
-        if RequestBody.SelectToken('payment_collections', PaymentCollectionsToken) then
-            if PaymentCollectionsToken.IsArray() then
-                foreach PaymentCollectionToken in PaymentCollectionsToken.AsArray() do
-                    if PaymentCollectionToken.SelectToken('payments', PaymentsArrayToken) and PaymentsArrayToken.IsArray() then
-                        foreach PaymentToken in PaymentsArrayToken.AsArray() do
-                            InsertEcomPaymentLine(PaymentToken, EcomSalesHeader, LastLineNo);
+        NonZeroAmount := HasNonZeroAmount(EcomSalesHeader);
+
+        if not (RequestBody.SelectToken('payment_collections', PaymentCollectionsToken) and PaymentCollectionsToken.IsArray()) then begin
+            if NonZeroAmount then
+                Error(MissingCollectionsErr, EcomSalesHeader."External No.", _JsonHelper.GetAbsolutePath(RequestBody, 'payment_collections'));
+            exit;
+        end;
+
+        foreach PaymentCollectionToken in PaymentCollectionsToken.AsArray() do begin
+            if not (PaymentCollectionToken.SelectToken('payments', PaymentsArrayToken) and PaymentsArrayToken.IsArray() and (PaymentsArrayToken.AsArray().Count() > 0)) then begin
+                if NonZeroAmount then
+                    Error(MissingPaymentsErr, EcomSalesHeader."External No.", _JsonHelper.GetAbsolutePath(PaymentCollectionToken, 'payments'));
+            end else
+                foreach PaymentToken in PaymentsArrayToken.AsArray() do begin
+                    InsertEcomPaymentLine(PaymentToken, EcomSalesHeader, LastLineNo);
+                    PaymentsInserted := true;
+                end;
+        end;
+
+        if (not PaymentsInserted) and NonZeroAmount then
+            Error(MissingPaymentsErr, EcomSalesHeader."External No.", _JsonHelper.GetAbsolutePath(RequestBody, 'payment_collections'));
+    end;
+
+    local procedure HasNonZeroAmount(EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
+    begin
+        EcomSalesHeader.CalcFields(Amount);
+        exit(EcomSalesHeader.Amount <> 0);
     end;
 
     local procedure InsertEcomPaymentLine(PaymentJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; var LastLineNo: Integer)

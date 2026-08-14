@@ -2,6 +2,7 @@
 codeunit 6248580 "NPR Entria Order Import JQ"
 {
     Access = Internal;
+    Permissions = tabledata "NPR Entria Order Imp. Failure" = rimd;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
@@ -47,7 +48,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         EntriaStore.SetCurrentKey(Enabled);
         EntriaStore.SetRange(Enabled, true);
         EntriaStore.SetRange("Sales Order Integration", true);
-        EntriaStore.SetAutoCalcFields("Last Order Import Sync At");
         EntriaStore.SetLoadFields(Code, "Location Code");
         if EntriaStore.FindSet() then
             repeat
@@ -56,131 +56,195 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     end;
 
     local procedure ProcessStore(EntriaStore: Record "NPR Entria Store")
+    var
+        ListFetched: Boolean;
     begin
-        SetMarkers(EntriaStore);
-        DownloadOrders(EntriaStore);
+        ListFetched := DownloadOrders(EntriaStore);
+        ProcessDueRetries(EntriaStore, ListFetched);
     end;
 
-    local procedure DownloadOrders(EntriaStore: Record "NPR Entria Store")
+    local procedure DownloadOrders(EntriaStore: Record "NPR Entria Store"): Boolean
     var
-        HasMore: Boolean;
+        ExpectedMarkerDT: DateTime;
+        FromDT: DateTime;
         Limit: Integer;
         Offset: Integer;
-        OrdersArr: JsonArray;
-        OrderCount: Integer;
+        PageCount: Integer;
     begin
+        ExpectedMarkerDT := GetSyncStateMarker(EntriaStore.Code);
+        _SessionMaxCreatedAt.Set(EntriaStore.Code, ExpectedMarkerDT);
+        FromDT := ExpectedMarkerDT;
+
         Offset := 0;
         Limit := 40;
-        HasMore := true;
         repeat
-            if not GetOrderList(EntriaStore, OrdersArr, Offset, Limit, GetFromDT(EntriaStore)) then begin
-                LogError(GetLastErrorText(), EntriaStore.Code, '');
-                exit;
+            if not DownloadOrdersPage(EntriaStore, FromDT, Offset, Limit, PageCount) then begin
+                EmitError(GetLastErrorText(), EntriaStore.Code, '');
+                exit(false);
             end;
-            OrderCount := OrdersArr.Count();
-            if OrderCount = 0 then
-                exit;
-            ProcessList(OrdersArr, EntriaStore);
-            FlushMarker(EntriaStore);
-            HasMore := OrderCount = Limit;
-            Offset += Limit;
-        until not HasMore;
-    end;
 
-    local procedure FlushMarker(EntriaStore: Record "NPR Entria Store")
-    var
-        EntriaStoreUpd: Record "NPR Entria Store";
-    begin
-        if _HasSessionErrors.Get(EntriaStore.Code) then
-            exit;
+            if PageCount = 0 then
+                exit(true);
 
-        EntriaStoreUpd.SetAutoCalcFields("Last Order Import Sync At");
-        EntriaStoreUpd.Get(EntriaStore.RecordId);
-        UpdateLastImportedAt(EntriaStoreUpd, _SessionMaxUpdatedAt.Get(EntriaStore.Code));
-    end;
+            // False means the marker was rewound (moved backwards) in the database while we were
+            // paging. A forward move is a parallel session's flush - it is adopted and paging continues.
+            if not TryFlushMarker(EntriaStore.Code, ExpectedMarkerDT) then
+                exit(true);
 
-    local procedure BuildOrderDocNoIndex(OrdersArr: JsonArray; var DocToIdx: Dictionary of [Code[20], Integer])
-    var
-        i: Integer;
-        OrderTkn: JsonToken;
-        DocumentNo: Code[20];
-    begin
-        Clear(DocToIdx);
-
-        for i := 0 to OrdersArr.Count() - 1 do begin
-            OrdersArr.Get(i, OrderTkn);
-
-            DocumentNo := GetDocumentNo(OrderTkn);
-            if DocumentNo <> '' then
-                if not DocToIdx.ContainsKey(DocumentNo) then
-                    DocToIdx.Add(DocumentNo, i);
-        end;
-    end;
-
-    local procedure GetOrderTokenByDocNo(OrdersArr: JsonArray; DocToIdx: Dictionary of [Code[20], Integer]; DocumentNo: Code[20]; var OrderTkn: JsonToken): Boolean
-    var
-        Idx: Integer;
-    begin
-        Clear(OrderTkn);
-
-        if not DocToIdx.Get(DocumentNo, Idx) then
-            exit(false);
-
-        if (Idx < 0) or (Idx >= OrdersArr.Count()) then
-            exit(false);
-
-        OrdersArr.Get(Idx, OrderTkn);
+            Offset += PageCount;
+        until PageCount < Limit;
         exit(true);
     end;
 
-    internal procedure GetOrderList(EntriaStore: Record "NPR Entria Store"; var OrdersArr: JsonArray; Offset: Integer; Limit: Integer; UpdatedAtFrom: DateTime): Boolean
+    local procedure DownloadOrdersPage(EntriaStore: Record "NPR Entria Store"; FromDT: DateTime; Offset: Integer; Limit: Integer; var PageCount: Integer): Boolean
     var
-        OrdersToken: JsonToken;
+        OrdersArr: JsonArray;
+    begin
+        PageCount := 0;
+        if not GetOrderList(EntriaStore, OrdersArr, Offset, Limit, FromDT) then
+            exit(false);
+
+        PageCount := OrdersArr.Count();
+        if PageCount > 0 then
+            exit(ProcessList(OrdersArr, EntriaStore));
+        exit(true);
+    end;
+
+    internal procedure TryFlushMarker(StoreCode: Code[20]; var ExpectedMarkerDT: DateTime): Boolean
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+        SessionMax: DateTime;
+        MarkerMovedBack: Boolean;
+    begin
+        GetSyncState(StoreCode, true, EntriaStoreSyncState);
+
+        // SQL Server datetime stores values on a 1/300s grid (.000/.003/.007) while the record
+        // variable keeps the unrounded value after Modify(), so a read-back can be ~1-2ms lower
+        // than what we wrote. A manual rewind is never sub-second, so only a move of 1s or more
+        // counts as one; anything smaller is a rounding artifact.
+        if ExpectedMarkerDT <> 0DT then
+            MarkerMovedBack := EntriaStoreSyncState."Last Orders Imported At" < (ExpectedMarkerDT - 1000);
+        SessionMax := _SessionMaxCreatedAt.Get(StoreCode);
+
+        if not MarkerMovedBack then begin
+            if SessionMax > EntriaStoreSyncState."Last Orders Imported At" then begin
+                EntriaStoreSyncState."Last Orders Imported At" := SessionMax;
+                EntriaStoreSyncState.Modify();
+            end;
+            // Track the value now in the database - our own write, or a parallel session's higher one 
+            ExpectedMarkerDT := EntriaStoreSyncState."Last Orders Imported At";
+        end;
+
+        Commit();
+        exit(not MarkerMovedBack);
+    end;
+
+    internal procedure GetSyncStateMarker(StoreCode: Code[20]): DateTime
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+    begin
+        GetSyncState(StoreCode, false, EntriaStoreSyncState);
+        exit(EntriaStoreSyncState."Last Orders Imported At");
+    end;
+
+    local procedure GetSyncState(StoreCode: Code[20]; LockRow: Boolean; var EntriaStoreSyncState: Record "NPR Entria Store Sync State")
+    begin
+        if LockRow then
+            EntriaStoreSyncState.ReadIsolation := IsolationLevel::UpdLock;
+        if EntriaStoreSyncState.Get(StoreCode) then
+            exit;
+
+        // A store that has never synced has no row yet.
+        EntriaStoreSyncState.Init();
+        EntriaStoreSyncState."Store Code" := StoreCode;
+        if not EntriaStoreSyncState.Insert() then
+            EntriaStoreSyncState.Get(StoreCode);
+    end;
+
+    internal procedure GetOrderList(EntriaStore: Record "NPR Entria Store"; var OrdersArr: JsonArray; Offset: Integer; Limit: Integer; CreatedAtFrom: DateTime): Boolean
+    var
         EntriaResponse: JsonToken;
         Request: Text;
     begin
         Clear(OrdersArr);
-        Request := GenerateGetOrderListRequest(Offset, Limit, UpdatedAtFrom);
+        Request := GenerateGetOrderListRequest(Offset, Limit, CreatedAtFrom);
         if not _EntriaAPIHandler.SendEntriaRequest(EntriaStore.Code, Request, Enum::"Http Request Type"::GET, EntriaResponse) then
             exit(false);
-        if EntriaResponse.SelectToken('orders', OrdersToken) then
-            if OrdersToken.IsArray() then
-                OrdersArr := OrdersToken.AsArray();
-        exit(true);
+
+        exit(TryGetOrdersArray(EntriaResponse, OrdersArr));
     end;
 
-    local procedure GenerateGetOrderListRequest(Offset: Integer; Limit: Integer; UpdatedAtFrom: DateTime): Text
+    [TryFunction]
+    local procedure TryGetOrdersArray(EntriaResponse: JsonToken; var OrdersArr: JsonArray)
     var
-        UpdatedAtText: Text;
+        OrdersToken: JsonToken;
+        NoOrdersArrayErr: Label 'The Entria order list request succeeded but its response contains no "orders" array, so the importer cannot tell an empty page from a broken payload.', Locked = true;
     begin
-        if UpdatedAtFrom <> 0DT then
-            UpdatedAtText := StrSubstNo('&updated_at[$gte]=%1', FormatDateTime(UpdatedAtFrom));
+        if not EntriaResponse.SelectToken('orders', OrdersToken) then
+            Error(NoOrdersArrayErr);
+        if not OrdersToken.IsArray() then
+            Error(NoOrdersArrayErr);
 
-        exit(StrSubstNo('admin/orders?offset=%1&limit=%2&order=updated_at&fields=-summary,+billing_address.*,+shipping_address.*,+shipping_methods.name,+currency_code,+email,+payment_collections.payments.*%3', Offset, Limit, UpdatedAtText));
+        OrdersArr := OrdersToken.AsArray();
+    end;
+
+    internal procedure GenerateGetOrderListRequest(Offset: Integer; Limit: Integer; CreatedAtFrom: DateTime): Text
+    var
+        CreatedAtText: Text;
+    begin
+        if CreatedAtFrom <> 0DT then
+            CreatedAtText := StrSubstNo('&created_at[$gte]=%1', FormatDateTime(CreatedAtFrom));
+
+        exit(StrSubstNo('admin/orders?offset=%1&limit=%2&order=created_at&%3%4', Offset, Limit, GetOrderFieldsProjection(), CreatedAtText));
+    end;
+
+    /// <summary>
+    /// The field projection shared by the list endpoint (admin/orders) and the single-order
+    /// re-fetch endpoint (admin/orders/{id}) - kept in one place so the two request builders
+    /// cannot drift apart.
+    /// </summary>
+    local procedure GetOrderFieldsProjection(): Text
+    begin
+        exit('fields=-summary,+billing_address.*,+shipping_address.*,+shipping_methods.name,+currency_code,+email,+payment_collections.payments.*');
     end;
 
     local procedure FormatDateTime(DT: DateTime): Text
     begin
-        //Introduces a 1-minute safety overlap window in incremental sync to prevent missing recently updated orders due to Entria Admin API propagation delays
-        exit(Format(DT - 1 * 60 * 1000, 0, 9));
+        // 30-second safety overlap window in incremental sync, to tolerate Entria Admin API propagation delay
+        exit(Format(DT - 30 * 1000, 0, 9));
     end;
 
-    local procedure GetExistingEcomDocsForBatch(DocToIdx: Dictionary of [Code[20], Integer]; var ExistingDocs: Dictionary of [Code[20], Boolean]; EntriaStoreCode: Code[20])
+    local procedure BuildOrFilter(Values: List of [Text]) FilterTxt: Text
+    var
+        Value: Text;
+    begin
+        foreach Value in Values do begin
+            if FilterTxt <> '' then
+                FilterTxt += '|';
+            FilterTxt += Value;
+        end;
+    end;
+
+    local procedure BuildOrFilter(Values: List of [Code[20]]): Text
+    var
+        TextValues: List of [Text];
+        Value: Code[20];
+    begin
+        foreach Value in Values do
+            TextValues.Add(Value);
+
+        exit(BuildOrFilter(TextValues));
+    end;
+
+    local procedure GetExistingEcomDocsForBatch(DocumentNos: Dictionary of [Code[20], Boolean]; var ExistingDocs: Dictionary of [Code[20], Boolean]; EntriaStoreCode: Code[20])
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         FilterTxt: Text;
-        DocNo: Code[20];
     begin
         // We limit each API page to 40 orders so the OR-filter stays bounded and safe for SetFilter.
         // Worst case length: 839 characters.
         Clear(ExistingDocs);
-
-        foreach DocNo in DocToIdx.Keys() do
-            if FilterTxt = '' then
-                FilterTxt := DocNo
-            else
-                FilterTxt += '|' + DocNo;
-
+        FilterTxt := BuildOrFilter(DocumentNos.Keys());
         if FilterTxt = '' then
             exit;
 
@@ -197,30 +261,120 @@ codeunit 6248580 "NPR Entria Order Import JQ"
             until EcomSalesHeader.Next() = 0;
     end;
 
-    local procedure ProcessList(OrdersArr: JsonArray; EntriaStore: Record "NPR Entria Store")
+    local procedure GetFailedOrderIdsForBatch(OrderIds: Dictionary of [Text, Boolean]; var FailedOrderIds: Dictionary of [Text, Boolean]; EntriaStoreCode: Code[20])
     var
-        DocToIdx: Dictionary of [Code[20], Integer];
-        ExistingDocs: Dictionary of [Code[20], Boolean];
-        DocumentNo: Code[20];
-        OrderTkn: JsonToken;
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        FilterTxt: Text;
     begin
-        BuildOrderDocNoIndex(OrdersArr, DocToIdx);
-        if DocToIdx.Count() = 0 then
+        Clear(FailedOrderIds);
+        FilterTxt := BuildOrFilter(OrderIds.Keys());
+        if FilterTxt = '' then
             exit;
 
-        GetExistingEcomDocsForBatch(DocToIdx, ExistingDocs, EntriaStore.Code);
+        EntriaOrderImpFailure.ReadIsolation := IsolationLevel::ReadCommitted;
+        EntriaOrderImpFailure.SetRange("Store Code", EntriaStoreCode);
+        EntriaOrderImpFailure.SetFilter("Order Id", FilterTxt);
+        EntriaOrderImpFailure.SetLoadFields("Order Id");
 
-        foreach DocumentNo in DocToIdx.Keys() do begin
-            if not ExistingDocs.ContainsKey(DocumentNo) then
-                if GetOrderTokenByDocNo(OrdersArr, DocToIdx, DocumentNo, OrderTkn) then begin
-                    if ProcessOrder(EntriaStore, OrderTkn, DocumentNo) then
-                        UpdateSessionMax(EntriaStore.Code, _JsonHelper.GetJDT(OrderTkn, 'updated_at', true));
-                    Commit();
-                end;
+        if EntriaOrderImpFailure.FindSet() then
+            repeat
+                if not FailedOrderIds.ContainsKey(EntriaOrderImpFailure."Order Id") then
+                    FailedOrderIds.Add(EntriaOrderImpFailure."Order Id", true);
+            until EntriaOrderImpFailure.Next() = 0;
+    end;
+
+    internal procedure ProcessList(OrdersArr: JsonArray; EntriaStore: Record "NPR Entria Store"): Boolean
+    var
+        OrderIds: Dictionary of [Text, Boolean];
+        DocumentNos: Dictionary of [Code[20], Boolean];
+        ExistingDocs: Dictionary of [Code[20], Boolean];
+        FailedOrderIds: Dictionary of [Text, Boolean];
+        OrderTkn: JsonToken;
+        i: Integer;
+    begin
+        if not TryCollectPageKeys(OrdersArr, OrderIds, DocumentNos) then
+            exit(false);
+
+        if OrderIds.Count() = 0 then
+            exit(true);
+
+        GetExistingEcomDocsForBatch(DocumentNos, ExistingDocs, EntriaStore.Code);
+        GetFailedOrderIdsForBatch(OrderIds, FailedOrderIds, EntriaStore.Code);
+
+        for i := 0 to OrdersArr.Count() - 1 do begin
+            OrdersArr.Get(i, OrderTkn);
+            ProcessListOrder(OrderTkn, ExistingDocs, FailedOrderIds, EntriaStore);
+        end;
+
+        exit(true);
+    end;
+
+    [TryFunction]
+    local procedure TryCollectPageKeys(OrdersArr: JsonArray; var OrderIds: Dictionary of [Text, Boolean]; var DocumentNos: Dictionary of [Code[20], Boolean])
+    var
+        OrderTkn: JsonToken;
+        OrderId: Text[100];
+        DocumentNo: Code[20];
+        i: Integer;
+    begin
+        Clear(OrderIds);
+        Clear(DocumentNos);
+
+        for i := 0 to OrdersArr.Count() - 1 do begin
+            OrdersArr.Get(i, OrderTkn);
+
+            OrderId := GetMedusaOrderId(OrderTkn);
+            if not OrderIds.ContainsKey(OrderId) then
+                OrderIds.Add(OrderId, true);
+
+            DocumentNo := GetDocumentNo(OrderTkn);
+            if DocumentNo <> '' then
+                if not DocumentNos.ContainsKey(DocumentNo) then
+                    DocumentNos.Add(DocumentNo, true);
         end;
     end;
 
-    internal procedure ProcessOrder(EntriaStore: Record "NPR Entria Store"; OrderTkn: JsonToken; DocumentNo: Code[20]): Boolean
+    local procedure ProcessListOrder(OrderTkn: JsonToken; ExistingDocs: Dictionary of [Code[20], Boolean]; FailedOrderIds: Dictionary of [Text, Boolean]; EntriaStore: Record "NPR Entria Store")
+    var
+        DocumentNo: Code[20];
+        OrderId: Text[100];
+        OrderCreatedAt: DateTime;
+        OrderUpdatedAt: DateTime;
+        DisplayNo: Integer;
+    begin
+        OrderId := GetMedusaOrderId(OrderTkn);
+        OrderCreatedAt := GetOrderCreatedAt(OrderTkn);
+        UpdateSessionMaxCreatedAt(EntriaStore.Code, OrderCreatedAt);
+        if FailedOrderIds.ContainsKey(OrderId) then
+            exit;
+
+        OrderUpdatedAt := GetOrderUpdatedAt(OrderTkn);
+        DisplayNo := GetDisplayNo(OrderTkn);
+
+        if not TryGetDocumentNo(OrderTkn, DocumentNo) then begin
+            LogOrderFailure(EntriaStore, '', OrderId, OrderUpdatedAt, GetLastErrorText(), DisplayNo);
+            Commit();
+            exit;
+        end;
+
+        if ExistingDocs.ContainsKey(DocumentNo) then
+            exit;
+
+        ProcessOrder(EntriaStore, OrderTkn, DocumentNo, OrderId, OrderUpdatedAt, DisplayNo);
+        Commit();
+    end;
+
+    local procedure GetOrderCreatedAt(OrderTkn: JsonToken): DateTime
+    begin
+        exit(_JsonHelper.GetJDT(OrderTkn, 'created_at', true));
+    end;
+
+    local procedure GetOrderUpdatedAt(OrderTkn: JsonToken): DateTime
+    begin
+        exit(_JsonHelper.GetJDT(OrderTkn, 'updated_at', true));
+    end;
+
+    internal procedure ProcessOrder(EntriaStore: Record "NPR Entria Store"; OrderTkn: JsonToken; DocumentNo: Code[20]; MedusaOrderId: Text[100]; OrderUpdatedAt: DateTime; DisplayNo: Integer): Boolean
     var
         EntriaOrderProcessor: Codeunit "NPR Entria Order Processor";
         EcomSalesDocApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
@@ -229,94 +383,98 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         ClearLastError();
         Clear(EntriaOrderProcessor);
         EntriaOrderProcessor.SetParams(OrderTkn, EntriaStore, DocumentNo);
+        Commit();
         if EntriaOrderProcessor.Run(EcomSalesHeader) then begin
             if EcomSalesHeader."Bucket Id" = 0 then
                 EcomSalesDocApiAgent.AssignBucketId(EcomSalesHeader);
+            DeleteOrderFailure(EntriaStore.Code, MedusaOrderId);
             exit(true);
         end;
-        LogError(GetErrorText(DocumentNo), EntriaStore.Code, DocumentNo);
+
+        LogOrderFailure(EntriaStore, DocumentNo, MedusaOrderId, OrderUpdatedAt, GetLastErrorText(), DisplayNo);
         exit(false);
     end;
 
-    local procedure GetDocumentNo(OrderTkn: JsonToken): Code[20]
+    [TryFunction]
+    local procedure TryGetDocumentNo(OrderTkn: JsonToken; var DocumentNo: Code[20])
+    var
+        MissingDocumentNoErr: Label 'The Entria order payload contains no non-empty custom_display_id.', Locked = true;
     begin
 #pragma warning disable AA0139
-        exit(_JsonHelper.GetJText(OrderTkn, 'custom_display_id', false));
+        DocumentNo := _JsonHelper.GetJText(OrderTkn, 'custom_display_id', true);
+#pragma warning restore AA0139
+        if DocumentNo = '' then
+            Error(MissingDocumentNoErr);
+    end;
+
+    local procedure GetDocumentNo(OrderTkn: JsonToken): Code[20]
+    var
+        DocumentNo: Code[20];
+    begin
+        if TryGetDocumentNo(OrderTkn, DocumentNo) then
+            exit(DocumentNo);
+        exit('');
+    end;
+
+    [TryFunction]
+    local procedure TryGetDisplayNo(OrderTkn: JsonToken; var DisplayNo: Integer)
+    begin
+        DisplayNo := _JsonHelper.GetJInteger(OrderTkn, 'display_id', false);
+    end;
+
+    local procedure GetDisplayNo(OrderTkn: JsonToken): Integer
+    var
+        DisplayNo: Integer;
+    begin
+        if TryGetDisplayNo(OrderTkn, DisplayNo) then
+            exit(DisplayNo);
+        exit(0);
+    end;
+
+    local procedure GetMedusaOrderId(OrderTkn: JsonToken): Text[100]
+    begin
+#pragma warning disable AA0139
+        exit(_JsonHelper.GetJText(OrderTkn, 'id', 100, true));
 #pragma warning restore AA0139
     end;
 
     #region markers
-    /// <summary>
-    /// _InitialFromDT[StoreCode]
-    ///   The baseline timestamp read from the database ("Last Orders Imported At").
-    ///   Used as the starting point for updatedAt filtering during this JQ cycle.
-    /// _SessionMaxUpdatedAt[StoreCode]
-    ///   Tracks the highest updatedAt value encountered during this JQ cycle.
-    ///   This value becomes the new "Last Orders Imported At" when the marker is updated.
-    ///_HasSessionErrors[StoreCode]
-    ///   Marker to track for any errors and prevent "Last Orders Imported At" from being updated is error exists.
-    /// </summary>
-    local procedure SetMarkers(EntriaStore: Record "NPR Entria Store")
-    var
-        FromDT: DateTime;
-    begin
-        if not _InitialFromDT.ContainsKey(EntriaStore.Code) then begin
-            if EntriaStore."Last Order Import Sync At" <> 0DT then
-                FromDT := EntriaStore."Last Order Import Sync At"
-            else
-                FromDT := GetDefaultFromDT();
-            _InitialFromDT.Add(EntriaStore.Code, FromDT);
-        end;
-
-        if not _SessionMaxUpdatedAt.ContainsKey(EntriaStore.Code) then
-            _SessionMaxUpdatedAt.Add(EntriaStore.Code, _InitialFromDT.Get(EntriaStore.Code));
-
-        if not _HasSessionErrors.ContainsKey(EntriaStore.Code) then
-            _HasSessionErrors.Add(EntriaStore.Code, false);
-    end;
-
-    local procedure UpdateSessionMax(StoreCode: Code[20]; UpdatedAt: DateTime)
+    local procedure UpdateSessionMaxCreatedAt(StoreCode: Code[20]; CreatedAt: DateTime)
     var
         CurrentMax: DateTime;
     begin
-        CurrentMax := _SessionMaxUpdatedAt.Get(StoreCode);
-        if UpdatedAt > CurrentMax then
-            _SessionMaxUpdatedAt.Set(StoreCode, UpdatedAt);
+        CurrentMax := _SessionMaxCreatedAt.Get(StoreCode);
+        if CreatedAt > CurrentMax then
+            _SessionMaxCreatedAt.Set(StoreCode, CreatedAt);
+    end;
+
+    internal procedure GetSessionMaxCreatedAt(StoreCode: Code[20]): DateTime
+    begin
+        exit(_SessionMaxCreatedAt.Get(StoreCode));
+    end;
+
+    internal procedure SeedSessionMax(StoreCode: Code[20])
+    begin
+        _SessionMaxCreatedAt.Set(StoreCode, GetSyncStateMarker(StoreCode));
     end;
     #endregion
 
-    local procedure UpdateLastImportedAt(EntriaStore: Record "NPR Entria Store"; NewDT: DateTime)
+    local procedure ShouldEmitSentryError(StoreCode: Code[20]): Boolean
     begin
-        if EntriaStore."Last Order Import Sync At" < NewDT then begin
-            EntriaStore.SetLastOrdersImportedAt(EntriaStore.Code, NewDT);
-            _InitialFromDT.Set(EntriaStore.Code, NewDT);
-            Commit();
-        end;
+        exit(ShouldEmitSentryError(StoreCode, CurrentDateTime()));
     end;
 
-    local procedure LogError(ErrMsg: Text; StoreCode: Code[20]; DocumentNo: Code[20])
-    begin
-        _HasSessionErrors.Set(StoreCode, true);
-        EmitError(ErrMsg, StoreCode, DocumentNo);
-    end;
-
-    local procedure ShouldEmitSentryError(StoreCode: Code[20]; DocumentNo: Code[20]): Boolean
-    begin
-        exit(ShouldEmitSentryError(StoreCode, DocumentNo, CurrentDateTime()));
-    end;
-
-    internal procedure ShouldEmitSentryError(StoreCode: Code[20]; DocumentNo: Code[20]; NowDT: DateTime): Boolean
+    /// <summary>
+    /// One-hour dedup for the store-wide list-fetch failure
+    /// </summary>
+    internal procedure ShouldEmitSentryError(StoreCode: Code[20]; NowDT: DateTime): Boolean
     var
         DKey: Text;
         LastEmitAt: DateTime;
         OneHour: Duration;
     begin
         OneHour := 60 * 60 * 1000;
-
-        if DocumentNo <> '' then
-            DKey := StrSubstNo('%1|%2', StoreCode, DocumentNo)
-        else
-            DKey := StrSubstNo('%1|<list-fetch>', StoreCode);
+        DKey := StrSubstNo('%1|<list-fetch>', StoreCode);
 
         if not _LastErrorEmitAt.ContainsKey(DKey) then begin
             _LastErrorEmitAt.Add(DKey, NowDT);
@@ -327,34 +485,17 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         if NowDT - LastEmitAt < OneHour then
             exit(false);
 
-        if (DocumentNo <> '') and EcomDocumentExists(StoreCode, DocumentNo) then begin
-            _LastErrorEmitAt.Remove(DKey);
-            exit(false);
-        end;
-
         _LastErrorEmitAt.Set(DKey, NowDT);
         exit(true);
     end;
 
-    local procedure EcomDocumentExists(StoreCode: Code[20]; ExternalNo: Code[20]): Boolean
-    var
-        EcomSalesHeader: Record "NPR Ecom Sales Header";
-    begin
-        EcomSalesHeader.ReadIsolation := IsolationLevel::ReadCommitted;
-        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
-        EcomSalesHeader.SetRange("Ecommerce Store Code", StoreCode);
-        EcomSalesHeader.SetRange("External No.", ExternalNo);
-        EcomSalesHeader.SetLoadFields("External No.");
-        exit(not EcomSalesHeader.IsEmpty());
-    end;
-
-    local procedure EmitSentryError(StoreCode: Code[20]; DocumentNo: Code[20])
+    local procedure EmitSentryError(StoreCode: Code[20]; OrderRef: Text)
     var
         Sentry: Codeunit "NPR Sentry";
         TransactionName: Text;
     begin
-        if DocumentNo <> '' then
-            TransactionName := StrSubstNo('Entria Order import failed: %1', DocumentNo)
+        if OrderRef <> '' then
+            TransactionName := StrSubstNo('Entria Order import failed: %1', OrderRef)
         else
             TransactionName := StrSubstNo('Entria Order list fetch failed: %1', StoreCode);
 
@@ -390,37 +531,264 @@ codeunit 6248580 "NPR Entria Order Import JQ"
 
     local procedure EmitError(ErrorText: Text; StoreCode: Code[20]; DocumentNo: Code[20])
     begin
-        if ShouldEmitSentryError(StoreCode, DocumentNo) then
+        if ShouldEmitSentryError(StoreCode) then
             EmitSentryError(StoreCode, DocumentNo);
         TelemetryTracking(ErrorText, DocumentNo);
     end;
 
     local procedure InitGlobals()
     begin
-        Clear(_InitialFromDT);
-        Clear(_SessionMaxUpdatedAt);
-        Clear(_HasSessionErrors);
+        Clear(_SessionMaxCreatedAt);
         Clear(_LastErrorEmitAt);
     end;
 
-    local procedure GetFromDT(EntriaStore: Record "NPR Entria Store"): DateTime
-    begin
-        if _InitialFromDT.ContainsKey(EntriaStore.Code) then
-            exit(_InitialFromDT.Get(EntriaStore.Code));
-        exit(GetDefaultFromDT());
-    end;
-
-    local procedure GetErrorText(DocumentNo: Code[20]) ErrMsg: Text
+    #region order failure registry
+    local procedure LogOrderFailure(EntriaStore: Record "NPR Entria Store"; DocumentNo: Code[20]; MedusaOrderId: Text[100]; OrderUpdatedAt: DateTime; ErrorText: Text; DisplayNo: Integer)
     var
-        FullOrderTxt: Label 'Import Order %1 from Entria failed: %2', Locked = true;
+        NewRetryCount: Integer;
     begin
-        ErrMsg := StrSubstNo(FullOrderTxt, DocumentNo, GetLastErrorText());
+        NewRetryCount := UpsertOrderFailure(EntriaStore.Code, DocumentNo, MedusaOrderId, OrderUpdatedAt, ErrorText, DisplayNo, CurrentDateTime());
+        TelemetryTracking(ErrorText, DocumentNo);
+        if ShouldEmitSentryErrorForOrder(NewRetryCount) then
+            if DocumentNo <> '' then
+                EmitSentryError(EntriaStore.Code, DocumentNo)
+            else
+                EmitSentryError(EntriaStore.Code, MedusaOrderId);
     end;
 
-    local procedure GetDefaultFromDT(): DateTime
+    internal procedure UpsertOrderFailure(StoreCode: Code[20]; DocumentNo: Code[20]; MedusaOrderId: Text[100]; OrderUpdatedAt: DateTime; ErrorText: Text; DisplayNo: Integer; NowDT: DateTime) RetryCount: Integer
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
     begin
-        exit(CreateDateTime(DMY2Date(1, 1, 2024), 0T));
+        EntriaOrderImpFailure.ReadIsolation := IsolationLevel::UpdLock;
+
+        if not EntriaOrderImpFailure.Get(StoreCode, MedusaOrderId) then begin
+            EntriaOrderImpFailure.Init();
+            EntriaOrderImpFailure."Store Code" := StoreCode;
+            EntriaOrderImpFailure."Order Id" := MedusaOrderId;
+            SetFailureFields(EntriaOrderImpFailure, DocumentNo, OrderUpdatedAt, ErrorText, DisplayNo, NowDT);
+            if EntriaOrderImpFailure.Insert() then
+                exit(EntriaOrderImpFailure."Retry Count");
+
+            EntriaOrderImpFailure.Get(StoreCode, MedusaOrderId);
+            exit(EntriaOrderImpFailure."Retry Count");
+        end;
+
+        EntriaOrderImpFailure."Retry Count" += 1;
+        SetFailureFields(EntriaOrderImpFailure, DocumentNo, OrderUpdatedAt, ErrorText, DisplayNo, NowDT);
+        EntriaOrderImpFailure.Modify();
+        exit(EntriaOrderImpFailure."Retry Count");
     end;
+
+    local procedure SetFailureFields(var EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure"; DocumentNo: Code[20]; OrderUpdatedAt: DateTime; ErrorText: Text; DisplayNo: Integer; NowDT: DateTime)
+    begin
+        if DocumentNo <> '' then
+            EntriaOrderImpFailure."Document No." := DocumentNo;
+        EntriaOrderImpFailure."Order Updated At" := OrderUpdatedAt;
+        if DisplayNo <> 0 then
+            EntriaOrderImpFailure."Display No." := DisplayNo;
+        EntriaOrderImpFailure."Last Error" := CopyStr(ErrorText, 1, MaxStrLen(EntriaOrderImpFailure."Last Error"));
+        if EntriaOrderImpFailure."Retry Count" < MaxRetries() then
+            EntriaOrderImpFailure."Next Retry At" := NowDT + BackoffDuration(EntriaOrderImpFailure."Retry Count" + 1)
+        else
+            EntriaOrderImpFailure."Next Retry At" := 0DT;
+    end;
+
+    internal procedure DeleteOrderFailure(StoreCode: Code[20]; OrderId: Text[100])
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+    begin
+        EntriaOrderImpFailure.ReadIsolation := IsolationLevel::UpdLock;
+        if EntriaOrderImpFailure.Get(StoreCode, OrderId) then
+            EntriaOrderImpFailure.Delete();
+    end;
+
+    internal procedure ShouldEmitSentryErrorForOrder(RetryCount: Integer): Boolean
+    begin
+        exit(RetryCount = MaxRetries());
+    end;
+
+    internal procedure MaxRetries(): Integer
+    begin
+        exit(10);
+    end;
+
+    internal procedure BackoffDuration(RetryNumber: Integer): Duration
+    var
+        InvalidRetryNumberErr: Label 'Retry number %1 is outside the supported Entria order retry range. This is a programming bug.', Locked = true;
+    begin
+        case RetryNumber of
+            1:
+                exit(5 * 1000);
+            2:
+                exit(10 * 1000);
+            3:
+                exit(15 * 1000);
+            4:
+                exit(20 * 1000);
+            5:
+                exit(30 * 1000);
+            6:
+                exit(40 * 1000);
+            7:
+                exit(60 * 1000);
+            8:
+                exit(90 * 1000);
+            9:
+                exit((2 * 60 + 30) * 1000);
+            10:
+                exit(3 * 60 * 1000);
+            else
+                Error(InvalidRetryNumberErr, RetryNumber);
+        end;
+    end;
+    #endregion
+
+    #region bounded retry of registered failures
+
+    internal procedure ProcessDueRetries(EntriaStore: Record "NPR Entria Store"; ListFetched: Boolean)
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        DueOrderIds: List of [Text];
+        OrderId: Text;
+    begin
+        // A Medusa outage that failed the store-wide list fetch also means retries are pointless right now
+        if not ListFetched then
+            exit;
+
+        CollectDueRetries(EntriaStore.Code, DueOrderIds);
+
+        foreach OrderId in DueOrderIds do
+            if EntriaOrderImpFailure.Get(EntriaStore.Code, OrderId) then
+                if IsRetryDue(EntriaOrderImpFailure) then begin
+                    ProcessDueRetry(EntriaStore, EntriaOrderImpFailure);
+                    Commit();
+                end;
+    end;
+
+    local procedure CollectDueRetries(StoreCode: Code[20]; var DueOrderIds: List of [Text])
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+    begin
+        Clear(DueOrderIds);
+
+        EntriaOrderImpFailure.SetCurrentKey("Next Retry At");
+        EntriaOrderImpFailure.SetRange("Store Code", StoreCode);
+        EntriaOrderImpFailure.SetRange(Suppressed, false);
+        EntriaOrderImpFailure.SetFilter("Retry Count", '<%1', MaxRetries());
+        EntriaOrderImpFailure.SetFilter("Next Retry At", '<>%1&<=%2', 0DT, CurrentDateTime());
+        if not EntriaOrderImpFailure.FindSet() then
+            exit;
+
+        repeat
+            DueOrderIds.Add(EntriaOrderImpFailure."Order Id");
+        until (EntriaOrderImpFailure.Next() = 0) or (DueOrderIds.Count() >= MaxRetryRowsPerCycle());
+    end;
+
+    internal procedure IsRetryDue(EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure"): Boolean
+    begin
+        exit(not EntriaOrderImpFailure.Suppressed and (EntriaOrderImpFailure."Retry Count" < MaxRetries())
+              and (EntriaOrderImpFailure."Next Retry At" <> 0DT) and (EntriaOrderImpFailure."Next Retry At" <= CurrentDateTime()));
+    end;
+
+    internal procedure IsOrderDueForIdBasedRetry(StoreCode: Code[20]; OrderId: Text): Boolean
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        DueOrderIds: List of [Text];
+    begin
+        CollectDueRetries(StoreCode, DueOrderIds);
+        if not DueOrderIds.Contains(OrderId) then
+            exit(false);
+        if not EntriaOrderImpFailure.Get(StoreCode, OrderId) then
+            exit(false);
+        exit(IsRetryDue(EntriaOrderImpFailure));
+    end;
+
+    local procedure MaxRetryRowsPerCycle(): Integer
+    begin
+        exit(20);
+    end;
+
+    local procedure ProcessDueRetry(EntriaStore: Record "NPR Entria Store"; EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure")
+    var
+        OrderTkn: JsonToken;
+        DocumentNo: Code[20];
+        OrderUpdatedAt: DateTime;
+        DisplayNo: Integer;
+        ErrorText: Text;
+    begin
+        if not GetSingleOrder(EntriaStore, EntriaOrderImpFailure."Order Id", OrderTkn) then begin
+            ErrorText := GetLastErrorText();
+            LogOrderFailure(EntriaStore, EntriaOrderImpFailure."Document No.", EntriaOrderImpFailure."Order Id", EntriaOrderImpFailure."Order Updated At", ErrorText, EntriaOrderImpFailure."Display No.");
+            exit;
+        end;
+        OrderUpdatedAt := GetOrderUpdatedAt(OrderTkn);
+        if IsPayloadFresher(OrderUpdatedAt, EntriaOrderImpFailure."Order Updated At") then begin
+            EntriaOrderImpFailure."Retry Count" := 0;
+            EntriaOrderImpFailure."Order Updated At" := OrderUpdatedAt;
+            EntriaOrderImpFailure.Modify();
+        end;
+
+        DisplayNo := GetDisplayNo(OrderTkn);
+        if not TryGetDocumentNo(OrderTkn, DocumentNo) then begin
+            ErrorText := GetLastErrorText();
+            LogOrderFailure(EntriaStore, '', EntriaOrderImpFailure."Order Id", OrderUpdatedAt, ErrorText, DisplayNo);
+            exit;
+        end;
+
+        ProcessOrder(EntriaStore, OrderTkn, DocumentNo, EntriaOrderImpFailure."Order Id", OrderUpdatedAt, DisplayNo);
+    end;
+
+    /// <summary>
+    /// The row's timestamp passed through SQL's 1/300s datetime grid and can read back up to 2ms
+    /// below what was written, while the payload value is freshly parsed at full precision. Without
+    /// the slack an unmodified order looks fresher on every retry and its budget resets forever,
+    /// never reaching parking. 10ms covers the rounding error and stays far below any real edit.
+    /// </summary>
+    internal procedure IsPayloadFresher(PayloadUpdatedAt: DateTime; RowUpdatedAt: DateTime): Boolean
+    begin
+        // Adding to 0DT would underflow the minimum date, so compare directly.
+        if RowUpdatedAt = 0DT then
+            exit(PayloadUpdatedAt <> 0DT);
+
+        exit(PayloadUpdatedAt > (RowUpdatedAt + 10));
+    end;
+
+    local procedure GetSingleOrder(EntriaStore: Record "NPR Entria Store"; MedusaOrderId: Text[100]; var OrderTkn: JsonToken): Boolean
+    var
+        EntriaResponse: JsonToken;
+        Request: Text;
+    begin
+        Clear(OrderTkn);
+        Request := GenerateGetSingleOrderRequest(MedusaOrderId);
+        if not _EntriaAPIHandler.SendEntriaRequest(EntriaStore.Code, Request, Enum::"Http Request Type"::GET, EntriaResponse) then
+            exit(false);
+
+        exit(TryGetSingleOrderToken(EntriaResponse, MedusaOrderId, OrderTkn));
+    end;
+
+    [TryFunction]
+    local procedure TryGetSingleOrderToken(EntriaResponse: JsonToken; ExpectedOrderId: Text[100]; var OrderTkn: JsonToken)
+    var
+        OrderToken: JsonToken;
+        ActualOrderId: Text;
+        WrongOrderErr: Label 'The single-order response for Medusa order %1 did not contain that order (envelope/id mismatch; response carried id "%2").', Locked = true;
+    begin
+        if EntriaResponse.SelectToken('order', OrderToken) then
+            OrderTkn := OrderToken
+        else
+            OrderTkn := EntriaResponse;
+
+        ActualOrderId := _JsonHelper.GetJText(OrderTkn, 'id', 100, false);
+        if ActualOrderId <> ExpectedOrderId then
+            Error(WrongOrderErr, ExpectedOrderId, ActualOrderId);
+    end;
+
+    internal procedure GenerateGetSingleOrderRequest(MedusaOrderId: Text[100]): Text
+    begin
+        exit(StrSubstNo('admin/orders/%1?%2', MedusaOrderId, GetOrderFieldsProjection()));
+    end;
+    #endregion
 
     internal procedure SetupJobQueue(Enable: Boolean)
     var
@@ -453,9 +821,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         _EntriaAPIHandler: Codeunit "NPR Entria API Handler";
         _EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
         _JsonHelper: Codeunit "NPR Json Helper";
-        _HasSessionErrors: Dictionary of [Code[20], Boolean];
-        _InitialFromDT: Dictionary of [Code[20], DateTime];
-        _SessionMaxUpdatedAt: Dictionary of [Code[20], DateTime];
+        _SessionMaxCreatedAt: Dictionary of [Code[20], DateTime];
         _LastErrorEmitAt: Dictionary of [Text, DateTime];
 }
 #endif

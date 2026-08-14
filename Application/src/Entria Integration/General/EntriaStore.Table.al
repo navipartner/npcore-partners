@@ -20,8 +20,10 @@ table 6059910 "NPR Entria Store"
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
-                if Enabled then
+                if Enabled then begin
                     TestField("Entria Url");
+                    CheckImportStartingPointBeforeEnabling();
+                end;
                 if (CurrFieldNo = FieldNo(Enabled)) and (Enabled <> xRec.Enabled) then
                     Modify();
                 EntriaIntegrationMgt.SetupJobQueues();
@@ -169,6 +171,22 @@ table 6059910 "NPR Entria Store"
             exit(false);
 
         exit(IsolatedStorage.Contains(Rec."Entria API Key Token", DataScope::Company));
+    end;
+
+    local procedure CheckImportStartingPointBeforeEnabling()
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+        NoStartingPointQst: Label 'No %1 is set so the first import will fetch all orders starting from the earliest available order. Do you want to continue?', Comment = '%1 = field caption';
+    begin
+        if not GuiAllowed() then
+            exit;
+
+        if EntriaStoreSyncState.Get(Code) then
+            if EntriaStoreSyncState."Last Orders Imported At" <> 0DT then
+                exit;
+
+        if not Confirm(NoStartingPointQst, false, EntriaStoreSyncState.FieldCaption("Last Orders Imported At")) then
+            Error('');
     end;
 
     internal procedure SetLastOrdersImportedAt(StoreCode: Code[20]; NewDateTime: DateTime)

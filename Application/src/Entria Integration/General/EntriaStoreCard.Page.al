@@ -45,15 +45,10 @@ page 6150929 "NPR Entria Store Card"
                 field("Last Orders Imported At"; _LastOrdersImportedAt)
                 {
                     Caption = 'Last Orders Imported At';
-                    ToolTip = 'Specifies the timestamp of the last successfully imported order update for this store. Used as the starting point for incremental order sync (updated_at). When new orders are processed, this value is updated periodically during the job queue run.';
+                    ToolTip = 'Specifies the timestamp of the last successfully imported order update for this store. Used as the starting point for incremental order sync (created_at). When new orders are processed, this value is updated periodically during the job queue run.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
-                    var
-                        JQRunningErr: Label 'The "Last Orders Imported At" value cannot be modified while the order import job is running. Stop the job queue and try again.';
                     begin
-                        if _EntriaIntegrationMgt.HasRunningEntriaJob() then
-                            Error(JQRunningErr);
-
                         Rec.SetLastOrdersImportedAt(Rec.Code, _LastOrdersImportedAt);
                     end;
                 }

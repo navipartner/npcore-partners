@@ -236,6 +236,15 @@
                                                       "Received Date" = FIELD("Date Filter")));
             FieldClass = FlowField;
         }
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        field(304; "Failed Entria Order Imports"; Integer)
+        {
+            Caption = 'Failed Entria Order Imports';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Entria Order Imp. Failure" where(Suppressed = const(false)));
+            Editable = false;
+        }
+#endif
     }
 
     keys

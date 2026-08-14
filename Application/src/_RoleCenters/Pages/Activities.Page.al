@@ -92,6 +92,21 @@
                         IncEcomSalesDocUtils.OpenFailedSalesOrders();
                     end;
                 }
+                field("Failed Entria Order Imports"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Entria Order Imports"))))
+                {
+                    Caption = 'Failed Entria Order Imports';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    ToolTip = 'Specifies the number of Entria orders that failed to import and are waiting in the failure registry. These never reach the incoming ecommerce sales documents, so they are not counted by the Failed Incoming Ecommerce Sales Orders cue.';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+                    begin
+                        EntriaOrderImpFailure.SetRange(Suppressed, false);
+                        Page.RunModal(Page::"NPR Entria Order Imp. Failures", EntriaOrderImpFailure);
+                    end;
+                }
 #endif
 
             }

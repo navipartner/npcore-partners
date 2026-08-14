@@ -207,23 +207,16 @@ codeunit 6150987 "NPR Entria Integration Mgt."
         EntriaOrderImportJQ.SetupJobQueue(MasterSwitch);
     end;
 
-    internal procedure HasRunningEntriaJob(): Boolean
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        JobQueueEntry.SetCurrentKey("Object Type to Run", "Object ID to Run", Status);
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Entria Order Import JQ");
-        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
-        exit(not JobQueueEntry.IsEmpty());
-    end;
-
     internal procedure DeleteRelatedRecords(StoreCode: Code[20])
     var
         EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
     begin
         EntriaStoreSyncState.SetRange("Store Code", StoreCode);
         EntriaStoreSyncState.DeleteAll();
+
+        EntriaOrderImpFailure.SetRange("Store Code", StoreCode);
+        EntriaOrderImpFailure.DeleteAll();
     end;
 }
 #endif
