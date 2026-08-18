@@ -157,6 +157,24 @@
         ClosePeriodRegister(POSUnitNo, ClosingEntryNo);
     end;
 
+    internal procedure CreateFirstTimeCheckpoint(POSUnitNo: Code[10])
+    var
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+    begin
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSUnitNo);
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+        if not POSWorkshiftCheckpoint.IsEmpty() then
+            exit;
+
+        POSWorkshiftCheckpoint."Entry No." := 0;
+        POSWorkshiftCheckpoint."POS Unit No." := POSUnitNo;
+        POSWorkshiftCheckpoint.Open := false;
+        POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::ZREPORT;
+        POSWorkshiftCheckpoint."Created At" := CurrentDateTime();
+        POSWorkshiftCheckpoint.Insert();
+    end;
+
     procedure SetOpeningEntryNo(POSUnitNo: Code[10]; OpeningEntryNo: Integer)
     var
         POSPeriodRegister: Record "NPR POS Period Register";

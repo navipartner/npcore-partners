@@ -1311,8 +1311,12 @@
     end;
 
     internal procedure GetPOSPeriodRegisterForPOSUnit(POSUnitNo: Code[10]; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
+    var
+        RequestedReadIsolation: IsolationLevel;
     begin
+        RequestedReadIsolation := POSPeriodRegister.ReadIsolation();
         POSPeriodRegister.Reset();
+        POSPeriodRegister.ReadIsolation := RequestedReadIsolation;
         POSPeriodRegister.SetCurrentKey("POS Unit No.");
         POSPeriodRegister.SetRange("POS Unit No.", POSUnitNo);
         if not POSPeriodRegister.FindLast() then

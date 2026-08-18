@@ -17,16 +17,19 @@ codeunit 85222 "NPR APIPOSUnit Open"
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
         Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
         Response: JsonObject;
         Body: JsonObject;
         QueryParams: Dictionary of [Text, Text];
         Headers: Dictionary of [Text, Text];
     begin
         // [SCENARIO] Happy path — POST /pos/unit/{id}/open on a CLOSED unit transitions it to OPEN and returns 200.
-        //             This is the core contract of the endpoint; every other test asserts rejection paths.
+        //             This is the core contract of the endpoint.
         Initialize();
 
         _POSUnit.Find();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
         _POSUnit.Status := _POSUnit.Status::CLOSED;
         _POSUnit.Modify();
         Commit();
@@ -36,6 +39,12 @@ codeunit 85222 "NPR APIPOSUnit Open"
 
         _POSUnit.Find();
         Assert.AreEqual(_POSUnit.Status::OPEN, _POSUnit.Status, 'POS Unit should be OPEN after the open endpoint returns 200');
+
+        // C1: an API-driven open of a CLOSED unit now produces an OPEN period register whose Opening Entry No. points
+        // at the unit-open system POS entry — the same period-register and opening-entry writes as attended START_POS.
+        // The API path omits the attended UI steps (Begin Workshift print, session start) and defers the commit to the
+        // API framework so open + period repair stay atomic.
+        AssertOpenPeriodLinkedToUnitOpenEntry(_POSUnit."No.");
     end;
 
     [Test]
@@ -44,21 +53,278 @@ codeunit 85222 "NPR APIPOSUnit Open"
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
         Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        CountBefore: Integer;
+    begin
+        // [SCENARIO] Opening an already-OPEN unit that already has an OPEN period register is a pure no-op:
+        //            200, and NO second period register is created.
+        Initialize();
+
+        _POSUnit.Find();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        POSPeriodRegister.Init();
+        POSPeriodRegister."POS Unit No." := _POSUnit."No.";
+        POSPeriodRegister."POS Store Code" := _POSUnit."POS Store Code";
+        POSPeriodRegister.Status := POSPeriodRegister.Status::OPEN;
+        POSPeriodRegister.Insert(true);
+        _POSUnit.Status := _POSUnit.Status::OPEN;
+        _POSUnit.Modify();
+        Commit();
+
+        CountBefore := POSPeriodRegister.Count();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open on already-open unit should succeed');
+
+        POSPeriodRegister.Reset();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        Assert.AreEqual(CountBefore, POSPeriodRegister.Count(), 'Idempotent open must not create a duplicate period register');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Open_OpenUnitMissingPeriod_RepairsPeriod_Returns200()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
         Response: JsonObject;
         Body: JsonObject;
         QueryParams: Dictionary of [Text, Text];
         Headers: Dictionary of [Text, Text];
     begin
-        // [SCENARIO] Opening an already-OPEN unit is idempotent (200).
+        // [SCENARIO] Unit Status is OPEN but it has NO open period register (the QA gap).
+        //            Opening it must repair the period register, not just return 200.
         Initialize();
 
         _POSUnit.Find();
         _POSUnit.Status := _POSUnit.Status::OPEN;
         _POSUnit.Modify();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
         Commit();
 
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
-        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open on already-open unit should succeed');
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open on OPEN-but-period-less unit should succeed');
+
+        AssertOpenPeriodLinkedToUnitOpenEntry(_POSUnit."No.");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Open_OpenUnitLastPeriodClosed_RepairsPeriod_Returns200()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Unit OPEN, last period register is CLOSED -> must create a new OPEN register.
+        Initialize();
+
+        _POSUnit.Find();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        POSPeriodRegister.Init();
+        POSPeriodRegister."POS Unit No." := _POSUnit."No.";
+        POSPeriodRegister."POS Store Code" := _POSUnit."POS Store Code";
+        POSPeriodRegister.Status := POSPeriodRegister.Status::CLOSED;
+        POSPeriodRegister.Insert(true);
+        _POSUnit.Status := _POSUnit.Status::OPEN;
+        _POSUnit.Modify();
+        Commit();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open should succeed');
+
+        AssertOpenPeriodLinkedToUnitOpenEntry(_POSUnit."No.");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Open_OpenUnitLastPeriodEOD_RepairsPeriod_Returns200()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        EODPeriodRegisterNo: Integer;
+    begin
+        // [SCENARIO] Unit OPEN, last period register is EOD -> must close it and create a new OPEN register.
+        Initialize();
+
+        _POSUnit.Find();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        POSPeriodRegister.Init();
+        POSPeriodRegister."POS Unit No." := _POSUnit."No.";
+        POSPeriodRegister."POS Store Code" := _POSUnit."POS Store Code";
+        POSPeriodRegister.Status := POSPeriodRegister.Status::EOD;
+        POSPeriodRegister.Insert(true);
+        EODPeriodRegisterNo := POSPeriodRegister."No.";
+        _POSUnit.Status := _POSUnit.Status::OPEN;
+        _POSUnit.Modify();
+        Commit();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open should succeed');
+
+        POSPeriodRegister.Get(EODPeriodRegisterNo);
+        Assert.AreEqual(POSPeriodRegister.Status::CLOSED, POSPeriodRegister.Status, 'The existing EOD POS Period Register must be CLOSED after repair');
+
+        AssertOpenPeriodLinkedToUnitOpenEntry(_POSUnit."No.");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Open_UnitWithoutZReportCheckpoint_CreatesBaseline()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] A unit that has never been balanced has no closed ZREPORT workshift checkpoint. Attended
+        //            START_POS seeds one before opening, so an API open must seed it too.
+        Initialize();
+
+        _POSUnit.Find();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", _POSUnit."No.");
+        POSWorkshiftCheckpoint.DeleteAll();
+        _POSUnit.Status := _POSUnit.Status::CLOSED;
+        _POSUnit.Modify();
+        Commit();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open should succeed');
+
+        POSWorkshiftCheckpoint.Reset();
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", _POSUnit."No.");
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+        Assert.AreEqual(1, POSWorkshiftCheckpoint.Count(), 'Opening a never-balanced unit must seed exactly one closed ZREPORT checkpoint');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Open_UnitWithZReportCheckpoint_KeepsExistingBaseline()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ExistingCheckpointEntryNo: Integer;
+    begin
+        // [SCENARIO] A unit that already has a closed ZREPORT checkpoint must not get a second one — the baseline is
+        //            what Z-report aggregation measures from, so seeding a duplicate would reset the period.
+        Initialize();
+
+        _POSUnit.Find();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", _POSUnit."No.");
+        POSWorkshiftCheckpoint.DeleteAll();
+        POSWorkshiftCheckpoint.Init();
+        POSWorkshiftCheckpoint."Entry No." := 0;
+        POSWorkshiftCheckpoint."POS Unit No." := _POSUnit."No.";
+        POSWorkshiftCheckpoint.Open := false;
+        POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::ZREPORT;
+        POSWorkshiftCheckpoint.Insert();
+        ExistingCheckpointEntryNo := POSWorkshiftCheckpoint."Entry No.";
+        _POSUnit.Status := _POSUnit.Status::CLOSED;
+        _POSUnit.Modify();
+        Commit();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open should succeed');
+
+        POSWorkshiftCheckpoint.Reset();
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", _POSUnit."No.");
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+        Assert.AreEqual(1, POSWorkshiftCheckpoint.Count(), 'Open must not seed a second ZREPORT checkpoint');
+        POSWorkshiftCheckpoint.FindFirst();
+        Assert.AreEqual(ExistingCheckpointEntryNo, POSWorkshiftCheckpoint."Entry No.", 'The pre-existing ZREPORT checkpoint must be the one kept');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Open_OpenUnitMissingPeriod_ThenSalePosts()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
+        CashPaymentMethod: Record "NPR POS Payment Method";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+    begin
+        // [SCENARIO] After repairing a period-less OPEN unit via /open, a full sale (line + cash payment + complete)
+        //            posts successfully — no "No open POS Period Register" error.
+        Initialize();
+
+        _POSUnit.Find();
+        _POSUnit.Status := _POSUnit.Status::OPEN;
+        _POSUnit.Modify();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        Commit();
+
+        // Repair via the endpoint under test.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open should succeed');
+
+        // Create sale.
+        SaleId := CreateGuid();
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // Add item line.
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Add sale line should succeed');
+
+        // Add cash payment covering the line.
+        CashPaymentMethod.SetRange("Processing Type", CashPaymentMethod."Processing Type"::CASH);
+        CashPaymentMethod.FindFirst();
+        Clear(Body);
+        Body.Add('paymentMethodCode', CashPaymentMethod.Code);
+        Body.Add('paymentType', 'Cash');
+        Body.Add('amount', _Item."Unit Price");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Add payment line should succeed');
+
+        // Complete -> triggers posting (this is where ERR_NO_OPEN_UNIT used to fire).
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed after period repair');
     end;
 
     [Test]
@@ -252,6 +518,24 @@ codeunit 85222 "NPR APIPOSUnit Open"
         JobQueueEntry."Object ID to Run" := Codeunit::"NPR JQ Cleanup Dead POS Sales";
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
         JobQueueEntry.Insert(true);
+    end;
+
+    local procedure AssertOpenPeriodLinkedToUnitOpenEntry(POSUnitNo: Code[10])
+    var
+        POSPeriodRegister: Record "NPR POS Period Register";
+        POSEntry: Record "NPR POS Entry";
+        Assert: Codeunit Assert;
+    begin
+        POSPeriodRegister.SetRange("POS Unit No.", POSUnitNo);
+        POSPeriodRegister.SetRange(Status, POSPeriodRegister.Status::OPEN);
+        Assert.AreEqual(1, POSPeriodRegister.Count(), 'Exactly one OPEN period register expected after open');
+        POSPeriodRegister.FindLast();
+        Assert.AreNotEqual(0, POSPeriodRegister."Opening Entry No.", 'Opening Entry No. must be set (non-zero)');
+
+        POSEntry.SetRange("POS Unit No.", POSUnitNo);
+        POSEntry.SetRange("System Entry", true);
+        POSEntry.SetRange("Entry No.", POSPeriodRegister."Opening Entry No.");
+        Assert.IsFalse(POSEntry.IsEmpty(), 'Opening Entry No. must point at the unit-open system POS entry');
     end;
 
     local procedure FormatGuid(Id: Guid): Text
