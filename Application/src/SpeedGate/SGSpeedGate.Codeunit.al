@@ -1549,7 +1549,6 @@ codeunit 6185130 "NPR SG SpeedGate"
         TempCustomCalendarChange.SetSource(
             TempCustomCalendarChange."Source Type"::NPR_TM_Admission, AdmissionCode, '', CalendarCode);
         TempCustomCalendarChange.Date := ReferenceDate;
-        TempCustomCalendarChange.Insert();
         CalendarManagement.CheckDateStatus(TempCustomCalendarChange);
         exit(TempCustomCalendarChange.Nonworking);
     end;

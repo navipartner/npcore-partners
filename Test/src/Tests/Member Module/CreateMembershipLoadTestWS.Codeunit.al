@@ -1,13 +1,20 @@
 codeunit 85138 "NPR CreateMembershipLoadTestWS"
 {
+    // The subscriber below replaces the entire member capture with random data. It must only be active
+    // for the duration of the load test, never just because this test app is installed - a statically
+    // bound instance also hijacks an interactive POS member sale.
+    EventSubscriberInstance = Manual;
+
     procedure POS_OnNewMembershipLoadTest(ItemNo: Code[20]; SaleLineCount: Integer; BatchId: Code[10])
     var
         PosSaleLine: Record "NPR POS Sale Line";
         MembershipRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        LoadTestSubscriber: Codeunit "NPR CreateMembershipLoadTestWS";
         i: Integer;
         UnitPrice: Decimal;
         ReturnCode: Integer;
     begin
+        BindSubscription(LoadTestSubscriber);
         Randomize();
 
         PosSaleLine."Register No." := StrSubstNo('WS-%1', 1000000 - Random(900000));
@@ -68,6 +75,9 @@ codeunit 85138 "NPR CreateMembershipLoadTestWS"
                 MemberTestLib.GenerateText(MemberInfoCapture2.City, MaxStrLen(MemberInfoCapture2.City));
                 MemberTestLib.GenerateText(MemberInfoCapture2.Country, MaxStrLen(MemberInfoCapture2.Country));
 
+                // GenerateText prepends whatever the field already holds, so an address captured in the
+                // POS would survive and the poke below would add a second '@'.
+                Clear(MemberInfoCapture2."E-Mail Address");
                 MemberTestLib.GenerateText(MemberInfoCapture2."E-Mail Address", 50);
                 MemberInfoCapture2."E-Mail Address"[3 + Random(10)] := '@';
                 MemberInfoCapture2."E-Mail Address"[StrLen(MemberInfoCapture2."E-Mail Address") - 3] := '.';

@@ -48,7 +48,6 @@ codeunit 6184773 "NPR TM TimeHelper"
         if (IsDaylightSavingsTime) then
             LocalTimeAsText := LocalTimeAsText + ' DST';
     end;
-
     #endregion
 
     #region Service
@@ -144,11 +143,14 @@ codeunit 6184773 "NPR TM TimeHelper"
     #endregion
 
     #region Create DateTime
+
+    // Note that the time zone offset is included in the DateTime value, so it is assumed to be local time.
     internal procedure FormatDateTimeWithAdmissionTimeZone(AdmissionCode: Code[20]; LocalDate: Date; LocalTime: Time) LocalDateTimeAsText: Text
     begin
         exit(FormatDateTimeWithAdmissionTimeZone(AdmissionCode, CreateDateTime(LocalDate, LocalTime)));
     end;
 
+    // Note that the time zone offset is included in the DateTime value, so it is assumed to be local time.
     internal procedure FormatDateTimeWithAdmissionTimeZone(AdmissionCode: Code[20]; LocalDateTime: DateTime) LocalDateTimeAsText: Text
     var
         OffsetDuration: Duration;
@@ -160,6 +162,16 @@ codeunit 6184773 "NPR TM TimeHelper"
         OffsetDuration := GetTimeZoneOffsetForAdmission(AdmissionCode, LocalDateTime);
         LocalDateTimeAsText := Format(LocalDateTime, 0, _UFormat) + GetTimeZoneOffsetAsText(OffsetDuration);
     end;
+
+    // Admission local time from UTC and adjust with time zone, then format as ISO 8601 string including the offset.
+    internal procedure GetLocalTimeAtAdmissionAsIso8601(AdmissionCode: Code[20]; UtcDateTime: DateTime) LocalTimeAsText: Text
+    var
+        OffsetDuration: Duration;
+    begin
+        OffsetDuration := GetTimeZoneOffsetForAdmission(AdmissionCode, UtcDateTime);
+        LocalTimeAsText := Format(UtcDateTime + OffsetDuration, 0, _UFormat) + GetTimeZoneOffsetAsText(OffsetDuration);
+    end;
+
 
     internal procedure AdjustAdmissionLocalDateTimeToUtc(AdmissionCode: Code[20]; LocalDate: Date; LocalTime: Time): DateTime
     var

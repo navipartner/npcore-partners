@@ -349,7 +349,6 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
             repeat
                 if (not Schedule.Get(AdmissionScheduleEntry."Schedule Code")) then
                     Schedule.Init();
-                TempCustomizedCalendarChange.DeleteAll();
                 CapacityStatusCode := _CapacityStatusCodeOption::OK;
                 BlockSaleReason := BlockSaleReason::OpenForSales;
 

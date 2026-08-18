@@ -22,6 +22,8 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         _TicketPrice: Codeunit "NPR TM Dynamic Price";
         _TicketManagement: Codeunit "NPR TM Ticket Management";
         _EnumEncoder: Codeunit "NPR TicketingApiTranslations";
+        _CalendarManager: Codeunit "NPR TMBaseCalendarManager";
+        _TimeHelper: Codeunit "NPR TM TimeHelper";
 
     internal procedure GetTimeSlots(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
@@ -227,10 +229,14 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
 
     local procedure EmitItems(var TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var NonTicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder")
     var
+        AdmissionLocalTimes: Dictionary of [Code[20], Text];
+        ResponseUtcTime: DateTime;
         CurrentItem: Code[20];
         CurrentVariant: Code[10];
         ItemOpen: Boolean;
     begin
+        ResponseUtcTime := _TimeHelper.UtcNow();
+
         ResponseJson.StartArray('items');
 
         // Admission components - each carries its required admissions; the price is emitted per date in datePrices.
@@ -252,8 +258,15 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                     ItemOpen := true;
                 end;
 
+                // The slot times are the admission's wall clock, so this is the reference the consumer
+                // compares them against to tell an elapsed slot from an open one. One instant for the whole
+                // array, so admissions differ only by their own offset and never by elapsed seconds.
+                if (not AdmissionLocalTimes.ContainsKey(TicketBuffer.AdmissionCode)) then
+                    AdmissionLocalTimes.Add(TicketBuffer.AdmissionCode, _TimeHelper.GetLocalTimeAtAdmissionAsIso8601(TicketBuffer.AdmissionCode, ResponseUtcTime));
+
                 ResponseJson.StartObject()
                     .AddProperty('admissionCode', TicketBuffer.AdmissionCode)
+                    .AddProperty('admissionLocalTime', AdmissionLocalTimes.Get(TicketBuffer.AdmissionCode))
                     .AddProperty('inclusion', _EnumEncoder.EncodeInclusion(TicketBuffer.AdmissionInclusion))
                     .AddProperty('default', TicketBuffer.DefaultAdmission)
                     .AddProperty('scheduleSelection', _EnumEncoder.EncodeScheduleSelection(TicketBuffer.TicketScheduleSelection, TicketBuffer.AdmissionScheduleSelection))
@@ -502,11 +515,13 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
         DefaultAdmissionByItem: Dictionary of [Text, Code[20]];
+        ClosedCalendarDates: Dictionary of [Text, Boolean];
         DefaultAdmissionCode: Code[20];
         DefaultLookupKey: Text;
         ResolvedItem: Code[20];
         ResolvedVariant: Code[10];
         AddOnFound: Boolean;
+        SlotIsClosed: Boolean;
     begin
         // Surface the cost of this function, it depends on date range, withPrice and withCapacity 
         Sentry.StartSpan(Span, StrSubstNo('EmitTimeSlots withPrice=%1 withCapacity=%2 %3..%4 (%5 days)', WithPrice, WithCapacity, Format(FromDate, 0, 9), Format(ToDate, 0, 9), ToDate - FromDate + 1));
@@ -545,6 +560,9 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                         DefaultAdmissionCode := DefaultAdmissionByItem.Get(DefaultLookupKey);
                 end;
 
+                // Resolved once per (item, variant, admission) for the whole window - never per slot.
+                CollectClosedCalendarDates(TicketBuffer, FromDate, ToDate, ClosedCalendarDates);
+
                 AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TicketBuffer.AdmissionCode);
                 AdmissionScheduleEntry.SetFilter("Admission Start Date", '%1..', FromDate);
                 AdmissionScheduleEntry.SetFilter("Admission End Date", '..%1', ToDate);
@@ -569,12 +587,29 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                         if (WithCapacity) then
                             EmitSlotCapacity(TicketBuffer, AdmissionScheduleEntry, ResponseJson);
 
+                        // A closed entry is the admission, schedule and schedule line calendars already
+                        // applied at generation time, so it costs nothing to read here. The ticket
+                        // calendars are not persisted anywhere and come from the resolved set.
+                        SlotIsClosed := (AdmissionScheduleEntry."Admission Is" = AdmissionScheduleEntry."Admission Is"::CLOSED);
+                        if (not SlotIsClosed) then
+                            SlotIsClosed := ClosedCalendarDates.ContainsKey(
+                                SlotCalendarKey(TicketBuffer.RequestItemNumber, TicketBuffer.RequestVariantCode, TicketBuffer.AdmissionCode, AdmissionScheduleEntry."Admission Start Date"));
+
+                        if (SlotIsClosed) then
+                            ResponseJson.AddProperty('closed', true);
+
                         ResponseJson.EndObject();
                     until (AdmissionScheduleEntry.Next() = 0);
             until (TicketBuffer.Next() = 0);
         end;
 
         ResponseJson.EndArray();
+
+        // Calendar resolution is always on, so this keeps it visible. The count is closed dates per
+        // component and admission, so it does grow with the window - it is not a regression signal. What it
+        // must not grow with is the slot count, because resolution is per admission, not per schedule entry.
+        Sentry.AddTransactionData('timeslots.calendar_closed_dates', Format(ClosedCalendarDates.Count()));
+
         Span.Finish();
     end;
 
@@ -661,6 +696,37 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         if (RemainingCapacity < 0) then
             RemainingCapacity := 0;
         ResponseJson.AddProperty('remainingCapacity', RemainingCapacity);
+    end;
+
+    /// <summary>
+    /// Resolves the ticket calendars for one component and admission across the whole window and keeps
+    /// the dates they close, for the slot loop to flag. Only the ticket calendars need resolving: the
+    /// admission, schedule and schedule line calendars are already applied to the generated entry.
+    /// </summary>
+    local procedure CollectClosedCalendarDates(var TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; FromDate: Date; ToDate: Date; var ClosedCalendarDates: Dictionary of [Text, Boolean])
+    var
+        TempCalendarExceptions: Record "Customized Calendar Change" temporary;
+        SlotKey: Text;
+    begin
+        _CalendarManager.CollectTicketCalendarExceptions(
+            TicketBuffer.RequestItemNumber, TicketBuffer.RequestVariantCode, TicketBuffer.AdmissionCode, FromDate, ToDate, TempCalendarExceptions);
+
+        TempCalendarExceptions.Reset();
+        // A working day carrying only a calendar note does not close the slot.
+        TempCalendarExceptions.SetRange(Nonworking, true);
+        if (not TempCalendarExceptions.FindSet()) then
+            exit;
+
+        repeat
+            SlotKey := SlotCalendarKey(TicketBuffer.RequestItemNumber, TicketBuffer.RequestVariantCode, TicketBuffer.AdmissionCode, TempCalendarExceptions.Date);
+            if (not ClosedCalendarDates.ContainsKey(SlotKey)) then
+                ClosedCalendarDates.Add(SlotKey, true);
+        until (TempCalendarExceptions.Next() = 0);
+    end;
+
+    local procedure SlotCalendarKey(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; ReferenceDate: Date): Text
+    begin
+        exit(StrSubstNo('%1|%2|%3|%4', ItemNo, VariantCode, AdmissionCode, Format(ReferenceDate, 0, 9)));
     end;
 
     local procedure SetErrorMessage(var ResponseMessage: Text; MessageText: Text): Boolean

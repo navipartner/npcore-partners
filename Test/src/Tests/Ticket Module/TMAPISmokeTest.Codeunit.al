@@ -1494,6 +1494,111 @@ codeunit 85013 "NPR TM API SmokeTest"
 
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TicketBaseCalendarAgreesWithCollector()
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        CustomizedCalendar: Record "Customized Calendar Change";
+        TempExceptions: Record "Customized Calendar Change" temporary;
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        CalendarManager: Codeunit "NPR TMBaseCalendarManager";
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        AdmissionCalendarCode: Code[10];
+        ClosedDate: Date;
+        OpenDate: Date;
+        BomItemLevelDate: Date;
+        AdmissionLevelDate: Date;
+        NonWorking: Boolean;
+        ResponseMessage: Text;
+    begin
+        // The ticket base calendars are resolved by two independent implementations that must not drift:
+        // CheckTicketBaseCalendar (record at a time, short-circuiting) decides allocatable on
+        // /ticket/capacity/search, and CollectTicketCalendarExceptions (set based) decides the closed flag
+        // on /ticket/timeslots/search. A divergence shows up as a slot one endpoint offers and the other
+        // refuses, which nothing else in the build would catch.
+        ItemNo := SelectBaseCalendarTestScenario();
+
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBom.FindFirst();
+        Admission.Get(TicketBom."Admission Code");
+
+        // Part 1 - shared calendar. Levels 2 and 3 resolve the same source here, so the collector dedupes
+        // level 3 away: this shape cannot expose per-level drift. What it does pin is the dedupe itself and
+        // the duplicate-key crash the worker used to hit when level 3 probed the same key on a working day.
+        // Assert the scenario still builds the shape rather than silently testing nothing.
+        Assert.AreNotEqual('', TicketBom."Ticket Base Calendar Code", 'Scenario must configure a ticket base calendar.');
+        Assert.AreEqual(Admission."Ticket Base Calendar Code", TicketBom."Ticket Base Calendar Code", 'Scenario must point the BOM and the admission at one ticket base calendar.');
+
+        ClosedDate := Today() + 3;
+        OpenDate := Today() + 4;
+
+        CustomizedCalendar.SetSource(CustomizedCalendar."Source Type"::NPR_TM_BOM_Admission, Admission."Admission Code", '', TicketBom."Ticket Base Calendar Code");
+        CreateNonWorkingEntry(CustomizedCalendar, ClosedDate);
+
+        TicketManagement.CheckTicketBaseCalendar(Admission."Admission Code", ItemNo, TicketBom."Variant Code", ClosedDate, NonWorking, ResponseMessage);
+        Assert.IsTrue(NonWorking, 'CheckTicketBaseCalendar must report the closed date as non working.');
+
+        // The open date reaches the worker's third level (the first two report working) - the old crash
+        // path. The collector never walks level 3 in this shape; that is covered with split calendars below.
+        TicketManagement.CheckTicketBaseCalendar(Admission."Admission Code", ItemNo, TicketBom."Variant Code", OpenDate, NonWorking, ResponseMessage);
+        Assert.IsFalse(NonWorking, 'CheckTicketBaseCalendar must report the open date as working.');
+
+        CalendarManager.CollectTicketCalendarExceptions(ItemNo, TicketBom."Variant Code", Admission."Admission Code", ClosedDate, OpenDate, TempExceptions);
+
+        TempExceptions.Reset();
+        TempExceptions.SetRange(Nonworking, true);
+        TempExceptions.SetRange(Date, ClosedDate);
+        Assert.IsFalse(TempExceptions.IsEmpty(), 'CollectTicketCalendarExceptions must close the date CheckTicketBaseCalendar closes.');
+
+        TempExceptions.SetRange(Date, OpenDate);
+        Assert.IsTrue(TempExceptions.IsEmpty(), 'CollectTicketCalendarExceptions must leave open the date CheckTicketBaseCalendar leaves open.');
+
+        // Part 2 - split calendars. Pointing the admission at its own calendar makes all three levels
+        // distinct sources, so both implementations must genuinely walk each one - this is the shape where
+        // deleting a level from either implementation, or transposing the item and admission code in the
+        // level 1 tuple, shows up as a divergence.
+        AdmissionCalendarCode := TicketLibrary.CreateBaseCalendar('');
+        Admission."Ticket Base Calendar Code" := AdmissionCalendarCode;
+        Admission.Modify();
+
+        BomItemLevelDate := Today() + 5;
+        AdmissionLevelDate := Today() + 6;
+
+        // Level 1: the additional source code is the item number - the tuple consultants' rows must match.
+        CustomizedCalendar.SetSource(CustomizedCalendar."Source Type"::NPR_TM_BOM_Admission_Item, Admission."Admission Code", TicketBom."Item No.", TicketBom."Ticket Base Calendar Code");
+        CreateNonWorkingEntry(CustomizedCalendar, BomItemLevelDate);
+
+        // Level 3: the admission's own ticket calendar, no longer collapsing into level 2.
+        CustomizedCalendar.SetSource(CustomizedCalendar."Source Type"::NPR_TM_BOM_Admission, Admission."Admission Code", '', AdmissionCalendarCode);
+        CreateNonWorkingEntry(CustomizedCalendar, AdmissionLevelDate);
+
+        TicketManagement.CheckTicketBaseCalendar(Admission."Admission Code", ItemNo, TicketBom."Variant Code", BomItemLevelDate, NonWorking, ResponseMessage);
+        Assert.IsTrue(NonWorking, 'CheckTicketBaseCalendar must close the date the BOM item level calendar closes.');
+
+        TicketManagement.CheckTicketBaseCalendar(Admission."Admission Code", ItemNo, TicketBom."Variant Code", AdmissionLevelDate, NonWorking, ResponseMessage);
+        Assert.IsTrue(NonWorking, 'CheckTicketBaseCalendar must close the date the admission ticket calendar closes.');
+
+        CalendarManager.CollectTicketCalendarExceptions(ItemNo, TicketBom."Variant Code", Admission."Admission Code", ClosedDate, AdmissionLevelDate, TempExceptions);
+
+        TempExceptions.Reset();
+        TempExceptions.SetRange(Nonworking, true);
+        TempExceptions.SetRange(Date, ClosedDate);
+        Assert.IsFalse(TempExceptions.IsEmpty(), 'CollectTicketCalendarExceptions must still close the level 2 date at the start of the window.');
+
+        TempExceptions.SetRange(Date, BomItemLevelDate);
+        Assert.IsFalse(TempExceptions.IsEmpty(), 'CollectTicketCalendarExceptions must close the date the BOM item level calendar closes.');
+
+        TempExceptions.SetRange(Date, AdmissionLevelDate);
+        Assert.IsFalse(TempExceptions.IsEmpty(), 'CollectTicketCalendarExceptions must close the date the admission ticket calendar closes - level 3 must be walked when its calendar differs from the BOM level.');
+
+        TempExceptions.SetRange(Date, OpenDate);
+        Assert.IsTrue(TempExceptions.IsEmpty(), 'CollectTicketCalendarExceptions must leave the open date open.');
+    end;
+
 
     [Normal]
     local procedure CreateNonWorkingEntry(var CustomizedCalendar: Record "Customized Calendar Change"; Date: Date)
