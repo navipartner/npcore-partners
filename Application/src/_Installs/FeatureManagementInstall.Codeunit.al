@@ -13,9 +13,11 @@ codeunit 6151434 "NPR Feature Management Install"
     local procedure HandleOnCompanyInitialize()
     var
         ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
+        ModuleLicensingFeat: Codeunit "NPR Module Licensing Feat.";
     begin
         InitFeatures();
         ExtJQRefresherOnlyFeat.EnableForNewCompany();
+        ModuleLicensingFeat.EnableForNewCompany();
         RefreshExperienceTierCurrentCompany();
     end;
 

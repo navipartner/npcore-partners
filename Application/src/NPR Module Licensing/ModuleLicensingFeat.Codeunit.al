@@ -33,6 +33,7 @@ codeunit 6248741 "NPR Module Licensing Feat." implements "NPR Feature Management
     procedure SetFeatureEnabled(NewEnabled: Boolean)
     var
         Feature: Record "NPR Feature";
+        DemoTenantMgt: Codeunit "NPR Demo Tenant Mgt.";
         LicenseMgt: Codeunit "NPR License Mgt.";
     begin
         if not Feature.Get(FeatureIdTok) then begin
@@ -42,16 +43,18 @@ codeunit 6248741 "NPR Module Licensing Feat." implements "NPR Feature Management
         if Feature.Enabled = NewEnabled then
             exit;
 
-        // The portal-reachability probe (KeyVault fetch + 30s HTTP) must run ONLY when it can matter. AL `and` does
+        // The portal-reachability probe (KeyVault fetch + network HTTP call) must run ONLY when it can matter. AL `and` does
         // not short-circuit, so a flat conjunction would execute the probe on every state change — including the
         // headless install/upgrade re-enable path (FeatureManagementInstall.InitFeatures) and in non-controlled
         // environments. Nesting keeps it interactive + controlled-environment only; the Error can never fail a
         // headless upgrade because GuiAllowed() is false there.
+        // MDX (formerly CDX) demo tenants are exempt from the probe so the feature stays switchable both ways for demos.
         if NewEnabled then
             if GuiAllowed() then
                 if LicenseMgt.IsControlledEnvironment() then
-                    if not LicenseMgt.IsPortalApiAccessible() then
-                        Error(PortalApiNotAccessibleErr);
+                    if not DemoTenantMgt.IsMdxEnvironment() then
+                        if not LicenseMgt.IsPortalApiAccessible() then
+                            Error(PortalApiNotAccessibleErr);
 
         Feature.Enabled := NewEnabled;
         Feature.Modify();
@@ -60,6 +63,33 @@ codeunit 6248741 "NPR Module Licensing Feat." implements "NPR Feature Management
     procedure GetFeatureId(): Text[50]
     begin
         exit(FeatureIdTok);
+    end;
+
+    // A company created after install goes through OnCompanyInitialize, not the install trigger, and "NPR Feature" is
+    // per-company - so the new company would start with licensing off. Inherit the stance of the sibling companies:
+    // an MDX (formerly CDX) demo tenant (and a tenant that opted out) stays off, a licensed tenant stays consistently on.
+    internal procedure EnableForNewCompany()
+    var
+        Company: Record Company;
+        Feature: Record "NPR Feature";
+        SiblingFeature: Record "NPR Feature";
+    begin
+        if not Feature.Get(FeatureIdTok) then
+            exit;
+        if Feature.Enabled then
+            exit;
+
+        Company.SetFilter(Name, '<>%1', CompanyName());
+        if Company.FindSet() then
+            repeat
+                SiblingFeature.ChangeCompany(Company.Name);
+                if SiblingFeature.Get(FeatureIdTok) and SiblingFeature.Enabled then begin
+                    // Direct write, no portal probe: creating a company must not fail on a transient outage.
+                    Feature.Enabled := true;
+                    Feature.Modify();
+                    exit;
+                end;
+            until Company.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnBeforeValidateEvent', 'Enabled', false, false)]
