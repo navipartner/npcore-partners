@@ -6,7 +6,7 @@
         ResizeImage: ControlAddIn "NPR ResizeImage";
         CtrlAddInInitialized: Boolean;
         Error000001: Label 'Maximum supported image size after conversion is 65523 bytes.\Uploaded image is %1 bytes after conversion. This usually happens if the image has too much height.';
-        Text000001: Label 'Insert Keyword';
+        Text000001: Label 'Insert Keyword', Locked = true;
         Text_UploadCaption: Label 'Choose logo file';
 
     procedure InitializeResizeImage(ResizeImageIn: ControlAddIn "NPR ResizeImage")
