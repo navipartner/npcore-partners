@@ -75,6 +75,25 @@ codeunit 6014528 "NPR Barcode Font Provider Mgt."
         exit(JsonTokValue.AsValue().AsText());
     end;
 
+    local procedure GenerateQRCodeImage(DataToEncode: Text; BarcodeEncodeSettings2D: Record "Barcode Encode Settings 2D"): Codeunit "Temp Blob"
+    var
+        BarcodeImageProvider2D: Interface "Barcode Image Provider 2D";
+    begin
+        BarcodeImageProvider2D := Enum::"Barcode Image Provider 2D"::Dynamics2D;
+        exit(BarcodeImageProvider2D.EncodeImage(DataToEncode, Enum::"Barcode Symbology 2D"::"QR-Code", BarcodeEncodeSettings2D));
+    end;
+
+    internal procedure GenerateQRCodeBase64(DataToEncode: Text; BarcodeEncodeSettings2D: Record "Barcode Encode Settings 2D"): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        QRCodeInStream: InStream;
+    begin
+        TempBlob := GenerateQRCodeImage(DataToEncode, BarcodeEncodeSettings2D);
+        TempBlob.CreateInStream(QRCodeInStream);
+        exit(Base64Convert.ToBase64(QRCodeInStream));
+    end;
+
     local procedure CreateQRCodeJSON(DataToEncode: Text; ECCLevel: Text; EciMode: Text; ForceUTF8: Boolean; UTF8BOM: Boolean; PixelsPerModule: Integer) ContentText: Text
     var
         JObject: JsonObject;
