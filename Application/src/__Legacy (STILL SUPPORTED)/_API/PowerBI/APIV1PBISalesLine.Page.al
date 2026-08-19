@@ -56,6 +56,14 @@ page 6150779 "NPR APIV1 PBISalesLine"
                 {
                     Caption = 'Amount Including VAT', Locked = true;
                 }
+                field(shippedNotInvoicedLCY; Rec."Shipped Not Invoiced (LCY)")
+                {
+                    Caption = 'Shipped Not Invoiced (LCY)', Locked = true;
+                }
+                field(shippedNotInvLCYNoVAT; Rec."Shipped Not Inv. (LCY) No VAT")
+                {
+                    Caption = 'Shipped Not Inv. (LCY) No VAT', Locked = true;
+                }
                 field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
                 {
                     Caption = 'Last Modified Date', Locked = true;
