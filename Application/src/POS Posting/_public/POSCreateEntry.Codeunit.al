@@ -207,6 +207,7 @@
         Contact: Record Contact;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSSaleLine: Record "NPR POS Sale Line";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
         SalespersonLbl: Label '%1: %2', Locked = true;
     begin
         POSEntry.Init();
@@ -233,7 +234,7 @@
         POSEntry."Dimension Set ID" := POSSale."Dimension Set ID";
         POSEntry.SystemId := POSSale.SystemId;
         POSEntry."Starting Time" := POSSale."Start Time";
-        POSEntry."Ending Time" := Time;
+        POSEntry."Ending Time" := TimeZoneMgt.GetLocalTime(CurrentDateTime());
         POSEntry."Posting Date" := POSSale.Date;
         POSEntry."Document Date" := POSSale.Date;
         POSEntry."Currency Code" := '';//All sales are in LCY for now (Payments can  be in FCY of course)
@@ -1208,6 +1209,9 @@
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        EntryDate: Date;
+        EntryTime: Time;
     begin
         Clear(GlobalPOSEntry);
         if (not GetPOSPeriodRegisterForPOSUnit(POSUnitNo, POSPeriodRegister, false)) then
@@ -1223,9 +1227,10 @@
         POSEntry."POS Unit No." := POSUnitNo;
         POSEntry."Responsibility Center" := GetResponsibilityCenterForStoreCode(POSEntry."POS Store Code");
 
-        POSEntry."Entry Date" := Today();
-        POSEntry."Starting Time" := Time;
-        POSEntry."Ending Time" := Time;
+        TimeZoneMgt.GetLocalDateTime(CurrentDateTime(), EntryDate, EntryTime);
+        POSEntry."Entry Date" := EntryDate;
+        POSEntry."Starting Time" := EntryTime;
+        POSEntry."Ending Time" := EntryTime;
         POSEntry."Salesperson Code" := SalespersonCode;
 
         POSEntry.Description := Description;
@@ -1242,6 +1247,9 @@
     local procedure CreatePaymentLineBinEntry(POSEntryPaymentLine: Record "NPR POS Entry Payment Line")
     var
         POSBinEntry: Record "NPR POS Bin Entry";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        TransactionDate: Date;
+        TransactionTime: Time;
     begin
 
         POSBinEntry."Entry No." := 0;
@@ -1259,8 +1267,9 @@
         POSBinEntry."POS Store Code" := POSEntryPaymentLine."POS Store Code";
         POSBinEntry."POS Unit No." := POSEntryPaymentLine."POS Unit No.";
 
-        POSBinEntry."Transaction Date" := Today();
-        POSBinEntry."Transaction Time" := Time;
+        TimeZoneMgt.GetLocalDateTime(CurrentDateTime(), TransactionDate, TransactionTime);
+        POSBinEntry."Transaction Date" := TransactionDate;
+        POSBinEntry."Transaction Time" := TransactionTime;
         POSBinEntry."Transaction Amount" := POSEntryPaymentLine.Amount;
         POSBinEntry."Transaction Currency Code" := POSEntryPaymentLine."Currency Code";
         POSBinEntry."Transaction Amount (LCY)" := POSEntryPaymentLine."Amount (LCY)";

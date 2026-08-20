@@ -114,6 +114,180 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateSale_WithEntraAppTimeZone_SetsSaleAndEntryDateTimesInLocalTime()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryTimeZone: Codeunit "NPR Library - Time Zone";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        PaymentLineId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        ReceiptNo: Text;
+        POSSale: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        POSBinEntry: Record "NPR POS Bin Entry";
+        CreateStartedAt: DateTime;
+        CreateEndedAt: DateTime;
+        CompleteStartedAt: DateTime;
+        CompleteEndedAt: DateTime;
+        SaleDate: Date;
+        SaleStartTime: Time;
+    begin
+        // [SCENARIO] POS API sale timestamps use the calling Entra application's time zone for legacy Date/Time fields.
+        Initialize();
+
+        // [GIVEN] The Entra application authenticating the request has an explicit time zone different from UTC.
+        LibraryTimeZone.SetSessionEntraAppTimeZone();
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        PaymentLineId := CreateGuid();
+
+        // [WHEN] Create a new sale through the POS API.
+        Body.Add('posUnit', _POSUnit."No.");
+        CreateStartedAt := CurrentDateTime();
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        CreateEndedAt := CurrentDateTime();
+
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+        Assert.IsTrue(POSSale.GetBySystemId(SaleId), 'POS Sale should exist');
+        SaleDate := POSSale.Date;
+        SaleStartTime := POSSale."Start Time";
+
+        // [WHEN] Add a sale line, pay in full, and complete the sale.
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        Clear(Body);
+        Body.Add('paymentMethodCode', _CashPaymentMethod.Code);
+        Body.Add('paymentType', 'Cash');
+        Body.Add('amount', _Item."Unit Price");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create payment line should succeed');
+
+        Clear(Body);
+        CompleteStartedAt := CurrentDateTime();
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        CompleteEndedAt := CurrentDateTime();
+
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('documentNo', JToken), 'Response should contain documentNo');
+        ReceiptNo := JToken.AsValue().AsText();
+        POSEntry.SetRange("Document No.", ReceiptNo);
+        Assert.IsTrue(POSEntry.FindFirst(), 'POS Entry should be created');
+        POSBinEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSBinEntry.SetRange(Type, POSBinEntry.Type::INPAYMENT);
+        Assert.IsTrue(POSBinEntry.FindFirst(), 'POS Bin Entry for the payment line should be created');
+
+        LibraryTimeZone.ClearSessionEntraAppTimeZone();
+
+        // [THEN] The POS Sale, POS Entry and POS Bin Entry stamps all sit on the Entra application's local timeline.
+        LibraryTimeZone.AssertDateTimePartsInTimeZoneRange(SaleDate, SaleStartTime, CreateStartedAt, CreateEndedAt, 'POS Sale start timestamp');
+        Assert.AreEqual(SaleDate, POSEntry."Entry Date", 'POS Entry date should match the local POS Sale date');
+        Assert.AreEqual(SaleStartTime, POSEntry."Starting Time", 'POS Entry starting time should match the local POS Sale start time');
+        LibraryTimeZone.AssertTimeInTimeZoneRange(POSEntry."Ending Time", CompleteStartedAt, CompleteEndedAt, 'POS Entry ending timestamp');
+        LibraryTimeZone.AssertDateTimePartsInTimeZoneRange(POSBinEntry."Transaction Date", POSBinEntry."Transaction Time", CompleteStartedAt, CompleteEndedAt, 'POS Bin Entry transaction timestamp');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetLocalDateTime_ConfiguredRowNonWebservice_ReturnsSessionTime()
+    var
+        LibraryTimeZone: Codeunit "NPR Library - Time Zone";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        Assert: Codeunit Assert;
+        SourceDateTime: DateTime;
+        LocalDate: Date;
+        LocalTime: Time;
+    begin
+        // [SCENARIO] A configured Entra application does not affect non-webservice sessions.
+        LibraryTimeZone.SetEntraAppTimeZone();
+        SourceDateTime := CreateDateTime(20260818D, 123456.789T);
+
+        TimeZoneMgt.GetLocalDateTime(SourceDateTime, LocalDate, LocalTime);
+        LibraryTimeZone.ClearSessionEntraAppTimeZone();
+
+        Assert.AreEqual(DT2Date(SourceDateTime), LocalDate, 'Non-webservice session date should remain session-local.');
+        Assert.AreEqual(DT2Time(SourceDateTime), LocalTime, 'Non-webservice session time should remain session-local.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetLocalDateTime_BlankTimeZone_ReturnsSessionTime()
+    var
+        LibraryTimeZone: Codeunit "NPR Library - Time Zone";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        Assert: Codeunit Assert;
+        SourceDateTime: DateTime;
+        LocalDate: Date;
+        LocalTime: Time;
+    begin
+        // [SCENARIO] A blank Entra application time zone preserves the existing session-local behavior.
+        LibraryTimeZone.SetSessionEntraAppTimeZone('');
+        SourceDateTime := CreateDateTime(20260818D, 123456.789T);
+
+        TimeZoneMgt.GetLocalDateTime(SourceDateTime, LocalDate, LocalTime);
+        LibraryTimeZone.ClearSessionEntraAppTimeZone();
+
+        Assert.AreEqual(DT2Date(SourceDateTime), LocalDate, 'Blank time zone date should remain session-local.');
+        Assert.AreEqual(DT2Time(SourceDateTime), LocalTime, 'Blank time zone time should remain session-local.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetLocalDateTime_ConfiguredTimeZone_PreservesMilliseconds()
+    var
+        LibraryTimeZone: Codeunit "NPR Library - Time Zone";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        Assert: Codeunit Assert;
+        SourceDateTime: DateTime;
+        LocalDate: Date;
+        LocalTime: Time;
+        ZeroMilliseconds: Integer;
+        OneDigitMilliseconds: Integer;
+        TwoDigitMilliseconds: Integer;
+        FullMilliseconds: Integer;
+    begin
+        // [SCENARIO] Time-zone conversion preserves zero, trimmed and full millisecond precision.
+        LibraryTimeZone.SetSessionEntraAppTimeZone();
+
+        SourceDateTime := CreateDateTime(20260818D, 123456T);
+        TimeZoneMgt.GetLocalDateTime(SourceDateTime, LocalDate, LocalTime);
+        ZeroMilliseconds := LocalTime.Millisecond();
+
+        SourceDateTime := CreateDateTime(20260818D, 123456.500T);
+        TimeZoneMgt.GetLocalDateTime(SourceDateTime, LocalDate, LocalTime);
+        OneDigitMilliseconds := LocalTime.Millisecond();
+
+        SourceDateTime := CreateDateTime(20260818D, 123456.780T);
+        TimeZoneMgt.GetLocalDateTime(SourceDateTime, LocalDate, LocalTime);
+        TwoDigitMilliseconds := LocalTime.Millisecond();
+
+        SourceDateTime := CreateDateTime(20260818D, 123456.789T);
+        TimeZoneMgt.GetLocalDateTime(SourceDateTime, LocalDate, LocalTime);
+        FullMilliseconds := LocalTime.Millisecond();
+
+        LibraryTimeZone.ClearSessionEntraAppTimeZone();
+
+        Assert.AreEqual(0, ZeroMilliseconds, 'Converted local time should preserve zero milliseconds.');
+        Assert.AreEqual(500, OneDigitMilliseconds, 'Converted local time should preserve one significant millisecond digit.');
+        Assert.AreEqual(780, TwoDigitMilliseconds, 'Converted local time should preserve two significant millisecond digits.');
+        Assert.AreEqual(789, FullMilliseconds, 'Converted local time should preserve milliseconds.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ListEntries_WithLinesParameter_ControlsReturnedLines()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";

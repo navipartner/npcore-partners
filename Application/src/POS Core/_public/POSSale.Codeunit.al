@@ -67,12 +67,16 @@
 
     local procedure InsertSale(SystemId: Guid)
     var
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        SaleDate: Date;
+        SaleTime: Time;
     begin
         _Rec."Salesperson Code" := _Setup.Salesperson();
         _Rec."Register No." := _POSUnit."No.";
         _Rec."Sales Ticket No." := GetNextReceiptNo(_Rec."Register No.");
-        _Rec.Date := Today();
-        _Rec."Start Time" := Time;
+        TimeZoneMgt.GetLocalDateTime(CurrentDateTime(), SaleDate, SaleTime);
+        _Rec.Date := SaleDate;
+        _Rec."Start Time" := SaleTime;
         _Rec."Sales Channel" := _Setup.SalesChannel();
 
         if WorkDate() <> Today() then begin
