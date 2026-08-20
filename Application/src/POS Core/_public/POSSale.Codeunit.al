@@ -516,11 +516,15 @@
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSEntry: Record "NPR POS Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
+        NpIaSaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
     begin
         POSCreateEntry.Run(_Rec);
         POSCreateEntry.GetCreatedPOSEntry(POSEntry);
         SetLastSalePOSEntry(POSEntry);
 
+        NpIaSaleLinePOSAddOn.SetRange("Register No.", SalePOS."Register No.");
+        NpIaSaleLinePOSAddOn.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        NpIaSaleLinePOSAddOn.DeleteAll(); // avoid loopy loop deletes from SaleLinePOS delete subscriber.
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.DeleteAll();
