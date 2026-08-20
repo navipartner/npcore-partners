@@ -1223,9 +1223,16 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditLogAdditionalInfo: Record "NPR FR POS Audit Log Add. Info";
         POSEntry: Record "NPR POS Entry";
         POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         RecRef: RecordRef;
     begin
+        if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then
+            if not POSUnit.Get(POSAuditLog."Acted on POS Unit No.") then
+                exit;
+        if not IsEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
         CompanyInformation.Get();
 
         POSAuditLogAdditionalInfo.Init();
