@@ -287,6 +287,16 @@ table 6151259 "NPR Ecom Sales Line"
             DataClassification = CustomerContent;
             Caption = 'Subscription';
         }
+        field(5058; "Member National Identifier"; Text[30])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member National Identifier';
+        }
+        field(5059; "Member Nat. Identifier Type"; Enum "NPR NationalIdentifierType")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Member National Identifier Type';
+        }
         field(5098; "Alteration Option System Id"; Guid)
         {
             DataClassification = CustomerContent;

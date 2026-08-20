@@ -281,6 +281,51 @@ codeunit 6151027 "NPR Entria Order Impl."
         EcomSalesLine."Member First Name" := _JsonHelper.GetJText(SalesLineJsonToken, 'metadata.member_first_name', MaxStrLen(EcomSalesLine."Member First Name"), false, false);
         EcomSalesLine."Member Email" := _JsonHelper.GetJText(SalesLineJsonToken, 'metadata.member_email', MaxStrLen(EcomSalesLine."Member Email"), false, false);
 #pragma warning restore AA0139
+        DeserializeDonationMemberFields(SalesLineJsonToken, EcomSalesLine);
+    end;
+
+    local procedure DeserializeDonationMemberFields(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        MemberToken: JsonToken;
+        MembersToken: JsonToken;
+        MemberBirthday: Date;
+        MemberPostCode: Text;
+    begin
+        if not SalesLineJsonToken.SelectToken('metadata.members', MembersToken) then
+            exit;
+
+        if not MembersToken.IsArray() then
+            exit;
+
+        if MembersToken.AsArray().Count() = 0 then
+            exit;
+
+        MembersToken.AsArray().Get(0, MemberToken);
+#pragma warning disable AA0139
+        FillIfBlank(EcomSalesLine."Member First Name", _JsonHelper.GetJText(MemberToken, 'first_name', MaxStrLen(EcomSalesLine."Member First Name"), false));
+        FillIfBlank(EcomSalesLine."Member Last Name", _JsonHelper.GetJText(MemberToken, 'last_name', MaxStrLen(EcomSalesLine."Member Last Name"), false));
+        FillIfBlank(EcomSalesLine."Member Email", _JsonHelper.GetJText(MemberToken, 'email', MaxStrLen(EcomSalesLine."Member Email"), false));
+        FillIfBlank(EcomSalesLine."Member Phone No.", _JsonHelper.GetJText(MemberToken, 'phone_no', MaxStrLen(EcomSalesLine."Member Phone No."), false));
+        FillIfBlank(EcomSalesLine."Member Address", _JsonHelper.GetJText(MemberToken, 'address', MaxStrLen(EcomSalesLine."Member Address"), false));
+        FillIfBlank(EcomSalesLine."Member City", _JsonHelper.GetJText(MemberToken, 'city', MaxStrLen(EcomSalesLine."Member City"), false));
+        if EcomSalesLine."Member Post Code" = '' then begin
+            MemberPostCode := _JsonHelper.GetJText(MemberToken, 'post_code', MaxStrLen(EcomSalesLine."Member Post Code"), false);
+            EcomSalesLine."Member Post Code" := MemberPostCode;
+        end;
+        FillIfBlank(EcomSalesLine."Member Country", _JsonHelper.GetJText(MemberToken, 'country', MaxStrLen(EcomSalesLine."Member Country"), false));
+        FillIfBlank(EcomSalesLine."Member National Identifier", _JsonHelper.GetJText(MemberToken, 'national_identifier', MaxStrLen(EcomSalesLine."Member National Identifier"), false));
+#pragma warning restore AA0139
+        if EcomSalesLine."Member Birthday" = 0D then begin
+            MemberBirthday := _JsonHelper.GetJDate(MemberToken, 'birthday', false);
+            EcomSalesLine."Member Birthday" := MemberBirthday;
+        end;
+    end;
+
+    local procedure FillIfBlank(var TargetValue: Text; SourceValue: Text)
+    begin
+        if TargetValue <> '' then
+            exit;
+        TargetValue := SourceValue;
     end;
 
     local procedure HandleAttractionWalletLine(ItemToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLineParams: Record "NPR Ecom Sales Line"; var LastLineNo: Integer)

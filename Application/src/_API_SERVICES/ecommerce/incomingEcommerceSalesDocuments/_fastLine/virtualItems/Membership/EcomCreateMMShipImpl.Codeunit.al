@@ -386,6 +386,8 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberInfoCapture.Country := EcomSalesLine."Member Country";
         MemberInfoCapture."Post Code Code" := EcomSalesLine."Member Post Code";
         MemberInfoCapture.Birthday := EcomSalesLine."Member Birthday";
+        MemberInfoCapture."Social Security No." := EcomSalesLine."Member National Identifier";
+        MemberInfoCapture.NationalIdentifierType := EcomSalesLine."Member Nat. Identifier Type";
         MemberInfoCapture.Gender := MemberApiAgent.DecodeGender(EcomSalesLine."Member Gender");
         MemberInfoCapture."News Letter" := MemberApiAgent.DecodeNewsLetter(EcomSalesLine."Member Newsletter");
         MemberInfoCapture."GDPR Approval" := MemberApiAgent.DecodeGdprConsent(EcomSalesLine."Member GDPR Approval");
@@ -438,7 +440,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             Community."Member Unique Identity"::PHONENO:
                 exit(EcomSalesLine."Member Phone No." <> '');
             Community."Member Unique Identity"::SSN:
-                exit(false);
+                exit(EcomSalesLine."Member National Identifier" <> '');
             Community."Member Unique Identity"::EMAIL_AND_PHONE:
                 exit((EcomSalesLine."Member Email" <> '') and (EcomSalesLine."Member Phone No." <> ''));
             Community."Member Unique Identity"::EMAIL_OR_PHONE:
@@ -455,7 +457,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberApiAgent: Codeunit "NPR MemberApiAgent";
         UniqueIdentityEmailRequiredErr: Label 'Membership community requires member email (Member Unique Identity = E-Mail). Member Email must be provided.', Locked = true;
         UniqueIdentityPhoneRequiredErr: Label 'Membership community requires member phone number (Member Unique Identity = Phone No.). Member Phone No. must be provided.', Locked = true;
-        UniqueIdentitySsnNotSupportedErr: Label 'Membership community requires Social Security No. (Member Unique Identity = SSN). This is not supported via ecommerce.', Locked = true;
+        UniqueIdentitySsnRequiredErr: Label 'Membership community requires Social Security No. (Member Unique Identity = SSN). Member National Identifier must be provided.', Locked = true;
         UniqueIdentityEmailAndPhoneRequiredErr: Label 'Membership community requires both member email and phone number (Member Unique Identity = E-Mail and Phone No.). Both Member Email and Member Phone No. must be provided.', Locked = true;
         UniqueIdentityEmailOrPhoneRequiredErr: Label 'Membership community requires member email or phone number (Member Unique Identity = E-Mail or Phone No.). Member Email or Member Phone No. must be provided.', Locked = true;
         UniqueIdentityEmailAndFirstNameRequiredErr: Label 'Membership community requires member email and first name (Member Unique Identity = E-Mail and First Name). Both Member Email and Member First Name must be provided.', Locked = true;
@@ -472,7 +474,8 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
                 if EcomSalesLine."Member Phone No." = '' then
                     Error(UniqueIdentityPhoneRequiredErr);
             Community."Member Unique Identity"::SSN:
-                Error(UniqueIdentitySsnNotSupportedErr);
+                if EcomSalesLine."Member National Identifier" = '' then
+                    Error(UniqueIdentitySsnRequiredErr);
             Community."Member Unique Identity"::EMAIL_AND_PHONE:
                 if (EcomSalesLine."Member Email" = '') or (EcomSalesLine."Member Phone No." = '') then
                     Error(UniqueIdentityEmailAndPhoneRequiredErr);
