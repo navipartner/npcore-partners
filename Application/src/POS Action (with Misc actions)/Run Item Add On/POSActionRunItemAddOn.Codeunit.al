@@ -217,7 +217,6 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
     local procedure OnActionRunAddOns(Context: Codeunit "NPR POS JSON Helper"): JsonObject
     var
         POSActRunItemAddOnB: Codeunit "NPR POS Action: RunItemAddOn B";
-        POSSession: Codeunit "NPR POS Session";
         UserSelectionJToken: JsonToken;
         ApplyItemAddOnNo: Code[20];
         CompulsoryAddOn: Boolean;
@@ -234,8 +233,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         if UserSelectionRequired then
             UserSelectionJToken := Context.GetJToken('UserSelectedAddons');
 
-        if POSActRunItemAddOnB.RunItemAddOns(GetBaseLineNoFromContext(Context, true), ApplyItemAddOnNo, CompulsoryAddOn, SkipItemAvailabilityCheck, UserSelectionRequired, UserSelectionJToken) then
-            POSSession.RequestFullRefresh();
+        POSActRunItemAddOnB.RunItemAddOns(GetBaseLineNoFromContext(Context, true), ApplyItemAddOnNo, CompulsoryAddOn, SkipItemAvailabilityCheck, UserSelectionRequired, UserSelectionJToken);
 
         exit(GetTicketTokens(Context));
     end;

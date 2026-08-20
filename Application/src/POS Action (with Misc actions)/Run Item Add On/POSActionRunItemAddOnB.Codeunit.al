@@ -2,7 +2,7 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
 {
     Access = Internal;
 
-    procedure RunItemAddOns(AppliesToLineNo: Integer; ApplyItemAddOnNo: Code[20]; CompulsoryAddOn: Boolean; SkipItemAvailabilityCheck: Boolean; UserSelectionRequired: Boolean; UserSelectionJToken: JsonToken) RequestFrontEndRefresh: Boolean
+    procedure RunItemAddOns(AppliesToLineNo: Integer; ApplyItemAddOnNo: Code[20]; CompulsoryAddOn: Boolean; SkipItemAvailabilityCheck: Boolean; UserSelectionRequired: Boolean; UserSelectionJToken: JsonToken)
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         PosInventoryProfile: Record "NPR POS Inventory Profile";
@@ -34,12 +34,12 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
 
         Clear(ItemAddOnMgt);
         if not UserSelectionRequired then
-            RequestFrontEndRefresh := ItemAddOnMgt.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn)
+            ItemAddOnMgt.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn)
         else begin
             if UserSelectionJToken.IsValue() then
                 if UserSelectionJToken.AsValue().IsNull() and not CompulsoryAddOn then
                     Error('');
-            RequestFrontEndRefresh := ItemAddOnMgt.InsertPOSAddOnLines(ItemAddOn, UserSelectionJToken, POSSession, AppliesToLineNo, CompulsoryAddOn);
+            ItemAddOnMgt.InsertPOSAddOnLines(ItemAddOn, UserSelectionJToken, POSSession, AppliesToLineNo, CompulsoryAddOn);
         end;
 
         if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
