@@ -110,18 +110,68 @@ codeunit 6248434 "NPR APIPOSUnit"
     var
         SSProfile: Record "NPR SS Profile";
         SelfserviceProfileJson: JsonObject;
+        EFTIntegrationType: Code[20];
     begin
         Json.Add('id', Format(POSUnit.SystemId, 0, 4).ToLower());
         Json.Add('code', POSUnit."No.");
         Json.Add('name', POSUnit.Name);
         Json.Add('posStoreCode', POSUnit."POS Store Code");
+        Json.Add('digitalReceiptEnabled', IsDigitalReceiptEnabled(POSUnit."POS Receipt Profile"));
 
         if (POSUnit."POS Self Service Profile" <> '') and SSProfile.Get(POSUnit."POS Self Service Profile") then begin
             SelfserviceProfileJson.Add('qrCardPaymentMethod', SSProfile."QR Card Payment Method");
             SelfserviceProfileJson.Add('selfserviceCardPaymentMethod', SSProfile."Selfservice Card Payment Meth.");
             SelfserviceProfileJson.Add('kioskModeUnlockPin', SSProfile."Kiosk Mode Unlock PIN");
+            if FindEFTIntegrationType(POSUnit."No.", SSProfile."Selfservice Card Payment Meth.", EFTIntegrationType) then
+                SelfserviceProfileJson.Add('selfserviceCardEftIntegrationType', EFTIntegrationType);
             Json.Add('selfserviceProfile', SelfserviceProfileJson);
         end;
+    end;
+
+    local procedure IsDigitalReceiptEnabled(POSReceiptProfileCode: Code[20]): Boolean
+    var
+        DigitalRcptSetup: Record "NPR Digital Rcpt. Setup";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+    begin
+        if POSReceiptProfileCode = '' then
+            exit(false);
+
+        POSReceiptProfile.SetLoadFields("Enable Digital Receipt");
+        if not POSReceiptProfile.Get(POSReceiptProfileCode) then
+            exit(false);
+        if not POSReceiptProfile."Enable Digital Receipt" then
+            exit(false);
+
+        DigitalRcptSetup.SetLoadFields("Enable");
+        if not DigitalRcptSetup.Get() then
+            exit(false);
+
+        exit(DigitalRcptSetup."Enable");
+    end;
+
+    local procedure FindEFTIntegrationType(POSUnitNo: Code[10]; PaymentMethodCode: Code[10]; var EFTIntegrationType: Code[20]): Boolean
+    var
+        EFTSetup: Record "NPR EFT Setup";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        Clear(EFTIntegrationType);
+
+        if PaymentMethodCode = '' then
+            exit(false);
+
+        POSPaymentMethod.SetLoadFields("Processing Type");
+        if not POSPaymentMethod.Get(PaymentMethodCode) then
+            exit(false);
+        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then
+            exit(false);
+
+        EFTSetup.SetLoadFields("EFT Integration Type");
+        if not EFTSetup.Get(PaymentMethodCode, POSUnitNo) then
+            if not EFTSetup.Get(PaymentMethodCode, '') then
+                exit(false);
+
+        EFTIntegrationType := EFTSetup."EFT Integration Type";
+        exit(EFTIntegrationType <> '');
     end;
 }
 #endif

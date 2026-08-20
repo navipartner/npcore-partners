@@ -1,7 +1,8 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 codeunit 85222 "NPR APIPOSUnit Open"
 {
-    // [FEATURE] POST /pos/unit/:unitId/open — opens a closed POS unit via API, plus closed-unit guards on mutating sale endpoints
+    // [FEATURE] POS Unit API — POST /pos/unit/:unitId/open opens a closed POS unit, GET /pos/unit/me returns the
+    //           current unit's representation, plus closed-unit guards on mutating sale endpoints
 
     Subtype = Test;
 
@@ -447,6 +448,78 @@ codeunit 85222 "NPR APIPOSUnit Open"
         Commit();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_ReturnsDigitalReceiptAndEftIntegrationType()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        DigitalRcptSetup: Record "NPR Digital Rcpt. Setup";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+        SelfserviceProfileJson: JsonObject;
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] GET /pos/unit/me returns digitalReceiptEnabled and the selfservice EFT Integration Type
+        Initialize();
+
+        // [GIVEN] The global Digital Receipt Setup is enabled
+        DigitalRcptSetup.Get();
+        DigitalRcptSetup."Enable" := true;
+        DigitalRcptSetup.Modify();
+
+        // [WHEN] GET /pos/unit/me
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/unit/me', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'GET /pos/unit/me should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+
+        // [THEN] digitalReceiptEnabled should be true
+        Assert.IsTrue(ResponseBody.Get('digitalReceiptEnabled', JToken), 'Response should contain digitalReceiptEnabled');
+        Assert.IsTrue(JToken.AsValue().AsBoolean(), 'digitalReceiptEnabled should be true when the receipt profile and the global setup are both enabled');
+
+        // [THEN] selfserviceProfile should carry the EFT Integration Type of the POS Unit
+        Assert.IsTrue(ResponseBody.Get('selfserviceProfile', JToken), 'Response should contain selfserviceProfile');
+        SelfserviceProfileJson := JToken.AsObject();
+        Assert.IsTrue(SelfserviceProfileJson.Get('selfserviceCardEftIntegrationType', JToken), 'selfserviceProfile should contain selfserviceCardEftIntegrationType');
+        Assert.AreEqual(EFTAdyenIntegration.CloudIntegrationType(), JToken.AsValue().AsText(), 'selfserviceCardEftIntegrationType should match the EFT Setup of the POS Unit');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_GlobalDigitalReceiptDisabled_ReturnsFalse()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        DigitalRcptSetup: Record "NPR Digital Rcpt. Setup";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] digitalReceiptEnabled is false when the global Digital Receipt Setup is disabled
+        Initialize();
+
+        // [GIVEN] The receipt profile is enabled but the global setup is disabled
+        DigitalRcptSetup.Get();
+        DigitalRcptSetup."Enable" := false;
+        DigitalRcptSetup.Modify();
+
+        // [WHEN] GET /pos/unit/me
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/unit/me', Body, QueryParams, Headers);
+
+        // [THEN] digitalReceiptEnabled should be false
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'GET /pos/unit/me should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('digitalReceiptEnabled', JToken), 'Response should contain digitalReceiptEnabled');
+        Assert.IsFalse(JToken.AsValue().AsBoolean(), 'digitalReceiptEnabled should be false when the global Digital Receipt Setup is disabled');
+    end;
+
     local procedure Initialize()
     var
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -454,6 +527,8 @@ codeunit 85222 "NPR APIPOSUnit Open"
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSSetup: Record "NPR POS Setup";
         UserSetup: Record "User Setup";
+        DigitalRcptSetup: Record "NPR Digital Rcpt. Setup";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
     begin
         if _Initialized then
             exit;
@@ -478,10 +553,69 @@ codeunit 85222 "NPR APIPOSUnit Open"
 
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, _POSStore);
 
+        // Digital receipt enabled on both levels — the POS Unit's receipt profile and the global setup
+        if not POSReceiptProfile.Get('APIUNIT') then begin
+            POSReceiptProfile.Init();
+            POSReceiptProfile.Code := 'APIUNIT';
+            POSReceiptProfile.Description := 'POS Unit API Test Profile';
+            POSReceiptProfile.Insert();
+        end;
+        POSReceiptProfile."Enable Digital Receipt" := true;
+        POSReceiptProfile.Modify();
+
+        _POSUnit."POS Receipt Profile" := POSReceiptProfile.Code;
+        _POSUnit.Modify();
+
+        if not DigitalRcptSetup.Get() then begin
+            DigitalRcptSetup.Init();
+            DigitalRcptSetup.Insert();
+        end;
+        DigitalRcptSetup."Enable" := true;
+        DigitalRcptSetup.Modify();
+
+        SetupSelfserviceEFTPaymentMethod();
+
         CreateCleanupJobQueueEntry();
 
         _Initialized := true;
         Commit();
+    end;
+
+    local procedure SetupSelfserviceEFTPaymentMethod()
+    var
+        LibraryEFT: Codeunit "NPR Library - EFT";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        SSProfile: Record "NPR SS Profile";
+        EFTSetup: Record "NPR EFT Setup";
+    begin
+        // Must be Processing Type EFT, otherwise the endpoint omits selfserviceCardEftIntegrationType
+        POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::EFT);
+        if not POSPaymentMethod.FindFirst() then
+            LibraryEFT.CreateEFTPaymentTypePOS(POSPaymentMethod, _POSUnit, _POSStore);
+
+        if not SSProfile.Get('APIUNIT') then begin
+            SSProfile.Init();
+            SSProfile.Code := 'APIUNIT';
+            SSProfile.Description := 'POS Unit API Test Profile';
+            SSProfile.Insert();
+        end;
+        SSProfile."Selfservice Card Payment Meth." := POSPaymentMethod.Code;
+        SSProfile.Modify();
+
+        _POSUnit."POS Self Service Profile" := SSProfile.Code;
+        _POSUnit.Modify();
+
+        if not EFTSetup.Get(POSPaymentMethod.Code, _POSUnit."No.") then begin
+            EFTSetup.Init();
+            EFTSetup."Payment Type POS" := POSPaymentMethod.Code;
+            EFTSetup."POS Unit No." := _POSUnit."No.";
+            EFTSetup."EFT Integration Type" := EFTAdyenIntegration.CloudIntegrationType();
+            EFTSetup.Insert();
+        end else begin
+            EFTSetup."EFT Integration Type" := EFTAdyenIntegration.CloudIntegrationType();
+            EFTSetup.Modify();
+        end;
     end;
 
     local procedure CreateActiveSale() SaleId: Guid
