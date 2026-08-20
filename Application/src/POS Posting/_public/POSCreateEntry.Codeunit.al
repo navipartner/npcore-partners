@@ -84,6 +84,7 @@
         POSSaleLine: Record "NPR POS Sale Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        UsedLineNos: Codeunit "NPR HashSet of [Integer]";
     begin
         POSSaleLine.SetRange("Register No.", POSSale."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
@@ -96,23 +97,23 @@
                     POSSaleLine."Line Type"::"Customer Deposit",
                     POSSaleLine."Line Type"::"Issue Voucher":
                         begin
-                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
+                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine, UsedLineNos);
                             InsertPOSTaxAmount(POSSaleLine.SystemId, POSEntry);
                         end;
                     POSSaleLine."Line Type"::Rounding:
                         begin
-                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, true, POSEntrySalesLine);
+                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, true, POSEntrySalesLine, UsedLineNos);
                             InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry);
                         end;
                     POSSaleLine."Line Type"::"GL Payment":
                         begin
-                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
+                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine, UsedLineNos);
                             InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry);
                         end;
                     POSSaleLine."Line Type"::"POS Payment":
                         InsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
                     POSSaleLine."Line Type"::Comment:
-                        InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
+                        InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine, UsedLineNos);
                 end;
             until POSSaleLine.Next() = 0;
         end;
@@ -275,7 +276,7 @@
         POSEntry.Insert(false, true);
     end;
 
-    local procedure InsertPOSSaleLine(POSSale: Record "NPR POS Sale"; POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    local procedure InsertPOSSaleLine(POSSale: Record "NPR POS Sale"; POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var UsedLineNos: Codeunit "NPR HashSet of [Integer]")
     var
         PricesIncludeTax: Boolean;
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
@@ -289,12 +290,10 @@
         POSEntrySalesLine.Reset();
         POSEntrySalesLine."POS Entry No." := POSEntry."Entry No.";
         POSEntrySalesLine."Line No." := POSSaleLine."Line No.";
-        if POSEntrySalesLine.Find() then begin
-            POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-            POSEntrySalesLine.FindLast();
-            POSEntrySalesLine."Line No." := POSEntrySalesLine."Line No." + 10000;
-            POSEntrySalesLine.SetRange("POS Entry No.");
-        end;
+
+        while UsedLineNos.Contains(POSEntrySalesLine."Line No.") do
+            POSEntrySalesLine."Line No." += 10000;
+        UsedLineNos.Add(POSEntrySalesLine."Line No.");
 
         POSEntrySalesLine.Init();
         POSEntrySalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
