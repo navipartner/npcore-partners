@@ -194,6 +194,20 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         Page.Run(Page::"NPR AttractionWalletCard", Wallet);
     end;
 
+    /// <summary>Looks up the wallet by its SystemId and returns its entry number. WalletEntryNo is
+    /// only assigned on a hit. Returns true if the wallet was found.</summary>
+    procedure GetWalletBySystemId(WalletSystemId: Guid; var WalletEntryNo: Integer): Boolean
+    var
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        Wallet.SetLoadFields(EntryNo);
+        if (not Wallet.GetBySystemId(WalletSystemId)) then
+            exit(false);
+
+        WalletEntryNo := Wallet.EntryNo;
+        exit(true);
+    end;
+
     procedure GetOriginatesFromItemNo(WalletEntryNo: Integer; var OriginatesFromItemNo: Code[20]): Boolean
     var
         Wallet: Record "NPR AttractionWallet";
