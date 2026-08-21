@@ -12,12 +12,10 @@ codeunit 6151434 "NPR Feature Management Install"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
     local procedure HandleOnCompanyInitialize()
     var
-        ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
-        ModuleLicensingFeat: Codeunit "NPR Module Licensing Feat.";
+        NewFeatureHandler: Codeunit "NPR New Feature Handler";
     begin
         InitFeatures();
-        ExtJQRefresherOnlyFeat.EnableForNewCompany();
-        ModuleLicensingFeat.EnableForNewCompany();
+        NewFeatureHandler.EnableForNewCompany();
         RefreshExperienceTierCurrentCompany();
     end;
 

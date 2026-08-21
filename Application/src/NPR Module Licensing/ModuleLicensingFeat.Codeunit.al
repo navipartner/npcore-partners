@@ -65,33 +65,6 @@ codeunit 6248741 "NPR Module Licensing Feat." implements "NPR Feature Management
         exit(FeatureIdTok);
     end;
 
-    // A company created after install goes through OnCompanyInitialize, not the install trigger, and "NPR Feature" is
-    // per-company - so the new company would start with licensing off. Inherit the stance of the sibling companies:
-    // an MDX (formerly CDX) demo tenant (and a tenant that opted out) stays off, a licensed tenant stays consistently on.
-    internal procedure EnableForNewCompany()
-    var
-        Company: Record Company;
-        Feature: Record "NPR Feature";
-        SiblingFeature: Record "NPR Feature";
-    begin
-        if not Feature.Get(FeatureIdTok) then
-            exit;
-        if Feature.Enabled then
-            exit;
-
-        Company.SetFilter(Name, '<>%1', CompanyName());
-        if Company.FindSet() then
-            repeat
-                SiblingFeature.ChangeCompany(Company.Name);
-                if SiblingFeature.Get(FeatureIdTok) and SiblingFeature.Enabled then begin
-                    // Direct write, no portal probe: creating a company must not fail on a transient outage.
-                    Feature.Enabled := true;
-                    Feature.Modify();
-                    exit;
-                end;
-            until Company.Next() = 0;
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnBeforeValidateEvent', 'Enabled', false, false)]
     local procedure ConfirmModuleLicensingToggle(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature"; CurrFieldNo: Integer)
     var

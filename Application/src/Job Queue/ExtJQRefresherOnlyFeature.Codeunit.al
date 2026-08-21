@@ -49,35 +49,6 @@ codeunit 6151269 "NPR Ext JQ Refresher Only Feat" implements "NPR Feature Manage
         exit(FeatureDescriptionLbl);
     end;
 
-    // A company created after install (e.g. the production company provisioned after the default company) runs
-    // through OnCompanyInitialize, which the install-time new-tenant handler (NPR New Feature Handler) does not cover.
-    // "NPR Feature" is per-company, so the new company would otherwise start with the feature off and run the legacy
-    // refresher. Inherit the tenant's stance instead: if any sibling company already has it enabled, enable it for the
-    // new company too, keeping an external-only tenant consistent across companies.
-    internal procedure EnableForNewCompany()
-    var
-        Company: Record Company;
-        Feature: Record "NPR Feature";
-        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        FeatureId: Text[50];
-    begin
-        if IsFeatureEnabled() then
-            exit;
-
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Ext JQ Refresher Only Feat', 'EnableForNewCompany');
-
-        FeatureId := GetFeatureId();
-        Company.SetFilter(Name, '<>%1', CompanyName());
-        if Company.FindSet() then
-            repeat
-                Feature.ChangeCompany(Company.Name);
-                if Feature.Get(FeatureId) and Feature.Enabled then
-                    SetFeatureEnabled(true); // operates on the current (new) company
-            until (Company.Next() = 0) or IsFeatureEnabled();
-
-        LogMessageStopwatch.LogFinish();
-    end;
-
     // Guards the manual toggle on the NaviPartner Feature Management page. The install/company-init paths enable
     // the feature via SetFeatureEnabled (direct Modify), which does not raise this validate event, so this only
     // affects an admin turning it on by hand. Enabling blocks the legacy refresher and requires the external one,

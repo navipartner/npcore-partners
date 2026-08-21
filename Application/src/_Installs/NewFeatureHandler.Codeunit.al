@@ -632,6 +632,111 @@ codeunit 6150632 "NPR New Feature Handler"
         PayByLinkNPEmailFeature.EnableIfNoLegacySetupInUse();
     end;
 
+    internal procedure EnableForNewCompany()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        EnabledInOtherCompanies: List of [Text];
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'EnableForNewCompany');
+
+        GetFeatureIdsEnabledInOtherCompanies(EnabledInOtherCompanies);
+        EnableForNewCompany(EnabledInOtherCompanies);
+
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    internal procedure EnableForNewCompany(EnabledInOtherCompanies: List of [Text])
+    begin
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New POS Editor", EnabledInOtherCompanies) then
+            POSEditorFeatureHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"POS Scenarios Obsoleted", EnabledInOtherCompanies) then
+            ScenarioObsoletedFeatureHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"POS Statistics Dashboard", EnabledInOtherCompanies) then
+            POSStatisticsDashboardFeatureHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"POS Webservice Sessions", EnabledInOtherCompanies) then
+            HandlePOSWebserviceSessionsFeature();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Email Experience", EnabledInOtherCompanies) then
+            HandleNewEmailFeature();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Sales Receipt Experience", EnabledInOtherCompanies) then
+            NewSalesReceiptExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New EFT Receipt Experience", EnabledInOtherCompanies) then
+            NewEFTReceiptExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Attraction Print Exerience", EnabledInOtherCompanies) then
+            NewAttractionPrintExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Restaurant Print Experience", EnabledInOtherCompanies) then
+            NewRestaurantPrintExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Voucher Reservation", EnabledInOtherCompanies) then
+            NewVoucherReservationHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New NpRv Print Experience", EnabledInOtherCompanies) then
+            NewNpRvPrintExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"External JQ Refresher Only", EnabledInOtherCompanies) then
+            ExtJQRefresherOnlyHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Z-Report Experience", EnabledInOtherCompanies) then
+            NewZReportExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Sales Doc Confirmation Experience", EnabledInOtherCompanies) then
+            NewSalesDocConfirmationExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Begin Workshift Experience", EnabledInOtherCompanies) then
+            NewBeginWorkshiftExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"New Cash Drawer Open Experience", EnabledInOtherCompanies) then
+            NewCashDrawerOpenExperienceHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"Shopify Order No. Without Prefix", EnabledInOtherCompanies) then
+            ShopifyOrderNoWithoutPrefixHandle();
+        JQNotifNPEmailHandle();
+        PayByLinkNPEmailHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"NPR Module Licensing", EnabledInOtherCompanies) then
+            ModuleLicensingHandle();
+    end;
+
+    local procedure ShouldEnableForNewCompany(FeatureToEnable: Enum "NPR Feature"; EnabledInOtherCompanies: List of [Text]): Boolean
+    var
+        FeatureToCheck: Record "NPR Feature";
+    begin
+        FeatureToCheck.SetCurrentKey(Feature);
+        FeatureToCheck.SetRange(Feature, FeatureToEnable);
+        if not FeatureToCheck.FindFirst() then
+            exit(false);
+        if FeatureToCheck.Enabled then
+            exit(false);
+
+        exit(EnabledInOtherCompanies.Contains(FeatureToCheck.Id));
+    end;
+
+    local procedure GetFeatureIdsEnabledInOtherCompanies(var EnabledInOtherCompanies: List of [Text])
+    var
+        Company: Record Company;
+        SiblingFeature: Record "NPR Feature";
+    begin
+        Company.SetFilter(Name, '<>%1', CompanyName());
+        if not Company.FindSet() then
+            exit;
+        repeat
+            SiblingFeature.Reset();
+            SiblingFeature.ChangeCompany(Company.Name);
+            SiblingFeature.SetRange(Enabled, true);
+            if SiblingFeature.FindSet() then
+                repeat
+                    if not EnabledInOtherCompanies.Contains(SiblingFeature.Id) then
+                        EnabledInOtherCompanies.Add(SiblingFeature.Id);
+                until SiblingFeature.Next() = 0;
+        until Company.Next() = 0;
+    end;
+
+    local procedure ModuleLicensingHandle()
+    var
+        Feature: Record "NPR Feature";
+        DemoTenantMgt: Codeunit "NPR Demo Tenant Mgt.";
+        ModuleLicensingFeat: Codeunit "NPR Module Licensing Feat.";
+    begin
+        if DemoTenantMgt.IsMdxEnvironment() then
+            exit;
+        if not Feature.Get(ModuleLicensingFeat.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR New Feature Handler");
