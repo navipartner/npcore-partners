@@ -43,10 +43,28 @@ codeunit 85379 "NPR Library - Entria"
         OrderObj.Add('display_id', 360);
         OrderObj.Add('created_at', CreatedAtText);
         OrderObj.Add('updated_at', UpdatedAtText);
+        OrderObj.Add('bc_status', 'pending');
+        OrderObj.Add('bc_status_updated_at', CreatedAtText);
         OrderObj.Add('payment_status', 'captured');
         OrderObj.Add('currency_code', '');
         OrderObj.Add('items', ItemsArr);
 
+        OrdersArr.Add(OrderObj);
+    end;
+
+    /// <summary>Replaces bc_status_updated_at on the array's first order, so a test can separate the
+    /// marker dimension from created_at.</summary>
+    procedure OverrideBcStatusUpdatedAt(var OrdersArr: JsonArray; BcStatusUpdatedAt: DateTime)
+    var
+        OrderTkn: JsonToken;
+        OrderObj: JsonObject;
+    begin
+        OrdersArr.Get(0, OrderTkn);
+        OrderObj := OrderTkn.AsObject();
+        OrderObj.Remove('bc_status_updated_at');
+        OrderObj.Add('bc_status_updated_at', Format(BcStatusUpdatedAt, 0, 9));
+
+        Clear(OrdersArr);
         OrdersArr.Add(OrderObj);
     end;
 
@@ -219,6 +237,8 @@ codeunit 85379 "NPR Library - Entria"
         OrderObj.Add('id', MedusaOrderId);
         OrderObj.Add('created_at', Format(CreatedAt, 0, 9));
         OrderObj.Add('updated_at', Format(CreatedAt, 0, 9));
+        OrderObj.Add('bc_status', 'pending');
+        OrderObj.Add('bc_status_updated_at', Format(CreatedAt, 0, 9));
         OrderObj.Add('payment_status', 'captured');
         OrderObj.Add('currency_code', '');
         OrderObj.Add('items', ItemsArr);
@@ -335,6 +355,298 @@ codeunit 85379 "NPR Library - Entria"
         Clear(OrdersArr);
         OrdersArr.Add(FirstOrderTkn.AsObject());
         OrdersArr.Add(SecondOrderTkn.AsObject());
+    end;
+
+    /// <summary>
+    /// One page carrying OrderCount distinct orders, returning the generated Medusa order ids and document
+    /// nos. in the same order as the page declares them, so a test can pick the order that lands in a
+    /// specific filter chunk. Every id is padded to exactly MedusaOrderIdLength characters, and every
+    /// custom_display_id to exactly DocumentNoLength characters when that is greater than zero - the two
+    /// lengths decide how many values fit one filter chunk, so a page that spans several chunks can be
+    /// built without needing an unreasonable order count. DocumentNoLength 0 keeps the natural display id
+    /// length. ItemTotal 0 keeps every order importable, a non-zero one makes every order fail the
+    /// payment guard.
+    /// </summary>
+    procedure BuildOrderPageWithManyOrders(var OrdersArr: JsonArray; OrderCount: Integer; MedusaOrderIdLength: Integer; DocumentNoLength: Integer; CreatedAt: DateTime; ItemTotal: Decimal; var GeneratedOrderIds: List of [Text]; var GeneratedDocumentNos: List of [Code[20]])
+    var
+        OrderArr: JsonArray;
+        OrderTkn: JsonToken;
+        DocumentNo: Code[20];
+        MedusaOrderId: Text;
+        i: Integer;
+    begin
+        Clear(OrdersArr);
+        Clear(GeneratedOrderIds);
+        Clear(GeneratedDocumentNos);
+
+        for i := 1 to OrderCount do begin
+            DocumentNo := ManyOrderDocumentNo(i, DocumentNoLength);
+            MedusaOrderId := ManyOrderMedusaOrderId(i, MedusaOrderIdLength);
+
+            BuildOrderArrayWithNoPaymentLines(OrderArr, DocumentNo, MedusaOrderId, CreatedAt, CreatedAt, ItemTotal);
+            OrderArr.Get(0, OrderTkn);
+            OrdersArr.Add(OrderTkn.AsObject());
+
+            GeneratedOrderIds.Add(MedusaOrderId);
+            GeneratedDocumentNos.Add(DocumentNo);
+        end;
+    end;
+
+    /// <summary>
+    /// The custom_display_id of the OrderIndex'th order of a BuildOrderPageWithManyOrders page, right-padded
+    /// with a non-digit filler to exactly DocumentNoLength characters when that is greater than zero - the
+    /// distinct part stays at the front, so display ids remain distinct whatever the requested length. Kept
+    /// within Code[20]: production reads custom_display_id into a Code[20] field, and an over-length one
+    /// would trip a separate, unrelated production defect.
+    /// </summary>
+    local procedure ManyOrderDocumentNo(OrderIndex: Integer; DocumentNoLength: Integer) DocumentNo: Code[20]
+    var
+        DocumentNoText: Text;
+        DocumentNoPrefixLbl: Label 'ENT-MANY-', Locked = true;
+        FillerCharLbl: Label '-', Locked = true;
+    begin
+        DocumentNoText := DocumentNoPrefixLbl + Format(OrderIndex);
+        _Assert.IsTrue(StrLen(DocumentNoText) <= MaxStrLen(DocumentNo),
+            'Setup: the generated custom_display_id must fit Code[20], otherwise the orders of the page would not stay distinct.');
+
+        if DocumentNoLength > 0 then begin
+            _Assert.IsTrue(DocumentNoLength <= MaxStrLen(DocumentNo),
+                'Setup: the requested custom_display_id length must fit Code[20] - an over-length display id trips a separate, unrelated production defect.');
+            _Assert.IsTrue(StrLen(DocumentNoText) <= DocumentNoLength,
+                'Setup: the requested custom_display_id length must fit the distinct part of the generated display id.');
+            DocumentNoText := PadStr(DocumentNoText, DocumentNoLength, FillerCharLbl);
+        end;
+
+        DocumentNo := CopyStr(DocumentNoText, 1, MaxStrLen(DocumentNo));
+    end;
+
+    /// <summary>
+    /// The id of the OrderIndex'th order of a BuildOrderPageWithManyOrders page, right-padded with a
+    /// non-digit filler to exactly MedusaOrderIdLength characters - the distinct part stays at the front,
+    /// so ids remain distinct whatever the requested length.
+    /// </summary>
+    local procedure ManyOrderMedusaOrderId(OrderIndex: Integer; MedusaOrderIdLength: Integer): Text
+    var
+        MedusaOrderId: Text;
+        MedusaOrderIdPrefixLbl: Label 'ord-many-', Locked = true;
+        FillerCharLbl: Label '-', Locked = true;
+    begin
+        MedusaOrderId := MedusaOrderIdPrefixLbl + Format(OrderIndex);
+        _Assert.IsTrue(StrLen(MedusaOrderId) <= MedusaOrderIdLength,
+            'Setup: the requested Medusa order id length must fit the distinct part of the generated id.');
+        exit(PadStr(MedusaOrderId, MedusaOrderIdLength, FillerCharLbl));
+    end;
+
+    /// <summary>
+    /// One order carrying the identity, billing address, shipping address and shipment method properties the
+    /// importer maps onto the Ecom Sales Header. Every shipping value differs from its billing counterpart,
+    /// so a mapping that reads one where it should read the other is detectable. The expected values are
+    /// exposed by the Expected* accessors below.
+    /// </summary>
+    procedure BuildOrderArrayWithAddresses(var OrdersArr: JsonArray; DocumentNo: Code[20]; MedusaOrderId: Text; CreatedAt: DateTime; ItemTotal: Decimal)
+    var
+        OrderTkn: JsonToken;
+        OrderObj: JsonObject;
+        BillingAddressObj: JsonObject;
+        ShippingAddressObj: JsonObject;
+        ShippingMethodsArr: JsonArray;
+        ShippingMethodObj: JsonObject;
+    begin
+        BuildOrderArrayWithNoPaymentLines(OrdersArr, DocumentNo, MedusaOrderId, CreatedAt, CreatedAt, ItemTotal);
+        OrdersArr.Get(0, OrderTkn);
+        OrderObj := OrderTkn.AsObject();
+
+        BillingAddressObj.Add('first_name', ExpectedBillingFirstName());
+        BillingAddressObj.Add('last_name', ExpectedBillingLastName());
+        BillingAddressObj.Add('address_1', ExpectedBillingAddress1());
+        BillingAddressObj.Add('address_2', ExpectedBillingAddress2());
+        BillingAddressObj.Add('city', ExpectedBillingCity());
+        BillingAddressObj.Add('postal_code', ExpectedBillingPostCode());
+        BillingAddressObj.Add('province', ExpectedBillingProvince());
+        BillingAddressObj.Add('country_code', ExpectedBillingCountryCode());
+        BillingAddressObj.Add('company', ExpectedBillingCompany());
+        BillingAddressObj.Add('phone', ExpectedBillingPhoneNo());
+
+        ShippingAddressObj.Add('first_name', ExpectedShippingFirstName());
+        ShippingAddressObj.Add('last_name', ExpectedShippingLastName());
+        ShippingAddressObj.Add('address_1', ExpectedShippingAddress1());
+        ShippingAddressObj.Add('address_2', ExpectedShippingAddress2());
+        ShippingAddressObj.Add('city', ExpectedShippingCity());
+        ShippingAddressObj.Add('postal_code', ExpectedShippingPostCode());
+        ShippingAddressObj.Add('province', ExpectedShippingProvince());
+        ShippingAddressObj.Add('country_code', ExpectedShippingCountryCode());
+        ShippingAddressObj.Add('company', ExpectedShippingCompany());
+
+        // Read as "shipping_methods[0].name": only the array's first element is mapped.
+        ShippingMethodObj.Add('name', ExpectedShipmentMethodName());
+        ShippingMethodsArr.Add(ShippingMethodObj);
+
+        OrderObj.Add('email', ExpectedEmail());
+        OrderObj.Add('billing_address', BillingAddressObj);
+        OrderObj.Add('shipping_address', ShippingAddressObj);
+        OrderObj.Add('shipping_methods', ShippingMethodsArr);
+
+        Clear(OrdersArr);
+        OrdersArr.Add(OrderObj);
+    end;
+
+    procedure ExpectedEmail(): Text
+    var
+        EmailLbl: Label 'billing@entria.test', Locked = true;
+    begin
+        exit(EmailLbl);
+    end;
+
+    procedure ExpectedBillingFirstName(): Text
+    var
+        FirstNameLbl: Label 'Bill', Locked = true;
+    begin
+        exit(FirstNameLbl);
+    end;
+
+    procedure ExpectedBillingLastName(): Text
+    var
+        LastNameLbl: Label 'Billing', Locked = true;
+    begin
+        exit(LastNameLbl);
+    end;
+
+    /// <summary>The full name the importer composes out of the billing first and last name.</summary>
+    procedure ExpectedSellToName(): Text
+    begin
+        exit(ExpectedBillingFirstName() + ' ' + ExpectedBillingLastName());
+    end;
+
+    procedure ExpectedBillingAddress1(): Text
+    var
+        Address1Lbl: Label 'Billing Street 1', Locked = true;
+    begin
+        exit(Address1Lbl);
+    end;
+
+    procedure ExpectedBillingAddress2(): Text
+    var
+        Address2Lbl: Label 'Billing Suite 11', Locked = true;
+    begin
+        exit(Address2Lbl);
+    end;
+
+    procedure ExpectedBillingCity(): Text
+    var
+        CityLbl: Label 'Billingtown', Locked = true;
+    begin
+        exit(CityLbl);
+    end;
+
+    procedure ExpectedBillingProvince(): Text
+    var
+        ProvinceLbl: Label 'Billing County', Locked = true;
+    begin
+        exit(ProvinceLbl);
+    end;
+
+    procedure ExpectedBillingCompany(): Text
+    var
+        CompanyLbl: Label 'Billing Company A/S', Locked = true;
+    begin
+        exit(CompanyLbl);
+    end;
+
+    procedure ExpectedBillingPostCode(): Text
+    var
+        PostCodeLbl: Label '1111', Locked = true;
+    begin
+        exit(PostCodeLbl);
+    end;
+
+    procedure ExpectedBillingCountryCode(): Text
+    var
+        CountryCodeLbl: Label 'DK', Locked = true;
+    begin
+        exit(CountryCodeLbl);
+    end;
+
+    procedure ExpectedBillingPhoneNo(): Text
+    var
+        PhoneNoLbl: Label '11111111', Locked = true;
+    begin
+        exit(PhoneNoLbl);
+    end;
+
+    procedure ExpectedShippingFirstName(): Text
+    var
+        FirstNameLbl: Label 'Ship', Locked = true;
+    begin
+        exit(FirstNameLbl);
+    end;
+
+    procedure ExpectedShippingLastName(): Text
+    var
+        LastNameLbl: Label 'Shipping', Locked = true;
+    begin
+        exit(LastNameLbl);
+    end;
+
+    /// <summary>The full name the importer composes out of the shipping first and last name.</summary>
+    procedure ExpectedShipToName(): Text
+    begin
+        exit(ExpectedShippingFirstName() + ' ' + ExpectedShippingLastName());
+    end;
+
+    procedure ExpectedShippingAddress1(): Text
+    var
+        Address1Lbl: Label 'Shipping Street 2', Locked = true;
+    begin
+        exit(Address1Lbl);
+    end;
+
+    procedure ExpectedShippingAddress2(): Text
+    var
+        Address2Lbl: Label 'Shipping Suite 22', Locked = true;
+    begin
+        exit(Address2Lbl);
+    end;
+
+    procedure ExpectedShippingCity(): Text
+    var
+        CityLbl: Label 'Shippingtown', Locked = true;
+    begin
+        exit(CityLbl);
+    end;
+
+    procedure ExpectedShippingProvince(): Text
+    var
+        ProvinceLbl: Label 'Shipping County', Locked = true;
+    begin
+        exit(ProvinceLbl);
+    end;
+
+    procedure ExpectedShippingCompany(): Text
+    var
+        CompanyLbl: Label 'Shipping Company AB', Locked = true;
+    begin
+        exit(CompanyLbl);
+    end;
+
+    procedure ExpectedShippingPostCode(): Text
+    var
+        PostCodeLbl: Label '2222', Locked = true;
+    begin
+        exit(PostCodeLbl);
+    end;
+
+    procedure ExpectedShippingCountryCode(): Text
+    var
+        CountryCodeLbl: Label 'SE', Locked = true;
+    begin
+        exit(CountryCodeLbl);
+    end;
+
+    procedure ExpectedShipmentMethodName(): Text
+    var
+        ShipmentMethodNameLbl: Label 'STD', Locked = true;
+    begin
+        exit(ShipmentMethodNameLbl);
     end;
 
     #endregion
@@ -457,6 +769,62 @@ codeunit 85379 "NPR Library - Entria"
         end;
     end;
 
+    /// <summary>
+    /// The Entria api handler refuses to send at all unless the NP Retail extension is allowed to make
+    /// HttpClient requests, and that guard is what makes every refetch in the suite fail deterministically.
+    /// A scenario that needs a live refetch switches it on; Initialize() switches it back off, because the
+    /// production code commits and the enabling write therefore outlives the test that made it.
+    /// </summary>
+    procedure SetHttpClientRequestsAllowed(Allowed: Boolean)
+    var
+        NAVAppSetting: Record "NAV App Setting";
+        NPRetailAppId: Guid;
+    begin
+        Evaluate(NPRetailAppId, '992c2309-cca4-43cb-9e41-911f482ec088');
+        if not NAVAppSetting.Get(NPRetailAppId) then begin
+            if not Allowed then
+                exit;
+            NAVAppSetting.Init();
+            NAVAppSetting."App ID" := NPRetailAppId;
+            NAVAppSetting.Insert();
+        end;
+        if NAVAppSetting."Allow HttpClient Requests" = Allowed then
+            exit;
+        NAVAppSetting."Allow HttpClient Requests" := Allowed;
+        NAVAppSetting.Modify();
+    end;
+
+    /// <summary>
+    /// Drops a store's api key from isolated storage, which the request builder reads and which no
+    /// per-test rollback removes once the production code has committed.
+    /// </summary>
+    procedure ClearStoreAPIKey(StoreCode: Code[20])
+    var
+        EntriaStore: Record "NPR Entria Store";
+    begin
+        if not EntriaStore.Get(StoreCode) then
+            exit;
+        if not EntriaStore.HasAPIKey() then
+            exit;
+
+        EntriaStore.DeleteAPIKey();
+        Clear(EntriaStore."Entria API Key Token");
+        EntriaStore.Modify();
+    end;
+
+    /// <summary>Gives a store the api key the request builder needs before it can send anything.</summary>
+    procedure EnsureStoreAPIKey(StoreCode: Code[20])
+    var
+        EntriaStore: Record "NPR Entria Store";
+    begin
+        EntriaStore.Get(StoreCode);
+        if EntriaStore.HasAPIKey() then
+            exit;
+
+        EntriaStore.SetAPIKey('entria-test-api-key');
+        EntriaStore.Modify();
+    end;
+
     #endregion
 
     #region Order import failure registry fixtures
@@ -466,6 +834,20 @@ codeunit 85379 "NPR Library - Entria"
     /// - going through UpsertOrderFailure would always produce the two parked conditions together.
     /// </summary>
     procedure InsertOrderFailureRow(StoreCode: Code[20]; MedusaOrderId: Text[100]; RetryCount: Integer; NextRetryAt: DateTime)
+    begin
+        InsertOrderFailureRowWithStatus(StoreCode, MedusaOrderId, RetryCount, NextRetryAt, Enum::"NPR Entria Order Imp. Status"::Pending);
+    end;
+    procedure InsertOrderFailureRowWithStatus(StoreCode: Code[20]; MedusaOrderId: Text[100]; RetryCount: Integer; NextRetryAt: DateTime; Status: Enum "NPR Entria Order Imp. Status")
+    begin
+        InsertOrderFailureRowWithTimestamp(StoreCode, MedusaOrderId, RetryCount, NextRetryAt, Status, 0DT);
+    end;
+
+    /// <summary>
+    /// As InsertOrderFailureRowWithStatus, plus the row's stored "Order Updated At" - the baseline the
+    /// freshness check judges a refetched payload against. Seeded here rather than by the caller so a
+    /// scenario does not have to insert, re-read and modify the row to place one field.
+    /// </summary>
+    procedure InsertOrderFailureRowWithTimestamp(StoreCode: Code[20]; MedusaOrderId: Text[100]; RetryCount: Integer; NextRetryAt: DateTime; Status: Enum "NPR Entria Order Imp. Status"; OrderUpdatedAt: DateTime)
     var
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
     begin
@@ -474,7 +856,8 @@ codeunit 85379 "NPR Library - Entria"
         EntriaOrderImpFailure."Order Id" := MedusaOrderId;
         EntriaOrderImpFailure."Retry Count" := RetryCount;
         EntriaOrderImpFailure."Next Retry At" := NextRetryAt;
-        EntriaOrderImpFailure.Suppressed := false;
+        EntriaOrderImpFailure.Status := Status;
+        EntriaOrderImpFailure."Order Updated At" := OrderUpdatedAt;
         EntriaOrderImpFailure.Insert();
     end;
 
@@ -496,6 +879,25 @@ codeunit 85379 "NPR Library - Entria"
 
         EntriaOrderImpFailure.Get(StoreCode, MedusaOrderId);
         _Assert.AreEqual(EntriaJQ.MaxRetries(), EntriaOrderImpFailure."Retry Count", 'Setup: row must be parked at MaxRetries().');
+        // All three markers of the parked state are asserted together on purpose: every caller of this
+        // fixture builds on all three, and a row whose Status and retry budget ever disagreed would let
+        // those tests pass while the production row was in a state the retry pass reads differently.
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Error, EntriaOrderImpFailure.Status, 'Setup: a row parked at MaxRetries() must read as Error, or it stays invisible in the Error cue tile.');
+        _Assert.AreEqual(0DT, EntriaOrderImpFailure."Next Retry At", 'Setup: a parked row must carry the 0DT sentinel, or it is still scheduled for an automatic retry it has no budget for.');
+    end;
+
+    /// <summary>
+    /// Runs the same "Skip" a human triggers from the failures list page, through the production
+    /// procedure the page action calls - the page only adds the Modify, which is done here too.
+    /// </summary>
+    procedure SkipOrder(StoreCode: Code[20]; MedusaOrderId: Text[100])
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        EntriaOrderImpFailure.Get(StoreCode, MedusaOrderId);
+        EntriaJQ.SkipOrder(EntriaOrderImpFailure);
+        EntriaOrderImpFailure.Modify();
     end;
 
     #endregion
@@ -507,8 +909,19 @@ codeunit 85379 "NPR Library - Entria"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
     begin
+        CreateEcomDocumentHeader(StoreCode, ExternalNo, EcomSalesHeader."Document Type"::Order);
+    end;
+
+    /// <summary>
+    /// Inserts a bare Ecom document header of the given document type, so a document of another type - or one
+    /// under another store - can stand in for something the duplicate guard should or should not match.
+    /// </summary>
+    procedure CreateEcomDocumentHeader(StoreCode: Code[20]; ExternalNo: Code[20]; DocumentType: Enum "NPR Ecom Sales Doc Type")
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    begin
         EcomSalesHeader.Init();
-        EcomSalesHeader."Document Type" := EcomSalesHeader."Document Type"::Order;
+        EcomSalesHeader."Document Type" := DocumentType;
         EcomSalesHeader."Ecommerce Store Code" := StoreCode;
         EcomSalesHeader."External No." := ExternalNo;
         EcomSalesHeader.Insert();

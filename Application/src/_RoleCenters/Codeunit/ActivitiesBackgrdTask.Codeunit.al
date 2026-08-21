@@ -20,7 +20,7 @@
         RetailSalesCue.CalcFields("Import Pending", "Task List", "Daily Sales Orders", "Sales Orders", "Shipped Sales Orders", "Sales Return Orders",
                                     "Pending Inc. Documents", "Processed Error Tasks", "Failed Webshop Payments", "Sales Quotes", "Magento Orders",
                                     "Daily Sales Invoices", "Tasks Unprocessed", "Posted Sales Invoices", "Failed imports", "Purchase Order List", "Failed Ecom Sales Orders", "Daily Ecom Sales Orders",
-                                    "Failed Entria Order Imports");
+                                    "Entria Order Imports Pending", "Entria Order Imports Error", "Entria Order Imports Skipped");
 #else
         RetailSalesCue.CalcFields("Import Pending", "Task List", "Daily Sales Orders", "Sales Orders", "Shipped Sales Orders", "Sales Return Orders",
                                     "Pending Inc. Documents", "Processed Error Tasks", "Failed Webshop Payments", "Sales Quotes", "Magento Orders",
@@ -45,7 +45,9 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         Result.Add(Format(RetailSalesCue.FieldNo("Failed Ecom Sales Orders")), Format(RetailSalesCue."Failed Ecom Sales Orders", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Daily Ecom Sales Orders")), Format(RetailSalesCue."Daily Ecom Sales Orders", 0, 9));
-        Result.Add(Format(RetailSalesCue.FieldNo("Failed Entria Order Imports")), Format(RetailSalesCue."Failed Entria Order Imports", 0, 9));
+        Result.Add(Format(RetailSalesCue.FieldNo("Entria Order Imports Pending")), Format(RetailSalesCue."Entria Order Imports Pending", 0, 9));
+        Result.Add(Format(RetailSalesCue.FieldNo("Entria Order Imports Error")), Format(RetailSalesCue."Entria Order Imports Error", 0, 9));
+        Result.Add(Format(RetailSalesCue.FieldNo("Entria Order Imports Skipped")), Format(RetailSalesCue."Entria Order Imports Skipped", 0, 9));
 #endif
         Page.SetBackgroundTaskResult(Result);
     end;

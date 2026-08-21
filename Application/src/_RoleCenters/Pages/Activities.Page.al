@@ -92,18 +92,48 @@
                         IncEcomSalesDocUtils.OpenFailedSalesOrders();
                     end;
                 }
-                field("Failed Entria Order Imports"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Entria Order Imports"))))
+                field("Entria Order Imports Pending"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Entria Order Imports Pending"))))
                 {
-                    Caption = 'Failed Entria Order Imports';
+                    Caption = 'Pending Entria Order Imports';
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
-                    ToolTip = 'Specifies the number of Entria orders that failed to import and are waiting in the failure registry. These never reach the incoming ecommerce sales documents, so they are not counted by the Failed Incoming Ecommerce Sales Orders cue.';
+                    ToolTip = 'Specifies the number of Entria orders that failed to import and still have retries left. These never reach the incoming ecommerce sales documents, so they are not counted by the Failed Incoming Ecommerce Sales Orders cue.';
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
                         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
                     begin
-                        EntriaOrderImpFailure.SetRange(Suppressed, false);
+                        EntriaOrderImpFailure.SetRange(Status, EntriaOrderImpFailure.Status::Pending);
+                        Page.RunModal(Page::"NPR Entria Order Imp. Failures", EntriaOrderImpFailure);
+                    end;
+                }
+                field("Entria Order Imports Error"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Entria Order Imports Error"))))
+                {
+                    Caption = 'Failed Entria Order Imports';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    ToolTip = 'Specifies the number of Entria orders that used up their retry budget and are now waiting for someone to look at them. These never reach the incoming ecommerce sales documents, so they are not counted by the Failed Incoming Ecommerce Sales Orders cue.';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+                    begin
+                        EntriaOrderImpFailure.SetRange(Status, EntriaOrderImpFailure.Status::Error);
+                        Page.RunModal(Page::"NPR Entria Order Imp. Failures", EntriaOrderImpFailure);
+                    end;
+                }
+                field("Entria Order Imports Skipped"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Entria Order Imports Skipped"))))
+                {
+                    Caption = 'Skipped Entria Order Imports';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    ToolTip = 'Specifies the number of Entria orders whose import someone has explicitly stopped. They are never retried until someone marks them for import again.';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+                    begin
+                        EntriaOrderImpFailure.SetRange(Status, EntriaOrderImpFailure.Status::Skipped);
                         Page.RunModal(Page::"NPR Entria Order Imp. Failures", EntriaOrderImpFailure);
                     end;
                 }

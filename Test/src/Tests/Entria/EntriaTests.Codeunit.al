@@ -22,6 +22,11 @@ codeunit 85260 "NPR Entria Tests"
         _Initialized: Boolean;
         _StoreCode: Code[20];
         _StoreCodeLbl: Label 'NPRENT-TEST', Locked = true;
+        _SecondStoreCodeLbl: Label 'NPRENT-TEST2', Locked = true;
+        _LastMessageTxt: Text;
+        _MockOrderId: Text[100];
+        _MockOrderUpdatedAt: DateTime;
+        _MockRequestCount: Integer;
 
     [Test]
     procedure WebhookGuards_PriceChangeOnEntriaItemWithEnabledStore_AllGuardsPass()
@@ -58,8 +63,6 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsTrue(TestSub.GetOnAfterXRecLoaded(), 'Guard: xRec."Unit Price" must be loaded');
         _Assert.AreEqual(200, TestSub.GetOnAfterRecPrice(), 'Guard: Rec."Unit Price" must reflect the new value');
         _Assert.AreEqual(100, TestSub.GetOnAfterXRecPrice(), 'Guard: xRec."Unit Price" must reflect the old value');
-        _Assert.AreNotEqual(TestSub.GetOnAfterRecPrice(), TestSub.GetOnAfterXRecPrice(),
-            'Guard: Rec."Unit Price" <> xRec."Unit Price" must hold');
 
         // [THEN] The store guard holds - at least one Entria store is enabled
         _Assert.IsTrue(EntriaIntegrationMgt.HasEnabledStore(), 'Guard: HasEnabledStore must be true');
@@ -289,8 +292,9 @@ codeunit 85260 "NPR Entria Tests"
     begin
         // [SCENARIO] Root cause: a deterministically failing order must not freeze
         // the "Last Order Import Sync At" marker - the session max must advance past it.
-        // created_at and updated_at are equal here - the marker now tracks created_at, but the
-        // distinction between the two is covered separately by MarkerAdvancesByCreatedAtNotUpdatedAt.
+        // All of the fixture's timestamps are equal here - the marker tracks bc_status_updated_at, and
+        // the distinction from created_at is covered separately by
+        // MarkerAdvancesByBcStatusUpdatedAtNotCreatedAt.
 
         // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 15 June 2024
         Initialize();
@@ -305,9 +309,9 @@ codeunit 85260 "NPR Entria Tests"
         // [WHEN] ProcessList runs over that page
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [THEN] The session max advances to the failing order's created_at instead of freezing
-        _Assert.AreEqual(OrderUpdatedAt, EntriaJQ.GetSessionMaxCreatedAt(_StoreCode),
-            'Session max must advance to the failing order''s created_at, not stay frozen.');
+        // [THEN] The session max advances to the failing order's bc_status_updated_at instead of freezing
+        _Assert.AreEqual(OrderUpdatedAt, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'Session max must advance to the failing order''s bc_status_updated_at, not stay frozen.');
 
         // [THEN] The failure is recorded in the registry, still on its full retry budget
         _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-marker-1'), 'A registry row must be recorded for the failed order.');
@@ -325,52 +329,55 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure MarkerAdvancesByCreatedAtNotUpdatedAt()
+    procedure MarkerAdvancesByBcStatusUpdatedAtNotCreatedAt()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         OrdersArr: JsonArray;
         OrderCreatedAt: DateTime;
         OrderUpdatedAt: DateTime;
+        OrderBcStatusUpdatedAt: DateTime;
     begin
-        // [SCENARIO] The marker must track the order's created_at (immutable), and must
-        // NOT be influenced by updated_at (mutable). updated_at is deliberately set far in the
-        // future of created_at, so a marker that took updated_at instead would be caught here.
+        // [SCENARIO] The marker must track the field the request actually filters and sorts on -
+        // bc_status_updated_at - and must be influenced by neither created_at nor updated_at. Feeding
+        // the window a created_at value would compare two different clocks: an order's bc status is
+        // stamped long after it was created, so the marker could overtake the bc_status_updated_at of
+        // orders still waiting and drop them out of the window for good. All three timestamps are
+        // deliberately distinct here, so a marker taking the wrong one is caught either way.
 
-        // [GIVEN] An enabled Entria store and an order created in 2024 but carrying an updated_at in 2030
+        // [GIVEN] An enabled Entria store, and an order created in 2024, bc-stamped in 2026, updated in 2030
         Initialize();
         _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
         EntriaStore.Get(_StoreCode);
         OrderCreatedAt := CreateDateTime(DMY2Date(15, 6, 2024), 100000T);
+        OrderBcStatusUpdatedAt := CreateDateTime(DMY2Date(15, 6, 2026), 100000T);
         OrderUpdatedAt := CreateDateTime(DMY2Date(15, 6, 2030), 100000T);
 
         // [GIVEN] A seeded session max and a page holding that one order
         EntriaJQ.SeedSessionMax(_StoreCode);
-        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-CREATEDMARK', 'medusa-createdmark', OrderCreatedAt, OrderUpdatedAt, 100);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-BCSTATMARK', 'medusa-bcstatmark', OrderCreatedAt, OrderUpdatedAt, 100);
+        _LibraryEntria.OverrideBcStatusUpdatedAt(OrdersArr, OrderBcStatusUpdatedAt);
 
         // [WHEN] ProcessList runs over that page
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [THEN] The session max tracks created_at and ignores the far later updated_at
-        _Assert.AreEqual(OrderCreatedAt, EntriaJQ.GetSessionMaxCreatedAt(_StoreCode),
-            'The marker must advance to the order''s created_at, not its (later) updated_at.');
+        // [THEN] The session max tracks bc_status_updated_at, ignoring the earlier created_at and the later updated_at
+        _Assert.AreEqual(OrderBcStatusUpdatedAt, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'The marker must advance to the order''s bc_status_updated_at, not its created_at or updated_at.');
     end;
 
     [Test]
-    procedure ProcessListSecondPassSkipsNotYetDueRegistryRow()
+    procedure ProcessListSecondPassLeavesExistingRegistryRowUntouched()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         OrdersArr: JsonArray;
         OrderUpdatedAt: DateTime;
-        SessionMaxAfterFirstPass: DateTime;
+        NextRetryAtAfterFirstPass: DateTime;
     begin
-        // [SCENARIO] Regression guard: once ProcessList has recorded a registry row for
-        // a failed order, a second ProcessList pass over the SAME order array must not touch that
-        // row again while it is not yet due - the registry, not the list path, owns retry timing.
-        // Before the fix this re-ran LogOrderFailure every pass, burning the whole
-        // backoff schedule in seconds and growing Retry Count unbounded.
+        // [SCENARIO] Regression guard: once ProcessList has recorded a registry row for a failed order,
+        // a second ProcessList pass over the SAME order array must leave that row completely alone.
 
         // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 20 June 2024
         Initialize();
@@ -388,17 +395,17 @@ codeunit 85260 "NPR Entria Tests"
         // [THEN] The registry row records the initial failure with Retry Count 0
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-duppass');
         _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count", 'First pass: initial failure, Retry Count must be 0.');
-        SessionMaxAfterFirstPass := EntriaJQ.GetSessionMaxCreatedAt(_StoreCode);
+        NextRetryAtAfterFirstPass := EntriaOrderImpFailure."Next Retry At";
 
-        // [WHEN] ProcessList runs a second time over the SAME order array, while the row is not yet due
+        // [WHEN] ProcessList runs a second time over the SAME order array
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [THEN] The registry row keeps its retry budget and the session max does not advance again
+        // [THEN] The registry row is untouched: both the budget it has left and when it is next due
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-duppass');
         _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
-            'Second pass over the same order must not touch the registry row - Next Retry At is still in the future.');
-        _Assert.AreEqual(SessionMaxAfterFirstPass, EntriaJQ.GetSessionMaxCreatedAt(_StoreCode),
-            'Second pass must not advance the session max again for a skipped not-due retry row.');
+            'Second pass over the same order must not re-log the failure - Retry Count would climb and the backoff budget would burn out in seconds.');
+        _Assert.AreEqual(NextRetryAtAfterFirstPass, EntriaOrderImpFailure."Next Retry At",
+            'Second pass must not reschedule the row either - re-logging rewrites Next Retry At from the current time and pushes the retry away on every cycle.');
     end;
 
     [Test]
@@ -421,19 +428,21 @@ codeunit 85260 "NPR Entria Tests"
         OrderCreatedAt := CreateDateTime(DMY2Date(10, 7, 2024), 100000T);
         EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerBefore);
 
-        // [GIVEN] A registry row for that order which is not yet due, so the list path skips it
+        // [GIVEN] A registry row for that order, which is what removes it from the list path - the skip
+        //         is on the row EXISTING, not on whether it is due; due-ness is the retry pass's business
         _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-regmark', 0, CurrentDateTime() + 3600000);
 
         // [GIVEN] A session max seeded from that marker and a page holding only that one order
         EntriaJQ.SeedSessionMax(_StoreCode);
-        _Assert.AreEqual(MarkerBefore, EntriaJQ.GetSessionMaxCreatedAt(_StoreCode), 'Setup: the session max must start at the stored marker.');
+        _Assert.AreEqual(EntriaJQ.PassWindowStart(MarkerBefore), EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'Setup: the session max must start at the window the pass opens with - the stored marker less the propagation overlap.');
         _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-REGMARK', 'medusa-regmark', OrderCreatedAt, OrderCreatedAt, 100);
 
         // [WHEN] ProcessList runs over that page
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [THEN] The session max advances to the skipped order's created_at
-        _Assert.AreEqual(OrderCreatedAt, EntriaJQ.GetSessionMaxCreatedAt(_StoreCode),
+        // [THEN] The session max advances to the skipped order's bc_status_updated_at
+        _Assert.AreEqual(OrderCreatedAt, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
             'A page of nothing but already-registered failures must still advance the session max - a marker frozen behind them makes the store re-list the same page every cycle forever.');
     end;
 
@@ -484,7 +493,7 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure ParkedRowRequiresManualMarkForImport()
+    procedure ParkedRowRequiresManualRequeue()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
@@ -494,7 +503,7 @@ codeunit 85260 "NPR Entria Tests"
         ParkedRowIsDue: Boolean;
     begin
         // [SCENARIO] A row that has exhausted its retry budget is PARKED. The one Sentry alert at exhaustion summons a human;
-        //only the page's "Mark for Import" (Retry Count 0, Next Retry At now) re-arms it.
+        //only the page's "Requeue for Import" (Retry Count 0, Next Retry At now, Status back to Pending) re-arms it.
 
         // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 23 June 2024
         Initialize();
@@ -519,44 +528,39 @@ codeunit 85260 "NPR Entria Tests"
         _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-PARKED', 'medusa-parked', OrderUpdatedAt, OrderUpdatedAt, 100);
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [THEN] The parked row is left untouched at MaxRetries()
+        // [THEN] The parked row is left untouched at MaxRetries(), still reading as Error
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-parked');
         _Assert.AreEqual(EntriaJQ.MaxRetries(), EntriaOrderImpFailure."Retry Count",
             'The list path must skip a parked row untouched.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Error, EntriaOrderImpFailure.Status,
+            'The list path must leave the parked row''s Status at Error - flipping it back to Pending would hand the exhausted row to the retry pass again.');
 
-        // [WHEN] A human uses "Mark for Import" - Retry Count back to 0, an immediate Next Retry At and Suppressed cleared
-        EntriaOrderImpFailure."Retry Count" := 0;
-        EntriaOrderImpFailure."Next Retry At" := CurrentDateTime();
-        EntriaOrderImpFailure.Suppressed := false;
+        // [WHEN] A human uses "Requeue for Import", the one way back out of Error
+        EntriaJQ.MarkOrderForRetry(EntriaOrderImpFailure);
         EntriaOrderImpFailure.Modify(true);
 
         // [THEN] The row is due for the ID-based retry pass again
         _Assert.IsTrue(EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, 'medusa-parked'),
-            '"Mark for Import" must make the row due for the ID-based retry pass again.');
+            '"Requeue for Import" must make the row due for the ID-based retry pass again.');
     end;
 
     [Test]
-    procedure FromDTStableAcrossPagesInOneCycle()
+    procedure ContinuationPageAdvancesWindowWithoutReapplyingOverlap()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         OrdersArr: JsonArray;
         ExpectedMarkerDT: DateTime;
-        FromDT: DateTime;
         InitialMarker: DateTime;
-        Page2CreatedAt: DateTime;
+        PageOrderDT: DateTime;
+        SessionMax: DateTime;
         Page1RequestText: Text;
-        Page2RequestText: Text;
-        RederivedRequestText: Text;
-        WindowSegment: Text;
-        WindowPos: Integer;
+        ContinuationRequestText: Text;
     begin
-        // [SCENARIO] The original pagination bug: the query window must be snapshotted once per
-        // DownloadOrders pass and stay fixed while Offset advances - re-deriving it from the marker per
-        // page narrows the window while Offset has already moved on, skipping a page worth of orders.
-        // DownloadOrders is local and needs a live HTTP layer, so what is pinned instead is the contract
-        // it rests on: GenerateGetOrderListRequest takes the window from the FromDT it is HANDED, never
-        // from the marker - which real flushes deliberately advance between the two pages here.
+        // [SCENARIO] The window a pass opens with is the stored marker moved back by the propagation
+        // overlap, computed ONCE, and every page after that moves the window strictly forward to the
+        // highest bc_status_updated_at consumed so far. The offset is only meaningful against a fixed
+        // filter, so the overlap must never be re-applied per page.
 
         // [GIVEN] An enabled Entria store whose marker already stands at 14 June 2024, so the pass has
         //         a real window start rather than the never-synced 0DT sentinel (which carries no filter)
@@ -565,51 +569,46 @@ codeunit 85260 "NPR Entria Tests"
         EntriaStore.Get(_StoreCode);
         InitialMarker := CreateDateTime(DMY2Date(14, 6, 2024), 100000T);
         EntriaStore.SetLastOrdersImportedAt(_StoreCode, InitialMarker);
-
-        // [GIVEN] A second page whose order is created a day after the first page's
-        Page2CreatedAt := CreateDateTime(DMY2Date(16, 6, 2024), 100000T);
-
-        // [GIVEN] The pass snapshots its query window FromDT once, up front, and seeds its session max
         ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
+
+        // [THEN] The pass opens one overlap before the stored marker, and the never-synced sentinel is
+        //        left alone so it still means "no window at all"
+        _Assert.AreEqual(ExpectedMarkerDT - EntriaJQ.PropagationOverlap(), EntriaJQ.PassWindowStart(ExpectedMarkerDT),
+            'A pass must open one propagation overlap before the stored marker, so orders that had not surfaced when the marker was written are still picked up.');
+        _Assert.AreEqual(0DT, EntriaJQ.PassWindowStart(0DT),
+            'The never-synced sentinel must survive untouched - subtracting from it would underflow and it has to keep meaning "request the whole backlog".');
+
+        // [THEN] The seeded running maximum equals that same opening window, never the bare marker -
+        //        seeded ahead of the window, the first comparison would advance the window regardless of
+        //        what the page actually contained
         EntriaJQ.SeedSessionMax(_StoreCode);
-        FromDT := ExpectedMarkerDT;
-        _Assert.AreEqual(InitialMarker, FromDT, 'Setup: the pass must snapshot the stored marker as its window start.');
+        _Assert.AreEqual(EntriaJQ.PassWindowStart(ExpectedMarkerDT), EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'The running maximum must start at the window the pass opens with, not at the stored marker.');
 
-        // [GIVEN] The window segment the pass's very first request carries, taken from that request's own
-        //         output rather than rebuilt here, so the overlap constant stays pinned in one place -
-        //         OrderListRequestContract
-        Page1RequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, FromDT);
-        WindowPos := Page1RequestText.IndexOf('created_at[$gte]=');
-        _Assert.IsTrue(WindowPos > 0, 'Setup: a pass with a real window start must carry a created_at window filter.');
-        WindowSegment := CopyStr(Page1RequestText, WindowPos);
+        // [GIVEN] The request that opening window produces
+        Page1RequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, EntriaJQ.PassWindowStart(ExpectedMarkerDT));
+        _Assert.IsTrue(Page1RequestText.Contains('bc_status_updated_at[$gte]=' + Format(ExpectedMarkerDT - EntriaJQ.PropagationOverlap(), 0, 9)),
+            'The opening request must carry the overlapped window verbatim.');
 
-        // [WHEN] Page 1 is processed and flushed
-        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-PAGE1', 'medusa-page-1', CreateDateTime(DMY2Date(15, 6, 2024), 100000T), CreateDateTime(DMY2Date(15, 6, 2024), 100000T), 100);
+        // [WHEN] A page carrying an order two days later is processed and flushed
+        PageOrderDT := CreateDateTime(DMY2Date(16, 6, 2024), 100000T);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-KEYSET', 'medusa-keyset', PageOrderDT, PageOrderDT, 100);
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
         EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT);
+        SessionMax := EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode);
+        _Assert.AreEqual(PageOrderDT, SessionMax, 'Setup: the running maximum must stand at the consumed order''s bc_status_updated_at.');
 
-        // [WHEN] Page 2, carrying the later order, is processed and flushed in the same pass
-        Clear(OrdersArr);
-        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-PAGE2', 'medusa-page-2', Page2CreatedAt, Page2CreatedAt, 100);
-        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
-        EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT);
+        // [THEN] The continuation opens exactly AT the consumed maximum - moved forward, and with no
+        //        second overlap subtracted from it
+        ContinuationRequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, SessionMax);
+        _Assert.IsTrue(ContinuationRequestText.Contains('bc_status_updated_at[$gte]=' + Format(SessionMax, 0, 9)),
+            'A continuation must open exactly at the consumed maximum - that forward step is what replaces ordinal offset paging, leaving the offset only for a page whose rows all share one timestamp.');
+        _Assert.IsFalse(ContinuationRequestText.Contains(Format(SessionMax - EntriaJQ.PropagationOverlap(), 0, 9)),
+            'The continuation window must not have the overlap subtracted again: re-applying it against the moving window rewinds it faster than it advances.');
 
-        // [THEN] The flushes have advanced the stored marker to the later order
-        _Assert.AreEqual(Page2CreatedAt, EntriaJQ.GetSyncStateMarker(_StoreCode),
-            'The flushes must have advanced the stored marker to the later order.');
-
-        // [THEN] The page-2 request built from the pass's own snapshot carries the very same window as
-        //        page 1 did, even though the marker has since advanced under it
-        Page2RequestText := EntriaJQ.GenerateGetOrderListRequest(40, 40, FromDT);
-        _Assert.IsTrue(Page2RequestText.Contains(WindowSegment),
-            'Page 2 must query the window the pass snapshotted - the request builder takes it from the FromDT it is handed, never from the marker.');
-
-        // [THEN] Re-deriving the window from the advanced marker gives a strictly narrower one - that
-        //        difference is exactly what the pagination bug leaked, so the snapshot is what
-        //        DownloadOrders has to keep passing in
-        RederivedRequestText := EntriaJQ.GenerateGetOrderListRequest(40, 40, EntriaJQ.GetSyncStateMarker(_StoreCode));
-        _Assert.IsFalse(RederivedRequestText.Contains(WindowSegment),
-            'A window re-derived from the advanced marker must NOT be the window the pass snapshotted - re-deriving it per page is the bug.');
+        // [THEN] The continuation has left the opening window behind, so the cursor makes forward progress
+        _Assert.IsFalse(ContinuationRequestText.Contains(Format(ExpectedMarkerDT - EntriaJQ.PropagationOverlap(), 0, 9)),
+            'The continuation must not still be querying the window the pass opened with.');
     end;
 
     [Test]
@@ -640,6 +639,8 @@ codeunit 85260 "NPR Entria Tests"
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-backoff');
         _Assert.AreEqual('medusa-backoff', EntriaOrderImpFailure."Order Id", 'Order Id must be stored.');
         _Assert.AreEqual(BaseDT + EntriaJQ.BackoffDuration(1), EntriaOrderImpFailure."Next Retry At", 'Retry 1 must be scheduled its first backoff step out.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
+            'A row created with its whole retry budget intact must read as Pending - Error here would send a human after an order the job is still working on by itself.');
 
         // [WHEN] Every retry but the last one in the budget fails in turn
         for i := 1 to EntriaJQ.MaxRetries() - 1 do begin
@@ -650,29 +651,42 @@ codeunit 85260 "NPR Entria Tests"
             EntriaOrderImpFailure.Get(_StoreCode, 'medusa-backoff');
             _Assert.AreEqual(BaseDT + EntriaJQ.BackoffDuration(i + 1), EntriaOrderImpFailure."Next Retry At",
                 StrSubstNo('Retry %1 must be scheduled its own backoff step out.', i + 1));
+
+            // [THEN] Status still reads Pending, in step with the real schedule the row just got
+            _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
+                StrSubstNo('After failed retry %1 the row still has budget left and must read as Pending, matching the real Next Retry At it was just given.', i));
         end;
 
         // [WHEN] The last retry in the budget fails
         RetryCount := EntriaJQ.UpsertOrderFailure(_StoreCode, 'ZZ-DOC-BACKOFF', 'medusa-backoff', BaseDT, 'boom final', 0, BaseDT);
 
-        // [THEN] Retry Count reaches MaxRetries() and the row is parked with the 0DT sentinel
+        // [THEN] Retry Count reaches MaxRetries() and the row is parked with the 0DT sentinel, now reading as Error
         _Assert.AreEqual(EntriaJQ.MaxRetries(), RetryCount, 'The last failed retry in the budget must bring Retry Count to MaxRetries() and park the row.');
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-backoff');
+        _Assert.AreEqual(EntriaJQ.MaxRetries(), EntriaOrderImpFailure."Retry Count",
+            'The parked row must be stored at MaxRetries() too, not only reported as such by the return value.');
         _Assert.AreEqual(0DT, EntriaOrderImpFailure."Next Retry At",
             'A parked row must carry the 0DT sentinel - no further automatic retry is ever scheduled.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Error, EntriaOrderImpFailure.Status,
+            'The failure that spends the last retry must flip Status to Error in the same write that sets the sentinel - the two halves of exhaustion must never be applied one without the other.');
     end;
 
     [Test]
-    procedure DisplayNoSurvivesFailedRefetchDuringIdBasedRetry()
+    procedure OrderUpdatedAtSurvivesFailedRefetchDuringIdBasedRetry()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         OrderUpdatedAt: DateTime;
     begin
-        // [SCENARIO] A row's captured identity must survive the ID-based retry pass's refetch-failure
-        // branch in ProcessDueRetry, which forwards the row's own "Display No.", "Document No." and
-        // "Order Updated At" to LogOrderFailure rather than losing them.
+        // [SCENARIO] When a retry cannot even fetch the order from Entria, the failure row must keep the
+        // order timestamp it already had. That timestamp is what later decides whether an edited order has
+        // earned a fresh retry budget, so losing it makes every later payload look newer than it is.
+        //
+        // The document no. and display no. are deliberately NOT asserted here: they are only ever written
+        // when a failure actually carries them, so they would survive this path even if it stopped passing
+        // them - asserting them here would pass no matter what the branch did. That guard is the real
+        // protection and CapturedIdentitySurvivesALaterIdentitylessFailure is what pins it.
 
         // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 7 February 2024
         Initialize();
@@ -695,13 +709,9 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.AreEqual(1, EntriaOrderImpFailure."Retry Count",
             'The refetch failure must have been logged as a retry - otherwise the branch under test never ran and the rest of this test would pass vacuously.');
 
-        // [THEN] The row keeps the identity it captured on the first failure
+        // [THEN] The row keeps the timestamp it captured on the first failure
         _Assert.AreEqual(OrderUpdatedAt, EntriaOrderImpFailure."Order Updated At",
-            'Order Updated At must survive the refetch-failure branch - it is written unconditionally, so a branch that stopped forwarding it would wipe the row''s timestamp.');
-        _Assert.AreEqual(360, EntriaOrderImpFailure."Display No.",
-            'Display No. must survive the refetch-failure branch of the ID-based retry - it is the order number the merchant sees in the Entria admin, captured from the list payload on the FIRST failure, and a refetch failure carries no payload to read display_id from again; resetting it to 0 shows an operator a column of blanks during an Entria outage.');
-        _Assert.AreEqual('ZZ-DOC-DISPNO', EntriaOrderImpFailure."Document No.",
-            'Document No. must survive the refetch-failure branch too - it is the other half of the row''s captured identity.');
+            'Order Updated At must survive the refetch-failure branch - it is written unconditionally, so a branch that stopped forwarding it would wipe the row''s timestamp and hand IsPayloadFresher a 0DT baseline that makes every later payload look fresher.');
     end;
 
     [Test]
@@ -713,12 +723,9 @@ codeunit 85260 "NPR Entria Tests"
         OrdersArr: JsonArray;
         OrderCreatedAt: DateTime;
     begin
-        // [SCENARIO] SetFailureFields writes "Document No." and "Display No." only when the failure
-        // being logged actually carries them. That matters as soon as an order fails TWICE: the first
-        // failure captured its identity from the payload, while both blank-identity branches - the list
-        // path's missing custom_display_id and the retry pass's own - log the second failure with '' and
-        // 0. Without the guards that second failure would blank out the very two columns an operator
-        // identifies the order by on the failures page, exactly when the order has been failing longest.
+        // [SCENARIO] An order that fails a second time must keep the document no. and display no. captured
+        // on the first failure. Some failures carry no identity at all, and if such a failure blanked those
+        // two columns, the failures page would stop naming the order exactly when it has been stuck longest.
 
         // [GIVEN] An enabled Entria store and an order created at 10:00 on 9 February 2024
         Initialize();
@@ -840,7 +847,7 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure MissingDisplayIdGetsOneRegistryRowNotOnePerPass()
+    procedure MissingCustomDisplayIdGetsOneRegistryRowNotOnePerPass()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
@@ -920,7 +927,7 @@ codeunit 85260 "NPR Entria Tests"
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
         // [THEN] The session max still advances past it, and no registry row is created
-        _Assert.AreEqual(OrderCreatedAt, EntriaJQ.GetSessionMaxCreatedAt(_StoreCode),
+        _Assert.AreEqual(OrderCreatedAt, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
             'The session max must advance past an already-imported order too.');
         _Assert.IsFalse(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-imported'),
             'An already-imported order must not produce a registry row.');
@@ -985,10 +992,11 @@ codeunit 85260 "NPR Entria Tests"
         RequestText: Text;
         FromDT: DateTime;
     begin
-        // [SCENARIO] The literal wire contract the whole marker design rests on: ordinal offset
-        // paging is only sound because the sort key is the immutable created_at, the window filter
-        // is created_at with the 30-second overlap subtracted, and offset/limit are passed through
-        // verbatim. Nothing else in the suite exercises the actual request text.
+        // [SCENARIO] The literal wire contract of the bc-sync work-list endpoint, and the one place in
+        // the suite that exercises the actual request text. Three things have to hold together or the
+        // marker design breaks: the work list is narrowed to bc_status=pending, the window filter and
+        // the sort key are the SAME field the marker is flushed from (bc_status_updated_at), and the
+        // sort is ascending so flushing between pages only ever advances past rows already consumed.
 
         // [GIVEN] A window start of 12:00 on 15 June 2024
         FromDT := CreateDateTime(DMY2Date(15, 6, 2024), 120000T);
@@ -996,15 +1004,34 @@ codeunit 85260 "NPR Entria Tests"
         // [WHEN] The list request is generated for offset 80 and limit 40 from that window start
         RequestText := EntriaJQ.GenerateGetOrderListRequest(80, 40, FromDT);
 
-        // [THEN] It sorts by created_at and filters on created_at with the 30-second overlap subtracted
-        _Assert.IsTrue(RequestText.Contains('order=created_at'), 'The list must be sorted by created_at.');
-        _Assert.IsTrue(RequestText.Contains('created_at[$gte]=' + Format(FromDT - 30000, 0, 9)),
-            'The window filter must be created_at with the 30-second overlap subtracted.');
+        // [THEN] It addresses the bc-sync endpoint and asks only for orders awaiting BC
+        _Assert.IsTrue(RequestText.StartsWith('admin/orders/bc-sync?'),
+            'The list must be fetched from the bc-sync endpoint - admin/orders/bc-sync, plural "orders".');
+        _Assert.IsTrue(RequestText.Contains('bc_status=pending'), 'The list must be narrowed to orders awaiting BC processing.');
 
-        // [THEN] Offset and limit are passed through verbatim and updated_at appears nowhere
+        // [THEN] Window filter and sort key are both bc_status_updated_at, and the window start is carried
+        //        through EXACTLY as handed in - the builder must not adjust it, or the offset it is paired
+        //        with would be indexing a result set of a different shape
+        _Assert.IsTrue(RequestText.Contains('bc_status_updated_at[$gte]=' + Format(FromDT, 0, 9)),
+            'The window filter must be bc_status_updated_at carrying the window start verbatim - any adjustment here reshapes the result set the offset counts against.');
+        _Assert.IsTrue(RequestText.Contains('order=bc_status_updated_at'),
+            'The list must be sorted by bc_status_updated_at - the same field the marker is flushed from.');
+
+        // [THEN] The sort is ascending, which is what the endpoint specifies - oldest first, so the
+        //        orders that have waited longest are imported first. It is also what makes carrying the
+        //        window forward between pages safe: newest-first would put the window maximum on page 1,
+        //        so a pass that stopped early would leave the marker above every page it never read and
+        //        lose those orders for good.
+        _Assert.IsFalse(RequestText.Contains('order=-'),
+            'The sort must be ascending: oldest first, so a between-pages flush only advances past consumed rows.');
+
+        // [THEN] The mutable updated_at drives neither the window nor the sort - that was the original skip bug
+        _Assert.IsFalse(RequestText.Contains('&updated_at[$gte]'), 'updated_at must never be the window filter - it is mutable.');
+        _Assert.IsFalse(RequestText.Contains('order=updated_at'), 'updated_at must never be the sort key - it is mutable.');
+
+        // [THEN] Offset and limit are passed through verbatim
         _Assert.IsTrue(RequestText.Contains('offset=80'), 'The offset must be passed through verbatim.');
         _Assert.IsTrue(RequestText.Contains('limit=40'), 'The limit must be passed through verbatim.');
-        _Assert.IsFalse(RequestText.Contains('updated_at'), 'updated_at must appear nowhere in the request - it is mutable and was the original skip bug.');
 
         // [THEN] The field projection asks for the properties the importer actually reads, so a
         //        projection that stopped requesting them cannot pass unnoticed
@@ -1018,9 +1045,11 @@ codeunit 85260 "NPR Entria Tests"
         // [WHEN] The list request is generated for a store that has never synced (0DT marker)
         RequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, 0DT);
 
-        // [THEN] The request carries no window filter at all, so the full history is requested
-        _Assert.IsFalse(RequestText.Contains('created_at[$gte]'),
-            'A store that has never synced (0DT marker) must request the full history, without a window filter.');
+        // [THEN] The request carries no window filter at all, so the full pending backlog is requested
+        _Assert.IsFalse(RequestText.Contains('[$gte]'),
+            'A store that has never synced (0DT marker) must request the whole pending backlog, without a window filter.');
+        _Assert.IsTrue(RequestText.Contains('bc_status=pending'),
+            'Even without a window the request must stay narrowed to orders awaiting BC processing.');
     end;
 
     [Test]
@@ -1304,7 +1333,7 @@ codeunit 85260 "NPR Entria Tests"
         // [SCENARIO] The ownership rule: ANY registry row - even a parked one facing a strictly
         // FRESHER payload - removes the order from the list path entirely. Re-arm on a newer
         // updated_at belongs to the ID-based retry pass, which only ever sees rows that are still
-        // due - a parked row has no automatic re-arm at all and waits for "Mark for Import".
+        // due - a parked row has no automatic re-arm at all and waits for "Requeue for Import".
         // Either way the list path must leave the row byte-for-byte untouched.
 
         // [GIVEN] An enabled Entria store, an order first seen on 1 February 2024 and a fresher payload dated a day later
@@ -1327,8 +1356,9 @@ codeunit 85260 "NPR Entria Tests"
         // [WHEN] ProcessList runs over that page
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [THEN] The row is left byte-for-byte untouched - Retry Count, Order Updated At and Next Retry At all unchanged
+        // [THEN] The row is left byte-for-byte untouched - Status, Retry Count, Order Updated At and Next Retry At all unchanged
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearm');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Error, EntriaOrderImpFailure.Status, 'The list path must not touch the row: Status unchanged, still Error.');
         _Assert.AreEqual(EntriaJQ.MaxRetries(), EntriaOrderImpFailure."Retry Count", 'The list path must not touch the row: Retry Count unchanged.');
         _Assert.AreEqual(OldUpdatedAt, EntriaOrderImpFailure."Order Updated At", 'The list path must not touch the row: Order Updated At unchanged.');
         _Assert.AreEqual(NextRetryAtBefore, EntriaOrderImpFailure."Next Retry At", 'The list path must not touch the row: Next Retry At unchanged.');
@@ -1382,7 +1412,7 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure SuppressedRowIsNotRearmedByFresherPayload()
+    procedure SkippedRowIsNotRearmedByFresherPayload()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
@@ -1392,8 +1422,11 @@ codeunit 85260 "NPR Entria Tests"
         NewUpdatedAt: DateTime;
         RetryCountBefore: Integer;
     begin
-        // [SCENARIO] Suppressed is an explicit human "stop trying this one" and outranks even a
-        // fresher updated_at. 
+        // [SCENARIO] Skipped is an explicit human "stop trying this one" and outranks even a fresher
+        // payload. Two things are pinned. The scheduled import must leave the row untouched - the order
+        // timestamp proves it, since it is always rewritten when a row is touched, so it would now be
+        // carrying the newer value; that half holds simply because the row exists, Skipped or not. The
+        // half that Skipped alone carries is the retry pass refusing to pick the row up as due.
 
         // [GIVEN] An enabled Entria store, an order first seen on 3 February 2024 and a fresher payload dated a day later
         Initialize();
@@ -1402,11 +1435,10 @@ codeunit 85260 "NPR Entria Tests"
         OldUpdatedAt := CreateDateTime(DMY2Date(3, 2, 2024), 100000T);
         NewUpdatedAt := CreateDateTime(DMY2Date(4, 2, 2024), 100000T);
 
-        // [GIVEN] A registry row for that order that a human has explicitly Suppressed
+        // [GIVEN] A registry row for that order that a human has explicitly Skipped
         EntriaJQ.UpsertOrderFailure(_StoreCode, 'ZZ-DOC-SUPRR', 'medusa-suprr', OldUpdatedAt, 'boom', 0, CurrentDateTime() - 60000);
+        _LibraryEntria.SkipOrder(_StoreCode, 'medusa-suprr');
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-suprr');
-        EntriaOrderImpFailure.Suppressed := true;
-        EntriaOrderImpFailure.Modify();
         RetryCountBefore := EntriaOrderImpFailure."Retry Count";
 
         // [GIVEN] A seeded session max and a page carrying that same order with the FRESHER updated_at
@@ -1416,18 +1448,20 @@ codeunit 85260 "NPR Entria Tests"
         // [WHEN] ProcessList runs over that page
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [THEN] The row survives with Suppressed still set and its Retry Count unchanged
-        _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-suprr'), 'The Suppressed row must still exist.');
-        _Assert.IsTrue(EntriaOrderImpFailure.Suppressed, 'Suppressed must remain true - a newer payload must not clear a human''s explicit stop.');
-        _Assert.AreEqual(RetryCountBefore, EntriaOrderImpFailure."Retry Count", 'Retry Count must be unchanged - the list path must not touch a Suppressed row at all.');
+        // [THEN] The row survives still reading Skipped and with its Retry Count unchanged
+        _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-suprr'), 'The Skipped row must still exist.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status, 'Status must remain Skipped - a newer payload must not clear a human''s explicit stop.');
+        _Assert.AreEqual(RetryCountBefore, EntriaOrderImpFailure."Retry Count", 'Retry Count must be unchanged - the list path must not touch a Skipped row at all.');
+        _Assert.AreEqual(OldUpdatedAt, EntriaOrderImpFailure."Order Updated At",
+            'Order Updated At must still be the ORIGINAL payload''s - SetFailureFields writes it unconditionally, so a list path that touched this row would have stamped the fresher timestamp onto it.');
 
         // [THEN] The ID-based retry pass does not re-arm it either
         _Assert.IsFalse(EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, 'medusa-suprr'),
-            'A Suppressed row must not be due for the ID-based retry pass either.');
+            'A Skipped row must not be due for the ID-based retry pass either.');
     end;
 
     [Test]
-    procedure SuppressedRowIsSkippedByTheWholeRetryPass()
+    procedure SkippedRowIsBypassedByTheWholeRetryPass()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
@@ -1435,11 +1469,11 @@ codeunit 85260 "NPR Entria Tests"
         OrderUpdatedAt: DateTime;
         NextRetryAtBefore: DateTime;
     begin
-        // [SCENARIO] Suppressed is checked twice on the way to a retry - as a filter when the due rows
-        // are collected, and once more per row just before it is retried, since a human can suppress a
+        // [SCENARIO] Skipped is checked twice on the way to a retry - as a filter when the due rows
+        // are collected, and once more per row just before it is retried, since a human can Skip a
         // row between the two. ProcessDueRetries is the only reachable seam that runs the whole sequence,
         // so the end-to-end guarantee is pinned here: a row that is due on every other count must come
-        // out of a complete retry pass untouched while it is Suppressed.
+        // out of a complete retry pass untouched while it is Skipped.
 
         // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 8 February 2024
         Initialize();
@@ -1451,12 +1485,11 @@ codeunit 85260 "NPR Entria Tests"
         EntriaJQ.UpsertOrderFailure(_StoreCode, 'ZZ-DOC-SUPRUN', 'medusa-suprun', OrderUpdatedAt, 'boom', 360, CurrentDateTime() - 60000);
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-suprun');
         _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" <= CurrentDateTime(),
-            'Setup: the row must already be due on its Next Retry At, so Suppressed is the only thing holding it back.');
+            'Setup: the row must already be due on its Next Retry At, so Skipped is the only thing holding it back.');
         NextRetryAtBefore := EntriaOrderImpFailure."Next Retry At";
 
-        // [GIVEN] A human has Suppressed that row
-        EntriaOrderImpFailure.Suppressed := true;
-        EntriaOrderImpFailure.Modify();
+        // [GIVEN] A human has Skipped that row
+        _LibraryEntria.SkipOrder(_StoreCode, 'medusa-suprun');
 
         // [WHEN] A full retry pass runs for a cycle whose store-wide list fetch succeeded
         EntriaJQ.ProcessDueRetries(EntriaStore, true);
@@ -1464,10 +1497,10 @@ codeunit 85260 "NPR Entria Tests"
         // [THEN] The row was never retried - retry budget, schedule and the human's stop are all intact
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-suprun');
         _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
-            'A Suppressed row must not be retried - a burnt retry means the pass drove an order a human explicitly stopped towards parking.');
+            'A Skipped row must not be retried - a burnt retry means the pass drove an order a human explicitly stopped towards parking.');
         _Assert.AreEqual(NextRetryAtBefore, EntriaOrderImpFailure."Next Retry At",
-            'A Suppressed row must not be rescheduled either - the retry pass must leave it exactly as the human left it.');
-        _Assert.IsTrue(EntriaOrderImpFailure.Suppressed, 'The retry pass must not clear Suppressed.');
+            'A Skipped row must not be rescheduled either - the retry pass must leave it exactly as the human left it.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status, 'The retry pass must not lift Skipped.');
     end;
 
     [Test]
@@ -1480,12 +1513,12 @@ codeunit 85260 "NPR Entria Tests"
         SentinelRowIsDue: Boolean;
         DueControlRowIsDue: Boolean;
     begin
-        // [SCENARIO] A row that reached parking through the normal route carries BOTH halves of the
-        // parked state at once - Retry Count at MaxRetries() AND the 0DT sentinel in "Next Retry At" -
-        // so no test built on such a row can tell which of the two conditions is doing the work. Each
-        // is pinned on its own here, on rows inserted directly: an exhausted budget alone keeps a row
-        // out of the retry pass even with a perfectly due timestamp, and the 0DT sentinel alone keeps
-        // it out even on a full budget.
+        // [SCENARIO] A row that reached parking through the normal route carries every marker of the
+        // parked state at once - Retry Count at MaxRetries(), the 0DT sentinel in "Next Retry At" AND
+        // Status Error - so no test built on such a row can tell which of the conditions is doing the
+        // work. Each is pinned on its own here, on rows inserted directly: an exhausted budget alone
+        // keeps a row out of the retry pass even with a perfectly due timestamp and a Status that still
+        // says Pending, and the 0DT sentinel alone keeps it out even on a full budget.
 
         // [GIVEN] An enabled Entria store and a due timestamp an hour in the past
         Initialize();
@@ -1494,7 +1527,7 @@ codeunit 85260 "NPR Entria Tests"
         PastDueDT := CurrentDateTime() - (60 * 60 * 1000);
 
         // [GIVEN] A row whose retry budget is exhausted, but whose Next Retry At is a real and long-past timestamp
-        _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-exhausted', EntriaJQ.MaxRetries(), PastDueDT);
+        _LibraryEntria.InsertOrderFailureRowWithStatus(_StoreCode, 'medusa-exhausted', EntriaJQ.MaxRetries(), PastDueDT, Enum::"NPR Entria Order Imp. Status"::Pending);
 
         // [GIVEN] A row on its full retry budget, but carrying the 0DT sentinel
         _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-sentinel', 0, 0DT);
@@ -1507,9 +1540,9 @@ codeunit 85260 "NPR Entria Tests"
         SentinelRowIsDue := EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, 'medusa-sentinel');
         DueControlRowIsDue := EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, 'medusa-duecontrol');
 
-        // [THEN] The exhausted row is not retried, however due its timestamp looks
+        // [THEN] The exhausted row is not retried, however due its timestamp looks and whatever its Status says
         _Assert.IsFalse(ExhaustedRowIsDue,
-            'A row at MaxRetries() must never be retried automatically - it waits for "Mark for Import", or the retry budget stops bounding anything.');
+            'A row at MaxRetries() must never be retried automatically - it waits for "Requeue for Import", or the retry budget stops bounding anything and a row is retried on the strength of its Status label alone.');
 
         // [THEN] The 0DT row is not retried either, however much budget it has left
         _Assert.IsFalse(SentinelRowIsDue,
@@ -1527,13 +1560,13 @@ codeunit 85260 "NPR Entria Tests"
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         PastDueDT: DateTime;
         ControlRowIsDue: Boolean;
-        SuppressedRowIsDue: Boolean;
+        SkippedRowIsDue: Boolean;
         ExhaustedRowIsDue: Boolean;
         SentinelRowIsDue: Boolean;
         FutureRowIsDue: Boolean;
     begin
         // [SCENARIO] IsRetryDue is the row-level re-check ProcessDueRetries runs after CollectDueRetries
-        // has already filtered, so it is the half that stops a row suppressed between the two steps.
+        // has already filtered, so it is the half that stops a row Skipped between the two steps.
         // Asserting it through IsOrderDueForIdBasedRetry cannot pin it - that helper calls both layers,
         // so each masks the other and deleting one condition alone stays green. Each is pinned here.
 
@@ -1544,20 +1577,16 @@ codeunit 85260 "NPR Entria Tests"
 
         // [GIVEN] A row due on every condition, and four rows each failing exactly one of them
         _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-due-all', 0, PastDueDT);
-        _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-due-suppressed', 0, PastDueDT);
-        _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-due-exhausted', EntriaJQ.MaxRetries(), PastDueDT);
+        _LibraryEntria.InsertOrderFailureRowWithStatus(_StoreCode, 'medusa-due-skipped', 0, PastDueDT, Enum::"NPR Entria Order Imp. Status"::Skipped);
+        _LibraryEntria.InsertOrderFailureRowWithStatus(_StoreCode, 'medusa-due-exhausted', EntriaJQ.MaxRetries(), PastDueDT, Enum::"NPR Entria Order Imp. Status"::Pending);
         _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-due-sentinel', 0, 0DT);
         _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-due-future', 0, CurrentDateTime() + (60 * 60 * 1000));
-
-        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-due-suppressed');
-        EntriaOrderImpFailure.Suppressed := true;
-        EntriaOrderImpFailure.Modify();
 
         // [WHEN] The row-level check is asked about each row on its own
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-due-all');
         ControlRowIsDue := EntriaJQ.IsRetryDue(EntriaOrderImpFailure);
-        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-due-suppressed');
-        SuppressedRowIsDue := EntriaJQ.IsRetryDue(EntriaOrderImpFailure);
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-due-skipped');
+        SkippedRowIsDue := EntriaJQ.IsRetryDue(EntriaOrderImpFailure);
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-due-exhausted');
         ExhaustedRowIsDue := EntriaJQ.IsRetryDue(EntriaOrderImpFailure);
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-due-sentinel');
@@ -1569,11 +1598,11 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsTrue(ControlRowIsDue,
             'A row with budget left and a past Next Retry At must be due here - otherwise this check rejects everything and the assertions below prove nothing.');
 
-        // [THEN] Suppressed alone stops it - this is the condition CollectDueRetries cannot cover
-        _Assert.IsFalse(SuppressedRowIsDue,
-            'A row suppressed after CollectDueRetries picked it up must still be stopped here, or a human''s "stop trying this one" is ignored under concurrency.');
+        // [THEN] Skipped alone stops it - this is the condition CollectDueRetries cannot cover
+        _Assert.IsFalse(SkippedRowIsDue,
+            'A row Skipped after CollectDueRetries picked it up must still be stopped here, or a human''s "stop trying this one" is ignored under concurrency.');
 
-        // [THEN] An exhausted budget alone stops it
+        // [THEN] An exhausted budget alone stops it, even while its Status still reads Pending
         _Assert.IsFalse(ExhaustedRowIsDue,
             'A row at MaxRetries() must be stopped by this check too, or the retry budget only bounds the collect step and not the process step.');
 
@@ -1666,7 +1695,6 @@ codeunit 85260 "NPR Entria Tests"
             EntriaOrderImpFailure."Store Code" := _StoreCode;
             EntriaOrderImpFailure."Order Id" := CopyStr(StrSubstNo('medusa-cap-%1', i), 1, MaxStrLen(EntriaOrderImpFailure."Order Id"));
             EntriaOrderImpFailure."Next Retry At" := BaseDT + (i * 1000);
-            EntriaOrderImpFailure.Suppressed := false;
             EntriaOrderImpFailure.Insert();
         end;
 
@@ -1883,15 +1911,17 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure FailuresPageActionsMarkForImportSuppressUnsuppress()
+    [HandlerFunctions('ConfirmHandlerYes,MessageHandler')]
+    procedure FailuresPageActionsRequeueForImportAndSkip()
     var
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
         EntriaOrderImpFailuresPage: TestPage "NPR Entria Order Imp. Failures";
         OrderUpdatedAt: DateTime;
         BeforeInvokeDT: DateTime;
     begin
-        // [SCENARIO] The failures list page's Mark for Import / Suppress / Unsuppress actions must
-        // write through Rec.Modify exactly as documented on the page.
+        // [SCENARIO] The failures list page's two actions - Requeue for Import and Skip - must write through
+        // Rec.Modify exactly as documented on the page. Requeue for Import is deliberately the only way back
+        // from Skipped, so it is exercised here on a row that is both parked AND Skipped.
 
         // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 5 February 2024
         Initialize();
@@ -1901,52 +1931,600 @@ codeunit 85260 "NPR Entria Tests"
         // [GIVEN] Enough failures for that order to park its registry row at MaxRetries()
         _LibraryEntria.ParkOrderAtMaxRetries(_StoreCode, 'ZZ-DOC-PAGEACT', 'medusa-pageact', OrderUpdatedAt);
 
-        // [GIVEN] The row is also Suppressed, so clearing Suppressed is an observable change rather
+        // [GIVEN] The row is also Skipped, so the move back to Pending is an observable change rather
         //         than a value it already carried, and the parked row's Next Retry At is the 0DT sentinel
+        _LibraryEntria.SkipOrder(_StoreCode, 'medusa-pageact');
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pageact');
-        EntriaOrderImpFailure.Suppressed := true;
-        EntriaOrderImpFailure.Modify();
         _Assert.AreEqual(0DT, EntriaOrderImpFailure."Next Retry At", 'Setup: a parked row carries the 0DT sentinel, so any real reschedule is observable.');
 
         // [GIVEN] A timestamp taken just before the invoke, less the few milliseconds a SQL datetime
         //         read-back can lose on its 1/300s grid
         BeforeInvokeDT := CurrentDateTime() - 10;
 
-        // [WHEN] "Mark for Import" is invoked on that row from the failures list page
+        // [WHEN] "Requeue for Import" is invoked on that row from the failures list page
         EntriaOrderImpFailuresPage.OpenEdit();
         EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
-        EntriaOrderImpFailuresPage.MarkForImport.Invoke();
+        EntriaOrderImpFailuresPage.RequeueForImport.Invoke();
         EntriaOrderImpFailuresPage.Close();
 
-        // [THEN] Retry Count is reset to 0, an immediate retry is scheduled and Suppressed is cleared
+        // [THEN] Retry Count is reset to 0, an immediate retry is scheduled and the row reads Pending again
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pageact');
-        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count", 'Mark for Import must reset Retry Count to 0.');
+        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count", 'Requeue for Import must reset Retry Count to 0.');
         _Assert.AreNotEqual(0DT, EntriaOrderImpFailure."Next Retry At",
-            'Mark for Import must write a real Next Retry At - left at the 0DT sentinel the row stays parked and the retry pass never picks it up, so the action would silently do nothing.');
+            'Requeue for Import must write a real Next Retry At - left at the 0DT sentinel the row stays parked and the retry pass never picks it up, so the action would silently do nothing.');
         _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" >= BeforeInvokeDT,
-            'Mark for Import must schedule the retry as of now - an older timestamp means the action wrote something other than the current time.');
-        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" <= CurrentDateTime(), 'Mark for Import must schedule an immediate retry.');
-        _Assert.IsFalse(EntriaOrderImpFailure.Suppressed, 'Mark for Import must clear Suppressed - a row left Suppressed is still excluded from the retry pass.');
+            'Requeue for Import must schedule the retry as of now - an older timestamp means the action wrote something other than the current time.');
+        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" <= CurrentDateTime(), 'Requeue for Import must schedule an immediate retry.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
+            'Requeue for Import must lift both Skipped and Error onto Pending - on any other Status the retry pass still filters the row out and the fresh budget it was just granted is never spent.');
 
-        // [WHEN] "Suppress" is invoked on the same row
+        // [WHEN] "Skip" is invoked on the same row
         EntriaOrderImpFailuresPage.OpenEdit();
         EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
-        EntriaOrderImpFailuresPage.Suppress.Invoke();
+        EntriaOrderImpFailuresPage.SkipOrder.Invoke();
         EntriaOrderImpFailuresPage.Close();
 
-        // [THEN] Suppressed is set to true
+        // [THEN] The row reads Skipped
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pageact');
-        _Assert.IsTrue(EntriaOrderImpFailure.Suppressed, 'Suppress must set Suppressed to true.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status, 'Skip must set Status to Skipped.');
 
-        // [WHEN] "Unsuppress" is invoked on the same row
+        // [THEN] Skip left the retry bookkeeping alone - it stops the order, it does not spend or grant budget
+        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count", 'Skip must not touch Retry Count - a row released later must resume on the budget it had when it was stopped.');
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerNo')]
+    procedure FailuresPageRequeueForImportCanBeCancelled()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        EntriaOrderImpFailuresPage: TestPage "NPR Entria Order Imp. Failures";
+        OrderUpdatedAt: DateTime;
+    begin
+        // [SCENARIO] "Requeue for Import" asks before it acts, and a No must cost nothing: the action grants a
+        // fresh retry budget to whichever row the cursor happens to sit on, so a misclick that went through
+        // silently would put an order back into the import rotation nobody asked to have retried.
+
+        // [GIVEN] An enabled Entria store and an order parked at MaxRetries(), so it reads Error on the 0DT sentinel
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderUpdatedAt := CreateDateTime(DMY2Date(5, 2, 2024), 100000T);
+        _LibraryEntria.ParkOrderAtMaxRetries(_StoreCode, 'ZZ-DOC-CANCEL', 'medusa-cancel', OrderUpdatedAt);
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-cancel');
+
+        // [WHEN] "Requeue for Import" is invoked on that row and the confirmation is answered No
         EntriaOrderImpFailuresPage.OpenEdit();
         EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
-        EntriaOrderImpFailuresPage.Unsuppress.Invoke();
+        EntriaOrderImpFailuresPage.RequeueForImport.Invoke();
         EntriaOrderImpFailuresPage.Close();
 
-        // [THEN] Suppressed is cleared again
-        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pageact');
-        _Assert.IsFalse(EntriaOrderImpFailure.Suppressed, 'Unsuppress must clear Suppressed.');
+        // [THEN] The row is exactly as it was - still parked in Error, on a spent budget and on the 0DT sentinel
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-cancel');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Error, EntriaOrderImpFailure.Status,
+            'A cancelled requeue must leave the Status alone - lifted to Pending on a No, the row is back in the retry rotation and the operator who misclicked has nothing telling them so.');
+        _Assert.AreEqual(EntriaJQ.MaxRetries(), EntriaOrderImpFailure."Retry Count",
+            'A cancelled requeue must leave Retry Count alone - reset on a No, the order is granted a whole fresh budget the operator declined to grant.');
+        _Assert.AreEqual(0DT, EntriaOrderImpFailure."Next Retry At",
+            'A cancelled requeue must leave the 0DT sentinel in place - given a real Next Retry At, the retry pass picks the row up on its next cycle.');
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes,MessageHandler')]
+    procedure FailuresPageRequeueForImportWarnsWhenStoreIsDisabled()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaStore: Record "NPR Entria Store";
+        JobQueueEntry: Record "Job Queue Entry";
+        EntriaOrderImpFailuresPage: TestPage "NPR Entria Order Imp. Failures";
+    begin
+        // [SCENARIO] Requeueing only re-arms the row - the import itself is done by the Entria import job, which
+        // skips a disabled store entirely. Requeued on such a store the row reads Pending and looks under way
+        // while nothing will ever pick it up, so the operator has to be told what is in the way.
+
+        // [GIVEN] An enabled Entria store carrying a Pending registry row
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-storeoff', 1, CurrentDateTime());
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-storeoff');
+
+        // [GIVEN] The store is disabled after the row was registered
+        _LibraryEntria.DisableAllStores();
+        Clear(_LastMessageTxt);
+
+        // [WHEN] "Requeue for Import" is confirmed on that row
+        EntriaOrderImpFailuresPage.OpenEdit();
+        EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
+        EntriaOrderImpFailuresPage.RequeueForImport.Invoke();
+        EntriaOrderImpFailuresPage.Close();
+
+        // [THEN] The requeue still went through - the action does what it says whatever state the store is in
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-storeoff');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
+            'The requeue must go through even on a disabled store - refused instead, an operator has to enable the store before a row can be re-armed at all, which is not what the action promises.');
+
+        // [THEN] The operator was told which store the import will not run for
+        _Assert.IsTrue(StrPos(_LastMessageTxt, _StoreCode) > 0,
+            StrSubstNo('Requeueing on a disabled store must warn and must name the store - unnamed, an operator holding several stores cannot tell which one to go and enable. Message: "%1"', _LastMessageTxt));
+        _Assert.IsTrue(StrPos(_LastMessageTxt, EntriaStore.TableCaption()) > 0,
+            StrSubstNo('The warning must point at the Entria store as the thing to fix. Message: "%1"', _LastMessageTxt));
+
+        // [THEN] It stops at the store and says nothing about the job queue: enabling the store runs
+        //        SetupJobQueues, which brings the import job back on its own, so naming it would send the
+        //        operator after a second thing that is about to fix itself
+        _Assert.IsTrue(StrPos(_LastMessageTxt, JobQueueEntry.TableCaption()) = 0,
+            StrSubstNo('A store that is off must be reported on its own - listing the job queue next to it sends the operator after something enabling the store already restores. Message: "%1"', _LastMessageTxt));
+    end;
+
+    [Test]
+    procedure FailuresPageActionVisibilityFollowsStatus()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaOrderImpFailuresPage: TestPage "NPR Entria Order Imp. Failures";
+        NextRetryAt: DateTime;
+    begin
+        // [SCENARIO] Skip must be offered only where it changes something - on a row that is not already
+        // Skipped. Requeue for Import is the single way out of both Error and Skipped, so unlike Skip it must be
+        // offered on every Status without exception, and a Skipped row is never left with no action at all.
+
+        // [GIVEN] An enabled Entria store and a Pending registry row
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        NextRetryAt := CreateDateTime(DMY2Date(5, 2, 2024), 100000T);
+        _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-pagevis', 1, NextRetryAt);
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pagevis');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status, 'Setup: the row must start out Pending, otherwise the first state is not the one under test.');
+
+        // [WHEN] The page is opened on that row
+        EntriaOrderImpFailuresPage.OpenEdit();
+        EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
+
+        // [THEN] Both actions are offered
+        _Assert.IsTrue(EntriaOrderImpFailuresPage.SkipOrder.Visible(), 'Skip must be visible on a Pending row - hidden, the retrying row cannot be stopped from the list at all.');
+        _Assert.IsTrue(EntriaOrderImpFailuresPage.RequeueForImport.Visible(), 'Requeue for Import must be visible on a Pending row - it is the only way to re-arm a row on demand, so it must never depend on the Status.');
+        EntriaOrderImpFailuresPage.Close();
+
+        // [GIVEN] The same row is at Error - its retry budget spent and no human stop on it
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pagevis');
+        EntriaOrderImpFailure.Status := EntriaOrderImpFailure.Status::Error;
+        EntriaOrderImpFailure.Modify();
+
+        // [WHEN] The page is reopened on it
+        EntriaOrderImpFailuresPage.OpenEdit();
+        EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
+
+        // [THEN] Skip follows Skipped and not "is this row moving", so an Error row is still offered Skip
+        _Assert.IsTrue(EntriaOrderImpFailuresPage.SkipOrder.Visible(), 'Skip must be visible on an Error row - a human must be able to take an exhausted order off the list without first re-arming it.');
+        _Assert.IsTrue(EntriaOrderImpFailuresPage.RequeueForImport.Visible(), 'Requeue for Import must be visible on an Error row - this is the Status it exists for.');
+        EntriaOrderImpFailuresPage.Close();
+
+        // [GIVEN] The same row is Skipped
+        _LibraryEntria.SkipOrder(_StoreCode, 'medusa-pagevis');
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pagevis');
+
+        // [WHEN] The page is reopened on it
+        EntriaOrderImpFailuresPage.OpenEdit();
+        EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
+
+        // [THEN] Skip drops away, and Requeue for Import is what is left to act on the row with
+        _Assert.IsFalse(EntriaOrderImpFailuresPage.SkipOrder.Visible(),
+            'Skip must be hidden on a Skipped row - offered, an operator invokes it on an already Skipped row and reads that as having just stopped a row that is in fact still retrying.');
+        _Assert.IsTrue(EntriaOrderImpFailuresPage.RequeueForImport.Visible(), 'Requeue for Import must be visible on a Skipped row - it is the only action that both lifts the stop and grants a fresh budget.');
+        EntriaOrderImpFailuresPage.Close();
+    end;
+
+    [Test]
+    procedure RequeueForImportFromErrorAndFromSkippedBothArmAFreshBudget()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrderUpdatedAt: DateTime;
+        BeforeInvokeDT: DateTime;
+    begin
+        // [SCENARIO] "Requeue for Import" is the single way out that actually gets the order imported again, and it
+        // must behave identically whichever dead end the row sits in: both Error and Skipped must come out
+        // Pending, on a full budget and due now. The page offers the action on every Status, so a state left
+        // out here is a state where an operator presses it and nothing happens.
+
+        // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 12 March 2024
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderUpdatedAt := CreateDateTime(DMY2Date(12, 3, 2024), 100000T);
+
+        // [GIVEN] One row parked in Error by a spent budget, and one row a human Skipped
+        _LibraryEntria.ParkOrderAtMaxRetries(_StoreCode, 'ZZ-DOC-REARMERR', 'medusa-rearmerr', OrderUpdatedAt);
+        _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-rearmskip', 3, CurrentDateTime() + (60 * 60 * 1000));
+        _LibraryEntria.SkipOrder(_StoreCode, 'medusa-rearmskip');
+
+        // [GIVEN] A timestamp taken just before the action, less the few milliseconds a SQL datetime
+        //         read-back can lose on its 1/300s grid
+        BeforeInvokeDT := CurrentDateTime() - 10;
+
+        // [WHEN] "Requeue for Import" is applied to the Error row
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearmerr');
+        EntriaJQ.MarkOrderForRetry(EntriaOrderImpFailure);
+        EntriaOrderImpFailure.Modify();
+
+        // [THEN] It is Pending on a full budget, scheduled as of now and due for the retry pass
+        AssertOrderWasArmedForImmediateRetry('medusa-rearmerr', BeforeInvokeDT, 'an Error row');
+
+        // [WHEN] The same action is applied to the Skipped row
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearmskip');
+        EntriaJQ.MarkOrderForRetry(EntriaOrderImpFailure);
+        EntriaOrderImpFailure.Modify();
+
+        // [THEN] It comes out in exactly the same state - a human's stop is no harder to lift than a spent budget
+        AssertOrderWasArmedForImmediateRetry('medusa-rearmskip', BeforeInvokeDT, 'a Skipped row');
+    end;
+
+    [Test]
+    procedure SkippedRowSurvivesAFailureLoggedDuringTheRetryWindow()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrderUpdatedAt: DateTime;
+    begin
+        // [SCENARIO] A retry pass that has already collected a row goes on to log its failure through
+        // UpsertOrderFailure, which maintains Status from the retry budget. If a human presses Skip in the
+        // meantime, that write must not talk the row back out of Skipped: the budget-derived Status is applied
+        // only while the row is not Skipped, so the stop survives the failure that lands on top of it. The
+        // row's own bookkeeping must still be kept, or the stop would freeze the budget too and an order
+        // released later would run on retries it had in fact already spent.
+
+        // [GIVEN] An enabled Entria store and an order timestamped 10:00 on 13 March 2024
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderUpdatedAt := CreateDateTime(DMY2Date(13, 3, 2024), 100000T);
+
+        // [GIVEN] A registry row a human has Skipped
+        EntriaJQ.UpsertOrderFailure(_StoreCode, 'ZZ-DOC-SKIPMID', 'medusa-skipmid', OrderUpdatedAt, 'boom', 0, CurrentDateTime() - 60000);
+        _LibraryEntria.SkipOrder(_StoreCode, 'medusa-skipmid');
+
+        // [WHEN] A failure is logged for that order anyway, as a retry already in flight would
+        EntriaJQ.UpsertOrderFailure(_StoreCode, 'ZZ-DOC-SKIPMID', 'medusa-skipmid', OrderUpdatedAt, 'boom again', 0, CurrentDateTime());
+
+        // [THEN] The row is still Skipped, and still not something the retry pass will pick up
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-skipmid');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status,
+            'A failure logged onto a Skipped row must leave it Skipped - deriving Status from the budget here would undo a human''s stop the moment one more failure landed.');
+        _Assert.IsFalse(EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, 'medusa-skipmid'),
+            'The row must still be out of the retry pass - a Status quietly reset to Pending would put it straight back in.');
+
+        // [THEN] The failure itself was still recorded, so the budget keeps counting behind the stop
+        _Assert.AreEqual(1, EntriaOrderImpFailure."Retry Count",
+            'The failure must still be counted on a Skipped row - dropping it would let the order be released later on a budget it had already spent.');
+        _Assert.AreEqual('boom again', EntriaOrderImpFailure."Last Error",
+            'The newest error must still be stored on a Skipped row - it is what a human decides on when releasing it.');
+    end;
+
+    [Test]
+    procedure CueTilesSplitTheRegistryByStatus()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        RetailSalesCue: Record "NPR Retail Sales Cue";
+        PendingBefore: Integer;
+        ErrorBefore: Integer;
+        SkippedBefore: Integer;
+    begin
+        // [SCENARIO] The three role center tiles must count three disjoint sets. Deltas are asserted rather
+        // than absolutes on purpose: the FlowFields carry no store filter, so a registry row left behind under
+        // a store code outside this codeunit's two is counted as well and Initialize() cannot sweep it. What a
+        // delta of exactly 1 per tile still catches is the copy-paste failure three near-identical CalcFormulas
+        // invite - two tiles sharing one Status filter, which moves one delta to 2 and leaves another at 0.
+
+        // [GIVEN] An enabled Entria store and the three tile counts as they stand before anything is seeded
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        // The singleton cue row is read the way the role center pages read it, and initialised in memory if
+        // the test database has none - none of the three CalcFormulas reads a field off the row itself.
+        if not RetailSalesCue.Get() then
+            RetailSalesCue.Init();
+        RetailSalesCue.CalcFields("Entria Order Imports Pending", "Entria Order Imports Error", "Entria Order Imports Skipped");
+        PendingBefore := RetailSalesCue."Entria Order Imports Pending";
+        ErrorBefore := RetailSalesCue."Entria Order Imports Error";
+        SkippedBefore := RetailSalesCue."Entria Order Imports Skipped";
+
+        // [WHEN] Exactly one row of each Status is added for the test store
+        _LibraryEntria.InsertOrderFailureRowWithStatus(_StoreCode, 'medusa-cue-pending', 0, CurrentDateTime(), EntriaOrderImpFailure.Status::Pending);
+        _LibraryEntria.InsertOrderFailureRowWithStatus(_StoreCode, 'medusa-cue-error', 0, 0DT, EntriaOrderImpFailure.Status::Error);
+        _LibraryEntria.InsertOrderFailureRowWithStatus(_StoreCode, 'medusa-cue-skipped', 0, CurrentDateTime(), EntriaOrderImpFailure.Status::Skipped);
+
+        // [THEN] Each tile moved by exactly one, so no two of them are counting the same Status
+        RetailSalesCue.CalcFields("Entria Order Imports Pending", "Entria Order Imports Error", "Entria Order Imports Skipped");
+        _Assert.AreEqual(PendingBefore + 1, RetailSalesCue."Entria Order Imports Pending",
+            'The Pending tile must move by the Pending row alone - counting another Status reports orders as still being worked on when nothing is retrying them.');
+        _Assert.AreEqual(ErrorBefore + 1, RetailSalesCue."Entria Order Imports Error",
+            'The Error tile must move by the Error row alone - this is the tile that summons a human, so a wrong filter either hides the work or invents it.');
+        _Assert.AreEqual(SkippedBefore + 1, RetailSalesCue."Entria Order Imports Skipped",
+            'The Skipped tile must move by the Skipped row alone - orders a human deliberately stopped must not be mixed into the two tiles that ask for attention.');
+    end;
+
+    [Test]
+    procedure UpgradeMapsSuppressedAndExhaustedRowsOntoStatus()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        UPGEcomSalesDocs: Codeunit "NPR UPG Ecom Sales Docs";
+        FutureRetryAt: DateTime;
+    begin
+        // [SCENARIO] The backfill that gives pre-existing registry rows a Status. Status ordinal 0 is Pending,
+        // so without it every parked and every suppressed row would read as Pending and be handed straight
+        // back to the retry pass. The one genuinely ambiguous row is the one that is BOTH suppressed and out
+        // of budget: it must end up Skipped, because a human's explicit stop outranks exhaustion - mapping it
+        // to Error instead would put an order somebody deliberately stopped onto the list of orders to act on.
+        //
+        // This is the only test that still writes the obsoleted Suppressed field, and it cannot avoid it: the
+        // state rows carried before Status existed is exactly what is under test.
+
+        // [GIVEN] An enabled Entria store and a future schedule stamped on a whole second, so it survives
+        //         SQL's 1/300s datetime grid unchanged and the "not touched" assertion below can be exact
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        FutureRetryAt := CreateDateTime(Today() + 1, 100000T);
+
+        // [GIVEN] Four rows as the old code left them - every Suppressed/budget combination, Status untouched
+        InsertLegacyOrderFailureRow('medusa-upg-suppbudget', 1, FutureRetryAt, true);
+        InsertLegacyOrderFailureRow('medusa-upg-suppmax', EntriaJQ.MaxRetries(), 0DT, true);
+        InsertLegacyOrderFailureRow('medusa-upg-max', EntriaJQ.MaxRetries(), 0DT, false);
+        InsertLegacyOrderFailureRow('medusa-upg-budget', 1, FutureRetryAt, false);
+
+        // [WHEN] The backfill runs
+        UPGEcomSalesDocs.MigrateEntriaOrderImpFailureStatus();
+
+        // [THEN] A suppressed row with budget left becomes Skipped
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-upg-suppbudget');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status,
+            'A suppressed row must become Skipped - left Pending it would be retried on the first cycle after the upgrade, against the stop a human had put on it.');
+
+        // [THEN] A row that was BOTH suppressed and out of budget becomes Skipped too - the human wins
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-upg-suppmax');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status,
+            'A suppressed row at MaxRetries() must become Skipped, not Error - a human''s explicit stop outranks exhaustion, so the Skipped mapping must be applied last and win.');
+
+        // [THEN] An exhausted row nobody suppressed becomes Error
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-upg-max');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Error, EntriaOrderImpFailure.Status,
+            'A row at MaxRetries() must become Error - left Pending it sits in the tile that says the job is still working on it while nothing will ever retry it again.');
+
+        // [THEN] An ordinary row with budget left stays Pending
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-upg-budget');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
+            'A row with budget left and no stop on it must stay Pending - moving it would strand an order the retry pass was still working through.');
+
+        // [THEN] The backfill only ever wrote Status - the retry bookkeeping it reads is left exactly as it was
+        _Assert.AreEqual(1, EntriaOrderImpFailure."Retry Count", 'The backfill must not touch Retry Count - rewriting it would either hand out retry budget or spend it.');
+        _Assert.AreEqual(FutureRetryAt, EntriaOrderImpFailure."Next Retry At", 'The backfill must not touch Next Retry At - the schedule the row already had is what the retry pass resumes on.');
+
+        // [WHEN] The backfill runs a second time, as a re-run of the upgrade would
+        UPGEcomSalesDocs.MigrateEntriaOrderImpFailureStatus();
+
+        // [THEN] Nothing moves - the mapping reads only fields it never writes, so it is idempotent
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-upg-suppmax');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status,
+            'A second run must leave the suppressed exhausted row Skipped - a run that re-derived Status from the budget alone would demote it to Error.');
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-upg-budget');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
+            'A second run must leave the untouched row Pending.');
+    end;
+
+    [Test]
+    procedure FresherPayloadReArmsPendingRowAndPersistsIt()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        StaleDT: DateTime;
+        FresherDT: DateTime;
+    begin
+        // [SCENARIO] A merchant edits a failing order in Medusa, so the refetched payload is fresher than the
+        // row's stored timestamp and the order gets its retry budget back. The assertions re-read the row from
+        // the database, because persisting the reset is the whole point of the procedure.
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+
+        // [GIVEN] A due Pending row with four of its ten retries spent, stamped 10:00 on 13 March 2024
+        StaleDT := CreateDateTime(DMY2Date(13, 3, 2024), 100000T);
+        FresherDT := StaleDT + (60 * 1000);
+        SeedRearmRow('medusa-rearm', Enum::"NPR Entria Order Imp. Status"::Pending, StaleDT);
+
+        // [WHEN] The re-arm runs with the fresher payload timestamp
+        EntriaJQ.ReArmOnFresherPayload(_StoreCode, 'medusa-rearm', FresherDT);
+
+        // [THEN] The stored row - not an in-memory copy - carries a fresh budget and the newer timestamp
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearm');
+        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
+            'The re-arm must reset the stored Retry Count to 0 - a write that never reached the database leaves the order spending retries it was just granted back.');
+        _Assert.AreEqual(FresherDT, EntriaOrderImpFailure."Order Updated At",
+            'The re-arm must store the fresher timestamp - left stale, every later payload looks fresher again, the budget resets on every cycle and the order never parks or reaches the Error tile.');
+
+        // [THEN] The row is due for the retry pass again, which is the whole point of re-arming it
+        _Assert.IsTrue(EntriaJQ.IsRetryDue(EntriaOrderImpFailure),
+            'A re-armed row must be due for the retry pass - a re-arm that reset the budget but left the row ineligible would be a silent no-op.');
+    end;
+
+    [Test]
+    procedure ReArmIsBlockedOnEveryNonPendingStatus()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        StaleDT: DateTime;
+        FresherDT: DateTime;
+    begin
+        // [SCENARIO] The re-arm is the one write that can hand an order back to the retry pass, so it must
+        // refuse every row a human or a spent budget has taken out of it, and must not resurrect a row that is
+        // already gone. The Pending control row is asserted alongside; otherwise a guard that rejected
+        // everything would satisfy all the negatives. The Error row carries a synthetic budget of four so that
+        // Status is the only eligibility condition that differs between the three rows.
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+
+        // [GIVEN] Three due rows at four spent retries and the same stale timestamp: Pending, Skipped, Error
+        StaleDT := CreateDateTime(DMY2Date(13, 3, 2024), 100000T);
+        FresherDT := StaleDT + (60 * 1000);
+        SeedRearmRow('medusa-rearm-pending', Enum::"NPR Entria Order Imp. Status"::Pending, StaleDT);
+        SeedRearmRow('medusa-rearm-skipped', Enum::"NPR Entria Order Imp. Status"::Skipped, StaleDT);
+        SeedRearmRow('medusa-rearm-error', Enum::"NPR Entria Order Imp. Status"::Error, StaleDT);
+
+        // [WHEN] The re-arm runs against each of them, and against an order that has no row at all
+        EntriaJQ.ReArmOnFresherPayload(_StoreCode, 'medusa-rearm-pending', FresherDT);
+        EntriaJQ.ReArmOnFresherPayload(_StoreCode, 'medusa-rearm-skipped', FresherDT);
+        EntriaJQ.ReArmOnFresherPayload(_StoreCode, 'medusa-rearm-error', FresherDT);
+        EntriaJQ.ReArmOnFresherPayload(_StoreCode, 'medusa-rearm-gone', FresherDT);
+
+        // [THEN] The Pending control row was re-armed, so the negatives below cannot hold vacuously
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearm-pending');
+        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
+            'The Pending control row must be re-armed here - otherwise the guard rejects every row and the assertions below prove nothing.');
+
+        // [THEN] The Skipped row keeps its budget, its timestamp and its Status, and stays out of the pass
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearm-skipped');
+        _Assert.AreEqual(4, EntriaOrderImpFailure."Retry Count",
+            'A Skipped row must keep its spent budget - re-arming it puts an order a human explicitly stopped back into the retry pass.');
+        _Assert.AreEqual(StaleDT, EntriaOrderImpFailure."Order Updated At",
+            'A Skipped row must keep its stored timestamp - moving it forward discards the baseline the order will be judged against when somebody releases it.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Skipped, EntriaOrderImpFailure.Status,
+            'A Skipped row must still read as Skipped - a re-arm that lifted the Status to Pending would undo a human''s stop while leaving every other field innocent.');
+        _Assert.IsFalse(EntriaJQ.IsRetryDue(EntriaOrderImpFailure),
+            'A Skipped row must stay out of the retry pass after the re-arm was refused.');
+
+        // [THEN] The Error row keeps its budget, its timestamp and its Status, and stays out of the pass
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearm-error');
+        _Assert.AreEqual(4, EntriaOrderImpFailure."Retry Count",
+            'An Error row must keep its spent budget - re-arming it bypasses Retry Import and hands an exhausted order back to the automatic pass.');
+        _Assert.AreEqual(StaleDT, EntriaOrderImpFailure."Order Updated At",
+            'An Error row must keep its stored timestamp - moving it forward discards the baseline the order will be judged against when somebody releases it.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Error, EntriaOrderImpFailure.Status,
+            'An Error row must still read as Error - a re-arm that lifted the Status to Pending would silently return an exhausted order to the retry pass.');
+        _Assert.IsFalse(EntriaJQ.IsRetryDue(EntriaOrderImpFailure),
+            'An Error row must stay out of the retry pass after the re-arm was refused.');
+
+        // [THEN] The order with no row was not resurrected
+        _Assert.IsFalse(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearm-gone'),
+            'The re-arm must not insert a row for an order whose registry entry is gone - a resurrected row would be retried forever for an order that already imported.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockRefetchedSingleOrder')]
+    procedure RetryPassReArmsRowOnFresherRefetchedPayload()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        StaleDT: DateTime;
+    begin
+        // [SCENARIO] When the refetched payload is fresher than the row's stored timestamp, the retry pass
+        // re-arms the row before logging whatever happens next. The refetch is mocked to succeed with a fresher
+        // updated_at and no custom_display_id, so the pass re-arms the row (four spent retries down to none)
+        // and then logs the missing-document failure on top of it, landing on one. Without the re-arm the same
+        // run lands on five, and the stored timestamp must advance too - left stale it makes every later
+        // payload look fresher, so the budget resets on every cycle and the order never parks.
+
+        // [GIVEN] An enabled Entria store carrying an api key, with HttpClient requests allowed - without
+        //         both, the refetch fails inside the request builder and never reaches the mock at all
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryEntria.SetHttpClientRequestsAllowed(true);
+        _LibraryEntria.EnsureStoreAPIKey(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+
+        // [GIVEN] A due Pending row at four spent retries, stamped 10:00 on 13 March 2024
+        StaleDT := CreateDateTime(DMY2Date(13, 3, 2024), 100000T);
+        _MockOrderId := 'medusa-wiring';
+        _MockOrderUpdatedAt := StaleDT + (60 * 1000);
+        SeedRearmRow(_MockOrderId, Enum::"NPR Entria Order Imp. Status"::Pending, StaleDT);
+
+        // [WHEN] The ID-based retry pass runs against the mocked refetch
+        EntriaJQ.ProcessDueRetries(EntriaStore, true);
+
+        // [THEN] The row was re-armed before the new failure was logged on top of it
+        EntriaOrderImpFailure.Get(_StoreCode, _MockOrderId);
+        _Assert.AreEqual(1, EntriaOrderImpFailure."Retry Count",
+            'The pass must re-arm the row before logging the new failure - a Retry Count of 5 means the row was not re-armed and the fresher payload was ignored.');
+
+        // [THEN] The fresher timestamp was carried through to the row, not the stale one it started with
+        _Assert.AreEqual(_MockOrderUpdatedAt, EntriaOrderImpFailure."Order Updated At",
+            'The pass must store the timestamp it just fetched - forwarding the stale one instead leaves every later payload looking fresher, so the budget resets on every cycle and the order never parks.');
+
+        // [THEN] The scenario issued exactly the one refetch it is supposed to
+        _Assert.AreEqual(1, _MockRequestCount,
+            'The scenario must issue exactly one outbound request - a second one means the mock answered something this test does not model.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockRefetchedSingleOrder')]
+    procedure RetryPassSpendsARetryWhenRefetchedPayloadIsUnchanged()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        StaleDT: DateTime;
+    begin
+        // [SCENARIO] The freshness gate in front of the re-arm. An order nobody touched in Medusa comes back
+        // with the timestamp the row already holds, so the retry must be spent rather than handed back: a pass
+        // that re-armed unconditionally would reset the budget on every cycle and the order would never park.
+
+        // [GIVEN] An enabled Entria store carrying an api key, with HttpClient requests allowed
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryEntria.SetHttpClientRequestsAllowed(true);
+        _LibraryEntria.EnsureStoreAPIKey(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+
+        // [GIVEN] A due Pending row at four spent retries, and a refetch that returns that same timestamp
+        StaleDT := CreateDateTime(DMY2Date(13, 3, 2024), 100000T);
+        _MockOrderId := 'medusa-unchanged';
+        _MockOrderUpdatedAt := StaleDT;
+        SeedRearmRow(_MockOrderId, Enum::"NPR Entria Order Imp. Status"::Pending, StaleDT);
+
+        // [WHEN] The ID-based retry pass runs against the unchanged payload
+        EntriaJQ.ProcessDueRetries(EntriaStore, true);
+
+        // [THEN] The retry was spent, not refunded
+        EntriaOrderImpFailure.Get(_StoreCode, _MockOrderId);
+        _Assert.AreEqual(5, EntriaOrderImpFailure."Retry Count",
+            'An unchanged payload must spend the retry - a Retry Count back at 0 or 1 means the re-arm ran without the freshness check and the order can never reach its retry ceiling.');
+    end;
+
+    [HttpClientHandler]
+    procedure MockRefetchedSingleOrder(Request: TestHttpRequestMessage; var Response: TestHttpResponseMessage): Boolean
+    var
+        OrdersArr: JsonArray;
+        OrderTkn: JsonToken;
+        EnvelopeObj: JsonObject;
+        ResponseTxt: Text;
+    begin
+        // Fails closed: only the single-order refetch for the order under test is answered, so a request this
+        // test does not model shows up as a 404 the caller reports rather than as a bogus success.
+        _MockRequestCount += 1;
+        if not Request.Path().Contains(_MockOrderId) then begin
+            Response.HttpStatusCode := 404;
+            Response.ReasonPhrase := 'Not Found';
+            exit(false);
+        end;
+
+        // The order carries no custom_display_id, so the pass fails on the document number after the re-arm has
+        // already run. BuildOrderArrayWithoutDisplayId stamps its CreatedAt argument onto updated_at as well,
+        // which is the value the freshness check compares against.
+        _LibraryEntria.BuildOrderArrayWithoutDisplayId(OrdersArr, _MockOrderId, _MockOrderUpdatedAt, 100);
+        OrdersArr.Get(0, OrderTkn);
+        EnvelopeObj.Add('order', OrderTkn.AsObject());
+        EnvelopeObj.WriteTo(ResponseTxt);
+
+        Response.Content.WriteFrom(ResponseTxt);
+        Response.HttpStatusCode := 200;
+        Response.ReasonPhrase := 'OK';
+        exit(false);
+    end;
+
+    /// <summary>
+    /// Seeds a registry row whose only varying condition is Status: four of the ten retries spent and a
+    /// Next Retry At an hour in the past, so every row these tests seed is due on every other condition.
+    /// </summary>
+    local procedure SeedRearmRow(MedusaOrderId: Text[100]; Status: Enum "NPR Entria Order Imp. Status"; OrderUpdatedAt: DateTime)
+    begin
+        _LibraryEntria.InsertOrderFailureRowWithTimestamp(_StoreCode, MedusaOrderId, 4, CurrentDateTime() - (60 * 60 * 1000), Status, OrderUpdatedAt);
     end;
 
     [Test]
@@ -2005,6 +2583,290 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsFalse(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-dupdispid-a'), 'The first order must not get a registry row - it is treated as already imported.');
         _Assert.IsFalse(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-dupdispid-b'),
             'The second, genuinely different Medusa order is ALSO silently skipped: the batch dedup keys on document no., not Medusa order id, so it too is treated as already imported and gets no registry row and no new document.');
+    end;
+
+    [Test]
+    procedure ListPathRegistryLookupIsScopedToTheStore()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+    begin
+        // [SCENARIO] Before importing a page, the job asks which of these orders have already failed - and it
+        // must ask only about the store it is importing. If that filter were lost, a failure belonging to one
+        // store would make a different store skip its own order: never imported, and not shown as failed either.
+
+        // [GIVEN] An enabled Entria store and an order created at 10:00 on 12 February 2024
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(12, 2, 2024), 100000T);
+
+        // [GIVEN] A SECOND store already holds a registry row for that same Medusa order id
+        _LibraryEntria.InsertOrderFailureRow(_SecondStoreCodeLbl, 'medusa-storescope', 0, CurrentDateTime() + 3600000);
+
+        // [GIVEN] A seeded session max and a page holding that order, which cannot import - amount 100 with no payment lines
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-STORESCOPE', 'medusa-storescope', OrderCreatedAt, OrderCreatedAt, 100);
+
+        // [WHEN] ProcessList runs for the FIRST store
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+
+        // [THEN] This store processed the order and registered its OWN failure
+        _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-storescope'),
+            'The order must be processed for this store: a registry row belonging to ANOTHER store must not hide it, or the order would never be imported and never be logged anywhere visible.');
+
+        // [THEN] The other store's row is left exactly as it was
+        _Assert.IsTrue(EntriaOrderImpFailure.Get(_SecondStoreCodeLbl, 'medusa-storescope'), 'The other store''s registry row must still exist.');
+        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
+            'The other store''s registry row must stay untouched - each store owns its own retry state for its own copy of the order.');
+    end;
+
+    [Test]
+    procedure ListPathExistingDocumentLookupIsScopedToTheStore()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+    begin
+        // [SCENARIO] The job also asks which of these orders it has already imported, and that question must
+        // likewise be limited to the store being imported. If that filter were lost, a document belonging to
+        // one store would make a different store treat its own order as done and skip it.
+
+        // [GIVEN] An enabled Entria store and an order created at 10:00 on 13 February 2024
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(13, 2, 2024), 100000T);
+
+        // [GIVEN] A SECOND store already has an Ecom Sales Header of type Order carrying that document no.
+        _LibraryEntria.CreateEcomOrderHeader(_SecondStoreCodeLbl, 'ZZ-DOC-HDRSCOPE');
+
+        // [GIVEN] A seeded session max and a page holding that order, which cannot import - amount 100 with no payment lines
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-HDRSCOPE', 'medusa-hdrscope', OrderCreatedAt, OrderCreatedAt, 100);
+
+        // [WHEN] ProcessList runs for the FIRST store
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+
+        // [THEN] The order was processed here and its failure registered
+        _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-hdrscope'),
+            'The order must be processed for this store: a document belonging to ANOTHER store that reuses the same External No. must not make it look already imported - it would be dropped with no document, no registry row and nothing to see it by.');
+    end;
+
+    [Test]
+    procedure ListPathExistingDocumentLookupIsScopedToDocumentTypeOrder()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+    begin
+        // [SCENARIO] When the job asks whether an order was already imported, only sales orders answer. A
+        // return document that happens to carry the same external order no. must not make the order itself
+        // look imported and get skipped.
+
+        // [GIVEN] An enabled Entria store and an order created at 10:00 on 14 February 2024
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(14, 2, 2024), 100000T);
+
+        // [GIVEN] This store already has a RETURN ORDER carrying that same External No.
+        _LibraryEntria.CreateEcomDocumentHeader(_StoreCode, 'ZZ-DOC-TYPESCOPE', EcomSalesHeader."Document Type"::"Return Order");
+
+        // [GIVEN] A seeded session max and a page holding that order, which cannot import - amount 100 with no payment lines
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-TYPESCOPE', 'medusa-typescope', OrderCreatedAt, OrderCreatedAt, 100);
+
+        // [WHEN] ProcessList runs over that page
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+
+        // [THEN] The order was processed and its failure registered
+        _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-typescope'),
+            'The order must be processed: a return of the same External No. is a different document type and must not suppress the order import.');
+    end;
+
+    [Test]
+    procedure PagingCursorMovesTheWindowForwardAndOnlyWalksTheOrdinalOnATie()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        WindowStartDT: DateTime;
+        ConsumedMaxDT: DateTime;
+        Offset: Integer;
+    begin
+        // [SCENARIO] The decision the import makes after each page: how far the window moves, and where the
+        // ordinal offset goes with it. An offset only means something against an unchanged filter, so it
+        // must reset the moment the window moves, and it may only keep counting while the window stands
+        // still. Getting either half wrong loses orders silently: an offset that survives a window move
+        // lands past rows nobody read, and one that resets on a page of identical timestamps re-serves the
+        // same rows forever.
+
+        // [WHEN] A page brought orders newer than the window, from a non-zero offset
+        WindowStartDT := CreateDateTime(DMY2Date(3, 3, 2024), 100000T);
+        ConsumedMaxDT := CreateDateTime(DMY2Date(4, 3, 2024), 100000T);
+        Offset := 80;
+        EntriaJQ.AdvancePagingCursor(ConsumedMaxDT, 40, WindowStartDT, Offset);
+
+        // [THEN] The window moves up to what was consumed and the offset starts over
+        _Assert.AreEqual(ConsumedMaxDT, WindowStartDT, 'The window must move up to the highest timestamp consumed so far.');
+        _Assert.AreEqual(0, Offset,
+            'The offset must reset when the window moves - carried across a window change it counts against a result set of a different shape and lands past rows that were never read.');
+
+        // [WHEN] The next page brings nothing above the window - every row shares the window's own timestamp
+        WindowStartDT := CreateDateTime(DMY2Date(4, 3, 2024), 100000T);
+        ConsumedMaxDT := WindowStartDT;
+        Offset := 0;
+        EntriaJQ.AdvancePagingCursor(ConsumedMaxDT, 40, WindowStartDT, Offset);
+
+        // [THEN] The window stands still and the ordinal walks through the tied block instead
+        _Assert.AreEqual(CreateDateTime(DMY2Date(4, 3, 2024), 100000T), WindowStartDT,
+            'On equality the window must stand still: rewriting it with its own value and resetting the offset would serve the same tied rows forever.');
+        _Assert.AreEqual(40, Offset, 'With the window unable to move, the ordinal is what walks through a block of rows sharing one timestamp.');
+
+        // [WHEN] A page somehow reports a maximum BELOW the window - clock skew, or a stale running maximum
+        WindowStartDT := CreateDateTime(DMY2Date(4, 3, 2024), 100000T);
+        ConsumedMaxDT := CreateDateTime(DMY2Date(3, 3, 2024), 100000T);
+        Offset := 40;
+        EntriaJQ.AdvancePagingCursor(ConsumedMaxDT, 40, WindowStartDT, Offset);
+
+        // [THEN] The window is never dragged backwards
+        _Assert.AreEqual(CreateDateTime(DMY2Date(4, 3, 2024), 100000T), WindowStartDT,
+            'The window must never move backwards - a window that retreats re-serves orders already imported and can stop the pass from ever finishing.');
+        _Assert.AreEqual(80, Offset, 'A page that adds nothing above the window advances the ordinal, exactly as the tied case does.');
+    end;
+
+    [Test]
+    procedure ListPathRegistryLookupSpansEveryFilterChunk()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        GeneratedOrderIds: List of [Text];
+        GeneratedDocumentNos: List of [Code[20]];
+        Index: Integer;
+        OrderCount: Integer;
+        OrderIdLength: Integer;
+        NextRetryAtBefore: DateTime;
+        OrderCreatedAt: DateTime;
+        FirstOrderId: Text[100];
+        SeededOrderId: Text[100];
+    begin
+        // [SCENARIO] A page can hold more orders than one database query can ask about at once, so the check
+        // for known failures runs in several passes. Every order already recorded as failed must be
+        // recognised in all of them - missed in a later pass, it is retried out of turn and burns its budget.
+
+        // [GIVEN] An enabled Entria store and enough orders created at 10:00 on 15 February 2024, with ids
+        //         at the Text[100] bound, that the ids cannot fit one filter chunk. The count is DERIVED
+        //         from the cap rather than hardcoded: widening the cap would otherwise collapse this page
+        //         into a single chunk and the test would keep passing while proving nothing about later ones.
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(15, 2, 2024), 100000T);
+        OrderIdLength := 100;
+        OrderCount := (EntriaJQ.MaxFilterLength() div (OrderIdLength + 1)) + 2;
+        _Assert.IsTrue((OrderCount * OrderIdLength) + (OrderCount - 1) > EntriaJQ.MaxFilterLength(),
+            'Setup: the ids of this page must not fit a single filter chunk, or every assertion below about later chunks proves nothing.');
+        _LibraryEntria.BuildOrderPageWithManyOrders(OrdersArr, OrderCount, OrderIdLength, 0, OrderCreatedAt, 100, GeneratedOrderIds, GeneratedDocumentNos);
+        FirstOrderId := CopyStr(GeneratedOrderIds.Get(1), 1, MaxStrLen(FirstOrderId));
+
+        // [GIVEN] A registry row for EVERY order of the page except the first - whichever chunk each id ends
+        //         up in, it is covered - holding its full retry budget and a retry an hour away
+        NextRetryAtBefore := CurrentDateTime() + 3600000;
+        for Index := 2 to GeneratedOrderIds.Count() do
+            _LibraryEntria.InsertOrderFailureRow(_StoreCode, CopyStr(GeneratedOrderIds.Get(Index), 1, MaxStrLen(SeededOrderId)), 0, NextRetryAtBefore);
+
+        // [WHEN] ProcessList runs over that page
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+
+        // [THEN] The page really was worked through - the first order, which has no registry row, could not import and got one
+        _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, FirstOrderId),
+            'The only order of the page without a registry row must have been processed and registered its failure - otherwise nothing at all happened and the chunk assertions below would prove nothing.');
+
+        // [THEN] Every pre-seeded row is untouched, so no filter chunk was dropped
+        for Index := 2 to GeneratedOrderIds.Count() do begin
+            SeededOrderId := CopyStr(GeneratedOrderIds.Get(Index), 1, MaxStrLen(SeededOrderId));
+            _Assert.IsTrue(EntriaOrderImpFailure.Get(_StoreCode, SeededOrderId), StrSubstNo('The pre-seeded registry row of order %1 must still exist.', SeededOrderId));
+            _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
+                StrSubstNo('The registry row of order %1 must be untouched: a lookup that skips a filter chunk re-processes and re-logs the orders in it on EVERY pass, burning the whole backoff schedule.', SeededOrderId));
+            _Assert.AreEqual(NextRetryAtBefore, EntriaOrderImpFailure."Next Retry At",
+                StrSubstNo('The retry of order %1 must not be rescheduled either - re-logging rewrites Next Retry At from the current time and pushes the retry away on every cycle.', SeededOrderId));
+        end;
+    end;
+
+    [Test]
+    procedure ListPathExistingDocumentLookupSpansEveryFilterChunk()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        GeneratedOrderIds: List of [Text];
+        GeneratedDocumentNos: List of [Code[20]];
+        DocumentNo: Code[20];
+        MarkerBefore: DateTime;
+        OrderCreatedAt: DateTime;
+        OrderCount: Integer;
+        DocumentNoLength: Integer;
+        LastOrderId: Text[100];
+    begin
+        // [SCENARIO] The same applies to the "already imported" check: on a page too large for one database
+        // query, a document must be recognised as imported even when it falls in the last pass - missed, the
+        // order is imported a second time.
+
+        // [GIVEN] An enabled Entria store whose marker stands a day before the orders' bc_status_updated_at
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        MarkerBefore := CreateDateTime(DMY2Date(15, 2, 2024), 100000T);
+        OrderCreatedAt := CreateDateTime(DMY2Date(16, 2, 2024), 100000T);
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerBefore);
+
+        // [GIVEN] Enough orders, with document nos. at the Code[20] bound, that the document nos. cannot fit
+        //         one filter chunk - the count derived from the cap, so widening the cap cannot quietly turn
+        //         this back into a single-chunk page that still passes
+        DocumentNoLength := 20;
+        OrderCount := (EntriaJQ.MaxFilterLength() div (DocumentNoLength + 1)) + 2;
+        _Assert.IsTrue((OrderCount * DocumentNoLength) + (OrderCount - 1) > EntriaJQ.MaxFilterLength(),
+            'Setup: the document nos. of this page must not fit a single filter chunk, or the later-chunk assertions prove nothing.');
+        _LibraryEntria.BuildOrderPageWithManyOrders(OrdersArr, OrderCount, 20, DocumentNoLength, OrderCreatedAt, 100, GeneratedOrderIds, GeneratedDocumentNos);
+        LastOrderId := CopyStr(GeneratedOrderIds.Get(GeneratedOrderIds.Count()), 1, MaxStrLen(LastOrderId));
+
+        // [GIVEN] Every one of those document nos. already has an Ecom Sales Header of type Order, so the whole page is a duplicate
+        foreach DocumentNo in GeneratedDocumentNos do
+            _LibraryEntria.CreateEcomOrderHeader(_StoreCode, DocumentNo);
+
+        // [GIVEN] A session max seeded from the stored marker
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _Assert.AreEqual(EntriaJQ.PassWindowStart(MarkerBefore), EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'Setup: the session max must start at the window the pass opens with - the stored marker less the propagation overlap.');
+
+        // [WHEN] ProcessList runs over that page
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+
+        // [THEN] The page really was parsed - the session max advanced to the orders' bc_status_updated_at.
+        //        The marker is advanced before the duplicate and failed-id checks, so this only rules out the
+        //        page never being processed at all; the chunk-lookup evidence is the assertions below.
+        _Assert.AreEqual(OrderCreatedAt, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'The session max must have advanced, which is what proves the page was parsed at all rather than never being processed.');
+
+        // [THEN] The last order, whose document no. only appears in the final chunk, got no registry row
+        _Assert.IsFalse(EntriaOrderImpFailure.Get(_StoreCode, LastOrderId),
+            'The last order must be recognised as already imported: a lookup that stops after the first filter chunk re-processes a genuine duplicate and logs a failure for it.');
+
+        // [THEN] And neither did any other order of the page
+        EntriaOrderImpFailure.Reset();
+        EntriaOrderImpFailure.SetRange("Store Code", _StoreCode);
+        _Assert.AreEqual(0, EntriaOrderImpFailure.Count(), 'No order of an all-duplicate page may be processed, so the failure registry must stay empty for the store.');
     end;
 
     [Test]
@@ -2356,10 +3218,11 @@ codeunit 85260 "NPR Entria Tests"
         EarlierCreatedAt: DateTime;
         LaterCreatedAt: DateTime;
     begin
-        // [SCENARIO] UpdateSessionMaxCreatedAt keeps the MAXIMUM created_at of the page, never the last
-        // one it happened to read. Entria lists by created_at, but the marker must not depend on that
-        // ordering: taking the last order instead rewinds the marker whenever a page ends on an earlier
-        // order, and the store then re-lists the same window every cycle.
+        // [SCENARIO] UpdateSessionMaxBcStatusUpdatedAt keeps the MAXIMUM bc_status_updated_at of the
+        // page, never the last one it happened to read. The list is requested in ascending order, but
+        // the marker must not depend on that ordering holding: taking the last order instead would
+        // rewind the marker whenever a page ends on an earlier order, and the store would then re-list
+        // the same window every cycle.
 
         // [GIVEN] An enabled Entria store and two orders created a day apart
         Initialize();
@@ -2376,8 +3239,8 @@ codeunit 85260 "NPR Entria Tests"
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
         // [THEN] The session max stands at the later order, not at the last one read
-        _Assert.AreEqual(LaterCreatedAt, EntriaJQ.GetSessionMaxCreatedAt(_StoreCode),
-            'The session max must end up at the page''s highest created_at - keeping the last order read instead moves the marker back a day and the store re-lists and re-skips that window on every cycle.');
+        _Assert.AreEqual(LaterCreatedAt, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'The session max must end up at the page''s highest bc_status_updated_at - keeping the last order read instead moves the marker back a day and the store re-lists and re-skips that window on every cycle.');
     end;
 
     [Test]
@@ -2585,6 +3448,218 @@ codeunit 85260 "NPR Entria Tests"
             'The url check must fire before SetupJobQueues - a store whose enabling was refused must not leave a live recurring import job running behind it.');
     end;
 
+    [Test]
+    procedure SuccessfulImportAssignsBucketId()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderTkn: JsonToken;
+        OrderCreatedAt: DateTime;
+        ImportSucceeded: Boolean;
+    begin
+        // [SCENARIO] A successfully imported order must leave the header bucketed: the ecom processing jobs are
+        // bucket-filtered, so an unbucketed document is never picked up and never becomes a sales order.
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+
+        // [GIVEN] A zero-value order that imports successfully
+        OrderCreatedAt := CreateDateTime(DMY2Date(10, 7, 2024), 100000T);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-BUCKET', 'medusa-bucket', OrderCreatedAt, OrderCreatedAt, 0);
+        OrdersArr.Get(0, OrderTkn);
+
+        // [WHEN] ProcessOrder imports it
+        ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, 'ZZ-DOC-BUCKET', 'medusa-bucket', OrderCreatedAt, 0);
+
+        // [THEN] The import succeeds
+        _Assert.IsTrue(ImportSucceeded, 'Setup: the zero-value order must import successfully, otherwise there is no header to assert the Bucket Id on.');
+
+        // [THEN] The imported header carries a Bucket Id
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-BUCKET');
+        _Assert.AreNotEqual(0, EcomSalesHeader."Bucket Id",
+            'A successful import must assign a Bucket Id - the ecom processing jobs filter on it, so an unbucketed document is silently never processed while the import still reports success.');
+    end;
+
+    [Test]
+    procedure ImportMapsPayloadIdentityBillingAndShippingOntoHeader()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        OrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+    begin
+        // [SCENARIO] The payload's identity, billing address, shipping address and shipment method must land on
+        // their own header fields - Sell-to from billing_address, Ship-to from shipping_address, never swapped.
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+
+        // [GIVEN] A zero-value order carrying an email, a billing address, a shipping address whose every value
+        // differs from its billing counterpart, and a shipment method
+        OrderCreatedAt := CreateDateTime(DMY2Date(10, 7, 2024), 110000T);
+        _LibraryEntria.BuildOrderArrayWithAddresses(OrdersArr, 'ZZ-DOC-ADDR', 'medusa-addr', OrderCreatedAt, 0);
+
+        // [WHEN] The order is imported
+        ImportPrebuiltOrder('ZZ-DOC-ADDR', OrdersArr);
+
+        // [THEN] The identity fields come from the payload's own identity properties
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-ADDR');
+        _Assert.AreEqual('medusa-addr', Format(EcomSalesHeader."External Document Id"), 'The payload id must reach External Document Id - it is what the order is matched back to Medusa by.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedEmail(), Format(EcomSalesHeader."Sell-to Email"), 'The payload email must reach Sell-to Email - it is the only address the order confirmation can be sent to.');
+
+        // [THEN] The Sell-to block comes from billing_address
+        _Assert.AreEqual(_LibraryEntria.ExpectedSellToName(), Format(EcomSalesHeader."Sell-to Name"), 'Sell-to Name must be the billing first and last name joined by a single space.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingAddress1(), Format(EcomSalesHeader."Sell-to Address"), 'billing_address.address_1 must reach Sell-to Address.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingAddress2(), Format(EcomSalesHeader."Sell-to Address 2"), 'billing_address.address_2 must reach Sell-to Address 2 - dropped, the invoice is missing the part of the address that identifies the flat or suite.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingPostCode(), Format(EcomSalesHeader."Sell-to Post Code"), 'billing_address.postal_code must reach Sell-to Post Code.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingCity(), Format(EcomSalesHeader."Sell-to City"), 'billing_address.city must reach Sell-to City.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingProvince(), Format(EcomSalesHeader."Sell-to County"), 'billing_address.province must reach Sell-to County - in the countries that require a state or province, an invoice without it is not deliverable.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingCountryCode(), Format(EcomSalesHeader."Sell-to Country Code"), 'billing_address.country_code must reach Sell-to Country Code.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingCompany(), Format(EcomSalesHeader."Sell-to Contact"), 'billing_address.company must reach Sell-to Contact - it is the company the order is billed to on a business purchase.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedBillingPhoneNo(), Format(EcomSalesHeader."Sell-to Phone No."), 'billing_address.phone must reach Sell-to Phone No. - it is the only number the customer can be reached on about the order.');
+
+        // [THEN] The Ship-to block comes from shipping_address
+        _Assert.AreEqual(_LibraryEntria.ExpectedShipToName(), Format(EcomSalesHeader."Ship-to Name"), 'Ship-to Name must be the shipping first and last name joined by a single space.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedShippingAddress1(), Format(EcomSalesHeader."Ship-to Address"), 'shipping_address.address_1 must reach Ship-to Address.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedShippingAddress2(), Format(EcomSalesHeader."Ship-to Address 2"), 'shipping_address.address_2 must reach Ship-to Address 2 - dropped, the parcel is missing the part of the address that identifies the flat or suite.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedShippingPostCode(), Format(EcomSalesHeader."Ship-to Post Code"), 'shipping_address.postal_code must reach Ship-to Post Code.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedShippingCity(), Format(EcomSalesHeader."Ship-to City"), 'shipping_address.city must reach Ship-to City.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedShippingProvince(), Format(EcomSalesHeader."Ship-to County"), 'shipping_address.province must reach Ship-to County - in the countries that require a state or province, a parcel without it is not deliverable.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedShippingCountryCode(), Format(EcomSalesHeader."Ship-to Country Code"), 'shipping_address.country_code must reach Ship-to Country Code.');
+        _Assert.AreEqual(_LibraryEntria.ExpectedShippingCompany(), Format(EcomSalesHeader."Ship-to Contact"), 'shipping_address.company must reach Ship-to Contact - it is who the carrier asks for at the delivery address.');
+
+        // [THEN] The shipment method comes from the first shipping method
+        _Assert.AreEqual(_LibraryEntria.ExpectedShipmentMethodName(), Format(EcomSalesHeader."Shipment Method Code"), 'shipping_methods[0].name must reach Shipment Method Code - without it the order ships by whatever method the customer did not pay for.');
+
+        // [THEN] The two blocks are not the same address: a Sell-to block wrongly read off shipping_address
+        // would satisfy every field-by-field assertion above once both sides were sourced from one address
+        _Assert.AreNotEqual(Format(EcomSalesHeader."Sell-to Address"), Format(EcomSalesHeader."Ship-to Address"),
+            'The Sell-to and Ship-to addresses must stay distinct - reading both off one address invoices or ships the order to the wrong party.');
+        _Assert.AreNotEqual(Format(EcomSalesHeader."Sell-to Name"), Format(EcomSalesHeader."Ship-to Name"),
+            'The Sell-to and Ship-to names must stay distinct - reading both off one address invoices or ships the order to the wrong party.');
+    end;
+
+    [Test]
+    procedure ImportSucceedsWithPartiallyLoadedStoreRecord()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderTkn: JsonToken;
+        OrderCreatedAt: DateTime;
+        ImportSucceeded: Boolean;
+    begin
+        // [SCENARIO] The scheduled import reads only two fields off the store - its code and its location. The
+        // import must work with just those, because relying on any further store setting would fail only when
+        // the job queue runs it, and nowhere else.
+
+        // [GIVEN] An enabled Entria store read with exactly the two fields the job queue loads - Code and
+        //         "Location Code". Widening the import path to read any third store field makes this test
+        //         fail here, instead of only in the job queue where every other test loads a full store.
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.SetLoadFields(Code, "Location Code");
+        EntriaStore.Get(_StoreCode);
+
+        // [GIVEN] A zero-value order that imports successfully
+        OrderCreatedAt := CreateDateTime(DMY2Date(10, 7, 2024), 140000T);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-PARTIAL', 'medusa-partial', OrderCreatedAt, OrderCreatedAt, 0);
+        OrdersArr.Get(0, OrderTkn);
+
+        // [WHEN] It is imported off that partially loaded store record
+        ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, 'ZZ-DOC-PARTIAL', 'medusa-partial', OrderCreatedAt, 0);
+
+        // [THEN] The import succeeds and the document is there
+        _Assert.IsTrue(ImportSucceeded, 'The import must succeed off a store record loaded with only Code and Location Code - it is exactly the record the scheduled pass hands it.');
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-PARTIAL');
+
+        // [THEN] Nothing was written to the failure registry
+        _Assert.IsFalse(EntriaOrderImpFailure.Get(_StoreCode, 'medusa-partial'),
+            'A successful import must leave no registry row - a row here means the partially loaded store record made the import throw and the order was parked for retry.');
+    end;
+
+    [Test]
+    procedure ImportedOrderIsTaxInclusive()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Item: Record Item;
+        ItemObj: JsonObject;
+        NoTaxRates: List of [Decimal];
+    begin
+        // [SCENARIO] An imported order must be tax-inclusive: the web always sends amounts with tax in them.
+
+        // [GIVEN] An enabled Entria store and an item
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryEntria.CreateItem(Item, 100, false);
+
+        // [GIVEN] An order of 100 in the local currency
+        _LibraryEntria.BuildItemLineJson(ItemObj, 'Entria tax-inclusive line', Item."No.", 1, 100, 100, 0, 100, NoTaxRates);
+
+        // [WHEN] The order is imported
+        ImportSingleLineOrder('ZZ-DOC-INCLVAT', 'medusa-inclvat', '', ItemObj, 100, CreateDateTime(DMY2Date(10, 7, 2024), 120000T));
+
+        // [THEN] The header is flagged tax-inclusive
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-INCLVAT');
+        _Assert.IsFalse(EcomSalesHeader."Price Excl. VAT",
+            'An imported Entria order must carry Price Excl. VAT false - flagged excluding VAT, every tax-inclusive amount the web sent is re-read as a net amount and VAT is added on top of an already taxed order.');
+    end;
+
+    [Test]
+    procedure MissingPaymentCollectionsAndMissingPaymentsFailWithDistinctMessages()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        NoCollectionsOrdersArr: JsonArray;
+        NoPaymentsOrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+        MissingCollectionsError: Text;
+        MissingPaymentsError: Text;
+    begin
+        // [SCENARIO] The two payment failure shapes must fail with their own message: "no payment_collections at
+        // all" is an integration fault needing a developer, "a collection carrying no payments" is a timing issue
+        // that fixes itself on retry, and an operator triaging a stuck store has only the message to tell them apart.
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderCreatedAt := CreateDateTime(DMY2Date(10, 7, 2024), 150000T);
+
+        // [GIVEN] One order of 100 carrying no payment_collections property at all, and one whose
+        // payment_collections is present but carries an empty payments array
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(NoCollectionsOrdersArr, 'ZZ-DOC-PCMSG1', 'medusa-pcmsg1', OrderCreatedAt, OrderCreatedAt, 100);
+        _LibraryEntria.BuildOrderArrayWithEmptyPaymentCollections(NoPaymentsOrdersArr, 'ZZ-DOC-PCMSG2', 'medusa-pcmsg2', OrderCreatedAt, OrderCreatedAt, 100);
+
+        // [WHEN] The order carrying no payment_collections is imported
+        asserterror ImportPrebuiltOrder('ZZ-DOC-PCMSG1', NoCollectionsOrdersArr);
+        MissingCollectionsError := GetLastErrorText();
+
+        // [THEN] It fails on the collections being unavailable
+        _Assert.ExpectedError('payment collections are not available yet');
+
+        // [WHEN] The order whose collection carries no payments is imported
+        asserterror ImportPrebuiltOrder('ZZ-DOC-PCMSG2', NoPaymentsOrdersArr);
+        MissingPaymentsError := GetLastErrorText();
+
+        // [THEN] It fails on the payment information being unavailable
+        _Assert.ExpectedError('payment information is not available yet');
+
+        // [THEN] The two failures do not report the same thing
+        _Assert.AreNotEqual(MissingCollectionsError, MissingPaymentsError,
+            'The two payment failure shapes must report differently - one message for both leaves an operator unable to tell an integration fault needing a developer from a benign timing issue that clears on retry.');
+
+        // [THEN] Neither failed import left a document behind
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("Ecommerce Store Code", _StoreCode);
+        EcomSalesHeader.SetFilter("External No.", '%1|%2', 'ZZ-DOC-PCMSG1', 'ZZ-DOC-PCMSG2');
+        _Assert.IsTrue(EcomSalesHeader.IsEmpty(), 'No Ecom Sales Header may survive a failed import - a surviving one would be invoiced with no payment at all.');
+    end;
+
     local procedure FindEcomOrderHeader(var EcomSalesHeader: Record "NPR Ecom Sales Header"; StoreCode: Code[20]; ExternalNo: Code[20])
     begin
         EcomSalesHeader.Reset();
@@ -2631,6 +3706,47 @@ codeunit 85260 "NPR Entria Tests"
         exit(EntriaStore."Entria Url");
     end;
 
+    /// <summary>
+    /// Asserts the whole state "Requeue for Import" has to leave behind, so the Error and the Skipped case are held
+    /// to the same bar - one of them asserted more loosely than the other is how the weaker path stays broken.
+    /// </summary>
+    local procedure AssertOrderWasArmedForImmediateRetry(MedusaOrderId: Text[100]; BeforeInvokeDT: DateTime; RowDescription: Text)
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        EntriaOrderImpFailure.Get(_StoreCode, MedusaOrderId);
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
+            StrSubstNo('"Requeue for Import" on %1 must leave it Pending - on any other Status the retry pass filters it out and the fresh budget is never spent.', RowDescription));
+        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
+            StrSubstNo('"Requeue for Import" on %1 must reset Retry Count to 0 - the budget check is independent of the Status, so a row left at its old count is still barred from the pass.', RowDescription));
+        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" >= BeforeInvokeDT,
+            StrSubstNo('"Requeue for Import" on %1 must schedule the retry as of now - an older timestamp means the action wrote something other than the current time.', RowDescription));
+        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" <= CurrentDateTime(),
+            StrSubstNo('"Requeue for Import" on %1 must schedule an immediate retry, not one in the future.', RowDescription));
+        _Assert.IsTrue(EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, MedusaOrderId),
+            StrSubstNo('"Requeue for Import" on %1 must make it due for the retry pass - anything less and the action silently does nothing.', RowDescription));
+    end;
+
+    /// <summary>
+    /// Inserts a registry row the way the code before the Status field did: Suppressed written explicitly and
+    /// Status left on its default, which is the state the upgrade backfill has to interpret.
+    /// </summary>
+    local procedure InsertLegacyOrderFailureRow(MedusaOrderId: Text[100]; RetryCount: Integer; NextRetryAt: DateTime; Suppressed: Boolean)
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+    begin
+        EntriaOrderImpFailure.Init();
+        EntriaOrderImpFailure."Store Code" := _StoreCode;
+        EntriaOrderImpFailure."Order Id" := MedusaOrderId;
+        EntriaOrderImpFailure."Retry Count" := RetryCount;
+        EntriaOrderImpFailure."Next Retry At" := NextRetryAt;
+#pragma warning disable AL0432
+        EntriaOrderImpFailure.Suppressed := Suppressed;
+#pragma warning restore AL0432
+        EntriaOrderImpFailure.Insert();
+    end;
+
     local procedure FindSingleEcomSalesLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; DocumentEntryNo: BigInteger)
     begin
         EcomSalesLine.Reset();
@@ -2645,27 +3761,61 @@ codeunit 85260 "NPR Entria Tests"
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EntriaStore: Record "NPR Entria Store";
         EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
         // Per test, not once per run: the production code under test commits, so BC's per-test
         // rollback does not undo its writes and leftover state would otherwise flow from one test
         // into the next - a marker a later test committed would silently break an earlier one's
         // assertions depending on declaration order.
-        EntriaOrderImpFailure.SetRange("Store Code", _StoreCodeLbl);
+        // Both store codes are swept: rows a cross-store test committed under the second one would
+        // otherwise flow into a later test the same way.
+        EntriaOrderImpFailure.SetFilter("Store Code", '%1|%2', _StoreCodeLbl, _SecondStoreCodeLbl);
         EntriaOrderImpFailure.DeleteAll();
-        EcomSalesHeader.SetRange("Ecommerce Store Code", _StoreCodeLbl);
+        EcomSalesHeader.SetFilter("Ecommerce Store Code", '%1|%2', _StoreCodeLbl, _SecondStoreCodeLbl);
         EcomSalesHeader.DeleteAll(true);
-        EntriaStoreSyncState.SetRange("Store Code", _StoreCodeLbl);
+        EntriaStoreSyncState.SetFilter("Store Code", '%1|%2', _StoreCodeLbl, _SecondStoreCodeLbl);
         EntriaStoreSyncState.DeleteAll();
+
+        // The integration mgt. codeunit is SingleInstance and caches both the setup and the stores it
+        // resolved by code. A test that switches "Enable Integration" off and fails before restoring it
+        // would otherwise leave that cache behind and turn every later test red for an unrelated reason.
+        EntriaIntegrationMgt.SetRereadSetup();
 
         EntriaStore.SetFilter(Code, 'ZZ-ENT-*');
         if not EntriaStore.IsEmpty() then
             EntriaStore.DeleteAll(true);
+
+        // The api-handler guard is what makes every refetch in this suite fail deterministically, and the one
+        // test that needs a live refetch has to switch it off - through a write ProcessDueRetries then commits.
+        // Swept here rather than restored at the end of that test: the restore would be rolled back with the
+        // test while the committed enable survived it, and it would be skipped entirely by a failed assertion.
+        _LibraryEntria.SetHttpClientRequestsAllowed(false);
+        _LibraryEntria.ClearStoreAPIKey(_StoreCodeLbl);
 
         if not _Initialized then begin
             _Initialized := true;
             _LibraryEntria.EnsureSetupExists();
         end;
         _StoreCode := _StoreCodeLbl;
+    end;
+
+    [ConfirmHandler]
+    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
+    end;
+
+    [ConfirmHandler]
+    procedure ConfirmHandlerNo(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := false;
+    end;
+
+    /// <summary>Keeps the last message a page raised, so a test can assert what the operator was told.</summary>
+    [MessageHandler]
+    procedure MessageHandler(Msg: Text[1024])
+    begin
+        _LastMessageTxt := Msg;
     end;
 
 }

@@ -47,6 +47,14 @@ page 6150928 "NPR Entria Integration Setup"
                 RunObject = page "Item List";
                 RunPageView = where("NPR Entria Product" = const(true));
             }
+            action(OrderImportFailures)
+            {
+                Caption = 'Order Import Failures';
+                ToolTip = 'View the Entria orders that could not be imported, with the last error, how much of the retry budget is left and when the next retry is due.';
+                ApplicationArea = NPRRetail;
+                Image = ErrorLog;
+                RunObject = page "NPR Entria Order Imp. Failures";
+            }
             action(JobQueueEntries)
             {
                 Caption = 'Job Queue Entries';

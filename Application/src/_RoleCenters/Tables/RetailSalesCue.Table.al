@@ -243,6 +243,30 @@
             FieldClass = FlowField;
             CalcFormula = count("NPR Entria Order Imp. Failure" where(Suppressed = const(false)));
             Editable = false;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2027-08-19';
+            ObsoleteReason = 'Counted orders still retrying and orders out of retries as one number. Split into Entria Order Imports Pending, Entria Order Imports Error and Entria Order Imports Skipped.';
+        }
+        field(305; "Entria Order Imports Pending"; Integer)
+        {
+            Caption = 'Pending Entria Order Imports';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Entria Order Imp. Failure" where(Status = const(Pending)));
+            Editable = false;
+        }
+        field(306; "Entria Order Imports Error"; Integer)
+        {
+            Caption = 'Failed Entria Order Imports';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Entria Order Imp. Failure" where(Status = const(Error)));
+            Editable = false;
+        }
+        field(307; "Entria Order Imports Skipped"; Integer)
+        {
+            Caption = 'Skipped Entria Order Imports';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Entria Order Imp. Failure" where(Status = const(Skipped)));
+            Editable = false;
         }
 #endif
     }

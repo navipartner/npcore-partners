@@ -51,12 +51,20 @@ table 6248186 "NPR Entria Order Imp. Failure"
         {
             Caption = 'Suppressed';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2027-08-19';
+            ObsoleteReason = 'Replaced by the Status field, where Skipped carries the same meaning.';
         }
         field(9; "Display No."; Integer)
         {
             Caption = 'Display No.';
             DataClassification = CustomerContent;
             BlankZero = true;
+        }
+        field(10; Status; Enum "NPR Entria Order Imp. Status")
+        {
+            Caption = 'Status';
+            DataClassification = CustomerContent;
         }
     }
 
@@ -66,7 +74,7 @@ table 6248186 "NPR Entria Order Imp. Failure"
         {
             Clustered = true;
         }
-        key(SK1; "Next Retry At")
+        key(SK1; Status, "Next Retry At")
         {
         }
     }

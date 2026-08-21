@@ -207,6 +207,48 @@ codeunit 6150987 "NPR Entria Integration Mgt."
         EntriaOrderImportJQ.SetupJobQueue(MasterSwitch);
     end;
 
+    internal procedure GetOrderImportBlockedReasons(EntriaStoreCode: Code[20]) Reasons: Text
+    var
+        EntriaSetup: Record "NPR Entria Integration Setup";
+        EntriaStore: Record "NPR Entria Store";
+        JobQueueEntry: Record "Job Queue Entry";
+        IntegrationDisabledLbl: Label '%1: %2 is not enabled.', Comment = '%1 = Entria Integration Setup table caption, %2 = Enable Integration field caption';
+        JobQueueNotActiveLbl: Label 'The %1 that imports Entria orders is not active.', Comment = '%1 = Job Queue Entry table caption';
+        StoreMissingLbl: Label '%1 %2 no longer exists.', Comment = '%1 = Entria Store table caption, %2 = Entria store code';
+        StoreDisabledLbl: Label '%1 %2 is not enabled.', Comment = '%1 = Entria Store table caption, %2 = Entria store code';
+        StoreSettingDisabledLbl: Label '%1 is not enabled on %2 %3.', Comment = '%1 = caption of the store setting that is off, %2 = Entria Store table caption, %3 = Entria store code';
+    begin
+        if (not EntriaSetup.Get()) or (not EntriaSetup."Enable Integration") then
+            AddReason(Reasons, StrSubstNo(IntegrationDisabledLbl, EntriaSetup.TableCaption(), EntriaSetup.FieldCaption("Enable Integration")));
+
+        if not EntriaStore.Get(EntriaStoreCode) then
+            AddReason(Reasons, StrSubstNo(StoreMissingLbl, EntriaStore.TableCaption(), EntriaStoreCode))
+        else begin
+            if not EntriaStore.Enabled then
+                AddReason(Reasons, StrSubstNo(StoreDisabledLbl, EntriaStore.TableCaption(), EntriaStoreCode));
+            if not EntriaStore."Sales Order Integration" then
+                AddReason(Reasons, StrSubstNo(StoreSettingDisabledLbl, EntriaStore.FieldCaption("Sales Order Integration"), EntriaStore.TableCaption(), EntriaStoreCode));
+        end;
+
+        // SetupJobQueues creates the import job when the integration or store is enabled.
+        // Only report the job queue state when the setup itself does not block importing.
+        if Reasons <> '' then
+            exit;
+
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Entria Order Import JQ");
+        JobQueueEntry.SetFilter(Status, '%1|%2', JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process");
+        if JobQueueEntry.IsEmpty() then
+            AddReason(Reasons, StrSubstNo(JobQueueNotActiveLbl, JobQueueEntry.TableCaption()));
+    end;
+
+    local procedure AddReason(var Reasons: Text; Reason: Text)
+    begin
+        if Reasons <> '' then
+            Reasons += '\';
+        Reasons += Reason;
+    end;
+
     internal procedure DeleteRelatedRecords(StoreCode: Code[20])
     var
         EntriaStoreSyncState: Record "NPR Entria Store Sync State";

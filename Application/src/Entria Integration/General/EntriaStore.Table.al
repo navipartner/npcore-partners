@@ -22,7 +22,8 @@ table 6059910 "NPR Entria Store"
             begin
                 if Enabled then begin
                     TestField("Entria Url");
-                    CheckImportStartingPointBeforeEnabling();
+                    if "Sales Order Integration" then
+                        CheckImportStartingPointBeforeEnabling();
                 end;
                 if (CurrFieldNo = FieldNo(Enabled)) and (Enabled <> xRec.Enabled) then
                     Modify();
@@ -56,6 +57,8 @@ table 6059910 "NPR Entria Store"
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
+                if IsEnablingSalesOrderIntegration() then
+                    CheckImportStartingPointBeforeEnabling();
                 if (CurrFieldNo = FieldNo("Sales Order Integration")) and ("Sales Order Integration" <> xRec."Sales Order Integration") then begin
                     Modify();
                     EntriaIntegrationMgt.SetupJobQueues();
@@ -217,6 +220,11 @@ table 6059910 "NPR Entria Store"
             DimMgt.SaveDefaultDim(Database::"NPR Entria Store", Code, FieldNumber, ShortcutDimCode);
             Modify();
         end;
+    end;
+
+    local procedure IsEnablingSalesOrderIntegration(): Boolean
+    begin
+        exit("Sales Order Integration" and not xRec."Sales Order Integration" and Enabled);
     end;
 
     var

@@ -18,6 +18,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         UpdateLastOrdersImportedAt();
         FixMonitoredJQEcomSalesDoc();
         FixMonitoredJQEcomSalesRetDoc();
+        SetEntriaOrderImpFailureStatus();
     end;
 
     local procedure UpgradeEcomJQs()
@@ -278,6 +279,34 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
             until EntriaStore.Next() = 0;
 
         SetUpgradeTag();
+    end;
+
+    internal procedure SetEntriaOrderImpFailureStatus()
+    begin
+        UpgradeStep := 'SetEntriaOrderImpFailureStatus';
+        if HasUpgradeTag() then
+            exit;
+
+        MigrateEntriaOrderImpFailureStatus();
+
+        SetUpgradeTag();
+    end;
+
+    internal procedure MigrateEntriaOrderImpFailureStatus()
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaOrderImportJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        if EntriaOrderImpFailure.IsEmpty() then
+            exit;
+
+        EntriaOrderImpFailure.SetFilter("Retry Count", '>=%1', EntriaOrderImportJQ.MaxRetries());
+        EntriaOrderImpFailure.ModifyAll(Status, EntriaOrderImpFailure.Status::Error);
+        EntriaOrderImpFailure.Reset();
+#pragma warning disable AL0432
+        EntriaOrderImpFailure.SetRange(Suppressed, true);
+#pragma warning restore AL0432
+        EntriaOrderImpFailure.ModifyAll(Status, EntriaOrderImpFailure.Status::Skipped);
     end;
 }
 #endif

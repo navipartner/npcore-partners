@@ -45,7 +45,7 @@ page 6150929 "NPR Entria Store Card"
                 field("Last Orders Imported At"; _LastOrdersImportedAt)
                 {
                     Caption = 'Last Orders Imported At';
-                    ToolTip = 'Specifies the timestamp of the last successfully imported order update for this store. Used as the starting point for incremental order sync (created_at). When new orders are processed, this value is updated periodically during the job queue run.';
+                    ToolTip = 'Specifies the timestamp of the last successfully imported order update for this store. Used as the starting point for incremental order sync (bc_status_updated_at). When new orders are processed, this value is updated periodically during the job queue run.';
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
