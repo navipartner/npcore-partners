@@ -28,6 +28,23 @@ page 6150928 "NPR Entria Integration Setup"
 
     actions
     {
+        area(processing)
+        {
+            action(ConfigureEntriaOrderImportJobQueue)
+            {
+                Caption = 'Configure Entria Order Import Job Queue';
+                ApplicationArea = NPRRetail;
+                Image = Add;
+                ToolTip = 'Create the job queue entry that imports sales orders from Entria, if it is missing, and register it as a monitored job, so that the job queue refresher recreates it if it is deleted. Recreation only happens while the job queue refresher itself is enabled. If the Entria sales order integration is switched off, any existing job queue entry for it is removed instead.';
+
+                trigger OnAction()
+                var
+                    EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+                begin
+                    EntriaIntegrationMgt.SetupJobQueuesWithConfirmation();
+                end;
+            }
+        }
         area(navigation)
         {
             action(Stores)
@@ -60,7 +77,7 @@ page 6150928 "NPR Entria Integration Setup"
                 Caption = 'Job Queue Entries';
                 ApplicationArea = NPRRetail;
                 Image = JobListSetup;
-                ToolTip = 'View the job queue entries for Entria order import and processing.';
+                ToolTip = 'View the Entria job queue entries.';
                 trigger OnAction()
                 var
                     JobQueueEntry: Record "Job Queue Entry";

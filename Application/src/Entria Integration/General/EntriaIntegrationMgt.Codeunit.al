@@ -62,18 +62,60 @@ codeunit 6150987 "NPR Entria Integration Mgt."
 
     internal procedure HasEnabledSalesOrderIntegrationStore(): Boolean
     var
-        EntriaStore: Record "NPR Entria Store";
+        NoExclusions: List of [Code[20]];
     begin
-        if ReadySetup() then begin
-            EntriaStore.SetLoadFields(Enabled, "Sales Order Integration");
-            EntriaStore.SetRange(Enabled, true);
-            if EntriaStore.FindSet() then
-                repeat
-                    if EntriaStore."Sales Order Integration" then
-                        exit(true);
-                until EntriaStore.Next() = 0;
-        end;
-        exit(false);
+        exit(HasEnabledSalesOrderIntegrationStore(NoExclusions));
+    end;
+
+    /// <summary>
+    /// Tells whether any enabled Entria store imports sales orders - "Enable Integration" on the Entria setup,
+    /// plus at least one store with both Enabled and "Sales Order Integration" ticked - optionally ignoring some
+    /// of them. Comments in this module call that condition the master switch: it decides whether the order
+    /// import job queue entry exists at all.
+    /// </summary>
+    /// <param name="ExcludedStoreCodes">
+    /// Stores to leave out of the scan; empty to consider all of them. Needed because the store's OnDelete runs
+    /// before the row is removed, so a store being deleted would otherwise still count towards the master switch.
+    /// </param>
+    internal procedure HasEnabledSalesOrderIntegrationStore(ExcludedStoreCodes: List of [Code[20]]): Boolean
+    var
+        EntriaStore: Record "NPR Entria Store";
+        ExclusionFilter: Text;
+    begin
+        if not ReadySetup() then
+            exit(false);
+
+        ExclusionFilter := ExcludedStoresFilter(ExcludedStoreCodes);
+        EntriaStore.SetRange(Enabled, true);
+        EntriaStore.SetRange("Sales Order Integration", true);
+        if ExclusionFilter <> '' then
+            EntriaStore.SetFilter(SystemId, ExclusionFilter);
+        exit(not EntriaStore.IsEmpty());
+    end;
+
+    /// <summary>
+    /// Builds a "none of these" filter expression over SystemId for the given store codes.
+    /// </summary>
+    /// <remarks>
+    /// Over SystemId, not Code: measured on BC 28.2 that '*' and '?' in a substituted value are filter wildcards
+    /// even inside single quotes (quoting covers only '&', '(', ')', '=', '|'), so a filter over the admin-typed
+    /// Code excludes 'NORTHEAST' along with 'NORTH*' and tears the import job down. A GUID cannot carry syntax.
+    /// </remarks>
+    local procedure ExcludedStoresFilter(ExcludedStoreCodes: List of [Code[20]]) FilterExpression: Text
+    var
+        EntriaStore: Record "NPR Entria Store";
+        StoreCode: Code[20];
+        NotEqualToLbl: Label '<>%1', Locked = true;
+        AndLbl: Label '&', Locked = true;
+    begin
+        //Code is the only ordinary field needed here; SystemId travels with every partial record.
+        EntriaStore.SetLoadFields(Code);
+        foreach StoreCode in ExcludedStoreCodes do
+            if EntriaStore.Get(StoreCode) then begin
+                if FilterExpression <> '' then
+                    FilterExpression += AndLbl;
+                FilterExpression += StrSubstNo(NotEqualToLbl, EntriaStore.SystemId);
+            end;
     end;
 
     local procedure ReadySetup(): Boolean
@@ -205,6 +247,70 @@ codeunit 6150987 "NPR Entria Integration Mgt."
         SetRereadSetup();
         MasterSwitch := HasEnabledSalesOrderIntegrationStore();
         EntriaOrderImportJQ.SetupJobQueue(MasterSwitch);
+    end;
+
+    internal procedure SetupJobQueuesOnStoreDeletion(DeletedStoreCode: Code[20])
+    var
+        EntriaOrderImportJQ: Codeunit "NPR Entria Order Import JQ";
+        ExcludedStoreCodes: List of [Code[20]];
+    begin
+        //Called from the store's OnDelete trigger, where the row being deleted is still readable, so the master
+        //switch has to be evaluated as if the store were already gone. Without this the job survives deletion of
+        //the last store importing sales orders, and - now that it is monitored - the refresher keeps it alive with
+        //no store left to import from. Note that such a job does NOT fail fast: CheckIsEnabled() only errors when
+        //the integration is off or no store is Enabled at all - it never consults "Sales Order Integration" - so a
+        //leftover job passes its own gate rather than erroring out.
+        ExcludedStoreCodes.Add(DeletedStoreCode);
+        SetRereadSetup();
+        EntriaOrderImportJQ.SetupJobQueue(HasEnabledSalesOrderIntegrationStore(ExcludedStoreCodes));
+    end;
+
+    internal procedure SetupJobQueuesWithConfirmation()
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        EntriaOrderImportJQ: Codeunit "NPR Entria Order Import JQ";
+        ConfigureJobQueuesQst: Label 'This function will create the job queue entry that imports sales orders from Entria, if it is missing, and register it as a monitored job, so that the job queue refresher recreates it if it is deleted. Recreation only happens while the job queue refresher itself is enabled.\\If the Entria sales order integration is switched off, any existing job queue entry for it is removed instead.\\Do you want to continue?';
+        JobQueueConfiguredMsg: Label 'The "%1" job queue entry has been configured and registered as a monitored job.', Comment = '%1 - job queue entry description';
+        IntegrationDisabledMsg: Label 'The Entria integration is switched off, so no job queue entry was created, and any existing one has been removed. Enable "%1" on this page and run this action again.', Comment = '%1 - the "Enable Integration" field caption';
+        NoJobQueueCreatedMsg: Label 'No Entria store has the sales order integration enabled, so no job queue entry was created, and any existing one has been removed. Please open the "Entria Store" page and enable the integration for at least one store.';
+        JobQueueNotReadyMsg: Label 'The Entria sales order integration is enabled, but the "%1" job queue entry is not ready to run, so no sales orders will be imported yet. Please open the "Job Queue Entries" page and set the status of the entry to Ready.', Comment = '%1 - job queue entry description';
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(ConfigureJobQueuesQst, true) then
+            exit;
+
+        //Routed through SetupJobQueues() rather than SetupJobQueue(true) on purpose, so the master switch decides:
+        //creating the job while the integration is off would produce an entry that fails on its first run.
+        SetupJobQueues();
+
+        if not GuiAllowed() then
+            exit;
+
+        //Reported after the work rather than disclosed in the question above, because the no-store case is not a
+        //no-op - it is the branch that also cleans up an orphaned monitored row - and because the precondition
+        //may live on another page, so the user needs to be told where to go rather than warned in the abstract.
+        //
+        //Read back from the entry, never from the master switch: the switch says what was asked for, not what runs.
+        if EntriaOrderImportJQ.IsJobQueueReadyToRun() then begin
+            Message(JobQueueConfiguredMsg, EntriaOrderImportJQ.GetJQDescription());
+            exit;
+        end;
+
+        //The two "nothing was created" causes are reported separately, the way CheckIsEnabled() already separates
+        //them: HasEnabledSalesOrderIntegrationStore() is false both when the master switch is off and when no
+        //enabled store imports sales orders, and those need opposite instructions - the master switch is the field
+        //on this very page, the store flag lives on the Entria Store page. Reporting the store message for a
+        //switched-off integration sends the admin to enable something that is already enabled.
+        if not ReadySetup() then begin
+            Message(IntegrationDisabledMsg, _EntriaSetup.FieldCaption("Enable Integration"));
+            exit;
+        end;
+
+        if not HasEnabledSalesOrderIntegrationStore() then begin
+            Message(NoJobQueueCreatedMsg);
+            exit;
+        end;
+
+        Message(JobQueueNotReadyMsg, EntriaOrderImportJQ.GetJQDescription());
     end;
 
     internal procedure GetOrderImportBlockedReasons(EntriaStoreCode: Code[20]) Reasons: Text

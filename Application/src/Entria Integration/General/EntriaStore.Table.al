@@ -140,6 +140,7 @@ table 6059910 "NPR Entria Store"
         DeleteAPIKey();
         DimMgt.DeleteDefaultDim(Database::"NPR Entria Store", Code);
         EntriaIntegrationMgt.DeleteRelatedRecords(Rec.Code);
+        EntriaIntegrationMgt.SetupJobQueuesOnStoreDeletion(Rec.Code);
     end;
 
     [NonDebuggable]

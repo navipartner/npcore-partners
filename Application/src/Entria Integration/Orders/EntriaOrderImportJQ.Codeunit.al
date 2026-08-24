@@ -887,28 +887,107 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        GetOrdersFromEntriaLbl: Label 'Get Sales Orders from Entria';
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        if Enable then begin
-            JobQueueMgt.SetJobTimeout(7, 0);
-            JobQueueMgt.SetProtected(true);
-            JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
-            if JobQueueMgt.InitRecurringJobQueueEntry(
-                JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(),
-                '', GetOrdersFromEntriaLbl,
-                CreateDateTime(Today(), 070000T), 1,
-                '', JobQueueEntry)
-            then
-                JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-        end else
-            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
+        if not Enable then begin
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, GetCodeunitId());
+            RemoveOrphanedMonitoredJQEntries();
+            exit;
+        end;
+
+        //Purge before creating, never after: if the registration below is ever reached with a blank job queue
+        //entry, a purge running afterwards would judge the row it had just created to be orphaned and delete it.
+        RemoveOrphanedMonitoredJQEntries();
+
+        JobQueueMgt.SetJobTimeout(7, 0);
+        JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit, GetCodeunitId(),
+            '', GetJQDescription(),
+            CreateDateTime(Today(), 070000T), 1,
+            '', JobQueueEntry)
+        then begin
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            if not IsNullGuid(JobQueueEntry.ID) then
+                MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(false, true, JobQueueEntry);
+        end;
     end;
 
-    local procedure CurrCodeunitId(): Integer
+    /// <summary>
+    /// Tells whether the order import job queue entry exists and is in a status that gets picked up and run.
+    /// </summary>
+    /// <remarks>
+    /// A query rather than a value returned by SetupJobQueue: a manually held entry, or one created by a session
+    /// that may not schedule tasks, is registered and monitored while importing nothing, so callers reporting to
+    /// a user must ask the entry rather than the master switch.
+    /// </remarks>
+    internal procedure IsJobQueueReadyToRun(): Boolean
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", GetCodeunitId());
+        JobQueueEntry.SetFilter(Status, '%1|%2', JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process");
+        exit(not JobQueueEntry.IsEmpty());
+    end;
+
+    /// <summary>
+    /// Deletes monitored job queue entries for this codeunit whose related job queue entry no longer exists.
+    /// Deleting an entry removes only its "NPR Managed By App Job Queue" row, and RemoveMonitoredJobQueueEntry()
+    /// can only match on the job queue entry ID, so such a row is reachable by object identity alone - and nothing
+    /// cleans it up automatically. Left behind it fails the refresher on every cycle with "Related job queue entry
+    /// could not be found", stamped on the row as Last Refresh Status = Error.
+    /// </summary>
+    local procedure RemoveOrphanedMonitoredJQEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+    begin
+        MonitoredJQEntry.SetCurrentKey("Object ID to Run", "Object Type to Run");
+        MonitoredJQEntry.SetRange("Object ID to Run", GetCodeunitId());
+        MonitoredJQEntry.SetRange("Object Type to Run", MonitoredJQEntry."Object Type to Run"::Codeunit);
+        if not MonitoredJQEntry.FindSet(true) then
+            exit;
+        repeat
+            if not JobQueueEntry.Get(MonitoredJQEntry."Job Queue Entry ID") then
+                MonitoredJQEntry.Delete(true);
+        until MonitoredJQEntry.Next() = 0;
+    end;
+
+    internal procedure GetCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR Entria Order Import JQ");
     end;
 
+    internal procedure GetJQDescription(): Text
+    var
+        GetOrdersFromEntriaLbl: Label 'Get Sales Orders from Entria';
+    begin
+        exit(GetOrdersFromEntriaLbl);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnBeforeValidateCreateMissingCustomJQs, '', false, false)]
+    local procedure SkipValidateCreateMissingCustomJQs(JobQueueEntry: Record "Job Queue Entry"; var SkipValidation: Boolean)
+    begin
+        if JobQueueEntry."Object Type to Run" <> JobQueueEntry."Object Type to Run"::Codeunit then
+            exit;
+        if JobQueueEntry."Object ID to Run" <> GetCodeunitId() then
+            exit;
+
+        //Without this the job queue refresher cannot recreate a deleted entry at all: the fallback it would
+        //otherwise use consults OnRefreshserCheckIfCreateMissingCustomJobs, which nothing subscribes to, so a
+        //monitored row whose job queue entry is missing just reports an error on every cycle.
+        //
+        //Unlike the ecommerce jobs that also subscribe to this event, the Entria order import job has a master
+        //switch, so the opt-in is gated. Recreating it while the sales order integration is switched off produces
+        //a job queue entry with nothing to import. It does not fail fast either: CheckIsEnabled() errors only when
+        //the integration is off or no store is Enabled at all - it never consults "Sales Order Integration" - so
+        //with an enabled store the recreated job passes its own gate rather than erroring out.
+        //SetRereadSetup() is needed because the setup is cached on a single instance codeunit for the session.
+        _EntriaIntegrationMgt.SetRereadSetup();
+        if _EntriaIntegrationMgt.HasEnabledSalesOrderIntegrationStore() then
+            SkipValidation := true;
+    end;
     var
         _EntriaAPIHandler: Codeunit "NPR Entria API Handler";
         _EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";

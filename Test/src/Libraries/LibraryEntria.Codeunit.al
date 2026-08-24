@@ -1,17 +1,81 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 codeunit 85379 "NPR Library - Entria"
 {
-    // Test fixtures for the Entria order import: builds the Medusa order payloads the import path
-    // reads (list page arrays in their various payment shapes) and seeds the minimal Entria setup
-    // and store records the job needs. Kept out of the test codeunit so several test codeunits can
-    // share the same payload shapes.
+    // Test fixtures for the Entria integration. Three groups live here: the Medusa order payloads the
+    // import path reads (list page arrays in their various payment shapes), the minimal Entria setup and
+    // store records the job needs, and the order import job queue fixture together with the job queue
+    // hold subscriber that fixture depends on. Kept out of the test codeunit so several test
+    // codeunits can share the same payload shapes.
+    //
+    // EventSubscriberInstance = Manual: the hold subscriber must be inert unless a test explicitly binds it.
+    // Callers are expected to bracket each call into production with BindSubscription/UnbindSubscription. The
+    // helper procedures are ordinary calls and need no binding.
     //
     // The Entria objects only exist from BC23 up, hence the version guard on the whole codeunit.
+
+    EventSubscriberInstance = Manual;
 
     var
         _Assert: Codeunit Assert;
         _LibraryInventory: Codeunit "Library - Inventory";
         _LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+
+    #region Job queue hold subscriber
+
+    // Guard rail keeping the platform scheduler out of tests that drive the production setup path.
+    //
+    // Production SetupJobQueue calls StartJobQueueEntry, and that chain ends in the platform scheduler:
+    //   StartJobQueueEntry -> ActivateJobQueueEntry -> JobQueueEntry.Restart()
+    //     -> base app SetStatusValue(Ready) -> EnqueueTask()
+    //     -> Codeunit.Run(Codeunit::"Job Queue - Enqueue") -> JobQueueEntry.ScheduleTask()
+    //     -> TaskScheduler.CreateTask(Codeunit::"Job Queue Dispatcher", ...)
+    //
+    // From a test that is two separate problems:
+    //   1) TaskScheduler.CreateTask hands the Entria order import codeunit to the platform. Its OnRun loops for
+    //      up to six hours (repeat ... Sleep(1000) until DurationLimitReached) and issues outbound HTTP calls for
+    //      every enabled Entria store. On CI tenants where the job queue scheduler is active this is a live risk.
+    //   2) "Job Queue - Enqueue" declares TableNo, and it is invoked via Codeunit.Run *after*
+    //      InitRecurringJobQueueEntry has already inserted the job queue entry in this same transaction.
+    //      AL forbids that from a test without a preceding Commit() - and Commit() is exactly what would turn
+    //      problem 1 from theoretical into real: TaskScheduler.CreateTask is transactional, and with the only
+    //      rollback at the codeunit boundary a pending task outlives every later test in the run, so the first
+    //      Commit() any of them issues hands it to the scheduler.
+    //
+    // JobQueueMgt.ActivateJobQueueEntry exits BEFORE Restart() when the entry is On Hold and
+    // "NPR Manually Set On Hold" is set, and InitRecurringJobQueueEntry always leaves a fresh or updated entry
+    // On Hold. Stamping the flag on the way in therefore skips activation altogether: no Codeunit.Run and no
+    // platform task, so the job queue setup path itself never forces a Commit().
+    //
+    // Narrowed to the Entria order import codeunit on purpose. Callers bracket each production call with
+    // BindSubscription/UnbindSubscription, but an error inside that call skips the unbind, so a leaked binding
+    // must be incapable of changing the behaviour of any other test suite running in the same session.
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnBeforeInsertRecurringJobQueueEntry, '', false, false)]
+    local procedure HoldNewEntriaJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        SetManualHold(JobQueueEntry);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnBeforeModifyUpdatedJobQueueEntry, '', false, false)]
+    local procedure HoldUpdatedEntriaJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        // The update path (JQEntryExists -> UpdateJobQueueEntry) needs the same treatment as the insert path,
+        // otherwise an existing entry updated in place would be activated.
+        SetManualHold(JobQueueEntry);
+    end;
+
+    local procedure SetManualHold(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        EntriaOrderImportJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        if JobQueueEntry."Object Type to Run" <> JobQueueEntry."Object Type to Run"::Codeunit then
+            exit;
+        if JobQueueEntry."Object ID to Run" <> EntriaOrderImportJQ.GetCodeunitId() then
+            exit;
+        JobQueueEntry."NPR Manually Set On Hold" := true;
+    end;
+
+    #endregion
 
     #region Medusa order payload fixtures
 
@@ -653,35 +717,38 @@ codeunit 85379 "NPR Library - Entria"
 
     #region Entria setup fixtures
 
+    /// <summary>Ensures the integration setup record exists and leaves the integration switched on.</summary>
     procedure EnsureSetupExists()
+    begin
+        SetEnableIntegration(true);
+    end;
+
+    /// <summary>
+    /// Flips the integration-level switch by direct assignment, creating the setup record if the tenant has
+    /// none. Direct assignment rather than Validate because the two are equivalent here: the whole
+    /// "Enable Integration" OnValidate body sits behind CurrFieldNo = FieldNo("Enable Integration"), and
+    /// CurrFieldNo is 0 for a code-driven Validate, so the trigger never runs from a test either way.
+    /// </summary>
+    procedure SetEnableIntegration(EnableIntegration: Boolean)
     var
         EntriaSetup: Record "NPR Entria Integration Setup";
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
         if not EntriaSetup.Get() then begin
             EntriaSetup.Init();
             EntriaSetup.Insert();
         end;
-        EntriaSetup."Enable Integration" := true;
-        EntriaSetup.Modify();
-    end;
-
-    /// <summary>
-    /// Flips the integration-level switch by direct assignment. Not Validate: the "Enable Integration"
-    /// OnValidate calls SetupJobQueues(), which would create real job queue entries in the test database.
-    /// </summary>
-    procedure SetEnableIntegration(EnableIntegration: Boolean)
-    var
-        EntriaSetup: Record "NPR Entria Integration Setup";
-    begin
-        EntriaSetup.Get();
         EntriaSetup."Enable Integration" := EnableIntegration;
         EntriaSetup.Modify();
+
+        EntriaIntegrationMgt.SetRereadSetup();
     end;
 
     /// <summary>Ensures the integration setup and the given store exist, and leaves the store Enabled.</summary>
     procedure EnableEntriaStore(StoreCode: Code[20])
     var
         EntriaStore: Record "NPR Entria Store";
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
         EnsureSetupExists();
         if not EntriaStore.Get(StoreCode) then begin
@@ -693,6 +760,36 @@ codeunit 85379 "NPR Library - Entria"
         EntriaStore.Enabled := true;
         EntriaStore."Sales Order Integration" := true;
         EntriaStore.Modify();
+
+        EntriaIntegrationMgt.SetRereadSetup();
+    end;
+
+    /// <summary>
+    /// Creates the given store if it is missing and sets exactly the two flags that decide the sales order
+    /// integration master switch, so a caller can express any of its four states. Direct assignment is needed
+    /// here, unlike on the setup record: EntriaStore.Enabled's OnValidate calls SetupJobQueues() unconditionally,
+    /// outside any CurrFieldNo guard, so validating it would run the production job setup path outside the
+    /// BindSubscription bracket that keeps the platform scheduler out.
+    /// </summary>
+    procedure SetStore(StoreCode: Code[20]; StoreEnabled: Boolean; SalesOrderIntegration: Boolean)
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+    begin
+        if not EntriaStore.Get(StoreCode) then begin
+            EntriaStore.Init();
+            EntriaStore.Code := StoreCode;
+            EntriaStore.Insert();
+        end;
+        //A reserved-TLD URL and no API key at all, on purpose: if the importer ever did get scheduled despite
+        //the hold subscriber, GetAPIKey() fails on the null token before a socket is opened, so a mistake here
+        //cannot reach a live Entria backend.
+        EntriaStore."Entria Url" := 'https://entria.invalid';
+        EntriaStore.Enabled := StoreEnabled;
+        EntriaStore."Sales Order Integration" := SalesOrderIntegration;
+        EntriaStore.Modify();
+
+        EntriaIntegrationMgt.SetRereadSetup();
     end;
 
     /// <summary>
@@ -700,23 +797,125 @@ codeunit 85379 "NPR Library - Entria"
     /// import starting point - the state the Enabled OnValidate path is exercised from.
     /// </summary>
     procedure CreateEntriaStoreWithUrl(var EntriaStore: Record "NPR Entria Store"; StoreCode: Code[20])
+    var
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
         EntriaStore.Init();
         EntriaStore.Code := StoreCode;
         EntriaStore."Entria Url" := 'https://entria.test';
         EntriaStore.Insert();
+
+        EntriaIntegrationMgt.SetRereadSetup();
     end;
 
     /// <summary>Clears Enabled on every Entria store by direct assignment, so no OnValidate side effect runs.</summary>
     procedure DisableAllStores()
     var
         EntriaStore: Record "NPR Entria Store";
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
         if EntriaStore.FindSet() then
             repeat
                 EntriaStore.Enabled := false;
                 EntriaStore.Modify();
             until EntriaStore.Next() = 0;
+
+        EntriaIntegrationMgt.SetRereadSetup();
+    end;
+
+    /// <summary>
+    /// Switches off every enabled Entria store except the one the caller owns, so the caller's own fixture
+    /// decides the sales-order-integration master switch rather than whatever else exists on the tenant.
+    /// </summary>
+    procedure DisableStoresExcept(KeepStoreCode: Code[20])
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+    begin
+        EntriaStore.SetFilter(Code, '<>%1', KeepStoreCode);
+        EntriaStore.SetRange(Enabled, true);
+        if EntriaStore.FindSet() then
+            repeat
+                EntriaStore.Enabled := false;
+                EntriaStore.Modify();
+            until EntriaStore.Next() = 0;
+
+        EntriaIntegrationMgt.SetRereadSetup();
+    end;
+
+    /// <summary>
+    /// Runs the production job queue setup with the hold subscriber bound for the duration of the call.
+    /// </summary>
+    /// <remarks>
+    /// The entry is left On Hold, so IsJobQueueReadyToRun() is false afterwards and no platform task is created.
+    /// </remarks>
+    procedure RunSetupJobQueues()
+    var
+        EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+        LibraryEntria: Codeunit "NPR Library - Entria";
+    begin
+        BindSubscription(LibraryEntria);
+        EntriaIntegrationMgt.SetupJobQueues();
+        UnbindSubscription(LibraryEntria);
+    end;
+
+    /// <summary>
+    /// Deletes the given Entria store with the hold subscriber bound for the duration of the delete, so the job
+    /// queue setup that the OnDelete trigger reaches cannot get to the platform scheduler.
+    /// </summary>
+    /// <remarks>
+    /// Binds a local instance rather than a caller-held global, exactly as RunSetupJobQueues does. Per the
+    /// BindSubscription documentation a manually bound instance is unbound when its variable goes out of scope, so
+    /// an error inside the bracket cannot leave the subscriber bound; a caller-held global has no such guarantee.
+    /// </remarks>
+    procedure DeleteStore(StoreCode: Code[20])
+    var
+        EntriaStore: Record "NPR Entria Store";
+        LibraryEntria: Codeunit "NPR Library - Entria";
+    begin
+        EntriaStore.Get(StoreCode);
+        BindSubscription(LibraryEntria);
+        EntriaStore.Delete(true);
+        UnbindSubscription(LibraryEntria);
+    end;
+
+    /// <summary>
+    /// Deletes every Entria store matching the given Code filter with the hold subscriber bound, for callers that
+    /// tear down a set of stores rather than one.
+    /// </summary>
+    procedure DeleteStores(StoreCodeFilter: Text)
+    var
+        EntriaStore: Record "NPR Entria Store";
+        LibraryEntria: Codeunit "NPR Library - Entria";
+    begin
+        EntriaStore.SetFilter(Code, StoreCodeFilter);
+        if EntriaStore.IsEmpty() then
+            exit;
+        BindSubscription(LibraryEntria);
+        EntriaStore.DeleteAll(true);
+        UnbindSubscription(LibraryEntria);
+    end;
+
+    /// <summary>
+    /// Writes "Enable Integration" WITHOUT invalidating the single-instance setup cache, so a caller can put the
+    /// session in the state a cross-session write leaves it in.
+    /// </summary>
+    /// <remarks>
+    /// The deliberate opposite of SetEnableIntegration. "NPR Entria Integration Mgt." is SingleInstance and
+    /// ReadySetup() reads the setup through GetRecordOnce, so production code that does not call SetRereadSetup()
+    /// first will read whatever this session cached earlier. Every other setter here invalidates the cache, which
+    /// is precisely why they cannot be used to test that production invalidates it.
+    /// </remarks>
+    procedure SetEnableIntegrationLeavingCacheStale(EnableIntegration: Boolean)
+    var
+        EntriaSetup: Record "NPR Entria Integration Setup";
+    begin
+        if not EntriaSetup.Get() then begin
+            EntriaSetup.Init();
+            EntriaSetup.Insert();
+        end;
+        EntriaSetup."Enable Integration" := EnableIntegration;
+        EntriaSetup.Modify();
     end;
 
     /// <summary>Creates an item with the given Unit Price and "NPR Entria Product" flag.</summary>
@@ -747,9 +946,9 @@ codeunit 85379 "NPR Library - Entria"
     end;
 
     /// <summary>
-    /// Returns an active voucher carrying the given reference no., issuing it if the test database has none
-    /// yet: the import commits, so a voucher issued by an earlier run of the same test survives and its
-    /// reference no. cannot be issued a second time.
+    /// Returns a voucher carrying the given reference no., issuing it if none carries it yet: nothing is
+    /// undone between tests - the rollback comes at the codeunit boundary - so a voucher issued earlier in
+    /// this codeunit's run is still there, and its reference no. cannot be issued a second time.
     /// </summary>
     procedure EnsureIssuedVoucher(VoucherReferenceNo: Text[50]; VoucherAmount: Decimal; var Voucher: Record "NPR NpRv Voucher")
     var
@@ -925,6 +1124,128 @@ codeunit 85379 "NPR Library - Entria"
         EcomSalesHeader."Ecommerce Store Code" := StoreCode;
         EcomSalesHeader."External No." := ExternalNo;
         EcomSalesHeader.Insert();
+    end;
+
+    #endregion
+
+    #region Order import job queue fixtures
+
+    procedure ClearOrderImportJobQueueState()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+    begin
+        //Monitored rows first, so their OnDelete cascade removes the companion Managed-By-App rows while the
+        //job queue entry IDs they reference are still resolvable. Scoped by object identity rather than by a
+        //parameter-string prefix, because the Entria job's Parameter String is empty.
+        FilterOrderImportMonitoredRows(MonitoredJQEntry);
+        if not MonitoredJQEntry.IsEmpty() then
+            MonitoredJQEntry.DeleteAll(true);
+
+        FilterOrderImportJobs(JobQueueEntry);
+        while JobQueueEntry.FindFirst() do begin
+            //An In Process entry cannot be deleted, and a dev tenant may well have one running.
+            JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+            JobQueueEntry.Delete(true);
+        end;
+    end;
+
+    /// <summary>
+    /// Inserts the legacy shape of the order import job: NP-protected, recurring, no monitored row.
+    /// Manually Set On Hold keeps the platform scheduler away from it before the hold subscriber is even bound.
+    /// </summary>
+    procedure CreateLegacyProtectedJob(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        EntriaOrderImportJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        JobQueueEntry.Init();
+        JobQueueEntry.ID := CreateGuid();
+        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+        JobQueueEntry."Object ID to Run" := EntriaOrderImportJQ.GetCodeunitId();
+        JobQueueEntry.Description := CopyStr(EntriaOrderImportJQ.GetJQDescription(), 1, MaxStrLen(JobQueueEntry.Description));
+        JobQueueEntry."Recurring Job" := true;
+        JobQueueEntry."No. of Minutes between Runs" := 1;
+        JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
+        JobQueueEntry."NPR NP Protected Job" := true;
+        JobQueueEntry."NPR Manually Set On Hold" := true;
+        JobQueueEntry.Insert(true);
+    end;
+
+    /// <summary>
+    /// Builds an uninserted job queue entry for the given codeunit. Deliberately not inserted: the refresher-gate
+    /// predicate only inspects the record it is handed.
+    /// </summary>
+    procedure BuildJobQueueEntryFor(CodeunitId: Integer; var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        Clear(JobQueueEntry);
+        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+        JobQueueEntry."Object ID to Run" := CodeunitId;
+    end;
+
+    /// <summary>
+    /// Builds an uninserted job queue entry whose "Object Type to Run" is Report rather than Codeunit, so a caller
+    /// can exercise the object-type half of a subscriber guard independently of the object-id half.
+    /// </summary>
+    procedure BuildReportJobQueueEntryFor(ObjectIdToRun: Integer; var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        Clear(JobQueueEntry);
+        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Report;
+        JobQueueEntry."Object ID to Run" := ObjectIdToRun;
+    end;
+
+    /// <summary>
+    /// Deletes a job queue entry the way support does when a job is stuck, leaving its monitored row orphaned.
+    /// </summary>
+    procedure DeleteJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+        JobQueueEntry.Delete(true);
+    end;
+
+    procedure FilterOrderImportJobs(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        EntriaOrderImportJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", EntriaOrderImportJQ.GetCodeunitId());
+    end;
+
+    procedure FilterOrderImportMonitoredRows(var MonitoredJQEntry: Record "NPR Monitored Job Queue Entry")
+    var
+        EntriaOrderImportJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        MonitoredJQEntry.Reset();
+        MonitoredJQEntry.SetRange("Object Type to Run", MonitoredJQEntry."Object Type to Run"::Codeunit);
+        MonitoredJQEntry.SetRange("Object ID to Run", EntriaOrderImportJQ.GetCodeunitId());
+    end;
+
+    procedure CountOrderImportJobs(): Integer
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        FilterOrderImportJobs(JobQueueEntry);
+        exit(JobQueueEntry.Count());
+    end;
+
+    procedure CountOrderImportMonitoredRows(): Integer
+    var
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+    begin
+        FilterOrderImportMonitoredRows(MonitoredJQEntry);
+        exit(MonitoredJQEntry.Count());
+    end;
+
+    procedure FindOrderImportJob(var JobQueueEntry: Record "Job Queue Entry"): Boolean
+    begin
+        FilterOrderImportJobs(JobQueueEntry);
+        exit(JobQueueEntry.FindFirst());
+    end;
+
+    procedure FindOrderImportMonitoredRow(var MonitoredJQEntry: Record "NPR Monitored Job Queue Entry"): Boolean
+    begin
+        FilterOrderImportMonitoredRows(MonitoredJQEntry);
+        exit(MonitoredJQEntry.FindFirst());
     end;
 
     #endregion

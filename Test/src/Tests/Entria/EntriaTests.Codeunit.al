@@ -1,17 +1,22 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 codeunit 85260 "NPR Entria Tests"
 {
-    // [FEATURE] Entria order import - the list and ID-based retry passes, the sync marker, the order
-    // import failure registry and the payload-to-document mapping - plus the guards of the Entria item
-    // price-change webhook subscriber.
+    // [FEATURE] Entria integration: the order import - the list and ID-based retry passes, the sync marker,
+    //           the order import failure registry and the payload-to-document mapping - the guards of the
+    //           Entria item price-change webhook subscriber, and enabling a store. The order import job
+    //           queue lifecycle lives in "NPR Entria JQ Tests".
     //
     // NOTE on the price-change webhook: the production publisher
     // "NPR Entria Integr. Webhooks".OnItemUnitPriceChanged is an [ExternalBusinessEvent], which is not a
     // subscribable in-process event type - the notification goes to external HTTP subscribers only after
     // the transaction commits, so a BC test cannot observe the dispatch. The WebhookGuards_* tests
-    // therefore verify that the production subscriber "NPR Entria Webhook Subscr." would REACH the
-    // publisher call: "NPR Entria TestSub" captures the same Rec/xRec state on Item OnAfterModifyEvent,
+    // therefore verify whether the production subscriber "NPR Entria Webhook Subscr." would REACH or exit
+    // before the publisher call: "NPR Entria TestSub" captures the same Rec/xRec state on Item OnAfterModifyEvent,
     // and HasEnabledStore() is called from the test directly.
+    //
+    // Initialize() normalises state at the START of each test that touches the database, not once per run:
+    // there is no per-test rollback - TestIsolation = Codeunit rolls back once, at the END of the codeunit -
+    // so every write an earlier test made, committed or not, is still there for every test declared after it.
 
     Subtype = Test;
     TestPermissions = Disabled;
@@ -274,7 +279,7 @@ codeunit 85260 "NPR Entria Tests"
 
         // [THEN] A failure 59 minutes in is deduped away
         _Assert.IsFalse(WithinHourEmits,
-            'A repeat within the hour must be deduped - the job retries every minute, so emitting each one would bury Sentry in duplicates of a single outage.');
+            'A repeat within the hour must be deduped - the job retries every second for its whole 6h session, so emitting each one would bury Sentry in duplicates of a single outage.');
 
         // [THEN] A failure at exactly one hour emits again, because the window is strict
         _Assert.IsTrue(AtExactlyOneHourEmits,
@@ -428,8 +433,7 @@ codeunit 85260 "NPR Entria Tests"
         OrderCreatedAt := CreateDateTime(DMY2Date(10, 7, 2024), 100000T);
         EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerBefore);
 
-        // [GIVEN] A registry row for that order, which is what removes it from the list path - the skip
-        //         is on the row EXISTING, not on whether it is due; due-ness is the retry pass's business
+        // [GIVEN] A registry row for that order, so the list path skips it
         _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-regmark', 0, CurrentDateTime() + 3600000);
 
         // [GIVEN] A session max seeded from that marker and a page holding only that one order
@@ -537,6 +541,12 @@ codeunit 85260 "NPR Entria Tests"
 
         // [WHEN] A human uses "Requeue for Import", the one way back out of Error
         EntriaJQ.MarkOrderForRetry(EntriaOrderImpFailure);
+        //A second in the past, not the CurrentDateTime() MarkOrderForRetry stamps: CollectDueRetries filters
+        //"Next Retry At" <= CurrentDateTime() against the STORED value, and SQL's 1/300s datetime grid can round
+        //the write up past the instant it was taken. Measured on this codeunit: 4 failures in 69 runs without the
+        //margin, 0 in 80 with it. Running this test alone never reproduced it - 0 in 40. That MarkOrderForRetry
+        //stamps the current time at all is pinned by FailuresPageActionsRequeueForImportAndSkip.
+        EntriaOrderImpFailure."Next Retry At" := CurrentDateTime() - 1000;
         EntriaOrderImpFailure.Modify(true);
 
         // [THEN] The row is due for the ID-based retry pass again
@@ -623,8 +633,7 @@ codeunit 85260 "NPR Entria Tests"
         // [SCENARIO] "Retry Count" counts retries performed, so the initial import failure creates
         // the row with 0 and the order still gets the full budget of MaxRetries() retries, each one
         // scheduled its own BackoffDuration() step out from the failure. The last retry in the
-        // budget failing is what parks the row at MaxRetries(). The concrete step lengths are pinned
-        // by BackoffDurationCoversExactlyTheRetryBudget.
+        // budget failing is what parks the row at MaxRetries().
 
         // [GIVEN] An enabled Entria store and a base timestamp of 08:00 on 1 January 2024
         Initialize();
@@ -1213,8 +1222,8 @@ codeunit 85260 "NPR Entria Tests"
         OrderTkn: JsonToken;
         ImportSucceeded: Boolean;
     begin
-        // [SCENARIO] Second shape: "payment_collections" IS present but carries no
-        // "payments". That must fail the import just like a missing "payment_collections" does.
+        // [SCENARIO] Second shape: "payment_collections" IS present but carries an empty
+        // "payments" array. That must fail the import just like a missing "payment_collections" does.
 
         // [GIVEN] An enabled Entria store
         Initialize();
@@ -1229,7 +1238,7 @@ codeunit 85260 "NPR Entria Tests"
         ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, 'ZZ-DOC-EMPTYPC', 'medusa-emptypc', CreateDateTime(DMY2Date(1, 1, 2024), 090000T), 0);
 
         // [THEN] The import fails, exactly as for a missing payment_collections
-        _Assert.IsFalse(ImportSucceeded, 'Import must fail when payment_collections carries no payments and the amount is non-zero.');
+        _Assert.IsFalse(ImportSucceeded, 'Import must fail when payment_collections carries an empty payments array and the amount is non-zero.');
 
         // [THEN] No Ecom Sales Header is left behind - the insert was rolled back
         EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
@@ -1252,7 +1261,7 @@ codeunit 85260 "NPR Entria Tests"
         ImportSucceeded: Boolean;
     begin
         // [SCENARIO] The success direction of the payment guard: a non-zero order that carries its
-        // payments imports and produces a payment line from payment_collections.payments. 
+        // payments imports and produces a payment line from payment_collections.payments.
 
         // [GIVEN] An enabled Entria store and an order of 100 created at 09:00 on 1 January 2024
         Initialize();
@@ -1629,8 +1638,7 @@ codeunit 85260 "NPR Entria Tests"
         // own writes are strictly monotonic, so a FORWARD move can only be a parallel session's
         // flush (or a deliberate skip-ahead) - not a re-sync request. The pass must adopt the
         // higher value and keep paging, instead of abandoning its progress on every cycle of a
-        // parallel session. Only a BACKWARDS move (a human rewind) stops the pass - covered by
-        // ManualMarkerEditMidPaginationIsNotOverwritten.
+        // parallel session. Only a BACKWARDS move (a human rewind) stops the pass.
 
         // [GIVEN] An enabled Entria store and a marker value from a parallel session, far ahead in 2030
         Initialize();
@@ -1687,7 +1695,7 @@ codeunit 85260 "NPR Entria Tests"
         Initialize();
         _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
         EntriaStore.Get(_StoreCode);
-        BaseDT := CurrentDateTime() - (60 * 60 * 1000); // one hour in the past, safely before "now"
+        BaseDT := CurrentDateTime() - (60 * 60 * 1000);
 
         // [GIVEN] 25 due registry rows whose Next Retry At values are staggered one second apart
         for i := 1 to 25 do begin
@@ -1712,7 +1720,7 @@ codeunit 85260 "NPR Entria Tests"
         // [THEN] The 5 latest due rows are left for a following cycle
         for i := 21 to 25 do
             _Assert.IsFalse(RowIsDue[i],
-                StrSubstNo('The %1. latest due row must be excluded by the 20-row cap.', i));
+                StrSubstNo('The %1. earliest due row must be excluded by the 20-row cap.', i));
     end;
 
     [Test]
@@ -1721,8 +1729,8 @@ codeunit 85260 "NPR Entria Tests"
         EntriaStore: Record "NPR Entria Store";
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
-        // [SCENARIO] The order import job only ever looks at stores that are BOTH Enabled and flagged
-        // for "Sales Order Integration"
+        // [SCENARIO] The master switch that decides whether the order import job exists counts only stores
+        // that are BOTH Enabled and flagged for "Sales Order Integration"
 
         // [GIVEN] Exactly one enabled Entria store, flagged for Sales Order Integration
         Initialize();
@@ -1757,7 +1765,7 @@ codeunit 85260 "NPR Entria Tests"
         StoreCodeWithoutFlag: Code[20];
     begin
         // [SCENARIO] The job's own store loop filters on Enabled AND "Sales Order Integration".
-        // HasEnabledSalesOrderIntegrationStore only gates SetupJobQueues, so it cannot cover this.
+        // HasEnabledSalesOrderIntegrationStore only decides whether the job exists, never which stores it visits.
 
         // [GIVEN] Exactly two enabled stores: one flagged for Sales Order Integration...
         Initialize();
@@ -1837,8 +1845,7 @@ codeunit 85260 "NPR Entria Tests"
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
         // [SCENARIO] IsEnabled is the combined gate - it needs the integration switch on AND a
-        // non-blank store code AND that store Enabled. All four corners are pinned here because
-        // nothing else in the suite calls it at all.
+        // non-blank store code AND that store Enabled. All four corners are pinned here.
         //
         // SetRereadSetup() follows every write because IsEnabled reaches the store through a
         // by-code cache that would otherwise answer from the pre-write record.
@@ -1874,9 +1881,9 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsFalse(EntriaIntegrationMgt.IsEnabled(_StoreCode),
             'The integration switch must outrank the store flag.');
 
-        // BC's per-test rollback restores the setup RECORD, but not the SingleInstance codeunit's
-        // cached copy of it - left as it is here, every later test in the run would read a cached
-        // "integration off". So the switch is restored and the cache invalidated explicitly.
+        // Nothing restores this between tests - TestIsolation = Codeunit rolls back at the END of the
+        // codeunit - and the SingleInstance codeunit caches the setup on top of that, so a later test that
+        // reads it would get "integration off". Both the switch and the cache are put back explicitly.
         _LibraryEntria.SetEnableIntegration(true);
         EntriaIntegrationMgt.SetRereadSetup();
     end;
@@ -1904,7 +1911,7 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsTrue(EntriaOrderImpFailure.Get(StoreCode, 'medusa-delrel'), 'Setup: the registry row must exist before the store is deleted.');
 
         // [WHEN] The store is deleted, so OnDelete runs DeleteRelatedRecords
-        EntriaStore.Delete(true);
+        _LibraryEntria.DeleteStore(StoreCode);
 
         // [THEN] The store's registry row is gone too
         _Assert.IsFalse(EntriaOrderImpFailure.Get(StoreCode, 'medusa-delrel'), 'Deleting the store must delete its Order Imp. Failure registry row too.');
@@ -3086,7 +3093,7 @@ codeunit 85260 "NPR Entria Tests"
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         OrdersArr: JsonArray;
     begin
-        // [SCENARIO] Third shape: "payment_collections" is present as an EMPTY array, so the loop over the
+        // [SCENARIO] "payment_collections" is present as an EMPTY array, so the loop over the
         // collections never runs. Only the check after the loop can catch it, and it must.
 
         // [GIVEN] An enabled Entria store
@@ -3202,7 +3209,7 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsTrue(EntriaStoreSyncState.Get(StoreCode), 'Setup: the sync state row must exist before the store is deleted.');
 
         // [WHEN] The store is deleted, so OnDelete runs DeleteRelatedRecords
-        EntriaStore.Delete(true);
+        _LibraryEntria.DeleteStore(StoreCode);
 
         // [THEN] The store's sync state row is gone too
         _Assert.IsFalse(EntriaStoreSyncState.Get(StoreCode),
@@ -3253,10 +3260,10 @@ codeunit 85260 "NPR Entria Tests"
         FlushAfterSubSecondGapProceeded: Boolean;
         FlushAfterTwoSecondGapProceeded: Boolean;
     begin
-        // [SCENARIO] TryFlushMarker's one-second tolerance, in both directions: SQL's 1/300s datetime
+        // [SCENARIO] TryFlushMarker's one-second tolerance, on both sides of the threshold: SQL's 1/300s datetime
         // grid can hand a marker back a few milliseconds below what was written, and counting that as an
-        // administrator's rewind would abandon pagination after every page - while a gap of a full
-        // second or more is a real external edit and must stop paging.
+        // administrator's rewind would abandon pagination after every page - while a gap of more than a
+        // second is a real external edit and must stop paging.
 
         // [GIVEN] An enabled Entria store whose stored marker stands at 10:00:00 on 4 July 2024
         Initialize();
@@ -3409,7 +3416,6 @@ codeunit 85260 "NPR Entria Tests"
     procedure EnablingStoreWithoutEntriaUrlIsRejected()
     var
         EntriaStore: Record "NPR Entria Store";
-        JobQueueEntry: Record "Job Queue Entry";
         StoreCode: Code[20];
         ImportJobsBefore: Integer;
     begin
@@ -3425,12 +3431,9 @@ codeunit 85260 "NPR Entria Tests"
         EntriaStore.Insert();
         Commit();
 
-        // [GIVEN] However many import jobs the tenant already runs, counted up front. The assertion below
-        //         is about the delta this test causes - the environment may legitimately have one configured,
-        //         and a test must never claim a tenant-wide absence it does not own.
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Entria Order Import JQ");
-        ImportJobsBefore := JobQueueEntry.Count();
+        // [GIVEN] The import job count up front. Initialize() has already purged every order import job, so
+        //         this is 0 - counted rather than assumed, so the assertion below stays a delta if that changes.
+        ImportJobsBefore := _LibraryEntria.CountOrderImportJobs();
 
         // [WHEN] Enabled is validated to true
         asserterror EntriaStore.Validate(Enabled, true);
@@ -3443,9 +3446,10 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsFalse(EntriaStore.Enabled,
             'A store with no Entria Url must stay disabled - enabled, the import job queries a backend the store has no address for and every cycle fails on it.');
 
-        // [THEN] The refusal came before the job queue setup, so it added no import job of its own
-        _Assert.AreEqual(ImportJobsBefore, JobQueueEntry.Count(),
-            'The url check must fire before SetupJobQueues - a store whose enabling was refused must not leave a live recurring import job running behind it.');
+        // [THEN] The refusal left no import job behind. This cannot prove the url check ran BEFORE
+        //        SetupJobQueues: asserterror rolls back the failed statement's own writes either way.
+        _Assert.AreEqual(ImportJobsBefore, _LibraryEntria.CountOrderImportJobs(),
+            'A store whose enabling was refused must not leave a live recurring import job running behind it.');
     end;
 
     [Test]
@@ -3671,16 +3675,10 @@ codeunit 85260 "NPR Entria Tests"
 
     local procedure ImportSingleLineOrder(DocumentNo: Code[20]; MedusaOrderId: Text; CurrencyCode: Code[10]; ItemObj: JsonObject; PaymentAmount: Decimal; CreatedAt: DateTime)
     var
-        EcomSalesHeader: Record "NPR Ecom Sales Header";
-        EntriaStore: Record "NPR Entria Store";
-        EntriaOrderImpl: Codeunit "NPR Entria Order Impl.";
         OrdersArr: JsonArray;
-        OrderTkn: JsonToken;
     begin
-        EntriaStore.Get(_StoreCode);
         _LibraryEntria.BuildOrderArrayForItemLine(OrdersArr, DocumentNo, MedusaOrderId, CreatedAt, CurrencyCode, ItemObj, PaymentAmount);
-        OrdersArr.Get(0, OrderTkn);
-        EntriaOrderImpl.ImportOrder(OrderTkn, EntriaStore, DocumentNo, EcomSalesHeader);
+        ImportPrebuiltOrder(DocumentNo, OrdersArr);
     end;
 
     local procedure ImportPrebuiltOrder(DocumentNo: Code[20]; OrdersArr: JsonArray)
@@ -3759,14 +3757,14 @@ codeunit 85260 "NPR Entria Tests"
     var
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        EntriaStore: Record "NPR Entria Store";
         EntriaStoreSyncState: Record "NPR Entria Store Sync State";
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
     begin
-        // Per test, not once per run: the production code under test commits, so BC's per-test
-        // rollback does not undo its writes and leftover state would otherwise flow from one test
-        // into the next - a marker a later test committed would silently break an earlier one's
-        // assertions depending on declaration order.
+        // Per test, not once per run: TestIsolation = Codeunit rolls back once, at the END of the codeunit,
+        // so every write an earlier test made - committed or not - is still there for the next one. A marker
+        // one test leaves behind would silently break the assertions of every test declared after it.
+        // Measured on BC 28: a committed row is gone in the next run, so the leak is between tests in one
+        // run, not across runs.
         // Both store codes are swept: rows a cross-store test committed under the second one would
         // otherwise flow into a later test the same way.
         EntriaOrderImpFailure.SetFilter("Store Code", '%1|%2', _StoreCodeLbl, _SecondStoreCodeLbl);
@@ -3781,9 +3779,18 @@ codeunit 85260 "NPR Entria Tests"
         // would otherwise leave that cache behind and turn every later test red for an unrelated reason.
         EntriaIntegrationMgt.SetRereadSetup();
 
-        EntriaStore.SetFilter(Code, 'ZZ-ENT-*');
-        if not EntriaStore.IsEmpty() then
-            EntriaStore.DeleteAll(true);
+        //Bracketed with the hold subscriber: this DeleteAll fires "NPR Entria Store".OnDelete, which re-asserts
+        //the order import job setup and reaches StartJobQueueEntry. That is inert today only because
+        //TaskScheduler.CanCreateTask() is false in the test runner - on a runner where it is true the call would
+        //hand the long-running importer to the platform. The hold subscriber removes that dependency.
+        _LibraryEntria.DeleteStores('ZZ-ENT-*');
+
+        // Deleting a store fires "NPR Entria Store".OnDelete, which re-asserts the order import job queue
+        // setup. While _StoreCodeLbl is enabled with Sales Order Integration on, that re-assertion CREATES the
+        // recurring importer entry and registers it as a monitored job. The hold subscriber keeps it On Hold,
+        // but the entry and its monitored row are still there for every later test in this run, so both are
+        // purged here.
+        _LibraryEntria.ClearOrderImportJobQueueState();
 
         // The api-handler guard is what makes every refetch in this suite fail deterministically, and the one
         // test that needs a live refetch has to switch it off - through a write ProcessDueRetries then commits.
