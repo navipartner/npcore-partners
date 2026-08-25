@@ -405,6 +405,13 @@ table 6151551 "NPR NpXml Template"
             Caption = 'OAuth2.0 Setup Code';
         }
 
+        field(2; "NP API Key Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NP API Key Setup";
+            Caption = 'NP API Key Setup Code';
+        }
+
         field(5238; "Automatic Username"; Boolean)
         {
             DataClassification = CustomerContent;
@@ -868,6 +875,8 @@ table 6151551 "NPR NpXml Template"
                 WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec.GetApiUsername(), Rec."API Password Key", AuthParamsBuff);
             Rec.AuthType::OAuth2:
                 WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+            Rec.AuthType::"NP API Key":
+                WebServiceAuthHelper.GetNPApiKeyAuthorizationParamsBuff(Rec."NP API Key Setup Code", AuthParamsBuff);
             Rec.AuthType::Custom:
                 WebServiceAuthHelper.GetCustomAuthorizationParamsBuff(Rec."API Authorization", AuthParamsBuff);
         end;

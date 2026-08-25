@@ -37,6 +37,10 @@ xmlport 6151013 "NPR NpRv Partners"
                 fieldelement(oauth_setup_code; TempNpRvPartner."OAuth2 Setup Code")
                 {
                 }
+                fieldelement(np_api_key_setup_code; TempNpRvPartner."NP API Key Setup Code")
+                {
+                    MinOccurs = Zero;
+                }
                 textelement(relations)
                 {
                     MaxOccurs = Once;

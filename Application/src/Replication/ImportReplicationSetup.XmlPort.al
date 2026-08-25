@@ -50,6 +50,20 @@ xmlport 6014402 "NPR Import Replication Setup"
                 { }
                 fieldelement(JobQueueStartTime; TempReplicationServiceSetup.JobQueueStartTime)
                 { }
+                tableelement(TempReplicationServiceSetupAPIKey; "NPR Replication Service Setup")
+                {
+                    // Mirrors the export wrapper, which is only emitted when AuthType = "NP API Key".
+                    // Optional (MinOccurs = Zero) so non-apikey setups and files exported before this
+                    // field existed import without error. The value is applied to the parent setup in
+                    // InsertReplicationSetup via a lookup on "API Version".
+                    MinOccurs = Zero;
+                    UseTemporary = true;
+                    XmlName = 'NPApiKey';
+                    LinkTable = TempReplicationServiceSetup;
+                    LinkFields = "API Version" = field("API Version");
+                    fieldelement(NPApiKeySetupCode; TempReplicationServiceSetupAPIKey."NP API Key Setup Code")
+                    { }
+                }
                 tableelement(TempReplicationEndpoint; "NPR Replication Endpoint")
                 {
                     MinOccurs = Zero;
@@ -190,6 +204,12 @@ xmlport 6014402 "NPR Import Replication Setup"
         if ReplicationSetup.UserName = '' then
             ReplicationSetup.UserName := TempReplicationSetup.UserName;
         ReplicationSetup."OAuth2 Setup Code" := TempReplicationSetup."OAuth2 Setup Code";
+        // The NP API Key code arrives in the optional <NPApiKey> wrapper (own temp buffer), so look it
+        // up by "API Version"; absent means the setup isn't apikey (or is an older file).
+        if TempReplicationServiceSetupAPIKey.Get(TempReplicationSetup."API Version") then
+            ReplicationSetup."NP API Key Setup Code" := TempReplicationServiceSetupAPIKey."NP API Key Setup Code"
+        else
+            ReplicationSetup."NP API Key Setup Code" := '';
         ReplicationSetup.JobQueueEndTime := TempReplicationSetup.JobQueueEndTime;
         ReplicationSetup.JobQueueMinutesBetweenRun := TempReplicationSetup.JobQueueMinutesBetweenRun;
         ReplicationSetup.JobQueueProcessImportList := TempReplicationSetup.JobQueueProcessImportList;

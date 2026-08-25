@@ -108,6 +108,30 @@
                         end;
                     }
                 }
+
+                group(NPApiKey)
+                {
+                    ShowCaption = false;
+                    Visible = IsNPApiKeyVisible;
+                    field(NPApiKeySetupCode; NPApiKeySetupCode)
+                    {
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                        Caption = 'NP API Key Setup Code';
+                        Editable = false;
+                        ToolTip = 'Specifies the NP API Key Setup Code used to authorize the outbound calls.';
+                        trigger OnAssistEdit()
+                        var
+                            NPApiKeySetupListPage: Page "NPR NP API Key Setup List";
+                            NPApiKeySetupRec: Record "NPR NP API Key Setup";
+                        begin
+                            NPApiKeySetupListPage.LookupMode(true);
+                            if NPApiKeySetupListPage.RunModal() = Action::LookupOK then begin
+                                NPApiKeySetupListPage.GetRecord(NPApiKeySetupRec);
+                                NPApiKeySetupCode := NPApiKeySetupRec.Code;
+                            end;
+                        end;
+                    }
+                }
                 field(ServiceBaseURL; ServiceBaseURL)
                 {
 
@@ -195,12 +219,12 @@
 
     trigger OnOpenPage()
     begin
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -236,8 +260,9 @@
         AuthType: Enum "NPR API Auth. Type";
 
         OAuth2SetupCode: Code[20];
+        NPApiKeySetupCode: Code[20];
 
-        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 
     local procedure InitializeDefaults()
@@ -259,7 +284,7 @@
         IsEditable := false;
     end;
 
-    internal procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vAuthType: Enum "NPR API Auth. Type"; var vUsername: Text[50]; var vPassword: Text[30]; var vOAuthSetupCode: Code[20]; var vDescription: Text; var vAuthCode: Text[40]; var vLoyaltyServerCompanyName: Text[80]; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
+    internal procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vAuthType: Enum "NPR API Auth. Type"; var vUsername: Text[50]; var vPassword: Text[30]; var vOAuthSetupCode: Code[20]; var vNPApiKeySetupCode: Code[20]; var vDescription: Text; var vAuthCode: Text[40]; var vLoyaltyServerCompanyName: Text[80]; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
     begin
 
         vCommunityCode := CommunityCode;
@@ -274,6 +299,7 @@
         vUsername := ServiceUser;
         vPassword := ServicePassword;
         vOAuthSetupCode := OAuth2SetupCode;
+        vNPApiKeySetupCode := NPApiKeySetupCode;
 
         vDescription := Description;
 

@@ -43,6 +43,12 @@
             Caption = 'Custom Authorization';
             DataClassification = CustomerContent;
         }
+
+        field(25; "NP API Key Setup Code"; Code[20])
+        {
+            Caption = 'NP API Key Setup Code';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

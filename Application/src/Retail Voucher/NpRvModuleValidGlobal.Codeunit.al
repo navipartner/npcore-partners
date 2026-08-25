@@ -49,6 +49,7 @@
         ResponseMessage: HttpResponseMessage;
         ResponseText: Text;
         RequestXmlText: Text;
+        NpApiKeySetupCodeElement: Text;
     begin
         NpRvVoucherType.Get(NpRvGlobalVoucherSetup."Voucher Type");
         if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
@@ -56,6 +57,11 @@
 
         NpRvPartner.Get(NpRvVoucherType."Partner Code");
         NpRvGlobalVoucherSetup.TestField("Service Url");
+
+        // Only include the NP API Key element when that auth type is actually in use, so OAuth/Basic
+        // partner pushes to peers that predate this field send an unchanged payload.
+        if NpRvPartner.AuthType = NpRvPartner.AuthType::"NP API Key" then
+            NpApiKeySetupCodeElement := '<np_api_key_setup_code>' + '<![CDATA[' + NpRvPartner."NP API Key Setup Code" + ']]>' + '</np_api_key_setup_code>';
 
         RequestXmlText
          :=
@@ -70,6 +76,7 @@
                      '<service_username>' + '<![CDATA[' + NpRvPartner."Service Username" + ']]>' + '</service_username>' +
                      '<service_password>' + '<![CDATA[' + WebServiceAuthHelper.GetApiPassword(NpRvPartner."API Password Key") + ']]>' + '</service_password>' +
                      '<oauth_setup_code>' + '<![CDATA[' + NpRvPartner."OAuth2 Setup Code" + ']]>' + '</oauth_setup_code>' +
+                     NpApiKeySetupCodeElement +
                      '<relations>' +
                        '<relation voucher_type="' + NpRvGlobalVoucherSetup."Voucher Type" + '" />' +
                      '</relations>' +

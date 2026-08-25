@@ -283,6 +283,8 @@ codeunit 6248507 "NPR MMMembershipSoapApi"
                 WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password Key", AuthParamsBuff);
             NPRRemoteEndpointSetup.AuthType::OAuth2:
                 WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(NPRRemoteEndpointSetup."OAuth2 Setup Code", AuthParamsBuff);
+            NPRRemoteEndpointSetup.AuthType::"NP API Key":
+                WebServiceAuthHelper.GetNPApiKeyAuthorizationParamsBuff(NPRRemoteEndpointSetup."NP API Key Setup Code", AuthParamsBuff);
         end;
         iAuth.CheckMandatoryValues(AuthParamsBuff);
         iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);

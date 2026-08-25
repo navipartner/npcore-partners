@@ -162,6 +162,16 @@ page 6151196 "NPR NpCs Store Card"
                                 ToolTip = 'Specifies OAuth2.0 Setup Code for this store.';
                             }
                         }
+                        group(NPApiKey)
+                        {
+                            ShowCaption = false;
+                            Visible = IsNPApiKeyVisible;
+                            field("NP API Key Setup Code"; Rec."NP API Key Setup Code")
+                            {
+                                ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies the NP API Key Setup Code used to authorize the outbound calls.';
+                            }
+                        }
                     }
                     field("Geolocation Latitude"; Rec."Geolocation Latitude")
                     {
@@ -406,7 +416,7 @@ page 6151196 "NPR NpCs Store Card"
 
     trigger OnOpenPage()
     begin
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnAfterGetRecord()
@@ -414,7 +424,7 @@ page 6151196 "NPR NpCs Store Card"
         pw := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             pw := '***';
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
         HeyLoyaltyName := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo(Name), false);
     end;
 
@@ -430,7 +440,7 @@ page 6151196 "NPR NpCs Store Card"
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         HeyLoyaltyName: Text[100];
         pw: Text[200];
-        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Store Setup\\Close anyway?';
         Text001: Label 'Store Setup validated successfully';

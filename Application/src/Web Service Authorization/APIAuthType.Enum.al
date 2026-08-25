@@ -21,4 +21,10 @@
         Implementation = "NPR API IAuthorization" = "NPR API Custom Auth";
     }
 
+    value(3; "NP API Key")
+    {
+        Caption = 'NP API Key', Locked = true;
+        Implementation = "NPR API IAuthorization" = "NPR API NP API Key Auth";
+    }
+
 }

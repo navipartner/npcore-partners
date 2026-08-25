@@ -36,6 +36,7 @@
         WebServiceAuthHelper.SetApiPassword(MagentoSetup.GetApiPassword(), NpXmlTemplate."API Password Key");
         NpXmlTemplate."API Authorization" := MagentoSetup."Api Authorization";
         NpXmlTemplate."OAuth2 Setup Code" := MagentoSetup."OAuth2 Setup Code";
+        NpXmlTemplate."NP API Key Setup Code" := ''; // Magento auth never uses NP API Key; keep the reset auth block complete.
         NpXmlTemplate."API Content-Type" := 'naviconnect/xml';
         NpXmlTemplate."API Accept" := 'naviconnect/xml';
         NpXmlTemplate."API Response Path" := '';

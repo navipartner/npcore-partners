@@ -138,6 +138,17 @@
                                 ToolTip = 'Specifies the OAuth2.0 Setup Code.';
                             }
                         }
+
+                        group(NPApiKey)
+                        {
+                            ShowCaption = false;
+                            Visible = IsNPApiKeyVisible;
+                            field("NP API Key Setup Code"; Rec."NP API Key Setup Code")
+                            {
+                                ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies the NP API Key Setup Code used to authorize the outbound calls.';
+                            }
+                        }
                     }
 
                 }
@@ -192,7 +203,7 @@
 
     trigger OnOpenPage()
     begin
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnAfterGetRecord()
@@ -200,7 +211,7 @@
         Password := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."Service Password") then
             Password := '***';
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -212,7 +223,7 @@
     end;
 
     var
-        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Global POS Sales Setup: %1\\Close anway?';
         Text001: Label 'Global POS Sales Setup validated successfully';

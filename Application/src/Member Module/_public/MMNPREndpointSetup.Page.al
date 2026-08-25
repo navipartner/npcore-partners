@@ -79,6 +79,12 @@
                     ToolTip = 'Specifies the OAuth2.0 Setup Code.';
                     Visible = IsOAuth2Visible;
                 }
+                field("NP API Key Setup Code"; Rec."NP API Key Setup Code")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the NP API Key Setup Code used to authorize the outbound calls.';
+                    Visible = IsNPApiKeyVisible;
+                }
                 field("Endpoint URI"; Rec."Endpoint URI")
                 {
 
@@ -155,7 +161,7 @@
 
     trigger OnOpenPage()
     begin
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnAfterGetRecord()
@@ -163,13 +169,13 @@
         pw := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."User Password Key") then
             pw := '***';
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     var
         pw: Text[200];
 
-        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 }
 

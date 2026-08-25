@@ -48,6 +48,18 @@ xmlport 6014400 "NPR Export Replication Setup"
                 fieldelement(JobQueueStartTime; NPRReplicationServiceSetup.JobQueueStartTime)
                 { }
 
+                tableelement(NPRReplicationServiceSetupAPIKey; "NPR Replication Service Setup")
+                {
+                    MinOccurs = Zero;
+                    LinkTable = NPRReplicationServiceSetup;
+                    LinkFields = "API Version" = field("API Version");
+                    SourceTableView = where(AuthType = const("NP API Key"));
+                    XmlName = 'NPApiKey';
+
+                    fieldelement(NPApiKeySetupCode; NPRReplicationServiceSetupAPIKey."NP API Key Setup Code")
+                    { }
+                }
+
                 tableelement(NPRReplicationEndpoint; "NPR Replication Endpoint")
                 {
                     MinOccurs = Zero;

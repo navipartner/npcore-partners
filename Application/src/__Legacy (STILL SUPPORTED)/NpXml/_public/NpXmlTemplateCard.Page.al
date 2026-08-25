@@ -565,6 +565,17 @@ page 6151551 "NPR NpXml Template Card"
                             }
                         }
 
+                        group(NPApiKey)
+                        {
+                            ShowCaption = false;
+                            Visible = IsNPApiKeyVisible;
+                            field("NP API Key Setup Code"; Rec."NP API Key Setup Code")
+                            {
+                                ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies the NP API Key Setup Code used to authorize the outbound calls.';
+                            }
+                        }
+
                     }
                     field("API Content-Type"; Rec."API Content-Type")
                     {
@@ -823,7 +834,7 @@ page 6151551 "NPR NpXml Template Card"
 
     trigger OnOpenPage()
     begin
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnAfterGetRecord()
@@ -831,7 +842,7 @@ page 6151551 "NPR NpXml Template Card"
         pw := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             pw := '***';
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -843,7 +854,7 @@ page 6151551 "NPR NpXml Template Card"
 
     var
         pw: Text[200];
-        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible : Boolean;
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
         NpXmlTemplateTriggersVisible: Boolean;

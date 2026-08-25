@@ -89,6 +89,13 @@
             Caption = 'OAuth2.0 Setup Code';
             ValidateTableRelation = false;
         }
+        field(2; "NP API Key Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NP API Key Setup";
+            Caption = 'NP API Key Setup Code';
+            ValidateTableRelation = false;
+        }
 
     }
 
@@ -119,6 +126,8 @@
                 WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec."Service Username", Rec."API Password Key", AuthParamsBuff);
             Rec.AuthType::OAuth2:
                 WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+            Rec.AuthType::"NP API Key":
+                WebServiceAuthHelper.GetNPApiKeyAuthorizationParamsBuff(Rec."NP API Key Setup Code", AuthParamsBuff);
         end;
         iAuth.CheckMandatoryValues(AuthParamsBuff);
         iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);

@@ -78,6 +78,16 @@
                                 ToolTip = 'Specifies the OAuth2.0 Setup Code.';
                             }
                         }
+                        group(NPApiKey)
+                        {
+                            ShowCaption = false;
+                            Visible = IsNPApiKeyVisible;
+                            field("NP API Key Setup Code"; Rec."NP API Key Setup Code")
+                            {
+                                ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies the NP API Key Setup Code used to authorize the outbound calls.';
+                            }
+                        }
                     }
 
 
@@ -125,7 +135,7 @@
 
     trigger OnOpenPage()
     begin
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     trigger OnAfterGetRecord()
@@ -133,12 +143,12 @@
         pw := '';
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             pw := '***';
-        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible);
     end;
 
     var
         pw: Text[200];
-        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible, IsNPApiKeyVisible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Global Voucher Setup\\Close anway?';
         Text001: Label 'Global Voucher Setup validated successfully';

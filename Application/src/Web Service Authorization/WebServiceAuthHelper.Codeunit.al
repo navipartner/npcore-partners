@@ -26,6 +26,16 @@
             CustomAuthVisible(AuthType, IsCustomAuthVisible);
     end;
 
+    procedure SetAuthenticationFieldsVisibility(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean; var IsOAuth2Visible: Boolean; var IsCustomAuthVisible: Boolean; var IsNPApiKeyVisible: Boolean)
+    var
+    begin
+        IsNPApiKeyVisible := false;
+        SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
+        if (not IsBasicAuthVisible) and (not IsOAuth2Visible) and (not IsCustomAuthVisible) then
+            NPApiKeyVisible(AuthType, IsNPApiKeyVisible);
+    end;
+
+
     procedure BasicAuthVisible(AuthType: Enum "NPR API Auth. Type"; var IsBasicAuthVisible: Boolean): Boolean
     var
         iAuth: Interface "NPR API IAuthorization";
@@ -49,6 +59,14 @@
         iAuth := AuthType;
         IsCustomAuthVisible := iAuth.IsEnabled(Format(AuthType), Format(AuthType::Custom));
     end;
+
+    procedure NPApiKeyVisible(AuthType: Enum "NPR API Auth. Type"; var IsNPApiKeyVisible: Boolean): Boolean
+    var
+        iAuth: Interface "NPR API IAuthorization";
+    begin
+        iAuth := AuthType;
+        IsNPApiKeyVisible := iAuth.IsEnabled(Format(AuthType), Format(AuthType::"NP API Key"));
+    end;
     #endregion
 
     #region Basic API Password Key
@@ -59,6 +77,27 @@
             APIPassGUID := CreateGuid();
 
         if not EncryptionEnabled() then
+            IsolatedStorage.Set(APIPassGUID, NewPassword, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted(APIPassGUID, NewPassword, DataScope::Company);
+    end;
+
+    [NonDebuggable]
+    procedure SetLongApiPassword(NewPassword: Text; var APIPassGUID: Guid);
+    var
+        MaxEncryptableLength: Integer;
+    begin
+        // IsolatedStorage.SetEncrypted uses RSA, which cannot encrypt plaintext longer than the key
+        // permits (~215 bytes for a 2048-bit key). Secrets that may exceed that (e.g. JWT API keys)
+        // are stored unencrypted; isolated storage is still tenant/company-isolated and encrypted at
+        // rest by the platform. Kept separate from SetApiPassword so short-secret callers keep their
+        // strict encryption behaviour. Threshold is a conservative bound below the RSA limit.
+        MaxEncryptableLength := 150;
+
+        if IsNullGuid(APIPassGUID) then
+            APIPassGUID := CreateGuid();
+
+        if not EncryptionEnabled() or (StrLen(NewPassword) > MaxEncryptableLength) then
             IsolatedStorage.Set(APIPassGUID, NewPassword, DataScope::Company)
         else
             IsolatedStorage.SetEncrypted(APIPassGUID, NewPassword, DataScope::Company);
@@ -104,6 +143,13 @@
         AuthorizationParamsBuffer.Init();
         AuthorizationParamsBuffer."Auth. Type" := AuthorizationParamsBuffer."Auth. Type"::Custom;
         AuthorizationParamsBuffer."Custom Auth." := CustomAuthValue;
+    end;
+
+    procedure GetNPApiKeyAuthorizationParamsBuff(NPApiKeySetupCode: Code[20]; var AuthorizationParamsBuffer: Record "NPR Auth. Param. Buffer")
+    begin
+        AuthorizationParamsBuffer.Init();
+        AuthorizationParamsBuffer."Auth. Type" := AuthorizationParamsBuffer."Auth. Type"::"NP API Key";
+        AuthorizationParamsBuffer."NP API Key Setup Code" := NPApiKeySetupCode;
     end;
 
     #endregion

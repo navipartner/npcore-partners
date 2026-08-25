@@ -350,6 +350,7 @@
         RetailInventorySetEntry.RemoveApiPassword();
         RetailInventorySetEntry."Api Url" := '';
         RetailInventorySetEntry."OAuth2 Setup Code" := '';
+        RetailInventorySetEntry."NP API Key Setup Code" := '';
     end;
 
     internal procedure SetApiUrl(var RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry")
