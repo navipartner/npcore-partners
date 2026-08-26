@@ -10323,6 +10323,272 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLineSecond."Discount %", 0, 'LineDiscPct <> POSSaleLine."Discount %"');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountWhenReturnLineAddedFirst()
+    var
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        Item: Record Item;
+        ReturnItem: Record Item;
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        DiscountCode: Code[20];
+        DiscountPct: Decimal;
+    begin
+        // [SCENARIO CORE-1837] Mix discount with minimum quantity 2 is applied to qualifying sale lines even when a return line was added to the sale first
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(ReturnItem, POSUnit, POSStore);
+        ReturnItem."Unit Price" := 500;
+        ReturnItem.Modify();
+
+        // [GIVEN] Mix discount on Item with minimum quantity 2
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithMinQty(Item, 10, false, 2, DiscountCode);
+
+        // [GIVEN] Minimum quantity is on the mix discount line, as the discount search reads it from there
+        MixedDiscountLine.SetRange(Code, DiscountCode);
+        MixedDiscountLine.FindFirst();
+        Assert.AreEqual(2, MixedDiscountLine."Min. Quantity", 'Setup: Min. Quantity was not set on the mix discount line');
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Return line added first
+        LibraryPOSMock.CreateItemLine(POSSession, ReturnItem."No.", -1);
+
+        // [WHEN] Two qualifying sale lines are added after the return line
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+
+        // [THEN] Mix discount is applied to both qualifying sale lines
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("No.", Item."No.");
+        Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of qualifying sale lines in the sale');
+        POSSaleLine.FindSet();
+        repeat
+            Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mix discount not applied to qualifying sale line when return line was added first');
+            Assert.AreEqual(DiscountCode, POSSaleLine."Discount Code", 'Wrong discount code on qualifying sale line');
+            Assert.AreEqual(DiscountPct, POSSaleLine."Discount %", 'Wrong mix discount % on qualifying sale line');
+        until POSSaleLine.Next() = 0;
+
+        // [THEN] Return line does not get the mix discount
+        POSSaleLine.SetRange("No.", ReturnItem."No.");
+        POSSaleLine.FindFirst();
+        Assert.IsFalse(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mix discount applied to return line');
+        Assert.AreEqual(0, POSSaleLine."Discount %", 'Discount % applied to return line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure KeepMixDiscountWhenReturnLineAddedLast()
+    var
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        Item: Record Item;
+        ReturnItem: Record Item;
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        DiscountCode: Code[20];
+        DiscountPct: Decimal;
+    begin
+        // [SCENARIO CORE-1837] Mix discount applied to qualifying sale lines is kept when a return line is added to the sale afterwards
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(ReturnItem, POSUnit, POSStore);
+        ReturnItem."Unit Price" := 500;
+        ReturnItem.Modify();
+
+        // [GIVEN] Mix discount on Item with minimum quantity 2
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithMinQty(Item, 10, false, 2, DiscountCode);
+
+        // [GIVEN] Minimum quantity is on the mix discount line, as the discount search reads it from there
+        MixedDiscountLine.SetRange(Code, DiscountCode);
+        MixedDiscountLine.FindFirst();
+        Assert.AreEqual(2, MixedDiscountLine."Min. Quantity", 'Setup: Min. Quantity was not set on the mix discount line');
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Two qualifying sale lines added first
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+
+        // [WHEN] Return line is added after the qualifying sale lines
+        LibraryPOSMock.CreateItemLine(POSSession, ReturnItem."No.", -1);
+
+        // [THEN] Mix discount is still applied to both qualifying sale lines
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("No.", Item."No.");
+        Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of qualifying sale lines in the sale');
+        POSSaleLine.FindSet();
+        repeat
+            Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mix discount not applied to qualifying sale line when return line was added last');
+            Assert.AreEqual(DiscountCode, POSSaleLine."Discount Code", 'Wrong discount code on qualifying sale line');
+            Assert.AreEqual(DiscountPct, POSSaleLine."Discount %", 'Wrong mix discount % on qualifying sale line');
+        until POSSaleLine.Next() = 0;
+
+        // [THEN] Return line does not get the mix discount
+        POSSaleLine.SetRange("No.", ReturnItem."No.");
+        POSSaleLine.FindFirst();
+        Assert.IsFalse(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mix discount applied to return line');
+        Assert.AreEqual(0, POSSaleLine."Discount %", 'Discount % applied to return line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountWhenReturnLineIsForDiscountedItem()
+    var
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        Item: Record Item;
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        DiscountCode: Code[20];
+        DiscountPct: Decimal;
+    begin
+        // [SCENARIO CORE-1837] A return line for the discounted item itself neither earns the mix discount nor blocks it for the sold lines
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Item with unit price
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Mix discount on Item with minimum quantity 2
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithMinQty(Item, 10, false, 2, DiscountCode);
+
+        // [GIVEN] Minimum quantity is on the mix discount line, as the discount search reads it from there
+        MixedDiscountLine.SetRange(Code, DiscountCode);
+        MixedDiscountLine.FindFirst();
+        Assert.AreEqual(2, MixedDiscountLine."Min. Quantity", 'Min. Quantity is not set on the mix discount line, the scenario would not be verified');
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Return line for the discounted item added first
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", -1);
+
+        // [WHEN] Two lines of the same item are sold after the return line
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+
+        // [THEN] Mix discount is applied to both sold lines
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("No.", Item."No.");
+        POSSaleLine.SetFilter(Quantity, '>%1', 0);
+        Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of sold lines in the sale');
+        POSSaleLine.FindSet();
+        repeat
+            Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+            Assert.AreEqual(DiscountCode, POSSaleLine."Discount Code", 'Mixed Discount not applied to POS Sale Line');
+            Assert.AreEqual(DiscountPct, POSSaleLine."Discount %", 'Discount Percent not calculated according to scenario.');
+        until POSSaleLine.Next() = 0;
+
+        // [THEN] The return line of the same item does not get the mix discount
+        POSSaleLine.SetFilter(Quantity, '<%1', 0);
+        POSSaleLine.FindFirst();
+        Assert.IsFalse(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount applied to POS Sale Line which is not according to scenario');
+        Assert.AreEqual(0, POSSaleLine."Discount %", 'Discount Percent not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountWhenReturnLineAddedFirstWrongQty()
+    var
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        Item: Record Item;
+        ReturnItem: Record Item;
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO CORE-1837] A return line does not count towards the minimum quantity, so sold lines below the minimum get no mix discount
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(ReturnItem, POSUnit, POSStore);
+        ReturnItem."Unit Price" := 500;
+        ReturnItem.Modify();
+
+        // [GIVEN] Mix discount on Item with minimum quantity 3
+        LibraryPOSDiscount.CreateTotalDiscountPctWithMinQty(Item, 10, false, 3, DiscountCode);
+
+        // [GIVEN] Minimum quantity is on the mix discount line, as the discount search reads it from there
+        MixedDiscountLine.SetRange(Code, DiscountCode);
+        MixedDiscountLine.FindFirst();
+        Assert.AreEqual(3, MixedDiscountLine."Min. Quantity", 'Min. Quantity is not set on the mix discount line, the scenario would not be verified');
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Return line added first
+        LibraryPOSMock.CreateItemLine(POSSession, ReturnItem."No.", -1);
+
+        // [WHEN] Fewer sale lines than the minimum quantity are added after the return line
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+
+        // [THEN] Verify Mix Discount is not applied
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("No.", Item."No.");
+        Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of sale lines in the sale');
+        POSSaleLine.FindSet();
+        repeat
+            Assert.IsFalse(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount applied to POS Sale Line which is not according to scenario');
+            Assert.IsFalse(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line which is not according to scenario');
+            Assert.AreEqual(0, POSSaleLine."Discount %", 'Discount Percent not calculated according to scenario.');
+        until POSSaleLine.Next() = 0;
+    end;
+
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";

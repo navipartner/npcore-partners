@@ -10,6 +10,25 @@ codeunit 85234 "NPR Library - POS Discount"
         exit(DiscPct);
     end;
 
+    internal procedure CreateTotalDiscountPctWithMinQty(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean; MinQuantity: Decimal; var DiscountCode: Code[20]): Decimal
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        DiscPct: Decimal;
+    begin
+        DiscPct := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscPct, TotalAmtExclTax);
+        MixedDiscount."Min. Quantity" := MinQuantity;
+        MixedDiscount.Modify();
+
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        MixedDiscountLine.SetRange(Code, MixedDiscount.Code);
+        MixedDiscountLine.ModifyAll("Min. Quantity", MinQuantity);
+
+        DiscountCode := MixedDiscount.Code;
+        exit(DiscPct);
+    end;
+
     internal procedure CreateTotalDiscountPctWithUOM(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";

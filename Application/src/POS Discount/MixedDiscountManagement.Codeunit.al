@@ -2244,6 +2244,7 @@
         POSSaleLine.SetRange("Register No.", SalePos."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         POSSaleLine.SetFilter("Line Type", '%1|%2', "NPR POS Sale Line Type"::Item, "NPR POS Sale Line Type"::"Item Category");
+        POSSaleLine.SetFilter(Quantity, '>%1', 0);
         POSSaleLine.CalcSums(Quantity);
         exit(POSSaleLine.Quantity);
     end;
