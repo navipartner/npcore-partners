@@ -1925,6 +1925,7 @@ codeunit 85260 "NPR Entria Tests"
         EntriaOrderImpFailuresPage: TestPage "NPR Entria Order Imp. Failures";
         OrderUpdatedAt: DateTime;
         BeforeInvokeDT: DateTime;
+        AfterInvokeDT: DateTime;
     begin
         // [SCENARIO] The failures list page's two actions - Requeue for Import and Skip - must write through
         // Rec.Modify exactly as documented on the page. Requeue for Import is deliberately the only way back
@@ -1944,27 +1945,23 @@ codeunit 85260 "NPR Entria Tests"
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pageact');
         _Assert.AreEqual(0DT, EntriaOrderImpFailure."Next Retry At", 'Setup: a parked row carries the 0DT sentinel, so any real reschedule is observable.');
 
-        // [GIVEN] A timestamp taken just before the invoke, less the few milliseconds a SQL datetime
-        //         read-back can lose on its 1/300s grid
+        // [GIVEN] A lower timestamp just before the invoke, with 10 ms tolerance for SQL datetime
+        //         precision on its 1/300s grid
         BeforeInvokeDT := CurrentDateTime() - 10;
 
         // [WHEN] "Requeue for Import" is invoked on that row from the failures list page
         EntriaOrderImpFailuresPage.OpenEdit();
         EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
         EntriaOrderImpFailuresPage.RequeueForImport.Invoke();
+        // The upper bound is taken immediately after the invoke, with the same SQL datetime tolerance
+        AfterInvokeDT := CurrentDateTime() + 10;
         EntriaOrderImpFailuresPage.Close();
 
-        // [THEN] Retry Count is reset to 0, an immediate retry is scheduled and the row reads Pending again
-        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pageact');
-        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count", 'Requeue for Import must reset Retry Count to 0.');
-        _Assert.AreNotEqual(0DT, EntriaOrderImpFailure."Next Retry At",
-            'Requeue for Import must write a real Next Retry At - left at the 0DT sentinel the row stays parked and the retry pass never picks it up, so the action would silently do nothing.');
-        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" >= BeforeInvokeDT,
-            'Requeue for Import must schedule the retry as of now - an older timestamp means the action wrote something other than the current time.');
-        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" <= CurrentDateTime(), 'Requeue for Import must schedule an immediate retry.');
-        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
-            'Requeue for Import must lift both Skipped and Error onto Pending - on any other Status the retry pass still filters the row out and the fresh budget it was just granted is never spent.');
+        // [THEN] The row is Pending on a fresh budget and scheduled inside the invoke window
+        AssertOrderWasArmedForImmediateRetry('medusa-pageact', BeforeInvokeDT, AfterInvokeDT, 'the page action');
 
+        // Refresh the record before using it on the page again
+        EntriaOrderImpFailure.Get(_StoreCode, 'medusa-pageact');
         // [WHEN] "Skip" is invoked on the same row
         EntriaOrderImpFailuresPage.OpenEdit();
         EntriaOrderImpFailuresPage.GoToRecord(EntriaOrderImpFailure);
@@ -2126,6 +2123,7 @@ codeunit 85260 "NPR Entria Tests"
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         OrderUpdatedAt: DateTime;
         BeforeInvokeDT: DateTime;
+        AfterInvokeDT: DateTime;
     begin
         // [SCENARIO] "Requeue for Import" is the single way out that actually gets the order imported again, and it
         // must behave identically whichever dead end the row sits in: both Error and Skipped must come out
@@ -2142,25 +2140,32 @@ codeunit 85260 "NPR Entria Tests"
         _LibraryEntria.InsertOrderFailureRow(_StoreCode, 'medusa-rearmskip', 3, CurrentDateTime() + (60 * 60 * 1000));
         _LibraryEntria.SkipOrder(_StoreCode, 'medusa-rearmskip');
 
-        // [GIVEN] A timestamp taken just before the action, less the few milliseconds a SQL datetime
-        //         read-back can lose on its 1/300s grid
+        // [GIVEN] A lower timestamp immediately before re-arming the Error row, with 10 ms tolerance
+        //         for SQL datetime precision on its 1/300s grid
         BeforeInvokeDT := CurrentDateTime() - 10;
 
         // [WHEN] "Requeue for Import" is applied to the Error row
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearmerr');
         EntriaJQ.MarkOrderForRetry(EntriaOrderImpFailure);
         EntriaOrderImpFailure.Modify();
+        // The upper bound is taken immediately after the write, with the same tolerance
+        AfterInvokeDT := CurrentDateTime() + 10;
 
-        // [THEN] It is Pending on a full budget, scheduled as of now and due for the retry pass
-        AssertOrderWasArmedForImmediateRetry('medusa-rearmerr', BeforeInvokeDT, 'an Error row');
+        // [THEN] It is Pending on a full budget, scheduled inside the action window and due for the retry pass
+        AssertOrderWasArmedForImmediateRetry('medusa-rearmerr', BeforeInvokeDT, AfterInvokeDT, 'an Error row');
+
+        // [GIVEN] A fresh lower bound immediately before re-arming the Skipped row
+        BeforeInvokeDT := CurrentDateTime() - 10;
 
         // [WHEN] The same action is applied to the Skipped row
         EntriaOrderImpFailure.Get(_StoreCode, 'medusa-rearmskip');
         EntriaJQ.MarkOrderForRetry(EntriaOrderImpFailure);
         EntriaOrderImpFailure.Modify();
+        // A fresh upper bound taken immediately after the write
+        AfterInvokeDT := CurrentDateTime() + 10;
 
         // [THEN] It comes out in exactly the same state - a human's stop is no harder to lift than a spent budget
-        AssertOrderWasArmedForImmediateRetry('medusa-rearmskip', BeforeInvokeDT, 'a Skipped row');
+        AssertOrderWasArmedForImmediateRetry('medusa-rearmskip', BeforeInvokeDT, AfterInvokeDT, 'a Skipped row');
     end;
 
     [Test]
@@ -3707,23 +3712,28 @@ codeunit 85260 "NPR Entria Tests"
     /// <summary>
     /// Asserts the whole state "Requeue for Import" has to leave behind, so the Error and the Skipped case are held
     /// to the same bar - one of them asserted more loosely than the other is how the weaker path stays broken.
+    /// Deliberately stops at the state the action wrote and does not re-ask IsOrderDueForIdBasedRetry: that helper
+    /// compares the stored Next Retry At against a fresh CurrentDateTime, and the stamp this action writes can round
+    /// up past that instant on SQL's 1/300s datetime grid - a few milliseconds that cost production nothing (the row
+    /// is left untouched and the next pass takes it) but make the assertion flaky. That this state is due is pinned
+    /// condition by condition in IsRetryDuePinsEachConditionOnItsOwn, and end to end with a margin in
+    /// ParkedRowRequiresManualRequeue.
     /// </summary>
-    local procedure AssertOrderWasArmedForImmediateRetry(MedusaOrderId: Text[100]; BeforeInvokeDT: DateTime; RowDescription: Text)
+    local procedure AssertOrderWasArmedForImmediateRetry(MedusaOrderId: Text[100]; BeforeInvokeDT: DateTime; AfterInvokeDT: DateTime; RowDescription: Text)
     var
         EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
-        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
     begin
         EntriaOrderImpFailure.Get(_StoreCode, MedusaOrderId);
+        _Assert.AreNotEqual(0DT, EntriaOrderImpFailure."Next Retry At",
+            StrSubstNo('"Requeue for Import" on %1 must write a real Next Retry At - a row carrying the 0DT sentinel is filtered out of every retry pass, so the action would silently do nothing.', RowDescription));
         _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status,
             StrSubstNo('"Requeue for Import" on %1 must leave it Pending - on any other Status the retry pass filters it out and the fresh budget is never spent.', RowDescription));
         _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count",
             StrSubstNo('"Requeue for Import" on %1 must reset Retry Count to 0 - the budget check is independent of the Status, so a row left at its old count is still barred from the pass.', RowDescription));
         _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" >= BeforeInvokeDT,
             StrSubstNo('"Requeue for Import" on %1 must schedule the retry as of now - an older timestamp means the action wrote something other than the current time.', RowDescription));
-        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" <= CurrentDateTime(),
-            StrSubstNo('"Requeue for Import" on %1 must schedule an immediate retry, not one in the future.', RowDescription));
-        _Assert.IsTrue(EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, MedusaOrderId),
-            StrSubstNo('"Requeue for Import" on %1 must make it due for the retry pass - anything less and the action silently does nothing.', RowDescription));
+        _Assert.IsTrue(EntriaOrderImpFailure."Next Retry At" <= AfterInvokeDT,
+            StrSubstNo('"Requeue for Import" on %1 must schedule an immediate retry, not one in the future - a later timestamp means the row''s old schedule was left in place or something other than the current time was written.', RowDescription));
     end;
 
     /// <summary>
