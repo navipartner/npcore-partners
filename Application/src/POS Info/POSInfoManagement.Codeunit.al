@@ -395,23 +395,29 @@
         SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", POSInfoTransaction."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", POSInfoTransaction."Sales Ticket No.");
-        SaleLinePOS.SetRange(Date, POSInfoTransaction."Sale Date");
         if POSInfoTransaction."Sales Line No." <> 0 then
-            SaleLinePOS.SetRange("Line No.", POSInfoTransaction."Sales Line No.");
+            SaleLinePOS.SetRange("Line No.", POSInfoTransaction."Sales Line No.")
+        else
+            SaleLinePOS.SetFilter("Line Type", '<>%1&<>%2', SaleLinePOS."Line Type"::"POS Payment", SaleLinePOS."Line Type"::Rounding);
         if SaleLinePOS.IsEmpty() then
             exit;
 
         SaleLinePOS.CalcSums(Quantity, Amount, "Amount Including VAT", "Discount Amount");
-        POSInfoTransaction.Quantity := POSInfoTransaction.Quantity + SaleLinePOS.Quantity;
-        POSInfoTransaction."Net Amount" := POSInfoTransaction."Net Amount" + SaleLinePOS.Amount;
-        POSInfoTransaction."Gross Amount" := POSInfoTransaction."Gross Amount" + SaleLinePOS."Amount Including VAT";
-        POSInfoTransaction."Discount Amount" := POSInfoTransaction."Discount Amount" + SaleLinePOS."Discount Amount";
+        POSInfoTransaction.Quantity := SaleLinePOS.Quantity;
+        POSInfoTransaction."Net Amount" := SaleLinePOS.Amount;
+        POSInfoTransaction."Gross Amount" := SaleLinePOS."Amount Including VAT";
+        POSInfoTransaction."Discount Amount" := SaleLinePOS."Discount Amount";
 
         if POSInfoTransaction."Sales Line No." <> 0 then begin
             SaleLinePOS.SetLoadFields("No.", "Unit Price");
             SaleLinePOS.FindLast();
             POSInfoTransaction."No." := SaleLinePOS."No.";
             POSInfoTransaction.Price := SaleLinePOS."Unit Price";
+        end else begin
+            // Rounding is stored negated on the sale line and reversed again on the POS entry, so it is subtracted to match Amount Incl. Tax & Round
+            SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Rounding);
+            SaleLinePOS.CalcSums("Amount Including VAT");
+            POSInfoTransaction."Gross Amount" -= SaleLinePOS."Amount Including VAT";
         end;
     end;
 
