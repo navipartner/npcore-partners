@@ -50,7 +50,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
                 POSSession.GetSale(POSSale);
                 POSSale.GetCurrentSale(SalePOS);
 
-                PostWorkshiftCheckpoint(CheckpointEntryNo, SalePOS, EndOfDayProfile."Bin Transfer Number Series");  //Has a commit
+                PostWorkshiftCheckpoint(CheckpointEntryNo, SalePOS, EndOfDayProfile."Bin Transfer Number Series", false);  //Has a commit
 
                 POSSession.ChangeViewLogin();
             end;
@@ -468,7 +468,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             exit(false);
         UpdateNotfinalizedPmtBinCheckpoints(PmtBinCheckpoint);
 
-        PostWorkshiftCheckpoint(WorkshiftCheckpoint."Entry No.", SalePOS, EndOfDayProfile."Bin Transfer Number Series");  //Has a commit
+        PostWorkshiftCheckpoint(WorkshiftCheckpoint."Entry No.", SalePOS, EndOfDayProfile."Bin Transfer Number Series", TransferIn);  //Has a commit
 
         if not PrintTransfer and TransferIn then
             PrintTransfer := BinTransferSetup.Get() and BinTransferSetup.PrintOnReceive;
@@ -672,12 +672,14 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         BinTransferJnlLine.Modify();
     end;
 
-    local procedure PostWorkshiftCheckpoint(CheckpointEntryNo: Integer; var SalePOSIn: Record "NPR POS Sale"; BinTransferNoSeriesCode: Code[20])
+    local procedure PostWorkshiftCheckpoint(CheckpointEntryNo: Integer; var SalePOSIn: Record "NPR POS Sale"; BinTransferNoSeriesCode: Code[20]; TransferIn: Boolean)
     var
         POSEntryToPost: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
+        WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSPostEntries: Codeunit "NPR POS Post Entries";
+        POSWebhooks: Codeunit "NPR POS Webhooks";
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         NoSeriesManagement: Codeunit "No. Series";
 #ELSE
@@ -724,6 +726,38 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         POSPostEntries.SetPostCompressed(false);
         POSPostEntries.Run(POSEntryToPost);
         Commit();
+
+        if RaisesBinTransferEvent(CheckpointEntryNo, TransferIn) then begin
+            WorkshiftCheckpoint.Get(CheckpointEntryNo);
+            POSWebhooks.InvokeBinTransferWebhook(WorkshiftCheckpoint.SystemId);
+        end;
+    end;
+
+    /// <summary>
+    /// Decides whether this posting moved cash that no other posting has already reported.
+    /// An outbound leg always does. An inbound leg only does when it received something that no sending
+    /// unit staged: a unit to unit transfer is received against the journal line its sender created and
+    /// already raised the event for, so reporting it again would count the same cash twice. Cash coming
+    /// from the bank is never staged by a sender, so it always reports.
+    /// </summary>
+    local procedure RaisesBinTransferEvent(CheckpointEntryNo: Integer; TransferIn: Boolean): Boolean
+    var
+        PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+    begin
+        if not TransferIn then
+            exit(true);
+
+        // Whatever an inbound leg receives through the bin slot came out of another bin in BC, and the
+        // posting that moved it out of that bin already raised the event - the sending unit, for a unit to
+        // unit transfer. Only the bank slot carries cash entering BC for the first time, so it is the one
+        // part of an inbound leg that nothing else reports.
+        // This deliberately reads only fields the server owns. The staging link between the two legs of a
+        // transfer reaches BC solely through the frontend's prestagedTransferIdBin
+        // optional once the receiving checkpoint exists, so it cannot be relied on to suppress anything.
+        PmtBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
+        PmtBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", CheckpointEntryNo);
+        PmtBinCheckpoint.SetFilter("Bank Deposit Amount", '<>%1', 0);
+        exit(not PmtBinCheckpoint.IsEmpty());
     end;
 
     procedure NewBinTransferFeatureFlag(): Text[50]

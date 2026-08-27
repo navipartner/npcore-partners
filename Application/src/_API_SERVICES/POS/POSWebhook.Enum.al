@@ -7,4 +7,5 @@ enum 6014552 "NPR POS Webhook"
 
     value(0; POSSaleCompleted) { }
     value(1; POSUnitBalanced) { }
+    value(2; POSBinTransferred) { }
 }
