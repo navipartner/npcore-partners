@@ -376,6 +376,106 @@ codeunit 85301 "NPR Module Licensing Tests"
         Assert.IsFalse(LicenseMgt.ParsePoolsJsonToTemp(Json, TempPool), 'parse must fail on missing validSince');
     end;
 
+    // INF-1040: URL path segments. The tenant id is passed as a short opaque literal on purpose - it is a GUID and
+    // is never encoded; only the environment and company segments are.
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Endpoint_CompanyNameWithSpace_PercentEncoded()
+    var
+        LicenseMgt: Codeunit "NPR License Mgt.";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] A space in the company name must reach the portal as %20. The old query-string encoder produced
+        // 'Contoso+USA', which the portal read as a literal '+' and answered with 422.
+        Initialize();
+
+        Assert.AreEqual('/tenants/T1/environments/Production/companies/Contoso%20USA/usage',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'Production', 'Contoso USA', '/usage'),
+            'space in company name must be %20');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Endpoint_ReservedCharsInCompanyName_Escaped()
+    var
+        LicenseMgt: Codeunit "NPR License Mgt.";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] '+', '%' and '/' are data inside the segment, not syntax. '+' in particular must NOT survive as a
+        // literal '+' - that is the character the old encoder overloaded to mean space.
+        Initialize();
+
+        Assert.AreEqual('/tenants/T1/environments/Production/companies/A%2B%20Retail',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'Production', 'A+ Retail', ''),
+            'plus must be %2B');
+        Assert.AreEqual('/tenants/T1/environments/Production/companies/100%25%20Off',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'Production', '100% Off', ''),
+            'percent must be %25');
+        // %2F verified on the wire: the prelive Cloudflare Worker logged .../companies/Contoso%20A%2FS/usage verbatim, HTTP 200.
+        Assert.AreEqual('/tenants/T1/environments/Production/companies/Contoso%20A%2FS',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'Production', 'Contoso A/S', ''),
+            'slash must be %2F so it cannot split the path');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Endpoint_EnvironmentNameWithSpace_PercentEncoded()
+    var
+        LicenseMgt: Codeunit "NPR License Mgt.";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] The environment segment has the same flaw as the company segment and is encoded the same way.
+        // 'My Sandbox' is defensive only - BC restricts environment names to alpha/numeric/_/-, so a space cannot occur in practice.
+        Initialize();
+
+        Assert.AreEqual('/tenants/T1/environments/My%20Sandbox',
+            LicenseMgt.BuildEnvironmentEndpoint('T1', 'My Sandbox', ''),
+            'space in environment name must be %20');
+        Assert.AreEqual('/tenants/T1/environments/My%20Sandbox/companies/Contoso%20USA/licenses/current',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'My Sandbox', 'Contoso USA', '/licenses/current'),
+            'both dynamic segments are encoded');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Endpoint_PlainNames_NotOverEncoded()
+    var
+        LicenseMgt: Codeunit "NPR License Mgt.";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] Names that need no encoding must pass through byte-for-byte - guards against a future switch to
+        // an encoder that mangles the common case.
+        Initialize();
+
+        Assert.AreEqual('/tenants/T1/environments/Production/companies/Contoso',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'Production', 'Contoso', ''),
+            'unreserved characters must not be touched');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Endpoint_BuilderPaths_Shaped()
+    var
+        LicenseMgt: Codeunit "NPR License Mgt.";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] The five paths the codeunit builds through these two helpers (it also issues three inline, at four
+        // call sites, that interpolate only the tenant id). Pins each helper's skeleton - not the call sites' suffixes.
+        Initialize();
+
+        Assert.AreEqual('/tenants/T1/environments/My%20Sandbox',
+            LicenseMgt.BuildEnvironmentEndpoint('T1', 'My Sandbox', ''), 'EnvironmentExists path');
+        Assert.AreEqual('/tenants/T1/environments/My%20Sandbox/companies',
+            LicenseMgt.BuildEnvironmentEndpoint('T1', 'My Sandbox', '/companies'), 'CreateCompany path');
+        Assert.AreEqual('/tenants/T1/environments/My%20Sandbox/companies/Contoso%20USA',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'My Sandbox', 'Contoso USA', ''), 'CompanyExists path');
+        Assert.AreEqual('/tenants/T1/environments/My%20Sandbox/companies/Contoso%20USA/usage',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'My Sandbox', 'Contoso USA', '/usage'), 'ReportUsageToApi path');
+        Assert.AreEqual('/tenants/T1/environments/My%20Sandbox/companies/Contoso%20USA/licenses/current',
+            LicenseMgt.BuildCompanyEndpoint('T1', 'My Sandbox', 'Contoso USA', '/licenses/current'), 'GetCurrentPoolsFromApi path');
+    end;
+
     // ----------------------------------------------------------------- Helpers
 
     local procedure Initialize()

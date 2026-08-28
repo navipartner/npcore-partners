@@ -156,7 +156,7 @@ codeunit 6248739 "NPR License Mgt."
             ErrorMsg := StrSubstNo(FailedToSyncTenantEnvironmentCompanyErr, GetLastErrorText());
             LogError(ErrorMsg, GetLastErrorCallStack());
             if GuiAllowed() and ShowErrorMessage then
-                Message(ErrorMsg);
+                Message('%1', ErrorMsg); // ErrorMsg is runtime-built and can hold a %-encoded endpoint - never pass it as a format string.
         end;
     end;
 
@@ -241,7 +241,6 @@ codeunit 6248739 "NPR License Mgt."
     local procedure EnvironmentExists(): Boolean
     var
         EnvInfo: Codeunit "Environment Information";
-        TypeHelper: Codeunit "Type Helper";
         Client: HttpClient;
         Response: HttpResponseMessage;
         Endpoint: Text;
@@ -249,7 +248,7 @@ codeunit 6248739 "NPR License Mgt."
         IsSent: Boolean;
     begin
         EnvironmentName := EnvInfo.GetEnvironmentName();
-        Endpoint := StrSubstNo('/tenants/%1/environments/%2', _TenantId, TypeHelper.UrlEncode(EnvironmentName));
+        Endpoint := BuildEnvironmentEndpoint(_TenantId, EnvironmentName, '');
         GetConfiguredHttpClient(Client);
         IsSent := Client.Get(BuildApiUrl(Endpoint), Response);
 
@@ -297,7 +296,6 @@ codeunit 6248739 "NPR License Mgt."
     local procedure CompanyExists(): Boolean
     var
         EnvInfo: Codeunit "Environment Information";
-        TypeHelper: Codeunit "Type Helper";
         Client: HttpClient;
         Response: HttpResponseMessage;
         Endpoint: Text;
@@ -307,10 +305,7 @@ codeunit 6248739 "NPR License Mgt."
     begin
         EnvironmentName := EnvInfo.GetEnvironmentName();
         CompanyNameTxt := CompanyName();
-        Endpoint := StrSubstNo('/tenants/%1/environments/%2/companies/%3',
-            _TenantId,
-            TypeHelper.UrlEncode(EnvironmentName),
-            TypeHelper.UrlEncode(CompanyNameTxt));
+        Endpoint := BuildCompanyEndpoint(_TenantId, EnvironmentName, CompanyNameTxt, '');
         GetConfiguredHttpClient(Client);
         IsSent := Client.Get(BuildApiUrl(Endpoint), Response);
 
@@ -327,16 +322,13 @@ codeunit 6248739 "NPR License Mgt."
     local procedure CreateCompany()
     var
         EnvInfo: Codeunit "Environment Information";
-        TypeHelper: Codeunit "Type Helper";
         RequestBody: JsonObject;
         JsonResponse: Codeunit "NPR Json Parser";
         Endpoint: Text;
         EnvironmentName: Text;
     begin
         EnvironmentName := EnvInfo.GetEnvironmentName();
-        Endpoint := StrSubstNo('/tenants/%1/environments/%2/companies',
-            _TenantId,
-            TypeHelper.UrlEncode(EnvironmentName));
+        Endpoint := BuildEnvironmentEndpoint(_TenantId, EnvironmentName, '/companies');
 
         RequestBody.Add('name', CompanyName());
         RequestBody.Add('status', 'active');
@@ -532,7 +524,6 @@ codeunit 6248739 "NPR License Mgt."
     local procedure ReportUsageToApi()
     var
         EnvInfo: Codeunit "Environment Information";
-        TypeHelper: Codeunit "Type Helper";
         JsonResponse: Codeunit "NPR Json Parser";
         Body: JsonObject;
         UsageArray: JsonArray;
@@ -554,10 +545,7 @@ codeunit 6248739 "NPR License Mgt."
         EnvironmentName := EnvInfo.GetEnvironmentName();
         CompanyNameTxt := CompanyName();
         Body.Add('usage', UsageArray);
-        Endpoint := StrSubstNo('/tenants/%1/environments/%2/companies/%3/usage',
-            _TenantId,
-            TypeHelper.UrlEncode(EnvironmentName),
-            TypeHelper.UrlEncode(CompanyNameTxt));
+        Endpoint := BuildCompanyEndpoint(_TenantId, EnvironmentName, CompanyNameTxt, '/usage');
 
         if not ApiPost(Endpoint, Body, JsonResponse) then
             LogError(StrSubstNo('ReportUsageToApi() error: %1', GetLastErrorText()), GetLastErrorCallStack());
@@ -659,7 +647,6 @@ codeunit 6248739 "NPR License Mgt."
     var
         JsonParser: Codeunit "NPR Json Parser";
         EnvInfo: Codeunit "Environment Information";
-        TypeHelper: Codeunit "Type Helper";
         Endpoint: Text;
         EnvironmentName: Text;
         CompanyNameTxt: Text;
@@ -668,10 +655,7 @@ codeunit 6248739 "NPR License Mgt."
 
         EnvironmentName := EnvInfo.GetEnvironmentName();
         CompanyNameTxt := CompanyName();
-        Endpoint := StrSubstNo('/tenants/%1/environments/%2/companies/%3/licenses/current',
-            _TenantId,
-            TypeHelper.UrlEncode(EnvironmentName),
-            TypeHelper.UrlEncode(CompanyNameTxt));
+        Endpoint := BuildCompanyEndpoint(_TenantId, EnvironmentName, CompanyNameTxt, '/licenses/current');
 
         if not ApiGet(Endpoint, JsonParser) then begin
             _LastSyncFailureReason := GetLastErrorText(); // user-facing API error - includes the HTTP status
@@ -1031,6 +1015,27 @@ codeunit 6248739 "NPR License Mgt."
             else
                 Error(ApiResponseErr, Response.HttpStatusCode);
         end;
+    end;
+
+    // INF-1040: the dynamic environment/company segments are percent-encoded per RFC 3986 (space -> %20), NOT with
+    // Type Helper.UrlEncode - that is a query/form encoder and renders a space as '+', which the portal reads as a
+    // literal '+' and rejects with 422. Suffix is always a hardcoded sub-path, never user data, so it stays raw.
+    internal procedure BuildEnvironmentEndpoint(TenantId: Text; EnvironmentName: Text; Suffix: Text): Text
+    var
+        Uri: Codeunit Uri;
+    begin
+        exit(StrSubstNo('/tenants/%1/environments/%2%3', TenantId, Uri.EscapeDataString(EnvironmentName), Suffix));
+    end;
+
+    internal procedure BuildCompanyEndpoint(TenantId: Text; EnvironmentName: Text; CompanyNameTxt: Text; Suffix: Text): Text
+    var
+        Uri: Codeunit Uri;
+    begin
+        exit(StrSubstNo('/tenants/%1/environments/%2/companies/%3%4',
+            TenantId,
+            Uri.EscapeDataString(EnvironmentName),
+            Uri.EscapeDataString(CompanyNameTxt),
+            Suffix));
     end;
 
     local procedure BuildApiUrl(Endpoint: Text): Text
