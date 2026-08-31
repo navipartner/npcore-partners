@@ -2,11 +2,11 @@ The Application folder contains the source code of NP Retail, NP Attraction and 
 All of it is compiled into one Microsoft Business Central ISV .app
 
 ## Build
-If you are working in a dev environment running a newer BC version than BC17, temporarily increase the app.json versions to match your dev environment in both Application & Test apps.
-(remember, for app.json, "runtime"= {bc_version} minus 11, so BC27.0 = runtime 16.0 and baseapp dependency does NOT have to be declared in "dependencies" as it's implicit via "platform" and "application")
+We support the latest Business Central SaaS major release and the preceding major release. As of 28 August 2026, BC28 is the latest release, so BC27 is the oldest supported version. OnPrem releases are out of scope.
+For local compilation, temporarily set `platform`, `application`, `runtime`, and `preprocessorSymbols` in both `Application/app.json` and `Test/app.json` to match the target version. The runtime is the BC major version minus 11, so BC28 uses runtime 17.0. The Base Application dependency is implicit through `platform` and `application`.
 Use the /bcdev claude skill to download symbols, compile, publish and run tests.
 Use the -suppressWarnings flag when compiling unless directed to show warnings.  
-When setting preprocessorSymbols for local compilation, define **only** the target version (e.g. `["BC27", "BC2700"]`), not all versions from BC17 through BC27. The guards use symbols as version-specific flags: `#if BC17 or BC18` means "only for that version", so defining BC17 when targeting BC27 would incorrectly include OnPrem-only code like dotnet.al.
+When setting `preprocessorSymbols` for local compilation, define only the target version, for example `["BC28", "BC2800"]`. Each symbol selects code for that specific version, so additional symbols enable code paths that do not apply to the target. The codebase still contains guards for unsupported legacy versions. Those guards need deliberate cleanup and do not mean the versions are supported.
 
 
 
@@ -15,9 +15,7 @@ When setting preprocessorSymbols for local compilation, define **only** the targ
 The Fern .yml API documentation for our .al endpoints lives in a separate repository: https://github.com/navipartner/documentation  
 - We have a big control addin that runs our react based POS frontend, communicating with .al via Application/src/POS Core/POSDragonglass.Page.al
 - Our tests are in a separate BC .app in the repo root /Test/app.json.
-- Our app.json files at Application/app.json and Test/app.json are always configured to our oldest supported BC version.
-Currently this is BC17.
-Our PR pipelines will loop through versions from BC17 up to the latest BC SaaS version to ensure compatibility across versions. For the few areas where we need to write version specific code we use compiler preprocessor symbols.
+- Our PR pipelines validate the supported BC SaaS version window. For the few areas that need version-specific code, use compiler preprocessor symbols.
 - Our app contains a Sentry.io telemetry integration which we use instead of BCs application insights.  
 When troubleshooting performance, you can narrow down what exactly is taking time by using codeunits:  
 Application/src/Sentry/_public/Sentry.Codeunit.al  
@@ -29,7 +27,7 @@ For errors, you can log them to Sentry via Sentry.AddLastErrorIfProgrammingBug()
 - Do not commit any app.json changes as our pipeline manages this file for the final artifacts.
 - We limit public object and procedures as much as possible, putting public objects inside a _public folder inside their module folder to make sure we know the developer truly intended his objects to be public rather than just forgetting to set Access = Internal;
 - Always remember to update the Fern .yml API specification in https://github.com/navipartner/documentation when changing the .al APIs.
-- All changes must be compatible with BC SaaS (app.json "target": "Cloud") - we no longer support OnPrem for BC versions higher than BC20.
+- All changes must remain compatible with every supported Business Central SaaS version. OnPrem is out of scope.
 - For new big features/modules without existing test libraries & code in place, design the application code with injection of interfaces implementation mocks in mind at the top level, allowing the test code to implement mocks that read from temporary records and write into temporary records, skipping the database completely. This means passing records around by reference in all internal functions so the temporary records are kept intact.
 - Never log API request/response bodies such as JSON/XML to blob/media fields as this is very slow in BC SaaS and our API module already logs all request/responses & metadata in cloudflare (our proxy around BC) & sentry.
 - If you need to log an error of the exception kind (="If this happened there's a bug and a developer needs to know about it"), use our sentry codeunit and make sure the error message is written in non-translated english with "This is a programming bug" at the end of the message.
