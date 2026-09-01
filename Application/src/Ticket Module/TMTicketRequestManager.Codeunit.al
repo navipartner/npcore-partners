@@ -123,7 +123,7 @@
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Entry Type");
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Entry Type", "Revoke Ticket Request");
         if (TicketReservationRequest.FindFirst()) then
             Error(CHANGE_NOT_ALLOWED);
 
@@ -139,7 +139,8 @@
         if (not TicketAccessStatistics.FindLast()) then
             TicketAccessStatistics.Init();
 
-        ExpireDateTime := CalculateNewExpireTime();
+        // Expired requests are retained for one hour
+        ExpireDateTime := CurrentDateTime() + 3600 * 1000;
         repeat
 
             if (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::PRIMARY) then begin
@@ -190,6 +191,8 @@
                 TicketReservationRequest2."Admission Created" := false;
                 TicketReservationRequest2."Request Status" := TicketReservationRequest."Request Status"::EXPIRED;
                 TicketReservationRequest2."Expires Date Time" := ExpireDateTime;
+                if (TicketReservationRequest."Revoke Ticket Request") then
+                    TicketReservationRequest2."Expires Date Time" := CurrentDateTime() - 10 * 1000; // Revoke requests are not retained - a lingering one blocks refunding the ticket on all registers
                 TicketReservationRequest2.Modify();
             end;
 
@@ -890,7 +893,7 @@
                 ValidateWaitingListReferenceCode(WaitingListReferenceCode, AdmissionSchEntry);
 
         if (AdmissionSchEntry."Entry No." <= 0) then
-            if (not AdmissionSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(Ticket, AdmissionCode, false))) then
+            if (not AdmissionSchEntry.Get(TicketManagement.GetCurrentScheduleEntryForIssue(Ticket, AdmissionCode, false))) then
                 Clear(AdmissionSchEntry);
 
         TicketManagement.CreateAdmissionAccessEntry(Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry, AdmissionOverAllocationConfirmed);
@@ -1514,8 +1517,10 @@
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         RequestMutex: Record "NPR TM TicketRequestMutex";
-        ExpiredTokens, DeletedTokens : List of [Text[100]];
+        ExpiredTokens, DeletedTokens, ExtendRetentionTokens, KeepAliveTokens : List of [Text[100]];
         Token: Text[100];
+        RetainToken: Boolean;
+        KeepAliveUntil: DateTime;
         MySessionId: Integer;
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
@@ -1527,10 +1532,12 @@
 
         MySessionId := SessionId();
 
+        KeepAliveUntil := GetNextExpiryDateTime();
+
         // Scan REGISTERED and expire tokens that are older than X minutes
         TicketReservationRequest.Reset();
         TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUnCommitted;
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Expires Date Time");
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Expires Date Time", "Receipt No.", "Revoke Ticket Request", "Created Date Time");
         TicketReservationRequest.SetCurrentKey("Request Status", "Expires Date Time");
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
         TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
@@ -1539,19 +1546,32 @@
         if (TicketReservationRequest.FindSet()) then
             repeat
                 Token := TicketReservationRequest."Session Token ID";
-                if (not ExpiredTokens.Contains(Token)) then
-                    if (RequestMutex.Acquire(Token, MySessionId)) then
-                        ExpiredTokens.Add(Token);
-            until (TicketReservationRequest.Next() = 0) or (ExpiredTokens.Count() >= MaxNumberOfTokensPerSession);
+                if ((not ExpiredTokens.Contains(Token)) and (not KeepAliveTokens.Contains(Token))) then
+                    if (RequestMutex.Acquire(Token, MySessionId)) then begin
+                        RetainToken := false;
+                        if (not TicketReservationRequest."Revoke Ticket Request") then
+                            if (TicketReservationRequest."Created Date Time" > MaxRetentionThreshold()) then
+                                if (ReceiptHasActiveAttendedPosSale(TicketReservationRequest."Receipt No.")) then
+                                    RetainToken := CanExtendReservation(Token, PrePaymentExpiryFloor());
+
+                        if (RetainToken) then
+                            KeepAliveTokens.Add(Token)
+                        else
+                            ExpiredTokens.Add(Token);
+                    end;
+            until (TicketReservationRequest.Next() = 0) or (ExpiredTokens.Count() + KeepAliveTokens.Count() >= MaxNumberOfTokensPerSession);
 
         foreach Token in ExpiredTokens do
             DeleteReservationRequestV2(Token, false);
 
+        foreach Token in KeepAliveTokens do
+            ExtendRegisteredToken(Token, KeepAliveUntil);
+
         // Scan EXPIRED and delete tokens that are older than X minutes
-        if (ExpiredTokens.Count() < MaxNumberOfTokensPerSession) then begin
+        if (ExpiredTokens.Count() + KeepAliveTokens.Count() < MaxNumberOfTokensPerSession) then begin
             TicketReservationRequest.Reset();
             TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUnCommitted;
-            TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Expires Date Time");
+            TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Expires Date Time", "Receipt No.", "Revoke Ticket Request", "Created Date Time");
             TicketReservationRequest.SetCurrentKey("Request Status", "Expires Date Time");
             TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
             TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
@@ -1559,17 +1579,30 @@
             if (TicketReservationRequest.FindSet()) then
                 repeat
                     Token := TicketReservationRequest."Session Token ID";
-                    if (not DeletedTokens.Contains(Token)) then
-                        if (RequestMutex.Acquire(Token, MySessionId)) then
-                            DeletedTokens.Add(Token);
+                    if ((not DeletedTokens.Contains(Token)) and (not ExtendRetentionTokens.Contains(Token))) then
+                        if (RequestMutex.Acquire(Token, MySessionId)) then begin
+                            // Revoke requests are never retained - a lingering revoke blocks refunding the ticket on all registers
+                            RetainToken := false;
+                            if (not TicketReservationRequest."Revoke Ticket Request") then
+                                if (TicketReservationRequest."Created Date Time" > MaxRetentionThreshold()) then
+                                    RetainToken := ReceiptHasActivePosSale(TicketReservationRequest."Receipt No.");
 
-                until (TicketReservationRequest.Next() = 0) or (DeletedTokens.Count() + ExpiredTokens.Count() >= MaxNumberOfTokensPerSession);
+                            if (RetainToken) then
+                                ExtendRetentionTokens.Add(Token)
+                            else
+                                DeletedTokens.Add(Token);
+                        end;
+
+                until (TicketReservationRequest.Next() = 0) or (DeletedTokens.Count() + ExpiredTokens.Count() + ExtendRetentionTokens.Count() + KeepAliveTokens.Count() >= MaxNumberOfTokensPerSession);
 
             foreach Token in DeletedTokens do
                 DeleteReservationRequestV2(Token, true);
+
+            foreach Token in ExtendRetentionTokens do
+                ExtendRetentionForOpenPosSale(Token);
         end;
 
-        // Client up the mutex table
+        // Clean-up the mutex table
         foreach Token in ExpiredTokens do
             if (RequestMutex.Get(Token)) then
                 RequestMutex.Delete();
@@ -1578,15 +1611,49 @@
             if (RequestMutex.Get(Token)) then
                 RequestMutex.Delete();
 
-        if (ExpiredTokens.Count() + DeletedTokens.Count() > 0) then begin
-            if (ExpiredTokens.Count() + DeletedTokens.Count() >= MaxNumberOfTokensPerSession) then
-                EmitExpiryMessageToTelemetry(StrSubstNo('Reservation Request Expiry: was capped by max number to handle per session: %1, expired: %2, deleted: %3.', MaxNumberOfTokensPerSession, ExpiredTokens.Count(), DeletedTokens.Count()), Verbosity::Warning)
+        foreach Token in ExtendRetentionTokens do
+            if (RequestMutex.Get(Token)) then
+                RequestMutex.Delete();
+
+        foreach Token in KeepAliveTokens do
+            if (RequestMutex.Get(Token)) then
+                RequestMutex.Delete();
+
+        if (ExpiredTokens.Count() + DeletedTokens.Count() + ExtendRetentionTokens.Count() + KeepAliveTokens.Count() > 0) then begin
+            if (ExpiredTokens.Count() + DeletedTokens.Count() + ExtendRetentionTokens.Count() + KeepAliveTokens.Count() >= MaxNumberOfTokensPerSession) then
+                EmitExpiryMessageToTelemetry(StrSubstNo('Reservation Request Expiry: was capped by max number to handle per session: %1, expired: %2, deleted: %3, retained for open POS sale: %4, kept alive for open POS sale: %5.', MaxNumberOfTokensPerSession, ExpiredTokens.Count(), DeletedTokens.Count(), ExtendRetentionTokens.Count(), KeepAliveTokens.Count()), Verbosity::Warning)
             else
-                EmitExpiryMessageToTelemetry(StrSubstNo('Reservation Request Expiry: expired: %1, deleted: %2.', ExpiredTokens.Count(), DeletedTokens.Count()), Verbosity::Normal);
+                EmitExpiryMessageToTelemetry(StrSubstNo('Reservation Request Expiry: expired: %1, deleted: %2, retained for open POS sale: %3, kept alive for open POS sale: %4.', ExpiredTokens.Count(), DeletedTokens.Count(), ExtendRetentionTokens.Count(), KeepAliveTokens.Count()), Verbosity::Normal);
         end;
 
         Span.Finish();
-        exit(ExpiredTokens.Count() + DeletedTokens.Count());
+        exit(ExpiredTokens.Count() + DeletedTokens.Count() + ExtendRetentionTokens.Count() + KeepAliveTokens.Count());
+    end;
+
+    local procedure ExtendRegisteredToken(Token: Text[100]; KeepAliveUntil: DateTime)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
+        TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
+        TicketReservationRequest.ModifyAll("Expires Date Time", KeepAliveUntil);
+    end;
+
+    // Push retention forward so the token is not scanned again by every sweep while its POS sale sits open.
+    // A fixed interval, deliberately not CalculateNewExpireTime(): that resolves the TTL from the SWEEPING
+    // session's user/POS unit, so a short-TTL kiosk sweep would re-scan other registers' tokens every few
+    // minutes. The date filter keeps rows with a longer stamp from being shortened.
+    local procedure ExtendRetentionForOpenPosSale(Token: Text[100])
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
+        TicketReservationRequest.SetFilter("Expires Date Time", '<%1', CurrentDateTime());
+        TicketReservationRequest.ModifyAll("Expires Date Time", CurrentDateTime() + 3600 * 1000);
     end;
 
     local procedure EmitExpiryMessageToTelemetry(MessageText: Text; MsgVerbosity: Verbosity)
@@ -1621,6 +1688,8 @@
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
+        HandledTokens: List of [Text[100]];
+        RetainToken: Boolean;
     begin
 
         // Performance enhancement
@@ -1658,13 +1727,306 @@
             LockResources('ExpireReservationRequests-2');
             if (TicketReservationRequest.FindSet()) then begin
                 repeat
-                    DeleteReservationRequest(TicketReservationRequest."Session Token ID", true);
+                    if (not HandledTokens.Contains(TicketReservationRequest."Session Token ID")) then begin
+                        HandledTokens.Add(TicketReservationRequest."Session Token ID");
+                        // Revoke requests are never retained - a lingering one blocks refunding the ticket on all registers
+                        RetainToken := false;
+                        if (not TicketReservationRequest."Revoke Ticket Request") then
+                            if (TicketReservationRequest."Created Date Time" > MaxRetentionThreshold()) then
+                                RetainToken := ReceiptHasActivePosSale(TicketReservationRequest."Receipt No.");
+
+                        if (not RetainToken) then
+                            DeleteReservationRequest(TicketReservationRequest."Session Token ID", true)
+                        else begin
+                            TicketReservationRequest2.Reset();
+                            TicketReservationRequest2.SetCurrentKey("Session Token ID");
+                            TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+                            TicketReservationRequest2.SetFilter("Request Status", '=%1', TicketReservationRequest2."Request Status"::EXPIRED);
+                            TicketReservationRequest2.SetFilter("Expires Date Time", '<%1', CurrentDateTime());
+                            TicketReservationRequest2.ModifyAll("Expires Date Time", CurrentDateTime() + 3600 * 1000); // Retained another hour while the POS sale is open
+                        end;
+                    end;
                 until (TicketReservationRequest.Next() = 0);
 
                 Commit();
                 LockResources('ExpireReservationRequests-2a');
             end;
         end;
+    end;
+
+    // Requests older than this are expired and deleted no matter what: an abandoned sale must not pin
+    // its requests forever, and a day-old basket holds stale slot resolutions.
+    local procedure MaxRetentionThreshold(): DateTime
+    begin
+        exit(CurrentDateTime() - 24 * 3600 * 1000);
+    end;
+
+    // No matching index on purpose: the table only holds un-finalized sales, so the scan touches a handful
+    // of rows. Receipt numbers are only unique per POS audit profile, so a same-number sale on another
+    // register can match - benign, it errs toward extra (ceiling-bounded) retention only.
+    local procedure ReceiptHasActivePosSale(ReceiptNo: Code[20]): Boolean
+    var
+        SalePOS: Record "NPR POS Sale";
+    begin
+        if (ReceiptNo = '') then
+            exit(false);
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        SalePOS.ReadIsolation := IsolationLevel::ReadUnCommitted;
+#ENDIF
+        SalePOS.SetFilter("Sales Ticket No.", '=%1', ReceiptNo);
+        exit(not SalePOS.IsEmpty());
+    end;
+
+    // As ReceiptHasActivePosSale, but only attended units qualify: holding capacity requires a human
+    // behind the basket. Abandoned kiosk sales keep the TTL - their cleanup job only removes yesterday's sales.
+    local procedure ReceiptHasActiveAttendedPosSale(ReceiptNo: Code[20]): Boolean
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if (ReceiptNo = '') then
+            exit(false);
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        SalePOS.ReadIsolation := IsolationLevel::ReadUnCommitted;
+#ENDIF
+        SalePOS.SetLoadFields("Register No.");
+        SalePOS.SetFilter("Sales Ticket No.", '=%1', ReceiptNo);
+        if (not SalePOS.FindFirst()) then
+            exit(false);
+
+        POSUnit.SetLoadFields("POS Type");
+        if (not POSUnit.Get(SalePOS."Register No.")) then
+            exit(false);
+
+        exit(POSUnit."POS Type" <> POSUnit."POS Type"::UNATTENDED);
+    end;
+
+    // The pre-payment check floors a live reservation's expiry this far out so it cannot lapse mid-payment. The
+    // sweep stops holding a slot the same distance short of its entry closing, so the floor never carries a
+    // payment past the slot.
+    internal procedure PrePaymentExpiryFloor(): Duration
+    begin
+        exit(5 * 60 * 1000);
+    end;
+
+    // Lingering POS Sales are kept alive for a fixed interval, so the sweep does not re-scan them every few minutes. The
+    // sweep's own expiry is capped at the end of the service day, so a lingering sale does not keep a slot open past the end of the day.
+    local procedure GetNextExpiryDateTime(): DateTime
+    var
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        ServiceLocalNow: DateTime;
+        EndOfDay: DateTime;
+    begin
+        // The real instant the SERVICE day ends: take the duration from service-local now to its next midnight and add
+        // it to CurrentDateTime(), so cap and stamp stay in the frame the sweep filter compares against.
+        ServiceLocalNow := TimeHelper.GetLocalTimeForService();
+        EndOfDay := CurrentDateTime() + (CreateDateTime(CalcDate('<+1D>', DT2Date(ServiceLocalNow)), 0T) - ServiceLocalNow);
+        if (CurrentDateTime() + 25 * 60 * 1000 > EndOfDay) then
+            exit(EndOfDay);
+        exit(CurrentDateTime() + 25 * 60 * 1000);
+    end;
+
+    // Sweep view: hold while the reservation is still worth holding - see the full overload.
+    internal procedure CanExtendReservation(Token: Text[100]; SlotMargin: Duration): Boolean
+    var
+        PaymentUntil: DateTime;
+        EndedSlotText: Text;
+        EndedSlotClosedAt: Text;
+        EndedAdmissionCode: Code[20];
+        EndedScheduleEntryNo: Integer;
+        HoldHasLapsed: Boolean;
+    begin
+        if (not CanExtendReservation(Token, SlotMargin, PaymentUntil, EndedSlotText, EndedSlotClosedAt, HoldHasLapsed, EndedAdmissionCode, EndedScheduleEntryNo)) then
+            exit(false);
+        exit(not HoldHasLapsed);
+    end;
+
+    // Decides whether an in-POS reservation is still worth holding. Tickets are minted at registration, so every
+    // line already holds a concrete slot. The result is false only when a GATE-ENFORCED slot (prebook-required
+    // admission) has closed for entry (less SlotMargin) or its entry is gone - a paid ticket for it would be
+    // refused at the gate, so the pre-payment check refuses and the sweep releases. HoldHasLapsed reports the
+    // softer case: a configured sales cut-off ("Sales Until", enforced per ticket BOM) has passed, or a slot the
+    // gate does not enforce has closed - nothing is left to hold an idle basket for, yet a live sale may still be
+    // paid (real setups close sales at the slot start while admitting for another 90 minutes, or all day).
+    // PaymentUntil is how long a payment already under way may run: the earliest gate-enforced entry closing, or
+    // 0DT when no gate-enforced slot bounds it (the caller must not treat 0DT as a ceiling - it means "unbounded").
+    // EndedSlotText / EndedSlotClosedAt name the admission, slot start and closing time behind a false result - a
+    // ticket can hold several admissions, and the sale line's own slot text only ever describes one of them.
+    // EndedAdmissionCode / EndedScheduleEntryNo carry that same closing slot as codes (admission, external schedule
+    // entry no.), for telemetry diagnosis - set only alongside a false result, blank/0 otherwise.
+    // Slot times are venue-local wall clock; remaining time is measured against the admission's clock and re-based
+    // onto the service clock the sweep compares "Expires Date Time" with.
+    internal procedure CanExtendReservation(Token: Text[100]; SlotMargin: Duration; var PaymentUntil: DateTime; var EndedSlotText: Text; var EndedSlotClosedAt: Text; var HoldHasLapsed: Boolean; var EndedAdmissionCode: Code[20]; var EndedScheduleEntryNo: Integer): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Admission: Record "NPR TM Admission";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        ExternalScheduleEntryNo: Integer;
+        CurrentTicketNo: Code[20];
+        CurrentExtLineRef: Integer;
+        GroupResolved: Boolean;
+        SlotIsBinding: Boolean;
+        GateEnforcesSlot: Boolean;
+        LocalNow: DateTime;
+        EntryClosesAt: DateTime;
+        SalesCutOff: DateTime;
+        RemainingTime: Duration;
+        SlotEndTime: Time;
+        SlotStartLbl: Label '%1 %2 %3', Locked = true;
+    begin
+        PaymentUntil := 0DT;
+        EndedSlotText := '';
+        EndedSlotClosedAt := '';
+        EndedAdmissionCode := '';
+        EndedScheduleEntryNo := 0;
+        HoldHasLapsed := false;
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUnCommitted;
+        AdmissionScheduleEntry.ReadIsolation := IsolationLevel::ReadUnCommitted;
+#ENDIF
+
+        Admission.SetLoadFields("Prebook Is Required");
+        AdmissionScheduleEntry.SetLoadFields("Admission Code", "Admission Start Date", "Admission Start Time", "Admission End Date", "Admission End Time", "Event Arrival Until Time", "Sales Until Date", "Sales Until Time");
+        AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+
+        TicketReservationRequest.SetLoadFields("Entry No.", "Session Token ID", "Ext. Line Reference No.", "Item No.", "Variant Code", "Admission Code", "Admission Description", "External Adm. Sch. Entry No.");
+        TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.", "Admission Inclusion");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Admission Created", '=%1', true);
+        if (not TicketReservationRequest.FindSet()) then
+            exit(true);
+
+        repeat
+            // The ticket is linked to the PRIMARY line of this row's ext-line-ref group and carries every admission
+            // of the group as an access entry - resolve it once per group (rows iterate in ext-line-ref order), not
+            // once per admission row. A POS token has a single group today, but a token may hold several.
+            if ((not GroupResolved) or (TicketReservationRequest."Ext. Line Reference No." <> CurrentExtLineRef)) then begin
+                CurrentExtLineRef := TicketReservationRequest."Ext. Line Reference No.";
+                CurrentTicketNo := ResolveCurrentTicketNo(Token, CurrentExtLineRef);
+                GroupResolved := true;
+            end;
+
+            // Every line holds the slot it was minted for. The slot BINDS the hold when the admission requires
+            // pre-booking or the request line carries an entry - the customer chose it, or pricing resolved the current
+            // slot at issuance (BC-priced sales); either way sales validation treats it as the slot sold. Only a
+            // gate-enforced slot may refuse payment or cap the payment floor: for a slot on a non-prebook admission
+            // the gate admits regardless, so the paid ticket is good.
+            ExternalScheduleEntryNo := GetMintedScheduleEntryNo(CurrentTicketNo, TicketReservationRequest);
+
+            GateEnforcesSlot := false;
+            if (Admission.Get(TicketReservationRequest."Admission Code")) then
+                GateEnforcesSlot := Admission."Prebook Is Required";
+            SlotIsBinding := GateEnforcesSlot or (TicketReservationRequest."External Adm. Sch. Entry No." > 0);
+            if (ExternalScheduleEntryNo > 0) then begin
+                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
+                AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
+                if (not AdmissionScheduleEntry.FindFirst()) then begin
+                    if (GateEnforcesSlot) then begin
+                        EndedSlotText := TicketReservationRequest."Admission Description";
+                        EndedAdmissionCode := TicketReservationRequest."Admission Code";
+                        EndedScheduleEntryNo := ExternalScheduleEntryNo;
+                        exit(false);
+                    end;
+                end else begin
+                    LocalNow := TimeHelper.GetLocalTimeAtAdmission(TicketReservationRequest."Admission Code");
+
+                    if (SlotIsBinding) then begin
+                        SlotEndTime := AdmissionScheduleEntry."Event Arrival Until Time";
+                        if (SlotEndTime = 0T) then
+                            SlotEndTime := AdmissionScheduleEntry."Admission End Time";
+                        EntryClosesAt := CreateDateTime(AdmissionScheduleEntry."Admission End Date", SlotEndTime);
+
+                        RemainingTime := EntryClosesAt - LocalNow - SlotMargin;
+                        if (RemainingTime <= 0) then begin
+                            if (GateEnforcesSlot) then begin
+                                EndedSlotText := StrSubstNo(SlotStartLbl, TicketReservationRequest."Admission Description", AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+                                EndedSlotClosedAt := Format(SlotEndTime);
+                                EndedAdmissionCode := TicketReservationRequest."Admission Code";
+                                EndedScheduleEntryNo := ExternalScheduleEntryNo;
+                                exit(false);
+                            end;
+                            HoldHasLapsed := true;
+                        end;
+
+                        if (GateEnforcesSlot) then
+                            if ((PaymentUntil = 0DT) or (CurrentDateTime() + (EntryClosesAt - LocalNow) < PaymentUntil)) then
+                                PaymentUntil := CurrentDateTime() + (EntryClosesAt - LocalNow);
+                    end;
+
+                    // Past a configured sales cut-off nothing is left to hold an idle basket for (an all-day entry that
+                    // stops selling at 16:30 must not sit in a basket until midnight) - the customer re-adds the line
+                    // and gets the slot that is on sale now.
+                    SalesCutOff := TicketManagement.GetSalesCutOff(AdmissionScheduleEntry, TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code");
+                    if ((SalesCutOff <> CreateDateTime(0D, 0T)) and (SalesCutOff <= LocalNow)) then
+                        HoldHasLapsed := true;
+                end;
+            end;
+        until (TicketReservationRequest.Next() = 0);
+
+        exit(true);
+    end;
+
+    // The slot the issued ticket holds for this admission: its open reservation detail, else its initial entry -
+    // the same walk as SyncScheduleEntryFromIssuedAdmission. TicketNo is the ticket for this ext-line-ref (see
+    // ResolveCurrentTicketNo); falls back to the request line when the ticket or this admission's access entry cannot be found.
+    local procedure GetMintedScheduleEntryNo(TicketNo: Code[20]; TicketReservationRequest: Record "NPR TM Ticket Reservation Req."): Integer
+    var
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        DetailedEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        if (TicketNo = '') then
+            exit(TicketReservationRequest."External Adm. Sch. Entry No.");
+
+        AccessEntry.SetLoadFields("Entry No.");
+        AccessEntry.SetCurrentKey("Ticket No.");
+        AccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
+        AccessEntry.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
+        if (not AccessEntry.FindFirst()) then
+            exit(TicketReservationRequest."External Adm. Sch. Entry No.");
+
+        DetailedEntry.SetLoadFields("External Adm. Sch. Entry No.");
+        DetailedEntry.SetCurrentKey("Ticket Access Entry No.");
+        DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
+        DetailedEntry.SetFilter(Quantity, '>%1', 0);
+        DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
+        if (not DetailedEntry.FindLast()) then
+            DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::INITIAL_ENTRY);
+        if (not DetailedEntry.FindLast()) then
+            exit(TicketReservationRequest."External Adm. Sch. Entry No.");
+
+        exit(DetailedEntry."External Adm. Sch. Entry No.");
+    end;
+
+    // The ticket for one ext-line-ref group of a token, found via the group's PRIMARY request line (InsertTicket
+    // runs once per group, for the primary line, and every admission of the group hangs off that one ticket).
+    // Keying the ticket by an admission row's own Entry No. would only match the primary row and send every
+    // secondary admission down the request-line fallback. Returns '' when the group has not been issued yet.
+    local procedure ResolveCurrentTicketNo(Token: Text[100]; ExtLineReferenceNo: Integer): Code[20]
+    var
+        PrimaryRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        PrimaryRequest.SetLoadFields("Entry No.");
+        PrimaryRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.", "Admission Inclusion");
+        PrimaryRequest.SetFilter("Session Token ID", '=%1', Token);
+        PrimaryRequest.SetFilter("Ext. Line Reference No.", '=%1', ExtLineReferenceNo);
+        PrimaryRequest.SetFilter("Primary Request Line", '=%1', true);
+        if (not PrimaryRequest.FindFirst()) then
+            exit('');
+
+        Ticket.SetLoadFields("No.");
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', PrimaryRequest."Entry No.");
+        if (not Ticket.FindFirst()) then
+            exit('');
+
+        exit(Ticket."No.");
     end;
 
     procedure RegisterArrivalRequest(Token: Text[100]; PosUnitNo: Code[10])

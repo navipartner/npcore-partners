@@ -325,7 +325,7 @@
         key(Key4; "Request Status", "Expires Date Time")
         {
 #if not (BC17 or BC18)
-            IncludedFields = "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion", "Primary Request Line", "Admission Created";
+            IncludedFields = "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion", "Primary Request Line", "Admission Created", "Receipt No.", "Revoke Ticket Request", "Created Date Time";
 #endif
 
         }

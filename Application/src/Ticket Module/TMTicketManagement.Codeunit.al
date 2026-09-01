@@ -30,7 +30,9 @@
         TICKET_NOT_VALID_YET: Label 'Ticket %1 is not valid until %2.';
         TICKET_EXPIRED: Label 'Ticket %1 expired on %2.';
         SHOULD_NOT_BE_ZERO: Label 'Should not be zero.';
-        SCHEDULE_ENTRY_EXPIRED: Label 'The schedule entry %1 for %2, specifies a time in the past (%3) and cant be used for ticket reservation at this time (%4).';
+        SLOT_ENDED: Label '%1 %2 %3 ended at %4 - it is now %5. Pick a later time.', Comment = '%1 = admission description, %2 = slot start date, %3 = slot start time, %4 = slot end time, %5 = current time';
+        SLOT_ENTRY_CLOSED: Label 'Entry to %1 %2 %3 closed at %4 - it is now %5. Pick a later time.', Comment = '%1 = admission description, %2 = slot start date, %3 = slot start time, %4 = time entry closed, %5 = current time';
+        SLOT_DATE_PASSED: Label '%1 %2 %3 is over - today is %4. Pick a later date.', Comment = '%1 = admission description, %2 = slot start date, %3 = slot start time, %4 = current date';
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
         RESCHEDULE_NOT_ALLOWED: Label 'The ticket reschedule policy for %1 and %2, prevents changes at this time.';
@@ -63,6 +65,7 @@
         HAS_PAYMENT_NO: Label '-1033';
         ENTRY_NOT_FOUND_NO: Label '-1034';
         DURATION_EXCEEDED_NO: Label '-1035';
+        SALES_CLOSED_NO: Label '-1036';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
         gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
         HANDLE_POSTPAID: Label 'Do you want to generate invoices for postpaid ticket?';
@@ -73,6 +76,7 @@
         POSTPAID_INVOICE: Label 'Creating invoices...';
         POSTPAID_UPDATING: Label 'Closing prepaid payments...';
         NO_DEFAULT_SCHEDULE: Label 'The ticket request did not specify a valid time-slot for admission %1 and the ticket rule is to get the default schedule. But there are currently no time-slots that matches %2 "%3".';
+        SALES_CLOSED: Label 'Sales for %1 closed at %2, so it cannot be sold any longer today.', Comment = '%1 = admission description, %2 = the sales cut-off date and time';
         WORKFLOW_DESC: Label 'Print Ticket';
         CONFIRM_EXCEED_CAPACITY: Label 'Capacity for %1 will be exceeded. Do you want to continue?';
         _TicketExecutionContext: Option SALES,ADMISSION;
@@ -117,6 +121,277 @@
             ListPriceInclVat, ListPriceExclVat);
 
         Span.Finish();
+    end;
+
+    /**
+    * Runs inside the payment action's first server call (no extra front-end roundtrip). Raises the reservation
+    * expiry error before any tender is captured and extends the expiry of live reservations so they cannot
+    * expire mid-payment.
+    **/
+    // SCOPE - attended WF2 payment only. This event ("NPR Payment Processing Events".OnAddPreWorkflowsToRun) is raised
+    // in exactly one place: POSActionPaymentWF2. Self-service pays via the SS-PAYMENT workflow (codeunit 6151291) on its
+    // own path and never enters here. That scope is load-bearing: CheckAndExtendTicketReservationsBeforePayment finds
+    // reservations by Receipt No. + Line No., which is the ATTENDED linkage. SS/web reservations are token-linked with a
+    // blank receipt (see TMTicketRetailMgt.GetTokenFromReceipt), so a Receipt+Line lookup would not find them - if this
+    // ever fires outside WF2, the no-rows RESERVATION_GONE branch would false-positive on a reservation that exists.
+    [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR Payment Processing Events", 'OnAddPreWorkflowsToRun', '', true, true)]
+
+    local procedure ValidateTicketReservationsOnBeforePayment(Context: Codeunit "NPR POS JSON Helper"; SalePOS: Record "NPR POS Sale"; var PreWorkflows: JsonObject)
+    begin
+        CheckAndExtendTicketReservationsBeforePayment(SalePOS);
+    end;
+
+    // Guards the sale's ticket lines before any tender is captured, so reservation problems surface while
+    // the cashier can still fix them (delete line and register again) instead of after payment.
+    // - Sale lines must have a reservation, and it must not be expired.
+    // - A live reservation whose binding time slot has passed is refused as well, even before the expiry
+    //   sweep has caught up with it (the cashier would otherwise pay for a ride that has departed).
+    // - Refund lines must not have an expired revoke request. A missing request is only an error when the
+    //   return traces back to tickets in this company - other return flows legitimately have none.
+    // - When all lines pass, near-expiry reservations get their expiry floored (PrePaymentExpiryFloor) so
+    //   they should not expire mid-payment. The floor is capped at the line's binding slot end, so it never
+    //   carries a payment past the slot - a slot stays payable right up to its close, though.
+    // Messages name the line the way the cashier sees it (description plus its time slot text); the cashier's
+    // remedy is always to delete the line and add the ticket again.
+    // Two modes, per tenant via feature flag 'enforceTicketPrePaymentReservationCheck': ENFORCE raises the
+    // errors; OBSERVE (flag off or missing - the safe default) only logs what would have been refused and lets
+    // the payment through exactly as before this check existed. The expiry floor applies in both modes.
+    internal procedure CheckAndExtendTicketReservationsBeforePayment(SalePOS: Record "NPR POS Sale")
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        ExpiredReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketType: Record "NPR TM Ticket Type";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+        EnforceRefusals: Boolean;
+        HasPayment: Boolean;
+        NewExpiryDateTime: DateTime;
+        HoldHasLapsed: Boolean;
+        TicketLineNos: List of [Integer];
+        NonLiveTicketLineNos: List of [Integer];
+        RefundTicketLineNos: List of [Integer];
+        LineDisplayTexts: Dictionary of [Integer, Text];
+        LineDescriptions: Dictionary of [Integer, Text];
+        TicketLineNo: Integer;
+        Token: Text[100];
+        EndedSlotText: Text;
+        EndedSlotClosedAt: Text;
+        EndedAdmissionCode: Code[20];
+        EndedScheduleEntryNo: Integer;
+        PaymentUntil: DateTime;
+        SlotPassed: Label 'Entry to %1 closed at %4, so %2 (line %3) can no longer be sold for that time. Delete the line and add the ticket again to get the next available time.', Comment = '%1 = admission description followed by the slot start date and time, %2 = sale line description, %3 = sale line number, %4 = time entry closed';
+        SlotGone: Label '%1 is no longer available, so %2 (line %3) cannot be sold for it. Delete the line and add the ticket again to get the next available time.', Comment = '%1 = admission description (and slot start when known), %2 = sale line description, %3 = sale line number';
+        ReservationExpired: Label 'The reservation for %1 (line %2) has expired and its tickets were released. Delete the line and add the ticket again.', Comment = '%1 = sale line description followed by its time slot text, %2 = sale line number';
+        ReservationGone: Label 'No tickets are linked to %1 (line %2) - the reservation was removed before payment. Delete the line and add the ticket again.', Comment = '%1 = sale line description followed by its time slot text, %2 = sale line number';
+        RefundExpired: Label 'The return for %1 (line %2) has timed out. Delete the line and scan the ticket again to return it.', Comment = '%1 = sale line description, %2 = sale line number';
+        RefundGone: Label 'The return for %1 (line %2) is no longer registered. Delete the line and scan the ticket again to return it.', Comment = '%1 = sale line description, %2 = sale line number';
+    begin
+
+        if (SalePOS."Register No." = '') then
+            exit;
+
+        // No ticket types means no sale line can be a ticket line
+        if (TicketType.IsEmpty()) then
+            exit;
+
+        Sentry.StartSpan(Span, 'bc.pos.payment.ticket.check-reservation-expiry');
+
+        // Find all ticket lines and ticket refund lines in the sale, so we can check their reservations.
+        SaleLinePOS.SetLoadFields("No.", "Line No.", Quantity, Description, "Description 2");
+        SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
+        SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::Item);
+        SaleLinePOS.SetFilter(Quantity, '<>%1', 0);
+        if (SaleLinePOS.FindSet()) then
+            repeat
+                if (TicketRetailManager.IsTicketSalesLine(SaleLinePOS)) then begin
+                    LineDisplayTexts.Add(SaleLinePOS."Line No.", GetSaleLineDisplayText(SaleLinePOS));
+                    LineDescriptions.Add(SaleLinePOS."Line No.", SaleLinePOS.Description);
+                    if (SaleLinePOS.Quantity > 0) then
+                        TicketLineNos.Add(SaleLinePOS."Line No.")
+                    else
+                        RefundTicketLineNos.Add(SaleLinePOS."Line No.");
+                end;
+            until (SaleLinePOS.Next() = 0);
+
+        if ((TicketLineNos.Count() = 0) and (RefundTicketLineNos.Count() = 0)) then begin
+            Span.Finish();
+            exit;
+        end;
+
+        // Only hard-refuse BEFORE the first tender is captured  From the first tender on, downgrade to observe.
+        HasPayment := IsTenderCaptured(SalePOS);
+        EnforceRefusals := FeatureFlagManagement.IsEnabled('enforceTicketPrePaymentReservationCheck') and (not HasPayment);
+
+        // One check per ticket line's token: refuse the line if its binding slot has closed for entry, otherwise
+        // floor the whole token's live reservation out so the expiry sweep cannot lapse it mid-payment. The floor
+        // is a single expiry (capped at the slot end, so a payment can never outlive the slot), applied to every
+        // REGISTERED row of the token in one pass. A line with no live rows falls through to the gone/expired
+        // checks below.
+        foreach TicketLineNo in TicketLineNos do begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetLoadFields("Session Token ID");
+            TicketReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
+            TicketReservationRequest.SetFilter("Receipt No.", '=%1', SalePOS."Sales Ticket No.");
+            TicketReservationRequest.SetFilter("Line No.", '=%1', TicketLineNo);
+            TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
+            if (TicketReservationRequest.FindFirst()) then begin
+                Token := TicketReservationRequest."Session Token ID";
+                if (not TicketRequestManager.CanExtendReservation(Token, 0, PaymentUntil, EndedSlotText, EndedSlotClosedAt, HoldHasLapsed, EndedAdmissionCode, EndedScheduleEntryNo)) then begin
+                    if (EndedSlotClosedAt = '') then
+                        Refuse('SLOT_GONE', StrSubstNo(SlotGone, EndedSlotText, LineDescriptions.Get(TicketLineNo), TicketLineNo), EnforceRefusals, HasPayment, SalePOS, TicketLineNo, Token, EndedAdmissionCode, EndedScheduleEntryNo)
+                    else
+                        Refuse('SLOT_PASSED', StrSubstNo(SlotPassed, EndedSlotText, LineDescriptions.Get(TicketLineNo), TicketLineNo, EndedSlotClosedAt), EnforceRefusals, HasPayment, SalePOS, TicketLineNo, Token, EndedAdmissionCode, EndedScheduleEntryNo);
+                end else begin
+                    NewExpiryDateTime := CurrentDateTime() + TicketRequestManager.PrePaymentExpiryFloor();
+                    if ((PaymentUntil <> 0DT) and (PaymentUntil < NewExpiryDateTime)) then
+                        NewExpiryDateTime := PaymentUntil;
+                    SetTokenExpiry(Token, NewExpiryDateTime);
+                end;
+            end else
+                // No live reservation for this line - it must be gone or already swept; verify below.
+                NonLiveTicketLineNos.Add(TicketLineNo);
+        end;
+
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
+        TicketReservationRequest.SetFilter("Receipt No.", '=%1', SalePOS."Sales Ticket No.");
+        ExpiredReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
+        ExpiredReservationRequest.SetFilter("Receipt No.", '=%1', SalePOS."Sales Ticket No.");
+        ExpiredReservationRequest.SetFilter("Request Status", '=%1', ExpiredReservationRequest."Request Status"::EXPIRED);
+
+        // Only the lines that had no live reservation above: each must be either gone (no rows) or already
+        // swept (EXPIRED rows) - refuse so nothing is paid for a reservation that is no longer valid.
+        foreach TicketLineNo in NonLiveTicketLineNos do begin
+            TicketReservationRequest.SetFilter("Line No.", '=%1', TicketLineNo);
+            if (TicketReservationRequest.IsEmpty()) then
+                Refuse('RESERVATION_GONE', StrSubstNo(ReservationGone, LineDisplayTexts.Get(TicketLineNo), TicketLineNo), EnforceRefusals, HasPayment, SalePOS, TicketLineNo, '', '', 0);
+
+            ExpiredReservationRequest.SetFilter("Line No.", '=%1', TicketLineNo);
+            if (ExpiredReservationRequest.FindFirst()) then
+                Refuse('RESERVATION_EXPIRED', StrSubstNo(ReservationExpired, LineDisplayTexts.Get(TicketLineNo), TicketLineNo), EnforceRefusals, HasPayment, SalePOS, TicketLineNo,
+                    ExpiredReservationRequest."Session Token ID", ExpiredReservationRequest."Admission Code", ExpiredReservationRequest."External Adm. Sch. Entry No.");
+        end;
+
+        // Refund lines must not have expired revoke requests when created by RevokeTicketSales. Their remedy is to
+        // re-scan the ticket for return, NOT to add a ticket - so they carry their own wording, not the sales labels.
+        foreach TicketLineNo in RefundTicketLineNos do begin
+            TicketReservationRequest.SetFilter("Line No.", '=%1', TicketLineNo);
+            if (TicketReservationRequest.IsEmpty()) then begin
+                if (RefundLineShouldHaveRevokeRequests(SalePOS, TicketLineNo)) then
+                    Refuse('REFUND_GONE', StrSubstNo(RefundGone, LineDisplayTexts.Get(TicketLineNo), TicketLineNo), EnforceRefusals, HasPayment, SalePOS, TicketLineNo, '', '', 0);
+            end else begin
+                ExpiredReservationRequest.SetFilter("Line No.", '=%1', TicketLineNo);
+                if (ExpiredReservationRequest.FindFirst()) then
+                    Refuse('REFUND_EXPIRED', StrSubstNo(RefundExpired, LineDisplayTexts.Get(TicketLineNo), TicketLineNo), EnforceRefusals, HasPayment, SalePOS, TicketLineNo,
+                        ExpiredReservationRequest."Session Token ID", ExpiredReservationRequest."Admission Code", ExpiredReservationRequest."External Adm. Sch. Entry No.");
+            end;
+        end;
+
+        Span.Finish();
+    end;
+
+    // Update rows about to expire with new NewExpiryDateTime
+    local procedure SetTokenExpiry(Token: Text[100]; NewExpiryDateTime: DateTime)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
+        TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), NewExpiryDateTime);
+        TicketReservationRequest.ModifyAll("Expires Date Time", NewExpiryDateTime);
+    end;
+
+    local procedure Refuse(Reason: Text; Message: Text; Enforce: Boolean; TenderCaptured: Boolean; SalePOS: Record "NPR POS Sale"; SaleLineNo: Integer; Token: Text[100]; AdmissionCode: Code[20]; ExtScheduleEntryNo: Integer)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        MessageVerbosity: Verbosity;
+    begin
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_RegisterNo', SalePOS."Register No.");
+        CustomDimensions.Add('NPR_ReceiptNo', SalePOS."Sales Ticket No.");
+        CustomDimensions.Add('NPR_SaleLineNo', Format(SaleLineNo, 0, 9));
+        CustomDimensions.Add('NPR_Reason', Reason);
+
+        if (Enforce) then begin
+            CustomDimensions.Add('NPR_Outcome', 'REFUSED');
+            MessageVerbosity := Verbosity::Error;
+        end else begin
+            CustomDimensions.Add('NPR_Outcome', 'OBSERVED');
+            MessageVerbosity := Verbosity::Warning;
+        end;
+
+        CustomDimensions.Add('NPR_TenderCaptured', Format(TenderCaptured, 0, 9));
+
+        if (Token <> '') then
+            CustomDimensions.Add('NPR_SessionToken', Token);
+        if (AdmissionCode <> '') then
+            CustomDimensions.Add('NPR_AdmissionCode', AdmissionCode);
+        if (ExtScheduleEntryNo <> 0) then
+            CustomDimensions.Add('NPR_ExtScheduleEntryNo', Format(ExtScheduleEntryNo, 0, 9));
+
+        Session.LogMessage('NPR_TM_PrePaymentCheck', Message, MessageVerbosity, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+
+        if (Enforce) then
+            Error(Message);
+    end;
+
+    local procedure GetSaleLineDisplayText(SaleLinePOS: Record "NPR POS Sale Line"): Text
+    begin
+        if (SaleLinePOS."Description 2" = '') then
+            exit(SaleLinePOS.Description);
+        exit(SaleLinePOS.Description + ' ' + SaleLinePOS."Description 2");
+    end;
+
+    // True until the first captured tender lands on the sale. Only "POS Payment" lines count - that is precisely what
+    // the POS core treats as paid (POSPaymentLine.CalculateBalance sums only "POS Payment" into PaidAmount; "GL Payment"
+    // and "Customer Deposit" are sale/owed side, not tender). Every real tender - cash, EFT, Adyen, Vipps, gift-card
+    // redemption - is a "POS Payment" line, so this stays correct even as new payment types are added. Used to arm the
+    // hard refusal only before any tender, so partial payments cannot be stranded mid-sale.
+    local procedure IsTenderCaptured(SalePOS: Record "NPR POS Sale"): Boolean
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", "Line Type");
+        SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
+        SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::"POS Payment");
+        exit(not SaleLinePOS.IsEmpty());
+    end;
+
+    // Mirrors the conditions under which RevokeTicketSales creates revoke requests: a return-sale reference
+    // resolving to tickets in this company. Keep in sync with RevokeTicketSales (TMTicketRetailMgt).
+    local procedure RefundLineShouldHaveRevokeRequests(SalePOS: Record "NPR POS Sale"; SaleLineNo: Integer): Boolean
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        OriginalSaleLine: Record "NPR POS Entry Sales Line";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        SaleLinePOS.SetLoadFields("Return Sale Sales Ticket No.", "Orig.POS Entry S.Line SystemId", "Line No.");
+        SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
+        SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Line No.", '=%1', SaleLineNo);
+        if (not SaleLinePOS.FindFirst()) then
+            exit(false);
+
+        if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
+            exit(false);
+
+        OriginalSaleLine."Document No." := SaleLinePOS."Return Sale Sales Ticket No.";
+        OriginalSaleLine."Line No." := SaleLinePOS."Line No.";
+        if (not IsNullGuid(SaleLinePOS."Orig.POS Entry S.Line SystemId")) then
+            if (not OriginalSaleLine.GetBySystemId(SaleLinePOS."Orig.POS Entry S.Line SystemId")) then
+                exit(false);
+
+        Ticket.SetFilter("Sales Receipt No.", '=%1', OriginalSaleLine."Document No.");
+        Ticket.SetFilter("Line No.", '=%1', OriginalSaleLine."Line No.");
+        exit(not Ticket.IsEmpty());
     end;
 
     procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10]; UnitAmountInclVat: Decimal; UnitAmountExclVat: Decimal; UnitPriceInclVat: Decimal; UnitPriceExclVat: Decimal)
@@ -774,8 +1049,12 @@
                 Admission."Default Schedule"::TODAY,
                 Admission."Default Schedule"::NEXT_AVAILABLE:
 
-                    if (not AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", true))) then
+                    if (not AdmissionSchEntry.Get(GetCurrentScheduleEntryForIssue(Ticket, Admission."Admission Code", true))) then begin
+                        // A slot is open but its sales have closed: say that, not "no schedule"
+                        if (AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", false))) then
+                            RaiseError(StrSubstNo(SALES_CLOSED, Admission.Description, Format(GetSalesCutOff(AdmissionSchEntry, Ticket."Item No.", Ticket."Variant Code"))), SALES_CLOSED_NO);
                         RaiseError(StrSubstNo(NO_DEFAULT_SCHEDULE, Admission."Admission Code", Admission.FieldCaption("Default Schedule"), Admission."Default Schedule"), NO_DEFAULT_SCHEDULE_NO);
+                    end;
             end;
         end else begin
 
@@ -842,8 +1121,12 @@
                 Admission."Default Schedule"::TODAY,
                 Admission."Default Schedule"::NEXT_AVAILABLE:
 
-                    if (not AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", true))) then
+                    if (not AdmissionSchEntry.Get(GetCurrentScheduleEntryForIssue(Ticket, Admission."Admission Code", true))) then begin
+                        // A slot is open but its sales have closed: say that, not "no schedule"
+                        if (AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", false))) then
+                            RaiseError(StrSubstNo(SALES_CLOSED, Admission.Description, Format(GetSalesCutOff(AdmissionSchEntry, Ticket."Item No.", Ticket."Variant Code"))), SALES_CLOSED_NO);
                         RaiseError(StrSubstNo(NO_DEFAULT_SCHEDULE, Admission."Admission Code", Admission.FieldCaption("Default Schedule"), Admission."Default Schedule"), NO_DEFAULT_SCHEDULE_NO);
+                    end;
             end;
         end else begin
 
@@ -1190,30 +1473,31 @@
 
     end;
 
+    // Messages are written for the cashier on a first shift: the slot as it is displayed, the time that actually
+    // closed it (the boarding cut-off for -1024, not the slot start or end) and the clock now. Codes unchanged.
     procedure IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date; ReferenceTime: Time; var ResponseMessage: Text; var ResponseCode: Integer): Boolean
     var
-        DateTimeLbl: Label '%1  - %2', Locked = true;
+        Admission: Record "NPR TM Admission";
+        AdmissionName: Text;
     begin
+        AdmissionName := AdmissionSchEntry."Admission Code";
+        Admission.SetLoadFields(Description);
+        if (Admission.Get(AdmissionSchEntry."Admission Code")) then
+            if (Admission.Description <> '') then
+                AdmissionName := Admission.Description;
+
         if (AdmissionSchEntry."Admission End Date" = ReferenceDate) then begin
 
             if ((AdmissionSchEntry."Event Arrival Until Time" = 0T) and
                 (AdmissionSchEntry."Admission End Time" < ReferenceTime)) then begin
-                ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
-                    AdmissionSchEntry."External Schedule Entry No.",
-                    AdmissionSchEntry."Admission Code",
-                    StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
-                    StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
+                ResponseMessage := StrSubstNo(SLOT_ENDED, AdmissionName, AdmissionSchEntry."Admission Start Date", AdmissionSchEntry."Admission Start Time", AdmissionSchEntry."Admission End Time", ReferenceTime);
                 Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO);
                 exit(true);
             end;
 
             if ((AdmissionSchEntry."Event Arrival Until Time" <> 0T) and
                 (AdmissionSchEntry."Event Arrival Until Time" < ReferenceTime)) then begin
-                ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
-                    AdmissionSchEntry."External Schedule Entry No.",
-                    AdmissionSchEntry."Admission Code",
-                    StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
-                    StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
+                ResponseMessage := StrSubstNo(SLOT_ENTRY_CLOSED, AdmissionName, AdmissionSchEntry."Admission Start Date", AdmissionSchEntry."Admission Start Time", AdmissionSchEntry."Event Arrival Until Time", ReferenceTime);
                 Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO2);
                 exit(true);
             end;
@@ -1221,11 +1505,7 @@
         end;
 
         if (AdmissionSchEntry."Admission End Date" < ReferenceDate) then begin
-            ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
-                AdmissionSchEntry."External Schedule Entry No.",
-                AdmissionSchEntry."Admission Code",
-                StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission End Time", 0, 9)),
-                StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
+            ResponseMessage := StrSubstNo(SLOT_DATE_PASSED, AdmissionName, AdmissionSchEntry."Admission Start Date", AdmissionSchEntry."Admission Start Time", ReferenceDate);
             Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO3);
             exit(true);
         end;
@@ -2978,7 +3258,38 @@
         exit(GetCurrentScheduleEntry(Ticket."Item No.", Ticket."Variant Code", AdmissionCode, WithCreate, 0));
     end;
 
+    // Picks the concrete TODAY / NEXT_AVAILABLE slot a ticket is stamped with at issuance (minting).
+    //
+    // Read the two arguments carefully - they look self-contradictory but are not:
+    //
+    // * ScheduleContext::Admit  -- do NOT read this as "admit the customer". In this option it means
+    //   "resolve which slot is current by the ARRIVAL WINDOW (Event Arrival From/Until)", as opposed to
+    //   ::Sale which means "resolve by running full sale validation". We use Admit here on purpose: the
+    //   slot we stamp is the one the GATE will later validate the ticket against, so it has to be resolved
+    //   the exact same way the gate resolves it - by the arrival window. 
+    //
+    // * HonourSalesCutOff = true -- the only thing issuance adds on top. The arrival window answers "which
+    //   slot can they enter"; it says nothing about "may I still sell it". So we also skip any slot whose
+    //   sales cut-off ("Sales Until", only when the ticket BOM has Enforce Schedule Sales Limits) has
+    //   passed, and take the next sellable one - otherwise a ticket lands in the basket already un-sellable.
+    //   With Enforce Schedule Sales Limits OFF (most setups) this flag is inert and behavior is unchanged.
+    //
+    // In short: resolve by the arrival window (so the mint matches the gate), but never mint a slot you can
+    // no longer sell. The GATE is calling the plain GetCurrentScheduleEntry (HonourSalesCutOff = false) ->
+    // the sales cut-off must not stop a customer entering on a ticket they already paid for.
+    internal procedure GetCurrentScheduleEntryForIssue(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
+    var
+        ScheduleContext: Option Admit,Sale;
+    begin
+        exit(GetCurrentScheduleEntryWorker(Ticket."Item No.", Ticket."Variant Code", AdmissionCode, WithCreate, ScheduleContext::Admit, true));
+    end;
+
     procedure GetCurrentScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; WithCreate: Boolean; ScheduleContext: Option Admit,Sale): Integer
+    begin
+        exit(GetCurrentScheduleEntryWorker(ItemNo, VariantCode, AdmissionCode, WithCreate, ScheduleContext, false));
+    end;
+
+    local procedure GetCurrentScheduleEntryWorker(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; WithCreate: Boolean; ScheduleContext: Option Admit,Sale; HonourSalesCutOff: Boolean): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
@@ -2989,24 +3300,67 @@
         Clear(AdmissionScheduleEntry);
         LocalTime := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
 
-        if (GetAdmScheduleEntry(ItemNo, VariantCode, AdmissionCode, DT2Date(LocalTime), DT2Time(LocalTime), AdmissionScheduleEntry, WithCreate, ScheduleContext)) then
+        if (GetAdmScheduleEntry(ItemNo, VariantCode, AdmissionCode, DT2Date(LocalTime), DT2Time(LocalTime), AdmissionScheduleEntry, WithCreate, ScheduleContext, HonourSalesCutOff)) then
             exit(AdmissionScheduleEntry."Entry No.");
 
+        // Nothing left today: fall through to the first later slot. Only issuance (HonourSalesCutOff) filters here.
         if (Admission."Default Schedule"::NEXT_AVAILABLE = GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode)) then begin
             AdmissionScheduleEntry.Reset();
             AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '>%1', DT2Date(LocalTime));
             AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-            if (AdmissionScheduleEntry.FindFirst()) then
-                exit(AdmissionScheduleEntry."Entry No.");
+            if (AdmissionScheduleEntry.FindSet()) then
+                repeat
+                    // Take the first later slot; when issuing, skip one whose sales window has already closed and try
+                    // the next. Deliberately NO full sale validation (ValidateAdmSchEntryForSales) here: it rejects
+                    // every future-dated entry (blank duration -> '<0D>', or ActivateOnSales date mismatch), which
+                    // would starve the pre-existing ::Sale callers (pricing, rebook, request time text) of the
+                    // "tomorrow's first slot" they have always resolved from this fallback.
+                    if (not (HonourSalesCutOff and SalesCutOffHasPassed(AdmissionScheduleEntry, ItemNo, VariantCode, LocalTime))) then
+                        exit(AdmissionScheduleEntry."Entry No.");
+                until (AdmissionScheduleEntry.Next() = 0);
         end;
 
         exit(0);
     end;
 
+    // The moment sales of a slot close, 0DT when no cut-off applies: the ticket BOM must enforce schedule
+    // sales limits and the entry must carry a "Sales Until" (blank date = the slot's end date, matching the
+    // schedule generator). Mirrors the "Sales Until" branch of ValidateAdmSchEntryForSales.
+    internal procedure GetSalesCutOff(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; ItemNo: Code[20]; VariantCode: Code[10]): DateTime
+    var
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        SalesUntilDate: Date;
+    begin
+        if ((AdmissionScheduleEntry."Sales Until Date" = 0D) and (AdmissionScheduleEntry."Sales Until Time" = 0T)) then
+            exit(CreateDateTime(0D, 0T));
 
-    local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean; ScheduleContext: Option Admit,Sale): Boolean
+        TicketBOM.SetLoadFields("Enforce Schedule Sales Limits");
+        if (not TicketBOM.Get(ItemNo, VariantCode, AdmissionScheduleEntry."Admission Code")) then
+            exit(CreateDateTime(0D, 0T));
+
+        if (not TicketBOM."Enforce Schedule Sales Limits") then
+            exit(CreateDateTime(0D, 0T));
+
+        SalesUntilDate := AdmissionScheduleEntry."Sales Until Date";
+        if (SalesUntilDate = 0D) then
+            SalesUntilDate := AdmissionScheduleEntry."Admission End Date";
+
+        exit(CreateDateTime(SalesUntilDate, AdmissionScheduleEntry."Sales Until Time"));
+    end;
+
+    local procedure SalesCutOffHasPassed(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; ItemNo: Code[20]; VariantCode: Code[10]; ReferenceTime: DateTime): Boolean
+    var
+        SalesCutOff: DateTime;
+    begin
+        SalesCutOff := GetSalesCutOff(AdmissionScheduleEntry, ItemNo, VariantCode);
+        if (SalesCutOff = CreateDateTime(0D, 0T)) then
+            exit(false);
+        exit(ReferenceTime > SalesCutOff);
+    end;
+
+    local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean; ScheduleContext: Option Admit,Sale; HonourSalesCutOff: Boolean): Boolean
     var
         Admission: Record "NPR TM Admission";
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -3018,6 +3372,7 @@
         AdmissionEndTime: DateTime;
         ReasonCode: Enum "NPR TM Sch. Block Sales Reason";
         RemainingQty: Integer;
+        SlotIsSellable: Boolean;
     begin
 
         if (AdmissionSchEntry."Entry No." = 0) then begin
@@ -3068,8 +3423,13 @@
                         AdmissionEndTime := CreateDateTime(AdmissionSchEntry."Admission End Date", AdmissionSchEntry."Event Arrival Until Time");
                 end;
 
-                if ((ScheduleContext = ScheduleContext::Admit) or
-                    ((ScheduleContext = ScheduleContext::Sale) and (ValidateAdmSchEntryForSales(AdmissionSchEntry, ItemNo, VariantCode, AdmissionDate, AdmissionTime, ReasonCode, RemainingQty)))) then begin
+                SlotIsSellable := true;
+                if (HonourSalesCutOff) then
+                    SlotIsSellable := not SalesCutOffHasPassed(AdmissionSchEntry, ItemNo, VariantCode, ReferenceTime);
+
+                if (SlotIsSellable and
+                    ((ScheduleContext = ScheduleContext::Admit) or
+                     ((ScheduleContext = ScheduleContext::Sale) and (ValidateAdmSchEntryForSales(AdmissionSchEntry, ItemNo, VariantCode, AdmissionDate, AdmissionTime, ReasonCode, RemainingQty))))) then begin
 
                     if ((ReferenceTime > AdmissionStartTime) and
                         (ReferenceTime > AdmissionEndTime) and

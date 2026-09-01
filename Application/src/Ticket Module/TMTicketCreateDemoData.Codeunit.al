@@ -231,6 +231,10 @@
         CreateTicketBOM('31100', '', AdmissionList[9], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
         CreateTicketBOM('31100', '', AdmissionList[10], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
 
+        CreateEntryAndTourTicket('31050');
+        CreateTimedEntryTicket('31051');
+        CreateTimedShowTicket('31052');
+
         TicketSetup."Print Server Generator URL" := 'http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders';
         TicketSetup."Timeout (ms)" := 30000;
         TicketSetup."Print Server Gen. Username" := 'web_experimentarium';
@@ -248,6 +252,170 @@
 
         MESSAGE('Setup of DEMO data for ticketing, completed.');
 
+    end;
+
+    // Entry + tour ticket: one admission is an all-day (08-21) entry resolved as TODAY and validated SAME_DAY, the
+    // other is a prebook-required ride running in 20-minute slots (3 per hour, 08:00-21:00) minted as NEXT_AVAILABLE
+    // - the "next tour" shape where the cashier never picks a slot but the ticket still holds a concrete one.
+    local procedure CreateEntryAndTourTicket(ItemNo: Code[20])
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        EntryAdmission: Code[20];
+        RideAdmission: Code[20];
+        ScheduleCode: Code[20];
+        SlotStart: Time;
+        SlotEnd: Time;
+        Hour: Integer;
+        Minute: Integer;
+    begin
+        EntryAdmission := CreateAdmissionCode('ENTRY', 'Park Entry (all day)', Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
+        RideAdmission := CreateAdmissionCode('TOUR', 'TOUR (20 minute slots)', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::NEXT_AVAILABLE);
+
+        // The gate enforces the reserved slot only when prebook is required on the ADMISSION (the runtime reads it there,
+        // not from the schedule line) - without this a 15:40 reservation could be admitted on the 19:00 slot.
+        Admission.Get(RideAdmission);
+        Admission."Prebook Is Required" := true;
+        Admission.Modify();
+
+        CreateSchedule('ENTRY-ALLDAY', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, Today(), AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 210000T, true, true, true, true, true, true, true);
+        CreateScheduleLine(EntryAdmission, 'ENTRY-ALLDAY', 1, false, 500, ScheduleLine."Capacity Control"::ADMITTED, '<+7D>', 0, 0);
+
+        // 39 rides: 08:00, 08:20, 08:40 ... 20:40, each boarding for its whole slot
+        for Hour := 8 to 20 do
+            for Minute := 0 to 2 do begin
+                SlotStart := 000000T + (Hour * 3600 * 1000) + (Minute * 20 * 60 * 1000);
+                SlotEnd := SlotStart + (20 * 60 * 1000);
+                ScheduleCode := CopyStr(StrSubstNo('TOUR-%1', Format(Hour * 100 + Minute * 20, 0, '<Integer,4><Filler Character,0>')), 1, MaxStrLen(ScheduleCode));
+
+                CreateSchedule(ScheduleCode, AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, Today(), AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, SlotStart, SlotEnd, true, true, true, true, true, true, true);
+                // -1 = no boarding cut-off: entry stays open to the slot end (the helper's >= 0 rule would set start + N)
+                CreateScheduleLine(RideAdmission, ScheduleCode, 1, true, 30, ScheduleLine."Capacity Control"::SALES, '<+7D>', 0, -1);
+            end;
+
+        CreateItem(ItemNo, '', 'POS-MSCAN', 'Entry + TOUR Ticket', 199);
+        CreateTicketBOM(ItemNo, '', EntryAdmission, '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
+        CreateTicketBOM(ItemNo, '', RideAdmission, '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+    end;
+
+    // The slot is auto-picked at sale (NEXT_AVAILABLE) - with all windows overlapping and open to 18:00, the mint
+    // resolves to the most recently started slot (see GetCurrentScheduleEntryForIssue), i.e. the current 20-minute
+    // cohort. No "Sales Until" cut-off is configured: it isn't needed here, because the overlap + most-current
+    // pick already lands the guest in the live slot, and a cut-off would only start refusing late walk-ins - the
+    // opposite of the intent. (Total in-venue headcount across the overlapping slots is a job for a concurrent
+    // admission limit, not per-slot capacity.)
+    local procedure CreateTimedEntryTicket(ItemNo: Code[20])
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        TimedAdmission: Code[20];
+        ScheduleCode: Code[20];
+        SlotStart: Time;
+        SlotEnd: Time;
+        Hour: Integer;
+        Minute: Integer;
+    begin
+        TimedAdmission := CreateAdmissionCode('TIMEDENTRY', 'Timed Entry (60 min slots)', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::NEXT_AVAILABLE);
+
+        // Prebook on the ADMISSION so the gate enforces the reserved slot (the runtime reads the flag here, not
+        // from the schedule line) - the guest is admitted against the slot on their ticket, within its window.
+        Admission.Get(TimedAdmission);
+        Admission."Prebook Is Required" := true;
+        Admission.Modify();
+
+        // Slots 08:00, 08:20, 08:40 ... 17:40 - 60 minutes long, so three overlap at any time
+        for Hour := 8 to 17 do
+            for Minute := 0 to 2 do begin
+                SlotStart := 000000T + (Hour * 3600 * 1000) + (Minute * 20 * 60 * 1000);
+                SlotEnd := SlotStart + (60 * 60 * 1000);
+                ScheduleCode := CopyStr(StrSubstNo('TE-%1', Format(Hour * 100 + Minute * 20, 0, '<Integer,4><Filler Character,0>')), 1, MaxStrLen(ScheduleCode));
+
+                CreateSchedule(ScheduleCode, AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, Today(), AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, SlotStart, SlotEnd, true, true, true, true, true, true, true);
+                CreateScheduleLine(TimedAdmission, ScheduleCode, 1, true, 60, ScheduleLine."Capacity Control"::SALES, '<+7D>', 0, -1);
+
+                // Arrival open until end-of-business, not slot end - the "arrive late, no fuss" rule. Set directly on the
+                // line (the CreateScheduleLine helper only expresses windows relative to the slot start).
+                ScheduleLine.Get(TimedAdmission, ScheduleCode);
+                ScheduleLine."Event Arrival Until Time" := 180000T;
+                ScheduleLine.Modify();
+            end;
+
+        CreateItem(ItemNo, '', 'POS-MSCAN', 'Timed Entry Ticket', 149);
+        CreateTicketBOM(ItemNo, '', TimedAdmission, '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+    end;
+
+    // Timed show ticket, 31052 - exercises all three windows at once, two 30-minute-skewed shows per hour, 10:00-15:35:
+    //   sales window   start-65min .. start    (buy from just over an hour out, up to curtain; BOM enforces the limit)
+    //   arrival window start-5min  .. start    (doors: enter only in the 5 minutes before curtain, never during the show)
+    //   the show       start       .. start+55min
+    // The three windows meet at the slot start, so the sellable, enterable minute is a knife-edge - exactly the shape
+    // the pre-payment guard and keep-alive cap are built for. Two admissions on one ticket so both behaviours show from
+    // a single sale:
+    //   SHOW-STRICT (Prebook Is Required on the admission) binds the reserved show - a scan after curtain is refused,
+    //               and the reservation caps its keep-alive / payment window at that show's arrival-until.
+    //   SHOW-SOFT   (no prebook) ignores the reserved show and re-resolves at the gate - watch which show it lands on
+    //               when scanned between the tight arrival windows (no window open now -> it takes the next show).
+    local procedure CreateTimedShowTicket(ItemNo: Code[20])
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule";
+        SoftAdmission: Code[20];
+        ScheduleCode: Code[20];
+        SlotStart: Time;
+        SlotEnd: Time;
+        Hour: Integer;
+        HalfHour: Integer;
+        StartMinutes: Integer;
+    begin
+        SoftAdmission := CreateAdmissionCode('SHOW-SOFT', 'Timed Show (soft, no prebook)', Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::NEXT_AVAILABLE);
+
+        // Shows at hh:05 and hh:35 - 55 minutes long, so the two per hour never overlap and neither do their windows.
+        for Hour := 08 to 18 do
+            for HalfHour := 0 to 1 do begin
+                StartMinutes := (Hour * 60) + 5 + (HalfHour * 30);
+                SlotStart := 000000T + (StartMinutes * 60 * 1000);
+                SlotEnd := SlotStart + (55 * 60 * 1000);
+                ScheduleCode := CopyStr(StrSubstNo('SHOW-%1', Format(StartMinutes, 0, '<Integer,4><Filler Character,0>')), 1, MaxStrLen(ScheduleCode));
+
+                // One schedule header per show; a line for each admission so both share the exact same windows.
+                CreateSchedule(ScheduleCode, AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, Today(), AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, SlotStart, SlotEnd, true, true, true, true, true, true, true);
+                AddShowScheduleLine(SoftAdmission, ScheduleCode, SlotStart);
+            end;
+
+        CreateItem(ItemNo, '', 'POS-MSCAN', 'Timed Show Ticket', 249);
+
+        CreateTicketBOM(ItemNo, '', SoftAdmission, '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        SetEnforceScheduleSalesLimits(ItemNo, SoftAdmission);
+    end;
+
+    local procedure AddShowScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; SlotStart: Time)
+    var
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+    begin
+        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, true, 50, ScheduleLine."Capacity Control"::SALES, '<+7D>', 0, -1);
+
+        // Set all three windows directly on the line - the CreateScheduleLine helper only expresses arrival relative to
+        // the slot, and leaving the date parts blank lets the generator stamp each window onto the show's own date.
+        ScheduleLine.Get(AdmissionCode, ScheduleCode);
+        ScheduleLine."Event Arrival From Time" := SlotStart - (5 * 60 * 1000);
+        ScheduleLine."Event Arrival Until Time" := SlotStart;
+        ScheduleLine."Sales From Time" := SlotStart - (65 * 60 * 1000);
+        ScheduleLine."Sales Until Time" := SlotStart;
+        ScheduleLine.Modify();
+    end;
+
+    local procedure SetEnforceScheduleSalesLimits(ItemNo: Code[20]; AdmissionCode: Code[20])
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+    begin
+        TicketBom.Get(ItemNo, '', AdmissionCode);
+        TicketBom."Enforce Schedule Sales Limits" := true;
+        TicketBom.Modify();
     end;
 
     procedure SetupMembershipGuestTicket(AdmissionCode: Code[20]; AdmissionDescription: text[50]; ItemCode: Code[20]; ItemDescription: text[100]): code[20]
@@ -425,15 +593,26 @@
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";
+        TemplateItemNo: Code[20];
         CreateItemLbl: Label 'IXRF-%1', Locked = true;
         CreateItem2Lbl: Label 'IXRF-%1-%2', Locked = true;
     begin
         TicketItem.Init();
         if (not (TicketItem.Get(No))) then begin
             TicketItem.Get('70000');
+            TemplateItemNo := TicketItem."No.";
             TicketItem."No." := No;
             TicketItem.Insert();
+
+            // The clone keeps the template's unit of measure codes, but "Item Unit of Measure" rows are per item
+            // and are not copied by Insert - without them the item's base unit does not resolve.
+            CopyItemUnitsOfMeasure(TemplateItemNo, TicketItem);
         end;
+
+        // Also repairs items created by earlier versions of this demo data
+        EnsureItemUnitOfMeasure(TicketItem."No.", TicketItem."Base Unit of Measure");
+        EnsureItemUnitOfMeasure(TicketItem."No.", TicketItem."Sales Unit of Measure");
+        EnsureItemUnitOfMeasure(TicketItem."No.", TicketItem."Purch. Unit of Measure");
 
         TicketItem.Description := Description;
         TicketItem."Unit Price" := UnitPrice;
@@ -475,6 +654,45 @@
         end;
 
         exit(No);
+    end;
+
+    local procedure CopyItemUnitsOfMeasure(TemplateItemNo: Code[20]; Item: Record Item)
+    var
+        ItemUnitOfMeasureTemplate: Record "Item Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+    begin
+        ItemUnitOfMeasureTemplate.SetFilter("Item No.", '=%1', TemplateItemNo);
+        if (ItemUnitOfMeasureTemplate.FindSet()) then
+            repeat
+                ItemUnitOfMeasure := ItemUnitOfMeasureTemplate;
+                ItemUnitOfMeasure."Item No." := Item."No.";
+                if (ItemUnitOfMeasure.Insert()) then;
+            until (ItemUnitOfMeasureTemplate.Next() = 0);
+    end;
+
+    local procedure EnsureItemUnitOfMeasure(ItemNo: Code[20]; UnitOfMeasureCode: Code[10])
+    var
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+    begin
+        if (UnitOfMeasureCode = '') then
+            exit;
+
+        if (not UnitOfMeasure.Get(UnitOfMeasureCode)) then begin
+            UnitOfMeasure.Init();
+            UnitOfMeasure.Code := UnitOfMeasureCode;
+            UnitOfMeasure.Description := UnitOfMeasureCode;
+            UnitOfMeasure.Insert();
+        end;
+
+        if (ItemUnitOfMeasure.Get(ItemNo, UnitOfMeasureCode)) then
+            exit;
+
+        ItemUnitOfMeasure.Init();
+        ItemUnitOfMeasure."Item No." := ItemNo;
+        ItemUnitOfMeasure.Code := UnitOfMeasureCode;
+        ItemUnitOfMeasure."Qty. per Unit of Measure" := 1;
+        ItemUnitOfMeasure.Insert();
     end;
 
     local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20])

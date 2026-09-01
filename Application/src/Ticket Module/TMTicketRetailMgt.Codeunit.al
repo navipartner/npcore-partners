@@ -894,12 +894,14 @@
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;
     begin
+        Item.SetLoadFields("NPR Ticket Type");
         if (not Item.Get(SaleLinePOS."No.")) then
             exit(false);
 
         if (Item."NPR Ticket Type" = '') then
             exit(false);
 
+        TicketType.SetLoadFields(Code);
         if (not TicketType.Get(Item."NPR Ticket Type")) then
             exit(false);
 
