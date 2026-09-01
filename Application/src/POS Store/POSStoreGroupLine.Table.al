@@ -37,5 +37,8 @@ table 6014686 "NPR POS Store Group Line"
         {
             Clustered = true;
         }
+        key(Key2; SystemRowVersion)
+        {
+        }
     }
 }

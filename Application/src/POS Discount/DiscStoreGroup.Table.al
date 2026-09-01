@@ -27,6 +27,9 @@ table 6059936 "NPR Disc. Store Group"
         {
             Clustered = true;
         }
+        key(Key2; SystemRowVersion)
+        {
+        }
     }
 
     var

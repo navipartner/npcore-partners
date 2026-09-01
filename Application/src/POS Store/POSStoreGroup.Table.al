@@ -28,6 +28,9 @@ table 6014685 "NPR POS Store Group"
         {
             Clustered = true;
         }
+        key(Key2; SystemRowVersion)
+        {
+        }
     }
 
     var

@@ -315,7 +315,7 @@ codeunit 6014608 "NPR Replication Register"
 
         MixedDiscountsLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLines/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 #ELSE
-        MixedDiscountsLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLines/?$filter=systemRowVersion gt %2&$orderby=systemRowVersions', Locked = true;
+        MixedDiscountsLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLines/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
 #ENDIF
         #endregion
 

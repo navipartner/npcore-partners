@@ -284,6 +284,9 @@
         {
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-01';
+            ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
 
@@ -303,6 +306,12 @@
         }
 
         key(Key5; "Replication Counter")
+        {
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-01';
+            ObsoleteReason = 'Replaced by SystemRowVersion';
+        }
+        key(Key6; SystemRowVersion)
         {
         }
     }

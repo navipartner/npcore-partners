@@ -145,6 +145,57 @@ codeunit 85042 "NPR Replication API Tests"
         UnbindSubscription(MockCU);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AllRegisteredReplicationTablesHaveRowVersionKey()
+    var
+        RepEndpointLocal: Record "NPR Replication Endpoint";
+        RepSetupLocal: Record "NPR Replication Service Setup";
+        CheckedTableIds: List of [Integer];
+        MinExpectedTables: Integer;
+        MissingKeyLbl: Label 'Endpoint %1 (table %2) has no secondary key on SystemRowVersion, so Get Last Replication Counter fails for it.', Locked = true;
+    begin
+        // [SCENARIO] Every replicated table has the secondary key on SystemRowVersion that the source side requires. Without it the user gets 400 Bad Request.
+
+        // [GIVEN] All replication services and their endpoints are registered
+        RepSetupLocal.Init();
+        RepSetupLocal."API Version" := LibraryUtility.GenerateRandomCode20(RepSetupLocal.FieldNo("API Version"), Database::"NPR Replication Service Setup");
+        RepSetupLocal.Enabled := false;
+        RepSetupLocal.Insert();
+        RepSetupLocal.OnRegisterService();
+
+        // [WHEN] Every registered table is checked for that key
+        // [THEN] All of them have it
+        RepEndpointLocal.SetFilter("Table ID", '<>%1', 0);
+        if RepEndpointLocal.FindSet() then
+            repeat
+                if not CheckedTableIds.Contains(RepEndpointLocal."Table ID") then begin
+                    CheckedTableIds.Add(RepEndpointLocal."Table ID");
+                    Assert.IsTrue(HasRowVersionKey(RepEndpointLocal."Table ID"),
+                        StrSubstNo(MissingKeyLbl, RepEndpointLocal."EndPoint ID", RepEndpointLocal."Table ID"));
+                end;
+            until RepEndpointLocal.Next() = 0;
+
+        // [THEN] The endpoints were really registered, so the loop above verified something
+        MinExpectedTables := 65;
+        Assert.IsTrue(CheckedTableIds.Count() >= MinExpectedTables, 'Replication endpoints were not registered, so no table was verified.');
+    end;
+
+    local procedure HasRowVersionKey(TableId: Integer): Boolean
+    var
+        RecRef: RecordRef;
+        KeyRef: KeyRef;
+        i: Integer;
+    begin
+        RecRef.Open(TableId);
+        for i := 2 to RecRef.KeyCount() do begin
+            KeyRef := RecRef.KeyIndex(i);
+            if KeyRef.Active and (KeyRef.FieldCount() = 1) then
+                if KeyRef.FieldIndex(1).Number = 0 then
+                    exit(true);
+        end;
+    end;
+
     local procedure CreateUOMs(NewUOMsList: List of [Code[20]])
     var
         i: Integer;

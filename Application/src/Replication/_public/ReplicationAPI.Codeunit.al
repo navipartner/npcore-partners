@@ -13,6 +13,8 @@
 
         WebAPIErrorTxtG: Label 'Something went wrong:\\Error Status Code: %1;\\Description: %2';
 
+        WebAPIErrorDetailsTxtG: Label 'Details from the server:\%1', Comment = '%1 = error message returned by the web service';
+
         ReplicationJobQueueCategoryCode: Label 'REP', locked = true;
 
         ReplicationCounterEvaluateErr: Label 'Cannot evaluate %1 value %2 into a BigInteger.';
@@ -405,13 +407,46 @@
     end;
 
     procedure IsSuccessfulRequest(TransportOK: Boolean; Response: HttpResponseMessage; var ErrorTxt: Text; var StatusCode: Integer): Boolean
+    var
+        ResponseDetails: Text;
     begin
         StatusCode := Response.HttpStatusCode();
         if TransportOK and Response.IsSuccessStatusCode() then
             exit(true);
 
         ErrorTxt := StrSubstNo(WebAPIErrorTxtG, Response.HttpStatusCode, Response.ReasonPhrase);
+        if not TransportOK then
+            exit(false);
+
+        ResponseDetails := GetResponseErrorDetails(Response);
+        if ResponseDetails <> '' then
+            ErrorTxt += '\\' + StrSubstNo(WebAPIErrorDetailsTxtG, ResponseDetails);
         exit(false);
+    end;
+
+    local procedure GetResponseErrorDetails(Response: HttpResponseMessage): Text
+    var
+        JObject: JsonObject;
+        JToken: JsonToken;
+        MaxDetailsLength: Integer;
+        ResponseBody: Text;
+    begin
+        MaxDetailsLength := 500;
+        if not Response.Content.ReadAs(ResponseBody) then
+            exit('');
+
+        ResponseBody := ResponseBody.Trim();
+        if ResponseBody = '' then
+            exit('');
+
+        if JObject.ReadFrom(ResponseBody) then
+            if JObject.SelectToken('$.error.message', JToken) then
+                if JToken.IsValue() and not JToken.AsValue().IsNull() then
+                    ResponseBody := JToken.AsValue().AsText().Trim();
+
+        if StrLen(ResponseBody) > MaxDetailsLength then
+            ResponseBody := CopyStr(ResponseBody, 1, MaxDetailsLength - 3) + '...';
+        exit(ResponseBody);
     end;
 
     procedure CreateInternalErrorResponse(ErrorCode: Text; ErrorDescription: Text; var Result: Codeunit "Temp Blob")

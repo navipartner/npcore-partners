@@ -46,6 +46,9 @@ table 6059938 "NPR Disc. Store Group Line"
         {
             Clustered = true;
         }
+        key(Key2; SystemRowVersion)
+        {
+        }
     }
 
     trigger OnDelete()
