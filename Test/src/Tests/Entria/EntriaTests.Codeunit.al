@@ -1295,6 +1295,210 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
+    procedure OrderWithUnresolvableLocaleStillImports()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntriaStore: Record "NPR Entria Store";
+        WindowsLanguage: Record "Windows Language";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        Language: Codeunit Language;
+        OrdersArr: JsonArray;
+        OrderObj: JsonObject;
+        OrderTkn: JsonToken;
+        OrderCreatedAt: DateTime;
+        ImportSucceeded: Boolean;
+    begin
+        // [SCENARIO] Entria deliberately does not reject an unusable locale at intake. The order imports with the tag
+        // preserved and no language code, so the rejection happens later, at processing time, through
+        // ValidateLanguage. Without that, one shop-side locale typo would fail the order's import and send it
+        // round the retry registry instead of leaving an actionable document for the operator.
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(1, 1, 2024), 090000T);
+
+        // [GIVEN] 'zz-ZZ' resolves to no Windows language, so no BC language code can be derived from it
+        _Assert.IsFalse(WindowsLanguage.Get(Language.GetLanguageIdFromCultureName('zz-ZZ')), 'Precondition: ''zz-ZZ'' must not resolve to a Windows Language row.');
+
+        // [GIVEN] An order payload carrying that locale
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-DOC-LOCALE', 'medusa-locale', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-LOCALE');
+        OrdersArr.Get(0, OrderTkn);
+        OrderObj := OrderTkn.AsObject();
+        OrderObj.Add('locale', 'zz-ZZ');
+        OrderTkn := OrderObj.AsToken();
+
+        // [WHEN] ProcessOrder imports it
+        ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, 'ZZ-DOC-LOCALE', 'medusa-locale', OrderCreatedAt, 0);
+
+        // [THEN] The import succeeds - an unusable locale must not fail the Entria import
+        _Assert.IsTrue(ImportSucceeded, 'An order carrying an unresolvable locale must still import.');
+
+        // [THEN] The document exists, keeps the tag it was sent, and carries no language code
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("Ecommerce Store Code", _StoreCode);
+        EcomSalesHeader.SetRange("External No.", 'ZZ-DOC-LOCALE');
+        _Assert.IsTrue(EcomSalesHeader.FindFirst(), 'The Ecom Sales Header must have been created.');
+        _Assert.AreEqual('zz-ZZ', EcomSalesHeader."Language Tag", 'The supplied locale must be preserved on the document, so the later failure names the offending value.');
+        _Assert.AreEqual('', EcomSalesHeader."Language Code", 'No language code can be derived from an unresolvable locale.');
+
+        // [THEN] ...and the document does not process: the locale is rejected at processing time instead,
+        asserterror EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+        _Assert.ExpectedError('RFC 5646');
+    end;
+
+    [Test]
+    procedure OrderWithUnmappedLocaleImportsThenFailsOnLanguageCode()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntriaStore: Record "NPR Entria Store";
+        Language: Record Language;
+        WindowsLanguage: Record "Windows Language";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        SystemLanguage: Codeunit Language;
+        OrdersArr: JsonArray;
+        OrderObj: JsonObject;
+        OrderTkn: JsonToken;
+        OrderCreatedAt: DateTime;
+        ImportSucceeded: Boolean;
+    begin
+        // [SCENARIO] The realistic version of the failure, and the one no intake gate catches. 'af-ZA' is a
+        // perfectly valid tag, so ValidateLanguageTag passes and the Ecom API would not reject it either - but
+        // no BC Language is set up for it, so the resolver falls back to the raw Windows abbreviation. The
+        // order imports carrying a non-blank language code that has no Language record, and dies later on the
+        // "Language Code" table relation - a different failure mechanism than an unusable tag.
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(1, 1, 2024), 090000T);
+
+        // [GIVEN] 'af-ZA' is a real culture...
+        _Assert.IsTrue(WindowsLanguage.Get(SystemLanguage.GetLanguageIdFromCultureName('af-ZA')), 'Precondition: ''af-ZA'' must resolve to a Windows Language row.');
+
+        // [GIVEN] ...that no BC Language maps to, by either lookup. Asserted rather than arranged: this
+        // codeunit rolls back once at the END of the run, so deleting real Language rows here would leak into
+        // every test declared after this one.
+        _Assert.IsFalse(Language.Get(WindowsLanguage."Abbreviated Name"), 'Precondition: no Language may be named after the Windows abbreviation of ''af-ZA''.');
+        Language.SetRange("Windows Language ID", WindowsLanguage."Language ID");
+        _Assert.IsTrue(Language.IsEmpty(), 'Precondition: no Language may carry the Windows language id of ''af-ZA''.');
+
+        // [GIVEN] An order payload carrying that locale
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-DOC-LOC-UNMAP', 'medusa-loc-unmap', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-LOC-UNMAP');
+        OrdersArr.Get(0, OrderTkn);
+        OrderObj := OrderTkn.AsObject();
+        OrderObj.Add('locale', 'af-ZA');
+        OrderTkn := OrderObj.AsToken();
+
+        // [WHEN] ProcessOrder imports it
+        ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, 'ZZ-DOC-LOC-UNMAP', 'medusa-loc-unmap', OrderCreatedAt, 0);
+
+        // [THEN] The import succeeds
+        _Assert.IsTrue(ImportSucceeded, 'An order whose locale maps to no BC language must still import.');
+
+        // [THEN] The document carries the Windows abbreviation, which is not a usable language code
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("Ecommerce Store Code", _StoreCode);
+        EcomSalesHeader.SetRange("External No.", 'ZZ-DOC-LOC-UNMAP');
+        _Assert.IsTrue(EcomSalesHeader.FindFirst(), 'The Ecom Sales Header must have been created.');
+        _Assert.AreEqual(WindowsLanguage."Abbreviated Name", EcomSalesHeader."Language Code", 'The fallback must put the Windows abbreviated name on the document.');
+        _Assert.IsFalse(Language.Get(EcomSalesHeader."Language Code"), 'The fallback code must have no Language record - that is what makes it fail later.');
+
+        // [THEN] ...so processing rejects it. The failure is the "Language Code" table relation, not the tag
+        // check that catches an unusable tag - only the offending code is pinned, since the surrounding words
+        // are a platform message.
+        asserterror EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+        _Assert.ExpectedError(EcomSalesHeader."Language Code");
+    end;
+
+    [Test]
+    procedure OrderWithoutLocaleImportsWithNoLanguage()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderTkn: JsonToken;
+        OrderCreatedAt: DateTime;
+        ImportSucceeded: Boolean;
+    begin
+        // [SCENARIO] An order that carries no locale at all must import with no language
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(1, 1, 2024), 090000T);
+
+        // [GIVEN] An order payload with no locale property at all
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-DOC-LOC-NONE', 'medusa-loc-none', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-LOC-NONE');
+        OrdersArr.Get(0, OrderTkn);
+
+        // [WHEN] ProcessOrder imports it
+        ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, 'ZZ-DOC-LOC-NONE', 'medusa-loc-none', OrderCreatedAt, 0);
+
+        // [THEN] The import succeeds and the document carries no language at all
+        _Assert.IsTrue(ImportSucceeded, 'An order without a locale must import.');
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("Ecommerce Store Code", _StoreCode);
+        EcomSalesHeader.SetRange("External No.", 'ZZ-DOC-LOC-NONE');
+        _Assert.IsTrue(EcomSalesHeader.FindFirst(), 'The Ecom Sales Header must have been created.');
+        _Assert.AreEqual('', EcomSalesHeader."Language Tag", 'No locale was supplied, so no language tag may be stored.');
+        _Assert.AreEqual('', EcomSalesHeader."Language Code", 'No locale was supplied, so no language code may be derived.');
+    end;
+
+    [Test]
+    procedure OrderWithMappedLocaleGetsLanguageCode()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntriaStore: Record "NPR Entria Store";
+        Language: Record Language;
+        WindowsLanguage: Record "Windows Language";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        SystemLanguage: Codeunit Language;
+        OrdersArr: JsonArray;
+        OrderObj: JsonObject;
+        OrderTkn: JsonToken;
+        OrderCreatedAt: DateTime;
+        ImportSucceeded: Boolean;
+    begin
+        // [SCENARIO] The success direction: the order with 'en-US' tag resolves to BC language code
+
+        // [GIVEN] An enabled Entria store
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        OrderCreatedAt := CreateDateTime(DMY2Date(1, 1, 2024), 090000T);
+
+        // [GIVEN] 'en-US' resolves to a Windows language whose abbreviation is a real BC Language
+        _Assert.IsTrue(WindowsLanguage.Get(SystemLanguage.GetLanguageIdFromCultureName('en-US')), 'Precondition: ''en-US'' must resolve to a Windows Language row.');
+        _Assert.IsTrue(Language.Get(WindowsLanguage."Abbreviated Name"), 'Precondition: a Language named after the Windows abbreviation of ''en-US'' must exist.');
+
+        // [GIVEN] An order payload carrying that locale
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-DOC-LOC-OK', 'medusa-loc-ok', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-LOC-OK');
+        OrdersArr.Get(0, OrderTkn);
+        OrderObj := OrderTkn.AsObject();
+        OrderObj.Add('locale', 'en-US');
+        OrderTkn := OrderObj.AsToken();
+
+        // [WHEN] ProcessOrder imports it
+        ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, 'ZZ-DOC-LOC-OK', 'medusa-loc-ok', OrderCreatedAt, 0);
+
+        // [THEN] The import succeeds and the document carries both the tag and a usable language code
+        _Assert.IsTrue(ImportSucceeded, 'An order with a mapped locale must import.');
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("Ecommerce Store Code", _StoreCode);
+        EcomSalesHeader.SetRange("External No.", 'ZZ-DOC-LOC-OK');
+        _Assert.IsTrue(EcomSalesHeader.FindFirst(), 'The Ecom Sales Header must have been created.');
+        _Assert.AreEqual('en-US', EcomSalesHeader."Language Tag", 'The supplied locale must be preserved on the document.');
+        _Assert.AreEqual(Language.Code, EcomSalesHeader."Language Code", 'The locale must resolve to the BC Language named after its Windows abbreviation.');
+    end;
+
+    [Test]
     procedure EmptyPaymentCollectionsWithZeroAmountSucceeds()
     var
         EntriaStore: Record "NPR Entria Store";

@@ -589,7 +589,7 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         end;
 #pragma warning disable AA0139, AL0432
         if FeatureFlag.IsEnabled(RemoveEcomTicketHolderNameAndLanguage()) then
-            TicketRequestManager.SetReservationRequestExtraInfo(EcomSalesHeader2."Ticket Reservation Token", EcomSalesHeader2."Sell-to Email", EcomSalesHeader2."External No.", CopyStr(EcomSalesHeader2."Sell-to Name", 1, 100), '')
+            TicketRequestManager.SetReservationRequestExtraInfo(EcomSalesHeader2."Ticket Reservation Token", EcomSalesHeader2."Sell-to Email", EcomSalesHeader2."External No.", CopyStr(EcomSalesHeader2."Sell-to Name", 1, 100), EcomSalesHeader2."Language Code")
         else
             TicketRequestManager.SetReservationRequestExtraInfo(EcomSalesHeader2."Ticket Reservation Token", EcomSalesHeader2."Sell-to Email", EcomSalesHeader2."External No.", EcomSalesHeader2."Ticket Holder Name", EcomSalesHeader2."Ticket Holder Preferred Lang");
 #pragma warning restore AA0139, AL0432

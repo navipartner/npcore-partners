@@ -963,21 +963,22 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
             Error(UnsupportedCultureCodeErr);
     end;
 
-    internal procedure LanguageTagToLanguageCode(LanguageTag: Text[80]) LanguageCode: Code[10]
+    internal procedure LanguageTagToLanguageCode(LanguageTag: Text[80]): Code[10]
     var
+        Language: Record Language;
         WindowsLanguage: Record "Windows Language";
-        Language: Codeunit Language;
     begin
         if not TryGetWindowsLanguageFromLanguageTag(LanguageTag, WindowsLanguage) then
             exit('');
 
-        LanguageCode := Language.GetLanguageCode(WindowsLanguage."Language ID");
-        // Fallback to Windows abbreviated name if no BC language code is defined.
-        // This allows the document to be imported and gives the user enough information
-        // to configure the missing language later, without deleting and reimporting the document.
-        if LanguageCode = '' then
-            LanguageCode := Windowslanguage."Abbreviated Name";
-        exit(LanguageCode);
+        if Language.Get(WindowsLanguage."Abbreviated Name") then
+            exit(Language.Code);
+
+        Language.SetRange("Windows Language ID", WindowsLanguage."Language ID");
+        if Language.FindFirst() then
+            exit(Language.Code);
+
+        exit(WindowsLanguage."Abbreviated Name");// Fallback to Windows abbreviated name if no BC language code is defined.
     end;
 
     local procedure TryGetWindowsLanguageFromLanguageTag(LanguageTag: Text[80]; var WindowsLanguage: Record "Windows Language"): Boolean
