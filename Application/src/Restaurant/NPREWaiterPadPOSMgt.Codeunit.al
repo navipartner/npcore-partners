@@ -923,6 +923,10 @@
         SaleLinePOSAddOn.Mandatory := WaiterPadLine.Mandatory;
         SaleLinePOSAddOn."Copy Serial No." := WaiterPadLine."Copy Serial No.";
         SaleLinePOSAddOn.Insert(true);
+
+        //The row the front end was sent when the line was inserted was built before this link existed, so it still says the
+        //line is not an add-on and it is drawn without the shifted alignment. Re-serialize just this row, now that it is.
+        SaleLinePOS.Modify();
     end;
 
     local procedure AddLineRelation(var LineRelation: Record "Line Number Buffer"; FromLineNumber: Integer; ToLineNumber: Integer)
