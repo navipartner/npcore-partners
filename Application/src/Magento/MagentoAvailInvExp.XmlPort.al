@@ -101,7 +101,9 @@
     end;
 
     var
+#pragma warning disable AA0073
         RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
+#pragma warning restore AA0073
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
         ItemFilter: Text;
         VariantFilter: Text;

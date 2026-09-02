@@ -62,7 +62,9 @@ page 6185127 "NPR Spfy Store-POS Entry Links"
     end;
 
     var
+#pragma warning disable AA0073
         SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link";
+#pragma warning restore AA0073
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 }
 #endif

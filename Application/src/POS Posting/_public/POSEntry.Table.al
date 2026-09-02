@@ -730,7 +730,7 @@
         POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
 #if not (BC17 or BC18 or BC19 or BC20)
         ShopifyStore: Record "NPR Spfy Store";
-        SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link";
+        TempSpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #endif
     begin
@@ -768,9 +768,9 @@
         ShopifyStore.SetLoadFields(Code);
         if ShopifyStore.FindSet() then
             repeat
-                SpfyStorePOSEntryLink."POS Entry No." := Rec."Entry No.";
-                SpfyStorePOSEntryLink."Shopify Store Code" := ShopifyStore.Code;
-                SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                TempSpfyStorePOSEntryLink."POS Entry No." := Rec."Entry No.";
+                TempSpfyStorePOSEntryLink."Shopify Store Code" := ShopifyStore.Code;
+                SpfyAssignedIDMgt.RemoveAssignedShopifyID(TempSpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             until ShopifyStore.Next() = 0;
 #endif
     end;
@@ -834,14 +834,14 @@
 
     internal procedure GetShopifyID(ShopifyStoreCode: Code[20]): Text[30]
     var
-        SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link";
+        TempSpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         if ("Entry No." = 0) or (ShopifyStoreCode = '') then
             exit('');
-        SpfyStorePOSEntryLink."POS Entry No." := "Entry No.";
-        SpfyStorePOSEntryLink."Shopify Store Code" := ShopifyStoreCode;
-        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"));
+        TempSpfyStorePOSEntryLink."POS Entry No." := "Entry No.";
+        TempSpfyStorePOSEntryLink."Shopify Store Code" := ShopifyStoreCode;
+        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(TempSpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"));
     end;
 #endif
 }

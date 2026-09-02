@@ -329,25 +329,25 @@
     procedure CancelAdyenPayByLink(var MagentoPaymentLine: Record "NPR Magento Payment Line")
     var
         HttpWebRequest: HttpRequestMessage;
-        Response: Record "NPR PG Payment Response";
+        TempResponse: Record "NPR PG Payment Response" temporary;
         PGInteractionsLogMgt: Codeunit "NPR PG Interactions Log Mgt.";
         Log: Record "NPR PG Interaction Log Entry";
-        Request: Record "NPR PG Payment Request";
+        TempRequest: Record "NPR PG Payment Request" temporary;
         SuccessMsg: Label 'The Pay by Link %1 has been successfully cancelled.';
     begin
         ClearLastError();
 
         CheckIfCanBeCanceled(MagentoPaymentLine);
 
-        CreateCancelLinkRequest(MagentoPaymentLine, HttpWebRequest, Request);
+        CreateCancelLinkRequest(MagentoPaymentLine, HttpWebRequest, TempRequest);
 
         PGInteractionsLogMgt.LogPayByLinkCancelStart(Log, MagentoPaymentLine.SystemId);
 
-        SendCancelLinkRequest(HttpWebRequest, Response);
+        SendCancelLinkRequest(HttpWebRequest, TempResponse);
 
-        PGInteractionsLogMgt.LogOperationFinished(Log, Request, Response, Response."Response Success", GetLastErrorText());
+        PGInteractionsLogMgt.LogOperationFinished(Log, TempRequest, TempResponse, TempResponse."Response Success", GetLastErrorText());
 
-        UpdatePaymentMagentoLine(MagentoPaymentLine, Response, true);
+        UpdatePaymentMagentoLine(MagentoPaymentLine, TempResponse, true);
         if ShowCancelMsg then
             Message(SuccessMsg, MagentoPaymentLine."Pay by Link URL");
     end;
@@ -416,8 +416,8 @@
 
     procedure IssuePayByLink(RecVariant: Variant; ShowDialog: Boolean)
     var
-        Request: Record "NPR PG Payment Request";
-        Response: Record "NPR PG Payment Response";
+        TempRequest: Record "NPR PG Payment Request" temporary;
+        TempResponse: Record "NPR PG Payment Response" temporary;
         FullAmount: Decimal;
         DocumentTableNo: Integer;
         DocumentNo: Code[20];
@@ -449,17 +449,17 @@
 
         GetPayByLinkParams(CustomerNo, AmtToPay, RequestedAmt, RequestedExpDate, SendEmail, Email, SendSMS, PhoneNo, ShowDialog);
 
-        DocumentToRequest(Request, RecVariant, RequestedAmt, AdyenPayByLinkSetup."Pay By Link Gateaway Code");
+        DocumentToRequest(TempRequest, RecVariant, RequestedAmt, AdyenPayByLinkSetup."Pay By Link Gateaway Code");
 
-        CreateMagentoPaymentLine(Request, MagentoPaymentLine);
+        CreateMagentoPaymentLine(TempRequest, MagentoPaymentLine);
 
         PGInteractionsLogMgt.LogPayByLinkStart(Log, MagentoPaymentLine.SystemId);
 
-        SendPayByLinkRequest(Request, Response, MagentoPaymentLine, RequestedExpDate);
+        SendPayByLinkRequest(TempRequest, TempResponse, MagentoPaymentLine, RequestedExpDate);
 
-        PGInteractionsLogMgt.LogOperationFinished(Log, Request, Response, Response."Response Success", GetLastErrorText());
+        PGInteractionsLogMgt.LogOperationFinished(Log, TempRequest, TempResponse, TempResponse."Response Success", GetLastErrorText());
 
-        UpdatePaymentMagentoLine(MagentoPaymentLine, Response, false);
+        UpdatePaymentMagentoLine(MagentoPaymentLine, TempResponse, false);
 
         if SendEmail then
             SendEmailNotification(Email, AdyenPayByLinkSetup."Pay By Link E-Mail Template", MagentoPaymentLine);

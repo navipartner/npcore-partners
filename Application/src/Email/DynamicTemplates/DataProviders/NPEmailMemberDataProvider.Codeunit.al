@@ -9,7 +9,7 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
     procedure GetContent(RecRef: RecordRef): JsonObject
     var
         Entry: Record "NPR MM Member Notific. Entry";
-        EntryBuffer: Record "NPR MMMemberNotificEntryBuf";
+        TempEntryBuffer: Record "NPR MMMemberNotificEntryBuf" temporary;
         DataProviderHelper: Codeunit "NPR DynTemplateDataProvHelper";
         JObject, CustomJObject : JsonObject;
         WrongRecordReceivedErr: Label 'The code received a record of an unknown type. Most likely a wrong data driver was used on the Dynamic Template.';
@@ -70,10 +70,10 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('termination_requested_at', Entry."Termination Requested At");
         JObject.Add('termination_requested_at_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Termination Requested At", Entry.PreferredLanguageCode));
 
-        EntryBuffer.TransferFields(Entry, true);
-        EntryBuffer.SystemId := Entry.SystemId;
-        EntryBuffer.Insert();
-        _DynTempDataProvSubs.OnAfterMemberGetContent(EntryBuffer, CustomJObject);
+        TempEntryBuffer.TransferFields(Entry, true);
+        TempEntryBuffer.SystemId := Entry.SystemId;
+        TempEntryBuffer.Insert();
+        _DynTempDataProvSubs.OnAfterMemberGetContent(TempEntryBuffer, CustomJObject);
         JObject.Add('custom_fields', CustomJObject);
 
         exit(JObject);

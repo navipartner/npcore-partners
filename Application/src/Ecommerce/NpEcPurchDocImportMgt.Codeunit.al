@@ -288,7 +288,9 @@
         PurchLine.Insert(true);
 
         PurchLine.Validate(Type, PurchLine.Type::"G/L Account");
+#pragma warning disable AA0139
         PurchLine.Validate("No.", AccountNo);
+#pragma warning restore AA0139
         if Quantity <> 0 then
             PurchLine.Validate(Quantity, Quantity);
 

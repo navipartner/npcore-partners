@@ -21,7 +21,7 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     #region Journal Text To Thermal Printer Parsers
     local procedure PrintThermalReceipt(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         RetailLogo: Record "NPR Retail Logo";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         i, j : Integer;
@@ -74,12 +74,12 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
             SectionCut := true;
         end;
 
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'Windows-1251';
+        TempPrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
 
         PrintDiscountNonFiscal(RSPOSAuditLogAuxInfo, SectionCut);
         PrintMembershipPointsNonFiscal(RSPOSAuditLogAuxInfo, SectionCut);
@@ -87,7 +87,7 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         if not SectionCut then begin
             Clear(Printer);
             PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
-            Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+            Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
             SectionCut := true;
         end;
 
@@ -96,13 +96,13 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         if (not RSFiscalisationSetup."Receipt Cut Per Section") and (not SectionCut) then begin
             Clear(Printer);
             PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
-            Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+            Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
         end;
     end;
 
     local procedure PrintThermalReceipt(RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy")
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         RetailLogo: Record "NPR Retail Logo";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         Printer: Codeunit "NPR RP Line Print Mgt.";
@@ -163,12 +163,12 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
 
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
 
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'Windows-1251';
+        TempPrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     #endregion
@@ -176,7 +176,7 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     #region Additional Non-Fiscal (Slip) Printing
     local procedure PrintDiscountNonFiscal(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; var SectionCut: Boolean)
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         Printer: Codeunit "NPR RP Line Print Mgt.";
         HasDiscountHeadlineLbl: Label 'ОСТВАРИЛИ СТЕ ПОПУСТ', Locked = true;
         TotalDiscountAmountLbl: Label 'Износ попуста: ', Locked = true;
@@ -201,19 +201,19 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         end else
             SectionCut := false;
 
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'Windows-1251';
+        TempPrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     local procedure PrintMembershipPointsNonFiscal(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; var SectionCut: Boolean)
     var
         MMMembersPointsEntry: Record "NPR MM Members. Points Entry";
         POSEntry: Record "NPR POS Entry";
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         Printer: Codeunit "NPR RP Line Print Mgt.";
         MembershipHeadlineLbl: Label 'LOYALTY', Locked = true;
         TotalMembershipPointsLbl: Label 'Укупно поена: ', Locked = true;
@@ -247,12 +247,12 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         end else
             SectionCut := false;
 
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'Windows-1251';
+        TempPrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     local procedure PrintNonFiscalCopyForNormalRefund(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")

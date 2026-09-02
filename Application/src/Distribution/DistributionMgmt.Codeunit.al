@@ -205,7 +205,9 @@
         TransferLine.Validate("Transfer-from Code", TransferHeader."Transfer-from Code");
         TransferLine.Validate("Transfer-to Code", TransferHeader."Transfer-to Code");
         TransferLine.Validate("Item No.", DistributionLines."Distribution Item");
+#pragma warning disable AA0139
         TransferLine.Validate("Variant Code", DistributionLines."Item Variant");
+#pragma warning restore AA0139
         TransferLine.Validate(Quantity, TransferQuantity);
 
         TransferLine.Modify(true);

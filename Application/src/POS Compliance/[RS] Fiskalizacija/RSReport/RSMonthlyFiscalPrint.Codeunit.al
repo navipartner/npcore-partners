@@ -10,7 +10,7 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
     local procedure PrintReport(StartDate: Date; EndDate: Date; POSUnitNo: Code[20])
     var
         POSUnit: Record "NPR POS Unit";
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         Printer: Codeunit "NPR RP Line Print";
     begin
         POSUnit.Get(POSUnitNo);
@@ -24,12 +24,12 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
         PrintGeneralInfo(Printer, POSUnit, StartDate, EndDate);
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
 
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'Windows-1251';
+        TempPrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS Monthly Fiscal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Monthly Fiscal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     local procedure PrintReceiptHeader(var Printer: Codeunit "NPR RP Line Print"; POSUnit: Record "NPR POS Unit")

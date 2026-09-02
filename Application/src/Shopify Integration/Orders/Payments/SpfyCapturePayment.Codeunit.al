@@ -44,8 +44,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     var
         PaymentLine: Record "NPR Magento Payment Line";
         PGInteractionLog: Record "NPR PG Interaction Log Entry";
-        Request: Record "NPR PG Payment Request";
-        Response: Record "NPR PG Payment Response";
+        TempRequest: Record "NPR PG Payment Request" temporary;
+        TempResponse: Record "NPR PG Payment Response" temporary;
         LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         Success: Boolean;
@@ -59,20 +59,20 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 #endif
         GetPaymentLine(NcTask."Record ID", PaymentLine);
         PaymentLine.TestField("Payment Gateway Code");
-        PaymentLine.ToRequest(Request);
+        PaymentLine.ToRequest(TempRequest);
 
         LogMgt.LogCaptureStart(PGInteractionLog, PaymentLine.SystemId);
-        Success := CaptureShopifyPayment(PaymentLine, NcTask, Response);
-        Request."Request Body" := NcTask."Data Output";
-        LogMgt.LogOperationFinished(PGInteractionLog, Request, Response, Success, GetLastErrorText());
+        Success := CaptureShopifyPayment(PaymentLine, NcTask, TempResponse);
+        TempRequest."Request Body" := NcTask."Data Output";
+        LogMgt.LogOperationFinished(PGInteractionLog, TempRequest, TempResponse, Success, GetLastErrorText());
         NcTask.Modify();
         Commit();
 
         if not Success then
             Error(GetLastErrorText());
 
-        if Response."Response Success" then begin
-            MagentoPmtMgt.UpdatePaymentLineWithEventResponse(PaymentLine, PaymentEventType::Capture, Response);  //has a commit
+        if TempResponse."Response Success" then begin
+            MagentoPmtMgt.UpdatePaymentLineWithEventResponse(PaymentLine, PaymentEventType::Capture, TempResponse);  //has a commit
             SpfyIntegrationEvents.OnModifyPaymentLineAfterCaptureIsolated(PaymentLine, NcTask);
             if not PaymentLine.Posted then begin
                 Commit();
@@ -216,13 +216,13 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     local procedure RefundShopifyPayment(var NcTask: Record "NPR Nc Task")
     var
         PaymentLine: Record "NPR Magento Payment Line";
-        Response: Record "NPR PG Payment Response";
+        TempResponse: Record "NPR PG Payment Response" temporary;
         Success: Boolean;
     begin
         if NcTask."Table No." <> Database::"NPR Magento Payment Line" then
             SpfyIntegrationMgt.UnsupportedIntegrationTable(NcTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Capture Payment"), 'RefundShopifyPayment'));
         PaymentLine.Get(NcTask."Record ID");
-        Success := RefundShopifyPayment(PaymentLine, NcTask, Response);
+        Success := RefundShopifyPayment(PaymentLine, NcTask, TempResponse);
         if not Success then
             Error(GetLastErrorText());
     end;

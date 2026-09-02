@@ -196,7 +196,9 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         GenJnlLine."Copy VAT Setup to Jnl. Lines" := UseVAT;
         GenJnlLine.Validate("Account No.", AccountNo);
         if CurrencyCode <> '' then
+#pragma warning disable AA0139
             GenJnlLine.Validate("Currency Code", CurrencyCode);
+#pragma warning restore AA0139
         GenJnlLine.Validate(Amount, Amount);
         GenJnlLine.Description := CopyStr(Description, 1, MaxStrLen(GenJnlLine.Description));
         if DimensionSetID <> 0 then begin
@@ -491,7 +493,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
     local procedure UnapplyCustomerLedgerEntry(CustLedgEntryNo: Integer; PostingDocNo: Code[20]; PostingDate: Date): Boolean
     var
 #if not (BC17 or BC18 or BC19)
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
+        TempApplyUnapplyParameters: Record "Apply Unapply Parameters" temporary;
 #endif
         CustLedgEntry: Record "Cust. Ledger Entry";
         DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
@@ -508,9 +510,9 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         DetailedCustLedgEntry.Get(ApplicationEntryNo);
         BindSubscription(CustEntryUnapplyModifier);
 #if not (BC17 or BC18 or BC19)
-        ApplyUnapplyParameters."Document No." := PostingDocNo;
-        ApplyUnapplyParameters."Posting Date" := PostingDate;
-        CustEntryApplyPostedEntries.PostUnApplyCustomerCommit(DetailedCustLedgEntry, ApplyUnapplyParameters, false);
+        TempApplyUnapplyParameters."Document No." := PostingDocNo;
+        TempApplyUnapplyParameters."Posting Date" := PostingDate;
+        CustEntryApplyPostedEntries.PostUnApplyCustomerCommit(DetailedCustLedgEntry, TempApplyUnapplyParameters, false);
 #else
         CustEntryApplyPostedEntries.PostUnApplyCustomerCommit(DetailedCustLedgEntry, PostingDocNo, PostingDate, false);
 #endif

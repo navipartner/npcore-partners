@@ -33,7 +33,7 @@ codeunit 6248585 "NPR Spfy POS Entry Export Mgt."
 
     internal procedure ProcessPOSEntry(POSEntry: Record "NPR POS Entry"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; var SpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer") TaskCreated: Boolean
     var
-        SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link";
+        TempSpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         if not IsEligibleForSync(POSEntry) then
@@ -45,9 +45,9 @@ codeunit 6248585 "NPR Spfy POS Entry Export Mgt."
                     if ((SpfyExportPointerBuffer."Cut-Off Date" = 0D) or (POSEntry."Entry Date" >= SpfyExportPointerBuffer."Cut-Off Date")) and
                        (POSEntry.SystemRowVersion > SpfyExportPointerBuffer."Cut-Off POS Entry Row Version")
                     then begin
-                        SpfyStorePOSEntryLink."POS Entry No." := POSEntry."Entry No.";
-                        SpfyStorePOSEntryLink."Shopify Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
-                        if SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '' then  //not yet sent to Shopify
+                        TempSpfyStorePOSEntryLink."POS Entry No." := POSEntry."Entry No.";
+                        TempSpfyStorePOSEntryLink."Shopify Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
+                        if SpfyAssignedIDMgt.GetAssignedShopifyID(TempSpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '' then  //not yet sent to Shopify
                             TaskCreated := SchedulePOSEntrySync(POSEntry, SpfyStoreCustomerLink."Shopify Store Code") or TaskCreated;
                     end;
 

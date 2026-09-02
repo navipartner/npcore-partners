@@ -6,8 +6,8 @@
     var
         PaymentLine: Record "NPR Magento Payment Line";
         PGInteractionLog: Record "NPR PG Interaction Log Entry";
-        Request: Record "NPR PG Payment Request";
-        Response: Record "NPR PG Payment Response";
+        TempRequest: Record "NPR PG Payment Request" temporary;
+        TempResponse: Record "NPR PG Payment Response" temporary;
         LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
         TryCapturePayment: Codeunit "NPR PG Try Capture Payment";
         TryRefundPayment: Codeunit "NPR PG Try Refund Payment";
@@ -31,36 +31,36 @@
 
         PaymentLine := Rec;
 
-        PaymentLine.ToRequest(Request);
+        PaymentLine.ToRequest(TempRequest);
 
         ClearLastError();
         case _PaymentEventType of
             _PaymentEventType::Capture:
                 begin
-                    TryCapturePayment.SetParameters(Request, Response);
+                    TryCapturePayment.SetParameters(TempRequest, TempResponse);
                     Success := TryCapturePayment.Run(PaymentLine);
-                    TryCapturePayment.GetParameters(Request, Response);
+                    TryCapturePayment.GetParameters(TempRequest, TempResponse);
                 end;
             _PaymentEventType::Refund:
                 begin
-                    TryRefundPayment.SetParameters(Request, Response);
+                    TryRefundPayment.SetParameters(TempRequest, TempResponse);
                     Success := TryRefundPayment.Run(PaymentLine);
-                    TryRefundPayment.GetParameters(Request, Response);
+                    TryRefundPayment.GetParameters(TempRequest, TempResponse);
                 end;
             _PaymentEventType::Cancel:
                 begin
-                    TryCancelPayment.SetParameters(Request, Response);
+                    TryCancelPayment.SetParameters(TempRequest, TempResponse);
                     Success := TryCancelPayment.Run(PaymentLine);
-                    TryCancelPayment.GetParameters(Request, Response);
+                    TryCancelPayment.GetParameters(TempRequest, TempResponse);
                 end;
         end;
 
-        LogMgt.LogOperationFinished(PGInteractionLog, Request, Response, Success, GetLastErrorText());
+        LogMgt.LogOperationFinished(PGInteractionLog, TempRequest, TempResponse, Success, GetLastErrorText());
 
         Commit();
 
         PaymentLine.Find();
-        UpdatePaymentLineWithEventResponse(PaymentLine, _PaymentEventType, Response);
+        UpdatePaymentLineWithEventResponse(PaymentLine, _PaymentEventType, TempResponse);
         Rec := PaymentLine;
 
         if (not Success) then

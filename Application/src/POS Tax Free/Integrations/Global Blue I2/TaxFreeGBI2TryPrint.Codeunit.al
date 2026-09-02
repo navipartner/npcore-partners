@@ -24,7 +24,7 @@ codeunit 6060032 "NPR Tax Free GBI2 Try Print"
 
     local procedure PrintThermal(TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         InStream: InStream;
@@ -46,7 +46,7 @@ codeunit 6060032 "NPR Tax Free GBI2 Try Print"
 
         PrintThermalLine(Printer, '<TearOff>'); //A final cut is not included in the printjob from I2 server.
 
-        Printer.ProcessBuffer(Codeunit::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Line: Text)

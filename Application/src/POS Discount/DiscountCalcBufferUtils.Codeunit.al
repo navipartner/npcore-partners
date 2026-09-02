@@ -60,9 +60,9 @@ codeunit 6151476 "NPR Discount Calc Buffer Utils"
 
     internal procedure CopyDiscountBuffer(var FromDiscountCalcBuffer: Record "NPR Discount Calc. Buffer"; var ToDiscountCalcBuffer: Record "NPR Discount Calc. Buffer")
     var
-        DiscountCalcBuffer: Record "NPR Discount Calc. Buffer";
+        TempDiscountCalcBuffer: Record "NPR Discount Calc. Buffer" temporary;
     begin
-        DiscountCalcBuffer := FromDiscountCalcBuffer;
+        TempDiscountCalcBuffer := FromDiscountCalcBuffer;
 
         ToDiscountCalcBuffer.Reset();
         if not ToDiscountCalcBuffer.IsEmpty then
@@ -77,6 +77,6 @@ codeunit 6151476 "NPR Discount Calc Buffer Utils"
             ToDiscountCalcBuffer.Insert();
         until FromDiscountCalcBuffer.Next() = 0;
 
-        FromDiscountCalcBuffer := DiscountCalcBuffer;
+        FromDiscountCalcBuffer := TempDiscountCalcBuffer;
     end;
 }

@@ -86,9 +86,9 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
 
     local procedure GenerateResponse(ItemReferenceNumber: Code[50]; FromDate: Date; ToDate: Date; WithPrice: Boolean; WithCapacity: Boolean; var ResponseMessage: Text) Response: Codeunit "NPR API Response"
     var
-        TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer";
-        NonTicketBuffer: Record "NPR TM AdmCapacityPriceBuffer";
-        DatePriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        TempTicketBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
+        TempNonTicketBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
+        TempDatePriceBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ResponseJson: Codeunit "NPR JSON Builder";
         ItemNo: Code[20];
@@ -99,19 +99,19 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         if (not TicketRequestManager.TranslateBarcodeToItemVariant(ItemReferenceNumber, ItemNo, VariantCode, ItemResolver)) then
             exit(Response.RespondBadRequest(TSL008Err));
 
-        if (not ResolveAdmissions(ItemNo, VariantCode, TicketBuffer, NonTicketBuffer, PackageAddOnNo, ResponseMessage)) then
+        if (not ResolveAdmissions(ItemNo, VariantCode, TempTicketBuffer, TempNonTicketBuffer, PackageAddOnNo, ResponseMessage)) then
             exit(Response.RespondBadRequest(ResponseMessage));
 
         ResponseJson.Initialize();
         ResponseJson.StartObject()
             .AddProperty('itemNumber', ItemReferenceNumber);
 
-        EmitItems(TicketBuffer, NonTicketBuffer, ResponseJson);
+        EmitItems(TempTicketBuffer, TempNonTicketBuffer, ResponseJson);
 
         if (WithPrice) then
-            EmitDatePrices(TicketBuffer, PackageAddOnNo, NonTicketBuffer, FromDate, ToDate, DatePriceBuffer, ResponseJson);
+            EmitDatePrices(TempTicketBuffer, PackageAddOnNo, TempNonTicketBuffer, FromDate, ToDate, TempDatePriceBuffer, ResponseJson);
 
-        EmitTimeSlots(TicketBuffer, PackageAddOnNo, FromDate, ToDate, WithPrice, WithCapacity, DatePriceBuffer, ResponseJson);
+        EmitTimeSlots(TempTicketBuffer, PackageAddOnNo, FromDate, ToDate, WithPrice, WithCapacity, TempDatePriceBuffer, ResponseJson);
 
         ResponseJson.EndObject();
         Response.RespondOK(ResponseJson.Build());
@@ -407,7 +407,7 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
     local procedure EmitNonTicketDatePrices(PackageAddOnNo: Code[20]; var NonTicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; FromDate: Date; ToDate: Date; CurrencyCode: Code[10]; var ResponseJson: Codeunit "NPR JSON Builder")
     var
         AddOnLine: Record "NPR NpIa Item AddOn Line";
-        ErpBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        TempErpBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
         IterationDate: Date;
         AddOnFound: Boolean;
         Forced: Boolean;
@@ -432,15 +432,15 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                 if (Forced) then
                     BasePrice := ForcedBasePrice
                 else begin
-                    Clear(ErpBuffer);
-                    ErpBuffer.EntryNo := 1;
-                    ErpBuffer.ItemNumber := NonTicketBuffer.ItemNumber;
-                    ErpBuffer.VariantCode := NonTicketBuffer.VariantCode;
-                    ErpBuffer.DecimalQuantity := NonTicketBuffer.DecimalQuantity; // CalculateErpPrice quotes the fractional qty
-                    ErpBuffer.ReferenceDate := IterationDate;
-                    if (not _TicketPrice.CalculateErpPrice(ErpBuffer)) then
-                        ErpBuffer.UnitPrice := 0;
-                    BasePrice := ErpBuffer.UnitPrice;
+                    Clear(TempErpBuffer);
+                    TempErpBuffer.EntryNo := 1;
+                    TempErpBuffer.ItemNumber := NonTicketBuffer.ItemNumber;
+                    TempErpBuffer.VariantCode := NonTicketBuffer.VariantCode;
+                    TempErpBuffer.DecimalQuantity := NonTicketBuffer.DecimalQuantity; // CalculateErpPrice quotes the fractional qty
+                    TempErpBuffer.ReferenceDate := IterationDate;
+                    if (not _TicketPrice.CalculateErpPrice(TempErpBuffer)) then
+                        TempErpBuffer.UnitPrice := 0;
+                    BasePrice := TempErpBuffer.UnitPrice;
                     if (AddOnFound) then
                         BasePrice := ApplyAddOnLineDiscount(AddOnLine, BasePrice);
                 end;

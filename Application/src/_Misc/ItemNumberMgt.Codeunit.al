@@ -254,7 +254,9 @@
                         end;
                         ItemReference.Init();
                         ItemReference.Validate("Item No.", ItemNo);
+#pragma warning disable AA0139
                         ItemReference.Validate("Variant Code", VariantCode);
+#pragma warning restore AA0139
                         ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"Bar Code");
                         ItemReference.Validate("Reference No.", BarCode);
                         if ItemReference."Variant Code" <> '' then begin

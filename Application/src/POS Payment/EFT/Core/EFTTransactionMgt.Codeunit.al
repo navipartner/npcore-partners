@@ -565,7 +565,9 @@
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::Item);
+#pragma warning disable AA0139
         SaleLinePOS.Validate("No.", ItemNo);
+#pragma warning restore AA0139
         SaleLinePOS.Validate(Quantity, Qty);
         SaleLinePOS.Validate("Unit Price", Amount);
         if DescriptionPostFix <> '' then begin
@@ -593,7 +595,9 @@
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"GL Payment";
         SaleLinePOS.Quantity := 1;
+#pragma warning disable AA0139
         SaleLinePOS.Validate("No.", AccountNo);
+#pragma warning restore AA0139
         SaleLinePOS."Amount Including VAT" := Amount;
         SaleLinePOS."Unit Price" := Amount;
         if DescriptionPostFix <> '' then begin

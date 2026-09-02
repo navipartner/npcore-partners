@@ -382,7 +382,9 @@ codeunit 6184672 "NPR DK SAF-T Cash Export Mgt."
         LineNo += 1;
         SAFTExportLine.Validate("Line No.", LineNo);
         SAFTExportLine.Validate("Master Data", MasterData);
+#pragma warning disable AA0139
         SAFTExportLine.Validate(Description, CopyStr(Description, 1, MaxStrLen(Description)));
+#pragma warning restore AA0139
         SAFTExportLine.Validate("Starting Date", StartingDate);
         SAFTExportLine.Validate("Ending Date", EndingDate);
         SAFTExportLine.Insert(true);

@@ -5,8 +5,10 @@ codeunit 6060068 "NPR PG Try Cancel Payment"
 
     var
         _Initialized: Boolean;
+#pragma warning disable AA0073
         _Request: Record "NPR PG Payment Request";
         _Response: Record "NPR PG Payment Response";
+#pragma warning restore AA0073
         NotInitializedErr: Label 'Codeunit not initialized. This is a programming error. Contact system vendor.';
 
     trigger OnRun()

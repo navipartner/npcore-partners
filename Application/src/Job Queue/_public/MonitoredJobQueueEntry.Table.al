@@ -418,5 +418,7 @@ table 6151148 "NPR Monitored Job Queue Entry"
     end;
 
     var
+#pragma warning disable AA0073
         _JQRunnerUser: Record "NPR Job Queue Runner User";
+#pragma warning restore AA0073
 }

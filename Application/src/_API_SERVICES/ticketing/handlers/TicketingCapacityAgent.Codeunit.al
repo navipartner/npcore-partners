@@ -9,7 +9,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
 
     internal procedure GetTimeSlots(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
-        AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        TempAdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ItemResolver: Integer;
         ItemNo: Code[20];
@@ -59,7 +59,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
         if (Request.QueryParams().ContainsKey('customerNumber')) then
             CustomerNumber := CopyStr(UpperCase(Request.QueryParams().Get('customerNumber')), 1, MaxStrLen(CustomerNumber));
 
-        exit(GetTimeSlots(ItemReferenceNumber, ItemNo, VariantCode, ItemResolver, ReferenceDate, Quantity, AdmissionCode, CustomerNumber, AdmCapacityPriceBuffer, ResponseMessage, TicketRequestManager));
+        exit(GetTimeSlots(ItemReferenceNumber, ItemNo, VariantCode, ItemResolver, ReferenceDate, Quantity, AdmissionCode, CustomerNumber, TempAdmCapacityPriceBuffer, ResponseMessage, TicketRequestManager));
 
     end;
 
@@ -77,7 +77,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
 
     internal procedure GetSchedules(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
-        AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        TempAdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
         QueryParameterValue: Text;
         ResponseMessage: Text;
 
@@ -108,7 +108,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
             ScheduleCode := CopyStr(UpperCase(Request.QueryParams().Get('scheduleCode')), 1, MaxStrLen(ScheduleCode));
 
 
-        exit(GetSchedules(AdmissionCode, StartDate, EndDate, ScheduleCode, AdmCapacityPriceBuffer, ResponseMessage));
+        exit(GetSchedules(AdmissionCode, StartDate, EndDate, ScheduleCode, TempAdmCapacityPriceBuffer, ResponseMessage));
     end;
 
     internal procedure GetSchedules(AdmissionCode: Code[20]; StartDate: Date; EndDate: Date; ScheduleCode: Code[20]; var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseMessage: Text) Response: Codeunit "NPR API Response"

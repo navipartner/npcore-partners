@@ -532,18 +532,24 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
 
         TempPOSSaleDigitalReceiptEntry.Init();
         JsonResponse.GetStringPropertyValueByName('_id', IdText);
+#pragma warning disable AA0139
         TempPOSSaleDigitalReceiptEntry.Validate(Id, IdText);
+#pragma warning restore AA0139
         JsonPdfLinkPropertyObject.InitializeObject(ResponseText);
         if JsonPdfLinkPropertyObject.GetArrayPropertyValueAsStringByName('assets', JsonArrayText) then begin
             JsonPdfLinkPropertyObject.InitializeObject(JsonArrayText);
             JsonPdfLinkPropertyObject.GetStringPropertyValueByName('pdf_link', PDFLinkText);
+#pragma warning disable AA0139
             TempPOSSaleDigitalReceiptEntry.Validate(PDFLink, PDFLinkText);
+#pragma warning restore AA0139
         end;
         JsonQRCodeObject.InitializeObject(ResponseText);
         if JsonQRCodeObject.GetArrayPropertyValueAsStringByName('public_link', JsonQRCodeText) then begin
             JsonQRCodeObject.InitializeObject(JsonQRCodeText);
             JsonQRCodeObject.GetStringPropertyValueByName('href', QRCodeText);
+#pragma warning disable AA0139
             TempPOSSaleDigitalReceiptEntry.Validate("QR Code Link", QRCodeText);
+#pragma warning restore AA0139
         end;
         TempPOSSaleDigitalReceiptEntry.Validate("POS Entry No.", POSEntry."Entry No.");
         TempPOSSaleDigitalReceiptEntry.Validate("POS Unit No.", POSEntry."POS Unit No.");

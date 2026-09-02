@@ -425,7 +425,9 @@
         PurchaseLine.Validate(Type, PurchaseLine.Type::"G/L Account");
         PurchaseLine.Validate("No.", GLAccountNo);
         PurchaseLine.Validate(Description, InvoiceChargeReason);
+#pragma warning disable AA0139
         PurchaseLine.Validate("Description 2", InvoiceChargeReason);
+#pragma warning restore AA0139
         PurchaseLine.Validate(Quantity, 1);
         PurchaseLine.Validate("Direct Unit Cost", InvoiceChargeAmount);
         PurchaseLine.Modify(true);

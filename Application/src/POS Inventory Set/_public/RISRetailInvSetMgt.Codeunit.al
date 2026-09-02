@@ -11,7 +11,7 @@
     var
         ItemVariant: Record "Item Variant";
         RetailInventorySet: Record "NPR RIS Retail Inv. Set";
-        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
+        TempRetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
         VariantFilter: Text;
     begin
         if PAGE.RunModal(0, RetailInventorySet) <> ACTION::LookupOK then
@@ -23,15 +23,15 @@
                 VariantFilter := ItemVariant.Code;
         end;
 
-        ProcessInventorySet(RetailInventorySet, Item."No.", VariantFilter, RetailInventoryBuffer);
-        PAGE.Run(0, RetailInventoryBuffer);
+        ProcessInventorySet(RetailInventorySet, Item."No.", VariantFilter, TempRetailInventoryBuffer);
+        PAGE.Run(0, TempRetailInventoryBuffer);
     end;
 
     internal procedure TestProcessInventorySet(RetailInventorySet: Record "NPR RIS Retail Inv. Set")
     var
         ItemVariant: Record "Item Variant";
         Item: Record Item;
-        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
+        TempRetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
         VariantFilter: Text;
     begin
         if PAGE.RunModal(0, Item) <> ACTION::LookupOK then
@@ -43,8 +43,8 @@
                 VariantFilter := ItemVariant.Code;
         end;
 
-        ProcessInventorySet(RetailInventorySet, Item."No.", VariantFilter, RetailInventoryBuffer);
-        PAGE.Run(0, RetailInventoryBuffer);
+        ProcessInventorySet(RetailInventorySet, Item."No.", VariantFilter, TempRetailInventoryBuffer);
+        PAGE.Run(0, TempRetailInventoryBuffer);
     end;
 
     internal procedure ProcessInventorySet(RetailInventorySet: Record "NPR RIS Retail Inv. Set"; ItemFilter: Text; VariantFilter: Text; var RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer")

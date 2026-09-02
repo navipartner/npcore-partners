@@ -173,11 +173,13 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                 end;
         end;
 
+#pragma warning disable AA0139
         if InputSerial <> '' then
             Line.Validate("Serial No.", InputSerial);
 
         if InputLot <> '' then
             Line.Validate("Lot No.", InputLot);
+#pragma warning restore AA0139
 
         if CustomDescription <> '' then
             Line.Description := CopyStr(CustomDescription, 1, MaxStrLen(Line.Description));

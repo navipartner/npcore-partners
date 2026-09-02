@@ -132,11 +132,11 @@
 
     trigger OnOpenPage()
     var
-        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
+        TempRetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
     begin
-        RetailInventoryBuffer.Copy(Rec, true);
-        RetailInventoryBuffer.SetRange("Processing Error", true);
-        ProcessingErrorExists := not RetailInventoryBuffer.IsEmpty();
+        TempRetailInventoryBuffer.Copy(Rec, true);
+        TempRetailInventoryBuffer.SetRange("Processing Error", true);
+        ProcessingErrorExists := not TempRetailInventoryBuffer.IsEmpty();
     end;
 
     var

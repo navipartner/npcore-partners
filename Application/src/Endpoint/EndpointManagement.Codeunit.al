@@ -283,7 +283,9 @@
                         EndpointQueryFilter.Validate("Endpoint Query No.", EndpointQuery."No.");
                         EndpointQueryFilter.Validate("Table No.", RecRef.Number);
                         EndpointQueryFilter.Validate("Field No.", FldRef.Number);
+#pragma warning disable AA0139
                         EndpointQueryFilter.Validate("Filter Text", FilterText);
+#pragma warning restore AA0139
                         EndpointQueryFilter.Insert(true);
                     end;
                 until FieldRec.Next() = 0;

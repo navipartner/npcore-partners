@@ -25,7 +25,7 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
 
     local procedure PrintThermalReceipt(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         Printer: Codeunit "NPR RP Line Print";
     begin
         Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
@@ -39,12 +39,12 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
 
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
 
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'Windows-1251';
+        TempPrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS EOD Fiscal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS EOD Fiscal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     local procedure PrintReceiptHeader(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")

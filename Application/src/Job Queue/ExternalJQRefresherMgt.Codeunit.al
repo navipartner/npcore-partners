@@ -178,18 +178,18 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
 
     internal procedure LookupJQRefresherUserName(var Text: Text; var JQRunnerUser: Record "NPR Job Queue Runner User"): Boolean
     var
-        JQRunnerUser1: Record "NPR Job Queue Runner User";
+        TempJQRunnerUser1: Record "NPR Job Queue Runner User" temporary;
         JQRunnerUserPage: Page "NPR Job Queue Runner Users";
     begin
-        JQRunnerUser1.Copy(JQRunnerUser, true);
-        JQRunnerUser1.Reset();
-        JQRunnerUser1.SetFilter("Failed Attempts", '<%1', JQRunnerUser1.MaxFailedAttempts());
-        JQRunnerUserPage.SetTableView(JQRunnerUser1);
+        TempJQRunnerUser1.Copy(JQRunnerUser, true);
+        TempJQRunnerUser1.Reset();
+        TempJQRunnerUser1.SetFilter("Failed Attempts", '<%1', TempJQRunnerUser1.MaxFailedAttempts());
+        JQRunnerUserPage.SetTableView(TempJQRunnerUser1);
         JQRunnerUserPage.LookupMode := true;
         if JQRunnerUserPage.RunModal() <> Action::LookupOK then
             exit(false);
-        JQRunnerUserPage.GetRecord(JQRunnerUser1);
-        Text := JQRunnerUser1."JQ Runner User Name";
+        JQRunnerUserPage.GetRecord(TempJQRunnerUser1);
+        Text := TempJQRunnerUser1."JQ Runner User Name";
         exit(true);
     end;
 

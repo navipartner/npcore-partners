@@ -52,11 +52,13 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
          * trigger dimension "calculation" which includes this field.
          */
         Sale.SelectToken('posUnit', TempJToken);
+#pragma warning disable AA0139
         ExternalPOSSale.Validate("Register No.", TempJToken.AsValue().AsCode());
         ExternalPOSSale.TestField("Register No.");
 
         Sale.SelectToken('posStore', TempJToken);
         ExternalPOSSale.Validate("POS Store Code", TempJToken.AsValue().AsCode());
+#pragma warning restore AA0139
         ExternalPOSSale.TestField("POS Store Code");
 
         POSStore.Get(ExternalPOSSale."POS Store Code");
@@ -77,7 +79,9 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
             ExternalPOSSale."Sales Ticket No." := POSSale.GetNextReceiptNo(ExternalPOSSale."Register No.");
 
         if (Sale.SelectToken('salespersonCode', TempJToken)) then
+#pragma warning disable AA0139
             ExternalPOSSale.Validate("Salesperson Code", TempJToken.AsValue().AsCode());
+#pragma warning restore AA0139
 
         if (Sale.SelectToken('customerId', TempJToken)) then begin
             Customer.SetLoadFields("No.");
@@ -116,10 +120,12 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
         Evaluate(ExternalPOSSaleLine."Line Type", TempJToken.AsValue().AsText());
 
         SaleLine.SelectToken('code', TempJToken);
+#pragma warning disable AA0139
         ExternalPOSSaleLine.Validate("No.", TempJToken.AsValue().AsCode());
 
         if (SaleLine.SelectToken('variantCode', TempJToken)) then
             ExternalPOSSaleLine.Validate("Variant Code", TempJToken.AsValue().AsCode());
+#pragma warning restore AA0139
 
         SaleLine.SelectToken('qty', TempJToken);
         ExternalPOSSaleLine.Validate(Quantity, TempJToken.AsValue().AsDecimal());
@@ -143,7 +149,9 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
         ExternalPOSSaleLine.Validate("Discount Amount", TempJToken.AsValue().AsDecimal());
 
         if (SaleLine.SelectToken('unitOfMeasureCode', TempJToken)) then
+#pragma warning disable AA0139
             ExternalPOSSaleLine.Validate("Unit of Measure Code", TempJToken.AsValue().AsCode());
+#pragma warning restore AA0139
 
         SaleLine.SelectToken('description', TempJToken);
         ExternalPOSSaleLine.Description := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSSaleLine.Description));
@@ -152,7 +160,9 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
             ExternalPOSSaleLine."Description 2" := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSSaleLine."Description 2"));
 
         if (SaleLine.SelectToken('returnReasonCode', TempJToken)) then
+#pragma warning disable AA0139
             ExternalPOSSaleLine.Validate("Return Reason Code", TempJToken.AsValue().AsCode());
+#pragma warning restore AA0139
 
         ExternalPOSSaleLine.Insert(true);
 
@@ -172,7 +182,9 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
         ExternalPOSPaymentLine.Validate("Line Type", Enum::"NPR POS Sale Line Type"::"POS Payment");
 
         PaymentLine.SelectToken('paymentMethodCode', TempJToken);
+#pragma warning disable AA0139
         ExternalPOSPaymentLine.Validate("No.", TempJToken.AsValue().AsCode());
+#pragma warning restore AA0139
 
         PaymentLine.SelectToken('description', TempJToken);
         ExternalPOSPaymentLine.Description := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSPaymentLine.Description));

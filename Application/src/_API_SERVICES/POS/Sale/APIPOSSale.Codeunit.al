@@ -144,12 +144,14 @@ codeunit 6248632 "NPR API POS Sale"
         if (CustomerNo <> '') or (VATBusinessPostingGroup <> '') or (GenBusinessPostingGroup <> '') then begin
             POSSale.GetCurrentSale(POSSaleRec);
             POSSaleRec.GetBySystemId(POSSaleRec.SystemId);
+#pragma warning disable AA0139
             if CustomerNo <> '' then
                 POSSaleRec.Validate("Customer No.", CustomerNo);
             if GenBusinessPostingGroup <> '' then
                 POSSaleRec.Validate("Gen. Bus. Posting Group", GenBusinessPostingGroup);
             if VATBusinessPostingGroup <> '' then
                 POSSaleRec.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup);
+#pragma warning restore AA0139
             POSSaleRec.Modify(true);
         end;
 

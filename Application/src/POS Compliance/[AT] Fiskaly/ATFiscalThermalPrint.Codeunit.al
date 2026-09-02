@@ -3,7 +3,9 @@ codeunit 6184903 "NPR AT Fiscal Thermal Print"
     Access = Internal;
 
     var
+#pragma warning disable AA0073
         PrinterDeviceSettingsForISO88591Encoding, PrinterDeviceSettingsForWindows1251Encoding : Record "NPR Printer Device Settings";
+#pragma warning restore AA0073
         Printer: Codeunit "NPR RP Line Print";
         TwoValuesClosePlaceholderLbl: Label '%1%2', Locked = true, Comment = '%1 - placeholder 1, %2 - placeholder 2';
 

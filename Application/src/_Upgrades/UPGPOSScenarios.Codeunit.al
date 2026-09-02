@@ -469,8 +469,8 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
     local procedure UpgradeAuditProfile()
     var
-        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
-        AuditProfileUpgradeBuff: Record "NPR Audit Profile Upgrade Buff";
+        TempPOSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff" temporary;
+        TempAuditProfileUpgradeBuff: Record "NPR Audit Profile Upgrade Buff" temporary;
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeAuditProfile');
@@ -479,9 +479,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             exit;
         end;
 
-        CreateAuditProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
-        CreateAuditProfileUpgradeBuff(POSScenarioUpgradeBuff, AuditProfileUpgradeBuff);
-        ProcessAuditProfileUpgradeBuff(AuditProfileUpgradeBuff);
+        CreateAuditProfilePOSScenarioUpgradeBuffer(TempPOSScenarioUpgradeBuff);
+        CreateAuditProfileUpgradeBuff(TempPOSScenarioUpgradeBuff, TempAuditProfileUpgradeBuff);
+        ProcessAuditProfileUpgradeBuff(TempAuditProfileUpgradeBuff);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeAuditProfile'));
         LogMessageStopwatch.LogFinish();
@@ -489,8 +489,8 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
     local procedure UpgradeMemberProfile()
     var
-        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
-        NPRMemberProfileUpgBuff: Record "NPR Member Profile Upg Buff";
+        TempPOSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff" temporary;
+        TempNPRMemberProfileUpgBuff: Record "NPR Member Profile Upg Buff" temporary;
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeMemberProfile');
@@ -499,9 +499,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             exit;
         end;
 
-        CreateMemberProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
-        CreateMemberProfileUpgradeBuff(POSScenarioUpgradeBuff, NPRMemberProfileUpgBuff);
-        ProcessMemberProfileUpgradeBuff(NPRMemberProfileUpgBuff);
+        CreateMemberProfilePOSScenarioUpgradeBuffer(TempPOSScenarioUpgradeBuff);
+        CreateMemberProfileUpgradeBuff(TempPOSScenarioUpgradeBuff, TempNPRMemberProfileUpgBuff);
+        ProcessMemberProfileUpgradeBuff(TempNPRMemberProfileUpgBuff);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeMemberProfile'));
         LogMessageStopwatch.LogFinish();
@@ -786,8 +786,8 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
     local procedure UpgradeLoyaltyProfile()
     var
-        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
-        LoyaltyProfileUpgBuff: Record "NPR Loyalty Profile Upg Buff";
+        TempPOSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff" temporary;
+        TempLoyaltyProfileUpgBuff: Record "NPR Loyalty Profile Upg Buff" temporary;
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeLoyaltyProfile');
@@ -796,9 +796,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             exit;
         end;
 
-        CreateLoyaltyProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
-        CreateLoyaltyProfileUpgradeBuff(POSScenarioUpgradeBuff, LoyaltyProfileUpgBuff);
-        ProcessLoyaltyProfileUpgradeBuff(LoyaltyProfileUpgBuff);
+        CreateLoyaltyProfilePOSScenarioUpgradeBuffer(TempPOSScenarioUpgradeBuff);
+        CreateLoyaltyProfileUpgradeBuff(TempPOSScenarioUpgradeBuff, TempLoyaltyProfileUpgBuff);
+        ProcessLoyaltyProfileUpgradeBuff(TempLoyaltyProfileUpgBuff);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeLoyaltyProfile'));
         LogMessageStopwatch.LogFinish();
@@ -905,8 +905,8 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
     local procedure UpgradeTicketProfile()
     var
-        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
-        TicketProfileUpgBuff: Record "NPR Ticket Profile Upg Buff";
+        TempPOSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff" temporary;
+        TempTicketProfileUpgBuff: Record "NPR Ticket Profile Upg Buff" temporary;
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeTicketProfile');
@@ -915,9 +915,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             exit;
         end;
 
-        CreateTicketProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
-        CreateTicketProfileUpgradeBuff(POSScenarioUpgradeBuff, TicketProfileUpgBuff);
-        ProcessTicketProfileUpgradeBuff(TicketProfileUpgBuff);
+        CreateTicketProfilePOSScenarioUpgradeBuffer(TempPOSScenarioUpgradeBuff);
+        CreateTicketProfileUpgradeBuff(TempPOSScenarioUpgradeBuff, TempTicketProfileUpgBuff);
+        ProcessTicketProfileUpgradeBuff(TempTicketProfileUpgBuff);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeTicketProfile'));
         LogMessageStopwatch.LogFinish();

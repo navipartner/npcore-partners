@@ -18,7 +18,7 @@
 
     local procedure ParsePrinter()
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         Index: Integer;
         ValDict: Dictionary of [Text, Text];
         JsonKey: Text;
@@ -88,7 +88,7 @@
         end;
         Printer.SetFont('COMMAND');
         Printer.AddLine('PAPERCUT', 0);
-        Printer.ProcessBuffer(CODEUNIT::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(CODEUNIT::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     local procedure ClearPrinterVar(var Font: Text[30]; var Center: Boolean; var Bold: Boolean; var ContenText: Text; var LinkText: Text; var RecNumText: Text)

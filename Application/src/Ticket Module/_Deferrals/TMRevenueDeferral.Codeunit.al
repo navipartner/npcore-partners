@@ -73,18 +73,18 @@ codeunit 6184739 "NPR TM RevenueDeferral"
     [CommitBehavior(CommitBehavior::Error)]
     internal procedure ProcessOne(DeferRevenueRequest: Record "NPR TM DeferRevenueRequest")
     var
-        RevenueRecognitionBuffer: Record "NPR TM RevenuePostingBuffer";
+        TempRevenueRecognitionBuffer: Record "NPR TM RevenuePostingBuffer" temporary;
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
         InitializeRevenueRequest(DeferRevenueRequest, DeferRevenueRequest.SalesDate);
         ProcessOneStatusRegistered(DeferRevenueRequest);
         if (ProcessOneStatusPendingDeferral(DeferRevenueRequest)) then
-            AggregateDeferrals(DeferRevenueRequest, RevenueRecognitionBuffer);
+            AggregateDeferrals(DeferRevenueRequest, TempRevenueRecognitionBuffer);
         DeferRevenueRequest.Modify();
 
         // Create posting journal lines from the aggregation buffer
-        CreateJournalLines(RevenueRecognitionBuffer, TempGenJournalLine);
+        CreateJournalLines(TempRevenueRecognitionBuffer, TempGenJournalLine);
 
         // Post Journal
         TempGenJournalLine.Reset();
@@ -280,7 +280,7 @@ EventDate: Date) ValidRequest: Boolean
     local procedure CalculateDeferralAndPost()
     var
         DeferRevenueRequest, DeferRevenueRequestUpdate : Record "NPR TM DeferRevenueRequest";
-        RevenueRecognitionBuffer: Record "NPR TM RevenuePostingBuffer";
+        TempRevenueRecognitionBuffer: Record "NPR TM RevenuePostingBuffer" temporary;
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
@@ -294,12 +294,12 @@ EventDate: Date) ValidRequest: Boolean
         repeat
             DeferRevenueRequestUpdate.Get(DeferRevenueRequest.TicketAccessEntryNo);
             if (ProcessOneStatusPendingDeferral(DeferRevenueRequestUpdate)) then
-                AggregateDeferrals(DeferRevenueRequestUpdate, RevenueRecognitionBuffer);
+                AggregateDeferrals(DeferRevenueRequestUpdate, TempRevenueRecognitionBuffer);
             DeferRevenueRequestUpdate.Modify();
         until (DeferRevenueRequest.Next() = 0);
 
         // Create posting journal lines from the aggregation buffer
-        CreateJournalLines(RevenueRecognitionBuffer, TempGenJournalLine);
+        CreateJournalLines(TempRevenueRecognitionBuffer, TempGenJournalLine);
 
         // Post Journal
         TempGenJournalLine.Reset();

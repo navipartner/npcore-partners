@@ -678,7 +678,9 @@ codeunit 6184681 "NPR Label Management"
                         RetailJnlLine."Quantity to Print" := 1;
                         RetailJnlLine.Description := ItemWorksheetLine.Description;
                         RetailJnlLine."Serial No." := ItemLedgerEntry."Serial No.";
+#pragma warning disable AA0139
                         RetailJnlLine.Validate("Variant Code", ItemWorksheetLine."Variant Code");
+#pragma warning restore AA0139
                         RetailJnlLine.Insert(true);
                     until ItemLedgerEntry.Next() = 0;
             end else begin
@@ -689,7 +691,9 @@ codeunit 6184681 "NPR Label Management"
                 RetailJnlLine.Validate("Item No.", ItemWorksheetLine."Item No.");
                 RetailJnlLine."Quantity to Print" := 1;
                 RetailJnlLine.Description := ItemWorksheetLine.Description;
+#pragma warning disable AA0139
                 RetailJnlLine.Validate("Variant Code", ItemWorksheetLine."Variant Code");
+#pragma warning restore AA0139
                 RetailJnlLine.Insert(true);
             end;
         until ItemWorksheetLine.Next() = 0;

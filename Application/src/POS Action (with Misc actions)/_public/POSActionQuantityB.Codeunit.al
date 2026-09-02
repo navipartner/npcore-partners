@@ -64,7 +64,9 @@ codeunit 6059879 "NPR POS Action: Quantity B"
 
         if ReturnReasonCode <> '' then begin
             SaleLine.GetCurrentSaleLine(SaleLinePOS);
+#pragma warning disable AA0139
             SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
+#pragma warning restore AA0139
             SaleLinePOS.Modify();
             SaleLine.RefreshCurrent();
         END;

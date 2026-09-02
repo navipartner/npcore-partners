@@ -1686,7 +1686,9 @@ codeunit 6184496 "NPR Pepper Library HWC"
         ParCreditCardTransaction.Validate("Entry No.", ParEntryNo);
         ParCreditCardTransaction.Validate("Line No.", 0);
         ParCreditCardTransaction.Validate(Type, 0);
+#pragma warning disable AA0139
         ParCreditCardTransaction.Validate(Text, ParText);
+#pragma warning restore AA0139
         ParCreditCardTransaction.Insert(true);
     end;
 

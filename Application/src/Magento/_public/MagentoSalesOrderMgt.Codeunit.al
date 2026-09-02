@@ -692,7 +692,9 @@
             end;
         end;
 
+#pragma warning disable AA0139
         SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
+#pragma warning restore AA0139
         if MagentoWebsite.Code <> '' then begin
             SalesHeader.SetHideValidationDialog(true);
             if MagentoWebsite."Global Dimension 1 Code" <> '' then
@@ -1074,7 +1076,9 @@
             TransferLine."Line No." := LineNo;
             TransferLine.Validate("Item No.", ItemNo);
             TransferLine.Validate(Quantity, NeededQty);
+#pragma warning disable AA0139
             TransferLine.Validate("Variant Code", VariantCode);
+#pragma warning restore AA0139
             TransferLine.Insert(true);
         end else begin
             TransferLine.Quantity += NeededQty;

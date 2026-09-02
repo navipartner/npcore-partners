@@ -542,7 +542,9 @@
         InsertSalesLine(SalesLine, SalesHeader, LineNo);
 
         SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+#pragma warning disable AA0139
         SalesLine.Validate("No.", AccountNo);
+#pragma warning restore AA0139
         if Quantity <> 0 then
             SalesLine.Validate(Quantity, Quantity);
 

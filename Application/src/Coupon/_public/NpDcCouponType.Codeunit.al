@@ -105,56 +105,56 @@ codeunit 6248503 "NPR NpDc Coupon Type"
 
     local procedure OnBeforeInsertRec(var CouponType: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var
-        CouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer";
+        TempCouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer" temporary;
     begin
-        PopulateBufferFromRec(CouponTypeBuffer, CouponType);
-        OnBeforeInsertRecEvent(CouponTypeBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponTypeBuffer, CouponType);
+        PopulateBufferFromRec(TempCouponTypeBuffer, CouponType);
+        OnBeforeInsertRecEvent(TempCouponTypeBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponTypeBuffer, CouponType);
     end;
 
     local procedure OnAfterInsertRec(var CouponType: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var
-        CouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer";
+        TempCouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer" temporary;
     begin
-        PopulateBufferFromRec(CouponTypeBuffer, CouponType);
-        OnAfterInsertRecEvent(CouponTypeBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponTypeBuffer, CouponType);
+        PopulateBufferFromRec(TempCouponTypeBuffer, CouponType);
+        OnAfterInsertRecEvent(TempCouponTypeBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponTypeBuffer, CouponType);
     end;
 
     local procedure OnBeforeModifyRec(var CouponType: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var
-        CouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer";
+        TempCouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer" temporary;
     begin
-        PopulateBufferFromRec(CouponTypeBuffer, CouponType);
-        OnBeforeModifyRecEvent(CouponTypeBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponTypeBuffer, CouponType);
+        PopulateBufferFromRec(TempCouponTypeBuffer, CouponType);
+        OnBeforeModifyRecEvent(TempCouponTypeBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponTypeBuffer, CouponType);
     end;
 
     local procedure OnAfterModifyRec(var CouponType: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var
-        CouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer";
+        TempCouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer" temporary;
     begin
-        PopulateBufferFromRec(CouponTypeBuffer, CouponType);
-        OnAfterModifyRecEvent(CouponTypeBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponTypeBuffer, CouponType);
+        PopulateBufferFromRec(TempCouponTypeBuffer, CouponType);
+        OnAfterModifyRecEvent(TempCouponTypeBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponTypeBuffer, CouponType);
     end;
 
     local procedure OnBeforeDeleteRec(var CouponType: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var
-        CouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer";
+        TempCouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer" temporary;
     begin
-        PopulateBufferFromRec(CouponTypeBuffer, CouponType);
-        OnBeforeDeleteRecEvent(CouponTypeBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponTypeBuffer, CouponType);
+        PopulateBufferFromRec(TempCouponTypeBuffer, CouponType);
+        OnBeforeDeleteRecEvent(TempCouponTypeBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponTypeBuffer, CouponType);
     end;
 
     local procedure OnAfterDeleteRec(var CouponType: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var
-        CouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer";
+        TempCouponTypeBuffer: Record "NPR NpDc Coupon Type Buffer" temporary;
     begin
-        PopulateBufferFromRec(CouponTypeBuffer, CouponType);
-        OnAfterDeleteRecEvent(CouponTypeBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponTypeBuffer, CouponType);
+        PopulateBufferFromRec(TempCouponTypeBuffer, CouponType);
+        OnAfterDeleteRecEvent(TempCouponTypeBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponTypeBuffer, CouponType);
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21

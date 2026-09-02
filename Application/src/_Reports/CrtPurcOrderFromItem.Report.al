@@ -174,7 +174,9 @@ report 6014411 "NPR Crt. Purc. Order From Item"
 
         PurchaseHeader.Validate("Buy-from Vendor No.", VendorNo);
         if LocationCode <> '' then
+#pragma warning disable AA0139
             PurchaseHeader.Validate("Location Code", LocationCode);
+#pragma warning restore AA0139
         PurchaseHeader.Modify();
 
     end;
@@ -195,7 +197,9 @@ report 6014411 "NPR Crt. Purc. Order From Item"
             PurchaseLine.Validate("Variant Code", VariantCode);
 
         if (LocationCode <> '') and (LocationCode <> PurchaseLine."Location Code") then
+#pragma warning disable AA0139
             PurchaseLine.Validate("Location Code", LocationCode);
+#pragma warning restore AA0139
 
         PurchaseLine.Validate(Quantity, 1);
         PurchaseLine.Modify();

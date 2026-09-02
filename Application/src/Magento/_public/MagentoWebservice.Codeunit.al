@@ -362,7 +362,9 @@
 
         MagentoSetup.AuthType := MagentoSetup.AuthType::Basic;
 
+#pragma warning disable AA0139
         MagentoSetup.Validate("Magento Url", MagentoUrl);
+#pragma warning restore AA0139
         MagentoSetup."Magento Enabled" := true;
         MagentoSetup."Brands Enabled" := true;
         MagentoSetup."Attributes Enabled" := true;

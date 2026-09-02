@@ -60,7 +60,9 @@
     var
         Rec: Record "NPR POS Sale";
         OnRunPOSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+#pragma warning disable AA0073
         OnRunExecutionOrderOnSale: Record "NPR Execution Order On Sale";
+#pragma warning restore AA0073
         //This variable has to be removed when pos scenarios are fully removed.
         UseNewExecutionOrderImplementation: Boolean;
 

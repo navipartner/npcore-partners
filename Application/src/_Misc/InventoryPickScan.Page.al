@@ -507,14 +507,14 @@
 
     local procedure HasItemTracking(ItemNo: Code[20]): Boolean
     var
-        WhseItemTrackingSetup: Record "Item Tracking Setup";
+        TempWhseItemTrackingSetup: Record "Item Tracking Setup" temporary;
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ItemTrackingNotEnabledError: Label 'Item doesn''t have item tracking enabled so you need to remove %1 before scanning.';
         ItemTrackingError: Label 'Item has item tracking enabled so you need to set %1 before scanning.';
     begin
-        ItemTrackingMgt.GetWhseItemTrkgSetup(ItemNo, WhseItemTrackingSetup);
-        SNRequired := WhseItemTrackingSetup."Serial No. Required";
-        LNRequired := WhseItemTrackingSetup."Lot No. Required";
+        ItemTrackingMgt.GetWhseItemTrkgSetup(ItemNo, TempWhseItemTrackingSetup);
+        SNRequired := TempWhseItemTrackingSetup."Serial No. Required";
+        LNRequired := TempWhseItemTrackingSetup."Lot No. Required";
         if SNRequired then begin
             if SerialNo = '' then
                 Error(ItemTrackingError, SerialNoCaption);

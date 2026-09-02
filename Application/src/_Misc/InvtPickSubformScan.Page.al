@@ -466,7 +466,7 @@
     local procedure SerialNoOnAfterValidate()
     var
 #IF NOT BC17 AND NOT BC18
-        WhseItemTrackingSetup: Record "Item Tracking Setup";
+        TempWhseItemTrackingSetup: Record "Item Tracking Setup" temporary;
 #ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ExpDate: Date;
@@ -477,9 +477,9 @@
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
                 Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
 #ELSE
-            ItemTrackingMgt.GetWhseItemTrkgSetup(Rec."Item No.", WhseItemTrackingSetup);
+            ItemTrackingMgt.GetWhseItemTrkgSetup(Rec."Item No.", TempWhseItemTrackingSetup);
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
-                WhseItemTrackingSetup, false, EntriesExist);
+                TempWhseItemTrackingSetup, false, EntriesExist);
 #ENDIF
         end;
 
@@ -490,7 +490,7 @@
     local procedure LotNoOnAfterValidate()
     var
 #IF NOT BC17 AND NOT BC18
-        WhseItemTrackingSetup: Record "Item Tracking Setup";
+        TempWhseItemTrackingSetup: Record "Item Tracking Setup" temporary;
 #ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ExpDate: Date;
@@ -501,9 +501,9 @@
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
                 Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
 #ELSE
-            ItemTrackingMgt.GetWhseItemTrkgSetup(Rec."Item No.", WhseItemTrackingSetup);
+            ItemTrackingMgt.GetWhseItemTrkgSetup(Rec."Item No.", TempWhseItemTrackingSetup);
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
-                WhseItemTrackingSetup, false, EntriesExist);
+                TempWhseItemTrackingSetup, false, EntriesExist);
 #ENDIF
         end;
 

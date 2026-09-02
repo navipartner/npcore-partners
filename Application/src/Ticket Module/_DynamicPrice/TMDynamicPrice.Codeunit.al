@@ -105,22 +105,22 @@ codeunit 6014559 "NPR TM Dynamic Price"
         var UnitPriceIncludesVat: Boolean;
         var UnitPriceVatPercentage: Decimal)
     var
-        AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        TempAdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
     begin
-        Clear(AdmCapacityPriceBuffer);
-        AdmCapacityPriceBuffer.EntryNo := 1;
-        AdmCapacityPriceBuffer.ItemNumber := ItemNo;
-        AdmCapacityPriceBuffer.VariantCode := VariantCode;
-        AdmCapacityPriceBuffer.CustomerNo := CustomerNo;
-        AdmCapacityPriceBuffer.ReferenceDate := ReferenceDate;
-        AdmCapacityPriceBuffer.Quantity := Quantity;
+        Clear(TempAdmCapacityPriceBuffer);
+        TempAdmCapacityPriceBuffer.EntryNo := 1;
+        TempAdmCapacityPriceBuffer.ItemNumber := ItemNo;
+        TempAdmCapacityPriceBuffer.VariantCode := VariantCode;
+        TempAdmCapacityPriceBuffer.CustomerNo := CustomerNo;
+        TempAdmCapacityPriceBuffer.ReferenceDate := ReferenceDate;
+        TempAdmCapacityPriceBuffer.Quantity := Quantity;
 
-        CalculateErpPrice(AdmCapacityPriceBuffer);
+        CalculateErpPrice(TempAdmCapacityPriceBuffer);
 
-        UnitPrice := AdmCapacityPriceBuffer.UnitPrice;
-        DiscountPct := AdmCapacityPriceBuffer.DiscountPct;
-        UnitPriceIncludesVat := AdmCapacityPriceBuffer.UnitPriceIncludesVat;
-        UnitPriceVatPercentage := AdmCapacityPriceBuffer.UnitPriceVatPercentage;
+        UnitPrice := TempAdmCapacityPriceBuffer.UnitPrice;
+        DiscountPct := TempAdmCapacityPriceBuffer.DiscountPct;
+        UnitPriceIncludesVat := TempAdmCapacityPriceBuffer.UnitPriceIncludesVat;
+        UnitPriceVatPercentage := TempAdmCapacityPriceBuffer.UnitPriceVatPercentage;
     end;
 
     internal procedure CalculateErpPrice(var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer") ValidErpPrice: Boolean

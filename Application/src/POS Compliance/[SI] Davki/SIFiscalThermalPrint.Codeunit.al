@@ -23,7 +23,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
     local procedure PrintThermalReceipt(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
     begin
         Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
         Printer.SetAutoLineBreak(false);
@@ -49,13 +49,13 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         if PrintEFTReceiptInformation(SIPOSAuditLogAuxInfo) then
             PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
 
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'PC852';
-        PrinterDeviceSettings.Insert();
+        TempPrinterDeviceSettings.Init();
+        TempPrinterDeviceSettings.Name := 'ENCODING';
+        TempPrinterDeviceSettings.Value := 'PC852';
+        TempPrinterDeviceSettings.Insert();
 
         Commit(); //fix for printing from mPOS (RunModal() run)
-        Printer.ProcessBuffer(Codeunit::"NPR SI Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR SI Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
 
         SIPOSAuditLogAuxInfo."Receipt Printed" := true;
         SIPOSAuditLogAuxInfo.Modify();

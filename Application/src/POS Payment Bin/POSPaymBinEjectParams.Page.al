@@ -58,7 +58,9 @@
 
                     trigger OnValidate()
                     begin
+#pragma warning disable AA0139
                         Rec.Validate(Value, ParameterValue);
+#pragma warning restore AA0139
                         Rec.Modify();
                         SetParameterValue();
                     end;

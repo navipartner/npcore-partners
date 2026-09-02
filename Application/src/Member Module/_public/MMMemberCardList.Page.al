@@ -319,11 +319,11 @@
                 trigger OnAction()
                 var
                     TimelinePage: Page "NPR MMTimelineList";
-                    TimelineEvents: Record "NPR MMTimelineEventBuffer";
+                    TempTimelineEvents: Record "NPR MMTimelineEventBuffer" temporary;
                     TimelineHandler: Codeunit "NPR MMTimelineHandler";
                 begin
-                    TimelineHandler.GetTimelineEvents(Rec."Membership Entry No.", TimelineEvents);
-                    TimelinePage.TransferData(TimelineEvents);
+                    TimelineHandler.GetTimelineEvents(Rec."Membership Entry No.", TempTimelineEvents);
+                    TimelinePage.TransferData(TempTimelineEvents);
                     TimelinePage.Run();
                 end;
             }

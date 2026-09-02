@@ -37,7 +37,7 @@ codeunit 6248213 "NPR CRO Fiscal E-Mail Mgt."
 
     local procedure CreateAndSendEmailMessage(var TempEmailItem: Record "Email Item" temporary; CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; RecipientEmail: Text): Text
     var
-        EmailAccount: Record "Email Account";
+        TempEmailAccount: Record "Email Account" temporary;
         CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
         EmailScenarios: Codeunit "Email Scenario";
         ErrorMessage: Text;
@@ -45,11 +45,11 @@ codeunit 6248213 "NPR CRO Fiscal E-Mail Mgt."
         InitializeEmailItem(TempEmailItem);
         CROFiscalizationSetup.Get();
 
-        if not EmailScenarios.GetEmailAccount(Enum::"Email Scenario"::Default, EmailAccount) then
+        if not EmailScenarios.GetEmailAccount(Enum::"Email Scenario"::Default, TempEmailAccount) then
             exit(_EmailAccountNotFoundErr);
 
-        TempEmailItem."From Address" := EmailAccount."Email Address";
-        TempEmailItem."From Name" := CopyStr(EmailAccount.Name, 1, MaxStrLen(TempEmailItem."From Name"));
+        TempEmailItem."From Address" := TempEmailAccount."Email Address";
+        TempEmailItem."From Name" := CopyStr(TempEmailAccount.Name, 1, MaxStrLen(TempEmailItem."From Name"));
 
         TempEmailItem.Modify();
 

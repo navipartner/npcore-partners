@@ -4,7 +4,7 @@ codeunit 6060098 "NPR POS Action: SinSaleStats-B"
     procedure RunSingleSalesStatsPage()
     var
         POSEntry: Record "NPR POS Entry";
-        POSSingleStatsBuffer: Record "NPR POS Single Stats Buffer";
+        TempPOSSingleStatsBuffer: Record "NPR POS Single Stats Buffer" temporary;
         POSSession: Codeunit "NPR POS Session";
         POSStatisticsMgt: Codeunit "NPR POS Statistics Mgt.";
         POSUnitNo: Code[10];
@@ -13,9 +13,9 @@ codeunit 6060098 "NPR POS Action: SinSaleStats-B"
         POSUnitNo := GetPOSUnit(POSSession);
 
         if POSStatisticsMgt.TryGetPOSEntry(POSEntry, POSUnitNo) then begin
-            POSStatisticsMgt.FillSingleStatsBuffer(POSSingleStatsBuffer, POSEntry);
+            POSStatisticsMgt.FillSingleStatsBuffer(TempPOSSingleStatsBuffer, POSEntry);
 
-            Page.Run(Page::"NPR POS Single Sale Statistics", POSSingleStatsBuffer);
+            Page.Run(Page::"NPR POS Single Sale Statistics", TempPOSSingleStatsBuffer);
         end;
     end;
 

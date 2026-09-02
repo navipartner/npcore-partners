@@ -5,7 +5,9 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     TableNo = "NPR Data Log Record";
 
     var
+#pragma warning disable AA0073
         _TempSpfyMetafieldDef: Record "NPR Spfy Metafield Definition";
+#pragma warning restore AA0073
         _UnexpectedResponseErr: Label '%1. Shopify returned the following response:\%2', Comment = '%1 - Error descrition, %2 - Shopify returned response.';
 
     procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean

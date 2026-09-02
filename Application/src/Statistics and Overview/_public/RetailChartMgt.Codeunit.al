@@ -288,7 +288,9 @@
                 LastUsedChart.Modify();
             end;
         end else begin
+#pragma warning disable AA0139
             LastUsedChart.Validate(UID, UserId());
+#pragma warning restore AA0139
             LastUsedChart.Validate("Code Unit ID", ChartDefinition."Code Unit ID");
             LastUsedChart.Validate("Chart Name", ChartDefinition."Chart Name");
             LastUsedChart.Insert();

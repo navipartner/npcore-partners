@@ -459,7 +459,9 @@
                     ExistingVarityValue.Init();
                 if not NewVarietyValue.Get(Variety, VarietyTableTo, VarietyValue) then begin
                     NewVarietyValue.Init();
+#pragma warning disable AA0139
                     NewVarietyValue.Validate(Type, Variety);
+#pragma warning restore AA0139
                     NewVarietyValue.Validate(Table, VarietyTableTo);
                     NewVarietyValue.Validate(Value, VarietyValue);
                     if ExistingVarityValue.Description <> '' then

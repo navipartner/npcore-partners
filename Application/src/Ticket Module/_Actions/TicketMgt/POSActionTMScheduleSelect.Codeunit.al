@@ -216,7 +216,9 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
                         TicketReservationRequest."Notification Address" := TicketReservationRequest.NormalizeNotificationAddress(Phone);
                     end;
                     TicketReservationRequest.TicketHolderName := CopyStr(Name, 1, MaxStrLen(TicketReservationRequest.TicketHolderName));
+#pragma warning disable AA0139
                     TicketReservationRequest.Validate(TicketHolderPreferredLanguage, Language.ToUpper());
+#pragma warning restore AA0139
                     TicketReservationRequest.Modify();
 
                 until (TicketReservationRequest.Next() = 0);

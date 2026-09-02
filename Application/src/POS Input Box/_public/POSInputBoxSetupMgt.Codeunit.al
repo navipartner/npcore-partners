@@ -212,7 +212,9 @@
 
             EanBoxParameter."Ean Box Value" := EanBoxValue;
             EanBoxParameter."Non Editable" := true;
+#pragma warning disable AA0139
             EanBoxParameter.Validate(Value, CopyStr(Value, 1, MaxStrLen(Value)));
+#pragma warning restore AA0139
 
             if PrevRec <> Format(EanBoxParameter) then
                 EanBoxParameter.Modify(true);

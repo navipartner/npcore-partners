@@ -45,7 +45,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 
     local procedure FillData(Context: Codeunit "NPR POS JSON Helper"): JsonArray
     var
-        PrintAndAdmitBuffer: Record "NPR Print and Admit Buffer";
+        TempPrintAndAdmitBuffer: Record "NPR Print and Admit Buffer" temporary;
         PrintAndAdmitPublic: Codeunit "NPR Print and Admit Public";
         ReferenceNo: Text;
         AdmissionCode: Code[20];
@@ -56,36 +56,36 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 
         ReferenceNo := Context.GetString('reference_input');
         if (ReferenceNo <> '') then
-            ResolveReferenceNo(ReferenceNo, PrintAndAdmitBuffer, AdmissionCode);
+            ResolveReferenceNo(ReferenceNo, TempPrintAndAdmitBuffer, AdmissionCode);
 
-        PrintAndAdmitPublic.OnGetDataForReference(ReferenceNo, PrintAndAdmitBuffer);
+        PrintAndAdmitPublic.OnGetDataForReference(ReferenceNo, TempPrintAndAdmitBuffer);
 
-        if (PrintAndAdmitBuffer.IsEmpty()) then
+        if (TempPrintAndAdmitBuffer.IsEmpty()) then
             error(NoDataFoundErr);
 
         ShowDataPrintAdmit := Context.GetBooleanParameter('ShowData');
         if ShowDataPrintAdmit then
-            ShowData(PrintAndAdmitBuffer);
+            ShowData(TempPrintAndAdmitBuffer);
 
-        if (PrintAndAdmitBuffer.IsEmpty()) then
+        if (TempPrintAndAdmitBuffer.IsEmpty()) then
             exit;
 
-        PrintAndAdmitPublic.OnBeforeHandleBuffer(PrintAndAdmitBuffer);
-        exit(BufferTableToJson(PrintAndAdmitBuffer));
+        PrintAndAdmitPublic.OnBeforeHandleBuffer(TempPrintAndAdmitBuffer);
+        exit(BufferTableToJson(TempPrintAndAdmitBuffer));
     end;
 
     local procedure HandleTryAdmit(Context: Codeunit "NPR POS JSON Helper"; POSUnitNo: Code[10]) Response: JsonObject
     var
-        PrintAndAdmitBuffer: Record "NPR Print and Admit Buffer";
+        TempPrintAndAdmitBuffer: Record "NPR Print and Admit Buffer" temporary;
         JArray: JsonArray;
         TryAdmitArray: JsonArray;
         UnconfirmedGroup: Boolean;
         DefaultQtyGroupUnconfirmedArray: JsonArray;
     begin
         JArray := Context.GetJToken('buffer_data').AsArray();
-        JsonToBufferTable(JArray, PrintAndAdmitBuffer);
+        JsonToBufferTable(JArray, TempPrintAndAdmitBuffer);
 
-        TryAdmit(PrintAndAdmitBuffer, Context, POSUnitNo, UnconfirmedGroup, DefaultQtyGroupUnconfirmedArray, TryAdmitArray);
+        TryAdmit(TempPrintAndAdmitBuffer, Context, POSUnitNo, UnconfirmedGroup, DefaultQtyGroupUnconfirmedArray, TryAdmitArray);
 
         Response.Add('unconfirmedGroup', UnconfirmedGroup);
         Response.Add('defaultQuantityUnconfirmed', DefaultQtyGroupUnconfirmedArray);
@@ -122,7 +122,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 
     local procedure HandlePrintAndAdmit(Context: Codeunit "NPR POS JSON Helper") WorkflowResponse: JsonObject
     var
-        PrintAndAdmitBuffer: Record "NPR Print and Admit Buffer";
+        TempPrintAndAdmitBuffer: Record "NPR Print and Admit Buffer" temporary;
         JArray: JsonArray;
         JObject: JsonObject;
         AdmittedReferences: JsonArray;
@@ -142,8 +142,8 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 
         Clear(JArray);
         JArray := Context.GetJToken('buffer_data').AsArray();
-        JsonToBufferTable(JArray, PrintAndAdmitBuffer);
-        PrintSuccessful := TryPrint.Run(PrintAndAdmitBuffer);
+        JsonToBufferTable(JArray, TempPrintAndAdmitBuffer);
+        PrintSuccessful := TryPrint.Run(TempPrintAndAdmitBuffer);
         WorkflowResponse.Add('printSuccessful', PrintSuccessful);
         if (not PrintSuccessful) then
             WorkflowResponse.Add('printErrorMsg', GetLastErrorText());

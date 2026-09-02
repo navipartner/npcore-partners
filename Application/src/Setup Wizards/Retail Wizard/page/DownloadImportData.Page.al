@@ -349,15 +349,15 @@ page 6150812 "NPR Download&Import Data"
 
     local procedure ImportNPRetailBasicData()
     var
-        BackgroundPackageImport: Record "NPR Background Package Import";
+        TempBackgroundPackageImport: Record "NPR Background Package Import" temporary;
         SessionId: Integer;
     begin
         if NPretailpackage = '' then
             exit;
-        BackgroundPackageImport."Package Name" := CopyStr(NPretailpackage, 1, MaxStrLen(BackgroundPackageImport."Package Name"));
-        BackgroundPackageImport."Adjust Table Names" := AdjustTableNames;
-        BackgroundPackageImport.Insert();
-        Session.StartSession(SessionId, Codeunit::"NPR Background Package Imp.", CompanyName, BackgroundPackageImport);
+        TempBackgroundPackageImport."Package Name" := CopyStr(NPretailpackage, 1, MaxStrLen(TempBackgroundPackageImport."Package Name"));
+        TempBackgroundPackageImport."Adjust Table Names" := AdjustTableNames;
+        TempBackgroundPackageImport.Insert();
+        Session.StartSession(SessionId, Codeunit::"NPR Background Package Imp.", CompanyName, TempBackgroundPackageImport);
     end;
 
     [NonDebuggable]

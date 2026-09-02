@@ -132,7 +132,9 @@ codeunit 6060008 "NPR POS Act.:Layaway Cancel-B"
         SalesLine."Document No." := SalesHeader."No.";
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine.Type := SalesLine.Type::Item;
+#pragma warning disable AA0139
         SalesLine.Validate("No.", CancellationFeeItemNo);
+#pragma warning restore AA0139
         SalesLine.Validate(Quantity, 1);
         SalesLine.Insert(true);
     end;

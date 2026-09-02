@@ -162,13 +162,17 @@
 
                     if JSON.HasProperty('columns') then begin
                         ParamValue.GetParameter(POSMenuButton.RecordId, POSMenuButton.ID, 'Columns');
+#pragma warning disable AA0139
                         ParamValue.Validate(Value, JSON.GetString('columns'));
+#pragma warning restore AA0139
                         ParamValue.Modify();
                     end;
 
                     if JSON.HasProperty('rows') then begin
                         ParamValue.GetParameter(POSMenuButton.RecordId, POSMenuButton.ID, 'Rows');
+#pragma warning disable AA0139
                         ParamValue.Validate(Value, JSON.GetString('rows'));
+#pragma warning restore AA0139
                         ParamValue.Modify();
                     end;
                 end;
@@ -341,7 +345,9 @@
             repeat
                 if POSParam.Get(POSAction.Code, TempParam.Name) then begin
                     if (JObject.Get(TempParam.Name, JToken)) then begin
+#pragma warning disable AA0139
                         POSParam.Validate("Default Value", JToken.AsValue().AsText());
+#pragma warning restore AA0139
                         TempParam.Value := POSParam."Default Value";
                         TempParam.Modify(false);
                     end;
@@ -419,7 +425,9 @@
                     Param.Insert();
                 Param."Action Code" := TempParam."Action Code";
                 Param."Data Type" := TempParam."Data Type";
+#pragma warning disable AA0139
                 Param.Validate(Value, JSON.GetString(TempParam.Name));
+#pragma warning restore AA0139
                 Param.Modify(false);
             until TempParam.Next() = 0;
 

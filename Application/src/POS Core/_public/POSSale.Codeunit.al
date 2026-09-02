@@ -621,7 +621,7 @@
         Item: Record Item;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         ItemTrackingCode: Record "Item Tracking Code";
-        ItemTrackingSetup: Record "Item Tracking Setup";
+        TempItemTrackingSetup: Record "Item Tracking Setup" temporary;
         SerialNoInfo: Record "Serial No. Information";
         LotNoInfo: Record "Lot No. Information";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
@@ -708,23 +708,23 @@
                 if Item."Item Tracking Code" <> '' then begin
                     ItemTrackingCode.Get(Item."Item Tracking Code");
 #if BC17
-                    ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+                    ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, TempItemTrackingSetup);
 #else
-                    ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
+                    ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, TempItemTrackingSetup);
 #endif
-                    if ItemTrackingSetup."Serial No. Required" then begin
+                    if TempItemTrackingSetup."Serial No. Required" then begin
                         if SaleLinePOS."Serial No." = '' then
                             Error(ErrSerialNumberRequired, SaleLinePOS."No.", SaleLinePOS.Description);
                     end;
-                    if ItemTrackingSetup."Serial No. Info Required" then begin
+                    if TempItemTrackingSetup."Serial No. Info Required" then begin
                         SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.");
                         SerialNoInfo.TestField(Blocked, false);
                     end;
-                    if ItemTrackingSetup."Lot No. Required" then begin
+                    if TempItemTrackingSetup."Lot No. Required" then begin
                         if SaleLinePOS."Lot No." = '' then
                             Error(ErrLotNoRequired, SaleLinePOS."No.", SaleLinePOS.Description);
                     end;
-                    if ItemTrackingSetup."Lot No. Info Required" then begin
+                    if TempItemTrackingSetup."Lot No. Info Required" then begin
                         LotNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Lot No.");
                         LotNoInfo.TestField(Blocked, false);
                     end

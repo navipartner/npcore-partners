@@ -847,7 +847,7 @@ codeunit 6151543 "NPR TM Client API BL"
 
     local procedure GenerateAdmissionSchedules(var JBuilder: Codeunit "Json Text Reader/Writer"; RequestId: Text; ItemReference: Text; ScheduleId: Integer; AdmissionCode: Text; ReferenceDate: Date; CustomerNumber: Text; Quantity: Integer)
     var
-        AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        TempAdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AdmissionSchedule: Record "NPR TM Admis. Schedule Entry";
@@ -866,20 +866,20 @@ codeunit 6151543 "NPR TM Client API BL"
             ReferenceDate := AdmissionSchedule."Admission Start Date";
         end;
 
-        AdmCapacityPriceBuffer.RequestId := CopyStr(RequestId, 1, MaxStrLen(AdmCapacityPriceBuffer.RequestId));
-        AdmCapacityPriceBuffer.ReferenceDate := ReferenceDate;
-        AdmCapacityPriceBuffer.CustomerNo := CopyStr(CustomerNumber, 1, MaxStrLen(AdmCapacityPriceBuffer.CustomerNo));
-        AdmCapacityPriceBuffer.Quantity := Quantity;
+        TempAdmCapacityPriceBuffer.RequestId := CopyStr(RequestId, 1, MaxStrLen(TempAdmCapacityPriceBuffer.RequestId));
+        TempAdmCapacityPriceBuffer.ReferenceDate := ReferenceDate;
+        TempAdmCapacityPriceBuffer.CustomerNo := CopyStr(CustomerNumber, 1, MaxStrLen(TempAdmCapacityPriceBuffer.CustomerNo));
+        TempAdmCapacityPriceBuffer.Quantity := Quantity;
 
-        AdmCapacityPriceBuffer.ItemReference := CopyStr(ItemReference, 1, MaxStrLen(AdmCapacityPriceBuffer.ItemReference));
-        if (not TicketRequestManager.TranslateBarcodeToItemVariant(AdmCapacityPriceBuffer.ItemReference, AdmCapacityPriceBuffer.RequestItemNumber, AdmCapacityPriceBuffer.RequestVariantCode, ItemResolver)) then
+        TempAdmCapacityPriceBuffer.ItemReference := CopyStr(ItemReference, 1, MaxStrLen(TempAdmCapacityPriceBuffer.ItemReference));
+        if (not TicketRequestManager.TranslateBarcodeToItemVariant(TempAdmCapacityPriceBuffer.ItemReference, TempAdmCapacityPriceBuffer.RequestItemNumber, TempAdmCapacityPriceBuffer.RequestVariantCode, ItemResolver)) then
             Error('Invalid ItemReference.');
 
-        AdmCapacityPriceBuffer.ItemNumber := AdmCapacityPriceBuffer.RequestItemNumber;
-        AdmCapacityPriceBuffer.VariantCode := AdmCapacityPriceBuffer.RequestVariantCode;
+        TempAdmCapacityPriceBuffer.ItemNumber := TempAdmCapacityPriceBuffer.RequestItemNumber;
+        TempAdmCapacityPriceBuffer.VariantCode := TempAdmCapacityPriceBuffer.RequestVariantCode;
 
-        TicketBom.SetFilter("Item No.", '=%1', AdmCapacityPriceBuffer.RequestItemNumber);
-        TicketBom.SetFilter("Variant Code", '=%1', AdmCapacityPriceBuffer.RequestVariantCode);
+        TicketBom.SetFilter("Item No.", '=%1', TempAdmCapacityPriceBuffer.RequestItemNumber);
+        TicketBom.SetFilter("Variant Code", '=%1', TempAdmCapacityPriceBuffer.RequestVariantCode);
         if (AdmissionCode <> '') then
             TicketBom.SetFilter("Admission Code", '=%1', CopyStr(AdmissionCode, 1, MaxStrLen(TicketBom."Admission Code")));
 
@@ -890,20 +890,20 @@ codeunit 6151543 "NPR TM Client API BL"
         repeat
             Admission.Get(TicketBom."Admission Code");
 
-            AdmCapacityPriceBuffer.EntryNo := BomIndex;
-            AdmCapacityPriceBuffer.AdmissionCode := TicketBom."Admission Code";
-            AdmCapacityPriceBuffer.DefaultAdmission := TicketBom.Default;
-            AdmCapacityPriceBuffer.AdmissionInclusion := TicketBom."Admission Inclusion";
+            TempAdmCapacityPriceBuffer.EntryNo := BomIndex;
+            TempAdmCapacityPriceBuffer.AdmissionCode := TicketBom."Admission Code";
+            TempAdmCapacityPriceBuffer.DefaultAdmission := TicketBom.Default;
+            TempAdmCapacityPriceBuffer.AdmissionInclusion := TicketBom."Admission Inclusion";
 
             if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
                 if (TicketBom.Default) then
-                    TicketPrice.CalculateErpPrice(AdmCapacityPriceBuffer);
+                    TicketPrice.CalculateErpPrice(TempAdmCapacityPriceBuffer);
 
             if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then begin
-                AdmCapacityPriceBuffer.ItemNumber := Admission."Additional Experience Item No.";
-                AdmCapacityPriceBuffer.VariantCode := '';
-                if (AdmCapacityPriceBuffer.ItemNumber <> '') then
-                    TicketPrice.CalculateErpPrice(AdmCapacityPriceBuffer);
+                TempAdmCapacityPriceBuffer.ItemNumber := Admission."Additional Experience Item No.";
+                TempAdmCapacityPriceBuffer.VariantCode := '';
+                if (TempAdmCapacityPriceBuffer.ItemNumber <> '') then
+                    TicketPrice.CalculateErpPrice(TempAdmCapacityPriceBuffer);
             end;
 
             JBuilder.WriteStartObject('');
@@ -925,13 +925,13 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteStringProperty('customerNumber', CustomerNumber);
             JBuilder.WriteStringProperty('referenceDate', format(ReferenceDate, 0, 9));
             JBuilder.WriteRawProperty('quantity', Quantity);
-            JBuilder.WriteNumberProperty('unitPrice', AdmCapacityPriceBuffer.UnitPrice);
-            JBuilder.WriteNumberProperty('discountPct', AdmCapacityPriceBuffer.DiscountPct);
-            JBuilder.WriteBooleanProperty('priceIncludesVat', AdmCapacityPriceBuffer.UnitPriceIncludesVat);
-            JBuilder.WriteNumberProperty('vatPct', AdmCapacityPriceBuffer.UnitPriceVatPercentage);
+            JBuilder.WriteNumberProperty('unitPrice', TempAdmCapacityPriceBuffer.UnitPrice);
+            JBuilder.WriteNumberProperty('discountPct', TempAdmCapacityPriceBuffer.DiscountPct);
+            JBuilder.WriteBooleanProperty('priceIncludesVat', TempAdmCapacityPriceBuffer.UnitPriceIncludesVat);
+            JBuilder.WriteNumberProperty('vatPct', TempAdmCapacityPriceBuffer.UnitPriceVatPercentage);
 
             JBuilder.WriteStartArray('schedule');
-            GenerateAdmissionScheduleEntries(JBuilder, AdmCapacityPriceBuffer, Admission, ScheduleId);
+            GenerateAdmissionScheduleEntries(JBuilder, TempAdmCapacityPriceBuffer, Admission, ScheduleId);
             JBuilder.WriteEndArray();
             JBuilder.WriteEndObject();
 
@@ -1112,7 +1112,7 @@ codeunit 6151543 "NPR TM Client API BL"
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
         TicketSetup: Record "NPR TM Ticket Setup";
-        TicketDescription: Record "NPR TM TempTicketDescription";
+        TempTicketDescription: Record "NPR TM TempTicketDescription" temporary;
         CastToInteger: Integer;
     begin
         if (not TicketSetup.Get()) then
@@ -1149,18 +1149,18 @@ codeunit 6151543 "NPR TM Client API BL"
                         JBuilder.WriteStartArray('admissions');
                         repeat
 
-                            TicketDescription.Init();
-                            TicketDescription.SetKeyAndDescription(Ticket."Item No.", Ticket."Variant Code", AccessEntry."Admission Code", TicketSetup."Store Code", TicketRequest.TicketHolderPreferredLanguage);
+                            TempTicketDescription.Init();
+                            TempTicketDescription.SetKeyAndDescription(Ticket."Item No.", Ticket."Variant Code", AccessEntry."Admission Code", TicketSetup."Store Code", TicketRequest.TicketHolderPreferredLanguage);
                             if (Admission.Get(AccessEntry."Admission Code")) then
                                 if (Admission."Additional Experience Item No." <> '') then
-                                    TicketDescription.SetDescription(Admission."Additional Experience Item No.", '', AccessEntry."Admission Code", TicketSetup."Store Code", TicketRequest.TicketHolderPreferredLanguage);
+                                    TempTicketDescription.SetDescription(Admission."Additional Experience Item No.", '', AccessEntry."Admission Code", TicketSetup."Store Code", TicketRequest.TicketHolderPreferredLanguage);
 
                             JBuilder.WriteStartObject('');
                             JBuilder.WriteStringProperty('admissionCode', AccessEntry."Admission Code");
                             CastToInteger := AccessEntry.Quantity;
                             JBuilder.WriteRawProperty('quantity', CastToInteger);
-                            JBuilder.WriteStringProperty('name', TicketDescription.Name);
-                            JBuilder.WriteStringProperty('description', TicketDescription.Description);
+                            JBuilder.WriteStringProperty('name', TempTicketDescription.Name);
+                            JBuilder.WriteStringProperty('description', TempTicketDescription.Description);
 
                             DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
                             DetailedEntry.SetFilter(Quantity, '>%1', 0);

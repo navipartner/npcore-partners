@@ -127,7 +127,9 @@ table 6014672 "NPR MPOS Data View"
         DataViewCode: Text;
     begin
         if DataViewMgt.LookupDataView(Rec."Data View Type", DataViewCode) then begin
+#pragma warning disable AA0139
             Rec.Validate("Data View Code", DataViewCode);
+#pragma warning restore AA0139
         end;
     end;
 }

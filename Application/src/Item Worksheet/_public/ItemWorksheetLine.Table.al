@@ -2254,7 +2254,9 @@
 
                                                 ExistingVariantCode := ItemWorksheetVariantLine.GetExistingVariantCode();
                                                 if ExistingVariantCode <> '' then
+#pragma warning disable AA0139
                                                     ItemWorksheetVariantLine.Validate("Existing Variant Code", ExistingVariantCode);
+#pragma warning restore AA0139
 
                                                 if ((LinesType = LinesType::All) or
                                                     ((LinesType = LinesType::"Varieties Without Variants") and (ExistingVariantCode = '')) or
@@ -2642,7 +2644,9 @@
                             ItemWorksheetVarValue.Validate("Worksheet Name", "Worksheet Name");
                             ItemWorksheetVarValue.Validate("Worksheet Line No.", "Line No.");
                             ItemWorksheetVarValue.Validate(Type, "Variety 1");
+#pragma warning disable AA0139
                             ItemWorksheetVarValue.Validate(Table, "Variety 1 Table (Base)");
+#pragma warning restore AA0139
                             ItemWorksheetVarValue.Validate(Value, ItemWorksheetVar."Variety 1 Value");
                             ItemWorksheetVarValue.Insert(true);
                             if not VarietyValue.Get("Variety 1", "Variety 1 Table (Base)", ItemWorksheetVar."Variety 1 Value") and

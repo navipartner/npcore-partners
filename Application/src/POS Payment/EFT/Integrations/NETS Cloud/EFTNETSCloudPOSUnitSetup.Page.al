@@ -24,7 +24,9 @@
                         TerminalIDOut: Text;
                     begin
                         if EFTNETSCloudIntegration.LookupTerminal(GlobalEFTSetup, TerminalIDOut) then
+#pragma warning disable AA0139
                             Rec.Validate("Terminal ID", TerminalIDOut);
+#pragma warning restore AA0139
                     end;
                 }
             }

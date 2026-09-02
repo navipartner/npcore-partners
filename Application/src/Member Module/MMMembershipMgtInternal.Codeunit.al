@@ -3828,7 +3828,9 @@
         UserAccount.AccountNo := 0;
         UserAccount.Validate(FirstName, Member."First Name");
         if (Member."Middle Name" <> '') then
+#pragma warning disable AA0139
             UserAccount.Validate(FirstName, UserAccount.FirstName + ' ' + Member."Middle Name");
+#pragma warning restore AA0139
         UserAccount.Validate(LastName, Member."Last Name");
         UserAccount.EmailAddress := CopyStr(Member."E-Mail Address".ToLower().Trim(), 1, MaxStrLen(UserAccount.EmailAddress));
         UserAccount.PhoneNo := Member."Phone No.";

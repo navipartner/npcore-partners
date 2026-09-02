@@ -250,15 +250,15 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
     trigger OnDelete()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        TempSpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         ShopifyStore.SetLoadFields(Code);
         if ShopifyStore.FindSet() then
             repeat
-                SpfyStoreItemCatLink."Item Category Code" := Rec.Code;
-                SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStore.Code;
-                SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                TempSpfyStoreItemCatLink."Item Category Code" := Rec.Code;
+                TempSpfyStoreItemCatLink."Shopify Store Code" := ShopifyStore.Code;
+                SpfyAssignedIDMgt.RemoveAssignedShopifyID(TempSpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             until ShopifyStore.Next() = 0;
     end;
 
@@ -294,15 +294,15 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
 
     local procedure NPRGetItemCategorySpfyGID(ItemCategoryCode: Code[20]; ShopifyStoreCode: Code[20]): Text
     var
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        TempSpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         ShopifyID: Text[30];
     begin
         if (ItemCategoryCode = '') or (ShopifyStoreCode = '') then
             exit('');
-        SpfyStoreItemCatLink."Item Category Code" := ItemCategoryCode;
-        SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
-        ShopifyID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        TempSpfyStoreItemCatLink."Item Category Code" := ItemCategoryCode;
+        TempSpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
+        ShopifyID := SpfyAssignedIDMgt.GetAssignedShopifyID(TempSpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if ShopifyID = '' then
             exit('');
         exit(StrSubstNo('gid://shopify/Metaobject/%1', ShopifyID));

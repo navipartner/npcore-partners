@@ -161,13 +161,17 @@
         end;
 
         NonstockItem.Validate("Unit of Measure", UnitofMeasure.Code);
+#pragma warning disable AA0139
         NonstockItem.Validate("Vendor Item No.", TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 4));
+#pragma warning restore AA0139
         if Evaluate(TempDec, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 20)) then
             if TempDec <> 0 then
                 NonstockItem.Validate("Published Cost", TempDec / 10);
         if Evaluate(TempDec, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 18)) then
             NonstockItem.Validate("Net Weight", TempDec);
+#pragma warning disable AA0139
         NonstockItem.Validate("Bar Code", TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 5));
+#pragma warning restore AA0139
         if Evaluate(TempDec, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 25)) then
             if TempDec <> 0 then
                 NonstockItem.Validate("Unit Price", TempDec / 10);

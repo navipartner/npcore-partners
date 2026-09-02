@@ -139,7 +139,9 @@
         end else begin
             if Confirm(StrSubstNo(TextCreateNewItemHierachyFromCamp, ItemHierarchy."Hierarchy Code", RetailCampaignHeader.Code), true) then begin
                 ItemHierarchy.Validate("Hierarchy Code", RetailCampaignHeader.Code);
+#pragma warning disable AA0139
                 ItemHierarchy.Validate(Description, RetailCampaignHeader.Description);
+#pragma warning restore AA0139
                 ItemHierarchy.Insert(true);
                 //Define static item level - should later be dynamical by setup
                 ItemHierarchyLevel.Validate("Hierarchy Code", ItemHierarchy."Hierarchy Code");

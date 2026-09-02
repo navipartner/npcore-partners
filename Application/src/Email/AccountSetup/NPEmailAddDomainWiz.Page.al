@@ -103,7 +103,9 @@ page 6185093 "NPR NPEmailAddDomainWiz"
     var
         _CurrentStep: Option Intro,Domain,DNSSetup;
         _Domain: Text[300];
+#pragma warning disable AA0073
         _DomainDNSRecord: Record "NPR NPEmailDomainDNSRecord";
+#pragma warning restore AA0073
         _NPEmailAccount: Record "NPR NP Email Account";
         _Initialized: Boolean;
 

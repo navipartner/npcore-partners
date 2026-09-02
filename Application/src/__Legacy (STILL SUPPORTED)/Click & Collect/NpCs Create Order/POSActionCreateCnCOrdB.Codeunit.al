@@ -211,7 +211,9 @@ codeunit 6059948 "NPR POSAction Create CnC Ord B"
 
         SalePOS."External Document No." := SalePOS."Sales Ticket No.";
         SalePOS.Reference := SalePOS."Sales Ticket No.";
+#pragma warning disable AA0139
         SalePOS.Validate("Customer No.", CustomerNo);
+#pragma warning restore AA0139
         SalePOS.TestField("Customer No.");
 
         if PrevRec <> Format(SalePOS) then

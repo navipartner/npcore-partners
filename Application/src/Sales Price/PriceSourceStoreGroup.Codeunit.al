@@ -35,13 +35,13 @@ codeunit 6059929 "NPR Price Source - Store Group" implements "Price Source"
 
     procedure IsLookupOK(var PriceSource: Record "Price Source"): Boolean
     var
-        xPriceSource: Record "Price Source";
+        TempxPriceSource: Record "Price Source" temporary;
     begin
-        xPriceSource := PriceSource;
-        if POSStoreGroup.Get(xPriceSource."Source No.") then;
+        TempxPriceSource := PriceSource;
+        if POSStoreGroup.Get(TempxPriceSource."Source No.") then;
         if Page.RunModal(0, POSStoreGroup) = ACTION::LookupOK then begin
-            xPriceSource.Validate("Source No.", POSStoreGroup."No.");
-            PriceSource := xPriceSource;
+            TempxPriceSource.Validate("Source No.", POSStoreGroup."No.");
+            PriceSource := TempxPriceSource;
             exit(true);
         end;
     end;

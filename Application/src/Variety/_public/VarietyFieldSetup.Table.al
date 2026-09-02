@@ -479,8 +479,10 @@
                 VRTFieldsSetup."Secondary Type" := Type2;
                 VRTFieldsSetup."Secondary Table No." := TableNo2;
                 VRTFieldsSetup.Validate("Secondary Field No.", FieldNo2);
+#pragma warning disable AA0139
                 VRTFieldsSetup.Validate("Variety Matrix Subscriber 1", MatrixSubscriber1);
                 VRTFieldsSetup.Validate("Variety Matrix Subscriber 2", MatrixSubscriber2);
+#pragma warning restore AA0139
                 VRTFieldsSetup."OnLookup Subscriber" := CopyStr(MatrixSubscriberOnLookup, 1, MaxStrLen(VRTFieldsSetup."OnLookup Subscriber"));
                 VRTFieldsSetup."Use OnLookup Return Value" := UseOnLookupValue;
                 VRTFieldsSetup."OnDrillDown Subscriber" := CopyStr(MatrixSubscriberOnDrillDown, 1, MaxStrLen(VRTFieldsSetup."OnDrillDown Subscriber"));
@@ -501,8 +503,10 @@
         VRTFieldsSetup."Secondary Type" := Type2;
         VRTFieldsSetup."Secondary Table No." := TableNo2;
         VRTFieldsSetup.Validate("Secondary Field No.", FieldNo2);
+#pragma warning disable AA0139
         VRTFieldsSetup.Validate("Variety Matrix Subscriber 1", MatrixSubscriber1);
         VRTFieldsSetup.Validate("Variety Matrix Subscriber 2", MatrixSubscriber2);
+#pragma warning restore AA0139
         VRTFieldsSetup."OnLookup Subscriber" := CopyStr(MatrixSubscriberOnLookup, 1, MaxStrLen(VRTFieldsSetup."OnLookup Subscriber"));
         VRTFieldsSetup."Use OnLookup Return Value" := UseOnLookupValue;
         VRTFieldsSetup."OnDrillDown Subscriber" := CopyStr(MatrixSubscriberOnDrillDown, 1, MaxStrLen(VRTFieldsSetup."OnDrillDown Subscriber"));

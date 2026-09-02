@@ -1755,8 +1755,8 @@
         TempMixedDiscountCopy: Record "NPR Mixed Discount" temporary;
         TempMixedDiscountLineCopy: Record "NPR Mixed Discount Line" temporary;
         TempSaleLinePOSCopy: Record "NPR POS Sale Line" temporary;
-        DiscountCalcBuffer: Record "NPR Discount Calc. Buffer";
-        DiscountCalcBufferCopy: Record "NPR Discount Calc. Buffer";
+        TempDiscountCalcBuffer: Record "NPR Discount Calc. Buffer" temporary;
+        TempDiscountCalcBufferCopy: Record "NPR Discount Calc. Buffer" temporary;
         NPRDiscountCalcBufferUtils: Codeunit "NPR Discount Calc Buffer Utils";
         DiscountCalcArray: array[1000] of Codeunit "NPR Discount Calc Array";
         DiscountCalcBufferLastEntryNo: Integer;
@@ -1771,7 +1771,7 @@
             exit;
         end;
         CopyMixedDiscount(TempMixedDiscount, TempMixedDiscountCopy);
-        DiscountCalcBufferLastEntryNo := NPRDiscountCalcBufferUtils.GetLastEntryNo(DiscountCalcBuffer);
+        DiscountCalcBufferLastEntryNo := NPRDiscountCalcBufferUtils.GetLastEntryNo(TempDiscountCalcBuffer);
 
         TempMixedDiscount.FindSet();
         repeat
@@ -1784,10 +1784,10 @@
                 TempSaleLinePOSCopy.CalcSums(Quantity);
 
                 DiscountCalcBufferLastEntryNo += 1;
-                DiscountCalcBuffer.Init();
-                DiscountCalcBuffer."Entry No." := DiscountCalcBufferLastEntryNo;
-                NPRDiscountCalcBufferUtils.FillMixDiscountCaclulationInformation(DiscountCalcBuffer, TempMixedDiscount.Code, TempMixedDiscount."Min. Quantity", DiscAmount, TempSaleLinePOSCopy.Quantity, TempMixedDiscountCopy, TempSaleLinePOSCopy);
-                DiscountCalcBuffer.Insert();
+                TempDiscountCalcBuffer.Init();
+                TempDiscountCalcBuffer."Entry No." := DiscountCalcBufferLastEntryNo;
+                NPRDiscountCalcBufferUtils.FillMixDiscountCaclulationInformation(TempDiscountCalcBuffer, TempMixedDiscount.Code, TempMixedDiscount."Min. Quantity", DiscAmount, TempSaleLinePOSCopy.Quantity, TempMixedDiscountCopy, TempSaleLinePOSCopy);
+                TempDiscountCalcBuffer.Insert();
 
                 DiscountCalcArray[DiscountCalcBufferLastEntryNo].ClearSaleLinePOSBuffer();
 
@@ -1796,48 +1796,48 @@
             end;
         until TempMixedDiscount.Next() = 0;
 
-        DiscountCalcBuffer.Reset();
-        DiscountCalcBuffer.SetCurrentKey(Recalculate, "Actual Discount Amount", "Actual Item Qty.");
-        DiscountCalcBuffer.Ascending(false);
-        DiscountCalcBuffer.SetRange(Recalculate, true);
-        if DiscountCalcBuffer.IsEmpty then begin
-            DiscountCalcBuffer.SetRange(Recalculate);
-            if not DiscountCalcBuffer.FindFirst() then
+        TempDiscountCalcBuffer.Reset();
+        TempDiscountCalcBuffer.SetCurrentKey(Recalculate, "Actual Discount Amount", "Actual Item Qty.");
+        TempDiscountCalcBuffer.Ascending(false);
+        TempDiscountCalcBuffer.SetRange(Recalculate, true);
+        if TempDiscountCalcBuffer.IsEmpty then begin
+            TempDiscountCalcBuffer.SetRange(Recalculate);
+            if not TempDiscountCalcBuffer.FindFirst() then
                 exit;
 
-            DiscountCalcArray[DiscountCalcBuffer."Entry No."].GetSaleLinePOSBuffer(TempSaleLinePOSCopy);
+            DiscountCalcArray[TempDiscountCalcBuffer."Entry No."].GetSaleLinePOSBuffer(TempSaleLinePOSCopy);
             UpdateSalesLinePOS(TempSaleLinePOSCopy, TempSaleLinePOS);
             exit;
         end;
 
-        DiscountCalcBuffer.Reset();
+        TempDiscountCalcBuffer.Reset();
         Clear(TempMixedDiscount);
 
-        NPRDiscountCalcBufferUtils.CopyDiscountBuffer(DiscountCalcBuffer, DiscountCalcBufferCopy);
+        NPRDiscountCalcBufferUtils.CopyDiscountBuffer(TempDiscountCalcBuffer, TempDiscountCalcBufferCopy);
 
-        DiscountCalcBuffer.SetRange("Recalculate", true);
-        DiscountCalcBuffer.SetFilter("Actual Discount Amount", '<>0');
-        if DiscountCalcBuffer.FindSet(true) then
+        TempDiscountCalcBuffer.SetRange("Recalculate", true);
+        TempDiscountCalcBuffer.SetFilter("Actual Discount Amount", '<>0');
+        if TempDiscountCalcBuffer.FindSet(true) then
             repeat
-                DiscountCalcBufferCopy.Get(DiscountCalcBuffer."Entry No.");
-                DiscountCalcArray[DiscountCalcBuffer."Entry No."].GetSaleLinePOSBuffer(TempSaleLinePOSCopy);
-                DiscAmount := CalcTotalAppliedMixDiscounts(DiscountCalcBufferCopy, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSCopy);
+                TempDiscountCalcBufferCopy.Get(TempDiscountCalcBuffer."Entry No.");
+                DiscountCalcArray[TempDiscountCalcBuffer."Entry No."].GetSaleLinePOSBuffer(TempSaleLinePOSCopy);
+                DiscAmount := CalcTotalAppliedMixDiscounts(TempDiscountCalcBufferCopy, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSCopy);
 
                 TempSaleLinePOSCopy.SetRange("Discount Type", TempSaleLinePOSCopy."Discount Type"::Mix);
-                TempSaleLinePOSCopy.SetRange("Discount Code", DiscountCalcBuffer."Discount Code");
+                TempSaleLinePOSCopy.SetRange("Discount Code", TempDiscountCalcBuffer."Discount Code");
                 TempSaleLinePOSCopy.CalcSums(Quantity);
 
-                DiscountCalcBuffer."Actual Discount Amount" := DiscAmount;
-                DiscountCalcBuffer."Actual Item Qty." := TempSaleLinePOSCopy.Quantity;
-                DiscountCalcBuffer.Modify();
-            until DiscountCalcBuffer.Next() = 0;
+                TempDiscountCalcBuffer."Actual Discount Amount" := DiscAmount;
+                TempDiscountCalcBuffer."Actual Item Qty." := TempSaleLinePOSCopy.Quantity;
+                TempDiscountCalcBuffer.Modify();
+            until TempDiscountCalcBuffer.Next() = 0;
 
-        DiscountCalcBuffer.Reset();
-        DiscountCalcBuffer.SetCurrentKey("Actual Discount Amount", "Actual Item Qty.");
-        DiscountCalcBuffer.Ascending(false);
-        if DiscountCalcBuffer.FindFirst() then begin
-            DiscountCalcArray[DiscountCalcBuffer."Entry No."].GetSaleLinePOSBuffer(TempSaleLinePOSCopy);
-            CalcTotalAppliedMixDiscounts(DiscountCalcBuffer, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSCopy);
+        TempDiscountCalcBuffer.Reset();
+        TempDiscountCalcBuffer.SetCurrentKey("Actual Discount Amount", "Actual Item Qty.");
+        TempDiscountCalcBuffer.Ascending(false);
+        if TempDiscountCalcBuffer.FindFirst() then begin
+            DiscountCalcArray[TempDiscountCalcBuffer."Entry No."].GetSaleLinePOSBuffer(TempSaleLinePOSCopy);
+            CalcTotalAppliedMixDiscounts(TempDiscountCalcBuffer, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSCopy);
             UpdateSalesLinePOS(TempSaleLinePOSCopy, TempSaleLinePOS);
         end;
 

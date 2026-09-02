@@ -430,8 +430,10 @@ xmlport 6060112 "NPR TM List Ticket Items"
         _ItemVariant: Record "Item Variant";
         _TMAdmission: Record "NPR TM Admission";
         _ItemResponse: Record Item;
+#pragma warning disable AA0073
         _TicketDescription: Record "NPR TM TempTicketDescription";
         _AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+#pragma warning restore AA0073
 
     internal procedure GetRequestedStoreCode(): Text
     begin

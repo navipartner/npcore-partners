@@ -114,15 +114,15 @@ page 6151479 "NPR Vipps Mp Webhook List"
                     VippsMpSetupState: Codeunit "NPR Vipps Mp SetupState";
                     VippsMpStore: Record "NPR Vipps Mp Store";
                     VippsMpWebhook: Record "NPR Vipps Mp Webhook";
-                    VippsMpUserPass: Record "NPR Vipps Mp UserPass";
+                    TempVippsMpUserPass: Record "NPR Vipps Mp UserPass" temporary;
                 begin
                     if (not VippsMpStore.Get(VippsMpSetupState.GetCurrentMsn())) then
                         Error('Cant create a webhook without a Merchant Serial Number');
                     if (EnvironmentInformation.IsOnPrem()) then begin
-                        VippsMpUserPass.Init();
-                        VippsMpUserPass.Insert();
+                        TempVippsMpUserPass.Init();
+                        TempVippsMpUserPass.Insert();
                         Commit();
-                        if (Page.RunModal(PAGE::"NPR Vipps Mp UserPass", VippsMpUserPass) = Action::LookupCancel) then
+                        if (Page.RunModal(PAGE::"NPR Vipps Mp UserPass", TempVippsMpUserPass) = Action::LookupCancel) then
                             exit;
                     end;
                     VippsMpWebhook.Init();
@@ -131,7 +131,7 @@ page 6151479 "NPR Vipps Mp Webhook List"
 #pragma warning restore AA0139
                     VippsMpWebhook."Merchant Serial Number" := VippsMpStore."Merchant Serial Number";
                     if (EnvironmentInformation.IsOnPrem()) then begin
-                        VippsMpWebhook."OnPrem AF Credential Id" := VippsMpUserPass.FriendlyNameId;
+                        VippsMpWebhook."OnPrem AF Credential Id" := TempVippsMpUserPass.FriendlyNameId;
 #pragma warning disable AA0139
                         VippsMpWebhook."OnPrem AF Credential Key" := VippsMpUtil.RemoveCurlyBraces(CreateGuid());
 #pragma warning restore AA0139
@@ -139,7 +139,7 @@ page 6151479 "NPR Vipps Mp Webhook List"
                     VippsMpWebhook.Insert();
                     VippsMpWebhookSetup.CreateWebhook(VippsMpStore, VippsMpWebhook);
                     if (EnvironmentInformation.IsOnPrem()) then
-                        Message(CreateOnPremJsonMsg(VippsMpWebhook, VippsMpUserPass));
+                        Message(CreateOnPremJsonMsg(VippsMpWebhook, TempVippsMpUserPass));
                 end;
             }
 

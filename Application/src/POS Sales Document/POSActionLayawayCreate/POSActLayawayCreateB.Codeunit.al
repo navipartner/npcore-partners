@@ -74,7 +74,9 @@ codeunit 6060012 "NPR POS Act.: Layaway Create-B"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
+#pragma warning disable AA0139
         SaleLinePOS.Validate("No.", CreationFeeItemNo);
+#pragma warning restore AA0139
         SaleLinePOS.Validate(Quantity, 1);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
@@ -91,7 +93,9 @@ codeunit 6060012 "NPR POS Act.: Layaway Create-B"
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
+#pragma warning disable AA0139
         SalePOS.Validate("Payment Terms Code", OrderPaymentTerms);
+#pragma warning restore AA0139
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);

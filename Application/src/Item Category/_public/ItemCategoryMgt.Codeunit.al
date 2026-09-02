@@ -1161,29 +1161,29 @@
 
     local procedure CheckIfCalcFieldExistsInItemCategoryBuffer(FieldNo: Integer): Integer
     var
-        ItemCategoryBuffer: Record "NPR Item Category Buffer";
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
     begin
         case FieldNo of
-            ItemCategoryBuffer.FieldNo("Calc Field 1"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 1"));
-            ItemCategoryBuffer.FieldNo("Calc Field 2"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 2"));
-            ItemCategoryBuffer.FieldNo("Calc Field 3"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 3"));
-            ItemCategoryBuffer.FieldNo("Calc Field 4"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 4"));
-            ItemCategoryBuffer.FieldNo("Calc Field 5"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 5"));
-            ItemCategoryBuffer.FieldNo("Calc Field 6"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 6"));
-            ItemCategoryBuffer.FieldNo("Calc Field 7"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 7"));
-            ItemCategoryBuffer.FieldNo("Calc Field 8"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 8"));
-            ItemCategoryBuffer.FieldNo("Calc Field 9"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 9"));
-            ItemCategoryBuffer.FieldNo("Calc Field 10"):
-                exit(ItemCategoryBuffer.FieldNo("Calc Field 10"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 1"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 1"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 2"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 2"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 3"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 3"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 4"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 4"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 5"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 5"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 6"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 6"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 7"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 7"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 8"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 8"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 9"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 9"));
+            TempItemCategoryBuffer.FieldNo("Calc Field 10"):
+                exit(TempItemCategoryBuffer.FieldNo("Calc Field 10"));
             else
                 exit(0);
         end;
@@ -1284,29 +1284,29 @@
 
     local procedure CheckIfDetailFieldExistsInItemCategoryBuffer(FieldNo: Integer): Integer
     var
-        ItemCategoryBuffer: Record "NPR Item Category Buffer";
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
     begin
         case FieldNo of
-            ItemCategoryBuffer.FieldNo("Detail Field 1"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 1"));
-            ItemCategoryBuffer.FieldNo("Detail Field 2"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 2"));
-            ItemCategoryBuffer.FieldNo("Detail Field 3"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 3"));
-            ItemCategoryBuffer.FieldNo("Detail Field 4"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 4"));
-            ItemCategoryBuffer.FieldNo("Detail Field 5"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 5"));
-            ItemCategoryBuffer.FieldNo("Detail Field 6"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 6"));
-            ItemCategoryBuffer.FieldNo("Detail Field 7"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 7"));
-            ItemCategoryBuffer.FieldNo("Detail Field 8"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 8"));
-            ItemCategoryBuffer.FieldNo("Detail Field 9"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 9"));
-            ItemCategoryBuffer.FieldNo("Detail Field 10"):
-                exit(ItemCategoryBuffer.FieldNo("Detail Field 10"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 1"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 1"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 2"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 2"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 3"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 3"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 4"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 4"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 5"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 5"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 6"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 6"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 7"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 7"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 8"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 8"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 9"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 9"));
+            TempItemCategoryBuffer.FieldNo("Detail Field 10"):
+                exit(TempItemCategoryBuffer.FieldNo("Detail Field 10"));
             else
                 exit(0);
         end;

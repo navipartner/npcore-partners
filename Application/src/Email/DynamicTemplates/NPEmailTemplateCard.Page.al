@@ -143,7 +143,7 @@ page 6185027 "NPR NPEmailTemplateCard"
     trigger OnAfterGetCurrRecord()
     var
         APIClient: Codeunit "NPR SendGrid API Client";
-        EmailAccount: Record "Email Account";
+        TempEmailAccount: Record "Email Account" temporary;
         EmailScenarioHndlr: Codeunit "Email Scenario";
         NPEmailAccount: Record "NPR NP Email Account";
         NPEmailWebSMTPAccount: Record "NPR NPEmailWebSMTPEmailAccount";
@@ -155,8 +155,8 @@ page 6185027 "NPR NPEmailTemplateCard"
         TempDynamicTemplates.Reset();
         TempDynamicTemplates.DeleteAll();
 
-        if (EmailScenarioHndlr.GetEmailAccount(Rec.EmailScenario, EmailAccount) and (EmailAccount.Connector = "Email Connector"::"NPR NP Email Web SMTP")) then begin
-            NPEmailWebSMTPAccount.Get(EmailAccount."Account Id");
+        if (EmailScenarioHndlr.GetEmailAccount(Rec.EmailScenario, TempEmailAccount) and (TempEmailAccount.Connector = "Email Connector"::"NPR NP Email Web SMTP")) then begin
+            NPEmailWebSMTPAccount.Get(TempEmailAccount."Account Id");
             AccountId := NPEmailWebSMTPAccount.NPEmailAccountId;
         end;
 

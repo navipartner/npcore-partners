@@ -28,7 +28,9 @@
         if Rec."Salesperson Code" = SalespersonCode then
             exit;
 
+#pragma warning disable AA0139
         Rec.Validate("Salesperson Code", SalespersonCode);
+#pragma warning restore AA0139
         Rec.Modify();
     end;
 }

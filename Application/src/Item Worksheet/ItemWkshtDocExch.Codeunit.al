@@ -27,7 +27,9 @@
         ItemWorksheetLine.Action := ItemWorksheetLine.Action::CreateNew;
         if (ItemGroupText <> '') and (StrLen(ItemGroupText) <= MaxStrLen(ItemCategory.Code)) then
             if ItemCategory.Get(ItemGroupText) then
+#pragma warning disable AA0139
                 ItemWorksheetLine.Validate("Item Category Code", ItemGroupText);
+#pragma warning restore AA0139
         ItemWorksheetLine.Validate("Vend Item No.", CopyStr(VendorItemNo, 1, MaxStrLen(ItemWorksheetLine."Vend Item No.")));
         ItemWorksheetLine.Validate(Description, CopyStr(VendorItemDescription, 1, MaxStrLen(ItemWorksheetLine.Description)));
         ItemWorksheetLine.Validate("Direct Unit Cost", DirectUnitCost);

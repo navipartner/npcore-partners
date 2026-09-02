@@ -279,7 +279,9 @@ page 6150891 "NPR Job Queue Refresh Setup"
     end;
 
     var
+#pragma warning disable AA0073
         _JQRunnerUser: Record "NPR Job Queue Runner User";
+#pragma warning restore AA0073
         _ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
         _ExtJQRefresherOnlyFeat: Codeunit "NPR Ext JQ Refresher Only Feat";
         _StyleExprTxt: Text[50];

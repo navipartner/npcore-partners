@@ -299,7 +299,7 @@
     var
         MembershipRole: Record "NPR MM Membership Role";
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
-        MemberNotificationEntryBuffer: Record "NPR MMMemberNotificEntryBuf";
+        TempMemberNotificationEntryBuffer: Record "NPR MMMemberNotificEntryBuf" temporary;
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -532,10 +532,10 @@
         if (not MemberNotificationEntry.Insert()) then
             exit(false);
 
-        MemberNotificationEntryBuffer.TransferFields(MemberNotificationEntry, true);
-        MemberNotificationEntryBuffer.SystemId := MemberNotificationEntry.SystemId;
-        MemberNotificationEntryBuffer.Insert();
-        OnAfterMemberNotificationEntryInsert(MemberNotificationEntryBuffer);
+        TempMemberNotificationEntryBuffer.TransferFields(MemberNotificationEntry, true);
+        TempMemberNotificationEntryBuffer.SystemId := MemberNotificationEntry.SystemId;
+        TempMemberNotificationEntryBuffer.Insert();
+        OnAfterMemberNotificationEntryInsert(TempMemberNotificationEntryBuffer);
 
         exit(true);
     end;

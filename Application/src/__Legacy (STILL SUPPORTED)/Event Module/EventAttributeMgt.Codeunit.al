@@ -32,7 +32,9 @@ codeunit 6060155 "NPR Event Attribute Mgt."
             if NewFormula <> '' then begin
                 if StrLen(NewFormula) > MaxStrLen(Rec.Formula) then
                     Error(MaxFormulaLengthExceededErr);
+#pragma warning disable AA0139
                 Rec.Validate(Formula, NewFormula);
+#pragma warning restore AA0139
                 Rec.Modify(true);
             end;
         end;

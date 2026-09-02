@@ -72,18 +72,22 @@ codeunit 6060102 "NPR POS Action-Set Sale VAT-B."
             repeat
                 BaseSaleLinePOS := SaleLinePOS;
                 OldVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
+#pragma warning disable AA0139
                 if (NewGenBusPostingGroup <> '') and (SaleLinePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
                     SaleLinePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
                 if (NewVATBusPostingGroup <> '') and (SaleLinePOS."VAT Bus. Posting Group" <> VATBusinessPostingGroup.Code) then
                     SaleLinePOS.Validate("VAT Bus. Posting Group", NewVATBusPostingGroup);
+#pragma warning restore AA0139
                 SaleLinePOS.UpdateVATSetup();
                 SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice(BaseSaleLinePOS);
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
                 SaleLinePOS.Modify();
                 NewVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
             until SaleLinePOS.Next() = 0;
+#pragma warning disable AA0139
         if (NewGenBusPostingGroup <> '') and (SalePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
             SalePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
+#pragma warning restore AA0139
         if (NewVATBusPostingGroup <> '') and (SalePOS."VAT Bus. Posting Group" <> VATBusinessPostingGroup.Code) then
             SalePOS.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup.Code);
         POSSale.Refresh(SalePOS);

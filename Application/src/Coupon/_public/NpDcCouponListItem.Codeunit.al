@@ -105,56 +105,56 @@ codeunit 6248505 "NPR NpDc Coupon List Item"
 
     local procedure OnBeforeInsertRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
-        CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
+        TempCouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf" temporary;
     begin
-        PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
-        OnBeforeInsertRecEvent(CouponListItemBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
+        PopulateBufferFromRec(TempCouponListItemBuffer, CouponListItem);
+        OnBeforeInsertRecEvent(TempCouponListItemBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponListItemBuffer, CouponListItem);
     end;
 
     local procedure OnAfterInsertRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
-        CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
+        TempCouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf" temporary;
     begin
-        PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
-        OnAfterInsertRecEvent(CouponListItemBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
+        PopulateBufferFromRec(TempCouponListItemBuffer, CouponListItem);
+        OnAfterInsertRecEvent(TempCouponListItemBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponListItemBuffer, CouponListItem);
     end;
 
     local procedure OnBeforeModifyRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
-        CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
+        TempCouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf" temporary;
     begin
-        PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
-        OnBeforeModifyRecEvent(CouponListItemBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
+        PopulateBufferFromRec(TempCouponListItemBuffer, CouponListItem);
+        OnBeforeModifyRecEvent(TempCouponListItemBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponListItemBuffer, CouponListItem);
     end;
 
     local procedure OnAfterModifyRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
-        CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
+        TempCouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf" temporary;
     begin
-        PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
-        OnAfterModifyRecEvent(CouponListItemBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
+        PopulateBufferFromRec(TempCouponListItemBuffer, CouponListItem);
+        OnAfterModifyRecEvent(TempCouponListItemBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponListItemBuffer, CouponListItem);
     end;
 
     local procedure OnBeforeDeleteRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
-        CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
+        TempCouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf" temporary;
     begin
-        PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
-        OnBeforeDeleteRecEvent(CouponListItemBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
+        PopulateBufferFromRec(TempCouponListItemBuffer, CouponListItem);
+        OnBeforeDeleteRecEvent(TempCouponListItemBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponListItemBuffer, CouponListItem);
     end;
 
     local procedure OnAfterDeleteRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
-        CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
+        TempCouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf" temporary;
     begin
-        PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
-        OnAfterDeleteRecEvent(CouponListItemBuffer, RunTrigger);
-        PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
+        PopulateBufferFromRec(TempCouponListItemBuffer, CouponListItem);
+        OnAfterDeleteRecEvent(TempCouponListItemBuffer, RunTrigger);
+        PopulateRecFromBuffer(TempCouponListItemBuffer, CouponListItem);
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21

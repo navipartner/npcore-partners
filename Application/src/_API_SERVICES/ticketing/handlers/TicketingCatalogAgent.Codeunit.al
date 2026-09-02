@@ -25,7 +25,7 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
         EnumEncoder: Codeunit "NPR TicketingApiTranslations";
 
         TempCatalogItems: Record "Item Variant" temporary;
-        TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
+        TempTicketDescriptionBuffer: Record "NPR TM TempTicketDescription" temporary;
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -34,7 +34,7 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
         UnitPriceIncludesVat: Boolean;
         UnitPriceVatPercentage: Decimal;
     begin
-        if (not PrepareCatalogItemList(StoreCode, ItemNumber, TempCatalogItems, TicketDescriptionBuffer, CopyStr(StoreCode, 1, 10))) then
+        if (not PrepareCatalogItemList(StoreCode, ItemNumber, TempCatalogItems, TempTicketDescriptionBuffer, CopyStr(StoreCode, 1, 10))) then
             exit(Response.RespondResourceNotFound('No items found in the catalog.'));
 
         GeneralLedgerSetup.Get();
@@ -56,7 +56,7 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
                 UnitPriceVatPercentage := 0;
             end;
 
-            TicketDescriptionBuffer.Get(TempCatalogItems."Item No.", TempCatalogItems.Code, '');
+            TempTicketDescriptionBuffer.Get(TempCatalogItems."Item No.", TempCatalogItems.Code, '');
 
             ResponseJson.StartObject()
                 .AddProperty('itemNumber', TempCatalogItems."Item No.")
@@ -74,13 +74,13 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
                     .AddProperty('kind', EnumEncoder.EncodeTicketTypeAdmissionKind(TicketType."Admission Registration"))
                 .EndObject()
                 .StartObject('description')
-                    .AddObject(AddPropertyNotNull(ResponseJson, 'title', TicketDescriptionBuffer.Title))
-                    .AddObject(AddPropertyNotNull(ResponseJson, 'subtitle', TicketDescriptionBuffer.Subtitle))
-                    .AddObject(AddPropertyNotNull(ResponseJson, 'name', TicketDescriptionBuffer.Name))
-                    .AddObject(AddPropertyNotNull(ResponseJson, 'description', TicketDescriptionBuffer.Description))
-                    .AddObject(AddPropertyNotNull(ResponseJson, 'fullDescription', TicketDescriptionBuffer.FullDescription))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'title', TempTicketDescriptionBuffer.Title))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'subtitle', TempTicketDescriptionBuffer.Subtitle))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'name', TempTicketDescriptionBuffer.Name))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'description', TempTicketDescriptionBuffer.Description))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'fullDescription', TempTicketDescriptionBuffer.FullDescription))
                 .EndObject()
-                .AddArray(AdmissionDetailsDTO(ResponseJson, 'contents', TempCatalogItems."Item No.", TempCatalogItems.Code, TicketDescriptionBuffer))
+                .AddArray(AdmissionDetailsDTO(ResponseJson, 'contents', TempCatalogItems."Item No.", TempCatalogItems.Code, TempTicketDescriptionBuffer))
             .EndObject();
 
         until (TempCatalogItems.Next() = 0);
@@ -245,7 +245,7 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
 
     local procedure CalculatePrice(ItemNumber: Code[20]; VariantCode: Code[10]; var UnitPrice: Decimal; var UnitPriceIncludesVat: Boolean; var UnitPriceVatPercentage: Decimal): Boolean
     var
-        AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        TempAdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer" temporary;
         TicketBom: Record "NPR TM Ticket Admission Bom";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         TimeHelper: Codeunit "NPR TM TimeHelper";
@@ -260,23 +260,23 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
 
         LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
 
-        AdmCapacityPriceBuffer.Init();
-        AdmCapacityPriceBuffer.EntryNo := 1;
-        AdmCapacityPriceBuffer.ItemNumber := ItemNumber;
-        AdmCapacityPriceBuffer.VariantCode := VariantCode;
-        AdmCapacityPriceBuffer.AdmissionCode := TicketBom."Admission Code";
-        AdmCapacityPriceBuffer.ReferenceDate := DT2Date(LocalDateTime);
-        AdmCapacityPriceBuffer.DefaultAdmission := TicketBom.Default;
-        AdmCapacityPriceBuffer.AdmissionInclusion := TicketBom."Admission Inclusion";
-        AdmCapacityPriceBuffer.Quantity := 1;
+        TempAdmCapacityPriceBuffer.Init();
+        TempAdmCapacityPriceBuffer.EntryNo := 1;
+        TempAdmCapacityPriceBuffer.ItemNumber := ItemNumber;
+        TempAdmCapacityPriceBuffer.VariantCode := VariantCode;
+        TempAdmCapacityPriceBuffer.AdmissionCode := TicketBom."Admission Code";
+        TempAdmCapacityPriceBuffer.ReferenceDate := DT2Date(LocalDateTime);
+        TempAdmCapacityPriceBuffer.DefaultAdmission := TicketBom.Default;
+        TempAdmCapacityPriceBuffer.AdmissionInclusion := TicketBom."Admission Inclusion";
+        TempAdmCapacityPriceBuffer.Quantity := 1;
 
         if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
             if (TicketBom.Default) then
-                TicketPrice.CalculateErpPrice(AdmCapacityPriceBuffer);
+                TicketPrice.CalculateErpPrice(TempAdmCapacityPriceBuffer);
 
-        UnitPrice := AdmCapacityPriceBuffer.UnitPrice;
-        UnitPriceIncludesVat := AdmCapacityPriceBuffer.UnitPriceIncludesVat;
-        UnitPriceVatPercentage := AdmCapacityPriceBuffer.UnitPriceVatPercentage;
+        UnitPrice := TempAdmCapacityPriceBuffer.UnitPrice;
+        UnitPriceIncludesVat := TempAdmCapacityPriceBuffer.UnitPriceIncludesVat;
+        UnitPriceVatPercentage := TempAdmCapacityPriceBuffer.UnitPriceVatPercentage;
         exit(true);
 
     end;

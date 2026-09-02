@@ -286,5 +286,7 @@ table 6059870 "NPR Job Queue Refresh Setup"
     end;
 
     var
+#pragma warning disable AA0073
         _JQRunnerUser: Record "NPR Job Queue Runner User";
+#pragma warning restore AA0073
 }

@@ -329,11 +329,11 @@
 
                     trigger OnAction()
                     var
-                        POSEntryStatistics: Record "NPR POS Entry Statistics";
+                        TempPOSEntryStatistics: Record "NPR POS Entry Statistics" temporary;
                     begin
-                        POSEntryStatistics.Calculate(Rec);
-                        POSEntryStatistics.SetFilter("POS Payment Method Filter", Rec.Code);
-                        Page.Run(POSEntryStatistics.GetPageId(), POSEntryStatistics);
+                        TempPOSEntryStatistics.Calculate(Rec);
+                        TempPOSEntryStatistics.SetFilter("POS Payment Method Filter", Rec.Code);
+                        Page.Run(TempPOSEntryStatistics.GetPageId(), TempPOSEntryStatistics);
                     end;
                 }
             }

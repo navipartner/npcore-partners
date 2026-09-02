@@ -117,7 +117,9 @@
 
         PrevRec := Format(NpCsStore);
 
+#pragma warning disable AA0139
         NpCsStore.Validate("Company Name", NpXmlDomMgt.GetElementText(Element, 'from_store/company_name', MaxStrLen(NpCsStore."Company Name"), true));
+#pragma warning restore AA0139
         NpCsStore.Name := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/name', MaxStrLen(NpCsStore.Name), true), 1, MaxStrLen(NpCsStore.Name));
         NpCsStore."Service Url" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_url', MaxStrLen(NpCsStore."Service Url"), true), 1, MaxStrLen(NpCsStore."Service Url"));
         NpCsStore."Service Username" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_username', MaxStrLen(NpCsStore."Service Username"), true), 1, MaxStrLen(NpCsStore."Service Username"));
@@ -143,7 +145,9 @@
             NpCsStore.Init();
             NpCsStore.Code := StoreCode;
             NpCsStore."Local Store" := true;
+#pragma warning disable AA0139
             NpCsStore.Validate("Company Name", CompanyName);
+#pragma warning restore AA0139
             NpCsStore.Insert(true);
         end;
     end;
@@ -249,13 +253,17 @@
             RecRef.SetTable(Customer);
         end;
 
+#pragma warning disable AA0139
         Customer.Validate(Name, NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name', MaxStrLen(Customer.Name), true));
+#pragma warning restore AA0139
         Customer."Name 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', MaxStrLen(Customer."Name 2"), true), 1, MaxStrLen(Customer."Name 2"));
         Customer.Address := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address', MaxStrLen(Customer.Address), true), 1, MaxStrLen(Customer.Address));
         Customer."Address 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address_2', MaxStrLen(Customer."Address 2"), true), 1, MaxStrLen(Customer."Address 2"));
         Customer."Post Code" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/post_code', MaxStrLen(Customer."Post Code"), true), 1, MaxStrLen(Customer."Post Code"));
         Customer.City := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/city', MaxStrLen(Customer.City), true), 1, MaxStrLen(Customer.City));
+#pragma warning disable AA0139
         Customer.Validate("Country/Region Code", NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/country_code', MaxStrLen(Customer."Country/Region Code"), true));
+#pragma warning restore AA0139
         Customer.Contact := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/contact', MaxStrLen(Customer.Contact), true), 1, MaxStrLen(Customer.Contact));
         Customer."Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true), 1, MaxStrLen(Customer."Phone No."));
         Customer."E-Mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true), 1, MaxStrLen(Customer."E-Mail"));
@@ -330,10 +338,12 @@
         BillToCustNo := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'bill_to_customer_no', MaxStrLen(SalesHeader."Bill-to Customer No."), false), 1, MaxStrLen(SalesHeader."Bill-to Customer No."));
         if BillToCustNo <> '' then
             SalesHeader.Validate("Bill-to Customer No.", BillToCustNo);
+#pragma warning disable AA0139
         SalesHeader.Validate("Location Code", NpXmlDomMgt.GetElementCode(Element, 'location_code', MaxStrLen(SalesHeader."Location Code"), true));
         SalesHeader.Validate("Salesperson Code", NpXmlDomMgt.GetElementCode(Element, 'salesperson_code', MaxStrLen(SalesHeader."Salesperson Code"), true));
         SalesHeader.Validate("Payment Method Code", NpXmlDomMgt.GetElementCode(Element, 'payment_method_code', MaxStrLen(SalesHeader."Payment Method Code"), true));
         SalesHeader.Validate("Shipment Method Code", NpXmlDomMgt.GetElementCode(Element, 'shipment_method_code', MaxStrLen(SalesHeader."Shipment Method Code"), true));
+#pragma warning restore AA0139
         SalesHeader."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(SalesHeader."Ship-to Contact"), false), 1, MaxStrLen(SalesHeader."Ship-to Contact"));
         if NpXmlDomMgt.FindElement(Element, 'prices_including_vat', false, InclVATElement) then
             if Evaluate(SalesHeader."Prices Including VAT", InclVATElement.InnerText, 9) then;
@@ -440,7 +450,9 @@
                     SalesLine.Validate("No.", ItemVariant."Item No.");
                     if ItemVariant.Code <> '' then
                         SalesLine.Validate("Variant Code", ItemVariant.Code);
+#pragma warning disable AA0139
                     SalesLine.Validate("Unit of Measure Code", NpXmlDomMgt.GetElementCode(Element, 'unit_of_measure_code', MaxStrLen(SalesLine."Unit of Measure Code"), true));
+#pragma warning restore AA0139
                     SalesLine.Description := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
                     SalesLine."Description 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false), 1, MaxStrLen(SalesLine."Description 2"));
                     SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(Element, 'quantity', true));
@@ -451,8 +463,10 @@
                 end;
             SalesLine.Type::"G/L Account":
                 begin
+#pragma warning disable AA0139
                     SalesLine.Validate("No.", NpXmlDomMgt.GetElementCode(Element, 'no', MaxStrLen(SalesLine."No."), true));
                     SalesLine.Validate("Unit of Measure Code", NpXmlDomMgt.GetElementCode(Element, 'unit_of_measure_code', MaxStrLen(SalesLine."Unit of Measure Code"), true));
+#pragma warning restore AA0139
                     SalesLine.Description := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
                     SalesLine."Description 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false), 1, MaxStrLen(SalesLine."Description 2"));
                     SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(Element, 'quantity', true));

@@ -147,7 +147,9 @@ codeunit 6248332 "NPR Adyen Try Webhook Process"
 
         GetPaymentMethod(MagentoPaymentLine, PaymentMethod);
 
+#pragma warning disable AA0139
         MagentoPaymentLine.Validate("Transaction ID", TransactionId);
+#pragma warning restore AA0139
         MagentoPaymentLine."No." := CopyStr(MagentoPaymentLine."Transaction ID", 1, MaxStrLen(MagentoPaymentLine."No."));
         MagentoPaymentLine."Date Authorized" := Today;
         MagentoPaymentLine.Amount := MagentoPaymentLine."Requested Amount";

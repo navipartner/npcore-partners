@@ -38,7 +38,7 @@
 
                             trigger OnAfterAssignVariable()
                             var
-                                RetailInventoryBuffer2: Record "NPR RIS Retail Inv. Buffer";
+                                TempRetailInventoryBuffer2: Record "NPR RIS Retail Inv. Buffer" temporary;
                                 RISRetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
                                 Position: Integer;
                             begin
@@ -52,15 +52,15 @@
                                 end;
 
                                 RISRetailInventorySetMgt.ProcessInventorySet(RISRetailInventorySet, TempItemVariant."Item No.", TempItemVariant.Code, RetailInventoryBuffer);
-                                if RetailInventoryBuffer2.FindSet() then
+                                if TempRetailInventoryBuffer2.FindSet() then
                                     repeat
                                         LineNo += 1;
                                         RetailInventoryBuffer.Init();
-                                        RetailInventoryBuffer := RetailInventoryBuffer2;
+                                        RetailInventoryBuffer := TempRetailInventoryBuffer2;
                                         RetailInventoryBuffer."Location Filter" := Format(RetailInventoryBuffer."Line No.");
                                         RetailInventoryBuffer."Line No." := LineNo;
                                         RetailInventoryBuffer.Insert();
-                                    until RetailInventoryBuffer2.Next() = 0;
+                                    until TempRetailInventoryBuffer2.Next() = 0;
                             end;
                         }
                     }
@@ -147,6 +147,8 @@
     }
 
     var
+#pragma warning disable AA0073
         RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
+#pragma warning restore AA0073
         LineNo: Integer;
 }

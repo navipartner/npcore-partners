@@ -1024,8 +1024,10 @@
         if not UnitOfMeasure.FindFirst() then
             if not UnitOfMeasure.Get(IntermediateDataImport.Value) then begin
                 UnitOfMeasure.Init();
+#pragma warning disable AA0139
                 UnitOfMeasure.Validate(Code, IntermediateDataImport.Value);
                 UnitOfMeasure.Validate(Description, IntermediateDataImport.Value);
+#pragma warning restore AA0139
                 UnitOfMeasure.Insert(true);
             end;
 

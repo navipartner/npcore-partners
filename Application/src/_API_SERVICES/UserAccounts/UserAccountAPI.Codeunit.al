@@ -180,12 +180,16 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
 
         if (JHelper.GetJsonToken(RequestJson, 'firstName', TempToken)) then begin
             FirstName := TempToken.AsValue().AsText().Trim();
+#pragma warning disable AA0139
             UserAccount.Validate(FirstName, FirstName);
+#pragma warning restore AA0139
         end;
 
         if (JHelper.GetJsonToken(RequestJson, 'lastName', TempToken)) then begin
             LastName := TempToken.AsValue().AsText().Trim();
+#pragma warning disable AA0139
             UserAccount.Validate(LastName, LastName);
+#pragma warning restore AA0139
         end;
     end;
 

@@ -182,6 +182,7 @@
         ItemWorksheetLine.SetUpNewLine(LastItemWorksheetLine);
         ItemWorksheetLine.Insert(true);
         ItemWorksheetLine.Action := ItemWorksheetLine.Action::CreateNew;
+#pragma warning disable AA0139
         ItemWorksheetLine.Validate("Item No.", GetXmlText(Element, 'ItemNo', MaxStrLen(ItemWorksheetLine."Item No."), false));
         ItemWorksheetLine.Validate("Vend Item No.",
             GetXmlText(
@@ -199,6 +200,7 @@
         TempText := GetXmlText(Element, 'Description2', MaxStrLen(ItemWorksheetLine."Description 2"), true);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Description 2", TempText);
+#pragma warning restore AA0139
         if Evaluate(TempDec, GetXmlText(Element, 'DirectUnitCost', 0, false)) then
             ItemWorksheetLine.Validate("Direct Unit Cost", TempDec);
         if Evaluate(TempDec, GetXmlText(Element, 'UnitPrice', 0, false)) then
@@ -207,12 +209,12 @@
 #pragma warning disable AA0139
         ItemWorksheetLine."Item Category Code" := GetXmlText(Element, 'ItemCategory', MaxStrLen(ItemWorksheetLine."Item Category Code"), false);
         ItemWorksheetLine."Product Group Code" := GetXmlText(Element, 'ProductGroup', MaxStrLen(ItemWorksheetLine."Product Group Code"), false);
-#pragma warning restore
         ItemWorksheetLine.Validate("Sales Price Currency Code", GetXmlText(Element, 'SalesPriceCurrencyCode', MaxStrLen(ItemWorksheetLine."Sales Price Currency Code"), false));
         ItemWorksheetLine.Validate("Purchase Price Currency Code", GetXmlText(Element, 'PurchasePriceCurrencyCode', MaxStrLen(ItemWorksheetLine."Purchase Price Currency Code"), false));
         TempText := GetXmlText(Element, 'VarietyGroup', MaxStrLen(ItemWorksheetLine."Variety Group"), false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Variety Group", TempText);
+#pragma warning restore AA0139
 
         if Evaluate(TempDec, GetXmlText(Element, 'RecommendedRetailPrice', 0, false)) then
             ItemWorksheetLine.Validate("Recommended Retail Price", TempDec);
@@ -227,18 +229,22 @@
         if Element.SelectNodes('Attributes', NodeList) then
             ReadWkshLineAttributes(ItemWorksheetLine, Element);
         TempText := GetXmlText(Element, 'No2', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("No. 2", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'Type', 0, false);
         if TempText <> '' then
             if Evaluate(TempInteger, TempText) then
                 ItemWorksheetLine.Validate(Type, TempInteger);
         TempText := GetXmlText(Element, 'ShelfNo', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Shelf No.", TempText);
         TempText := GetXmlText(Element, 'ItemDiscGroup', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Item Disc. Group", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'AllowInvoiceDisc', 0, false);
         if TempText <> '' then
             if Evaluate(TempBool, TempText) then
@@ -295,8 +301,10 @@
                 if TempDec <> 0 then
                     ItemWorksheetLine.Validate("Duty Due %", TempDec);
         TempText := GetXmlText(Element, 'DutyCode', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Duty Code", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'UnitsperParcel', 0, false);
         if TempText <> '' then
             if Evaluate(TempDec, TempText) then
@@ -308,19 +316,23 @@
                 if TempDec <> 0 then
                     ItemWorksheetLine.Validate("Unit Volume", TempDec);
         TempText := GetXmlText(Element, 'Durability', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate(Durability, TempText);
         TempText := GetXmlText(Element, 'FreightType', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Freight Type", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'DutyUnitConversion', 0, false);
         if TempText <> '' then
             if Evaluate(TempDec, TempText) then
                 if TempDec <> 0 then
                     ItemWorksheetLine.Validate("Duty Unit Conversion", TempDec);
         TempText := GetXmlText(Element, 'CountryRegionPurchasedCode', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Country/Region Purchased Code", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'BudgetQuantity', 0, false);
         if TempText <> '' then
             if Evaluate(TempDec, TempText) then
@@ -351,8 +363,10 @@
                 else
                     ItemWorksheetLine.Validate("Price Includes VAT", 0);
         TempText := GetXmlText(Element, 'CountryRegionofOriginCode', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Country/Region of Origin Code", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'AutomaticExtTexts', 0, false);
         if TempText <> '' then
             if Evaluate(TempBool, TempText) then
@@ -377,16 +391,20 @@
             if Evaluate(TempInteger, TempText) then
                 ItemWorksheetLine.Validate("Assembly Policy", TempInteger);
         TempText := GetXmlText(Element, 'GTIN', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate(GTIN, TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'LotSize', 0, false);
         if TempText <> '' then
             if Evaluate(TempDec, TempText) then
                 if TempDec <> 0 then
                     ItemWorksheetLine.Validate("Lot Size", TempDec);
         TempText := GetXmlText(Element, 'SerialNos', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Serial Nos.", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'Scrap', 0, false);
         if TempText <> '' then
             if Evaluate(TempDec, TempText) then
@@ -474,6 +492,7 @@
                 if TempDec <> 0 then
                     ItemWorksheetLine.Validate("Overflow Level", TempDec);
         TempText := GetXmlText(Element, 'ServiceItemGroup', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Service Item Group", TempText);
         TempText := GetXmlText(Element, 'ItemTrackingCode', 0, false);
@@ -482,11 +501,13 @@
         TempText := GetXmlText(Element, 'LotNos', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Lot Nos.", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'ExpirationCalculation', 0, false);
         if TempText <> '' then
             if Evaluate(TempDateFormula, TempText) then
                 ItemWorksheetLine.Validate("Expiration Calculation", TempDateFormula);
         TempText := GetXmlText(Element, 'SpecialEquipmentCode', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Special Equipment Code", TempText);
         TempText := GetXmlText(Element, 'PutawayTemplateCode', 0, false);
@@ -498,6 +519,7 @@
         TempText := GetXmlText(Element, 'PhysInvtCountingPeriodCode', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Phys Invt Counting Period Code", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'UseCrossDocking', 0, false);
         if TempText <> '' then
             if Evaluate(TempBool, TempText) then
@@ -513,8 +535,10 @@
                 else
                     ItemWorksheetLine.Validate("Group sale", 0);
         TempText := GetXmlText(Element, 'LabelBarcode', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Label Barcode", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'ExplodeBOMauto', 0, false);
         if TempText <> '' then
             if Evaluate(TempBool, TempText) then
@@ -537,8 +561,10 @@
                 else
                     ItemWorksheetLine.Validate("Cannot edit unit price", 0);
         TempText := GetXmlText(Element, 'Secondhandnumber', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Second-hand number", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'Condition', 0, false);
         if TempText <> '' then
             if Evaluate(TempInteger, TempText) then
@@ -555,6 +581,7 @@
             if Evaluate(TempInteger, TempText) then
                 ItemWorksheetLine.Validate("Guarantee Index", TempInteger);
         TempText := GetXmlText(Element, 'Insurrancecategory', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Insurrance category", TempText);
         TempText := GetXmlText(Element, 'ItemBrand', 0, false);
@@ -563,6 +590,7 @@
         TempText := GetXmlText(Element, 'TypeRetail', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Type Retail", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'NoPrintonReciept', 0, false);
         if TempText <> '' then
             if Evaluate(TempBool, TempText) then
@@ -571,8 +599,10 @@
                 else
                     ItemWorksheetLine.Validate("No Print on Reciept", 0);
         TempText := GetXmlText(Element, 'PrintTags', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Print Tags", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'ChangequantitybyPhotoorder', 0, false);
         if TempText <> '' then
             if Evaluate(TempBool, TempText) then
@@ -593,8 +623,10 @@
                 else
                     ItemWorksheetLine.Validate("Blocked on Pos", 0);
         TempText := GetXmlText(Element, 'TicketType', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Ticket Type", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'MagentoStatus', 0, false);
         if TempText <> '' then
             if Evaluate(TempInteger, TempText) then
@@ -637,8 +669,10 @@
                 if TempDate <> 0D then
                     ItemWorksheetLine.Validate("Special Price To", TempDate);
         TempText := GetXmlText(Element, 'MagentoBrand', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Magento Brand", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'DisplayOnly', 0, false);
         if TempText <> '' then
             if Evaluate(TempBool, TempText) then
@@ -654,6 +688,7 @@
                 else
                     ItemWorksheetLine.Validate("Magento Item", 0);
         TempText := GetXmlText(Element, 'MagentoName', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Magento Name", TempText);
         TempText := GetXmlText(Element, 'SeoLink', 0, false);
@@ -668,6 +703,7 @@
         TempText := GetXmlText(Element, 'MetaKeywords', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Meta Keywords", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'FeaturedFrom', 0, false);
         if TempText <> '' then
             if Evaluate(TempDate, TempText) then
@@ -679,11 +715,13 @@
                 if TempDate <> 0D then
                     ItemWorksheetLine.Validate("Featured To", TempDate);
         TempText := GetXmlText(Element, 'RoutingNo', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Routing No.", TempText);
         TempText := GetXmlText(Element, 'ProductionBOMNo', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Production BOM No.", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'OverheadRate', 0, false);
         if TempText <> '' then
             if Evaluate(TempDec, TempText) then
@@ -701,18 +739,22 @@
                 else
                     ItemWorksheetLine.Validate(Critical, 0);
         TempText := GetXmlText(Element, 'CommonItemNo', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Common Item No.", TempText);
         TempText := GetXmlText(Element, 'TariffNo', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Tariff No.", TempText);
+#pragma warning restore AA0139
         ItemWshtImpExpMgt.SetImportActionWorksheetLine(ItemWorksheetLine);
         TempText := GetXmlText(Element, 'InternalBarcode', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Internal Bar Code", TempText);
         TempText := GetXmlText(Element, 'VendorsBarcode', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Vendors Bar Code", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'SalesPriceStartDate', 0, false);
         if TempText <> '' then
             if Evaluate(TempDate, TempText, 9) then
@@ -722,6 +764,7 @@
             if Evaluate(TempDate, TempText, 9) then
                 ItemWorksheetLine.Validate("Purchase Price Start Date", TempDate);
         TempText := GetXmlText(Element, 'CustomText1', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Custom Text 1", TempText);
         TempText := GetXmlText(Element, 'CustomText2', 0, false);
@@ -736,6 +779,7 @@
         TempText := GetXmlText(Element, 'CustomText5', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Custom Text 5", TempText);
+#pragma warning restore AA0139
         TempText := GetXmlText(Element, 'CustomPrice1', 0, false);
         if TempText <> '' then
             if Evaluate(TempDec, TempText, 9) then
@@ -757,6 +801,7 @@
             if Evaluate(TempDec, TempText, 9) then
                 ItemWorksheetLine.Validate("Custom Price 5", TempDec);
         TempText := GetXmlText(Element, 'BaseUnitOfMeasure', 0, false);
+#pragma warning disable AA0139
         if TempText <> '' then
             ItemWorksheetLine.Validate("Base Unit of Measure", TempText);
         TempText := GetXmlText(Element, 'SalesUnitOfMeasure', 0, false);
@@ -765,6 +810,7 @@
         TempText := GetXmlText(Element, 'PurchUnitOfMeasure', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Purch. Unit of Measure", TempText);
+#pragma warning restore AA0139
         ItemWorksheetLine.Modify(true);
         ItemWorksheetCU.OnAfterImportWorksheetLine(ItemWorksheetLine);
         ItemWorksheetVariantLine.Init();

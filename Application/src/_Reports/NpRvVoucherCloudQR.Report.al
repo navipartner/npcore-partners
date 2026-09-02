@@ -164,17 +164,17 @@ report 6014516 "NPR NpRv Voucher Cloud QR"
 
             trigger OnAfterGetRecord()
             var
-                BarcodeEncodeSettings2D: Record "Barcode Encode Settings 2D";
+                TempBarcodeEncodeSettings2D: Record "Barcode Encode Settings 2D" temporary;
                 Language: Codeunit Language;
             begin
                 BarCodeText := "NpRv Voucher"."Reference No.";
-                BarcodeEncodeSettings2D.Init();
-                BarcodeEncodeSettings2D."Error Correction Level" := BarcodeEncodeSettings2D."Error Correction Level"::Medium;
-                BarcodeEncodeSettings2D."Module Size" := 9;
-                BarcodeEncodeSettings2D."Quite Zone Width" := 4;
+                TempBarcodeEncodeSettings2D.Init();
+                TempBarcodeEncodeSettings2D."Error Correction Level" := TempBarcodeEncodeSettings2D."Error Correction Level"::Medium;
+                TempBarcodeEncodeSettings2D."Module Size" := 9;
+                TempBarcodeEncodeSettings2D."Quite Zone Width" := 4;
                 // Code Page defaults to 932 (Shift-JIS), the voucher payload is UTF-8
-                BarcodeEncodeSettings2D."Code Page" := 65001;
-                BarCodeEncodedText := BarcodeFontProviderMgt.GenerateQRCodeBase64(BarCodeText, BarcodeEncodeSettings2D);
+                TempBarcodeEncodeSettings2D."Code Page" := 65001;
+                BarCodeEncodedText := BarcodeFontProviderMgt.GenerateQRCodeBase64(BarCodeText, TempBarcodeEncodeSettings2D);
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));

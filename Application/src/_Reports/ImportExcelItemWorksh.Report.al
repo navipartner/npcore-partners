@@ -223,7 +223,9 @@
                     if MappingFound then begin
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+#pragma warning disable AA0139
                                 ItemWorksheetLine.Validate("Item No.", CopyStr(AppendPrefix(ExcelBuf2."Cell Value as Text", ItemWorksheetLine), 1, FieldLength));
+#pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item Category Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
 # pragma warning disable AA0139
@@ -234,10 +236,12 @@
 # pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vendor No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+#pragma warning disable AA0139
                                 ItemWorksheetLine.Validate("Vendor No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vend Item No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Vend Item No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Direct Unit Cost"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
@@ -245,11 +249,13 @@
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Sales Price Currency Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if ExcelBuf2."Cell Value as Text" <> GLSetup."LCY Code" then
+#pragma warning disable AA0139
                                     ItemWorksheetLine.Validate("Sales Price Currency Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Purchase Price Currency Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if ExcelBuf2."Cell Value as Text" <> GLSetup."LCY Code" then
                                     ItemWorksheetLine.Validate("Purchase Price Currency Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Sales Price Start Date"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDate, ExcelBuf2."Cell Value as Text") then
@@ -260,10 +266,12 @@
                                     ItemWorksheetLine.Validate("Purchase Price Start Date", TempDate);
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Tariff No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+#pragma warning disable AA0139
                                 ItemWorksheetLine.Validate("Tariff No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Variety Group"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Variety Group", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Product Group Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
 # pragma warning disable AA0139
@@ -275,10 +283,12 @@
                                     ItemWorksheetLine.Validate("Recommended Retail Price", TempDec);
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vendors Bar Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+#pragma warning disable AA0139
                                 ItemWorksheetLine.Validate("Vendors Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Internal Bar Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Internal Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Net Weight"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
@@ -289,7 +299,9 @@
                                     ItemWorksheetLine.Validate("Gross Weight", TempDec);
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo(Description), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+#pragma warning disable AA0139
                                 ItemWorksheetLine.Validate(Description, CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Sales Price"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
@@ -300,6 +312,7 @@
                         GetAttributeMapping();
                     end else begin
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 1) then
+#pragma warning disable AA0139
                             ItemWorksheetLine.Validate("Item No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 5) then
                             ItemWorksheetLine.Validate("Vend Item No.", ExcelBuf2."Cell Value as Text");
@@ -307,6 +320,7 @@
                             ItemWorksheetLine.Validate("Vendor No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 2) then
                             ItemWorksheetLine.Validate(Description, ExcelBuf2."Cell Value as Text");
+#pragma warning restore AA0139
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 9) then
                             if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
                                 ItemWorksheetLine.Validate("Direct Unit Cost", TempDec);
@@ -315,14 +329,18 @@
                                 ItemWorksheetLine.Validate("Sales Price", TempDec);
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 8) then
                             if ExcelBuf2."Cell Value as Text" <> GLSetup."LCY Code" then
+#pragma warning disable AA0139
                                 ItemWorksheetLine.Validate("Sales Price Currency Code", ExcelBuf2."Cell Value as Text");
+#pragma warning restore AA0139
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 10) then
                             if ExcelBuf2."Cell Value as Text" <> GLSetup."LCY Code" then
                                 ItemWorksheetLine.Validate("Purchase Price Currency Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, 3));
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 6) then
+#pragma warning disable AA0139
                             ItemWorksheetLine.Validate("Tariff No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 13) then
                             ItemWorksheetLine.Validate("Variety Group", ExcelBuf2."Cell Value as Text");
+#pragma warning restore AA0139
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 3) then
                             ItemWorksheetLine."Item Category Code" := CopyStr(ExcelBuf2."Cell Value as Text", 1, MaxStrLen(ItemWorksheetLine."Item Category Code"));
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 4) then
@@ -331,9 +349,11 @@
                             if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
                                 ItemWorksheetLine.Validate("Recommended Retail Price", TempDec);
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 19) then
+#pragma warning disable AA0139
                             ItemWorksheetLine.Validate("Vendors Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 20) then
                             ItemWorksheetLine.Validate("Internal Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 21) then
                             if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
                                 ItemWorksheetLine.Validate("Net Weight", TempDec);
@@ -394,10 +414,12 @@
 # pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Vendors Bar Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+#pragma warning disable AA0139
                                 ItemWorksheetVariantLine.Validate("Vendors Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Internal Bar Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetVariantLine.Validate("Internal Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                     end else begin
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 14) then
                             ItemWorksheetVariantLine."Variety 1 Value" := CopyStr(ExcelBuf2."Cell Value as Text", 1, MaxStrLen(ItemWorksheetVariantLine."Variety 1 Value"));
@@ -408,9 +430,11 @@
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 17) then
                             ItemWorksheetVariantLine."Variety 4 Value" := CopyStr(ExcelBuf2."Cell Value as Text", 1, MaxStrLen(ItemWorksheetVariantLine."Variety 4 Value"));
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 19) then
+#pragma warning disable AA0139
                             ItemWorksheetVariantLine.Validate("Vendors Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 20) then
                             ItemWorksheetVariantLine.Validate("Internal Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+#pragma warning restore AA0139
                     end;
                     ItemWorksheetVariantLine.Validate("Variety 1 Value");
                     ItemWorksheetVariantLine.Validate("Variety 2 Value");

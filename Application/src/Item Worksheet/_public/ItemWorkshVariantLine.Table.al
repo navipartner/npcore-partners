@@ -699,7 +699,9 @@
                         ItemWorksheetVarValue.Validate("Worksheet Name", _ItemWorksheetLine."Worksheet Name");
                         ItemWorksheetVarValue.Validate("Worksheet Line No.", _ItemWorksheetLine."Line No.");
                         ItemWorksheetVarValue.Validate(Type, VrtType);
+#pragma warning disable AA0139
                         ItemWorksheetVarValue.Validate(Table, VrtTable);
+#pragma warning restore AA0139
                         ItemWorksheetVarValue.Validate(Value, VrtValue);
                         ItemWorksheetVarValue.Insert(true);
                     end;

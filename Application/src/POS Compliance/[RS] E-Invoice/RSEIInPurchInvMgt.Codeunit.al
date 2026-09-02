@@ -202,7 +202,9 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
 #ELSE
                     PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Order Nos.", Today(), true);
 #ENDIF
+#pragma warning disable AA0139
                     PurchaseHeader.Validate("Vendor Invoice No.", HelperText);
+#pragma warning restore AA0139
                 end;
             PurchaseDocumentType::Invoice:
                 begin
@@ -211,7 +213,9 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
 #ELSE
                     PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Invoice Nos.", Today(), true);
 #ENDIF
+#pragma warning disable AA0139
                     PurchaseHeader.Validate("Vendor Invoice No.", HelperText);
+#pragma warning restore AA0139
                 end;
             PurchaseDocumentType::"Credit Memo":
                 begin
@@ -220,7 +224,9 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
 #ELSE
                     PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Credit Memo Nos.", Today(), true);
 #ENDIF
+#pragma warning disable AA0139
                     PurchaseHeader.Validate("Vendor Cr. Memo No.", HelperText)
+#pragma warning restore AA0139
                 end;
         end;
     end;

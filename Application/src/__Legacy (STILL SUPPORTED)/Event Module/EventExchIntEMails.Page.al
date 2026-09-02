@@ -29,7 +29,9 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                         TempEmailAccount: Record "Email Account" temporary;
                     begin
                         if Page.RunModal(Page::"Email Accounts", TempEmailAccount) = ACTION::LookupOK then
+#pragma warning disable AA0139
                             Rec.Validate("E-Mail", TempEmailAccount."Email Address");
+#pragma warning restore AA0139
                     end;
                 }
                 field(TokenSet; Rec."Access Token".HasValue())

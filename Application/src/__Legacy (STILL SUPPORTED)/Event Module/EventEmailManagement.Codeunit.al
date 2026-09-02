@@ -165,7 +165,7 @@ codeunit 6060153 "NPR Event Email Management"
         BCCRecipients: List of [Text];
         EmailAction: Enum "Email Action";
 #ENDIF
-        EmailAccount: Record "Email Account";
+        TempEmailAccount: Record "Email Account" temporary;
     begin
         case RecRef.Number of
             DATABASE::Job:
@@ -202,7 +202,7 @@ codeunit 6060153 "NPR Event Email Management"
         end;
 
         EventEWSMgt.GetOrganizerSetup(Job, Source);
-        GetEmailAccount(EmailAccount);
+        GetEmailAccount(TempEmailAccount);
 
 #IF NOT BC17
         EmailMessage.Create(Recipients, EmailTemplateMgt.MergeMailContent(RecRef2, EMailTemplateHeader.Subject, EMailTemplateHeader."Fieldnumber Start Tag", EMailTemplateHeader."Fieldnumber End Tag"), BodyText, true, CcRecipients, BCCRecipients);
@@ -214,9 +214,9 @@ codeunit 6060153 "NPR Event Email Management"
 #endif
 
         if EventExchIntTemplate."Open E-mail dialog" then
-            exit(Email.OpenInEditorModally(EmailMessage, EmailAccount) = EmailAction::Sent)
+            exit(Email.OpenInEditorModally(EmailMessage, TempEmailAccount) = EmailAction::Sent)
         else
-            exit(Email.Send(EmailMessage, EmailAccount));
+            exit(Email.Send(EmailMessage, TempEmailAccount));
 #ENDIF
     end;
 

@@ -106,7 +106,9 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                 ReverseAuditInfoToSalesLine(SaleLinePOS, POSSalesLine, CopyLineDimensions);
 
                 if ReturnReasonCode <> '' then
+#pragma warning disable AA0139
                     SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
+#pragma warning restore AA0139
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
                 SaleLinePOS."Return Sale Sales Ticket No." := SalesTicketNo;
                 CallOnReverseSalesTicketOnBeforeModifySalesLinePOS(SaleLinePOS, SalePOS);

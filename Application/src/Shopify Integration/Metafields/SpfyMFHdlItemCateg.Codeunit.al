@@ -42,7 +42,7 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
         Item: Record Item;
         ItemCategory: Record "Item Category";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        TempSpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         ShopifyAssignedID.SetRange("Table No.", Database::"NPR Spfy Store-Item Cat. Link");
@@ -51,9 +51,9 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
             ItemCategory.SetLoadFields(Code);
             if ItemCategory.FindSet() then
                 repeat
-                    SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-                    SpfyStoreItemCatLink."Shopify Store Code" := SpfyMetafieldMapping."Shopify Store Code";
-                    SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                    TempSpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
+                    TempSpfyStoreItemCatLink."Shopify Store Code" := SpfyMetafieldMapping."Shopify Store Code";
+                    SpfyAssignedIDMgt.RemoveAssignedShopifyID(TempSpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
                 until ItemCategory.Next() = 0;
         end;
 
@@ -123,7 +123,7 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
     local procedure GenerateItemCategoryMetafieldValueArray(ItemCategoryCode: Code[20]; ShopifyStoreCode: Code[20]) ItemCategories: JsonArray
     var
         ItemCategory: Record "Item Category";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        TempSpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         AssignedID: Text[30];
         NoIDAssignedErr: Label 'No Shopify metaobject ID has been assigned to the item category %1 from Shopify store %2. Please ensure that the item category has been synchronized with the Shopify store.', Comment = '%1 - item category code, %2 - Shopify store code';
@@ -134,9 +134,9 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
         if not ItemCategory.Get(ItemCategoryCode) then
             exit;
         repeat
-            SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-            SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
-            AssignedID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+            TempSpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
+            TempSpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
+            AssignedID := SpfyAssignedIDMgt.GetAssignedShopifyID(TempSpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             If AssignedID = '' then
                 AssignedID := UpsertItemCategoryMetaobject(ItemCategory, ShopifyStoreCode);
             If AssignedID = '' then
@@ -390,7 +390,7 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
     local procedure SyncItemCategory(ItemCategory: Record "Item Category"; ShopifyStoreCode: Code[20]; ResyncExisting: Boolean; CallLevel: Integer; var SyncedCategories: List of [Code[20]])
     var
         ParentItemCategory: Record "Item Category";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        TempSpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SyncRec: Boolean;
         PossibleCircularReferenceErr: Label 'The number of parent category levels reached 50 at the item category "%1". Further processing has been stopped due to a possible circular reference.', Comment = '%1 - Item category code';
@@ -406,24 +406,24 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
             SyncItemCategory(ParentItemCategory, ShopifyStoreCode, ResyncExisting, CallLevel + 1, SyncedCategories);
         end;
 
-        SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-        SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
+        TempSpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
+        TempSpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
         if not ResyncExisting then
-            SyncRec := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '';
+            SyncRec := SpfyAssignedIDMgt.GetAssignedShopifyID(TempSpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '';
         if SyncRec or ResyncExisting then
             UpsertItemCategoryMetaobject(ItemCategory, ShopifyStoreCode);
     end;
 
     local procedure UpsertItemCategoryMetaobject(ItemCategory: Record "Item Category"; ShopifyStoreCode: Code[20]) MetaobjectValueID: Text[30]
     var
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        TempSpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         MetaobjectValueID := SpfyMetafieldMgt.UpsertMetaobject(ShopifyStoreCode, StrSubstNo('%1 "%2"', ItemCategory.TableCaption(), ItemCategory.Code), ItemCategoryShopifyMetaobjectUpsertQuery(ItemCategory, ShopifyStoreCode));
 
-        SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-        SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
-        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", MetaobjectValueID, false);
+        TempSpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
+        TempSpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
+        SpfyAssignedIDMgt.AssignShopifyID(TempSpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", MetaobjectValueID, false);
     end;
 
     local procedure ItemCategoryShopifyMetaobjectUpsertQuery(ItemCategory: Record "Item Category"; ShopifyStoreCode: Code[20]): JsonObject

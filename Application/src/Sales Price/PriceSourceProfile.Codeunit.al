@@ -35,13 +35,13 @@ codeunit 6150958 "NPR Price Source - Profile" implements "Price Source"
 
     procedure IsLookupOK(var PriceSource: Record "Price Source"): Boolean
     var
-        xPriceSource: Record "Price Source";
+        TempxPriceSource: Record "Price Source" temporary;
     begin
-        xPriceSource := PriceSource;
-        if POSPricingProfile.Get(xPriceSource."Source No.") then;
+        TempxPriceSource := PriceSource;
+        if POSPricingProfile.Get(TempxPriceSource."Source No.") then;
         if Page.RunModal(0, POSPricingProfile) = ACTION::LookupOK then begin
-            xPriceSource.Validate("Source No.", POSPricingProfile.Code);
-            PriceSource := xPriceSource;
+            TempxPriceSource.Validate("Source No.", POSPricingProfile.Code);
+            PriceSource := TempxPriceSource;
             exit(true);
         end;
     end;

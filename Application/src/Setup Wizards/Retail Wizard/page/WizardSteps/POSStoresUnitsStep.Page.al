@@ -204,7 +204,9 @@
         PosStore.Validate("Location Code", CompanyInfo."Location Code");
         POSStore.Validate("Phone No.", CompanyInfo."Phone No.");
         PosStore.Validate("E-Mail", CompanyInfo."E-Mail");
+#pragma warning disable AA0139
         PosStore.Validate("Home Page", CompanyInfo."Home Page");
+#pragma warning restore AA0139
         PosStore.Validate("Responsibility Center", CompanyInfo."Responsibility Center");
     end;
 

@@ -44,8 +44,10 @@ codeunit 6014553 "NPR Email Sending Handler"
             EmailItem.Validate("Plaintext Formatted", true);
             EmailItem.Validate("Message Type", EmailItem."Message Type"::"Custom Message");
         end;
+#pragma warning disable AA0139
         EmailItem.Validate("From Address", FromAddress);
         EmailItem.Validate("From Name", FromName);
+#pragma warning restore AA0139
 
         for i := 1 to Recipients.Count do begin
             Recipients.Get(i, RecValue);
@@ -61,9 +63,11 @@ codeunit 6014553 "NPR Email Sending Handler"
                     else
                         RecipientsCCText += ';' + RecValue;
         end;
+#pragma warning disable AA0139
         EmailItem.Validate("Send to", RecipientsText);
         EmailItem.Validate("Send CC", RecipientsCCText);
         EmailItem.Validate(Subject, Subject);
+#pragma warning restore AA0139
         EmailItem.SetBodyText(Body);
         EmailItem.Insert();
     end;
@@ -149,7 +153,9 @@ codeunit 6014553 "NPR Email Sending Handler"
                     RecipientsText += ';' + RecValue;
         end;
 
+#pragma warning disable AA0139
         EmailItem.Validate("Send to", RecipientsText);
+#pragma warning restore AA0139
         EmailItem.Modify();
     end;
 
@@ -170,7 +176,9 @@ codeunit 6014553 "NPR Email Sending Handler"
                     RecipientsText += ';' + RecValue;
         end;
 
+#pragma warning disable AA0139
         EmailItem.Validate("Send CC", RecipientsText);
+#pragma warning restore AA0139
         EmailItem.Modify();
     end;
 
@@ -191,7 +199,9 @@ codeunit 6014553 "NPR Email Sending Handler"
                     RecipientsText += ';' + RecValue;
         end;
 
+#pragma warning disable AA0139
         EmailItem.Validate("Send BCC", RecipientsText);
+#pragma warning restore AA0139
         EmailItem.Modify();
     end;
 

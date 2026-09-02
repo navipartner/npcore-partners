@@ -134,7 +134,9 @@
                     ItemWorksheetExcelColumn.Validate("Excel Column No.", ExcelBuf."Column No.");
                     ItemWorksheetExcelColumn.Insert(true);
                 end;
+#pragma warning disable AA0139
                 ItemWorksheetExcelColumn.Validate("Excel Header Text", ExcelBuf."Cell Value as Text");
+#pragma warning restore AA0139
                 if ExcelBuf2.Get(ExcelBuf."Row No." + 1, ExcelBuf."Column No.") then
                     ItemWorksheetExcelColumn.Validate("Sample Data Row 1", ExcelBuf2."Cell Value as Text");
                 if ExcelBuf2.Get(ExcelBuf."Row No." + 2, ExcelBuf."Column No.") then

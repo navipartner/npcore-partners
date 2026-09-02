@@ -1179,19 +1179,19 @@ page 6014651 "NPR Retail Wizard"
 
     local procedure ImportDemoData()
     var
-        BackgroundPackageImport: Record "NPR Background Package Import";
+        TempBackgroundPackageImport: Record "NPR Background Package Import" temporary;
         BackgroundPackageImp: Codeunit "NPR Background Package Imp.";
         SessionId: Integer;
     begin
         if package = '' then
             exit;
-        BackgroundPackageImport."Package Name" := CopyStr(package, 1, MaxStrLen(BackgroundPackageImport."Package Name"));
-        BackgroundPackageImport."Adjust Table Names" := AdjustTableNames;
-        BackgroundPackageImport.Insert();
+        TempBackgroundPackageImport."Package Name" := CopyStr(package, 1, MaxStrLen(TempBackgroundPackageImport."Package Name"));
+        TempBackgroundPackageImport."Adjust Table Names" := AdjustTableNames;
+        TempBackgroundPackageImport.Insert();
         if RunInBackground then
-            Session.StartSession(SessionId, Codeunit::"NPR Background Package Imp.", CompanyName, BackgroundPackageImport)
+            Session.StartSession(SessionId, Codeunit::"NPR Background Package Imp.", CompanyName, TempBackgroundPackageImport)
         else
-            BackgroundPackageImp.Run(BackgroundPackageImport);
+            BackgroundPackageImp.Run(TempBackgroundPackageImport);
     end;
 
     [NonDebuggable]

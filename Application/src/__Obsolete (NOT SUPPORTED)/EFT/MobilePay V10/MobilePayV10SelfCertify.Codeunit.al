@@ -261,7 +261,9 @@
         MobilePayV10UnitSetup.Validate("Merchant POS ID", GetSelfCertMerchangPosId());
         MobilePayV10UnitSetup.Insert(true);
 
+#pragma warning disable AA0139
         MobilePayV10UnitSetup.Validate("Store ID", GetSelfCertStoreId());
+#pragma warning restore AA0139
         MobilePayV10UnitSetup.Validate("Only QR", true);
         MobilePayV10UnitSetup.Modify();
     end;

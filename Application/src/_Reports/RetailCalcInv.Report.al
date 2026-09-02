@@ -522,7 +522,7 @@
 
     local procedure CalcWhseQty(AdjmtBin: Code[20]; var PosQuantity: Decimal; var NegQuantity: Decimal)
     var
-        WhseItemTrackingSetup: Record "Item Tracking Setup";
+        TempWhseItemTrackingSetup: Record "Item Tracking Setup" temporary;
         WarehouseEntry: Record "Warehouse Entry";
         WarehouseEntry2: Record "Warehouse Entry";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
@@ -531,8 +531,8 @@
         WhseQuantity: Decimal;
     begin
         AdjustPosQty := false;
-        ItemTrackingMgt.GetWhseItemTrkgSetup(TempQuantityOnHandBuffer."Item No.", WhseItemTrackingSetup);
-        ItemTrackingSplit := WhseItemTrackingSetup."Serial No. Required" or WhseItemTrackingSetup."Lot No. Required";
+        ItemTrackingMgt.GetWhseItemTrkgSetup(TempQuantityOnHandBuffer."Item No.", TempWhseItemTrackingSetup);
+        ItemTrackingSplit := TempWhseItemTrackingSetup."Serial No. Required" or TempWhseItemTrackingSetup."Lot No. Required";
         WarehouseEntry.SetCurrentKey(
           "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
           "Lot No.", "Serial No.", "Entry Type");
@@ -544,7 +544,7 @@
         WhseQuantity := WarehouseEntry."Qty. (Base)";
         WarehouseEntry.SetRange("Bin Code", AdjmtBin);
 
-        if WhseItemTrackingSetup."Serial No. Required" then begin
+        if TempWhseItemTrackingSetup."Serial No. Required" then begin
             WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::"Positive Adjmt.");
             WarehouseEntry.CalcSums("Qty. (Base)");
             PosQuantity := WhseQuantity - WarehouseEntry."Qty. (Base)";

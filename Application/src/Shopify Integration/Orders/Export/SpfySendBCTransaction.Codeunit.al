@@ -21,7 +21,7 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
 
     local procedure SendPOSEntry(var NcTask: Record "NPR Nc Task")
     var
-        SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link";
+        TempSpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link" temporary;
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         SendToShopify: Boolean;
@@ -32,7 +32,7 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         ClearLastError();
         Success := true;
 
-        SendToShopify := PrepareShopifyOrderCreateRequest(NcTask, SpfyStorePOSEntryLink);
+        SendToShopify := PrepareShopifyOrderCreateRequest(NcTask, TempSpfyStorePOSEntryLink);
         if SendToShopify then
             Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
         NcTask.Modify();
@@ -45,7 +45,7 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
             Error('');
 
-        AssignShopifyOrderID(SpfyStorePOSEntryLink, ShopifyResponse);
+        AssignShopifyOrderID(TempSpfyStorePOSEntryLink, ShopifyResponse);
     end;
 
     local procedure AssignShopifyOrderID(SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link"; ShopifyResponse: JsonToken)

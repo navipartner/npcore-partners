@@ -1226,8 +1226,10 @@ codeunit 6184796 "NPR Adyen Management"
         WebhookRequest."Report Download URL" := LocalFileLbl;
 
         if UploadIntoStream('Import Report', '', 'Microsoft Excel Worksheet (*.xlsx)|*.xlsx', FileName, InStr) then begin
+#pragma warning disable AA0139
             WebhookRequest.Validate("PSP Reference", FileName);
             WebhookRequest.Validate("Report Name", FileName);
+#pragma warning restore AA0139
             WebhookRequest."Report Data".CreateOutStream(OutStr, TextEncoding::UTF8);
             if (not CopyStream(OutStr, InStr)) then
                 Error(FileNotUploaded);

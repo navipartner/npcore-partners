@@ -213,13 +213,17 @@
         if not ApplyToCustLedgerEntries.FindSet(true) then
             exit;
         repeat
+#pragma warning disable AA0139
             ApplyToCustLedgerEntries.Validate("Applies-to ID", UserId);
+#pragma warning restore AA0139
             ApplyToCustLedgerEntries.Validate("Amount to Apply", ApplyToCustLedgerEntries."Remaining Amount");
             ApplyToCustLedgerEntries.Modify(true);
         until ApplyToCustLedgerEntries.Next() = 0;
 
         ApplyingCustLedgerEntry.Validate("Applying Entry", true);
+#pragma warning disable AA0139
         ApplyingCustLedgerEntry.Validate("Applies-to ID", UserId);
+#pragma warning restore AA0139
         ApplyingCustLedgerEntry.Validate("Amount to Apply", ApplyingCustLedgerEntry."Remaining Amount");
         CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", ApplyingCustLedgerEntry);
         Commit();
@@ -233,7 +237,9 @@
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
     begin
         SalesHeader.Validate("Prepayment %", 0);
+#pragma warning disable AA0139
         SalesHeader.Validate("Prepmt. Payment Terms Code", PrepaymentPaymentTerms);
+#pragma warning restore AA0139
         SalesHeader.Validate("Prepayment Due Date", WorkDate());
         SalesHeader.Modify(true);
 
@@ -267,7 +273,9 @@
     begin
         //Split the remaining amount out over X prepayment invoices ie. calculate the percentage.
         //Set the remaining amount on the last instalment so any rounding diff is put onto this one.
+#pragma warning disable AA0139
         SalesHeader.Validate("Prepmt. Payment Terms Code", PrepaymentPaymentTerms);
+#pragma warning restore AA0139
         SalesHeader.Modify(true);
 
         InstalmentPct := (100 - DownpaymentPct) / Instalments;

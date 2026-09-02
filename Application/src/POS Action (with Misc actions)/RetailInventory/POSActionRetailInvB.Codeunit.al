@@ -3,7 +3,7 @@ codeunit 6150622 "NPR POS Action - Retail Inv. B"
     Access = Internal;
     procedure ProcessInventorySet(POSSaleLine: Codeunit "NPR POS Sale Line"; FixedInventorySetCode: Code[20])
     var
-        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
+        TempRetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
         RetailInventorySet: Record "NPR RIS Retail Inv. Set";
         SaleLinePOS: Record "NPR POS Sale Line";
         RetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
@@ -15,8 +15,8 @@ codeunit 6150622 "NPR POS Action - Retail Inv. B"
         if not SelectRetailInventorySetCode(FixedInventorySetCode, RetailInventorySet) then
             exit;
 
-        RetailInventorySetMgt.ProcessInventorySet(RetailInventorySet, SaleLinePOS."No.", SaleLinePOS."Variant Code", RetailInventoryBuffer);
-        PAGE.RunModal(0, RetailInventoryBuffer);
+        RetailInventorySetMgt.ProcessInventorySet(RetailInventorySet, SaleLinePOS."No.", SaleLinePOS."Variant Code", TempRetailInventoryBuffer);
+        PAGE.RunModal(0, TempRetailInventoryBuffer);
     end;
 
     local procedure SelectRetailInventorySetCode(FixedInventorySetCode: Code[20]; var RetailInventorySet: Record "NPR RIS Retail Inv. Set") EntrySetSelected: Boolean

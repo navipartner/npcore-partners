@@ -82,13 +82,13 @@ page 6248219 "NPR Job Queue Runner Users"
 
                 trigger OnAction()
                 var
-                    SelectedJQRunnerUser: Record "NPR Job Queue Runner User";
+                    TempSelectedJQRunnerUser: Record "NPR Job Queue Runner User" temporary;
                     ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
                     ResultMessage: Text;
                 begin
-                    SelectedJQRunnerUser.Copy(Rec, true);
-                    CurrPage.SetSelectionFilter(SelectedJQRunnerUser);
-                    ResultMessage := ExternalJQRefresherMgt.ResetJQRunnerUserFailedAttempts(SelectedJQRunnerUser);
+                    TempSelectedJQRunnerUser.Copy(Rec, true);
+                    CurrPage.SetSelectionFilter(TempSelectedJQRunnerUser);
+                    ResultMessage := ExternalJQRefresherMgt.ResetJQRunnerUserFailedAttempts(TempSelectedJQRunnerUser);
                     CurrPage.Update(false);
                     if ResultMessage <> '' then
                         Message(ResultMessage);

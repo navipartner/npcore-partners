@@ -337,7 +337,9 @@
         end;
 
         if MagentoWebsite.Get(NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'website_code', MaxStrLen(MagentoWebsite.Code), true)) then begin
+#pragma warning disable AA0139
             SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
+#pragma warning restore AA0139
             if (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
                 SalesHeader.SetHideValidationDialog(true);
                 SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");

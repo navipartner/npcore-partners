@@ -249,21 +249,21 @@ codeunit 6150743 "NPR MMMembershipRestApi"
 
     local procedure SetRequestHeadersAuthorization(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var RequestHeaders: HttpHeaders)
     var
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        TempAuthParamsBuff: Record "NPR Auth. Param. Buffer" temporary;
         iAuth: Interface "NPR API IAuthorization";
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         iAuth := NPRRemoteEndpointSetup.AuthType;
         case NPRRemoteEndpointSetup.AuthType of
             NPRRemoteEndpointSetup.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password Key", AuthParamsBuff);
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password Key", TempAuthParamsBuff);
             NPRRemoteEndpointSetup.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(NPRRemoteEndpointSetup."OAuth2 Setup Code", AuthParamsBuff);
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(NPRRemoteEndpointSetup."OAuth2 Setup Code", TempAuthParamsBuff);
             NPRRemoteEndpointSetup.AuthType::"NP API Key":
-                WebServiceAuthHelper.GetNPApiKeyAuthorizationParamsBuff(NPRRemoteEndpointSetup."NP API Key Setup Code", AuthParamsBuff);
+                WebServiceAuthHelper.GetNPApiKeyAuthorizationParamsBuff(NPRRemoteEndpointSetup."NP API Key Setup Code", TempAuthParamsBuff);
         end;
-        iAuth.CheckMandatoryValues(AuthParamsBuff);
-        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
+        iAuth.CheckMandatoryValues(TempAuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, TempAuthParamsBuff);
     end;
 
     local procedure IsCraneUrl(RestApiEndpointURI: Text[200]): Boolean

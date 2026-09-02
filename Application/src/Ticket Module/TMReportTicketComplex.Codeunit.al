@@ -5,7 +5,7 @@
 
     trigger OnRun()
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         Ticket: Record "NPR TM Ticket";
         TicketType: Record "NPR TM Ticket Type";
     begin
@@ -22,7 +22,7 @@
 
             until Ticket.Next() = 0;
 
-        Printer.ProcessBuffer(Codeunit::"NPR TM Report - Ticket", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR TM Report - Ticket", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     var

@@ -62,7 +62,9 @@ page 6185087 "NPR Spfy Store-Item Cat. Links"
     end;
 
     var
+#pragma warning disable AA0073
         SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+#pragma warning restore AA0073
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 }
 #endif

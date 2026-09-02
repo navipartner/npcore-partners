@@ -12,7 +12,9 @@ codeunit 6059968 "NPR POS Action Transfer Order"
         TransferHeader.Validate("Transfer-from Code", POSStore."Location Code");
         if Location.Get(CopyStr(TransferToCodeString, 1, MaxStrLen(Location.Code))) then
             if not Location."Use As In-Transit" and (TransferHeader."Transfer-from Code" <> Location.Code) then
+#pragma warning disable AA0139
                 TransferHeader.Validate("Transfer-to Code", TransferToCodeString);
+#pragma warning restore AA0139
         TransferHeader.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");
         TransferHeader.Modify();
 

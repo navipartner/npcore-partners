@@ -178,7 +178,9 @@ codeunit 6150987 "NPR Entria Integration Mgt."
 
         InputDialog.InputText(1, NewUrl);
         if NewUrl <> Rec."Entria Url" then
+#pragma warning disable AA0139
             Rec.Validate("Entria Url", NewUrl);
+#pragma warning restore AA0139
 
         InputDialog.InputText(2, NewKey);
         if NewKey = '' then begin

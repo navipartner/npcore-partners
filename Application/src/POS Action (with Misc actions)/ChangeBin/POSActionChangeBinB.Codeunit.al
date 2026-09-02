@@ -5,7 +5,7 @@ codeunit 6150621 "NPR POS Action: Change Bin-B"
     procedure ChangeBin(SaleLine: codeunit "NPR POS Sale Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        WhseItemTrackingSetup: Record "Item Tracking Setup";
+        TempWhseItemTrackingSetup: Record "Item Tracking Setup" temporary;
         WMSMgt: Codeunit "WMS Management";
         NewBinCode: Code[20];
         NonInvItemError: Label 'Bin Code cannot be selected for a non-inventoriable item.';
@@ -15,8 +15,8 @@ codeunit 6150621 "NPR POS Action: Change Bin-B"
         if not SaleLinePOS.IsInventoriableItem() then
             Error(NonInvItemError);
 
-        WhseItemTrackingSetup."Serial No." := SaleLinePOS."Serial No.";
-        NewBinCode := WMSMgt.BinContentLookUp(SaleLinePOS."Location Code", SaleLinePOS."No.", SaleLinePOS."Variant Code", '', WhseItemTrackingSetup, SaleLinePOS."Bin Code");
+        TempWhseItemTrackingSetup."Serial No." := SaleLinePOS."Serial No.";
+        NewBinCode := WMSMgt.BinContentLookUp(SaleLinePOS."Location Code", SaleLinePOS."No.", SaleLinePOS."Variant Code", '', TempWhseItemTrackingSetup, SaleLinePOS."Bin Code");
         if NewBinCode = '' then
             exit;
 

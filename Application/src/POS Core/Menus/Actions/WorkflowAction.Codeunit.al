@@ -106,7 +106,9 @@
     [TryFunction]
     local procedure IsCorrectParameterValueType(Parameter: Record "NPR POS Action Parameter"; Value: Text)
     begin
+#pragma warning disable AA0139
         Parameter.Validate("Default Value", Value);
+#pragma warning restore AA0139
         if (Parameter."Data Type" = Parameter."Data Type"::Option) and (Value = '-1') then
             Parameter.FieldError("Default Value");
     end;

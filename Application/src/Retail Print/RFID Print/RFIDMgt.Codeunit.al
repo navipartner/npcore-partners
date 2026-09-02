@@ -68,10 +68,12 @@
         ItemReference: Record "Item Reference";
     begin
         ItemReference.Init();
+#pragma warning disable AA0139
         ItemReference.Validate("Item No.", ItemNo);
         ItemReference.Validate("Variant Code", VariantCode);
         ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
         ItemReference.Validate("Reference No.", TagValue);
+#pragma warning restore AA0139
         ItemReference.Insert(true);
     end;
 

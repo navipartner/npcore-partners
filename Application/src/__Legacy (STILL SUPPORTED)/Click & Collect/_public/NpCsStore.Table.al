@@ -375,20 +375,20 @@ table 6151195 "NPR NpCs Store"
 
     procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
     var
-        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        TempAuthParamsBuff: Record "NPR Auth. Param. Buffer" temporary;
         iAuth: Interface "NPR API IAuthorization";
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         iAuth := Rec.AuthType;
         case Rec.AuthType of
             Rec.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec."Service Username", Rec."API Password Key", AuthParamsBuff);
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec."Service Username", Rec."API Password Key", TempAuthParamsBuff);
             Rec.AuthType::OAuth2:
-                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", TempAuthParamsBuff);
             Rec.AuthType::"NP API Key":
-                WebServiceAuthHelper.GetNPApiKeyAuthorizationParamsBuff(Rec."NP API Key Setup Code", AuthParamsBuff);
+                WebServiceAuthHelper.GetNPApiKeyAuthorizationParamsBuff(Rec."NP API Key Setup Code", TempAuthParamsBuff);
         end;
-        iAuth.CheckMandatoryValues(AuthParamsBuff);
-        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
+        iAuth.CheckMandatoryValues(TempAuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, TempAuthParamsBuff);
     end;
 }

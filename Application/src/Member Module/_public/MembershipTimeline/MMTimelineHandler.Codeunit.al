@@ -4,7 +4,7 @@ codeunit 6151092 "NPR MMTimelineHandler"
     internal procedure GetTimelineEvents(MembershipEntryNo: Integer; var TimelineEvents: Record "NPR MMTimelineEventBuffer")
     var
         EventTypeInterface: Interface "NPR MMTimelineTypeInterface";
-        TimelineEvent: Record "NPR MMTimelineEventBuffer";
+        TempTimelineEvent: Record "NPR MMTimelineEventBuffer" temporary;
         TimeLineEventType: Enum "NPR MMTimelineEventType";
         EventTypes: List of [Integer];
         EventType: Integer;
@@ -30,25 +30,25 @@ codeunit 6151092 "NPR MMTimelineHandler"
 
             EventTypeInterface := TimeLineEventType; // interface implemented by enum value
 
-            TimelineEvent.Reset();
-            TimelineEvent.DeleteAll();
-            Clear(TimelineEvent);
+            TempTimelineEvent.Reset();
+            TempTimelineEvent.DeleteAll();
+            Clear(TempTimelineEvent);
 
             InsertEvents := false;
-            TimelineEvent.EventType := TimeLineEventType;
-            EventTypeInterface.CollectEvents(MembershipEntryNo, TimelineEvent, InsertEvents);
+            TempTimelineEvent.EventType := TimeLineEventType;
+            EventTypeInterface.CollectEvents(MembershipEntryNo, TempTimelineEvent, InsertEvents);
 
             if (InsertEvents) then begin
-                TimelineEvent.Reset();
-                TimelineEvent.SetFilter(EventType, '=%1', TimeLineEventType);
-                if (TimelineEvent.FindSet()) then begin
+                TempTimelineEvent.Reset();
+                TempTimelineEvent.SetFilter(EventType, '=%1', TimeLineEventType);
+                if (TempTimelineEvent.FindSet()) then begin
                     repeat
                         EventCounter := EventCounter + 1;
-                        TimelineEvents.TransferFields(TimelineEvent, false);
+                        TimelineEvents.TransferFields(TempTimelineEvent, false);
                         TimelineEvents.EntryNo := EventCounter;
-                        TimelineEvents.SystemId := TimelineEvent.SystemId;
+                        TimelineEvents.SystemId := TempTimelineEvent.SystemId;
                         TimelineEvents.Insert();
-                    until TimelineEvent.Next() = 0;
+                    until TempTimelineEvent.Next() = 0;
                 end;
             end;
         end;
@@ -59,11 +59,11 @@ codeunit 6151092 "NPR MMTimelineHandler"
             repeat
                 EventTypeInterface := TimelineEvents.EventType;
 
-                TimelineEvent.TransferFields(TimelineEvents, true);
-                EventTypeInterface.DescribeEvent(TimelineEvent);
+                TempTimelineEvent.TransferFields(TimelineEvents, true);
+                EventTypeInterface.DescribeEvent(TempTimelineEvent);
 
-                TimelineEvents.Title := TimelineEvent.Title;
-                TimelineEvents.Details := TimelineEvent.Details;
+                TimelineEvents.Title := TempTimelineEvent.Title;
+                TimelineEvents.Details := TempTimelineEvent.Details;
                 if (not TimelineEvents.Modify()) then;
 
             until (TimelineEvents.Next() = 0);

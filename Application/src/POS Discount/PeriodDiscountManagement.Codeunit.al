@@ -487,7 +487,9 @@
         PeriodDiscountLine.Validate(Code, PeriodDiscountCode);
         PeriodDiscountLine.Validate("Item No.", ItemNo);
         if VariantCode <> '' then
+#pragma warning disable AA0139
             PeriodDiscountLine.Validate("Variant Code", VariantCode);
+#pragma warning restore AA0139
 
         PeriodDiscountLine.TestField(Code);
         PeriodDiscountLine.TestField("Item No.");

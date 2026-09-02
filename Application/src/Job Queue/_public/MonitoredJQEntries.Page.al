@@ -270,7 +270,9 @@ page 6185041 "NPR Monitored JQ Entries"
     end;
 
     var
+#pragma warning disable AA0073
         _JQRunnerUser: Record "NPR Job Queue Runner User";
+#pragma warning restore AA0073
         _ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
         _MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
         _StyleExprTxt: Text[50];

@@ -26,15 +26,15 @@ table 6151118 "NPR NPEmailTemplate"
             trigger OnValidate()
             var
                 EmailScenarioHndlr: Codeunit "Email Scenario";
-                EmailAccount: Record "Email Account";
+                TempEmailAccount: Record "Email Account" temporary;
                 EmailAccountNotSupportedErr: Label 'The e-mail account assigned to the selected scenario, or the default e-mail account if scenario is not mapped to an account, must of type "%1". The current type is "%2"', Comment = '%1, %2 = email connector type';
             begin
-                if (not EmailScenarioHndlr.GetEmailAccount(Rec.EmailScenario, EmailAccount)) then
-                    if (not EmailScenarioHndlr.GetDefaultEmailAccount(EmailAccount)) then
+                if (not EmailScenarioHndlr.GetEmailAccount(Rec.EmailScenario, TempEmailAccount)) then
+                    if (not EmailScenarioHndlr.GetDefaultEmailAccount(TempEmailAccount)) then
                         exit;
 
-                if (EmailAccount.Connector <> "Email Connector"::"NPR NP Email Web SMTP") then
-                    Error(EmailAccountNotSupportedErr, "Email Connector"::"NPR NP Email Web SMTP", EmailACcount.Connector);
+                if (TempEmailAccount.Connector <> "Email Connector"::"NPR NP Email Web SMTP") then
+                    Error(EmailAccountNotSupportedErr, "Email Connector"::"NPR NP Email Web SMTP", TempEmailAccount.Connector);
             end;
         }
         field(3; LayoutId; Text[50])

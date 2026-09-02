@@ -337,7 +337,9 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
 
         PurchaseHeader.Validate("Buy-from Vendor No.", VendorNo);
         if LocationCode <> '' then
+#pragma warning disable AA0139
             PurchaseHeader.Validate("Location Code", LocationCode);
+#pragma warning restore AA0139
         PurchaseHeader.Modify();
     end;
 
