@@ -25,7 +25,7 @@ The values of these are described as follows:
 | Card Name | Text\[24\] | Name of the type of card e.g. VISA Electron | M | M | O |
 | Card Number | Text\[30\] | the card PAN | O | O | O |
 | Card Issuer ID | Text\[30\] | NETS specific ID | M/O | M/O |  |
-| Card Application ID | Text\[30\] | A standardized code scheme identifying provider and card type. | M | M | O |
+| Card Application ID | Text\[32\] | A standardized code scheme identifying provider and card type. An EMV AID is up to 16 bytes = 32 hex characters, so assign the value directly rather than truncating it. | M | M | O |
 | Track Presence Input | Option | ??? | O | O | O |
 | Card Information Input | Text\[40\] | ??? | O | O | O |
 | Card Expiry Date | Text\[4\] | Expiry Date | O | O | O |

@@ -173,7 +173,7 @@ codeunit 6150940 "NPR EFT Planet PAX Response"
         CustomerReceipt: Text;
         Out: OutStream;
     begin
-        EftReq."Card Application ID" := CopyStr(Util.GetXmlNodeTxtValueOrDefault(Xml, '/Response/EmvApplicationId', ''), 1, 30);
+        EftReq."Card Application ID" := CopyStr(Util.GetXmlNodeTxtValueOrDefault(Xml, '/Response/EmvApplicationId', ''), 1, MaxStrLen(EftReq."Card Application ID"));
         EftReq."Card Name" := CopyStr(Util.GetXmlNodeTxtValueOrDefault(Xml, '/Response/CardSchemeName', ''), 1, 24);
         EftReq."Card Number" := CopyStr(Util.GetXmlNodeTxtValueOrDefault(Xml, '/Response/CardNumber', ''), 1, 30);
         EftReq."External Transaction ID" := CopyStr(Util.GetXmlNodeTxtValueOrDefault(Xml, '/Response/TransRefNum', ''), 1, 50);

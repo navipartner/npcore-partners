@@ -1257,7 +1257,7 @@
             Caption = 'Card Number';
             DataClassification = CustomerContent;
         }
-        field(507; "EFT Card Application ID"; Text[30])
+        field(507; "EFT Card Application ID"; Text[32])
         {
             Caption = 'Card Application Id';
             DataClassification = CustomerContent;

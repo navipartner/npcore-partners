@@ -131,7 +131,7 @@
             Caption = 'Card Issuer ID';
             DataClassification = CustomerContent;
         }
-        field(132; "Card Application ID"; Text[30])
+        field(132; "Card Application ID"; Text[32])
         {
             Caption = 'Card Application ID';
             DataClassification = CustomerContent;
