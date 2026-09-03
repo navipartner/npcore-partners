@@ -486,24 +486,49 @@ codeunit 6185051 "NPR API Request"
     /// </summary>
     procedure SkipCacheIfNonStickyRequest(TableIds: List of [Integer])
     var
-        RequestServerId: Integer;
         Sentry: Codeunit "NPR Sentry";
+        CacheHit: Boolean;
+        ActualServerId: Integer;
+        RequestServerId: Integer;
+        AuthMode: Text;
+        HeaderState: Text;
+        HeaderValue: Text;
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23 and not BC24
         TableId: Integer;
 #endif
     begin
-        if (_Headers.ContainsKey('x-server-cache-id')) then begin
-            Evaluate(RequestServerId, _Headers.Get('x-server-cache-id'));
-            if (RequestServerId = ServiceInstanceId()) then
-                exit;
+        ActualServerId := ServiceInstanceId();
+
+        HeaderState := 'absent';
+        RequestServerId := -1; // Existing Sentry filters rely on -1 meaning absent or invalid.
+        if _Headers.Get('x-server-cache-id', HeaderValue) then begin
+            HeaderState := 'invalid';
+            if HeaderValue <> '' then
+                if Evaluate(RequestServerId, HeaderValue) then
+                    if RequestServerId > 0 then begin
+                        if RequestServerId = ActualServerId then begin
+                            HeaderState := 'match';
+                            CacheHit := true;
+                        end else
+                            HeaderState := 'mismatch';
+                    end else
+                        RequestServerId := -1;
         end;
 
-        If RequestServerId = 0 then
-            RequestServerId := -1;
+        // Telemetry hint only: NP API-key auth overwrites x-np-app-id;
+        // native requests may retain a client-supplied value.
+        AuthMode := 'native';
+        if _Headers.ContainsKey('x-np-app-id') then
+            AuthMode := 'np-api-key';
 
+        Sentry.AddTransactionTag('bc.cache.authMode', AuthMode);
+        Sentry.AddTransactionTag('bc.cache.headerState', HeaderState);
+        Sentry.AddTransactionTag('bc.cache.actualServerId', Format(ActualServerId));
         Sentry.AddTransactionTag('bc.cache.headerServerId', Format(RequestServerId));
-        Sentry.AddTransactionTag('bc.cache.actualServerId', Format(ServiceInstanceId()));
-        Sentry.AddTransactionTag('bc.cache.miss', 'true');
+        Sentry.AddTransactionTag('bc.cache.miss', Format((not CacheHit), 0, 9));
+
+        if CacheHit then
+            exit;
 
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23 and not BC24
         foreach TableId in TableIds do begin
