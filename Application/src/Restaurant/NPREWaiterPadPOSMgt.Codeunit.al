@@ -283,9 +283,18 @@
 
     local procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var LineRelation: Record "Line Number Buffer")
     var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
+        HasItemAddOnLink: Boolean;
         NewLine: Boolean;
+        AttachToLineNo: Integer;
     begin
+        // The main line of an item add-on line is resolved once, up front: a new line has to be positioned
+        // relative to it before it is inserted, and the add-on link has to be stored on it afterwards.
+        HasItemAddOnLink := FindItemAddOnPOSLink(SaleLinePOS, SaleLinePOSAddOn);
+        if HasItemAddOnLink then
+            AttachToLineNo := AttachToWaiterPadLineNo(SaleLinePOSAddOn, LineRelation);
+
         WaiterPadLine2.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine2.SetRange("Sale Line Retail ID", SaleLinePOS.SystemID);
         NewLine := not WaiterPadLine2.FindFirst() or IsNullGuid(SaleLinePOS.SystemID);
@@ -312,6 +321,7 @@
             WaiterPadLine."Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
             WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
             WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
+            WaiterPadLine."Line No." := NewWaiterPadLineNo(WaiterPad."No.", AttachToLineNo);
             WaiterPadLine.Insert(true);
 
             WaiterPadMgt.AssignWPadLinePrintCategories(WaiterPadLine, true);
@@ -333,7 +343,8 @@
         WaiterPadLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
         WaiterPadLine."Order No. from Web" := SaleLinePOS."Order No. from Web";
         WaiterPadLine."Order Line No. from Web" := SaleLinePOS."Order Line No. from Web";
-        CopyItemAddOnLinkInfoToWPLine(WaiterPadLine, SaleLinePOS, LineRelation);
+        if HasItemAddOnLink then
+            CopyItemAddOnLinkInfoToWPLine(WaiterPadLine, SaleLinePOSAddOn, AttachToLineNo);
         WaiterPadLine.Modify();
 
         WaiterPadLine.Mark := NewLine or (WaiterPadLine."Quantity (Base)" <> WaiterPadLine2."Quantity (Base)");
@@ -882,23 +893,66 @@
         if POSEntryWaiterPadLink.Insert() then;
     end;
 
-    local procedure CopyItemAddOnLinkInfoToWPLine(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; SaleLinePOS: Record "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")
-    var
-        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    local procedure CopyItemAddOnLinkInfoToWPLine(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn"; AttachToLineNo: Integer)
     begin
-        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
-        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
-        if not SaleLinePOSAddOn.FindFirst() then
-            exit;
-        LineRelation.Get(SaleLinePOSAddOn."Applies-to Line No.");
-        WaiterPadLine."Attached to Line No." := LineRelation."New Line Number";
+        WaiterPadLine."Attached to Line No." := AttachToLineNo;
         WaiterPadLine."AddOn No." := SaleLinePOSAddOn."AddOn No.";
         WaiterPadLine."AddOn Line No." := SaleLinePOSAddOn."AddOn Line No.";
         WaiterPadLine."Fixed Quantity" := SaleLinePOSAddOn."Fixed Quantity";
         WaiterPadLine."Per Unit" := SaleLinePOSAddOn."Per Unit";
         WaiterPadLine.Mandatory := SaleLinePOSAddOn.Mandatory;
         WaiterPadLine."Copy Serial No." := SaleLinePOSAddOn."Copy Serial No.";
+    end;
+
+    local procedure FindItemAddOnPOSLink(SaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn"): Boolean
+    var
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
+        exit(SaleLinePOSAddOn.FindFirst());
+    end;
+
+    local procedure AttachToWaiterPadLineNo(SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn"; var LineRelation: Record "Line Number Buffer"): Integer
+    var
+        NoLineRelationErr: Label 'No waiter pad line relation registered for POS sale line no. %1, which item add-on line no. %2 applies to. The main line of an add-on line always precedes it, so its relation must already exist at this point. This is a programming bug.', Locked = true, Comment = 'Raised if the POS sale lines are ever processed in an order where an item add-on line is moved to the waiter pad before its main line.';
+    begin
+        if not LineRelation.Get(SaleLinePOSAddOn."Applies-to Line No.") then
+            Error(NoLineRelationErr, SaleLinePOSAddOn."Applies-to Line No.", SaleLinePOSAddOn."Sale Line No.");
+        exit(LineRelation."New Line Number");
+    end;
+
+    local procedure NewWaiterPadLineNo(WaiterPadNo: Code[20]; AttachToLineNo: Integer): Integer
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        Sentry: Codeunit "NPR Sentry";
+        NewLineNo: Integer;
+        PrecedingLineNo: Integer;
+        GapExhaustedTxt: Label 'Waiter pad %1: no free line number left between %2 and %3, so an item add-on line of main line %4 had to be appended at the end of the waiter pad. It will be shown below the wrong main line, and the misplacement is permanent.', Locked = true, Comment = 'Logged to Sentry, not shown to the user. Reached only after the 10000 gap between two waiter pad lines has been subdivided about thirteen times.';
+    begin
+        if AttachToLineNo = 0 then
+            exit(0);
+
+        PrecedingLineNo := AttachToLineNo;
+        WaiterPadLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        WaiterPadLine.SetRange("Attached to Line No.", AttachToLineNo);
+        if WaiterPadLine.FindLast() then
+            if WaiterPadLine."Line No." > PrecedingLineNo then
+                PrecedingLineNo := WaiterPadLine."Line No.";
+
+        WaiterPadLine.Reset();
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        WaiterPadLine.SetFilter("Line No.", '>%1', PrecedingLineNo);
+        if not WaiterPadLine.FindFirst() then
+            exit(0);
+
+        NewLineNo := PrecedingLineNo + (WaiterPadLine."Line No." - PrecedingLineNo) div 2;
+        if NewLineNo <= PrecedingLineNo then begin
+            Sentry.AddError(StrSubstNo(GapExhaustedTxt, WaiterPadNo, PrecedingLineNo, WaiterPadLine."Line No.", AttachToLineNo));
+            exit(0);
+        end;
+        exit(NewLineNo);
     end;
 
     local procedure CopyItemAddOnLinkInfoFromWPLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; SaleLinePOS: Record "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")

@@ -520,16 +520,20 @@
 
     trigger OnInsert()
     var
-        BongLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        BongLine.Reset();
-        BongLine.SetRange("Waiter Pad No.", Rec."Waiter Pad No.");
-        if BongLine.IsEmpty then begin
+        // A preset "Line No." is honoured, so that callers can place a line at a specific position among its
+        // siblings. Waiter pad lines express the item add-on hierarchy through their order, so an add-on line
+        // has to be inserted directly below its main item rather than appended at the end of the waiter pad.
+        if "Line No." <> 0 then
+            exit;
+
+        WaiterPadLine.Reset();
+        WaiterPadLine.SetRange("Waiter Pad No.", Rec."Waiter Pad No.");
+        if WaiterPadLine.FindLast() then
+            "Line No." := WaiterPadLine."Line No." + 10000
+        else
             "Line No." := 10000;
-        end else begin
-            BongLine.FindLast();
-            "Line No." := BongLine."Line No." + 10000;
-        end;
     end;
 
     trigger OnRename()
