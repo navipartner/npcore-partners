@@ -613,6 +613,7 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
 
         _IsInitialized := true;
     end;
+
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure Test_CreateMembership_Qty1_BackCompat()
@@ -1637,6 +1638,390 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         EcomSalesLine."Membership Operation" := EcomSalesLine."Membership Operation"::ConfirmMembership;
         EcomSalesLine.Captured := true;
         EcomSalesLine.Insert(true);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure Test_ExtendMembership_RevalidatesCleanlyAfterProcessing()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] Validation used to be re-run unconditionally by ValidateDocBySource on every sales-document
+        // creation and capture attempt. Because the restriction rules compare the requested period against the
+        // membership's LAST entry, and a completed extend makes that entry the one it just created, the line
+        // was rejected forever with "period conflicts with the existing one" while already marked Processed.
+        // Validation must therefore stand down once the alteration has been recorded.
+        Initialize();
+
+        // [GIVEN] A membership and the extend alteration option set up for it
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::EXTEND);
+        if not AlterationSetup.FindFirst() then
+            Error('Extend alteration setup for T-ECOM not found — check Initialize().');
+
+        // [GIVEN] A captured ecom line asking to extend that membership
+        // The document date is pinned, as the sibling alteration tests do: the resolved date drives both the
+        // alteration's own start date and the one re-validation recomputes, and leaving it floating would let
+        // a run that straddles midnight compute two different dates and mask the defect.
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader.Modify();
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::ExtendMembership, 1, 100);
+        Commit();
+
+        // [WHEN] The alteration is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+
+        // [THEN] It is recorded as done
+        EcomSalesMembershipLink.SetCurrentKey("Source Line System Id", "Entry No.");
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.AreEqual(1, EcomSalesMembershipLink.Count(), 'The processed extend must have recorded exactly one membership link row.');
+
+        // [THEN] Re-validating the document does not reject the line. Any error raised here fails the test;
+        // before the fix this threw the conflicting-period error raised against the extend's own new entry.
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure Test_RenewMembership_RevalidatesCleanlyAfterProcessing()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ValidUntilBefore: Date;
+        ValidUntilAfter: Date;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] Renew: Re-validation compares the entry active today (the old one) against the new future entry and raises "stacking not allowed".
+        Initialize();
+
+        // [GIVEN] A membership and the non-stackable renew option set up for it
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::RENEW);
+        if not AlterationSetup.FindFirst() then
+            Error('Renew alteration setup for T-ECOM not found — check Initialize().');
+
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader.Modify();
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::RenewMembership, 1, 100);
+        ValidUntilBefore := LastMembershipEntryValidUntil(Membership);
+        Commit();
+
+        // [WHEN] The alteration is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+
+        // [THEN] The renew really happened - without this the test would still pass if Process silently
+        // became a no-op, since re-validation of an unaltered membership succeeds anyway
+        ValidUntilAfter := LastMembershipEntryValidUntil(Membership);
+        _Assert.IsTrue(ValidUntilAfter > ValidUntilBefore, 'Membership Valid Until must advance after Renew.');
+
+        // [THEN] Re-validating the document does not reject the line
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure Test_UpgradeMembership_RevalidatesCleanlyAfterProcessing()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] The upgrade rewrites the membership's own Membership Code to the To-code, so on the second pass the alteration
+        // setup no longer matches the membership and validation dies on the setup-mismatch check, long before
+        // any date rule is reached.
+        Initialize();
+
+        // [GIVEN] A membership and the upgrade option that moves it to a different membership code
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::UPGRADE);
+        if not AlterationSetup.FindFirst() then
+            Error('Upgrade alteration setup for T-ECOM not found — check Initialize().');
+        _Assert.AreNotEqual(AlterationSetup."From Membership Code", AlterationSetup."To Membership Code", 'Precondition: the upgrade must change the membership code, or this test proves nothing.');
+
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader.Modify();
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::UpgradeMembership, 1, 100);
+        Commit();
+
+        // [WHEN] The alteration is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+
+        // [THEN] The upgrade really happened - and this is the very state that breaks re-validation, since the
+        // setup's "From Membership Code" no longer matches the membership
+        Membership.Get(Membership."Entry No.");
+        _Assert.AreEqual(AlterationSetup."To Membership Code", Membership."Membership Code", 'The upgrade must have moved the membership to the To Membership Code.');
+
+        // [THEN] Re-validating the document does not reject the line
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure Test_ExtendMembership_DocumentValidatesAfterProcessing()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] An ecommerce document containing an already processed membership alteration can be validated successfully before sales order creation.
+        Initialize();
+
+        // [GIVEN] A membership and the extend option set up for it
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::EXTEND);
+        if not AlterationSetup.FindFirst() then
+            Error('Extend alteration setup for T-ECOM not found — check Initialize().');
+
+        // [GIVEN] A document that carries a store code, so ValidateDocBySource does not exit at its own gate
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Ecommerce Store Code" := 'TEST-STORE';
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader.Modify();
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::ExtendMembership, 1, 100);
+
+        // [GIVEN] A matching payment line. ValidateDocBySource validates the whole order, and a non-zero
+        // document with no payment lines is rejected by the payment check that runs after the line checks,
+        // so the fixture needs one for the call to complete.
+        CreateCapturedPaymentLine(EcomSalesHeader, 100);
+        Commit();
+
+        // [WHEN] The alteration is provisioned
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+
+        // [THEN] The document validates. Before the fix this raised the conflicting-period error against the
+        // extend's own new entry, and kept raising it on every creation and capture attempt.
+        EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Test_AlterationMarker_LinkForDifferentMembership_IsRejected()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipTargeted: Record "NPR MM Membership";
+        MembershipOther: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] A processed-alteration marker is rejected when it points to 
+        //a different membership than the one targeted by the ecommerce line.
+        Initialize();
+
+        // [GIVEN] Two memberships and an extend option
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        MembershipTargeted.Get(MembershipEntryNo);
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        MembershipOther.Get(MembershipEntryNo);
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::EXTEND);
+        if not AlterationSetup.FindFirst() then
+            Error('Extend alteration setup for T-ECOM not found — check Initialize().');
+
+        // [GIVEN] A line targeting the first membership, but a link row recorded against the second
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", MembershipTargeted, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::ExtendMembership, 1, 100);
+        InsertMembershipLinkRow(EcomSalesHeader, EcomSalesLine, MembershipOther);
+
+        // [WHEN] The document is validated
+        // [THEN] The mismatch is reported rather than treated as completed work
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        _Assert.ExpectedError('points at a different membership');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Test_AlterationMarker_MultipleLinkRows_AreRejected()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] An alteration line may produce at most one link row. More than one means the marker has
+        // been corrupted, and validation must say so instead of short-circuiting on the first row it finds.
+        Initialize();
+
+        // [GIVEN] A membership and an extend option
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::EXTEND);
+        if not AlterationSetup.FindFirst() then
+            Error('Extend alteration setup for T-ECOM not found — check Initialize().');
+
+        // [GIVEN] A line carrying two link rows for the same membership
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::ExtendMembership, 1, 100);
+        InsertMembershipLinkRow(EcomSalesHeader, EcomSalesLine, Membership);
+        InsertMembershipLinkRow(EcomSalesHeader, EcomSalesLine, Membership);
+
+        // Deliberately NOT committed: two link rows for one membership is a state AssertDistinctMembershipIds
+        // forbids table-wide, so letting the asserterror roll them back keeps them out of later tests.
+
+        // [WHEN] The document is validated
+        // [THEN] The corruption is reported
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        _Assert.ExpectedError('link row(s) exist');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Test_AlterationMarker_DoesNotMaskQuantityViolation()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] An existing processed-alteration marker does not bypass validation of an invalid alteration quantity.
+        Initialize();
+
+        // [GIVEN] A membership and an extend option
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::EXTEND);
+        if not AlterationSetup.FindFirst() then
+            Error('Extend alteration setup for T-ECOM not found — check Initialize().');
+
+        // [GIVEN] An alteration line with quantity 2 that already carries a valid link row
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::ExtendMembership, 2, 100);
+        InsertMembershipLinkRow(EcomSalesHeader, EcomSalesLine, Membership);
+
+        // [WHEN] The document is validated
+        // [THEN] The quantity violation still wins over the marker
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        _Assert.ExpectedError('quantity must be 1');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Test_AlterationRequest_StillValidatedWhenNotYetApplied()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] Membership alteration validation is still performed 
+        //when the alteration has not yet been processed.
+        Initialize();
+
+        // [GIVEN] A blocked membership and an extend option, and NO link row - the alteration has not run
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+        Membership.Blocked := true;
+        Membership.Modify();
+
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::EXTEND);
+        if not AlterationSetup.FindFirst() then
+            Error('Extend alteration setup for T-ECOM not found — check Initialize().');
+
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::ExtendMembership, 1, 100);
+        Commit();
+
+        // [WHEN] The document is validated
+        // [THEN] The precondition still bites
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        _Assert.ExpectedError('is blocked');
+    end;
+
+    local procedure CreateCapturedPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PaymentAmount: Decimal)
+    var
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+    begin
+        EcomSalesPmtLine.Init();
+        EcomSalesPmtLine."Document Entry No." := EcomSalesHeader."Entry No.";
+        EcomSalesPmtLine."Line No." := 10000;
+        EcomSalesPmtLine."Payment Method Type" := EcomSalesPmtLine."Payment Method Type"::"Payment Method";
+        EcomSalesPmtLine.Amount := PaymentAmount;
+        // Captured Amount deliberately equals Amount: ValidateImportedPaymentLines only validates a line whose
+        // captured amount differs, so this keeps the fixture out of payment-method setup the test is not about.
+        EcomSalesPmtLine."Captured Amount" := PaymentAmount;
+        EcomSalesPmtLine.Insert(true);
+    end;
+
+    local procedure InsertMembershipLinkRow(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; Membership: Record "NPR MM Membership")
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+    begin
+        EcomSalesMembershipLink.Init();
+        EcomSalesMembershipLink."Source System Id" := EcomSalesHeader.SystemId;
+        EcomSalesMembershipLink."Source Line System Id" := EcomSalesLine.SystemId;
+        EcomSalesMembershipLink."Membership System Id" := Membership.SystemId;
+        EcomSalesMembershipLink.Insert();
+    end;
+
+    local procedure LastMembershipEntryValidUntil(Membership: Record "NPR MM Membership"): Date
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        _Assert.IsTrue(MembershipEntry.FindLast(), 'Membership must have at least one non-blocked, non-REGRET entry.');
+        exit(MembershipEntry."Valid Until Date");
     end;
 
     local procedure CreateCapturedAlterationMembershipLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20]; Membership: Record "NPR MM Membership"; AlterationOptionSystemId: Guid; MembershipOperation: Enum "NPR ECom Membership Operation"; Qty: Decimal; UnitPrice: Decimal)

@@ -324,39 +324,48 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     internal procedure ProcessMembershipAlteration(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header") DidAlterThisRound: Boolean
     var
-        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
         Membership: Record "NPR MM Membership";
-        ExistingLinkCount: Integer;
+        MembershipNotFoundErr: Label 'Membership with Id %1 not found.', Locked = true;
         QuantityErr: Label 'Membership alteration line quantity must be 1.';
-        AlterationCorruptionErr: Label 'Internal data inconsistency on membership alteration line %1: %2 link row(s) exist for membership %3 but exactly 0 or 1 was expected. Contact support to investigate. This is a programming bug.', Locked = true;
-        AlterationMembershipMismatchErr: Label 'Internal data inconsistency on membership alteration line %1: existing link row points at a different membership than the line''s targeted Membership Id. Contact support to investigate. This is a programming bug.', Locked = true;
     begin
         if EcomSalesLine.Quantity <> 1 then
             Error(QuantityErr);
 
+        if AlterationAlreadyApplied(EcomSalesLine) then
+            exit(false);
+
+        ReshapeMembershipDuration(EcomSalesLine, EcomSalesHeader);
+
+        if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
+            Error(MembershipNotFoundErr, EcomSalesLine."Membership Id");
+        InsertMembershipLink(EcomSalesHeader, EcomSalesLine, Membership);
+        DidAlterThisRound := true;
+    end;
+
+    local procedure AlterationAlreadyApplied(EcomSalesLine: Record "NPR Ecom Sales Line"): Boolean
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        ExistingLinkCount: Integer;
+        AlterationCorruptionErr: Label 'Internal data inconsistency on membership alteration line %1: %2 link row(s) exist for membership %3 but exactly 0 or 1 was expected. Contact support to investigate. This is a programming bug.', Locked = true;
+        AlterationMembershipMismatchErr: Label 'Internal data inconsistency on membership alteration line %1: existing link row points at a different membership than the line''s targeted Membership Id. Contact support to investigate. This is a programming bug.', Locked = true;
+    begin
         EcomSalesMembershipLink.SetCurrentKey("Source Line System Id", "Entry No.");
         EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
         ExistingLinkCount := EcomSalesMembershipLink.Count();
 
         case ExistingLinkCount of
             0:
-                ;
+                exit(false);
             1:
                 begin
                     EcomSalesMembershipLink.FindFirst();
                     if EcomSalesMembershipLink."Membership System Id" <> EcomSalesLine."Membership Id" then
                         Error(AlterationMembershipMismatchErr, EcomSalesLine.RecordId());
-                    exit(false);
+                    exit(true);
                 end;
             else
                 Error(AlterationCorruptionErr, EcomSalesLine.RecordId(), ExistingLinkCount, EcomSalesLine."Membership Id");
         end;
-
-        ReshapeMembershipDuration(EcomSalesLine, EcomSalesHeader);
-
-        Membership.GetBySystemId(EcomSalesLine."Membership Id");
-        InsertMembershipLink(EcomSalesHeader, EcomSalesLine, Membership);
-        DidAlterThisRound := true;
     end;
 
     local procedure SetNotificationMethod(var MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -665,6 +674,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         DocumentDate: Date;
         StartDateNew: Date;
         EndDateNew: Date;
+        AlterationApplied: Boolean;
         CardEntryNo: Integer;
         ExternalCardNo: Text[100];
         ReasonText: Text;
@@ -682,6 +692,8 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         if EcomSalesLine.Quantity <> 1 then
             Error(QuantityErr);
 
+        AlterationApplied := AlterationAlreadyApplied(EcomSalesLine);
+
         if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
             Error(MembershipNotFoundErr, EcomSalesLine."Membership Id");
 
@@ -691,14 +703,18 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         if not MembershipAlterationSetup.GetBySystemId(EcomSalesLine."Alteration Option System Id") then
             Error(AlterationSetupNotFoundErr, EcomSalesLine."Alteration Option System Id");
 
-        if MembershipAlterationSetup."From Membership Code" <> Membership."Membership Code" then
-            Error(AlterationSetupMismatchErr, EcomSalesLine."Alteration Option System Id", Membership."Membership Code");
+        if not AlterationApplied then
+            if MembershipAlterationSetup."From Membership Code" <> Membership."Membership Code" then
+                Error(AlterationSetupMismatchErr, EcomSalesLine."Alteration Option System Id", Membership."Membership Code");
 
         if MembershipAlterationSetup."Not Available Via Web Service" then
             Error(AlterationNotAvailableViaWebServiceErr, EcomSalesLine."Alteration Option System Id");
 
         if EcomSalesLine."No." <> MembershipAlterationSetup."Sales Item No." then
             Error(AlterationItemMismatchErr, EcomSalesLine."No.", MembershipAlterationSetup."Sales Item No.", EcomSalesLine."Alteration Option System Id");
+
+        if AlterationApplied then
+            exit;
 
         MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
         MembershipEntry.SetFilter(Blocked, '=%1', false);
