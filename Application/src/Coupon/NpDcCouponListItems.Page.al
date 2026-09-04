@@ -145,6 +145,12 @@
                     ToolTip = 'Specifies the value of the Validation Quantity field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Offered at POS Store Code"; Rec."Offered at POS Store Code")
+                {
+
+                    ToolTip = 'Cashiers at this POS Store are offered the applicable items when redeeming the coupon from a wallet. Blank means every store.';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Priority; Rec.Priority)
                 {
 

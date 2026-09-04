@@ -101,6 +101,12 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.46';
         }
+        field(40; "Offered at POS Store Code"; Code[10])
+        {
+            Caption = 'Offered at POS Store';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Store";
+        }
         field(50; Priority; Integer)
         {
             Caption = 'Priority';

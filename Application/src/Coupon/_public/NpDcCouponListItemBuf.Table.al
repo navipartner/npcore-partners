@@ -62,6 +62,12 @@ table 6151219 "NPR NpDc Coupon List Item Buf"
             DataClassification = CustomerContent;
 
         }
+        field(40; "Offered at POS Store Code"; Code[10])
+        {
+            Caption = 'Offered at POS Store';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Store";
+        }
         field(50; Priority; Integer)
         {
             Caption = 'Priority';
