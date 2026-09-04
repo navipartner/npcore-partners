@@ -93,6 +93,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR DE Fiscal" := IsDEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR BE Fiscal" := IsBEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR HU Laurel Fiscal" := IsHULaurelFiscalizationEnabled();
+        TempApplicationAreaSetup."NPR PL Digmatix Fiscal" := IsPLFiscalizationEnabled();
         TempApplicationAreaSetup."NPR RO Fiscal" := IsROFiscalizationEnabled();
     end;
 
@@ -311,6 +312,16 @@ codeunit 6151349 "NPR Enable Application Areas"
             exit(false);
 
         exit(HULFiscalizationSetup."HU Laurel Fiscal Enabled");
+    end;
+
+    local procedure IsPLFiscalizationEnabled(): Boolean
+    var
+        PLFiscalizationSetup: Record "NPR PL Digmatix Fisc. Setup";
+    begin
+        if not PLFiscalizationSetup.Get() then
+            exit(false);
+
+        exit(PLFiscalizationSetup."Enable PL Fiscal");
     end;
 
     local procedure IsROFiscalizationEnabled(): Boolean
