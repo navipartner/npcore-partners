@@ -111,7 +111,7 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         if (WithPrice) then
             EmitDatePrices(TempTicketBuffer, PackageAddOnNo, TempNonTicketBuffer, FromDate, ToDate, TempDatePriceBuffer, ResponseJson);
 
-        EmitTimeSlots(TempTicketBuffer, PackageAddOnNo, FromDate, ToDate, WithPrice, WithCapacity, TempDatePriceBuffer, ResponseJson);
+        EmitTimeSlots(TempTicketBuffer, FromDate, ToDate, WithPrice, WithCapacity, TempDatePriceBuffer, ResponseJson);
 
         ResponseJson.EndObject();
         Response.RespondOK(ResponseJson.Build());
@@ -337,7 +337,6 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         ForcedUnitPrice: Decimal;
         ForcedIncludesVat: Boolean;
         ForcedVatPercentage: Decimal;
-        DisplayBasePrice: Decimal;
     begin
         DatePriceBuffer.Reset();
         DatePriceBuffer.DeleteAll();
@@ -382,19 +381,17 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                         if (not _TicketPrice.CalculateErpPrice(DatePriceBuffer)) then
                             DatePriceBuffer.UnitPrice := 0;
 
-                    // basePrice shown = that un-discounted base with the AddOn line discount applied
-                    DisplayBasePrice := DatePriceBuffer.UnitPrice;
-                    if (AddOnFound) then
-                        DisplayBasePrice := ApplyAddOnLineDiscount(AddOnLine, DisplayBasePrice);
-
+                    // basePrice is the raw base (forced unit price, or price-list price). Discounts are not folded in;
+                    // they surface as separate fields for the consumer to apply after priceDelta.
                     ResponseJson.StartObject()
                         .AddProperty('componentItemNumber', DatePriceBuffer.RequestItemNumber)
                         .AddProperty('variantCode', DatePriceBuffer.RequestVariantCode)
                         .AddProperty('admissionCode', DatePriceBuffer.AdmissionCode)
                         .AddProperty('date', IterationDate)
-                        .AddProperty('basePrice', DisplayBasePrice)
-                        .AddProperty('currencyCode', CurrencyCode)
-                    .EndObject();
+                        .AddProperty('basePrice', DatePriceBuffer.UnitPrice)
+                        .AddProperty('currencyCode', CurrencyCode);
+                    AddPriceBreakdown(ResponseJson, Forced, AddOnFound, AddOnLine, DatePriceBuffer.DiscountPct);
+                    ResponseJson.EndObject();
 
                     if (not DatePriceBuffer.Insert()) then;
 
@@ -412,7 +409,7 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         AddOnFound: Boolean;
         Forced: Boolean;
         BasePrice: Decimal;
-        ForcedBasePrice: Decimal;
+        ErpDiscountPct: Decimal;
     begin
         // Non-admission components (e.g. coupons)
         NonTicketBuffer.Reset();
@@ -424,13 +421,12 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
             Forced := false;
             if (AddOnFound) then
                 Forced := IsForcedPricedAddOnLine(AddOnLine);
-            if (Forced) then
-                ForcedBasePrice := ApplyAddOnLineDiscount(AddOnLine, AddOnLine."Unit Price");
 
             IterationDate := FromDate;
             while (IterationDate <= ToDate) do begin
+                ErpDiscountPct := 0;
                 if (Forced) then
-                    BasePrice := ForcedBasePrice
+                    BasePrice := AddOnLine."Unit Price"
                 else begin
                     Clear(TempErpBuffer);
                     TempErpBuffer.EntryNo := 1;
@@ -441,8 +437,7 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                     if (not _TicketPrice.CalculateErpPrice(TempErpBuffer)) then
                         TempErpBuffer.UnitPrice := 0;
                     BasePrice := TempErpBuffer.UnitPrice;
-                    if (AddOnFound) then
-                        BasePrice := ApplyAddOnLineDiscount(AddOnLine, BasePrice);
+                    ErpDiscountPct := TempErpBuffer.DiscountPct;
                 end;
 
                 ResponseJson.StartObject()
@@ -451,8 +446,9 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                     .AddProperty('admissionCode', '')
                     .AddProperty('date', IterationDate)
                     .AddProperty('basePrice', BasePrice)
-                    .AddProperty('currencyCode', CurrencyCode)
-                .EndObject();
+                    .AddProperty('currencyCode', CurrencyCode);
+                AddPriceBreakdown(ResponseJson, Forced, AddOnFound, AddOnLine, ErpDiscountPct);
+                ResponseJson.EndObject();
 
                 IterationDate += 1;
             end;
@@ -464,18 +460,30 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         exit((AddOnLine."Use Unit Price" = AddOnLine."Use Unit Price"::Always) or (AddOnLine."Unit Price" <> 0));
     end;
 
-    local procedure ApplyAddOnLineDiscount(AddOnLine: Record "NPR NpIa Item AddOn Line"; UnitPriceIn: Decimal): Decimal
+    local procedure AddPriceBreakdown(var ResponseJson: Codeunit "NPR JSON Builder"; Forced: Boolean; AddOnFound: Boolean; AddOnLine: Record "NPR NpIa Item AddOn Line"; ErpDiscountPct: Decimal)
+    var
+        PriceListDiscountPct: Decimal;
+        PackageDiscountPct: Decimal;
+        PackageDiscountAmount: Decimal;
     begin
-        if (AddOnLine."Discount %" <> 0) then
-            exit(Round(UnitPriceIn * (1 - (AddOnLine."Discount %" / 100)), 0.01));
+        // Mirrors NpIaItemAddOnMgt: the AddOn % applies only when no amount is set and the amount only when no % is
+        // set (both set -> POS applies neither). Whichever applies marks the POS line Manual, which the price-list /
+        // campaign discount chain skips, so the price-list discount only survives on an undiscounted price-list line.
+        if (AddOnFound) then begin
+            if ((AddOnLine."Discount %" <> 0) and (AddOnLine.DiscountAmount = 0)) then
+                PackageDiscountPct := AddOnLine."Discount %";
+            if ((AddOnLine."Discount %" = 0) and (AddOnLine.DiscountAmount <> 0) and (AddOnLine.Quantity > 0)) then
+                PackageDiscountAmount := Round(AddOnLine.DiscountAmount / AddOnLine.Quantity, 0.01);
+        end;
 
-        if (AddOnLine.DiscountAmount = 0) then
-            exit(UnitPriceIn);
+        PriceListDiscountPct := ErpDiscountPct;
+        if (Forced or (PackageDiscountPct <> 0) or (PackageDiscountAmount <> 0)) then
+            PriceListDiscountPct := 0;
 
-        if (AddOnLine.Quantity <= 0) then
-            exit(UnitPriceIn);
-
-        exit(Round((UnitPriceIn * AddOnLine.Quantity - AddOnLine.DiscountAmount) / AddOnLine.Quantity, 0.01));
+        ResponseJson
+            .AddProperty('priceListDiscountPct', PriceListDiscountPct)
+            .AddProperty('packageDiscountPct', PackageDiscountPct)
+            .AddProperty('packageDiscountAmount', PackageDiscountAmount);
     end;
 
     local procedure GetItemPriceVatBasis(ItemNo: Code[20]; var IncludesVat: Boolean; var VatPercentage: Decimal)
@@ -508,10 +516,9 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         exit(AddOnLine.FindFirst());
     end;
 
-    local procedure EmitTimeSlots(var TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; PackageAddOnNo: Code[20]; FromDate: Date; ToDate: Date; WithPrice: Boolean; WithCapacity: Boolean; var DatePriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder")
+    local procedure EmitTimeSlots(var TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; FromDate: Date; ToDate: Date; WithPrice: Boolean; WithCapacity: Boolean; var DatePriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder")
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        AddOnLine: Record "NPR NpIa Item AddOn Line";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
         DefaultAdmissionByItem: Dictionary of [Text, Code[20]];
@@ -520,7 +527,6 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         DefaultLookupKey: Text;
         ResolvedItem: Code[20];
         ResolvedVariant: Code[10];
-        AddOnFound: Boolean;
         SlotIsClosed: Boolean;
     begin
         // Surface the cost of this function, it depends on date range, withPrice and withCapacity 
@@ -547,13 +553,11 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
 
             AdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
             repeat
-                // AddOn line + default admission are per (item, variant). Rows are grouped by item, so only
-                // re-resolve when the item/variant changes - a multi-admission item then resolves its AddOn line
-                // once instead of once per admission row.
+                // The default admission is per (item, variant). Rows are grouped by item, so only re-resolve when
+                // the item/variant changes - a multi-admission item then resolves it once instead of once per admission row.
                 if (WithPrice and ((TicketBuffer.RequestItemNumber <> ResolvedItem) or (TicketBuffer.RequestVariantCode <> ResolvedVariant))) then begin
                     ResolvedItem := TicketBuffer.RequestItemNumber;
                     ResolvedVariant := TicketBuffer.RequestVariantCode;
-                    AddOnFound := TryGetPackageAddOnLine(PackageAddOnNo, ResolvedItem, ResolvedVariant, AddOnLine);
                     DefaultAdmissionCode := '';
                     DefaultLookupKey := StrSubstNo('%1|%2', ResolvedItem, ResolvedVariant);
                     if (DefaultAdmissionByItem.ContainsKey(DefaultLookupKey)) then
@@ -582,7 +586,7 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                             .AddProperty('endTime', AdmissionScheduleEntry."Admission End Time");
 
                         if (WithPrice) then
-                            ResponseJson.AddProperty('priceDelta', ResolveSlotPriceDelta(TicketBuffer, AdmissionScheduleEntry, DatePriceBuffer, DefaultAdmissionCode, AddOnFound, AddOnLine));
+                            ResponseJson.AddProperty('priceDelta', ResolveSlotPriceDelta(TicketBuffer, AdmissionScheduleEntry, DatePriceBuffer, DefaultAdmissionCode));
 
                         if (WithCapacity) then
                             EmitSlotCapacity(TicketBuffer, AdmissionScheduleEntry, ResponseJson);
@@ -617,14 +621,12 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         var TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer";
         var AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         var DatePriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
-        DefaultAdmissionCode: Code[20];
-        AddOnFound: Boolean;
-        AddOnLine: Record "NPR NpIa Item AddOn Line"): Decimal
+        DefaultAdmissionCode: Code[20]): Decimal
     var
         BasePrice: Decimal;
         AddonPrice: Decimal;
         ItemBase: Decimal;
-        SlotPriceBeforeDiscount: Decimal;
+        SlotPrice: Decimal;
     begin
         DatePriceBuffer.Reset();
         DatePriceBuffer.SetFilter(RequestItemNumber, '=%1', TicketBuffer.RequestItemNumber);
@@ -649,25 +651,17 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
             AddonPrice);
 
         // Only the default admission carries the item's base price (it is the single datePrices row for the item).
-        // Default slot: base may be replaced (FIXED) or adjusted (RELATIVE/PERCENT) -> SlotPriceBeforeDiscount = BasePrice + AddonPrice.
+        // Default slot: base may be replaced (FIXED) or adjusted (RELATIVE/PERCENT) -> SlotPrice = BasePrice + AddonPrice.
         // Non-default slot: it contributes only its own per-slot addon; we measure against the default base so the
-        // base cancels in the delta below. So a non-default priceDelta is the (discounted) incremental addon for that
-        // admission - NOT a standalone price. The consumer reconstructs the line as datePrices.basePrice (default) +
-        // the chosen slot's priceDelta per admission, never base + base.
+        // base cancels in the delta below. So a non-default priceDelta is the incremental addon for that admission -
+        // NOT a standalone price. The consumer reconstructs the line as datePrices.basePrice (default) + the chosen
+        // slot's priceDelta per admission, never base + base, and applies the datePrices discounts to that sum.
         if (TicketBuffer.AdmissionCode = DefaultAdmissionCode) then
-            SlotPriceBeforeDiscount := BasePrice + AddonPrice
+            SlotPrice := BasePrice + AddonPrice
         else
-            SlotPriceBeforeDiscount := ItemBase + AddonPrice;
+            SlotPrice := ItemBase + AddonPrice;
 
-        // priceDelta = how much this slot changes the price the consumer already has (the discounted base). The AddOn
-        // discount is applied last to the whole line, so we run both the slot price and the base through the same
-        // ApplyAddOnLineDiscount and subtract: the base cancels, leaving the discounted addon (or, for FIXED,
-        // discount(ruleAmount) - discount(base)). The %/amount split itself lives inside ApplyAddOnLineDiscount; by
-        // differencing its output the caller doesn't repeat that fork, and base + priceDelta == the discounted total
-        // holds for whatever discount shape it implements.
-        if (AddOnFound) then
-            exit(ApplyAddOnLineDiscount(AddOnLine, SlotPriceBeforeDiscount) - ApplyAddOnLineDiscount(AddOnLine, ItemBase));
-        exit(SlotPriceBeforeDiscount - ItemBase);
+        exit(SlotPrice - ItemBase);
     end;
 
     local procedure EmitSlotCapacity(var TicketBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; var ResponseJson: Codeunit "NPR JSON Builder")
