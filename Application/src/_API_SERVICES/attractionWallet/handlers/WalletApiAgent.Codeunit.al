@@ -245,7 +245,7 @@ codeunit 6248331 "NPR WalletApiAgent"
 
 
     #region Helper methods
-    local procedure WalletContentDTO(ResponseJson: Codeunit "NPR Json Builder"; Wallet: Record "NPR AttractionWallet"; LanguageCode: Code[10]): Codeunit "NPR Json Builder"
+    internal procedure WalletContentDTO(ResponseJson: Codeunit "NPR Json Builder"; Wallet: Record "NPR AttractionWallet"; LanguageCode: Code[10]): Codeunit "NPR Json Builder"
     var
         AttractionWallet: Codeunit "NPR AttractionWallet";
         ExternalReference: Text[100];
