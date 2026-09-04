@@ -336,8 +336,12 @@
         CaptionsGlobalAdd: Label 'Add';
         CaptionsGlobalMove: Label 'Move';
         CaptionsGlobalOpen: Label 'Open';
+        CaptionsGlobalConfirm: Label 'Confirm';
         CaptionsGlobalPreviewModeLbl: Label 'PREVIEW MODE';
         WorkflowsDisabledPreviewModeLbl: Label 'Running workflows in preview mode is not enabled';
+        NoLayoutAssignedLbl: Label 'This POS unit has no layout assigned. Assign a layout on the POS Unit list page in Business Central.';
+        OldPosNotSupportedLbl: Label 'The legacy POS is no longer supported. Assign a layout on the POS Unit list page in Business Central.';
+        OldMposNotSupportedLbl: Label 'This POS unit is not configured with a mobile POS editor layout. The legacy mobile POS is no longer supported, assign a mobile layout on the POS Unit list page in Business Central.';
         BalancingCashMovementsLbl: Label 'Cash Movements';
         BalancingCashCountNotFinalizedLbl: Label 'You have not finalized Cash Count yet. Still need to finalize:';
         BalancingPleaseGoBackToCashCountLbl: Label 'Please go back to Cash Count and finalize the above.';
@@ -512,6 +516,9 @@
         ActionsEditorOptionsLabelOpenPopupMenuLbl: Label 'Open Popup Menu';
         ActionsEditorOptionsLabelOpenNestedMenuLbl: Label 'Open Nested Menu';
         ActionsEditorOptionsLabelChangeViewLbl: Label 'Change View';
+        ActionsEditorOptionsLabelOpenDialogLbl: Label 'Dialogs';
+        ActionsEditorSelectDialogLbl: Label 'Select Dialog';
+        ActionsEditorDialogOptionMemberDetailsLbl: Label 'Member Details BETA';
         CaptionsEditorHavingImgCaptionPopupTextLbl: Label 'Having background image disables having more than one caption.';
         CaptionsEditorSwipeCaptionPopupTextLbl: Label 'Swipe buttons cant have captions.';
         CaptionsEditorDrawerCaptionPopupTextLbl: Label 'Drawer buttons can have only one caption.';
@@ -553,6 +560,9 @@
         EditableButtonRunIncreaseLbl: Label 'Run INCREASE';
         EditableButtonRunDecreaseLbl: Label 'Run DECREASE';
         EditableButtonNoButtonToPasteErrorLbl: Label 'No button to paste';
+        EditableButtonChangeViewErrorLbl: Label 'An unexpected error occurred while changing view';
+        EditableButtonChangeViewALErrorLbl: Label 'An error occurred while changing view';
+        OpenDialogMemberCardInputLbl: Label 'Enter member card number:';
         FooterUnsavedChangesLbl: Label 'You have unsaved changes. Please save or discard them.';
         FooterPreviewModeActiveLbl: Label 'Preview mode active';
         SaveLayoutModalEnterNewLayoutNameLbl: Label 'Enter new layout name';
@@ -591,6 +601,9 @@
         LayoutProviderCannotDeleteCurrentlyAssignedLayouLbl: label 'You cannot delete the layout currently assigned to this POS unit';
         LayoutProviderCannotDeleteOtherPosLayoutsLbl: label 'You cannot delete this layout because the following POS units are assigned are using it: ';
         LayoutProviderDeleteConfirmationLbl: label 'Are you sure you want to delete : ';
+        LayoutProviderDeleteLayoutFailedLbl: label 'Failed to delete the layout: ';
+        LayoutProviderSaveLayoutFailedLbl: label 'The layout was not saved. Your changes are kept as a draft.';
+        LayoutProviderCreateLayoutFailedLbl: label 'The layout was not created.';
         LogoPickerFileTypeNotAllowedLbl: label 'This filetype is not allowed: ';
         LogoPickerImageSizeErrorLbl: label 'Image size cannot exceed 10 megabytes';
         LogoPickerFailedUploadLbl: label 'File was not uploaded correctly';
@@ -638,7 +651,12 @@
         GlobalSettingsImportOldLayoutIsImportingStatusLabelLbl: Label 'Importing...';
         GlobalSettingsImportOldLayoutSuccessTitleLbl: Label 'Layout imported successfully!';
         GlobalSettingsImportOldLayoutSuccessMessageLbl: Label 'Please be sure to double check the layout and save it.';
+        GlobalSettingsImportOldLayoutNoLegacyMenusFoundLbl: Label 'Unable to import because there aren''t any legacy menus defined in this system. Please contact your administrator.';
+        GlobalSettingsImportOldLayoutUnknownErrorLbl: Label 'Unknown error: unable to import. Please contact your administrator.';
         GlobalSettingsPOSLifecycleMethodsLbl: Label 'POS Lifecycle Methods';
+        GenericLifecycleSettingEnterNewPositionLbl: Label 'Enter new position';
+        GenericLifecycleSettingPleaseSelectValidPositionLbl: Label 'Please select a valid position.';
+        GenericLifecycleSettingWorkflowAlreadyPresentLbl: Label 'This workflow is already present in workflows list.';
         GlobalSettingsMaintenancePerformanceProfilerLbl: Label 'Performance Profiler';
         GlobalSettingsStartStopPerfRecordingLbl: Label 'Opens built-in BC page for starting/stopping performance recordings : ';
         GlobalSettingsMaintenanceErrorHandlingLbl: Label 'Error Handling';
@@ -648,6 +666,8 @@
         GlobalSettingsReservationDialogCalendarSizeLbl: Label 'Reservation dialog calendar size :';
         GlobalSettingsReservationDialogCalendarDateRangeLbl: Label 'Reservation dialog calendar days ahead range :';
         GlobalSettingsDialogTabLbl: Label 'Dialog';
+        GlobalSettingsExperimentalSettingsTitleLbl: Label 'Experimental Settings';
+        GlobalSettingsEnableExperimentalDialogsLbl: Label 'Enable experimental dialogs';
         GlobalSettingsNotificationsTabLbl: Label 'Notifications';
         GlobalSettingsNotificationsImageSizeSelectionLbl: Label 'Image Size Selection';
         GlobalSettingsNotificationsPreferableImageSizeLbl: Label 'Please select the preferable image size:';
@@ -673,6 +693,7 @@
         GlobalShortcutsEditParametersLbl: Label 'Edit parameters';
         GlobalShortcutsAddShortcutLbl: Label 'Add shortcut';
         GlobalShortcutsEnableShortcutsLbl: Label 'Enable shortcuts';
+        GlobalShortcutsShortcutsAffectPerformanceLbl: Label 'Enabling shortcuts affects app performance';
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
         GlobalSettingsNoEditableVariablesLbl: Label 'No Editable Variables';
         GlobalSettingsAddNewLbl: Label 'Add New';
@@ -735,6 +756,10 @@
         ScheduleDialogAdmissionsTableFindAllTimeslotsDescriptionLbl: Label 'from the selected date will be checked for required admission timeslots. The date range can be adjusted in global settings.';
         ScheduleDialogAdmissionsTableDaysLabelLbl: Label 'days';
         ScheduleDialog_No_Available_TimeslotsLbl: Label 'There are no available timeslots';
+        ScheduleDialogAdmissionsTableCapacityRequestFailedLbl: Label 'Could not fetch availability - try again';
+        ScheduleDialogAdmissionsTableSearchingForTimeslotLbl: Label 'Searching for timeslot ...';
+        ScheduleDialogAdmissionsTableSelectTimeslotLbl: Label 'Select a timeslot';
+        ScheduleDialogRetryLbl: Label 'Retry';
         RestaurantMenusEditorPleaseIgnoreLbl: Label 'Please ignore this if you are not using restaurant';
         RestaurantMenusEditorAdminButtonsLbl: Label 'Admin Buttons';
         RestaurantMenusEditorWaiterPadMenuLbl: Label 'Waiter Pad Menu';
@@ -750,6 +775,8 @@
         RestaurantSeatingComponentRemoveLbl: Label 'Remove';
         RestaurantSeatingComponentConfigureLbl: Label 'Configure';
         RestaurantSeatingComponentDuplicateLbl: Label 'Duplicate';
+        RestaurantDialogSeatingSetupLocationIdErrorLbl: Label 'Location with the same Id already exists.';
+        RestaurantDialogSeatingSetupElementRenameErrorLbl: Label 'Element with the same settings already exists.';
         BinTransferPleaseCompleteTheBinTransferLbl: Label 'Please, complete the bin transfer';
         BinTransferNotCompletedConfirmationLbl: Label 'You have not reviewed and confirmed the counting. Are you sure you want to cancel bin transfer?';
         BinTransferCashCountFinalizedLbl: Label 'finalized';
@@ -917,8 +944,12 @@
         Captions.Add('Global_Add', CaptionsGlobalAdd);
         Captions.Add('Global_Move', CaptionsGlobalMove);
         Captions.Add('Global_Open', CaptionsGlobalOpen);
+        Captions.Add('Global_Confirm', CaptionsGlobalConfirm);
         Captions.Add('Global_PreviewMode', CaptionsGlobalPreviewModeLbl);
         Captions.Add('Global_WorkflowsDisabledPreviewMode', WorkflowsDisabledPreviewModeLbl);
+        Captions.Add('Global_NoLayoutAssigned', NoLayoutAssignedLbl);
+        Captions.Add('Global_OldPosNotSupported', OldPosNotSupportedLbl);
+        Captions.Add('Global_OldMposNotSupported', OldMposNotSupportedLbl);
         Captions.Add('Balancing_CashMovements', BalancingCashMovementsLbl);
         Captions.Add('Balancing_CashCountNotFinalized', BalancingCashCountNotFinalizedLbl);
         Captions.Add('Balancing_PleaseGoBackToCashCount', BalancingPleaseGoBackToCashCountLbl);
@@ -1085,6 +1116,9 @@
         Captions.Add('Actions_Editor_OptionsLabelOpenPopupMenu', ActionsEditorOptionsLabelOpenPopupMenuLbl);
         Captions.Add('Actions_Editor_OptionsLabelOpenNestedMenu', ActionsEditorOptionsLabelOpenNestedMenuLbl);
         Captions.Add('Actions_Editor_OptionsLabelChangeView', ActionsEditorOptionsLabelChangeViewLbl);
+        Captions.Add('Actions_Editor_OptionsLabelOpenDialog', ActionsEditorOptionsLabelOpenDialogLbl);
+        Captions.Add('Actions_Editor_SelectDialog', ActionsEditorSelectDialogLbl);
+        Captions.Add('Actions_Editor_DialogOptionMemberDetails', ActionsEditorDialogOptionMemberDetailsLbl);
         Captions.Add('Captions_Editor_HavingImgCaptionPopupText', CaptionsEditorHavingImgCaptionPopupTextLbl);
         Captions.Add('Captions_Editor_SwipeCaptionPopupText', CaptionsEditorSwipeCaptionPopupTextLbl);
         Captions.Add('Captions_Editor_DrawerCaptionPopupText', CaptionsEditorDrawerCaptionPopupTextLbl);
@@ -1126,6 +1160,9 @@
         Captions.Add('Editable_Button_RunIncrease', EditableButtonRunIncreaseLbl);
         Captions.Add('Editable_Button_RunDecrease', EditableButtonRunDecreaseLbl);
         Captions.Add('Editable_Button_NoButtonToPasteError', EditableButtonNoButtonToPasteErrorLbl);
+        Captions.Add('Editable_Button_ChangeViewError', EditableButtonChangeViewErrorLbl);
+        Captions.Add('Editable_Button_ChangeViewALError', EditableButtonChangeViewALErrorLbl);
+        Captions.Add('OPEN_DIALOG_MemberCardInput', OpenDialogMemberCardInputLbl);
         Captions.Add('Footer_UnsavedChanges', FooterUnsavedChangesLbl);
         Captions.Add('Footer_PreviewModeActive', FooterPreviewModeActiveLbl);
         Captions.Add('Save_Layout_Modal_EnterNewLayoutName', SaveLayoutModalEnterNewLayoutNameLbl);
@@ -1164,6 +1201,9 @@
         Captions.Add('Layout_Provider_CannotDeleteCurrentlyAssignedLayout', LayoutProviderCannotDeleteCurrentlyAssignedLayouLbl);
         Captions.Add('Layout_Provider_CannotDeleteOtherPosLayouts', LayoutProviderCannotDeleteOtherPosLayoutsLbl);
         Captions.Add('Layout_Provider_DeleteConfirmation', LayoutProviderDeleteConfirmationLbl);
+        Captions.Add('Layout_Provider_DeleteLayoutFailed', LayoutProviderDeleteLayoutFailedLbl);
+        Captions.Add('Layout_Provider_SaveLayoutFailed', LayoutProviderSaveLayoutFailedLbl);
+        Captions.Add('Layout_Provider_CreateLayoutFailed', LayoutProviderCreateLayoutFailedLbl);
         Captions.Add('Logo_Picker_FileTypeNotAllowed', LogoPickerFileTypeNotAllowedLbl);
         Captions.Add('Logo_Picker_ImageSizeError', LogoPickerImageSizeErrorLbl);
         Captions.Add('Logo_Picker_FailedUpload', LogoPickerFailedUploadLbl);
@@ -1229,7 +1269,12 @@
         Captions.Add('Global_Settings_ImportOldLayout_IsImportingStatusLabel', GlobalSettingsImportOldLayoutIsImportingStatusLabelLbl);
         Captions.Add('Global_Settings_ImportOldLayout_SuccessTitle', GlobalSettingsImportOldLayoutSuccessTitleLbl);
         Captions.Add('Global_Settings_ImportOldLayout_SuccessMessage', GlobalSettingsImportOldLayoutSuccessMessageLbl);
+        Captions.Add('Global_Settings_ImportOldLayout_NoLegacyMenusFound', GlobalSettingsImportOldLayoutNoLegacyMenusFoundLbl);
+        Captions.Add('Global_Settings_ImportOldLayout_UnknownError', GlobalSettingsImportOldLayoutUnknownErrorLbl);
         Captions.Add('Global_Settings_POSLifecycleMethods', GlobalSettingsPOSLifecycleMethodsLbl);
+        Captions.Add('GenericLifecycleSetting_EnterNewPosition', GenericLifecycleSettingEnterNewPositionLbl);
+        Captions.Add('GenericLifecycleSetting_PleaseSelectValidPosition', GenericLifecycleSettingPleaseSelectValidPositionLbl);
+        Captions.Add('GenericLifecycleSetting_WorkflowAlreadyPresent', GenericLifecycleSettingWorkflowAlreadyPresentLbl);
         Captions.Add('Global_Settings_Maintenance_PerformanceProfiler', GlobalSettingsMaintenancePerformanceProfilerLbl);
         Captions.Add('Global_Settings_Maintenance_StartStopPerfRecording', GlobalSettingsStartStopPerfRecordingLbl);
         Captions.Add('Global_Settings_Maintenance_ErrorHandling', GlobalSettingsMaintenanceErrorHandlingLbl);
@@ -1239,6 +1284,8 @@
         Captions.Add('Global_Settings_ReservationDialogCalendarDateRange', GlobalSettingsReservationDialogCalendarDateRangeLbl);
         Captions.Add('Global_Settings_DatePickerSettingsTitle', GlobalSettingsDatePickerSettingsTitleLbl);
         Captions.Add('Global_Settings_DialogTab', GlobalSettingsDialogTabLbl);
+        Captions.Add('Global_Settings_ExperimentalSettingsTitle', GlobalSettingsExperimentalSettingsTitleLbl);
+        Captions.Add('Global_Settings_EnableExperimentalDialogs', GlobalSettingsEnableExperimentalDialogsLbl);
         Captions.Add('Global_Settings_NotificationsTab', GlobalSettingsNotificationsTabLbl);
         Captions.Add('Global_Settings_NotificationsPreferableImageSize', GlobalSettingsNotificationsPreferableImageSizeLbl);
         Captions.Add('Global_Settings_NotificationsImageSizeSelection', GlobalSettingsNotificationsImageSizeSelectionLbl);
@@ -1264,6 +1311,7 @@
         Captions.Add('Global_Shortcuts_EditParameters', GlobalShortcutsEditParametersLbl);
         Captions.Add('Global_Shortcuts_AddShortcut', GlobalShortcutsAddShortcutLbl);
         Captions.Add('Global_Shortcuts_EnableShortcuts', GlobalShortcutsEnableShortcutsLbl);
+        Captions.Add('Global_Shortcuts_ShortcutsAffectPerformance', GlobalShortcutsShortcutsAffectPerformanceLbl);
         Captions.Add('Color_Settings_SelectPrimaryColor', ColorSettingsSelectPrimaryColorLbl);
         Captions.Add('Color_Settings_ChangeColor', ColorSettingsChangeColorLbl);
         Captions.Add('Color_Settings_SelectSecondaryColor', ColorSettingsSelectSecondaryColorLbl);
@@ -1309,6 +1357,10 @@
         Captions.Add('ScheduleDialog_Admissions_Table_FindAllTimeslotsDescription', ScheduleDialogAdmissionsTableFindAllTimeslotsDescriptionLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_DaysLabel', ScheduleDialogAdmissionsTableDaysLabelLbl);
         Captions.Add('ScheduleDialog_No_Available_Timeslots', ScheduleDialog_No_Available_TimeslotsLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_CapacityRequestFailed', ScheduleDialogAdmissionsTableCapacityRequestFailedLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_SearchingForTimeslot', ScheduleDialogAdmissionsTableSearchingForTimeslotLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_SelectTimeslot', ScheduleDialogAdmissionsTableSelectTimeslotLbl);
+        Captions.Add('ScheduleDialog_Retry', ScheduleDialogRetryLbl);
         Captions.Add('Restaurant_Menus_Editor_PleaseIgnore', RestaurantMenusEditorPleaseIgnoreLbl);
         Captions.Add('Restaurant_Menus_Editor_AdminButtons', RestaurantMenusEditorAdminButtonsLbl);
         Captions.Add('Restaurant_Menus_Editor_WaiterPadMenu', RestaurantMenusEditorWaiterPadMenuLbl);
@@ -1324,6 +1376,8 @@
         Captions.Add('Restaurant_SeatingComponent_Remove', RestaurantSeatingComponentRemoveLbl);
         Captions.Add('Restaurant_SeatingComponent_Configure', RestaurantSeatingComponentConfigureLbl);
         Captions.Add('Restaurant_SeatingComponent_Duplicate', RestaurantSeatingComponentDuplicateLbl);
+        Captions.Add('Restaurant_DialogSeatingSetup_LocationIdError', RestaurantDialogSeatingSetupLocationIdErrorLbl);
+        Captions.Add('Restaurant_DialogSeatingSetup_ElementRenameError', RestaurantDialogSeatingSetupElementRenameErrorLbl);
         Captions.Add('BinTransfer_PleaseCompleteTheBinTransfer', BinTransferPleaseCompleteTheBinTransferLbl);
         Captions.Add('BinTransfer_NotCompletedConfirmation', BinTransferNotCompletedConfirmationLbl);
         Captions.Add('BinTransfer_CashCountFinalized', BinTransferCashCountFinalizedLbl);
