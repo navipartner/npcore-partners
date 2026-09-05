@@ -8,7 +8,33 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 #pragma warning disable AA0073
         _TempSpfyMetafieldDef: Record "NPR Spfy Metafield Definition";
 #pragma warning restore AA0073
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
+        _GraphQLClientSet: Boolean;
         _UnexpectedResponseErr: Label '%1. Shopify returned the following response:\%2', Comment = '%1 - Error descrition, %2 - Shopify returned response.';
+
+    /// <summary>
+    /// Routes the metafield-definition paging request through the given client, so that tests can drive the
+    /// paging loop against a mock. Scope is deliberately narrow: every other GraphQL call in this codeunit
+    /// still goes through "NPR Spfy Communication Handler" directly and is NOT intercepted - notably
+    /// CreateMetafieldDefinition, which writes to the live store. A test that injects a mock and then reaches
+    /// one of those paths will make a real HTTP call. Injection is also one-way; the client cannot be reset.
+    /// </summary>
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
 
     procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     begin
@@ -394,12 +420,19 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         ReceivedShopifyMetafields: JsonArray;
+        HasNextPage: JsonToken;
         ReceivedShopifyMetafield: JsonToken;
+        ReceivedShopifyMetafieldEdges: JsonToken;
         ValidationRule: JsonToken;
         ValidationRules: JsonToken;
         ShopifyResponse: JsonToken;
         Window: Dialog;
         Cursor: Text;
+        PreviousCursor: Text;
+        PageCount: Integer;
+        EdgesFound: Boolean;
+        HasNextPageFound: Boolean;
+        MorePages: Boolean;
         CouldNotGetMetafieldDefinitionsErr: Label 'Could not get metafield definitions from Shopify. The following error occured: %1', Comment = '%1 - Shopify returned error text.';
     begin
         if WithDialog then
@@ -412,12 +445,20 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         Cursor := '';
 
         repeat
-            if not GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, QueryFilters, Cursor, ShopifyResponse) then
+            if not GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, QueryFilters, Cursor, ShopifyResponse) then begin
+                ClearTempSpfyMetafieldDefinitions();
                 Error(CouldNotGetMetafieldDefinitionsErr, GetLastErrorText());
-            ShopifyResponse.SelectToken('data.metafieldDefinitions.edges', ShopifyResponse);
-            ReceivedShopifyMetafields := ShopifyResponse.AsArray();
+            end;
+            PageCount += 1;
+            // Select the edges into their own token: ShopifyResponse must keep pointing at the response root,
+            // or the pageInfo lookups below cannot see hasNextPage/endCursor and paging stops after the first page.
+            EdgesFound := JsonHelper.GetJsonToken(ShopifyResponse, 'data.metafieldDefinitions.edges', ReceivedShopifyMetafieldEdges);
+            if EdgesFound then
+                EdgesFound := ReceivedShopifyMetafieldEdges.IsArray();
+            if not EdgesFound then
+                AbandonWalkOnUnexpectedResponse(ShopifyResponse);
+            ReceivedShopifyMetafields := ReceivedShopifyMetafieldEdges.AsArray();
             foreach ReceivedShopifyMetafield in ReceivedShopifyMetafields do begin
-                Cursor := JsonHelper.GetJText(ReceivedShopifyMetafield, 'cursor', false);
                 _TempSpfyMetafieldDef.Init();
 #pragma warning disable AA0139
                 _TempSpfyMetafieldDef.ID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ReceivedShopifyMetafield, 'node.id', true), '/');
@@ -440,9 +481,55 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
                     _TempSpfyMetafieldDef.Insert();
                 end;
             end;
-        until not JsonHelper.GetJBoolean(ShopifyResponse, 'data.metafieldDefinitions.pageInfo.hasNextPage', false) or (Cursor = '');
+
+            PreviousCursor := Cursor;
+            Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.metafieldDefinitions.pageInfo.endCursor', false);
+            HasNextPageFound := JsonHelper.GetJsonToken(ShopifyResponse, 'data.metafieldDefinitions.pageInfo.hasNextPage', HasNextPage);
+            if HasNextPageFound then
+                HasNextPageFound := HasNextPage.IsValue();
+            if HasNextPageFound then
+                HasNextPageFound := not HasNextPage.AsValue().IsNull();
+            if not HasNextPageFound then
+                AbandonWalkOnUnexpectedResponse(ShopifyResponse);
+            MorePages := JsonHelper.GetJBoolean(ShopifyResponse, 'data.metafieldDefinitions.pageInfo.hasNextPage', false);
+            if MorePages then begin
+                if (Cursor = '') or (Cursor = PreviousCursor) then
+                    AbandonWalkOnUnexpectedResponse(ShopifyResponse);
+                if PageCount >= MaxPagesPerWalk() then
+                    AbandonNonConvergingWalk(PageCount);
+            end;
+        until not MorePages;
         if WithDialog then
             Window.Close();
+    end;
+
+    /// <summary>Pages a walk may take before we treat the connection as non-converging. Far beyond any real store.</summary>
+    local procedure MaxPagesPerWalk(): Integer
+    begin
+        exit(100);
+    end;
+
+    /// <summary>
+    /// Abandons a walk that cannot be completed. Every exit from the walk goes through here or through
+    /// AbandonNonConvergingWalk, because the buffer is a temporary table: an Error does not roll it back, and
+    /// the readers gate their refetch on IsEmpty() alone, so anything left behind is picked up by the next
+    /// reader on this instance as if it were the complete definition list.
+    /// </summary>
+    local procedure AbandonWalkOnUnexpectedResponse(ShopifyResponse: JsonToken)
+    var
+        CouldNotReadMetafieldDefinitionsErr: Label 'Could not read the metafield definition list returned by Shopify.';
+    begin
+        ClearTempSpfyMetafieldDefinitions();
+        Error(_UnexpectedResponseErr, CouldNotReadMetafieldDefinitionsErr, ShopifyResponse);
+    end;
+
+    /// <summary>Abandons a walk that keeps reporting further pages.</summary>
+    local procedure AbandonNonConvergingWalk(PagesRead: Integer)
+    var
+        TooManyPagesErr: Label 'Shopify is still reporting more metafield definitions after %1 pages. The list has been discarded because it cannot be read completely.', Comment = '%1 - number of pages read before giving up.';
+    begin
+        ClearTempSpfyMetafieldDefinitions();
+        Error(TooManyPagesErr, PagesRead);
     end;
 
     local procedure GetShopifyMetafieldDefinitions(ShopifyStoreCode: Code[20]; OwnerType: Enum "NPR Spfy Metafield Owner Type"; QueryFilters: Text; Cursor: Text; var ShopifyResponse: JsonToken): Boolean
@@ -452,23 +539,19 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         QueryStream: OutStream;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
-        FirstPageQueryTok: Label 'query($ownerType: MetafieldOwnerType!, $queryFilters: String!) {metafieldDefinitions(first: 25, ownerType: $ownerType, query: $queryFilters) {edges{cursor node{id key type{name category} name description namespace validations{name type value}}} pageInfo{hasNextPage}}}', Locked = true;
-        SubsequentPageQueryTok: Label 'query($ownerType: MetafieldOwnerType!, $queryFilters: String!, $afterCursor: String!) {metafieldDefinitions(first: 25, after: $afterCursor, ownerType: $ownerType, query: $queryFilters) {edges{cursor node{id key type{name category} name description namespace validations{name type value}}} pageInfo{hasNextPage}}}', Locked = true;
+        QueryTok: Label 'query($ownerType: MetafieldOwnerType!, $queryFilters: String!, $afterCursor: String) {metafieldDefinitions(first: 100, after: $afterCursor, ownerType: $ownerType, query: $queryFilters) {edges{node{id key type{name category} name description namespace validations{name type value}}} pageInfo{hasNextPage endCursor}}}', Locked = true;
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         VariablesJson.Add('ownerType', OwnerTypeEnumValueName(OwnerType));
         VariablesJson.Add('queryFilters', QueryFilters);
-        if Cursor = '' then
-            RequestJson.Add('query', FirstPageQueryTok)
-        else begin
-            RequestJson.Add('query', SubsequentPageQueryTok);
-            VariablesJson.Add('afterCursor', Cursor);
-        end;
+        // A null afterCursor asks for the first page, so a single query serves the whole walk
+        SpfyCommunicationHandler.AddGraphQLCursor(VariablesJson, Cursor);
+        RequestJson.Add('query', QueryTok);
         RequestJson.Add('variables', VariablesJson);
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
 
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse));
     end;
 
     local procedure GenerateMetafieldsSet(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20]; var MetafieldsSet: JsonObject): Boolean
