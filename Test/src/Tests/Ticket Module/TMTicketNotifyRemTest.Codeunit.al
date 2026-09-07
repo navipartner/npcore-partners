@@ -23,12 +23,13 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
     begin
         // [Scenario] A welcome reminder is scheduled on the service local wall clock, not on the clock of the session that creates it.
 
-        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
-        SetServiceTimeZoneToUtcPlus12();
-
         // [GIVEN] A confirmed ticket whose admission carries a welcome profile without a time offset
         ProfileCode := CreateNotificationProfile(ProfileLine."Notification Trigger"::WELCOME, ProfileLine."Unit of Measure"::DAYS, 0);
         ArrangeConfirmedTicket(ProfileCode, Ticket, TicketAccessEntry);
+
+        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
+        // (must follow the arrange - see SetServiceTimeZoneToUtcPlus12)
+        SetServiceTimeZoneToUtcPlus12();
 
         // [WHEN] The welcome reminder is created
         Expected := TimeHelper.GetLocalTimeForService();
@@ -62,12 +63,13 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
     begin
         // [Scenario] A revoke notification is scheduled on the service local wall clock, not on the clock of the session that creates it.
 
-        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
-        SetServiceTimeZoneToUtcPlus12();
-
         // [GIVEN] A confirmed ticket whose admission carries a revoke profile without a time offset
         ProfileCode := CreateNotificationProfile(ProfileLine."Notification Trigger"::REVOKE, ProfileLine."Unit of Measure"::DAYS, 0);
         ArrangeConfirmedTicket(ProfileCode, Ticket, TicketAccessEntry);
+
+        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
+        // (must follow the arrange - see SetServiceTimeZoneToUtcPlus12)
+        SetServiceTimeZoneToUtcPlus12();
 
         // [WHEN] The revoke notification is created
         Expected := TimeHelper.GetLocalTimeForService();
@@ -104,12 +106,13 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
     begin
         // [Scenario] When a reservation reminder computes to a moment which has already passed, it is bumped to the service local wall clock rather than to the clock of the session that creates it.
 
-        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
-        SetServiceTimeZoneToUtcPlus12();
-
         // [GIVEN] A confirmed reservation whose admission carries a reservation profile with a 48 hour lead time
         ProfileCode := CreateNotificationProfile(ProfileLine."Notification Trigger"::RESERVATION, ProfileLine."Unit of Measure"::HOURS, 48);
         ArrangeConfirmedReservationTicket(ProfileCode, Ticket, TicketAccessEntry);
+
+        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
+        // (must follow the arrange - see SetServiceTimeZoneToUtcPlus12)
+        SetServiceTimeZoneToUtcPlus12();
 
         DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
@@ -158,12 +161,13 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
     begin
         // [Scenario] A post admission reminder is offset from the service local rendering of the admission timestamp, not from the clock of the session that creates it.
 
-        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
-        SetServiceTimeZoneToUtcPlus12();
-
         // [GIVEN] A confirmed ticket whose admission carries an on each admission profile with a one day offset
         ProfileCode := CreateNotificationProfile(ProfileLine."Notification Trigger"::ON_EACH_ADMISSION, ProfileLine."Unit of Measure"::DAYS, 1);
         ArrangeConfirmedTicket(ProfileCode, Ticket, TicketAccessEntry);
+
+        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
+        // (must follow the arrange - see SetServiceTimeZoneToUtcPlus12)
+        SetServiceTimeZoneToUtcPlus12();
 
         // [GIVEN] The admission detail entry written by the ticket confirmation
         DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
@@ -204,12 +208,13 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
     begin
         // [Scenario] The batch job selects reminders whose notify moment has passed on the service clock, so the pickup filter reads the same basis that scheduling writes.
 
-        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
-        SetServiceTimeZoneToUtcPlus12();
-
         // [GIVEN] A pending batch reminder
         ProfileCode := CreateNotificationProfile(ProfileLine."Notification Trigger"::WELCOME, ProfileLine."Unit of Measure"::DAYS, 0);
         ArrangeConfirmedTicket(ProfileCode, Ticket, TicketAccessEntry);
+
+        // [GIVEN] A service time zone which is hours away from the time zone of the session running the test
+        // (must follow the arrange - see SetServiceTimeZoneToUtcPlus12)
+        SetServiceTimeZoneToUtcPlus12();
 
         DueEntryNo := NotifyParticpt.CreateAdmissionWelcomeReminder(TicketAccessEntry, Ticket."External Member Card No.");
         Assert.AreNotEqual(0, DueEntryNo, 'Expected the welcome reminder to be created.');
@@ -242,6 +247,9 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
             'A reminder not yet due on the service clock was sent, so the pickup filter is not bounded by the notify moment.');
     end;
 
+    // Call this AFTER the arrange helpers, never before: they go through the ticket library's CreateMinimalSetup,
+    // which fits the service time zone to the session clock and would fit this one away again. A test that switched
+    // the zone first would still pass, having compared the session clock against itself and asserted nothing.
     [Normal]
     local procedure SetServiceTimeZoneToUtcPlus12()
     var

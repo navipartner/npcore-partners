@@ -742,25 +742,6 @@ codeunit 85392 "NPR TM TicketExpiryTest"
     end;
 #endif
 
-    // Resolve the current ride against the same clock that validates it. GetLocalTimeAtAdmission reads
-    // TicketSetup.ServiceTimeZoneNo - 0 in a bare test company, which sends it down the DST-free user-offset
-    // fallback and drifts an hour from Today()/Time() on a DST-applying runner (the CI flake). Point the service
-    // timezone at the session user's own zone so resolver and validator agree in any runner TZ - the config a real
-    // tenant always has. Left unchanged (still 0) when the user has no personal zone, so nothing breaks locally.
-    local procedure AlignServiceTimeZoneToSession(var TicketSetup: Record "NPR TM Ticket Setup")
-    var
-        UserPersonalization: Record "User Personalization";
-        TimeZone: Record "Time Zone";
-    begin
-        if (not UserPersonalization.Get(UserSecurityId())) then
-            exit;
-        if (UserPersonalization."Time Zone" = '') then
-            exit;
-        TimeZone.SetRange(ID, UserPersonalization."Time Zone");
-        if (TimeZone.FindFirst()) then
-            TicketSetup.ServiceTimeZoneNo := TimeZone."No.";
-    end;
-
     local procedure Initialize()
     var
         LibraryTicketModule: Codeunit "NPR Library - Ticket Module";
@@ -774,7 +755,6 @@ codeunit 85392 "NPR TM TicketExpiryTest"
                 TicketSetup.Insert();
             end;
             TicketSetup.ExpireReservationWithJobQueue := false;
-            AlignServiceTimeZoneToSession(TicketSetup);
             TicketSetup.Modify();
 
             _ItemNo := LibraryTicketModule.CreateScenario_SmokeTest();

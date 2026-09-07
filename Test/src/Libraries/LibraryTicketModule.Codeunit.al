@@ -894,6 +894,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         NprMasterData: Codeunit "NPR Library - POS Master Data";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
+        AlignServiceTimeZoneToSession();
         WorkDate(Today());
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
         CreateNumberSeries();
@@ -901,6 +902,50 @@ codeunit 85011 "NPR Library - Ticket Module"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         EnableTriStateLockingFeaturesInTicketModule();
 #endif
+    end;
+
+    // The service time resolver (TMTimeHelper) and the validator (Today()/Time()) must read the same clock, or a ride
+    // resolved "today" is rejected around midnight and in the DST hour. The sessions time zone cannot be changed without
+    // a re-login, so the service zone is fitted to the session instead: ask the resolver what each time zone reads
+    // right now and store the first that reproduces the session clock.
+    local procedure AlignServiceTimeZoneToSession()
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
+        TimeZone: Record "Time Zone";
+        SessionNow: DateTime;
+    begin
+        SessionNow := CreateDateTime(Today(), Time());
+
+        if (not TicketSetup.Get()) then begin
+            TicketSetup.Init();
+            TicketSetup.Insert();
+        end;
+
+        if (ResolverMatchesSession(TicketSetup.ServiceTimeZoneNo, SessionNow)) then
+            exit;
+
+        if (not TimeZone.FindSet()) then
+            Error('The Time Zone table is empty, so the service time zone cannot be fitted to the session clock. Ticket tests would run the resolver and the validator on two different clocks.');
+
+        repeat
+            if (ResolverMatchesSession(TimeZone."No.", SessionNow)) then begin
+                TicketSetup.ServiceTimeZoneNo := TimeZone."No.";
+                TicketSetup.Modify();
+                exit;
+            end;
+        until (TimeZone.Next() = 0);
+
+        Error('No time zone found whose service clock matches the session clock. Tests cannot be run.');
+
+    end;
+
+    local procedure ResolverMatchesSession(TimeZoneNo: Integer; SessionNow: DateTime): Boolean
+    var
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        TimeZoneCode: Code[20];
+        IsDaylightSavingsTime: Boolean;
+    begin
+        exit(Abs(TimeHelper.GetTimeZoneLocalTime(TimeZoneNo, TimeZoneCode, IsDaylightSavingsTime) - SessionNow) <= 60000);
     end;
 
     internal procedure EnableTriStateLockingFeaturesInTicketModule()

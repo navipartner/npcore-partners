@@ -216,7 +216,8 @@ codeunit 6184773 "NPR TM TimeHelper"
     end;
     #endregion
 
-    local procedure GetTimeZoneLocalTime(TimeZoneNo: Integer; var TimeZoneCode: Code[20]; var IsDaylightSavingsTime: Boolean) LocalDateTime: DateTime
+    // Internal for the ticket test library, which fits the service zone to the session clock; app code goes through the admission/service overloads, which apply the zone precedence.
+    internal procedure GetTimeZoneLocalTime(TimeZoneNo: Integer; var TimeZoneCode: Code[20]; var IsDaylightSavingsTime: Boolean) LocalDateTime: DateTime
     var
         TimeZone: Record "Time Zone";
         TimeZoneDuration: Duration;
