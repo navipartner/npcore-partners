@@ -36,6 +36,7 @@ codeunit 85253 "NPR Library - RS Retail Loc."
         GenProdPostGrp: Record "Gen. Product Posting Group";
         InvtPostGrp: Record "Inventory Posting Group";
         InventorySetup: Record "Inventory Setup";
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
     begin
         if _Initialized then
             exit;
@@ -87,6 +88,10 @@ codeunit 85253 "NPR Library - RS Retail Loc."
         InventorySetup.Validate("Automatic Cost Posting", true);
         InventorySetup.Validate("Automatic Cost Adjustment", InventorySetup."Automatic Cost Adjustment"::Always);
         InventorySetup.Modify();
+
+        SalesReceivablesSetup.Get();
+        SalesReceivablesSetup.Validate("Allow Editing Active Price", true);
+        SalesReceivablesSetup.Modify();
 
         _Initialized := true;
     end;

@@ -1775,16 +1775,102 @@ codeunit 85008 "NPR E-Commerce Tests"
         // [Then] Handle purchase invoice page        
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateCustomerCopiesItemVATFromExistingSetup()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemWithoutVATSetup: Record Item;
+        SourceVATBusPostingGroup: Record "VAT Business Posting Group";
+        VATProdPostingGroup: Record "VAT Product Posting Group";
+        CustomerVATPostingSetup: Record "VAT Posting Setup";
+        SourceVATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Assert: Codeunit Assert;
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryInventory: Codeunit "Library - Inventory";
+        CustomerEmail: Text;
+    begin
+        Initialize();
+
+        // A blank customer business group sorts before every nonblank source group.
+        LibraryERM.CreateVATProductPostingGroup(VATProdPostingGroup);
+        LibraryERM.CreateVATPostingSetup(CustomerVATPostingSetup, '', VATProdPostingGroup.Code);
+        CustomerVATPostingSetup.Validate("VAT Identifier", 'CUSTOMER25');
+        CustomerVATPostingSetup.Validate("VAT %", 25);
+        CustomerVATPostingSetup.Validate("Sales VAT Account", LibraryERM.CreateGLAccountNo());
+        CustomerVATPostingSetup.Validate("Purchase VAT Account", LibraryERM.CreateGLAccountNo());
+        CustomerVATPostingSetup.Modify(true);
+
+        LibraryInventory.CreateItem(Item);
+        LibraryERM.CreateVATProductPostingGroup(VATProdPostingGroup);
+        Item.Validate("VAT Prod. Posting Group", VATProdPostingGroup.Code);
+        Item.Modify(true);
+        LibraryERM.CreateVATBusinessPostingGroup(SourceVATBusPostingGroup);
+        LibraryERM.CreateVATPostingSetup(SourceVATPostingSetup, SourceVATBusPostingGroup.Code, Item."VAT Prod. Posting Group");
+        SourceVATPostingSetup.Validate("VAT %", 17);
+        SourceVATPostingSetup.Validate("VAT Identifier", 'SOURCE17');
+        SourceVATPostingSetup.Modify(true);
+
+        LibraryInventory.CreateItem(ItemWithoutVATSetup);
+        LibraryERM.CreateVATProductPostingGroup(VATProdPostingGroup);
+        ItemWithoutVATSetup.Validate("VAT Prod. Posting Group", VATProdPostingGroup.Code);
+        ItemWithoutVATSetup.Modify(true);
+
+        CustomerEmail := LowerCase(DelChr(Format(CreateGuid()), '=', '{}-')) + '@example.com';
+        LibraryECommerce.CreateCustomer(CustomerEmail, '');
+
+        Customer.SetRange("E-Mail", CustomerEmail);
+        Assert.AreEqual(1, Customer.Count(), 'The generated email must identify exactly one customer.');
+        Customer.FindFirst();
+        Assert.AreEqual('', Customer."VAT Bus. Posting Group", 'The customer VAT group must sort before the source group.');
+        VATPostingSetup.Get(Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
+        Assert.AreEqual(SourceVATPostingSetup."VAT %", VATPostingSetup."VAT %", 'The item VAT rate must be copied from the existing source.');
+        Assert.AreEqual(SourceVATPostingSetup."VAT Identifier", VATPostingSetup."VAT Identifier", 'The item VAT identifier must be copied from the existing source.');
+
+        VATPostingSetup.Get(Customer."VAT Bus. Posting Group", ItemWithoutVATSetup."VAT Prod. Posting Group");
+        Assert.AreEqual(0, VATPostingSetup."VAT %", 'An item without a source VAT setup must retain the default rate.');
+        Assert.AreEqual(VATPostingSetup."VAT Calculation Type"::"Normal VAT", VATPostingSetup."VAT Calculation Type", 'An item without a source VAT setup must use normal VAT.');
+        VATPostingSetup.TestField("Sales VAT Account");
+        VATPostingSetup.TestField("Purchase VAT Account");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateCustomerCopiesItemVATWithExistingBlankIdentifier()
+    var
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        Initialize();
+        // The test runner can reset the random seed while committed fixture rows remain.
+        LibraryRandom.SetSeed(1);
+        CreateCustomerCopiesItemVATFromExistingSetup();
+        LibraryRandom.SetSeed(1);
+        CreateCustomerCopiesItemVATFromExistingSetup();
+    end;
+
     local procedure Initialize()
     begin
         if not Initialized then begin
             PrepareDataForXml();
             SetSalesDocumentAsXml();
-            SetPurchDocumentAsXml();
             InitializeRelatedRecords();
             Initialized := true;
         end;
+        RefreshPurchDocumentFixture();
         Commit();
+    end;
+
+    local procedure RefreshPurchDocumentFixture()
+    var
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+    begin
+        Clear(VendorInvoiceNo);
+        LibraryECommerce.GetVendorInvoiceNo(VendorInvoiceNo);
+        Clear(XmlPurch);
+        SetPurchDocumentAsXml();
     end;
 
     local procedure PrepareDataForXml()

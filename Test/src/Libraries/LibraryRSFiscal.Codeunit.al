@@ -13,6 +13,7 @@ codeunit 85065 "NPR Library RS Fiscal"
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         PaymentMethod: Record "Payment Method";
+        LibraryInventory: Codeunit "Library - Inventory";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
         LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
     begin
@@ -52,11 +53,8 @@ codeunit 85065 "NPR Library RS Fiscal"
             RSVATPostSetupMapping.Init();
             RSVATPostSetupMapping."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
             RSVATPostSetupMapping."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
-            RSVATPostSetupMapping."RS Tax Category Name" := 'VAT';
-            RSVATPostSetupMapping."RS Tax Category Label" := 'A';
             RSVATPostSetupMapping.Insert();
         end;
-
         POSPaymentMethod.FindSet();
         repeat
             if not RSPOSPaymMethMapping.Get(POSPaymentMethod.Code) then begin
@@ -67,6 +65,8 @@ codeunit 85065 "NPR Library RS Fiscal"
             end;
         until POSPaymentMethod.Next() = 0;
 
+        if PaymentMethod.IsEmpty() then
+            LibraryInventory.CreatePaymentMethod(PaymentMethod);
         PaymentMethod.FindSet();
         repeat
             if not RSPaymentMethodMapping.Get(PaymentMethod.Code) then begin
@@ -682,7 +682,31 @@ codeunit 85065 "NPR Library RS Fiscal"
                 ']' +
             '}';
         Sender.TestFillAllowedTaxRates(ResponseText, false);
+        EnsureTestVATPostingSetupMappings();
         IsHandled := true;
+    end;
+
+    local procedure EnsureTestVATPostingSetupMappings()
+    var
+        RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        if not RSVATPostSetupMapping.FindSet() then
+            exit;
+
+        repeat
+            if ((RSVATPostSetupMapping."RS Tax Category Name" = '') or
+                (RSVATPostSetupMapping."RS Tax Category Label" = '')) and
+               VATPostingSetup.Get(
+                   RSVATPostSetupMapping."VAT Bus. Posting Group",
+                   RSVATPostSetupMapping."VAT Prod. Posting Group") and
+               (VATPostingSetup."VAT %" = 9)
+            then begin
+                RSVATPostSetupMapping."RS Tax Category Name" := 'VAT';
+                RSVATPostSetupMapping."RS Tax Category Label" := 'A';
+                RSVATPostSetupMapping.Modify();
+            end;
+        until RSVATPostSetupMapping.Next() = 0;
     end;
 
 #if not BC17

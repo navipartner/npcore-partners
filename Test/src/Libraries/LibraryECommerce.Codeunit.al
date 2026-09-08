@@ -6,6 +6,8 @@ codeunit 85010 "NPR Library - E-Commerce"
         CreatePurchOrderDescLbl: Label 'Create Purchase Order';
         PostSalesOrderDescLbl: Label 'Post Sales Order';
         DeleteSalesOrderDescLbl: Label 'Delete Sales Order';
+        FixtureGenBusPostingGroup: Code[20];
+        FixtureVATBusPostingGroup: Code[20];
 
     procedure CreateEcStore(StoreCode: Code[20])
     var
@@ -30,6 +32,10 @@ codeunit 85010 "NPR Library - E-Commerce"
     procedure CreateCustomer(EMailAddress: Text; PhoneNo: Text)
     var
         Customer: Record Customer;
+        GLAccount: Record "G/L Account";
+        Item: Record Item;
+        ZeroVATPostingSetup: Record "VAT Posting Setup";
+        LibraryERM: Codeunit "Library - ERM";
         LibrarySales: Codeunit "Library - Sales";
     begin
         LibrarySales.CreateCustomer(Customer);
@@ -40,6 +46,30 @@ codeunit 85010 "NPR Library - E-Commerce"
         Customer."Post Code" := '';
         Customer.City := '';
         Customer.Modify();
+        FixtureGenBusPostingGroup := Customer."Gen. Bus. Posting Group";
+        FixtureVATBusPostingGroup := Customer."VAT Bus. Posting Group";
+        // The Microsoft libraries choose posting groups independently for customers,
+        // items, and G/L accounts. Add only the missing combinations required by the
+        // records this fixture generated; do not rewrite populated-company records.
+        if Item.FindSet() then
+            repeat
+                if Item.Description = Item."No." then
+                    EnsureFixturePostingSetups(
+                        Item."Gen. Prod. Posting Group", '', Item."VAT Prod. Posting Group");
+            until Item.Next() = 0;
+        if GLAccount.FindSet() then
+            repeat
+                if (GLAccount.Name = GLAccount."No.") and
+                   (GLAccount."Gen. Posting Type" = GLAccount."Gen. Posting Type"::Sale)
+                then
+                    EnsureFixturePostingSetups(
+                        GLAccount."Gen. Prod. Posting Group", GLAccount."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group");
+            until GLAccount.Next() = 0;
+        if not ZeroVATPostingSetup.Get(Customer."VAT Bus. Posting Group", '') then begin
+            LibraryERM.CreateVATPostingSetup(ZeroVATPostingSetup, Customer."VAT Bus. Posting Group", '');
+            ZeroVATPostingSetup.Validate("VAT Calculation Type", ZeroVATPostingSetup."VAT Calculation Type"::"Normal VAT");
+            ZeroVATPostingSetup.Modify(true);
+        end;
     end;
 
     procedure CreateVendor(EMailAddress: Text; PhoneNo: Text; var VendorNo: Code[20])
@@ -88,6 +118,7 @@ codeunit 85010 "NPR Library - E-Commerce"
         ShipmentMapping."Shipment Fee Type" := ShipmentMapping."Shipment Fee Type"::"G/L Account";
         LibraryERM.FindVATPostingSetup(VATPostSetup, "Tax Calculation Type"::"Normal VAT");
         GLAccountNo := LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostSetup, "General Posting Type"::Sale);
+        EnsureCreatedSalesGLAccountPostingSetups(GLAccountNo);
         ShipmentMapping."Shipment Fee No." := GLAccountNo;
         ShipmentMapping.Modify();
     end;
@@ -120,12 +151,17 @@ codeunit 85010 "NPR Library - E-Commerce"
         ItemJournalLine: Record "Item Journal Line";
         ItemJournalTemplate: Record "Item Journal Template";
         ItemJournalBatch: Record "Item Journal Batch";
+        Item: Record Item;
         Location: Record Location;
         LibraryInventory: Codeunit "Library - Inventory";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
     begin
         Location.Code := LocationCode;
         Location.Find();
+        Item.Get(ItemNo);
+        NPRLibraryPOSMasterData.CreateGeneralPostingSetupForSaleItem(
+            '', Item."Gen. Prod. Posting Group", LocationCode, Item."Inventory Posting Group");
         LibraryInventory.UpdateInventoryPostingSetup(Location);
         LibraryInventory.CreateItemJournalTemplate(ItemJournalTemplate);
         LibraryInventory.CreateItemJournalBatch(ItemJournalBatch, ItemJournalTemplate.Name);
@@ -145,6 +181,49 @@ codeunit 85010 "NPR Library - E-Commerce"
             exit;
         LibraryERM.FindVATPostingSetup(VATPostSetup, "Tax Calculation Type"::"Normal VAT");
         GLAccountNo := LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostSetup, "General Posting Type"::Sale);
+    end;
+
+    local procedure EnsureCreatedSalesGLAccountPostingSetups(GLAccountNo: Code[20])
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        if (FixtureGenBusPostingGroup = '') or not GLAccount.Get(GLAccountNo) then
+            exit;
+
+        EnsureFixturePostingSetups(
+            GLAccount."Gen. Prod. Posting Group", GLAccount."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group");
+    end;
+
+    local procedure EnsureFixturePostingSetups(GenProdPostingGroup: Code[20]; SourceVATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20])
+    var
+        SourceVATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LibraryERM: Codeunit "Library - ERM";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SourceVATPostingSetupFound: Boolean;
+    begin
+        if FixtureGenBusPostingGroup = '' then
+            exit;
+
+        NPRLibraryPOSMasterData.CreateGeneralPostingSetupForSale(FixtureGenBusPostingGroup, GenProdPostingGroup);
+        if VATPostingSetup.Get(FixtureVATBusPostingGroup, VATProdPostingGroup) then
+            exit;
+
+        SourceVATPostingSetup.SetRange("VAT Prod. Posting Group", VATProdPostingGroup);
+        SourceVATPostingSetup.SetRange("VAT Calculation Type", SourceVATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        if SourceVATBusPostingGroup <> '' then
+            SourceVATPostingSetup.SetRange("VAT Bus. Posting Group", SourceVATBusPostingGroup);
+        SourceVATPostingSetupFound := SourceVATPostingSetup.FindFirst();
+
+        LibraryERM.CreateVATPostingSetup(VATPostingSetup, FixtureVATBusPostingGroup, VATProdPostingGroup);
+        VATPostingSetup.Validate("VAT Calculation Type", VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        if SourceVATPostingSetupFound then begin
+            VATPostingSetup.Validate("VAT Identifier", SourceVATPostingSetup."VAT Identifier");
+            VATPostingSetup.Validate("VAT %", SourceVATPostingSetup."VAT %");
+        end;
+        VATPostingSetup.Validate("Sales VAT Account", LibraryERM.CreateGLAccountNo());
+        VATPostingSetup.Validate("Purchase VAT Account", LibraryERM.CreateGLAccountNo());
+        VATPostingSetup.Modify(true);
     end;
 
     procedure GetSalesOrderNo(var SalesOrderNo: Code[20])

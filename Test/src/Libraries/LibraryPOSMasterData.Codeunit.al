@@ -196,11 +196,11 @@ codeunit 85002 "NPR Library - POS Master Data"
             POSPaymentMethod."Processing Type"::CASH:
                 begin
                     POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"Bank Account";
-                    POSPostingSetup."Account No." := LibraryERM.CreateBankAccountNo;
+                    POSPostingSetup."Account No." := CreateBankAccountNoWithPostingGroup();
                     if not UseGLAsDifferenceAccounts then begin
                         POSPostingSetup."Difference Account Type" := POSPostingSetup."Account Type"::"Bank Account";
-                        POSPostingSetup."Difference Acc. No." := LibraryERM.CreateBankAccountNo;
-                        POSPostingSetup."Difference Acc. No. (Neg)" := LibraryERM.CreateBankAccountNo;
+                        POSPostingSetup."Difference Acc. No." := CreateBankAccountNoWithPostingGroup();
+                        POSPostingSetup."Difference Acc. No. (Neg)" := CreateBankAccountNoWithPostingGroup();
                     end;
                 end;
             POSPaymentMethod."Processing Type"::EFT:
@@ -224,6 +224,15 @@ codeunit 85002 "NPR Library - POS Master Data"
             POSPostingSetup."Difference Acc. No. (Neg)" := POSPostingSetup."Difference Acc. No.";
         end;
         POSPostingSetup.Insert();
+    end;
+
+    local procedure CreateBankAccountNoWithPostingGroup(): Code[20]
+    var
+        GLAccount: Record "G/L Account";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        GLAccount.Get(LibraryERM.CreateGLAccountNo());
+        exit(LibraryERM.CreateBankAccountNoWithNewPostingGroup(GLAccount));
     end;
 
     procedure CreatePOSSetup(var POSSetup: Record "NPR POS Setup")
@@ -374,26 +383,35 @@ codeunit 85002 "NPR Library - POS Master Data"
 
     procedure CreateGeneralPostingSetupForSaleItem(GenBusPostGrp: Code[10]; GenProdPostGrp: Code[10]; LocationCode: Code[20]; InvPostingGroup: Code[10])
     var
-        LibraryERM: Codeunit "Library - ERM";
-        GeneralPostingSetup: Record "General Posting Setup";
         InventoryPostingSetup: Record "Inventory Posting Setup";
         Location: Record Location;
         LibraryInventory: Codeunit "Library - Inventory";
+    begin
+        CreateGeneralPostingSetupForSale('', GenProdPostGrp);
+        CreateGeneralPostingSetupForSale(GenBusPostGrp, GenProdPostGrp);
+        if not InventoryPostingSetup.Get(LocationCode, InvPostingGroup) then
+            LibraryInventory.CreateInventoryPostingSetup(InventoryPostingSetup, LocationCode, InvPostingGroup);
+        if Location.Get(LocationCode) then
+            LibraryInventory.UpdateInventoryPostingSetup(Location);
+    end;
+
+    procedure CreateGeneralPostingSetupForSale(GenBusPostGrp: Code[10]; GenProdPostGrp: Code[10])
+    var
+        LibraryERM: Codeunit "Library - ERM";
+        GeneralPostingSetup: Record "General Posting Setup";
     begin
         if GeneralPostingSetup.Get(GenBusPostGrp, GenProdPostGrp) then
             exit;
 
         LibraryERM.CreateGeneralPostingSetup(GeneralPostingSetup, GenBusPostGrp, GenProdPostGrp);
         GeneralPostingSetup.Validate("Sales Account", LibraryERM.CreateGLAccountNo);
-        GeneralPostingSetup."Sales Line Disc. Account" := LibraryERM.CreateGLAccountNo;
+        GeneralPostingSetup.Validate("Sales Line Disc. Account", LibraryERM.CreateGLAccountNo);
+        GeneralPostingSetup.Validate("Sales Inv. Disc. Account", LibraryERM.CreateGLAccountNo);
+        GeneralPostingSetup.Validate("Sales Credit Memo Account", LibraryERM.CreateGLAccountNo);
         GeneralPostingSetup.Validate("Purch. Account", LibraryERM.CreateGLAccountNo);
         GeneralPostingSetup.Validate("COGS Account", LibraryERM.CreateGLAccountNo);
         GeneralPostingSetup.Validate("Inventory Adjmt. Account", LibraryERM.CreateGLAccountNo);
         GeneralPostingSetup.Modify(true);
-        if not InventoryPostingSetup.Get(LocationCode, InvPostingGroup) then
-            LibraryInventory.CreateInventoryPostingSetup(InventoryPostingSetup, LocationCode, InvPostingGroup);
-        if Location.Get(LocationCode) then
-            LibraryInventory.UpdateInventoryPostingSetup(Location);
     end;
 
     procedure CreatePostingSetupForSaleItem(Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
@@ -458,12 +476,12 @@ codeunit 85002 "NPR Library - POS Master Data"
         if not POSPostingProfile.Find() then
             POSPostingProfile.Insert();
 
+        LibraryERM.CreateGeneralPostingSetupInvt(GeneralPostingSetup);
         POSPostingProfile."POS Posting Diff. Account" := LibraryERM.CreateGLAccountNo();
         POSPostingProfile."Max. POS Posting Diff. (LCY)" := 0.5;
         POSPostingProfile."POS Sales Rounding Account" := LibraryERM.CreateGLAccountWithSalesSetup();
         POSPostingProfile."POS Sales Amt. Rndng Precision" := 0.5;
 
-        LibraryERM.CreateGeneralPostingSetupInvt(GeneralPostingSetup);
         POSPostingProfile.Validate("Gen. Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group");
         LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 25);
         POSPostingProfile.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
@@ -727,15 +745,18 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryERM: Codeunit "Library - ERM";
         GeneralPostingSetup: Record "General Posting Setup";
         GLAccount: Record "G/L Account";
+        NPRLibrarySalesEvents: Codeunit "NPR Library - Sales Events";
     begin
         VoucherType.Init();
         if (not VoucherType.Get('PARTIAL')) then begin
             VoucherType.Code := 'PARTIAL';
             VoucherType.Insert();
         end;
+        EnsureGeneralPostingSetupExists();
         VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
 
         GLAccount.Get(VoucherType."Account No.");
+        NPRLibrarySalesEvents.RegisterGenProductPostingGroup(GLAccount."Gen. Prod. Posting Group");
         GeneralPostingSetup.Get(GLAccount."Gen. Bus. Posting Group", GLAccount."Gen. Prod. Posting Group");
         LibraryERM.SetGeneralPostingSetupSalesAccounts(GeneralPostingSetup);
         GeneralPostingSetup.Modify();
@@ -753,14 +774,19 @@ codeunit 85002 "NPR Library - POS Master Data"
 
     procedure CreateDefaultVoucherType(var VoucherType: Record "NPR NpRv Voucher Type"; AllowTopUp: Boolean)
     var
+        GLAccount: Record "G/L Account";
         LibraryERM: Codeunit "Library - ERM";
+        NPRLibrarySalesEvents: Codeunit "NPR Library - Sales Events";
     begin
         VoucherType.Init();
         if (not VoucherType.Get('DEFAULT')) then begin
             VoucherType.Code := 'DEFAULT';
             VoucherType.Insert();
         end;
+        EnsureGeneralPostingSetupExists();
         VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
+        GLAccount.Get(VoucherType."Account No.");
+        NPRLibrarySalesEvents.RegisterGenProductPostingGroup(GLAccount."Gen. Prod. Posting Group");
         VoucherType."No. Series" := LibraryERM.CreateNoSeriesCode('D');
         VoucherType."Arch. No. Series" := LibraryERM.CreateNoSeriesCode('DA');
         VoucherType."Reference No. Type" := VoucherType."Reference No. Type"::Pattern;
@@ -770,6 +796,18 @@ codeunit 85002 "NPR Library - POS Master Data"
         VoucherType."Send Voucher Module" := CreateDefaultSendVoucherModule();
         VoucherType."Payment Type" := CreateVoucherPaymentMethod();
         VoucherType.Modify();
+    end;
+
+    local procedure EnsureGeneralPostingSetupExists()
+    var
+        GeneralPostingSetup: Record "General Posting Setup";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        GeneralPostingSetup.SetFilter("Gen. Bus. Posting Group", '<>%1', '');
+        GeneralPostingSetup.SetFilter("Gen. Prod. Posting Group", '<>%1', '');
+        if not GeneralPostingSetup.FindFirst() then
+            // CreateGLAccountWithSalesSetup requires at least one complete posting setup.
+            LibraryERM.CreateGeneralPostingSetupInvt(GeneralPostingSetup);
     end;
 
     procedure CreateReturnVoucherType(ReturnVoucherType: Code[20]; VoucherType: Code[20])
@@ -852,10 +890,14 @@ codeunit 85002 "NPR Library - POS Master Data"
         if not PriceListLine.FindFirst() then
             LibraryPriceCalculation.CreatePriceListLine(PriceListLine, PriceListHeader, Enum::"Price Amount Type"::Price, Enum::"Price Asset Type"::Item, ItemNo);
         PriceListLine."Unit Price" := Price;
+        PriceListLine.Status := PriceListLine.Status::Active;
         PriceListLine.Modify();
 
         if PriceListHeader.Status <> PriceListHeader.Status::Active then begin
-            PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
+            if PriceSourceType = PriceSourceType::"All Customers" then
+                PriceListHeader.Status := PriceListHeader.Status::Active
+            else
+                PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
             PriceListHeader.Modify();
         end;
     end;
@@ -863,6 +905,9 @@ codeunit 85002 "NPR Library - POS Master Data"
     #region CreateDefaultGroupCodeSetup
     internal procedure CreateDefaultGroupCodeSetup(var NPRGroupCode: Record "NPR Group Code")
     begin
+        if NPRGroupCode.Get('DEFAULT') then
+            exit;
+
         NPRGroupCode.Init();
         NPRGroupCode.Code := 'DEFAULT';
         NPRGroupCode.Description := 'DEFAULT';
@@ -870,4 +915,3 @@ codeunit 85002 "NPR Library - POS Master Data"
     end;
     #endregion CreateDefaultGroupCodeSetup
 }
-
