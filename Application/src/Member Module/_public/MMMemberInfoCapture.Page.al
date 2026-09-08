@@ -973,9 +973,6 @@
 
     trigger OnAfterGetRecord()
     begin
-        if (ActivationDateEditable) then
-            Rec.Validate("Document Date", ActivationDate);
-
         if (_ShowAddToMembershipSection) then
             SetMembershipDetails(ExternalMembershipNo);
 
@@ -1055,7 +1052,6 @@
         ActivationDateMandatory: Boolean;
         INVALID_ACTIVATION_DATE: Label 'The activation date %1 is not valid. The resulting membership must have remaining time when applying the membership duration formula to activation date.';
         INVALID_ACTIVATION_DATE_2: Label 'The activation date %1 is not valid. The membership activation date must not exceed the membership duration applied to work date.';
-        ActivationDate: Date;
         ExternalMembershipNo: Code[20];
         _ShowNewMemberSection: Boolean;
         _ShowNewCardSection: Boolean;
@@ -1713,7 +1709,10 @@
                         Rec."Document Date" := WorkDate();
                     MembershipSalesSetup."Valid From Base"::DATEFORMULA:
                         begin
-                            Rec."Document Date" := CalcDate(MembershipSalesSetup."Valid From Date Calculation", WorkDate());
+                            // Only a default: this runs on every record fetch, so re-deriving would discard an
+                            // operator-entered date when the capture is revisited.
+                            if (Rec."Document Date" = 0D) then
+                                Rec."Document Date" := CalcDate(MembershipSalesSetup."Valid From Date Calculation", WorkDate());
                             ActivationDateEditable := true;
                         end;
                     MembershipSalesSetup."Valid From Base"::PROMPT:
@@ -2282,7 +2281,6 @@
 
             end;
         end;
-        ActivationDate := Rec."Document Date";
     end;
 
     local procedure ValidateNationalIdentifier()
