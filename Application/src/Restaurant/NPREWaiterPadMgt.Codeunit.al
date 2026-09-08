@@ -471,14 +471,7 @@
 
     local procedure WPIsServed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
     var
-        TempFlowStatus: Record "NPR NPRE Flow Status" temporary;
-        KitchenRequest: Record "NPR NPRE Kitchen Request";
-        KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link";
-        TempKitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
-        TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        TempWPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
-        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         RestPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
         if not SetupProxy.KDSActivated() then
@@ -490,32 +483,7 @@
         if WaiterPadLine.IsEmpty() then
             exit(true);
 
-        RestPrint.InitTempFlowStatusList(TempFlowStatus, TempFlowStatus."Status Object"::WaiterPadLineMealFlow);
-        RestPrint.InitTempPrintCategoryList(TempPrintCategory);
-        RestPrint.BufferEligibleForSendingWPadLines(
-            WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
-            TempFlowStatus, TempPrintCategory, true, false, TempWPadLineBuffer);
-
-        if TempWPadLineBuffer.FindSet() then
-            repeat
-                if WaiterPadLine.Get(TempWPadLineBuffer."Waiter Pad No.", TempWPadLineBuffer."Waiter Pad Line No.") then
-                    if KitchenOrderMgt.FindApplicableWPLineKitchenStations(
-                        TempKitchenStationBuffer, WaiterPadLine, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code")
-                    then begin
-                        KitchenOrderMgt.InitKitchenReqSourceFromWaiterPadLine(
-                            KitchenReqSourceParam, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", '', '', TempWPadLineBuffer."Serving Step", 0DT);
-                        KitchenRequest.Reset();
-                        KitchenOrderMgt.FindKitchenRequestsForSourceDoc(KitchenRequest, KitchenReqSourceParam);
-                        if not KitchenRequest.FindSet() then
-                            exit(false);
-                        repeat
-                            if KitchenRequest."Line Status" <> KitchenRequest."Line Status"::Served then
-                                exit(false);
-                        until KitchenRequest.Next() = 0;
-                    end;
-            until TempWPadLineBuffer.Next() = 0;
-
-        exit(true);
+        exit(RestPrint.AllEligibleKDSLinesServed(WaiterPadLine));
     end;
 
     procedure MoveNumberOfGuests(var FromWaiterPad: Record "NPR NPRE Waiter Pad"; var ToWaiterPad: Record "NPR NPRE Waiter Pad"; NumberOfGuests: Integer)

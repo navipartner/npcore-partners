@@ -278,7 +278,7 @@
         exit(not WPadLineBuffer.IsEmpty());
     end;
 
-    internal procedure BufferEligibleForSendingWPadLines(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; OutputType: Integer; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; ForceResend: Boolean; AskResendConfirmation: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf.")
+    local procedure BufferEligibleForSendingWPadLines(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; OutputType: Integer; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; ForceResend: Boolean; AskResendConfirmation: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf.")
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
@@ -453,6 +453,128 @@
         until FlowStatus.Next() = 0;
 
         Span.Finish();
+    end;
+
+    internal procedure AllEligibleKDSLinesServed(var WaiterPadLineParam: Record "NPR NPRE Waiter Pad Line"): Boolean
+    var
+        TempFlowStatus: Record "NPR NPRE Flow Status" temporary;
+        TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
+        TempWPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
+        TempWPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        NewRestaurantPrintExp: Codeunit "NPR New Restaurant Print Exp.";
+    begin
+        //Which lines are outstanding is decided by the same eligibility rules that decide what gets sent, so the served check
+        //has to follow whichever print implementation is active.
+
+        //Taken by reference and copied, the same way BufferWPadLinesForSending does it. By reference because the caller's
+        //filters are the only thing scoping this to one waiter pad, and an AL record parameter passed by value arrives
+        //without them - measured on BC28, and the reason an earlier revision of this procedure scanned every waiter pad line
+        //in the company. Copied because the buffering below leaves its own filters and a moved cursor on what it is handed.
+        WaiterPadLine.Copy(WaiterPadLineParam);
+        InitTempFlowStatusList(TempFlowStatus, TempFlowStatus."Status Object"::WaiterPadLineMealFlow);
+        InitTempPrintCategoryList(TempPrintCategory);
+
+        //ForceResend is forced on, so the buffer holds every line in scope for KDS output whether or not it was ever sent.
+        //That is deliberate: an in-scope line the kitchen was never told about has no requests and therefore reads as
+        //unserved below, and food nobody asked the kitchen for is not food that has been served.
+
+        if NewRestaurantPrintExp.IsFeatureEnabled() then begin
+            BufferEligibleForSendingWPadLines(
+                WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
+                TempFlowStatus, TempPrintCategory, true, false, TempWPadLineOutBuffer);
+            if TempWPadLineOutBuffer.FindSet() then
+                repeat
+                    if not WPadLineIsServed(
+                        TempWPadLineOutBuffer."Waiter Pad No.", TempWPadLineOutBuffer."Waiter Pad Line No.",
+                        TempWPadLineOutBuffer."Serving Step", TempWPadLineOutBuffer."Print Category Code")
+                    then
+                        exit(false);
+                until TempWPadLineOutBuffer.Next() = 0;
+            exit(true);
+        end;
+
+        BufferEligibleForSendingWPadLines(
+            WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
+            TempFlowStatus, TempPrintCategory, true, false, TempWPadLineBuffer);
+        if TempWPadLineBuffer.FindSet() then
+            repeat
+                if not WPadLineIsServed(
+                    TempWPadLineBuffer."Waiter Pad No.", TempWPadLineBuffer."Waiter Pad Line No.",
+                    TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code")
+                then
+                    exit(false);
+            until TempWPadLineBuffer.Next() = 0;
+        exit(true);
+    end;
+
+    local procedure WPadLineIsServed(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer; ServingStep: Code[10]; PrintCategoryCode: Code[20]): Boolean
+    var
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        KitchenReqSource: Record "NPR NPRE Kitchen Req.Src. Link";
+        TempKitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+        LineGoneTok: Label 'served: the line was buffered as eligible but no longer exists', Locked = true;
+        NoKitchenRequestsTok: Label 'unserved: no kitchen requests found for the line', Locked = true;
+        NoStationsTok: Label 'served: routing resolves no kitchen station for the line''s current seating', Locked = true;
+        RequestNotServedTok: Label 'unserved: a kitchen request is not yet served', Locked = true;
+    begin
+        //The line was buffered as eligible moments ago but is no longer there, so there is nothing left to serve.
+        if not WaiterPadLine.Get(WaiterPadNo, WaiterPadLineNo) then begin
+            LogServedCheckOutcome(WaiterPadNo, WaiterPadLineNo, ServingStep, PrintCategoryCode, LineGoneTok);
+            exit(true);
+        end;
+
+        //Routing does not resolve for this line's current seating, so it is treated as nothing outstanding.
+        //This asks whether routing resolves *now*, not whether anything was ever routed to produce the line, and the two
+        //diverge once a pad moves seating: ChangeSeating relinks without re-routing, so a pad moved to a location whose
+        //restaurant has no matching station selection reports every line served while the kitchen is still cooking.
+        //Note the asymmetry with the FindKitchenRequestsForSourceDoc guard further down, which reads its own absence of
+        //evidence the other way: no stations resolved means served, no requests found means unserved. Pre-existing, and
+        //the mirror of the cancelled-request case in CORE-1961 - both infer a serving state from something missing.
+        //This branch is the one that frees a table early, so it is logged even though it answers in the affirmative.
+        if not KitchenOrderMgt.FindApplicableWPLineKitchenStations(
+            TempKitchenStationBuffer, WaiterPadLine, ServingStep, PrintCategoryCode)
+        then begin
+            LogServedCheckOutcome(WaiterPadNo, WaiterPadLineNo, ServingStep, PrintCategoryCode, NoStationsTok);
+            exit(true);
+        end;
+
+        KitchenOrderMgt.InitKitchenReqSourceFromWaiterPadLine(
+            KitchenReqSource, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", '', '', ServingStep, 0DT);
+        KitchenRequest.Reset();
+        KitchenOrderMgt.FindKitchenRequestsForSourceDoc(KitchenRequest, KitchenReqSource);
+        if not KitchenRequest.FindSet() then begin
+            LogServedCheckOutcome(WaiterPadNo, WaiterPadLineNo, ServingStep, PrintCategoryCode, NoKitchenRequestsTok);
+            exit(false);
+        end;
+        repeat
+            if KitchenRequest."Line Status" <> KitchenRequest."Line Status"::Served then begin
+                LogServedCheckOutcome(WaiterPadNo, WaiterPadLineNo, ServingStep, PrintCategoryCode, RequestNotServedTok);
+                exit(false);
+            end;
+        until KitchenRequest.Next() = 0;
+        exit(true);
+    end;
+
+    local procedure LogServedCheckOutcome(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer; ServingStep: Code[10]; PrintCategoryCode: Code[20]; Outcome: Text)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        ServedCheckKeyTok: Label 'npre.waiterpad.%1.line-%2.served-check', Locked = true;
+        ServedCheckDetailsTok: Label 'serving step ''%1'', print category ''%2'': %3', Locked = true;
+    begin
+        //Both directions are recorded, not just the vetoes. A false blocks the pad close and TryCloseWaiterPad discards it
+        //with no error - the symptom this change set exists to make diagnosable - but the two affirmative-on-absence paths
+        //are worse when they are wrong: the pad closes and the seating clears while the kitchen is still cooking, and
+        //nobody notices until the food arrives at a reseated table.
+        //
+        //Keyed per pad and line rather than by a constant. The Sentry scope is the whole transaction and the data is
+        //last-write-wins, while TryCloseWaiterPad runs once per posted sales line and once per kitchen request source
+        //link - so a constant key would leave a sale spanning several pads reporting only whichever was checked last.
+        Sentry.AddTransactionData(
+            StrSubstNo(ServedCheckKeyTok, WaiterPadNo, WaiterPadLineNo),
+            StrSubstNo(ServedCheckDetailsTok, ServingStep, PrintCategoryCode, Outcome));
     end;
 
     local procedure WPadLineIsInScopeForSending(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; OutputType: Integer; ServingStepCode: Code[10]; PrintCategoryCode: Code[20]): Boolean
@@ -978,7 +1100,7 @@
         WaiterPad.Modify();
     end;
 
-    internal procedure InitTempPrintCategoryList(var PrintCategoryTmp: Record "NPR NPRE Print/Prod. Cat.")
+    local procedure InitTempPrintCategoryList(var PrintCategoryTmp: Record "NPR NPRE Print/Prod. Cat.")
     var
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
     begin
@@ -997,7 +1119,7 @@
             PrintCategoryTmp.Insert();
     end;
 
-    internal procedure InitTempFlowStatusList(var FlowStatusTmp: Record "NPR NPRE Flow Status"; StatusObject: Enum "NPR NPRE Status Object")
+    local procedure InitTempFlowStatusList(var FlowStatusTmp: Record "NPR NPRE Flow Status"; StatusObject: Enum "NPR NPRE Status Object")
     var
         FlowStatus: Record "NPR NPRE Flow Status";
     begin
