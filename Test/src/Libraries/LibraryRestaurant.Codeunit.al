@@ -588,5 +588,113 @@ codeunit 85242 "NPR Library - Restaurant"
         WaiterPadLine.Validate("Billed Quantity", BilledQuantity);
         WaiterPadLine.Modify(true);
     end;
+
+    procedure CreateKitchenStationSelection(
+        var KitchenStationSelection: Record "NPR NPRE Kitchen Station Slct.";
+        RestaurantCode: Code[20];
+        SeatingLocationCode: Code[20];
+        ServingStep: Code[10];
+        PrintCategoryCode: Code[20];
+        KitchenStationCode: Code[20];
+        ProductionStep: Integer)
+    begin
+        KitchenStationSelection.Init();
+        KitchenStationSelection."Restaurant Code" := RestaurantCode;
+        KitchenStationSelection."Seating Location" := SeatingLocationCode;
+        KitchenStationSelection."Serving Step" := ServingStep;
+        KitchenStationSelection."Print Category Code" := PrintCategoryCode;
+        KitchenStationSelection."Production Restaurant Code" := RestaurantCode;
+        KitchenStationSelection."Kitchen Station" := KitchenStationCode;
+        KitchenStationSelection."Production Step" := ProductionStep;
+        KitchenStationSelection.Insert(true);
+    end;
+
+    procedure CreateProductionChain(RestaurantCode: Code[20]; SeatingLocationCode: Code[20]; ServingStep: Code[10]; StepCount: Integer)
+    var
+        Step: Integer;
+    begin
+        // One station per production step, numbered from zero. Tests reach the resulting stations through the
+        // "NPR NPRE Kitchen Req. Station" records created on sending, which carry the production step themselves,
+        // so there is no need to hand the station codes back to the caller.
+        for Step := 0 to StepCount - 1 do
+            AddKitchenStationAtStep(RestaurantCode, SeatingLocationCode, ServingStep, Step);
+    end;
+
+    procedure AddKitchenStationAtStep(RestaurantCode: Code[20]; SeatingLocationCode: Code[20]; ServingStep: Code[10]; ProductionStep: Integer)
+    var
+        KitchenStation: Record "NPR NPRE Kitchen Station";
+        KitchenStationSelection: Record "NPR NPRE Kitchen Station Slct.";
+    begin
+        CreateKitchenStation(KitchenStation, RestaurantCode);
+        CreateKitchenStationSelection(
+            KitchenStationSelection, RestaurantCode, SeatingLocationCode, ServingStep, '', KitchenStation.Code, ProductionStep);
+    end;
+
+    procedure CreatePrintCategory(var PrintCategory: Record "NPR NPRE Print/Prod. Cat.")
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        PrintCategory.Init();
+        PrintCategory.Code := CopyStr(
+            LibraryUtility.GenerateRandomCode(PrintCategory.FieldNo(Code), DATABASE::"NPR NPRE Print/Prod. Cat."), 1,
+            LibraryUtility.GetFieldLength(DATABASE::"NPR NPRE Print/Prod. Cat.", PrintCategory.FieldNo(Code)));
+        PrintCategory.Description := 'Test Print Category';
+        PrintCategory.Insert(true);
+    end;
+
+    procedure AssignPrintCategoryToRoutingProfile(ItemRoutingProfile: Record "NPR NPRE Item Routing Profile"; PrintCategoryCode: Code[20])
+    var
+        AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
+        ItemRoutingProfileRefresh: Record "NPR NPRE Item Routing Profile";
+    begin
+        // Re-get the record so the RecordId is properly formed, as AssignFlowStatusToRoutingProfile does.
+        ItemRoutingProfileRefresh.Get(ItemRoutingProfile.Code);
+
+        AssignedPrintCategory.Init();
+        AssignedPrintCategory."Table No." := DATABASE::"NPR NPRE Item Routing Profile";
+        AssignedPrintCategory."Record ID" := ItemRoutingProfileRefresh.RecordId;
+        AssignedPrintCategory."Print/Prod. Category Code" := PrintCategoryCode;
+        if not AssignedPrintCategory.Find() then
+            AssignedPrintCategory.Insert();
+    end;
+
+    procedure SendWaiterPadToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+        SendWaiterPadToKitchen(WaiterPad, false);
+    end;
+
+    procedure SendWaiterPadToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; ShowNothingToSendErr: Boolean) Sent: Boolean
+    var
+        PrintTemplate: Record "NPR NPRE Print Templ.";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
+    begin
+        // ShowNothingToSendErr = true is how the POS "Send Kitchen Order" action sends a waiter pad.
+        // The return value is the only signal that anything was sent at all, so it is handed back rather than dropped:
+        // a test asserting that nothing reached the kitchen needs to be able to tell "nothing was eligible" from
+        // "the send never ran".
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        exit(
+            RestaurantPrint.PrintWaiterPadLinesToKitchen(
+                WaiterPad, WaiterPadLine, PrintTemplate."Print Type"::"Kitchen Order", '', false, ShowNothingToSendErr));
+    end;
+
+    procedure FindKitchenRequestsForPad(WaiterPadNo: Code[20]; var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+    begin
+        KitchenRequest.Reset();
+        KitchenRequest.SetRange("Request No.", 0);
+        KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
+        KitchenReqSourceLink.SetRange("Source Document No.", WaiterPadNo);
+        if not KitchenReqSourceLink.FindSet() then
+            exit;
+        KitchenRequest.SetRange("Request No.");
+        repeat
+            KitchenRequest.Get(KitchenReqSourceLink."Request No.");
+            KitchenRequest.Mark(true);
+        until KitchenReqSourceLink.Next() = 0;
+        KitchenRequest.MarkedOnly(true);
+    end;
 }
 #endif
