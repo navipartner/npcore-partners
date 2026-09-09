@@ -269,6 +269,11 @@
             Caption = 'Allow Merge On Conflict';
             DataClassification = CustomerContent;
         }
+        field(192; SuppressPersonalData; Boolean)
+        {
+            Caption = 'Suppress Personal Data';
+            DataClassification = SystemMetadata;
+        }
         field(200; "User Logon ID"; Code[80])
         {
             Caption = 'User Logon ID';

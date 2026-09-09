@@ -523,6 +523,22 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         EcomSalesMembershipLink.DeleteAll(false);
     end;
 
+    internal procedure GetJTextMaxLength(Token: JsonToken; Path: Text; MaxLength: Integer; Required: Boolean): Text
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        Value: Text;
+        MaxLengthErr: Label 'The value of property: %1 is too long. Maximum length: %2. Current length: %3.', Comment = '%1 - path, %2 - max. length, %3 - current length', Locked = true;
+    begin
+        Value := JsonHelper.GetJText(Token, Path, Required);
+        if MaxLength <= 0 then
+            exit(Value);
+
+        if StrLen(Value) > MaxLength then
+            Error(MaxLengthErr, Path, MaxLength, StrLen(Value));
+
+        exit(Value);
+    end;
+
     internal procedure CheckPartialVoucherAllowed(var EcomSalesLine: Record "NPR Ecom Sales Line"; SalesLineJsonToken: JsonToken; VoucherModuleCode: Code[20])
     var
         VoucherType: Record "NPR NpRv Voucher Type";

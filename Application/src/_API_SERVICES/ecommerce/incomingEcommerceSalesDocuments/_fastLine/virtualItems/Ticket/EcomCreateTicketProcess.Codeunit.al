@@ -43,7 +43,6 @@ codeunit 6248548 "NPR EcomCreateTicketProcess"
         EcomSalesLine: Record "NPR Ecom Sales Line";
         DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         UpdateErrStatus: Boolean;
-        TicketEventId: Label 'NPR_API_Ecommerce_VirtualTicketCreationFailed', Locked = true;
     begin
         if not IncEcomSalesDocSetup.Get() then
             IncEcomSalesDocSetup.Init();
@@ -79,7 +78,6 @@ codeunit 6248548 "NPR EcomCreateTicketProcess"
         until EcomSalesLine.Next() = 0;
 
         if not Success then begin
-            EcomVirtualItemMgt.EmitError(GetLastErrorText(), TicketEventId);
             if UpdateErrStatus then
                 EcomSalesHeader2."Ticket Processing Status" := EcomSalesHeader."Ticket Processing Status"::Error
         end else

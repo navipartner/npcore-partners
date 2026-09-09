@@ -43,7 +43,6 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
     var
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
         UpdateErrStatus: Boolean;
-        MembershipEventId: Label 'NPR_API_Ecommerce_VirtualMembershipCreationFailed', Locked = true;
         ErrorMessage: Text;
     begin
         if not IncEcomSalesDocSetup.Get() then
@@ -59,30 +58,8 @@ codeunit 6248533 "NPR EcomCreateMMShipProcess"
             ErrorMessage := GetLastErrorText();
             UpdateErrStatus := EcomSalesLine."Virtual Item Proc Retry Count" >= IncEcomSalesDocSetup."Max Virtual Item Retry Count";
             SetSalesDocMembershipStatusError(EcomSalesLine, CopyStr(ErrorMessage, 1, MaxStrLen(EcomSalesLine."Virtual Item Process ErrMsg")), UpdateErrStatus);
-            EmitError(ErrorMessage, MembershipEventId);
         end else
             SetSalesDocMembershipStatusCreated(EcomSalesLine);
-    end;
-
-    local procedure EmitError(ErrorTxt: Text; EventId: Text)
-    var
-        CustomDimensions: Dictionary of [Text, Text];
-        ActiveSession: Record "Active Session";
-    begin
-        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
-            Clear(ActiveSession);
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-        CustomDimensions.Add('NPR_ErrorText', ErrorTxt);
-        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
-
-        Session.LogMessage(EventId, ErrorTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     local procedure SetSalesDocMembershipStatusError(var EcomSalesLine: Record "NPR Ecom Sales Line"; ErrorMessage: Text[500]; UpdateStatus: Boolean)

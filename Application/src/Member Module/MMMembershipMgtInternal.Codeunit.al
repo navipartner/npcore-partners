@@ -11,6 +11,7 @@
         CASE_MISSING: Label '%1 value %2 is missing its implementation.';
         TO_MANY_MEMBERS: Label 'Max number of members exceeded. The membership %1 of type %2 allows a maximum of %3 members per membership.';
         LOGIN_ID_EXIST: Label 'The selected member logon id [%1] is already in use.\\Member %2.';
+        LOGIN_ID_EXIST_NO_PII: Label 'The selected member logon id is already in use.\\Member %1.', Comment = '%1 = external member no. of the member already holding it';
         LOGIN_ID_BLANK: Label 'The %1 can''t be blank when the setting for %2 is %3.';
 
         MEMBER_BLOCKED: Label 'Member ID [%1] is blocked. Block date is %2.';
@@ -66,6 +67,8 @@
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
         ALLOW_MEMBER_MERGE_NOT_SET: Label 'This request violates the community’s unique member identity rules. See the API documentation for merge options.';
         MEMBER_WITH_UID_EXISTS: Label 'Member with unique ID [%1] with name: %2 is already in use.';
+        AGE_VERIFICATION_NO_PII: Label 'The member does not meet the age constraint of %1 years set on this product.', Comment = '%1 = required age in years';
+        MEMBER_WITH_UID_EXISTS_NO_PII: Label 'A member with the same %1 already exists.', Comment = '%1 = member unique identity type';
         CONCURRENT_MEMBER_UPDATE: Label 'A member with the same unique ID is being handled by another process. Please try again later.';
 
     internal procedure CreateMembershipInteractive(var MemberInfoCapture: Record "NPR MM Member Info Capture") ExternalCardNumber: Text[100];
@@ -450,7 +453,7 @@
             if (not CheckAgeConstraint(GetMembershipAgeConstraintDate(MembershipSalesSetup, MembershipInfoCapture), Member.Birthday, MembershipSetup."Validate Age Against",
                 MembershipSalesSetup."Age Constraint Type", MembershipSalesSetup."Age Constraint (Years)")) then begin
                 Span.Finish();
-                exit(RaiseError(ReasonText, StrSubstNo(AGE_VERIFICATION, Member."Display Name", MembershipSalesSetup."Age Constraint (Years)"), AGE_VERIFICATION_NO) = 0);
+                exit(RaiseError(ReasonText, GetAgeVerificationErrorText(MembershipInfoCapture, Member, MembershipSalesSetup."Age Constraint (Years)"), AGE_VERIFICATION_NO) = 0);
             end;
         end;
 
@@ -1546,7 +1549,7 @@
 
             case Community."Create Member UI Violation" of
                 Community."Create Member UI Violation"::Error:
-                    RaiseError(ResponseMessage, StrSubstNo(MEMBER_WITH_UID_EXISTS, Member.GetFilters(), Member."Display Name"), MEMBER_WITH_UID_EXISTS_NO);
+                    RaiseError(ResponseMessage, GetMemberWithUidExistsErrorText(MemberInfoCapture, Member, Community."Member Unique Identity"), MEMBER_WITH_UID_EXISTS_NO);
 
                 Community."Create Member UI Violation"::Confirm:
                     begin
@@ -2456,7 +2459,7 @@
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
         if (not CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
-            exit(ExitFalseOrWithError(WithConfirm, ReasonText));
+            exit(ExitFalseOrWithError(WithConfirm, GetAlterAgeConstraintErrorText(MemberInfoCapture, MembershipAlterationSetup, ReasonText)));
 
         if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
             IPriceHandler := MembershipAlterationSetup."Price Calculation";
@@ -2662,7 +2665,7 @@
         end;
 
         if (not CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
-            exit(ExitFalseOrWithError(WithConfirm, ReasonText));
+            exit(ExitFalseOrWithError(WithConfirm, GetAlterAgeConstraintErrorText(MemberInfoCapture, MembershipAlterationSetup, ReasonText)));
 
         if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
             IPriceHandler := MembershipAlterationSetup."Price Calculation";
@@ -2865,7 +2868,7 @@
         ValidFromDate := GetUpgradeInitialValidFromDate(MembershipEntry."Entry No.");
 
         if (not CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
-            exit(ExitFalseOrWithError(WithConfirm, ReasonText));
+            exit(ExitFalseOrWithError(WithConfirm, GetAlterAgeConstraintErrorText(MemberInfoCapture, MembershipAlterationSetup, ReasonText)));
 
         if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
             IPriceHandler := MembershipAlterationSetup."Price Calculation";
@@ -5703,7 +5706,10 @@
 
         MembershipRole."User Logon ID" := SelectMemberLogonCredentials(Membership."Community Code", Member, MemberInfoCapture."User Logon ID");
         if (LogonIdExists(MembershipRole."Community Code", MembershipRole."User Logon ID")) then
-            Error(LOGIN_ID_EXIST, MembershipRole."User Logon ID", Member."External Member No.");
+            if (MemberInfoCapture.SuppressPersonalData) then
+                Error(LOGIN_ID_EXIST_NO_PII, Member."External Member No.")
+            else
+                Error(LOGIN_ID_EXIST, MembershipRole."User Logon ID", Member."External Member No.");
 
         MembershipRole."GDPR Agreement No." := MembershipSetup."GDPR Agreement No.";
         MembershipRole."GDPR Data Subject Id" := CreateDataSubjectId();
@@ -6343,6 +6349,31 @@
             ResponseMessage := StrSubstNo(PlaceHolderLbl, MessageId, MessageText);
 
         Error(ResponseMessage);
+    end;
+
+    local procedure GetAgeVerificationErrorText(MemberInfoCapture: Record "NPR MM Member Info Capture"; Member: Record "NPR MM Member"; AgeConstraintYears: Integer): Text
+    begin
+        if (MemberInfoCapture.SuppressPersonalData) then
+            exit(StrSubstNo(AGE_VERIFICATION_NO_PII, AgeConstraintYears));
+
+        exit(StrSubstNo(AGE_VERIFICATION, Member."Display Name", AgeConstraintYears));
+    end;
+
+    local procedure GetAlterAgeConstraintErrorText(MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; ReasonText: Text): Text
+    begin
+        //ReasonText comes from CheckMemberAgeConstraint, which names the member and their birthday.
+        if (MemberInfoCapture.SuppressPersonalData) then
+            exit(StrSubstNo(AGE_VERIFICATION_NO_PII, MembershipAlterationSetup."Age Constraint (Years)"));
+
+        exit(ReasonText);
+    end;
+
+    local procedure GetMemberWithUidExistsErrorText(MemberInfoCapture: Record "NPR MM Member Info Capture"; Member: Record "NPR MM Member"; MemberUniqueIdentity: Enum "NPR MM Member Unique Identity"): Text
+    begin
+        if (MemberInfoCapture.SuppressPersonalData) then
+            exit(StrSubstNo(MEMBER_WITH_UID_EXISTS_NO_PII, MemberUniqueIdentity));
+
+        exit(StrSubstNo(MEMBER_WITH_UID_EXISTS, Member.GetFilters(), Member."Display Name"));
     end;
 
     local procedure ExitFalseOrWithError(VerboseMessage: Boolean; ErrorMessage: Text): Boolean

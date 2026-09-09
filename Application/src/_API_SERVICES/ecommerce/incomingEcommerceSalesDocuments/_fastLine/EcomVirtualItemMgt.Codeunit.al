@@ -647,27 +647,6 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         exit(EcomCreateCouponImpl.IsCouponItem(EcomSalesLine, CheckCouponTypes));
     end;
 
-    internal procedure EmitError(ErrorTxt: text; EventId: text)
-    var
-        CustomDimensions: Dictionary of [Text, Text];
-        ActiveSession: Record "Active Session";
-    begin
-        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-            Clear(ActiveSession);
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-        CustomDimensions.Add('NPR_ErrorText', ErrorTxt);
-        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
-
-        Session.LogMessage(EventId, ErrorTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
-    end;
-
     internal procedure SetVirtualItemSubtypeFilter(var EcomSalesLine: Record "NPR Ecom Sales Line")
     begin
         EcomSalesLine.SetFilter(Subtype, '%1|%2|%3|%4', EcomSalesLine.Subtype::Ticket, EcomSalesLine.Subtype::Voucher, EcomSalesLine.SubType::Membership, EcomSalesLine.Subtype::Coupon);

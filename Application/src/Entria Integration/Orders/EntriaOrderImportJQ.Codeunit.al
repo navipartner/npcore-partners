@@ -80,7 +80,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         Limit := 40;
         repeat
             if not DownloadOrdersPage(EntriaStore, WindowStartDT, Offset, Limit, PageCount) then begin
-                EmitError(GetLastErrorText(), EntriaStore.Code, '');
+                EmitError(EntriaStore.Code, '');
                 exit(false);
             end;
 
@@ -561,35 +561,10 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         Sentry.FinalizeScope();
     end;
 
-    local procedure TelemetryTracking(ErrorText: Text; DocumentNo: Code[20])
-    var
-        ActiveSession: Record "Active Session";
-        CustomDimensions: Dictionary of [Text, Text];
-        EventId: Label 'NPR_EntriaAPI_OrderImportFailed', Locked = true;
-    begin
-        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-            Clear(ActiveSession);
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-        CustomDimensions.Add('NPR_ErrorText', ErrorText);
-        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
-        if DocumentNo <> '' then
-            CustomDimensions.Add('NPR_EntriaDocumentNo', DocumentNo);
-
-        Session.LogMessage(EventId, ErrorText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
-    end;
-
-    local procedure EmitError(ErrorText: Text; StoreCode: Code[20]; DocumentNo: Code[20])
+    local procedure EmitError(StoreCode: Code[20]; DocumentNo: Code[20])
     begin
         if ShouldEmitSentryError(StoreCode) then
             EmitSentryError(StoreCode, DocumentNo);
-        TelemetryTracking(ErrorText, DocumentNo);
     end;
 
     local procedure InitGlobals()
@@ -604,7 +579,6 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         NewRetryCount: Integer;
     begin
         NewRetryCount := UpsertOrderFailure(EntriaStore.Code, DocumentNo, MedusaOrderId, OrderUpdatedAt, ErrorText, DisplayNo, CurrentDateTime());
-        TelemetryTracking(ErrorText, DocumentNo);
         if ShouldEmitSentryErrorForOrder(NewRetryCount) then
             if DocumentNo <> '' then
                 EmitSentryError(EntriaStore.Code, DocumentNo)
@@ -988,6 +962,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         if _EntriaIntegrationMgt.HasEnabledSalesOrderIntegrationStore() then
             SkipValidation := true;
     end;
+
     var
         _EntriaAPIHandler: Codeunit "NPR Entria API Handler";
         _EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";

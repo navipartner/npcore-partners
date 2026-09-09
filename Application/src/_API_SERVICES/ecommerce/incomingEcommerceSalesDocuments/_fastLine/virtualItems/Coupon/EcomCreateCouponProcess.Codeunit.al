@@ -47,10 +47,8 @@ codeunit 6151122 "NPR EcomCreateCouponProcess"
     internal procedure HandleResponse(Success: Boolean; var EcomSalesLine: Record "NPR Ecom Sales Line"; UpdateRetryCount: Boolean)
     var
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
-        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         ErrorMessage: Text;
         UpdateErrStatus: Boolean;
-        CouponEventId: Label 'NPR_API_Ecommerce_VirtualCouponCreationFailed', Locked = true;
     begin
         if not IncEcomSalesDocSetup.Get() then
             IncEcomSalesDocSetup.Init();
@@ -64,7 +62,6 @@ codeunit 6151122 "NPR EcomCreateCouponProcess"
             UpdateErrStatus := EcomSalesLine."Virtual Item Proc Retry Count" >= IncEcomSalesDocSetup."Max Virtual Item Retry Count";
             ErrorMessage := GetLastErrorText();
             SetSalesDocCouponStatusError(EcomSalesLine, ErrorMessage, UpdateErrStatus);
-            EcomVirtualItemMgt.EmitError(ErrorMessage, CouponEventId);
         end else
             SetSalesDocCouponStatusCreated(EcomSalesLine);
     end;

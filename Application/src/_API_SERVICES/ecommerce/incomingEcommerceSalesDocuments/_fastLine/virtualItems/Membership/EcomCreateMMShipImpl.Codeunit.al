@@ -307,6 +307,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         UpdateMemberInfoCaptureFromLine(MemberInfoCapture, EcomSalesLine);
         SetNotificationMethod(MemberInfoCapture);
         MemberInfoCapture.AllowMergeOnConflict := true;
+        MemberInfoCapture.SuppressPersonalData := true;
         MemberInfoCapture.Modify();
 
         GetMembershipSaleSetup(MembershipSalesSetup, GetItemNoAsCode20(EcomSalesLine));
@@ -471,7 +472,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         UniqueIdentityEmailOrPhoneRequiredErr: Label 'Membership community requires member email or phone number (Member Unique Identity = E-Mail or Phone No.). Member Email or Member Phone No. must be provided.', Locked = true;
         UniqueIdentityEmailAndFirstNameRequiredErr: Label 'Membership community requires member email and first name (Member Unique Identity = E-Mail and First Name). Both Member Email and Member First Name must be provided.', Locked = true;
         GdprApprovalRequiredErr: Label 'Membership %1 has GDPR Mode = Required. memberGdprApproval must be set to "accepted".', Comment = '%1=Membership Code', Locked = true;
-        InvalidEmailErr: Label 'memberEmail "%1" is not a valid email address.', Comment = '%1=Email address', Locked = true;
+        InvalidEmailErr: Label 'memberEmail is not a valid email address.', Locked = true;
     begin
         Community.Get(MembershipSetup."Community Code");
 
@@ -498,7 +499,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         if EcomSalesLine."Member Email" <> '' then
             if not TryCheckValidEmailAddress(EcomSalesLine."Member Email") then
-                Error(InvalidEmailErr, EcomSalesLine."Member Email");
+                Error(InvalidEmailErr);
 
         if MembershipSetup."GDPR Mode" = MembershipSetup."GDPR Mode"::REQUIRED then
             if MemberApiAgent.DecodeGdprConsent(EcomSalesLine."Member GDPR Approval") <> MemberInfoCapture."GDPR Approval"::ACCEPTED then
@@ -687,6 +688,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MembershipEntryNotFoundErr: Label 'No active membership entry found for membership %1.', Comment = '%1=External Membership No.', Locked = true;
         MembershipNotActivatedErr: Label 'Membership %1 must be activated before it can be altered.', Comment = '%1=External Membership No.', Locked = true;
         GracePeriodErr: Label 'Membership is outside the grace period for alteration type %1.', Comment = '%1=Alteration Type', Locked = true;
+        AlterAgeConstraintErr: Label 'The member does not meet the age constraint required for alteration type %1.', Comment = '%1 = Alteration Type';
         QuantityErr: Label 'Membership alteration line quantity must be 1.';
     begin
         if EcomSalesLine.Quantity <> 1 then
@@ -744,7 +746,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
                 Error(ReasonText);
 
         if not MembershipMgtInternal.CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, DocumentDate, StartDateNew, EndDateNew, ReasonText) then
-            Error(ReasonText);
+            Error(AlterAgeConstraintErr, MembershipAlterationSetup."Alteration Type");
 
         if not MembershipMgtInternal.CheckExtendMemberCards(false, Membership."Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, ExternalCardNo, CardEntryNo, ReasonText) then
             Error(ReasonText);
@@ -1173,6 +1175,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             MembershipAlterationSetup."Alteration Type"::EXTEND:
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::EXTEND;
         end;
+        MemberInfoCapture.SuppressPersonalData := true;
         MemberInfoCapture.Insert(); // Gets me the auto-increment Entry No. for tracking purposes
 
         // Execute the alteration logic

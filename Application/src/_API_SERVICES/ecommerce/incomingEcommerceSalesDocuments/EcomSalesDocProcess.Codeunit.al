@@ -53,7 +53,6 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
         if not Success then begin
             UpdateErrorStatus := EcomSalesHeader."Process Retry Count" >= IncEcomSalesDocSetup."Max Doc Process Retry Count";
             EcomSalesDocUtils.SetSalesDocCreationStatusError(EcomSalesHeader, CopyStr(GetLastErrorText(), 1, MaxStrLen(EcomSalesHeader."Last Error Message")), UpdateErrorStatus, false);
-            EmitError(GetLastErrorText());
         end else
             EcomSalesDocUtils.SetSalesDocCreationStatusCreated(EcomSalesHeader, false);
 
@@ -228,27 +227,6 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
     internal procedure GetShowError() ShowError: Boolean
     begin
         ShowError := _ShowError;
-    end;
-
-    local procedure EmitError(ErrorText: Text)
-    var
-        CustomDimensions: Dictionary of [Text, Text];
-        ActiveSession: Record "Active Session";
-    begin
-        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-            Clear(ActiveSession);
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-        CustomDimensions.Add('NPR_ErrorText', ErrorText);
-        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-        CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
-
-        Session.LogMessage('NPR_API_Ecommerce_IncomingSalesDocumentProcessFailed', ErrorText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     var

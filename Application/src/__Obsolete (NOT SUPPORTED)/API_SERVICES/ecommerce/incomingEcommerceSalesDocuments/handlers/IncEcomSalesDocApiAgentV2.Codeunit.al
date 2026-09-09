@@ -62,6 +62,7 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
     local procedure DeserializeIncomingEcomSalesHeader(RequestBody: JsonToken; var IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header");
     var
         JsonHelper: Codeunit "NPR Json Helper";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         IncEcomSalesDocApiEvents: Codeunit "NPR IncEcomSalesDocApiEvents";
         IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
         SalesDocToJsonToken: JsonToken;
@@ -90,35 +91,35 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
 
         //Sell-to
         SellToCustomerJsonToken := JsonHelper.GetJsonToken(RequestBody, 'sellToCustomer');
-        IncEcomSalesHeader."Sell-to Customer No." := JsonHelper.GetJText(RequestBody, 'sellToCustomer.no', MaxStrLen(IncEcomSalesHeader."Sell-to Customer No."), true, false);
-        IncEcomSalesHeader."Customer Template" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.customerTemplate', MaxStrLen(IncEcomSalesHeader."Customer Template"), true, false);
-        IncEcomSalesHeader."Configuration Template" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.configurationTemplate', MaxStrLen(IncEcomSalesHeader."Configuration Template"), true, false);
-        IncEcomSalesHeader."Sell-to Name" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.name', MaxStrLen(IncEcomSalesHeader."Sell-to Name"), true, true);
-        IncEcomSalesHeader."Sell-to Address" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.address', MaxStrLen(IncEcomSalesHeader."Sell-to Address"), true, true);
-        IncEcomSalesHeader."Sell-to Address 2" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.address2', MaxStrLen(IncEcomSalesHeader."Sell-to Address 2"), true, false);
-        IncEcomSalesHeader."Sell-to Post Code" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.postCode', MaxStrLen(IncEcomSalesHeader."Sell-to Post Code"), true, true);
-        IncEcomSalesHeader."Sell-to County" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.county', MaxStrLen(IncEcomSalesHeader."Sell-to County"), true, false);
-        IncEcomSalesHeader."Sell-to City" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.city', MaxStrLen(IncEcomSalesHeader."Sell-to City"), true, true);
-        IncEcomSalesHeader."Sell-to Country Code" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.countryCode', MaxStrLen(IncEcomSalesHeader."Sell-to Country Code"), true, true);
-        IncEcomSalesHeader."Sell-to Contact" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.contact', MaxStrLen(IncEcomSalesHeader."Sell-to Contact"), true, false);
-        IncEcomSalesHeader."Sell-to Email" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.email', MaxStrLen(IncEcomSalesHeader."Sell-to Email"), true, true);
-        IncEcomSalesHeader."Sell-to Phone No." := JsonHelper.GetJText(RequestBody, 'sellToCustomer.phone', MaxStrLen(IncEcomSalesHeader."Sell-to Phone No."), true, false);
-        IncEcomSalesHeader."Sell-to EAN" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.ean', MaxStrLen(IncEcomSalesHeader."Sell-to EAN"), true, false);
-        IncEcomSalesHeader."Sell-to VAT Registration No." := JsonHelper.GetJText(RequestBody, 'sellToCustomer.vatRegistrationNo', MaxStrLen(IncEcomSalesHeader."Sell-to VAT Registration No."), true, false);
+        IncEcomSalesHeader."Sell-to Customer No." := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.no', MaxStrLen(IncEcomSalesHeader."Sell-to Customer No."), false);
+        IncEcomSalesHeader."Customer Template" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.customerTemplate', MaxStrLen(IncEcomSalesHeader."Customer Template"), false);
+        IncEcomSalesHeader."Configuration Template" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.configurationTemplate', MaxStrLen(IncEcomSalesHeader."Configuration Template"), false);
+        IncEcomSalesHeader."Sell-to Name" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.name', MaxStrLen(IncEcomSalesHeader."Sell-to Name"), true);
+        IncEcomSalesHeader."Sell-to Address" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.address', MaxStrLen(IncEcomSalesHeader."Sell-to Address"), true);
+        IncEcomSalesHeader."Sell-to Address 2" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.address2', MaxStrLen(IncEcomSalesHeader."Sell-to Address 2"), false);
+        IncEcomSalesHeader."Sell-to Post Code" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.postCode', MaxStrLen(IncEcomSalesHeader."Sell-to Post Code"), true);
+        IncEcomSalesHeader."Sell-to County" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.county', MaxStrLen(IncEcomSalesHeader."Sell-to County"), false);
+        IncEcomSalesHeader."Sell-to City" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.city', MaxStrLen(IncEcomSalesHeader."Sell-to City"), true);
+        IncEcomSalesHeader."Sell-to Country Code" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.countryCode', MaxStrLen(IncEcomSalesHeader."Sell-to Country Code"), true);
+        IncEcomSalesHeader."Sell-to Contact" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.contact', MaxStrLen(IncEcomSalesHeader."Sell-to Contact"), false);
+        IncEcomSalesHeader."Sell-to Email" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.email', MaxStrLen(IncEcomSalesHeader."Sell-to Email"), true);
+        IncEcomSalesHeader."Sell-to Phone No." := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.phone', MaxStrLen(IncEcomSalesHeader."Sell-to Phone No."), false);
+        IncEcomSalesHeader."Sell-to EAN" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.ean', MaxStrLen(IncEcomSalesHeader."Sell-to EAN"), false);
+        IncEcomSalesHeader."Sell-to VAT Registration No." := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.vatRegistrationNo', MaxStrLen(IncEcomSalesHeader."Sell-to VAT Registration No."), false);
 
         if IncEcomSalesHeader."Document Type" = IncEcomSalesHeader."Document Type"::Order then
-            IncEcomSalesHeader."Sell-to Invoice Email" := JsonHelper.GetJText(RequestBody, 'sellToCustomer.invoiceEmail', MaxStrLen(IncEcomSalesHeader."Sell-to Invoice Email"), true, false);
+            IncEcomSalesHeader."Sell-to Invoice Email" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.invoiceEmail', MaxStrLen(IncEcomSalesHeader."Sell-to Invoice Email"), false);
 
         //Ship-to
         if JsonHelper.GetJsonToken(RequestBody, 'shipToCustomer', ShipToJsonToken) then begin
-            IncEcomSalesHeader."Ship-to Name" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.name', MaxStrLen(IncEcomSalesHeader."Ship-to Name"), true, true);
-            IncEcomSalesHeader."Ship-to Address" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.address', MaxStrLen(IncEcomSalesHeader."Ship-to Address"), true, true);
-            IncEcomSalesHeader."Ship-to Address 2" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.address2', MaxStrLen(IncEcomSalesHeader."Ship-to Address 2"), true, false);
-            IncEcomSalesHeader."Ship-to Post Code" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.postCode', MaxStrLen(IncEcomSalesHeader."Ship-to Post Code"), true, true);
-            IncEcomSalesHeader."Ship-to County" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.county', MaxStrLen(IncEcomSalesHeader."Ship-to County"), true, false);
-            IncEcomSalesHeader."Ship-to City" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.city', MaxStrLen(IncEcomSalesHeader."Ship-to City"), true, true);
-            IncEcomSalesHeader."Ship-to Country Code" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.countryCode', MaxStrLen(IncEcomSalesHeader."Ship-to Country Code"), true, false);
-            IncEcomSalesHeader."Ship-to Contact" := JsonHelper.GetJText(RequestBody, 'shipToCustomer.contact', MaxStrLen(IncEcomSalesHeader."Ship-to Contact"), true, false);
+            IncEcomSalesHeader."Ship-to Name" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.name', MaxStrLen(IncEcomSalesHeader."Ship-to Name"), true);
+            IncEcomSalesHeader."Ship-to Address" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.address', MaxStrLen(IncEcomSalesHeader."Ship-to Address"), true);
+            IncEcomSalesHeader."Ship-to Address 2" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.address2', MaxStrLen(IncEcomSalesHeader."Ship-to Address 2"), false);
+            IncEcomSalesHeader."Ship-to Post Code" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.postCode', MaxStrLen(IncEcomSalesHeader."Ship-to Post Code"), true);
+            IncEcomSalesHeader."Ship-to County" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.county', MaxStrLen(IncEcomSalesHeader."Ship-to County"), false);
+            IncEcomSalesHeader."Ship-to City" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.city', MaxStrLen(IncEcomSalesHeader."Ship-to City"), true);
+            IncEcomSalesHeader."Ship-to Country Code" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.countryCode', MaxStrLen(IncEcomSalesHeader."Ship-to Country Code"), false);
+            IncEcomSalesHeader."Ship-to Contact" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipToCustomer.contact', MaxStrLen(IncEcomSalesHeader."Ship-to Contact"), false);
         end;
 
         //Shipment
@@ -307,6 +308,7 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
     local procedure DeserializeIncomingEcomSalesPaymentLine(IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header"; PaymentLineJsonToken: JsonToken; var IncEcomSalesPmtLine: Record "NPR Inc Ecom Sales Pmt. Line")
     var
         JsonHelper: Codeunit "NPR Json Helper";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         IncEcomSalesDocApiEvents: Codeunit "NPR IncEcomSalesDocApiEvents";
         LineTypeText: Text;
         LineTypeErr: Label 'Property %1 has incorrect value: %2.', Comment = '%1 - abolute path, %2 - type', Locked = true;
@@ -319,7 +321,7 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
             IncEcomSalesPmtLine."Payment Method Type"::"Payment Method":
                 begin
 #pragma warning disable AA0139
-                    IncEcomSalesPmtLine."Payment Reference" := JsonHelper.GetJText(PaymentLineJsonToken, 'paymentReference', MaxStrLen(IncEcomSalesPmtLine."Payment Reference"), true, false);
+                    IncEcomSalesPmtLine."Payment Reference" := EcomSalesDocUtils.GetJTextMaxLength(PaymentLineJsonToken, 'paymentReference', MaxStrLen(IncEcomSalesPmtLine."Payment Reference"), false);
                     IncEcomSalesPmtLine.Amount := JsonHelper.GetJDecimal(PaymentLineJsonToken, 'paymentAmount', true);
                     IncEcomSalesPmtLine."PAR Token" := JsonHelper.GetJText(PaymentLineJsonToken, 'parToken', false);
                     IncEcomSalesPmtLine."PSP Token" := JsonHelper.GetJText(PaymentLineJsonToken, 'pspToken', false);

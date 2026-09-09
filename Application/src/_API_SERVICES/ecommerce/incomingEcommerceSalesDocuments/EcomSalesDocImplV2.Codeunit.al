@@ -121,6 +121,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesDocImplEvents.OnAfterPopulateGeneralSalesHeaderInformation(EcomSalesHeader, SalesHeader);
         SalesHeader.Insert(true);
 
+        //Checked before the validate: the platform blocked customer errors quote Customer."No.", which the
+        //customer mapping may have derived from a personal identifier such as the phone no.
+        CheckCustomerNotBlocked(Customer, SalesHeader."Document Type");
+
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
         PopulateSalesHeaderSellToNameFromEcomSalesHeader(EcomSalesHeader, SalesHeader);
         SalesHeader."Sell-to Address" := EcomSalesHeader."Sell-to Address";
@@ -292,6 +296,30 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         DimMgt.UpdateGlobalDimFromDimSetID(SalesLine."Dimension Set ID", SalesLine."Shortcut Dimension 1 Code", SalesLine."Shortcut Dimension 2 Code");
     end;
 
+    //Mirrors Customer.CheckBlockedCustOnDocs for the Shipment = false, Transaction = false call that the
+    //Sell-to Customer No. validate makes, privacy first and in the same order, so a value-free label is
+    //raised wherever the platform would raise one quoting Customer."No.".
+    local procedure CheckCustomerNotBlocked(Customer: Record Customer; DocumentType: Enum "Sales Document Type")
+    var
+        CustomerBlockedErr: Label 'The %1 assigned to this order is blocked (%2 = %3).', Comment = '%1 = Customer table caption, %2 = Blocked field caption, %3 = the Blocked value';
+        CustomerPrivacyBlockedErr: Label 'The %1 assigned to this order is blocked for privacy (%2).', Comment = '%1 = Customer table caption, %2 = Privacy Blocked field caption';
+        IsBlocked: Boolean;
+    begin
+        if Customer."Privacy Blocked" then
+            Error(CustomerPrivacyBlockedErr, Customer.TableCaption(), Customer.FieldCaption("Privacy Blocked"));
+
+        case Customer.Blocked of
+            Customer.Blocked::All:
+                IsBlocked := true;
+            Customer.Blocked::Invoice,
+            Customer.Blocked::Ship:
+                IsBlocked := DocumentType = DocumentType::Order;
+        end;
+
+        if IsBlocked then
+            Error(CustomerBlockedErr, Customer.TableCaption(), Customer.FieldCaption(Blocked), Format(Customer.Blocked));
+    end;
+
     local procedure InsertCustomer(EcomSalesHeader: Record "NPR Ecom Sales Header"; var Customer: Record Customer) Success: Boolean
     var
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
@@ -303,6 +331,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         ConfigTemplateCode: Code[10];
         CustomerTemplateCode: Code[20];
         VATBusPostingGroupCode: Code[20];
+        CustomerNoInUseErr: Label 'A %1 with the number derived from the order already exists.', Comment = '%1 = Customer table caption';
     begin
         if not IncEcomSalesDocSetup.Get() then
             Clear(IncEcomSalesDocSetup);
@@ -324,7 +353,13 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             InitCustomer(EcomSalesHeader, Customer);
 
             Customer."NPR External Customer No." := EcomSalesHeader."Sell-to Customer No.";
-            Customer.Insert(true);
+
+            //Conditional insert rather than a read first: the platform duplicate key error quotes
+            //Customer."No.", which the customer mapping may have derived from a personal identifier such as
+            //the phone no., and a separate read would leave a window for a concurrent import deriving the
+            //same number to lose the race to it.
+            if not Customer.Insert(true) then
+                Error(CustomerNoInUseErr, Customer.TableCaption());
 
             Customer."Post Code" := EcomSalesHeader."Sell-to Post Code";
             Customer."Country/Region Code" := EcomSalesHeader."Sell-to Country Code";

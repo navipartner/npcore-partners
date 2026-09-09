@@ -407,7 +407,6 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
 
         EcomSalesHeader2.ReadIsolation := EcomSalesHeader2.ReadIsolation::UpdLock;
         EcomSalesHeader2.Get(EcomSalesHeader."Entry No.");
-        EmitWalletProcessingError(ErrorText);
         EcomSalesHeader2."Attr. Wallet Processing Status" := EcomSalesHeader2."Attr. Wallet Processing Status"::Error;
         EcomSalesHeader2."Virtual Items Process Status" := EcomVirtualItemMgt.CalculateVirtualItemsDocStatus(EcomSalesHeader2);
         EcomSalesHeader2.Modify(true);
@@ -442,7 +441,6 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
             ParentLine."Attr. Wallet Process ErrMsg" := CopyStr(ErrorText, 1, MaxStrLen(ParentLine."Attr. Wallet Process ErrMsg"));
             if ParentLine."Attr. Wallet Retry Count" >= IncEcomSalesDocSetup."Max Attr. Wallet Retry Count" then
                 ParentLine."Attr. Wallet Processing Status" := ParentLine."Attr. Wallet Processing Status"::Error;
-            EmitWalletProcessingError(ErrorText);
         end;
         ParentLine.Modify(true);
 
@@ -492,14 +490,6 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
         EcomVirtualItemMgt.SetVirtualItemSubtypeFilter(ComponentLine);
-    end;
-
-    local procedure EmitWalletProcessingError(ErrorText: Text)
-    var
-        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
-        WalletEventId: Label 'NPR_API_Ecommerce_WalletCreationFailed', Locked = true;
-    begin
-        EcomVirtualItemMgt.EmitError(ErrorText, WalletEventId);
     end;
 
     internal procedure IsAttractionWallet(EcomSalesLine: Record "NPR Ecom Sales Line"): Boolean

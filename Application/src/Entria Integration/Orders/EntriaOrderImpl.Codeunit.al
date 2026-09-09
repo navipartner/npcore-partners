@@ -96,30 +96,30 @@ codeunit 6151027 "NPR Entria Order Impl."
         EcomSalesHeader."Your Reference" := _JsonHelper.GetJText(RequestBody, 'display_id', MaxStrLen(EcomSalesHeader."Your Reference"), true, false);
         EcomSalesHeader."Language Tag" := _JsonHelper.GetJText(RequestBody, 'locale', MaxStrLen(EcomSalesHeader."Language Tag"), true, false);
         EcomSalesHeader."Language Code" := _EcomSalesDocUtils.LanguageTagToLanguageCode(EcomSalesHeader."Language Tag");
-        EcomSalesHeader."Sell-to Name" := BuildFullName(_JsonHelper.GetJText(RequestBody, 'billing_address.first_name', MaxStrLen(EcomSalesHeader."Sell-to Name"), true, false), _JsonHelper.GetJText(RequestBody, 'billing_address.last_name', MaxStrLen(EcomSalesHeader."Sell-to Name"), true, false), MaxStrLen(EcomSalesHeader."Sell-to Name"));
+        EcomSalesHeader."Sell-to Name" := BuildFullName(_EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.first_name', MaxStrLen(EcomSalesHeader."Sell-to Name"), false), _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.last_name', MaxStrLen(EcomSalesHeader."Sell-to Name"), false), MaxStrLen(EcomSalesHeader."Sell-to Name"));
         //billing adress
-        EcomSalesHeader."Sell-to Address" := _JsonHelper.GetJText(RequestBody, 'billing_address.address_1', MaxStrLen(EcomSalesHeader."Sell-to Address"), true, false);
-        EcomSalesHeader."Sell-to Address 2" := _JsonHelper.GetJText(RequestBody, 'billing_address.address_2', MaxStrLen(EcomSalesHeader."Sell-to Address 2"), true, false);
-        EcomSalesHeader."Sell-to Post Code" := _JsonHelper.GetJText(RequestBody, 'billing_address.postal_code', MaxStrLen(EcomSalesHeader."Sell-to Post Code"), true, false);
-        EcomSalesHeader."Sell-to County" := _JsonHelper.GetJText(RequestBody, 'billing_address.province', MaxStrLen(EcomSalesHeader."Sell-to County"), true, false);
-        EcomSalesHeader."Sell-to City" := _JsonHelper.GetJText(RequestBody, 'billing_address.city', MaxStrLen(EcomSalesHeader."Sell-to City"), true, false);
-        EcomSalesHeader."Sell-to Country Code" := _JsonHelper.GetJText(RequestBody, 'billing_address.country_code', MaxStrLen(EcomSalesHeader."Sell-to Country Code"), true, false);
-        EcomSalesHeader."Sell-to Contact" := _JsonHelper.GetJText(RequestBody, 'billing_address.company', MaxStrLen(EcomSalesHeader."Sell-to Contact"), true, false);
-        EcomSalesHeader."Sell-to Email" := _JsonHelper.GetJText(RequestBody, 'email', MaxStrLen(EcomSalesHeader."Sell-to Email"), true, false);
-        EcomSalesHeader."Sell-to Phone No." := _JsonHelper.GetJText(RequestBody, 'billing_address.phone', MaxStrLen(EcomSalesHeader."Sell-to Phone No."), true, false);
+        EcomSalesHeader."Sell-to Address" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.address_1', MaxStrLen(EcomSalesHeader."Sell-to Address"), false);
+        EcomSalesHeader."Sell-to Address 2" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.address_2', MaxStrLen(EcomSalesHeader."Sell-to Address 2"), false);
+        EcomSalesHeader."Sell-to Post Code" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.postal_code', MaxStrLen(EcomSalesHeader."Sell-to Post Code"), false);
+        EcomSalesHeader."Sell-to County" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.province', MaxStrLen(EcomSalesHeader."Sell-to County"), false);
+        EcomSalesHeader."Sell-to City" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.city', MaxStrLen(EcomSalesHeader."Sell-to City"), false);
+        EcomSalesHeader."Sell-to Country Code" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.country_code', MaxStrLen(EcomSalesHeader."Sell-to Country Code"), false);
+        EcomSalesHeader."Sell-to Contact" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.company', MaxStrLen(EcomSalesHeader."Sell-to Contact"), false);
+        EcomSalesHeader."Sell-to Email" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'email', MaxStrLen(EcomSalesHeader."Sell-to Email"), false);
+        EcomSalesHeader."Sell-to Phone No." := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.phone', MaxStrLen(EcomSalesHeader."Sell-to Phone No."), false);
         //Ship-to
         if _JsonHelper.GetJsonToken(RequestBody, 'shipping_address', ShipToJsonToken) then begin
-            EcomSalesHeader."Ship-to Name" := BuildFullName(_JsonHelper.GetJText(RequestBody, 'shipping_address.first_name', MaxStrLen(EcomSalesHeader."Ship-to Name"), true, false), _JsonHelper.GetJText(RequestBody, 'shipping_address.last_name', MaxStrLen(EcomSalesHeader."Ship-to Name"), true, false), MaxStrLen(EcomSalesHeader."Ship-to Name"));
-            EcomSalesHeader."Ship-to Address" := _JsonHelper.GetJText(RequestBody, 'shipping_address.address_1', MaxStrLen(EcomSalesHeader."Ship-to Address"), true, false);
-            EcomSalesHeader."Ship-to Address 2" := _JsonHelper.GetJText(RequestBody, 'shipping_address.address_2', MaxStrLen(EcomSalesHeader."Ship-to Address 2"), true, false);
-            EcomSalesHeader."Ship-to Post Code" := _JsonHelper.GetJText(RequestBody, 'shipping_address.postal_code', MaxStrLen(EcomSalesHeader."Ship-to Post Code"), true, false);
-            EcomSalesHeader."Ship-to County" := _JsonHelper.GetJText(RequestBody, 'shipping_address.province', MaxStrLen(EcomSalesHeader."Ship-to County"), true, false);
-            EcomSalesHeader."Ship-to City" := _JsonHelper.GetJText(RequestBody, 'shipping_address.city', MaxStrLen(EcomSalesHeader."Ship-to City"), true, false);
-            EcomSalesHeader."Ship-to Country Code" := _JsonHelper.GetJText(RequestBody, 'shipping_address.country_code', MaxStrLen(EcomSalesHeader."Ship-to Country Code"), true, false);
-            EcomSalesHeader."Ship-to Contact" := _JsonHelper.GetJText(RequestBody, 'shipping_address.company', MaxStrLen(EcomSalesHeader."Ship-to Contact"), true, false);
+            EcomSalesHeader."Ship-to Name" := BuildFullName(_EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.first_name', MaxStrLen(EcomSalesHeader."Ship-to Name"), false), _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.last_name', MaxStrLen(EcomSalesHeader."Ship-to Name"), false), MaxStrLen(EcomSalesHeader."Ship-to Name"));
+            EcomSalesHeader."Ship-to Address" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.address_1', MaxStrLen(EcomSalesHeader."Ship-to Address"), false);
+            EcomSalesHeader."Ship-to Address 2" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.address_2', MaxStrLen(EcomSalesHeader."Ship-to Address 2"), false);
+            EcomSalesHeader."Ship-to Post Code" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.postal_code', MaxStrLen(EcomSalesHeader."Ship-to Post Code"), false);
+            EcomSalesHeader."Ship-to County" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.province', MaxStrLen(EcomSalesHeader."Ship-to County"), false);
+            EcomSalesHeader."Ship-to City" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.city', MaxStrLen(EcomSalesHeader."Ship-to City"), false);
+            EcomSalesHeader."Ship-to Country Code" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.country_code', MaxStrLen(EcomSalesHeader."Ship-to Country Code"), false);
+            EcomSalesHeader."Ship-to Contact" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_address.company', MaxStrLen(EcomSalesHeader."Ship-to Contact"), false);
         end;
         //Shipment method
-        EcomSalesHeader."Shipment Method Code" := _JsonHelper.GetJText(RequestBody, 'shipping_methods[0].name', MaxStrLen(EcomSalesHeader."Shipment Method Code"), true, false);
+        EcomSalesHeader."Shipment Method Code" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'shipping_methods[0].name', MaxStrLen(EcomSalesHeader."Shipment Method Code"), false);
 #pragma warning restore AA0139
         _IntegrationEvents.OnAfterDeserializeEntriaOrderHeader(EcomSalesHeader, RequestBody);
     end;
@@ -571,8 +571,8 @@ codeunit 6151027 "NPR Entria Order Impl."
                 begin
                     EcomSalesPmtLine."External Payment Method Code" := EcomSalesPmtLine.Description;
                     EcomSalesPmtLine."External Payment Type" := _JsonHelper.GetJText(PaymentToken, 'data.paymentMethod', true);
-                    EcomSalesPmtLine."PSP Token" := _JsonHelper.GetJText(PaymentToken, 'data.recurringToken', MaxStrLen(EcomSalesPmtLine."PSP Token"), true, false);
-                    EcomSalesPmtLine."PAR Token" := _JsonHelper.GetJText(PaymentToken, 'data.shopperReference', MaxStrLen(EcomSalesPmtLine."PAR Token"), true, false);
+                    EcomSalesPmtLine."PSP Token" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.recurringToken', MaxStrLen(EcomSalesPmtLine."PSP Token"), false);
+                    EcomSalesPmtLine."PAR Token" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.shopperReference', MaxStrLen(EcomSalesPmtLine."PAR Token"), false);
                 end;
             EcomSalesPmtLine."Payment Method Type"::Voucher:
                 EcomSalesPmtLine.Description := CopyStr(EcomSalesPmtLine.Description + ' ' + EcomSalesPmtLine."Payment Reference", 1, MaxStrLen(EcomSalesPmtLine.Description));
