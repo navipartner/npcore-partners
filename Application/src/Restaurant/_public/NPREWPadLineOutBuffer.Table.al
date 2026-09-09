@@ -17,6 +17,13 @@ table 6151292 "NPR NPRE W.Pad.Line Out.Buffer"
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Waiter Pad";
         }
+        field(2; "Print Template Code"; Code[20])
+        {
+            Caption = 'Print Template Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR RP Template Header";
+            Description = 'Used only by the retail print template dispatch route - the one that runs when the New Restaurant Print Experience feature flag is off - for all three print types: kitchen orders, serving requests and pre-receipts. The handler codeunit route uses Codeunit ID instead. Goes away when that dispatch route does - not when kitchen printing changes.';
+        }
         field(20; "Codeunit ID"; Integer)
         {
             Caption = 'Codeunit ID';

@@ -56,6 +56,7 @@
         Span: Codeunit "NPR Sentry Span";
         ModifiersUpdated: Boolean;
         Result: Boolean;
+        UseHandlerCodeunitRoute: Boolean;
     begin
         //A dish whose add-on lines changed is not eligible for sending itself, and removing its last add-on line leaves nothing
         //eligible at all. Reconcile the kitchen's copy before the routines below decide there is nothing to send: telling the
@@ -65,94 +66,22 @@
         if PrintType = _PrintTemplate."Print Type"::"Kitchen Order" then
             ModifiersUpdated := KitchenOrderMgt.RefreshWaiterPadKitchenRequestModifiers(WaiterPad);
 
-        if NewRestaurantPrintExp.IsFeatureEnabled() then begin
-            Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen');
-            Result := PrintWaiterPadLinesToKitchenNew(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr and not ModifiersUpdated)
-        end else begin
+        //Both print implementations share this orchestration. They differ in two places, each branched where it happens
+        //rather than by duplicating everything around it: AddPrintTemplatesToBuffer, which reads a different template
+        //master table per route, and DispatchPrintJobs, which hands the job over differently. The feature flag is read
+        //once here and the answer passed down, so the two cannot disagree, the flag is not re-read per buffered row, and
+        //the span below cannot end up labelled for the route that did not run.
+        UseHandlerCodeunitRoute := NewRestaurantPrintExp.IsFeatureEnabled();
+        if UseHandlerCodeunitRoute then
+            Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen')
+        else
             Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen-legacy');
-            Result := PrintWaiterPadLinesToKitchenOld(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr and not ModifiersUpdated);
-        end;
+        Result := PrintWaiterPadLinesToKitchenImpl(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusCode, ForceResend, ShowNothingToSendErr and not ModifiersUpdated, UseHandlerCodeunitRoute);
         Span.Finish();
         exit(Result or ModifiersUpdated);
     end;
 
-    local procedure PrintWaiterPadLinesToKitchenOld(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
-    var
-        TempFlowStatus: Record "NPR NPRE Flow Status" temporary;
-        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        TempWPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
-        TempPrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
-        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
-        PrintDateTime: DateTime;
-        KDSUpdated: Boolean;
-    begin
-        InitTempFlowStatusList(TempFlowStatus, TempFlowStatus."Status Object"::WaiterPadLineMealFlow);
-        if FlowStatusCode <> '' then
-            TempFlowStatus.SetRange(Code, FlowStatusCode);
-
-        if not BufferWPadLinesForSending(WaiterPad, WaiterPadLineIn, PrintType, TempFlowStatus, ForceResend, TempWPadLineBuffer) then begin
-            if ShowNothingToSendErr then
-                Error(NothingToSendLbl);
-            exit(false);
-        end;
-
-        TempPrintTemplateBuffer.DeleteAll();
-        PrintDateTime := CurrentDateTime;
-
-        TempFlowStatus.SetCurrentKey("Status Object", "Flow Order");  //ensure serving steps are processed in correct order
-        if TempFlowStatus.FindSet() then
-            repeat
-                TempWPadLineBuffer.SetRange("Serving Step", TempFlowStatus.Code);
-                if TempWPadLineBuffer.FindFirst() then
-                    repeat
-                        TempWPadLineBuffer.SetRange("Output Type", TempWPadLineBuffer."Output Type");
-                        repeat
-                            WaiterPadLine.Reset();
-                            TempWPadLineBuffer.SetRange("Print Category Code", TempWPadLineBuffer."Print Category Code");
-                            TempWPadLineBuffer.FindSet();
-                            repeat
-                                if WaiterPadLine.Get(TempWPadLineBuffer."Waiter Pad No.", TempWPadLineBuffer."Waiter Pad Line No.") then
-                                    WaiterPadLine.Mark := true;
-                            until TempWPadLineBuffer.Next() = 0;
-
-                            WaiterPadLine.MarkedOnly(true);
-                            if not WaiterPadLine.IsEmpty then
-                                case TempWPadLineBuffer."Output Type" of
-                                    TempWPadLineBuffer."Output Type"::Print:
-                                        if FindPrintTemplates(
-                                            WaiterPad, WaiterPadLine, PrintType, TempWPadLineBuffer."Print Category Code", TempWPadLineBuffer."Serving Step", TempPrintTemplateBuffer)
-                                        then begin
-                                            WaiterPadLine.FindSet();
-                                            repeat
-                                                LogWaiterPadLinePrint(
-                                                    WaiterPadLine, PrintType, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintDateTime, 0, 0);
-                                            until WaiterPadLine.Next() = 0;
-                                        end;
-                                    TempWPadLineBuffer."Output Type"::KDS:
-                                        KDSUpdated :=
-                                            KitchenOrderMgt.SendWPLinesToKitchen(
-                                                WaiterPad, WaiterPadLine, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintType, PrintDateTime) or KDSUpdated;
-                                end;
-
-                            TempWPadLineBuffer.DeleteAll();
-                            TempWPadLineBuffer.SetRange("Print Category Code");
-                        until not TempWPadLineBuffer.FindFirst();  //Print category loop
-                        TempWPadLineBuffer.SetRange("Output Type");
-                    until not TempWPadLineBuffer.FindFirst();  //Output type loop
-            until TempFlowStatus.Next() = 0;
-
-        if TempPrintTemplateBuffer.IsEmpty and not KDSUpdated then begin
-            if ShowNothingToSendErr then
-                Error(NothingToSendLbl);
-            exit(false);
-        end;
-
-        Commit();  //Print routine requires transaction to be ended
-        SendToPrint(TempPrintTemplateBuffer);
-        exit(true);
-    end;
-
-    local procedure PrintWaiterPadLinesToKitchenNew(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
+    local procedure PrintWaiterPadLinesToKitchenImpl(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean; UseHandlerCodeunitRoute: Boolean): Boolean
     var
         TempFlowStatus: Record "NPR NPRE Flow Status" temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
@@ -196,7 +125,7 @@
                                 case TempWPadLineBuffer."Output Type" of
                                     TempWPadLineBuffer."Output Type"::Print:
                                         if FindPrintTemplates(
-                                            WaiterPad, WaiterPadLine, PrintType, TempWPadLineBuffer."Print Category Code", TempWPadLineBuffer."Serving Step", TempPrintTemplateBuffer)
+                                            WaiterPad, WaiterPadLine, PrintType, TempWPadLineBuffer."Print Category Code", TempWPadLineBuffer."Serving Step", TempPrintTemplateBuffer, UseHandlerCodeunitRoute)
                                         then begin
                                             WaiterPadLine.FindSet();
                                             repeat
@@ -224,118 +153,20 @@
         end;
 
         Commit();  //Print routine requires transaction to be ended
-        SendToPrint(TempPrintTemplateBuffer);
+        DispatchPrintJobs(TempPrintTemplateBuffer, UseHandlerCodeunitRoute);
         exit(true);
     end;
 
-    local procedure BufferWPadLinesForSending(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; ForceResend: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf."): Boolean
-    var
-        TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
-        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        Sentry: Codeunit "NPR Sentry";
-        Span: Codeunit "NPR Sentry Span";
-        OutputType: Integer;
-        AskResendConfirmation: Boolean;
-        OutputTypeIsActive: Boolean;
+    local procedure DispatchPrintJobs(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; UseHandlerCodeunitRoute: Boolean)
     begin
-        _SetupProxy.InitializeUsingWaiterPad(WaiterPad);
-        if not (_SetupProxy.KitchenPrintingActivated() or _SetupProxy.KDSActivated()) then
-            Error(NowhereToSend);
-
-        WaiterPadLine.Copy(WaiterPadLineIn);
-        WaiterPadLine.FilterGroup(2);
-        WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
-        WaiterPadLine.FilterGroup(0);
-        if WaiterPadLine.IsEmpty then
-            exit(false);
-
-        if not ForceResend then begin
-            AskResendConfirmation := _SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Ask;
-            if not AskResendConfirmation then
-                ForceResend := _SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Yes;
-        end;
-
-        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.print-to-kitchen.buffer-legacy');
-
-        WPadLineBuffer.Reset();
-        WPadLineBuffer.DeleteAll();
-
-        InitTempPrintCategoryList(TempPrintCategory);
-
-        for OutputType := WaiterPadLine."Output Type Filter"::Print to WaiterPadLine."Output Type Filter"::KDS do begin
-            case OutputType of
-                WaiterPadLine."Output Type Filter"::Print:
-                    OutputTypeIsActive := _SetupProxy.KitchenPrintingActivated() and (not _IsCancelledSale or _SetupProxy.PrintOnSaleCancelActivated());
-                WaiterPadLine."Output Type Filter"::KDS:
-                    OutputTypeIsActive := _SetupProxy.KDSActivated();
-            end;
-            if OutputTypeIsActive then
-                BufferEligibleForSendingWPadLines(
-                  WaiterPadLine, OutputType, PrintType, FlowStatus, TempPrintCategory, ForceResend, AskResendConfirmation, WPadLineBuffer);
-        end;
-
-        Span.Finish();
-        exit(not WPadLineBuffer.IsEmpty());
-    end;
-
-    local procedure BufferEligibleForSendingWPadLines(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; OutputType: Integer; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; ForceResend: Boolean; AskResendConfirmation: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf.")
-    var
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
-        Sentry: Codeunit "NPR Sentry";
-        Span: Codeunit "NPR Sentry Span";
-        PrintCategoryFilter: Text;
-        SelectedSendOption: Option Cancel,"Only New",All;
-    begin
-        if WaiterPadLine.IsEmpty() or FlowStatus.IsEmpty() or PrintCategory.IsEmpty() then
-            exit;
-
-        Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.buffer-eligible-lines-legacy');
-
-        FlowStatus.SetCurrentKey("Status Object", "Flow Order");
-        FlowStatus.FindSet();
-        repeat
-            WaiterPadLine.FindSet();
-            repeat
-                PrintCategoryFilter := WaiterPadMgt.AssignedPrintCategoriesAsFilterString(WaiterPadLine.RecordId, FlowStatus.Code);
-                if PrintCategoryFilter <> '' then
-                    PrintCategory.SetFilter(Code, PrintCategoryFilter)
-                else
-                    PrintCategory.SetRange(Code, '');
-                if PrintCategory.FindSet() then
-                    repeat
-                        if WPadLineIsInScopeForSending(WaiterPadLine, PrintType, OutputType, FlowStatus.Code, PrintCategory.Code) then begin
-                            WaiterPadLine.CalcFields("Sent to Kitchen", "Sent to Kitchen Qty. (Base)");
-                            if AskResendConfirmation then
-                                if not ForceResend and WaiterPadLine."Sent to Kitchen" and
-                                    (WaiterPadLine."Quantity (Base)" = WaiterPadLine."Sent to Kitchen Qty. (Base)")
-                                then begin
-                                    AskResendConfirmation := false;
-                                    SelectedSendOption :=
-                                      Sentry.StrMenu(ResendOptions, 1,
-                                        StrSubstNo(LinesHaveAlreadyBeenSent, WaiterPad.FieldCaption("Serving Step Code"), FlowStatus.Code, PrintCategory.TableCaption, PrintCategory.Code));
-                                    if SelectedSendOption = SelectedSendOption::Cancel then
-                                        Error('');
-                                    ForceResend := SelectedSendOption = SelectedSendOption::All;
-                                end;
-
-                            if not WaiterPadLine."Sent to Kitchen" or ForceResend or
-                                (WaiterPadLine."Quantity (Base)" <> WaiterPadLine."Sent to Kitchen Qty. (Base)")
-                            then begin
-                                WPadLineBuffer."Output Type" := OutputType;
-                                WPadLineBuffer."Waiter Pad No." := WaiterPadLine."Waiter Pad No.";
-                                WPadLineBuffer."Waiter Pad Line No." := WaiterPadLine."Line No.";
-                                WPadLineBuffer."Print Category Code" := PrintCategory.Code;
-                                WPadLineBuffer."Serving Step" := FlowStatus.Code;
-                                if not WPadLineBuffer.Find() then
-                                    WPadLineBuffer.Insert();
-                            end;
-                        end;
-                    until PrintCategory.Next() = 0;
-            until WaiterPadLine.Next() = 0;
-        until FlowStatus.Next() = 0;
-
-        Span.Finish();
+        //Handing the job over is one of the two places the implementations genuinely differ - the other is
+        //AddPrintTemplatesToBuffer, which reads a different template master table per route. Both are named for the
+        //mechanism rather than for which came first: the "New Restaurant Print Experience" feature flag is the handler
+        //codeunit route, and everything before it is the retail print template route.
+        if UseHandlerCodeunitRoute then
+            SendToPrintViaHandlerCodeunit(PrintTemplateBuffer)
+        else
+            SendToPrintViaRPTemplate(PrintTemplateBuffer);
     end;
 
     local procedure BufferWPadLinesForSending(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; ForceResend: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"): Boolean
@@ -459,13 +290,11 @@
     var
         TempFlowStatus: Record "NPR NPRE Flow Status" temporary;
         TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
-        TempWPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
-        TempWPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        TempWPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        NewRestaurantPrintExp: Codeunit "NPR New Restaurant Print Exp.";
     begin
-        //Which lines are outstanding is decided by the same eligibility rules that decide what gets sent, so the served check
-        //has to follow whichever print implementation is active.
+        //Which lines are outstanding is decided by the same eligibility rules that decide what gets sent. Both print
+        //implementations now share those rules and one output buffer, so this no longer has to pick a side.
 
         //Taken by reference and copied, the same way BufferWPadLinesForSending does it. By reference because the caller's
         //filters are the only thing scoping this to one waiter pad, and an AL record parameter passed by value arrives
@@ -478,22 +307,6 @@
         //ForceResend is forced on, so the buffer holds every line in scope for KDS output whether or not it was ever sent.
         //That is deliberate: an in-scope line the kitchen was never told about has no requests and therefore reads as
         //unserved below, and food nobody asked the kitchen for is not food that has been served.
-
-        if NewRestaurantPrintExp.IsFeatureEnabled() then begin
-            BufferEligibleForSendingWPadLines(
-                WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
-                TempFlowStatus, TempPrintCategory, true, false, TempWPadLineOutBuffer);
-            if TempWPadLineOutBuffer.FindSet() then
-                repeat
-                    if not WPadLineIsServed(
-                        TempWPadLineOutBuffer."Waiter Pad No.", TempWPadLineOutBuffer."Waiter Pad Line No.",
-                        TempWPadLineOutBuffer."Serving Step", TempWPadLineOutBuffer."Print Category Code")
-                    then
-                        exit(false);
-                until TempWPadLineOutBuffer.Next() = 0;
-            exit(true);
-        end;
-
         BufferEligibleForSendingWPadLines(
             WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
             TempFlowStatus, TempPrintCategory, true, false, TempWPadLineBuffer);
@@ -606,87 +419,23 @@
 
     local procedure FindAndPrintTemplates(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]): Boolean
     var
-        NewRestaurantPrintExp: Codeunit "NPR New Restaurant Print Exp.";
-    begin
-        if NewRestaurantPrintExp.IsFeatureEnabled() then
-            exit(FindAndPrintTemplatesNew(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep))
-        else
-            exit(FindAndPrintTemplatesOld(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep));
-    end;
-
-    local procedure FindAndPrintTemplatesOld(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]): Boolean
-    var
-        TempPrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
-    begin
-        TempPrintTemplateBuffer.DeleteAll();
-        if FindPrintTemplates(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep, TempPrintTemplateBuffer) then begin
-            SendToPrint(TempPrintTemplateBuffer);
-            exit(true);
-        end;
-        exit(false);
-    end;
-
-    local procedure FindAndPrintTemplatesNew(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]): Boolean
-    var
         TempPrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        NewRestaurantPrintExp: Codeunit "NPR New Restaurant Print Exp.";
+        UseHandlerCodeunitRoute: Boolean;
     begin
+        //Finding the templates is shared. Which template master table is read, and how the job is handed over, are not:
+        //the handler codeunit route runs a codeunit named on the template, the retail print template route resolves an
+        //"NPR RP Template Header" and prints it directly. Resolved once here and passed to both.
+        UseHandlerCodeunitRoute := NewRestaurantPrintExp.IsFeatureEnabled();
         TempPrintTemplateBuffer.DeleteAll();
-        if FindPrintTemplates(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep, TempPrintTemplateBuffer) then begin
-            SendToPrint(TempPrintTemplateBuffer);
-            exit(true);
-        end;
-        exit(false);
+        if not FindPrintTemplates(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep, TempPrintTemplateBuffer, UseHandlerCodeunitRoute) then
+            exit(false);
+
+        DispatchPrintJobs(TempPrintTemplateBuffer, UseHandlerCodeunitRoute);
+        exit(true);
     end;
 
-    local procedure FindPrintTemplates(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]; var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf.") TemplateFound: Boolean
-    var
-        Seating: Record "NPR NPRE Seating";
-        SeatingLocation: Record "NPR NPRE Seating Location";
-        TempSeatingLocation: Record "NPR NPRE Seating Location" temporary;
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        RestaurantCodes: List of [Code[20]];
-        RestaurantCode: Code[20];
-        FindForBlankLocation: Boolean;
-    begin
-        SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
-        if SeatingWaiterPadLink.FindSet() then
-            repeat
-                if Seating.Get(SeatingWaiterPadLink."Seating Code") then
-                    if Seating."Seating Location" <> '' then begin
-                        SeatingLocation.Code := Seating."Seating Location";
-                        if not SeatingLocation.Find() then
-                            SeatingLocation.Init();
-                        TempSeatingLocation := SeatingLocation;
-                        TempSeatingLocation.Insert();
-                    end;
-            until SeatingWaiterPadLink.Next() = 0;
-
-        TemplateFound := false;
-        FindForBlankLocation := not TempSeatingLocation.FindSet();
-        if FindForBlankLocation then
-            RestaurantCodes.Add('')
-        else
-            repeat
-                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
-                    TemplateFound := true
-                else begin
-                    if not RestaurantCodes.Contains(TempSeatingLocation."Restaurant Code") then
-                        RestaurantCodes.Add(TempSeatingLocation."Restaurant Code");
-                    FindForBlankLocation := true;
-                end;
-            until TempSeatingLocation.Next() = 0;
-
-        if FindForBlankLocation then begin
-            Clear(TempSeatingLocation);
-            foreach RestaurantCode in RestaurantCodes do begin
-                TempSeatingLocation."Restaurant Code" := RestaurantCode;
-                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
-                    TemplateFound := true;
-            end;
-        end;
-    end;
-
-    local procedure SendToPrint(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf.")
+    local procedure SendToPrintViaRPTemplate(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
     var
         PrintTemplate: Record "NPR RP Template Header";
         WaiterPad: Record "NPR NPRE Waiter Pad";
@@ -699,7 +448,23 @@
         Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.send-to-print-legacy');
         if PrintTemplateBuffer.FindFirst() then
             repeat
-                PrintTemplateBuffer.SetRecFilter();
+                //The group is spelled out rather than taken from SetRecFilter(), which filters the fields of the current
+                //key. That was the whole group on the old buffer, whose primary key was these six fields; on the shared
+                //buffer the primary key is the surrogate "Entry No.", so SetRecFilter() would select a single row and
+                //each waiter pad line would be printed as its own job. SendToPrintViaHandlerCodeunit spells out the same
+                //group for the same reason. No key on the shared buffer expresses this one - Key2 carries "Codeunit ID"
+                //where the legacy route needs "Print Template Code" - so SetCurrentKey is not a shortcut here either.
+                //Group membership is identical to the old buffer's; the order the groups come out in is not. The old
+                //buffer had one key and walked groups in "Print Template Code"/"Serving Step"/"Print Category Code"
+                //order. Here the current key is "Entry No.", so groups come out in insertion order, which is serving
+                //step "Flow Order" - starter ticket before main course rather than alphabetical by template code. That
+                //is the better order for a kitchen and is why no SetCurrentKey is added to restore the old one. Order
+                //within a group is unaffected: the print below iterates the waiter pad line's own key, not this buffer.
+                PrintTemplateBuffer.SetRange("Output Type", PrintTemplateBuffer."Output Type");
+                PrintTemplateBuffer.SetRange("Waiter Pad No.", PrintTemplateBuffer."Waiter Pad No.");
+                PrintTemplateBuffer.SetRange("Print Template Code", PrintTemplateBuffer."Print Template Code");
+                PrintTemplateBuffer.SetRange("Serving Step", PrintTemplateBuffer."Serving Step");
+                PrintTemplateBuffer.SetRange("Print Category Code", PrintTemplateBuffer."Print Category Code");
                 PrintTemplateBuffer.SetRange("Waiter Pad Line No.");
 
                 PrintTemplate.Get(PrintTemplateBuffer."Print Template Code");
@@ -734,7 +499,7 @@
         Span.Finish();
     end;
 
-    local procedure SendToPrint(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
+    local procedure SendToPrintViaHandlerCodeunit(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
     var
         TempJobBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
         Sentry: Codeunit "NPR Sentry";
@@ -767,7 +532,7 @@
         Span.Finish();
     end;
 
-    local procedure FindPrintTemplates(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]; var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer") TemplateFound: Boolean
+    local procedure FindPrintTemplates(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]; var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; UseHandlerCodeunitRoute: Boolean) TemplateFound: Boolean
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -796,7 +561,7 @@
             RestaurantCodes.Add('')
         else
             repeat
-                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
+                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep, UseHandlerCodeunitRoute) then
                     TemplateFound := true
                 else begin
                     if not RestaurantCodes.Contains(TempSeatingLocation."Restaurant Code") then
@@ -809,7 +574,7 @@
             Clear(TempSeatingLocation);
             foreach RestaurantCode in RestaurantCodes do begin
                 TempSeatingLocation."Restaurant Code" := RestaurantCode;
-                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
+                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep, UseHandlerCodeunitRoute) then
                     TemplateFound := true;
             end;
         end;
@@ -820,9 +585,27 @@
                                             SeatingLocation: Record "NPR NPRE Seating Location";
                                             PrintType: Integer;
                                             PrintCategoryCode: Code[20];
+                                            ServingStep: Code[10];
+                                            UseHandlerCodeunitRoute: Boolean): Boolean
+    begin
+        //The two routes read different template master tables - one names a retail print template, the other a
+        //handler codeunit - so this is a real fork rather than duplication. The buffer they fill is the same either way.
+        //The route is resolved once per print run and passed in, so this and DispatchPrintJobs cannot disagree.
+        if UseHandlerCodeunitRoute then
+            exit(AddHandlerCodeunitJobsToBuffer(PrintTemplateBuffer, WaiterPadLine, SeatingLocation, PrintType, PrintCategoryCode, ServingStep));
+        exit(AddRPTemplateJobsToBuffer(PrintTemplateBuffer, WaiterPadLine, SeatingLocation, PrintType, PrintCategoryCode, ServingStep));
+    end;
+
+    local procedure AddHandlerCodeunitJobsToBuffer(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer";
+                                            var WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+                                            SeatingLocation: Record "NPR NPRE Seating Location";
+                                            PrintType: Integer;
+                                            PrintCategoryCode: Code[20];
                                             ServingStep: Code[10]): Boolean
     var
         PrintTemplate: Record "NPR NPRE Print Template";
+        BufferPrintCategoryCode: Code[20];
+        BufferServingStep: Code[10];
         NextEntryNo: Integer;
     begin
         PrintTemplate.SetRange("Print Type", PrintType);
@@ -863,25 +646,47 @@
             NextEntryNo := 1;
 
         repeat
+            BufferPrintCategoryCode := '';
+            BufferServingStep := '';
+            if PrintTemplate."Split Print Jobs By" in [PrintTemplate."Split Print Jobs By"::"Print Category", PrintTemplate."Split Print Jobs By"::Both] then
+                BufferPrintCategoryCode := PrintCategoryCode;
+            if PrintTemplate."Split Print Jobs By" in [PrintTemplate."Split Print Jobs By"::"Serving Step", PrintTemplate."Split Print Jobs By"::Both] then
+                BufferServingStep := ServingStep;
+
             if WaiterPadLine.FindSet() then
                 repeat
-                    Clear(PrintTemplateBuffer);
-                    PrintTemplateBuffer."Entry No." := NextEntryNo;
-                    NextEntryNo += 1;
-                    PrintTemplateBuffer."Waiter Pad No." := WaiterPadLine."Waiter Pad No.";
-                    PrintTemplateBuffer."Waiter Pad Line No." := WaiterPadLine."Line No.";
-                    PrintTemplateBuffer."Codeunit ID" := PrintTemplate."Codeunit ID";
-                    if PrintTemplate."Split Print Jobs By" in [PrintTemplate."Split Print Jobs By"::"Print Category", PrintTemplate."Split Print Jobs By"::Both] then
-                        PrintTemplateBuffer."Print Category Code" := PrintCategoryCode;
-                    if PrintTemplate."Split Print Jobs By" in [PrintTemplate."Split Print Jobs By"::"Serving Step", PrintTemplate."Split Print Jobs By"::Both] then
-                        PrintTemplateBuffer."Serving Step" := ServingStep;
-                    PrintTemplateBuffer.Insert();
+                    //Same duplicate guard as the retail print template route, and needed here for the same reason:
+                    //FindPrintTemplates calls this once per seating location the pad is linked to and again for a blank
+                    //location, so a pad spanning two locations that both fall back to one generic template resolves that
+                    //template twice. The legacy buffer got this for free from its primary key; the shared buffer is keyed
+                    //by a surrogate entry number, so it has to be spelled out. Without it SendToPrintViaHandlerCodeunit
+                    //groups both copies into a single job - it does not filter "Entry No." - and the handler prints every
+                    //dish twice on one ticket, with no error and nothing in telemetry.
+                    PrintTemplateBuffer.Reset();
+                    PrintTemplateBuffer.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
+                    PrintTemplateBuffer.SetRange("Waiter Pad Line No.", WaiterPadLine."Line No.");
+                    PrintTemplateBuffer.SetRange("Codeunit ID", PrintTemplate."Codeunit ID");
+                    PrintTemplateBuffer.SetRange("Print Category Code", BufferPrintCategoryCode);
+                    PrintTemplateBuffer.SetRange("Serving Step", BufferServingStep);
+                    if PrintTemplateBuffer.IsEmpty() then begin
+                        PrintTemplateBuffer.Reset();
+                        PrintTemplateBuffer.Init();
+                        PrintTemplateBuffer."Entry No." := NextEntryNo;
+                        NextEntryNo += 1;
+                        PrintTemplateBuffer."Waiter Pad No." := WaiterPadLine."Waiter Pad No.";
+                        PrintTemplateBuffer."Waiter Pad Line No." := WaiterPadLine."Line No.";
+                        PrintTemplateBuffer."Codeunit ID" := PrintTemplate."Codeunit ID";
+                        PrintTemplateBuffer."Print Category Code" := BufferPrintCategoryCode;
+                        PrintTemplateBuffer."Serving Step" := BufferServingStep;
+                        PrintTemplateBuffer.Insert();
+                    end;
+                    PrintTemplateBuffer.Reset();
                 until WaiterPadLine.Next() = 0;
         until PrintTemplate.Next() = 0;
         exit(true);
     end;
 
-    local procedure AddPrintTemplatesToBuffer(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf.";
+    local procedure AddRPTemplateJobsToBuffer(var PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer";
                                             var WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
                                             SeatingLocation: Record "NPR NPRE Seating Location";
                                             PrintType: Integer;
@@ -889,7 +694,15 @@
                                             ServingStep: Code[10]): Boolean
     var
         PrintTemplate: Record "NPR NPRE Print Templ.";
+        BufferPrintCategoryCode: Code[20];
+        BufferServingStep: Code[10];
+        NextEntryNo: Integer;
     begin
+        if PrintTemplateBuffer.FindLast() then
+            NextEntryNo := PrintTemplateBuffer."Entry No." + 1
+        else
+            NextEntryNo := 1;
+
         PrintTemplate.SetRange("Print Type", PrintType);
         PrintTemplate.SetRange("Seating Location", SeatingLocation.Code);
         PrintTemplate.SetRange("Print Category Code", PrintCategoryCode);
@@ -924,16 +737,38 @@
         repeat
             if WaiterPadLine.FindSet() then
                 repeat
-                    Clear(PrintTemplateBuffer);
-                    PrintTemplateBuffer."Waiter Pad No." := WaiterPadLine."Waiter Pad No.";
-                    PrintTemplateBuffer."Waiter Pad Line No." := WaiterPadLine."Line No.";
-                    PrintTemplateBuffer."Print Template Code" := PrintTemplate."Template Code";
+                    BufferPrintCategoryCode := '';
+                    BufferServingStep := '';
                     if PrintTemplate."Split Print Jobs By" in [PrintTemplate."Split Print Jobs By"::"Print Category", PrintTemplate."Split Print Jobs By"::Both] then
-                        PrintTemplateBuffer."Print Category Code" := PrintCategoryCode;
+                        BufferPrintCategoryCode := PrintCategoryCode;
                     if PrintTemplate."Split Print Jobs By" in [PrintTemplate."Split Print Jobs By"::"Serving Step", PrintTemplate."Split Print Jobs By"::Both] then
-                        PrintTemplateBuffer."Serving Step" := ServingStep;
-                    if not PrintTemplateBuffer.Find() then
+                        BufferServingStep := ServingStep;
+
+                    //This used to be a Find on the legacy buffer's primary key. The shared buffer is keyed by a
+                    //surrogate entry number instead, so the same guard is written out here. It is not redundant:
+                    //FindPrintTemplates calls this once per seating location and again for a blank location, so two
+                    //locations resolving to the same template would otherwise queue the same line twice.
+                    //AddHandlerCodeunitJobsToBuffer carries the same guard, keyed on "Codeunit ID" where this one is
+                    //keyed on "Print Template Code" - that is the only difference between them.
+                    PrintTemplateBuffer.Reset();
+                    PrintTemplateBuffer.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
+                    PrintTemplateBuffer.SetRange("Waiter Pad Line No.", WaiterPadLine."Line No.");
+                    PrintTemplateBuffer.SetRange("Print Template Code", PrintTemplate."Template Code");
+                    PrintTemplateBuffer.SetRange("Print Category Code", BufferPrintCategoryCode);
+                    PrintTemplateBuffer.SetRange("Serving Step", BufferServingStep);
+                    if PrintTemplateBuffer.IsEmpty() then begin
+                        PrintTemplateBuffer.Reset();
+                        PrintTemplateBuffer.Init();
+                        PrintTemplateBuffer."Entry No." := NextEntryNo;
+                        NextEntryNo += 1;
+                        PrintTemplateBuffer."Waiter Pad No." := WaiterPadLine."Waiter Pad No.";
+                        PrintTemplateBuffer."Waiter Pad Line No." := WaiterPadLine."Line No.";
+                        PrintTemplateBuffer."Print Template Code" := PrintTemplate."Template Code";
+                        PrintTemplateBuffer."Print Category Code" := BufferPrintCategoryCode;
+                        PrintTemplateBuffer."Serving Step" := BufferServingStep;
                         PrintTemplateBuffer.Insert();
+                    end;
+                    PrintTemplateBuffer.Reset();
                 until WaiterPadLine.Next() = 0;
         until PrintTemplate.Next() = 0;
         exit(true);

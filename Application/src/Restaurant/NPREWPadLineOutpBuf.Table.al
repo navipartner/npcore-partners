@@ -3,6 +3,9 @@
     Access = Internal;
     Caption = 'Waiter Pad Line Output Buffer';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-09-02';
+    ObsoleteReason = 'Both kitchen print implementations now share table 6151292. This one was only ever used as a temporary buffer, so nothing is stored in it.';
 
     fields
     {

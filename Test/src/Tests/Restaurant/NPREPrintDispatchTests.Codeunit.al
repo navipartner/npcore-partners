@@ -14,17 +14,21 @@ codeunit 85412 "NPR NPRE Print Dispatch Tests"
         _LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         _LibraryRestaurant: Codeunit "NPR Library - Restaurant";
         _TestPrintHandler: Codeunit "NPR NPRE Test Print Handler";
+        _TestRPPreprocess: Codeunit "NPR NPRE Test RP Preprocess";
+        _TestRPPreprocessWPad: Codeunit "NPR NPRE Test RP Pre WPad";
         _FlagAtEntry: Boolean;
         _FlagCaptured: Boolean;
         _POSInitialized: Boolean;
         _RestaurantInitialized: Boolean;
         MainCourseStepTok: Label 'MAIN', Locked = true;
+        StarterStepTok: Label 'STARTER', Locked = true;
 
-    // SCOPE. Template resolution and dispatch are covered for the new print experience only. The legacy path has no
-    // equivalent seam - it resolves an "NPR RP Template Header" and branches on that template's Table ID - so a
-    // faithful fixture would need a retail print template built against the waiter pad tables, which the test
-    // libraries do not provide. Covering it was weighed against the fact that stage 2b unifies the two output
-    // buffers and collapses this code, and deliberately deferred - see this PR description for the reasoning.
+    // SCOPE. Both dispatch routes are covered. The handler codeunit route (the "New Restaurant Print Experience"
+    // feature flag) hands the job to a codeunit named on the template, so "NPR NPRE Test Print Handler" stands in for
+    // it and reports what it was given. The retail print template route has no such seam - it resolves an
+    // "NPR RP Template Header" and prints it - so it is observed one level lower, through
+    // "NPR Object Output Mgt.".OnBeforeSendLinePrint, which fires once per dispatched job and lets the subscriber skip
+    // the printer. The feature flag defaults to off, so the retail print template route is the one most tenants run.
 
     #region Template resolution and dispatch, new print experience
 
@@ -116,6 +120,191 @@ codeunit 85412 "NPR NPRE Print Dispatch Tests"
         RestoreNewPrintExperience();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadInTwoRestaurants_OnlyGenericTemplate_LineQueuedOnce()
+    var
+        Item: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        // [SCENARIO] A pad whose seatings span two restaurants, served by one generic template, prints each dish once
+        //
+        // Template resolution runs once per seating location the pad is linked to and, for each location that found
+        // nothing, once more for a blank location under that location's restaurant. "Seating Location" is never
+        // relaxed, so a generic template - blank restaurant, blank seating location - cannot be matched on the
+        // per-location passes and is reached twice on the blank ones, once per restaurant. Both passes resolve the
+        // same template and buffer the same lines, and the dispatch groups on the handler codeunit without filtering
+        // "Entry No.", so without a duplicate guard every dish reaches the kitchen twice on one ticket.
+        //
+        // [GIVEN] One generic kitchen order template, and a pad seated in two restaurants
+        Initialize();
+        SetNewPrintExperience(true);
+        CreateGenericPrintTemplate();
+        CreatePadWithRoutedLine(WaiterPad, Item, WaiterPadLine, MainCourseStepTok);
+        LinkPadToASeatingInAnotherRestaurant(WaiterPad);
+        _TestPrintHandler.ClearCaptured();
+
+        // [WHEN] The pad is sent to the kitchen
+        SendToKitchen(WaiterPad);
+
+        // [THEN] One job went out, carrying the line once
+        _Assert.AreEqual(1, _TestPrintHandler.InvocationCount(), 'The generic template should have produced a single job.');
+        _Assert.AreEqual(
+            1, _TestPrintHandler.LastJobLineCount(),
+            'The line should be on the ticket once. Twice means both blank-location passes queued it.');
+        RestoreNewPrintExperience();
+    end;
+
+    #endregion
+
+    #region Template resolution and dispatch, retail print template route
+
+    // Both tests here bind "NPR Retail Print Handler" around the send. It is not what they measure - that is the
+    // stand-in pre-processing codeunit - but the job does reach "NPR Object Output Mgt." and, with no output
+    // configured for a freshly created template, that opens the printer selection page. The handler's subscriber sets
+    // Skip before that happens, so nothing is asked for and nothing leaves the session.
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LegacyRoute_TwoLinesOneTemplate_BothLinesInOneJob()
+    var
+        PrintTempl: Record "NPR NPRE Print Templ.";
+        FirstItem: Record Item;
+        SecondItem: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FirstLine: Record "NPR NPRE Waiter Pad Line";
+        SecondLine: Record "NPR NPRE Waiter Pad Line";
+        RetailPrintHandler: Codeunit "NPR Retail Print Handler";
+    begin
+        // [SCENARIO] With the feature flag off, a pad with two lines and one template prints one ticket
+        //
+        // This is the acceptance test for the group the retail print template dispatch builds by hand. The two routes
+        // share one output buffer whose primary key is a surrogate entry number, so the group cannot be taken from
+        // SetRecFilter() - that would select a single row and turn every waiter pad line into its own ticket. Nothing
+        // else in the suite reaches this code: the parity test runs with kitchen printing off.
+        //
+        // [GIVEN] The retail print template route, a template that does not split jobs, and a pad with two lines
+        Initialize();
+        SetNewPrintExperience(false);
+        CreateLegacyPrintTemplate(PrintTempl."Split Print Jobs By"::None);
+        CreatePadWithRoutedLine(WaiterPad, FirstItem, FirstLine, MainCourseStepTok);
+        AddRoutedLine(WaiterPad, SecondItem, SecondLine, MainCourseStepTok);
+        _TestRPPreprocess.ClearCaptured();
+
+        // [WHEN] The pad is sent to the kitchen
+        BindSubscription(RetailPrintHandler);
+        SendToKitchen(WaiterPad);
+        UnbindSubscription(RetailPrintHandler);
+
+        // [THEN] One print job was dispatched, and it selected both lines
+        _Assert.AreEqual(
+            1, PrintLogCount(WaiterPad."No.", FirstLine."Line No."),
+            'The template should have been resolved for the line. Without that the job count below is vacuous.');
+        _Assert.AreEqual(
+            1, _TestRPPreprocess.InvocationCount(),
+            'Both lines belong to one print group and should have gone out as a single job.');
+        _Assert.AreEqual(
+            WaiterPad."No.", _TestRPPreprocess.CapturedWaiterPadNo(), 'The job should have carried this pad.');
+        _Assert.AreEqual(
+            2, _TestRPPreprocess.JobLineCount(1),
+            'The job should have selected both dishes. A job that selected none would still be one job.');
+        _Assert.AreEqual(
+            1, _TestRPPreprocess.JobIndexContainingLine(FirstLine."Line No."), 'The first dish should be on the ticket.');
+        _Assert.AreEqual(
+            1, _TestRPPreprocess.JobIndexContainingLine(SecondLine."Line No."), 'The second dish should be on the ticket.');
+        RestoreNewPrintExperience();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LegacyRoute_TemplateSplitByServingStep_OneJobPerStep()
+    var
+        PrintTempl: Record "NPR NPRE Print Templ.";
+        StarterItem: Record Item;
+        MainItem: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        StarterLine: Record "NPR NPRE Waiter Pad Line";
+        MainLine: Record "NPR NPRE Waiter Pad Line";
+        RetailPrintHandler: Codeunit "NPR Retail Print Handler";
+    begin
+        // [SCENARIO] A template split by serving step prints the starter and the main course on separate tickets
+        //
+        // The companion to the test above: that one fails if the group is too narrow, this one fails if it is too
+        // wide. Together they pin the hand-written group to the fields the legacy buffer's primary key used to supply.
+        //
+        // [GIVEN] The retail print template route, a template split by serving step, and a line in each step
+        Initialize();
+        SetNewPrintExperience(false);
+        CreateLegacyPrintTemplate(PrintTempl."Split Print Jobs By"::"Serving Step");
+        CreatePadWithRoutedLine(WaiterPad, StarterItem, StarterLine, StarterStepTok);
+        AddRoutedLine(WaiterPad, MainItem, MainLine, MainCourseStepTok);
+        _TestRPPreprocess.ClearCaptured();
+
+        // [WHEN] The pad is sent to the kitchen
+        BindSubscription(RetailPrintHandler);
+        SendToKitchen(WaiterPad);
+        UnbindSubscription(RetailPrintHandler);
+
+        // [THEN] Each serving step got its own print job, carrying that step's dish and no other
+        _Assert.AreEqual(
+            2, _TestRPPreprocess.InvocationCount(), 'Splitting by serving step should dispatch one job per step.');
+        _Assert.AreEqual(
+            1, _TestRPPreprocess.JobLineCount(1), 'The first ticket should carry one dish.');
+        _Assert.AreEqual(
+            1, _TestRPPreprocess.JobLineCount(2), 'The second ticket should carry one dish.');
+        _Assert.AreNotEqual(
+            _TestRPPreprocess.JobIndexContainingLine(StarterLine."Line No."),
+            _TestRPPreprocess.JobIndexContainingLine(MainLine."Line No."),
+            'The starter and the main course should be on different tickets.');
+        _Assert.AreNotEqual(
+            0, _TestRPPreprocess.JobIndexContainingLine(StarterLine."Line No."), 'The starter should be on a ticket at all.');
+        RestoreNewPrintExperience();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LegacyRoute_WaiterPadHeaderTemplate_OneJobForThePad()
+    var
+        PrintTempl: Record "NPR NPRE Print Templ.";
+        FirstItem: Record Item;
+        SecondItem: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FirstLine: Record "NPR NPRE Waiter Pad Line";
+        SecondLine: Record "NPR NPRE Waiter Pad Line";
+        RetailPrintHandler: Codeunit "NPR Retail Print Handler";
+    begin
+        // [SCENARIO] A template built on the waiter pad rather than its lines prints the pad once
+        //
+        // The dispatch branches on the resolved template's "Table ID": a waiter pad line template is handed the marked
+        // set of lines, a waiter pad template is handed the pad itself with SetRecFilter(). The two tests above cover
+        // the line branch; this one covers the header branch, which is the shape a pre-receipt uses.
+        //
+        // [GIVEN] The retail print template route and a kitchen order template built on the waiter pad table
+        Initialize();
+        SetNewPrintExperience(false);
+        CreateLegacyWaiterPadTemplate(PrintTempl."Split Print Jobs By"::None);
+        CreatePadWithRoutedLine(WaiterPad, FirstItem, FirstLine, MainCourseStepTok);
+        AddRoutedLine(WaiterPad, SecondItem, SecondLine, MainCourseStepTok);
+        _TestRPPreprocessWPad.ClearCaptured();
+
+        // [WHEN] The pad is sent to the kitchen
+        BindSubscription(RetailPrintHandler);
+        SendToKitchen(WaiterPad);
+        UnbindSubscription(RetailPrintHandler);
+
+        // [THEN] One job went out, and it selected this pad and only this pad
+        _Assert.AreEqual(
+            1, _TestRPPreprocessWPad.InvocationCount(),
+            'Two lines on one pad are one print group, so the pad should have been printed once.');
+        _Assert.AreEqual(
+            1, _TestRPPreprocessWPad.CapturedPadCount(),
+            'The job should have been narrowed to a single pad. Without SetRecFilter it would carry every pad.');
+        _Assert.AreEqual(
+            WaiterPad."No.", _TestRPPreprocessWPad.CapturedWaiterPadNo(), 'The job should have carried this pad.');
+        RestoreNewPrintExperience();
+    end;
+
     #endregion
 
     #region Old and New parity on the shared orchestration
@@ -176,6 +365,7 @@ codeunit 85412 "NPR NPRE Print Dispatch Tests"
     var
         KitchenStationSelectionAll: Record "NPR NPRE Kitchen Station Slct.";
         PrintTemplateAll: Record "NPR NPRE Print Template";
+        LegacyPrintTemplAll: Record "NPR NPRE Print Templ.";
         POSRestProfile: Record "NPR POS NPRE Rest. Profile";
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
     begin
@@ -202,8 +392,10 @@ codeunit 85412 "NPR NPRE Print Dispatch Tests"
         // orchestration buffers KDS rows only, no print template is ever resolved and nothing is dispatched.
         SetKitchenPrintingActive(true);
 
-        // Templates and routing both leak between tests, so both start empty.
+        // Templates and routing both leak between tests, so both start empty. Both template master tables are wiped:
+        // which one is read depends on the feature flag, and tests in this codeunit run on either side of it.
         PrintTemplateAll.DeleteAll();
+        LegacyPrintTemplAll.DeleteAll();
         KitchenStationSelectionAll.DeleteAll();
         _LibraryRestaurant.CreateSeatingLocation(_SeatingLocation, _Restaurant.Code);
         _LibraryRestaurant.AddKitchenStationAtStep(_Restaurant.Code, _SeatingLocation.Code, MainCourseStepTok, 0);
@@ -279,6 +471,123 @@ codeunit 85412 "NPR NPRE Print Dispatch Tests"
         PrintTemplate.Insert(true);
     end;
 
+    local procedure CreateGenericPrintTemplate()
+    var
+        PrintTemplate: Record "NPR NPRE Print Template";
+    begin
+        // No restaurant and no seating location, so it is only ever reached by the blank-location fallback pass.
+        PrintTemplate.Init();
+        PrintTemplate."Print Type" := PrintTemplate."Print Type"::"Kitchen Order";
+        PrintTemplate."Restaurant Code" := '';
+        PrintTemplate."Seating Location" := '';
+        PrintTemplate."Serving Step" := '';
+        PrintTemplate."Print Category Code" := '';
+        PrintTemplate."Split Print Jobs By" := PrintTemplate."Split Print Jobs By"::None;
+        PrintTemplate."Codeunit ID" := Codeunit::"NPR NPRE Test Print Handler";
+        PrintTemplate.Insert(true);
+    end;
+
+    local procedure CreateLegacyPrintTemplate(SplitJobsBy: Option) TemplateCode: Code[20]
+    var
+        TemplateHeader: Record "NPR RP Template Header";
+        DataItems: Record "NPR RP Data Items";
+        PrintTempl: Record "NPR NPRE Print Templ.";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        // A retail print template with a data item, no layout lines and a stand-in pre-processing codeunit. The
+        // pre-processor is what these tests observe: it runs once per print job, before the engine renders anything,
+        // so the ticket does not have to be printable for the grouping to be measurable - and the grouping, not the
+        // ticket's content, is what is under test. The data item is also what the header's "Table ID" is calculated
+        // from, and that is what the dispatch branches on to pick the waiter pad line branch.
+        TemplateHeader.Init();
+        TemplateHeader.Code :=
+            CopyStr(
+                LibraryUtility.GenerateRandomCode(TemplateHeader.FieldNo(Code), Database::"NPR RP Template Header"),
+                1, MaxStrLen(TemplateHeader.Code));
+        TemplateHeader."Printer Device" := 'EPSON';
+        TemplateHeader."Pre Processing Codeunit" := Codeunit::"NPR NPRE Test RP Preprocess";
+        TemplateHeader.Insert();
+
+        DataItems.Init();
+        DataItems.Code := TemplateHeader.Code;
+        DataItems.Validate("Data Source", 'NPR NPRE Waiter Pad Line');
+        DataItems.Insert();
+
+        // "Data Source" validation ends in a bare FindFirst on AllObjWithCaption and leaves "Table ID" at zero when
+        // the object name does not match, and the dispatch branches on that same value - a zero would fall through
+        // both branches, print nothing, raise nothing, and make every job count below read zero for the wrong reason.
+        TemplateHeader.CalcFields("Table ID");
+        _Assert.AreEqual(
+            Database::"NPR NPRE Waiter Pad Line", TemplateHeader."Table ID",
+            'The retail print template should resolve to the waiter pad line table.');
+
+        PrintTempl.Init();
+        PrintTempl."Print Type" := PrintTempl."Print Type"::"Kitchen Order";
+        PrintTempl."Restaurant Code" := _Restaurant.Code;
+        PrintTempl."Seating Location" := _SeatingLocation.Code;
+        PrintTempl."Serving Step" := '';
+        PrintTempl."Print Category Code" := '';
+        PrintTempl."Template Code" := TemplateHeader.Code;
+        PrintTempl."Split Print Jobs By" := SplitJobsBy;
+        PrintTempl.Insert(true);
+        exit(TemplateHeader.Code);
+    end;
+
+    local procedure CreateLegacyWaiterPadTemplate(SplitJobsBy: Option)
+    var
+        TemplateHeader: Record "NPR RP Template Header";
+        DataItems: Record "NPR RP Data Items";
+        PrintTempl: Record "NPR NPRE Print Templ.";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        // Same shape as CreateLegacyPrintTemplate, with the data item on the waiter pad rather than its lines. That
+        // is the only thing that sends the dispatch down its other branch.
+        TemplateHeader.Init();
+        TemplateHeader.Code :=
+            CopyStr(
+                LibraryUtility.GenerateRandomCode(TemplateHeader.FieldNo(Code), Database::"NPR RP Template Header"),
+                1, MaxStrLen(TemplateHeader.Code));
+        TemplateHeader."Printer Device" := 'EPSON';
+        TemplateHeader."Pre Processing Codeunit" := Codeunit::"NPR NPRE Test RP Pre WPad";
+        TemplateHeader.Insert();
+
+        DataItems.Init();
+        DataItems.Code := TemplateHeader.Code;
+        DataItems.Validate("Data Source", 'NPR NPRE Waiter Pad');
+        DataItems.Insert();
+
+        TemplateHeader.CalcFields("Table ID");
+        _Assert.AreEqual(
+            Database::"NPR NPRE Waiter Pad", TemplateHeader."Table ID",
+            'The retail print template should resolve to the waiter pad table.');
+
+        PrintTempl.Init();
+        PrintTempl."Print Type" := PrintTempl."Print Type"::"Kitchen Order";
+        PrintTempl."Restaurant Code" := _Restaurant.Code;
+        PrintTempl."Seating Location" := _SeatingLocation.Code;
+        PrintTempl."Serving Step" := '';
+        PrintTempl."Print Category Code" := '';
+        PrintTempl."Template Code" := TemplateHeader.Code;
+        PrintTempl."Split Print Jobs By" := SplitJobsBy;
+        PrintTempl.Insert(true);
+    end;
+
+    local procedure LinkPadToASeatingInAnotherRestaurant(WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        OtherRestaurant: Record "NPR NPRE Restaurant";
+        OtherSeatingLocation: Record "NPR NPRE Seating Location";
+        OtherSeating: Record "NPR NPRE Seating";
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+    begin
+        _LibraryRestaurant.CreateRestaurant(OtherRestaurant, _ServFlowProfile.Code);
+        _LibraryRestaurant.CreateSeatingLocation(OtherSeatingLocation, OtherRestaurant.Code);
+        _LibraryRestaurant.CreateSeating(OtherSeating, OtherSeatingLocation.Code);
+        if not WaiterPadMgt.LinkSeatingToWaiterPad(WaiterPad, OtherSeating.Code, SeatingWaiterPadLink) then
+            _Assert.Fail('The pad should have been linked to a seating in the second restaurant.');
+        Commit();
+    end;
+
     local procedure CreatePadWithRoutedLine(var WaiterPad: Record "NPR NPRE Waiter Pad"; var Item: Record Item; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; ServingStep: Code[10])
     begin
         CreatePadWithRoutedLine(WaiterPad, Item, WaiterPadLine, ServingStep, '');
@@ -322,6 +631,16 @@ codeunit 85412 "NPR NPRE Print Dispatch Tests"
     begin
         _LibraryRestaurant.FindKitchenRequestsForPad(WaiterPadNo, KitchenRequest);
         exit(KitchenRequest.Count());
+    end;
+
+    local procedure PrintLogCount(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer): Integer
+    var
+        WPadLinePrintLogEntry: Record "NPR NPRE W.Pad Prnt LogEntry";
+    begin
+        WPadLinePrintLogEntry.SetRange("Waiter Pad No.", WaiterPadNo);
+        WPadLinePrintLogEntry.SetRange("Waiter Pad Line No.", WaiterPadLineNo);
+        WPadLinePrintLogEntry.SetRange("Output Type", WPadLinePrintLogEntry."Output Type"::Print);
+        exit(WPadLinePrintLogEntry.Count());
     end;
 
     local procedure KdsLogCount(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer): Integer
