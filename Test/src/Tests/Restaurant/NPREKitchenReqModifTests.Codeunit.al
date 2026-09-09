@@ -38,8 +38,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(OriginalAddOnItem);
         CreateAddOnItem(NewAddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", OriginalAddOnItem."No.", 1, MainWaiterPadLine."Line No.", OriginalAddOnLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", OriginalAddOnItem."No.", 1, MainWaiterPadLine."Line No.", OriginalAddOnLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
         _Assert.AreEqual(
@@ -48,7 +48,7 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
 
         // [WHEN] The add-on line is replaced with a different one and the waiter pad is sent again
         OriginalAddOnLine.Delete(true);
-        AddWaiterPadLine(WaiterPad."No.", NewAddOnItem."No.", 1, MainWaiterPadLine."Line No.", NewAddOnLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", NewAddOnItem."No.", 1, MainWaiterPadLine."Line No.", NewAddOnLine);
         SendWaiterPadToKitchen(WaiterPad);
 
         // [THEN] The kitchen sees the add-on line that is now on the waiter pad
@@ -78,8 +78,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(OriginalAddOnItem);
         CreateAddOnItem(NewAddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", OriginalAddOnItem."No.", 1, MainWaiterPadLine."Line No.", OriginalAddOnLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", OriginalAddOnItem."No.", 1, MainWaiterPadLine."Line No.", OriginalAddOnLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
         KitchenRequestStation.SetRange("Request No.", RequestNo);
@@ -88,7 +88,7 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
 
         // [WHEN] The add-on line is replaced with a different one and the waiter pad is sent again
         OriginalAddOnLine.Delete(true);
-        AddWaiterPadLine(WaiterPad."No.", NewAddOnItem."No.", 1, MainWaiterPadLine."Line No.", NewAddOnLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", NewAddOnItem."No.", 1, MainWaiterPadLine."Line No.", NewAddOnLine);
         SendWaiterPadToKitchen(WaiterPad);
 
         // [THEN] The station requests are flagged as changed, the same way a quantity change flags them
@@ -120,8 +120,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
         _Assert.AreEqual(
@@ -168,8 +168,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(AddOnItem);
         CreateItemVariant(AddOnItem, ItemVariant);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         AddOnWaiterPadLine."Variant Code" := ItemVariant.Code;
         AddOnWaiterPadLine.Modify(true);
 
@@ -203,8 +203,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
         _Assert.AreEqual(AddOnItem."No.", GetOnlyModifierItemNo(RequestNo), 'The kitchen request should have been created with a modifier line.');
@@ -242,10 +242,10 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(AddOnItem);
         CreateDishItem(OtherItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, MergeToWaiterPad);
-        AddWaiterPadLine(MergeToWaiterPad."No.", OtherItem."No.", 1, 0, OtherWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(MergeToWaiterPad."No.", OtherItem."No.", 1, 0, OtherWaiterPadLine);
 
         // [WHEN] The first waiter pad is merged into the second one
         WaiterPadMgt.MergeWaiterPad(WaiterPad, MergeToWaiterPad);
@@ -285,8 +285,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(AddOnItem);
         CreateDishItem(OtherItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad, false);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
         KitchenRequestStation.SetRange("Request No.", RequestNo);
@@ -294,7 +294,7 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         KitchenRequestStation.ModifyAll("Qty. Change Not Accepted", false);
 
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, MergeToWaiterPad);
-        AddWaiterPadLine(MergeToWaiterPad."No.", OtherItem."No.", 1, 0, OtherWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(MergeToWaiterPad."No.", OtherItem."No.", 1, 0, OtherWaiterPadLine);
         WaiterPadMgt.MergeWaiterPad(WaiterPad, MergeToWaiterPad);
 
         // [WHEN] The merged waiter pad is sent to the kitchen
@@ -326,8 +326,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad, false);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
 
@@ -357,8 +357,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad, false);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
         KitchenRequestStation.SetRange("Request No.", RequestNo);
@@ -397,11 +397,11 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(AddOnItem);
         CreateAddOnItem(LateAddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
-        AddWaiterPadLine(WaiterPad."No.", LateAddOnItem."No.", 1, MainWaiterPadLine."Line No.", LateAddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", LateAddOnItem."No.", 1, MainWaiterPadLine."Line No.", LateAddOnWaiterPadLine);
 
         // [WHEN] The waiter requests the next serving step, which auto-advances until a step actually has something to send
         RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '', true);
@@ -433,8 +433,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, SplitToWaiterPad);
 
         AddBillLine(BillLines, AddOnWaiterPadLine);
@@ -477,8 +477,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 2, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 2, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
 
@@ -521,8 +521,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 2, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 2, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 2, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 2, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
 
@@ -570,9 +570,9 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(AddOnItem);
         CreateAddOnItem(SubAddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", SubAddOnItem."No.", 1, AddOnWaiterPadLine."Line No.", SubAddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", SubAddOnItem."No.", 1, AddOnWaiterPadLine."Line No.", SubAddOnWaiterPadLine);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, SplitToWaiterPad);
 
         AddBillLine(BillLines, SubAddOnWaiterPadLine);
@@ -620,15 +620,15 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateAddOnItem(SecondAddOnItem);
         CreateAddOnItem(NewAddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", FirstAddOnItem."No.", 1, MainWaiterPadLine."Line No.", FirstAddOnLine);
-        AddWaiterPadLine(WaiterPad."No.", SecondAddOnItem."No.", 1, MainWaiterPadLine."Line No.", SecondAddOnLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", FirstAddOnItem."No.", 1, MainWaiterPadLine."Line No.", FirstAddOnLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", SecondAddOnItem."No.", 1, MainWaiterPadLine."Line No.", SecondAddOnLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
 
         // [WHEN] The second add-on line is replaced and the waiter pad is sent again
         SecondAddOnLine.Delete(true);
-        AddWaiterPadLine(WaiterPad."No.", NewAddOnItem."No.", 1, MainWaiterPadLine."Line No.", NewAddOnLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", NewAddOnItem."No.", 1, MainWaiterPadLine."Line No.", NewAddOnLine);
         SendWaiterPadToKitchen(WaiterPad);
 
         // [THEN] The kitchen holds both add-on lines, the untouched one first
@@ -671,8 +671,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         CreateDishItem(MainItem);
         CreateAddOnItem(AddOnItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnItem."No.", 1, MainWaiterPadLine."Line No.", AddOnWaiterPadLine);
         SendWaiterPadToKitchen(WaiterPad);
         RequestNo := GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.");
 
@@ -706,8 +706,8 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         Initialize();
         CreateDishItem(MainItem);
         _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
-        AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
-        AddWaiterPadCommentLine(WaiterPad."No.", NoOnionsTok, MainWaiterPadLine."Line No.", CommentWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadCommentLine(WaiterPad."No.", NoOnionsTok, MainWaiterPadLine."Line No.", CommentWaiterPadLine);
 
         // [WHEN] The waiter pad is sent to the kitchen
         SendWaiterPadToKitchen(WaiterPad);
@@ -784,44 +784,6 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         ItemVariant.Code := CopyStr(LibraryUtility.GenerateRandomCode(ItemVariant.FieldNo(Code), Database::"Item Variant"), 1, MaxStrLen(ItemVariant.Code));
         ItemVariant.Description := 'Test Item Variant';
         ItemVariant.Insert(true);
-    end;
-
-    local procedure AddWaiterPadLine(WaiterPadNo: Code[20]; ItemNo: Code[20]; Quantity: Decimal; AttachedToLineNo: Integer; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
-    var
-        Item: Record Item;
-        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
-    begin
-        Item.Get(ItemNo);
-
-        WaiterPadLine.Init();
-        WaiterPadLine."Waiter Pad No." := WaiterPadNo;
-        WaiterPadLine."Line Type" := WaiterPadLine."Line Type"::Item;
-        WaiterPadLine."No." := ItemNo;
-        WaiterPadLine.Description := Item.Description;
-        WaiterPadLine."Attached to Line No." := AttachedToLineNo;
-        if AttachedToLineNo <> 0 then
-            WaiterPadLine.Indentation := 1;
-        WaiterPadLine.Insert(true);
-
-        if Item."Sales Unit of Measure" <> '' then
-            WaiterPadLine.Validate("Unit of Measure Code", Item."Sales Unit of Measure")
-        else
-            WaiterPadLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
-        WaiterPadLine.Validate(Quantity, Quantity);
-        WaiterPadLine.Modify(true);
-
-        WaiterPadMgt.AssignWPadLinePrintCategories(WaiterPadLine, true);
-    end;
-
-    local procedure AddWaiterPadCommentLine(WaiterPadNo: Code[20]; CommentText: Text; AttachedToLineNo: Integer; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
-    begin
-        WaiterPadLine.Init();
-        WaiterPadLine."Waiter Pad No." := WaiterPadNo;
-        WaiterPadLine."Line Type" := WaiterPadLine."Line Type"::Comment;
-        WaiterPadLine.Description := CopyStr(CommentText, 1, MaxStrLen(WaiterPadLine.Description));
-        WaiterPadLine."Attached to Line No." := AttachedToLineNo;
-        WaiterPadLine.Indentation := 1;
-        WaiterPadLine.Insert(true);
     end;
 
     local procedure AddBillLine(var BillLines: JsonArray; WaiterPadLine: Record "NPR NPRE Waiter Pad Line")

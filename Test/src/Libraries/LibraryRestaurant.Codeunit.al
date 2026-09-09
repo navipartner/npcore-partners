@@ -423,5 +423,170 @@ codeunit 85242 "NPR Library - Restaurant"
         if Item."NPR NPRE Item Routing Profile" <> ItemRoutingProfile.Code then
             Error('Failed to link item %1 to routing profile %2', Item."No.", ItemRoutingProfile.Code);
     end;
+
+    procedure SeatingStatusReady(): Code[10]
+    begin
+        exit('READY');
+    end;
+
+    procedure SeatingStatusOccupied(): Code[10]
+    begin
+        exit('OCCUPIED');
+    end;
+
+    procedure SeatingStatusBlocked(): Code[10]
+    begin
+        exit('BLOCKED');
+    end;
+
+    procedure WaiterPadStatusReadyForPmt(): Code[10]
+    begin
+        exit('PAY');
+    end;
+
+    procedure CreateSeatingFlowStatuses()
+    var
+        FlowStatus: Record "NPR NPRE Flow Status";
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        CreateFlowStatus(FlowStatus."Status Object"::Seating, SeatingStatusReady(), 'Ready', 10);
+        CreateFlowStatus(FlowStatus."Status Object"::Seating, SeatingStatusOccupied(), 'Occupied', 20);
+        CreateFlowStatus(FlowStatus."Status Object"::Seating, SeatingStatusBlocked(), 'Blocked', 30);
+
+        // SetSeatingIsReady/Occupied/Blocked resolve the status code to write from these, so without them they write a
+        // blank status - which is what the occupied assertions read. The clearing assertions do not depend on them:
+        // TrySetSeatingIsCleared takes its code from the service flow profile, and the Blocked recompute inside
+        // SetSeatingStatus yields false either way.
+        CreateRestaurantSetup(RestaurantSetup);
+        RestaurantSetup."Seat.Status: Ready" := SeatingStatusReady();
+        RestaurantSetup."Seat.Status: Occupied" := SeatingStatusOccupied();
+        RestaurantSetup."Seat.Status: Blocked" := SeatingStatusBlocked();
+        RestaurantSetup.Modify();
+    end;
+
+    procedure CreateWaiterPadFlowStatuses()
+    var
+        FlowStatus: Record "NPR NPRE Flow Status";
+    begin
+        CreateFlowStatus(FlowStatus."Status Object"::WaiterPad, WaiterPadStatusReadyForPmt(), 'Ready for Payment', 10);
+    end;
+
+    local procedure CreateFlowStatus(StatusObject: Enum "NPR NPRE Status Object"; StatusCode: Code[10]; Description: Text[50]; FlowOrder: Integer)
+    var
+        FlowStatus: Record "NPR NPRE Flow Status";
+    begin
+        if FlowStatus.Get(StatusCode, StatusObject) then
+            exit;
+        FlowStatus.Init();
+        FlowStatus.Code := StatusCode;
+        FlowStatus."Status Object" := StatusObject;
+        FlowStatus.Description := Description;
+        FlowStatus."Flow Order" := FlowOrder;
+        FlowStatus.Auxiliary := false;
+        FlowStatus.Insert(true);
+    end;
+
+    procedure ConfigureServiceFlowProfile(var ServFlowProfile: Record "NPR NPRE Serv.Flow Profile"; CloseWaiterPadOn: Enum "NPR NPRE Serv.Flow Close W/Pad"; ClearSeatingOn: Enum "NPR NPRE Serv.Flow Clear Seat."; SetReadyForPmtOn: Enum "NPR NPRE W/Pad Status Pmt. On"; OnlyIfFullyPaid: Boolean)
+    begin
+        // Assigned rather than validated on purpose. The OnValidate triggers on these fields raise a Message and rewrite
+        // each other - setting "Close Waiter Pad On" to a Pre-Receipt value forces "Set W/Pad Ready for Pmt. On" back to
+        // Manual, for instance - so validating here would silently hand the test a different matrix cell than it asked for.
+        // Callers are responsible for asking only for combinations the UI can actually produce.
+        ServFlowProfile."Close Waiter Pad On" := CloseWaiterPadOn;
+        ServFlowProfile."Clear Seating On" := ClearSeatingOn;
+        ServFlowProfile."Set W/Pad Ready for Pmt. On" := SetReadyForPmtOn;
+        ServFlowProfile."Only if Fully Paid" := OnlyIfFullyPaid;
+        ServFlowProfile."Seating Status after Clearing" := SeatingStatusReady();
+        ServFlowProfile."W/Pad Ready for Pmt. Status" := WaiterPadStatusReadyForPmt();
+        ServFlowProfile.Modify();
+    end;
+
+    procedure SetRestaurantKDSActive(var Restaurant: Record "NPR NPRE Restaurant"; Active: Boolean)
+    begin
+        if Active then
+            Restaurant."KDS Active" := Restaurant."KDS Active"::Yes
+        else
+            Restaurant."KDS Active" := Restaurant."KDS Active"::No;
+        Restaurant.Modify();
+    end;
+
+    procedure CreateItemUnitOfMeasure(Item: Record Item; var ItemUnitOfMeasure: Record "Item Unit of Measure"; QtyPerUnitOfMeasure: Decimal)
+    var
+        UnitOfMeasure: Record "Unit of Measure";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        UnitOfMeasure.Init();
+        UnitOfMeasure.Code := CopyStr(
+            LibraryUtility.GenerateRandomCode(UnitOfMeasure.FieldNo(Code), Database::"Unit of Measure"), 1, MaxStrLen(UnitOfMeasure.Code));
+        UnitOfMeasure.Insert(true);
+
+        ItemUnitOfMeasure.Init();
+        ItemUnitOfMeasure."Item No." := Item."No.";
+        ItemUnitOfMeasure.Code := UnitOfMeasure.Code;
+        ItemUnitOfMeasure.Validate("Qty. per Unit of Measure", QtyPerUnitOfMeasure);
+        ItemUnitOfMeasure.Insert(true);
+    end;
+
+    procedure AddWaiterPadLine(WaiterPadNo: Code[20]; ItemNo: Code[20]; Quantity: Decimal; AttachedToLineNo: Integer; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    var
+        Item: Record Item;
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+    begin
+        Item.Get(ItemNo);
+
+        WaiterPadLine.Init();
+        ClearLineNoSoTheTableAssignsIt(WaiterPadLine);
+        WaiterPadLine."Waiter Pad No." := WaiterPadNo;
+        WaiterPadLine."Line Type" := WaiterPadLine."Line Type"::Item;
+        WaiterPadLine."No." := ItemNo;
+        WaiterPadLine.Description := Item.Description;
+        WaiterPadLine."Attached to Line No." := AttachedToLineNo;
+        if AttachedToLineNo <> 0 then
+            WaiterPadLine.Indentation := 1;
+        WaiterPadLine.Insert(true);
+
+        if Item."Sales Unit of Measure" <> '' then
+            WaiterPadLine.Validate("Unit of Measure Code", Item."Sales Unit of Measure")
+        else
+            WaiterPadLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
+        WaiterPadLine.Validate(Quantity, Quantity);
+        WaiterPadLine.Modify(true);
+
+        WaiterPadMgt.AssignWPadLinePrintCategories(WaiterPadLine, true);
+    end;
+
+    procedure AddWaiterPadCommentLine(WaiterPadNo: Code[20]; CommentText: Text; AttachedToLineNo: Integer; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        WaiterPadLine.Init();
+        ClearLineNoSoTheTableAssignsIt(WaiterPadLine);
+        WaiterPadLine."Waiter Pad No." := WaiterPadNo;
+        WaiterPadLine."Line Type" := WaiterPadLine."Line Type"::Comment;
+        WaiterPadLine.Description := CopyStr(CommentText, 1, MaxStrLen(WaiterPadLine.Description));
+        WaiterPadLine."Attached to Line No." := AttachedToLineNo;
+        if AttachedToLineNo <> 0 then
+            WaiterPadLine.Indentation := 1;
+        WaiterPadLine.Insert(true);
+    end;
+
+    local procedure ClearLineNoSoTheTableAssignsIt(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        // Init() leaves the primary key alone, so a caller that passes the same record variable twice - one call to
+        // receive the item line, a second to receive a comment on it - arrives here still holding the first line's
+        // "Line No.". The table's OnInsert honours a non-blank "Line No." on purpose, so that add-on lines can be
+        // placed directly below their main item, and would take that stale number as a deliberate position: the
+        // second insert then collides with the first on the primary key.
+        //
+        // Blanking it says what these two helpers actually mean - append to the end of the pad, whatever the caller's
+        // variable happened to hold - rather than leaving the outcome to depend on how the test declared its
+        // variables. The product does the same thing explicitly in NPREWaiterPadPOSMgt, which assigns "Line No." from
+        // NewWaiterPadLineNo on every iteration for exactly this reason.
+        WaiterPadLine."Line No." := 0;
+    end;
+
+    procedure SetWaiterPadLineBilledQuantity(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; BilledQuantity: Decimal)
+    begin
+        WaiterPadLine.Validate("Billed Quantity", BilledQuantity);
+        WaiterPadLine.Modify(true);
+    end;
 }
 #endif
