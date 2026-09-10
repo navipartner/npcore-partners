@@ -95,11 +95,11 @@
         if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
             exit(false);
 
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("No."));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Vendor No."));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Category Code"));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Disc. Group"));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Search Description"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Caption, Item.FieldNo("No."));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Caption, Item.FieldNo("Vendor No."));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Caption, Item.FieldNo("Item Category Code"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Caption, Item.FieldNo("Item Disc. Group"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Caption, Item.FieldNo("Search Description"));
         FilterPageBuilder.PageCaption := AddItemsTxt;
         if not FilterPageBuilder.RunModal() then
             exit(false);
