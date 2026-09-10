@@ -57,6 +57,8 @@ codeunit 6151117 "NPR EcomCreateCouponJQ"
         EcomSalesHeader.SetFilter("Bucket Id", BucketFilter);
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 EcomVirtualItemMgt.CreateCoupons(EcomSalesHeader, false, true);
             until EcomSalesHeader.Next() = 0;
     end;

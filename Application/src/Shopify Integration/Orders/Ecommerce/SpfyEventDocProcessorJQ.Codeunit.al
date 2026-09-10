@@ -32,6 +32,7 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
     local procedure ProcessLogEntries(BucketFilter: Text)
     var
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
         SpfyEventLogEntry.SetCurrentKey("Processing Status", "Process Retry Count", "Not Before Date-Time", "Document Type", "Bucket Id");
         SpfyEventLogEntry.SetFilter("Processing Status", '<>%1', SpfyEventLogEntry."Processing Status"::Processed);
@@ -41,6 +42,8 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
         SpfyEventLogEntry.SetFilter("Bucket Id", BucketFilter);
         if SpfyEventLogEntry.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 ProcessLogEntry(SpfyEventLogEntry);
             until SpfyEventLogEntry.Next() = 0;
     end;

@@ -63,6 +63,8 @@ codeunit 6248518 "NPR EcomCreateVoucherJQ"
         EcomSalesHeader.SetLoadFields("Entry No.");
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 EcomVirtualItemMgt.CreateVouchers(EcomSalesHeader, false, true);
             until EcomSalesHeader.Next() = 0;
     end;

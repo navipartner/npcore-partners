@@ -600,6 +600,99 @@ codeunit 85381 "NPR Ecom Async Creation Tests"
     end;
 
     [Test]
+    procedure CouponLineIsNotChargedWhenTheAppSetChangesMidDocument()
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomAppSetWatch: Codeunit "NPR Ecom App Set Watch";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        ExternalPaymentCode: Code[50];
+        ItemNo: Code[20];
+        RetryCountAfter: Integer;
+        StatusAfter: Enum "NPR EcomVirtualItemProcestatus";
+        LineFound: Boolean;
+    begin
+        Initialize();
+
+        // [Scenario] EcomCreateCouponJQ consults the app set watch once per document and then hands the whole
+        // document to CreateCoupons, which charges a retry per line. A publish landing in that gap must not be
+        // charged to the lines: the budget is three, so one publish would otherwise spend a third of it and
+        // overwrite whatever real error a line was already carrying.
+
+        // [Given] a captured coupon order - the state the coupon job queue hands to CreateCoupons
+        ItemNo := _LibEcom.CreateEcomCouponItem(CouponType);
+        ExternalPaymentCode := _LibEcom.CreateGatewayCapturedPaymentMapping();
+        _LibEcom.InsertEcomDocumentWithItemLineAndPayment(NextExternalNo(), ItemNo, _LibEcom.CreateCustomer(), ExternalPaymentCode, 100, EcomSalesHeader);
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSaleCaptureJQ", EcomSalesHeader);
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+
+        // [When] the app set changes after the per-document check has passed, and the lines are processed -
+        //        CreateCoupons is called directly because that is precisely the reachable state: the job
+        //        queue's own check is upstream of it and has already let this document through.
+        EcomAppSetWatch.SetChangedForTest();
+        EcomVirtualItemMgt.CreateCoupons(EcomSalesHeader, false, true);
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Coupon);
+        LineFound := EcomSalesLine.FindFirst();
+        if LineFound then begin
+            RetryCountAfter := EcomSalesLine."Virtual Item Proc Retry Count";
+            StatusAfter := EcomSalesLine."Virtual Item Process Status";
+        end;
+        // Read first, reset second, assert last. The watch is SingleInstance and TestIsolation = Codeunit
+        // rolls none of it back, so an assertion failing above this line would leave the latch set for every
+        // later suite in the session.
+        EcomAppSetWatch.ResetForTest();
+
+        // [Then] the line was found at all - without this the two assertions below would both hold on a
+        //        document that never had a coupon line, which is the one way they can pass vacuously
+        _Assert.IsTrue(LineFound, 'Precondition: the document should carry a coupon line.');
+
+        // [Then] the line keeps its full retry budget
+        _Assert.AreEqual(0, RetryCountAfter, 'A guarded line loop must not spend a retry. The line did nothing wrong - the extension did.');
+
+        // [Then] and it is still waiting, so the next run picks it up. Asserted separately from the count
+        //        because a line the loop processed successfully would also read 0 retries if the charge were
+        //        ever moved behind the success branch.
+        _Assert.AreEqual(Enum::"NPR EcomVirtualItemProcestatus"::" ", StatusAfter, 'A guarded line loop must leave the line untouched, not process it.');
+    end;
+
+    [Test]
+    procedure CouponLineIsChargedWhenTheAppSetIsUnchanged()
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ExternalPaymentCode: Code[50];
+        ItemNo: Code[20];
+    begin
+        Initialize();
+
+        // [Scenario] The control for the case above. With a clear latch the same line IS reached and charged,
+        // through the real job queue rather than a direct call - so this also shows the new line-level guard
+        // does not stop the healthy path. Without this control the guarded case would pass just as well on a
+        // CreateCoupons that had stopped looping lines for any reason at all.
+
+        // [Given] the same captured coupon order and a clear latch
+        ItemNo := _LibEcom.CreateEcomCouponItem(CouponType);
+        ExternalPaymentCode := _LibEcom.CreateGatewayCapturedPaymentMapping();
+        _LibEcom.InsertEcomDocumentWithItemLineAndPayment(NextExternalNo(), ItemNo, _LibEcom.CreateCustomer(), ExternalPaymentCode, 100, EcomSalesHeader);
+
+        // [When] the capture and coupon job queues run in scheduler order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSaleCaptureJQ", EcomSalesHeader);
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomCreateCouponJQ", EcomSalesHeader);
+
+        // [Then] the line really was reached and charged, so the guarded case above is not vacuous. The charge
+        //        is unconditional on the outcome (EcomCreateCouponProcess.HandleResponse), so this holds
+        //        whether the issue succeeded or failed - it is a statement about reaching the line, not about
+        //        what happened once there.
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Coupon);
+        _Assert.IsTrue(EcomSalesLine.FindFirst(), 'Precondition: the document should carry a coupon line.');
+        _Assert.AreEqual(1, EcomSalesLine."Virtual Item Proc Retry Count", 'Without a change to guard against, the line must be reached and charged - if it is not, the guarded case proves nothing.');
+    end;
+
+    [Test]
     procedure NotificationJobQueueAttemptsAQueuedEntry()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -1009,9 +1102,16 @@ codeunit 85381 "NPR Ecom Async Creation Tests"
     // Entry, not exit: a failing assertion would skip trailing cleanup, so restoring afterwards protects
     // only the runs that did not need protecting.
     local procedure Initialize()
+    var
+        EcomAppSetWatch: Codeunit "NPR Ecom App Set Watch";
     begin
         _LibEcom.ResetEcomSetupToDefaults();
         _TestIntegration.Reset();
+        // Every case here reaches ShouldSoftExit, so it consults the app set watch. That watch is
+        // SingleInstance and TestIsolation = Codeunit does not roll AL state back, so a latch left behind
+        // by an earlier codeunit would make RunEcomJobQueueOnce return having processed nothing and the
+        // negative assertions below would pass for the wrong reason.
+        EcomAppSetWatch.ResetForTest();
     end;
 
     local procedure NextExternalNo(): Code[20]

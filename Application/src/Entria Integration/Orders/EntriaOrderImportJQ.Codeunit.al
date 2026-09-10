@@ -51,6 +51,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         EntriaStore.SetLoadFields(Code, "Location Code");
         if EntriaStore.FindSet() then
             repeat
+                if _EcomJobManagement.ApplicationChanged() then
+                    exit;
                 ProcessStore(EntriaStore);
             until EntriaStore.Next() = 0;
     end;
@@ -79,6 +81,12 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         Offset := 0;
         Limit := 40;
         repeat
+            // Ends the paging: nothing is fetched, no order is processed, TryFlushMarker is not reached,
+            // so the marker stays where the last complete page left it and the next pass re-reads from
+            // there.
+            if _EcomJobManagement.ApplicationChanged() then
+                exit(false);
+
             if not DownloadOrdersPage(EntriaStore, WindowStartDT, Offset, Limit, PageCount) then begin
                 EmitError(EntriaStore.Code, '');
                 exit(false);
@@ -86,6 +94,9 @@ codeunit 6248580 "NPR Entria Order Import JQ"
 
             if PageCount = 0 then
                 exit(true);
+
+            if _EcomJobManagement.ApplicationChanged() then
+                exit(false);
 
             // False means the marker was rewound (moved backwards) in the database while we were
             // paging. A forward move is a parallel session's flush - it is adopted and paging continues.
@@ -388,6 +399,9 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         OrderUpdatedAt: DateTime;
         DisplayNo: Integer;
     begin
+        if _EcomJobManagement.ApplicationChanged() then
+            exit;
+
         OrderId := GetMedusaOrderId(OrderTkn);
         // Taken from the page's pre-validated set, not re-read here: the Required read already
         // happened inside TryCollectPageKeys, where a missing field rejects the page instead of
@@ -713,12 +727,15 @@ codeunit 6248580 "NPR Entria Order Import JQ"
 
         CollectDueRetries(EntriaStore.Code, DueOrderIds);
 
-        foreach OrderId in DueOrderIds do
+        foreach OrderId in DueOrderIds do begin
+            if _EcomJobManagement.ApplicationChanged() then
+                exit;
             if EntriaOrderImpFailure.Get(EntriaStore.Code, OrderId) then
                 if IsRetryDue(EntriaOrderImpFailure) then begin
                     ProcessDueRetry(EntriaStore, EntriaOrderImpFailure);
                     Commit();
                 end;
+        end;
     end;
 
     local procedure CollectDueRetries(StoreCode: Code[20]; var DueOrderIds: List of [Text])
@@ -964,6 +981,7 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     end;
 
     var
+        _EcomJobManagement: Codeunit "NPR Ecom Job Management";
         _EntriaAPIHandler: Codeunit "NPR Entria API Handler";
         _EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
         _JsonHelper: Codeunit "NPR Json Helper";

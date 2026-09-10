@@ -62,6 +62,8 @@ codeunit 6248613 "NPR EcomSalesRetOrderProcJQ"
         if not EcomSalesHeader.FindSet() then
             exit;
         repeat
+            if EcomJobManagement.ApplicationChanged() then
+                exit;
             Clear(EcomSalesDocProcess);
             EcomSalesDocProcess.SetShowError(false);
             EcomSalesDocProcess.SetUpdateRetryCount(true);

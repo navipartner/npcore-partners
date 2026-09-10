@@ -3973,6 +3973,7 @@ codeunit 85260 "NPR Entria Tests"
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EntriaStoreSyncState: Record "NPR Entria Store Sync State";
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+        EcomAppSetWatch: Codeunit "NPR Ecom App Set Watch";
     begin
         // Per test, not once per run: TestIsolation = Codeunit rolls back once, at the END of the codeunit,
         // so every write an earlier test made - committed or not - is still there for the next one. A marker
@@ -3992,6 +3993,11 @@ codeunit 85260 "NPR Entria Tests"
         // resolved by code. A test that switches "Enable Integration" off and fails before restoring it
         // would otherwise leave that cache behind and turn every later test red for an unrelated reason.
         EntriaIntegrationMgt.SetRereadSetup();
+
+        // Same reasoning for the app set watch, which the import loops consult per store and per order:
+        // it is SingleInstance too, so a latch an earlier codeunit left behind would make every loop here
+        // exit before touching a record and the assertions would hold for the wrong reason.
+        EcomAppSetWatch.ResetForTest();
 
         //Bracketed with the hold subscriber: this DeleteAll fires "NPR Entria Store".OnDelete, which re-asserts
         //the order import job setup and reaches StartJobQueueEntry. That is inert today only because

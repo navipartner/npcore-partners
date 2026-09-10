@@ -62,6 +62,8 @@ codeunit 6248511 "NPR EcomCreateTicketJQ"
         EcomSalesHeader.SetFilter("Bucket Id", BucketFilter);
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 EcomVirtualItemMgt.CreateTickets(EcomSalesHeader, false, true);
             until EcomSalesHeader.Next() = 0;
     end;

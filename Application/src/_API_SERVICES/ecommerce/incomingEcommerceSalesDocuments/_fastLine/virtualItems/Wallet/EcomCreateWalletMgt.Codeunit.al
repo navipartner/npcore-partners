@@ -182,6 +182,7 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
     var
         ParentLine: Record "NPR Ecom Sales Line";
         ParentLine2: Record "NPR Ecom Sales Line";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
         if not EcomSalesHeader."Attraction Wallets Exist" or
            (EcomSalesHeader."Attr. Wallet Processing Status" = EcomSalesHeader."Attr. Wallet Processing Status"::Processed) or
@@ -196,6 +197,8 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
         ParentLine.SetFilter("Attr. Wallet Processing Status", '<>%1', ParentLine."Attr. Wallet Processing Status"::Processed);
         if ParentLine.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 ParentLine2 := ParentLine;
                 CreateWalletsForTopLevelParentLine(EcomSalesHeader, ParentLine2, ShowError, UpdateRetryCount);
             until ParentLine.Next() = 0;

@@ -36,10 +36,13 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     internal procedure Process(StoresDict: Dictionary of [Code[20], Dictionary of [Enum "NPR SpfyEventLogDocType", Boolean]])
     var
         ShopifyStore: Record "NPR Spfy Store";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         StoreCode: Code[20];
     begin
         ShopifyStore.SetAutoCalcFields("Last Orders Imported At (FF)", "Last Returns Imported At (FF)");
         foreach StoreCode in StoresDict.Keys() do begin
+            if EcomJobManagement.ApplicationChanged() then
+                exit;
             ShopifyStore.ReadIsolation := IsolationLevel::ReadCommitted;
             ShopifyStore.Get(StoreCode);
             ProcessStore(ShopifyStore, StoresDict.Get(StoreCode));
@@ -102,6 +105,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure DownloadOrders(ShopifyStore: Record "NPR Spfy Store"; OrderStatus: Enum "NPR SpfyAPIDocumentStatus")
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         OrdersArr: JsonArray;
         ShopifyResponse: JsonToken;
         Cursor: Text;
@@ -110,6 +114,9 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         Cursor := '';
         HasNext := true;
         repeat
+            if EcomJobManagement.ApplicationChanged() then
+                exit;
+
             if not SpfyAPIOrderHelper.GetOrderList(HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, OrderStatus, GetFromDT(ShopifyStore, "NPR SpfyEventLogDocType"::Order)) then begin
                 LogError(GetLastErrorText(), ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order);
                 exit;
@@ -123,12 +130,16 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessList(OrdersArr: JsonArray; OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; ShopifyStore: Record "NPR Spfy Store"): Boolean
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         CurrNode: JsonToken;
         OrderTkn: JsonToken;
         OrderGID: Text;
         OrderProcessed: Boolean;
     begin
         foreach OrderTkn in OrdersArr do begin
+            if EcomJobManagement.ApplicationChanged() then
+                exit(OrderProcessed);
+
             OrderTkn.SelectToken('node', CurrNode);
             GetOrderGID(CurrNode, OrderGID);
             if SaveOrder(ShopifyStore, CurrNode, OrderStatus, OrderGID) then
@@ -150,6 +161,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure DownloadReturns(ShopifyStore: Record "NPR Spfy Store")
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         OrdersArr: JsonArray;
         ShopifyResponse: JsonToken;
         Cursor: Text;
@@ -158,6 +170,9 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         Cursor := '';
         HasNext := true;
         repeat
+            if EcomJobManagement.ApplicationChanged() then
+                exit;
+
             if not SpfyAPIOrderHelper.GetReturnList(HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, GetFromDT(ShopifyStore, "NPR SpfyEventLogDocType"::"Return Order")) then begin
                 LogError(GetLastErrorText(), ShopifyStore.Code, "NPR SpfyEventLogDocType"::"Return Order");
                 exit;
@@ -171,12 +186,17 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessReturnList(OrdersArr: JsonArray; ShopifyStore: Record "NPR Spfy Store"): Boolean
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         OrderTkn: JsonToken;
         OrderNode: JsonToken;
         ReturnsNode: JsonToken;
         ReturnProcessed: Boolean;
     begin
         foreach OrderTkn in OrdersArr do begin
+            // Above UpdateSessionMax, so a skipped order cannot raise the session maximum.
+            if EcomJobManagement.ApplicationChanged() then
+                exit(ReturnProcessed);
+
             OrderTkn.SelectToken('node', OrderNode);
             UpdateSessionMax(ShopifyStore.Code, "NPR SpfyEventLogDocType"::"Return Order", JsonHelper.GetJDT(OrderNode, 'updatedAt', true));
             if OrderNode.SelectToken('returns', ReturnsNode) then
@@ -188,6 +208,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessOrderReturns(ShopifyStore: Record "NPR Spfy Store"; OrderGID: Text; ReturnsNode: JsonToken) ReturnProcessed: Boolean
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         ReturnsEdges: JsonToken;
         ReturnsArr: JsonArray;
         Cursor: Text;
@@ -201,6 +222,11 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         HasNext := JsonHelper.GetJBoolean(ReturnsNode, 'pageInfo.hasNextPage', false);
         Cursor := JsonHelper.GetJText(ReturnsNode, 'pageInfo.endCursor', false);
         while HasNext do begin
+            // Its own fetch loop, so it needs its own check: without it a single order with many
+            // closed returns keeps calling Shopify after the session is already known to be stale.
+            if EcomJobManagement.ApplicationChanged() then
+                exit;
+
             if not SpfyAPIOrderHelper.GetOrderReturns(ShopifyStore, OrderGID, Cursor, HasNext, ReturnsArr) then begin
                 LogError(GetReturnErrorText(OrderGID), ShopifyStore.Code, "NPR SpfyEventLogDocType"::"Return Order");
                 exit;
@@ -212,10 +238,15 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessReturnEdges(ShopifyStore: Record "NPR Spfy Store"; ReturnsArr: JsonArray) ReturnProcessed: Boolean
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         ReturnEdge: JsonToken;
         ReturnNode: JsonToken;
     begin
         foreach ReturnEdge in ReturnsArr do begin
+            // Innermost record loop, so this is what bounds the charge to a single return.
+            if EcomJobManagement.ApplicationChanged() then
+                exit;
+
             ReturnEdge.SelectToken('node', ReturnNode);
             if ProcessReturn(ShopifyStore, ReturnNode) then
                 ReturnProcessed := true;
@@ -277,7 +308,12 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     ///ErrorsSinceLastMarker[StoreCode|DocType] 
     ///   Marker to track for any errors and prevent “Last Orders / Last Returns Imported At” from being updated is error exists.
     /// </summary>
-    local procedure SetMarkers(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
+    // internal, not local: the marker guarantee is only testable if a test can build the precondition
+    // (SetMarkers, UpdateSessionMax) and then call a guarded writer. That writer is FinalizeMarker, not
+    // UpdateLastImportedAt - the latter is the unguarded primitive both writers share, and it is local.
+    // TryUpdateMarker is the other guarded writer but a test cannot drive it: it is throttled to one
+    // write every five minutes.
+    internal procedure SetMarkers(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
     var
         FromDT: DateTime;
         MarkerKeyTxt: Text;
@@ -310,9 +346,13 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     local procedure TryUpdateMarker(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
     var
         SpfyStore: Record "NPR Spfy Store";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         NowDT: DateTime;
         MarkerKeyTxt: Text;
     begin
+        if EcomJobManagement.ApplicationChanged() then
+            exit;
+
         MarkerKeyTxt := MarkerKey(ShopifyStore.Code, DocType);
         NowDT := CurrentDateTime();
         if (NowDT - LastMarkerUpdate.Get(MarkerKeyTxt)) < (5 * 60000) then
@@ -328,8 +368,12 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     local procedure FinalizeMarkers(StoresDict: Dictionary of [Code[20], Dictionary of [Enum "NPR SpfyEventLogDocType", Boolean]])
     var
         ShopifyStore: Record "NPR Spfy Store";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         StoreCode: Code[20];
     begin
+        if EcomJobManagement.ApplicationChanged() then
+            exit;
+
         foreach StoreCode in StoresDict.Keys() do begin
             ShopifyStore.ReadIsolation := IsolationLevel::ReadCommitted;
             ShopifyStore.Get(StoreCode);
@@ -338,10 +382,14 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         end;
     end;
 
-    local procedure FinalizeMarker(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
+    internal procedure FinalizeMarker(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         MarkerKeyTxt: Text;
     begin
+        if EcomJobManagement.ApplicationChanged() then
+            exit;
+
         MarkerKeyTxt := MarkerKey(ShopifyStore.Code, DocType);
         if not SessionMaxUpdatedAt.ContainsKey(MarkerKeyTxt) then
             exit;
@@ -350,7 +398,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         UpdateLastImportedAt(ShopifyStore, DocType);
     end;
 
-    local procedure UpdateSessionMax(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"; UpdatedAt: DateTime)
+    internal procedure UpdateSessionMax(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"; UpdatedAt: DateTime)
     var
         CurrentMax: DateTime;
         MarkerKeyTxt: Text;

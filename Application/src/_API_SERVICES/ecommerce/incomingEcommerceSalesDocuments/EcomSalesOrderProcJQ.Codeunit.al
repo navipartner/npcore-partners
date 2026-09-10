@@ -64,6 +64,8 @@ codeunit 6248612 "NPR EcomSalesOrderProcJQ"
 
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 Clear(EcomSalesDocProcess);
                 EcomSalesDocProcess.SetShowError(false);
                 EcomSalesDocProcess.SetUpdateRetryCount(true);
@@ -81,6 +83,8 @@ codeunit 6248612 "NPR EcomSalesOrderProcJQ"
         EcomSalesHeader.SetFilter("External No.", SalesOrderNoTextFilter);
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 Clear(EcomSalesDocProcess);
                 EcomSalesDocProcess.SetShowError(false);
                 EcomSalesDocProcess.SetUpdateRetryCount(true);

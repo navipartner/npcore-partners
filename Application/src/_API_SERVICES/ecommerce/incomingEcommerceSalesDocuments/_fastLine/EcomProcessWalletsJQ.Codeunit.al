@@ -57,6 +57,8 @@ codeunit 6151069 "NPR EcomProcessWalletsJQ"
         EcomSalesHeader.SetFilter("Bucket Id", BucketFilter);
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 EcomCreateWalletMgt.CreateWallets(EcomSalesHeader, false, true);
             until EcomSalesHeader.Next() = 0;
     end;

@@ -59,6 +59,8 @@ codeunit 6151049 "NPR EcomCreateMembershipJQ"
         EcomSalesHeader.SetLoadFields("Entry No.");
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 EcomVirtualItemMgt.CreateMemberships(EcomSalesHeader, false, true);
             until EcomSalesHeader.Next() = 0;
     end;

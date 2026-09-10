@@ -75,6 +75,8 @@ codeunit 6151116 "NPR EcomDigitalNotifJQ"
             exit;
 
         repeat
+            if EcomJobManagement.ApplicationChanged() then
+                exit;
             DigitalNotificationSend.SendNotification(DigitalNotifEntry);
             Commit();
         until DigitalNotifEntry.Next() = 0;

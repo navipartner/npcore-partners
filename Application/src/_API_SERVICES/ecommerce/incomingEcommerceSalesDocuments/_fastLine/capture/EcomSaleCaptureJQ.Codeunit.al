@@ -88,6 +88,8 @@ codeunit 6248538 "NPR EcomSaleCaptureJQ"
         EcomSalesHeader.SetFilter("Capture Retry Count", '<=%1', IncEcomSalesDocSetup."Max Capture Retry Count");
         if EcomSalesHeader.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 Clear(EcomSaleDocCaptureProcess);
                 EcomSaleDocCaptureProcess.SetUpdateRetryCount(true);
                 EcomSaleDocCaptureProcess.SetShowError(false);

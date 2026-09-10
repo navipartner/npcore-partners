@@ -47,6 +47,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     internal procedure CreateVouchers(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
         if not EcomSalesHeader."Vouchers Exist" then
             exit;
@@ -67,6 +68,8 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetFilter("Unit Price", '<>0');
         if EcomSalesLine.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 CreateVoucher(EcomSalesLine, ShowError, UpdateRetryCount);
             until EcomSalesLine.Next() = 0;
 
@@ -103,6 +106,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     internal procedure CreateMemberships(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
         if not EcomSalesHeader."Memberships Exist" then
             exit;
@@ -122,6 +126,8 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetFilter(Quantity, '<>0');
         if EcomSalesLine.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 HandleMembership(EcomSalesLine, ShowError, UpdateRetryCount);
             until EcomSalesLine.Next() = 0;
 
@@ -141,6 +147,7 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
     internal procedure CreateCoupons(var EcomSalesHeader: Record "NPR Ecom Sales Header"; ShowError: Boolean; UpdateRetryCount: Boolean)
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
         if not EcomSalesHeader."Coupons Exist" then
             exit;
@@ -156,6 +163,8 @@ codeunit 6248551 "NPR Ecom Virtual Item Mgt"
         EcomSalesLine.SetFilter(Quantity, '<>%1', 0);
         if EcomSalesLine.FindSet() then
             repeat
+                if EcomJobManagement.ApplicationChanged() then
+                    exit;
                 CreateCoupons(EcomSalesLine, ShowError, UpdateRetryCount);
             until EcomSalesLine.Next() = 0;
 

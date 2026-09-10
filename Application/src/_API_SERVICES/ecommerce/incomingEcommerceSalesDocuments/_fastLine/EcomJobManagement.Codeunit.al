@@ -119,6 +119,17 @@ codeunit 6248560 "NPR Ecom Job Management"
         if (JobQueueEntry."User Session ID" <> 0) and (JobQueueEntry."User Session ID" <> SessionId()) then
             exit(true);
 
+        ///An extension was published, upgraded, installed or uninstalled while this session was running
+        if ApplicationChanged() then
+            exit(true);
+
         exit(false);
+    end;
+
+    internal procedure ApplicationChanged(): Boolean
+    var
+        EcomAppSetWatch: Codeunit "NPR Ecom App Set Watch";
+    begin
+        exit(EcomAppSetWatch.ApplicationChanged());
     end;
 }
