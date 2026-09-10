@@ -14,6 +14,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         CurrentMerchantAccount: Text;
         CurrentBatchNumber: Integer;
         EntryAmount: Integer;
+        DroppedRebookings: Integer;
     begin
         ReportWebhookRequest.TestField(ID);
         _GLSetup.Get();
@@ -46,10 +47,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
 
             if InitReconciliationHeader(ReconciliationHeader, RecreateExistingDocument, CurrentBatchNumber, CurrentMerchantAccount, ExistingDocumentNo, ReportWebhookRequest) then begin
-                EntryAmount := InsertReconciliationLines(CurrentMerchantAccount, CurrentBatchNumber, ReconciliationHeader, ReportWebhookRequest);
+                Clear(DroppedRebookings);
+                EntryAmount := InsertReconciliationLines(CurrentMerchantAccount, CurrentBatchNumber, ReconciliationHeader, ReportWebhookRequest, DroppedRebookings);
 
                 if (EntryAmount > 0) then begin
-                    _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", true, StrSubstNo(ImportLinesSuccess01, ReconciliationHeader."Document No.", Format(EntryAmount)), ReportWebhookRequest.ID);
+                    if DroppedRebookings > 0 then
+                        _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError05, ReconciliationHeader."Document No.", Format(EntryAmount), Format(DroppedRebookings)), ReportWebhookRequest.ID)
+                    else
+                        _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", true, StrSubstNo(ImportLinesSuccess01, ReconciliationHeader."Document No.", Format(EntryAmount)), ReportWebhookRequest.ID);
                     NewDocumentsList.Add(ReconciliationHeader."Document No.");
                 end else begin
                     ReconciliationHeader.Delete();
@@ -65,6 +70,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         RecLine: Record "NPR Adyen Recon. Line";
         WebhookRequest: Record "NPR AF Rec. Webhook Request";
         InsertedEntryAmount: Integer;
+        DroppedRebookings: Integer;
         WebhookRequestDoesNotExistLbl: Label 'Webhook Request with ID %1 does not exist anymore.';
         DocumentIsPostedLbl: Label 'Document %1 is already posted.';
         NoUnpostedEntriesLbl: Label 'Document %1 is not yet posted, however there are no unposted entries to recreate.';
@@ -91,7 +97,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             RecLine.DeleteAll(true);
 
         GetReportData(WebhookRequest, true);
-        InsertedEntryAmount := InsertReconciliationLines(RecHeader."Merchant Account", RecHeader."Batch Number", RecHeader, WebhookRequest);
+        InsertedEntryAmount := InsertReconciliationLines(RecHeader."Merchant Account", RecHeader."Batch Number", RecHeader, WebhookRequest, DroppedRebookings);
+        if DroppedRebookings > 0 then
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError05, RecHeader."Document No.", Format(InsertedEntryAmount), Format(DroppedRebookings)), WebhookRequest.ID);
 
         if (InsertedEntryAmount > 0) and (RecHeader.Status <> RecHeader.Status::Unmatched) then begin
             RecHeader.Status := RecHeader.Status::Unmatched;
@@ -160,7 +168,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Line No." += xReconciliationLine."Line No.";
     end;
 
-    local procedure InsertReconciliationLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; BatchNumber: Integer; MerchantAccount: Text; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; LineNo: Integer; var EntryAmount: Integer): Boolean
+    local procedure InsertReconciliationLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; BatchNumber: Integer; MerchantAccount: Text; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; LineNo: Integer; var EntryAmount: Integer; var DroppedAsRebooking: Boolean): Boolean
     var
         TypeHelper: Codeunit "Type Helper";
         UTCOffset: Integer;
@@ -302,6 +310,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::ChargebackReversed;
             'RefundedReversed':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::RefundedReversed;
+            'CaptureFailed':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::"CaptureFailed (Sales Day payout)";
+            'RefundFailed':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::"RefundFailed (Sales Day payout)";
+            'SettledReversed':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::"SettledReversed (Sales Day payout)";
+            'RefundNotCleared':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::"RefundNotCleared (Sales Day payout)";
             'InvoiceDeduction':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::InvoiceDeduction;
             'MerchantPayout':
@@ -351,7 +367,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Webhook Request ID" := ReportWebhookRequest.ID;
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"To Be Determined";
 
-        if ReconLineIsUnique(ReconciliationLine) then begin
+        if ReconLineIsUnique(ReconciliationLine, DroppedAsRebooking) then begin
             if _GLSetup."LCY Code" <> ReconciliationLine."Adyen Acc. Currency Code" then
                 CalculateLCYAmounts(ReconciliationLine)
             else
@@ -362,6 +378,18 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine.Insert(true)
         end;
         ReconciliationHeader.Modify();
+    end;
+
+    local procedure LogSkippedReportRow(ReconciliationLine: Record "NPR Adyen Recon. Line"; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; LineNo: Integer)
+    begin
+        if SalesDayPayoutReversalExists(ReconciliationLine) then
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", false,
+                StrSubstNo(ImportLinesError04, Format(ReconciliationLine."Transaction Type"), ReconciliationLine."PSP Reference", Format(ReconciliationLine."Amount (TCY)"), LineNo),
+                ReportWebhookRequest.ID)
+        else
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", false,
+                StrSubstNo(ImportLinesError06, Format(ReconciliationLine."Transaction Type"), ReconciliationLine."PSP Reference", Format(ReconciliationLine."Amount (TCY)"), LineNo),
+                ReportWebhookRequest.ID);
     end;
 
     local procedure FillMerchantPayout(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LineNo: Integer)
@@ -393,11 +421,13 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationHeader.Modify();
     end;
 
-    local procedure InsertReconciliationLines(CurrentMerchantAccount: Text; CurrentBatchNumber: Integer; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request") EntryAmount: Integer
+    local procedure InsertReconciliationLines(CurrentMerchantAccount: Text; CurrentBatchNumber: Integer; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; var DroppedRebookings: Integer) EntryAmount: Integer
     var
         ReconciliationLine: Record "NPR Adyen Recon. Line";
+        DeferredRows: List of [Integer];
         LineNo: Integer;
         ReportFirstLineNo: Integer;
+        DroppedAsRebooking: Boolean;
     begin
         EntryAmount := 0;
         case ReportWebhookRequest."Report Type" of
@@ -415,10 +445,21 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     case GetValueAtCell(LineNo, GetColumnIndex('Type', ReconciliationHeader."Document Type")) of
                         'Balancetransfer':
                             InsertBalanceTransfer(ReconciliationHeader, LineNo);
-                        else
-                            InsertReconciliationLine(ReconciliationLine, ReconciliationHeader, CurrentBatchNumber, CurrentMerchantAccount, ReportWebhookRequest, LineNo, EntryAmount);
+                        else begin
+                            InsertReconciliationLine(ReconciliationLine, ReconciliationHeader, CurrentBatchNumber, CurrentMerchantAccount, ReportWebhookRequest, LineNo, EntryAmount, DroppedAsRebooking);
+                            if DroppedAsRebooking then
+                                DeferredRows.Add(LineNo);
+                        end;
                     end;
                 end;
+            end;
+        end;
+
+        foreach LineNo in DeferredRows do begin
+            InsertReconciliationLine(ReconciliationLine, ReconciliationHeader, CurrentBatchNumber, CurrentMerchantAccount, ReportWebhookRequest, LineNo, EntryAmount, DroppedAsRebooking);
+            if DroppedAsRebooking then begin
+                DroppedRebookings += 1;
+                LogSkippedReportRow(ReconciliationLine, ReportWebhookRequest, LineNo);
             end;
         end;
     end;
@@ -468,6 +509,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     ReconciliationLine2."Transaction Type"::SettledExternallyWithInfo,
                     ReconciliationLine2."Transaction Type"::Refunded,
                     ReconciliationLine2."Transaction Type"::RefundedExternallyWithInfo,
+                    ReconciliationLine2."Transaction Type"::"CaptureFailed (Sales Day payout)",
+                    ReconciliationLine2."Transaction Type"::"RefundFailed (Sales Day payout)",
+                    ReconciliationLine2."Transaction Type"::"SettledReversed (Sales Day payout)",
+                    ReconciliationLine2."Transaction Type"::"RefundNotCleared (Sales Day payout)",
                     ReconciliationLine2."Transaction Type"::Chargeback,
                     ReconciliationLine2."Transaction Type"::SecondChargeback,
                     ReconciliationLine2."Transaction Type"::ChargebackExternallyWithInfo,
@@ -540,18 +585,22 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         SubscrPaymentRequest.Reset();
         SubscrPaymentRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
         SubscrPaymentRequest.SetRange(PSP, Enum::"NPR MM Subscription PSP"::Adyen);
-        if not (ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::Chargeback,
-            ReconciliationLine."Transaction Type"::SecondChargeback,
-            ReconciliationLine."Transaction Type"::RefundedReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
-        then
-            SubscrPaymentRequest.SetRange(Reconciled, false)
+        if ReconciliationLine.IsSalesDayPayoutReversal() then
+            SubscrPaymentRequest.SetRange(Reversed, false)
         else
-            SubscrPaymentRequest.SetRange(Reversed, false);
+            if not (ReconciliationLine."Transaction Type" in
+                [ReconciliationLine."Transaction Type"::Chargeback,
+                ReconciliationLine."Transaction Type"::SecondChargeback,
+                ReconciliationLine."Transaction Type"::RefundedReversed,
+                ReconciliationLine."Transaction Type"::ChargebackReversed,
+                ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
+            then
+                SubscrPaymentRequest.SetRange(Reconciled, false)
+            else
+                SubscrPaymentRequest.SetRange(Reversed, false);
         if not SubscrPaymentRequest.FindFirst() then
-            exit;
+            if not FindSubscrRequestPendingRelease(SubscrPaymentRequest, ReconciliationLine) then
+                exit;
 
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"Subscription Payment";
         ReconciliationLine."Matching Entry System ID" := SubscrPaymentRequest.SystemId;
@@ -572,20 +621,24 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         EFTTransactionRequest.Reset();
         EFTTransactionRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
         _AdyenManagement.SetEFTAdyenIntegrationFilter(EFTTransactionRequest);
-        if not (ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::Chargeback,
-            ReconciliationLine."Transaction Type"::SecondChargeback,
-            ReconciliationLine."Transaction Type"::RefundedReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
-        then
-            EFTTransactionRequest.SetRange(Reconciled, false)
+        if ReconciliationLine.IsSalesDayPayoutReversal() then
+            EFTTransactionRequest.SetRange(Reversed, false)
         else
-            EFTTransactionRequest.SetRange(Reversed, false);
+            if not (ReconciliationLine."Transaction Type" in
+                [ReconciliationLine."Transaction Type"::Chargeback,
+                ReconciliationLine."Transaction Type"::SecondChargeback,
+                ReconciliationLine."Transaction Type"::RefundedReversed,
+                ReconciliationLine."Transaction Type"::ChargebackReversed,
+                ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
+            then
+                EFTTransactionRequest.SetRange(Reconciled, false)
+            else
+                EFTTransactionRequest.SetRange(Reversed, false);
 
         if not EFTTransactionRequest.FindFirst() then
             if not TryMatchingVoidPaymentWithEFT(EFTTransactionRequest, ReconciliationLine) then
-                exit;
+                if not FindEFTRequestPendingRelease(EFTTransactionRequest, ReconciliationLine) then
+                    exit;
 
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"EFT Transaction";
         ReconciliationLine."Matching Entry System ID" := EFTTransactionRequest.SystemId;
@@ -638,22 +691,26 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MagentoPaymentLine.SetFilter("Payment Gateway Code", FilterPGCodes);
         MagentoPaymentLine.SetRange(Amount, Abs(ReconciliationLine."Amount (TCY)"));
 
-        if not (ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::Chargeback,
-            ReconciliationLine."Transaction Type"::SecondChargeback,
-            ReconciliationLine."Transaction Type"::RefundedReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
-        then
-            MagentoPaymentLine.SetRange(Reconciled, false)
+        if ReconciliationLine.IsSalesDayPayoutReversal() then
+            MagentoPaymentLine.SetRange(Reversed, false)
         else
-            MagentoPaymentLine.SetRange(Reversed, false);
+            if not (ReconciliationLine."Transaction Type" in
+                [ReconciliationLine."Transaction Type"::Chargeback,
+                ReconciliationLine."Transaction Type"::SecondChargeback,
+                ReconciliationLine."Transaction Type"::RefundedReversed,
+                ReconciliationLine."Transaction Type"::ChargebackReversed,
+                ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
+            then
+                MagentoPaymentLine.SetRange(Reconciled, false)
+            else
+                MagentoPaymentLine.SetRange(Reversed, false);
 
         if not MagentoPaymentLine.Find('-') then
 #if not BC17
             if not FilterShopifyPaymentLine(MagentoPaymentLine, ReconciliationLine) then
 #endif
-                exit;
+                if not FindMagentoLinePendingRelease(MagentoPaymentLine, ReconciliationLine, FilterPGCodes) then
+                    exit;
 
         MatchingFound := false;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -664,7 +721,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine2.SetRange("Matching Table Name", ReconciliationLine2."Matching Table Name"::"Magento Payment Line");
             ReconciliationLine2.SetRange("Matching Entry System ID", MagentoPaymentLine.SystemId);
             FilterReconciliationLineTransactionType(ReconciliationLine2, ReconciliationLine);
-            MatchingFound := ReconciliationLine2.IsEmpty();
+            if ReconciliationLine2.IsEmpty() then
+                MatchingFound := true
+            else
+                MatchingFound := ReconciliationLine2.Count() <= SalesDayPayoutMagentoClaimAllowance(ReconciliationLine, MagentoPaymentLine.SystemId);
 
             if MatchingFound then begin
                 ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"Magento Payment Line";
@@ -688,6 +748,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Transaction Type"::RefundedReversed:
                 ReconciliationLine2.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
 
+            ReconciliationLine."Transaction Type"::"CaptureFailed (Sales Day payout)",
+            ReconciliationLine."Transaction Type"::"SettledReversed (Sales Day payout)",
+            ReconciliationLine."Transaction Type"::"RefundFailed (Sales Day payout)",
+            ReconciliationLine."Transaction Type"::"RefundNotCleared (Sales Day payout)":
+                SetCycleReversalFilter(ReconciliationLine2, ReconciliationLine."Transaction Type");
+
             ReconciliationLine."Transaction Type"::ChargebackReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
                 ReconciliationLine2.SetFilter("Transaction Type", '%1|%2',
@@ -695,12 +761,16 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo)
 
             else
-                ReconciliationLine2.SetFilter("Transaction Type", '<>%1&<>%2&<>%3&<>%4&<>%5',
+                ReconciliationLine2.SetFilter("Transaction Type", '<>%1&<>%2&<>%3&<>%4&<>%5&<>%6&<>%7&<>%8&<>%9',
                     ReconciliationLine."Transaction Type"::Chargeback,
                     ReconciliationLine."Transaction Type"::SecondChargeback,
                     ReconciliationLine."Transaction Type"::RefundedReversed,
                     ReconciliationLine."Transaction Type"::ChargebackReversed,
-                    ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo);
+                    ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo,
+                    ReconciliationLine."Transaction Type"::"CaptureFailed (Sales Day payout)",
+                    ReconciliationLine."Transaction Type"::"RefundFailed (Sales Day payout)",
+                    ReconciliationLine."Transaction Type"::"SettledReversed (Sales Day payout)",
+                    ReconciliationLine."Transaction Type"::"RefundNotCleared (Sales Day payout)");
         end;
     end;
 
@@ -830,6 +900,17 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Failed to Reconcile", ReconciliationLine.Status::"Failed to Post"]) then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(TransactionNotMatchedLbl, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
             UnReconciledEntries += 1;
+            exit;
+        end;
+
+        if ReconciliationLine.IsSalesDayPayoutReversal() then begin
+            if not RevertPaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name") then begin
+                _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(PaymentEntryReleaseError01, ReconciliationLine."Matching Entry System ID"), ReconciliationHeader."Webhook Request ID");
+                ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Reconcile";
+                UnReconciledEntries += 1;
+                exit;
+            end;
+            ReconciliationLine.Status := ReconciliationLine.Status::Reconciled;
             exit;
         end;
 
@@ -1017,7 +1098,20 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
         end;
 
+        if ReconciliationLine.IsSalesDayPayoutReversal() then begin
+            if (ReconciliationLine.Status <> ReconciliationLine.Status::Reconciled) and (not ReconciliationLine."Transaction Posted") then
+                if not RevertPaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name") then begin
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PaymentEntryReleaseError01, ReconciliationLine."Matching Entry System ID"), ReconciliationHeader."Webhook Request ID");
+                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                    UnPostedEntries += 1;
+                    exit;
+                end;
+            ReconciliationLine.Status := ReconciliationLine.Status::Posted;
+            exit;
+        end;
+
         ReconciliationLine.Status := ReconciliationLine.Status::Posted;
+
         case ReconciliationLine."Matching Table Name" of
             ReconciliationLine."Matching Table Name"::"EFT Transaction":
                 begin
@@ -1530,10 +1624,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Other Commissions (LCY)" := ReconciliationLine."Other Commissions (NC)";
     end;
 
-    local procedure ReconLineIsUnique(ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    local procedure ReconLineIsUnique(ReconciliationLine: Record "NPR Adyen Recon. Line"; var DroppedAsRebooking: Boolean): Boolean
     var
         RecLine: Record "NPR Adyen Recon. Line";
     begin
+        DroppedAsRebooking := false;
         RecLine.Reset();
         RecLine.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
         RecLine.SetRange("Merchant Account", ReconciliationLine."Merchant Account");
@@ -1547,6 +1642,201 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
         if RecLine.IsEmpty() then
             exit(true);
+
+        // Recreate Document leaves posted lines in place and re-reads every row of the report, so a posted line in the
+        // document being imported is that same row coming round again - nothing is lost by skipping it. A line this run
+        // inserted a moment ago is a different row, and gets judged on the cycle counts like any other.
+        RecLine.SetRange("Document No.", ReconciliationLine."Document No.");
+        RecLine.SetFilter(Status, '%1|%2', RecLine.Status::Posted, RecLine.Status::"Posted Failed to Match");
+        if not RecLine.IsEmpty() then
+            exit;
+        RecLine.SetRange("Document No.");
+        RecLine.SetRange(Status);
+
+        if SalesDayPayoutRebookingAllowed(ReconciliationLine) then
+            exit(true);
+        DroppedAsRebooking := TakesPartInSalesDayPayoutCycle(ReconciliationLine."Transaction Type");
+    end;
+
+    local procedure SalesDayPayoutRebookingAllowed(ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    var
+        BookingCount: Integer;
+        ReversalCount: Integer;
+    begin
+        if ReconciliationLine."PSP Reference" = '' then
+            exit;
+        if not TakesPartInSalesDayPayoutCycle(ReconciliationLine."Transaction Type") then
+            exit;
+
+        CountSalesDayPayoutCycle(ReconciliationLine, BookingCount, ReversalCount);
+        if IsSalesDayPayoutBooking(ReconciliationLine."Transaction Type") then
+            exit(BookingCount <= ReversalCount);
+        exit(ReversalCount < BookingCount);
+    end;
+
+    local procedure CountSalesDayPayoutCycle(ReconciliationLine: Record "NPR Adyen Recon. Line"; var BookingCount: Integer; var ReversalCount: Integer)
+    var
+        RecLine: Record "NPR Adyen Recon. Line";
+        BookingAmount: Decimal;
+    begin
+        if IsSalesDayPayoutBooking(ReconciliationLine."Transaction Type") then
+            BookingAmount := ReconciliationLine."Amount (TCY)"
+        else
+            BookingAmount := -ReconciliationLine."Amount (TCY)";
+
+        RecLine.SetRange("Merchant Account", ReconciliationLine."Merchant Account");
+        RecLine.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
+
+        RecLine.SetRange("Amount (TCY)", BookingAmount);
+        SetCycleBookingFilter(RecLine, ReconciliationLine."Transaction Type");
+        BookingCount := RecLine.Count();
+
+        RecLine.SetRange("Amount (TCY)", -BookingAmount);
+        SetCycleReversalFilter(RecLine, ReconciliationLine."Transaction Type");
+        ReversalCount := RecLine.Count();
+    end;
+
+    local procedure SalesDayPayoutMagentoClaimAllowance(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingEntrySystemID: Guid) Allowance: Integer
+    var
+        RecLine: Record "NPR Adyen Recon. Line";
+    begin
+        if not TakesPartInSalesDayPayoutCycle(ReconciliationLine."Transaction Type") then
+            exit(0);
+
+        RecLine.SetRange("Matching Table Name", RecLine."Matching Table Name"::"Magento Payment Line");
+        RecLine.SetRange("Matching Entry System ID", MatchingEntrySystemID);
+
+        if IsSalesDayPayoutBooking(ReconciliationLine."Transaction Type") then begin
+            SetCycleReversalFilter(RecLine, ReconciliationLine."Transaction Type");
+            exit(RecLine.Count());
+        end;
+
+        SetCycleBookingFilter(RecLine, ReconciliationLine."Transaction Type");
+        Allowance := RecLine.Count() - 1;
+        if Allowance < 0 then
+            Allowance := 0;
+    end;
+
+    local procedure FindEFTRequestPendingRelease(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    begin
+        if not IsSalesDayPayoutBooking(ReconciliationLine."Transaction Type") then
+            exit;
+
+        EFTTransactionRequest.Reset();
+        EFTTransactionRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
+        _AdyenManagement.SetEFTAdyenIntegrationFilter(EFTTransactionRequest);
+        EFTTransactionRequest.SetRange(Reversed, false);
+        if not EFTTransactionRequest.FindSet() then
+            exit;
+        repeat
+            if SalesDayPayoutReleasePending(ReconciliationLine, ReconciliationLine."Matching Table Name"::"EFT Transaction", EFTTransactionRequest.SystemId) then
+                exit(true);
+        until EFTTransactionRequest.Next() = 0;
+    end;
+
+    local procedure FindSubscrRequestPendingRelease(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    begin
+        if not IsSalesDayPayoutBooking(ReconciliationLine."Transaction Type") then
+            exit;
+
+        SubscrPaymentRequest.Reset();
+        SubscrPaymentRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
+        SubscrPaymentRequest.SetRange(PSP, Enum::"NPR MM Subscription PSP"::Adyen);
+        SubscrPaymentRequest.SetRange(Reversed, false);
+        if not SubscrPaymentRequest.FindSet() then
+            exit;
+        repeat
+            if SalesDayPayoutReleasePending(ReconciliationLine, ReconciliationLine."Matching Table Name"::"Subscription Payment", SubscrPaymentRequest.SystemId) then
+                exit(true);
+        until SubscrPaymentRequest.Next() = 0;
+    end;
+
+    local procedure FindMagentoLinePendingRelease(var MagentoPaymentLine: Record "NPR Magento Payment Line"; ReconciliationLine: Record "NPR Adyen Recon. Line"; FilterPGCodes: Text): Boolean
+    begin
+        if not IsSalesDayPayoutBooking(ReconciliationLine."Transaction Type") then
+            exit;
+
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetRange("Transaction ID", ReconciliationLine."PSP Reference");
+        MagentoPaymentLine.SetFilter("Payment Gateway Code", FilterPGCodes);
+        MagentoPaymentLine.SetRange(Amount, Abs(ReconciliationLine."Amount (TCY)"));
+        MagentoPaymentLine.SetRange(Reversed, false);
+        if not MagentoPaymentLine.Find('-') then
+            exit;
+        repeat
+            if SalesDayPayoutReleasePending(ReconciliationLine, ReconciliationLine."Matching Table Name"::"Magento Payment Line", MagentoPaymentLine.SystemId) then
+                exit(true);
+        until MagentoPaymentLine.Next() = 0;
+    end;
+
+    local procedure SalesDayPayoutReleasePending(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table"; EntrySystemID: Guid): Boolean
+    var
+        RecLine: Record "NPR Adyen Recon. Line";
+    begin
+        RecLine.SetRange("Matching Table Name", MatchingTable);
+        RecLine.SetRange("Matching Entry System ID", EntrySystemID);
+        RecLine.SetFilter(Status, '%1|%2', RecLine.Status::Matched, RecLine.Status::"Matched Manually");
+        SetCycleReversalFilter(RecLine, ReconciliationLine."Transaction Type");
+        exit(not RecLine.IsEmpty());
+    end;
+
+    local procedure SalesDayPayoutReversalExists(ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    var
+        RecLine: Record "NPR Adyen Recon. Line";
+    begin
+        if ReconciliationLine."PSP Reference" = '' then
+            exit;
+        if not TakesPartInSalesDayPayoutCycle(ReconciliationLine."Transaction Type") then
+            exit;
+
+        RecLine.SetRange("Merchant Account", ReconciliationLine."Merchant Account");
+        RecLine.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
+        SetCycleReversalFilter(RecLine, ReconciliationLine."Transaction Type");
+        exit(not RecLine.IsEmpty());
+    end;
+
+    local procedure TakesPartInSalesDayPayoutCycle(TransactionType: Enum "NPR Adyen Rec. Trans. Type"): Boolean
+    begin
+        exit(TransactionType in
+            [TransactionType::Settled,
+            TransactionType::Refunded,
+            TransactionType::"CaptureFailed (Sales Day payout)",
+            TransactionType::"SettledReversed (Sales Day payout)",
+            TransactionType::"RefundFailed (Sales Day payout)",
+            TransactionType::"RefundNotCleared (Sales Day payout)"]);
+    end;
+
+    local procedure IsSalesDayPayoutBooking(TransactionType: Enum "NPR Adyen Rec. Trans. Type"): Boolean
+    begin
+        exit(TransactionType in [TransactionType::Settled, TransactionType::Refunded]);
+    end;
+
+    local procedure IsSettleSideCycle(TransactionType: Enum "NPR Adyen Rec. Trans. Type"): Boolean
+    begin
+        exit(TransactionType in
+            [TransactionType::Settled,
+            TransactionType::"CaptureFailed (Sales Day payout)",
+            TransactionType::"SettledReversed (Sales Day payout)"]);
+    end;
+
+    local procedure SetCycleBookingFilter(var RecLine: Record "NPR Adyen Recon. Line"; TransactionType: Enum "NPR Adyen Rec. Trans. Type")
+    begin
+        if IsSettleSideCycle(TransactionType) then
+            RecLine.SetRange("Transaction Type", TransactionType::Settled)
+        else
+            RecLine.SetRange("Transaction Type", TransactionType::Refunded);
+    end;
+
+    local procedure SetCycleReversalFilter(var RecLine: Record "NPR Adyen Recon. Line"; TransactionType: Enum "NPR Adyen Rec. Trans. Type")
+    begin
+        if IsSettleSideCycle(TransactionType) then
+            RecLine.SetFilter("Transaction Type", '%1|%2',
+                TransactionType::"CaptureFailed (Sales Day payout)",
+                TransactionType::"SettledReversed (Sales Day payout)")
+        else
+            RecLine.SetFilter("Transaction Type", '%1|%2',
+                TransactionType::"RefundFailed (Sales Day payout)",
+                TransactionType::"RefundNotCleared (Sales Day payout)");
     end;
 
     local procedure GetColumnIndex(FieldName: Text; ReportType: Enum "NPR Adyen Report Type"): Integer
@@ -1626,13 +1916,74 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
             ReconciliationLine.Modify();
             if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line", ReconciliationLine."Matching Table Name"::"Subscription Payment"] then
-                RevertPaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name");
+                if ReconciliationLine.IsSalesDayPayoutReversal() then
+                    RestorePaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name")
+                else
+                    RevertPaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name");
             Reversed := true;
         end;
         Commit();
     end;
 
-    internal procedure RevertPaymentReconciliation(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table")
+    internal procedure RevertPaymentReconciliation(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table") EntryFound: Boolean
+    begin
+        EntryFound := SetPaymentReconciled(ReconciliationLine, MatchingTable, false, 0D);
+    end;
+
+    internal procedure RestorePaymentReconciliation(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table") EntryFound: Boolean
+    var
+        BookingLine: Record "NPR Adyen Recon. Line";
+    begin
+        if not BookingStillClaimsEntry(ReconciliationLine, MatchingTable, BookingLine) then
+            exit(true);
+
+        EntryFound := SetPaymentReconciled(ReconciliationLine, MatchingTable, true, BookingReconciliationDate(BookingLine));
+        if not EntryFound then
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(PaymentEntryRestoreError01, ReconciliationLine."Matching Entry System ID", ReconciliationLine."Line No."), ReconciliationLine."Webhook Request ID");
+    end;
+
+    local procedure BookingStillClaimsEntry(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table"; var BookingLine: Record "NPR Adyen Recon. Line"): Boolean
+    var
+        ReversalLine: Record "NPR Adyen Recon. Line";
+        ReversalCount: Integer;
+    begin
+        if not TakesPartInSalesDayPayoutCycle(ReconciliationLine."Transaction Type") then
+            exit;
+
+        // The reversals still standing once this one is unwound each keep a booking released, so only a booking beyond that
+        // count is waiting for the entry back. Asking merely whether any booking exists over-restores on a repeated cycle.
+        ReversalLine.SetRange("Matching Table Name", MatchingTable);
+        ReversalLine.SetRange("Matching Entry System ID", ReconciliationLine."Matching Entry System ID");
+        ReversalLine.SetFilter(Status, '%1|%2', ReversalLine.Status::Posted, ReversalLine.Status::Reconciled);
+        ReversalLine.SetFilter(SystemId, '<>%1', ReconciliationLine.SystemId);
+        SetCycleReversalFilter(ReversalLine, ReconciliationLine."Transaction Type");
+        ReversalCount := ReversalLine.Count();
+
+        BookingLine.SetRange("Matching Table Name", MatchingTable);
+        BookingLine.SetRange("Matching Entry System ID", ReconciliationLine."Matching Entry System ID");
+        BookingLine.SetFilter(Status, '%1|%2', BookingLine.Status::Posted, BookingLine.Status::Reconciled);
+        SetCycleBookingFilter(BookingLine, ReconciliationLine."Transaction Type");
+        if BookingLine.Count() <= ReversalCount then
+            exit;
+
+        // Bookings and reversals pair up in the order they arrived, so the one getting its claim back is the first that the
+        // remaining reversals do not cover.
+        if not BookingLine.FindSet() then
+            exit;
+        if ReversalCount > 0 then
+            if BookingLine.Next(ReversalCount) = 0 then
+                exit;
+        exit(true);
+    end;
+
+    local procedure BookingReconciliationDate(BookingLine: Record "NPR Adyen Recon. Line"): Date
+    begin
+        if BookingLine."Posting Date" <> 0D then
+            exit(BookingLine."Posting Date");
+        exit(Today());
+    end;
+
+    local procedure SetPaymentReconciled(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table"; SetReconciled: Boolean; ReconciliationDate: Date) EntryFound: Boolean
     var
         EFTTransRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
@@ -1642,25 +1993,28 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             MatchingTable::"EFT Transaction":
                 begin
                     if EFTTransRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        EFTTransRequest.Reconciled := false;
-                        EFTTransRequest."Reconciliation Date" := 0D;
+                        EFTTransRequest.Reconciled := SetReconciled;
+                        EFTTransRequest."Reconciliation Date" := ReconciliationDate;
                         EFTTransRequest.Modify();
+                        EntryFound := true;
                     end;
                 end;
             MatchingTable::"Magento Payment Line":
                 begin
                     if MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        MagentoPaymentLine.Reconciled := false;
-                        MagentoPaymentLine."Reconciliation Date" := 0D;
+                        MagentoPaymentLine.Reconciled := SetReconciled;
+                        MagentoPaymentLine."Reconciliation Date" := ReconciliationDate;
                         MagentoPaymentLine.Modify();
+                        EntryFound := true;
                     end;
                 end;
             MatchingTable::"Subscription Payment":
                 begin
                     if SubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        SubscrPaymentRequest.Reconciled := false;
-                        SubscrPaymentRequest."Reconciliation Date" := 0D;
+                        SubscrPaymentRequest.Reconciled := SetReconciled;
+                        SubscrPaymentRequest."Reconciliation Date" := ReconciliationDate;
                         SubscrPaymentRequest.Modify();
+                        EntryFound := true;
                     end;
                 end;
         end;
@@ -1678,12 +2032,13 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MatchValidationPassed: Boolean;
         ManualMatchTransactionError01: Label 'Failed to match with Subscription Payment Request No. %1 because amounts aren''t equal or Subscription Payment Request status is either Canceled or Rejected.';
     begin
-        if ReconciliationLine."Transaction Type" in
+        if (ReconciliationLine."Transaction Type" in
             [ReconciliationLine."Transaction Type"::Chargeback,
             ReconciliationLine."Transaction Type"::SecondChargeback,
             ReconciliationLine."Transaction Type"::RefundedReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]) or
+            ReconciliationLine.IsSalesDayPayoutReversal()
         then
             MatchValidationPassed := Abs(SubscrPaymentRequest."Amount") = Abs(ReconciliationLine."Amount (TCY)")
         else
@@ -1760,12 +2115,13 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
         end;
 
-        if ReconciliationLine."Transaction Type" in
+        if (ReconciliationLine."Transaction Type" in
             [ReconciliationLine."Transaction Type"::Chargeback,
             ReconciliationLine."Transaction Type"::SecondChargeback,
             ReconciliationLine."Transaction Type"::RefundedReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]) or
+            ReconciliationLine.IsSalesDayPayoutReversal()
         then
             MatchValidationPassed := Abs(EFTTransactionRequest."Result Amount") = Abs(ReconciliationLine."Amount (TCY)")
         else
@@ -1876,7 +2232,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ImportLinesError01: Label 'Report ''%1'' has no entries. Report Data exist - %2';
         ImportLinesError02: Label 'Report ''%1'' has no transactions within Merchant Account ''%2''.';
         ImportLinesError03: Label 'Unsupported Journal Type: %1.\Entry was skipped.';
+        ImportLinesError04: Label '%1 of %3 for PSP Reference ''%2'' on report row %4 already exists and was skipped. If Adyen re-booked this transaction, import the payout report holding its Sales Day Payout reversal first, then recreate this document.', Comment = '%1 = journal (transaction) type, %2 = PSP reference, %3 = transaction amount, %4 = row number in the settlement report';
+        ImportLinesError06: Label '%1 of %3 for PSP Reference ''%2'' on report row %4 already exists and was skipped.', Comment = '%1 = journal (transaction) type, %2 = PSP reference, %3 = transaction amount, %4 = row number in the settlement report';
         ImportLinesSuccess01: Label 'NP Pay Reconciliation Document %1 was successfully created with %2 transaction entries.';
+        ImportLinesError05: Label 'NP Pay Reconciliation Document %1 is incomplete: %2 transaction entries were imported and %3 were skipped. Each skipped transaction has its own entry in this document''s reconciliation log.', Comment = '%1 = document no., %2 = number of imported entries, %3 = number of skipped entries';
         MatchTransactionsError01: Label 'Failed to match with EFT Transaction Request No. %1 because one of the conditions failed:\\ -Amounts aren''t equal.\\ -EFT Transaction Request has no Financial Impact.';
         MatchTransactionsError02: Label 'NP Pay Reconciliation Document %1 does not contain any transactions within Marchant Account ''%2''.';
         MatchTransactionsError03: Label 'Couldn''t match %1 entries in NP Pay Reconciliation Document %2.';
@@ -1890,6 +2249,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         PostTransactionsEFTError01: Label 'EFT Transaction Request %1 does not exist.';
         PostTransactionsMagentoError01: Label 'Magento Payment Line %1 does not exist.';
         PostTransactionsSubscriptionError01: Label 'Subscription Payment Request %1 does not exist.';
+        PaymentEntryReleaseError01: Label 'Payment entry %1 could not be released and does not exist anymore.', Comment = '%1 = the matched payment entry''s System ID (GUID).';
+        PaymentEntryRestoreError01: Label 'Payment entry %1 does not exist anymore, so the claim released by line %2 could not be given back. The transaction it settles has to be reconciled manually.', Comment = '%1 = the matched payment entry''s System ID (GUID), %2 = reconciliation line number';
         PostTransactionsError03: Label 'Couldn''t post %1 entries in NP Pay Reconciliation Document %2.';
         ReconcileTransactionsError02: Label 'Couldn''t reconcile %1 entries in NP Pay Reconciliation Document %2.';
         PostTransactionsSuccess01: Label 'Successfully posted entries in NP Pay Reconciliation Document %1.';

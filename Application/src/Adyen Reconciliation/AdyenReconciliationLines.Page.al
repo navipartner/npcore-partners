@@ -112,16 +112,19 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                                     if _AdyenManagement.ManualMatchingAllowed(Rec) then begin
                                         EFTTransaction.FilterGroup(2);
                                         _AdyenManagement.SetEFTAdyenIntegrationFilter(EFTTransaction);
-                                        if not (Rec."Transaction Type" in
-                                            [Rec."Transaction Type"::Chargeback,
-                                            Rec."Transaction Type"::SecondChargeback,
-                                            Rec."Transaction Type"::RefundedReversed,
-                                            Rec."Transaction Type"::ChargebackReversed,
-                                            Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
-                                        then
-                                            EFTTransaction.SetRange(Reconciled, false)
+                                        if Rec.IsSalesDayPayoutReversal() then
+                                            EFTTransaction.SetRange(Reversed, false)
                                         else
-                                            EFTTransaction.SetRange(Reversed, false);
+                                            if not (Rec."Transaction Type" in
+                                                [Rec."Transaction Type"::Chargeback,
+                                                Rec."Transaction Type"::SecondChargeback,
+                                                Rec."Transaction Type"::RefundedReversed,
+                                                Rec."Transaction Type"::ChargebackReversed,
+                                                Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
+                                            then
+                                                EFTTransaction.SetRange(Reconciled, false)
+                                            else
+                                                EFTTransaction.SetRange(Reversed, false);
                                         EFTTransaction.FilterGroup(0);
                                         EFTTransactions.SetTableView(EFTTransaction);
                                         if not IsNullGuid(Rec."Matching Entry System ID") then
@@ -155,16 +158,19 @@ page 6184503 "NPR Adyen Reconciliation Lines"
 
                                         MagentoPaymentLine.FilterGroup(2);
                                         MagentoPaymentLine.SetFilter("Payment Gateway Code", FilterPGCodes);
-                                        if not (Rec."Transaction Type" in
-                                            [Rec."Transaction Type"::Chargeback,
-                                            Rec."Transaction Type"::SecondChargeback,
-                                            Rec."Transaction Type"::RefundedReversed,
-                                            Rec."Transaction Type"::ChargebackReversed,
-                                            Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
-                                        then
-                                            MagentoPaymentLine.SetRange(Reconciled, false)
+                                        if Rec.IsSalesDayPayoutReversal() then
+                                            MagentoPaymentLine.SetRange(Reversed, false)
                                         else
-                                            MagentoPaymentLine.SetRange(Reversed, false);
+                                            if not (Rec."Transaction Type" in
+                                                [Rec."Transaction Type"::Chargeback,
+                                                Rec."Transaction Type"::SecondChargeback,
+                                                Rec."Transaction Type"::RefundedReversed,
+                                                Rec."Transaction Type"::ChargebackReversed,
+                                                Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
+                                            then
+                                                MagentoPaymentLine.SetRange(Reconciled, false)
+                                            else
+                                                MagentoPaymentLine.SetRange(Reversed, false);
                                         MagentoPaymentLine.FilterGroup(0);
                                         MagentoPaymentLines.SetTableView(MagentoPaymentLine);
                                         if not IsNullGuid(Rec."Matching Entry System ID") then
@@ -189,16 +195,19 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                                     if _AdyenManagement.ManualMatchingAllowed(Rec) then begin
                                         SubscrPaymentRequest.FilterGroup(2);
                                         SubscrPaymentRequest.SetRange(PSP, Enum::"NPR MM Subscription PSP"::Adyen);
-                                        if not (Rec."Transaction Type" in
-                                            [Rec."Transaction Type"::Chargeback,
-                                            Rec."Transaction Type"::SecondChargeback,
-                                            Rec."Transaction Type"::RefundedReversed,
-                                            Rec."Transaction Type"::ChargebackReversed,
-                                            Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
-                                        then
-                                            SubscrPaymentRequest.SetRange(Reconciled, false)
+                                        if Rec.IsSalesDayPayoutReversal() then
+                                            SubscrPaymentRequest.SetRange(Reversed, false)
                                         else
-                                            SubscrPaymentRequest.SetRange(Reversed, false);
+                                            if not (Rec."Transaction Type" in
+                                                [Rec."Transaction Type"::Chargeback,
+                                                Rec."Transaction Type"::SecondChargeback,
+                                                Rec."Transaction Type"::RefundedReversed,
+                                                Rec."Transaction Type"::ChargebackReversed,
+                                                Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
+                                            then
+                                                SubscrPaymentRequest.SetRange(Reconciled, false)
+                                            else
+                                                SubscrPaymentRequest.SetRange(Reversed, false);
                                         SubscrPaymentRequest.FilterGroup(0);
                                         SubscrPaymentRequests.SetTableView(SubscrPaymentRequest);
                                         if not IsNullGuid(Rec."Matching Entry System ID") then

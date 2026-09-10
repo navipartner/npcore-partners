@@ -598,6 +598,12 @@ table 6150874 "NPR Adyen Recon. Line"
     var
         _AdyenTransactionMatching: Codeunit "NPR Adyen Trans. Matching";
     begin
+        if Rec.IsSalesDayPayoutReversal() then begin
+            if Rec.Status = Rec.Status::Reconciled then
+                _AdyenTransactionMatching.RestorePaymentReconciliation(Rec, Rec."Matching Table Name");
+            exit;
+        end;
+
         if Rec.Status in [Rec.Status::Matched, Rec.Status::"Matched Manually", Rec.Status::Reconciled] then
             _AdyenTransactionMatching.RevertPaymentReconciliation(Rec, Rec."Matching Table Name");
     end;
@@ -607,5 +613,14 @@ table 6150874 "NPR Adyen Recon. Line"
         if RecalcFlowFields then
             CalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted", "Realized Losses Posted");
         exit("Transaction Posted" and "Markup Posted" and "Commissions Posted");
+    end;
+
+    internal procedure IsSalesDayPayoutReversal(): Boolean
+    begin
+        exit("Transaction Type" in
+            ["Transaction Type"::"CaptureFailed (Sales Day payout)",
+            "Transaction Type"::"RefundFailed (Sales Day payout)",
+            "Transaction Type"::"SettledReversed (Sales Day payout)",
+            "Transaction Type"::"RefundNotCleared (Sales Day payout)"]);
     end;
 }

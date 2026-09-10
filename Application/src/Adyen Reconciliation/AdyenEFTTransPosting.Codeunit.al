@@ -179,6 +179,13 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         EFTTransactionRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
         POSPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID");
         OriginalAmountLCY := POSPaymentLine."Amount (LCY)";
+
+        // Gated on purpose: the chargeback types also bind to an opposite-signed payment line, so lifting the gate would
+        // change G/L amounts on cross-currency postings that ship today.
+        if _ReconciliationLine.IsSalesDayPayoutReversal() then
+            if (POSPaymentLine."Amount (LCY)" <> 0) and (_ReconciliationLine."Amount (TCY)" * POSPaymentLine."Amount (LCY)" < 0) then
+                OriginalAmountLCY := -OriginalAmountLCY;
+
         case _ReconciliationLine."Transaction Type" of
             _ReconciliationLine."Transaction Type"::Chargeback,
             _ReconciliationLine."Transaction Type"::SecondChargeback,

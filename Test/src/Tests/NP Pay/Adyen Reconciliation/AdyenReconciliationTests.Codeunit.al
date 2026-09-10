@@ -15,6 +15,11 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         _Initialized: Boolean;
         _BatchNumberSeed: Integer;
         _SettledTypeLbl: Label 'Settled', Locked = true;
+        _RefundedTypeLbl: Label 'Refunded', Locked = true;
+        _CaptureFailedTypeLbl: Label 'CaptureFailed', Locked = true;
+        _SettledReversedTypeLbl: Label 'SettledReversed', Locked = true;
+        _RefundFailedTypeLbl: Label 'RefundFailed', Locked = true;
+        _RefundNotClearedTypeLbl: Label 'RefundNotCleared', Locked = true;
         _FeeTypeLbl: Label 'Fee', Locked = true;
         _CompanyAccountLbl: Label 'NPCompanyTestAccount', Locked = true;
         _LocalFileLbl: Label 'Local File Upload', Locked = true;
@@ -431,7 +436,7 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         Amount := 100;
         ExchangeRate := 1.2;
         BookedAmountLCY := 90;
-        ExpectedRealizedGL := Round(ExchangeRate * -Amount) + BookedAmountLCY; // rate*(-TCY) - (-bookedLCY) = -120 + 90 = -30
+        ExpectedRealizedGL := Round(ExchangeRate * -Amount) + BookedAmountLCY;
 
         // [Given] A captured Adyen subscription payment (positive, already settled) with a known booked LCY.
         //         Reconciled = true both mirrors reality and stops CreateReverseSubscrPaymentRequest from mistaking the
@@ -781,6 +786,437 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         ReconciliationLine.FindFirst();
         ReconciliationLine.TestField("PSP Reference", PSPReference);
         ReconciliationLine.TestField("Amount (TCY)", SettledAmount);
+    end;
+
+    #endregion
+
+    #region [Sales Day Payout journal types]
+
+    [Test]
+    procedure SalesDayPayout_CaptureFailed_ReleasesEFTAndAllowsResettlement()
+    begin
+        // [Scenario] Adyen settles a card payment, books CaptureFailed in the next payout because the scheme funds never
+        //            arrived, then settles the very same transaction again once they do - twice over, since the re-capture
+        //            can fail as well.
+        AssertSalesDayPayoutCycle(
+            _SettledTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::Settled,
+            _CaptureFailedTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::"CaptureFailed (Sales Day payout)",
+            50, true);
+    end;
+
+    [Test]
+    procedure SalesDayPayout_SettledReversed_ReleasesEFTAndAllowsResettlement()
+    begin
+        // [Scenario] The other settle-side reversal: Adyen claws back funds it never received within 30 days, then re-books
+        //            the settlement if they arrive late. Pairs with Settled, exactly as CaptureFailed does.
+        AssertSalesDayPayoutCycle(
+            _SettledTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::Settled,
+            _SettledReversedTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::"SettledReversed (Sales Day payout)",
+            10, true);
+    end;
+
+    [Test]
+    procedure SalesDayPayout_RefundNotCleared_ReleasesEFTAndAllowsReRefund()
+    begin
+        // [Scenario] The credit-side mirror: a refund is booked, RefundNotCleared credits it back because the funds were
+        //            never cleared, and the refund is booked again.
+        AssertSalesDayPayoutCycle(
+            _RefundedTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::Refunded,
+            _RefundNotClearedTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::"RefundNotCleared (Sales Day payout)",
+            10.2, false);
+    end;
+
+    [Test]
+    procedure SalesDayPayout_RefundFailed_ReleasesEFTAndAllowsReRefund()
+    begin
+        // [Scenario] The other refund-side reversal - the refund never reached the shopper, so Adyen credits it back.
+        //            Pairs with Refunded, exactly as RefundNotCleared does.
+        AssertSalesDayPayoutCycle(
+            _RefundedTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::Refunded,
+            _RefundFailedTypeLbl, Enum::"NPR Adyen Rec. Trans. Type"::"RefundFailed (Sales Day payout)",
+            6.42, false);
+    end;
+
+    [Test]
+    procedure SalesDayPayout_ReversalAboveItsRebooking_BothImportMatchAndPost()
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        PSPReference: Code[16];
+        PaymentAccountNo: Code[20];
+        Amount: Decimal;
+    begin
+        // [Scenario] One payout report carries the reversal and the re-booking it releases, reversal printed first. The
+        //            reversal only hands the payment entry back when it posts, and the whole document is matched before any
+        //            of it posts, so the re-booking has to be able to take an entry whose release is still pending.
+        Initialize();
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 50;
+        PaymentAccountNo := CreatePostableEFTTransactionRequestWithLCY(EFTTransactionRequest, PSPReference, Amount, Amount);
+
+        // [Given] The original settlement, matched and posted, holding the request
+        ProcessJournalReport(PSPReference, _SettledTypeLbl, 0, Amount);
+        EFTTransactionRequest.Find();
+        EFTTransactionRequest.TestField(Reconciled, true);
+
+        // [When] The next payout reports SettledReversed and the re-booked Settled in that order
+        ProcessTwoJournalReport(PSPReference, _SettledReversedTypeLbl, Amount, 0, _SettledTypeLbl, 0, Amount);
+
+        // [Then] Both rows imported
+        _Assert.AreEqual(1, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::"SettledReversed (Sales Day payout)"), 'The reversal should have imported.');
+        _Assert.AreEqual(2, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::Settled), 'The re-booked Settled should have imported.');
+
+        // [Then] The re-booking matched on its own rather than being left for a manual match
+        FindReconLine(ReconciliationLine, PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::Settled, true);
+        ReconciliationLine.TestField("Matching Table Name", ReconciliationLine."Matching Table Name"::"EFT Transaction");
+        ReconciliationLine.TestField("Matching Entry System ID", EFTTransactionRequest.SystemId);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Posted);
+
+        FindReconLine(ReconciliationLine, PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::"SettledReversed (Sales Day payout)", true);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Posted);
+
+        // [Then] The reversal released and the re-booking claimed again, in that order, so the entry ends up claimed
+        EFTTransactionRequest.Find();
+        EFTTransactionRequest.TestField(Reconciled, true);
+        _Assert.AreEqual(-Amount, GLAccountBalance(PaymentAccountNo), 'Reversal plus re-booking should leave the POS payment account holding one settlement.');
+    end;
+
+    [Test]
+    procedure SalesDayPayout_RebookingAboveItsReversal_StillImports()
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        PSPReference: Code[16];
+        Amount: Decimal;
+    begin
+        // [Scenario] The same report the other way round, re-booking printed above the reversal that releases it. The cycle
+        //            counts only see rows already read, so judging the row where it sits would throw it away as a duplicate
+        //            with no way to get it back - the document posts, and Recreate Document refuses posted documents.
+        Initialize();
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 50;
+        CreatePostableEFTTransactionRequestWithLCY(EFTTransactionRequest, PSPReference, Amount, Amount);
+
+        ProcessJournalReport(PSPReference, _SettledTypeLbl, 0, Amount);
+
+        // [When] The payout prints the re-booked Settled above its SettledReversed
+        ProcessTwoJournalReport(PSPReference, _SettledTypeLbl, 0, Amount, _SettledReversedTypeLbl, Amount, 0);
+
+        // [Then] Neither row was lost - report row order does not decide what survives
+        _Assert.AreEqual(2, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::Settled), 'A re-booking printed above its reversal must still import.');
+        _Assert.AreEqual(1, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::"SettledReversed (Sales Day payout)"), 'The reversal should have imported.');
+
+        FindReconLine(ReconciliationLine, PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::Settled, true);
+        ReconciliationLine.TestField("Matching Entry System ID", EFTTransactionRequest.SystemId);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Posted);
+    end;
+
+    local procedure ProcessTwoJournalReport(PSPReference: Code[16]; FirstType: Text; FirstDebit: Decimal; FirstCredit: Decimal; SecondType: Text; SecondDebit: Decimal; SecondCredit: Decimal)
+    var
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        AdyenRecReportProcess: Codeunit "NPR Adyen Rec. Report Process";
+    begin
+        BuildTwoJournalWebhookRequest(AFRecWebhookRequest, GenerateUniqueBatchNumber(), PSPReference, FirstType, FirstDebit, FirstCredit, SecondType, SecondDebit, SecondCredit);
+        AdyenRecReportProcess.Run(AFRecWebhookRequest);
+    end;
+
+    [Test]
+    procedure SalesDayPayout_CaptureFailedCrossCurrency_PostsAgainstTheReversalSign()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        PSPReference: Code[16];
+        PaymentAccountNo: Code[20];
+        TransactionCurrency: Code[10];
+        Amount: Decimal;
+        BookedAmountLCY: Decimal;
+        ExchangeRate: Decimal;
+        ExpectedRealizedGL: Decimal;
+        BaselineLogId: Integer;
+    begin
+        // [Scenario] A cross-currency CaptureFailed (negative Amount (TCY)) binds to the positive POS payment line of the
+        //            Settled it undoes, so the cross-currency basis must follow the reconciliation line's sign. This is the
+        //            only branch where that flip is observable; same-currency lines never reach it.
+        Initialize();
+        TransactionCurrency := PickFCYDistinctFrom(_NetCurrency, _LCYCode);
+        EnsureCurrencyWithRealizedAccounts(TransactionCurrency);
+
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 100;
+        ExchangeRate := 1.2;
+        BookedAmountLCY := 90;
+        ExpectedRealizedGL := Round(ExchangeRate * -Amount) + BookedAmountLCY;
+
+        // [Given] A card payment captured at the POS whose booked LCY differs from the settled amount
+        PaymentAccountNo := CreatePostableEFTTransactionRequestWithLCY(EFTTransactionRequest, PSPReference, Amount, BookedAmountLCY);
+
+        // [Given] Its Settled booking, matched and posted
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, TransactionCurrency, ExchangeRate, Enum::"NPR Adyen Rec. Trans. Type"::Settled, true);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+        AdyenTransMatching.PostEntries(ReconciliationHeader);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Posted);
+
+        // [When] The next payout reports CaptureFailed for the same PSP reference
+        Clear(AdyenTransMatching);
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, TransactionCurrency, ExchangeRate, Enum::"NPR Adyen Rec. Trans. Type"::"CaptureFailed (Sales Day payout)", false);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Matched);
+        ReconciliationLine.TestField("Matching Entry System ID", EFTTransactionRequest.SystemId);
+
+        BaselineLogId := LastReconLogId();
+        AdyenTransMatching.PostEntries(ReconciliationHeader);
+
+        // [Then] Realized G/L followed the reversal's sign - an unflipped basis would give -120 - 90 = -210 instead
+        ReconciliationLine.Find();
+        _Assert.AreEqual(ReconciliationLine.Status::Posted, ReconciliationLine.Status, StrSubstNo('CaptureFailed line was not posted. Root-cause reconciliation-log error: %1', GetFirstReconErrorSince(BaselineLogId)));
+        _Assert.AreEqual(ExpectedRealizedGL, ReconciliationLine."Realized Gains or Losses", 'A cross-currency Sales Day Payout reversal must compute its realized G/L against the reconciliation line sign.');
+
+        // [Then] The transaction pair backed the booking out of the POS payment account rather than repeating it
+        _Assert.AreEqual(0, GLAccountBalance(PaymentAccountNo), 'The reversal should leave the POS payment account flat, not post the booked amount a second time.');
+    end;
+
+    [Test]
+    procedure SalesDayPayout_CaptureFailedReconcileOnly_ReleasesEFT()
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        PSPReference: Code[16];
+        Amount: Decimal;
+    begin
+        // [Scenario] With automatic posting disabled the report takes the Reconcile branch instead of the Post branch, which
+        //            has its own handling for the four new types and must release the payment entry there too.
+        Initialize();
+        SetEnableAutomaticPosting(false);
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 50;
+
+        CreatePostableEFTTransactionRequestWithLCY(EFTTransactionRequest, PSPReference, Amount, Amount);
+
+        // [Given] The Settled booking reconciled - claiming the request
+        ProcessJournalReport(PSPReference, _SettledTypeLbl, 0, Amount);
+        FindReconLine(ReconciliationLine, PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::Settled, true);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Reconciled);
+        EFTTransactionRequest.Find();
+        EFTTransactionRequest.TestField(Reconciled, true);
+
+        // [When] CaptureFailed for the same PSP reference is reconciled
+        ProcessJournalReport(PSPReference, _CaptureFailedTypeLbl, Amount, 0);
+
+        // [Then] The line reconciled and the request was released rather than claimed again
+        FindReconLine(ReconciliationLine, PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::"CaptureFailed (Sales Day payout)", true);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Reconciled);
+        ReconciliationLine.TestField("Matching Entry System ID", EFTTransactionRequest.SystemId);
+        EFTTransactionRequest.Find();
+        EFTTransactionRequest.TestField(Reconciled, false);
+        EFTTransactionRequest.TestField("Reconciliation Date", 0D);
+        EFTTransactionRequest.TestField(Reversed, false);
+    end;
+
+    [Test]
+    procedure SalesDayPayout_SecondBookingWithoutReversal_IsDropped()
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        PSPReference: Code[16];
+        Amount: Decimal;
+        BaselineLogId: Integer;
+    begin
+        // [Scenario] The refusing side of the import guard. Two Settled bookings for one PSP reference with no reversal
+        //            between them are a duplicated report row, not a re-booking, and the second must not import.
+        Initialize();
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 50;
+
+        CreatePostableEFTTransactionRequestWithLCY(EFTTransactionRequest, PSPReference, Amount, Amount);
+        ProcessJournalReport(PSPReference, _SettledTypeLbl, 0, Amount);
+        _Assert.AreEqual(1, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::Settled), 'The first Settled should have imported.');
+
+        // [When] The same Settled arrives again in a later payout, with nothing having undone the first
+        BaselineLogId := LastReconLogId();
+        ProcessJournalReport(PSPReference, _SettledTypeLbl, 0, Amount, true);
+
+        // [Then] It was refused, and named in the log rather than being dropped silently
+        _Assert.AreEqual(1, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::Settled), 'A second Settled with no reversal between must be refused as a duplicate.');
+        _Assert.IsTrue(ReconErrorLoggedFor(BaselineLogId, PSPReference, _SettledTypeLbl), 'The refused row must be named in the reconciliation log by journal type and PSP reference.');
+        _Assert.IsTrue(ReconErrorLoggedFor(BaselineLogId, 'is incomplete', ''), 'The document must be reported as incomplete rather than successfully imported.');
+    end;
+
+    [Test]
+    procedure SalesDayPayout_SecondReversalWithoutBooking_IsDropped()
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        PSPReference: Code[16];
+        Amount: Decimal;
+        BaselineLogId: Integer;
+    begin
+        // [Scenario] The same guard from the reversal side: a second CaptureFailed with only one Settled behind it has
+        //            nothing left to undo, so it must not import either.
+        Initialize();
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 50;
+
+        CreatePostableEFTTransactionRequestWithLCY(EFTTransactionRequest, PSPReference, Amount, Amount);
+        ProcessJournalReport(PSPReference, _SettledTypeLbl, 0, Amount);
+        ProcessJournalReport(PSPReference, _CaptureFailedTypeLbl, Amount, 0);
+        _Assert.AreEqual(1, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::"CaptureFailed (Sales Day payout)"), 'The first CaptureFailed should have imported.');
+
+        // [When] A second CaptureFailed arrives without a second Settled to undo
+        BaselineLogId := LastReconLogId();
+        ProcessJournalReport(PSPReference, _CaptureFailedTypeLbl, Amount, 0, true);
+
+        // [Then] It was refused, and named in the log
+        _Assert.AreEqual(1, ReconLineCount(PSPReference, Enum::"NPR Adyen Rec. Trans. Type"::"CaptureFailed (Sales Day payout)"), 'A second CaptureFailed with no outstanding booking must be refused as a duplicate.');
+        _Assert.IsTrue(ReconErrorLoggedFor(BaselineLogId, PSPReference, _CaptureFailedTypeLbl), 'The refused row must be named in the reconciliation log by journal type and PSP reference.');
+        _Assert.IsTrue(ReconErrorLoggedFor(BaselineLogId, 'is incomplete', ''), 'The document must be reported as incomplete rather than successfully imported.');
+    end;
+
+    [Test]
+    procedure SalesDayPayout_MagentoClaim_RefusesDuplicateAndAllowsResettlement()
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        PSPReference: Code[16];
+        Amount: Decimal;
+    begin
+        // [Scenario] The Magento leg of the cycle, which the EFT tests never reach. Only one recon line of a given class may
+        //            claim a payment line at a time, but a Sales Day Payout reversal hands that claim back - so a re-booking
+        //            must be able to take it again while a plain duplicate still may not.
+        Initialize();
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 50;
+        CreateMagentoPaymentLine(MagentoPaymentLine, PSPReference, Amount);
+
+        // [Given] A Settled booking holding the claim on that payment line
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, _NetCurrency, 1, Enum::"NPR Adyen Rec. Trans. Type"::Settled, true);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField("Matching Table Name", ReconciliationLine."Matching Table Name"::"Magento Payment Line");
+        ReconciliationLine.TestField("Matching Entry System ID", MagentoPaymentLine.SystemId);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Matched);
+
+        // [When] A second Settled turns up with nothing having released that claim
+        Clear(AdyenTransMatching);
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, _NetCurrency, 1, Enum::"NPR Adyen Rec. Trans. Type"::Settled, true);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+
+        // [Then] The claim guard refuses it - the payment line is already spoken for
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::"Failed to Match");
+
+        // [When] A CaptureFailed releases the claim, and the settlement is then re-booked
+        Clear(AdyenTransMatching);
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, _NetCurrency, 1, Enum::"NPR Adyen Rec. Trans. Type"::"CaptureFailed (Sales Day payout)", false);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField("Matching Entry System ID", MagentoPaymentLine.SystemId);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Matched);
+
+        Clear(AdyenTransMatching);
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount, _NetCurrency, 1, Enum::"NPR Adyen Rec. Trans. Type"::Settled, true);
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+
+        // [Then] The re-booking takes the released claim, where the plain duplicate above could not
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField("Matching Entry System ID", MagentoPaymentLine.SystemId);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Matched);
+    end;
+
+    local procedure InsertFCYReconLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; PSPReference: Code[16]; Amount: Decimal; TransactionCurrency: Code[10]; ExchangeRate: Decimal; TransactionType: Enum "NPR Adyen Rec. Trans. Type"; IsCredit: Boolean)
+    begin
+        InitReconLineForHeader(ReconciliationLine, ReconciliationHeader);
+        ReconciliationLine."PSP Reference" := PSPReference;
+        ReconciliationLine."Merchant Reference" := CopyStr('REF-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
+        ReconciliationLine."Merchant Order Reference" := CopyStr('ORD-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
+        ReconciliationLine."Transaction Date" := CreateDateTime(Today(), Time());
+        ReconciliationLine."Transaction Currency Code" := TransactionCurrency;
+        ReconciliationLine."Adyen Acc. Currency Code" := _NetCurrency;
+        if IsCredit then begin
+            ReconciliationLine.Validate("Gross Credit", Amount);
+            ReconciliationLine.Validate("Net Credit", Amount);
+        end else begin
+            ReconciliationLine.Validate("Gross Debit", Amount);
+            ReconciliationLine.Validate("Net Debit", Amount);
+        end;
+        ReconciliationLine."Exchange Rate" := ExchangeRate;
+        ReconciliationLine."Amount (LCY)" := ReconciliationLine."Amount(AAC)";
+        ReconciliationLine."Transaction Type" := TransactionType;
+        ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"To Be Determined";
+        ReconciliationLine.Status := ReconciliationLine.Status::" ";
+        ReconciliationLine.Insert();
+    end;
+
+    local procedure AssertSalesDayPayoutCycle(BookingTypeLbl: Text; BookingType: Enum "NPR Adyen Rec. Trans. Type"; ReversalTypeLbl: Text; ReversalType: Enum "NPR Adyen Rec. Trans. Type"; Amount: Decimal; BookingIsCredit: Boolean)
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        PSPReference: Code[16];
+        PaymentAccountNo: Code[20];
+        BookedBalance: Decimal;
+        ReconciledOn: Date;
+        Cycle: Integer;
+    begin
+        Initialize();
+        PSPReference := GenerateUniquePSPReference();
+
+        if BookingIsCredit then
+            BookedBalance := -Amount
+        else
+            BookedBalance := Amount;
+
+        // [Given] A card payment (or refund) captured at the POS, posted and ready to be reconciled
+        PaymentAccountNo := CreatePostableEFTTransactionRequest(EFTTransactionRequest, PSPReference, -BookedBalance);
+
+        for Cycle := 1 to 2 do begin
+            // [When] The settlement report carrying the booking is processed end to end
+            ReconciledOn := Today();
+            ProcessJournalReportForSide(PSPReference, BookingTypeLbl, Amount, BookingIsCredit);
+
+            // [Then] It imported despite repeating an earlier booking's PSP reference and amount, then claimed the request
+            _Assert.AreEqual(Cycle, ReconLineCount(PSPReference, BookingType), StrSubstNo('Cycle %1: the booking must not be dropped as a duplicate of the one the reversal already undid.', Cycle));
+            FindReconLine(ReconciliationLine, PSPReference, BookingType, true);
+            ReconciliationLine.TestField(Status, ReconciliationLine.Status::Posted);
+            ReconciliationLine.TestField("Matching Entry System ID", EFTTransactionRequest.SystemId);
+            EFTTransactionRequest.Find();
+            EFTTransactionRequest.TestField(Reconciled, true);
+            EFTTransactionRequest.TestField("Reconciliation Date", ReconciledOn);
+            _Assert.AreEqual(BookedBalance, GLAccountBalance(PaymentAccountNo), StrSubstNo('Cycle %1: the booking should move the amount across the POS payment account.', Cycle));
+
+            // [When] A later payout reports the Sales Day Payout reversal against the same PSP reference
+            ProcessJournalReportForSide(PSPReference, ReversalTypeLbl, Amount, not BookingIsCredit);
+
+            // [Then] It bound to the same request - not a new one - and posted the amount straight back
+            _Assert.AreEqual(Cycle, ReconLineCount(PSPReference, ReversalType), StrSubstNo('Cycle %1: the reversal must not be dropped as a duplicate of the earlier one.', Cycle));
+            FindReconLine(ReconciliationLine, PSPReference, ReversalType, true);
+            ReconciliationLine.TestField(Status, ReconciliationLine.Status::Posted);
+            ReconciliationLine.TestField("Matching Entry System ID", EFTTransactionRequest.SystemId);
+            _Assert.AreEqual(0, GLAccountBalance(PaymentAccountNo), StrSubstNo('Cycle %1: the reversal should back out what the booking posted, leaving the POS payment account flat.', Cycle));
+
+            // [Then] The request is untouched again - released rather than reversed, with no reversing request created
+            EFTTransactionRequest.Find();
+            EFTTransactionRequest.TestField(Reconciled, false);
+            EFTTransactionRequest.TestField("Reconciliation Date", 0D);
+            EFTTransactionRequest.TestField(Reversed, false);
+            _Assert.AreEqual(1, EFTRequestCount(PSPReference), StrSubstNo('Cycle %1: a Sales Day Payout reversal must not create a reversing EFT Transaction Request.', Cycle));
+        end;
+    end;
+
+    local procedure ProcessJournalReportForSide(PSPReference: Code[16]; JournalType: Text; Amount: Decimal; IsCredit: Boolean)
+    begin
+        if IsCredit then
+            ProcessJournalReport(PSPReference, JournalType, 0, Amount)
+        else
+            ProcessJournalReport(PSPReference, JournalType, Amount, 0);
     end;
 
     #endregion
@@ -1161,6 +1597,109 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         EFTTransactionRequest.Insert();
     end;
 
+    local procedure CreatePostableEFTTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; PSPReference: Code[16]; Amount: Decimal) PaymentAccountNo: Code[20]
+    begin
+        PaymentAccountNo := CreatePostableEFTTransactionRequestWithLCY(EFTTransactionRequest, PSPReference, Amount, Amount);
+    end;
+
+    local procedure CreatePostableEFTTransactionRequestWithLCY(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; PSPReference: Code[16]; Amount: Decimal; AmountLCY: Decimal) PaymentAccountNo: Code[20]
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
+        POSStoreCode: Code[10];
+    begin
+        CreateEFTTransactionRequest(EFTTransactionRequest, PSPReference, Amount);
+
+        POSEntry.SetRange("Document No.", EFTTransactionRequest."Sales Ticket No.");
+        POSEntry.FindFirst();
+
+        PaymentAccountNo := CreatePOSPostingSetup(POSStoreCode);
+
+        POSPaymentLine.Init();
+        POSPaymentLine."POS Entry No." := POSEntry."Entry No.";
+        POSPaymentLine."Line No." := 10000;
+        POSPaymentLine."POS Store Code" := POSStoreCode;
+        POSPaymentLine."Amount (LCY)" := AmountLCY;
+        POSPaymentLine.Insert();
+
+        EFTTransactionRequest."Sales Line ID" := POSPaymentLine.SystemId;
+        EFTTransactionRequest.Modify();
+    end;
+
+    local procedure CreatePOSPostingSetup(var POSStoreCode: Code[10]) AccountNo: Code[20]
+    var
+        POSPostingSetup: Record "NPR POS Posting Setup";
+    begin
+        POSStoreCode := CopyStr('AR' + DelChr(Format(CreateGuid()), '=', '{}-'), 1, 10);
+        AccountNo := _LibraryERM.CreateGLAccountNo();
+
+        POSPostingSetup.Init();
+        POSPostingSetup."POS Store Code" := POSStoreCode;
+        POSPostingSetup."POS Payment Method Code" := '';
+        POSPostingSetup."POS Payment Bin Code" := '';
+        POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
+        POSPostingSetup."Account No." := AccountNo;
+        POSPostingSetup.Insert();
+    end;
+
+    local procedure ProcessJournalReport(PSPReference: Code[16]; JournalType: Text; GrossDebit: Decimal; GrossCredit: Decimal)
+    begin
+        ProcessJournalReport(PSPReference, JournalType, GrossDebit, GrossCredit, false);
+    end;
+
+    local procedure ProcessJournalReport(PSPReference: Code[16]; JournalType: Text; GrossDebit: Decimal; GrossCredit: Decimal; WithFeeRow: Boolean)
+    var
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        AdyenRecReportProcess: Codeunit "NPR Adyen Rec. Report Process";
+    begin
+        // WithFeeRow adds a second, always-importable row. A report whose only row is refused creates no document at all,
+        // which CreateSettlementDocuments reports as ImportLinesError02 and the process entry point turns into an error -
+        // so the refusal path can only be observed on a report that has something else to import alongside it.
+        BuildJournalWebhookRequest(AFRecWebhookRequest, GenerateUniqueBatchNumber(), PSPReference, JournalType, GrossDebit, GrossCredit, WithFeeRow);
+        AdyenRecReportProcess.Run(AFRecWebhookRequest);
+    end;
+
+    local procedure FindReconLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; PSPReference: Code[16]; TransactionType: Enum "NPR Adyen Rec. Trans. Type"; TakeLatest: Boolean)
+    begin
+        FilterReconLines(ReconciliationLine, PSPReference, TransactionType);
+        if TakeLatest then
+            ReconciliationLine.FindLast()
+        else
+            ReconciliationLine.FindFirst();
+    end;
+
+    local procedure ReconLineCount(PSPReference: Code[16]; TransactionType: Enum "NPR Adyen Rec. Trans. Type"): Integer
+    var
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+    begin
+        FilterReconLines(ReconciliationLine, PSPReference, TransactionType);
+        exit(ReconciliationLine.Count());
+    end;
+
+    local procedure FilterReconLines(var ReconciliationLine: Record "NPR Adyen Recon. Line"; PSPReference: Code[16]; TransactionType: Enum "NPR Adyen Rec. Trans. Type")
+    begin
+        ReconciliationLine.Reset();
+        ReconciliationLine.SetRange("PSP Reference", PSPReference);
+        ReconciliationLine.SetRange("Transaction Type", TransactionType);
+    end;
+
+    local procedure EFTRequestCount(PSPReference: Code[16]): Integer
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTTransactionRequest.SetRange("PSP Reference", PSPReference);
+        exit(EFTTransactionRequest.Count());
+    end;
+
+    local procedure GLAccountBalance(AccountNo: Code[20]): Decimal
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        GLEntry.SetRange("G/L Account No.", AccountNo);
+        GLEntry.CalcSums(Amount);
+        exit(GLEntry.Amount);
+    end;
+
     local procedure EnsurePOSEntryFor(SalesTicketNo: Code[20])
     var
         POSEntry: Record "NPR POS Entry";
@@ -1230,6 +1769,21 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         if ReconciliationLog.FindLast() then
             exit(ReconciliationLog.ID);
         exit(0);
+    end;
+
+    local procedure ReconErrorLoggedFor(AfterLogId: Integer; FirstFragment: Text; SecondFragment: Text): Boolean
+    var
+        ReconciliationLog: Record "NPR Adyen Reconciliation Log";
+    begin
+        ReconciliationLog.SetFilter(ID, '>%1', AfterLogId);
+        ReconciliationLog.SetRange(Success, false);
+        if not ReconciliationLog.FindSet() then
+            exit;
+        repeat
+            if StrPos(ReconciliationLog.Description, FirstFragment) > 0 then
+                if (SecondFragment = '') or (StrPos(ReconciliationLog.Description, SecondFragment) > 0) then
+                    exit(true);
+        until ReconciliationLog.Next() = 0;
     end;
 
     local procedure GetFirstReconErrorSince(AfterLogId: Integer): Text
@@ -1547,6 +2101,113 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         SetCell(TempExcelBuf, RowNo, 25, '0');
         SetCell(TempExcelBuf, RowNo, 26, '0');
         SetCell(TempExcelBuf, RowNo, 27, FormatDecimal(FeeAmount));
+        SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CurrentDateTime()));
+    end;
+
+    local procedure BuildTwoJournalWebhookRequest(var AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request"; BatchNumber: Integer; PSPReference: Code[16]; FirstType: Text; FirstDebit: Decimal; FirstCredit: Decimal; SecondType: Text; SecondDebit: Decimal; SecondCredit: Decimal)
+    var
+        TempExcelBuf: Record "Excel Buffer" temporary;
+        TempBlob: Codeunit "Temp Blob";
+        BlobInStr: InStream;
+        BlobOutStr: OutStream;
+    begin
+        TempExcelBuf.DeleteAll();
+        WriteHeaderRow(TempExcelBuf);
+        WriteJournalRow(TempExcelBuf, 2, BatchNumber, PSPReference, FirstType, FirstDebit, FirstCredit);
+        WriteJournalRow(TempExcelBuf, 3, BatchNumber, PSPReference, SecondType, SecondDebit, SecondCredit);
+        TempExcelBuf.CreateNewBook(_DataSheetLbl);
+        TempExcelBuf.WriteSheet(_DataSheetLbl, CompanyName(), UserId());
+        TempExcelBuf.CloseBook();
+
+        TempBlob.CreateOutStream(BlobOutStr);
+        TempExcelBuf.SaveToStream(BlobOutStr, true);
+        TempBlob.CreateInStream(BlobInStr);
+        InitJournalWebhookRequest(AFRecWebhookRequest, BatchNumber, BlobInStr);
+    end;
+
+    local procedure InitJournalWebhookRequest(var AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request"; BatchNumber: Integer; var BlobInStr: InStream)
+    var
+        ReportOutStr: OutStream;
+        FileName: Text;
+    begin
+        FileName := 'settlement_detail_batch_' + Format(BatchNumber) + '.xlsx';
+        AFRecWebhookRequest.Init();
+        AFRecWebhookRequest.ID := 0;
+        AFRecWebhookRequest."Report Name" := CopyStr(FileName, 1, MaxStrLen(AFRecWebhookRequest."Report Name"));
+        AFRecWebhookRequest."Report Type" := AFRecWebhookRequest."Report Type"::"Settlement details";
+        AFRecWebhookRequest."Report Download URL" := _LocalFileLbl;
+        AFRecWebhookRequest.Insert();
+
+        AFRecWebhookRequest."Report Data".CreateOutStream(ReportOutStr);
+        CopyStream(ReportOutStr, BlobInStr);
+        AFRecWebhookRequest.Modify();
+    end;
+
+    local procedure BuildJournalWebhookRequest(var AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request"; BatchNumber: Integer; PSPReference: Code[16]; JournalType: Text; GrossDebit: Decimal; GrossCredit: Decimal; WithFeeRow: Boolean)
+    var
+        TempExcelBuf: Record "Excel Buffer" temporary;
+        TempBlob: Codeunit "Temp Blob";
+        BlobInStr: InStream;
+        BlobOutStr: OutStream;
+        ReportOutStr: OutStream;
+        FileName: Text;
+    begin
+        TempExcelBuf.DeleteAll();
+        WriteHeaderRow(TempExcelBuf);
+        WriteJournalRow(TempExcelBuf, 2, BatchNumber, PSPReference, JournalType, GrossDebit, GrossCredit);
+        // Its modification reference carries the batch number, so it is unique per report and always imports.
+        if WithFeeRow then
+            WriteFeeRow(TempExcelBuf, 3, BatchNumber, 'ORD-' + PSPReference, 1);
+        TempExcelBuf.CreateNewBook(_DataSheetLbl);
+        TempExcelBuf.WriteSheet(_DataSheetLbl, CompanyName(), UserId());
+        TempExcelBuf.CloseBook();
+
+        TempBlob.CreateOutStream(BlobOutStr);
+        TempExcelBuf.SaveToStream(BlobOutStr, true);
+        TempBlob.CreateInStream(BlobInStr);
+
+        FileName := 'settlement_detail_batch_' + Format(BatchNumber) + '.xlsx';
+        AFRecWebhookRequest.Init();
+        AFRecWebhookRequest.ID := 0;
+        AFRecWebhookRequest."Report Name" := CopyStr(FileName, 1, MaxStrLen(AFRecWebhookRequest."Report Name"));
+        AFRecWebhookRequest."Report Type" := AFRecWebhookRequest."Report Type"::"Settlement details";
+        AFRecWebhookRequest."Report Download URL" := _LocalFileLbl;
+        AFRecWebhookRequest.Insert();
+
+        AFRecWebhookRequest."Report Data".CreateOutStream(ReportOutStr);
+        CopyStream(ReportOutStr, BlobInStr);
+        AFRecWebhookRequest.Modify();
+    end;
+
+    local procedure WriteJournalRow(var TempExcelBuf: Record "Excel Buffer" temporary; RowNo: Integer; BatchNumber: Integer; PSPReference: Code[16]; JournalType: Text; GrossDebit: Decimal; GrossCredit: Decimal)
+    begin
+        SetCell(TempExcelBuf, RowNo, 1, _CompanyAccountLbl);
+        SetCell(TempExcelBuf, RowNo, 2, _MerchantAccount);
+        SetCell(TempExcelBuf, RowNo, 3, PSPReference);
+        SetCell(TempExcelBuf, RowNo, 4, 'REF-' + PSPReference);
+        SetCell(TempExcelBuf, RowNo, 5, 'visa');
+        SetCell(TempExcelBuf, RowNo, 6, FormatDateTimeIso(CurrentDateTime()));
+        SetCell(TempExcelBuf, RowNo, 7, 'CET');
+        SetCell(TempExcelBuf, RowNo, 8, JournalType);
+        SetCell(TempExcelBuf, RowNo, 9, '');
+        SetCell(TempExcelBuf, RowNo, 10, _NetCurrency);
+        SetCell(TempExcelBuf, RowNo, 11, FormatDecimal(GrossDebit));
+        SetCell(TempExcelBuf, RowNo, 12, FormatDecimal(GrossCredit));
+        SetCell(TempExcelBuf, RowNo, 13, '1');
+        SetCell(TempExcelBuf, RowNo, 14, _NetCurrency);
+        SetCell(TempExcelBuf, RowNo, 15, FormatDecimal(GrossDebit));
+        SetCell(TempExcelBuf, RowNo, 16, FormatDecimal(GrossCredit));
+        SetCell(TempExcelBuf, RowNo, 17, '0');
+        SetCell(TempExcelBuf, RowNo, 18, '0');
+        SetCell(TempExcelBuf, RowNo, 19, 'visadebit');
+        SetCell(TempExcelBuf, RowNo, 20, '');
+        SetCell(TempExcelBuf, RowNo, 21, Format(BatchNumber));
+        SetCell(TempExcelBuf, RowNo, 22, '0');
+        SetCell(TempExcelBuf, RowNo, 23, '0');
+        SetCell(TempExcelBuf, RowNo, 24, 'ORD-' + PSPReference);
+        SetCell(TempExcelBuf, RowNo, 25, '0');
+        SetCell(TempExcelBuf, RowNo, 26, '0');
+        SetCell(TempExcelBuf, RowNo, 27, '0');
         SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CurrentDateTime()));
     end;
 
