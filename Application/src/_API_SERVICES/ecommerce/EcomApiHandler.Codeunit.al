@@ -38,6 +38,8 @@ codeunit 6248361 "NPR EcomApiHandler"
                 RunCreateDocAPIAgentBasedOnRequestHeaderVersion();
             _ApiFunction::GET_SALES_DOCUMENT:
                 RunGetDocAPIAgentBasedOnRequestHeaderVersion();
+            _ApiFunction::FIND_SALES_DOCUMENTS:
+                _Response := EcomSalesDocApiAgentV2.FindIncomingEcomDocumentsByEmail(_Request);
         end;
     end;
 

@@ -529,6 +529,12 @@ table 6151258 "NPR Ecom Sales Header"
         key(CreatedDateSorting; SystemCreatedAt)
         {
         }
+        key(SellToEmail; "Sell-to Email", SystemCreatedAt)
+        {
+        }
+        key(SellToInvoiceEmail; "Sell-to Invoice Email", SystemCreatedAt)
+        {
+        }
         key(VoucherProcessing; "Document Type", "Creation Status", "Vouchers Exist", "Capture Processing Status", "Voucher Processing Status", "Bucket Id")
         {
         }

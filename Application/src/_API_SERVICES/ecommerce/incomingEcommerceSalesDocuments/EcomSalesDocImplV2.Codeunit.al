@@ -147,7 +147,6 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         SetFieldText(RecordRef, 13630, EcomSalesHeader."Sell-to EAN");
         RecordRef.SetTable(SalesHeader);
 
-        SalesHeader."NPR Bill-to E-mail" := EcomSalesHeader."Sell-to Invoice Email";
         SalesHeader."NPR Bill-to Phone No." := EcomSalesHeader."Sell-to Invoice Phone No.";
         SalesHeader."Bill-to Name" := SalesHeader."Sell-to Customer Name";
         SalesHeader."Bill-to Name 2" := SalesHeader."Sell-to Customer Name 2";
@@ -160,6 +159,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         SalesHeader."Bill-to Country/Region Code" := SalesHeader."Sell-to Country/Region Code";
         SalesHeader."Bill-to County" := SalesHeader."Sell-to County";
         SalesHeader."NPR Bill-to E-mail" := EcomSalesHeader."Sell-to Email";
+
+        if EcomSalesHeader."Sell-to Invoice Email" <> '' then
+            SalesHeader."NPR Bill-to E-mail" := EcomSalesHeader."Sell-to Invoice Email";
+
         SalesHeader."Ship-to Name" := SalesHeader."Sell-to Customer Name";
         SalesHeader."Ship-to Name 2" := SalesHeader."Sell-to Customer Name 2";
         SalesHeader."Ship-to Address" := SalesHeader."Sell-to Address";
@@ -390,7 +393,9 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         Customer.City := EcomSalesHeader."Sell-to City";
         Customer."Country/Region Code" := EcomSalesHeader."Sell-to Country Code";
         Customer.Contact := EcomSalesHeader."Sell-to Contact";
-        Customer."E-Mail" := EcomSalesHeader."Sell-to Email";
+        // The stored address is normalised, so overwriting on a casing-only difference would lower-case the card.
+        if LowerCase(Customer."E-Mail") <> EcomSalesHeader."Sell-to Email" then
+            Customer."E-Mail" := EcomSalesHeader."Sell-to Email";
         Customer."Phone No." := EcomSalesHeader."Sell-to Phone No.";
         Customer.GLN := EcomSalesHeader."Sell-to EAN";
         if Customer.GLN <> '' then begin
@@ -450,6 +455,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
     local procedure GetCustomer(EcomSalesHeader: Record "NPR Ecom Sales Header"; var Customer: Record Customer) Found: Boolean
     var
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
     begin
         if not IncEcomSalesDocSetup.Get() then
             IncEcomSalesDocSetup.Init();
@@ -459,7 +465,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         case IncEcomSalesDocSetup."Customer Mapping" of
             IncEcomSalesDocSetup."Customer Mapping"::"E-mail":
                 begin
-                    Customer.SetRange("E-Mail", EcomSalesHeader."Sell-to Email");
+                    EcomSalesDocUtils.SetCustomerEmailFilter(Customer, EcomSalesHeader."Sell-to Email");
                     Found := Customer.FindFirst() and (Customer."E-Mail" <> '');
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"Phone No.":
@@ -469,13 +475,13 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"E-mail AND Phone No.":
                 begin
-                    Customer.SetRange("E-Mail", EcomSalesHeader."Sell-to Email");
+                    EcomSalesDocUtils.SetCustomerEmailFilter(Customer, EcomSalesHeader."Sell-to Email");
                     Customer.SetRange("Phone No.", EcomSalesHeader."Sell-to Phone No.");
                     Found := Customer.FindFirst() and (Customer."E-Mail" <> '') and (Customer."Phone No." <> '');
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"E-mail OR Phone No.":
                 begin
-                    Customer.SetRange("E-Mail", EcomSalesHeader."Sell-to Email");
+                    EcomSalesDocUtils.SetCustomerEmailFilter(Customer, EcomSalesHeader."Sell-to Email");
                     Found := Customer.FindFirst() and (Customer."E-Mail" <> '');
                     if Found then
                         exit;

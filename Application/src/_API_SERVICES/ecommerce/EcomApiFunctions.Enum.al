@@ -15,5 +15,9 @@ enum 6059868 "NPR EcomApiFunctions"
     {
         Caption = 'get sales document';
     }
+    value(61; FIND_SALES_DOCUMENTS)
+    {
+        Caption = 'find sales documents';
+    }
 }
 #endif

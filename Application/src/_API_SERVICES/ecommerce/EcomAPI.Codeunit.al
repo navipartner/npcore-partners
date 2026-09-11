@@ -13,6 +13,8 @@ codeunit 6248360 "NPR EcomAPI" implements "NPR API Request Handler"
                 exit(Handle(_ApiFunction::CREATE_SALES_DOCUMENT, Request));
             Request.Match('GET', '/ecommerce/documents/:documentId'):
                 exit(Handle(_ApiFunction::GET_SALES_DOCUMENT, Request));
+            Request.Match('GET', '/ecommerce/documents'):
+                exit(Handle(_ApiFunction::FIND_SALES_DOCUMENTS, Request));
         end;
     end;
 

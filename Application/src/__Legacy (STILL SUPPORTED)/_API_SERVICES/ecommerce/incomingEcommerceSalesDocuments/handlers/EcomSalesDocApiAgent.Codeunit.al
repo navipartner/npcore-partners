@@ -106,13 +106,13 @@ codeunit 6248617 "NPR EcomSalesDocApiAgent"
         EcomSalesHeader."Sell-to City" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.city', MaxStrLen(EcomSalesHeader."Sell-to City"), true);
         EcomSalesHeader."Sell-to Country Code" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.countryCode', MaxStrLen(EcomSalesHeader."Sell-to Country Code"), true);
         EcomSalesHeader."Sell-to Contact" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.contact', MaxStrLen(EcomSalesHeader."Sell-to Contact"), false);
-        EcomSalesHeader."Sell-to Email" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.email', MaxStrLen(EcomSalesHeader."Sell-to Email"), true);
+        EcomSalesHeader."Sell-to Email" := EcomSalesDocUtils.NormalizeEmail(EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.email', MaxStrLen(EcomSalesHeader."Sell-to Email"), true));
         EcomSalesHeader."Sell-to Phone No." := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.phone', MaxStrLen(EcomSalesHeader."Sell-to Phone No."), false);
         EcomSalesHeader."Sell-to EAN" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.ean', MaxStrLen(EcomSalesHeader."Sell-to EAN"), false);
         EcomSalesHeader."Sell-to VAT Registration No." := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.vatRegistrationNo', MaxStrLen(EcomSalesHeader."Sell-to VAT Registration No."), false);
 
         if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then
-            EcomSalesHeader."Sell-to Invoice Email" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.invoiceEmail', MaxStrLen(EcomSalesHeader."Sell-to Invoice Email"), false);
+            EcomSalesHeader."Sell-to Invoice Email" := EcomSalesDocUtils.NormalizeEmail(EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.invoiceEmail', MaxStrLen(EcomSalesHeader."Sell-to Invoice Email"), false));
 
         //Ship-to
         if JsonHelper.GetJsonToken(RequestBody, 'shipToCustomer', ShipToJsonToken) then begin
@@ -609,6 +609,8 @@ codeunit 6248617 "NPR EcomSalesDocApiAgent"
                 SalesDocumenttatusApiType := 'error';
             EcomSalesHeader."Creation Status"::Pending:
                 SalesDocumenttatusApiType := 'pending';
+            EcomSalesHeader."Creation Status"::Canceled:
+                SalesDocumenttatusApiType := 'canceled';
             else
                 Error(NotSupportedStatusErrorLbl, EcomSalesHeader."Creation Status");
         end;

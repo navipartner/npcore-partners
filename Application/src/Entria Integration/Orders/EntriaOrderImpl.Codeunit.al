@@ -105,7 +105,7 @@ codeunit 6151027 "NPR Entria Order Impl."
         EcomSalesHeader."Sell-to City" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.city', MaxStrLen(EcomSalesHeader."Sell-to City"), false);
         EcomSalesHeader."Sell-to Country Code" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.country_code', MaxStrLen(EcomSalesHeader."Sell-to Country Code"), false);
         EcomSalesHeader."Sell-to Contact" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.company', MaxStrLen(EcomSalesHeader."Sell-to Contact"), false);
-        EcomSalesHeader."Sell-to Email" := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'email', MaxStrLen(EcomSalesHeader."Sell-to Email"), false);
+        EcomSalesHeader."Sell-to Email" := _EcomSalesDocUtils.NormalizeEmail(_EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'email', MaxStrLen(EcomSalesHeader."Sell-to Email"), false));
         EcomSalesHeader."Sell-to Phone No." := _EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'billing_address.phone', MaxStrLen(EcomSalesHeader."Sell-to Phone No."), false);
         //Ship-to
         if _JsonHelper.GetJsonToken(RequestBody, 'shipping_address', ShipToJsonToken) then begin
@@ -279,7 +279,7 @@ codeunit 6151027 "NPR Entria Order Impl."
         EcomSalesLine."Member Birthday" := _JsonHelper.GetJDate(SalesLineJsonToken, 'metadata.birthdate', false);
         EcomSalesLine."Membership Activation Date" := _JsonHelper.GetJDate(SalesLineJsonToken, 'metadata.activation_date', false);
         EcomSalesLine."Member First Name" := _JsonHelper.GetJText(SalesLineJsonToken, 'metadata.member_first_name', MaxStrLen(EcomSalesLine."Member First Name"), false, false);
-        EcomSalesLine."Member Email" := _JsonHelper.GetJText(SalesLineJsonToken, 'metadata.member_email', MaxStrLen(EcomSalesLine."Member Email"), false, false);
+        EcomSalesLine."Member Email" := _EcomSalesDocUtils.NormalizeEmail(_JsonHelper.GetJText(SalesLineJsonToken, 'metadata.member_email', MaxStrLen(EcomSalesLine."Member Email"), false, false));
 #pragma warning restore AA0139
         DeserializeDonationMemberFields(SalesLineJsonToken, EcomSalesLine);
     end;
@@ -304,7 +304,7 @@ codeunit 6151027 "NPR Entria Order Impl."
 #pragma warning disable AA0139
         FillIfBlank(EcomSalesLine."Member First Name", _JsonHelper.GetJText(MemberToken, 'first_name', MaxStrLen(EcomSalesLine."Member First Name"), false));
         FillIfBlank(EcomSalesLine."Member Last Name", _JsonHelper.GetJText(MemberToken, 'last_name', MaxStrLen(EcomSalesLine."Member Last Name"), false));
-        FillIfBlank(EcomSalesLine."Member Email", _JsonHelper.GetJText(MemberToken, 'email', MaxStrLen(EcomSalesLine."Member Email"), false));
+        FillIfBlank(EcomSalesLine."Member Email", _EcomSalesDocUtils.NormalizeEmail(_JsonHelper.GetJText(MemberToken, 'email', MaxStrLen(EcomSalesLine."Member Email"), false)));
         FillIfBlank(EcomSalesLine."Member Phone No.", _JsonHelper.GetJText(MemberToken, 'phone_no', MaxStrLen(EcomSalesLine."Member Phone No."), false));
         FillIfBlank(EcomSalesLine."Member Address", _JsonHelper.GetJText(MemberToken, 'address', MaxStrLen(EcomSalesLine."Member Address"), false));
         FillIfBlank(EcomSalesLine."Member City", _JsonHelper.GetJText(MemberToken, 'city', MaxStrLen(EcomSalesLine."Member City"), false));

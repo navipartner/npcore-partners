@@ -448,7 +448,14 @@ codeunit 6185051 "NPR API Request"
     end;
 
     procedure GetNextPageUrl(NextPageKey: Text): Text
+    begin
+        exit(GetNextPageUrl(NextPageKey, false));
+    end;
+
+    // Query values arrive decoded from the proxy; EncodeQueryValues re-encodes them so a '+' or '&' in a value survives the round trip.
+    procedure GetNextPageUrl(NextPageKey: Text; EncodeQueryValues: Boolean): Text
     var
+        Uri: Codeunit Uri;
         Url: Text;
         QueryParam: Text;
         QueryString: Text;
@@ -465,7 +472,10 @@ codeunit 6185051 "NPR API Request"
                 else
                     QueryString += '&';
 
-                QueryString += StrSubstNo('%1=%2', QueryParam, _QueryParams.Get(QueryParam));
+                if EncodeQueryValues then
+                    QueryString += StrSubstNo('%1=%2', Uri.EscapeDataString(QueryParam), Uri.EscapeDataString(_QueryParams.Get(QueryParam)))
+                else
+                    QueryString += StrSubstNo('%1=%2', QueryParam, _QueryParams.Get(QueryParam));
             end
         end;
         if QueryString = '' then

@@ -19,6 +19,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         FixMonitoredJQEcomSalesDoc();
         FixMonitoredJQEcomSalesRetDoc();
         SetEntriaOrderImpFailureStatus();
+        LowercaseEcomEmails();
     end;
 
     local procedure UpgradeEcomJQs()
@@ -307,6 +308,87 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         EntriaOrderImpFailure.SetRange(Suppressed, true);
 #pragma warning restore AL0432
         EntriaOrderImpFailure.ModifyAll(Status, EntriaOrderImpFailure.Status::Skipped);
+    end;
+
+    internal procedure LowercaseEcomEmails()
+    begin
+        UpgradeStep := 'LowercaseEcomEmails';
+        if HasUpgradeTag() then
+            exit;
+
+        NormalizeEcomEmails(1000);
+
+        SetUpgradeTag();
+    end;
+
+    // Batched so the commit checkpoint releases each batch's locks rather than holding the remaining tail.
+    internal procedure NormalizeEcomEmails(BatchSize: Integer) ModifiedCount: Integer
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Completed: Boolean;
+        FromEntryNo: BigInteger;
+        LastEntryNo: BigInteger;
+        LastLineEntryNo: BigInteger;
+        ToEntryNo: BigInteger;
+    begin
+        // A non-positive size would leave the cursor unmoved, so the walk would never terminate.
+        if BatchSize <= 0 then
+            BatchSize := 1000;
+
+        repeat
+            EcomSalesHeader.Reset();
+            EcomSalesHeader.SetCurrentKey("Entry No.");
+            EcomSalesHeader.SetFilter("Entry No.", '>%1', LastEntryNo);
+            Completed := not EcomSalesHeader.FindFirst();
+            if not Completed then begin
+                FromEntryNo := EcomSalesHeader."Entry No.";
+                ToEntryNo := FromEntryNo + BatchSize - 1;
+                EcomSalesHeader.SetRange("Entry No.", FromEntryNo, ToEntryNo);
+                if EcomSalesHeader.FindSet(true) then
+                    repeat
+                        ModifiedCount += NormalizeHeaderEmails(EcomSalesHeader);
+                        LastEntryNo := EcomSalesHeader."Entry No.";
+                    until EcomSalesHeader.Next() = 0;
+                ModifiedCount += NormalizeLineEmails(LastLineEntryNo + 1, ToEntryNo);
+                LastLineEntryNo := ToEntryNo;
+                Commit();
+            end;
+        until Completed;
+    end;
+
+    local procedure NormalizeHeaderEmails(var EcomSalesHeader: Record "NPR Ecom Sales Header") ModifiedCount: Integer
+    var
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        NormalizedInvoiceEmail: Text[80];
+        NormalizedSellToEmail: Text[80];
+    begin
+        NormalizedSellToEmail := EcomSalesDocUtils.NormalizeEmail(EcomSalesHeader."Sell-to Email");
+        NormalizedInvoiceEmail := EcomSalesDocUtils.NormalizeEmail(EcomSalesHeader."Sell-to Invoice Email");
+        if (EcomSalesHeader."Sell-to Email" <> NormalizedSellToEmail) or (EcomSalesHeader."Sell-to Invoice Email" <> NormalizedInvoiceEmail) then begin
+            EcomSalesHeader."Sell-to Email" := NormalizedSellToEmail;
+            EcomSalesHeader."Sell-to Invoice Email" := NormalizedInvoiceEmail;
+            EcomSalesHeader.Modify(false);
+            ModifiedCount += 1;
+        end;
+    end;
+
+    local procedure NormalizeLineEmails(FromEntryNo: BigInteger; ToEntryNo: BigInteger) ModifiedCount: Integer
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        NormalizedMemberEmail: Text[80];
+    begin
+        EcomSalesLine.SetRange("Document Entry No.", FromEntryNo, ToEntryNo);
+        EcomSalesLine.SetFilter("Member Email", '<>%1', '');
+        if EcomSalesLine.FindSet(true) then
+            repeat
+                NormalizedMemberEmail := EcomSalesDocUtils.NormalizeEmail(EcomSalesLine."Member Email");
+                if EcomSalesLine."Member Email" <> NormalizedMemberEmail then begin
+                    EcomSalesLine."Member Email" := NormalizedMemberEmail;
+                    EcomSalesLine.Modify(false);
+                    ModifiedCount += 1;
+                end;
+            until EcomSalesLine.Next() = 0;
     end;
 }
 #endif

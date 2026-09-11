@@ -1411,7 +1411,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         NpEcStore.TestField("Salesperson/Purchaser Code")
     end;
 
-    local procedure SetSellToCustomer(NpEcStore: Record "NPR NpEc Store"; Order: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
+    internal procedure SetSellToCustomer(NpEcStore: Record "NPR NpEc Store"; Order: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
     var
         Customer: Record Customer;
         IsHandled: Boolean;
@@ -1427,7 +1427,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if EcomSalesHeader."Sell-to Customer No." <> Customer."No." then
             EcomSalesHeader."Sell-to Customer No." := Customer."No.";
 #pragma warning disable AA0139
-        EcomSalesHeader."Sell-to Email" := Customer."E-Mail";
+        EcomSalesHeader."Sell-to Email" := _IncEcomSalesDocUtils.NormalizeEmail(Customer."E-Mail");
         EcomSalesHeader."Sell-to Phone No." := Customer."Phone No.";
 #pragma warning restore AA0139
         if Order.SelectToken('billingAddress', BillingAddress) then begin
@@ -1455,7 +1455,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if EcomSalesHeader."Sell-to Contact" = '' then
             EcomSalesHeader."Sell-to Contact" := CopyStr(EcomSalesHeader."Sell-to Name", 1, MaxStrLen(EcomSalesHeader."Sell-to Contact"));
 #pragma warning disable AA0139
-        EcomSalesHeader."Sell-to Invoice Email" := OrderMgt.GetJTextWithFallback(Order, 'email', 'customer.defaultEmailAddress.emailAddress', MaxStrLen(EcomSalesHeader."Sell-to Invoice Email"));
+        EcomSalesHeader."Sell-to Invoice Email" := _IncEcomSalesDocUtils.NormalizeEmail(OrderMgt.GetJTextWithFallback(Order, 'email', 'customer.defaultEmailAddress.emailAddress', MaxStrLen(EcomSalesHeader."Sell-to Invoice Email")));
         EcomSalesHeader."Sell-to Invoice Phone No." := OrderMgt.GetJTextWithFallback(Order, 'phone', 'customer.defaultPhoneNumber.phoneNumber', MaxStrLen(EcomSalesHeader."Sell-to Invoice Phone No."));
 #pragma warning restore AA0139
     end;

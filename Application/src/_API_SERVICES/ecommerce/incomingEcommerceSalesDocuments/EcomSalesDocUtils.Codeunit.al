@@ -1100,6 +1100,50 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
                 Currency."Amount Rounding Precision"));
     end;
 
+    internal procedure NormalizeEmail(Value: Text): Text[80]
+    begin
+        exit(CopyStr(LowerCase(Value.Trim()), 1, 80));
+    end;
+
+    // Checked on the trimmed value, so a padded address passes and a whitespace-only one counts as blank.
+    internal procedure ValidateEmailFormat(Email: Text; PropertyPath: Text; Required: Boolean)
+    var
+        MailManagement: Codeunit "Mail Management";
+        InvalidEmailErr: Label 'Invalid value at %1. Expected an e-mail address.', Comment = '%1 = JSON path', Locked = true;
+    begin
+        if Email.Trim() = '' then begin
+            if Required then
+                Error(InvalidEmailErr, PropertyPath);
+            exit;
+        end;
+        if not MailManagement.CheckValidEmailAddress(Email.Trim()) then
+            Error(InvalidEmailErr, PropertyPath);
+    end;
+
+    internal procedure SetCustomerEmailFilter(var Customer: Record Customer; Email: Text)
+    begin
+        if Email = '' then begin
+            Customer.SetRange("E-Mail", '');
+            exit;
+        end;
+
+        // The placeholder protects the filter separators but not the two wildcards, so those match exactly instead.
+        if HoldsWildcard(Email) then begin
+            Customer.SetRange("E-Mail", CopyStr(Email, 1, MaxStrLen(Customer."E-Mail")));
+            exit;
+        end;
+
+        // Customer cards are never normalised, so the leading '@' is what makes the match ignore casing.
+        Customer.SetFilter("E-Mail", '%1', '@' + Email);
+    end;
+
+    local procedure HoldsWildcard(Email: Text): Boolean
+    var
+        WildcardsLbl: Label '*?', Locked = true;
+    begin
+        exit(DelChr(Email, '=', WildcardsLbl) <> Email);
+    end;
+
     local procedure GetGLSetup()
     begin
         if _GLSetupRetrieved then

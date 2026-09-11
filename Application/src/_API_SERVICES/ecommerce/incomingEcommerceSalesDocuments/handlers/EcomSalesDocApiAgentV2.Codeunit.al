@@ -8,7 +8,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         CreateEcomOCNotif: Codeunit "NPR Create Ecom OC Notif";
         Sentry: Codeunit "NPR Sentry";
     begin
-        Request.SkipCacheIfNonStickyRequest(GetTableIds());
+        Request.SkipCacheIfNonStickyRequest(GetWriteTableIds());
         InsertSalesDocument(Request, EcomSalesHeader);
 
         Commit();
@@ -29,7 +29,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         DocumentIdText: Text;
         DocumentId: Guid;
     begin
-        Request.SkipCacheIfNonStickyRequest(GetTableIds());
+        Request.SkipCacheIfNonStickyRequest(GetReadTableIds());
         if (not Request.Paths().Get(3, DocumentIdText)) then
             exit(Response.RespondBadRequest('Missing required parameter: documentId'));
 
@@ -41,6 +41,116 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             exit(Response.RespondResourceNotFound());
 
         exit(Response.RespondOK(GetSalesDocumentJsonObject(EcomSalesHeader)));
+    end;
+
+    internal procedure FindIncomingEcomDocumentsByEmail(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        ResponseJson: Codeunit "NPR Json Builder";
+        RecRef: RecordRef;
+        EmailFieldRef: FieldRef;
+        DataFound: Boolean;
+        MoreRecords: Boolean;
+        PageContinuation: Boolean;
+        WithDetails: Boolean;
+        EmailFieldNo: Integer;
+        EmittedCount: Integer;
+        Limit: Integer;
+        Email: Text;
+        EmailParamName: Text;
+        InvoiceEmail: Text;
+        PageKey: Text;
+    begin
+        Request.SkipCacheIfNonStickyRequest(GetReadTableIds());
+
+        if (Request.QueryParams().ContainsKey('email')) then
+            Email := Request.QueryParams().Get('email').Trim();
+        if (Request.QueryParams().ContainsKey('invoiceEmail')) then
+            InvoiceEmail := Request.QueryParams().Get('invoiceEmail').Trim();
+
+        if (Email = '') and (InvoiceEmail = '') then
+            exit(Response.RespondBadRequest('Missing required parameter: email or invoiceEmail'));
+        if (Email <> '') and (InvoiceEmail <> '') then
+            exit(Response.RespondBadRequest('Only one of email and invoiceEmail may be given'));
+
+        if (InvoiceEmail <> '') then begin
+            Email := InvoiceEmail;
+            EmailParamName := 'invoiceEmail';
+            EmailFieldNo := EcomSalesHeader.FieldNo("Sell-to Invoice Email");
+        end else begin
+            EmailParamName := 'email';
+            EmailFieldNo := EcomSalesHeader.FieldNo("Sell-to Email");
+        end;
+
+        if (StrLen(Email) > MaxStrLen(EcomSalesHeader."Sell-to Email")) then
+            exit(Response.RespondBadRequest('Malformed parameter: ' + EmailParamName));
+
+        if (Request.QueryParams().ContainsKey('withDetails')) then
+            WithDetails := (Request.QueryParams().Get('withDetails').ToLower() = 'true');
+
+        Limit := 100;
+        if (Request.QueryParams().ContainsKey('pageSize')) then
+            if not Evaluate(Limit, Request.QueryParams().Get('pageSize')) then
+                exit(Response.RespondBadRequest('Malformed parameter: pageSize'));
+        if (Limit < 1) then
+            Limit := 100;
+        if (Limit > 100) then
+            Limit := 100;
+
+        EcomSalesHeader.ReadIsolation := EcomSalesHeader.ReadIsolation::ReadCommitted;
+        if (EmailFieldNo = EcomSalesHeader.FieldNo("Sell-to Invoice Email")) then
+            EcomSalesHeader.SetCurrentKey("Sell-to Invoice Email", SystemCreatedAt)
+        else
+            EcomSalesHeader.SetCurrentKey("Sell-to Email", SystemCreatedAt);
+        EcomSalesHeader.Ascending(false);
+
+        RecRef.GetTable(EcomSalesHeader);
+        if (Request.QueryParams().ContainsKey('pageKey')) then begin
+            Request.ApplyPageKey(Request.QueryParams().Get('pageKey'), RecRef);
+            PageContinuation := true;
+        end;
+        // The page key carries a caller-supplied view, so the requested e-mail is imposed after it.
+        EmailFieldRef := RecRef.Field(EmailFieldNo);
+        EmailFieldRef.SetRange(EcomSalesDocUtils.NormalizeEmail(Email));
+        if (not WithDetails) then
+            RecRef.SetLoadFields(
+                EcomSalesHeader.FieldNo("External No."), EcomSalesHeader.FieldNo("External Document No."), EcomSalesHeader.FieldNo("Document Type"),
+                EcomSalesHeader.FieldNo("Creation Status"), EcomSalesHeader.FieldNo("Posting Status"), EcomSalesHeader.FieldNo("Capture Processing Status"),
+                EcomSalesHeader.FieldNo("Currency Code"), EcomSalesHeader.FieldNo("Created Doc No."), EcomSalesHeader.FieldNo("Sell-to Customer No."),
+                EcomSalesHeader.FieldNo("Sell-to Name"), EcomSalesHeader.FieldNo("Sell-to Email"), EcomSalesHeader.FieldNo("Sell-to Invoice Email"),
+                EcomSalesHeader.FieldNo("Sell-to Phone No."));
+        RecRef.ReadIsolation := IsolationLevel::ReadCommitted;
+
+        ResponseJson.StartObject('').StartArray('salesDocuments');
+        if (PageContinuation) then
+            DataFound := RecRef.Find('>')
+        else
+            DataFound := RecRef.Find('-');
+        if (DataFound) then
+            repeat
+                RecRef.SetTable(EcomSalesHeader);
+                ResponseJson.StartObject();
+                if (WithDetails) then
+                    AddSalesDocumentProperties(EcomSalesHeader, ResponseJson, false)
+                else
+                    AddSalesDocumentSummaryProperties(EcomSalesHeader, ResponseJson);
+                ResponseJson.EndObject();
+                EmittedCount += 1;
+                if (EmittedCount = Limit) then
+                    PageKey := Request.GetPageKey(RecRef);
+                MoreRecords := RecRef.Next() <> 0;
+            until (not MoreRecords) or (EmittedCount = Limit);
+        ResponseJson.EndArray();
+
+        if (not MoreRecords) then
+            PageKey := '';
+        ResponseJson.AddProperty('morePages', MoreRecords)
+                    .AddProperty('nextPageKey', PageKey)
+                    .AddProperty('nextPageURL', Request.GetNextPageUrl(PageKey, true))
+                    .EndObject();
+
+        exit(Response.RespondOK(ResponseJson));
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
@@ -72,6 +182,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         SellToCustomerJsonToken: JsonToken;
         ShipmentJsonToken: JsonToken;
         ShipToJsonToken: JsonToken;
+        SellToEmail: Text;
+        SellToInvoiceEmail: Text;
         NegativeExchangeRateErr: Label 'The %1 cannot be negative.', Comment = '%1 = Currency Exchange Rate field caption';
     begin
 #pragma warning disable AA0139
@@ -122,14 +234,19 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesHeader."Sell-to City" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.city', MaxStrLen(EcomSalesHeader."Sell-to City"), true);
         EcomSalesHeader."Sell-to Country Code" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.countryCode', MaxStrLen(EcomSalesHeader."Sell-to Country Code"), true);
         EcomSalesHeader."Sell-to Contact" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.contact', MaxStrLen(EcomSalesHeader."Sell-to Contact"), false);
-        EcomSalesHeader."Sell-to Email" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.email', MaxStrLen(EcomSalesHeader."Sell-to Email"), true);
+        SellToEmail := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.email', MaxStrLen(EcomSalesHeader."Sell-to Email"), true);
+        EcomSalesDocUtils.ValidateEmailFormat(SellToEmail, 'sellToCustomer.email', true);
+        EcomSalesHeader."Sell-to Email" := EcomSalesDocUtils.NormalizeEmail(SellToEmail);
         EcomSalesHeader."Sell-to Phone No." := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.phone', MaxStrLen(EcomSalesHeader."Sell-to Phone No."), false);
         ValidatePhoneNumber(EcomSalesHeader."Sell-to Phone No.");
         EcomSalesHeader."Sell-to EAN" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.ean', MaxStrLen(EcomSalesHeader."Sell-to EAN"), false);
         EcomSalesHeader."Sell-to VAT Registration No." := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.vatRegistrationNo', MaxStrLen(EcomSalesHeader."Sell-to VAT Registration No."), false);
 
-        if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then
-            EcomSalesHeader."Sell-to Invoice Email" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.invoiceEmail', MaxStrLen(EcomSalesHeader."Sell-to Invoice Email"), false);
+        if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then begin
+            SellToInvoiceEmail := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'sellToCustomer.invoiceEmail', MaxStrLen(EcomSalesHeader."Sell-to Invoice Email"), false);
+            EcomSalesDocUtils.ValidateEmailFormat(SellToInvoiceEmail, 'sellToCustomer.invoiceEmail', false);
+            EcomSalesHeader."Sell-to Invoice Email" := EcomSalesDocUtils.NormalizeEmail(SellToInvoiceEmail);
+        end;
 
         //Ship-to
         if JsonHelper.GetJsonToken(RequestBody, 'shipToCustomer', ShipToJsonToken) then begin
@@ -828,6 +945,13 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     end;
 
     internal procedure GetSalesDocumentJsonObject(EcomSalesHeader: Record "NPR Ecom Sales Header") IncSalesDocumentJsonObject: Codeunit "NPR Json Builder";
+    begin
+        IncSalesDocumentJsonObject.StartObject('salesDocument');
+        AddSalesDocumentProperties(EcomSalesHeader, IncSalesDocumentJsonObject, true);
+        IncSalesDocumentJsonObject.EndObject();
+    end;
+
+    local procedure AddSalesDocumentProperties(EcomSalesHeader: Record "NPR Ecom Sales Header"; var IncSalesDocumentJsonObject: Codeunit "NPR Json Builder"; IncludePayments: Boolean)
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
@@ -844,8 +968,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         CommentJsonObject: Codeunit "NPR Json Builder";
         EcomSalesHeaderCustomFieldsObject: Codeunit "NPR Json Builder";
     begin
-        IncSalesDocumentJsonObject.StartObject('salesDocument')
-                                 .AddProperty('externalNo', EcomSalesHeader."External No.")
+        IncSalesDocumentJsonObject.AddProperty('externalNo', EcomSalesHeader."External No.")
                                  .AddProperty('id', Format(EcomSalesHeader.SystemId, 0, 4).ToLower())
                                  .AddProperty('documentType', GetSalesDocumentApiType(EcomSalesHeader))
                                  .AddProperty('creationStatus', GetSalesDocumentCreationStatusApiType(EcomSalesHeader))
@@ -860,7 +983,12 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                  .AddProperty('ticketReservationToken', EcomSalesHeader."Ticket Reservation Token")
                                  .AddProperty('captureProcessingStatus', GetSalesDocumentCaptureProcessingStatusApiType(EcomSalesHeader))
                                  .AddProperty('lastCaptureErrorMessage', EcomSalesHeader."Last Capture Error Message")
-                                 .StartObject('sellToCustomer')
+                                 .AddProperty('createdAt', EcomSalesHeader.SystemCreatedAt)
+                                 .AddProperty('createdDocumentNo', EcomSalesHeader."Created Doc No.");
+
+        AddPostedDocumentNos(EcomSalesHeader, IncSalesDocumentJsonObject);
+
+        IncSalesDocumentJsonObject.StartObject('sellToCustomer')
                                     .AddProperty('no', EcomSalesHeader."Sell-to Customer No.")
                                     .AddProperty('name', EcomSalesHeader."Sell-to Name")
                                     .AddProperty('address', EcomSalesHeader."Sell-to Address")
@@ -911,15 +1039,17 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             IncSalesDocumentJsonObject.EndArray();
         end;
 
-        EcomSalesPmtLine.Reset();
-        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
-        if EcomSalesPmtLine.FindSet() then begin
-            IncSalesDocumentJsonObject.StartArray('payments');
-            repeat
-                PaymentLineJsonObject := CreateAddPaymentDocumentDetailsJsonObject(EcomSalesPmtLine, IncSalesDocumentJsonObject);
-                IncSalesDocumentJsonObject.AddObject(PaymentLineJsonObject);
-            until EcomSalesPmtLine.Next() = 0;
-            IncSalesDocumentJsonObject.EndArray();
+        if IncludePayments then begin
+            EcomSalesPmtLine.Reset();
+            EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+            if EcomSalesPmtLine.FindSet() then begin
+                IncSalesDocumentJsonObject.StartArray('payments');
+                repeat
+                    PaymentLineJsonObject := CreateAddPaymentDocumentDetailsJsonObject(EcomSalesPmtLine, IncSalesDocumentJsonObject);
+                    IncSalesDocumentJsonObject.AddObject(PaymentLineJsonObject);
+                until EcomSalesPmtLine.Next() = 0;
+                IncSalesDocumentJsonObject.EndArray();
+            end;
         end;
 
         EcomSalesLine.Reset();
@@ -936,8 +1066,61 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             until EcomSalesLine.Next() = 0;
             IncSalesDocumentJsonObject.EndArray();
         end;
+    end;
 
-        IncSalesDocumentJsonObject.EndObject();
+    local procedure AddSalesDocumentSummaryProperties(EcomSalesHeader: Record "NPR Ecom Sales Header"; var IncSalesDocumentJsonObject: Codeunit "NPR Json Builder")
+    begin
+        IncSalesDocumentJsonObject.AddProperty('externalNo', EcomSalesHeader."External No.")
+                                 .AddProperty('id', Format(EcomSalesHeader.SystemId, 0, 4).ToLower())
+                                 .AddProperty('documentType', GetSalesDocumentApiType(EcomSalesHeader))
+                                 .AddProperty('creationStatus', GetSalesDocumentCreationStatusApiType(EcomSalesHeader))
+                                 .AddProperty('postingStatus', GetSalesDocumentPostingStatusApiType(EcomSalesHeader))
+                                 .AddProperty('currencyCode', EcomSalesHeader."Currency Code")
+                                 .AddProperty('externalDocumentNo', EcomSalesHeader."External Document No.")
+                                 .AddProperty('captureProcessingStatus', GetSalesDocumentCaptureProcessingStatusApiType(EcomSalesHeader))
+                                 .AddProperty('createdAt', EcomSalesHeader.SystemCreatedAt)
+                                 .AddProperty('createdDocumentNo', EcomSalesHeader."Created Doc No.");
+
+        AddPostedDocumentNos(EcomSalesHeader, IncSalesDocumentJsonObject);
+
+        IncSalesDocumentJsonObject.StartObject('sellToCustomer')
+                                    .AddProperty('no', EcomSalesHeader."Sell-to Customer No.")
+                                    .AddProperty('name', EcomSalesHeader."Sell-to Name")
+                                    .AddProperty('email', EcomSalesHeader."Sell-to Email")
+                                    .AddProperty('phone', EcomSalesHeader."Sell-to Phone No.")
+                                .EndObject();
+    end;
+
+    // Always emitted, empty when nothing is posted yet: the contract types postedDocumentNos as an array.
+    local procedure AddPostedDocumentNos(EcomSalesHeader: Record "NPR Ecom Sales Header"; var IncSalesDocumentJsonObject: Codeunit "NPR Json Builder")
+    var
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        IncSalesDocumentJsonObject.StartArray('postedDocumentNos');
+        case EcomSalesHeader."Document Type" of
+            EcomSalesHeader."Document Type"::Order:
+                begin
+                    SalesInvoiceHeader.ReadIsolation := SalesInvoiceHeader.ReadIsolation::ReadCommitted;
+                    SalesInvoiceHeader.SetLoadFields("No.");
+                    SalesInvoiceHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+                    if SalesInvoiceHeader.FindSet() then
+                        repeat
+                            IncSalesDocumentJsonObject.AddValue(SalesInvoiceHeader."No.");
+                        until SalesInvoiceHeader.Next() = 0;
+                end;
+            EcomSalesHeader."Document Type"::"Return Order":
+                begin
+                    SalesCrMemoHeader.ReadIsolation := SalesCrMemoHeader.ReadIsolation::ReadCommitted;
+                    SalesCrMemoHeader.SetLoadFields("No.");
+                    SalesCrMemoHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+                    if SalesCrMemoHeader.FindSet() then
+                        repeat
+                            IncSalesDocumentJsonObject.AddValue(SalesCrMemoHeader."No.");
+                        until SalesCrMemoHeader.Next() = 0;
+                end;
+        end;
+        IncSalesDocumentJsonObject.EndArray();
     end;
 
     internal procedure CreateAddPaymentDocumentDetailsJsonObject(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var PaymentDocumentDetailsJsonObject: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
@@ -1155,6 +1338,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 SalesDocumenttatusApiType := 'error';
             EcomSalesHeader."Creation Status"::Pending:
                 SalesDocumenttatusApiType := 'pending';
+            EcomSalesHeader."Creation Status"::Canceled:
+                SalesDocumenttatusApiType := 'canceled';
             else
                 Error(NotSupportedStatusErrorLbl, EcomSalesHeader."Creation Status");
         end;
@@ -1186,11 +1371,20 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         end;
     end;
 
-    local procedure GetTableIds() TableIds: List of [Integer]
+    local procedure GetWriteTableIds() TableIds: List of [Integer]
     begin
         TableIds.Add(Database::"NPR Ecom Sales Pmt. Line");
         TableIds.Add(Database::"NPR Ecom Sales Line");
         TableIds.Add(Database::"NPR Ecom Sales Header");
+    end;
+
+    local procedure GetReadTableIds() TableIds: List of [Integer]
+    begin
+        TableIds.Add(Database::"NPR Ecom Sales Pmt. Line");
+        TableIds.Add(Database::"NPR Ecom Sales Line");
+        TableIds.Add(Database::"NPR Ecom Sales Header");
+        TableIds.Add(Database::"Sales Invoice Header");
+        TableIds.Add(Database::"Sales Cr.Memo Header");
     end;
 
     internal procedure GetEcomDocumentTypeFromRequest(RequestBody: JsonToken) EcomSalesDocType: Enum "NPR Ecom Sales Doc Type"
@@ -1331,12 +1525,16 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     local procedure ParseMemberFields(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         JsonHelper: Codeunit "NPR Json Helper";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        MemberEmail: Text;
     begin
 #pragma warning disable AA0139
         EcomSalesLine."Member First Name" := JsonHelper.GetJText(SalesLineJsonToken, 'memberFirstName', MaxStrLen(EcomSalesLine."Member First Name"), false, false);
         EcomSalesLine."Member Last Name" := JsonHelper.GetJText(SalesLineJsonToken, 'memberLastName', MaxStrLen(EcomSalesLine."Member Last Name"), false, false);
         EcomSalesLine."Member Middle Name" := JsonHelper.GetJText(SalesLineJsonToken, 'memberMiddleName', MaxStrLen(EcomSalesLine."Member Middle Name"), false, false);
-        EcomSalesLine."Member Email" := JsonHelper.GetJText(SalesLineJsonToken, 'memberEmail', MaxStrLen(EcomSalesLine."Member Email"), false, false);
+        MemberEmail := EcomSalesDocUtils.GetJTextMaxLength(SalesLineJsonToken, 'memberEmail', MaxStrLen(EcomSalesLine."Member Email"), false);
+        EcomSalesDocUtils.ValidateEmailFormat(MemberEmail, 'memberEmail', false);
+        EcomSalesLine."Member Email" := EcomSalesDocUtils.NormalizeEmail(MemberEmail);
         EcomSalesLine."Member Phone No." := JsonHelper.GetJText(SalesLineJsonToken, 'memberPhoneNo', MaxStrLen(EcomSalesLine."Member Phone No."), false, false);
         EcomSalesLine."Member Address" := JsonHelper.GetJText(SalesLineJsonToken, 'memberAddress', MaxStrLen(EcomSalesLine."Member Address"), false, false);
         EcomSalesLine."Member City" := JsonHelper.GetJText(SalesLineJsonToken, 'memberCity', MaxStrLen(EcomSalesLine."Member City"), false, false);
