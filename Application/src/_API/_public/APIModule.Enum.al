@@ -115,5 +115,10 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
         Implementation = "NPR API Module Resolver" = "NPR API Restaurant Resolver";
     }
 
+    value(6248744; company)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR ApiCompanyResolver";
+    }
+
 }
 #endif
