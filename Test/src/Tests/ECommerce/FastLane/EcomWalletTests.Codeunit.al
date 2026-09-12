@@ -346,6 +346,134 @@ codeunit 85238 "NPR Ecom Wallet Tests"
     end;
     #endregion
 
+    #region CreateWallets - sell-to email reference
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateWallets_SellToEmail_StoredAsLooseReference()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ParentLine: Record "NPR Ecom Sales Line";
+        WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+        WalletHeaderEntryNos: List of [Integer];
+        Email: Text[80];
+    begin
+        // [Scenario] The buyer email is written to the wallet as a loose, searchable reference - table id 0 with a null
+        // system id - and not as a record link. That is the only shape UpdateEmailAddressOnAllWallets() looks for, and it
+        // keeps the email row from colliding with the header record link written for the same wallet.
+        _LibEcom.EnableAttractionWallets(true);
+        Email := UniqueEmail();
+        SetupHeaderForWalletProcessing(EcomSalesHeader);
+        EcomSalesHeader."Sell-to Email" := Email;
+        EcomSalesHeader.Modify();
+        CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
+
+        WalletMgt.CreateWallets(EcomSalesHeader, false, false);
+
+        FindWalletHeaderEntryNos(EcomSalesHeader, WalletHeaderEntryNos);
+        _Assert.AreEqual(1, WalletHeaderEntryNos.Count(), 'One wallet should have been created for the single wallet line');
+        _Assert.AreEqual(
+            1,
+            CountEmailReferences(WalletHeaderEntryNos.Get(1), Email),
+            'The wallet should carry exactly one email reference, stored with table id 0 and a null system id');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateWallets_NoSellToEmail_NoLooseReference()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ParentLine: Record "NPR Ecom Sales Line";
+        WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+        WalletHeaderEntryNos: List of [Integer];
+    begin
+        // [Scenario] A blank sell-to email writes no reference at all. An empty reference row would be matched wholesale by
+        // UpdateEmailAddressOnAllWallets('', ...) across unrelated wallets, so the blank must not reach the wallet.
+        _LibEcom.EnableAttractionWallets(true);
+        SetupHeaderForWalletProcessing(EcomSalesHeader);  // the library helper leaves "Sell-to Email" blank
+        CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
+
+        WalletMgt.CreateWallets(EcomSalesHeader, false, false);
+
+        FindWalletHeaderEntryNos(EcomSalesHeader, WalletHeaderEntryNos);
+        _Assert.AreEqual(1, WalletHeaderEntryNos.Count(), 'One wallet should have been created for the single wallet line');
+        _Assert.AreEqual(
+            0,
+            CountLooseReferences(WalletHeaderEntryNos.Get(1)),
+            'No loose reference row should be written for a wallet whose document has no sell-to email');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateWallets_QuantityTwo_EmailReferenceOnEveryWallet()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ParentLine: Record "NPR Ecom Sales Line";
+        WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+        WalletHeaderEntryNos: List of [Integer];
+        Email: Text[80];
+        WalletHeaderEntryNo: Integer;
+    begin
+        // [Scenario] A wallet line of quantity 2 creates one wallet per unit, and each of them gets its own email reference -
+        // the reference is written inside the per-wallet loop, not once per line.
+        _LibEcom.EnableAttractionWallets(true);
+        Email := UniqueEmail();
+        SetupHeaderForWalletProcessing(EcomSalesHeader);
+        EcomSalesHeader."Sell-to Email" := Email;
+        EcomSalesHeader.Modify();
+        CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
+        ParentLine.Quantity := 2;
+        ParentLine.Modify();
+
+        WalletMgt.CreateWallets(EcomSalesHeader, false, false);
+
+        FindWalletHeaderEntryNos(EcomSalesHeader, WalletHeaderEntryNos);
+        _Assert.AreEqual(2, WalletHeaderEntryNos.Count(), 'Two wallets should have been created for a wallet line of quantity 2');
+        foreach WalletHeaderEntryNo in WalletHeaderEntryNos do
+            _Assert.AreEqual(
+                1,
+                CountEmailReferences(WalletHeaderEntryNo, Email),
+                'Every wallet created for the line should carry exactly one email reference');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateWallets_SellToEmail_EmailChangeRewritesReference()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ParentLine: Record "NPR Ecom Sales Line";
+        AttractionWalletFacade: Codeunit "NPR AttractionWalletFacade";
+        WalletMgt: Codeunit "NPR EcomCreateWalletMgt";
+        WalletHeaderEntryNos: List of [Integer];
+        Email: Text[80];
+        NewEmail: Text[80];
+    begin
+        // [Scenario] End to end through the production consumer: the reference the ecom track writes must be reachable by
+        // UpdateEmailAddressOnAllWallets(). That procedure matches on an exact reference filter within table id 0 and a null
+        // system id, so a row written in any other shape leaves the wallet holding the old address forever.
+        _LibEcom.EnableAttractionWallets(true);
+        Email := UniqueEmail();
+        NewEmail := UniqueEmail();
+        SetupHeaderForWalletProcessing(EcomSalesHeader);
+        EcomSalesHeader."Sell-to Email" := Email;
+        EcomSalesHeader.Modify();
+        CreateWalletParentLine(ParentLine, EcomSalesHeader, 'LINE-001');
+        WalletMgt.CreateWallets(EcomSalesHeader, false, false);
+        FindWalletHeaderEntryNos(EcomSalesHeader, WalletHeaderEntryNos);
+        _Assert.AreEqual(1, WalletHeaderEntryNos.Count(), 'One wallet should have been created for the single wallet line');
+
+        AttractionWalletFacade.UpdateEmailAddressOnAllWallets(Email, NewEmail);
+
+        _Assert.AreEqual(
+            0,
+            CountEmailReferences(WalletHeaderEntryNos.Get(1), Email),
+            'The old address should be gone from the wallet after the email change');
+        _Assert.AreEqual(
+            1,
+            CountEmailReferences(WalletHeaderEntryNos.Get(1), NewEmail),
+            'The wallet email reference should have been rewritten to the new address');
+    end;
+    #endregion
+
     #region Helpers
     local procedure SetupHeaderForWalletProcessing(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
@@ -397,6 +525,55 @@ codeunit 85238 "NPR Ecom Wallet Tests"
         EcomSalesLine."External Line ID" := ExternalLineId;
         EcomSalesLine."Parent Ext. Line ID" := ParentExternalLineId;
         EcomSalesLine.Insert(true);
+    end;
+
+    local procedure UniqueEmail(): Text[80]
+    begin
+        // The wallet track commits, so rows survive between tests in a run - a per-test address keeps
+        // UpdateEmailAddressOnAllWallets() in one test off the wallets created by another.
+        exit(CopyStr('wallet.buyer.' + DelChr(Format(CreateGuid()), '=', '{}-') + '@test.navipartner.com', 1, 80));
+    end;
+
+    local procedure FindWalletHeaderEntryNos(EcomSalesHeader: Record "NPR Ecom Sales Header"; var WalletHeaderEntryNos: List of [Integer])
+    var
+        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
+    begin
+        Clear(WalletHeaderEntryNos);
+        WalletAssetHeaderRef.SetCurrentKey(LinkToTableId, LinkToSystemId);
+        WalletAssetHeaderRef.SetRange(LinkToTableId, Database::"NPR Ecom Sales Header");
+        WalletAssetHeaderRef.SetRange(LinkToSystemId, EcomSalesHeader.SystemId);
+        if WalletAssetHeaderRef.FindSet() then
+            repeat
+                if not WalletHeaderEntryNos.Contains(WalletAssetHeaderRef.WalletHeaderEntryNo) then
+                    WalletHeaderEntryNos.Add(WalletAssetHeaderRef.WalletHeaderEntryNo);
+            until WalletAssetHeaderRef.Next() = 0;
+    end;
+
+    local procedure CountEmailReferences(WalletHeaderEntryNoParam: Integer; Email: Text[100]): Integer
+    var
+        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
+    begin
+        FilterLooseReferences(WalletAssetHeaderRef, WalletHeaderEntryNoParam);
+        WalletAssetHeaderRef.SetRange(LinkToReference, Email);
+        exit(WalletAssetHeaderRef.Count());
+    end;
+
+    local procedure CountLooseReferences(WalletHeaderEntryNoParam: Integer): Integer
+    var
+        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
+    begin
+        FilterLooseReferences(WalletAssetHeaderRef, WalletHeaderEntryNoParam);
+        exit(WalletAssetHeaderRef.Count());
+    end;
+
+    local procedure FilterLooseReferences(var WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference"; WalletHeaderEntryNoParam: Integer)
+    var
+        NullGuid: Guid;
+    begin
+        WalletAssetHeaderRef.Reset();
+        WalletAssetHeaderRef.SetRange(WalletHeaderEntryNo, WalletHeaderEntryNoParam);
+        WalletAssetHeaderRef.SetRange(LinkToTableId, 0);
+        WalletAssetHeaderRef.SetRange(LinkToSystemId, NullGuid);
     end;
     #endregion
 }

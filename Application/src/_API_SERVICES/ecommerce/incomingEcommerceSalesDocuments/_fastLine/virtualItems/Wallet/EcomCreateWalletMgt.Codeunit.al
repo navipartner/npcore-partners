@@ -21,6 +21,7 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
         WalletCount: Integer;
         WalletEntryNo: Integer;
         i: Integer;
+        NullGuid: Guid;
     begin
         WalletCount := Round(ParentLine.Quantity, 1, '>');
         if WalletCount <= 0 then
@@ -37,6 +38,8 @@ codeunit 6151072 "NPR EcomCreateWalletMgt"
             AttractionWalletFacade.SetWalletReferenceNumber(WalletEntryNo, Database::"NPR Ecom Sales Line", ParentLine.SystemId, CopyStr(Format(ParentLine.RecordId()), 1, 100));
             if (EcomSalesHeader."Sell-to Customer No." <> '') and Customer.Get(EcomSalesHeader."Sell-to Customer No.") then
                 AttractionWalletFacade.SetWalletReferenceNumber(WalletEntryNo, Database::Customer, Customer.SystemId, Customer."No.");
+            if EcomSalesHeader."Sell-to Email" <> '' then
+                AttractionWalletFacade.SetWalletReferenceNumber(WalletEntryNo, 0, NullGuid, EcomSalesHeader."Sell-to Email");
         end;
 
         AddAssetsToWallets(WalletEntryNos, WalletEntryNos.Count(), EcomSalesHeader, ParentLine);
