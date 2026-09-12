@@ -22,7 +22,7 @@ codeunit 6248331 "NPR WalletApiAgent"
         ReferenceNumberRequired: Label 'Parameter value for referenceNumber cannot be empty.', Locked = true;
         InvalidLength: Label 'Reference number exceeds maximum length of 100 characters.', Locked = true;
         Wallet: Record "NPR AttractionWallet";
-        WithDetails, WithAssets : Boolean;
+        WithDetails, WithAssets, OnlyActiveAssets : Boolean;
         LanguageCode: Code[10];
     begin
 
@@ -40,6 +40,9 @@ codeunit 6248331 "NPR WalletApiAgent"
 
         if (Request.QueryParams().ContainsKey('withDetails')) then
             WithDetails := (Request.QueryParams().Get('withDetails').ToLower() = 'true');
+
+        if (Request.QueryParams().ContainsKey('activeAssetsOnly')) then
+            OnlyActiveAssets := (Request.QueryParams().Get('activeAssetsOnly').ToLower() = 'true');
 
         if (Request.QueryParams().ContainsKey('languageCode')) then
             LanguageCode := CopyStr(Request.QueryParams().Get('languageCode'), 1, MaxStrLen(LanguageCode));
@@ -66,7 +69,7 @@ codeunit 6248331 "NPR WalletApiAgent"
                 if (not Wallets.Contains(FindWallet.WalletEntryNo)) then begin
                     Wallets.Add(FindWallet.WalletEntryNo);
                     if (Wallet.Get(FindWallet.WalletEntryNo)) then
-                        ResponseJson := GetWalletAssetsDTO(ResponseJson, Wallet, (WithAssets or WithDetails), WithDetails, LanguageCode);
+                        ResponseJson := GetWalletAssetsDTO(ResponseJson, Wallet, (WithAssets or WithDetails), WithDetails, OnlyActiveAssets, LanguageCode);
                 end;
             end;
             FindWallet.Close();
@@ -80,6 +83,7 @@ codeunit 6248331 "NPR WalletApiAgent"
     var
         Wallet: Record "NPR AttractionWallet";
         WithDetails: Boolean;
+        OnlyActiveAssets: Boolean;
         LanguageCode: Code[10];
     begin
 
@@ -89,10 +93,13 @@ codeunit 6248331 "NPR WalletApiAgent"
         if (Request.QueryParams().ContainsKey('withDetails')) then
             WithDetails := (Request.QueryParams().Get('withDetails').ToLower() = 'true');
 
+        if (Request.QueryParams().ContainsKey('activeAssetsOnly')) then
+            OnlyActiveAssets := (Request.QueryParams().Get('activeAssetsOnly').ToLower() = 'true');
+
         if (Request.QueryParams().ContainsKey('languageCode')) then
             LanguageCode := CopyStr(Request.QueryParams().Get('languageCode'), 1, MaxStrLen(LanguageCode));
 
-        exit(GetWalletAssetsResponse(Wallet, WithDetails, LanguageCode));
+        exit(GetWalletAssetsResponse(Wallet, WithDetails, OnlyActiveAssets, LanguageCode));
     end;
 
     internal procedure AddAssets(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -287,23 +294,26 @@ codeunit 6248331 "NPR WalletApiAgent"
     var
         ResponseJson: Codeunit "NPR Json Builder";
     begin
-        exit(Response.RespondOk(GetWalletAssetsDTO(ResponseJson, Wallet, true, WithDetails, '').Build()));
+        exit(Response.RespondOk(GetWalletAssetsDTO(ResponseJson, Wallet, true, WithDetails, false, '').Build()));
     end;
 
-    local procedure GetWalletAssetsResponse(Wallet: Record "NPR AttractionWallet"; WithDetails: Boolean; LanguageCode: Code[10]) Response: Codeunit "NPR API Response"
+    local procedure GetWalletAssetsResponse(Wallet: Record "NPR AttractionWallet"; WithDetails: Boolean; OnlyActiveAssets: Boolean; LanguageCode: Code[10]) Response: Codeunit "NPR API Response"
     var
         ResponseJson: Codeunit "NPR Json Builder";
     begin
-        exit(Response.RespondOk(GetWalletAssetsDTO(ResponseJson, Wallet, true, WithDetails, LanguageCode).Build()));
+        exit(Response.RespondOk(GetWalletAssetsDTO(ResponseJson, Wallet, true, WithDetails, OnlyActiveAssets, LanguageCode).Build()));
     end;
 
-    local procedure GetWalletAssetsDTO(var ResponseJson: Codeunit "NPR Json Builder"; Wallet: Record "NPR AttractionWallet"; WithAssets: Boolean; WithDetails: Boolean; LanguageCode: Code[10]): Codeunit "NPR Json Builder"
+    local procedure GetWalletAssetsDTO(var ResponseJson: Codeunit "NPR Json Builder"; Wallet: Record "NPR AttractionWallet"; WithAssets: Boolean; WithDetails: Boolean; OnlyActiveAssets: Boolean; LanguageCode: Code[10]): Codeunit "NPR Json Builder"
     var
         WalletAssets: Query "NPR AttractionWalletAssets";
         Ticket: Record "NPR TM Ticket";
         ItemTranslation: Record "Item Translation";
+        WalletManager: Codeunit "NPR AttractionWallet";
         ItemDescription: Text[250];
+        EvaluatedAt: DateTime;
     begin
+        EvaluatedAt := CurrentDateTime();
         ResponseJson := WalletContentDTO(ResponseJson.StartObject(), Wallet, LanguageCode);
         if (not WithAssets) then
             exit(ResponseJson.EndObject());
@@ -311,8 +321,18 @@ codeunit 6248331 "NPR WalletApiAgent"
         ResponseJson.StartArray('assets');
 
         WalletAssets.SetFilter(WalletSystemId, '=%1', Wallet.SystemId);
+        if (OnlyActiveAssets) then begin
+            WalletAssets.SetFilter(SupersededByEntryNo, '=%1', 0);
+            WalletAssets.SetFilter(AssetExpirationDate, '=%1|>=%2', 0DT, EvaluatedAt);
+        end;
+
         WalletAssets.Open();
         while (WalletAssets.Read()) do begin
+
+            if (OnlyActiveAssets) then begin
+                if (WalletManager.IsAssetDead(WalletAssets.AssetType, WalletAssets.AssetSystemId)) then
+                    continue;
+            end;
 
             ItemDescription := WalletAssets.AssetDescription;
             if (ItemTranslation.Get(WalletAssets.AssetItemNo, '', LanguageCode)) then
@@ -329,10 +349,9 @@ codeunit 6248331 "NPR WalletApiAgent"
                 .AddObject(AddOptionalProperty(ResponseJson, 'expiryDatetime', WalletAssets.AssetExpirationDate));
 
             if (WithDetails) then begin
-                if (WalletAssets.AssetType = WalletAssets.AssetType::Ticket) then begin
-                    Ticket.GetBySystemId(WalletAssets.AssetSystemId);
-                    ResponseJson.AddObject(AddTicketDetails(ResponseJson, Ticket, LanguageCode));
-                end;
+                if (WalletAssets.AssetType = WalletAssets.AssetType::Ticket) then
+                    if (Ticket.GetBySystemId(WalletAssets.AssetSystemId)) then
+                        ResponseJson.AddObject(AddTicketDetails(ResponseJson, Ticket, LanguageCode));
 
                 if (WalletAssets.AssetType = WalletAssets.AssetType::MEMBERSHIP) then begin
                     // Add member card details in future

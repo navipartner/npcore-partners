@@ -106,6 +106,24 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         exit(WalletManagement.GetAssetBlockState(AssetLine));
     end;
 
+    /// <summary>Answers whether a wallet asset is finished with - revoked, spent or past its validity - so a caller
+    /// can leave it out of a wallet listing or mark it as no longer usable. An asset that simply cannot be used yet,
+    /// such as one valid from a future date or still awaiting activation, is not finished and is reported alive.
+    /// Use it for presentation, not permission: it is the wallet's own judgement, it can be more permissive than the
+    /// module that owns the asset, and it reflects a single moment, so anything acting on an asset must validate it
+    /// again at the point of use. An asset that cannot be found is reported dead.</summary>
+    /// <param name="AssetEntryNo">Entry number of the NPR WalletAssetLine to inspect.</param>
+    procedure IsAssetDead(AssetEntryNo: Integer) Dead: Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+        AssetLine: Record "NPR WalletAssetLine";
+    begin
+        if (not AssetLine.Get(AssetEntryNo)) then
+            exit(true);
+
+        exit(WalletManagement.IsAssetDead(AssetLine));
+    end;
+
     procedure AddTicketsToWallet(WalletEntryNo: Integer; TicketIds: List of [Guid])
     var
         WalletManagement: Codeunit "NPR AttractionWallet";

@@ -819,7 +819,7 @@ codeunit 6185062 "NPR AttractionWallet"
                 SetVoucherBlock(AssetLine.LineTypeSystemId, true);
 
             else
-                Error('Unknown asset type, this is a programming bug');
+                Error('Unknown asset type %1. This is a programming bug', AssetLine.Type);
         end;
     end;
 
@@ -839,10 +839,12 @@ codeunit 6185062 "NPR AttractionWallet"
                 SetVoucherBlock(AssetLine.LineTypeSystemId, false);
 
             else
-                Error('Unknown asset type, this is a programming error that should be investigated and fixed');
+                Error('Unknown asset type %1. This is a programming bug', AssetLine.Type);
         end;
     end;
 
+    /// <summary>The asset's own blocked flag, and nothing else - this is what the Block and UnBlock actions set and
+    /// clear. Use IsAssetDead to decide whether an asset is still usable.</summary>
     internal procedure GetAssetBlockState(AssetLine: Record "NPR WalletAssetLine"): Boolean
     var
         Ticket: Record "NPR TM Ticket";
@@ -871,10 +873,114 @@ codeunit 6185062 "NPR AttractionWallet"
                     exit(not Voucher.Open);
 
             else
-                Error('Unknown asset type, this is a programming error that should be investigated and fixed');
+                Error('Unknown asset type %1. This is a programming bug', AssetLine.Type);
         end;
 
         exit(true); // If we cannot find the asset, we consider it blocked to avoid any potential misuse. 
+    end;
+
+    internal procedure IsAssetDead(AssetLine: Record "NPR WalletAssetLine"): Boolean
+    begin
+        exit(IsAssetDead(AssetLine.Type, AssetLine.LineTypeSystemId));
+    end;
+
+    internal procedure IsAssetDead(AssetType: Enum "NPR WalletLineType"; AssetSystemId: Guid): Boolean
+    var
+        Ticket: Record "NPR TM Ticket";
+        Coupon: Record "NPR NpDc Coupon";
+        MembershipCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Member: Record "NPR MM Member";
+        Voucher: Record "NPR NpRv Voucher";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        LocalDate: Date;
+        LocalTime: Time;
+    begin
+        Voucher.SetAutoCalcFields(Open);
+        Coupon.SetAutoCalcFields(Open);
+
+        case AssetType of
+            AssetType::TICKET:
+                if (Ticket.GetBySystemId(AssetSystemId)) then begin
+                    if (Ticket.Blocked) then
+                        exit(true);
+
+                    TimeZoneMgt.GetLocalDateTime(CurrentDateTime(), LocalDate, LocalTime);
+                    if (Ticket."Valid To Date" <> 0D) then
+                        if (Ticket."Valid To Date" < LocalDate) then
+                            exit(true);
+
+                    exit(false);
+                end;
+
+            AssetType::COUPON:
+                if (Coupon.GetBySystemId(AssetSystemId)) then begin
+                    if (not Coupon.Open) then
+                        exit(true);
+
+                    if (Coupon."Ending Date" <> 0DT) then
+                        if (Coupon."Ending Date" < CurrentDateTime()) then
+                            exit(true);
+
+                    exit(false);
+                end;
+
+            AssetType::MEMBERSHIP:
+                if (MembershipCard.GetBySystemId(AssetSystemId)) then begin
+                    if (MembershipCard.Blocked) then
+                        exit(true);
+
+                    Membership.SetBaseLoadFields();
+                    if (not Membership.Get(MembershipCard."Membership Entry No.")) then
+                        exit(true);
+
+                    if (Membership.Blocked) then
+                        exit(true);
+
+                    if (MembershipCard."Member Entry No." <> 0) then begin
+                        Member.SetBaseLoadFields();
+                        if (not Member.Get(MembershipCard."Member Entry No.")) then
+                            exit(true);
+
+                        if (Member.Blocked) then
+                            exit(true);
+                    end;
+
+                    MembershipSetup.SetBaseLoadFields();
+                    if (not MembershipSetup.Get(Membership."Membership Code")) then
+                        exit(true);
+
+                    TimeZoneMgt.GetLocalDateTime(CurrentDateTime(), LocalDate, LocalTime);
+                    if (MembershipSetup."Card Expire Date Calculation" <> MembershipSetup."Card Expire Date Calculation"::NA) then
+                        if (MembershipCard."Valid Until" <> 0D) then
+                            if (MembershipCard."Valid Until" < LocalDate) then
+                                exit(true);
+
+                    exit(false);
+                end;
+
+            AssetType::VOUCHER:
+                if (Voucher.GetBySystemId(AssetSystemId)) then begin
+                    if (not Voucher.Open) then
+                        exit(true);
+
+                    if (Voucher."Ending Date" <> 0DT) then
+                        if (Voucher."Ending Date" < CurrentDateTime()) then
+                            exit(true);
+
+                    exit(false);
+                end;
+
+            // Added for type completeness. Nested wallets are not a thing. But if they were, it would list so user can iterate them
+            AssetType::WALLET:
+                exit(false);
+
+            else
+                Error('Unknown asset type %1. This is a programming bug', AssetType);
+        end;
+
+        exit(true); // If we cannot find the asset, we consider it dead to avoid any potential misuse. 
     end;
 
 
