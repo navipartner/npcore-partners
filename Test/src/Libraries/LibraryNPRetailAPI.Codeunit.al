@@ -1,7 +1,7 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 codeunit 85235 "NPR Library - NPRetail API"
 {
-    internal procedure CallApi(Method: Text; Path: Text; Body: JsonObject; QueryParameters: Dictionary of [Text, Text]; Headers: Dictionary of [Text, Text]) Response: JsonObject
+    procedure CallApi(Method: Text; Path: Text; Body: JsonObject; QueryParameters: Dictionary of [Text, Text]; Headers: Dictionary of [Text, Text]) Response: JsonObject
     var
         APIRequestProcessor: Codeunit "NPR API Request Processor";
         Request: JsonObject;
@@ -22,7 +22,7 @@ codeunit 85235 "NPR Library - NPRetail API"
         Response.ReadFrom(APIRequestProcessor.httpmethod(RequestText));
     end;
 
-    internal procedure IsSuccessStatusCode(Response: JsonObject): Boolean
+    procedure IsSuccessStatusCode(Response: JsonObject): Boolean
     var
         JToken: JsonToken;
         StatusCode: Integer;
@@ -35,7 +35,7 @@ codeunit 85235 "NPR Library - NPRetail API"
         exit((StatusCode >= 200) and (StatusCode < 300));
     end;
 
-    internal procedure GetResponseBody(Response: JsonObject): JsonObject
+    procedure GetResponseBody(Response: JsonObject): JsonObject
     var
         FeatureFlag: Codeunit "NPR Feature Flags Management";
         Base64Convert: Codeunit "Base64 Convert";
@@ -55,7 +55,7 @@ codeunit 85235 "NPR Library - NPRetail API"
         exit(Body);
     end;
 
-    internal procedure GetResponseBodyAsArray(Response: JsonObject) Body: JsonArray
+    procedure GetResponseBodyAsArray(Response: JsonObject) Body: JsonArray
     var
         FeatureFlag: Codeunit "NPR Feature Flags Management";
         Base64Convert: Codeunit "Base64 Convert";
@@ -74,7 +74,7 @@ codeunit 85235 "NPR Library - NPRetail API"
         exit(Body);
     end;
 
-    internal procedure CreateAPIPermission(UserSecurityId: Guid; Company: Text; RoleId: Code[20])
+    procedure CreateAPIPermission(UserSecurityId: Guid; Company: Text; RoleId: Code[20])
     var
         AccessControl: Record "Access Control";
     begin

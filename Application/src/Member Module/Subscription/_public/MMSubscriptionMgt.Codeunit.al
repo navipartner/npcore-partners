@@ -182,5 +182,50 @@ codeunit 6185029 "NPR MM Subscription Mgt."
 
         exit(true);
     end;
+
+    /// <summary>
+    /// Returns the last date the membership remains usable, inclusive, if the guest cancels auto-renewal right now.
+    /// </summary>
+    /// <param name="Membership">The membership record</param>
+    /// <param name="UsableUntilDate">Output: The last usable date, inclusive</param>
+    /// <param name="RenewalRequiredFirst">Output: True when the membership renews, and is charged, once more before it can end</param>
+    /// <returns>True if a date could be determined; false when it could not - no subscription, no internally managed auto-renewal, or a period end that could not be resolved</returns>
+    procedure GetUsableUntilDateIfCancelledNow(Membership: Record "NPR MM Membership"; var UsableUntilDate: Date; var RenewalRequiredFirst: Boolean): Boolean
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        exit(SubscriptionMgtImpl.GetUsableUntilDateIfCancelledNow(Membership, UsableUntilDate, RenewalRequiredFirst));
+    end;
+
+    /// <summary>
+    /// Returns the next date on which an automatic renewal of the membership subscription will be attempted.
+    /// </summary>
+    /// <param name="Membership">The membership record</param>
+    /// <param name="NextRenewalAttemptDate">Output: The next renewal attempt date</param>
+    /// <returns>True if a renewal attempt is planned, false otherwise</returns>
+    procedure GetNextRenewalAttemptDate(Membership: Record "NPR MM Membership"; var NextRenewalAttemptDate: Date): Boolean
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        exit(SubscriptionMgtImpl.GetNextRenewalAttemptDate(Membership, NextRenewalAttemptDate));
+    end;
+
+    /// <summary>
+    /// Returns both subscription dates in one pass. Prefer this over calling the two single-value procedures when a
+    /// response reports both: the usable-until calculation depends on the renewal attempt date, so one call keeps the
+    /// two answers consistent and halves the setup and alteration rule lookups a response reporting both would otherwise make.
+    /// </summary>
+    /// <param name="Membership">The membership record</param>
+    /// <param name="UsableUntilDate">Output: The last usable date, inclusive, if the guest cancels auto-renewal now</param>
+    /// <param name="RenewalRequiredFirst">Output: True when the membership renews, and is charged, once more before it can end</param>
+    /// <param name="NextRenewalAttemptDate">Output: The next renewal attempt date</param>
+    /// <param name="RenewalIsPlanned">Output: True if a renewal attempt is planned, false otherwise</param>
+    /// <returns>True if a usable-until date could be determined; false when it could not - no subscription, no internally managed auto-renewal, or a period end that could not be resolved</returns>
+    procedure GetSubscriptionDates(Membership: Record "NPR MM Membership"; var UsableUntilDate: Date; var RenewalRequiredFirst: Boolean; var NextRenewalAttemptDate: Date; var RenewalIsPlanned: Boolean): Boolean
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        exit(SubscriptionMgtImpl.GetSubscriptionDates(Membership, UsableUntilDate, RenewalRequiredFirst, NextRenewalAttemptDate, RenewalIsPlanned));
+    end;
 #endif
 }

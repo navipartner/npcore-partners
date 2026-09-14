@@ -126,8 +126,10 @@ codeunit 6185123 "NPR MembershipApiAgent"
         SubscriptionRequest: Record "NPR MM Subscr. Request";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         RequestSubscrRenewal: Codeunit "NPR MM Subscr. Renew: Request";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         ResponseJson: Codeunit "NPR JSON Builder";
         MembershipID: Text;
+        NextRenewalAttemptDate: Date;
         SubscriptionRequestFound: Boolean;
     begin
         MembershipID := Request.Paths().Get(2);
@@ -168,6 +170,16 @@ codeunit 6185123 "NPR MembershipApiAgent"
             RequestSubscrRenewal.CalculateSubscriptionRenewal(Subscription, SubscriptionRequest);
         end;
 
+        // Passing the subscription this response was built from, when there is a real one, rather than letting the
+        // helper look one up again: it guarantees the attempt date belongs to the same row as the dates and amount
+        // above it. The synthesised record used when no subscription exists has no entry no., and nothing can be
+        // renewed in that case anyway.
+        if (Subscription."Entry No." <> 0) then begin
+            if (not SubscriptionMgtImpl.GetNextRenewalAttemptDate(Membership, Subscription, NextRenewalAttemptDate)) then
+                Clear(NextRenewalAttemptDate);
+        end else
+            Clear(NextRenewalAttemptDate);
+
         ResponseJson.StartObject()
             .StartObject('membership')
                 .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
@@ -176,6 +188,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
                 .AddProperty('newValidFromDate', SubscriptionRequest."New Valid From Date")
                 .AddProperty('newValidUntilDate', SubscriptionRequest."New Valid Until Date")
                 .AddProperty('amountInclVat', SubscriptionRequest.Amount)
+                .AddObject(AddRequiredProperty(ResponseJson, 'nextRenewalAttemptDate', NextRenewalAttemptDate))
             .EndObject()
         .EndObject();
 
@@ -306,7 +319,11 @@ codeunit 6185123 "NPR MembershipApiAgent"
         exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
-    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"
+    /// <summary>
+    /// Adds a date property that is always present in the response, emitting null when the date is not set, so a
+    /// consumer can tell "not known" apart from a property the payload happens to omit.
+    /// </summary>
+    internal procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"
     begin
         if (PropertyValue = 0D) then
             exit(ResponseJson.AddProperty(PropertyName));

@@ -1200,4 +1200,390 @@ codeunit 85014 "NPR Library - Member Module"
         InfoCapture.PreferredLanguageCode := 'ENU';
     end;
 
+    #region Subscription setup
+    // These live here rather than in the individual test codeunits because the subscription and renewal schedule
+    // tables are internal to NP Retail. Test apps outside NP Retail (the Tivoli app's tests, for example) cannot
+    // reach them directly, so they set their scenarios up through this library instead.
+
+    /// <summary>
+    /// Points the membership's recurring payment setup at a renewal schedule with the given attempt offsets in days,
+    /// recreating the schedule lines so the scenario is deterministic.
+    /// </summary>
+    /// <param name="AttemptOffsetsInDays">Attempt offsets relative to the expiry date, e.g. -5, -2, 1, 4.</param>
+    procedure SetupRenewalSchedule(MembershipCode: Code[20]; ScheduleCode: Code[20]; AttemptOffsetsInDays: List of [Integer])
+    var
+        RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+        RenewalSchedHdr: Record "NPR MM Renewal Sched Hdr";
+        RenewalSchedLine: Record "NPR MM Renewal Sched Line";
+        OffsetInDays: Integer;
+    begin
+        if not RenewalSchedHdr.Get(ScheduleCode) then begin
+            RenewalSchedHdr.Init();
+            RenewalSchedHdr.Code := ScheduleCode;
+            RenewalSchedHdr.Insert();
+        end;
+
+        RenewalSchedLine.SetRange("Schedule Code", ScheduleCode);
+        RenewalSchedLine.DeleteAll();
+
+        foreach OffsetInDays in AttemptOffsetsInDays do
+            AddRenewalSchedLine(ScheduleCode, OffsetInDays);
+
+        GetRecurringPaymentSetup(MembershipCode, RecurPaymentSetup);
+        RecurPaymentSetup."Subscr. Auto-Renewal On" := RecurPaymentSetup."Subscr. Auto-Renewal On"::Schedule;
+        RecurPaymentSetup."Subscr Auto-Renewal Sched Code" := ScheduleCode;
+        RecurPaymentSetup.Modify();
+    end;
+
+    /// <summary>
+    /// Sets up the whole "this membership renews on a schedule" scenario: the renewal schedule itself plus the
+    /// auto-renew rule it renews into. Both are needed before a renewal attempt date can be reported at all, so
+    /// pairing them here stops each test rediscovering that.
+    /// </summary>
+    procedure SetupRenewalScheduleWithAutoRenew(MembershipCode: Code[20]; ScheduleCode: Code[20]; AutoRenewToItemNo: Code[20]; AttemptOffsetsInDays: List of [Integer])
+    begin
+        SetupRenewalSchedule(MembershipCode, ScheduleCode, AttemptOffsetsInDays);
+        SetupAutoRenewToSelf(MembershipCode, AutoRenewToItemNo, StrSubstNo('Auto renew %1', MembershipCode));
+    end;
+
+    local procedure AddRenewalSchedLine(ScheduleCode: Code[20]; OffsetInDays: Integer)
+    var
+        RenewalSchedLine: Record "NPR MM Renewal Sched Line";
+        DateFormulaValue: DateFormula;
+    begin
+        Evaluate(DateFormulaValue, StrSubstNo('<%1D>', OffsetInDays));
+
+        RenewalSchedLine.Init();
+        RenewalSchedLine."Schedule Code" := ScheduleCode;
+        RenewalSchedLine.Validate("Date Formula", DateFormulaValue);
+        RenewalSchedLine.Insert(true);
+    end;
+
+    /// <summary>
+    /// Switches the membership's recurring payment setup to the offset model, where the first renewal attempt happens
+    /// the given number of days before the subscription expires.
+    /// </summary>
+    procedure SetupRecurringPaymentOffsetModel(MembershipCode: Code[20]; FirstAttemptOffsetDays: Integer)
+    var
+        RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+    begin
+        GetRecurringPaymentSetup(MembershipCode, RecurPaymentSetup);
+        RecurPaymentSetup."Subscr. Auto-Renewal On" := RecurPaymentSetup."Subscr. Auto-Renewal On"::"Expiry Date";
+        RecurPaymentSetup."First Attempt Offset (Days)" := FirstAttemptOffsetDays;
+        RecurPaymentSetup.Modify();
+    end;
+
+    /// <summary>
+    /// Switches the membership's recurring payment setup to the next start date model, where the attempt window is
+    /// anchored on the start of the next period rather than the end of the current one.
+    /// </summary>
+    procedure SetupRecurringPaymentNextStartDateModel(MembershipCode: Code[20]; FirstAttemptOffsetDays: Integer)
+    var
+        RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+    begin
+        GetRecurringPaymentSetup(MembershipCode, RecurPaymentSetup);
+        RecurPaymentSetup."Subscr. Auto-Renewal On" := RecurPaymentSetup."Subscr. Auto-Renewal On"::"Next Start Date";
+        RecurPaymentSetup."First Attempt Offset (Days)" := FirstAttemptOffsetDays;
+        RecurPaymentSetup.Modify();
+    end;
+
+    /// <summary>
+    /// Switches the membership's recurring payment setup so renewals never run automatically.
+    /// </summary>
+    procedure SetupRecurringPaymentNeverModel(MembershipCode: Code[20])
+    var
+        RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+    begin
+        GetRecurringPaymentSetup(MembershipCode, RecurPaymentSetup);
+        RecurPaymentSetup."Subscr. Auto-Renewal On" := RecurPaymentSetup."Subscr. Auto-Renewal On"::Never;
+        RecurPaymentSetup.Modify();
+    end;
+
+    /// <summary>
+    /// Sets the notice period a guest has to observe before a subscription can be terminated, unenforced.
+    /// </summary>
+    /// <remarks>
+    /// Also clears enforcement, so the setup record cannot arrive at a test carrying a previous test's gate. Call
+    /// EnforceTerminationPeriod after this one, not before, for a test that means to exercise the gate.
+    /// </remarks>
+    /// <param name="TerminationPeriodText">A date formula, e.g. '&lt;1M&gt;'.</param>
+    procedure SetupTerminationPeriod(MembershipCode: Code[20]; TerminationPeriodText: Text)
+    var
+        RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+        TerminationPeriod: DateFormula;
+    begin
+        Clear(TerminationPeriod);
+        if (TerminationPeriodText <> '') then
+            Evaluate(TerminationPeriod, TerminationPeriodText);
+
+        GetRecurringPaymentSetup(MembershipCode, RecurPaymentSetup);
+        RecurPaymentSetup.TerminationPeriod := TerminationPeriod;
+        RecurPaymentSetup.EnforceTerminationPeriod := false;
+        RecurPaymentSetup.Modify();
+    end;
+
+    /// <summary>
+    /// Turns on enforcement of the notice period, so a termination request outside it is refused.
+    /// </summary>
+    /// <remarks>
+    /// Separate from SetupTerminationPeriod because the two are separate setup fields, and because the split is
+    /// load-bearing for tests: without this the notice period is only ever a suggestion that prefills a date, and
+    /// CheckTerminationPeriod exits before it validates anything. A test that means to exercise the gate and only
+    /// calls SetupTerminationPeriod passes whatever the gate does.
+    /// </remarks>
+    procedure EnforceTerminationPeriod(MembershipCode: Code[20])
+    var
+        RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+    begin
+        GetRecurringPaymentSetup(MembershipCode, RecurPaymentSetup);
+        RecurPaymentSetup.EnforceTerminationPeriod := true;
+        RecurPaymentSetup.Modify();
+    end;
+
+    /// <summary>
+    /// Reads the membership's recurring payment setup, and asserts the precondition every caller here depends on:
+    /// that the membership type actually renews through a recurring payment. Tests run in sequence against shared
+    /// setup records, so establishing the whole precondition rather than half of it keeps them order-independent.
+    /// </summary>
+    local procedure GetRecurringPaymentSetup(MembershipCode: Code[20]; var RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup")
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        MembershipSetup.Get(MembershipCode);
+
+        if (MembershipSetup."Auto-Renew Model" <> MembershipSetup."Auto-Renew Model"::RECURRING_PAYMENT) then begin
+            MembershipSetup."Auto-Renew Model" := MembershipSetup."Auto-Renew Model"::RECURRING_PAYMENT;
+            MembershipSetup.Modify();
+        end;
+
+        RecurPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
+    end;
+
+    /// <summary>
+    /// Gives the membership an auto-renewing subscription ending on the given date, creating the subscription record
+    /// if the membership does not have one yet.
+    /// </summary>
+    procedure SetSubscriptionPeriod(MembershipEntryNo: Integer; ValidUntilDate: Date)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+    begin
+        Membership.Get(MembershipEntryNo);
+
+        Subscription.Reset();
+        Subscription.SetRange("Membership Entry No.", MembershipEntryNo);
+        if not Subscription.FindFirst() then begin
+            MembershipEntry.SetRange("Membership Entry No.", MembershipEntryNo);
+            MembershipEntry.FindLast();
+
+            Subscription.Init();
+            Subscription."Membership Entry No." := MembershipEntryNo;
+            Subscription."Membership Ledger Entry No." := MembershipEntry."Entry No.";
+            Subscription."Membership Code" := Membership."Membership Code";
+            Subscription."Valid From Date" := MembershipEntry."Valid From Date";
+            Subscription.Insert();
+        end;
+
+        Subscription."Valid Until Date" := ValidUntilDate;
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Modify();
+    end;
+
+    /// <summary>
+    /// Sets the auto-renew state on the membership's subscription.
+    /// </summary>
+    procedure SetSubscriptionAutoRenew(MembershipEntryNo: Integer; AutoRenew: Enum "NPR MM MembershipAutoRenew")
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+        Subscription."Auto-Renew" := AutoRenew;
+        Subscription.Modify();
+    end;
+
+    /// <summary>
+    /// Sets the date the membership's subscription is committed until, before which it cannot be terminated.
+    /// </summary>
+    procedure SetSubscriptionCommittedUntil(MembershipEntryNo: Integer; CommittedUntil: Date)
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+        Subscription."Committed Until" := CommittedUntil;
+        Subscription.Modify();
+    end;
+
+    /// <summary>
+    /// Suppresses renewal attempts on the membership's subscription until the given date.
+    /// </summary>
+    procedure SetSubscriptionPostponeRenewalUntil(MembershipEntryNo: Integer; PostponeUntil: Date)
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+        Subscription."Postpone Renewal Attempt Until" := PostponeUntil;
+        Subscription.Modify();
+    end;
+
+    /// <summary>
+    /// Puts the membership's subscription into the pending-termination state with an agreed termination date, without
+    /// going through the payment and refund machinery a real termination request needs.
+    /// </summary>
+    procedure RequestSubscriptionTerminationDirectly(MembershipEntryNo: Integer; TerminationDate: Date)
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+
+        SubscriptionRequest.Init();
+        SubscriptionRequest.Type := SubscriptionRequest.Type::Terminate;
+        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
+        SubscriptionRequest."Terminate At" := TerminationDate;
+        SubscriptionRequest."Termination Reason" := "NPR MM Subs Termination Reason"::CUSTOMER_INITIATED;
+        SubscriptionRequest."Termination Requested At" := CurrentDateTime();
+        SubscriptionRequest.Insert(true);
+
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::TERMINATION_REQUESTED;
+        Subscription.Modify();
+    end;
+
+    /// <summary>
+    /// Removes any auto-renew alteration rule for the membership type, so the membership genuinely has nowhere to
+    /// renew to. Tests share these setup records, so a test that needs the rule absent has to say so rather than
+    /// rely on running before whichever test creates it.
+    /// </summary>
+    procedure RemoveAutoRenewSetup(MembershipCode: Code[20])
+    var
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+    begin
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::AUTORENEW);
+        AlterationSetup.SetRange("From Membership Code", MembershipCode);
+        AlterationSetup.DeleteAll();
+    end;
+
+    /// <summary>
+    /// Leaves a renewal request outstanding (Pending) on the membership's subscription, which is what stops the
+    /// renewal job from creating another one.
+    /// </summary>
+    procedure CreateOutstandingRenewalRequest(MembershipEntryNo: Integer)
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+
+        SubscriptionRequest.Init();
+        SubscriptionRequest.Type := SubscriptionRequest.Type::Renew;
+        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
+        SubscriptionRequest.Insert(true);
+    end;
+
+    /// <summary>
+    /// Cancels the membership's pending termination requests and puts the subscription back to auto-renewing, the way
+    /// a guest who changes their mind leaves a withdrawn request behind.
+    /// </summary>
+    procedure WithdrawSubscriptionTermination(MembershipEntryNo: Integer)
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        if SubscriptionRequest.FindSet() then
+            repeat
+                SubscriptionRequest.Status := SubscriptionRequest.Status::Cancelled;
+                // Production marks a cancelled request's processing as done, not left pending. Matching that here
+                // keeps the fixture honest for anyone who later asserts on renewal behaviour after a withdrawal.
+                SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+                SubscriptionRequest.Modify();
+            until SubscriptionRequest.Next() = 0;
+
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Modify();
+    end;
+
+    /// <summary>
+    /// Turns on internally managed auto-renewal on the membership itself. The terminate endpoint gates on this flag
+    /// rather than on the subscription's, so a test that posts a termination has to set it. Calls the production
+    /// routine so the fixture cannot drift from what really happens.
+    /// </summary>
+    procedure EnableMembershipAutoRenewal(MembershipEntryNo: Integer)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        Membership.Get(MembershipEntryNo);
+        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, false, false);
+    end;
+
+    /// <summary>
+    /// Cancels the termination request but leaves its processing status Pending and the subscription still flagged
+    /// TERMINATION_REQUESTED.
+    /// </summary>
+    /// <remarks>
+    /// A cancelled request that is still Pending is reachable in production: UpdateSubscriptionRequestStatus in the
+    /// Adyen payment handler sets Status to Cancelled and only touches Processing Status for the Error and Success
+    /// cases, so any other processing status is left as it was. This fixture is what makes the Status filters
+    /// load-bearing - the ordinary withdrawal helper turns auto-renewal back on, so callers exit before they ever
+    /// reach them.
+    /// </remarks>
+    procedure CancelTerminationRequestKeepingItPending(MembershipEntryNo: Integer)
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        if SubscriptionRequest.FindSet() then
+            repeat
+                SubscriptionRequest.Status := SubscriptionRequest.Status::Cancelled;
+                SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+                SubscriptionRequest.Modify();
+            until SubscriptionRequest.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Drives the termination request into its terminal Error state, leaving the subscription flagged
+    /// TERMINATION_REQUESTED. Reached in production once the request runs out of process retries.
+    /// </summary>
+    procedure FailTerminationRequest(MembershipEntryNo: Integer)
+    var
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        GetSubscription(MembershipEntryNo, Subscription);
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        if SubscriptionRequest.FindSet() then
+            repeat
+                SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Error;
+                SubscriptionRequest.Modify();
+            until SubscriptionRequest.Next() = 0;
+    end;
+
+    local procedure GetSubscription(MembershipEntryNo: Integer; var Subscription: Record "NPR MM Subscription")
+    var
+        SubscriptionNotFoundErr: Label 'The membership with entry no. %1 has no subscription. This is a programming bug', Locked = true;
+    begin
+        Subscription.Reset();
+        Subscription.SetRange("Membership Entry No.", MembershipEntryNo);
+        if not Subscription.FindFirst() then
+            Error(SubscriptionNotFoundErr, MembershipEntryNo);
+    end;
+
+    #endregion
+
 }
