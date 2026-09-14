@@ -40,7 +40,7 @@ let main = async ({ workflow, context, parameters, popup, captions }) => {
     parameters.ToastMessageTimer !== undefined &&
     parameters.ToastMessageTimer !== 0
       ? parameters.ToastMessageTimer
-      : 15;
+      : 5;
   if (result.MemberScanned && hideAfter > 0) {
     toast.memberScanned({
       memberImg: result.MemberScanned.ImageDataUrl,

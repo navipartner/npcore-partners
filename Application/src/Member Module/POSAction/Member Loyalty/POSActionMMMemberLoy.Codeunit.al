@@ -28,7 +28,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
                                         FunctionOptionString_CptLbl);
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefInput_CptLbl, ParamDefInput_DescLbl);
         WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
-        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 15, ToastMessageCaption, ToastMessageDescription);
+        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 5, ToastMessageCaption, ToastMessageDescription);
         WorkflowConfig.AddLabel('LoyaltyWindowTitle', LoyaltyWindowTitle);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
     end;
@@ -51,7 +51,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionMMMemberLoy.js###
-'let main=async({workflow:i,context:o,parameters:n,popup:s,captions:r})=>{await i.respond("OnBeforeWorkflow");const l=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"];let t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(o.show_dialog=!1);const d=r.LoyaltyWindowTitle.substitute(l[t]);let a="";if(o.show_dialog&&(a=await s.input({caption:r.MemberCardPrompt,title:d}),a===null))return;const e=await i.respond("do_work",{membercard_number:a}),m=n.ToastMessageTimer!==null&&n.ToastMessageTimer!==void 0&&n.ToastMessageTimer!==0?n.ToastMessageTimer:15;e.MemberScanned&&m>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:void 0,hideAfter:m,memberExpiry:void 0,memberHeadline:e.MemberScanned.Headline,content:[{caption:e.MemberScanned.MembershipCodeCaption,value:e.MemberScanned.MembershipCodeDescription}]}),e.workflowName!==""&&await i.run(e.workflowName,{parameters:e.parameters})};'
+'let main=async({workflow:i,context:o,parameters:n,popup:s,captions:m})=>{await i.respond("OnBeforeWorkflow");const d=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"];let t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(o.show_dialog=!1);const l=m.LoyaltyWindowTitle.substitute(d[t]);let a="";if(o.show_dialog&&(a=await s.input({caption:m.MemberCardPrompt,title:l}),a===null))return;const e=await i.respond("do_work",{membercard_number:a}),r=n.ToastMessageTimer!==null&&n.ToastMessageTimer!==void 0&&n.ToastMessageTimer!==0?n.ToastMessageTimer:5;e.MemberScanned&&r>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:void 0,hideAfter:r,memberExpiry:void 0,memberHeadline:e.MemberScanned.Headline,content:[{caption:e.MemberScanned.MembershipCodeCaption,value:e.MemberScanned.MembershipCodeDescription}]}),e.workflowName!==""&&await i.run(e.workflowName,{parameters:e.parameters})};'
         )
     end;
 
