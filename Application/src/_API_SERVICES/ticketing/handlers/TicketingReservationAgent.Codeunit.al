@@ -449,47 +449,47 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
         TicketReservationRequest.FindSet();
         repeat
-            ResponseJson.AddObject(ReservationDetailsDTO(ResponseJson, TicketReservationRequest."Entry No.", Token, TicketReservationRequest."Ext. Line Reference No.", TicketReservationRequest.SystemId));
+            ResponseJson.AddObject(ReservationDetailsDTO(ResponseJson, TicketReservationRequest));
         until (TicketReservationRequest.Next() = 0);
         ResponseJson.EndArray();
 
         exit(ResponseJson);
     end;
 
-    local procedure ReservationDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer; Token: Code[100]; LineNo: Integer; PrimaryEntrySystemId: Guid): Codeunit "NPR Json Builder";
+    local procedure ReservationDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryRequestLine: Record "NPR TM Ticket Reservation Req."): Codeunit "NPR Json Builder";
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketingCatalog: Codeunit "NPR TicketingCatalogAgent";
         TempTicketDescriptionBuffer: Record "NPR TM TempTicketDescription" temporary;
         TicketAgent: Codeunit "NPR TicketingTicketAgent";
     begin
-        TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', LineNo);
-        TicketReservationRequest.FindSet();
+        TicketingCatalog.GetCatalogItemDescription('', PrimaryRequestLine."Item No.", TempTicketDescriptionBuffer, PrimaryRequestLine.TicketHolderPreferredLanguage);
 
         ResponseJson.StartObject('reservations')
-            .AddProperty('itemNumber', TicketReservationRequest."Item No.")
-            .AddProperty('quantity', TicketReservationRequest."Quantity")
-            .AddProperty('lineId', Format(PrimaryEntrySystemId, 0, 4).ToLower())
-            .AddObject(CompactTicketDetailsDTO(ResponseJson, PrimaryEntryNo, TicketReservationRequest."Quantity"))
+            .AddProperty('itemNumber', PrimaryRequestLine."Item No.")
+            .AddProperty('quantity', PrimaryRequestLine.Quantity)
+            .AddProperty('lineId', Format(PrimaryRequestLine.SystemId, 0, 4).ToLower())
+            .AddObject(CompactTicketDetailsDTO(ResponseJson, PrimaryRequestLine))
             .StartArray('content');
-        repeat
-            TicketingCatalog.GetCatalogItemDescription('', TicketReservationRequest."Item No.", TempTicketDescriptionBuffer, TicketReservationRequest.TicketHolderPreferredLanguage);
 
-            ResponseJson
-                .StartObject()
-                .AddObject(TicketAgent.AdmissionDTO(ResponseJson, 'admissionDetails', TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", false, TicketReservationRequest."Admission Inclusion", TempTicketDescriptionBuffer))
-                .AddObject(TicketAgent.ScheduleDTO(ResponseJson, 'scheduleDetails', TicketReservationRequest."External Adm. Sch. Entry No.", 9998))
-                .EndObject()
-        until (TicketReservationRequest.Next() = 0);
+        TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', PrimaryRequestLine."Session Token ID");
+        TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', PrimaryRequestLine."Ext. Line Reference No.");
+        if (TicketReservationRequest.FindSet()) then
+            repeat
+                ResponseJson
+                    .StartObject()
+                    .AddObject(TicketAgent.AdmissionDTO(ResponseJson, 'admissionDetails', TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", false, TicketReservationRequest."Admission Inclusion", TempTicketDescriptionBuffer))
+                    .AddObject(TicketAgent.ScheduleDTO(ResponseJson, 'scheduleDetails', TicketReservationRequest."External Adm. Sch. Entry No.", 9998))
+                    .EndObject()
+            until (TicketReservationRequest.Next() = 0);
 
         ResponseJson.EndArray()
             .EndObject();
         exit(ResponseJson);
     end;
 
-    local procedure CompactTicketDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer; OrderedQuantity: Integer): Codeunit "NPR Json Builder";
+    local procedure CompactTicketDetailsDTO(ResponseJson: Codeunit "NPR Json Builder"; PrimaryRequestLine: Record "NPR TM Ticket Reservation Req."): Codeunit "NPR Json Builder";
     var
         Ticket: Record "NPR TM Ticket";
         TicketType: Record "NPR TM Ticket Type";
@@ -498,7 +498,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         EnumEncoder: Codeunit "NPR TicketingApiTranslations";
     begin
         Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', PrimaryEntryNo);
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', PrimaryRequestLine."Entry No.");
         if (not Ticket.FindFirst()) then
             exit(ResponseJson);
 
@@ -509,37 +509,40 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             .AddProperty('ticketKind', EnumEncoder.EncodeTicketTypeAdmissionKind(TicketType."Admission Registration"))
             .AddObject(TicketAgent.TicketValidDateProperties(ResponseJson, Ticket))
             .AddObject(TicketAgent.TicketPriceInformation(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code"))
-            .AddArray(CompactTicketList(ResponseJson, PrimaryEntryNo, 'ticketNumbers'));
+            .AddArray(CompactTicketList(ResponseJson, PrimaryRequestLine, 'ticketNumbers'));
+
+        if (PrimaryRequestLine."Request Status" = PrimaryRequestLine."Request Status"::Confirmed) then
+            ResponseJson
+                .AddProperty('pinCode', PrimaryRequestLine."Authorization Code")
+                .AddProperty('ticketHolder', PrimaryRequestLine.TicketHolderName);
 
         if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
-            ResponseJson.AddObject(TicketAgent.GroupEntitlementDTO(ResponseJson, 'admissionEntitlements', Ticket."Item No.", OrderedQuantity));
+            ResponseJson.AddObject(TicketAgent.GroupEntitlementDTO(ResponseJson, 'admissionEntitlements', Ticket."Item No.", PrimaryRequestLine.Quantity));
 
         ResponseJson.EndObject();
 
         exit(ResponseJson);
     end;
 
-    local procedure CompactTicketList(ResponseJson: Codeunit "NPR Json Builder"; PrimaryEntryNo: Integer; PropertyName: Text): Codeunit "NPR Json Builder";
+    local procedure CompactTicketList(ResponseJson: Codeunit "NPR Json Builder"; PrimaryRequestLine: Record "NPR TM Ticket Reservation Req."; PropertyName: Text): Codeunit "NPR Json Builder";
     var
         Ticket: Record "NPR TM Ticket";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
-        TicketReservationRequest.Get(PrimaryEntryNo);
-        if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::Confirmed) then
+        if (PrimaryRequestLine."Request Status" <> PrimaryRequestLine."Request Status"::Confirmed) then
             if (not _IncludeTicketNumbers) then
                 exit(ResponseJson);
 
         ResponseJson.StartArray(PropertyName);
 
         Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', PrimaryEntryNo);
-        Ticket.FindSet();
-        repeat
-            ResponseJson.StartObject()
-                .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
-                .AddProperty('ticketNumber', Ticket."External Ticket No.")
-                .EndObject();
-        until (Ticket.Next() = 0);
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', PrimaryRequestLine."Entry No.");
+        if (Ticket.FindSet()) then
+            repeat
+                ResponseJson.StartObject()
+                    .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
+                    .AddProperty('ticketNumber', Ticket."External Ticket No.")
+                    .EndObject();
+            until (Ticket.Next() = 0);
 
         ResponseJson.EndArray();
         exit(ResponseJson);
