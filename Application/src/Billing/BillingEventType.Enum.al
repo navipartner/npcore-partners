@@ -40,5 +40,13 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'Retail Self-Service Orders Amount LCY', Locked = true;
     }
+    value(9; ECOM_ENTRIA_ORDERS_COUNT)
+    {
+        Caption = 'Ecommerce Entria Orders Count', Locked = true;
+    }
+    value(10; ECOM_ENTRIA_ORDERS_AMOUNT_SHOP)
+    {
+        Caption = 'Ecommerce Entria Orders Amount Shop', Locked = true;
+    }
 }
 #endif

@@ -737,6 +737,10 @@
         if CaptureSalesInvoice(SalesInvHdrNo) then
             Commit();
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        RegisterEcomBillingAfterCapture(SalesInvHdrNo);
+#endif
+
         OnAfterCaptureSalesInvoice(SalesInvHdrNo, PaymentLinesToCaptureFound);
         if PaymentLinesToCaptureFound then
             Commit();
@@ -1607,6 +1611,27 @@
         SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
     begin
         SpfyPaymentGatewayHdlr.RegisterBillingEvents(PaymentLine);
+    end;
+
+    /// <summary>
+    /// Registers the captured amount for an ecom-linked Sales Invoice, ISOLATED from the
+    /// Sales-Post transaction.
+    /// </summary>
+    local procedure RegisterEcomBillingAfterCapture(SalesInvHdrNo: Code[20])
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomBillingMgt: Codeunit "NPR Ecom Billing Mgt.";
+    begin
+        SalesInvHeader.SetLoadFields("NPR Inc Ecom Sale Id");
+        if not SalesInvHeader.Get(SalesInvHdrNo) then
+            exit;
+        if IsNullGuid(SalesInvHeader."NPR Inc Ecom Sale Id") then
+            exit;
+        if not EcomSalesHeader.GetBySystemId(SalesInvHeader."NPR Inc Ecom Sale Id") then
+            exit;
+
+        EcomBillingMgt.RegisterAmountEvent(EcomSalesHeader);
     end;
 #endif
 

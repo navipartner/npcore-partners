@@ -72,6 +72,15 @@ page 6150928 "NPR Entria Integration Setup"
                 Image = ErrorLog;
                 RunObject = page "NPR Entria Order Imp. Failures";
             }
+            action(BillingEvents)
+            {
+                Caption = 'Billing Events';
+                ToolTip = 'View the billing events registered for Entria orders.';
+                ApplicationArea = NPRRetail;
+                Image = Entries;
+                RunObject = page "NPR Ecom Billing Events";
+                RunPageView = order(descending) where(Channel = const(Entria));
+            }
             action(JobQueueEntries)
             {
                 Caption = 'Job Queue Entries';

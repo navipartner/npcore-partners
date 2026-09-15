@@ -32,6 +32,10 @@ codeunit 6248656 "NPR EcomSaleDocCaptureProcess"
         SentrySpan.Finish();
         if OwnsTransaction then
             Sentry.FinalizeScope();
+
+        if _Success then
+            RegisterBillingAfterCapture(Rec);
+
         if (not _Success) and _ShowError then
             Error(Rec."Last Capture Error Message");
     end;
@@ -63,6 +67,16 @@ codeunit 6248656 "NPR EcomSaleDocCaptureProcess"
             EcomLineCaptureProcess.SetSalesDocCaptureProcessingStatusProcessed(EcomSalesHeader);
 
         UpdateTicketReservationExpiryTimeAfterCapture(EcomSalesHeader);
+    end;
+
+    /// <summary>
+    /// Registers the captured amount for an Entria order, isolated from the capture outcome.
+    /// </summary>
+    local procedure RegisterBillingAfterCapture(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomBillingMgt: Codeunit "NPR Ecom Billing Mgt.";
+    begin
+        EcomBillingMgt.RegisterAmountEvent(EcomSalesHeader);
     end;
 
     local procedure UpdateTicketReservationExpiryTimeAfterCapture(var EcommSalesHeader: Record "NPR Ecom Sales Header")

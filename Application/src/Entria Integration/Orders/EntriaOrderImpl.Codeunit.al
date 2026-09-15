@@ -9,6 +9,8 @@ codeunit 6151027 "NPR Entria Order Impl."
             exit;
 
         CreateEcommerceDocument(OrderTkn, EntriaStore, DocumentNo, EcomSalesHeader);
+
+        _EcomBillingMgt.RegisterOrderImported(EcomSalesHeader);
     end;
 
     local procedure TryGetExistingOrder(EntriaStore: Record "NPR Entria Store"; DocumentNo: Code[20]; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
@@ -686,6 +688,7 @@ codeunit 6151027 "NPR Entria Order Impl."
 
     var
         _Currency: Record Currency;
+        _EcomBillingMgt: Codeunit "NPR Ecom Billing Mgt.";
         _EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         _EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         _IntegrationEvents: Codeunit "NPR Entria Integration Events";
