@@ -53,6 +53,7 @@ table 6150816 "NPR Spfy Inventory Level"
         }
         key(ByItem; "Item No.", "Variant Code") { }
         key(ByItemAtLocation; "Shopify Store Code", "Item No.", "Shopify Location ID", "Variant Code") { }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 
     trigger OnInsert()

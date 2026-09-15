@@ -307,9 +307,33 @@
         AddAllowedTable(Database::"NPR Spfy Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
         AddAllowedTable(Database::"NPR Spfy App Request", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
         AddShopifyWebhookNotificationRetentionPolicy();
+        AddShopifyDeletionLogRetentionPolicy();
 
         if IsUpgrade then
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'Shopify');
+    end;
+
+    local procedure AddShopifyDeletionLogRetentionPolicy()
+    var
+        SpfyDeletionLog: Record "NPR Spfy Deletion Log";
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RecRef: RecordRef;
+        RtnPeriodEnum: Enum "Retention Period Enum";
+        TableFilters: JsonArray;
+    begin
+        RemoveRetentionPolicy(Database::"NPR Spfy Deletion Log");
+
+        // MANDATORY filter (last arg before RecRef = true): only terminal-state rows (Cancelled / Processed) are ever
+        // eligible. A Pending row is the deletes-only outbox cursor and a pruned Pending row would be an unrecoverable
+        // orphaned remote delete, so the standard "Apply Retention Policy" job can never reach one, regardless of admin config.
+        SpfyDeletionLog.SetRange(Status, SpfyDeletionLog.Status::Cancelled, SpfyDeletionLog.Status::Processed);
+        RtnPeriodEnum := RtnPeriodEnum::"3 Months";
+        RecRef.GetTable(SpfyDeletionLog);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemModifiedAtNo(), true, false, RecRef);
+
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR Spfy Deletion Log", RecRef.SystemModifiedAtNo(), TableFilters);
+
+        CreateRetentionPolicySetup(Database::"NPR Spfy Deletion Log", GetRetentionPeriodCode(RtnPeriodEnum), true, false);
     end;
 
     local procedure AddShopifyWebhookNotificationRetentionPolicy()

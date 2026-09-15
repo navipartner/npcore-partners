@@ -51,6 +51,35 @@ page 6184553 "NPR Spfy Integration Setup"
                 }
             }
 #endif
+            group(RowVersionSeeding)
+            {
+                Caption = 'RowVersion Change Detection';
+                Visible = ShowRowVersionMigrationUI;
+                field("RowVersion Migration Status"; Rec."RowVersion Migration Status")
+                {
+                    ToolTip = 'Specifies the status of the RowVersion change-detection migration (CORE-433): the baseline seeding sweep and the one-way cutover from the Data Log. Cutover runs once the status shows Seeded.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+                field("RowVersion Seeding Started At"; Rec."RowVersion Seeding Started At")
+                {
+                    ToolTip = 'Specifies when the RowVersion baseline seeding sweep started.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+                field("RowVersion Seeding Compl. At"; Rec."RowVersion Seeding Compl. At")
+                {
+                    ToolTip = 'Specifies when the RowVersion baseline seeding sweep completed.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+                field("RowVersion Seeding Error Text"; Rec."RowVersion Seeding Error Text")
+                {
+                    ToolTip = 'Specifies the error text if the RowVersion baseline seeding sweep failed.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+            }
             part(ShopifyStores; "NPR Spfy Stores Subpage")
             {
                 ApplicationArea = NPRShopify;
@@ -153,6 +182,40 @@ page 6184553 "NPR Spfy Integration Setup"
                         end;
                     }
                 }
+                action(SeedRowVersionBaselines)
+                {
+                    Caption = 'Seed RowVersion Baselines';
+                    ToolTip = 'Runs the initial RowVersion baseline seeding sweep (CORE-433 §8.2) for already-synced Shopify entities. Choose foreground (blocking, with progress) or a background Job Queue entry. This does NOT enable the RowVersion change-detection feature; it only warms up the baselines so the first poll after go-live is a clean no-op.';
+                    ApplicationArea = NPRShopify;
+                    Image = Migration;
+                    Visible = ShowRowVersionMigrationUI;
+
+                    trigger OnAction()
+                    var
+                        SpfySyncStateSeeding: Codeunit "NPR Spfy Sync State Seeding";
+                    begin
+                        CurrPage.SaveRecord();
+                        SpfySyncStateSeeding.SeedSyncState();
+                        CurrPage.Update(false);
+                    end;
+                }
+                action(MigrateToRowVersionDetection)
+                {
+                    Caption = 'Migrate to RowVersion detection';
+                    ToolTip = 'Runs the one-way CORE-433 migration from the Data Log to RowVersion change detection, in a single step. Choose foreground (runs now, blocking) or background (recommended for a large integration). It seeds the RowVersion baselines, enables the feature alongside the live Data Log, drains the remaining Data Log backlog, and finally removes the Shopify Data Log setup. The background option completes automatically with no second run. Safe to re-run if interrupted.';
+                    ApplicationArea = NPRShopify;
+                    Image = Migration;
+                    Visible = ShowRowVersionMigrationUI;
+
+                    trigger OnAction()
+                    var
+                        SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
+                    begin
+                        CurrPage.SaveRecord();
+                        SpfyRowVersionMigration.MigrateAndEnable();
+                        CurrPage.Update(false);
+                    end;
+                }
                 group("Azure Active Directory OAuth")
                 {
                     Caption = 'Microsoft Entra ID OAuth';
@@ -176,6 +239,32 @@ page 6184553 "NPR Spfy Integration Setup"
                 }
             }
         }
+        area(Navigation)
+        {
+            group(ChangeDetection)
+            {
+                Caption = 'Change Detection';
+                Image = List;
+                action(ShopifyChangeTracker)
+                {
+                    Caption = 'Change Tracker';
+                    ToolTip = 'Opens the RowVersion change tracker for the Shopify integration. Each row is one polled table with its last processed SystemRowVersion high-water mark; from here you can inspect a mark or reset it to force a full re-sync of that table.';
+                    ApplicationArea = NPRShopify;
+                    Image = List;
+                    Visible = RowVersionFeatureEnabled;
+                    RunObject = page "NPR Spfy Change Tracker";
+                }
+                action(ShopifyDeletionLog)
+                {
+                    Caption = 'Deletion Log';
+                    ToolTip = 'Opens the RowVersion deletion log for the Shopify integration. Each row is a captured delete of a synced entity, drained last each cycle so it is sent to Shopify after any pending modifications. Use it to inspect pending, processed, and cancelled deletes.';
+                    ApplicationArea = NPRShopify;
+                    Image = Log;
+                    Visible = RowVersionFeatureEnabled;
+                    RunObject = page "NPR Spfy Deletion Log";
+                }
+            }
+        }
     }
 
     trigger OnOpenPage()
@@ -189,6 +278,16 @@ page 6184553 "NPR Spfy Integration Setup"
         end;
         PreparexDataSet();
         HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    var
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+    begin
+        RowVersionFeatureEnabled := SpfyRowVersionFeature.IsFeatureEnabled();
+        ShowRowVersionMigrationUI :=
+            SpfyRowVersionFeature.RunsShopifyOnDataLog() and
+            (Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::Completed);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -249,5 +348,7 @@ page 6184553 "NPR Spfy Integration Setup"
         xSetup: Record "NPR Spfy Integration Setup";
         TempxShopifyStore: Record "NPR Spfy Store" temporary;
         HasAzureADConnection: Boolean;
+        RowVersionFeatureEnabled: Boolean;
+        ShowRowVersionMigrationUI: Boolean;
 }
 #endif

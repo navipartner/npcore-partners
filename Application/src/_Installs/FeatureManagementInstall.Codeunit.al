@@ -58,6 +58,7 @@ codeunit 6151434 "NPR Feature Management Install"
 #if not BC17
         AddFeature(Feature::Shopify);
 #endif
+        AddFeature(Feature::"Shopify RowVersion Change Detection");
         AddFeature(Feature::"POS Scenarios Obsoleted");
         AddFeature(Feature::"New POS Editor");
         AddFeature(Feature::"POS Statistics Dashboard");

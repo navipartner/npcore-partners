@@ -46,12 +46,15 @@ table 6150811 "NPR Spfy Store-Item Link"
             var
                 SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
                 SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+                SpfyDeleteCaptureSubscr: Codeunit "NPR Spfy Del. Capture Subscr.";
                 ConfirmDisableSyncLbl: Label 'Are you sure you want to disable synchronization for Item %1 with the Shopify store %2? If you confirm, the item will be removed from the Shopify store.', Comment = '%1 - Item No., %2 - Shopify Store Code';
             begin
                 if xRec."Sync. to this Store" and not "Sync. to this Store" then
                     if GuiAllowed and not SpfyIntegrationMgt.ApplyingConfigPackage() then
                         if not Confirm(ConfirmDisableSyncLbl, false, "Item No.", "Shopify Store Code") then
                             Error('');
+                // CORE-433 Phase 5 — BC-origin unsync/re-sync intent capture (before the post-send teardown wipes the ID).
+                SpfyDeleteCaptureSubscr.OnStoreItemLinkSyncValidated(Rec, "Sync. to this Store", xRec."Sync. to this Store");
                 if "Sync. to this Store" then begin
                     Modify();
                     SpfyMetafieldMgt.InitStoreItemLinkMetafields(Rec);
@@ -127,6 +130,7 @@ table 6150811 "NPR Spfy Store-Item Link"
         }
         key(SyncEnabled; Type, "Item No.", "Variant Code", "Synchronization Is Enabled") { }
         key(StoreItems; "Shopify Store Code") { }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 
     trigger OnDelete()
@@ -137,6 +141,9 @@ table 6150811 "NPR Spfy Store-Item Link"
         SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
+        // CORE-433 Phase 5: link-row deletion is NOT captured as a Shopify delete (parity — the legacy ProcessStoreItemLink
+        // ignored Data Log Delete entries; deletes come from the sync-disable transition, captured in OnValidate). By the time
+        // a synced item's link is cascade-deleted it has already been unsynced (OnBeforeDelete block), so its ID is gone here.
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
         if Rec.Type = Rec.Type::Item then begin

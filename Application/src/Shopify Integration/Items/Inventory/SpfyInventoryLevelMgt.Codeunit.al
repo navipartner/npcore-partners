@@ -22,6 +22,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
 
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
         IncludeTransferOrdersAnyStore: Boolean;
 
     local procedure Initialize(): Boolean
@@ -84,23 +85,43 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
 
     local procedure TouchInventoryLevel(SalesLine: Record "Sales Line"; var InventoryLevel: Record "NPR Spfy Inventory Level")
     begin
-        if (SalesLine."Document Type" <> SalesLine."Document Type"::Order) or
-           (SalesLine.Type <> SalesLine.Type::Item) or
-           (SalesLine."No." = '')
-        then
+        if not SalesLineInScope(SalesLine) then
             exit;
         TouchInventoryLevel(SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code", InventoryLevel);
     end;
 
     local procedure TouchInventoryLevel(TransferLine: Record "Transfer Line"; var InventoryLevel: Record "NPR Spfy Inventory Level")
     begin
-        if (TransferLine."Derived From Line No." <> 0) or
-           (TransferLine."Item No." = '') or
-           not IncludeTransferOrdersAnyStore
-        then
+        if not TransferLineInScope(TransferLine) then
             exit;
         TouchInventoryLevel(TransferLine."Transfer-from Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevel);
         TouchInventoryLevel(TransferLine."Transfer-to Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevel);
+    end;
+
+    internal procedure SalesLineInScope(SalesLine: Record "Sales Line"): Boolean
+    begin
+        exit(
+            (SalesLine."Document Type" = SalesLine."Document Type"::Order) and
+            (SalesLine.Type = SalesLine.Type::Item) and
+            (SalesLine."No." <> ''));
+    end;
+
+    internal procedure TransferLineInScope(TransferLine: Record "Transfer Line"): Boolean
+    begin
+        exit(
+            (TransferLine."Derived From Line No." = 0) and
+            (TransferLine."Item No." <> '') and
+            SpfyIntegrationMgt.IncludeTrasferOrdersAnyStore());
+    end;
+
+    // Filtered existence check can only over-include (RecalcKey then no-ops), never drop a real inventory update.
+    internal procedure IsShopifyInventoryItem(ItemNo: Code[20]): Boolean
+    var
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+    begin
+        if not SpfyStoreLinkMgt.FilterStoreItemLinksToSync(ItemNo, SpfyStoreItemLink) then
+            exit(false);
+        exit(not SpfyStoreItemLink.IsEmpty());
     end;
 
     local procedure TouchInventoryLevel(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; var InventoryLevel: Record "NPR Spfy Inventory Level")
@@ -129,6 +150,29 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                     end;
                 end;
             until SpfyStoreLocationLink.Next() = 0;
+    end;
+
+    internal procedure RecalcKey(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10])
+    var
+        TempInventoryLevel: Record "NPR Spfy Inventory Level" temporary;
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+    begin
+        TouchInventoryLevel(LocationCode, ItemNo, VariantCode, TempInventoryLevel);
+        if TempInventoryLevel.FindSet() then
+            repeat
+                InventoryLevel := TempInventoryLevel;
+                RecalcInventoryLevel(InventoryLevel);
+            until TempInventoryLevel.Next() = 0;
+    end;
+
+    internal procedure RecalcItemStructural(ItemNo: Code[20]; ShopifyStoreFilter: Text)
+    var
+        Item: Record Item;
+    begin
+        if not Item.Get(ItemNo) then
+            exit;
+        Item.SetRecFilter();
+        InitializeInventoryLevels(ShopifyStoreFilter, Item, true);
     end;
 
     local procedure RecalcInventoryLevel(InventoryLevelParam: Record "NPR Spfy Inventory Level")

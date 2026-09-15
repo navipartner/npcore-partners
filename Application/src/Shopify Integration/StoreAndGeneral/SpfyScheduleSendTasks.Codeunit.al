@@ -4,7 +4,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     Access = Internal;
     Permissions =
         tabledata "NPR Nc Task Setup" = rimd,
-        tabledata "NPR Nc Task Processor" = rimd;
+        tabledata "NPR Nc Task Processor" = rimd,
+        tabledata "NPR Data Log Subscriber" = rimd;
 
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
@@ -204,6 +205,45 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"NPR NpRv Voucher Entry":
                 NewTasksInserted := SpfyRetailVoucherMgt.ProcessDataLogRecord(DataLogRecord);
         end;
+    end;
+
+    internal procedure DrainShopifyDataLogBacklogNow()
+    var
+        DataLogSubscriber: Record "NPR Data Log Subscriber";
+        TempDataLogRecord: Record "NPR Data Log Record" temporary;
+        DataLogSubMgt: Codeunit "NPR Data Log Sub. Mgt.";
+        SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
+        SpfyHandlerId: Code[20];
+        MaxRecords: Integer;
+        PassRecordCount: Integer;
+    begin
+        SpfyHandlerId := SpfyIntegrationMgt.DataProcessingHandlerID(false);
+        if SpfyHandlerId = '' then
+            exit;
+
+        DataLogSubscriber.SetRange(Code, SpfyHandlerId);
+        DataLogSubscriber.SetRange("Company Name", '');
+        DataLogSubscriber.SetFilter("Delayed Data Processing (sec)", '>%1', 0);
+        if not DataLogSubscriber.IsEmpty() then
+            DataLogSubscriber.ModifyAll("Delayed Data Processing (sec)", 0);
+        Commit();
+
+        // Drain one per pass so a handler error can't advance the cursor past unprocessed records.
+        repeat
+            MaxRecords := 1;
+            if not DataLogSubMgt.GetNewRecords(SpfyHandlerId, '', true, MaxRecords, TempDataLogRecord) then begin
+                Commit();
+                exit;
+            end;
+            PassRecordCount := 0;
+            if TempDataLogRecord.FindSet() then
+                repeat
+                    PassRecordCount += 1;
+                    ProcessAndEnqueueDataLogRecord(TempDataLogRecord);
+                until TempDataLogRecord.Next() = 0;
+            SpfyRowVersionMigration.RefreshRunHeartbeat();
+            Commit();
+        until PassRecordCount = 0;
     end;
 
 #if BC18 or BC19 or BC20 or BC21

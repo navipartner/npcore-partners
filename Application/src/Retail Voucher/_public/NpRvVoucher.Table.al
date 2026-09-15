@@ -522,6 +522,7 @@
         key(Key3; "Reference No.")
         {
         }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 
     trigger OnDelete()

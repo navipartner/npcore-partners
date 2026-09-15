@@ -1797,6 +1797,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
+        SpfyDeletionLogMgt: Codeunit "NPR Spfy Deletion Log Mgt";
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         ShopifyInventoryItemID: Text[30];
         xShopifyInventoryItemID: Text[30];
         ShopifyVariantID: Text[30];
@@ -1805,6 +1807,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         WeightUnit: Enum "NPR Spfy Weight Unit";
         WeightValue: Decimal;
         xDoNotTrackInventory: Boolean;
+        SkipNotAvailableReset: Boolean;
     begin
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
         SpfyStoreItemVariantLink."Item No." := ItemVariant."Item No.";
@@ -1832,7 +1835,15 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         xShopifyInventoryItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyVariantID, false);
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID", ShopifyInventoryItemID, false);
-        SpfyItemVariantModifMgt.SetItemVariantAsNotAvailableInShopify(SpfyStoreItemVariantLink, false);
+        // A successful (re)send means the variant is live in Shopify → clear Not Available. BUT skip this when the variant
+        // has an OUTSTANDING rowversion-outbox delete: the read-back returned it only because that delete hasn't sent yet,
+        // and resetting the flag would spuriously cancel the user's pending delete (CORE-433). NESTED (AL has no
+        // short-circuit) so the Deletion Log lookup never runs on the legacy Data Log path; user re-enable uses the page setter.
+        SkipNotAvailableReset := false;
+        if SpfyRowVersionFeature.IsFeatureEnabled() then
+            SkipNotAvailableReset := SpfyDeletionLogMgt.HasOutstandingDelete(Database::"Item Variant", ShopifyStoreCode, "NPR Spfy ID Type"::"Entry ID", ShopifyVariantID);
+        if not SkipNotAvailableReset then
+            SpfyItemVariantModifMgt.SetItemVariantAsNotAvailableInShopify(SpfyStoreItemVariantLink, false);
 
         if TriggeredExternally and not SkipRecalc and ((ShopifyVariantID <> xShopifyVariantID) or (ShopifyInventoryItemID <> xShopifyInventoryItemID)) then begin
             RecalculateInventoryLevels(SpfyStoreItemVariantLink);
@@ -2159,12 +2170,18 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     local procedure ModifySpfyStoreItemLink(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DisableDataLog: Boolean)
     var
         DataLogMgt: Codeunit "NPR Data Log Management";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
     begin
         if DisableDataLog then
             DataLogMgt.DisableDataLog(true);
         SpfyStoreItemLink.Modify(true);
-        if DisableDataLog then
+        if DisableDataLog then begin
             DataLogMgt.DisableDataLog(false);
+            // Self-write convergence (CORE-433): advance the rowversion-poll baseline to this post-writeback state so
+            // mirroring Shopify's product response (Name/Description/Vendor) back here doesn't re-trigger a sync.
+            // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected. §5.4.
+            SpfySyncStateMgt.AdvanceStoreItemLinkBaseline(SpfyStoreItemLink);
+        end;
     end;
 
     local procedure DisableIntegrationForItem(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")

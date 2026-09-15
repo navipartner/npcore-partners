@@ -70,6 +70,11 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Implementation = "NPR Feature Management" = "NPR Spfy Ecommerce Order Exp";
     }
 #endif
+    value(92; "Shopify RowVersion Change Detection")
+    {
+        Caption = 'Shopify RowVersion Change Detection', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR Spfy RowVersion Feature";
+    }
     value(100; "POS Scenarios Obsoleted")
     {
         Caption = 'POS Scenarios Obsoleted', Locked = true, MaxLength = 50;

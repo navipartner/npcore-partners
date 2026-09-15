@@ -64,14 +64,23 @@ page 6184563 "NPR Spfy Change Assigned ID"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
+        SpfyDelCaptureSubscr: Codeunit "NPR Spfy Del. Capture Subscr.";
+        ConfirmTxt: Text;
         EmptyShopifyIDConfTxt: Label 'You have not specified the New Shopify ID.\Are you sure you want to clear Shopify ID for the entity?';
+        PendingDeletionCancelledTxt: Label '\A pending Shopify deletion of this entity will be cancelled, as it can no longer be sent.';
         UpdateInventoryLevelsTxt: Label 'You have changed Shopify Location ID.\You will need to run the "Calculate Inventory Levels" batch job on the "Shopify Inventory Levels" page to make sure inventory availability sent to Shopify reflects the change.';
     begin
         if CloseAction = Action::Yes then begin
-            if NewShopifyID = '' then
-                if not Confirm(EmptyShopifyIDConfTxt, true) then
+            if NewShopifyID = '' then begin
+                ConfirmTxt := EmptyShopifyIDConfTxt;
+                if SpfyDelCaptureSubscr.HasOutstandingDeleteForClearedID(BCRecID, IDType) then
+                    ConfirmTxt += PendingDeletionCancelledTxt;
+                if not Confirm(ConfirmTxt, true) then
                     exit(false);
+            end;
             SpfyAssignedIDMgt.AssignShopifyID(BCRecID, IDType, NewShopifyID, BCRecID.TableNo <> Database::"NPR Spfy Store-Location Link");
+            if NewShopifyID = '' then
+                SpfyDelCaptureSubscr.OnShopifyIDCleared(BCRecID, IDType);
             if (CurrentShopifyID <> NewShopifyID) and (BCRecID.TableNo = Database::"NPR Spfy Store-Location Link") and (IDType = "NPR Spfy ID Type"::"Entry ID") then
                 Message(UpdateInventoryLevelsTxt);
         end;

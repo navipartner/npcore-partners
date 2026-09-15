@@ -1,0 +1,184 @@
+codeunit 6151215 "NPR Spfy Deletion Log Mgt"
+{
+    Access = Internal;
+
+    var
+        CancelledByReactivationTxt: Label 'Cancelled: the entity was reactivated in Business Central before the delete was sent to Shopify.';
+
+    procedure LogDelete(EntityTableNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; CustomerNo: Code[20]; RecordIdParam: RecordId; SystemId: Guid; StoreCode: Code[20]; ShopifyIdType: Enum "NPR Spfy ID Type"; ShopifyId: Text[30])
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+    begin
+        if ShopifyId = '' then
+            exit;
+
+        DeletionLog.SetCurrentKey("Table No.", "Shopify ID Type", "Shopify ID", "Shopify Store Code", Status);
+        DeletionLog.SetRange("Table No.", EntityTableNo);
+        DeletionLog.SetRange("Shopify ID Type", ShopifyIdType);
+        DeletionLog.SetRange("Shopify ID", ShopifyId);
+        DeletionLog.SetRange("Shopify Store Code", StoreCode);
+        DeletionLog.SetRange(Status, DeletionLog.Status::Pending);
+        if not DeletionLog.IsEmpty() then
+            exit;
+
+        DeletionLog.Init();
+        DeletionLog."Table No." := EntityTableNo;
+        DeletionLog."Item No." := ItemNo;
+        DeletionLog."Variant Code" := VariantCode;
+        DeletionLog."Customer No." := CustomerNo;
+        DeletionLog."Record ID" := RecordIdParam;
+        DeletionLog."Entity System Id" := SystemId;
+        DeletionLog."Shopify Store Code" := StoreCode;
+        DeletionLog."Shopify ID Type" := ShopifyIdType;
+        DeletionLog."Shopify ID" := ShopifyId;
+        DeletionLog.Status := DeletionLog.Status::Pending;
+        DeletionLog.Insert(true);
+    end;
+
+    procedure CancelDelete(EntityTableNo: Integer; StoreCode: Code[20]; ShopifyIdType: Enum "NPR Spfy ID Type"; ShopifyId: Text[30])
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+    begin
+        if ShopifyId = '' then
+            exit;
+
+        DeletionLog.SetCurrentKey("Table No.", "Shopify ID Type", "Shopify ID", "Shopify Store Code", Status);
+        DeletionLog.SetRange("Table No.", EntityTableNo);
+        DeletionLog.SetRange("Shopify ID Type", ShopifyIdType);
+        DeletionLog.SetRange("Shopify ID", ShopifyId);
+        DeletionLog.SetRange("Shopify Store Code", StoreCode);
+        DeletionLog.SetFilter(Status, '%1|%2', DeletionLog.Status::Pending, DeletionLog.Status::Processed);
+        DeletionLog.ReadIsolation := IsolationLevel::UpdLock;
+        if not DeletionLog.FindSet(true) then
+            exit;
+        repeat
+            CancelRow(DeletionLog);
+        until DeletionLog.Next() = 0;
+    end;
+
+    // Cancels by entity identity: the id the intent was captured with may already be cleared or reassigned.
+    procedure CancelDeleteForEntity(EntityTableNo: Integer; StoreCode: Code[20]; EntitySystemId: Guid)
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+    begin
+        if IsNullGuid(EntitySystemId) then
+            exit;
+
+        DeletionLog.SetCurrentKey("Table No.", "Entity System Id", "Shopify Store Code", Status);
+        DeletionLog.SetRange("Table No.", EntityTableNo);
+        DeletionLog.SetRange("Entity System Id", EntitySystemId);
+        DeletionLog.SetRange("Shopify Store Code", StoreCode);
+        DeletionLog.SetFilter(Status, '%1|%2', DeletionLog.Status::Pending, DeletionLog.Status::Processed);
+        DeletionLog.ReadIsolation := IsolationLevel::UpdLock;
+        if not DeletionLog.FindSet(true) then
+            exit;
+        repeat
+            CancelRow(DeletionLog);
+        until DeletionLog.Next() = 0;
+    end;
+
+    // Same predicate as HasOutstandingDelete, keyed by entity: everything CancelDeleteForEntity would actually cancel.
+    procedure HasOutstandingDeleteForEntity(EntityTableNo: Integer; StoreCode: Code[20]; EntitySystemId: Guid): Boolean
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+        NcTask: Record "NPR Nc Task";
+    begin
+        if IsNullGuid(EntitySystemId) then
+            exit(false);
+
+        DeletionLog.SetCurrentKey("Table No.", "Entity System Id", "Shopify Store Code", Status);
+        DeletionLog.SetRange("Table No.", EntityTableNo);
+        DeletionLog.SetRange("Entity System Id", EntitySystemId);
+        DeletionLog.SetRange("Shopify Store Code", StoreCode);
+        DeletionLog.SetRange(Status, DeletionLog.Status::Pending);
+        if not DeletionLog.IsEmpty() then
+            exit(true);
+        DeletionLog.SetRange(Status, DeletionLog.Status::Processed);
+        if DeletionLog.FindSet() then
+            repeat
+                if (DeletionLog."NC Task Entry No." <> 0) and NcTask.Get(DeletionLog."NC Task Entry No.") then
+                    if not NcTask.Processed then
+                        exit(true);
+            until DeletionLog.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure CancelRow(var DeletionLog: Record "NPR Spfy Deletion Log")
+    begin
+        case DeletionLog.Status of
+            DeletionLog.Status::Pending:
+                begin
+                    DeletionLog.Status := DeletionLog.Status::Cancelled;
+                    DeletionLog.Modify(true);
+                end;
+            DeletionLog.Status::Processed:
+                if CancelOutstandingNcTask(DeletionLog."NC Task Entry No.") then begin
+                    DeletionLog.Status := DeletionLog.Status::Cancelled;
+                    DeletionLog.Modify(true);
+                end;
+        end;
+    end;
+
+    // True while a delete intent for this (table, Shopify ID, store) still needs sending: Pending, or Processed with an
+    // NC task that hasn't run yet. Lets a post-send Shopify read-back avoid resetting a flag that would cancel the delete.
+    procedure HasOutstandingDelete(EntityTableNo: Integer; StoreCode: Code[20]; ShopifyIdType: Enum "NPR Spfy ID Type"; ShopifyId: Text[30]): Boolean
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+        NcTask: Record "NPR Nc Task";
+    begin
+        if ShopifyId = '' then
+            exit(false);
+        DeletionLog.SetCurrentKey("Table No.", "Shopify ID Type", "Shopify ID", "Shopify Store Code", Status);
+        DeletionLog.SetRange("Table No.", EntityTableNo);
+        DeletionLog.SetRange("Shopify ID Type", ShopifyIdType);
+        DeletionLog.SetRange("Shopify ID", ShopifyId);
+        DeletionLog.SetRange("Shopify Store Code", StoreCode);
+        DeletionLog.SetRange(Status, DeletionLog.Status::Pending);
+        if not DeletionLog.IsEmpty() then
+            exit(true);
+        DeletionLog.SetRange(Status, DeletionLog.Status::Processed);
+        if DeletionLog.FindSet() then
+            repeat
+                if (DeletionLog."NC Task Entry No." <> 0) and NcTask.Get(DeletionLog."NC Task Entry No.") then
+                    if not NcTask.Processed then
+                        exit(true);
+            until DeletionLog.Next() = 0;
+        exit(false);
+    end;
+
+    procedure MarkProcessed(EntryNo: BigInteger; NcTaskEntryNo: BigInteger)
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+    begin
+        if not DeletionLog.Get(EntryNo) then
+            exit;
+        if DeletionLog.Status <> DeletionLog.Status::Pending then
+            exit;
+        DeletionLog.Status := DeletionLog.Status::Processed;
+        DeletionLog."NC Task Entry No." := NcTaskEntryNo;
+        DeletionLog.Modify(true);
+    end;
+
+    local procedure CancelOutstandingNcTask(NcTaskEntryNo: BigInteger): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        OutStr: OutStream;
+    begin
+        if NcTaskEntryNo = 0 then
+            exit(false);
+        if not NcTask.Get(NcTaskEntryNo) then
+            exit(false);
+        if NcTask.Processed then
+            exit(false);
+
+        NcTask.Processed := true;
+        NcTask."Process Error" := false;
+        NcTask."Last Processing Started at" := 0DT;
+        NcTask."Last Processing Completed at" := CurrentDateTime();
+        NcTask."Last Processing Duration" := 0;
+        NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(CancelledByReactivationTxt);
+        NcTask.Modify();
+        exit(true);
+    end;
+}

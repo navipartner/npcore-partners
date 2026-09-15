@@ -11,5 +11,10 @@ tableextension 6014523 "NPR Stockkeeping Unit" extends "Stockkeeping Unit"
             MinValue = 0;
         }
     }
+
+    keys
+    {
+        key(NPRSpfyInvRowVersion; SystemRowVersion) { }
+    }
 }
 #endif

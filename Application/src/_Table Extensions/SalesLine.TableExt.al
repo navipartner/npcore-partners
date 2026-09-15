@@ -224,6 +224,11 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
         }
     }
 
+    keys
+    {
+        key(NPRSpfyInvRowVersion; SystemRowVersion) { }
+    }
+
     var
         _SkipPOSPaymentMethodItemCheck: Boolean;
 

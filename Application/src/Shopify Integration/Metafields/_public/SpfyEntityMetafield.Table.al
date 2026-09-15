@@ -68,6 +68,7 @@ table 6150951 "NPR Spfy Entity Metafield"
         }
         key(Key2; "Table No.", "BC Record ID", "Owner Type", "Metafield ID") { }
         key(Key3; "Owner Type", "Metafield ID", "Table No.") { }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 
     procedure SetMetafieldValue(NewMetafieldValue: Text)

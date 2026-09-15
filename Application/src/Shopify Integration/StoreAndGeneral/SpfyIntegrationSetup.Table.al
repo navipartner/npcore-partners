@@ -237,6 +237,9 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Data Processing Handler ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-06-24';
+            ObsoleteReason = 'CORE-433: Data Log detection replaced by SystemRowVersion polling; the SPFY data-log handler is being retired. Removal in a later release.';
 
             trigger OnValidate()
             var
@@ -260,6 +263,37 @@ table 6150807 "NPR Spfy Integration Setup"
         field(160; "Enable Product Variant Sorting"; Boolean)
         {
             Caption = 'Enable Product Variant Sorting';
+            DataClassification = CustomerContent;
+        }
+        // ---- CORE-433 Phase 6c (§8.2): initial RowVersion baseline-seeding status. Persisted here (the Shopify
+        //      integration singleton) so 6d's go-live can gate on Completed (esp. the background Job Queue path).
+        field(170; "RowVersion Migration Status"; Option)
+        {
+            Caption = 'RowVersion Migration Status';
+            DataClassification = CustomerContent;
+            OptionMembers = NotStarted,Seeding,Seeded,Migrating,Completed,Failed;
+            OptionCaption = 'Not Started,Seeding,Seeded,Migrating,Completed,Failed';
+        }
+        field(171; "RowVersion Seeding Started At"; DateTime)
+        {
+            Caption = 'RowVersion Seeding Started At';
+            DataClassification = CustomerContent;
+        }
+        field(172; "RowVersion Seeding Compl. At"; DateTime)
+        {
+            Caption = 'RowVersion Seeding Completed At';
+            DataClassification = CustomerContent;
+        }
+        field(173; "RowVersion Seeding Error Text"; Text[250])
+        {
+            Caption = 'RowVersion Seeding Error Text';
+            DataClassification = CustomerContent;
+        }
+        field(174; "RowVersion Pld. Ver. Seeded"; Integer)
+        {
+            // The SpfySyncStateMgt.PayloadVersion() captured at seeding completion. 6d accepts Completed only when this
+            // equals the current PayloadVersion() — a PayloadVersion bump invalidates a stale Completed (design §8.2).
+            Caption = 'RowVersion Payload Version Seeded';
             DataClassification = CustomerContent;
         }
     }

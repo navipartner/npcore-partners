@@ -944,12 +944,18 @@ codeunit 6248540 "NPR Spfy Send Customers"
     local procedure ModifySpfyStoreCustomerLink(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; DisableDataLog: Boolean)
     var
         DataLogMgt: Codeunit "NPR Data Log Management";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
     begin
         if DisableDataLog then
             DataLogMgt.DisableDataLog(true);
         SpfyStoreCustomerLink.Modify(true);
-        if DisableDataLog then
+        if DisableDataLog then begin
             DataLogMgt.DisableDataLog(false);
+            // Self-write convergence (CORE-433): advance the rowversion-poll baseline to this post-writeback state so
+            // mirroring Shopify's customer response (name/email/phone/marketing/address) back here doesn't re-trigger a sync.
+            // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected. §5.4.
+            SpfySyncStateMgt.AdvanceStoreCustomerLinkBaseline(SpfyStoreCustomerLink);
+        end;
     end;
 
     local procedure DisableIntegrationForCustomer(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")

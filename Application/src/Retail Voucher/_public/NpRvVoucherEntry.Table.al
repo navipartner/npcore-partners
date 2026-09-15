@@ -188,5 +188,6 @@
         key(Key8; "Voucher No.", "Entry Type", "Partner Code")
         {
         }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 }

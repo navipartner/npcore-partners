@@ -149,5 +149,9 @@ enum 6014585 "NPR Retention Policy V2" implements "NPR IRetention Policy V2"
     {
         Implementation = "NPR IRetention Policy V2" = "NPR Ret.Pol.: Dig.Notif.Ent";
     }
+    value(36; "NPR Spfy Deletion Log")
+    {
+        Implementation = "NPR IRetention Policy V2" = "NPR Ret.Pol.: SpfyDeletionLog";
+    }
 }
 #endif

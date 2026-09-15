@@ -406,5 +406,6 @@
         key(Key4; "Arch. No.")
         {
         }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 }

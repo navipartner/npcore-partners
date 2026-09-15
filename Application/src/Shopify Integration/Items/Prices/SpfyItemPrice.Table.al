@@ -59,6 +59,7 @@ table 6150924 "NPR Spfy Item Price"
             Clustered = true;
         }
         key(ByItem; "Item No.", "Variant Code") { }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 }
 #endif

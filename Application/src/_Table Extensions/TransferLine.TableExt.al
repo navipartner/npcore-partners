@@ -44,5 +44,10 @@ tableextension 6014444 "NPR Transfer Line" extends "Transfer Line"
             ObsoleteReason = '"NPR Distrib. Table Map" used instead.';
         }
     }
+
+    keys
+    {
+        key(NPRSpfyInvRowVersion; SystemRowVersion) { }
+    }
 }
 

@@ -63,6 +63,7 @@ table 6151028 "NPR Spfy Item Variant Modif."
             Clustered = true;
         }
         key(NotAvailabe; "Not Available") { }
+        key(RowVersion; SystemRowVersion) { }   // rowversion polling (generic — shared across integrations)
     }
 }
 #endif

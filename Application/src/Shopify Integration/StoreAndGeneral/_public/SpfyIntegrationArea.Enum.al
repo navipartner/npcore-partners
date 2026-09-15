@@ -1,20 +1,24 @@
 #if not BC17
-enum 6014656 "NPR Spfy Integration Area"
+enum 6014656 "NPR Spfy Integration Area" implements "NPR Spfy Change Handler"
 {
     Extensible = true;
+    DefaultImplementation = "NPR Spfy Change Handler" = "NPR Spfy Chg Hdlr Default";
 
     value(0; " ") { }
     value(10; Items)
     {
         Caption = 'Item List';
+        Implementation = "NPR Spfy Change Handler" = "NPR Spfy Chg Hdlr Items";
     }
     value(11; "Inventory Levels")
     {
         Caption = 'Inventory';
+        Implementation = "NPR Spfy Change Handler" = "NPR Spfy Chg Hdlr Inventory";
     }
     value(12; "Item Prices")
     {
         Caption = 'Item Prices';
+        Implementation = "NPR Spfy Change Handler" = "NPR Spfy Chg Hdlr Item Prices";
     }
     value(13; "Item Categories")
     {
@@ -23,6 +27,7 @@ enum 6014656 "NPR Spfy Integration Area"
     value(20; "Sales Orders")
     {
         Caption = 'Sales Orders';
+        Implementation = "NPR Spfy Change Handler" = "NPR Spfy Chg Hdlr Sales Orders";
     }
     value(21; "Order Fulfillments")
     {
@@ -49,6 +54,7 @@ enum 6014656 "NPR Spfy Integration Area"
     value(30; "Retail Vouchers")
     {
         Caption = 'Retail Vouchers';
+        Implementation = "NPR Spfy Change Handler" = "NPR Spfy Chg Hdlr Vouchers";
     }
     value(40; "Loyalty Points")
     {
@@ -60,5 +66,12 @@ enum 6014656 "NPR Spfy Integration Area"
         Caption = 'BC Customer Transactions';
     }
 #endif
+    value(60; Metafields)
+    {
+        // Dispatch-routing area for the owner-polymorphic NPR Spfy Entity Metafield table (Item + Customer metafields).
+        // Not an end-user "enable" toggle — the handler gates each metafield by its OWNER's area (Items/Customers).
+        Caption = 'Metafields';
+        Implementation = "NPR Spfy Change Handler" = "NPR Spfy Chg Hdlr Metafields";
+    }
 }
 #endif

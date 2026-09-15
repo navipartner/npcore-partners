@@ -20,6 +20,7 @@ codeunit 6248412 "NPR Spfy ItemVariantModif Mgt."
     local procedure SaveItemVariantModifToDB(var SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif."; DisableDataLog: Boolean)
     var
         DataLogMgt: Codeunit "NPR Data Log Management";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
     begin
         if DisableDataLog then
             DataLogMgt.DisableDataLog(true);
@@ -27,8 +28,14 @@ codeunit 6248412 "NPR Spfy ItemVariantModif Mgt."
             SpfyItemVariantModif.Insert(true)
         else
             SpfyItemVariantModif.Modify(true);
-        if DisableDataLog then
+        if DisableDataLog then begin
             DataLogMgt.DisableDataLog(false);
+            // Self-write convergence (CORE-433): DisableDataLog = "this is the integration's own write" (e.g. mirroring
+            // Shopify's inventoryPolicy/tracked/weight back here). Advance the rowversion-poll baseline to this
+            // post-writeback state so it does NOT re-trigger a sync. No-op when the RowVersion feature is off; a real
+            // USER edit comes in with DisableDataLog=false and is NOT advanced → still detected. (Design §5.4.)
+            SpfySyncStateMgt.AdvanceItemVariantModifBaseline(SpfyItemVariantModif);
+        end;
     end;
 
     internal procedure SetItemVariantAsNotAvailableInShopify(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; NotAvailable: Boolean)

@@ -37,10 +37,16 @@ table 6150810 "NPR Spfy Store"
                 SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
 #endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+                SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
             begin
                 if Enabled then
                     TestField("Shopify Url");
                 Modify();
+
+                // CORE-433 §8.1 — auto-adopt the RowVersion poll on a fresh environment (shared checked-enable guard). On a
+                // non-fresh environment this is a no-op and the legacy Data-Log path is used until the Phase 6c seeding migration.
+                if Enabled then
+                    SpfyRowVersionFeature.MaybeAutoAdoptFreshEnvironment("Code");
 
                 ShopifyStore.Get("Code");
                 ShopifyStore.SetRecFilter();
@@ -137,7 +143,7 @@ table 6150810 "NPR Spfy Store"
             trigger OnValidate()
             begin
                 if "Item List Integration" then
-                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::Items);
+                    SetupIntegrationArea("NPR Spfy Integration Area"::Items);
             end;
         }
         field(61; "Do Not Sync. Sales Prices"; Boolean)
@@ -153,7 +159,7 @@ table 6150810 "NPR Spfy Store"
             begin
                 if not "Do Not Sync. Sales Prices" then begin
                     SpfyItemPriceMgt.EnableShopifyLogRetentionPolicy();
-                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Item Prices");
+                    SetupIntegrationArea("NPR Spfy Integration Area"::"Item Prices");
                 end;
                 SpfyScheduleSendTasks.ToggleSpfyItemPriceSyncJobQueue(Enabled and not "Do Not Sync. Sales Prices");
             end;
@@ -193,7 +199,7 @@ table 6150810 "NPR Spfy Store"
                     if not "Item List Integration" then
                         if Confirm(EnableItemListIntegrLbl, true, Rec.FieldCaption("Item List Integration"), Rec.FieldCaption("Send Inventory Updates")) then
                             Rec.Validate("Item List Integration", true);
-                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Inventory Levels");
+                    SetupIntegrationArea("NPR Spfy Integration Area"::"Inventory Levels");
                 end;
             end;
         }
@@ -208,7 +214,7 @@ table 6150810 "NPR Spfy Store"
             begin
                 if "Include Transfer Orders" <> "Include Transfer Orders"::No then begin
                     Modify();
-                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Inventory Levels");
+                    SetupIntegrationArea("NPR Spfy Integration Area"::"Inventory Levels");
                 end;
             end;
         }
@@ -239,7 +245,7 @@ table 6150810 "NPR Spfy Store"
 #endif
                 OrderMgt.SetupJobQueues();
                 if "Sales Order Integration" then begin
-                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Sales Orders");
+                    SetupIntegrationArea("NPR Spfy Integration Area"::"Sales Orders");
                     SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
                     if SpfyAllowedFinStatus.IsEmpty() then
                         AddAllowedOrderFinancialStatus(Enum::"NPR Spfy Order FinancialStatus"::Authorized);
@@ -368,7 +374,7 @@ table 6150810 "NPR Spfy Store"
             trigger OnValidate()
             begin
                 if "Retail Voucher Integration" then
-                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Retail Vouchers");
+                    SetupIntegrationArea("NPR Spfy Integration Area"::"Retail Vouchers");
             end;
         }
         field(131; "Voucher Type (Sold at Shopify)"; Code[20])
@@ -601,6 +607,26 @@ table 6150810 "NPR Spfy Store"
     var
         _SpfyDataLogSubscrMgt: Codeunit "NPR Spfy DLog Subscr.Mgt.Impl.";
         _SpfyWebhookMgt: Codeunit "NPR Spfy Webhook Mgt.";
+
+    /// <summary>
+    /// CORE-433 §8.1 — per-area enable routing. Auto-adopt first (so a fresh customer who toggles an area flag BEFORE the
+    /// master "Enabled" still adopts RowVersion rather than creating legacy Data Log setup that would poison the fresh
+    /// predicate). With the RowVersion feature on, register that area's polled tables + ensure the monitored detection job;
+    /// with the feature off (existing Data-Log integration), fall back to the legacy Data-Log path unchanged.
+    /// </summary>
+    local procedure SetupIntegrationArea(IntegrationArea: Enum "NPR Spfy Integration Area")
+    var
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+        SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
+        SpfyScheduleDetectionJQ: Codeunit "NPR Spfy Schedule Detection JQ";
+    begin
+        SpfyRowVersionFeature.MaybeAutoAdoptFreshEnvironment("Code");
+        if SpfyRowVersionFeature.IsFeatureEnabled() then begin
+            SpfyChangeTrackerMgt.RegisterArea(IntegrationArea);   // per-area, mirroring CreateDataLogSetup(area) granularity
+            SpfyScheduleDetectionJQ.EnsureChangeDetectionJobScheduled();
+        end else
+            _SpfyDataLogSubscrMgt.CreateDataLogSetup(IntegrationArea);
+    end;
 
     trigger OnRename()
     var

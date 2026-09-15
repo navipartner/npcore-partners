@@ -51,16 +51,8 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 
     internal procedure ProcessMetafield(DataLogEntry: Record "NPR Data Log Record"): Boolean
     var
-        NcTask: Record "NPR Nc Task";
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
-        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
-        SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
-        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
         RecRef: RecordRef;
-        ShopifyStoreCode: Code[20];
-        TaskRecordValue: Text;
-        ProcessRecord: Boolean;
     begin
         if DataLogEntry."Type of Change" <> DataLogEntry."Type of Change"::Modify then
             exit;
@@ -70,6 +62,30 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         if not SpfyEntityMetafield.Find() then
             exit;
 
+        exit(ProcessMetafield(SpfyEntityMetafield));
+    end;
+
+    internal procedure ProcessMetafield(SpfyEntityMetafield: Record "NPR Spfy Entity Metafield"): Boolean
+    var
+        ProcessedEligibly: Boolean;
+    begin
+        exit(ProcessMetafield(SpfyEntityMetafield, ProcessedEligibly));
+    end;
+
+    internal procedure ProcessMetafield(SpfyEntityMetafield: Record "NPR Spfy Entity Metafield"; var ProcessedEligibly: Boolean): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
+        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+        RecRef: RecordRef;
+        ShopifyStoreCode: Code[20];
+        TaskRecordValue: Text;
+        ProcessRecord: Boolean;
+    begin
+        ProcessedEligibly := false;
+        RecRef.GetTable(SpfyEntityMetafield);
         SpfyMetafieldMgtPublic.OnProcessMetafieldEntityDataLogEntry(SpfyEntityMetafield, ShopifyStoreCode, TaskRecordValue, ProcessRecord);
         if not ProcessRecord then
             case SpfyEntityMetafield."Table No." of
@@ -84,6 +100,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         if TaskRecordValue = '' then
             TaskRecordValue := Format(SpfyEntityMetafield."BC Record ID");
 
+        ProcessedEligibly := true;
         clear(NcTask);
         NcTask.Type := NcTask.Type::Modify;
         exit(SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, SpfyEntityMetafield."BC Record ID", TaskRecordValue, NcTask.Type, 0DT, 0DT, Enum::"NPR Spfy Reuse Delayed NC Task"::Any, NcTask));
@@ -220,8 +237,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         SpfyEntityMetafield.SetRange("Metafield ID", xMetafieldID);
         if Removed then begin
             if xMetafieldID <> '' then
-                if not SpfyEntityMetafield.IsEmpty() then
-                    SpfyEntityMetafield.DeleteAll();
+                ClearEntityMetafieldValuesAsTombstones(SpfyEntityMetafield);
             if not Silent then
                 Window.Close();
             exit;
@@ -234,6 +250,26 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         SpfyMetafieldMgtPublic.OnProcessMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed, Silent);
         if not Silent then
             Window.Close();
+    end;
+
+    // Poll mode: do NOT hard-delete on mapping removal — clearing the value keeps the empty-value tombstone that drives metafieldsDelete.
+    internal procedure ClearEntityMetafieldValuesAsTombstones(var SpfyEntityMetafield: Record "NPR Spfy Entity Metafield")
+    var
+        SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
+    begin
+        if not SpfyEntityMetafield.FindSet() then
+            exit;
+        if not SpfyChangeTrackerMgt.MetafieldOwnerOnRowVersionPoll(SpfyEntityMetafield."Table No.") then begin
+            SpfyEntityMetafield.DeleteAll();
+            exit;
+        end;
+        repeat
+            if SpfyEntityMetafield.GetMetafieldValue(true) <> '' then begin
+                SpfyEntityMetafield.SetMetafieldValue('');
+                SpfyEntityMetafield."Metafield Value Version ID" := '';
+                SpfyEntityMetafield.Modify(true);
+            end;
+        until SpfyEntityMetafield.Next() = 0;
     end;
 
     internal procedure UpdateMetafieldIDInExistingSpfyEntityMetafieldEntries(var SpfyEntityMetafield: Record "NPR Spfy Entity Metafield"; NewMetafieldID: Text[30])
@@ -283,19 +319,46 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         NcTask: Record "NPR Nc Task";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
         QueryStream: OutStream;
         MetafieldsSet: JsonToken;
         ShopifyResponse: JsonToken;
         OwnerTypeTxt: Text;
     begin
-        if not MetafieldMappingExist(ShopifyStoreCode, ShopifyOwnerType) then
+        if not MetafieldMappingExist(ShopifyStoreCode, ShopifyOwnerType) then begin
+            if SpfyChangeTrackerMgt.MetafieldOwnerOnRowVersionPoll(EntityRecID.TableNo()) then
+                CleanupOrphanedMetafieldTombstones(EntityRecID, ShopifyOwnerType);
             exit;
+        end;
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         ShopifyEntityMetafieldsSetRequestQuery(ShopifyOwnerType, ShopifyOwnerID, OwnerTypeTxt, QueryStream);
         if SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
             if ShopifyResponse.SelectToken(StrSubstNo('data.%1.metafields.edges', SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt)), MetafieldsSet) then
                 UpdateBCMetafieldData(EntityRecID, ShopifyOwnerType, ShopifyStoreCode, MetafieldsSet);
+    end;
+
+    local procedure CleanupOrphanedMetafieldTombstones(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type")
+    var
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        DataLogMgt: Codeunit "NPR Data Log Management";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        OrphanSystemIds: List of [Guid];
+        OrphanSystemId: Guid;
+    begin
+        FilterSpfyEntityMetafields(EntityRecID, ShopifyOwnerType, SpfyEntityMetafield);
+        if SpfyEntityMetafield.FindSet() then
+            repeat
+                if SpfyEntityMetafield.GetMetafieldValue(true) = '' then
+                    OrphanSystemIds.Add(SpfyEntityMetafield.SystemId);
+            until SpfyEntityMetafield.Next() = 0;
+        foreach OrphanSystemId in OrphanSystemIds do
+            if SpfyEntityMetafield.GetBySystemId(OrphanSystemId) then begin
+                DataLogMgt.DisableDataLog(true);
+                SpfyEntityMetafield.Delete(true);
+                DataLogMgt.DisableDataLog(false);
+                SpfySyncStateMgt.RemoveBaseline(Database::"NPR Spfy Entity Metafield", OrphanSystemId, '');
+            end;
     end;
 
     internal procedure UpdateBCMetafieldData(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyStoreCode: Code[20]; MetafieldsSet: JsonToken)
@@ -762,6 +825,8 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     var
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
         DataLogMgt: Codeunit "NPR Data Log Management";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        EntityMetafieldSystemId: Guid;
         NewValue: Text;
     begin
         if Params."Metafield Raw Value".HasValue() then
@@ -789,18 +854,23 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             if DisableDataLog then
                 DataLogMgt.DisableDataLog(true);
             SpfyEntityMetafield.Modify(true);
-            if DisableDataLog then
+            if DisableDataLog then begin
                 DataLogMgt.DisableDataLog(false);
+                SpfySyncStateMgt.AdvanceEntityMetafieldBaseline(SpfyEntityMetafield);
+            end;
             exit;
         end;
 
         if DeleteEmpty then
             if not Params."Metafield Raw Value".HasValue() or IsEmptyMetafieldValue(NewValue) then begin
+                EntityMetafieldSystemId := SpfyEntityMetafield.SystemId;
                 if DisableDataLog then
                     DataLogMgt.DisableDataLog(true);
                 SpfyEntityMetafield.Delete(true);
-                if DisableDataLog then
+                if DisableDataLog then begin
                     DataLogMgt.DisableDataLog(false);
+                    SpfySyncStateMgt.RemoveBaseline(Database::"NPR Spfy Entity Metafield", EntityMetafieldSystemId, '');
+                end;
                 exit;
             end;
 
@@ -818,8 +888,10 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         if DisableDataLog then
             DataLogMgt.DisableDataLog(true);
         SpfyEntityMetafield.Modify(true);
-        if DisableDataLog then
+        if DisableDataLog then begin
             DataLogMgt.DisableDataLog(false);
+            SpfySyncStateMgt.AdvanceEntityMetafieldBaseline(SpfyEntityMetafield);
+        end;
     end;
 
     local procedure MetafieldMappingExist(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"): Boolean
