@@ -34,10 +34,10 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
     begin
         ItemId := Request.Paths().Get(3);
         Item.ReadIsolation := IsolationLevel::ReadCommitted;
+        Item.SetAutoCalcFields(Inventory, "NPR Has Variants");
         if not Item.GetBySystemId(ItemId) then
             exit(Response.RespondResourceNotFound());
 
-        Item.CalcFields(Inventory);
         if (Request.QueryParams().ContainsKey('withAttributes')) then
             WithAttributes := (Request.QueryParams().Get('withAttributes').ToLower() = 'true');
 
