@@ -33,12 +33,24 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         ChangeTracker.Insert(true);
     end;
 
-    procedure AdvanceMark(var ChangeTracker: Record "NPR Change Tracker"; NewMaxRowVersion: BigInteger)
+    procedure AdvanceMark(var ChangeTracker: Record "NPR Change Tracker"; NewMaxRowVersion: BigInteger): Boolean
+    var
+        FreshTracker: Record "NPR Change Tracker";
     begin
-        if NewMaxRowVersion <= ChangeTracker."Last Row Version" then
-            exit;
-        ChangeTracker."Last Row Version" := NewMaxRowVersion;
-        ChangeTracker.Modify(true);
+        // Re-Get under UpdLock: the caller's in-memory row goes stale once its per-row Commit released the lock.
+        FreshTracker.ReadIsolation(IsolationLevel::UpdLock);
+        if not FreshTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
+            exit(false);
+        // A concurrent lowering (reset/re-sync) must win: advancing past it would discard the forced re-scan.
+        // FreshTracker is deliberately not copied back — the caller's stale high mark keeps repeat calls false.
+        if FreshTracker."Last Row Version" < ChangeTracker."Last Row Version" then
+            exit(false);
+        if NewMaxRowVersion > FreshTracker."Last Row Version" then begin
+            FreshTracker."Last Row Version" := NewMaxRowVersion;
+            FreshTracker.Modify(true);
+        end;
+        ChangeTracker := FreshTracker;
+        exit(true);
     end;
 
     procedure SeedToCurrentMax(var ChangeTracker: Record "NPR Change Tracker"; CurrentMaxRowVersionParam: BigInteger)

@@ -185,7 +185,7 @@ page 6184553 "NPR Spfy Integration Setup"
                 action(SeedRowVersionBaselines)
                 {
                     Caption = 'Seed RowVersion Baselines';
-                    ToolTip = 'Runs the initial RowVersion baseline seeding sweep (CORE-433 §8.2) for already-synced Shopify entities. Choose foreground (blocking, with progress) or a background Job Queue entry. This does NOT enable the RowVersion change-detection feature; it only warms up the baselines so the first poll after go-live is a clean no-op.';
+                    ToolTip = 'Runs the initial RowVersion baseline seeding sweep (CORE-433 §8.2) for already-synced Shopify entities. Choose foreground (blocking, with progress) or a background Job Queue entry. This does NOT enable the RowVersion change-detection feature; it only warms up the baselines so the first poll after go-live is a clean no-op. This is a pre-cutover migration tool only: it fast-forwards ALL tracker marks and rewinds the migration status. After cut-over, use Quiet-Seed Baselines instead.';
                     ApplicationArea = NPRShopify;
                     Image = Migration;
                     Visible = ShowRowVersionMigrationUI;
@@ -238,6 +238,72 @@ page 6184553 "NPR Spfy Integration Setup"
                     }
                 }
             }
+            group(Resync)
+            {
+                Caption = 'Re-sync to Shopify';
+                Image = Refresh;
+
+                action(FullResync)
+                {
+                    ApplicationArea = NPRShopify;
+                    Caption = 'Full Re-sync…';
+                    Image = RefreshLines;
+                    Visible = RowVersionFeatureEnabled;
+                    ToolTip = 'Clears all Shopify sync baselines and re-scans every tracked table, re-sending the current BC state of every synced product, variant, customer, metafield and inventory level to Shopify. Retail Vouchers and Item Prices are excluded, and the Item Ledger Entry mark is left untouched (its pending backlog drains over the next detection cycles). Use after data loss on the Shopify side or a payload version change you want to force-push. Values equal to their default (for example a zero cost) are not re-pushed. You will be asked to confirm the affected row counts.';
+
+                    trigger OnAction()
+                    var
+                        SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
+                    begin
+                        SpfyResyncMgt.StartFullResync();
+                    end;
+                }
+                action(ResyncStore)
+                {
+                    ApplicationArea = NPRShopify;
+                    Caption = 'Re-sync Store…';
+                    Image = Refresh;
+                    Visible = RowVersionFeatureEnabled;
+                    ToolTip = 'Re-sends one Shopify store''s synced data: clears the store''s baselines (products, per-store variant data, customers and their metafields) and re-scans the affected tables. Store-agnostic baselines (variant structural data, inventory move-keys) are only cleared if you opt in — clearing them affects ALL stores. Retail Vouchers and Item Prices are excluded.';
+
+                    trigger OnAction()
+                    var
+                        SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
+                    begin
+                        SpfyResyncMgt.StartStoreResync();
+                    end;
+                }
+                action(ResyncArea)
+                {
+                    ApplicationArea = NPRShopify;
+                    Caption = 'Re-sync Area…';
+                    Image = Refresh;
+                    Visible = RowVersionFeatureEnabled;
+                    ToolTip = 'Re-sends one integration area (Item List, Inventory, Sales Orders/Customers or Metafields): clears the area''s baselines and re-scans its tracked tables. Retail Vouchers are excluded; Item Prices have no baselines and cannot be re-synced this way. Metafields are their own area; run the Metafields area, a store re-sync, or a full re-sync to re-push metafields.';
+
+                    trigger OnAction()
+                    var
+                        SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
+                    begin
+                        SpfyResyncMgt.StartAreaResync();
+                    end;
+                }
+                action(QuietSeedBaselines)
+                {
+                    ApplicationArea = NPRShopify;
+                    Caption = 'Quiet-Seed Baselines…';
+                    Image = Approve;
+                    Visible = RowVersionFeatureEnabled;
+                    ToolTip = 'Overwrites all Shopify sync baselines with the current computed BC state WITHOUT sending anything to Shopify. Use when the baselines are wrong but Shopify is already correct (partial seed, aborted migration, payload version bump). WARNING: any genuinely pending, un-sent change to a baseline-tracked value is absorbed and will not be sent. Tracker marks and the migration status are left untouched. Only available after the RowVersion migration has completed; re-running after a failure is safe.';
+
+                    trigger OnAction()
+                    var
+                        SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
+                    begin
+                        SpfyResyncMgt.StartQuietSeed();
+                    end;
+                }
+            }
         }
         area(Navigation)
         {
@@ -262,6 +328,15 @@ page 6184553 "NPR Spfy Integration Setup"
                     Image = Log;
                     Visible = RowVersionFeatureEnabled;
                     RunObject = page "NPR Spfy Deletion Log";
+                }
+                action(ShopifyResyncRuns)
+                {
+                    ApplicationArea = NPRShopify;
+                    Caption = 'Re-sync Runs';
+                    Image = History;
+                    Visible = RowVersionFeatureEnabled;
+                    RunObject = page "NPR Spfy Resync Runs";
+                    ToolTip = 'Shows the audit trail of Shopify re-sync and quiet-seed runs: scope, status, progress heartbeat, affected row counts and errors.';
                 }
             }
         }

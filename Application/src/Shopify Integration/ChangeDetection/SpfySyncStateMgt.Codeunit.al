@@ -311,6 +311,78 @@ codeunit 6151227 "NPR Spfy Sync State Mgt"
             SyncState.DeleteAll(true);
     end;
 
+    internal procedure CountBaselinesForTable(TableNo: Integer): Integer
+    var
+        SyncState: Record "NPR Spfy Sync State";
+    begin
+        SyncState.SetRange("Table No.", TableNo);
+        exit(SyncState.Count());
+    end;
+
+    internal procedure CountBaselinesForTableAndStore(TableNo: Integer; StoreCode: Code[20]): Integer
+    var
+        SyncState: Record "NPR Spfy Sync State";
+    begin
+        SyncState.SetRange("Table No.", TableNo);
+        SyncState.SetRange("Shopify Store Code", StoreCode);
+        exit(SyncState.Count());
+    end;
+
+    internal procedure DeleteBaselinesForTable(TableNo: Integer) DeletedCount: Integer
+    var
+        SyncState: Record "NPR Spfy Sync State";
+    begin
+        SyncState.SetRange("Table No.", TableNo);
+        DeletedCount := SyncState.Count();
+        if DeletedCount = 0 then
+            exit;
+        SyncState.DeleteAll(true);
+    end;
+
+    internal procedure DeleteBaselinesForTableAndStore(TableNo: Integer; StoreCode: Code[20]) DeletedCount: Integer
+    var
+        SyncState: Record "NPR Spfy Sync State";
+    begin
+        // StoreCode = '' targets ONLY store-agnostic rows (blank is a real key value, not a wildcard).
+        SyncState.SetRange("Table No.", TableNo);
+        SyncState.SetRange("Shopify Store Code", StoreCode);
+        DeletedCount := SyncState.Count();
+        if DeletedCount = 0 then
+            exit;
+        SyncState.DeleteAll(true);
+    end;
+
+    internal procedure CountMetafieldBaselinesForOwner(OwnerTableNo: Integer; OwnerRecordId: RecordId): Integer
+    var
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        MetafieldCount: Integer;
+    begin
+        SpfyEntityMetafield.SetRange("Table No.", OwnerTableNo);
+        SpfyEntityMetafield.SetRange("BC Record ID", OwnerRecordId);
+        if SpfyEntityMetafield.FindSet() then
+            repeat
+                if HasBaseline(Database::"NPR Spfy Entity Metafield", SpfyEntityMetafield.SystemId, '') then
+                    MetafieldCount += 1;
+            until SpfyEntityMetafield.Next() = 0;
+        exit(MetafieldCount);
+    end;
+
+    internal procedure DeleteMetafieldBaselinesForOwner(OwnerTableNo: Integer; OwnerRecordId: RecordId) DeletedCount: Integer
+    var
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+    begin
+        // Metafield baselines are keyed store-blank; store scoping comes from the OWNER link row.
+        SpfyEntityMetafield.SetRange("Table No.", OwnerTableNo);
+        SpfyEntityMetafield.SetRange("BC Record ID", OwnerRecordId);
+        if SpfyEntityMetafield.FindSet() then
+            repeat
+                if HasBaseline(Database::"NPR Spfy Entity Metafield", SpfyEntityMetafield.SystemId, '') then begin
+                    RemoveBaseline(Database::"NPR Spfy Entity Metafield", SpfyEntityMetafield.SystemId, '');
+                    DeletedCount += 1;
+                end;
+            until SpfyEntityMetafield.Next() = 0;
+    end;
+
     procedure ItemCategoryCode(Item: Record Item): Text
     begin
         exit(Item."Item Category Code");

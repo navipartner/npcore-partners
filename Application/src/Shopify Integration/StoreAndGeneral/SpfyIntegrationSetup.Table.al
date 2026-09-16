@@ -265,8 +265,7 @@ table 6150807 "NPR Spfy Integration Setup"
             Caption = 'Enable Product Variant Sorting';
             DataClassification = CustomerContent;
         }
-        // ---- CORE-433 Phase 6c (§8.2): initial RowVersion baseline-seeding status. Persisted here (the Shopify
-        //      integration singleton) so 6d's go-live can gate on Completed (esp. the background Job Queue path).
+        // initial RowVersion baseline-seeding status
         field(170; "RowVersion Migration Status"; Option)
         {
             Caption = 'RowVersion Migration Status';

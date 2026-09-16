@@ -13,9 +13,13 @@ codeunit 6151218 "NPR Spfy Change Detection"
         ChangeTracker: Record "NPR Change Tracker";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
+        SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
         EnabledTables: List of [Integer];
     begin
         if not SpfyRowVersionFeature.IsFeatureEnabled() then
+            exit;
+        // Skip the whole cycle while a re-sync is active; an in-flight poll self-aborts on its first AdvanceMark.
+        if SpfyResyncMgt.IsResyncActive() then
             exit;
         SpfyChangeTrackerMgt.RegisterEnabledTables(EnabledTables);
         ChangeTracker.SetCurrentKey("Integration Type", "Processing Order", "Table No.");   // source tables (order 0) before derived/send tables (order 1000) → same-cycle send
@@ -34,9 +38,13 @@ codeunit 6151218 "NPR Spfy Change Detection"
     local procedure DrainDeletionLog()
     var
         DeletionLog: Record "NPR Spfy Deletion Log";
+        SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
         EntryNo: BigInteger;
         RowsThisCycle: Integer;
     begin
+        // Defer (never drop): rows stay Pending and drain next cycle after the re-sync completes.
+        if SpfyResyncMgt.IsResyncActive() then
+            exit;
         DeletionLog.SetCurrentKey(Status, "Entry No.");
         DeletionLog.SetRange(Status, DeletionLog.Status::Pending);
         if not DeletionLog.FindSet() then
@@ -86,6 +94,7 @@ codeunit 6151218 "NPR Spfy Change Detection"
         RowVer: BigInteger;
         RowVerFieldNo: Integer;
         RowsThisCycle: Integer;
+        AbortPoll: Boolean;
     begin
         // Separate local record so we do NOT disturb the RunDetection FindSet cursor; UpdLock so concurrent job instances don't race the mark.
         LockedTracker.ReadIsolation(IsolationLevel::UpdLock);
@@ -102,10 +111,12 @@ codeunit 6151218 "NPR Spfy Change Detection"
                 RowVer := RecRef.Field(RowVerFieldNo).Value();
                 DetectedChange.Init(SpfyChangeTrackerMgt.IntegrationAreaForTable(LockedTracker."Table No."), "NPR Spfy Change Type"::Modify, LockedTracker."Table No.", RecRef.RecordId(), ChangeTrackerMgt.SystemIdOf(RecRef));
                 SpfyChangeDispatcher.Dispatch(DetectedChange);
-                ChangeTrackerMgt.AdvanceMark(LockedTracker, RowVer);
+                // false = mark concurrently lowered (re-sync): abort without re-raising; the dispatched row
+                // re-dispatches on the forced re-scan.
+                AbortPoll := not ChangeTrackerMgt.AdvanceMark(LockedTracker, RowVer);
                 Commit();
                 RowsThisCycle += 1;
-            until (RecRef.Next() = 0) or (RowsThisCycle >= MaxRows());
+            until (RecRef.Next() = 0) or (RowsThisCycle >= MaxRows()) or AbortPoll;
         RecRef.Close();
     end;
 

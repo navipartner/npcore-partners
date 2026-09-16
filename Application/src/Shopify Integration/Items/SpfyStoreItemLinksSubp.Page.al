@@ -305,7 +305,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
             action(SyncItems)
             {
                 Caption = 'Update Sync. Status';
-                ToolTip = 'Updates item synchronization status between BC and Shopify. The system will go through Shopify stores and mark the item as synchronized if it has already been created on the store. The system will also update the item status, name, description and metafields from Shopify, and create a request to assign product tags in Shopify based on the item category.';
+                ToolTip = 'Adopts the sync status FROM Shopify: the system goes through the Shopify stores and, if the item already exists on the store, marks it as synchronized. It also pulls the item status, name, description and metafields from Shopify, and creates a request to assign product tags in Shopify based on the item category. This pulls status only — it does not push BC data to Shopify; use Re-push to Shopify to force-send the current BC state.';
                 ApplicationArea = NPRShopify;
                 Image = CheckList;
 
@@ -368,6 +368,22 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                 RunObject = page "NPR Spfy Inv. Item Locations";
                 RunPageLink = "Shopify Store Code" = field("Shopify Store Code"), "Item No." = field("Item No."), "Variant Code" = field("Variant Code");
             }
+            action(RePushToShopify)
+            {
+                ApplicationArea = NPRShopify;
+                Caption = 'Re-push to Shopify';
+                Image = Refresh;
+                Scope = Repeater;
+                Visible = RowVersionFeatureEnabled;
+                ToolTip = 'Re-sends this product to this Shopify store: the product payload, its variants (structural data is shared, so variants are re-sent to every synced store), per-store variant settings, metafields, cost and category tags, and inventory levels. Clears the stored baselines and lets the next detection cycle (typically within a minute) send the current BC state. Use when Shopify lost or corrupted this product''s data. Values equal to their default (for example a zero cost) are not re-pushed.';
+
+                trigger OnAction()
+                var
+                    SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
+                begin
+                    SpfyResyncMgt.ResyncStoreItemLink(Rec);
+                end;
+            }
         }
     }
 
@@ -385,13 +401,17 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
         DoNotTrackInventory: Boolean;
         ItemListIntegrationIsEnabled: Boolean;
         ProductVariantSortingEnabled: Boolean;
+        RowVersionFeatureEnabled: Boolean;
         ItemIntegrIsNotEnabledErr: Label 'Item integration is not enabled for the store. You cannot adjust this parameter.';
 
     trigger OnOpenPage()
+    var
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
     begin
         SpfyIntegrationMgt.ResetConfigPackageApplyState();
         ItemListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
         ProductVariantSortingEnabled := SpfyIntegrationMgt.ProductVariantSortingEnabled();
+        RowVersionFeatureEnabled := SpfyRowVersionFeature.IsFeatureEnabled();
     end;
 
     trigger OnAfterGetRecord()

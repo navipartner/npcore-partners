@@ -11,7 +11,10 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
         _SpfyInventoryLevelMgt: Codeunit "NPR Spfy Inventory Level Mgt.";
         _SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
         _SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
+        _SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
         _ShowProgress: Boolean;
+        _BaselinesOnly: Boolean;
+        _ResyncRunEntryNo: BigInteger;
         _Window: Dialog;
         _ProcessedCount: Integer;
         _StartedAt: DateTime;
@@ -28,6 +31,23 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
     internal procedure SetShowProgress(NewShowProgress: Boolean)
     begin
         _ShowProgress := NewShowProgress;
+    end;
+
+    internal procedure SetBaselinesOnly(NewBaselinesOnly: Boolean)
+    begin
+        _BaselinesOnly := NewBaselinesOnly;
+    end;
+
+    internal procedure SetResyncRunEntryNo(NewResyncRunEntryNo: BigInteger)
+    begin
+        // Quiet-seed sets this so the heartbeat targets its own run row; left 0 by the migration path (no-op there).
+        _ResyncRunEntryNo := NewResyncRunEntryNo;
+    end;
+
+    internal procedure GetProcessedCount(): Integer
+    begin
+        // Variable state survives a failed Codeunit.Run, so the count is available on the failure path too.
+        exit(_ProcessedCount);
     end;
 
     local procedure RunSweepWork()
@@ -49,9 +69,12 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
         SeedVoucherBaselines();
         CommitBatch(true);
 
-        // Run after baseline seeding so the marks sit at the cut-over high-water mark.
-        SeedTrackerMarks();
-        CommitBatch(true);
+        if not _BaselinesOnly then begin
+            // After baseline seeding, so the marks sit at the cut-over high-water mark. The quiet-seed leaves
+            // marks untouched (pending backlog keeps processing).
+            SeedTrackerMarks();
+            CommitBatch(true);
+        end;
 
         if _ShowProgress then
             _Window.Close();
@@ -70,6 +93,7 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
         if not SpfyStoreItemLink.FindSet() then
             exit;
         repeat
+            ScanHeartbeat();   // orphaned links skip CountOne — a long skip stretch must still heartbeat
             if SpfyStoreItemLink."Item No." <> LastItemNo then
                 ItemFound := Item.Get(SpfyStoreItemLink."Item No.");
             if ItemFound then begin
@@ -106,6 +130,7 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
         ItemVariant.SetRange("Item No.", ItemNo);
         if ItemVariant.FindSet() then
             repeat
+                ScanHeartbeat();   // unassigned variants skip CountOne
                 if SeedVariantIfAssigned(ItemVariant) then
                     CountOne();
             until ItemVariant.Next() = 0;
@@ -134,6 +159,7 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
         SpfyItemVariantModif.SetRange("Item No.", ItemNo);
         if SpfyItemVariantModif.FindSet() then
             repeat
+                ScanHeartbeat();
                 if SpfyItemVariantModif."Shopify Store Code" <> '' then begin
                     _SpfySyncStateMgt.SeedItemVariantModifBaseline(SpfyItemVariantModif);
                     CountOne();
@@ -210,6 +236,7 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
         SpfyStoreCustomerLink.SetRange("Sync. to this Store", true);
         if SpfyStoreCustomerLink.FindSet() then
             repeat
+                ScanHeartbeat();   // disabled-area links skip CountOne
                 if _SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders", SpfyStoreCustomerLink."Shopify Store Code") then begin
                     _SpfySyncStateMgt.SeedStoreCustomerLinkBaseline(SpfyStoreCustomerLink);
                     CountOne();
@@ -276,6 +303,7 @@ codeunit 6151239 "NPR Spfy Sync St. Seed Worker"
         if (_UncommittedCount = 0) and not Force then
             exit;
         _SpfyRowVersionMigration.RefreshRunHeartbeat();
+        _SpfyResyncMgt.RefreshRunHeartbeat(_ResyncRunEntryNo);   // no-op (EntryNo 0) on the migration path
         Commit();
         _UncommittedCount := 0;
         _LastHeartbeatAt := CurrentDateTime();

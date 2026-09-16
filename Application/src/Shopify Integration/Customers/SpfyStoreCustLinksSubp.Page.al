@@ -207,7 +207,7 @@ page 6185092 "NPR Spfy Store-Cust.Links Subp"
             action(SyncItems)
             {
                 Caption = 'Update Sync. Status';
-                ToolTip = 'Updates customer synchronization status between BC and Shopify. The system will go through Shopify stores and mark the customer as synchronized if it has already been created in the store. The system will also update the customer first and last names, email, phone number and metafields from Shopify.';
+                ToolTip = 'Adopts the sync status FROM Shopify: the system goes through the Shopify stores and, if the customer already exists in the store, marks it as synchronized. It also pulls the customer first and last names, email, phone number and metafields from Shopify. This pulls status only — it does not push BC data to Shopify; use Re-push to Shopify to force-send the current BC state.';
                 ApplicationArea = NPRShopify;
                 Image = CheckList;
 
@@ -242,6 +242,22 @@ page 6185092 "NPR Spfy Store-Cust.Links Subp"
                     CurrPage.Update(false);
                 end;
             }
+            action(RePushToShopify)
+            {
+                ApplicationArea = NPRShopify;
+                Caption = 'Re-push to Shopify';
+                Image = Refresh;
+                Scope = Repeater;
+                Visible = RowVersionFeatureEnabled;
+                ToolTip = 'Re-sends this customer to this Shopify store: the customer payload and its metafields. Clears the stored baselines and lets the next detection cycle (typically within a minute) send the current BC state. The Customer card itself is not modified.';
+
+                trigger OnAction()
+                var
+                    SpfyResyncMgt: Codeunit "NPR Spfy Resync Mgt";
+                begin
+                    SpfyResyncMgt.ResyncStoreCustomerLink(Rec);
+                end;
+            }
         }
     }
 
@@ -250,11 +266,15 @@ page 6185092 "NPR Spfy Store-Cust.Links Subp"
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         CustomerListIntegrationIsEnabled: Boolean;
+        RowVersionFeatureEnabled: Boolean;
 
     trigger OnOpenPage()
+    var
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
     begin
         SpfyIntegrationMgt.ResetConfigPackageApplyState();
         CustomerListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
+        RowVersionFeatureEnabled := SpfyRowVersionFeature.IsFeatureEnabled();
     end;
 
     local procedure CheckIntegrationIsEnabled()
