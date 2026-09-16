@@ -108,6 +108,89 @@ codeunit 85246 "NPR Ecom Voucher Tests"
     end;
     #endregion
 
+    #region Customer attribution (CORE-1924)
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VoucherProcess_HeaderCarriesNonBCCustomer_IssuedVoucherHasBlankCustomerNo()
+    var
+        Customer: Record Customer;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        WebshopCustomerNo: Code[20];
+    begin
+        // [Scenario] "Sell-to Customer No." on the ecom header is whatever the webshop sent in
+        // sellToCustomer.no - it has no TableRelation and is stored unvalidated, and it only ever
+        // denotes a BC customer when Ecommerce Setup maps Customer Mapping to "Customer No.".
+        // The voucher's "Customer No." does relate to Customer and gates POS redemption through
+        // NpRvVoucherMgt.CheckCustomer, so the header value must never reach the voucher: an
+        // unknown id there makes the voucher unusable on a "Require Customer Match" voucher type.
+        WebshopCustomerNo := 'WEB-12345';
+        _Assert.IsFalse(Customer.Get(WebshopCustomerNo), 'Fixture requires that no BC customer exists under the webshop id.');
+
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Sell-to Customer No." := WebshopCustomerNo;
+        EcomSalesHeader.Modify();
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        CreateCapturedVoucherLine(EcomSalesLine, EcomSalesHeader, VoucherType.Code, 1, 100);
+
+        VchrImpl.Process(EcomSalesLine);
+
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        EcomSalesVoucherLink.FindFirst();
+        NpRvVoucher.Get(EcomSalesVoucherLink."Voucher No.");
+        _Assert.AreEqual('', NpRvVoucher."Customer No.", 'Webshop customer id from the ecom header must not end up on the issued voucher.');
+
+        // Pin the vector as well: the voucher inherits "Customer No." from the NpRv Sales Line, so the
+        // header value must not be parked there on its way through either.
+        NpRvSalesLine.SetRange("NPR Inc Ecom Sales Line Id", EcomSalesLine.SystemId);
+        NpRvSalesLine.FindFirst();
+        _Assert.AreEqual('', NpRvSalesLine."Customer No.", 'Webshop customer id from the ecom header must not be copied onto the voucher sales line.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VoucherProcess_ReservedSalesLineCarriesBCCustomer_IssuedVoucherInheritsCustomerNo()
+    var
+        Customer: Record Customer;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesVoucherLink: Record "NPR Ecom Sales Voucher Link";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        LibrarySales: Codeunit "Library - Sales";
+        VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+    begin
+        // [Scenario] The Shopify import pre-reserves one NpRv Sales Line per gift card and validates a
+        // real BC customer onto it (SpfyEcomSalesDocImport.CreateVoucherReservation) - for Shopify
+        // documents "Sell-to Customer No." *is* a BC customer, because EcomSalesDocImplV2 hard-Gets it.
+        // When the fast lane later issues against such a reservation, that customer must survive onto
+        // the voucher, so customer attribution and the voucher_created customerNo stay intact.
+        LibrarySales.CreateCustomer(Customer);
+        _LibPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Sell-to Customer No." := Customer."No.";
+        EcomSalesHeader.Modify();
+        CreateCapturedVoucherLine(EcomSalesLine, EcomSalesHeader, VoucherType.Code, 1, 100);
+
+        ReserveVoucherSalesLineForCustomer(NpRvSalesLine, EcomSalesHeader, EcomSalesLine, VoucherType, Customer."No.");
+        EcomSalesLine."Barcode No." := NpRvSalesLine."Reference No.";
+        EcomSalesLine.Modify();
+
+        VchrImpl.Process(EcomSalesLine);
+
+        EcomSalesVoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        EcomSalesVoucherLink.FindFirst();
+        NpRvVoucher.Get(EcomSalesVoucherLink."Voucher No.");
+        _Assert.AreEqual(Customer."No.", NpRvVoucher."Customer No.", 'Voucher must inherit the BC customer that the voucher sales line was reserved for.');
+    end;
+    #endregion
+
     #region Quantity validation
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -983,6 +1066,35 @@ codeunit 85246 "NPR Ecom Voucher Tests"
         VoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
         VoucherMgt.InitVoucher(VoucherType, TempVoucher."No.", TempVoucher."Reference No.", 0DT, true, NpRvVoucher);
         NpRvVoucher.Modify();
+    end;
+
+    local procedure ReserveVoucherSalesLineForCustomer(var NpRvSalesLine: Record "NPR NpRv Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; CustomerNo: Code[20])
+    var
+        TempVoucher: Record "NPR NpRv Voucher" temporary;
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        // Mirrors the reservation the Shopify import writes in SpfyEcomSalesDocImport, minus the
+        // Shopify-only fields: an unposted "New Voucher" sales line tied to this ecom line, carrying a
+        // generated Reference No. and a validated BC customer. Passing that Reference No. as the ecom
+        // line's "Barcode No." makes the fast lane issue against the reservation without needing a
+        // Spfy Event Log Entry to make IsShopifyDocument true.
+        VoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
+
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine."Voucher No." := TempVoucher."No.";
+        NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
+        NpRvSalesLine."External Document No." := EcomSalesHeader."External No.";
+        NpRvSalesLine."NPR Inc Ecom Sales Line Id" := EcomSalesLine.SystemId;
+        NpRvSalesLine.Amount := EcomSalesLine."Line Amount";
+        NpRvSalesLine.Validate("Customer No.", CustomerNo);
+        NpRvSalesLine.Insert();
+
+        NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, TempVoucher);
     end;
 
     local procedure InsertCorruptLinkRow(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line")

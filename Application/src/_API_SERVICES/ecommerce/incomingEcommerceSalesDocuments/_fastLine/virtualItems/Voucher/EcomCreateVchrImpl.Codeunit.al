@@ -149,8 +149,10 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineRef: Record "NPR NpRv Sales Line Ref.";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvGlobalVoucher: Codeunit "NPR NpRv Global Voucher WS";
+        RetailVoucherWebhook: Codeunit "NPR Retail Voucher Webhooks";
         VoucherFaceValueLCY: Decimal;
         EffectiveBarcode: Text[50];
     begin
@@ -193,10 +195,19 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
         NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
         if not VoucherAlreadyExist(NpRvSalesLine."Voucher No.") then
-            InsertVoucher(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
+            InsertVoucher(NpRvVoucher, NpRvVoucherType, NpRvSalesLine)
+        else
+            if NpRvVoucher."No." <> NpRvSalesLine."Voucher No." then
+                NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
         UpdateSalesLineFromVoucher(NpRvVoucher, NpRvSalesLine);
 
-        PostIssueVoucherEntry(NpRvVoucher, NpRvVoucherType, NpRvSalesLine);
+        PostIssueVoucherEntry(NpRvVoucher, NpRvVoucherType, NpRvSalesLine, NpRvVoucherEntry);
+
+        if NpRvVoucherEntry."Entry Type" = NpRvVoucherEntry."Entry Type"::"Issue Voucher" then begin
+            NpRvVoucher.CalcFields("Initial Amount", "Issue External Document No.");
+            RetailVoucherWebhook.OnVoucherCreated(NpRvVoucher.SystemId, NpRvVoucher."Voucher Type", NpRvVoucher."Initial Amount", NpRvVoucher."Customer No.", NpRvVoucher."Reference No.", '', NpRvVoucher."Issue External Document No.");
+        end;
+
         NpRvSalesLine.Posted := true;
         NpRvSalesLine.Modify();
 
@@ -295,6 +306,8 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
     local procedure NpRvSalesLineToVoucher(var NpRvVoucher: Record "NPR NpRv Voucher"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
+        NpRvVoucher."Customer No." := NpRvSalesLine."Customer No.";
+        NpRvVoucher."Contact No." := NpRvSalesLine."Contact No.";
         NpRvVoucher.Name := NpRvSalesLine.Name;
         NpRvVoucher."Name 2" := NpRvSalesLine."Name 2";
         NpRvVoucher.Address := NpRvSalesLine.Address;
@@ -318,9 +331,8 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 #endif
     end;
 
-    local procedure PostIssueVoucherEntry(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; NpRvSalesLine: Record "NPR NpRv Sales Line")
+    local procedure PostIssueVoucherEntry(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; NpRvSalesLine: Record "NPR NpRv Sales Line"; var VoucherEntry: Record "NPR NpRv Voucher Entry")
     var
-        VoucherEntry: Record "NPR NpRv Voucher Entry";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         VoucherEntry.Init();
