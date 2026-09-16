@@ -33,6 +33,16 @@ table 6151207 "NPR Change Tracker"
         {
             Caption = 'Last Row Version';
         }
+        field(40; "Failing Row Version"; BigInteger)
+        {
+            Caption = 'Failing Row Version';
+            Editable = false;
+        }
+        field(41; "Consecutive Failures"; Integer)
+        {
+            Caption = 'Consecutive Failures';
+            Editable = false;
+        }
     }
 
     keys

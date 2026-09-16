@@ -28,8 +28,8 @@ table 6151227 "NPR Spfy Deletion Log"
         field(7; Status; Option)
         {
             Caption = 'Status';
-            OptionMembers = Pending,Cancelled,Processed;
-            OptionCaption = 'Pending,Cancelled,Processed';
+            OptionMembers = Pending,Cancelled,Processed,Quarantined;
+            OptionCaption = 'Pending,Cancelled,Processed,Quarantined';
         }
         field(9; "NC Task Entry No."; BigInteger)
         {
@@ -58,6 +58,11 @@ table 6151227 "NPR Spfy Deletion Log"
         field(22; "Shopify ID"; Text[30])
         {
             Caption = 'Shopify ID';
+        }
+        field(23; "Dispatch Failure Count"; Integer)
+        {
+            Caption = 'Dispatch Failure Count';
+            Editable = false;
         }
     }
 

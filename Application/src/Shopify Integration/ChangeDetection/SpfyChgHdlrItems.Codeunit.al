@@ -142,8 +142,11 @@ codeunit 6151189 "NPR Spfy Chg Hdlr Items" implements "NPR Spfy Change Handler"
         if not (SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled") then
             exit;
 
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreItemLink."Shopify Store Code") then
-            SpfyInventoryLevelMgt.RecalcItemStructural(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Shopify Store Code");
+        // Structural recompute only on sync-state transitions: a steady-state link edit (incl. the post-send
+        // "Synchronization Is Enabled" write-back) does not change the required inventory-row shape.
+        if SpfyStoreItemLink."Sync. to this Store" <> SpfyStoreItemLink."Synchronization Is Enabled" then
+            if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreItemLink."Shopify Store Code") then
+                SpfyInventoryLevelMgt.RecalcItemStructural(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Shopify Store Code");
 
         if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Prices", SpfyStoreItemLink."Shopify Store Code") then
             if SpfyStoreItemLink."Sync. to this Store" and not SpfyStoreItemLink."Synchronization Is Enabled" then

@@ -23,7 +23,7 @@ codeunit 6151235 "NPR Spfy Del. Capture Subscr."
     end;
 
     // Desired-state reconciliation, NOT xRec transition detection: xRec is unreliable in a modify subscriber when the
-    // Modify comes from code (it equals Rec). LogDelete/CancelDelete are idempotent and CancelVariantDelete
+    // Modify comes from code (it equals Rec). LogDelete/CancelDeleteForEntity are idempotent and CancelVariantDelete
     // keeps other (Blocked/link) deactivations intact, so driving off the CURRENT "Not Available" is both reliable and safe.
     local procedure ReconcileVariantNotAvailableDeleteIntent(SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.")
     begin
@@ -69,7 +69,7 @@ codeunit 6151235 "NPR Spfy Del. Capture Subscr."
         Capture: Boolean;
     begin
         // Desired-state reconciliation off current Blocked, NOT an xRec transition (xRec is unreliable when Modify comes
-        // from code). Cheap: FilterStoreItemLinksToSync returns empty fast for non-Shopify items, LogDelete/CancelDelete
+        // from code). Cheap: FilterStoreItemLinksToSync returns empty fast for non-Shopify items, LogDelete/CancelDeleteForEntity
         // are idempotent, and it's gated behind the cached feature flag.
         if Rec.IsTemporary() or not SpfyRowVersionFeature.IsFeatureEnabled() then
             exit;
@@ -132,7 +132,27 @@ codeunit 6151235 "NPR Spfy Del. Capture Subscr."
             exit;
         if (EntityTableNo = Database::"Item Variant") and OtherVariantDeactivationActive(ItemNo, VariantCode, SpfyStoreItemLink."Shopify Store Code", false) then
             exit;
+        if EntityTableNo = Database::Item then
+            CancelStaleVariantDeletes(ItemNo, SpfyStoreItemLink."Shopify Store Code");
         SpfyDeletionLogMgt.CancelDeleteForEntity(EntityTableNo, SpfyStoreItemLink."Shopify Store Code", EntitySystemId(EntityTableNo, ItemNo, VariantCode));
+    end;
+
+    // An item-link re-sync reactivates the item's variants, so any delete intent captured while the link was
+    // unsynced is stale unless another deactivation cause still demands it (CORE-433 4-transition edge).
+    local procedure CancelStaleVariantDeletes(ItemNo: Code[20]; ShopifyStoreCode: Code[20])
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+    begin
+        DeletionLog.SetRange("Table No.", Database::"Item Variant");
+        DeletionLog.SetRange("Item No.", ItemNo);
+        DeletionLog.SetRange("Shopify Store Code", ShopifyStoreCode);
+        // Include Processed: a drained-but-unsent delete is still cancellable via CancelDeleteForEntity/CancelOutstandingNcTask.
+        DeletionLog.SetFilter(Status, '%1|%2|%3', DeletionLog.Status::Pending, DeletionLog.Status::Processed, DeletionLog.Status::Quarantined);
+        if DeletionLog.FindSet() then
+            repeat
+                if not OtherVariantDeactivationActive(DeletionLog."Item No.", DeletionLog."Variant Code", ShopifyStoreCode, true) then
+                    SpfyDeletionLogMgt.CancelDeleteForEntity(Database::"Item Variant", ShopifyStoreCode, DeletionLog."Entity System Id");
+            until DeletionLog.Next() = 0;
     end;
 
     local procedure StoreItemLinkEntity(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var EntityTableNo: Integer; var ItemNo: Code[20]; var VariantCode: Code[10]): Boolean

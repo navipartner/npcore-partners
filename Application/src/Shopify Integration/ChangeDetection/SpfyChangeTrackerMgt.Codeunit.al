@@ -157,4 +157,23 @@ codeunit 6151194 "NPR Spfy Change Tracker Mgt."
     begin
         exit(SpfyRowVersionFeature.IsFeatureEnabled());
     end;
+
+    // Per-row lockstep for the tables whose dispatch commits internally (the variant task builder commits
+    // mid-flight) - their duplicate window must stay <=1. Everything else flushes the mark per 100-row chunk.
+    procedure BatchSizeForTable(TableNo: Integer): Integer
+    begin
+        case TableNo of
+            Database::"Item Variant",
+            Database::"NPR Spfy Item Variant Modif.",
+            Database::"Item Reference":
+                exit(1);
+        end;
+        exit(100);
+    end;
+
+    // Described, without the number, by the Consecutive Failures tooltip on the Shopify Change Tracker page and the Dispatch Failure Count tooltip on the Shopify Deletion Log page.
+    procedure QuarantineThreshold(): Integer
+    begin
+        exit(3);
+    end;
 }

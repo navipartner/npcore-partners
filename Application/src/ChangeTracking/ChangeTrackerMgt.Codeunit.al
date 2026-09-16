@@ -53,6 +53,58 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         exit(true);
     end;
 
+    procedure RecordRowFailure(var ChangeTracker: Record "NPR Change Tracker"; FailingRowVersion: BigInteger): Integer
+    var
+        FreshTracker: Record "NPR Change Tracker";
+    begin
+        FreshTracker.ReadIsolation(IsolationLevel::UpdLock);
+        if not FreshTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
+            exit(0);
+        // A modified poison row gets a new rowversion -> the streak restarts (the row changed, it may dispatch now).
+        if FreshTracker."Failing Row Version" = FailingRowVersion then
+            FreshTracker."Consecutive Failures" += 1
+        else begin
+            FreshTracker."Failing Row Version" := FailingRowVersion;
+            FreshTracker."Consecutive Failures" := 1;
+        end;
+        FreshTracker.Modify(true);
+        ChangeTracker := FreshTracker;
+        exit(FreshTracker."Consecutive Failures");
+    end;
+
+    procedure ClearRowFailure(var ChangeTracker: Record "NPR Change Tracker")
+    var
+        FreshTracker: Record "NPR Change Tracker";
+    begin
+        FreshTracker.ReadIsolation(IsolationLevel::UpdLock);
+        if not FreshTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
+            exit;
+        if (FreshTracker."Failing Row Version" <> 0) or (FreshTracker."Consecutive Failures" <> 0) then begin
+            FreshTracker."Failing Row Version" := 0;
+            FreshTracker."Consecutive Failures" := 0;
+            FreshTracker.Modify(true);
+        end;
+        ChangeTracker := FreshTracker;
+    end;
+
+    procedure QuarantineRow(var ChangeTracker: Record "NPR Change Tracker"; RowVersion: BigInteger; QuarRecordId: RecordId; EntitySystemId: Guid; ErrorText: Text)
+    var
+        ChangeQuarantine: Record "NPR Change Quarantine";
+    begin
+        ChangeQuarantine.Init();
+        ChangeQuarantine."Integration Type" := ChangeTracker."Integration Type";
+        ChangeQuarantine."Table No." := ChangeTracker."Table No.";
+        ChangeQuarantine."Row Version" := RowVersion;
+        ChangeQuarantine."Record ID" := QuarRecordId;
+        ChangeQuarantine."Entity System Id" := EntitySystemId;
+        ChangeQuarantine."Error Text" := CopyStr(ErrorText, 1, MaxStrLen(ChangeQuarantine."Error Text"));
+        ChangeQuarantine."Quarantined At" := CurrentDateTime();
+        ChangeQuarantine.Insert(true);
+        // Advance past the quarantined row (discarded return intentional; a re-sync racing this narrow window can lose its reset here - accepted).
+        if AdvanceMark(ChangeTracker, RowVersion) then;
+        ClearRowFailure(ChangeTracker);
+    end;
+
     procedure SeedToCurrentMax(var ChangeTracker: Record "NPR Change Tracker"; CurrentMaxRowVersionParam: BigInteger)
     begin
         ChangeTracker."Last Row Version" := CurrentMaxRowVersionParam;

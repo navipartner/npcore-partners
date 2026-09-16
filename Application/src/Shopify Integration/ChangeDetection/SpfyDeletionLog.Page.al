@@ -25,8 +25,13 @@ page 6150971 "NPR Spfy Deletion Log"
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = NPRShopify;
-                    ToolTip = 'Specifies the state of the delete: Pending (captured, not yet sent), Processed (a task to delete the object in Shopify was created), or Cancelled (the entity was reactivated in Business Central before the delete was sent).';
+                    ToolTip = 'Specifies the state of the delete: Pending (captured, not yet sent), Processed (a task to delete the object in Shopify was created), Cancelled (the entity was reactivated in Business Central before the delete was sent), or Quarantined (dispatch kept failing and the delete is parked until it is requeued).';
                     StyleExpr = StatusStyle;
+                }
+                field("Dispatch Failure Count"; Rec."Dispatch Failure Count")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies how many consecutive detection cycles this delete failed to dispatch. When the failure threshold is reached, the entry is quarantined.';
                 }
                 field(SystemCreatedAt; Rec.SystemCreatedAt)
                 {
@@ -85,6 +90,29 @@ page 6150971 "NPR Spfy Deletion Log"
         }
     }
 
+    actions
+    {
+        area(Processing)
+        {
+            action(Requeue)
+            {
+                ApplicationArea = NPRShopify;
+                Caption = 'Requeue';
+                Image = ResetStatus;
+                ToolTip = 'Returns the selected quarantined deletes to Pending so the next detection cycle sends them again. Use this after the cause of the failure has been resolved.';
+
+                trigger OnAction()
+                begin
+                    RequeueSelected();
+                end;
+            }
+        }
+        area(Promoted)
+        {
+            actionref(Requeue_Promoted; Requeue) { }
+        }
+    }
+
     trigger OnAfterGetRecord()
     begin
         StatusStyle := StatusStyleExpr();
@@ -92,6 +120,30 @@ page 6150971 "NPR Spfy Deletion Log"
 
     var
         StatusStyle: Text;
+
+    local procedure RequeueSelected()
+    var
+        SelectedEntry: Record "NPR Spfy Deletion Log";
+        DeletionLog: Record "NPR Spfy Deletion Log";
+        SpfyDeletionLogMgt: Codeunit "NPR Spfy Deletion Log Mgt";
+        RequeuedCount: Integer;
+        RequeuedMsg: Label '%1 entry(-ies) returned to Pending. The next detection cycle sends them again.', Comment = '%1 = the number of entries requeued';
+        NoneRequeueableMsg: Label 'None of the selected entries can be requeued. Only a quarantined entry can be.';
+    begin
+        CurrPage.SetSelectionFilter(SelectedEntry);
+        if SelectedEntry.FindSet() then
+            repeat
+                DeletionLog := SelectedEntry;
+                if SpfyDeletionLogMgt.Requeue(DeletionLog) then
+                    RequeuedCount += 1;
+            until SelectedEntry.Next() = 0;
+        if RequeuedCount = 0 then begin
+            Message(NoneRequeueableMsg);
+            exit;
+        end;
+        Message(RequeuedMsg, RequeuedCount);
+        CurrPage.Update(false);
+    end;
 
     local procedure StatusStyleExpr(): Text
     begin
@@ -102,6 +154,8 @@ page 6150971 "NPR Spfy Deletion Log"
                 exit('Subordinate');
             Rec.Status::Processed:
                 exit('Favorable');
+            Rec.Status::Quarantined:
+                exit('Unfavorable');
         end;
         exit('Standard');
     end;

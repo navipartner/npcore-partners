@@ -35,27 +35,6 @@ codeunit 6151215 "NPR Spfy Deletion Log Mgt"
         DeletionLog.Insert(true);
     end;
 
-    procedure CancelDelete(EntityTableNo: Integer; StoreCode: Code[20]; ShopifyIdType: Enum "NPR Spfy ID Type"; ShopifyId: Text[30])
-    var
-        DeletionLog: Record "NPR Spfy Deletion Log";
-    begin
-        if ShopifyId = '' then
-            exit;
-
-        DeletionLog.SetCurrentKey("Table No.", "Shopify ID Type", "Shopify ID", "Shopify Store Code", Status);
-        DeletionLog.SetRange("Table No.", EntityTableNo);
-        DeletionLog.SetRange("Shopify ID Type", ShopifyIdType);
-        DeletionLog.SetRange("Shopify ID", ShopifyId);
-        DeletionLog.SetRange("Shopify Store Code", StoreCode);
-        DeletionLog.SetFilter(Status, '%1|%2', DeletionLog.Status::Pending, DeletionLog.Status::Processed);
-        DeletionLog.ReadIsolation := IsolationLevel::UpdLock;
-        if not DeletionLog.FindSet(true) then
-            exit;
-        repeat
-            CancelRow(DeletionLog);
-        until DeletionLog.Next() = 0;
-    end;
-
     // Cancels by entity identity: the id the intent was captured with may already be cleared or reassigned.
     procedure CancelDeleteForEntity(EntityTableNo: Integer; StoreCode: Code[20]; EntitySystemId: Guid)
     var
@@ -68,7 +47,7 @@ codeunit 6151215 "NPR Spfy Deletion Log Mgt"
         DeletionLog.SetRange("Table No.", EntityTableNo);
         DeletionLog.SetRange("Entity System Id", EntitySystemId);
         DeletionLog.SetRange("Shopify Store Code", StoreCode);
-        DeletionLog.SetFilter(Status, '%1|%2', DeletionLog.Status::Pending, DeletionLog.Status::Processed);
+        DeletionLog.SetFilter(Status, '%1|%2|%3', DeletionLog.Status::Pending, DeletionLog.Status::Processed, DeletionLog.Status::Quarantined);
         DeletionLog.ReadIsolation := IsolationLevel::UpdLock;
         if not DeletionLog.FindSet(true) then
             exit;
@@ -106,7 +85,7 @@ codeunit 6151215 "NPR Spfy Deletion Log Mgt"
     local procedure CancelRow(var DeletionLog: Record "NPR Spfy Deletion Log")
     begin
         case DeletionLog.Status of
-            DeletionLog.Status::Pending:
+            DeletionLog.Status::Pending, DeletionLog.Status::Quarantined:
                 begin
                     DeletionLog.Status := DeletionLog.Status::Cancelled;
                     DeletionLog.Modify(true);
@@ -157,6 +136,57 @@ codeunit 6151215 "NPR Spfy Deletion Log Mgt"
         DeletionLog.Status := DeletionLog.Status::Processed;
         DeletionLog."NC Task Entry No." := NcTaskEntryNo;
         DeletionLog.Modify(true);
+    end;
+
+    procedure RecordDrainFailure(EntryNo: BigInteger; ErrorText: Text; CallStack: Text)
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+        SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        QuarantinedDeleteLbl: Label 'Shopify deletion log entry %1 was quarantined after %2 consecutive dispatch failures; the remote delete will not be sent until the entry is requeued from the Shopify Deletion Log page. Table %3, Shopify ID %4, store %5. Last error: %6 This is a programming bug.', Locked = true;
+    begin
+        DeletionLog.ReadIsolation(IsolationLevel::UpdLock);
+        if not DeletionLog.Get(EntryNo) then
+            exit;
+        if DeletionLog.Status <> DeletionLog.Status::Pending then
+            exit;
+        DeletionLog."Dispatch Failure Count" += 1;
+        if DeletionLog."Dispatch Failure Count" >= SpfyChangeTrackerMgt.QuarantineThreshold() then begin
+            DeletionLog.Status := DeletionLog.Status::Quarantined;
+            Sentry.InitScopeAndTransaction('Shopify delete quarantine', 'bc.spfy.change_detection.delete_quarantine');
+            Sentry.AddError(StrSubstNo(QuarantinedDeleteLbl, DeletionLog."Entry No.", SpfyChangeTrackerMgt.QuarantineThreshold(), DeletionLog."Table No.", DeletionLog."Shopify ID", DeletionLog."Shopify Store Code", ErrorText), CallStack);
+            Sentry.FinalizeScope();
+        end;
+        DeletionLog.Modify(true);
+    end;
+
+    procedure ClearDrainFailure(EntryNo: BigInteger)
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+    begin
+        DeletionLog.ReadIsolation(IsolationLevel::UpdLock);
+        if not DeletionLog.Get(EntryNo) then
+            exit;
+        if DeletionLog.Status <> DeletionLog.Status::Pending then
+            exit;
+        if DeletionLog."Dispatch Failure Count" = 0 then
+            exit;
+        DeletionLog."Dispatch Failure Count" := 0;
+        DeletionLog.Modify(true);
+    end;
+
+    procedure Requeue(var DeletionLog: Record "NPR Spfy Deletion Log"): Boolean
+    begin
+        DeletionLog.ReadIsolation(IsolationLevel::UpdLock);
+        if not DeletionLog.Get(DeletionLog."Entry No.") then
+            exit(false);
+        if DeletionLog.Status <> DeletionLog.Status::Quarantined then
+            exit(false);
+
+        DeletionLog.Status := DeletionLog.Status::Pending;
+        DeletionLog."Dispatch Failure Count" := 0;
+        DeletionLog.Modify(true);
+        exit(true);
     end;
 
     local procedure CancelOutstandingNcTask(NcTaskEntryNo: BigInteger): Boolean

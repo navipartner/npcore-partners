@@ -46,6 +46,18 @@ page 6151227 "NPR Spfy Change Tracker"
                             Rec."Last Row Version" := 0;
                     end;
                 }
+                field("Failing Row Version"; Rec."Failing Row Version")
+                {
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                    ToolTip = 'Specifies the SQL row version of the row whose dispatch is currently failing. Empty (0) when the table is healthy.';
+                }
+                field("Consecutive Failures"; Rec."Consecutive Failures")
+                {
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                    ToolTip = 'Specifies how many consecutive detection cycles the failing row has errored. When the failure threshold is reached, the row is quarantined and the scan advances past it.';
+                }
                 field(ResetPolicy; _ResetPolicyText)
                 {
                     ApplicationArea = NPRShopify;
@@ -102,6 +114,15 @@ page 6151227 "NPR Spfy Change Tracker"
                     ChangeTrackerMgt.SeedToCurrentMax(Rec, ChangeTrackerMgt.CurrentMaxRowVersion(Rec."Table No."));
                     CurrPage.Update(false);
                 end;
+            }
+            action(QuarantinedChanges)
+            {
+                ApplicationArea = NPRShopify;
+                Caption = 'Quarantined Changes';
+                Image = ErrorLog;
+                RunObject = page "NPR Change Quarantine";
+                RunPageLink = "Integration Type" = const(Shopify);
+                ToolTip = 'Shows changed rows the detection quarantined after repeated dispatch failures. Quarantined rows were skipped; each entity re-syncs on its next real change or via the re-sync actions.';
             }
         }
     }
