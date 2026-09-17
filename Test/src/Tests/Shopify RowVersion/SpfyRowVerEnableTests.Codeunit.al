@@ -18,19 +18,18 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
     end;
 
     [Test]
-    procedure GivenAnySyncedArtifact_ThenEnvIsNotFresh_AndBareEnvironmentAutoAdopts()
+    procedure GivenAnySyncedArtifact_ThenEnvIsNotFresh_AndBareEnvironmentDoesNotAutoAdopt()
     var
         ShopifyStore: Record "NPR Spfy Store";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyAssignedID: Record "NPR Spfy Assigned ID";
         ShopifySetup: Record "NPR Spfy Integration Setup";
-        SyncState: Record "NPR Spfy Sync State";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         StoreCode: Code[20];
     begin
-        // [SCENARIO] Any synced artifact disqualifies an environment from being fresh, and a bare environment auto-adopts the feature with the migration marked Completed, the detection job ensured, no seeding and no Data Log setup.
+        // [SCENARIO] Any synced artifact disqualifies an environment from being fresh, and fresh-environment auto-adoption is suspended: an environment that still qualifies as a fresh candidate does not switch RowVersion detection on.
         Initialize();
         NeutralizeSyncedArtifacts();
         _Assert.IsTrue(SpfyRowVersionFeature.IsFreshRowVersionCandidate(''), 'A bare environment must qualify as fresh');
@@ -73,17 +72,55 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         _Assert.IsTrue(SpfyRowVersionFeature.IsFreshRowVersionCandidate(''), 'The environment must be fresh again after cleanup');
         SpfyRowVersionFeature.MaybeAutoAdoptFreshEnvironment('');
 
-        // [THEN] The adopt enables the feature and runs the post-enable side effects: migration stamped Completed,
-        // detection job ensured, no seeding, no Data Log setup.
-        _Assert.IsTrue(SpfyRowVersionFeature.IsFeatureEnabled(), 'A fresh environment must auto-adopt the feature');
+        // [THEN] The suspended adoption changes nothing: feature off, migration unstarted, no detection job.
+        _Assert.IsFalse(SpfyRowVersionFeature.IsFeatureEnabled(), 'A fresh environment must not auto-adopt the feature while adoption is suspended');
         ShopifySetup.Get();
-        _Assert.IsTrue(ShopifySetup."RowVersion Migration Status" = ShopifySetup."RowVersion Migration Status"::Completed, 'A fresh adopt must mark the migration Completed');
-        _Assert.IsTrue(SyncState.IsEmpty(), 'A fresh adopt must not run any baseline seeding');
-        _Assert.IsFalse(SpfyDataLogSubscribersExist(), 'A fresh adopt must never create Shopify Data Log setup');
+        _Assert.IsTrue(
+            ShopifySetup."RowVersion Migration Status" = ShopifySetup."RowVersion Migration Status"::NotStarted,
+            StrSubstNo('A declined auto-adopt must leave the migration NotStarted, actual status %1', ShopifySetup."RowVersion Migration Status"));
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Change Detection");
-        _Assert.AreEqual(1, JobQueueEntry.Count(), 'A fresh adopt must ensure the detection job');
-        _Lib.DeleteDetectionJobQueueEntries();
+        _Assert.AreEqual(0, JobQueueEntry.Count(), 'A declined auto-adopt must not ensure the detection job');
+    end;
+
+    [Test]
+    procedure GivenFreshEnvironment_WhenAnIntegrationAreaIsEnabled_ThenShopifyStaysOnDataLog()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        JobQueueEntry: Record "Job Queue Entry";
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A fresh environment that enables a Shopify store and an integration area keeps the legacy Data Log path and leaves the migration action reachable.
+        Initialize();
+        // [GIVEN] A bare environment with the feature off, no Data Log subscribers, and an enabled store that still qualifies as fresh.
+        NeutralizeSyncedArtifacts();
+        _Assert.IsFalse(SpfyRowVersionFeature.IsFeatureEnabled(), 'The environment must start with the feature off');
+        _Assert.IsFalse(SpfyDataLogSubscribersExist(), 'The environment must start without Shopify Data Log setup');
+        StoreCode := _Lib.CreateStore(false, false, false, false, false);
+        ShopifyStore.Get(StoreCode);
+        _Assert.IsTrue(SpfyRowVersionFeature.IsFreshRowVersionCandidate(StoreCode), 'The store being enabled must still qualify as a fresh RowVersion candidate');
+
+        // [WHEN] The Items area is switched on for that store.
+        ShopifyStore.Validate("Item List Integration", true);
+        ShopifyStore.Modify(true);
+
+        // [THEN] The legacy route runs instead of an adoption: the feature stays off and the Data Log setup is created.
+        _Assert.IsFalse(SpfyRowVersionFeature.IsFeatureEnabled(), 'A fresh environment must no longer adopt RowVersion detection');
+        _Assert.IsTrue(SpfyDataLogSubscribersExist(), 'A fresh environment must fall back to the legacy Data Log setup');
+        // [THEN] The environment answers the migration action's visibility predicate, so an operator can still start the migration.
+        _Assert.IsTrue(SpfyRowVersionFeature.RunsShopifyOnDataLog(), 'The environment must run Shopify on the Data Log, which is what keeps the migration action reachable');
+        ShopifySetup.Get();
+        _Assert.IsTrue(
+            ShopifySetup."RowVersion Migration Status" = ShopifySetup."RowVersion Migration Status"::NotStarted,
+            StrSubstNo('An unadopted environment must stay NotStarted, actual status %1', ShopifySetup."RowVersion Migration Status"));
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Change Detection");
+        _Assert.AreEqual(0, JobQueueEntry.Count(), 'An unadopted environment must have no change detection job');
+
+        // The area tick committed SPFY subscriber rows, and Initialize() does not clear them for the next test.
+        DeleteSpfyDataLogSubscribers();
     end;
 
     [Test]

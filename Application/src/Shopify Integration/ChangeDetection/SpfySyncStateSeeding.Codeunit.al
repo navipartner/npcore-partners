@@ -42,7 +42,7 @@ codeunit 6151237 "NPR Spfy Sync State Seeding"
         // Persist Failed (committed) then RE-RAISE — else the background JQ looks "Finished" and the cutover goes live on an incomplete seed.
         LastError := GetLastErrorText();
         MarkSeedingFailed(CopyStr(LastError, 1, 250));
-        Error(LastError);
+        Error('%1', LastError);
     end;
 
     local procedure MarkSeedingInProgress()

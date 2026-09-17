@@ -75,7 +75,7 @@ page 6184553 "NPR Spfy Integration Setup"
                 }
                 field("RowVersion Seeding Error Text"; Rec."RowVersion Seeding Error Text")
                 {
-                    ToolTip = 'Specifies the error text if the RowVersion baseline seeding sweep failed.';
+                    ToolTip = 'Specifies the error text of the most recent failed step of the RowVersion migration: the baseline seeding sweep, the scheduling of its background job, or the cutover itself.';
                     ApplicationArea = NPRShopify;
                     Editable = false;
                 }
@@ -188,7 +188,7 @@ page 6184553 "NPR Spfy Integration Setup"
                     ToolTip = 'Runs the initial RowVersion baseline seeding sweep (CORE-433 §8.2) for already-synced Shopify entities. Choose foreground (blocking, with progress) or a background Job Queue entry. This does NOT enable the RowVersion change-detection feature; it only warms up the baselines so the first poll after go-live is a clean no-op. This is a pre-cutover migration tool only: it fast-forwards ALL tracker marks and rewinds the migration status. After cut-over, use Quiet-Seed Baselines instead.';
                     ApplicationArea = NPRShopify;
                     Image = Migration;
-                    Visible = ShowRowVersionMigrationUI;
+                    Visible = ShowRowVersionSeedingUI;
 
                     trigger OnAction()
                     var
@@ -360,9 +360,15 @@ page 6184553 "NPR Spfy Integration Setup"
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
     begin
         RowVersionFeatureEnabled := SpfyRowVersionFeature.IsFeatureEnabled();
-        ShowRowVersionMigrationUI :=
+        // Seeding fast-forwards every tracker mark, so it stays on the pre-cutover predicate and unreachable once the Data Log wiring is gone.
+        ShowRowVersionSeedingUI :=
             SpfyRowVersionFeature.RunsShopifyOnDataLog() and
             (Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::Completed);
+        // A started migration stays offered once its Data Log wiring is gone, or a run that failed mid-cutover would have no action left to finish it.
+        ShowRowVersionMigrationUI :=
+            ShowRowVersionSeedingUI or
+            ((Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::Completed) and
+            (Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::NotStarted));
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -425,5 +431,6 @@ page 6184553 "NPR Spfy Integration Setup"
         HasAzureADConnection: Boolean;
         RowVersionFeatureEnabled: Boolean;
         ShowRowVersionMigrationUI: Boolean;
+        ShowRowVersionSeedingUI: Boolean;
 }
 #endif

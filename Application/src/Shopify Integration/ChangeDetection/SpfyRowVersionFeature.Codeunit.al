@@ -11,7 +11,7 @@ codeunit 6151216 "NPR Spfy RowVersion Feature" implements "NPR Feature Managemen
     procedure AddFeature()
     var
         Feature: Record "NPR Feature";
-        PageDescriptionLbl: Label 'Shopify RowVersion Change Detection — a managed, one-way switch. It is NOT enabled directly here: a fresh environment adopts it automatically when the Shopify integration is enabled, and an existing Data-Log environment is migrated via the "Migrate to RowVersion detection" action on the Shopify Integration Setup page.', MaxLength = 2048;
+        PageDescriptionLbl: Label 'Shopify RowVersion Change Detection — a managed, one-way switch. Enable it here only on a new environment, while no Shopify integration area has been switched on yet; detection then starts immediately and there is nothing to migrate. Once any integration area is on, this environment detects Shopify changes with the Data Log and must be moved across with the "Migrate to RowVersion detection" action on the Shopify Integration Setup page, which also removes the Data Log wiring.', MaxLength = 2048;
     begin
         Feature.Init();
         Feature.Id := GetFeatureId();
@@ -52,11 +52,19 @@ codeunit 6151216 "NPR Spfy RowVersion Feature" implements "NPR Feature Managemen
 
     internal procedure MaybeAutoAdoptFreshEnvironment(CurrentStoreCode: Code[20])
     begin
+        if not AutoAdoptionEnabled() then
+            exit;
         if IsFeatureEnabled() then
             exit;
         if not IsFreshRowVersionCandidate(CurrentStoreCode) then
             exit;
         EnableFeatureChecked();
+    end;
+
+    // CORE-2063: auto-adoption suspended for go-live - return true to restore it (until then a fresh environment enables the feature itself on Feature Management; the Setup action only appears once an integration area is on).
+    local procedure AutoAdoptionEnabled(): Boolean
+    begin
+        exit(false);
     end;
 
     local procedure MarkMigrationCompletedForNonDataLogEnable()
@@ -124,7 +132,7 @@ codeunit 6151216 "NPR Spfy RowVersion Feature" implements "NPR Feature Managemen
     var
         SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
         CannotDisableErr: Label 'The %1 feature is one-way and cannot be disabled once enabled.', Comment = '%1 = feature description';
-        ExistingIntegrationErr: Label 'Enabling %1 on an environment that already runs Shopify on the Data Log requires running the RowVersion migration. Use the "Migrate to RowVersion detection" action on the Shopify Integration Setup page.', Comment = '%1 = feature description';
+        ExistingIntegrationErr: Label 'Enabling %1 here is only possible before this environment has any Shopify Data Log wiring, which switching on an integration area creates. This environment still has that wiring, so it requires running the RowVersion migration instead. Use the "Migrate to RowVersion detection" action on the Shopify Integration Setup page.', Comment = '%1 = feature description';
     begin
         if Rec.Id <> GetFeatureId() then
             exit;
