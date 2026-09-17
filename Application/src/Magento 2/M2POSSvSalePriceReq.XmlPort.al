@@ -123,9 +123,19 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
                         {
 
                             trigger OnBeforePassVariable()
+                            var
+                                GeneralLedgerSetup: Record "General Ledger Setup";
+                                FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+                                POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
                             begin
-                                LineAmount := Format(
-                                  Round(TmpSalesLineResponse."Unit Price" * TmpSalesLineResponse.Quantity - TmpSalesLineResponse."Discount Amount"), 0, 9);
+                                if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then begin
+                                    if not GeneralLedgerSetup.Get() then
+                                        Clear(GeneralLedgerSetup);
+                                    LineAmount := Format(
+                                      Round(POSSaleTaxCalc.CalcAmountAfterDiscount(TmpSalesLineResponse."Unit Price" * TmpSalesLineResponse.Quantity, TmpSalesLineResponse."Discount Amount", GeneralLedgerSetup."Amount Rounding Precision")), 0, 9);
+                                end else
+                                    LineAmount := Format(
+                                      Round(TmpSalesLineResponse."Unit Price" * TmpSalesLineResponse.Quantity - TmpSalesLineResponse."Discount Amount"), 0, 9);
                             end;
                         }
                         fieldattribute(LineDiscountPercent; TmpSalesLineResponse."Discount %")

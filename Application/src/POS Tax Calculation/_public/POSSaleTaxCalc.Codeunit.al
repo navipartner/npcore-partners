@@ -86,10 +86,13 @@
         POSSaleTax: Record "NPR POS Sale Tax";
         POSSaleTax2: Record "NPR POS Sale Tax";
         Currency: Record Currency;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         POSTaxCalc: Interface "NPR POS ITaxCalc";
         ExchangeRate: Decimal;
     begin
         DeleteTaxAmount(Rec);
+        if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+            GetCurrency(Currency, Rec."Currency Code");
         if Rec."Price Includes VAT" then begin
             UpdateSourceBeforeCalculateTaxBackward(Rec, Currency);
         end else begin
@@ -113,7 +116,8 @@
         else
             ExchangeRate := CurrencyFactor;
 
-        GetCurrency(Currency, Rec."Currency Code");
+        if not FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+            GetCurrency(Currency, Rec."Currency Code");
 
         if not Find(POSSaleTax, Rec.SystemId) then begin
             POSSaleTax.Init();
@@ -131,6 +135,8 @@
     end;
 
     internal procedure UpdateSourceBeforeCalculateTaxForward(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         Rec.Amount := Rec.Quantity * Rec."Unit Price";
         if Rec."Discount %" <> 0 then
@@ -138,13 +144,23 @@
         else
             if Rec."Discount Amount" <> 0 then begin
                 Rec."Discount Amount" := Round(Rec."Discount Amount", Currency."Amount Rounding Precision");
-                Rec."Discount %" := Round(100 - (Rec.Amount - Rec."Discount Amount") / Rec.Amount * 100, 0.0001);
+                if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                    Rec."Discount %" := Round(100 - CalcAmountAfterDiscount(Rec.Amount, Rec."Discount Amount", Currency."Amount Rounding Precision") / Rec.Amount * 100, 0.0001)
+                else
+                    Rec."Discount %" := Round(100 - (Rec.Amount - Rec."Discount Amount") / Rec.Amount * 100, 0.0001);
             end;
-        Rec.Amount := Round(Rec.Amount - Rec."Discount Amount", Currency."Amount Rounding Precision");
-        Rec."Line Amount" := Round(Rec.Quantity * Rec."Unit Price" - Rec."Discount Amount", Currency."Amount Rounding Precision");
+        if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then begin
+            Rec.Amount := Round(CalcAmountAfterDiscount(Rec.Amount, Rec."Discount Amount", Currency."Amount Rounding Precision"), Currency."Amount Rounding Precision");
+            Rec."Line Amount" := Round(CalcAmountAfterDiscount(Rec.Quantity * Rec."Unit Price", Rec."Discount Amount", Currency."Amount Rounding Precision"), Currency."Amount Rounding Precision");
+        end else begin
+            Rec.Amount := Round(Rec.Amount - Rec."Discount Amount", Currency."Amount Rounding Precision");
+            Rec."Line Amount" := Round(Rec.Quantity * Rec."Unit Price" - Rec."Discount Amount", Currency."Amount Rounding Precision");
+        end;
     end;
 
     internal procedure UpdateSourceBeforeCalculateTaxBackward(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         Rec."Amount Including VAT" := Rec.Quantity * Rec."Unit Price";
         if Rec."Discount %" <> 0 then
@@ -152,10 +168,25 @@
         else
             if Rec."Discount Amount" <> 0 then begin
                 Rec."Discount Amount" := Round(Rec."Discount Amount", Currency."Amount Rounding Precision");
-                Rec."Discount %" := Round(100 - (Rec."Amount Including VAT" - Rec."Discount Amount") / Rec."Amount Including VAT" * 100, 0.0001);
+                if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                    Rec."Discount %" := Round(100 - CalcAmountAfterDiscount(Rec."Amount Including VAT", Rec."Discount Amount", Currency."Amount Rounding Precision") / Rec."Amount Including VAT" * 100, 0.0001)
+                else
+                    Rec."Discount %" := Round(100 - (Rec."Amount Including VAT" - Rec."Discount Amount") / Rec."Amount Including VAT" * 100, 0.0001);
             end;
-        Rec."Amount Including VAT" := Round(Rec."Amount Including VAT" - Rec."Discount Amount", Currency."Amount Rounding Precision");
-        Rec."Line Amount" := Round(Rec.Quantity * Rec."Unit Price" - Rec."Discount Amount", Currency."Amount Rounding Precision");
+        if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then begin
+            Rec."Amount Including VAT" := Round(CalcAmountAfterDiscount(Rec."Amount Including VAT", Rec."Discount Amount", Currency."Amount Rounding Precision"), Currency."Amount Rounding Precision");
+            Rec."Line Amount" := Round(CalcAmountAfterDiscount(Rec.Quantity * Rec."Unit Price", Rec."Discount Amount", Currency."Amount Rounding Precision"), Currency."Amount Rounding Precision");
+        end else begin
+            Rec."Amount Including VAT" := Round(Rec."Amount Including VAT" - Rec."Discount Amount", Currency."Amount Rounding Precision");
+            Rec."Line Amount" := Round(Rec.Quantity * Rec."Unit Price" - Rec."Discount Amount", Currency."Amount Rounding Precision");
+        end;
+    end;
+
+    internal procedure CalcAmountAfterDiscount(Amount: Decimal; DiscountAmount: Decimal; RoundingPrecision: Decimal): Decimal
+    begin
+        if (DiscountAmount <> 0) and (DiscountAmount = Round(Amount, RoundingPrecision)) then
+            exit(0);
+        exit(Amount - DiscountAmount);
     end;
 
     internal procedure UpdateSourceTaxSetup(var Rec: Record "NPR POS Sale Line"; VATPostingSetup: Record "VAT Posting Setup"; SalePOS: Record "NPR POS Sale"; CurrencyFactor: Decimal)

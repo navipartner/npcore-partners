@@ -530,6 +530,8 @@ codeunit 6151077 "NPR Total Discount Management"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         LineDiscountAmountWithVAT: Decimal;
         xLineDiscountAmountWithVAT: Decimal;
         LineAmountWithVAT: Decimal;
@@ -558,30 +560,49 @@ codeunit 6151077 "NPR Total Discount Management"
                     LineAmountWithoutDiscountVAT := UnitPriceIncludingVAT(SaleLinePOS) * SaleLinePOS.Quantity;
 
                     LineDiscountPercent := 0;
-                    if CurrSaleLine.Quantity <> xCurrSaleLine.Quantity then begin
-                        xLineDiscountAmountWithVAT := SaleLinePOS."Disc. Amt. Without Total Disc.";
-                        if not SaleLinePOS."Price Includes VAT" then
-                            xLineDiscountAmountWithVAT := CalcAmountWithVAT(xLineDiscountAmountWithVAT,
-                                                                           SaleLinePOS."VAT %",
-                                                                           0);
+                    if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then begin
+                        if CurrSaleLine.Quantity <> xCurrSaleLine.Quantity then begin
+                            xLineDiscountAmountWithVAT := DiscountAmountIncludingVAT(SaleLinePOS, SaleLinePOS."Disc. Amt. Without Total Disc.");
 
-                        xLineAmountWithoutDiscountVAT := UnitPriceIncludingVAT(xCurrSaleLine) * xCurrSaleLine.Quantity;
-                        if xLineAmountWithoutDiscountVAT <> 0 then
-                            LineDiscountPercent := xLineDiscountAmountWithVAT / xLineAmountWithoutDiscountVAT * 100;
+                            xLineAmountWithoutDiscountVAT := UnitPriceIncludingVAT(xCurrSaleLine) * xCurrSaleLine.Quantity;
+                            if xLineAmountWithoutDiscountVAT <> 0 then
+                                LineDiscountPercent := 100 - POSSaleTaxCalc.CalcAmountAfterDiscount(xLineAmountWithoutDiscountVAT, xLineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision") / xLineAmountWithoutDiscountVAT * 100;
 
-                        LineDiscountAmountWithVAT := LineAmountWithoutDiscountVAT * LineDiscountPercent / 100;
+                            LineDiscountAmountWithVAT := LineAmountWithoutDiscountVAT * LineDiscountPercent / 100;
 
+                        end else begin
+                            LineDiscountAmountWithVAT := DiscountAmountIncludingVAT(SaleLinePOS, SaleLinePOS."Disc. Amt. Without Total Disc.");
+                            if LineAmountWithoutDiscountVAT <> 0 then
+                                LineDiscountPercent := 100 - POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, LineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision") / LineAmountWithoutDiscountVAT * 100;
+                        end;
+
+                        LineAmountWithVAT := POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, LineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision");
                     end else begin
-                        LineDiscountAmountWithVAT := SaleLinePOS."Disc. Amt. Without Total Disc.";
-                        if not SaleLinePOS."Price Includes VAT" then
-                            LineDiscountAmountWithVAT := CalcAmountWithVAT(LineDiscountAmountWithVAT,
-                                                                           SaleLinePOS."VAT %",
-                                                                           0);
-                        if LineAmountWithoutDiscountVAT <> 0 then
-                            LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
-                    end;
+                        if CurrSaleLine.Quantity <> xCurrSaleLine.Quantity then begin
+                            xLineDiscountAmountWithVAT := SaleLinePOS."Disc. Amt. Without Total Disc.";
+                            if not SaleLinePOS."Price Includes VAT" then
+                                xLineDiscountAmountWithVAT := CalcAmountWithVAT(xLineDiscountAmountWithVAT,
+                                                                               SaleLinePOS."VAT %",
+                                                                               0);
 
-                    LineAmountWithVAT := LineAmountWithoutDiscountVAT - LineDiscountAmountWithVAT;
+                            xLineAmountWithoutDiscountVAT := UnitPriceIncludingVAT(xCurrSaleLine) * xCurrSaleLine.Quantity;
+                            if xLineAmountWithoutDiscountVAT <> 0 then
+                                LineDiscountPercent := xLineDiscountAmountWithVAT / xLineAmountWithoutDiscountVAT * 100;
+
+                            LineDiscountAmountWithVAT := LineAmountWithoutDiscountVAT * LineDiscountPercent / 100;
+
+                        end else begin
+                            LineDiscountAmountWithVAT := SaleLinePOS."Disc. Amt. Without Total Disc.";
+                            if not SaleLinePOS."Price Includes VAT" then
+                                LineDiscountAmountWithVAT := CalcAmountWithVAT(LineDiscountAmountWithVAT,
+                                                                               SaleLinePOS."VAT %",
+                                                                               0);
+                            if LineAmountWithoutDiscountVAT <> 0 then
+                                LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
+                        end;
+
+                        LineAmountWithVAT := LineAmountWithoutDiscountVAT - LineDiscountAmountWithVAT;
+                    end;
 
                     if not SaleLinePOS."Price Includes VAT" then
                         SaleLinePOS."Discount Amount" := CalcAmountWithoutVAT(LineDiscountAmountWithVAT,
@@ -993,6 +1014,8 @@ codeunit 6151077 "NPR Total Discount Management"
                                                var TempNPRTotalDiscountBenefit: Record "NPR Total Discount Benefit" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         LineTotalDiscountAmountWithVAT: Decimal;
         LineAmountWithoutDiscountVAT: Decimal;
         LineDiscountAmountWithVAT: Decimal;
@@ -1012,7 +1035,10 @@ codeunit 6151077 "NPR Total Discount Management"
 
                 LineDiscountPercent := 0;
                 if LineAmountWithoutDiscountVAT <> 0 then
-                    LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
+                    if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                        LineDiscountPercent := 100 - POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, LineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision") / LineAmountWithoutDiscountVAT * 100
+                    else
+                        LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
 
                 TempTotalDiscountSaleLinePOS."Total Discount Amount" := Round(LineTotalDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision");
                 TempTotalDiscountSaleLinePOS."Disc. Amt. Without Total Disc." := TempTotalDiscountSaleLinePOS."Discount Amount";
@@ -1020,7 +1046,10 @@ codeunit 6151077 "NPR Total Discount Management"
                 TempTotalDiscountSaleLinePOS."Discount %" := LineDiscountPercent;
                 TempTotalDiscountSaleLinePOS."Total Discount Code" := TempNPRTotalDiscountBenefit."Total Discount Code";
                 TempTotalDiscountSaleLinePOS."Total Discount Step" := TempNPRTotalDiscountBenefit."Step Amount";
-                TempTotalDiscountSaleLinePOS."Amount Including VAT" := LineAmountWithoutDiscountVAT - TempTotalDiscountSaleLinePOS."Discount Amount";
+                if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                    TempTotalDiscountSaleLinePOS."Amount Including VAT" := POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, TempTotalDiscountSaleLinePOS."Discount Amount", GeneralLedgerSetup."Amount Rounding Precision")
+                else
+                    TempTotalDiscountSaleLinePOS."Amount Including VAT" := LineAmountWithoutDiscountVAT - TempTotalDiscountSaleLinePOS."Discount Amount";
                 TempTotalDiscountSaleLinePOS.Amount := CalcAmountWithoutVAT(TempTotalDiscountSaleLinePOS."Amount Including VAT",
                                                                             TempTotalDiscountSaleLinePOS."VAT %",
                                                                             GeneralLedgerSetup."Amount Rounding Precision");
@@ -1037,6 +1066,8 @@ codeunit 6151077 "NPR Total Discount Management"
                                               var TempNPRTotalDiscountBenefit: Record "NPR Total Discount Benefit" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         LineTotalDiscountAmountWithVAT: Decimal;
         LineAmountWithoutDiscountVAT: Decimal;
         LineDiscountAmountWithVAT: Decimal;
@@ -1048,6 +1079,10 @@ codeunit 6151077 "NPR Total Discount Management"
         //Discount Amount includes VAT in the current calculation;
         if TempNPRTotalDiscountBenefit."Value Type" <> TempNPRTotalDiscountBenefit."Value Type"::Amount then
             exit;
+
+        if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+            if not GeneralLedgerSetup.Get() then
+                Clear(GeneralLedgerSetup);
 
         TempTotalDiscountSaleLinePOS.Reset();
         TempTotalDiscountSaleLinePOS.CalcSums("Amount Including VAT");
@@ -1067,13 +1102,19 @@ codeunit 6151077 "NPR Total Discount Management"
 
             LineDiscountPercent := 0;
             if LineAmountWithoutDiscountVAT <> 0 then
-                LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
+                if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                    LineDiscountPercent := 100 - POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, LineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision") / LineAmountWithoutDiscountVAT * 100
+                else
+                    LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
 
             TempTotalDiscountSaleLinePOS."Disc. Amt. Without Total Disc." := TempTotalDiscountSaleLinePOS."Discount Amount";
             TempTotalDiscountSaleLinePOS."Discount Amount" := Round(LineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision");
             TempTotalDiscountSaleLinePOS."Total Discount Amount" := Round(LineTotalDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision");
             TempTotalDiscountSaleLinePOS."Discount %" := LineDiscountPercent;
-            TempTotalDiscountSaleLinePOS."Amount Including VAT" := LineAmountWithoutDiscountVAT - TempTotalDiscountSaleLinePOS."Discount Amount";
+            if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                TempTotalDiscountSaleLinePOS."Amount Including VAT" := POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, TempTotalDiscountSaleLinePOS."Discount Amount", GeneralLedgerSetup."Amount Rounding Precision")
+            else
+                TempTotalDiscountSaleLinePOS."Amount Including VAT" := LineAmountWithoutDiscountVAT - TempTotalDiscountSaleLinePOS."Discount Amount";
             TempTotalDiscountSaleLinePOS.Amount := CalcAmountWithoutVAT(TempTotalDiscountSaleLinePOS."Amount Including VAT",
                                                                         TempTotalDiscountSaleLinePOS."VAT %",
                                                                          GeneralLedgerSetup."Amount Rounding Precision");
@@ -1102,12 +1143,18 @@ codeunit 6151077 "NPR Total Discount Management"
 
                     LineDiscountPercent := 0;
                     if LineAmountWithoutDiscountVAT <> 0 then
-                        LineDiscountPercent := (LineTotalDiscountAmountWithVAT + TempTotalDiscountSaleLinePOS."Discount Amount") / LineAmountWithoutDiscountVAT * 100;
+                        if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                            LineDiscountPercent := 100 - POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, LineTotalDiscountAmountWithVAT + TempTotalDiscountSaleLinePOS."Discount Amount", GeneralLedgerSetup."Amount Rounding Precision") / LineAmountWithoutDiscountVAT * 100
+                        else
+                            LineDiscountPercent := (LineTotalDiscountAmountWithVAT + TempTotalDiscountSaleLinePOS."Discount Amount") / LineAmountWithoutDiscountVAT * 100;
 
                     TempTotalDiscountSaleLinePOS."Total Discount Amount" += LineTotalDiscountAmountWithVAT;
                     TempTotalDiscountSaleLinePOS."Discount Amount" += LineTotalDiscountAmountWithVAT;
                     TempTotalDiscountSaleLinePOS."Discount %" := LineDiscountPercent;
-                    TempTotalDiscountSaleLinePOS."Amount Including VAT" := LineAmountWithoutDiscountVAT - TempTotalDiscountSaleLinePOS."Discount Amount";
+                    if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                        TempTotalDiscountSaleLinePOS."Amount Including VAT" := POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, TempTotalDiscountSaleLinePOS."Discount Amount", GeneralLedgerSetup."Amount Rounding Precision")
+                    else
+                        TempTotalDiscountSaleLinePOS."Amount Including VAT" := LineAmountWithoutDiscountVAT - TempTotalDiscountSaleLinePOS."Discount Amount";
                     TempTotalDiscountSaleLinePOS.Amount := CalcAmountWithoutVAT(TempTotalDiscountSaleLinePOS."Amount Including VAT",
                                                                                 TempTotalDiscountSaleLinePOS."VAT %",
                                                                                 GeneralLedgerSetup."Amount Rounding Precision");
@@ -1128,11 +1175,24 @@ codeunit 6151077 "NPR Total Discount Management"
         exit(SaleLinePOS."Unit Price" * (1 + SaleLinePOS."VAT %" / 100));
     end;
 
-    local procedure DiscountAmountIncludingVAT(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
+    local procedure DiscountAmountIncludingVAT(SaleLinePOS: Record "NPR POS Sale Line"; DiscountAmount: Decimal): Decimal
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
         if SaleLinePOS."Price Includes VAT" then
-            exit(SaleLinePOS."Discount Amount");
-        exit(SaleLinePOS."Discount Amount" * (1 + SaleLinePOS."VAT %" / 100));
+            exit(DiscountAmount);
+
+        if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then begin
+            if not GeneralLedgerSetup.Get() then
+                Clear(GeneralLedgerSetup);
+
+            if POSSaleTaxCalc.CalcAmountAfterDiscount(SaleLinePOS."Unit Price" * SaleLinePOS.Quantity, DiscountAmount, GeneralLedgerSetup."Amount Rounding Precision") = 0 then
+                exit(UnitPriceIncludingVAT(SaleLinePOS) * SaleLinePOS.Quantity);
+        end;
+
+        exit(DiscountAmount * (1 + SaleLinePOS."VAT %" / 100));
     end;
 
 
@@ -1142,6 +1202,8 @@ codeunit 6151077 "NPR Total Discount Management"
 
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
         if ToSaleLinePOS.Get(FromSaleLinePOS.RecordId) then
             exit;
@@ -1153,9 +1215,12 @@ codeunit 6151077 "NPR Total Discount Management"
         ToSaleLinePOS := FromSaleLinePOS;
 
         if UpdateDiscountAmount then
-            ToSaleLinePOS."Discount Amount" := DiscountAmountIncludingVAT(ToSaleLinePOS);
+            ToSaleLinePOS."Discount Amount" := DiscountAmountIncludingVAT(ToSaleLinePOS, ToSaleLinePOS."Discount Amount");
 
-        ToSaleLinePOS."Amount Including VAT" := UnitPriceIncludingVAT(ToSaleLinePOS) * ToSaleLinePOS.Quantity - ToSaleLinePOS."Discount Amount";
+        if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+            ToSaleLinePOS."Amount Including VAT" := POSSaleTaxCalc.CalcAmountAfterDiscount(UnitPriceIncludingVAT(ToSaleLinePOS) * ToSaleLinePOS.Quantity, ToSaleLinePOS."Discount Amount", GeneralLedgerSetup."Amount Rounding Precision")
+        else
+            ToSaleLinePOS."Amount Including VAT" := UnitPriceIncludingVAT(ToSaleLinePOS) * ToSaleLinePOS.Quantity - ToSaleLinePOS."Discount Amount";
         ToSaleLinePOS.Amount := CalcAmountWithoutVAT(ToSaleLinePOS."Amount Including VAT",
                                                      ToSaleLinePOS."VAT %",
                                                      GeneralLedgerSetup."Amount Rounding Precision");
@@ -1409,6 +1474,8 @@ codeunit 6151077 "NPR Total Discount Management"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         LineDiscountAmountWithVAT: Decimal;
         LineAmountWithVAT: Decimal;
         LineAmountWithoutDiscountVAT: Decimal;
@@ -1436,15 +1503,23 @@ codeunit 6151077 "NPR Total Discount Management"
 
                 LineDiscountPercent := 0;
 
-                LineDiscountAmountWithVAT := SaleLinePOS."Disc. Amt. Without Total Disc.";
-                if not SaleLinePOS."Price Includes VAT" then
-                    LineDiscountAmountWithVAT := CalcAmountWithVAT(LineDiscountAmountWithVAT, SaleLinePOS."VAT %", 0);
+                if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then begin
+                    LineDiscountAmountWithVAT := DiscountAmountIncludingVAT(SaleLinePOS, SaleLinePOS."Disc. Amt. Without Total Disc.");
 
-                if LineAmountWithoutDiscountVAT <> 0 then
-                    LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
+                    if LineAmountWithoutDiscountVAT <> 0 then
+                        LineDiscountPercent := 100 - POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, LineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision") / LineAmountWithoutDiscountVAT * 100;
 
+                    LineAmountWithVAT := POSSaleTaxCalc.CalcAmountAfterDiscount(LineAmountWithoutDiscountVAT, LineDiscountAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision");
+                end else begin
+                    LineDiscountAmountWithVAT := SaleLinePOS."Disc. Amt. Without Total Disc.";
+                    if not SaleLinePOS."Price Includes VAT" then
+                        LineDiscountAmountWithVAT := CalcAmountWithVAT(LineDiscountAmountWithVAT, SaleLinePOS."VAT %", 0);
 
-                LineAmountWithVAT := LineAmountWithoutDiscountVAT - LineDiscountAmountWithVAT;
+                    if LineAmountWithoutDiscountVAT <> 0 then
+                        LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
+
+                    LineAmountWithVAT := LineAmountWithoutDiscountVAT - LineDiscountAmountWithVAT;
+                end;
 
                 if not SaleLinePOS."Price Includes VAT" then
                     SaleLinePOS."Discount Amount" := CalcAmountWithoutVAT(LineDiscountAmountWithVAT, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision")

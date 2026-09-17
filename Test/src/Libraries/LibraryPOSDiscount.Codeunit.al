@@ -378,6 +378,52 @@ codeunit 85234 "NPR Library - POS Discount"
         MixedDiscTimeInterv.Modify(true);
     end;
 
+    internal procedure CreatePriorityDiscountPerMinQty(Item: Record Item; MinQuantity: Decimal; ItemDiscountQty: Decimal; ItemDiscountPct: Decimal; var DiscountCode: Code[20])
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        MixedDiscount.Code := LibraryUtility.GenerateRandomCode(MixedDiscount.FieldNo(Code), MixDiscountSourceTableId());
+        MixedDiscount.Init();
+        MixedDiscount.Status := MixedDiscount.Status::Active;
+        MixedDiscount."Starting date" := Today() - 7;
+        MixedDiscount."Ending date" := Today() + 7;
+        MixedDiscount."Discount Type" := MixedDiscount."Discount Type"::"Priority Discount per Min. Qty";
+        MixedDiscount."Min. Quantity" := MinQuantity;
+        MixedDiscount."Item Discount Qty." := ItemDiscountQty;
+        MixedDiscount."Item Discount %" := ItemDiscountPct;
+        MixedDiscount.Insert();
+
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        MixedDiscountLine.SetRange(Code, MixedDiscount.Code);
+        MixedDiscountLine.ModifyAll("Min. Quantity", MinQuantity);
+
+        DiscountCode := MixedDiscount.Code;
+    end;
+
+    internal procedure AllowThreeDecimalUnitPrices()
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        if (GeneralLedgerSetup."Unit-Amount Rounding Precision" = 0) or (GeneralLedgerSetup."Unit-Amount Rounding Precision" > 0.001) then begin
+            GeneralLedgerSetup."Unit-Amount Rounding Precision" := 0.001;
+            GeneralLedgerSetup.Modify();
+        end;
+    end;
+
+    internal procedure SetAmountRoundingPrecision(AmountRoundingPrecision: Decimal) PreviousPrecision: Decimal
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        PreviousPrecision := GeneralLedgerSetup."Amount Rounding Precision";
+        GeneralLedgerSetup."Amount Rounding Precision" := AmountRoundingPrecision;
+        GeneralLedgerSetup.Modify();
+    end;
+
     internal procedure MixDiscountSourceTableId(): Integer
     begin
         exit(DATABASE::"NPR Mixed Discount");

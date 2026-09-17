@@ -20,6 +20,7 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         TaxGroup: Record "Tax Group";
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
         Assert: Codeunit Assert;
+        LibraryFeatureFlags: Codeunit "NPR Library - Feature Flags";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
         POSSession: Codeunit "NPR POS Session";
 
@@ -6155,6 +6156,316 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         // [THEN] Verify Discount not applied
         Assert.IsTrue(SaleLinePOS."Total Discount Code" = '', 'Total Discount was triggered but it should not have been triggered.');
         Assert.IsTrue(SaleLinePOS."Discount Amount" = 0, 'Discount Amount is not correct after total discount application');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckTotalDiscountKeepsFreeMixDiscountLineAt100PctOnThreeDecimalPrice()
+    var
+        Item: Record Item;
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LibraryApplicationArea: Codeunit "Library - Application Area";
+        LibraryPOSDiscount: Codeunit "NPR Library - POS Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRMixedDiscountManagement: Codeunit "NPR Mixed Discount Management";
+        NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        DiscountFilterLbl: Label '%1|%2', Locked = true, Comment = '%1 - discount table id, %2 - discount table id';
+        MixDiscountCode: Code[20];
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] A total discount applied on top of a free mix discount line with a 3 decimal price keeps that line at exactly 100% and zero amounts
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] No Discounts
+        DeleteDiscounts();
+
+        // [GIVEN] Total and mix discounts enabled
+        EnableDiscount(StrSubstNo(DiscountFilterLbl, NPRTotalDiscountManagement.DiscSourceTableId(), NPRMixedDiscountManagement.DiscSourceTableId()));
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 21;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with a 3 decimal unit price that rounds up to 2 decimals
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 7.355;
+        Item.Modify();
+
+        // [GIVEN] Mix discount: buy 6, 1 of them is 100% discounted
+        LibraryPOSDiscount.CreatePriorityDiscountPerMinQty(Item, 6, 1, 100, MixDiscountCode);
+
+        // [GIVEN] 10% total discount on every line once the sale reaches 10
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"No Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::All, '', '', NPRTotalDiscountLine);
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 10, Enum::"NPR Total Disc. Benefit Type"::Discount, '', '', 0, Enum::"NPR Total Disc Ben Value Type"::Percent, 10, false, NPRTotalDiscountBenefit);
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+
+        // [GIVEN] Active POS session & sale with the minimum quantity of the mix discount
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
+
+        // [WHEN] Total Pressed
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The free line carries the total discount and still has exactly 100% discount and zero amounts
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("No.", Item."No.");
+        Assert.AreEqual(2, SaleLinePOS.Count(), 'Unexpected number of sale lines in the sale');
+        SaleLinePOS.SetRange(Quantity, 1);
+        SaleLinePOS.FindFirst();
+        Assert.AreEqual(7.355, SaleLinePOS."Unit Price", 'Unit price with 3 decimals is not kept on the sale line, the scenario would not be verified');
+        Assert.AreEqual(MixDiscountCode, SaleLinePOS."Discount Code", 'Mix Discount Code on the free line');
+        Assert.AreEqual(NPRTotalDiscountHeader.Code, SaleLinePOS."Total Discount Code", 'Total Discount Code on the free line');
+        Assert.AreEqual(7.36, SaleLinePOS."Discount Amount", 'Discount Amount on the free line');
+        Assert.AreEqual(100, SaleLinePOS."Discount %", 'Discount % on the free line');
+        Assert.AreEqual(0, SaleLinePOS."Amount Including VAT", 'Amount Including VAT on the free line');
+        Assert.AreEqual(0, SaleLinePOS.Amount, 'Amount on the free line');
+
+        // [THEN] The paid line gets exactly the 10% total discount
+        SaleLinePOS.SetRange(Quantity, 5);
+        SaleLinePOS.FindFirst();
+        Assert.AreEqual(NPRTotalDiscountHeader.Code, SaleLinePOS."Total Discount Code", 'Total Discount Code on the paid line');
+        Assert.AreEqual(3.68, SaleLinePOS."Discount Amount", 'Discount Amount on the paid line');
+        Assert.AreEqual(10, SaleLinePOS."Discount %", 'Discount % on the paid line');
+        Assert.AreEqual(33.1, SaleLinePOS."Amount Including VAT", 'Amount Including VAT on the paid line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckTotalDiscountKeepsFreeMixDiscLineAt100PctOnThreeDecimalPriceExclVAT()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LibraryApplicationArea: Codeunit "Library - Application Area";
+        LibraryPOSDiscount: Codeunit "NPR Library - POS Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRMixedDiscountManagement: Codeunit "NPR Mixed Discount Management";
+        NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        DiscountFilterLbl: Label '%1|%2', Locked = true, Comment = '%1 - discount table id, %2 - discount table id';
+        MixDiscountCode: Code[20];
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] A total discount on a sale that runs excluding VAT keeps a free mix discount line at exactly 100% and zero amounts
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] No Discounts
+        DeleteDiscounts();
+
+        // [GIVEN] Total and mix discounts enabled
+        EnableDiscount(StrSubstNo(DiscountFilterLbl, NPRTotalDiscountManagement.DiscSourceTableId(), NPRMixedDiscountManagement.DiscSourceTableId()));
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 25;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Customer with prices excluding VAT, which makes the whole sale run excluding VAT
+        CreateCustomer(Customer, false, true);
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+
+        // [GIVEN] Item priced including VAT with 3 decimals, so the POS stores 5.884 excluding VAT on the line
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 7.355;
+        Item.Modify();
+
+        // [GIVEN] Mix discount: buy 6, 1 of them is 100% discounted
+        LibraryPOSDiscount.CreatePriorityDiscountPerMinQty(Item, 6, 1, 100, MixDiscountCode);
+
+        // [GIVEN] 10% total discount on every line once the sale reaches 10
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"No Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::All, '', '', NPRTotalDiscountLine);
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 10, Enum::"NPR Total Disc. Benefit Type"::Discount, '', '', 0, Enum::"NPR Total Disc Ben Value Type"::Percent, 10, false, NPRTotalDiscountBenefit);
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+
+        // [GIVEN] Active POS session, customer attached, and the minimum quantity of the mix discount
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
+
+        // [WHEN] Total Pressed
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The free line still has exactly 100% discount and zero amounts
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("No.", Item."No.");
+        Assert.AreEqual(2, SaleLinePOS.Count(), 'Unexpected number of sale lines in the sale');
+        SaleLinePOS.SetRange(Quantity, 1);
+        SaleLinePOS.FindFirst();
+        Assert.IsFalse(SaleLinePOS."Price Includes VAT", 'Price Includes VAT on the sale line, the scenario would not be verified');
+        Assert.AreEqual(5.884, SaleLinePOS."Unit Price", 'Unit price excluding VAT with 3 decimals is not kept on the sale line, the scenario would not be verified');
+        Assert.AreEqual(MixDiscountCode, SaleLinePOS."Discount Code", 'Mix Discount Code on the free line');
+        Assert.AreEqual(NPRTotalDiscountHeader.Code, SaleLinePOS."Total Discount Code", 'Total Discount Code on the free line');
+        Assert.AreEqual(5.88, SaleLinePOS."Discount Amount", 'Discount Amount on the free line');
+        Assert.AreEqual(100, SaleLinePOS."Discount %", 'Discount % on the free line');
+        Assert.AreEqual(0, SaleLinePOS.Amount, 'Amount on the free line');
+        Assert.AreEqual(0, SaleLinePOS."Amount Including VAT", 'Amount Including VAT on the free line');
+
+        // [THEN] The paid line gets exactly the 10% total discount
+        SaleLinePOS.SetRange(Quantity, 5);
+        SaleLinePOS.FindFirst();
+        Assert.AreEqual(2.94, SaleLinePOS."Discount Amount", 'Discount Amount on the paid line');
+        Assert.AreEqual(10, SaleLinePOS."Discount %", 'Discount % on the paid line');
+        Assert.AreEqual(26.48, SaleLinePOS.Amount, 'Amount on the paid line');
+        Assert.AreEqual(33.1, SaleLinePOS."Amount Including VAT", 'Amount Including VAT on the paid line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckTotalDiscountAmountKeepsFreeMixDiscLineAt100PctOnThreeDecimalPrice()
+    var
+        Item: Record Item;
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LibraryApplicationArea: Codeunit "Library - Application Area";
+        LibraryPOSDiscount: Codeunit "NPR Library - POS Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRMixedDiscountManagement: Codeunit "NPR Mixed Discount Management";
+        NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        DiscountFilterLbl: Label '%1|%2', Locked = true, Comment = '%1 - discount table id, %2 - discount table id';
+        MixDiscountCode: Code[20];
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] An amount type total discount applied on top of a free mix discount line with a 3 decimal price keeps that line at exactly 100% and zero amounts
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] No Discounts
+        DeleteDiscounts();
+
+        // [GIVEN] Total and mix discounts enabled
+        EnableDiscount(StrSubstNo(DiscountFilterLbl, NPRTotalDiscountManagement.DiscSourceTableId(), NPRMixedDiscountManagement.DiscSourceTableId()));
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 21;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with a 3 decimal unit price that rounds up to 2 decimals
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 7.355;
+        Item.Modify();
+
+        // [GIVEN] Mix discount: buy 6, 1 of them is 100% discounted
+        LibraryPOSDiscount.CreatePriorityDiscountPerMinQty(Item, 6, 1, 100, MixDiscountCode);
+
+        // [GIVEN] Total discount of 5.00 spread over the sale once it reaches 10
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"No Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::All, '', '', NPRTotalDiscountLine);
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 10, Enum::"NPR Total Disc. Benefit Type"::Discount, '', '', 0, Enum::"NPR Total Disc Ben Value Type"::Amount, 5, false, NPRTotalDiscountBenefit);
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+
+        // [GIVEN] Active POS session & sale with the minimum quantity of the mix discount
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
+
+        // [WHEN] Total Pressed
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The free line takes no share of the amount discount and stays at exactly 100% with zero amounts
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("No.", Item."No.");
+        Assert.AreEqual(2, SaleLinePOS.Count(), 'Unexpected number of sale lines in the sale');
+        SaleLinePOS.SetRange(Quantity, 1);
+        SaleLinePOS.FindFirst();
+        Assert.AreEqual(MixDiscountCode, SaleLinePOS."Discount Code", 'Mix Discount Code on the free line');
+        Assert.AreEqual(7.36, SaleLinePOS."Discount Amount", 'Discount Amount on the free line');
+        Assert.AreEqual(100, SaleLinePOS."Discount %", 'Discount % on the free line');
+        Assert.AreEqual(0, SaleLinePOS."Amount Including VAT", 'Amount Including VAT on the free line');
+        Assert.AreEqual(0, SaleLinePOS.Amount, 'Amount on the free line');
+
+        // [THEN] The whole 5.00 lands on the paid line
+        SaleLinePOS.SetRange(Quantity, 5);
+        SaleLinePOS.FindFirst();
+        Assert.AreEqual(NPRTotalDiscountHeader.Code, SaleLinePOS."Total Discount Code", 'Total Discount Code on the paid line');
+        Assert.AreEqual(5, SaleLinePOS."Discount Amount", 'Discount Amount on the paid line');
+        Assert.AreEqual(31.78, SaleLinePOS."Amount Including VAT", 'Amount Including VAT on the paid line');
+    end;
+
+    local procedure CreateCustomer(var Customer: Record Customer; PricesIncludingTax: Boolean; AllowLineDisc: Boolean)
+    var
+        LibrarySales: Codeunit "Library - Sales";
+    begin
+        LibrarySales.CreateCustomerWithAddress(Customer);
+        Customer."Prices Including VAT" := PricesIncludingTax;
+        Customer."Allow Line Disc." := AllowLineDisc;
+        Customer.Modify();
     end;
 
     local procedure CheckTotalDiscountBenefits(SalePOS: Record "NPR POS Sale";

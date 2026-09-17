@@ -557,6 +557,8 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     local procedure DoCheckArePricesIncludingVAT(SaleHeader: Record "NPR POS Sale")
     var
         POSSaleLine: Record "NPR POS Sale Line";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         CalculatedAmountIncludingVAT: Decimal;
         PricesNotIncludingVATErr: Label 'Price on %1 for %2 %3 %4 is not including VAT. Please recreate the %1 in order to finish the sale.', Comment = '%1 - POS Sale Line table caption, %2 - Line Type Item value, %3 - Item Number value, %4 - Item Description value';
     begin
@@ -569,7 +571,10 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
 
         if POSSaleLine.FindSet() then
             repeat
-                CalculatedAmountIncludingVAT := POSSaleLine."Unit Price" * POSSaleLine.Quantity - POSSaleLine."Discount Amount";
+                if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then
+                    CalculatedAmountIncludingVAT := POSSaleTaxCalc.CalcAmountAfterDiscount(POSSaleLine."Unit Price" * POSSaleLine.Quantity, POSSaleLine."Discount Amount", 0.01)
+                else
+                    CalculatedAmountIncludingVAT := POSSaleLine."Unit Price" * POSSaleLine.Quantity - POSSaleLine."Discount Amount";
                 if Abs(Round(CalculatedAmountIncludingVAT, 0.01)) <> Abs(Round(POSSaleLine."Amount Including VAT", 0.01)) then
                     Error(PricesNotIncludingVATErr, POSSaleLine.TableCaption, POSSaleLine."Line Type"::Item, POSSaleLine."No.", POSSaleLine.Description);
             until POSSaleLine.Next() = 0;

@@ -25,6 +25,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryRandom: Codeunit "Library - Random";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
         LibraryPOSDiscount: Codeunit "NPR Library - POS Discount";
+        LibraryFeatureFlags: Codeunit "NPR Library - Feature Flags";
         Initialized: Boolean;
         DayDirection: Option Today,Future,Past;
 
@@ -10587,6 +10588,362 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
             Assert.IsFalse(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line which is not according to scenario');
             Assert.AreEqual(0, POSSaleLine."Discount %", 'Discount Percent not calculated according to scenario.');
         until POSSaleLine.Next() = 0;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyPriorityMixDiscount100PctOnThreeDecimalPriceInclVAT()
+    var
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        DiscountCode: Code[20];
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] Buy 6 get 1 free on an item with a 3 decimal price incl. VAT gives a free line with exactly 100% discount and zero amounts
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 21;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with a 3 decimal unit price that rounds up to 2 decimals
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 7.355;
+        Item.Modify();
+
+        // [GIVEN] Mix discount: buy 6, 1 of them is 100% discounted
+        LibraryPOSDiscount.CreatePriorityDiscountPerMinQty(Item, 6, 1, 100, DiscountCode);
+
+        // [GIVEN] Active POS session & sale with 1 pcs of the item
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        Assert.AreEqual(7.355, POSSaleLine."Unit Price", 'Unit price with 3 decimals is not kept on the sale line, the scenario would not be verified');
+
+        // [WHEN] Quantity is changed to the minimum quantity of the mix discount
+        POSSaleLineUnit.SetQuantity(6);
+
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The free line has exactly 100% discount and zero amounts
+        FilterSaleLines(POSSaleLine, POSSale, Item."No.");
+        Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of sale lines in the sale');
+        POSSaleLine.SetRange(Quantity, 1);
+        POSSaleLine.FindFirst();
+        VerifyFreeMixDiscountLine(POSSaleLine, DiscountCode, 7.36);
+
+        // [THEN] The other 5 pcs are paid in full
+        POSSaleLine.SetRange(Quantity, 5);
+        POSSaleLine.FindFirst();
+        Assert.AreEqual(0, POSSaleLine."Discount Amount", 'Discount Amount on the paid line');
+        Assert.AreEqual(0, POSSaleLine."Discount %", 'Discount % on the paid line');
+        Assert.AreEqual(36.78, POSSaleLine."Amount Including VAT", 'Amount Including VAT on the paid line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyPriorityMixDiscount100PctOnThreeDecimalPriceRoundingDown()
+    var
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        DiscountCode: Code[20];
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] Buy 6 get 1 free on an item with a 3 decimal price that rounds down gives a free line with exactly 100% discount, not 99.97%
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 21;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with a 3 decimal unit price that rounds down to 2 decimals
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 7.352;
+        Item.Modify();
+
+        // [GIVEN] Mix discount: buy 6, 1 of them is 100% discounted
+        LibraryPOSDiscount.CreatePriorityDiscountPerMinQty(Item, 6, 1, 100, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [WHEN] The minimum quantity of the mix discount is added to the sale
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
+
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The free line has exactly 100% discount and zero amounts
+        FilterSaleLines(POSSaleLine, POSSale, Item."No.");
+        Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of sale lines in the sale');
+        POSSaleLine.SetRange(Quantity, 1);
+        POSSaleLine.FindFirst();
+        VerifyFreeMixDiscountLine(POSSaleLine, DiscountCode, 7.35);
+
+        // [THEN] The other 5 pcs are paid in full
+        POSSaleLine.SetRange(Quantity, 5);
+        POSSaleLine.FindFirst();
+        Assert.AreEqual(0, POSSaleLine."Discount Amount", 'Discount Amount on the paid line');
+        Assert.AreEqual(36.76, POSSaleLine."Amount Including VAT", 'Amount Including VAT on the paid line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyPriorityMixDiscount100PctOnThreeDecimalPriceExclVAT()
+    var
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        DiscountCode: Code[20];
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] Buy 6 get 1 free on an item with a 3 decimal price excl. VAT gives a free line with exactly 100% discount and zero amounts
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] Customer with prices excl. VAT
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 21;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with a 3 decimal unit price excl. VAT that rounds up to 2 decimals
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 7.355;
+        Item.Modify();
+
+        // [GIVEN] Mix discount: buy 6, 1 of them is 100% discounted
+        LibraryPOSDiscount.CreatePriorityDiscountPerMinQty(Item, 6, 1, 100, DiscountCode);
+
+        // [GIVEN] Active POS session & debit sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [WHEN] The minimum quantity of the mix discount is added to the sale
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
+
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The free line has exactly 100% discount and zero amounts
+        FilterSaleLines(POSSaleLine, POSSale, Item."No.");
+        Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of sale lines in the sale');
+        POSSaleLine.SetRange(Quantity, 1);
+        POSSaleLine.FindFirst();
+        Assert.IsFalse(POSSaleLine."Price Includes VAT", 'Price Includes VAT on the sale line, the scenario would not be verified');
+        VerifyFreeMixDiscountLine(POSSaleLine, DiscountCode, 7.36);
+
+        // [THEN] The other 5 pcs are paid in full
+        POSSaleLine.SetRange(Quantity, 5);
+        POSSaleLine.FindFirst();
+        Assert.AreEqual(0, POSSaleLine."Discount Amount", 'Discount Amount on the paid line');
+        Assert.AreEqual(36.78, POSSaleLine.Amount, 'Amount on the paid line');
+        Assert.AreEqual(44.5, POSSaleLine."Amount Including VAT", 'Amount Including VAT on the paid line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyManualDiscount100PctOnThreeDecimalPrice()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] A manual 100% line discount on an item with a 3 decimal price incl. VAT gives zero amounts, not -0.01
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 21;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with a 3 decimal unit price that rounds up to 2 decimals
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 7.355;
+        Item.Modify();
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        // [WHEN] The item is added with a manual 100% line discount
+        LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", 1, 100);
+
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The line is free with zero amounts
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        Assert.AreEqual(7.355, POSSaleLine."Unit Price", 'Unit price with 3 decimals is not kept on the sale line, the scenario would not be verified');
+        Assert.AreEqual(100, POSSaleLine."Discount %", 'Discount % on the free line');
+        Assert.AreEqual(7.36, POSSaleLine."Discount Amount", 'Discount Amount on the free line');
+        Assert.AreEqual(0, POSSaleLine."Amount Including VAT", 'Amount Including VAT on the free line');
+        Assert.AreEqual(0, POSSaleLine.Amount, 'Amount on the free line');
+        Assert.AreEqual(0, POSSaleLine."Line Amount", 'Line Amount on the free line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyPriorityMixDiscount100PctOnThreeDecimalAmountRoundingPrecision()
+    var
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        DiscountCode: Code[20];
+        FreeLineAmount: Decimal;
+        FreeLineAmountInclVAT: Decimal;
+        FreeLineDiscountAmount: Decimal;
+        FreeLineDiscountPct: Decimal;
+        PaidLineAmountInclVAT: Decimal;
+        PreviousAmountRoundingPrecision: Decimal;
+        PreviousFeatureFlagValue: Boolean;
+    begin
+        // [SCENARIO CORE-1843] On a tenant whose money precision is thousandths, the free line is still exactly 100% and zero, and the discount keeps that precision
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
+        LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
+        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 21;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with a 3 decimal unit price
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 7.355;
+        Item.Modify();
+
+        // [GIVEN] Mix discount: buy 6, 1 of them is 100% discounted
+        LibraryPOSDiscount.CreatePriorityDiscountPerMinQty(Item, 6, 1, 100, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Money itself is rounded to thousandths, as in a 3 decimal currency
+        PreviousAmountRoundingPrecision := LibraryPOSDiscount.SetAmountRoundingPrecision(0.001);
+
+        // [WHEN] The minimum quantity of the mix discount is added to the sale
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
+
+        // [THEN] Read the result, then restore the precision before asserting so a failure cannot leak into later tests
+        FilterSaleLines(POSSaleLine, POSSale, Item."No.");
+        POSSaleLine.SetRange(Quantity, 1);
+        if POSSaleLine.FindFirst() then begin
+            FreeLineDiscountAmount := POSSaleLine."Discount Amount";
+            FreeLineDiscountPct := POSSaleLine."Discount %";
+            FreeLineAmountInclVAT := POSSaleLine."Amount Including VAT";
+            FreeLineAmount := POSSaleLine.Amount;
+        end;
+        POSSaleLine.SetRange(Quantity, 5);
+        if POSSaleLine.FindFirst() then
+            PaidLineAmountInclVAT := POSSaleLine."Amount Including VAT";
+
+        LibraryPOSDiscount.SetAmountRoundingPrecision(PreviousAmountRoundingPrecision);
+        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
+
+        // [THEN] The free line is exactly 100% and zero, and the discount keeps the thousandths precision
+        Assert.AreEqual(7.355, FreeLineDiscountAmount, 'Discount Amount on the free line');
+        Assert.AreEqual(100, FreeLineDiscountPct, 'Discount % on the free line');
+        Assert.AreEqual(0, FreeLineAmountInclVAT, 'Amount Including VAT on the free line');
+        Assert.AreEqual(0, FreeLineAmount, 'Amount on the free line');
+
+        // [THEN] The other 5 pcs are paid in full at the same precision
+        Assert.AreEqual(36.775, PaidLineAmountInclVAT, 'Amount Including VAT on the paid line');
+    end;
+
+    local procedure FilterSaleLines(var POSSaleLine: Record "NPR POS Sale Line"; POSSale: Record "NPR POS Sale"; ItemNo: Code[20])
+    begin
+        POSSaleLine.Reset();
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("No.", ItemNo);
+    end;
+
+    local procedure VerifyFreeMixDiscountLine(POSSaleLine: Record "NPR POS Sale Line"; DiscountCode: Code[20]; ExpectedDiscountAmount: Decimal)
+    begin
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to the free line');
+        Assert.AreEqual(DiscountCode, POSSaleLine."Discount Code", 'Discount Code on the free line');
+        Assert.AreEqual(ExpectedDiscountAmount, POSSaleLine."Discount Amount", 'Discount Amount on the free line');
+        Assert.AreEqual(100, POSSaleLine."Discount %", 'Discount % on the free line');
+        Assert.AreEqual(0, POSSaleLine."Amount Including VAT", 'Amount Including VAT on the free line');
+        Assert.AreEqual(0, POSSaleLine.Amount, 'Amount on the free line');
+        Assert.AreEqual(0, POSSaleLine."Line Amount", 'Line Amount on the free line');
     end;
 
     procedure InitializeData()
