@@ -1120,7 +1120,7 @@ codeunit 85157 "NPR POS API Tests"
         EFTTransactionRequest.SetRange("Card Number", '************1234');
         Assert.IsTrue(EFTTransactionRequest.FindFirst(), 'EFT Transaction Request should be created');
         Assert.AreEqual('PSP-REF-12345', EFTTransactionRequest."PSP Reference", 'PSP Reference should match');
-        Assert.AreEqual('PAR-TOKEN-ABCDEF', EFTTransactionRequest."External Payment Token", 'PAR Token should match');
+        Assert.AreEqual('PAR-TOKEN-ABCDEF', EFTTransactionRequest."Payment Account Reference", 'PAR Token should match');
         Assert.IsTrue(EFTTransactionRequest.Successful, 'Transaction should be marked as successful');
 
         // [THEN] EFT Receipt lines are created
@@ -2594,7 +2594,7 @@ codeunit 85157 "NPR POS API Tests"
         Body.Add('paymentType', 'EFT');
         Body.Add('amount', _Item."Unit Price");
         Body.Add('maskedCardNo', '************5678');
-        Body.Add('pspReference', 'PSP-REF-CLEANUP-TEST');
+        Body.Add('pspReference', 'PSP-CLEANUP-TEST');
         Body.Add('success', true);
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create EFT payment line should succeed');
@@ -2619,6 +2619,1129 @@ codeunit 85157 "NPR POS API Tests"
 
         // Restore WorkDate
         WorkDate(OriginalWorkDate);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_AuthorizedAttemptHasFinancialResultAndLinks()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        GLSetup: Record "General Ledger Setup";
+        OriginalLCYCode: Code[10];
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] An authorized external payment records financial results and sale linkage.
+        // [GIVEN] An unattended sale and a successful LCY EFT payload.
+        CreateSaleForExternalEFT(POSSale);
+        _EFTPaymentMethod.TestField("Currency Code", '');
+        _EFTPaymentMethod.TestField("Fixed Rate", 0);
+        _EFTPaymentMethod.TestField("Use Stand. Exc. Rate for Bal.", false);
+        GLSetup.Get();
+        OriginalLCYCode := GLSetup."LCY Code";
+        GLSetup."LCY Code" := 'DKK';
+        GLSetup.Modify();
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('description', 'External card payment');
+        Body.Add('success', true);
+        // [WHEN] The external system submits the payment.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+
+        GLSetup."LCY Code" := OriginalLCYCode;
+        GLSetup.Modify();
+        // [THEN] The request is finalized in LCY and links to the approved payment line.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Authorized attempt should be accepted');
+        EFTTransactionRequest.SetRange("Register No.", POSSale."Register No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        Assert.IsTrue(EFTTransactionRequest.FindFirst(), 'Authorized attempt should be recorded');
+        Assert.AreEqual(100, EFTTransactionRequest."Result Amount", 'Authorized amount must be available to reconciliation');
+        Assert.AreEqual(100, EFTTransactionRequest."Amount Input", 'Input should retain the requested amount');
+        Assert.AreEqual(100, EFTTransactionRequest."Amount Output", 'Output should contain the authorized amount');
+        Assert.IsTrue(EFTTransactionRequest.Successful, 'The external authorization should be retained');
+        Assert.IsTrue(EFTTransactionRequest."Financial Impact", 'A nonzero authorized payment should have financial impact');
+        Assert.IsTrue(EFTTransactionRequest."External Result Known", 'The supplied authorization result is known');
+        Assert.IsTrue(EFTTransactionRequest."Result Processed", 'The external result should be fully processed');
+        Assert.AreEqual(EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type", 'The attempt should be a payment');
+        Assert.AreEqual('POS_API', EFTTransactionRequest."Integration Type", 'External attempts should retain their integration type');
+        Assert.AreEqual('DKK', EFTTransactionRequest."Currency Code", 'The current payload uses local currency');
+        Assert.AreEqual(POSSale.SystemId, EFTTransactionRequest."Sales ID", 'The attempt should identify its sale');
+        Assert.AreEqual(UserId(), EFTTransactionRequest."User ID", 'The attempt should identify the API user');
+        Assert.IsTrue(EFTTransactionRequest."Self Service", 'The unattended POS unit should be identified');
+        Assert.AreEqual(_EFTPaymentMethod.Code, EFTTransactionRequest."Original POS Payment Type Code", 'The requested payment method should be retained');
+        Assert.AreEqual(_EFTPaymentMethod.Code, EFTTransactionRequest."POS Payment Type Code", 'An unmapped payment should retain its method');
+        Assert.AreEqual('External card payment', EFTTransactionRequest."POS Description", 'The supplied description should be retained');
+        Assert.AreNotEqual(0DT, EFTTransactionRequest.Started, 'The recording time should be populated');
+        Assert.IsTrue(EFTTransactionRequest.Finished >= EFTTransactionRequest.Started, 'The attempt should be finished');
+
+        Assert.IsTrue(PaymentLine.GetBySystemId(PaymentLineId), 'The approved line should use the caller-provided ID');
+        Assert.IsTrue(PaymentLine."EFT Approved", 'The payment line should retain authorization');
+        Assert.AreEqual(100, PaymentLine."Amount Including VAT", 'The approved payment should contribute to the sale');
+        Assert.AreEqual(PaymentLine.SystemId, EFTTransactionRequest."Sales Line ID", 'Reconciliation should be able to resolve the payment line');
+        Assert.AreEqual(PaymentLine."Line No.", EFTTransactionRequest."Sales Line No.", 'The request should retain the actual payment line number');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_FailedAttemptIsAuditOnly()
+    begin
+        // [SCENARIO] A reported failure is retained without paying the sale.
+        // [GIVEN] An external attempt with success set to false.
+        // [WHEN] The external attempt is submitted to the API.
+        // [THEN] Its outcome is validated without creating a payment line.
+        AssertExternalEFTAttemptIsAuditOnly();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_OmittedSuccessIsAuditOnly()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        ReceiptLines: JsonArray;
+        JToken: JsonToken;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Legacy EFT callers may omit success, which defaults to an unsuccessful audit-only attempt.
+        // [GIVEN] A sale and an EFT payload with receipts but no success property.
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        ReceiptLines.Add('External outcome');
+        Body.Add('eftReceipt', ReceiptLines);
+
+        // [WHEN] The external system submits the attempt without an outcome.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+
+        // [THEN] The API records the attempt and receipt without paying the sale or consuming the payment-line ID.
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(201, JToken.AsValue().AsInteger(), 'An omitted outcome should be accepted for backwards compatibility');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('totalPaymentAmount', JToken);
+        Assert.AreEqual(0, JToken.AsValue().AsDecimal(), 'An omitted outcome must not pay the sale');
+        ResponseBody.Get('refreshedPaymentLines', JToken);
+        Assert.AreEqual(0, JToken.AsArray().Count(), 'No payment line should be returned');
+        Assert.IsFalse(PaymentLine.GetBySystemId(PaymentLineId), 'An omitted outcome must not consume the caller payment-line ID');
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(404, JToken.AsValue().AsInteger(), 'There should be no payment line to retrieve');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.AreEqual(1, EFTTransactionRequest.Count(), 'One audit record should be retained');
+        EFTTransactionRequest.FindFirst();
+        Assert.IsFalse(EFTTransactionRequest.Successful, 'An omitted outcome must default to false');
+        Assert.AreEqual(100, EFTTransactionRequest."Amount Input", 'The attempted amount should be retained');
+        Assert.AreEqual(0, EFTTransactionRequest."Amount Output", 'An omitted outcome has no authorized output');
+        Assert.AreEqual(0, EFTTransactionRequest."Result Amount", 'An omitted outcome has no financial result');
+        Assert.IsFalse(EFTTransactionRequest."Financial Impact", 'An omitted outcome must not have financial impact');
+        Assert.IsTrue(EFTTransactionRequest."External Result Known", 'An omitted outcome should be recorded as the default false outcome');
+        Assert.IsTrue(EFTTransactionRequest."Result Processed", 'The audit outcome should be fully recorded');
+        Assert.IsTrue(IsNullGuid(EFTTransactionRequest."Sales Line ID"), 'An audit-only attempt must not link to a payment line');
+        Assert.AreEqual(0, EFTTransactionRequest."Sales Line No.", 'An audit-only attempt must not have a payment-line number');
+        EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+        Assert.AreEqual(1, EFTReceipt.Count(), 'The supplied receipt should be retained');
+        EFTReceipt.FindFirst();
+        Assert.AreEqual('External outcome', EFTReceipt.Text, 'The receipt should retain the supplied text');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_NullSuccessReturnsBadRequest()
+    begin
+        // [SCENARIO] JSON null is not an EFT outcome.
+        // [GIVEN] An EFT payload with success set to null.
+        // [WHEN] The payload is submitted to the payment-line API.
+        // [THEN] A structured 400 is returned without recording the attempt.
+        AssertExternalEFTRejectsInvalidSuccess('null');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_StringSuccessReturnsBadRequest()
+    begin
+        // [SCENARIO] A string spelling true is not a JSON boolean.
+        // [GIVEN] An EFT payload with a string-valued outcome.
+        // [WHEN] The external attempt is submitted.
+        // [THEN] The API returns a structured 400 without recording it.
+        AssertExternalEFTRejectsInvalidSuccess('"true"');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_NumberSuccessReturnsBadRequest()
+    begin
+        // [SCENARIO] A numeric outcome is not a JSON boolean.
+        // [GIVEN] An EFT payload with success set to 1.
+        // [WHEN] The external attempt is submitted.
+        // [THEN] The API returns a structured 400 without recording it.
+        AssertExternalEFTRejectsInvalidSuccess('1');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_ObjectSuccessReturnsBadRequest()
+    begin
+        // [SCENARIO] An object cannot stand in for an EFT outcome.
+        // [GIVEN] An EFT payload with an object-valued success property.
+        // [WHEN] The external attempt is submitted.
+        // [THEN] The API returns a structured 400 without recording it.
+        AssertExternalEFTRejectsInvalidSuccess('{}');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_ArraySuccessReturnsBadRequest()
+    begin
+        // [SCENARIO] An array cannot stand in for an EFT outcome.
+        // [GIVEN] An EFT payload with an array-valued success property.
+        // [WHEN] The external attempt is submitted.
+        // [THEN] The API returns a structured 400 without recording it.
+        AssertExternalEFTRejectsInvalidSuccess('[]');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_RejectsOverlongPSPReference()
+    begin
+        // [SCENARIO] An overlong pspReference is rejected rather than stored under a different value.
+        // [GIVEN] An external attempt with pspReference one character over its storage limit.
+        // [WHEN] The caller submits either an authorized or failed attempt.
+        // [THEN] Both outcomes fail without recording an attempt, receipt or payment.
+        AssertExternalPaymentRejectsLongIdentifier('pspReference', 17, 'EFT', true);
+        AssertExternalPaymentRejectsLongIdentifier('pspReference', 17, 'EFT', false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_RejectsOverlongPARToken()
+    begin
+        // [SCENARIO] An overlong parToken is rejected rather than stored under a different value.
+        // [GIVEN] An external attempt with parToken one character over its storage limit.
+        // [WHEN] The caller submits either an authorized or failed attempt.
+        // [THEN] Both outcomes fail without recording an attempt, receipt or payment.
+        AssertExternalPaymentRejectsLongIdentifier('parToken', 101, 'EFT', true);
+        AssertExternalPaymentRejectsLongIdentifier('parToken', 101, 'EFT', false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_RejectsOverlongCardApplicationId()
+    begin
+        // [SCENARIO] An overlong cardApplicationId is rejected rather than stored under a different value.
+        // [GIVEN] An external attempt with cardApplicationId one character over its storage limit.
+        // [WHEN] The caller submits either an authorized or failed attempt.
+        // [THEN] Both outcomes fail without recording an attempt, receipt or payment.
+        AssertExternalPaymentRejectsLongIdentifier('cardApplicationId', 33, 'EFT', true);
+        AssertExternalPaymentRejectsLongIdentifier('cardApplicationId', 33, 'EFT', false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_RejectsOverlongMaskedCardNo()
+    begin
+        // [SCENARIO] An overlong maskedCardNo is rejected rather than stored under a different value.
+        // [GIVEN] An external attempt with maskedCardNo one character over its storage limit.
+        // [WHEN] The caller submits either an authorized or failed attempt.
+        // [THEN] Both outcomes fail without recording an attempt, receipt or payment.
+        AssertExternalPaymentRejectsLongIdentifier('maskedCardNo', 31, 'EFT', true);
+        AssertExternalPaymentRejectsLongIdentifier('maskedCardNo', 31, 'EFT', false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_RejectsOverlongPaymentMethodCode()
+    begin
+        // [SCENARIO] An overlong paymentMethodCode is rejected rather than stored under a different value.
+        // [GIVEN] An external attempt with paymentMethodCode one character over its storage limit.
+        // [WHEN] The caller submits either an authorized or failed attempt.
+        // [THEN] Both outcomes fail without recording an attempt, receipt or payment.
+        AssertExternalPaymentRejectsLongIdentifier('paymentMethodCode', 11, 'EFT', true);
+        AssertExternalPaymentRejectsLongIdentifier('paymentMethodCode', 11, 'EFT', false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_CashRejectsOverlongPaymentMethodCode()
+    begin
+        // [SCENARIO] Cash also rejects an overlong method code rather than selecting its prefix.
+        // [GIVEN] A cash method and a code one character over the ten-character limit.
+        // [WHEN] The caller submits that code.
+        // [THEN] No payment is recorded against the truncated prefix.
+        AssertExternalPaymentRejectsLongIdentifier('paymentMethodCode', 11, 'Cash', false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_MaximumLengthIdentifiersArePreserved()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        PaymentLineId: Guid;
+        CardNo: Text;
+        PAR: Text;
+        CardApplicationId: Text;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Identifiers at their supported limits are stored without losing characters.
+        // [GIVEN] A ten-character EFT method and references at every documented length limit.
+        CreateSaleForExternalEFT(POSSale);
+        POSPaymentMethod := _EFTPaymentMethod;
+        POSPaymentMethod.Code := 'EFTMAXCODE';
+        POSPaymentMethod.Insert(true);
+        PaymentLineId := CreateGuid();
+        CardNo := PadStr('', 30, '*');
+        PAR := PadStr('PAR-', 100, 'X');
+        CardApplicationId := PadStr('AID-', 32, 'X');
+        Body.Add('paymentMethodCode', POSPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('success', true);
+        Body.Add('maskedCardNo', CardNo);
+        Body.Add('pspReference', '1234567890123456');
+        Body.Add('parToken', PAR);
+        Body.Add('cardApplicationId', CardApplicationId);
+
+        // [WHEN] The caller submits the authorized payment.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+
+        // [THEN] Every request and payment-line reference retains the complete supplied value.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Identifiers at the limits must be accepted');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        EFTTransactionRequest.FindFirst();
+        Assert.AreEqual('EFTMAXCODE', EFTTransactionRequest."POS Payment Type Code", 'The full method code must be retained');
+        Assert.AreEqual(CardNo, EFTTransactionRequest."Card Number", 'The complete masked card must be retained');
+        Assert.AreEqual('1234567890123456', EFTTransactionRequest."PSP Reference", 'The complete PSP reference must be retained');
+        Assert.AreEqual('1234567890123456', EFTTransactionRequest."External Transaction ID", 'The external transaction must retain the same PSP');
+        Assert.AreEqual('1234567890123456', EFTTransactionRequest."Reference Number Output", 'The output reference must retain the same PSP');
+        Assert.AreEqual('', EFTTransactionRequest."External Payment Token", 'An account reference must not be stored as a reusable payment token');
+        Assert.AreEqual(PAR, EFTTransactionRequest."Payment Account Reference", 'The complete PAR must reach the account reference');
+        Assert.AreEqual(CardApplicationId, EFTTransactionRequest."Card Application ID", 'The complete AID must be retained');
+        PaymentLine.GetBySystemId(PaymentLineId);
+        Assert.AreEqual('EFTMAXCODE', PaymentLine."No.", 'The payment must use the full method code');
+        Assert.AreEqual('1234567890123456', PaymentLine.Reference, 'The payment must retain the complete PSP');
+        Assert.AreEqual(CardNo, PaymentLine."EFT Card Number", 'The payment must retain the complete masked card');
+        Assert.AreEqual(PAR, PaymentLine."EFT Payment Account Reference", 'The payment must retain the complete PAR');
+        Assert.AreEqual(CardApplicationId, PaymentLine."EFT Card Application ID", 'The payment must retain the complete AID');
+    end;
+
+    local procedure AssertExternalPaymentRejectsLongIdentifier(PropertyName: Text; ValueLength: Integer; PaymentType: Text; Success: Boolean)
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        ReceiptLines: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        CreateSaleForExternalEFT(POSSale);
+        if PaymentType = 'Cash' then
+            POSPaymentMethod := _CashPaymentMethod
+        else
+            POSPaymentMethod := _EFTPaymentMethod;
+        if PropertyName = 'paymentMethodCode' then begin
+            POSPaymentMethod.Code := 'XXXXXXXXXX';
+            POSPaymentMethod.Insert(true);
+        end;
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', POSPaymentMethod.Code);
+        Body.Add('paymentType', PaymentType);
+        Body.Add('amount', 100);
+        if PaymentType = 'EFT' then
+            Body.Add('success', Success);
+        if Body.Contains(PropertyName) then
+            Body.Replace(PropertyName, PadStr('', ValueLength, 'X'))
+        else
+            Body.Add(PropertyName, PadStr('', ValueLength, 'X'));
+        ReceiptLines.Add('External attempt');
+        Body.Add('eftReceipt', ReceiptLines);
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        if PropertyName = 'paymentMethodCode' then
+            POSPaymentMethod.Delete(true);
+
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(400, JToken.AsValue().AsInteger(), 'An overlong identifier must return a structured bad request');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('code', JToken);
+        Assert.AreEqual('generic_error', JToken.AsValue().AsText(), 'The rejection should use the API error envelope');
+        ResponseBody.Get('message', JToken);
+        Assert.AreEqual(StrSubstNo('%1 must not exceed %2 characters.', PropertyName, ValueLength - 1), JToken.AsValue().AsText(), 'The rejection should identify the invalid property and its limit');
+        Assert.IsTrue(POSSale.GetBySystemId(POSSale.SystemId), 'The arranged sale must survive the rejected identifier');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.IsTrue(EFTTransactionRequest.IsEmpty(), 'An overlong identifier must not leave an EFT request');
+        EFTReceipt.SetRange("Register No.", POSSale."Register No.");
+        EFTReceipt.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        Assert.IsTrue(EFTReceipt.IsEmpty(), 'An overlong identifier must not leave receipts');
+        Assert.IsFalse(PaymentLine.GetBySystemId(PaymentLineId), 'An overlong identifier must not create a payment line');
+    end;
+
+    local procedure AssertExternalEFTRejectsInvalidSuccess(SuccessJson: Text)
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        ReceiptLines: JsonArray;
+        JToken: JsonToken;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [GIVEN] A sale and an EFT attempt whose success property is not a boolean.
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        JToken.ReadFrom(SuccessJson);
+        Body.Add('success', JToken);
+        ReceiptLines.Add('External outcome');
+        Body.Add('eftReceipt', ReceiptLines);
+
+        // [WHEN] The attempt is submitted.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+
+        // [THEN] The caller receives the JSON validation error with no side effects.
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(400, JToken.AsValue().AsInteger(), 'EFT success must be a JSON boolean');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('code', JToken);
+        Assert.AreEqual('generic_error', JToken.AsValue().AsText(), 'Validation should use the API error envelope');
+        ResponseBody.Get('message', JToken);
+        Assert.AreEqual('Invalid field: success. Expected a boolean.', JToken.AsValue().AsText(), 'The error should identify the invalid outcome');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.IsTrue(EFTTransactionRequest.IsEmpty(), 'An invalid outcome must not create an EFT request');
+        EFTReceipt.SetRange("Register No.", POSSale."Register No.");
+        EFTReceipt.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        Assert.IsTrue(EFTReceipt.IsEmpty(), 'An invalid outcome must not create receipts');
+        Assert.IsFalse(PaymentLine.GetBySystemId(PaymentLineId), 'An invalid outcome must not create a payment line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_NegativeAmountIsRejectedWithoutWrites()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        ReceiptLines: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] The API rejects external refunds without recording financial data.
+        // [GIVEN] A sale and a negative EFT amount.
+        CreateSaleForExternalEFT(POSSale);
+        Commit();
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', -100);
+        Body.Add('success', true);
+        Body.Add('pspReference', 'REFUND-PSP');
+        ReceiptLines.Add('External refund');
+        Body.Add('eftReceipt', ReceiptLines);
+
+        // [WHEN] The external system submits the refund.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        // [THEN] A structured 400 rejects the refund without changing the sale or payment records.
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(400, JToken.AsValue().AsInteger(), 'A negative EFT amount must return a bad request');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('code', JToken);
+        Assert.AreEqual('generic_error', JToken.AsValue().AsText(), 'The refund rejection must use the API error envelope');
+        ResponseBody.Get('message', JToken);
+        Assert.AreEqual('refunds not implemented', JToken.AsValue().AsText(), 'The rejection must explain that refunds are not implemented');
+        Assert.IsTrue(POSSale.GetBySystemId(POSSale.SystemId), 'The arranged sale should survive the rejected request');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.IsTrue(EFTTransactionRequest.IsEmpty(), 'A rejected refund must not leave an EFT request');
+        EFTReceipt.SetRange("Register No.", POSSale."Register No.");
+        EFTReceipt.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        Assert.IsTrue(EFTReceipt.IsEmpty(), 'A rejected refund must not leave a receipt');
+        Assert.IsFalse(PaymentLine.GetBySystemId(PaymentLineId), 'A rejected refund must not leave a payment line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_MappedCardMetadataSurvivesCompletion()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        PostedPaymentLine: Record "NPR POS Entry Payment Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        PaymentLineId: Guid;
+        PAR: Text;
+        OriginalDescription: Text[50];
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Mapped external card metadata remains linked after posting.
+        // [GIVEN] An LCY EFT mapping and an authorized payment with a 100-character account reference.
+        InitializeEFTMapping();
+        CreateSaleForExternalEFT(POSSale);
+        _VisaPaymentMethod.TestField("Currency Code", '');
+        _VisaPaymentMethod.TestField("Fixed Rate", 0);
+        _VisaPaymentMethod.TestField("Use Stand. Exc. Rate for Bal.", false);
+        OriginalDescription := _VisaPaymentMethod.Description;
+        _VisaPaymentMethod.Description := 'Visa external card payment';
+        _VisaPaymentMethod.Modify();
+        PaymentLineId := CreateGuid();
+        PAR := PadStr('PAR-', 100, 'X');
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('description', 'QR payment');
+        Body.Add('success', true);
+        Body.Add('maskedCardNo', '411111******1234');
+        Body.Add('pspReference', 'MERCHANT.PSP-42');
+        Body.Add('parToken', PAR);
+        Body.Add('cardApplicationId', 'A0000000031010');
+        // [WHEN] The external system submits the payment.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        _VisaPaymentMethod.Description := OriginalDescription;
+        _VisaPaymentMethod.Modify();
+
+        // [THEN] The request and active line retain the mapped method and complete card references.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The mapped external payment should be accepted');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        EFTTransactionRequest.FindFirst();
+        Assert.AreEqual(PAR, EFTTransactionRequest."Payment Account Reference", 'The full PAR should be stored in its account reference field');
+        Assert.AreEqual('', EFTTransactionRequest."External Payment Token", 'An account reference must not be stored as a reusable payment token');
+        Assert.AreEqual('MERCHANT.PSP-42', EFTTransactionRequest."PSP Reference", 'The supplied PSP reference must not be split as a terminal ID');
+        Assert.AreEqual('MERCHANT.PSP-42', EFTTransactionRequest."External Transaction ID", 'The external transaction should identify the supplied PSP reference');
+        Assert.AreEqual('MERCHANT.PSP-42', EFTTransactionRequest."Reference Number Output", 'The output reference should identify the external attempt');
+        Assert.AreEqual(_EFTPaymentMethod.Code, EFTTransactionRequest."Original POS Payment Type Code", 'The original payment method should be retained');
+        Assert.AreEqual(_VisaPaymentMethod.Code, EFTTransactionRequest."POS Payment Type Code", 'The card should select the mapped method');
+        Assert.AreEqual('Visa external card payme', EFTTransactionRequest."Card Name", 'The mapped description should fit the card name field');
+
+        PaymentLine.GetBySystemId(PaymentLineId);
+        Assert.AreEqual('MERCHANT.PSP-42', PaymentLine.Reference, 'The active payment line should carry the external reference');
+        Assert.AreEqual('QR payment', PaymentLine.Description, 'The supplied POS description should survive mapping');
+        Assert.AreEqual('411111******1234', PaymentLine."EFT Card Number", 'The active line should retain the masked card');
+        Assert.AreEqual('Visa external card payme', PaymentLine."EFT Card Name", 'The active line should retain the mapped card name');
+        Assert.AreEqual('A0000000031010', PaymentLine."EFT Card Application ID", 'The active line should retain the AID');
+        Assert.AreEqual(PAR, PaymentLine."EFT Payment Account Reference", 'The active line should retain the full PAR');
+        // [WHEN] The authorized sale is completed.
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The authorized sale should complete');
+        // [THEN] Posting preserves the payment ID and card metadata.
+        Assert.IsTrue(PostedPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID"), 'Reconciliation should resolve the posted line through the stored ID');
+        Assert.AreEqual(PaymentLineId, PostedPaymentLine.SystemId, 'Posting should preserve the caller payment ID');
+        Assert.IsTrue(PostedPaymentLine.EFT, 'The posted payment should remain approved EFT');
+        Assert.AreEqual(100, PostedPaymentLine."Amount (LCY)", 'The posted amount should equal the authorized result');
+        Assert.AreEqual('411111******1234', PostedPaymentLine."EFT Card Number", 'Posting should preserve the masked card');
+        Assert.AreEqual('Visa external card payme', PostedPaymentLine."EFT Card Name", 'Posting should preserve the mapped card name');
+        Assert.AreEqual('A0000000031010', PostedPaymentLine."EFT Card Application ID", 'Posting should preserve the AID');
+        Assert.AreEqual(PAR, PostedPaymentLine."EFT Payment Account Reference", 'Posting should preserve the full PAR');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_RequestAndReceiptsUseSessionTimeZone()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryTimeZone: Codeunit "NPR Library - Time Zone";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        BeforeRequest: DateTime;
+        AfterRequest: DateTime;
+        Body: JsonObject;
+        Response: JsonObject;
+        ReceiptLines: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] The attempt and its receipts share the API session's local timestamp.
+        // [GIVEN] A declined attempt with two receipt lines and a configured API time zone.
+        CreateSaleForExternalEFT(POSSale);
+        LibraryTimeZone.SetSessionEntraAppTimeZone();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('success', false);
+        ReceiptLines.Add('Payment declined');
+        ReceiptLines.Add('Please try again');
+        Body.Add('eftReceipt', ReceiptLines);
+        BeforeRequest := CurrentDateTime;
+        // [WHEN] The external system submits the payment.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        AfterRequest := CurrentDateTime;
+        LibraryTimeZone.ClearSessionEntraAppTimeZone();
+
+        // [THEN] The request and receipts share the API session's local transaction date and time.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The failed attempt should be recorded');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        EFTTransactionRequest.FindFirst();
+        Assert.AreNotEqual(0D, EFTTransactionRequest."Transaction Date", 'Even a failed attempt should have a transaction date');
+        Assert.IsTrue((EFTTransactionRequest.Started >= BeforeRequest) and (EFTTransactionRequest.Started <= AfterRequest), 'The recording timestamp should fall within the API call');
+        Assert.AreEqual(EFTTransactionRequest.Started, EFTTransactionRequest.Finished, 'An externally processed attempt should use one recording timestamp');
+        LibraryTimeZone.AssertDateTimePartsInTimeZoneRange(EFTTransactionRequest."Transaction Date", EFTTransactionRequest."Transaction Time", BeforeRequest, AfterRequest, 'External EFT recording time');
+        EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+        Assert.AreEqual(2, EFTReceipt.Count(), 'Both receipt lines should be recorded');
+        EFTReceipt.FindSet();
+        repeat
+            Assert.AreEqual(EFTTransactionRequest."Transaction Date", EFTReceipt.Date, 'Receipt reprinting must find the same local transaction date');
+            Assert.AreEqual(EFTTransactionRequest."Transaction Time", EFTReceipt."Transaction Time", 'Receipt lines should use the same local transaction time');
+        until EFTReceipt.Next() = 0;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_CashFixedRateUsesNormalPOSConversion()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryERM: Codeunit "Library - ERM";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        PostedPaymentLine: Record "NPR POS Entry Payment Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        Currency: Record Currency;
+        GLSetup: Record "General Ledger Setup";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Cash retains the normal POS fixed-rate conversion without an EFT outcome.
+        // [GIVEN] A 100 LCY sale and a cash method worth 2 LCY per foreign currency unit.
+        CreateSaleForExternalEFT(POSSale);
+        GLSetup.Get();
+        repeat
+            LibraryERM.CreateCurrency(Currency);
+        until Currency.Code <> GLSetup."LCY Code";
+        Currency.InitRoundingPrecision();
+        Currency.Modify();
+        LibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
+        POSPaymentMethod."Currency Code" := Currency.Code;
+        POSPaymentMethod."Fixed Rate" := 200;
+        POSPaymentMethod."Use Stand. Exc. Rate for Bal." := false;
+        POSPaymentMethod.Modify();
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', POSPaymentMethod.Code);
+        Body.Add('paymentType', 'Cash');
+        Body.Add('amount', 100);
+
+        // [WHEN] The caller records a cash payment without the EFT-only success property.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+
+        // [THEN] Normal POS insertion records 50 foreign units as 100 LCY and creates no EFT request.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Cash should retain its existing contract');
+        PaymentLine.GetBySystemId(PaymentLineId);
+        Assert.AreEqual(100, PaymentLine."Amount Including VAT", 'The cash payment should cover the 100 LCY sale');
+        Assert.AreEqual(50, PaymentLine."Currency Amount", 'The fixed rate should convert 100 LCY to 50 foreign units');
+        Assert.IsFalse(PaymentLine."EFT Approved", 'A cash payment is not an EFT authorization');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.IsTrue(EFTTransactionRequest.IsEmpty(), 'Cash must not create an EFT request');
+
+        // [WHEN] The cash-paid sale is completed.
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/complete', Body, QueryParams, Headers);
+
+        // [THEN] Posting preserves both currency amounts and the cash method's currency.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The cash-paid sale should complete');
+        PostedPaymentLine.GetBySystemId(PaymentLineId);
+        Assert.AreEqual(100, PostedPaymentLine."Amount (LCY)", 'Posting must preserve the local cash amount');
+        Assert.AreEqual(50, PostedPaymentLine.Amount, 'Posting must preserve the fixed-rate foreign amount');
+        Assert.AreEqual(Currency.Code, PostedPaymentLine."Currency Code", 'Posting must preserve the cash method currency');
+        Assert.IsFalse(PostedPaymentLine.EFT, 'The posted payment must remain cash');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_ZeroAuthorizationCreatesApprovedLine()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] A zero authorization creates a linked approved line without financial impact.
+        // [GIVEN] A sale and an explicitly successful zero-amount EFT attempt.
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 0);
+        Body.Add('success', true);
+        // [WHEN] The external system submits the payment.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        // [THEN] An approved zero-value line links to a successful, nonfinancial request.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'A zero authorization should be accepted');
+        Assert.IsTrue(PaymentLine.GetBySystemId(PaymentLineId), 'A zero authorization should still create the caller payment line');
+        Assert.IsTrue(PaymentLine."EFT Approved", 'The zero payment line should remain approved');
+        Assert.AreEqual(0, PaymentLine."Amount Including VAT", 'The approved line should have zero amount');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        EFTTransactionRequest.FindFirst();
+        Assert.IsTrue(EFTTransactionRequest.Successful, 'The zero attempt should retain its successful outcome');
+        Assert.IsFalse(EFTTransactionRequest."Financial Impact", 'A zero authorization has no financial impact');
+        Assert.AreEqual(0, EFTTransactionRequest."Result Amount", 'A zero authorization has a zero result');
+        Assert.AreEqual(PaymentLineId, EFTTransactionRequest."Sales Line ID", 'The zero request should link to its payment line');
+        Assert.AreEqual(PaymentLine."Line No.", EFTTransactionRequest."Sales Line No.", 'The zero request should retain its payment line number');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_RefundGuardDoesNotChangeCash()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Negative cash amounts remain accepted without an EFT outcome.
+        // [GIVEN] A cash payload with a negative amount and no success property.
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _CashPaymentMethod.Code);
+        Body.Add('paymentType', 'Cash');
+        Body.Add('amount', -10);
+        // [WHEN] The external system submits the payment.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        // [THEN] The negative cash payment retains the existing cash behavior.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Negative cash handling should be unchanged');
+        PaymentLine.GetBySystemId(PaymentLineId);
+        Assert.AreEqual(-10, PaymentLine."Amount Including VAT", 'The cash line should retain its negative amount');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.IsTrue(EFTTransactionRequest.IsEmpty(), 'Cash should not create an EFT request');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_FailedAttemptCanBeRetriedWithSameLineId()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        FailedRequestEntryNo: Integer;
+        ReceiptEntryNo: Integer;
+        ReceiptLines: JsonArray;
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] A failed attempt does not consume the ID needed by a later authorization.
+        // [GIVEN] A recorded failed attempt and a reusable caller payment-line ID.
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('success', false);
+        Body.Add('pspReference', 'RETRIED-PSP');
+        ReceiptLines.Add('DECLINED');
+        Body.Add('eftReceipt', ReceiptLines);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The failed attempt should be logged');
+        // [WHEN] The provider reports an authorization using the same ID.
+        Body.Replace('success', true);
+        Clear(ReceiptLines);
+        ReceiptLines.Add('APPROVED');
+        ReceiptLines.Add('AUTH: 123456');
+        Body.Replace('eftReceipt', ReceiptLines);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        // [THEN] Only the authorization pays the sale, and each attempt retains its own receipts.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The authorization should be accepted with the same caller ID');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('totalPaymentAmount', JToken);
+        Assert.AreEqual(100, JToken.AsValue().AsDecimal(), 'Only the successful attempt should pay the sale');
+        Assert.IsTrue(PaymentLine.GetBySystemId(PaymentLineId), 'The retry should create the caller payment line');
+        Assert.IsTrue(PaymentLine."EFT Approved", 'The retry should be approved');
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        EFTTransactionRequest.SetRange("PSP Reference", 'RETRIED-PSP');
+        Assert.AreEqual(2, EFTTransactionRequest.Count(), 'Both outcomes should remain in the audit trail');
+        EFTTransactionRequest.SetRange(Successful, false);
+        EFTTransactionRequest.FindFirst();
+        FailedRequestEntryNo := EFTTransactionRequest."Entry No.";
+        Assert.IsFalse(EFTTransactionRequest."Financial Impact", 'The earlier failed attempt must remain nonfinancial');
+        Assert.IsTrue(IsNullGuid(EFTTransactionRequest."Sales Line ID"), 'The earlier failed attempt must remain unlinked');
+        EFTTransactionRequest.SetRange(Successful, true);
+        EFTTransactionRequest.FindFirst();
+        Assert.AreEqual(PaymentLineId, EFTTransactionRequest."Sales Line ID", 'Only the authorization should link to the payment line');
+        EFTReceipt.SetRange("Register No.", POSSale."Register No.");
+        EFTReceipt.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        Assert.AreEqual(3, EFTReceipt.Count(), 'Both attempts must retain their receipts');
+        EFTReceipt.FindSet();
+        repeat
+            ReceiptEntryNo += 1;
+            Assert.AreEqual(ReceiptEntryNo, EFTReceipt."Entry No.", 'Receipt entry numbers must remain distinct and sequential across attempts');
+            if ReceiptEntryNo = 1 then begin
+                Assert.AreEqual(FailedRequestEntryNo, EFTReceipt."EFT Trans. Request Entry No.", 'The declined receipt must retain its original request link');
+                Assert.AreEqual('DECLINED', EFTReceipt.Text, 'The declined receipt must not be overwritten');
+            end else begin
+                Assert.AreEqual(EFTTransactionRequest."Entry No.", EFTReceipt."EFT Trans. Request Entry No.", 'The approved receipt must link to the successful request');
+                if ReceiptEntryNo = 2 then
+                    Assert.AreEqual('APPROVED', EFTReceipt.Text, 'The approval must be appended after the declined receipt')
+                else
+                    Assert.AreEqual('AUTH: 123456', EFTReceipt.Text, 'All approved receipt lines must be retained');
+            end;
+        until EFTReceipt.Next() = 0;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_DoubleSuccessWithSameIdDoesNotDuplicatePayment()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        PaymentLineId: Guid;
+        RequestId: Guid;
+        RequestEntryNo: Integer;
+        PaymentLineNo: Integer;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        ReceiptLines: JsonArray;
+        JToken: JsonToken;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Retrying an authorized payment with the same ID cannot pay the sale twice.
+        // [GIVEN] A persisted authorized EFT payment and its two receipt lines.
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('success', true);
+        Body.Add('pspReference', 'DOUBLE-SUCCESS');
+        ReceiptLines.Add('APPROVED');
+        ReceiptLines.Add('AUTH: 123456');
+        Body.Add('eftReceipt', ReceiptLines);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The first authorization should be recorded');
+        PaymentLine.GetBySystemId(PaymentLineId);
+        PaymentLineNo := PaymentLine."Line No.";
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        EFTTransactionRequest.FindFirst();
+        RequestId := EFTTransactionRequest.SystemId;
+        RequestEntryNo := EFTTransactionRequest."Entry No.";
+        Commit();
+
+        // [WHEN] The exact successful payload is submitted again with the same ID.
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+
+        // [THEN] Only the original financial request, approved line and receipts remain.
+        Assert.AreEqual(1, EFTTransactionRequest.Count(), 'A duplicate success must not create another EFT request');
+        EFTTransactionRequest.FindFirst();
+        Assert.AreEqual(RequestId, EFTTransactionRequest.SystemId, 'The original request must remain unchanged');
+        Assert.IsTrue(EFTTransactionRequest.Successful, 'The original outcome must remain successful');
+        Assert.IsTrue(EFTTransactionRequest."Financial Impact", 'The original payment must remain financial');
+        Assert.AreEqual(100, EFTTransactionRequest."Result Amount", 'The original authorized amount must be preserved');
+        Assert.AreEqual(PaymentLineId, EFTTransactionRequest."Sales Line ID", 'The request must retain its payment-line ID');
+        Assert.AreEqual(PaymentLineNo, EFTTransactionRequest."Sales Line No.", 'The request must retain its payment-line number');
+        PaymentLine.SetRange("Register No.", POSSale."Register No.");
+        PaymentLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        PaymentLine.SetRange("Line Type", PaymentLine."Line Type"::"POS Payment");
+        Assert.AreEqual(1, PaymentLine.Count(), 'Only one payment line may exist for the authorization');
+        PaymentLine.FindFirst();
+        Assert.AreEqual(PaymentLineId, PaymentLine.SystemId, 'The approved line must retain the caller ID');
+        Assert.IsTrue(PaymentLine."EFT Approved", 'The remaining line must stay approved');
+        EFTReceipt.SetRange("Register No.", POSSale."Register No.");
+        EFTReceipt.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        Assert.AreEqual(2, EFTReceipt.Count(), 'The replay must not duplicate receipts');
+        EFTReceipt.FindSet();
+        repeat
+            Assert.AreEqual(RequestEntryNo, EFTReceipt."EFT Trans. Request Entry No.", 'Receipts must stay linked to the original request');
+        until EFTReceipt.Next() = 0;
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(400, JToken.AsValue().AsInteger(), 'An already-used payment ID should be rejected');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('code', JToken);
+        Assert.AreEqual('generic_error', JToken.AsValue().AsText(), 'The duplicate rejection must use the API error envelope');
+        ResponseBody.Get('message', JToken);
+        Assert.IsTrue(StrPos(JToken.AsValue().AsText(), Format(PaymentLineId)) > 0, 'The duplicate rejection must identify the already-used ID');
+
+        // [WHEN] The sale is retrieved after the rejected replay.
+        Clear(Body);
+        QueryParams.Add('withLines', 'true');
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(POSSale.SystemId), Body, QueryParams, Headers);
+
+        // [THEN] Its total still contains exactly one payment.
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The paid sale should still be retrievable');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('totalPaymentAmount', JToken);
+        Assert.AreEqual(100, JToken.AsValue().AsDecimal(), 'A duplicate success must not increase the sale payment total');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_FailedAttemptDoesNotParkAbandonedSale()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        POSSavedSaleEntry: Record "NPR POS Saved Sale Entry";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        SaleId: Guid;
+        OriginalWorkDate: Date;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] Cleanup deletes an abandoned sale that has only a failed EFT attempt.
+        // [GIVEN] An abandoned sale with a recorded failure and no approved payment.
+        CreateSaleForExternalEFT(POSSale);
+        SaleId := POSSale.SystemId;
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('success', false);
+        Body.Add('pspReference', 'ABANDONED-PSP');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The failed attempt should be recorded');
+        Commit();
+        OriginalWorkDate := WorkDate();
+        WorkDate(CalcDate('<+2D>', POSSale.Date));
+        // [WHEN] The cleanup job processes the expired sale.
+        RunCleanupJob();
+        WorkDate(OriginalWorkDate);
+        // [THEN] The failed attempt remains in the audit log but does not cause the sale to be parked.
+        Assert.IsFalse(POSSale.GetBySystemId(SaleId), 'Cleanup should remove the unpaid abandoned sale');
+        Assert.IsFalse(POSSavedSaleEntry.GetBySystemId(SaleId), 'A failed PSP attempt should not cause the sale to be parked');
+        EFTTransactionRequest.SetRange("Sales ID", SaleId);
+        Assert.AreEqual(1, EFTTransactionRequest.Count(), 'Cleanup should retain the failed audit record');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_FailedAttemptRejectsMissingMethod()
+    begin
+        // [SCENARIO] An unknown payment method is rejected even on a failed attempt.
+        // [GIVEN] A failed EFT payload naming a nonexistent payment method.
+        // [WHEN] The external attempt is submitted to the API.
+        // [THEN] Its outcome is validated without creating a payment line.
+        AssertExternalEFTRejectsInvalidMethod(false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExternalEFT_FailedAttemptRejectsBlockedMappedMethod()
+    begin
+        // [SCENARIO] A blocked mapped method is rejected even on a failed attempt.
+        // [GIVEN] A failed EFT payload whose card maps to a blocked payment method.
+        // [WHEN] The external attempt is submitted to the API.
+        // [THEN] Its outcome is validated without creating a payment line.
+        AssertExternalEFTRejectsInvalidMethod(true);
+    end;
+
+    local procedure AssertExternalEFTRejectsInvalidMethod(BlockedMappedMethod: Boolean)
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryEFT: Codeunit "NPR Library - EFT";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        EFTBINGroup: Record "NPR EFT BIN Group";
+        PaymentLineId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        if BlockedMappedMethod then begin
+            LibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::EFT, '', false);
+            POSPaymentMethod."Block POS Payment" := true;
+            POSPaymentMethod.Modify();
+            LibraryEFT.CreateBINGroup(EFTBINGroup, CopyStr(FormatGuid(CreateGuid()), 1, 10), 'Blocked external card', 4);
+            LibraryEFT.CreateBINRange(EFTBINGroup.Code, 610002, 610002);
+            LibraryEFT.CreateBINGroupPaymentLink(EFTBINGroup.Code, POSPaymentMethod.Code);
+            Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+            Body.Add('maskedCardNo', '610002******1234');
+        end else begin
+            POSPaymentMethod.Code := CopyStr(FormatGuid(CreateGuid()), 1, 10);
+            Body.Add('paymentMethodCode', POSPaymentMethod.Code);
+        end;
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('success', false);
+        Commit();
+        asserterror Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        if BlockedMappedMethod then
+            Assert.ExpectedError(POSPaymentMethod.FieldCaption("Block POS Payment"))
+        else
+            Assert.ExpectedError(POSPaymentMethod.Code);
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.IsTrue(EFTTransactionRequest.IsEmpty(), 'An invalid payment method must not leave an EFT audit record');
+        Assert.IsFalse(PaymentLine.GetBySystemId(PaymentLineId), 'An invalid payment method must not create a payment line');
+    end;
+
+    local procedure AssertExternalEFTAttemptIsAuditOnly()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSale: Record "NPR POS Sale";
+        PaymentLine: Record "NPR POS Sale Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        PaymentLineId: Guid;
+        PAR: Text;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        ReceiptLines: JsonArray;
+        JToken: JsonToken;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        CreateSaleForExternalEFT(POSSale);
+        PaymentLineId := CreateGuid();
+        Body.Add('paymentMethodCode', _EFTPaymentMethod.Code);
+        Body.Add('paymentType', 'EFT');
+        Body.Add('amount', 100);
+        Body.Add('success', false);
+        Body.Add('maskedCardNo', '************1234');
+        Body.Add('pspReference', 'FAILED-PSP');
+        PAR := PadStr('FAILED-PAR-', 100, 'X');
+        Body.Add('parToken', PAR);
+        Body.Add('cardApplicationId', 'A0000000031010');
+        ReceiptLines.Add('Payment declined');
+        Body.Add('eftReceipt', ReceiptLines);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(201, JToken.AsValue().AsInteger(), 'A failed attempt should be accepted for logging');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('totalPaymentAmount', JToken);
+        Assert.AreEqual(0, JToken.AsValue().AsDecimal(), 'A failed attempt must not pay the sale');
+        ResponseBody.Get('refreshedPaymentLines', JToken);
+        Assert.AreEqual(0, JToken.AsArray().Count(), 'No payment line should be returned');
+        Assert.IsFalse(PaymentLine.GetBySystemId(PaymentLineId), 'A failed attempt must not consume the caller payment line ID');
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(POSSale.SystemId) + '/paymentline/' + FormatGuid(PaymentLineId), Body, QueryParams, Headers);
+        Response.Get('statusCode', JToken);
+        Assert.AreEqual(404, JToken.AsValue().AsInteger(), 'There should be no payment line to retrieve');
+
+        EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
+        Assert.AreEqual(1, EFTTransactionRequest.Count(), 'One audit record should be retained');
+        EFTTransactionRequest.FindFirst();
+        Assert.AreEqual(100, EFTTransactionRequest."Amount Input", 'The attempted amount should be retained');
+        Assert.AreEqual(0, EFTTransactionRequest."Amount Output", 'A failed attempt has no authorized output');
+        Assert.AreEqual(0, EFTTransactionRequest."Result Amount", 'A failed attempt has no financial result');
+        Assert.IsFalse(EFTTransactionRequest.Successful, 'The attempt should remain unsuccessful');
+        Assert.IsFalse(EFTTransactionRequest."Financial Impact", 'A failed attempt must not have financial impact');
+        Assert.IsTrue(EFTTransactionRequest."External Result Known", 'The external outcome is known');
+        Assert.IsTrue(EFTTransactionRequest."Result Processed", 'The failed outcome should be fully recorded');
+        Assert.IsTrue(IsNullGuid(EFTTransactionRequest."Sales Line ID"), 'A failed attempt must not link to a payment line');
+        Assert.AreEqual(0, EFTTransactionRequest."Sales Line No.", 'A failed attempt must not have a payment line number');
+        Assert.AreEqual('FAILED-PSP', EFTTransactionRequest."PSP Reference", 'A PSP reference does not imply authorization');
+        Assert.AreEqual('************1234', EFTTransactionRequest."Card Number", 'Failed card metadata should be retained');
+        Assert.AreEqual('', EFTTransactionRequest."External Payment Token", 'An account reference must not be stored as a reusable payment token');
+        Assert.AreEqual(PAR, EFTTransactionRequest."Payment Account Reference", 'The complete failed account reference should be retained');
+        Assert.AreEqual('A0000000031010', EFTTransactionRequest."Card Application ID", 'The supplied AID should be retained');
+        EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+        Assert.AreEqual(1, EFTReceipt.Count(), 'The failed receipt should be retained');
+        EFTReceipt.FindFirst();
+        Assert.AreEqual('Payment declined', EFTReceipt.Text, 'The receipt should retain the external outcome');
+    end;
+
+    local procedure CreateSaleForExternalEFT(var POSSale: Record "NPR POS Sale")
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        SaleId: Guid;
+        Body: JsonObject;
+        Response: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        Initialize();
+        SaleId := CreateGuid();
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Sale should be created for the external attempt');
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The sale should contain an item');
+        POSSale.GetBySystemId(SaleId);
     end;
 
     local procedure RunCleanupJob()
