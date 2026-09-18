@@ -1149,6 +1149,8 @@
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSession: Codeunit "NPR POS Session";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+        WPadLinesToSend: Option "New/Updated",All;
     begin
         if RestaurantSetup.IsEmpty() then
             exit;
@@ -1184,8 +1186,8 @@
 
         end;
 
-        MainParameters.Add('LinesToSend', 0);  //New/Updated
-        MainParameters.Add('WaiterPadAction', 2);  //Request Next Serving
+        MainParameters.Add('LinesToSend', WPadLinesToSend::"New/Updated");
+        MainParameters.Add('WaiterPadAction', WPadAction::"Request Next Serving");
         MainParameters.Add('MoveSaleToWPadOnFinish', false);
         MainParameters.Add('ReturnToDefaultView', false);
         MainParameters.Add('Silent', true);
@@ -1241,38 +1243,76 @@
             POSInfoWaiterPadLink.DeleteAll();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, false)]
-    local procedure UpdateBilledQtyOnPOSSalePost(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', true, false)]
+    local procedure UpdateWaiterPadOnAfterPOSEntryCreate(var POSEntry: Record "NPR POS Entry"; var SalePOS: Record "NPR POS Sale")
+    var
+        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSRestProfile(POSRestaurantProfile);
+        if POSRestaurantProfile.Code = '' then begin
+            WaiterPadLine.SetCurrentKey("Sale Retail ID");
+            WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
+            if WaiterPadLine.IsEmpty() then
+                exit;
+        end;
+
+        UpdateWaiterPadBilledQty(POSEntry);
+        AttemptToCloseWaiterPadOnSaleFinish(SalePOS);
+    end;
+
+    local procedure UpdateWaiterPadBilledQty(POSEntry: Record "NPR POS Entry")
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        TempPOSEntrySalesLine: Record "NPR POS Entry Sales Line" temporary;
+        FilterString: Text;
     begin
-        if IsNullGuid(POSSalesLine.SystemId) then
-            exit;
-        WaiterPadLine.SetCurrentKey("Sale Line Retail ID");
-        WaiterPadLine.SetRange("Sale Line Retail ID", POSSalesLine.SystemId);
-        if WaiterPadLine.FindFirst() then begin
-            Sentry.StartSpan(Span, 'bc.restaurant.endsale.update-billed-qty');
-            if POSSalesLine."Quantity (Base)" <> 0 then begin
-                if WaiterPadLine."Qty. per Unit of Measure" = POSSalesLine."Qty. per Unit of Measure" then
-                    WaiterPadLine.Validate("Billed Quantity", WaiterPadLine."Billed Quantity" + POSSalesLine.Quantity)
-                else
-                    WaiterPadLine.Validate("Billed Qty. (Base)", WaiterPadLine."Billed Qty. (Base)" + POSSalesLine."Quantity (Base)");
-                WaiterPadLine.Modify();
-            end;
-            AddPosEntrySalesLineWaiterPadLineLink(POSSalesLine, WaiterPadLine);
+        Sentry.StartSpan(Span, 'bc.restaurant.endsale.update-billed-qty');
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSEntrySalesLine.FindSet() then
+            repeat
+                TempPOSEntrySalesLine := POSEntrySalesLine;
+                TempPOSEntrySalesLine.Insert(false, true);
+                if FilterString <> '' then
+                    FilterString += '|';
+                FilterString += Format(POSEntrySalesLine.SystemId);
+            until POSEntrySalesLine.Next() = 0;
 
-            if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
-                WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
+        if FilterString <> '' then begin
+            // Only the session that owns this POS sale can post its linked billed quantities.
+            WaiterPadLine.ReadIsolation := IsolationLevel::ReadUncommitted;
+            WaiterPadLine.SetCurrentKey("Sale Line Retail ID");
+            WaiterPadLine.SetFilter("Sale Line Retail ID", FilterString);
+            if WaiterPadLine.FindSet() then
+                repeat
+                    if TempPOSEntrySalesLine.GetBySystemId(WaiterPadLine."Sale Line Retail ID") then begin
+                        if TempPOSEntrySalesLine."Quantity (Base)" <> 0 then begin
+                            if WaiterPadLine."Qty. per Unit of Measure" = TempPOSEntrySalesLine."Qty. per Unit of Measure" then
+                                WaiterPadLine.Validate("Billed Quantity", WaiterPadLine."Billed Quantity" + TempPOSEntrySalesLine.Quantity)
+                            else
+                                WaiterPadLine.Validate("Billed Qty. (Base)", WaiterPadLine."Billed Qty. (Base)" + TempPOSEntrySalesLine."Quantity (Base)");
+                            WaiterPadLine.Modify();
+                        end;
 
-            Span.Finish();
+                        AddPosEntrySalesLineWaiterPadLineLink(TempPOSEntrySalesLine, WaiterPadLine);
+                        if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
+                            WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
+
+                        TempPOSEntrySalesLine.Delete(); //only process the first waiter pad line for each sale line
+                    end
+                until WaiterPadLine.Next() = 0;
         end;
+        Span.Finish();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', true, false)]
-    local procedure AttemptToCloseWaiterPadOnSaleFinish(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
+    local procedure AttemptToCloseWaiterPadOnSaleFinish(SalePOS: Record "NPR POS Sale")
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         Sentry: Codeunit "NPR Sentry";

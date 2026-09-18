@@ -13,7 +13,9 @@ codeunit 85242 "NPR Library - Restaurant"
         if not RecordExists then begin
             NPRERestaurantSetup.Init();
             NPRERestaurantSetup.Code := '';
+        end;
 
+        if NPRERestaurantSetup."Waiter Pad No. Serie" = '' then begin
             LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
             LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'WP000001', 'WP999999');
             NPRERestaurantSetup."Waiter Pad No. Serie" := NoSeries.Code;
@@ -422,6 +424,134 @@ codeunit 85242 "NPR Library - Restaurant"
         Item.Find();
         if Item."NPR NPRE Item Routing Profile" <> ItemRoutingProfile.Code then
             Error('Failed to link item %1 to routing profile %2', Item."No.", ItemRoutingProfile.Code);
+    end;
+
+    procedure SetServiceFlowWaiterPadClosing(ServiceFlowProfileCode: Code[20]; CloseWaiterPadOn: Enum "NPR NPRE Serv.Flow Close W/Pad"; OnlyIfFullyPaid: Boolean)
+    var
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+    begin
+        ServiceFlowProfile.Get(ServiceFlowProfileCode);
+        ServiceFlowProfile.Validate("Close Waiter Pad On", CloseWaiterPadOn);
+        ServiceFlowProfile."Only if Fully Paid" := OnlyIfFullyPaid;
+        ServiceFlowProfile.Modify(true);
+    end;
+
+    procedure SetAutoSaveToWaiterPadOnSaleEnd(ServiceFlowProfileCode: Code[20]; AutoSave: Boolean)
+    var
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+    begin
+        ServiceFlowProfile.Get(ServiceFlowProfileCode);
+        ServiceFlowProfile."AutoSave to W/Pad on Sale End" := AutoSave;
+        ServiceFlowProfile.Modify(true);
+    end;
+
+    procedure SaveCurrentPOSSaleToWaiterPad(POSSession: Codeunit "NPR POS Session"; var WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean): Boolean
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        exit(WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, CleanupSale));
+    end;
+
+    procedure LoadWaiterPadIntoCurrentPOSSale(POSSession: Codeunit "NPR POS Session"; WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+    end;
+
+    procedure RunWaiterPadAction(POSSession: Codeunit "NPR POS Session"; WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving"; ClearSaleOnFinish: Boolean)
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSActionRunWaiterPad: Codeunit "NPR POSAction: Run WAct-B";
+        NewWaiterPadNo: Code[20];
+        CleanupMessageText: Text;
+        ResultMessageText: Text;
+        WPadLinesToSend: Option "New/Updated",All;
+    begin
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSActionRunWaiterPad.RunWaiterPadAction(
+          WPadAction, WPadLinesToSend::All, '', ClearSaleOnFinish, true, POSSale, POSSaleLine,
+          NewWaiterPadNo, ResultMessageText, CleanupMessageText);
+        POSActionRunWaiterPad.CleanupSale(WPadAction, NewWaiterPadNo, ClearSaleOnFinish, POSSale, POSSaleLine);
+    end;
+
+    procedure CreateItemSalesUnitOfMeasure(var Item: Record Item; var ItemUnitOfMeasure: Record "Item Unit of Measure"; QtyPerUnitOfMeasure: Decimal)
+    var
+        UnitOfMeasure: Record "Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
+    begin
+        BindSubscription(OIOUBLUoMTestDisabler);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, QtyPerUnitOfMeasure);
+        Item.Validate("Sales Unit of Measure", ItemUnitOfMeasure.Code);
+        Item.Modify(true);
+    end;
+
+    procedure SetItemUnitOfMeasureFactor(var ItemUnitOfMeasure: Record "Item Unit of Measure"; QtyPerUnitOfMeasure: Decimal)
+    begin
+        ItemUnitOfMeasure.Validate("Qty. per Unit of Measure", QtyPerUnitOfMeasure);
+        ItemUnitOfMeasure.Modify(true);
+    end;
+
+    procedure SetupTableServiceRestaurant(var POSUnit: Record "NPR POS Unit"; var Seating: Record "NPR NPRE Seating"; var ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile")
+    var
+        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
+        Restaurant: Record "NPR NPRE Restaurant";
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+        SeatingLocation: Record "NPR NPRE Seating Location";
+    begin
+        CreateRestaurantSetup(RestaurantSetup);
+        CreateServiceFlowProfile(ServiceFlowProfile);
+        CreateRestaurant(Restaurant, ServiceFlowProfile.Code);
+        CreatePOSRestaurantProfile(POSRestaurantProfile, Restaurant.Code);
+        CreateSeatingLocation(SeatingLocation, Restaurant.Code);
+        CreateSeating(Seating, SeatingLocation.Code);
+
+        POSUnit."POS Restaurant Profile" := POSRestaurantProfile.Code;
+        POSUnit.Modify();
+    end;
+
+    procedure GetPOSUnitServiceFlowProfile(POSUnit: Record "NPR POS Unit"; var ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile")
+    var
+        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
+        Restaurant: Record "NPR NPRE Restaurant";
+    begin
+        POSRestaurantProfile.Get(POSUnit."POS Restaurant Profile");
+        Restaurant.Get(POSRestaurantProfile."Restaurant Code");
+        ServiceFlowProfile.Get(Restaurant."Service Flow Profile");
+    end;
+
+    procedure SetServiceFlowSeatingClearing(ServiceFlowProfileCode: Code[20]; ClearSeatingOn: Enum "NPR NPRE Serv.Flow Clear Seat.")
+    var
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+    begin
+        ServiceFlowProfile.Get(ServiceFlowProfileCode);
+        ServiceFlowProfile."Clear Seating On" := ClearSeatingOn;
+        ServiceFlowProfile.Modify(true);
+    end;
+
+    procedure MarkWaiterPadPreReceiptPrinted(var WaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+        WaiterPad.Get(WaiterPad."No.");
+        WaiterPad."Pre-receipt Printed" := true;
+        WaiterPad.Modify();
+    end;
+
+    procedure SetServingStepDiscoveryMethod(DiscoveryMethod: Enum "NPR NPRE Serv.Step Discovery")
+    var
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        CreateRestaurantSetup(RestaurantSetup);
+        RestaurantSetup."Serving Step Discovery Method" := DiscoveryMethod;
+        RestaurantSetup.Modify(true);
     end;
 
     procedure SeatingStatusReady(): Code[10]

@@ -63,7 +63,7 @@ codeunit 85406 "NPR NPRE W/Pad Posting Tests"
         // [GIVEN] A pad line of one bottle in a six-to-one unit of measure, recalled and then rung up as six glasses
         //         The sale line has to be switched to the base unit after the recall. Recall copies the pad line's unit
         //         onto the sale line, and the POS entry line copies it again, so without this both sides carry the same
-        //         Qty. per Unit of Measure and the equal-units branch of UpdateBilledQtyOnPOSSalePost runs. Both branches
+        //         Qty. per Unit of Measure and the equal-units billing branch runs. Both branches
         //         happen to compute 6 on that fixture, so the differing-units arm could be deleted and this stay green.
         Initialize();
         ConfigureProfile("NPR NPRE Serv.Flow Close W/Pad"::Manual);
