@@ -19,7 +19,7 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         modify("Vendor Cr. Memo No.")
         {
-            Editable = IsDocumentRSEInvoice;
+            Editable = not _IsDocumentRSEInvoice;
         }
         addlast(content)
         {
@@ -151,7 +151,7 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
         RSPurchaseHeader.Read(Rec.SystemId);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxPurchHeader.ReadRSEIAuxPurchHeaderFields(Rec);
-        IsDocumentRSEInvoice := not (RSEIAuxPurchHeader."NPR RS E-Invoice");
+        _IsDocumentRSEInvoice := RSEIAuxPurchHeader."NPR RS E-Invoice";
 #endif
     end;
 
@@ -159,6 +159,6 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
         RSPurchaseHeader: Record "NPR RS Purchase Header";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header";
-        IsDocumentRSEInvoice: Boolean;
+        _IsDocumentRSEInvoice: Boolean;
 #endif
 }

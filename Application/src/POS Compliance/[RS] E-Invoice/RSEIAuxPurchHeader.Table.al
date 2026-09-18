@@ -1,4 +1,4 @@
-table 6150862 "NPR RS EI Aux Purch. Header"
+﻿table 6150862 "NPR RS EI Aux Purch. Header"
 {
     Access = Internal;
     Caption = 'RS EI Aux Purchase Header';
@@ -89,8 +89,10 @@ table 6150862 "NPR RS EI Aux Purch. Header"
     var
         RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
     begin
-        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
+        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then begin
+            Rec.Init();
             exit;
+        end;
         if not Rec.Get(PurchaseHeader.SystemId) then begin
             Rec.Init();
             Rec."Purchase Header SystemId" := PurchaseHeader.SystemId;
@@ -99,6 +101,9 @@ table 6150862 "NPR RS EI Aux Purch. Header"
 
     internal procedure SaveRSEIAuxPurchaseHeaderFields()
     begin
+        if IsNullGuid(Rec."Purchase Header SystemId") then
+            exit;
+
         if not Insert() then
             Modify();
     end;

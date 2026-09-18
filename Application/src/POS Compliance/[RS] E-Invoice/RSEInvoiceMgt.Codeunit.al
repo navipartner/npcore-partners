@@ -1,4 +1,4 @@
-codeunit 6184860 "NPR RS E-Invoice Mgt."
+﻿codeunit 6184860 "NPR RS E-Invoice Mgt."
 {
     Access = Internal;
     Permissions = TableData "Tenant Media" = rd;
@@ -195,6 +195,44 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
         if not RSEInvoiceDocument.IsEmpty() then
             RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Header", 'OnBeforeValidateEvent', 'Vendor Invoice No.', false, false)]
+    local procedure PurchaseHeader_OnBeforeValidateVendorInvoiceNo(var Rec: Record "Purchase Header"; var xRec: Record "Purchase Header")
+    begin
+        if Rec."Vendor Invoice No." = xRec."Vendor Invoice No." then
+            exit;
+
+        CheckDocumentNoIsEditableOnRSEInvoice(Rec, Rec.FieldCaption("Vendor Invoice No."));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Header", 'OnBeforeValidateEvent', 'Vendor Cr. Memo No.', false, false)]
+    local procedure PurchaseHeader_OnBeforeValidateVendorCrMemoNo(var Rec: Record "Purchase Header"; var xRec: Record "Purchase Header")
+    begin
+        if Rec."Vendor Cr. Memo No." = xRec."Vendor Cr. Memo No." then
+            exit;
+
+        CheckDocumentNoIsEditableOnRSEInvoice(Rec, Rec.FieldCaption("Vendor Cr. Memo No."));
+    end;
+
+    local procedure CheckDocumentNoIsEditableOnRSEInvoice(PurchaseHeader: Record "Purchase Header"; FieldCaptionParam: Text)
+    var
+        RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header";
+        CannotChangeDocumentNoErr: Label 'You cannot change %1 on %2 %3 because the document was imported as an RS e-invoice.', Comment = '%1 = Vendor Invoice No. field caption, %2 = Purchase Header table caption, %3 = document number';
+    begin
+        if PurchaseHeader.IsTemporary() then
+            exit;
+
+        if not IsRSEInvoiceEnabled() then
+            exit;
+
+        if not RSEIAuxPurchHeader.Get(PurchaseHeader.SystemId) then
+            exit;
+
+        if not RSEIAuxPurchHeader."NPR RS E-Invoice" then
+            exit;
+
+        Error(CannotChangeDocumentNoErr, FieldCaptionParam, PurchaseHeader.TableCaption(), PurchaseHeader."No.");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Purch. Inv. Header", 'OnAfterDeleteEvent', '', false, false)]

@@ -14,7 +14,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         modify("Vendor Invoice No.")
         {
-            Editable = IsDocumentRSEInvoice;
+            Editable = not _IsDocumentRSEInvoice;
         }
         addlast(content)
         {
@@ -233,11 +233,11 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
     trigger OnAfterGetRecord()
     begin
         RSEIAuxPurchHeader.ReadRSEIAuxPurchHeaderFields(Rec);
-        IsDocumentRSEInvoice := not (RSEIAuxPurchHeader."NPR RS E-Invoice");
+        _IsDocumentRSEInvoice := RSEIAuxPurchHeader."NPR RS E-Invoice";
     end;
 
     var
         RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header";
-        IsDocumentRSEInvoice: Boolean;
+        _IsDocumentRSEInvoice: Boolean;
 #endif
 }
