@@ -24,6 +24,7 @@ codeunit 85260 "NPR Entria Tests"
     var
         _Assert: Codeunit Assert;
         _LibraryEntria: Codeunit "NPR Library - Entria";
+        _LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         _Initialized: Boolean;
         _StoreCode: Code[20];
         _StoreCodeLbl: Label 'NPRENT-TEST', Locked = true;
@@ -3294,6 +3295,99 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.AreEqual(100, VoucherSalesLine.Amount, 'The reservation must hold the amount the voucher pays on this order.');
         _Assert.IsTrue(VoucherSalesLine."NPR Inc Ecom Sales Pmt Line Id" = EcomSalesPmtLine.SystemId,
             'The reservation must link back to its payment line - without the link the reservation cannot be released when the payment line goes away.');
+    end;
+
+    [Test]
+    procedure ImportedVoucherSaleRejectsFullPaymentModule()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        ItemObj: JsonObject;
+        NoTaxRates: List of [Decimal];
+    begin
+        // [SCENARIO] Voucher types whose apply-payment module is a full-payment module (DEFAULT/LIMIT) must be rejected when sold through an imported Entria order.
+
+        // [GIVEN] An imported Entria voucher line whose voucher type uses the DEFAULT module
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        _LibraryEntria.BuildItemLineJson(ItemObj, 'Entria voucher', VoucherType.Code, 1, 100, 100, 0, 100, NoTaxRates);
+        ItemObj.Remove('is_giftcard');
+        ItemObj.Add('is_giftcard', true);
+        ImportSingleLineOrder('ZZ-DOC-VCH-SALE', 'medusa-vch-sale', '', ItemObj, 100, CreateDateTime(DMY2Date(9, 7, 2024), 120000T));
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-VCH-SALE');
+
+        // [WHEN] The shared Ecommerce validation processes the imported document
+        asserterror EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+
+        // [THEN] It rejects the voucher type with a partial-payment message
+        _Assert.ExpectedError('does not support partial payment application');
+    end;
+
+    [Test]
+    procedure ImportedVoucherSaleRejectsLimitPaymentModule()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        ModulePayLimit: Codeunit "NPR NpRv Module Pay.: Limit";
+        ItemObj: JsonObject;
+        NoTaxRates: List of [Decimal];
+    begin
+        // [SCENARIO] Voucher types whose apply-payment module is LIMIT must be rejected when sold through an imported Entria order.
+
+        // [GIVEN] An imported Entria voucher line whose voucher type is switched to the LIMIT module
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        VoucherType."Apply Payment Module" := ModulePayLimit.ModuleCode();
+        VoucherType.Modify();
+        _LibraryEntria.BuildItemLineJson(ItemObj, 'Entria voucher', VoucherType.Code, 1, 100, 100, 0, 100, NoTaxRates);
+        ItemObj.Remove('is_giftcard');
+        ItemObj.Add('is_giftcard', true);
+        ImportSingleLineOrder('ZZ-DOC-VCH-LIMIT', 'medusa-vch-limit', '', ItemObj, 100, CreateDateTime(DMY2Date(9, 7, 2024), 120000T));
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-VCH-LIMIT');
+
+        // [WHEN] The shared Ecommerce validation processes the imported document
+        asserterror EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+
+        // [THEN] It rejects the voucher type with a partial-payment message
+        _Assert.ExpectedError('does not support partial payment application');
+    end;
+
+    [Test]
+    procedure ImportedVoucherSaleAcceptsPartialPaymentModule()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        ItemObj: JsonObject;
+        NoTaxRates: List of [Decimal];
+    begin
+        // [SCENARIO] Voucher types whose apply-payment module supports partial payment application must be accepted when sold through an imported Entria order.
+
+        // [GIVEN] An imported Entria voucher line whose voucher type uses the PARTIAL module
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryPOSMasterData.CreatePartialVoucherType(VoucherType, false);
+        _LibraryEntria.BuildItemLineJson(ItemObj, 'Entria voucher', VoucherType.Code, 1, 100, 100, 0, 100, NoTaxRates);
+        ItemObj.Remove('is_giftcard');
+        ItemObj.Add('is_giftcard', true);
+        ImportSingleLineOrder('ZZ-DOC-VCH-OK', 'medusa-vch-ok', '', ItemObj, 100, CreateDateTime(DMY2Date(9, 7, 2024), 120000T));
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-VCH-OK');
+
+        // [GIVEN] The intake-time payment line is marked captured, matching the pattern real integrations use downstream
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesPmtLine.FindFirst();
+        EcomSalesPmtLine."Captured Amount" := EcomSalesPmtLine.Amount;
+        EcomSalesPmtLine.Modify();
+
+        // [WHEN] The shared Ecommerce validation processes the imported document
+        EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+
+        // [THEN] It passes — no error
     end;
 
     [Test]

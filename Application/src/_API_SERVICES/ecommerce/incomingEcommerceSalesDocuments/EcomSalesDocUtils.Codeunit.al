@@ -717,12 +717,27 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
 
     local procedure ValidateImportedVoucherLine(EcomSalesLine: Record "NPR Ecom Sales Line")
     var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        ModulePayDefault: Codeunit "NPR NpRv Module Pay.: Default";
+        ModulePayLimit: Codeunit "NPR NpRv Module Pay.: Limit";
         MissingVoucherTypeErr: Label 'Missing voucher type on voucher sales line %1.', Comment = '%1=Line No.';
+        VoucherTypeNotFoundErr: Label '%1 %2 does not exist.', Comment = '%1=Voucher Type table caption, %2=Voucher Type code';
+        VoucherModuleNotPartialErr: Label '%1 %2 cannot be sold through an imported ecommerce order because %3 %4 does not support partial payment application.', Comment = '%1=Voucher Type table caption, %2=Voucher Type code, %3=Apply Payment Module field caption, %4=Apply Payment Module code';
     begin
         if (EcomSalesLine."Barcode No." = '') then
             if (EcomSalesLine."Voucher Type" = '') then
                 Error(MissingVoucherTypeErr, EcomSalesLine."Line No.");
         EcomSalesLine.TestField("Unit Price");
+
+        if EcomSalesLine."Voucher Type" = '' then
+            exit;
+
+        VoucherType.SetLoadFields("Apply Payment Module");
+        if not VoucherType.Get(EcomSalesLine."Voucher Type") then
+            Error(VoucherTypeNotFoundErr, VoucherType.TableCaption, EcomSalesLine."Voucher Type");
+
+        if VoucherType."Apply Payment Module" in [ModulePayDefault.ModuleCode(), ModulePayLimit.ModuleCode()] then
+            Error(VoucherModuleNotPartialErr, VoucherType.TableCaption, VoucherType.Code, VoucherType.FieldCaption("Apply Payment Module"), VoucherType."Apply Payment Module");
     end;
 
     local procedure ValidateImportedPaymentLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
