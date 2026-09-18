@@ -1,4 +1,4 @@
-codeunit 6151363 "NPR RS POS GL Addition"
+﻿codeunit 6151363 "NPR RS POS GL Addition"
 {
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
@@ -53,7 +53,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
             InsertRetailValueEntries(RetailValueEntry, POSEntry, ReturnDocumentNo);
 
-            if (RetailValueEntry."Entry No." <> 0) and (RetailValueEntry."Cost Amount (Actual)" <> 0) then begin
+            if (RetailValueEntry."Entry No." <> 0) and (RetailValueEntry."Cost Posted to G/L" <> 0) then begin
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
@@ -385,7 +385,11 @@ codeunit 6151363 "NPR RS POS GL Addition"
         if (RetailValueEntry."Cost Amount (Actual)" = 0) and (RetailValueEntry."Sales Amount (Actual)" = 0) then
             exit;
 
+        RetailValueEntry."Cost Amount (Non-Invtbl.)" := RetailValueEntry."Cost Amount (Actual)";
+        RetailValueEntry."Cost Amount (Actual)" := 0;
+
         RetailValueEntry.Description := CalculationValueEntryDescLbl;
+        RetailValueEntry."Entry Type" := RetailValueEntry."Entry Type"::"NPR RS Retail Calculation";
 
         RetailValueEntry.Insert();
 
@@ -498,6 +502,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
         StdCorrectionValueEntry."Cost Posted to G/L" := StdCorrectionValueEntry."Cost Amount (Actual)";
         StdCorrectionValueEntry.Description := StdCorrectionValueEntryDescLbl;
+        StdCorrectionValueEntry."Entry Type" := StdCorrectionValueEntry."Entry Type"::"NPR RS Retail Calculation";
         StdCorrectionValueEntry.Insert();
 
         RSRLocalizationMgt.InsertStdCorrectionValueEntryMappingEntry(StdCorrectionValueEntry);
@@ -616,6 +621,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         COGSCorrectionValueEntry."Cost Amount (Actual)" := COGSCorrectionValueEntry."Cost per Unit" * COGSCorrectionValueEntry."Invoiced Quantity";
         COGSCorrectionValueEntry."Cost Posted to G/L" := COGSCorrectionValueEntry."Cost Amount (Actual)";
         COGSCorrectionValueEntry.Description := CorrectionEntryDescLbl;
+        COGSCorrectionValueEntry."Entry Type" := COGSCorrectionValueEntry."Entry Type"::"NPR RS Retail Calculation";
         COGSCorrectionValueEntry.Insert();
 
         SumOfCOGSCostPerUnit += COGSCorrectionValueEntry."Cost per Unit";

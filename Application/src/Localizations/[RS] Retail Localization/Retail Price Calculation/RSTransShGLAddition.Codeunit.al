@@ -302,6 +302,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         CorrectionValueEntry."Cost per Unit" := -(TransitCostPerUnit - TrueCostPerUnit);
         CorrectionValueEntry."Cost Amount (Actual)" := CorrectionValueEntry."Cost per Unit" * TransitLocationItemLedgerEntries."Invoiced Quantity";
         CorrectionValueEntry."Cost Posted to G/L" := CorrectionValueEntry."Cost Amount (Actual)";
+        CorrectionValueEntry."Entry Type" := CorrectionValueEntry."Entry Type"::"NPR RS Retail Calculation";
 
         if CorrectionValueEntry."Cost Amount (Actual)" = 0 then
             exit;

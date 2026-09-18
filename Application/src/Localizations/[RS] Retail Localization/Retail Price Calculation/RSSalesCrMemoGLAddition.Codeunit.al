@@ -1,4 +1,4 @@
-codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
+﻿codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 {
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
@@ -44,11 +44,13 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
         TempSalesCrMemoLine.FindSet();
         repeat
+            Clear(RetailValueEntry);
+
             RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempSalesCrMemoLine."No.", TempSalesCrMemoLine."Location Code", TempSalesCrMemoLine."Posting Date");
 
             InsertRetailValueEntries(RetailValueEntry, SalesCrMemoHeader);
 
-            if (RetailValueEntry."Entry No." <> 0) then begin
+            if (RetailValueEntry."Entry No." <> 0) and (RetailValueEntry."Cost Amount (Actual)" <> 0) then begin
                 CreateAdditionalGLEntries(SalesCrMemoHeader, RetailValueEntry, RSRetailCalculationType::VAT);
                 CreateAdditionalGLEntries(SalesCrMemoHeader, RetailValueEntry, RSRetailCalculationType::Margin);
                 CreateAdditionalGLEntries(SalesCrMemoHeader, RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
@@ -613,6 +615,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         COGSCorrectionValueEntry."Cost per Unit" := CostPerUnit;
         SetValueEntryCostAmtActualAndQuantites(COGSCorrectionValueEntry, Quantity);
         COGSCorrectionValueEntry.Description := COGSCorrectionValueEntryDescLbl;
+        COGSCorrectionValueEntry."Entry Type" := COGSCorrectionValueEntry."Entry Type"::"NPR RS Retail Calculation";
         COGSCorrectionValueEntry.Insert();
 
         SumOfCOGSCostPerUnit += COGSCorrectionValueEntry."Cost per Unit";
@@ -640,6 +643,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         StdCorrectionValueEntry."Valued Quantity" := -StdValueEntry."Valued Quantity";
         StdCorrectionValueEntry."Item Ledger Entry Quantity" := -StdValueEntry."Item Ledger Entry Quantity";
         StdCorrectionValueEntry.Description := StdCorrectionValueEntryDescLbl;
+        StdCorrectionValueEntry."Entry Type" := StdCorrectionValueEntry."Entry Type"::"NPR RS Retail Calculation";
         StdCorrectionValueEntry.Insert();
 
         CreateAdditionalGLEntries(SalesCrMemoHeader, StdCorrectionValueEntry, RSRetailCalculationType::"Standard Correction");
@@ -679,6 +683,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             exit;
 
         RetailValueEntry."Cost Posted to G/L" := RetailValueEntry."Cost Amount (Actual)";
+        RetailValueEntry."Entry Type" := RetailValueEntry."Entry Type"::"NPR RS Retail Calculation";
 
         RetailValueEntry.Insert();
 

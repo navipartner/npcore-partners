@@ -7,6 +7,8 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     var
         _RSRetLocalizationSetup: Record "NPR RS R Localization Setup";
         _HasRSLocalizationSetup: Boolean;
+        _InFilterLbl: Label '%1|%2', Locked = true;
+        _NotInFilterLbl: Label '<>%1&<>%2', Locked = true;
 
     internal procedure IsRSLocalizationActive(): Boolean
     begin
@@ -198,6 +200,18 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     end;
 
     #endregion RS Retail Value Entry Mapping Mgt.
+
+    #region RS Retail Synthesised Value Entries
+
+    internal procedure SetSynthesisedEntryTypeFilter(var ValueEntry: Record "Value Entry"; Synthesised: Boolean)
+    begin
+        if Synthesised then
+            ValueEntry.SetFilter("Entry Type", _InFilterLbl, "Cost Entry Type"::"NPR RS Retail Calculation", "Cost Entry Type"::"NPR Nivelation")
+        else
+            ValueEntry.SetFilter("Entry Type", _NotInFilterLbl, "Cost Entry Type"::"NPR RS Retail Calculation", "Cost Entry Type"::"NPR Nivelation");
+    end;
+
+    #endregion RS Retail Synthesised Value Entries
 
     #region RS Retail Localization Helper Procedures
 

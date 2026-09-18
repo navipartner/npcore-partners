@@ -1,4 +1,4 @@
-codeunit 6184751 "NPR RS Retail Cost Adjustment"
+﻿codeunit 6184751 "NPR RS Retail Cost Adjustment"
 {
     Access = Internal;
 
@@ -6,10 +6,7 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeRunWithCheck', '', false, false)]
     local procedure OnBeforeRunWithCheck(var IsHandled: Boolean; ItemJournalLine: Record "Item Journal Line"; CalledFromAdjustment: Boolean)
     var
-        Location: Record Location;
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        LocationFilter: Code[20];
-        LocationFilters: List of [Code[20]];
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
@@ -17,20 +14,13 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
         if not CalledFromAdjustment then
             exit;
 
-        if ItemJournalLine."Entry Type" in ["Item Ledger Entry Type"::Transfer] then begin
+        if RSRLocalizationMgt.IsRetailLocation(ItemJournalLine."Location Code") then begin
             IsHandled := true;
             exit;
         end;
 
-        Location.SetRange("NPR Retail Location", true);
-        if not Location.FindSet() then
-            exit;
-        repeat
-            LocationFilters.Add(Location.Code);
-        until Location.Next() = 0;
-
-        foreach LocationFilter in LocationFilters do
-            if ItemJournalLine."Location Code" = LocationFilter then
+        if ItemJournalLine."Entry Type" = "Item Ledger Entry Type"::Transfer then
+            if RSRLocalizationMgt.IsRetailLocation(ItemJournalLine."New Location Code") then
                 IsHandled := true;
     end;
 
@@ -39,18 +29,11 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
     local procedure ItemCostManagement_OnAfterSetFilters(var ValueEntry: Record "Value Entry"; var Item: Record Item)
     var
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        RetailLocationFilter: Text;
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        if Item."No." = '' then
-            exit;
-
-        RetailLocationFilter := CreateRetailLocationsFilter();
-
-        if RetailLocationFilter <> '' then
-            ValueEntry.SetFilter("Location Code", StrSubstNo('%1', RetailLocationFilter));
+        RSRLocalizationMgt.SetSynthesisedEntryTypeFilter(ValueEntry, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Batch", 'OnPostLinesOnAfterPostLine', '', false, false)]
@@ -66,6 +49,7 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
             exit;
 
         ValueEntry.SetRange("Document No.", ItemJournalLine."Document No.");
+        RSRLocalizationMgt.SetSynthesisedEntryTypeFilter(ValueEntry, false);
         if not ValueEntry.FindLast() then
             exit;
 
@@ -73,31 +57,4 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
     end;
 #endif
     #endregion Cost Adjustment Subscribers
-
-    #region RS Retail Cost Adjustment Helper Procedures
-
-#if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
-
-    local procedure CreateRetailLocationsFilter() LocationCodeFilter: Text
-    var
-        Location: Record Location;
-        TextBuilder: TextBuilder;
-        FilterDiffFormLbl: Label '<>%1', Locked = true, Comment = '%1 = Entry No.';
-        AddFilterDiffFormLbl: Label '&<>%1', Locked = true, Comment = '%1 = Entry No.';
-    begin
-        Location.SetRange("NPR Retail Location", true);
-        if not Location.FindSet() then
-            exit;
-        repeat
-            if TextBuilder.Length = 0 then
-                TextBuilder.Append(StrSubstNo(FilterDiffFormLbl, Location.Code))
-            else
-                TextBuilder.Append(StrSubstNo(AddFilterDiffFormLbl, Location.Code))
-        until Location.Next() = 0;
-
-        LocationCodeFilter := TextBuilder.ToText();
-    end;
-
-#endif
-    #endregion RS Retail Cost Adjustment Helper Procedures
 }

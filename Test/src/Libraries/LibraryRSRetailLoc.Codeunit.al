@@ -642,6 +642,179 @@ codeunit 85253 "NPR Library - RS Retail Loc."
     begin
         LibraryCosting.AdjustCostItemEntries(ItemNo, '');
     end;
+
+    /// <summary>
+    /// Posts a purchase order as receipt only, so the item ledger entry carries an expected cost that
+    /// a later invoice at a different cost will have to adjust. Returns the order no. so the caller
+    /// can invoice it with InvoiceReceivedPurchaseAtCost.
+    /// </summary>
+    internal procedure ReceivePurchaseOrderOnly(ItemNo: Code[20]; LocationCode: Code[10]; Qty: Decimal; DirectUnitCost: Decimal) OrderNo: Code[20]
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Vendor: Record Vendor;
+    begin
+        LibraryPurchase.CreateVendor(Vendor);
+        Vendor.Validate("Gen. Bus. Posting Group", _GenBusPostGrp);
+        Vendor.Validate("VAT Bus. Posting Group", _VATBusPostGrp);
+        Vendor.Modify(true);
+
+        // Library - Purchase.CreatePurchHeader already assigns a Vendor Invoice No. for every document
+        // type except Credit Memo / Return Order, so the Order created here arrives with one and the
+        // invoice step in InvoiceReceivedPurchaseAtCost has what it needs.
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, Vendor."No.");
+
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, ItemNo, Qty);
+        PurchaseLine.Validate("Location Code", LocationCode);
+        PurchaseLine.Validate("Direct Unit Cost", DirectUnitCost);
+        PurchaseLine.Modify(true);
+
+        OrderNo := PurchaseHeader."No.";
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
+    end;
+
+    /// <summary>
+    /// Invoices a previously received purchase order at a different unit cost, which is what forces
+    /// standard cost adjustment to have real work to propagate onwards to any transfer of the goods.
+    /// </summary>
+    internal procedure InvoiceReceivedPurchaseAtCost(OrderNo: Code[20]; NewDirectUnitCost: Decimal)
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, OrderNo);
+        // Posting the receipt leaves the order Released, and Direct Unit Cost cannot be validated on a
+        // released document, so reopen before changing the cost.
+        LibraryPurchase.ReopenPurchaseDocument(PurchaseHeader);
+
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+        PurchaseLine.FindFirst();
+        PurchaseLine.Validate("Direct Unit Cost", NewDirectUnitCost);
+        PurchaseLine.Modify(true);
+
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
+    end;
+
+    /// <summary>
+    /// Counts value entries carrying the standard "Adjustment" flag for the item ledger entries of a
+    /// posted transfer shipment, across every location the shipment touches. A shipment spans both the
+    /// from-location and the in-transit leg, so a non-zero count only tells you that SOME leg was
+    /// adjusted - for a transfer touching a retail location the non-retail leg alone can produce it.
+    /// Use this only for wholly non-retail transfers; anything per-leg needs
+    /// CountAdjustmentValueEntriesAtLocation.
+    /// </summary>
+    internal procedure CountAdjustmentValueEntriesForTransfer(ShptNo: Code[20]) AdjustmentEntryCount: Integer
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        ValueEntry: Record "Value Entry";
+    begin
+        ItemLedgerEntry.SetLoadFields("Entry No.");
+        ItemLedgerEntry.SetRange("Document No.", ShptNo);
+        if not ItemLedgerEntry.FindSet() then
+            exit(0);
+        repeat
+            ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+            ValueEntry.SetRange(Adjustment, true);
+            AdjustmentEntryCount += ValueEntry.Count();
+        until ItemLedgerEntry.Next() = 0;
+    end;
+
+    /// <summary>
+    /// As CountAdjustmentValueEntriesForTransfer, but restricted to the item ledger entries sitting at
+    /// one location. A transfer spans three legs (from, in-transit, to) and only the leg at a retail
+    /// location is expected to be suppressed, so assertions have to name the location they mean.
+    /// </summary>
+    internal procedure CountAdjustmentValueEntriesAtLocation(DocumentNo: Code[20]; LocationCode: Code[10]) AdjustmentEntryCount: Integer
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        ValueEntry: Record "Value Entry";
+    begin
+        ItemLedgerEntry.SetLoadFields("Entry No.");
+        ItemLedgerEntry.SetRange("Document No.", DocumentNo);
+        ItemLedgerEntry.SetRange("Location Code", LocationCode);
+        // A zero from this helper must mean "the leg was not adjusted", never "the filter matched no
+        // item ledger entry at all". Callers assert AreEqual(0, ...) to prove suppression, so a
+        // mistyped document no. or location code would otherwise turn into a silent pass.
+        Assert.IsFalse(ItemLedgerEntry.IsEmpty(), StrSubstNo('No item ledger entries for document %1 at location %2, so a suppression assertion on this helper would be vacuous.', DocumentNo, LocationCode));
+        ItemLedgerEntry.FindSet();
+        repeat
+            ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+            ValueEntry.SetRange(Adjustment, true);
+            AdjustmentEntryCount += ValueEntry.Count();
+        until ItemLedgerEntry.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Turns automatic cost adjustment off (or back on). InitializeSetup leaves it on Always, which is
+    /// usually what you want: a cost change posted AFTER the entries it affects - a receipt invoiced
+    /// later at a different cost, say - still leaves real work for an explicit Adjust Cost run, which
+    /// is how most tests here observe adjustment. Turn it off only when the adjustment must not have
+    /// happened already at posting time, so the test can take a G/L snapshot before it runs.
+    /// </summary>
+    internal procedure SetAutomaticCostAdjustment(Enabled: Boolean)
+    var
+        InventorySetup: Record "Inventory Setup";
+    begin
+        InventorySetup.Get();
+        if Enabled then
+            InventorySetup.Validate("Automatic Cost Adjustment", InventorySetup."Automatic Cost Adjustment"::Always)
+        else
+            InventorySetup.Validate("Automatic Cost Adjustment", InventorySetup."Automatic Cost Adjustment"::Never);
+        InventorySetup.Modify(true);
+    end;
+
+    internal procedure GetItemUnitCost(ItemNo: Code[20]): Decimal
+    var
+        Item: Record Item;
+    begin
+        Item.Get(ItemNo);
+        exit(Item."Unit Cost");
+    end;
+    #endregion
+
+    #region RS retail calculation entry type
+    internal procedure CountRSCalcValueEntries(DocumentNo: Code[20]; Marked: Boolean): Integer
+    var
+        ValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+    begin
+        ValueEntry.SetRange("Document No.", DocumentNo);
+        RSRLocalizationMgt.SetSynthesisedEntryTypeFilter(ValueEntry, Marked);
+        exit(ValueEntry.Count());
+    end;
+
+    /// <summary>
+    /// As CountRSCalcValueEntries, but scoped to an item rather than a document. Needed for posting
+    /// paths that do not hand back a document no. - a POS sale posts through the job queue - and safe
+    /// because each test creates its own item, so every entry for it belongs to the scenario.
+    /// </summary>
+    internal procedure CountRSCalcValueEntriesForItem(ItemNo: Code[20]; Marked: Boolean): Integer
+    var
+        ValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+    begin
+        ValueEntry.SetRange("Item No.", ItemNo);
+        RSRLocalizationMgt.SetSynthesisedEntryTypeFilter(ValueEntry, Marked);
+        exit(ValueEntry.Count());
+    end;
+
+    /// <summary>
+    /// Sums Cost Amount (Actual) over the value entries of a document that do NOT carry one of the
+    /// RS retail calculation entry types, i.e. the genuine cost that standard costing may see.
+    /// </summary>
+    internal procedure GetUnmarkedCostAmount(DocumentNo: Code[20]): Decimal
+    var
+        ValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+    begin
+        ValueEntry.SetRange("Document No.", DocumentNo);
+        RSRLocalizationMgt.SetSynthesisedEntryTypeFilter(ValueEntry, false);
+        ValueEntry.CalcSums("Cost Amount (Actual)");
+        exit(ValueEntry."Cost Amount (Actual)");
+    end;
+
     #endregion
 
     #region Accessors

@@ -4,4 +4,8 @@ enumextension 6014412 "NPR Cost Entry Type" extends "Cost Entry Type"
     {
         Caption = 'Nivelation';
     }
+    value(6014401; "NPR RS Retail Calculation")
+    {
+        Caption = 'RS Retail Calculation';
+    }
 }

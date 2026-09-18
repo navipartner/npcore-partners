@@ -40,11 +40,13 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             exit;
 
         repeat
+            Clear(RetailValueEntry);
+
             RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempPurchInvLine."No.", TempPurchInvLine."Location Code", PurchInvHeader."Posting Date");
 
             InsertRetailValueEntries(RetailValueEntry, PurchInvHeader);
 
-            if RetailValueEntry."Entry No." <> 0 then begin
+            if (RetailValueEntry."Entry No." <> 0) and (RetailValueEntry."Cost Amount (Actual)" <> 0) then begin
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
@@ -254,6 +256,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         RetailValueEntry."Cost Amount (Actual)" := RetailValueEntry."Cost per Unit" * TempPurchInvLine.Quantity;
         RetailValueEntry."Cost Posted to G/L" := RetailValueEntry."Cost Amount (Actual)";
         RetailValueEntry.Description := CalculationValueEntryDescLbl;
+        RetailValueEntry."Entry Type" := RetailValueEntry."Entry Type"::"NPR RS Retail Calculation";
 
         if (RetailValueEntry."Cost Amount (Actual)" = 0) then
             exit;

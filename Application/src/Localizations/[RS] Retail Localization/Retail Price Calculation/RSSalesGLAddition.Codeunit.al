@@ -1,4 +1,4 @@
-codeunit 6151094 "NPR RS Sales GL Addition"
+﻿codeunit 6151094 "NPR RS Sales GL Addition"
 {
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
@@ -43,6 +43,8 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
         TempSalesInvoiceLine.FindSet();
         repeat
+            Clear(RetailValueEntry);
+
             RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempSalesInvoiceLine."No.", TempSalesInvoiceLine."Location Code", TempSalesInvoiceLine."Posting Date");
 
             InsertRetailValueEntries(RetailValueEntry, SalesInvoiceHeader);
@@ -546,6 +548,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         COGSCorrectionValueEntry."Cost Amount (Actual)" := COGSCorrectionValueEntry."Cost per Unit" * COGSCorrectionValueEntry."Invoiced Quantity";
         COGSCorrectionValueEntry."Cost Posted to G/L" := COGSCorrectionValueEntry."Cost Amount (Actual)";
         COGSCorrectionValueEntry.Description := CorrectionEntryDescLbl;
+        COGSCorrectionValueEntry."Entry Type" := COGSCorrectionValueEntry."Entry Type"::"NPR RS Retail Calculation";
         COGSCorrectionValueEntry.Insert();
 
         SumOfCOGSCostPerUnit += COGSCorrectionValueEntry."Cost per Unit";
@@ -573,6 +576,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         StdCorrectionValueEntry."Valued Quantity" := Abs(StdValueEntry."Valued Quantity");
         StdCorrectionValueEntry."Item Ledger Entry Quantity" := Abs(StdValueEntry."Item Ledger Entry Quantity");
         StdCorrectionValueEntry.Description := StdCorrectionValueEntryDescLbl;
+        StdCorrectionValueEntry."Entry Type" := StdCorrectionValueEntry."Entry Type"::"NPR RS Retail Calculation";
         StdCorrectionValueEntry.Insert();
 
         RSRLocalizationMgt.InsertStdCorrectionValueEntryMappingEntry(StdCorrectionValueEntry);
@@ -617,6 +621,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
             exit;
 
         RetailValueEntry.Description := CalculationValueEntryDescLbl;
+        RetailValueEntry."Entry Type" := RetailValueEntry."Entry Type"::"NPR RS Retail Calculation";
 
         RetailValueEntry.Insert();
 

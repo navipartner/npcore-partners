@@ -280,6 +280,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         NewValueEntry.Init();
         NewValueEntry.Copy(TempValueEntry);
         NewValueEntry."Entry No." := NewValueEntry.GetLastEntryNo() + 1;
+        NewValueEntry."Entry Type" := NewValueEntry."Entry Type"::"NPR RS Retail Calculation";
         NewValueEntry.Insert();
 
         RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(NewValueEntry);

@@ -1,4 +1,4 @@
-codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
+﻿codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
 {
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
@@ -63,6 +63,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         RSRLocalizationMgt.ReverseSignOnValueEntry(NewValueEntry);
         NewValueEntry."Cost per Unit" := -NewValueEntry."Cost per Unit";
         NewValueEntry.Description := StdCorrectionValueEntryLbl;
+        NewValueEntry."Entry Type" := NewValueEntry."Entry Type"::"NPR RS Retail Calculation";
         NewValueEntry.Insert();
         RSRLocalizationMgt.InsertStdCorrectionValueEntryMappingEntry(NewValueEntry);
 
@@ -167,6 +168,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         RSRLocalizationMgt.ResetValueEntryAmounts(NewValueEntry);
         RSRLocalizationMgt.CopyValueEntryAmounts(TransitValueEntry, NewValueEntry);
         RSRLocalizationMgt.ReverseSignOnValueEntry(NewValueEntry);
+        NewValueEntry."Entry Type" := NewValueEntry."Entry Type"::"NPR RS Retail Calculation";
         NewValueEntry.Insert();
     end;
 
@@ -193,6 +195,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
             NewValueEntry."Cost Amount (Actual)" := (PriceListLine."Unit Price" * Abs(StdRetailItemLedgEntry."Invoiced Quantity")) - StdRetailItemLedgEntry."Cost Amount (Actual)";
             NewValueEntry."Cost per Unit" := NewValueEntry."Cost Amount (Actual)" / Abs(StdRetailItemLedgEntry."Invoiced Quantity");
             NewValueEntry.Description := RetailCalculationValueEntryLbl;
+            NewValueEntry."Entry Type" := NewValueEntry."Entry Type"::"NPR RS Retail Calculation";
             NewValueEntry.Insert();
 
             RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(NewValueEntry);
@@ -274,6 +277,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         RSRLocalizationMgt.CopyValueEntryAmounts(AppliedValueEntry, NewValueEntry);
         RSRLocalizationMgt.ReverseSignOnValueEntry(NewValueEntry);
         NewValueEntry.Description := RetailCalculationValueEntryLbl;
+        NewValueEntry."Entry Type" := NewValueEntry."Entry Type"::"NPR RS Retail Calculation";
         NewValueEntry.Insert();
 
         CreateAdditionalGLEntries(NewValueEntry, Enum::"NPR RS Retail Calculation Type"::"Transit Adjustment");
