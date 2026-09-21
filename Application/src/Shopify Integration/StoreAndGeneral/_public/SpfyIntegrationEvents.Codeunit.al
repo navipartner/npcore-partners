@@ -172,6 +172,10 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnResolveUnknownItem(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; Sku: Text; var ItemVariant: Record "Item Variant")
+    begin
+    end;
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeFindCustomerInEcommerceDocument(OrderJsonToken: JsonToken; var Customer: Record Customer; var EcomSalesHeader: Record "NPR Ecom Sales Header"; var IsHandled: Boolean);
