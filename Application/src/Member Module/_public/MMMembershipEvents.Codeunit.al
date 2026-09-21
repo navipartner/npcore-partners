@@ -246,4 +246,10 @@
     procedure OnAfterCalculatePoints(LoyaltySetupCode: Code[20]; SaleLinePOS: Record "NPR POS Sale Line"; var TotalPoints: Integer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnResolveSubscriptionPSPFromPaymentGateway(PaymentGateway: Record "NPR Magento Payment Gateway"; var SubscriptionPSP: Enum "NPR MM Subscription PSP"; var Handled: Boolean)
+    begin
+    end;
 }

@@ -137,12 +137,25 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
             exit;
 
-        case PaymentGateway."Integration Type" of
-            PaymentGateway."Integration Type"::Adyen:
-                SubscriptionPSP := SubscriptionPSP::Adyen;
-        end;
+        GetSubscriptionPSPFromGateway(PaymentLine."Payment Gateway Code", SubscriptionPSP);
 
         Found := FindMemberPaymentMethod(PaymentLine."Payment Token", PaymentLine."Payment Gateway Shopper Ref.", SubscriptionPSP, MemberPaymentMethod);
+    end;
+
+    internal procedure FindMemberPaymentMethod(PaymentLine: Record "NPR Magento Payment Line"; UserAccount: Record "NPR UserAccount"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+        SubscriptionPSP: Enum "NPR MM Subscription PSP";
+    begin
+        if PaymentLine."Payment Token" = '' then
+            exit;
+
+        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
+            exit;
+
+        GetSubscriptionPSPFromGateway(PaymentLine."Payment Gateway Code", SubscriptionPSP);
+
+        Found := FindPaymentMethod(PaymentLine."Payment Token", PaymentLine."Payment Gateway Shopper Ref.", SubscriptionPSP, UserAccount, MemberPaymentMethod);
     end;
 
     internal procedure FindMemberPaymentMethod(PaymentToken: Text[64]; ShopperReference: Text[50]; SubscriptionPSP: Enum "NPR MM Subscription PSP"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
@@ -286,6 +299,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
     internal procedure AddMemberPaymentMethod(UserAccount: Record "NPR UserAccount"; PaymentLine: Record "NPR Magento Payment Line"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
+        SubscriptionPSP: Enum "NPR MM Subscription PSP";
     begin
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
 
@@ -299,10 +313,8 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         MemberPaymentMethod."Shopper Reference" := PaymentLine."Payment Gateway Shopper Ref.";
         MemberPaymentMethod."PAN Last 4 Digits" := PaymentLine."Card Summary";
         MemberPaymentMethod."Expiry Date" := GetLastDateOfMonth(PaymentLine."Expiry Date Text");
-        case PaymentGateway."Integration Type" of
-            PaymentGateway."Integration Type"::Adyen:
-                MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;
-        end;
+        GetSubscriptionPSPFromGateway(PaymentLine."Payment Gateway Code", SubscriptionPSP);
+        MemberPaymentMethod.PSP := SubscriptionPSP;
         MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
         MemberPaymentMethod."Payment Instrument Type" := PaymentLine."Payment Instrument Type";
         MemberPaymentMethod."Payment Brand" := PaymentLine.Brand;
@@ -399,5 +411,35 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
                 end;
         end;
         exit(false);
+    end;
+
+    internal procedure GetSubscriptionPSPFromGateway(PaymentGatewayCode: Code[10]; var SubscriptionPSP: Enum "NPR MM Subscription PSP"): Boolean
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
+        Handled: Boolean;
+        UnassignedPSPErr: Label 'A subscriber to OnResolveSubscriptionPSPFromPaymentGateway handled payment gateway %1 without assigning a subscription PSP. This is a programming bug.', Locked = true;
+    begin
+        if PaymentGatewayCode = '' then
+            exit(false);
+        if not PaymentGateway.Get(PaymentGatewayCode) then
+            exit(false);
+
+        case PaymentGateway."Integration Type" of
+            PaymentGateway."Integration Type"::Adyen:
+                begin
+                    SubscriptionPSP := SubscriptionPSP::Adyen;
+                    exit(true);
+                end;
+        end;
+
+        MembershipEvents.OnResolveSubscriptionPSPFromPaymentGateway(PaymentGateway, SubscriptionPSP, Handled);
+        if not Handled then begin
+            Clear(SubscriptionPSP);
+            exit(false);
+        end;
+        if SubscriptionPSP.AsInteger() = 0 then
+            Error(UnassignedPSPErr, PaymentGatewayCode);
+        exit(true);
     end;
 }

@@ -187,7 +187,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         SponsorshipTicketMgmt.OnMembershipPayment(MembershipEntry);
         if EcomSalesLine.Subscription then begin
-            CreateMembershipPaymentMethods(EcomSalesHeader, Membership, AmountInclVATForEntry);
+            CreateMembershipPaymentMethods(EcomSalesHeader, Membership, AmountInclVATForEntry, true);
             VerifySubscriptionEnrolled(Membership);
         end;
         EnsureMembershipLinkExists(EcomSalesHeader, EcomSalesLine, Membership);
@@ -335,10 +335,22 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         if AlterationAlreadyApplied(EcomSalesLine) then
             exit(false);
 
+        if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
+            Error(MembershipNotFoundErr, EcomSalesLine."Membership Id");
+
+        if EcomSalesLine.Subscription then
+            CheckAlterationEnrollmentPreconditions(EcomSalesLine, Membership);
+
         ReshapeMembershipDuration(EcomSalesLine, EcomSalesHeader);
 
         if not Membership.GetBySystemId(EcomSalesLine."Membership Id") then
             Error(MembershipNotFoundErr, EcomSalesLine."Membership Id");
+
+        if EcomSalesLine.Subscription then begin
+            CreateMembershipPaymentMethods(EcomSalesHeader, Membership, 0, false);
+            VerifySubscriptionEnrolled(Membership);
+        end;
+
         InsertMembershipLink(EcomSalesHeader, EcomSalesLine, Membership);
         DidAlterThisRound := true;
     end;
@@ -531,7 +543,10 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         NoOperationErr: Label 'Membership operation is not selected for line %1.', Comment = '%1 = line no.';
         MissingOperationIdErr: Label 'Missing or invalid membership operation.';
     begin
-        ValidateSubscriptionFlag(EcomSalesLine);
+        if not (EcomSalesLine."Membership Operation" in [EcomSalesLine."Membership Operation"::RenewMembership,
+                                                         EcomSalesLine."Membership Operation"::ExtendMembership,
+                                                         EcomSalesLine."Membership Operation"::UpgradeMembership]) then
+            ValidateSubscriptionFlag(EcomSalesLine);
 
         case EcomSalesLine."Membership Operation" of
             EcomSalesLine."Membership Operation"::NoOperationSelected:
@@ -545,7 +560,10 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             EcomSalesLine."Membership Operation"::RenewMembership,
             EcomSalesLine."Membership Operation"::ExtendMembership,
             EcomSalesLine."Membership Operation"::UpgradeMembership:
-                EcomCreateMMShipImpl.ValidateMembershipAlterationRequest(EcomSalesLine, EcomSalesHeader);
+                begin
+                    EcomCreateMMShipImpl.ValidateMembershipAlterationRequest(EcomSalesLine, EcomSalesHeader);
+                    ValidateSubscriptionFlag(EcomSalesLine);
+                end;
             else
                 Error(MissingOperationIdErr);
         end;
@@ -554,7 +572,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     internal procedure ValidateSubscriptionFlag(EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        SubscriptionNotAllowedErr: Label '%1 can only be enabled on membership lines being created or confirmed (line %2, operation %3).', Comment = '%1 = Subscription field caption, %2 = line no., %3 = membership operation';
         NotRecurringItemErr: Label '%1 is enabled on line %2, but membership %3 is not set up for recurring payments (%4 is empty), so it could never auto-renew.', Comment = '%1 = Subscription field caption, %2 = line no., %3 = Membership Code, %4 = Recurring Payment Code field caption';
     begin
         if not EcomSalesLine.Subscription then
@@ -562,9 +579,6 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         if EcomSalesLine.Subtype <> EcomSalesLine.Subtype::Membership then
             exit;
-
-        if not (EcomSalesLine."Membership Operation" in [EcomSalesLine."Membership Operation"::CreateMembership, EcomSalesLine."Membership Operation"::ConfirmMembership]) then
-            Error(SubscriptionNotAllowedErr, EcomSalesLine.FieldCaption(Subscription), EcomSalesLine."Line No.", EcomSalesLine."Membership Operation");
 
         if GetMembershipSetupForLine(EcomSalesLine, MembershipSetup) then
             if MembershipSetup."Recurring Payment Code" = '' then
@@ -575,6 +589,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         Membership: Record "NPR MM Membership";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MembershipCode: Code[20];
     begin
         case EcomSalesLine."Membership Operation" of
@@ -584,6 +599,15 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             EcomSalesLine."Membership Operation"::ConfirmMembership:
                 if Membership.GetBySystemId(EcomSalesLine."Membership Id") then
                     MembershipCode := Membership."Membership Code";
+            EcomSalesLine."Membership Operation"::RenewMembership,
+            EcomSalesLine."Membership Operation"::ExtendMembership,
+            EcomSalesLine."Membership Operation"::UpgradeMembership:
+                if MembershipAlterationSetup.GetBySystemId(EcomSalesLine."Alteration Option System Id") then
+                    if MembershipAlterationSetup."To Membership Code" <> '' then
+                        MembershipCode := MembershipAlterationSetup."To Membership Code"
+                    else
+                        if Membership.GetBySystemId(EcomSalesLine."Membership Id") then
+                            MembershipCode := Membership."Membership Code";
         end;
 
         if MembershipCode = '' then
@@ -750,6 +774,25 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         if not MembershipMgtInternal.CheckExtendMemberCards(false, Membership."Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, ExternalCardNo, CardEntryNo, ReasonText) then
             Error(ReasonText);
+
+        if EcomSalesLine.Subscription then
+            CheckAlterationEnrollmentPreconditions(EcomSalesLine, Membership);
+    end;
+
+    local procedure CheckAlterationEnrollmentPreconditions(EcomSalesLine: Record "NPR Ecom Sales Line"; Membership: Record "NPR MM Membership")
+    var
+        MembershipSubscription: Record "NPR MM Subscription";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        PendingPartialRegretErr: Label '%1 is enabled on line %2, but membership %3 has a pending termination with a refund in progress, so it cannot be enrolled in auto-renewal. Process or cancel the refund first.', Comment = '%1 = Subscription field caption, %2 = line no., %3 = External Membership No.';
+        SubscriptionBlockedErr: Label '%1 is enabled on line %2, but the %3 of membership %4 is blocked, so it could never auto-renew.', Comment = '%1 = Subscription field caption, %2 = line no., %3 = Subscription table caption, %4 = External Membership No.';
+    begin
+        if MembershipMgtInternal.UnprocessedPartialRegretExists(Membership) then
+            Error(PendingPartialRegretErr, EcomSalesLine.FieldCaption(Subscription), EcomSalesLine."Line No.", Membership."External Membership No.");
+
+        if SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", MembershipSubscription) then
+            if MembershipSubscription.Blocked then
+                Error(SubscriptionBlockedErr, EcomSalesLine.FieldCaption(Subscription), EcomSalesLine."Line No.", MembershipSubscription.TableCaption(), Membership."External Membership No.");
     end;
 
     local procedure ResolveAlterationDocumentDate(EcomSalesHeader: Record "NPR Ecom Sales Header"): Date
@@ -994,7 +1037,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         Page.Run(Page::"NPR MM Membership Card", Membership);
     end;
 
-    local procedure CreateMembershipPaymentMethods(EcomSalesHeader: Record "NPR Ecom Sales Header"; Membership: Record "NPR MM Membership"; SaleAmountInclVAT: Decimal)
+    local procedure CreateMembershipPaymentMethods(EcomSalesHeader: Record "NPR Ecom Sales Header"; Membership: Record "NPR MM Membership"; SaleAmountInclVAT: Decimal; CreateInitialSale: Boolean)
     var
         TempPaymentLine: Record "NPR Magento Payment Line" temporary;
         PaymentLine: Record "NPR Magento Payment Line";
@@ -1026,28 +1069,28 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
                 TempPaymentLine.SystemId := PaymentLine.SystemId;
                 TempPaymentLine.Insert();
 
-                if not PaymentMethodMgt.FindMemberPaymentMethod(TempPaymentLine, MemberPaymentMethod) then begin
 #pragma warning disable AA0139
-                    if not UserAccountMgt.FindAccountByEmail(EcomSalesHeader."Sell-to Email".Trim().ToLower(), UserAccount) then begin
+                if not UserAccountMgt.FindAccountByEmail(EcomSalesHeader."Sell-to Email".Trim().ToLower(), UserAccount) then begin
 #pragma warning restore
-                        UserAccount.Init();
-                        UserAccount.EmailAddress := EcomSalesHeader."Sell-to Email";
-                        if EcomSalesHeader."Sell-to Name" <> '' then begin
-                            NameParts := EcomSalesHeader."Sell-to Name".Trim().Split(' ');
+                    UserAccount.Init();
+                    UserAccount.EmailAddress := EcomSalesHeader."Sell-to Email";
+                    if EcomSalesHeader."Sell-to Name" <> '' then begin
+                        NameParts := EcomSalesHeader."Sell-to Name".Trim().Split(' ');
 #pragma warning disable AA0139
-                            if not (NameParts.Get(1, UserAccount.FirstName)) then;
-                            if not (NameParts.Get(2, UserAccount.LastName)) then;
+                        if not (NameParts.Get(1, UserAccount.FirstName)) then;
+                        if not (NameParts.Get(2, UserAccount.LastName)) then;
 #pragma warning restore
-                        end;
-                        UserAccount.PhoneNo := EcomSalesHeader."Sell-to Phone No.";
-                        UserAccountMgt.CreateAccount(UserAccount);
                     end;
-                    PaymentMethodMgt.AddMemberPaymentMethod(UserAccount, TempPaymentLine, MemberPaymentMethod);
+                    UserAccount.PhoneNo := EcomSalesHeader."Sell-to Phone No.";
+                    UserAccountMgt.CreateAccount(UserAccount);
                 end;
+                if not PaymentMethodMgt.FindMemberPaymentMethod(TempPaymentLine, UserAccount, MemberPaymentMethod) then
+                    PaymentMethodMgt.AddMemberPaymentMethod(UserAccount, TempPaymentLine, MemberPaymentMethod);
 
                 PaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
                 MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
-                CreateInitialSaleForMembership(Membership, MemberPaymentMethod, PaymentLine, SaleAmountInclVAT);
+                if CreateInitialSale then
+                    CreateInitialSaleForMembership(Membership, MemberPaymentMethod, PaymentLine, SaleAmountInclVAT);
             end;
         until PaymentLine.Next() = 0;
     end;
@@ -1082,12 +1125,13 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
     local procedure VerifySubscriptionEnrolled(Membership: Record "NPR MM Membership")
     var
         Subscription: Record "NPR MM Subscription";
-        NotRenewableErr: Label 'Membership %1 was sold as a subscription but is not enrolled in internal auto-renewal after processing, so it could never renew. Check that the membership item is not configured to activate on first use.', Comment = '%1 = External Membership No.';
+        NotRenewableErr: Label 'Membership %1 was sold as a subscription but is not enrolled in an unblocked internal auto-renewal after processing, so it could never renew. Check that the membership item is not configured to activate on first use, and that the membership and its %2 are not blocked.', Comment = '%1 = External Membership No., %2 = Subscription table caption';
     begin
         Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
         Subscription.SetRange("Auto-Renew", Subscription."Auto-Renew"::YES_INTERNAL);
+        Subscription.SetRange(Blocked, false);
         if Subscription.IsEmpty() then
-            Error(NotRenewableErr, Membership."External Membership No.");
+            Error(NotRenewableErr, Membership."External Membership No.", Subscription.TableCaption());
     end;
 
     local procedure ComputeWholeLineAmounts(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; var WholeAmount: Decimal; var WholeAmountInclVAT: Decimal)
