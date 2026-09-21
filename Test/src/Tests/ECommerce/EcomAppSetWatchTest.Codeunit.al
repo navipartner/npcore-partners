@@ -447,6 +447,8 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
         _LibraryEntria.DisableStoresExcept(_StoreCodeLbl);
         _Assert.IsFalse(EntriaStoreSyncState.Get(_StoreCodeLbl), 'Setup: the store must start without a sync-state row.');
 
+        _LibraryEntria.SuppressListFetchSentryEmit(EntriaJQ, _StoreCodeLbl);
+
         // [WHEN] The store loop runs
         EntriaJQ.ProcessEnabledStores();
 

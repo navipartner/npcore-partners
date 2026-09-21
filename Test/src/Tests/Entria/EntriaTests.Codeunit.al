@@ -1991,6 +1991,8 @@ codeunit 85260 "NPR Entria Tests"
         EntriaStoreSyncState.DeleteAll();
         EntriaStoreSyncState.Reset();
 
+        _LibraryEntria.SuppressListFetchSentryEmit(EntriaJQ, _StoreCode);
+
         // [WHEN] The store loop runs, called directly - OnRun soft-exits on a synthetic Job Queue Entry ID
         EntriaJQ.ProcessEnabledStores();
 

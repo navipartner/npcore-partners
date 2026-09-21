@@ -1036,6 +1036,7 @@ codeunit 85379 "NPR Library - Entria"
     begin
         InsertOrderFailureRowWithStatus(StoreCode, MedusaOrderId, RetryCount, NextRetryAt, Enum::"NPR Entria Order Imp. Status"::Pending);
     end;
+
     procedure InsertOrderFailureRowWithStatus(StoreCode: Code[20]; MedusaOrderId: Text[100]; RetryCount: Integer; NextRetryAt: DateTime; Status: Enum "NPR Entria Order Imp. Status")
     begin
         InsertOrderFailureRowWithTimestamp(StoreCode, MedusaOrderId, RetryCount, NextRetryAt, Status, 0DT);
@@ -1246,6 +1247,16 @@ codeunit 85379 "NPR Library - Entria"
     begin
         FilterOrderImportMonitoredRows(MonitoredJQEntry);
         exit(MonitoredJQEntry.FindFirst());
+    end;
+
+    /// <summary>
+    /// Prime the JQ's per-store Sentry throttle so the sandbox DownloadOrdersPage
+    /// failure in the caller doesn't emit "Entria Order list fetch failed: ...".
+    /// Walk and sync-state observable are unchanged; only the emission is suppressed.
+    /// </summary>
+    internal procedure SuppressListFetchSentryEmit(var EntriaJQ: Codeunit "NPR Entria Order Import JQ"; StoreCode: Code[20])
+    begin
+        EntriaJQ.ShouldEmitSentryError(StoreCode, CurrentDateTime());
     end;
 
     #endregion
