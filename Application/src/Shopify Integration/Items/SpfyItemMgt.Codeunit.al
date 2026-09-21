@@ -910,6 +910,39 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(ParseItem(ShopifyStoreCode, Sku, ItemVariant, Item));
     end;
 
+    /// <summary>
+    /// Resolves the SKU on a Shopify document line to a BC item, and if the standard lookup finds nothing, gives
+    /// OnResolveUnknownItem subscribers a chance to map it before the caller reports an unknown SKU.
+    /// <para>
+    /// Kept separate from ParseItem rather than folded into it, because for most callers an unresolved SKU is a
+    /// normal outcome. Product synchronization ("NPR Spfy Send Items&amp;Inventory") in particular must never
+    /// resolve through the fallback: it would link a fallback item, assign Shopify IDs to it and push its data.
+    /// </para>
+    /// <para>
+    /// Only the legacy order import ("NPR Spfy Order Mgt.".UpsertSalesLine) calls this today. The ecommerce sales
+    /// document import ("NPR Spfy Ecom Sales Doc Import".AddNewSaleLine and ResolveItem) raises the same unknown
+    /// SKU error and wants the same extension point, but is deliberately out of scope for now because the stores
+    /// this was built for run the legacy import. Wiring it up also needs an overload returning the Item record:
+    /// ResolveItem classifies the line subtype from it, so a resolution leaving Item blank would silently import
+    /// a ticket as an ordinary item line.
+    /// </para>
+    /// </summary>
+    procedure ParseItemForDocumentImport(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
+    var
+        Item: Record Item;
+    begin
+        if ParseItem(ShopifyStoreCode, ShopifyJToken, ItemVariant, Sku) then
+            exit(true);
+        exit(ResolveUnknownItem(ShopifyStoreCode, ShopifyJToken, Sku, ItemVariant, Item));
+    end;
+
+    procedure ParseItemForDocumentImport(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Item: Record Item; var Sku: Text): Boolean
+    begin
+        if ParseItem(ShopifyStoreCode, ShopifyJToken, ItemVariant, Item, Sku) then
+            exit(true);
+        exit(ResolveUnknownItem(ShopifyStoreCode, ShopifyJToken, Sku, ItemVariant, Item));
+    end;
+
     procedure ParseItem(ShopifyStoreCode: Code[20]; Sku: Text; var ItemVariant: Record "Item Variant"): Boolean
     var
         Item: Record Item;
@@ -923,6 +956,39 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             exit(false);
         if Item."No." = '' then
             exit(Item.Get(ItemVariant."Item No."));
+        exit(true);
+    end;
+
+    local procedure ResolveUnknownItem(ShopifyStoreCode: Code[20]; ShopifyJToken: JsonToken; Sku: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item): Boolean
+    var
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
+        ResolvedItemNo: Code[20];
+        ResolvedVariantCode: Code[10];
+        InvalidResolutionErr: Label 'OnResolveUnknownItem resolved Shopify SKU "%1" (store "%2") to item "%3" variant "%4", which does not exist. This is a programming bug.', Locked = true;
+    begin
+        Clear(ItemVariant);
+        Clear(Item);
+        if Sku = '' then
+            exit(false);
+
+        SpfyIntegrationEvents.OnResolveUnknownItem(ShopifyStoreCode, ShopifyJToken, Sku, ItemVariant);
+        ResolvedItemNo := ItemVariant."Item No.";
+        ResolvedVariantCode := ItemVariant.Code;
+        Clear(ItemVariant);
+
+        if ResolvedItemNo = '' then
+            exit(false);
+
+        if not Item.Get(ResolvedItemNo) then
+            Error(InvalidResolutionErr, Sku, ShopifyStoreCode, ResolvedItemNo, ResolvedVariantCode);
+
+        if ResolvedVariantCode <> '' then begin
+            if not ItemVariant.Get(ResolvedItemNo, ResolvedVariantCode) then
+                Error(InvalidResolutionErr, Sku, ShopifyStoreCode, ResolvedItemNo, ResolvedVariantCode);
+            exit(true);
+        end;
+
+        ItemVariant."Item No." := Item."No.";
         exit(true);
     end;
 
