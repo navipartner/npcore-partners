@@ -1296,6 +1296,51 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
+    procedure CardPaymentImportsExpiryDateAndMaskedCardNumber()
+    begin
+        VerifyCardPaymentImport('03/2030', '1111');
+    end;
+
+    [Test]
+    procedure CardPaymentImportsWithoutExpiryDate()
+    begin
+        VerifyCardPaymentImport('', '1111');
+    end;
+
+    [Test]
+    procedure CardPaymentImportsWithoutMaskedCardNumber()
+    begin
+        VerifyCardPaymentImport('03/2030', '');
+    end;
+
+    [Test]
+    procedure CardPaymentImportsWithoutCardDetails()
+    begin
+        VerifyCardPaymentImport('', '');
+    end;
+
+    [Test]
+    procedure CardPaymentWithExpiryMissingSlashLogsFailure()
+    begin
+        // [SCENARIO] An Entria card payment with expiryDate missing the / separator fails the import and lands in the failure table with the validator's error text.
+        VerifyMalformedExpiryLogsFailure('2030-03', 'ZZ-DOC-EXPNS', 'medusa-exp-noslash');
+    end;
+
+    [Test]
+    procedure CardPaymentWithTwoDigitYearLogsFailure()
+    begin
+        // [SCENARIO] An Entria card payment with a 2-digit year fails the import - the strict MM/YYYY validator rejects it to prevent downstream DMY2Date producing year 30 instead of 2030.
+        VerifyMalformedExpiryLogsFailure('03/30', 'ZZ-DOC-EXP2Y', 'medusa-exp-2yr');
+    end;
+
+    [Test]
+    procedure CardPaymentWithMonthOutOfRangeLogsFailure()
+    begin
+        // [SCENARIO] An Entria card payment with a month outside 1..12 fails the import - the validator's month-range check rejects it before downstream DMY2Date would.
+        VerifyMalformedExpiryLogsFailure('13/2030', 'ZZ-DOC-EXP13', 'medusa-exp-mon13');
+    end;
+
+    [Test]
     procedure OrderWithUnresolvableLocaleStillImports()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -3967,6 +4012,89 @@ codeunit 85260 "NPR Entria Tests"
         EcomSalesHeader.SetRange("Ecommerce Store Code", _StoreCode);
         EcomSalesHeader.SetFilter("External No.", '%1|%2', 'ZZ-DOC-PCMSG1', 'ZZ-DOC-PCMSG2');
         _Assert.IsTrue(EcomSalesHeader.IsEmpty(), 'No Ecom Sales Header may survive a failed import - a surviving one would be invoiced with no payment at all.');
+    end;
+
+    local procedure VerifyCardPaymentImport(ExpiryDate: Text; PANLastDigits: Text)
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        OrdersArr: JsonArray;
+        OrderTkn: JsonToken;
+        DataToken: JsonToken;
+        DataObj: JsonObject;
+        OrderCreatedAt: DateTime;
+    begin
+        // [GIVEN] A card payment with recurring tokens and optional card details
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderCreatedAt := CreateDateTime(DMY2Date(1, 1, 2024), 090000T);
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-DOC-CARD', 'medusa-card', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-CARD');
+        OrdersArr.Get(0, OrderTkn);
+        OrderTkn.SelectToken('payment_collections[0].payments[0].data', DataToken);
+        DataObj := DataToken.AsObject();
+        DataObj.Add('recurringToken', 'RECURRING-CARD');
+        DataObj.Add('shopperReference', 'SHOPPER-CARD');
+        if ExpiryDate <> '' then
+            DataObj.Add('expiryDate', ExpiryDate);
+        if PANLastDigits <> '' then
+            DataObj.Add('PANLastDigits', PANLastDigits);
+
+        // [WHEN] The order is imported with either, both or neither card detail supplied
+        ImportPrebuiltOrder('ZZ-DOC-CARD', OrdersArr);
+
+        // [THEN] Exactly one payment line is created with the supplied card details; absent details stay blank
+        FindEcomOrderHeader(EcomSalesHeader, _StoreCode, 'ZZ-DOC-CARD');
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(1, EcomSalesPmtLine.Count(), 'The card payment must import as exactly one payment line.');
+        EcomSalesPmtLine.FindFirst();
+        _Assert.AreEqual(ExpiryDate, EcomSalesPmtLine."Card Expiry Date", 'The card expiry date must match data.expiryDate, or be blank when absent.');
+        _Assert.AreEqual(PANLastDigits, EcomSalesPmtLine."Masked Card Number", 'The masked card number must match data.PANLastDigits, or be blank when absent.');
+
+        // [THEN] Existing payment fields and recurring tokens are preserved in every case
+        _Assert.AreEqual(100, EcomSalesPmtLine.Amount, 'The payment amount must be preserved.');
+        _Assert.AreEqual('PSP-CARD', EcomSalesPmtLine."Payment Reference", 'The payment reference must be preserved.');
+        _Assert.AreEqual(EcomSalesPmtLine."Payment Method Type"::"Payment Method", EcomSalesPmtLine."Payment Method Type", 'The payment must remain a card payment.');
+        _Assert.AreEqual('pp_test', EcomSalesPmtLine.Description, 'The provider description must be preserved.');
+        _Assert.AreEqual('pp_test', EcomSalesPmtLine."External Payment Method Code", 'The payment provider must be preserved.');
+        _Assert.AreEqual('visa', EcomSalesPmtLine."External Payment Type", 'The payment type must be preserved.');
+        _Assert.AreEqual('RECURRING-CARD', EcomSalesPmtLine."PSP Token", 'The recurring token must be preserved.');
+        _Assert.AreEqual('SHOPPER-CARD', EcomSalesPmtLine."PAR Token", 'The shopper reference must be preserved.');
+    end;
+
+    local procedure VerifyMalformedExpiryLogsFailure(ExpiryDate: Text; DocNo: Code[20]; MedusaOrderId: Text[100])
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderTkn: JsonToken;
+        DataToken: JsonToken;
+        DataObj: JsonObject;
+        OrderCreatedAt: DateTime;
+        ImportSucceeded: Boolean;
+    begin
+        // [GIVEN] A card payment with a malformed expiryDate value
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderCreatedAt := CreateDateTime(DMY2Date(1, 1, 2024), 090000T);
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, DocNo, MedusaOrderId, OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-CARD');
+        OrdersArr.Get(0, OrderTkn);
+        OrderTkn.SelectToken('payment_collections[0].payments[0].data', DataToken);
+        DataObj := DataToken.AsObject();
+        DataObj.Add('expiryDate', ExpiryDate);
+        EntriaStore.Get(_StoreCode);
+
+        // [WHEN] The order is processed through the JQ wrapper (which routes deep errors to the failure table)
+        ImportSucceeded := EntriaJQ.ProcessOrder(EntriaStore, OrderTkn, DocNo, MedusaOrderId, OrderCreatedAt, 0);
+
+        // [THEN] The import fails and a failure row is logged with the validator's message and the received value
+        _Assert.IsFalse(ImportSucceeded, 'A malformed expiryDate must abort the import.');
+        EntriaOrderImpFailure.Get(_StoreCode, MedusaOrderId);
+        _Assert.AreEqual(0, EntriaOrderImpFailure."Retry Count", 'A first-attempt failure must record Retry Count 0.');
+        _Assert.AreEqual(EntriaOrderImpFailure.Status::Pending, EntriaOrderImpFailure.Status, 'Below MaxRetries the failure must be Pending, not Skipped.');
+        _Assert.AreEqual(DocNo, EntriaOrderImpFailure."Document No.", 'The failure row must be anchored on the Document No.');
+        _Assert.IsTrue(StrPos(EntriaOrderImpFailure."Last Error", 'must be MM/YYYY') > 0, 'The failure Last Error must carry the validator label.');
+        _Assert.IsTrue(StrPos(EntriaOrderImpFailure."Last Error", ExpiryDate) > 0, 'The failure Last Error must carry the received expiryDate value.');
     end;
 
     local procedure FindEcomOrderHeader(var EcomSalesHeader: Record "NPR Ecom Sales Header"; StoreCode: Code[20]; ExternalNo: Code[20])

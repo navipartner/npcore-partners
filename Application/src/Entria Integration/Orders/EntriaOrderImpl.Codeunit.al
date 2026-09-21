@@ -575,6 +575,9 @@ codeunit 6151027 "NPR Entria Order Impl."
                     EcomSalesPmtLine."External Payment Type" := _JsonHelper.GetJText(PaymentToken, 'data.paymentMethod', true);
                     EcomSalesPmtLine."PSP Token" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.recurringToken', MaxStrLen(EcomSalesPmtLine."PSP Token"), false);
                     EcomSalesPmtLine."PAR Token" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.shopperReference', MaxStrLen(EcomSalesPmtLine."PAR Token"), false);
+                    EcomSalesPmtLine."Card Expiry Date" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.expiryDate', MaxStrLen(EcomSalesPmtLine."Card Expiry Date"), false);
+                    ValidateCardExpiryFormat(PaymentToken, EcomSalesPmtLine."Card Expiry Date");
+                    EcomSalesPmtLine."Masked Card Number" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.PANLastDigits', MaxStrLen(EcomSalesPmtLine."Masked Card Number"), false);
                 end;
             EcomSalesPmtLine."Payment Method Type"::Voucher:
                 EcomSalesPmtLine.Description := CopyStr(EcomSalesPmtLine.Description + ' ' + EcomSalesPmtLine."Payment Reference", 1, MaxStrLen(EcomSalesPmtLine.Description));
@@ -607,6 +610,36 @@ codeunit 6151027 "NPR Entria Order Impl."
 #pragma warning restore AA0139
         EcomSalesPmtLine."Payment Reference" := PaymentReference;
 
+    end;
+
+    local procedure ValidateCardExpiryFormat(PaymentToken: JsonToken; ExpiryDate: Text)
+    var
+        MonthText: Text;
+        YearText: Text;
+        SeparatorPosition: Integer;
+        Month: Integer;
+        Year: Integer;
+        InvalidExpiryFormatErr: Label 'Card expiry date at %1 must be MM/YYYY, got "%2".', Comment = '%1=absolute path, %2=received value';
+    begin
+        if ExpiryDate = '' then
+            exit;
+
+        SeparatorPosition := StrPos(ExpiryDate, '/');
+        if SeparatorPosition <= 0 then
+            Error(InvalidExpiryFormatErr, _JsonHelper.GetAbsolutePath(PaymentToken, 'data.expiryDate'), ExpiryDate);
+
+        MonthText := CopyStr(ExpiryDate, 1, SeparatorPosition - 1);
+        YearText := CopyStr(ExpiryDate, SeparatorPosition + 1);
+
+        if not Evaluate(Month, MonthText) then
+            Error(InvalidExpiryFormatErr, _JsonHelper.GetAbsolutePath(PaymentToken, 'data.expiryDate'), ExpiryDate);
+        if (Month < 1) or (Month > 12) then
+            Error(InvalidExpiryFormatErr, _JsonHelper.GetAbsolutePath(PaymentToken, 'data.expiryDate'), ExpiryDate);
+
+        if StrLen(YearText) <> 4 then
+            Error(InvalidExpiryFormatErr, _JsonHelper.GetAbsolutePath(PaymentToken, 'data.expiryDate'), ExpiryDate);
+        if not Evaluate(Year, YearText) then
+            Error(InvalidExpiryFormatErr, _JsonHelper.GetAbsolutePath(PaymentToken, 'data.expiryDate'), ExpiryDate);
     end;
 
     local procedure ReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
