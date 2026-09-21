@@ -1,4 +1,4 @@
-codeunit 85253 "NPR Library - RS Retail Loc."
+﻿codeunit 85253 "NPR Library - RS Retail Loc."
 {
     Access = Internal;
 
@@ -20,6 +20,8 @@ codeunit 85253 "NPR Library - RS Retail Loc."
         _GlobalMarginAcc: Code[20];
         _STDVATRate: Decimal;
         _REDVATRate: Decimal;
+        _CountDocumentNoCounter: Integer;
+        _CountDocumentNoPrefix: Code[12];
 
     #region Setup
     internal procedure InitializeSetup()
@@ -635,6 +637,162 @@ codeunit 85253 "NPR Library - RS Retail Loc."
     end;
     #endregion
 
+    #region Item counting (physical inventory) posting
+    /// <summary>
+    /// Posts a counted quantity difference at a location the way item counting does: an item journal
+    /// Positive/Negative Adjmt. line carrying the phys. inventory flag and source code, pushed through
+    /// Item Jnl.-Post Batch. This is the path taken by the NPR Retail Calc. Inv. report feeding the
+    /// NPR Retail Item Journal, and by the BC standard Phys. Inventory Journal.
+    /// CountedQty is the counted on-hand; CalculatedQty is what the system believed was on hand.
+    /// </summary>
+    internal procedure PostRetailCountAdjustment(ItemNo: Code[20]; LocationCode: Code[10]; CalculatedQty: Decimal; CountedQty: Decimal) DocumentNo: Code[20]
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
+        ItemJournalTemplate: Record "Item Journal Template";
+        ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
+    begin
+        LibraryInventory.CreateItemJournalTemplateByType(ItemJournalTemplate, ItemJournalTemplate.Type::"Phys. Inventory");
+        LibraryInventory.CreateItemJournalBatch(ItemJournalBatch, ItemJournalTemplate.Name);
+
+        DocumentNo := NextCountDocumentNo();
+        CreateCountBatchLine(ItemJournalLine, ItemJournalTemplate.Name, ItemJournalBatch.Name, DocumentNo, ItemNo, LocationCode, CalculatedQty, CountedQty);
+
+        ItemJnlPostBatch.Run(ItemJournalLine);
+    end;
+
+    /// <summary>
+    /// Posts a count batch holding a line per item under ONE document no., the way a real count of a
+    /// store does. Multi-line batches are their own case: every line shares the document no., so any
+    /// posting logic that locates its work by document no. alone can pick up the wrong line's entries.
+    /// </summary>
+    internal procedure PostRetailCountAdjustmentTwoItems(Item1: Code[20]; Item2: Code[20]; LocationCode: Code[10]; CalculatedQty: Decimal; CountedQty1: Decimal; CountedQty2: Decimal) DocumentNo: Code[20]
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
+        ItemJournalTemplate: Record "Item Journal Template";
+        ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
+    begin
+        LibraryInventory.CreateItemJournalTemplateByType(ItemJournalTemplate, ItemJournalTemplate.Type::"Phys. Inventory");
+        LibraryInventory.CreateItemJournalBatch(ItemJournalBatch, ItemJournalTemplate.Name);
+
+        DocumentNo := NextCountDocumentNo();
+        CreateCountBatchLine(ItemJournalLine, ItemJournalTemplate.Name, ItemJournalBatch.Name, DocumentNo, Item1, LocationCode, CalculatedQty, CountedQty1);
+        CreateCountBatchLine(ItemJournalLine, ItemJournalTemplate.Name, ItemJournalBatch.Name, DocumentNo, Item2, LocationCode, CalculatedQty, CountedQty2);
+
+        ItemJournalLine.SetRange("Journal Template Name", ItemJournalTemplate.Name);
+        ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
+        ItemJournalLine.FindFirst();
+        ItemJnlPostBatch.Run(ItemJournalLine);
+    end;
+
+    /// <summary>
+    /// Creates one line of a count batch through LibraryInventory, so line numbering and any field a
+    /// future BC version makes mandatory on Item Journal Line stay owned by the maintained library rather
+    /// than by this fixture. Only the count-specific fields are layered on top afterwards.
+    /// Every line of one count carries the same document no. - that is the point of this fixture.
+    /// </summary>
+    local procedure CreateCountBatchLine(var ItemJournalLine: Record "Item Journal Line"; TemplateName: Code[10]; BatchName: Code[10]; DocumentNo: Code[20]; ItemNo: Code[20]; LocationCode: Code[10]; CalculatedQty: Decimal; CountedQty: Decimal)
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+        Difference: Decimal;
+    begin
+        Difference := CountedDifference(CalculatedQty, CountedQty);
+
+        LibraryInventory.CreateItemJournalLine(ItemJournalLine, TemplateName, BatchName, CountEntryType(Difference), ItemNo, Abs(Difference));
+
+        ItemJournalLine.Validate("Posting Date", WorkDate());
+        ItemJournalLine.Validate("Document No.", DocumentNo);
+        ItemJournalLine.Validate("Location Code", LocationCode);
+
+        // Mirror NPR Retail Calc. Inv.: the phys. inventory flag and source code are what make this a
+        // count rather than an ad-hoc adjustment, and the localization must react to it either way.
+        SourceCodeSetup.Get();
+        ItemJournalLine.Validate("Source Code", SourceCodeSetup."Phys. Inventory Journal");
+        ItemJournalLine."Phys. Inventory" := true;
+        ItemJournalLine."Qty. (Calculated)" := CalculatedQty;
+        ItemJournalLine."Qty. (Phys. Inventory)" := CountedQty;
+        ItemJournalLine.Modify(true);
+    end;
+
+    /// <summary>
+    /// As PostRetailCountAdjustment, but posted straight through Item Jnl.-Post Line without a journal
+    /// batch - the path the POS "Adjust Inventory" action takes. Kept separate because a subscriber on
+    /// Item Jnl.-Post Batch never fires here, so the two paths need independent coverage.
+    /// </summary>
+    internal procedure PostRetailCountAdjustmentDirect(ItemNo: Code[20]; LocationCode: Code[10]; CalculatedQty: Decimal; CountedQty: Decimal) DocumentNo: Code[20]
+    var
+        TempItemJournalLine: Record "Item Journal Line" temporary;
+        POSActionAdjustInvB: Codeunit "NPR POS Action: Adjust Inv. B";
+    begin
+        InitCountAdjustmentLine(TempItemJournalLine, ItemNo, LocationCode, CalculatedQty, CountedQty);
+        TempItemJournalLine.Insert();
+
+        DocumentNo := TempItemJournalLine."Document No.";
+        // Posts through the POS action's own procedure rather than Item Jnl.-Post Line, so the test
+        // covers the production path including whatever that action does after posting. Driving the
+        // full action would need a live POS sale context, which this assertion does not need.
+        POSActionAdjustInvB.PostItemJnlLine(TempItemJournalLine);
+    end;
+
+    /// <summary>
+    /// The counted difference, asserted non-zero - a count adjustment test with no difference would post
+    /// nothing and assert nothing.
+    /// </summary>
+    local procedure CountedDifference(CalculatedQty: Decimal; CountedQty: Decimal) Difference: Decimal
+    begin
+        Difference := CountedQty - CalculatedQty;
+        Assert.AreNotEqual(0, Difference, 'A count adjustment test needs a non-zero counted difference');
+    end;
+
+    /// <summary>
+    /// Business Central carries the sign of a count adjustment in the entry type, not in Quantity, so the
+    /// quantity posted is always the absolute difference.
+    /// </summary>
+    local procedure CountEntryType(Difference: Decimal): Enum "Item Ledger Entry Type"
+    begin
+        if Difference > 0 then
+            exit("Item Ledger Entry Type"::"Positive Adjmt.");
+        exit("Item Ledger Entry Type"::"Negative Adjmt.");
+    end;
+
+    /// <summary>
+    /// Fills a TEMPORARY count-adjustment line for the POS path, which posts through Item Jnl.-Post Line
+    /// with no journal template or batch. LibraryInventory.CreateItemJournalLine cannot serve this case -
+    /// it writes a real line into a real batch - so this one line is built by hand on purpose.
+    /// </summary>
+    local procedure InitCountAdjustmentLine(var ItemJournalLine: Record "Item Journal Line"; ItemNo: Code[20]; LocationCode: Code[10]; CalculatedQty: Decimal; CountedQty: Decimal)
+    var
+        Difference: Decimal;
+    begin
+        Difference := CountedDifference(CalculatedQty, CountedQty);
+
+        ItemJournalLine.Init();
+        ItemJournalLine.Validate("Posting Date", WorkDate());
+        ItemJournalLine.Validate("Entry Type", CountEntryType(Difference));
+        ItemJournalLine.Validate("Document No.", NextCountDocumentNo());
+        ItemJournalLine.Validate("Item No.", ItemNo);
+        ItemJournalLine.Validate("Location Code", LocationCode);
+        ItemJournalLine.Validate(Quantity, Abs(Difference));
+    end;
+
+    /// <summary>
+    /// A document no. unique per call, so each count in a test is independently assertable by document.
+    /// </summary>
+    local procedure NextCountDocumentNo(): Code[20]
+    begin
+        // Seeded from a GUID, not just a counter. The counter is plain codeunit state and each test
+        // declares its own library instance, so a counter alone restarts at 0 every test - and the
+        // runners use TestIsolation = Codeunit, so nothing is rolled back between tests in a codeunit.
+        // Every test would then post under the same document no., and any assertion filtering on
+        // document alone would silently span the whole codeunit's postings.
+        if _CountDocumentNoPrefix = '' then
+            _CountDocumentNoPrefix := CopyStr(DelChr(Format(CreateGuid()), '=', '{}-'), 1, 12);
+        _CountDocumentNoCounter += 1;
+        exit(CopyStr(_CountDocumentNoPrefix + Format(_CountDocumentNoCounter), 1, 20));
+    end;
+    #endregion
+
     #region Costing
     internal procedure RunAdjustCostItemEntries(ItemNo: Code[20])
     var
@@ -763,6 +921,44 @@ codeunit 85253 "NPR Library - RS Retail Loc."
         else
             InventorySetup.Validate("Automatic Cost Adjustment", InventorySetup."Automatic Cost Adjustment"::Never);
         InventorySetup.Modify(true);
+    end;
+
+    /// <summary>
+    /// Counts the COGS-correction mapping rows a document registered for an item. A counted-in quantity
+    /// needs one so a later sale of those units can produce its COGS correction; without it the sale
+    /// falls through to the unmapped path and posts no COGS legs. Scoped by document on purpose - a
+    /// purchase registers one of its own, so an item-wide count would pass without the count's row.
+    /// </summary>
+    internal procedure CountCOGSCorrectionMappings(ItemNo: Code[20]; DocumentNo: Code[20]): Integer
+    var
+        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
+    begin
+        RSRetValueEntryMapp.SetRange("Item No.", ItemNo);
+        RSRetValueEntryMapp.SetRange("Document No.", DocumentNo);
+        RSRetValueEntryMapp.SetRange("COGS Correction", true);
+        exit(RSRetValueEntryMapp.Count());
+    end;
+
+    /// <summary>
+    /// Counts the G/L entries of a document that fall inside no G/L Register range. Entries outside every
+    /// register are invisible in General Ledger Registers, unreachable from register Navigate, and skipped
+    /// by Reverse Register - so statutory entries must never be among them.
+    /// </summary>
+    internal procedure CountGLEntriesOutsideAnyRegister(DocumentNo: Code[20]) OrphanCount: Integer
+    var
+        GLEntry: Record "G/L Entry";
+        GLRegister: Record "G/L Register";
+    begin
+        GLEntry.SetRange("Document No.", DocumentNo);
+        if not GLEntry.FindSet() then
+            exit;
+        repeat
+            GLRegister.Reset();
+            GLRegister.SetFilter("From Entry No.", '<=%1', GLEntry."Entry No.");
+            GLRegister.SetFilter("To Entry No.", '>=%1', GLEntry."Entry No.");
+            if GLRegister.IsEmpty() then
+                OrphanCount += 1;
+        until GLEntry.Next() = 0;
     end;
 
     internal procedure GetItemUnitCost(ItemNo: Code[20]): Decimal

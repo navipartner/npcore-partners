@@ -1,4 +1,4 @@
-codeunit 6059836 "NPR POS Action: Adjust Inv. B"
+﻿codeunit 6059836 "NPR POS Action: Adjust Inv. B"
 {
     Access = Internal;
 
@@ -85,10 +85,17 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         TempItemJnlLine.Insert();
     end;
 
-    local procedure PostItemJnlLine(var TempItemJnlLine: Record "Item Journal Line" temporary)
+    internal procedure PostItemJnlLine(var TempItemJnlLine: Record "Item Journal Line" temporary)
     var
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
     begin
         ItemJnlPostLine.Run(TempItemJnlLine);
+
+        OnAfterPostItemJnlLine(TempItemJnlLine);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPostItemJnlLine(var TempItemJnlLine: Record "Item Journal Line" temporary)
+    begin
     end;
 }
