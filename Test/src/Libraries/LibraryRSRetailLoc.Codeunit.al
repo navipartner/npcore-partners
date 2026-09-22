@@ -18,6 +18,9 @@
         _InvtPostGrp: Code[20];
         _GlobalVATAcc: Code[20];
         _GlobalMarginAcc: Code[20];
+        _GlobalSurplusAcc: Code[20];
+        _GlobalShortageAcc: Code[20];
+        _InvtAdjmtAcc: Code[20];
         _STDVATRate: Decimal;
         _REDVATRate: Decimal;
         _CountDocumentNoCounter: Integer;
@@ -72,6 +75,8 @@
 
         _GlobalVATAcc := LibraryERM.CreateGLAccountNo();
         _GlobalMarginAcc := LibraryERM.CreateGLAccountNo();
+        _GlobalSurplusAcc := LibraryERM.CreateGLAccountNo();
+        _GlobalShortageAcc := LibraryERM.CreateGLAccountNo();
 
         if not RSSetup.Get() then begin
             RSSetup.Init();
@@ -80,6 +85,8 @@
         RSSetup."Enable RS Retail Localization" := true;
         RSSetup."RS Calc. VAT GL Account" := _GlobalVATAcc;
         RSSetup."RS Calc. Margin GL Account" := _GlobalMarginAcc;
+        RSSetup."RS Surplus GL Account" := _GlobalSurplusAcc;
+        RSSetup."RS Shortage GL Account" := _GlobalShortageAcc;
         RSSetup."RS Ret. Localization Country" := RSSetup."RS Ret. Localization Country"::Serbia;
         RSSetup."RS Nivelation Hdr No. Series" := LibraryERM.CreateNoSeriesCode();
         RSSetup."RS Posted Niv. No. Series" := LibraryERM.CreateNoSeriesCode();
@@ -150,7 +157,9 @@
         GeneralPostingSetup.Validate("Direct Cost Applied Account", LibraryERM.CreateGLAccountNo());
         GeneralPostingSetup.Validate("Overhead Applied Account", LibraryERM.CreateGLAccountNo());
         GeneralPostingSetup.Validate("Purchase Variance Account", LibraryERM.CreateGLAccountNo());
-        GeneralPostingSetup.Validate("Inventory Adjmt. Account", LibraryERM.CreateGLAccountNo());
+        if _InvtAdjmtAcc = '' then
+            _InvtAdjmtAcc := LibraryERM.CreateGLAccountNo();
+        GeneralPostingSetup.Validate("Inventory Adjmt. Account", _InvtAdjmtAcc);
         GeneralPostingSetup.Validate("COGS Account", LibraryERM.CreateGLAccountNo());
         GeneralPostingSetup.Validate("COGS Account (Interim)", LibraryERM.CreateGLAccountNo());
         GeneralPostingSetup.Validate("Sales Account", LibraryERM.CreateGLAccountNo());
@@ -736,6 +745,28 @@
     end;
 
     /// <summary>
+    /// As PostRetailCountAdjustmentDirect, but carrying the reason the way the POS action carries it:
+    /// POSActionAdjustInvB.CreateItemJnlLine validates "Return Reason Code" and never touches
+    /// "Reason Code", so a POS write-off reaches the value entry with the Reason Code field blank. That
+    /// asymmetry is the whole point of the fixture - a helper that set "Reason Code" here would be
+    /// testing the journal path a second time under a POS-sounding name.
+    /// </summary>
+    internal procedure PostRetailCountAdjustmentDirectWithReturnReason(ItemNo: Code[20]; LocationCode: Code[10]; CalculatedQty: Decimal; CountedQty: Decimal; ReturnReasonCode: Code[10]) DocumentNo: Code[20]
+    var
+        TempItemJournalLine: Record "Item Journal Line" temporary;
+        POSActionAdjustInvB: Codeunit "NPR POS Action: Adjust Inv. B";
+    begin
+        InitCountAdjustmentLine(TempItemJournalLine, ItemNo, LocationCode, CalculatedQty, CountedQty);
+        TempItemJournalLine.Validate("Return Reason Code", ReturnReasonCode);
+        TempItemJournalLine.Insert();
+
+        Assert.AreEqual('', TempItemJournalLine."Reason Code", 'The POS fixture must leave Reason Code blank, as the POS action does - otherwise it is not exercising the Return Reason path.');
+
+        DocumentNo := TempItemJournalLine."Document No.";
+        POSActionAdjustInvB.PostItemJnlLine(TempItemJournalLine);
+    end;
+
+    /// <summary>
     /// The counted difference, asserted non-zero - a count adjustment test with no difference would post
     /// nothing and assert nothing.
     /// </summary>
@@ -961,6 +992,302 @@
         until GLEntry.Next() = 0;
     end;
 
+    /// <summary>
+    /// Creates a reason code. When WithAccounts is set it also gets its own surplus and shortage
+    /// accounts, which is how a write-off reason such as breakage is directed away from the default
+    /// shortage account. Returns the code plus both accounts so a test can assert on them.
+    /// </summary>
+    internal procedure CreateCountReasonCode(WithAccounts: Boolean; var SurplusAcc: Code[20]; var ShortageAcc: Code[20]) ReasonCode: Code[10]
+    var
+        ReasonCodeRec: Record "Reason Code";
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+    begin
+        // The parent is created first, and through the library that owns it, so the mapping's TableRelation
+        // holds and the fixture keeps working if "Reason Code" ever gains a mandatory field.
+        LibraryERM.CreateReasonCode(ReasonCodeRec);
+        ReasonCodeRec.Validate(Description, 'RS count reason');
+        ReasonCodeRec.Modify(true);
+
+        Clear(SurplusAcc);
+        Clear(ShortageAcc);
+        if WithAccounts then begin
+            SurplusAcc := LibraryERM.CreateGLAccountNo();
+            ShortageAcc := LibraryERM.CreateGLAccountNo();
+            RSReasonCodeAccMapp.Init();
+            RSReasonCodeAccMapp.Validate("Reason Type", RSReasonCodeAccMapp."Reason Type"::"Reason Code");
+            RSReasonCodeAccMapp.Validate("Reason Code", ReasonCodeRec.Code);
+            RSReasonCodeAccMapp.Validate("Surplus Account", SurplusAcc);
+            RSReasonCodeAccMapp.Validate("Shortage Account", ShortageAcc);
+            RSReasonCodeAccMapp.Insert(true);
+        end;
+        exit(ReasonCodeRec.Code);
+    end;
+
+    /// <summary>
+    /// The POS counterpart of CreateCountReasonCode. The POS "Adjust Inventory" action asks the cashier
+    /// for a Return Reason, not a Reason Code - two different tables - so a POS write-off reason has to be
+    /// mapped on its own line, under the Return Reason type.
+    /// </summary>
+    internal procedure CreateCountReturnReason(WithAccounts: Boolean; var SurplusAcc: Code[20]; var ShortageAcc: Code[20]) ReturnReasonCode: Code[10]
+    var
+        ReturnReason: Record "Return Reason";
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+    begin
+        // Created through the library that owns the table, for the same reason CreateCountReasonCode does.
+        LibraryERM.CreateReturnReasonCode(ReturnReason);
+        ReturnReason.Validate(Description, 'RS POS count reason');
+        ReturnReason.Modify(true);
+
+        Clear(SurplusAcc);
+        Clear(ShortageAcc);
+        if WithAccounts then begin
+            SurplusAcc := LibraryERM.CreateGLAccountNo();
+            ShortageAcc := LibraryERM.CreateGLAccountNo();
+            RSReasonCodeAccMapp.Init();
+            RSReasonCodeAccMapp.Validate("Reason Type", RSReasonCodeAccMapp."Reason Type"::"Return Reason");
+            RSReasonCodeAccMapp.Validate("Reason Code", ReturnReason.Code);
+            RSReasonCodeAccMapp.Validate("Surplus Account", SurplusAcc);
+            RSReasonCodeAccMapp.Validate("Shortage Account", ShortageAcc);
+            RSReasonCodeAccMapp.Insert(true);
+        end;
+        exit(ReturnReason.Code);
+    end;
+
+    /// <summary>
+    /// Creates a Reason Code and a Return Reason that share one code value, each mapped to its own
+    /// shortage account. Nothing stops the two tables from holding the same code - they are independent -
+    /// so this is the fixture that proves a lookup reaches the right list rather than merely finding
+    /// something. The shared code is forced by hand because the ERM library assigns its own.
+    /// </summary>
+    internal procedure CreateCollidingCountReasons(var SharedCode: Code[10]; var JournalShortageAcc: Code[20]; var POSShortageAcc: Code[20])
+    var
+        ReasonCodeRec: Record "Reason Code";
+        ReturnReason: Record "Return Reason";
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+    begin
+        LibraryERM.CreateReasonCode(ReasonCodeRec);
+        SharedCode := ReasonCodeRec.Code;
+
+        ReturnReason.Init();
+        ReturnReason.Validate(Code, SharedCode);
+        ReturnReason.Validate(Description, 'RS colliding POS reason');
+        ReturnReason.Insert(true);
+
+        JournalShortageAcc := LibraryERM.CreateGLAccountNo();
+        POSShortageAcc := LibraryERM.CreateGLAccountNo();
+
+        RSReasonCodeAccMapp.Init();
+        RSReasonCodeAccMapp.Validate("Reason Type", RSReasonCodeAccMapp."Reason Type"::"Reason Code");
+        RSReasonCodeAccMapp.Validate("Reason Code", SharedCode);
+        RSReasonCodeAccMapp.Validate("Shortage Account", JournalShortageAcc);
+        RSReasonCodeAccMapp.Insert(true);
+
+        RSReasonCodeAccMapp.Init();
+        RSReasonCodeAccMapp.Validate("Reason Type", RSReasonCodeAccMapp."Reason Type"::"Return Reason");
+        RSReasonCodeAccMapp.Validate("Reason Code", SharedCode);
+        RSReasonCodeAccMapp.Validate("Shortage Account", POSShortageAcc);
+        RSReasonCodeAccMapp.Insert(true);
+    end;
+
+    /// <summary>
+    /// Renames a Reason Code, which is what an accountant tidying up a code list does. Business Central
+    /// is documented to carry a rename into every table that relates to the renamed one, so this is here
+    /// to prove the account mapping actually follows rather than being left behind under the old code.
+    /// </summary>
+    internal procedure RenameReasonCode(OldCode: Code[10]; NewCode: Code[10])
+    var
+        ReasonCodeRec: Record "Reason Code";
+    begin
+        ReasonCodeRec.Get(OldCode);
+        ReasonCodeRec.Rename(NewCode);
+    end;
+
+    /// <summary>
+    /// An ordinary posting account carrying an account category on purpose, and deliberately one that
+    /// none of the six RS fields asks for, so the test proves the guards ignore the category rather than
+    /// merely happening to agree with it.
+    /// The category has to be set here rather than left blank: "G/L Account Category Mgt." stamps its own
+    /// category onto a category-less account and modifies the account to save it, and the server rejects
+    /// that write inside the TryFunction the fields are probed through.
+    /// </summary>
+    internal procedure CreatePlainPostingGLAccount() AccountNo: Code[20]
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Account Type", GLAccount."Account Type"::Posting);
+        GLAccount.Validate("Account Category", GLAccount."Account Category"::Liabilities);
+        GLAccount.Modify(true);
+        exit(GLAccount."No.");
+    end;
+
+    internal procedure GLAccountCategoryOf(AccountNo: Code[20]): Text
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        if not GLAccount.Get(AccountNo) then
+            exit('<missing>');
+        exit(Format(GLAccount."Account Category") + '/' + Format(GLAccount."Account Subcategory Entry No."));
+    end;
+
+    internal procedure CreateBlockedGLAccount() AccountNo: Code[20]
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate(Blocked, true);
+        GLAccount.Modify(true);
+        exit(GLAccount."No.");
+    end;
+
+    /// <summary>
+    /// A Heading account - one of the four non-postable account types that a plain
+    /// TableRelation = "G/L Account" happily offers. Nothing can ever post to it.
+    /// </summary>
+    internal procedure CreateHeadingGLAccount() AccountNo: Code[20]
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Account Type", GLAccount."Account Type"::Heading);
+        GLAccount.Modify(true);
+        exit(GLAccount."No.");
+    end;
+
+    /// <summary>
+    /// Names every RS account field that ACCEPTED the given account, so a test asserting "none of them"
+    /// gets told which field is missing its guard rather than just that something is wrong. Covers all
+    /// six: the four on the Inventory Posting Setup extension and the two on the reason code mapping.
+    /// </summary>
+    internal procedure RSAccountFieldsAccepting(LocationCode: Code[10]; ItemNo: Code[20]; ReasonCode: Code[10]; AccountNo: Code[20]) Accepted: Text
+    begin
+        exit(RSAccountFieldsWhere(LocationCode, ItemNo, ReasonCode, AccountNo, true));
+    end;
+
+    /// <summary>
+    /// The mirror of RSAccountFieldsAccepting: names every RS account field that REJECTED the account.
+    /// Used to prove the guards stay out of the way of an ordinary posting account.
+    /// </summary>
+    internal procedure RSAccountFieldsRejecting(LocationCode: Code[10]; ItemNo: Code[20]; ReasonCode: Code[10]; AccountNo: Code[20]) Rejected: Text
+    begin
+        exit(RSAccountFieldsWhere(LocationCode, ItemNo, ReasonCode, AccountNo, false));
+    end;
+
+    local procedure RSAccountFieldsWhere(LocationCode: Code[10]; ItemNo: Code[20]; ReasonCode: Code[10]; AccountNo: Code[20]; WantAccepted: Boolean) Names: Text
+    var
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+        Item: Record Item;
+        SetupRef: RecordRef;
+        MappingRef: RecordRef;
+    begin
+        Item.Get(ItemNo);
+        InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group");
+        SetupRef.GetTable(InventoryPostingSetup);
+
+        CollectField(Names, SetupRef, InventoryPostingSetup.FieldNo("NPR RS Calc. VAT Account"), AccountNo, WantAccepted);
+        CollectField(Names, SetupRef, InventoryPostingSetup.FieldNo("NPR RS Calc. Margin Account"), AccountNo, WantAccepted);
+        CollectField(Names, SetupRef, InventoryPostingSetup.FieldNo("NPR RS Surplus Account"), AccountNo, WantAccepted);
+        CollectField(Names, SetupRef, InventoryPostingSetup.FieldNo("NPR RS Shortage Account"), AccountNo, WantAccepted);
+
+        RSReasonCodeAccMapp.Get(RSReasonCodeAccMapp."Reason Type"::"Reason Code", ReasonCode);
+        MappingRef.GetTable(RSReasonCodeAccMapp);
+
+        CollectField(Names, MappingRef, RSReasonCodeAccMapp.FieldNo("Surplus Account"), AccountNo, WantAccepted);
+        CollectField(Names, MappingRef, RSReasonCodeAccMapp.FieldNo("Shortage Account"), AccountNo, WantAccepted);
+    end;
+
+    local procedure CollectField(var Names: Text; RecRef: RecordRef; FieldNo: Integer; AccountNo: Code[20]; WantAccepted: Boolean)
+    var
+        FldRef: FieldRef;
+    begin
+        if TryValidateAccountField(RecRef, FieldNo, AccountNo) <> WantAccepted then
+            exit;
+
+        FldRef := RecRef.Field(FieldNo);
+        if Names <> '' then
+            Names += ', ';
+        Names += RecRef.Caption() + '.' + FldRef.Caption();
+    end;
+
+    [TryFunction]
+    local procedure TryValidateAccountField(RecRef: RecordRef; FieldNo: Integer; AccountNo: Code[20])
+    var
+        FldRef: FieldRef;
+    begin
+        FldRef := RecRef.Field(FieldNo);
+        FldRef.Validate(AccountNo);
+    end;
+
+    /// <summary>
+    /// Switches Automatic Cost Posting off so a count leaves its value entries unposted to the G/L, which
+    /// is what makes the deferred "Post Inventory Cost to G/L" path reachable from a test. Each test holds
+    /// its own library instance, so InitializeSetup turns it back on for the next one.
+    /// </summary>
+    internal procedure SetAutomaticCostPosting(Enabled: Boolean)
+    var
+        InventorySetup: Record "Inventory Setup";
+    begin
+        InventorySetup.Get();
+        InventorySetup.Validate("Automatic Cost Posting", Enabled);
+        InventorySetup.Modify(true);
+    end;
+
+    /// <summary>
+    /// Drives the per-posting-group leg of "Inventory Posting To G/L" for one item, the way the standard
+    /// "Post Inventory Cost to G/L" report does at its default Posting Method: the buffer is filled entry
+    /// by entry and then flushed once with a blank Value Entry, which is what leaves the posting code with
+    /// no item to resolve accounts from.
+    /// </summary>
+    internal procedure PostInventoryCostPerPostingGroup(ItemNo: Code[20]; DocumentNo: Code[20])
+    var
+        ValueEntry: Record "Value Entry";
+        InvtPostingToGL: Codeunit "Inventory Posting To G/L";
+    begin
+        InvtPostingToGL.Initialize(true);
+        InvtPostingToGL.SetRunOnlyCheck(false, false, false);
+
+        ValueEntry.SetRange("Item No.", ItemNo);
+        if ValueEntry.FindSet() then
+            repeat
+                InvtPostingToGL.BufferInvtPosting(ValueEntry);
+            until ValueEntry.Next() = 0;
+
+        InvtPostingToGL.PostInvtPostBufPerPostGrp(DocumentNo, '');
+    end;
+
+    /// <summary>
+    /// As PostRetailCountAdjustment, but the journal batch carries a reason code - the shape the
+    /// counting report produces, which copies the batch reason onto every line it generates.
+    /// </summary>
+    internal procedure PostRetailCountAdjustmentWithReason(ItemNo: Code[20]; LocationCode: Code[10]; CalculatedQty: Decimal; CountedQty: Decimal; ReasonCode: Code[10]) DocumentNo: Code[20]
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
+        ItemJournalTemplate: Record "Item Journal Template";
+        SourceCodeSetup: Record "Source Code Setup";
+        ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
+    begin
+        LibraryInventory.CreateItemJournalTemplateByType(ItemJournalTemplate, ItemJournalTemplate.Type::"Phys. Inventory");
+        LibraryInventory.CreateItemJournalBatch(ItemJournalBatch, ItemJournalTemplate.Name);
+
+        InitCountAdjustmentLine(ItemJournalLine, ItemNo, LocationCode, CalculatedQty, CountedQty);
+        ItemJournalLine.Validate("Journal Template Name", ItemJournalTemplate.Name);
+        ItemJournalLine.Validate("Journal Batch Name", ItemJournalBatch.Name);
+        ItemJournalLine."Line No." := 10000;
+
+        SourceCodeSetup.Get();
+        ItemJournalLine.Validate("Source Code", SourceCodeSetup."Phys. Inventory Journal");
+        ItemJournalLine."Phys. Inventory" := true;
+        ItemJournalLine."Qty. (Calculated)" := CalculatedQty;
+        ItemJournalLine."Qty. (Phys. Inventory)" := CountedQty;
+        ItemJournalLine.Validate("Reason Code", ReasonCode);
+        ItemJournalLine.Insert(true);
+
+        DocumentNo := ItemJournalLine."Document No.";
+        ItemJnlPostBatch.Run(ItemJournalLine);
+    end;
+
     internal procedure GetItemUnitCost(ItemNo: Code[20]): Decimal
     var
         Item: Record Item;
@@ -1020,6 +1347,39 @@
     begin
         InvtPostingSetup.Get(LocationCode, _InvtPostGrp);
         exit(InvtPostingSetup."Inventory Account");
+    end;
+
+    internal procedure GlobalSurplusAcc(): Code[20]
+    begin
+        exit(_GlobalSurplusAcc);
+    end;
+
+    internal procedure GlobalShortageAcc(): Code[20]
+    begin
+        exit(_GlobalShortageAcc);
+    end;
+
+    internal procedure InvtAdjmtAcc(): Code[20]
+    begin
+        exit(_InvtAdjmtAcc);
+    end;
+
+    /// <summary>
+    /// Points one location + inventory posting group at its own surplus and shortage accounts, so a
+    /// test can prove the per-location override is preferred over the global setup accounts.
+    /// </summary>
+    internal procedure SetLocationCountAccounts(LocationCode: Code[10]; ItemNo: Code[20]; var SurplusAcc: Code[20]; var ShortageAcc: Code[20])
+    var
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+        Item: Record Item;
+    begin
+        Item.Get(ItemNo);
+        InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group");
+        SurplusAcc := LibraryERM.CreateGLAccountNo();
+        ShortageAcc := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."NPR RS Surplus Account" := SurplusAcc;
+        InventoryPostingSetup."NPR RS Shortage Account" := ShortageAcc;
+        InventoryPostingSetup.Modify();
     end;
 
     internal procedure GlobalVATAcc(): Code[20]

@@ -1,4 +1,4 @@
-codeunit 6151490 "NPR RS R Localization Mgt."
+﻿codeunit 6151490 "NPR RS R Localization Mgt."
 {
     Access = Internal;
     Permissions = tabledata "G/L Register" = rimd,
@@ -7,6 +7,7 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     var
         _RSRetLocalizationSetup: Record "NPR RS R Localization Setup";
         _HasRSLocalizationSetup: Boolean;
+        _CountAccountMissingErr: Label 'No %1 is set up on %2, so the counted difference for %3 %4 at location %5 cannot be posted. Fill it in, or set %6 on %7 for that location.', Comment = '%1 = Surplus or Shortage account field caption, %2 = RS Retail Localization Setup table caption, %3 = Item table caption, %4 = Item No., %5 = Location Code, %6 = per-location account field caption, %7 = Inventory Posting Setup table caption';
         _InFilterLbl: Label '%1|%2', Locked = true;
         _NotInFilterLbl: Label '<>%1&<>%2', Locked = true;
 
@@ -232,9 +233,9 @@ codeunit 6151490 "NPR RS R Localization Mgt."
 
     internal procedure GetCalcVATAccount(ItemNo: Code[20]; LocationCode: Code[10]): Code[20]
     var
-        InventoryPostingSetup: Record "Inventory Posting Setup";
         Item: Record Item;
         LocalizationSetup: Record "NPR RS R Localization Setup";
+        InventoryPostingSetup: Record "Inventory Posting Setup";
     begin
         Item.SetLoadFields("Inventory Posting Group");
         Item.Get(ItemNo);
@@ -248,9 +249,9 @@ codeunit 6151490 "NPR RS R Localization Mgt."
 
     internal procedure GetCalcMarginAccount(ItemNo: Code[20]; LocationCode: Code[10]): Code[20]
     var
-        InventoryPostingSetup: Record "Inventory Posting Setup";
         Item: Record Item;
         LocalizationSetup: Record "NPR RS R Localization Setup";
+        InventoryPostingSetup: Record "Inventory Posting Setup";
     begin
         Item.SetLoadFields("Inventory Posting Group");
         Item.Get(ItemNo);
@@ -260,6 +261,74 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         LocalizationSetup.Get();
         LocalizationSetup.TestField("RS Calc. Margin GL Account");
         exit(LocalizationSetup."RS Calc. Margin GL Account");
+    end;
+
+    internal procedure GetSurplusAccount(ItemNo: Code[20]; LocationCode: Code[10]; ReasonType: Enum "NPR RS Count Reason Type"; ReasonCode: Code[10]): Code[20]
+    var
+        Item: Record Item;
+        LocalizationSetup: Record "NPR RS R Localization Setup";
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+    begin
+        if ReasonCode <> '' then
+            if RSReasonCodeAccMapp.Get(ReasonType, ReasonCode) then
+                if RSReasonCodeAccMapp."Surplus Account" <> '' then
+                    exit(RSReasonCodeAccMapp."Surplus Account");
+
+        Item.SetLoadFields("Inventory Posting Group");
+        Item.Get(ItemNo);
+
+        if InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
+            if InventoryPostingSetup."NPR RS Surplus Account" <> '' then
+                exit(InventoryPostingSetup."NPR RS Surplus Account");
+
+        if not LocalizationSetup.Get() or (LocalizationSetup."RS Surplus GL Account" = '') then
+            Error(CountAccountMissingError(
+                StrSubstNo(_CountAccountMissingErr,
+                    LocalizationSetup.FieldCaption("RS Surplus GL Account"), LocalizationSetup.TableCaption(),
+                    Item.TableCaption(), ItemNo, LocationCode,
+                    InventoryPostingSetup.FieldCaption("NPR RS Surplus Account"), InventoryPostingSetup.TableCaption())));
+        exit(LocalizationSetup."RS Surplus GL Account");
+    end;
+
+    internal procedure GetShortageAccount(ItemNo: Code[20]; LocationCode: Code[10]; ReasonType: Enum "NPR RS Count Reason Type"; ReasonCode: Code[10]): Code[20]
+    var
+        Item: Record Item;
+        LocalizationSetup: Record "NPR RS R Localization Setup";
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+    begin
+        if ReasonCode <> '' then
+            if RSReasonCodeAccMapp.Get(ReasonType, ReasonCode) then
+                if RSReasonCodeAccMapp."Shortage Account" <> '' then
+                    exit(RSReasonCodeAccMapp."Shortage Account");
+
+        Item.SetLoadFields("Inventory Posting Group");
+        Item.Get(ItemNo);
+
+        if InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
+            if InventoryPostingSetup."NPR RS Shortage Account" <> '' then
+                exit(InventoryPostingSetup."NPR RS Shortage Account");
+
+        if not LocalizationSetup.Get() or (LocalizationSetup."RS Shortage GL Account" = '') then
+            Error(CountAccountMissingError(
+                StrSubstNo(_CountAccountMissingErr,
+                    LocalizationSetup.FieldCaption("RS Shortage GL Account"), LocalizationSetup.TableCaption(),
+                    Item.TableCaption(), ItemNo, LocationCode,
+                    InventoryPostingSetup.FieldCaption("NPR RS Shortage Account"), InventoryPostingSetup.TableCaption())));
+        exit(LocalizationSetup."RS Shortage GL Account");
+    end;
+
+    local procedure CountAccountMissingError(ErrorMessage: Text) CountAccountMissing: ErrorInfo
+    var
+        LocalizationSetup: Record "NPR RS R Localization Setup";
+        ShowRSRetailSetupLbl: Label 'Open RS Retail Localization Setup';
+    begin
+        CountAccountMissing.Message := ErrorMessage;
+        CountAccountMissing.PageNo := Page::"NPR RS R Localization Setup";
+        if LocalizationSetup.Get() then
+            CountAccountMissing.RecordId := LocalizationSetup.RecordId();
+        CountAccountMissing.AddNavigationAction(ShowRSRetailSetupLbl);
     end;
 
     internal procedure InsertGLItemLedgerRelation(GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; GLEntryNo: Integer; ValueEntryNo: Integer)

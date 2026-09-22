@@ -3,7 +3,8 @@
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
                   tabledata "Value Entry" = rimd,
-                  tabledata "G/L Register" = rm;
+                  tabledata "G/L Register" = rm,
+                  tabledata "NPR RS Reason Code Acc. Mapp." = rd;
 
     #region Eventsubscribers - RS Item Counting Posting Behaviour
 
@@ -40,6 +41,130 @@
             exit;
 
         PostCountCalculationEntries(ItemLedgerEntry);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Inventory Posting To G/L", 'OnBeforePostInvtPostBuf', '', false, false)]
+    local procedure OnBeforePostInvtPostBuf(var GenJournalLine: Record "Gen. Journal Line"; var InvtPostingBuffer: Record "Invt. Posting Buffer"; ValueEntry: Record "Value Entry")
+    begin
+        RouteCountCounterpartAccount(GenJournalLine, InvtPostingBuffer, ValueEntry);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Inventory Posting To G/L", 'OnBeforeCheckInvtPostBuf', '', false, false)]
+    local procedure OnBeforeCheckInvtPostBuf(var GenJournalLine: Record "Gen. Journal Line"; var InvtPostingBuffer: Record "Invt. Posting Buffer"; ValueEntry: Record "Value Entry")
+    begin
+        RouteCountCounterpartAccount(GenJournalLine, InvtPostingBuffer, ValueEntry);
+    end;
+
+    local procedure RouteCountCounterpartAccount(var GenJournalLine: Record "Gen. Journal Line"; InvtPostingBuffer: Record "Invt. Posting Buffer"; ValueEntry: Record "Value Entry")
+    begin
+        CheckPostingMethodSupported(InvtPostingBuffer, ValueEntry);
+
+        if InvtPostingBuffer."Account Type" <> InvtPostingBuffer."Account Type"::"Inventory Adjmt." then
+            exit;
+        if GenJournalLine."Account No." = '' then
+            exit;
+        if not IsRetailCountCounterpart(ValueEntry) then
+            exit;
+
+        GenJournalLine."Account No." := GetCountCounterpartAccount(ValueEntry);
+    end;
+
+    local procedure CheckPostingMethodSupported(InvtPostingBuffer: Record "Invt. Posting Buffer"; ValueEntry: Record "Value Entry")
+    var
+        PostingMethodNotSupportedErr: Label 'Inventory cost cannot be posted to the general ledger per posting group while %1 is enabled, because %2 for a location such as %3 would be summarised without the %4 each entry belongs to. Run %5 again and set %6 to %7.', Comment = '%1 = Enable RS Retail Localization field caption, %2 = Value Entry table caption, %3 = Location Code, %4 = Item table caption, %5 = Post Inventory Cost to G/L report name, %6 = Posting Method option caption, %7 = Per Entry option value';
+        PerEntryPostingMethodLbl: Label 'Per Entry';
+        PostingMethodOptionLbl: Label 'Posting Method';
+        PostInvtCostToGLLbl: Label 'Post Inventory Cost to G/L';
+        RSRLocalizationSetup: Record "NPR RS R Localization Setup";
+        Item: Record Item;
+    begin
+        if ValueEntry."Entry No." <> 0 then
+            exit;
+        if not (InvtPostingBuffer."Account Type" in [InvtPostingBuffer."Account Type"::"Inventory Adjmt."]) and
+           not (InvtPostingBuffer."Bal. Account Type" in [InvtPostingBuffer."Bal. Account Type"::"Inventory Adjmt."])
+        then
+            exit;
+        if not _RSRLocalizationMgt.IsRSLocalizationActive() then
+            exit;
+        if not _RSRLocalizationMgt.IsRetailLocation(InvtPostingBuffer."Location Code") then
+            exit;
+
+        Error(PostingMethodNotSupportedErr,
+            RSRLocalizationSetup.FieldCaption("Enable RS Retail Localization"),
+            ValueEntry.TableCaption(),
+            InvtPostingBuffer."Location Code",
+            Item.TableCaption(),
+            PostInvtCostToGLLbl,
+            PostingMethodOptionLbl,
+            PerEntryPostingMethodLbl);
+    end;
+
+    local procedure IsRetailCountCounterpart(ValueEntry: Record "Value Entry"): Boolean
+    begin
+        if not (ValueEntry."Item Ledger Entry Type" in ["Item Ledger Entry Type"::"Positive Adjmt.", "Item Ledger Entry Type"::"Negative Adjmt."]) then
+            exit(false);
+
+        if ValueEntry."Entry Type" <> ValueEntry."Entry Type"::"Direct Cost" then
+            exit(false);
+
+        if ValueEntry."Item No." = '' then
+            exit(false);
+
+        if not _RSRLocalizationMgt.IsRSLocalizationActive() then
+            exit(false);
+
+        if not _RSRLocalizationMgt.IsRetailLocation(ValueEntry."Location Code") then
+            exit(false);
+
+        exit(not _RSRLocalizationMgt.IsServiceItem(ValueEntry."Item No."));
+    end;
+
+    local procedure GetCountCounterpartAccount(ValueEntry: Record "Value Entry"): Code[20]
+    var
+        ReasonType: Enum "NPR RS Count Reason Type";
+        ReasonCode: Code[10];
+    begin
+        GetAdjustmentReason(ValueEntry, ReasonType, ReasonCode);
+
+        if ValueEntry."Item Ledger Entry Type" = "Item Ledger Entry Type"::"Positive Adjmt." then
+            exit(_RSRLocalizationMgt.GetSurplusAccount(ValueEntry."Item No.", ValueEntry."Location Code", ReasonType, ReasonCode));
+        exit(_RSRLocalizationMgt.GetShortageAccount(ValueEntry."Item No.", ValueEntry."Location Code", ReasonType, ReasonCode));
+    end;
+
+    local procedure GetAdjustmentReason(ValueEntry: Record "Value Entry"; var ReasonType: Enum "NPR RS Count Reason Type"; var ReasonCode: Code[10])
+    begin
+        if ValueEntry."Reason Code" <> '' then begin
+            ReasonType := ReasonType::"Reason Code";
+            ReasonCode := ValueEntry."Reason Code";
+            exit;
+        end;
+
+        ReasonType := ReasonType::"Return Reason";
+        ReasonCode := ValueEntry."Return Reason Code";
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Reason Code", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure ReasonCodeOnAfterDeleteEvent(var Rec: Record "Reason Code"; RunTrigger: Boolean)
+    var
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if RSReasonCodeAccMapp.Get(RSReasonCodeAccMapp."Reason Type"::"Reason Code", Rec.Code) then
+            RSReasonCodeAccMapp.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Return Reason", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure ReturnReasonOnAfterDeleteEvent(var Rec: Record "Return Reason"; RunTrigger: Boolean)
+    var
+        RSReasonCodeAccMapp: Record "NPR RS Reason Code Acc. Mapp.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if RSReasonCodeAccMapp.Get(RSReasonCodeAccMapp."Reason Type"::"Return Reason", Rec.Code) then
+            RSReasonCodeAccMapp.Delete();
     end;
     #endregion
 

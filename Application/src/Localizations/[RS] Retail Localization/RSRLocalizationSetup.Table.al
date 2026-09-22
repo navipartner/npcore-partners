@@ -1,4 +1,4 @@
-table 6060007 "NPR RS R Localization Setup"
+﻿table 6060007 "NPR RS R Localization Setup"
 {
     DataClassification = CustomerContent;
     Access = Internal;
@@ -58,6 +58,36 @@ table 6060007 "NPR RS R Localization Setup"
         {
             Caption = 'RS Ret. Localization Country';
             DataClassification = CustomerContent;
+        }
+        field(10; "RS Surplus GL Account"; Code[20])
+        {
+            Caption = 'Surplus GL Account';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+            ToolTip = 'Specifies the G/L account that a counted inventory surplus is posted to. Can be overridden per location and inventory posting group on the Inventory Posting Setup page.';
+
+            trigger OnValidate()
+            var
+                GLAccountCategory: Record "G/L Account Category";
+                GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
+            begin
+                GLAccountCategoryMgt.CheckGLAccount("RS Surplus GL Account", false, false, GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetOtherIncomeExpense());
+            end;
+        }
+        field(11; "RS Shortage GL Account"; Code[20])
+        {
+            Caption = 'Shortage GL Account';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+            ToolTip = 'Specifies the G/L account that a counted inventory shortage is posted to. Can be overridden per location and inventory posting group on the Inventory Posting Setup page.';
+
+            trigger OnValidate()
+            var
+                GLAccountCategory: Record "G/L Account Category";
+                GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
+            begin
+                GLAccountCategoryMgt.CheckGLAccount("RS Shortage GL Account", false, false, GLAccountCategory."Account Category"::Expense, GLAccountCategoryMgt.GetOtherIncomeExpense());
+            end;
         }
     }
 

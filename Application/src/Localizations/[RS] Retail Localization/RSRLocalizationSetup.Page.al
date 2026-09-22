@@ -1,4 +1,4 @@
-page 6151098 "NPR RS R Localization Setup"
+﻿page 6151098 "NPR RS R Localization Setup"
 {
     Caption = 'RS Retail Localization Setup';
     PageType = Card;
@@ -44,6 +44,14 @@ page 6151098 "NPR RS R Localization Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the account for posting Calculated Margin.';
+                }
+                field("RS Surplus GL Account"; Rec."RS Surplus GL Account")
+                {
+                    ApplicationArea = NPRRetail;
+                }
+                field("RS Shortage GL Account"; Rec."RS Shortage GL Account")
+                {
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(NoSeries)
