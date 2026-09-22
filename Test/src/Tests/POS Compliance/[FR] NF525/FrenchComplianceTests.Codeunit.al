@@ -641,6 +641,53 @@ codeunit 85039 "NPR French Compliance Tests"
         _FRAuditMgt.Destruct();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ZReportPrintsCaptionsUncut()
+    var
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        Base64: Codeunit "Base64 Convert";
+        RetailPrintHandler: Codeunit "NPR Retail Print Handler";
+        PrintJob: Text;
+    begin
+        // [Scenario] Every caption on the french Z-report reaches the paper in full. The caption column is only part of
+        // the 42 character line, so a caption that does not fit it used to be cut off in the middle of a word.
+
+        // [Given] A Z-report checkpoint with amounts on the rows carrying the longest captions
+        InitializeData();
+        POSWorkshiftCheckpoint.Init();
+        POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::ZREPORT;
+        POSWorkshiftCheckpoint."POS Unit No." := _POSUnit."No.";
+        POSWorkshiftCheckpoint."Direct Item Returns (LCY)" := -100;
+        POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)" := -50;
+        POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" := 30;
+        POSWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)" := 25;
+
+        // [When] Printing the report
+        BindSubscription(RetailPrintHandler);
+        Codeunit.Run(Codeunit::"NPR FR Static Z Report", POSWorkshiftCheckpoint);
+        UnbindSubscription(RetailPrintHandler);
+        PrintJob := Base64.FromBase64(RetailPrintHandler.GetPrintJobBase64());
+
+        // [Then] The captions are on the paper whole, and so are their amounts
+        AssertPrinted(PrintJob, POSWorkshiftCheckpoint.FieldCaption("Direct Item Returns (LCY)"));
+        AssertPrinted(PrintJob, POSWorkshiftCheckpoint.FieldCaption("Credit Real. Return Amt. (LCY)"));
+        AssertPrinted(PrintJob, POSWorkshiftCheckpoint.FieldCaption("Credit Unreal. Sale Amt. (LCY)"));
+        AssertPrinted(PrintJob, POSWorkshiftCheckpoint.FieldCaption("Redeemed Credit Voucher (LCY)"));
+        AssertPrinted(PrintJob, '-100.00');
+        AssertPrinted(PrintJob, '-50.00');
+        AssertPrinted(PrintJob, '30.00');
+        AssertPrinted(PrintJob, '25.00');
+        _FRAuditMgt.Destruct();
+    end;
+
+    local procedure AssertPrinted(PrintJob: Text; ExpectedText: Text)
+    var
+        Assert: Codeunit "Assert";
+    begin
+        Assert.IsTrue(StrPos(PrintJob, ExpectedText) > 0, StrSubstNo('Z-report must print ''%1'' without cutting it off', ExpectedText));
+    end;
+
     local procedure DoItemSale(): Integer
     var
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";

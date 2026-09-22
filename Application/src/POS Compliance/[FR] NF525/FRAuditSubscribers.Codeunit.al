@@ -61,15 +61,10 @@ codeunit 6184890 "NPR FR Audit Subscribers"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Aux: Event Publishers", 'OnSalesReceiptFooter', '', true, true)]
     local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text; LinePrintMgt: Codeunit "NPR RP Line Print Mgt.")
     var
-        AuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
-        InStream: InStream;
-        MissingSignatureErr: Label '%1 %2 is missing a digital signature';
-        PrintSignature: Text;
-        Signature: Text;
-        SignatureChunk: Text;
+        FRStaticSalesReceipt: Codeunit "NPR FR Static Sales Receipt";
     begin
         POSEntry.SetRange("Document No.", ReceiptNo);
         if not POSEntry.FindFirst() then
@@ -83,29 +78,7 @@ codeunit 6184890 "NPR FR Audit Subscribers"
         LinePrintMgt.SetBold(TemplateLine.Bold);
         LinePrintMgt.SetUnderLine(TemplateLine.Underline);
 
-        AuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
-        AuditLog.SetRange("Action Type", AuditLog."Action Type"::RECEIPT_COPY);
-        AuditLog.SetAutoCalcFields("Electronic Signature");
-        if not AuditLog.FindLast() then begin
-            AuditLog.SetRange("Action Type", AuditLog."Action Type"::DIRECT_SALE_END);
-            if not AuditLog.FindLast() then
-                exit;
-        end;
-
-        if not AuditLog."Electronic Signature".HasValue() then
-            Error(MissingSignatureErr, POSEntry.TableCaption, POSEntry."Entry No.");
-
-        AuditLog."Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
-        while (not InStream.EOS) do begin
-            InStream.ReadText(SignatureChunk);
-            Signature += SignatureChunk;
-        end;
-
-        LinePrintMgt.AddTextField(1, TemplateLine.Align, Format(AuditLog."Log Timestamp", 0, 3));
-        PrintSignature := CopyStr(Signature, 3, 1) + CopyStr(Signature, 7, 1) + CopyStr(Signature, 13, 1) + CopyStr(Signature, 19, 1);
-        LinePrintMgt.AddTextField(1, TemplateLine.Align, PrintSignature);
-        LinePrintMgt.AddTextField(1, TemplateLine.Align, 'NF525/0274-1 (B)');
-        LinePrintMgt.AddTextField(1, TemplateLine.Align, FRAuditMgt.GetFiscalVersion());
+        FRStaticSalesReceipt.AddNF525Footer(POSEntry, LinePrintMgt, TemplateLine.Align);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnValidateLogRecords', '', true, true)]
