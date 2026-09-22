@@ -15,19 +15,37 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
 
     internal procedure GetOrderDetails(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var ShopifyResponse: JsonToken)
     var
+        FulfilmentsArr: JsonArray;
+        LineItemsArr: JsonArray;
+        ShippingLinesArr: JsonArray;
+        HeaderResponse: JsonObject;
         OutStr: OutStream;
         JsonText: Text;
+        OrderGID: Text[100];
+        Replayed: Boolean;
         WrongJSONFormatErr: Label 'Unable to serialize Shopify JSON response.';
     begin
         if SpfyEventLogEntry."Document Type" = SpfyEventLogEntry."Document Type"::"Return Order" then begin
             if not TryGetReturnDetails(SpfyEventLogEntry, ShopifyResponse) then
                 Error(GetLastErrorText());
-        end else
-            if not TryGetOrderDetails(SpfyEventLogEntry, ShopifyResponse) then
-                Error(GetLastErrorText());
+        end else begin
+            OrderGID := 'gid://shopify/Order/' + SpfyEventLogEntry."Shopify ID";
+
+            if not _HasExternalCache then
+                _FulfillmentCache.ClearCache();
+            Replayed := TryReplayOrderData(SpfyEventLogEntry, ShopifyResponse);
+            if not Replayed then begin
+                if not TryGetOrderDetails(OrderGID, SpfyEventLogEntry, LineItemsArr, HeaderResponse, FulfilmentsArr, ShippingLinesArr, _FulfillmentCache) then
+                    Error(GetLastErrorText());
+
+                ShopifyResponse := BuildUnifiedOrderJson(HeaderResponse, LineItemsArr, FulfilmentsArr, ShippingLinesArr);
+            end;
+        end;
 
         if ShouldSkipEcommerceDocumentImport(SpfyEventLogEntry, ShopifyResponse) then
             Error(GetLastErrorText());
+        if Replayed then
+            exit;
         SpfyEventLogEntry.CalcFields("Order Data");
         if SpfyEventLogEntry."Order Data".HasValue() then
             Clear(SpfyEventLogEntry."Order Data");
@@ -41,6 +59,64 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     internal procedure GetResponse() ShopifyResponse: JsonToken;
     begin
         exit(_ShopifyResponse);
+    end;
+
+    internal procedure SetFulfillmentCache(var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
+    begin
+        _FulfillmentCache := FulfillmentCache;
+        _HasExternalCache := true;
+    end;
+
+    internal procedure GetFulfillmentCache(var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
+    begin
+        FulfillmentCache := _FulfillmentCache;
+    end;
+
+    internal procedure CacheFulfillment(FulfilmentResponseArr: JsonArray; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache"): Boolean
+    begin
+        ClearLastError();
+        exit(TryCacheFulfillment(FulfilmentResponseArr, FulfillmentCache));
+    end;
+
+    internal procedure BuildFulfillmentCacheFromOrderJson(OrderResponse: JsonToken; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache") HasGiftCard: Boolean
+    var
+        LineItemsToken: JsonToken;
+        FulfillmentsToken: JsonToken;
+    begin
+        FulfillmentCache.ClearCache();
+        if OrderResponse.SelectToken('data.order.fulfillments', FulfillmentsToken) and FulfillmentsToken.IsArray() then
+            if not TryCacheFulfillment(FulfillmentsToken.AsArray(), FulfillmentCache) then
+                Error(GetLastErrorText());
+        if OrderResponse.SelectToken('data.order.lineItems', LineItemsToken) and LineItemsToken.IsArray() then
+            HasGiftCard := FindAndCacheGiftCards(LineItemsToken.AsArray(), FulfillmentCache);
+    end;
+
+    local procedure TryReplayOrderData(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var ShopifyResponse: JsonToken): Boolean
+    var
+        InStr: InStream;
+        OrderObject: JsonObject;
+    begin
+        SpfyEventLogEntry.CalcFields("Order Data");
+        if not SpfyEventLogEntry."Order Data".HasValue() then
+            exit(false);
+
+        SpfyEventLogEntry."Order Data".CreateInStream(InStr, TextEncoding::UTF8);
+        if not ShopifyResponse.ReadFrom(InStr) then
+            exit(false);
+
+        ClearLastError();
+        if BuildFulfillmentCacheFromOrderJson(ShopifyResponse, _FulfillmentCache) then begin
+            _FulfillmentCache.ClearCache();
+            exit(false);
+        end;
+
+        OrderObject := ShopifyResponse.AsObject();
+        if HandleAnonymizedCustomerOrder(OrderObject, SpfyEventLogEntry) then
+            Error(GetLastErrorText());
+        if not ValidateTransactions(OrderObject) then
+            Error(GetLastErrorText());
+
+        exit(true);
     end;
 
     local procedure BuildUnifiedOrderJson(HeaderResponse: JsonObject; LineItemsArr: JsonArray; FulfilmentsArr: JsonArray; ShippingLinesArr: JsonArray): JsonToken
@@ -86,7 +162,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     local procedure GetReturn(ReturnGID: Text; ShopifyStoreCode: Code[20]; var ReturnResponse: JsonToken): Boolean
     var
         NcTask: Record "NPR Nc Task";
-        ReturnRequest: Label 'query GetReturn($OrderId: ID!) { return(id: $OrderId) { id name status order { id name number email phone note sourceName taxesIncluded currencyCode presentmentCurrencyCode customer { id firstName lastName defaultEmailAddress { emailAddress } defaultPhoneNumber { phoneNumber } defaultAddress { phone } } billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 phone } } refunds(first: 50) { pageInfo { hasNextPage } edges { node { id totalRefundedSet { presentmentMoney { amount } shopMoney { amount currencyCode } } refundLineItems(first: 100) { pageInfo { hasNextPage } edges { node { quantity subtotalSet { presentmentMoney { amount } } totalTaxSet { presentmentMoney { amount } } lineItem { id sku name title variantTitle taxLines { ratePercentage priceSet { presentmentMoney { amount } } } } } } } transactions(first: 100) { pageInfo { hasNextPage } edges { node { id kind status gateway processedAt createdAt authorizationExpiresAt amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentId paymentDetails { ... on CardPaymentDetails { company expirationMonth expirationYear name number paymentMethodName } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } } } } } } }', Locked = true;
+        ReturnRequest: Label 'query GetReturn($OrderId: ID!) { return(id: $OrderId) { id name status order { id name number email phone note sourceName taxesIncluded currencyCode presentmentCurrencyCode customer { id firstName lastName defaultEmailAddress { emailAddress } defaultPhoneNumber { phoneNumber } defaultAddress { phone } } billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 phone } } refunds(first: 50) { pageInfo { hasNextPage } edges { node { id totalRefundedSet { presentmentMoney { amount } shopMoney { amount currencyCode } } refundLineItems(first: 100) { pageInfo { hasNextPage } edges { node { quantity subtotalSet { presentmentMoney { amount } } totalTaxSet { presentmentMoney { amount } } lineItem { id sku name title variantTitle isGiftCard taxLines { ratePercentage priceSet { presentmentMoney { amount } } } } } } } transactions(first: 100) { pageInfo { hasNextPage } edges { node { id kind status gateway processedAt createdAt authorizationExpiresAt amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentId paymentDetails { ... on CardPaymentDetails { company expirationMonth expirationYear name number paymentMethodName } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } } } } } } }', Locked = true;
     begin
         ClearLastError();
         Clear(NcTask);
@@ -225,20 +301,13 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         end;
     end;
 
-    local procedure TryGetOrderDetails(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var ShopifyResponse: JsonToken): Boolean
+    local procedure TryGetOrderDetails(OrderGID: Text[100]; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var LineItemsArr: JsonArray; var HeaderResponse: JsonObject; var FulfilmentsArr: JsonArray; var ShippingLinesArr: JsonArray; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache"): Boolean
     var
-        TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
-        LineItemsArr: JsonArray;
-        HeaderResponse: JsonObject;
-        FulfilmentsArr: JsonArray;
-        ShippingLinesArr: JsonArray;
-        OrderGID: Text;
-        HeaderRequest: Label 'query GetHeader($OrderId: ID!) { order(id: $OrderId) { id taxesIncluded displayFinancialStatus createdAt reservationToken: metafield(namespace: "np-ticket", key: "reservation_token") { value } lineItemsData: metafield(namespace: "np-ticket", key: "line_items_data") { value } email phone note sourceName customer{id firstName lastName defaultEmailAddress{emailAddress} defaultPhoneNumber{phoneNumber} defaultAddress{phone}} billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 phone } name number note sourceName createdAt closedAt cancelledAt totalPriceSet { presentmentMoney { amount } shopMoney { amount } } currencyCode presentmentCurrencyCode capturable transactions(first: 250) { id kind status amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } authorizationCode authorizationExpiresAt processedAt createdAt gateway multiCapturable parentTransaction { id kind } paymentId processedAt status totalUnsettledSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentDetails { ... on CardPaymentDetails { avsResultCode bin company expirationMonth expirationYear name number paymentMethodName wallet } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } }', Locked = true;
+        TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
+        HeaderRequest: Label 'query GetHeader($OrderId: ID!) { order(id: $OrderId) { id taxesIncluded displayFinancialStatus createdAt reservationToken: metafield(namespace: "np-ticket", key: "reservation_token") { value } lineItemsData: metafield(namespace: "np-ticket", key: "line_items_data") { value } email phone note sourceName customer{id firstName lastName defaultEmailAddress{emailAddress} defaultPhoneNumber{phoneNumber} defaultAddress{phone}} billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 phone } name number note sourceName createdAt closedAt cancelledAt totalPriceSet { presentmentMoney { amount } shopMoney { amount } } currentTotalPriceSet { presentmentMoney { amount } shopMoney { amount } } currencyCode presentmentCurrencyCode capturable transactions(first: 250) { id kind status amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } authorizationCode authorizationExpiresAt processedAt createdAt gateway multiCapturable parentTransaction { id kind } paymentId processedAt status totalUnsettledSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } paymentDetails { ... on CardPaymentDetails { avsResultCode bin company expirationMonth expirationYear name number paymentMethodName wallet } ... on LocalPaymentMethodsPaymentDetails { paymentDescriptor paymentMethodName } } receiptJson } } }', Locked = true;
         ItemLinesRequest: Label 'query GetOrderLines($OrderId: ID!, $afterCursor:String) { order(id: $OrderId) { lineItems(after:$afterCursor, first: 50) { pageInfo { hasNextPage endCursor } edges { node { id sku  taxLines{ratePercentage priceSet{presentmentMoney{amount}}} originalUnitPriceSet { presentmentMoney { amount } shopMoney { amount } } customAttributes {key value} isGiftCard product {id productType} name title variant{price} quantity variantTitle unfulfilledQuantity currentQuantity nonFulfillableQuantity discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } } } } } }', Locked = true;
         ShippingLinesRequest: Label 'query GetShippingLines($OrderId: ID!, $afterCursor:String) { order(id: $OrderId) { shippingLines(first: 10, after:$afterCursor) { pageInfo { endCursor hasNextPage } edges { node { id code title taxLines{ratePercentage priceSet{presentmentMoney{amount}}} discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } code originalPriceSet { presentmentMoney { amount } } } } } } }', Locked = true;
     begin
-        OrderGID := 'gid://shopify/Order/' + SpfyEventLogEntry."Shopify ID";
-
         if not TryGetOrderLines(OrderGID, SpfyEventLogEntry."Store Code", 'lineItems', ItemLinesRequest, LineItemsArr) then
             exit(false);
 
@@ -251,40 +320,35 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         if not ValidateTransactions(HeaderResponse) then
             exit(false);
 
-        if not TryGetAndCacheFulfilments(OrderGID, SpfyEventLogEntry, FulfilmentsArr) then
+        if not TryGetAndCacheFulfilments(OrderGID, SpfyEventLogEntry, FulfilmentsArr, FulfillmentCache) then
             exit(false);
 
-        if FindAndCacheGiftCards(LineItemsArr) then
-            if not CheckIfGiftCardsReady(SpfyEventLogEntry."Document Status", TempTempSpfyFulfillmentBuffer) then
+        if FindAndCacheGiftCards(LineItemsArr, FulfillmentCache) then
+            if not CheckIfGiftCardsReady(SpfyEventLogEntry."Document Status", TempSpfyFulfillmentBuffer, FulfillmentCache) then
                 PostponeProcessing(SpfyEventLogEntry)
             else
-                if not TryGetOrderGiftCards(OrderGID, SpfyEventLogEntry."Store Code", TempTempSpfyFulfillmentBuffer) then
+                if not TryGetOrderGiftCards(OrderGID, SpfyEventLogEntry."Store Code", TempSpfyFulfillmentBuffer, FulfillmentCache) then
                     exit(false);
 
-        if not TryGetOrderLines(OrderGID, SpfyEventLogEntry."Store Code", 'shippingLines', ShippingLinesRequest, ShippingLinesArr) then
-            exit(false);
-
-        ShopifyResponse := BuildUnifiedOrderJson(HeaderResponse, LineItemsArr, FulfilmentsArr, ShippingLinesArr);
-        exit(true);
+        exit(TryGetOrderLines(OrderGID, SpfyEventLogEntry."Store Code", 'shippingLines', ShippingLinesRequest, ShippingLinesArr));
     end;
 
     local procedure HandleAnonymizedCustomerOrder(HeaderResponse: JsonObject; SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
     var
         EcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
         OrderToken: JsonToken;
-        ContinueProcess: Boolean;
         AnonymizedCustomerOrderErr: Label 'The order is for an anonymous customer. If the order has not yet been posted, the system has deleted it. Further processing has been skipped.';
     begin
         HeaderResponse.SelectToken('data.order', OrderToken);
         if not OrderMgt.IsAnonymizedCustomerOrder(JsonHelper.GetJText(OrderToken, 'customer.firstName', false), JsonHelper.GetJText(OrderToken, 'customer.lastName', false)) then
             exit(false);
         EcomSalesDocImport.DeleteDocument(SpfyEventLogEntry);
-        ContinueProcess := RaiseError(AnonymizedCustomerOrderErr);
-        exit(not ContinueProcess);
+        if not SetLastErrorMessage(AnonymizedCustomerOrderErr) then;
+        exit(true);
     end;
 
     [TryFunction]
-    local procedure RaiseError(Input: Text)
+    local procedure SetLastErrorMessage(Input: Text)
     begin
         Error(input);
     end;
@@ -298,55 +362,51 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         SpfyEventLogEntry."Last Error Message" := CopyStr(GetLastErrorText(), 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
     end;
 
-    local procedure TryGetAndCacheFulfilments(OrderGID: Text; SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var Result: JsonArray): Boolean
+    local procedure TryGetAndCacheFulfilments(OrderGID: Text[100]; SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var Result: JsonArray; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache"): Boolean
     begin
         //don't check for canceled orders
         Clear(Result);
+        ClearLastError();
         if SpfyEventLogEntry."Document Status" <> SpfyEventLogEntry."Document Status"::Cancelled then begin
             if not TryGetOrderFulfilments(OrderGID, SpfyEventLogEntry."Store Code", Result) then
                 exit(false);
-            exit(CacheFulfillment(Result));
+            exit(TryCacheFulfillment(Result, FulfillmentCache));
         end;
         exit(true);
     end;
 
-    local procedure TryGetOrderGiftCards(OrderGID: Text; StoreCode: Code[20]; var TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary): Boolean
+    [TryFunction]
+    local procedure TryGetOrderGiftCards(OrderGID: Text[100]; StoreCode: Code[20]; var TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     begin
         ClearLastError();
-        exit(TryProcessGiftCardsForOrder(OrderGID, StoreCode, TempTempSpfyFulfillmentBuffer));
+        ProcessGiftCardLines(TempTempSpfyFulfillmentBuffer, OrderGID, StoreCode, FulfillmentCache);
     end;
 
     [TryFunction]
-    local procedure TryProcessGiftCardsForOrder(OrderGID: Text; StoreCode: Code[20]; var TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary)
-    begin
-        ProcessGiftCardLines(TempTempSpfyFulfillmentBuffer, OrderGID, StoreCode);
-    end;
-
-    [TryFunction]
-    local procedure CheckIfGiftCardsReady(OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; var TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary)
+    local procedure CheckIfGiftCardsReady(OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; var TempTempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     var
         NoGiftCardsErr: Label 'No gift cards found in the Fulfillments';
         VouchersNotReadyErr: Label 'The order cannot be processed yet because not all gift cards are fulfilled in Shopify.';
     begin
         ClearLastError();
-        if not SpfyFulfillmentCache.GetOrderLines(TempTempSpfyFulfillmentBuffer, true) then
+        if not FulfillmentCache.GetOrderLines(TempTempSpfyFulfillmentBuffer, true) then
             Error(NoGiftCardsErr);
 
         //in closed they are All fulfilled
         if OrderStatus = OrderStatus::Open then
-            if not SpfyFulfillmentCache.AllFulfilled() then
+            if not FulfillmentCache.AllFulfilled() then
                 Error(VouchersNotReadyErr);
     end;
 
-    local procedure ProcessGiftCardLines(var TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary; OrderGID: Text; StoreCode: Code[20])
+    local procedure ProcessGiftCardLines(var TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary; OrderGID: Text[100]; StoreCode: Code[20]; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     begin
         if TempSpfyFulfillmentBuffer.FindSet() then
             repeat
-                GetGiftCard(TempSpfyFulfillmentBuffer."Order Line ID", TempSpfyFulfillmentBuffer."Initial Amount", TempSpfyFulfillmentBuffer."Updated At", OrderGID, StoreCode, TempSpfyFulfillmentBuffer.Email);
+                GetGiftCard(TempSpfyFulfillmentBuffer."Order Line ID", TempSpfyFulfillmentBuffer."Initial Amount", TempSpfyFulfillmentBuffer."Created At", OrderGID, StoreCode, TempSpfyFulfillmentBuffer.Email, FulfillmentCache);
             until TempSpfyFulfillmentBuffer.Next() = 0;
     end;
 
-    local procedure GetGiftCard(GCOrderLineId: Text[30]; InitialAmt: Decimal; CreatedAt: DateTime; OrderGID: Text; StoreCode: Code[20]; CustEmail: Text)
+    local procedure GetGiftCard(GCOrderLineId: Text[30]; InitialAmt: Decimal; CreatedAt: DateTime; OrderGID: Text[100]; StoreCode: Code[20]; CustEmail: Text; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     var
         GiftCardsArr: JsonArray;
         Cursor: Text;
@@ -354,6 +414,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         FetchedAll: Boolean;
         NoGiftCardErr: Label 'No gift cards found for order %1', Comment = '%1=Shopify Order Id';
     begin
+        ClearLastError();
         SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         repeat
             Clear(GiftCardsArr);
@@ -361,11 +422,11 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
                 Error(GetLastErrorText());
             if GiftCardsArr.Count = 0 then
                 Error(NoGiftCardErr, GetNumericId(OrderGID));
-            FetchedAll := CacheGiftCardDetailsForOrder(GCOrderLineId, OrderGID, GiftCardsArr);
+            FetchedAll := CacheGiftCardDetailsForOrder(GCOrderLineId, OrderGID, GiftCardsArr, FulfillmentCache);
         until (not HasNext) or FetchedAll;
     end;
 
-    local procedure CacheGiftCardDetailsForOrder(GCOrderLineId: Text[30]; OrderGID: Text; GiftCardsArr: JsonArray): Boolean
+    local procedure CacheGiftCardDetailsForOrder(GCOrderLineId: Text[30]; OrderGID: Text[100]; GiftCardsArr: JsonArray; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache"): Boolean
     var
         GiftNode: JsonToken;
         ExpectedCount: Integer;
@@ -374,12 +435,12 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         LastCharacters: Text;
         NoMatchingGiftCardsErr: Label 'Unable to find the expected gift card(s) for Shopify Order Line %1 (Shopify Order %2).', Comment = '%1 = GCOrderLineId; %2 = OrderGID';
     begin
-        ExpectedCount := SpfyFulfillmentCache.GetExpectedGiftCardCount(GCOrderLineId);
+        ExpectedCount := FulfillmentCache.GetExpectedGiftCardCount(GCOrderLineId);
         foreach GiftNode in GiftCardsArr do
             if (JsonHelper.GetJText(GiftNode, 'node.order.id', false) = OrderGID) then begin
                 GiftCardGID := JsonHelper.GetJText(GiftNode, 'node.id', true);
                 LastCharacters := JsonHelper.GetJText(GiftNode, 'node.lastCharacters', true);
-                SpfyFulfillmentCache.AddGiftCardDetails(GCOrderLineId, GiftCardGID, LastCharacters);
+                FulfillmentCache.AddGiftCardDetails(GCOrderLineId, GiftCardGID, LastCharacters);
                 FoundCount += 1;
                 if FoundCount >= ExpectedCount then
                     exit(true);
@@ -398,7 +459,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     begin
         HasNext := false;
         ClearLastError();
-        DateTimeSingleQ := SingleQuotes(Format(CreatedAt, 0, 9));
+        DateTimeSingleQ := SingleQuotes(Format(GiftCardSearchLowerBound(CreatedAt), 0, 9));
         CreateRequestForList(NcTask, Cursor, StoreCode, GiftCardRequest, StrSubstNo('created_at:>=%1 AND initial_value:%2 AND %3', DateTimeSingleQ, InitialAmt, CustEmail));
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, Response) then
             Error(GetLastErrorText());
@@ -408,20 +469,14 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         GiftCardsArr := ResponseBody.AsArray();
     end;
 
-    local procedure TryGetOrderHeader(OrderGID: Text; ShopifyStoreCode: Code[20]; HeaderRequest: Text; var Result: JsonObject): Boolean
-    begin
-        ClearLastError();
-        Clear(Result);
-        exit(TryGetHeader(OrderGID, ShopifyStoreCode, HeaderRequest, Result));
-    end;
-
     [TryFunction]
-    local procedure TryGetHeader(OrderGID: Text; ShopifyStoreCode: Code[20]; HeaderRequest: Text; var Result: JsonObject)
+    local procedure TryGetOrderHeader(OrderGID: Text[100]; ShopifyStoreCode: Code[20]; HeaderRequest: Text; var Result: JsonObject)
     var
         NcTask: Record "NPR Nc Task";
         HeaderResponse: JsonToken;
     begin
-        Clear(NcTask);
+        ClearLastError();
+        Clear(Result);
         SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, '', ShopifyStoreCode, HeaderRequest, OrderGID, false);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, HeaderResponse) then
             Error(GetLastErrorText());
@@ -454,7 +509,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     end;
 
     [TryFunction]
-    local procedure TryGetLines(OrderGID: Text; StoreCode: Code[20]; PropertyName: Text; RequestText: Text; var FullResults: JsonArray)
+    local procedure TryGetOrderLines(OrderGID: Text[100]; StoreCode: Code[20]; PropertyName: Text; RequestText: Text; var FullResults: JsonArray)
     var
         NcTask: Record "NPR Nc Task";
         Results: JsonArray;
@@ -463,9 +518,9 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         Cursor: Text;
         HasNext: Boolean;
     begin
-        SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         ClearLastError();
-        Clear(Results);
+        Clear(FullResults);
+        SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         repeat
             Clear(NcTask);
             SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, StoreCode, RequestText, OrderGID, true);
@@ -478,54 +533,121 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
             FullResults.Add(ResultToken);
     end;
 
-
-    local procedure TryGetOrderFulfilments(OrderGID: Text; ShopifyStoreCode: Code[20]; var FullResults: JsonArray): Boolean
-    var
-        FulfilmentRequest: Label 'query GetFulfilments($OrderId: ID!, $afterCursor: String) { order(id: $OrderId) { fulfillments { createdAt order{id email} updatedAt displayStatus status id fulfillmentLineItems(first: 10, after: $afterCursor) { edges { cursor node { id quantity lineItem { id currentQuantity variant{price} unfulfilledQuantity nonFulfillableQuantity isGiftCard originalUnitPriceSet{presentmentMoney{amount}}} } } pageInfo { endCursor hasNextPage } } } } }', Locked = true;
-    begin
-        ClearLastError();
-        exit(TryGetFulfilments(OrderGID, ShopifyStoreCode, FulfilmentRequest, FullResults));
-    end;
-
     [TryFunction]
-    local procedure TryGetFulfilments(OrderGID: Text; ShopifyStoreCode: Code[20]; RequestText: Text; var FullResults: JsonArray)
+    local procedure TryGetOrderFulfilments(OrderGID: Text[100]; ShopifyStoreCode: Code[20]; var FullResults: JsonArray)
     var
         NcTask: Record "NPR Nc Task";
-        HasNext: Boolean;
+        FulfillmentByIds: Dictionary of [Text, JsonObject];
         FulfilmentArr: JsonArray;
         Results: JsonArray;
-        FulfillmentLineItemsJO: JsonObject;
         FulfilmentJToken: JsonToken;
         ResponseBody: JsonToken;
-        Cursor: Text;
+        FulfillmentIdGID: Text;
+        LinesArr: JsonArray;
+        FulfillmentObj: JsonObject;
+        FulfilmentRequest: Label 'query GetFulfilments($OrderId: ID!) { order(id: $OrderId) { fulfillmentsCount { count } fulfillments { createdAt order{id email} updatedAt displayStatus status id } } }', Locked = true;
+        MissingFulfilmentsErr: Label 'Shopify did not return the fulfillments of order %1, so the quantities to ship cannot be determined.', Comment = '%1 = Shopify order ID';
     begin
         Clear(FullResults);
         Clear(NcTask);
-        SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, ShopifyStoreCode, RequestText, OrderGID, true);
+        Clear(FulfilmentArr);
+        Clear(FulfillmentByIds);
+        ClearLastError();
+        SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, '', ShopifyStoreCode, FulfilmentRequest, OrderGID, false);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ResponseBody) then
             Error(GetLastErrorText());
 
-        ResponseBody.SelectToken('data.order.fulfillments', FulfilmentJToken);
+        // "order(id:)" is nullable, so an absent "fulfillments" node is not the same thing as an empty one: the order
+        // may genuinely have none ("fulfillments": [] with count 0), or the GID may not have resolved at all
+        // ("order": null), which still arrives as HTTP 200. The legacy importer cannot hit the second case, because
+        // there the fulfillments come inside the order payload itself.
+        if not ResponseBody.SelectToken('data.order.fulfillments', FulfilmentJToken) then
+            Error(MissingFulfilmentsErr, OrderGID);
+        if not FulfilmentJToken.IsArray() then
+            Error(MissingFulfilmentsErr, OrderGID);
         FulfilmentArr := FulfilmentJToken.AsArray();
-
+        // "fulfillments" is a plain list with a "first" truncation argument, not a paginated connection, so there is no
+        // hasNextPage to detect a short result. Compare against the order's own count instead - and require the count,
+        // allowing only zero, because that is what separates the two cases above. A silenced guard leaves an empty
+        // cache, which makes every line look unfulfilled, zeroes the quantities to post, and then deletes the document
+        // anyway when "Delete After Final Posting" is on.
+        CheckFulfilmentsNotTruncated(ResponseBody, FulfilmentArr, OrderGID);
+        if FulfilmentArr.Count() = 0 then
+            exit;
         foreach FulfilmentJToken in FulfilmentArr do begin
             Clear(Results);
-            Clear(FulfillmentLineItemsJO);
-            SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
-            AddFulfilmentInfo(FulfillmentLineItemsJO, FulfilmentJToken);
-            repeat
-                ClearLastError();
-                Clear(NcTask);
-                SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, ShopifyStoreCode, RequestText, OrderGID, true);
-                if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ResponseBody) then
-                    Error(GetLastErrorText());
-                if not Parse(FulfilmentJToken, 'fulfillmentLineItems', Results, HasNext, Cursor, false) then
-                    Error(GetLastErrorText());
-            until not HasNext;
-
-            FulfillmentLineItemsJO.Add('fulfillmentLineItems', Results);
-            FullResults.Add(FulfillmentLineItemsJO);
+            Clear(FulfillmentObj);
+            AddFulfilmentInfo(FulfillmentObj, FulfilmentJToken);
+            FulfillmentIdGID := JsonHelper.GetJText(FulfilmentJToken, 'id', true);
+            if not FulfillmentByIds.ContainsKey(FulfillmentIdGID) then
+                FulfillmentByIds.Add(FulfillmentIdGID, FulfillmentObj);
         end;
+        foreach FulfillmentIdGID in FulfillmentByIds.Keys() do begin
+            Clear(LinesArr);
+            FulfillmentByIds.Get(FulfillmentIdGID, FulfillmentObj);
+            // The line items are paged with one request per fulfillment, so only fetch them where they can matter:
+            // TryCacheFulfillment contributes fulfilled quantities from successful fulfillments only, and ignores the
+            // rest. Paging a cancelled fulfillment costs a request per fulfillment on every attempt and changes nothing.
+            if FulfilmentSucceeded(FulfillmentObj) then
+                GetFulfillmentLineItemsByFulfillmentId(ShopifyStoreCode, FulfillmentIdGID, LinesArr);
+            FulfillmentObj.Add('fulfillmentLineItems', LinesArr);
+            FulfillmentByIds.Set(FulfillmentIdGID, FulfillmentObj);
+        end;
+
+        foreach FulfillmentIdGID in FulfillmentByIds.Keys() do begin
+            FulfillmentByIds.Get(FulfillmentIdGID, FulfillmentObj);
+            FullResults.Add(FulfillmentObj);
+        end;
+    end;
+
+    internal procedure CheckFulfilmentsNotTruncated(ResponseBody: JsonToken; FulfilmentArr: JsonArray; OrderGID: Text)
+    var
+        ExpectedFulfilmentCount: Integer;
+        TruncatedFulfilmentsErr: Label 'Shopify returned only %1 of the %2 fulfillments registered on the order, so the quantities to ship cannot be determined reliably.', Comment = '%1 = number of fulfillments received, %2 = number of fulfillments the order has in Shopify';
+    begin
+        ExpectedFulfilmentCount := JsonHelper.GetJInteger(ResponseBody, 'data.order.fulfillmentsCount.count', true, true);
+        if FulfilmentArr.Count() < ExpectedFulfilmentCount then
+            Error(TruncatedFulfilmentsErr, FulfilmentArr.Count(), ExpectedFulfilmentCount);
+    end;
+
+    /// <summary>
+    /// Reads the status off a fulfillment node the way TryCacheFulfillment does, so the two never disagree about which
+    /// fulfillments count.
+    /// </summary>
+    internal procedure FulfilmentSucceeded(FulfillmentObj: JsonObject): Boolean
+    begin
+        exit(JsonHelper.GetJText(FulfillmentObj.AsToken(), 'status', false).ToLower() = 'success');
+    end;
+
+    local procedure GetFulfillmentLineItemsByFulfillmentId(ShopifyStoreCode: Code[20]; FulfillmentGID: Text; var OutLineItemsEdges: JsonArray)
+    var
+        NcTask: Record "NPR Nc Task";
+        ResponseBody: JsonToken;
+        Cursor: Text;
+        HasNext: Boolean;
+        Results: JsonArray;
+        LinesRequest: Label 'query GetFulfilmentLines($OrderId: ID!, $afterCursor: String) { fulfillment(id: $OrderId) { fulfillmentLineItems(first: 50, after: $afterCursor) { pageInfo { hasNextPage endCursor } edges { node { id quantity lineItem { id currentQuantity variant{price} unfulfilledQuantity nonFulfillableQuantity isGiftCard originalUnitPriceSet{presentmentMoney{amount}} } } } } } }', Locked = true;
+    begin
+        Clear(OutLineItemsEdges);
+        SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
+        repeat
+            Clear(NcTask);
+            SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, ShopifyStoreCode, LinesRequest, FulfillmentGID, true);
+            if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ResponseBody) then
+                Error(GetLastErrorText());
+            Clear(Results);
+            if not Parse(ResponseBody, 'data.fulfillment.fulfillmentLineItems', Results, HasNext, Cursor, false) then
+                Error(GetLastErrorText());
+            AppendJsonArray(OutLineItemsEdges, Results);
+        until not HasNext;
+    end;
+
+    local procedure AppendJsonArray(var Target: JsonArray; Source: JsonArray)
+    var
+        Token: JsonToken;
+    begin
+        foreach Token in Source do
+            Target.Add(token);
     end;
 
     local procedure AddFulfilmentInfo(var TargetObj: JsonObject; FJToken: JsonToken)
@@ -569,39 +691,32 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         end;
     end;
 
-    local procedure CacheGiftCardOrderLine(OrderLine: JsonToken)
+    local procedure CacheGiftCardOrderLine(OrderLine: JsonToken; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     var
         TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
         OrderLineId: Text[30];
     begin
         OrderLineId := GetNumericId(JsonHelper.GetJText(OrderLine, 'id', false));
-        if not SpfyFulfillmentCache.GetLineFromCache(OrderLineId, TempSpfyFulfillmentBuffer) then begin
+        if not FulfillmentCache.GetLineFromCache(OrderLineId, TempSpfyFulfillmentBuffer) then begin
             TempSpfyFulfillmentBuffer.Init();
-            MapFulfillmentSharedFields(TempSpfyFulfillmentBuffer, OrderLine, OrderLineId);
+            MapFulfillmentSharedFields(TempSpfyFulfillmentBuffer, OrderLine, OrderLineId, FulfillmentCache);
             TempSpfyFulfillmentBuffer.Insert();
         end;
         if not TempSpfyFulfillmentBuffer.IsEmpty() then
-            SpfyFulfillmentCache.CacheLine(TempSpfyFulfillmentBuffer);
+            FulfillmentCache.CacheLine(TempSpfyFulfillmentBuffer);
     end;
 
-    local procedure MapFulfillmentSharedFields(var TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary; OrderLine: JsonToken; OrderLineId: Text[30])
+    local procedure MapFulfillmentSharedFields(var TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary; OrderLine: JsonToken; OrderLineId: Text[30]; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     begin
         TempSpfyFulfillmentBuffer."Order Line ID" := OrderLineId;
-        TempSpfyFulfillmentBuffer."Entry No." := SpfyFulfillmentCache.GetLastFulfillmentEntryNo() + 1;
+        TempSpfyFulfillmentBuffer."Entry No." := FulfillmentCache.GetLastFulfillmentEntryNo() + 1;
         TempSpfyFulfillmentBuffer."Gift Card" := JsonHelper.GetJBoolean(OrderLine, 'isGiftCard', false);
         if TempSpfyFulfillmentBuffer."Gift Card" then
             TempSpfyFulfillmentBuffer."Initial Amount" := JsonHelper.GetJDecimal(OrderLine, 'variant.price', true)
         else
             TempSpfyFulfillmentBuffer."Initial Amount" := JsonHelper.GetJDecimal(OrderLine, 'originalUnitPriceSet.presentmentMoney.amount', true);
 
-        TempSpfyFulfillmentBuffer."Fulfillable Quantity" := JsonHelper.GetJDecimal(OrderLine, 'unfulfilledQuantity', false);
-    end;
-
-    local procedure TryGetOrderLines(OrderGID: Text; StoreCode: Code[20]; Property: Text; RequestTxt: Text; var Result: JsonArray) Success: Boolean
-    begin
-        ClearLastError();
-        Clear(Result);
-        Success := TryGetLines(OrderGID, StoreCode, Property, RequestTxt, Result);
+        TempSpfyFulfillmentBuffer."Fulfillable Quantity" := LineOpenQuantity(OrderLine);
     end;
 
     local procedure SetPath(PropertyName: Text; IncludeOrderPath: Boolean) Path: Text
@@ -614,18 +729,16 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     end;
 
     [TryFunction]
-    internal procedure GetOrderList(var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; FromDT: DateTime)
+    internal procedure GetOrderList(var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; QueryFilters: Text)
     var
         NcTask: Record "NPR Nc Task";
         ResponseBody: JsonToken;
-        DateTimeSingleQ: Text;
         OrderListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id email number displayFinancialStatus createdAt closedAt updatedAt cancelledAt sourceName name customer { firstName lastName } currentTotalPriceSet { presentmentMoney { amount } shopMoney { amount } } presentmentCurrencyCode currencyCode } } pageInfo { endCursor hasNextPage } } }', Locked = true;
     begin
         HasNext := false;
         Clear(OrdersArr);
         ClearLastError();
-        DateTimeSingleQ := SingleQuotes(Format(FromDT - 6 * 60 * 1000, 0, 9));//6mins scope
-        CreateRequestForList(NcTask, Cursor, ShopifyStore.Code, OrderListRequest, StrSubstNo('status:%1 AND updated_at:>=%2', MapStatusToQueryParam(OrderStatus), DateTimeSingleQ));
+        CreateRequestForList(NcTask, Cursor, ShopifyStore.Code, OrderListRequest, QueryFilters);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
             Error(GetLastErrorText());
         Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.orders.pageInfo.endCursor', false);
@@ -637,18 +750,16 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     // The Shopify Admin API has no top-level returns query, so we poll orders updated since the marker and read their closed returns
     // (orders filtered by updated_at; the inner returns connection filters status:CLOSED). A return_status pre-filter could optimize this later.
     [TryFunction]
-    internal procedure GetReturnList(var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; FromDT: DateTime)
+    internal procedure GetReturnList(var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; QueryFilters: Text)
     var
         NcTask: Record "NPR Nc Task";
         ResponseBody: JsonToken;
-        DateTimeSingleQ: Text;
         ReturnListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id updatedAt returns(first: 10, query: "status:CLOSED") { edges { node { id name status createdAt closedAt } } pageInfo { endCursor hasNextPage } } } } pageInfo { endCursor hasNextPage } } }', Locked = true;
     begin
         HasNext := false;
         Clear(OrdersArr);
         ClearLastError();
-        DateTimeSingleQ := SingleQuotes(Format(FromDT - 6 * 60 * 1000, 0, 9));//6mins scope
-        CreateRequestForList(NcTask, Cursor, ShopifyStore.Code, ReturnListRequest, StrSubstNo('updated_at:>=%1', DateTimeSingleQ));
+        CreateRequestForList(NcTask, Cursor, ShopifyStore.Code, ReturnListRequest, QueryFilters);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
             Error(GetLastErrorText());
         Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.orders.pageInfo.endCursor', false);
@@ -677,18 +788,18 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         ReturnsArr := ResponseBody.AsArray();
     end;
 
-    local procedure FindAndCacheGiftCards(ItemLineResponseArr: JsonArray): Boolean
+    local procedure FindAndCacheGiftCards(ItemLineResponseArr: JsonArray; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache"): Boolean
     var
         HasGiftCard: Boolean;
     begin
         ClearLastError();
-        if not TryFindAndCacheGiftCard(ItemLineResponseArr, HasGiftCard) then
+        if not TryFindAndCacheGiftCard(ItemLineResponseArr, HasGiftCard, FulfillmentCache) then
             Error(GetLastErrorText);
         exit(HasGiftCard);
     end;
 
     [TryFunction]
-    local procedure TryFindAndCacheGiftCard(ItemLineResponseArr: JsonArray; var HasGiftCard: Boolean)
+    local procedure TryFindAndCacheGiftCard(ItemLineResponseArr: JsonArray; var HasGiftCard: Boolean; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     var
         ItemLineToken: JsonToken;
         LineToken: JsonToken;
@@ -696,22 +807,16 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         Clear(HasGiftCard);
         foreach ItemLineToken in ItemLineResponseArr do begin
             ItemLineToken.SelectToken('node', LineToken);
-            if (JsonHelper.GetJInteger(LineToken, 'currentQuantity', false)) <> 0 then
+            if LineOrderedQuantity(LineToken) <> 0 then
                 if JsonHelper.GetJBoolean(LineToken, 'isGiftCard', false) then begin
                     HasGiftCard := true;
-                    CacheGiftCardOrderLine(LineToken);
+                    CacheGiftCardOrderLine(LineToken, FulfillmentCache);
                 end;
         end;
     end;
 
-    local procedure CacheFulfillment(FulfilmentResponseArr: JsonArray): Boolean
-    begin
-        ClearLastError();
-        exit(TryCacheFulfillment(FulfilmentResponseArr));
-    end;
-
     [TryFunction]
-    local procedure TryCacheFulfillment(FulfilmentResponseArr: JsonArray)
+    local procedure TryCacheFulfillment(FulfilmentResponseArr: JsonArray; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
     var
         TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
         LineEdgesArr: JsonArray;
@@ -720,6 +825,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         LineEdgeToken: JsonToken;
         Node: JsonToken;
         UpdatedAt: DateTime;
+        CreatedAt: DateTime;
         FulfilledQty: Decimal;
         LineItemId: Text[30];
         OrderId: Text[30];
@@ -732,6 +838,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
             FulfillmentObj := FulfillmentToken.AsObject();
 #pragma warning disable AA0139
             UpdatedAt := JsonHelper.GetJDT(FulfillmentToken, 'updatedAt', true);
+            CreatedAt := JsonHelper.GetJDT(FulfillmentToken, 'createdAt', true);
             OrderId := GetNumericId(JsonHelper.GetJText(FulfillmentToken, 'orderId', true));
             Email := JsonHelper.GetJText(FulfillmentToken, 'email', false);
 #pragma warning restore AA0139
@@ -743,24 +850,26 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
                         if FulfilledQty > 0 then begin
                             LineEdgeToken.SelectToken('node.lineItem', Node);
                             LineItemId := GetNumericId(JsonHelper.GetJText(Node, 'id', true));
-                            if not SpfyFulfillmentCache.GetLineFromCache(LineItemId, TempSpfyFulfillmentBuffer) then begin
+                            if not FulfillmentCache.GetLineFromCache(LineItemId, TempSpfyFulfillmentBuffer) then begin
                                 TempSpfyFulfillmentBuffer.Init();
-                                MapFulfillmentSharedFields(TempSpfyFulfillmentBuffer, Node, LineItemId);
+                                MapFulfillmentSharedFields(TempSpfyFulfillmentBuffer, Node, LineItemId, FulfillmentCache);
                                 TempSpfyFulfillmentBuffer."Updated At" := UpdatedAt;
+                                TempSpfyFulfillmentBuffer."Created At" := CreatedAt;
                                 TempSpfyFulfillmentBuffer."Fulfilled Quantity" := FulfilledQty;
                                 TempSpfyFulfillmentBuffer.Email := Email;
                                 TempSpfyFulfillmentBuffer.Insert();
                             end else begin
-                                TempSpfyFulfillmentBuffer."Fulfillable Quantity" := JsonHelper.GetJDecimal(Node, 'unfulfilledQuantity', true);
+                                TempSpfyFulfillmentBuffer."Fulfillable Quantity" := LineOpenQuantity(Node);
                                 TempSpfyFulfillmentBuffer."Fulfilled Quantity" += FulfilledQty;
                                 if TempSpfyFulfillmentBuffer."Gift Card" then begin
                                     TempSpfyFulfillmentBuffer."Updated At" := UpdatedAt;
+                                    TempSpfyFulfillmentBuffer."Created At" := CreatedAt;
                                     TempSpfyFulfillmentBuffer.Email := Email;
                                     TempSpfyFulfillmentBuffer."Initial Amount" := JsonHelper.GetJDecimal(Node, 'variant.price', true);
                                 end;
                             end;
                             TempSpfyFulfillmentBuffer.Modify();
-                            SpfyFulfillmentCache.CacheLine(TempSpfyFulfillmentBuffer);
+                            FulfillmentCache.CacheLine(TempSpfyFulfillmentBuffer);
                         end;
                     end;
                 end;
@@ -802,6 +911,72 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     local procedure SingleQuotes(Input: Text): Text
     begin
         exit('''' + Input + '''');
+    end;
+
+    #region line quantities
+    internal procedure LineOrderedQuantity(SalesLineJsonToken: JsonToken): Decimal
+    begin
+        // What the order holds now - refunded and removed units excluded.
+        exit(JsonHelper.GetJDecimal(SalesLineJsonToken, 'currentQuantity', true));
+    end;
+
+    internal procedure LineOpenQuantity(SalesLineJsonToken: JsonToken): Decimal
+    begin
+        exit(JsonHelper.GetJDecimal(SalesLineJsonToken, 'unfulfilledQuantity', true));
+    end;
+
+    internal procedure LineDiscountBaseQuantity(SalesLineJsonToken: JsonToken): Decimal
+    begin
+        exit(JsonHelper.GetJDecimal(SalesLineJsonToken, 'quantity', false) - JsonHelper.GetJDecimal(SalesLineJsonToken, 'nonFulfillableQuantity', false));
+    end;
+
+    internal procedure LineIsNoLongerOnOrder(SalesLineJsonToken: JsonToken): Boolean
+    begin
+        // Nothing left to order and nothing left to fulfill: the line was removed or fully refunded.
+        exit((LineOrderedQuantity(SalesLineJsonToken) = 0) and (LineOpenQuantity(SalesLineJsonToken) = 0));
+    end;
+    #endregion
+
+    internal procedure GetSafetyOverlapWindow(): Duration
+    var
+        BufferMs: Integer;
+    begin
+        // Shopify's updated_at search index is eventually consistent, and Shopify documents neither a lag bound nor a
+        // recommended overlap. The window is anchored to the stored marker rather than to the time of the last poll, so
+        // polling more often does not widen it: the tolerated lag is this buffer plus one poll interval, and the busiest
+        // stores poll every second (PollInterval in "NPR Spfy Order Import JQ"). The legacy REST importer
+        // (SpfyOrderMgt.DownloadOrders) uses 10 minutes for the same reason. Over-fetching costs only rows that
+        // DocExists rejects; under-fetching loses the order permanently and without any error.
+        BufferMs := 6 * 60 * 1000;
+        exit(BufferMs);
+    end;
+
+    /// <summary>
+    /// The list filter for one poll cycle. A Shopify cursor points into the result set of one specific query, so the
+    /// filter is built once per cycle and handed to every page
+    /// </summary>
+    internal procedure OrderListFilter(OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; FromDT: DateTime): Text
+    begin
+        exit(StrSubstNo('status:%1 AND updated_at:>=%2', MapStatusToQueryParam(OrderStatus), SingleQuotes(Format(FromDT - GetSafetyOverlapWindow(), 0, 9))));
+    end;
+
+    /// <summary>
+    /// The return list filter for one poll cycle. See <see cref="OrderListFilter"/> for why it is built once.
+    /// </summary>
+    internal procedure ReturnListFilter(FromDT: DateTime): Text
+    begin
+        exit(StrSubstNo('updated_at:>=%1', SingleQuotes(Format(FromDT - GetSafetyOverlapWindow(), 0, 9))));
+    end;
+
+    internal procedure GiftCardSearchLowerBound(FulfillmentCreatedAt: DateTime): DateTime
+    var
+        SafetyMarginMs: Integer;
+    begin
+        // Widen the search lower bound so a valid gift card is never excluded
+        if FulfillmentCreatedAt = 0DT then
+            exit(0DT);
+        SafetyMarginMs := 60000; // 1 minute
+        exit(FulfillmentCreatedAt - SafetyMarginMs);
     end;
 
     local procedure MapStatusToQueryParam(Status: Enum "NPR SpfyAPIDocumentStatus") Result: Text
@@ -862,9 +1037,10 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     var
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        SpfyFulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        _FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
         _ShopifyResponse: JsonToken;
+        _HasExternalCache: Boolean;
         TooLongValueErr: Label 'Incoming Shopify %1 "%2" exceeds maximum allowed length of %3 characters', Comment = '%1 - incoming field name, %2 - incoming field value, %3 - number of characters';
 
 }

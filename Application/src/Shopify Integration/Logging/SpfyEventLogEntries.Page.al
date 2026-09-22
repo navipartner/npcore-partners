@@ -163,22 +163,24 @@ page 6184903 "NPR Spfy Event Log Entries"
             action(ProcessLogEntries)
             {
                 Caption = 'Process Document';
-                ToolTip = 'Processes Shopify event log entries with error status, attempting to create or update the corresponding Business Central documents based on the information in the log entries.';
+                ToolTip = 'Tries to create the Business Central document again, from the order details that were downloaded from Shopify earlier. Use this after correcting something in Business Central, such as a missing item, currency or posting setup. All log entries of the same Shopify document are processed together, because a closed entry cannot complete while its open counterpart is still pending.';
                 ApplicationArea = NPRShopifyEcommerce;
                 Image = Process;
                 trigger OnAction()
-                var
-                    SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
-                    SpfyAPIOrderProcessor: Codeunit "NPR Spfy Event Log DocProcessr";
-                    OperationFinishedErrMsg: Label 'Operation completed with Errors.';
-                    OperationFinishedSuccessMsg: Label 'Operation completed.';
                 begin
-                    CurrPage.SetSelectionFilter(SpfyEventLogEntry);
-                    if SpfyAPIOrderProcessor.ProcessLogEntries(SpfyEventLogEntry) then
-                        Message(OperationFinishedSuccessMsg)
-                    else
-                        Message(OperationFinishedErrMsg);
-                    CurrPage.Update(false);
+                    ProcessSelectedEntries();
+                end;
+            }
+            action(GetOrderFromShopify)
+            {
+                Caption = 'Get Order from Shopify';
+                ToolTip = 'Throws away the order details downloaded from Shopify earlier, so the order is downloaded again the next time the document is processed. Use this when the order itself was changed in Shopify after it was imported. Entries that are already processed are left alone - their document exists and nothing would re-read the order - and entries that had run out of retries are given a fresh start.';
+                ApplicationArea = NPRShopifyEcommerce;
+                Image = Refresh;
+                Enabled = _EntryCanBeDownloadedAgain;
+                trigger OnAction()
+                begin
+                    GetSelectedOrdersFromShopify();
                 end;
             }
             action(ResetRetryCount)
@@ -208,9 +210,68 @@ page 6184903 "NPR Spfy Event Log Entries"
             actionref(RelatedEntries_Promoted; RelatedEntries) { }
 #if not BC21 and not BC22
             actionref(ProcessLogEntries_Promoted; ProcessLogEntries) { }
+            actionref(GetOrderFromShopify_Promoted; GetOrderFromShopify) { }
 #endif
         }
 #endif
     }
+
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    var
+        _EntryCanBeDownloadedAgain: Boolean;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        _EntryCanBeDownloadedAgain := Rec."Processing Status" <> Rec."Processing Status"::Processed;
+    end;
+
+    local procedure GetSelectedOrdersFromShopify()
+    var
+        EntriesToDiscard: Record "NPR Spfy Event Log Entry";
+        SelectedEntries: Record "NPR Spfy Event Log Entry";
+        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+        DiscardedCount: Integer;
+        NothingToDownloadMsg: Label 'Nothing to download again: every entry in the selection is already processed.';
+        OrderWillBeDownloadedMsg: Label '%1 entries will download their order from Shopify again. Please process the documents.', Comment = '%1 = number of entries';
+    begin
+        CurrPage.SetSelectionFilter(SelectedEntries);
+        SpfyEventLogMgt.ExpandSelectionToSiblings(SelectedEntries, EntriesToDiscard);
+        EntriesToDiscard.SetFilter("Processing Status", '<>%1', EntriesToDiscard."Processing Status"::Processed);
+        DiscardedCount := SpfyEventLogMgt.DiscardStoredOrderData(EntriesToDiscard);
+        if DiscardedCount = 0 then
+            Message(NothingToDownloadMsg)
+        else
+            Message(OrderWillBeDownloadedMsg, DiscardedCount);
+        if Rec.Get(Rec."Entry No.") then;
+        CurrPage.Update(false);
+    end;
+
+    local procedure ProcessSelectedEntries()
+    var
+        EntriesToProcess: Record "NPR Spfy Event Log Entry";
+        SelectedEntries: Record "NPR Spfy Event Log Entry";
+        SpfyAPIOrderProcessor: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+        PostponedCount: Integer;
+        OperationFinishedErrMsg: Label 'Operation completed with Errors.';
+        OperationFinishedSuccessMsg: Label 'Operation completed.';
+        OperationPostponedMsg: Label 'Operation completed, but %1 of the selected entries could not be imported yet and were postponed. They are waiting for related processing to finish and will be picked up again automatically.', Comment = '%1 = number of postponed entries';
+    begin
+        CurrPage.SetSelectionFilter(SelectedEntries);
+        SpfyEventLogMgt.ExpandSelectionToSiblings(SelectedEntries, EntriesToProcess);
+
+        case true of
+            not SpfyAPIOrderProcessor.ProcessLogEntries(EntriesToProcess, PostponedCount):
+                Message(OperationFinishedErrMsg);
+            PostponedCount > 0:
+                Message(OperationPostponedMsg, PostponedCount);
+            else
+                Message(OperationFinishedSuccessMsg);
+        end;
+
+        if Rec.Get(Rec."Entry No.") then;
+        CurrPage.Update(false);
+    end;
+#endif
 }
 #endif

@@ -34,9 +34,11 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
     begin
+        SpfyIntegrationMgt.SetRereadSetup();
+
         SpfyEventLogEntry.SetCurrentKey("Processing Status", "Process Retry Count", "Not Before Date-Time", "Document Type", "Bucket Id");
         SpfyEventLogEntry.SetFilter("Processing Status", '<>%1', SpfyEventLogEntry."Processing Status"::Processed);
-        SpfyEventLogEntry.Setfilter("Process Retry Count", '<=%1', SpfyIntegrationMgt.GetMaxDocRetryCount());
+        SpfyEventLogEntry.SetFilter("Process Retry Count", '<=%1', SpfyIntegrationMgt.GetMaxDocRetryCount());
         SpfyEventLogEntry.SetFilter("Not Before Date-Time", '<=%1', CurrentDateTime());
         SpfyEventLogEntry.SetRange("Document Type", SpfyEventLogEntry."Document Type"::Order);
         SpfyEventLogEntry.SetFilter("Bucket Id", BucketFilter);
@@ -49,8 +51,6 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
     end;
 
     local procedure ProcessLogEntry(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
-    var
-        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
     begin
         SpfyEcomSalesDocPrcssr.ProcessLogEntry(SpfyEventLogEntry);
     end;
@@ -78,7 +78,7 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
             JobQueueEntry.SetRange("Object ID to Run", CurrCodeunitId());
             if not JobQueueEntry.FindFirst() then begin
-                JobQueueEntry."Parameter String" := CopyStr(CreateParameterSting(), 1, MaxStrLen(JobQueueEntry."Parameter String"));
+                JobQueueEntry."Parameter String" := CopyStr(CreateParameterString(), 1, MaxStrLen(JobQueueEntry."Parameter String"));
                 JobQueueEntry.Description := CopyStr(GetOrdersFromShopifyLbl, 1, MaxStrLen(JobQueueEntry.Description));
                 JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
                 JobQueueEntry."Object ID to Run" := CurrCodeunitId();
@@ -110,7 +110,7 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
 
     end;
 
-    internal procedure CreateParameterSting(): text
+    internal procedure CreateParameterString(): text
     var
         ParamScope: Label '=1..100', Locked = true;
     begin
@@ -150,6 +150,7 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
 
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
         GetOrdersFromShopifyLbl: Label 'Process Sales Orders from Shopify Event Log';
 
 }

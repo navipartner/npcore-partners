@@ -2,7 +2,6 @@
 codeunit 6248593 "NPR Spfy Fulfillment Cache"
 {
     Access = Internal;
-    SingleInstance = true;
     internal procedure GetVocherReferenceNo(OrderLineId: Text[30]; var ReferenceNo: Code[50]; var GiftCardId: Text[30])
     var
         TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
@@ -70,15 +69,6 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
         exit(true);
     end;
 
-    internal procedure IsShopifyGiftCard(): Boolean
-    var
-        TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
-    begin
-        PrepareTempBuffer(TempBuffer);
-        TempBuffer.SetRange("Gift Card", true);
-        exit(not TempBuffer.IsEmpty());
-    end;
-
     internal procedure GetLineFromCache(OrderLineId: Text[30]; var SpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary): Boolean
     var
         TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
@@ -94,6 +84,22 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
 
         SpfyFulfillmentBuffer.Copy(TempBuffer, true);
 
+        exit(true);
+    end;
+
+    internal procedure GetFulfillmentLineFromSnapshot(OrderLineId: Text[30]; var InSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary; var OutSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary): Boolean
+    var
+        TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
+    begin
+        Clear(OutSpfyFulfillmentBuffer);
+
+        TempBuffer.Copy(InSpfyFulfillmentBuffer, true);
+        TempBuffer.SetRange("Order Line ID", OrderLineId);
+
+        if not TempBuffer.FindFirst() then
+            exit(false);
+
+        OutSpfyFulfillmentBuffer.Copy(TempBuffer, true);
         exit(true);
     end;
 
@@ -174,8 +180,12 @@ codeunit 6248593 "NPR Spfy Fulfillment Cache"
     local procedure PrepareTempBuffer(var TempBuffer: record "NPR Spfy Fulfillment Buffer" temporary)
     begin
         Temp_SpfyFulfillmentBuffer.Reset();
-        TempBuffer.DeleteAll();
         TempBuffer.Copy(Temp_SpfyFulfillmentBuffer, true);
+    end;
+
+    internal procedure PrepareFulfillmentBufferSnapshot(var TempBuffer: Record "NPR Spfy Fulfillment Buffer" temporary)
+    begin
+        PrepareTempBuffer(TempBuffer);
     end;
 
     internal procedure CacheLine(SourceLine: Record "NPR Spfy Fulfillment Buffer" temporary)

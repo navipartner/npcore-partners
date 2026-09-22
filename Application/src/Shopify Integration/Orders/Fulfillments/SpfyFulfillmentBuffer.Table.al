@@ -77,6 +77,11 @@ table 6150815 "NPR Spfy Fulfillment Buffer"
             DataClassification = CustomerContent;
             Caption = 'Updated At';
         }
+        field(34; "Created At"; DateTime)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Created At';
+        }
 #endif
     }
     keys

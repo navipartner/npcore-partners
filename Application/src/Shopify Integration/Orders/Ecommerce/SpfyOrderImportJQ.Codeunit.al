@@ -6,7 +6,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     TableNo = "Job Queue Entry";
     trigger OnRun()
     var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
         StartTime: DateTime;
         StoresDict: Dictionary of [Code[20], Dictionary of [Enum "NPR SpfyEventLogDocType", Boolean]];
@@ -24,19 +23,55 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
             if (CurrentDateTime() - LastStoresReload) > (5 * 60000) then
                 LoadEnabledStores(StoresDict);
 
+            _OrdersLoggedInCycle := 0;
             Process(StoresDict);
             Commit();
             if Rec."Recurring Job" then
-                Sleep(1000);
+                SleepUntilInterruptedOrElapsed(PollInterval(_OrdersLoggedInCycle), Rec.ID, StartTime, MaxDuration);
         until not Rec."Recurring Job" or EcomJobManagement.DurationLimitReached(StartTime, MaxDuration);
+    end;
 
-        FinalizeMarkers(StoresDict);
+    internal procedure PollInterval(OrdersLogged: Integer): Duration
+    begin
+        case true of
+            OrdersLogged > 100:
+                exit(1000);
+            OrdersLogged >= 50:
+                exit(5 * 1000);
+            OrdersLogged >= 10:
+                exit(10 * 1000);
+        end;
+        exit(60 * 1000);
+    end;
+
+    local procedure SleepUntilInterruptedOrElapsed(TotalInterval: Duration; JobId: Guid; StartTime: DateTime; MaxDuration: Duration)
+    var
+        SliceMs: Duration;
+        Elapsed: Duration;
+        Remaining: Duration;
+    begin
+        // Slice the sleep so ShouldSoftExit and DurationLimitReached are honoured within ~1s instead of up to one full poll interval.
+        SliceMs := 1000;
+        Elapsed := 0;
+        while Elapsed < TotalInterval do begin
+            if EcomJobManagement.ShouldSoftExit(JobId) then
+                exit;
+            if EcomJobManagement.DurationLimitReached(StartTime, MaxDuration) then
+                exit;
+            Remaining := TotalInterval - Elapsed;
+            if Remaining < SliceMs then begin
+                Sleep(Remaining);
+                Elapsed += Remaining;
+            end else begin
+                Sleep(SliceMs);
+                Elapsed += SliceMs;
+            end;
+        end;
     end;
 
     internal procedure Process(StoresDict: Dictionary of [Code[20], Dictionary of [Enum "NPR SpfyEventLogDocType", Boolean]])
     var
         ShopifyStore: Record "NPR Spfy Store";
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         StoreCode: Code[20];
     begin
         ShopifyStore.SetAutoCalcFields("Last Orders Imported At (FF)", "Last Returns Imported At (FF)");
@@ -105,19 +140,20 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure DownloadOrders(ShopifyStore: Record "NPR Spfy Store"; OrderStatus: Enum "NPR SpfyAPIDocumentStatus")
     var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         OrdersArr: JsonArray;
         ShopifyResponse: JsonToken;
         Cursor: Text;
+        QueryFilters: Text;
         HasNext: Boolean;
     begin
         Cursor := '';
         HasNext := true;
+        QueryFilters := SpfyAPIOrderHelper.OrderListFilter(OrderStatus, GetFromDT(ShopifyStore, "NPR SpfyEventLogDocType"::Order));
         repeat
             if EcomJobManagement.ApplicationChanged() then
                 exit;
 
-            if not SpfyAPIOrderHelper.GetOrderList(HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, OrderStatus, GetFromDT(ShopifyStore, "NPR SpfyEventLogDocType"::Order)) then begin
+            if not SpfyAPIOrderHelper.GetOrderList(HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, QueryFilters) then begin
                 LogError(GetLastErrorText(), ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order);
                 exit;
             end;
@@ -130,7 +166,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessList(OrdersArr: JsonArray; OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; ShopifyStore: Record "NPR Spfy Store"): Boolean
     var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         CurrNode: JsonToken;
         OrderTkn: JsonToken;
         OrderGID: Text;
@@ -142,9 +177,12 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
             OrderTkn.SelectToken('node', CurrNode);
             GetOrderGID(CurrNode, OrderGID);
+            UpdateSessionMax(ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order, JsonHelper.GetJDT(CurrNode, 'updatedAt', true));
             if SaveOrder(ShopifyStore, CurrNode, OrderStatus, OrderGID) then
-                if ProcessOrder(ShopifyStore, CurrNode, OrderStatus, OrderGID) then
+                if ProcessOrder(ShopifyStore, CurrNode, OrderStatus, OrderGID) then begin
                     OrderProcessed := true;
+                    _OrdersLoggedInCycle += 1;
+                end;
         end;
         exit(OrderProcessed);
     end;
@@ -152,7 +190,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     internal procedure ProcessOrder(ShopifyStore: Record "NPR Spfy Store"; OrderTkn: JsonToken; OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; OrderGID: Text): Boolean
     begin
         ClearLastError();
-        UpdateSessionMax(ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order, JsonHelper.GetJDT(OrderTkn, 'updatedAt', true));
         if InsertShopifyLog(OrderTkn, OrderStatus, "NPR SpfyEventLogDocType"::Order, ShopifyStore) then
             exit(true);
         LogError(GetErrorText(OrderStatus, OrderGID), ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order);
@@ -161,19 +198,20 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure DownloadReturns(ShopifyStore: Record "NPR Spfy Store")
     var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         OrdersArr: JsonArray;
         ShopifyResponse: JsonToken;
         Cursor: Text;
+        QueryFilters: Text;
         HasNext: Boolean;
     begin
         Cursor := '';
         HasNext := true;
+        // Built once and handed to every page - see DownloadOrders.
+        QueryFilters := SpfyAPIOrderHelper.ReturnListFilter(GetFromDT(ShopifyStore, "NPR SpfyEventLogDocType"::"Return Order"));
         repeat
             if EcomJobManagement.ApplicationChanged() then
                 exit;
-
-            if not SpfyAPIOrderHelper.GetReturnList(HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, GetFromDT(ShopifyStore, "NPR SpfyEventLogDocType"::"Return Order")) then begin
+            if not SpfyAPIOrderHelper.GetReturnList(HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, QueryFilters) then begin
                 LogError(GetLastErrorText(), ShopifyStore.Code, "NPR SpfyEventLogDocType"::"Return Order");
                 exit;
             end;
@@ -186,7 +224,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessReturnList(OrdersArr: JsonArray; ShopifyStore: Record "NPR Spfy Store"): Boolean
     var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         OrderTkn: JsonToken;
         OrderNode: JsonToken;
         ReturnsNode: JsonToken;
@@ -208,7 +245,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessOrderReturns(ShopifyStore: Record "NPR Spfy Store"; OrderGID: Text; ReturnsNode: JsonToken) ReturnProcessed: Boolean
     var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         ReturnsEdges: JsonToken;
         ReturnsArr: JsonArray;
         Cursor: Text;
@@ -238,7 +274,6 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
     local procedure ProcessReturnEdges(ShopifyStore: Record "NPR Spfy Store"; ReturnsArr: JsonArray) ReturnProcessed: Boolean
     var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         ReturnEdge: JsonToken;
         ReturnNode: JsonToken;
     begin
@@ -248,8 +283,10 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
                 exit;
 
             ReturnEdge.SelectToken('node', ReturnNode);
-            if ProcessReturn(ShopifyStore, ReturnNode) then
+            if ProcessReturn(ShopifyStore, ReturnNode) then begin
                 ReturnProcessed := true;
+                _OrdersLoggedInCycle += 1;
+            end;
         end;
     end;
 
@@ -296,106 +333,83 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     end;
     #region markers 
     /// <summary>
-    /// InitialFromDT[StoreCode|DocType] 
-    ///   The baseline timestamp read from the database (“Last Orders / Last Returns Imported At”). 
+    /// InitialFromDT[StoreCode|DocType]
+    ///   The baseline timestamp read from the database (“Last Orders / Last Returns Imported At”).
     ///   Used as the starting point for updatedAt filtering during this JQ cycle.
-    /// SessionMaxUpdatedAt[StoreCode|DocType] 
-    ///   Tracks the highest updatedAt value encountered during this JQ cycle. 
-    ///   This value becomes the new “Last Orders / Last Returns Imported At” when the marker is updated.
-    /// LastMarkerUpdate[StoreCode|DocType] 
-    ///   Records the last time the marker was written to the database. 
-    ///   Used to control periodic marker updates and reduce database write frequency.
-    ///ErrorsSinceLastMarker[StoreCode|DocType] 
-    ///   Marker to track for any errors and prevent “Last Orders / Last Returns Imported At” from being updated is error exists.
+    /// SessionMaxUpdatedAt[StoreCode|DocType]
+    ///   The highest updatedAt this run has examined - written to the event log, or deliberately
+    ///   passed over.
+    ///   This value becomes the new “Last Orders / Last Returns Imported At” when the marker is written.
+    /// _MarkerStopped[StoreCode|DocType]
+    ///   Set by LogError: something in this cycle was not examined to the end - a list request that failed
+    ///   part way, an order or return that could not be written to the event log - so the marker is not
+    ///   written at all this cycle. It is cleared at the start of every cycle, not once per run: the previous
+    ///   version never cleared it, so a single failing order froze the store's watermark for the whole hour.
     /// </summary>
-    // internal, not local: the marker guarantee is only testable if a test can build the precondition
-    // (SetMarkers, UpdateSessionMax) and then call a guarded writer. That writer is FinalizeMarker, not
-    // UpdateLastImportedAt - the latter is the unguarded primitive both writers share, and it is local.
-    // TryUpdateMarker is the other guarded writer but a test cannot drive it: it is throttled to one
-    // write every five minutes.
     internal procedure SetMarkers(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
     var
         FromDT: DateTime;
         MarkerKeyTxt: Text;
     begin
         MarkerKeyTxt := MarkerKey(ShopifyStore.Code, DocType);
+        FromDT := StoredImportMarker(ShopifyStore, DocType);
         if not InitialFromDT.ContainsKey(MarkerKeyTxt) then begin
-            case DocType of
-                DocType::Order:
-                    FromDT := ShopifyStore."Last Orders Imported At (FF)";
-                DocType::"Return Order":
-                    FromDT := ShopifyStore."Last Returns Imported At (FF)";
-                else
-                    DocTypeNotSupported(DocType);
-            end;
             if FromDT = 0DT then
                 FromDT := GetImportStartFromDT(ShopifyStore, DocType);
             InitialFromDT.Add(MarkerKeyTxt, FromDT);
-        end;
+        end else
+            if RebaseMarkerAfterRollback(MarkerKeyTxt, FromDT) then;
 
         if not SessionMaxUpdatedAt.ContainsKey(MarkerKeyTxt) then
             SessionMaxUpdatedAt.Add(MarkerKeyTxt, InitialFromDT.Get(MarkerKeyTxt));
 
-        if not LastMarkerUpdate.ContainsKey(MarkerKeyTxt) then
-            LastMarkerUpdate.Add(MarkerKeyTxt, CurrentDateTime());
-
-        if not ErrorsSinceLastMarker.ContainsKey(MarkerKeyTxt) then
-            ErrorsSinceLastMarker.Add(MarkerKeyTxt, false);
+        if _MarkerStopped.ContainsKey(MarkerKeyTxt) then
+            _MarkerStopped.Remove(MarkerKeyTxt);
     end;
 
-    local procedure TryUpdateMarker(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
+    internal procedure StopMarker(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType")
+    begin
+        _MarkerStopped.Set(MarkerKey(StoreCode, DocType), true);
+    end;
+
+    local procedure MarkerStopped(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"): Boolean
+    begin
+        exit(_MarkerStopped.ContainsKey(MarkerKey(StoreCode, DocType)));
+    end;
+
+    local procedure RebaseMarkerAfterRollback(MarkerKeyTxt: Text; StoredFromDT: DateTime): Boolean
+    begin
+        if StoredFromDT = 0DT then
+            exit(false);
+        if StoredFromDT >= InitialFromDT.Get(MarkerKeyTxt) then
+            exit(false);
+
+        InitialFromDT.Set(MarkerKeyTxt, StoredFromDT);
+        SessionMaxUpdatedAt.Set(MarkerKeyTxt, StoredFromDT);
+        exit(true);
+    end;
+
+    internal procedure TryUpdateMarker(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
     var
         SpfyStore: Record "NPR Spfy Store";
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
-        NowDT: DateTime;
         MarkerKeyTxt: Text;
     begin
         if EcomJobManagement.ApplicationChanged() then
             exit;
-
-        MarkerKeyTxt := MarkerKey(ShopifyStore.Code, DocType);
-        NowDT := CurrentDateTime();
-        if (NowDT - LastMarkerUpdate.Get(MarkerKeyTxt)) < (5 * 60000) then
+        if MarkerStopped(ShopifyStore.Code, DocType) then
             exit;
-        if ErrorsSinceLastMarker.Get(MarkerKeyTxt) then
+        MarkerKeyTxt := MarkerKey(ShopifyStore.Code, DocType);
+        // Defense in depth: SetMarkers seeds both dicts at the start of every ProcessStore call, but a future caller that
+        // bypasses SetMarkers would otherwise get a "key not present" crash instead of a no-op.
+        if not SessionMaxUpdatedAt.ContainsKey(MarkerKeyTxt) then
+            exit;
+        if not InitialFromDT.ContainsKey(MarkerKeyTxt) then
+            exit;
+        if SessionMaxUpdatedAt.Get(MarkerKeyTxt) <= InitialFromDT.Get(MarkerKeyTxt) then
             exit;
         SpfyStore.ReadIsolation := IsolationLevel::UpdLock;
         SpfyStore.Get(ShopifyStore.RecordId);
         UpdateLastImportedAt(SpfyStore, DocType);
-        LastMarkerUpdate.Set(MarkerKeyTxt, NowDT);
-    end;
-
-    local procedure FinalizeMarkers(StoresDict: Dictionary of [Code[20], Dictionary of [Enum "NPR SpfyEventLogDocType", Boolean]])
-    var
-        ShopifyStore: Record "NPR Spfy Store";
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
-        StoreCode: Code[20];
-    begin
-        if EcomJobManagement.ApplicationChanged() then
-            exit;
-
-        foreach StoreCode in StoresDict.Keys() do begin
-            ShopifyStore.ReadIsolation := IsolationLevel::ReadCommitted;
-            ShopifyStore.Get(StoreCode);
-            FinalizeMarker(ShopifyStore, "NPR SpfyEventLogDocType"::Order);
-            FinalizeMarker(ShopifyStore, "NPR SpfyEventLogDocType"::"Return Order");
-        end;
-    end;
-
-    internal procedure FinalizeMarker(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
-    var
-        EcomJobManagement: Codeunit "NPR Ecom Job Management";
-        MarkerKeyTxt: Text;
-    begin
-        if EcomJobManagement.ApplicationChanged() then
-            exit;
-
-        MarkerKeyTxt := MarkerKey(ShopifyStore.Code, DocType);
-        if not SessionMaxUpdatedAt.ContainsKey(MarkerKeyTxt) then
-            exit;
-        if ErrorsSinceLastMarker.Get(MarkerKeyTxt) then
-            exit;
-        UpdateLastImportedAt(ShopifyStore, DocType);
     end;
 
     internal procedure UpdateSessionMax(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"; UpdatedAt: DateTime)
@@ -404,6 +418,10 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         MarkerKeyTxt: Text;
     begin
         MarkerKeyTxt := MarkerKey(StoreCode, DocType);
+        if not SessionMaxUpdatedAt.ContainsKey(MarkerKeyTxt) then begin
+            SessionMaxUpdatedAt.Add(MarkerKeyTxt, UpdatedAt);
+            exit;
+        end;
         CurrentMax := SessionMaxUpdatedAt.Get(MarkerKeyTxt);
         if UpdatedAt > CurrentMax then
             SessionMaxUpdatedAt.Set(MarkerKeyTxt, UpdatedAt);
@@ -416,26 +434,51 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     #endregion
     local procedure UpdateLastImportedAt(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType")
     var
-        SessionMax: DateTime;
+        NewMarker: DateTime;
+        StoredMarker: DateTime;
+        MarkerKeyTxt: Text;
     begin
-        SessionMax := SessionMaxUpdatedAt.Get(MarkerKey(ShopifyStore.Code, DocType));
+        MarkerKeyTxt := MarkerKey(ShopifyStore.Code, DocType);
+        NewMarker := SessionMaxUpdatedAt.Get(MarkerKeyTxt);
+        StoredMarker := StoredImportMarker(ShopifyStore, DocType);
+
+        // someone moved the marker back while the cycle was running
+        if not RebaseMarkerAfterRollback(MarkerKeyTxt, StoredMarker) then
+            if StoredMarker < NewMarker then begin
+                WriteImportMarker(ShopifyStore, DocType, NewMarker);
+                InitialFromDT.Set(MarkerKeyTxt, StoredImportMarker(ShopifyStore, DocType));
+            end;
+        Commit(); // Commit here is required to release UpdLock before next Sleep() iteration
+    end;
+
+    local procedure StoredImportMarker(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType"): DateTime
+    begin
         case DocType of
             DocType::Order:
                 begin
                     ShopifyStore.CalcFields("Last Orders Imported At (FF)");
-                    if ShopifyStore."Last Orders Imported At (FF)" < SessionMax then
-                        ShopifyStore.SetLastOrdersImportedAt(SessionMax);
+                    exit(ShopifyStore."Last Orders Imported At (FF)");
                 end;
             DocType::"Return Order":
                 begin
                     ShopifyStore.CalcFields("Last Returns Imported At (FF)");
-                    if ShopifyStore."Last Returns Imported At (FF)" < SessionMax then
-                        ShopifyStore.SetLastReturnsImportedAt(SessionMax);
+                    exit(ShopifyStore."Last Returns Imported At (FF)");
                 end;
             else
                 DocTypeNotSupported(DocType);
         end;
-        Commit(); // Commit here is required to release UpdLock before next Sleep() iteration
+    end;
+
+    local procedure WriteImportMarker(var ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType"; NewMarker: DateTime)
+    begin
+        case DocType of
+            DocType::Order:
+                ShopifyStore.SetLastOrdersImportedAt(NewMarker);
+            DocType::"Return Order":
+                ShopifyStore.SetLastReturnsImportedAt(NewMarker);
+            else
+                DocTypeNotSupported(DocType);
+        end;
     end;
 
     local procedure GetOrderGID(OrderTkn: JsonToken; var OrderGID: Text)
@@ -461,18 +504,63 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     local procedure LogError(ErrMsg: Text; StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType")
     var
         SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
-        EventIdLbl: Label 'NPR_ShopifyAPI_OrderImportFailed', Locked = true;
     begin
-        ErrorsSinceLastMarker.Set(MarkerKey(StoreCode, DocType), true);
-        SpfyEcomSalesDocPrcssr.EmitMessage(ErrMsg, EventIdLbl);
+        // Every failure reaches this procedure, which is why the marker is stopped here rather than at each call
+        // site: whatever went wrong, something in this cycle was not examined to the end.
+        StopMarker(StoreCode, DocType);
+        if ShouldEmitSentryError(StoreCode, DocType) then
+            EmitSentryError(StoreCode, DocType);
+        SpfyEcomSalesDocPrcssr.LogTelemetry(ErrMsg, 'NPR_ShopifyAPI_OrderImportFailed');
+    end;
+
+    local procedure ShouldEmitSentryError(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"): Boolean
+    begin
+        exit(ShouldEmitSentryError(StoreCode, DocType, CurrentDateTime()));
+    end;
+
+    /// <summary>
+    /// Throttles Sentry to at most one event per hour per store and document type, so a persistent failure polled
+    /// once every poll cycle does not flood it. App insights telemetry (LogTelemetry) still records every error.
+    /// The NowDT parameter exists so the throttle can be unit tested without waiting an hour.
+    /// </summary>
+    internal procedure ShouldEmitSentryError(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"; NowDT: DateTime): Boolean
+    var
+        LastEmitAt: DateTime;
+        ThrottleWindow: Duration;
+        ThrottleKey: Text;
+    begin
+        ThrottleWindow := 60 * 60 * 1000;
+        ThrottleKey := MarkerKey(StoreCode, DocType);
+        if not _LastSentryEmitAt.ContainsKey(ThrottleKey) then begin
+            _LastSentryEmitAt.Add(ThrottleKey, NowDT);
+            exit(true);
+        end;
+        LastEmitAt := _LastSentryEmitAt.Get(ThrottleKey);
+        if (NowDT - LastEmitAt) < ThrottleWindow then
+            exit(false);
+        _LastSentryEmitAt.Set(ThrottleKey, NowDT);
+        exit(true);
+    end;
+
+    local procedure EmitSentryError(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType")
+    var
+        Sentry: Codeunit "NPR Sentry";
+        TransactionNameLbl: Label 'Shopify import failed (%1): %2', Comment = '%1 = document type, %2 = Shopify store code', Locked = true;
+    begin
+        // Logs the active error to Sentry (developers' primary error tool), aligning Shopify with Entria.
+        Sentry.InitScopeAndTransaction(StrSubstNo(TransactionNameLbl, Format(DocType), StoreCode), 'bc.shopify.order.import.error');
+        Sentry.AddTransactionTag('shopify.store_code', StoreCode);
+        Sentry.AddTransactionTag('shopify.doc_type', Format(DocType));
+        Sentry.AddLastErrorIfProgrammingBug();
+        Sentry.FinalizeScope();
     end;
 
     local procedure InitGlobals()
     begin
         Clear(InitialFromDT);
         Clear(SessionMaxUpdatedAt);
-        Clear(LastMarkerUpdate);
-        Clear(ErrorsSinceLastMarker);
+        Clear(_MarkerStopped);
+        Clear(_LastSentryEmitAt);
     end;
 
     local procedure GetFromDT(ShopifyStore: Record "NPR Spfy Store"; DocType: Enum "NPR SpfyEventLogDocType"): DateTime
@@ -635,14 +723,16 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     end;
 
     var
+        EcomJobManagement: Codeunit "NPR Ecom Job Management";
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyAPIOrderHelper: Codeunit "NPR Spfy Order ApiHelper";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         LastStoresReload: DateTime;
-        ErrorsSinceLastMarker: Dictionary of [Text, Boolean];
         InitialFromDT: Dictionary of [Text, DateTime];
-        LastMarkerUpdate: Dictionary of [Text, DateTime];
         SessionMaxUpdatedAt: Dictionary of [Text, DateTime];
+        _LastSentryEmitAt: Dictionary of [Text, DateTime];
+        _MarkerStopped: Dictionary of [Text, Boolean];
+        _OrdersLoggedInCycle: Integer;
 }
 #endif

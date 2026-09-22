@@ -26,7 +26,7 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         SpfyEventLogEntry."Document Name" := CopyStr(JsonHelper.GetJText(OrderTkn, 'name', false), 1, MaxStrLen(SpfyEventLogEntry."Document Name"));
         SpfyEventLogEntry."Bucket Id" := Random(100);
         if SpfyEventLogEntry."Document Type" = SpfyEventLogEntry."Document Type"::Order then
-            SetCurrencyCode(OrderTkn, SpfyEventLogEntry);
+            SetCurrencyCodeOrDefer(OrderTkn, SpfyEventLogEntry);
         SetDates(SpfyEventLogEntry, SpfyEventLogEntry."Document Status", OrderTkn);
         If LogEntryExist(SpfyEventLogEntry."Shopify ID", SpfyEventLogEntry."Document Status", SpfyEventLogEntry."Store Code", SpfyEventLogEntry."Document Type") then
             Error(AlreadyExistsErr, SpfyEventLogEntry."Shopify ID", SpfyEventLogEntry."Document Status");
@@ -54,6 +54,62 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
             OrderStatus = OrderStatus::Cancelled:
                 SpfyEventLogEntry."Cancelled Date" := DT2Date(JsonHelper.GetJDT(OrderToken, 'cancelledAt', true));
         end;
+    end;
+
+    local procedure SetCurrencyCodeOrDefer(Order: JsonToken; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
+    var
+        CurrencyDeferredLbl: Label 'The currency of the order could not be resolved while it was logged and will be resolved when the order is processed: %1', Comment = '%1 = the error reported by the currency lookup';
+    begin
+        if TrySetCurrencyCode(Order, SpfyEventLogEntry) then
+            exit;
+        ClearCurrencyFields(SpfyEventLogEntry);
+        SpfyEventLogEntry."Last Error Message" := CopyStr(StrSubstNo(CurrencyDeferredLbl, GetLastErrorText()), 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
+        ClearLastError();
+    end;
+
+    /// <summary>
+    /// SetCurrencyCode writes the currency fields one after another and can fail after the first of them - the store
+    /// currency may have no Currency record, or the order date no exchange rate. A failing TryFunction rolls back the
+    /// database but not the in-memory state of a var parameter, so the half-written record would be stored with a
+    /// non-blank "Presentment Currency Code" and "Amount (LCY)" = 0. That reads as resolved to
+    /// CurrencyResolutionPending, so the deferral would never be picked up again.
+    /// </summary>
+    local procedure ClearCurrencyFields(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
+    begin
+        SpfyEventLogEntry."Presentment Currency Code" := '';
+        SpfyEventLogEntry."Store Currency Code" := '';
+        SpfyEventLogEntry."Amount (PCY)" := 0;
+        SpfyEventLogEntry."Amount (SCY)" := 0;
+        SpfyEventLogEntry."Amount (LCY)" := 0;
+    end;
+
+    [TryFunction]
+    local procedure TrySetCurrencyCode(Order: JsonToken; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
+    begin
+        SetCurrencyCode(Order, SpfyEventLogEntry);
+    end;
+
+    internal procedure ResolveCurrencyIfPending(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; Response: JsonToken)
+    var
+        OrderToken: JsonToken;
+        MissingOrderNodeErr: Label 'Invalid Shopify response: missing "data.order" node.', Locked = true;
+    begin
+        if not CurrencyResolutionPending(SpfyEventLogEntry) then
+            exit;
+        if not Response.SelectToken('data.order', OrderToken) then
+            Error(MissingOrderNodeErr);
+        // Raised, not deferred again: by the time the order is processed the currency has to resolve. The fields are
+        // cleared first so the entry keeps its "not resolved yet" state and a later retry gets another attempt.
+        if not TrySetCurrencyCode(OrderToken, SpfyEventLogEntry) then begin
+            ClearCurrencyFields(SpfyEventLogEntry);
+            Error(GetLastErrorText());
+        end;
+        SpfyEventLogEntry.Modify();
+    end;
+
+    local procedure CurrencyResolutionPending(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    begin
+        exit((SpfyEventLogEntry."Document Type" = SpfyEventLogEntry."Document Type"::Order) and (SpfyEventLogEntry."Presentment Currency Code" = ''));
     end;
 
     local procedure SetCurrencyCode(Order: JsonToken; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
@@ -122,9 +178,11 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
                 begin
                     SpfyEventLogEntry."Last Error Date" := Today;
                     SpfyEventLogEntry."Process Retry Count" += 1;
-                    if MaxRetryLimitReached(SpfyEventLogEntry) then
-                        SpfyEventLogEntry."Processing Status" := SpfyEventLogEntry."Processing Status"::Error
-                    else
+                    if MaxRetryLimitReached(SpfyEventLogEntry) then begin
+                        SpfyEventLogEntry."Processing Status" := SpfyEventLogEntry."Processing Status"::Error;
+                        if (InputTxt <> '') and (SpfyEventLogEntry."Last Error Message" <> InputTxt) then
+                            SpfyEventLogEntry."Last Error Message" := CopyStr(InputTxt, 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
+                    end else
                         SpfyEventLogEntry."Processing Status" := SpfyEventLogEntry."Processing Status"::Postponed;
                 end;
             Success:
@@ -137,7 +195,8 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
                 begin
                     SpfyEventLogEntry."Processing Status" := SpfyEventLogEntry."Processing Status"::Error;
                     SpfyEventLogEntry."Last Error Date" := Today;
-                    SpfyEventLogEntry."Last Error Message" := CopyStr(InputTxt, 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
+                    if InputTxt <> '' then
+                        SpfyEventLogEntry."Last Error Message" := CopyStr(InputTxt, 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
                     SpfyEventLogEntry."Process Retry Count" += 1;
                 end;
         end;
@@ -196,6 +255,73 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
     end;
 
+    /// <summary>
+    /// Gives every failed entry of one store and document type a fresh start: the cached order payload is dropped so
+    /// the next attempt is downloaded from Shopify instead of replayed, and the retry state is reset, which un-parks
+    /// entries that had already run out of retries.
+    /// Deliberately not bounded by time: the import marker is an updated_at watermark, while the only timestamp an
+    /// entry carries is "Event Date-Time", which is the order's createdAt. Bounding on it would leave the stale payload
+    /// on exactly the orders a rewind is meant to refresh - the ones created long ago but updated recently.
+    /// The reach is therefore every failed entry of the store, not only those of the rewound period, and the cost is
+    /// not only a re-download: each un-parked entry is retried up to the maximum retry count again. That is the
+    /// intended shape of the gesture - an operator rewinding the marker is asking for the store to be re-read - but it
+    /// is worth showing them how many entries it touched, which is why the count is returned rather than discarded.
+    /// </summary>
+    internal procedure DiscardStoredOrderData(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"): Integer
+    var
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+    begin
+        SpfyEventLogEntry.SetCurrentKey(Type, "Store Code", "Document Type", "Processing Status");
+        SpfyEventLogEntry.SetRange(Type, SpfyEventLogEntry.Type::"Incoming Sales Order");
+        SpfyEventLogEntry.SetRange("Store Code", StoreCode);
+        SpfyEventLogEntry.SetRange("Document Type", DocType);
+        SpfyEventLogEntry.SetRange("Processing Status", SpfyEventLogEntry."Processing Status"::Error);
+        exit(DiscardStoredOrderData(SpfyEventLogEntry));
+    end;
+
+    internal procedure DiscardStoredOrderData(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry") DiscardedCount: Integer
+    begin
+        if not SpfyEventLogEntry.FindSet() then
+            exit;
+        repeat
+            Clear(SpfyEventLogEntry."Order Data");
+            SpfyEventLogEntry."Process Retry Count" := 0;
+            SpfyEventLogEntry.Postponed := false;
+            SpfyEventLogEntry."Not Before Date-Time" := 0DT;
+            SpfyEventLogEntry.Modify();
+            DiscardedCount += 1;
+        until SpfyEventLogEntry.Next() = 0;
+    end;
+
+    internal procedure ExpandSelectionToSiblings(var SelectedEntries: Record "NPR Spfy Event Log Entry"; var ExpandedEntries: Record "NPR Spfy Event Log Entry")
+    var
+        SiblingEntry: Record "NPR Spfy Event Log Entry";
+    begin
+        ExpandedEntries.Reset();
+        ExpandedEntries.ClearMarks();
+        SiblingEntry.SetCurrentKey("Type", "Store Code", "Shopify ID", "Document Status", "Document Type");
+        SiblingEntry.ReadIsolation := IsolationLevel::ReadCommitted;
+        if SelectedEntries.FindSet() then
+            repeat
+                if ExpandedEntries.Get(SelectedEntries."Entry No.") then
+                    ExpandedEntries.Mark(true);
+                if SelectedEntries."Shopify ID" <> '' then begin
+                    SiblingEntry.SetRange(Type, SelectedEntries.Type);
+                    SiblingEntry.SetRange("Store Code", SelectedEntries."Store Code");
+                    SiblingEntry.SetRange("Shopify ID", SelectedEntries."Shopify ID");
+                    SiblingEntry.SetRange("Document Type", SelectedEntries."Document Type");
+                    SiblingEntry.SetFilter("Document Status", '%1|%2', SiblingEntry."Document Status"::Open, SiblingEntry."Document Status"::Closed);
+                    if SiblingEntry.FindSet() then
+                        repeat
+                            if ExpandedEntries.Get(SiblingEntry."Entry No.") then
+                                ExpandedEntries.Mark(true);
+                        until SiblingEntry.Next() = 0;
+                end;
+            until SelectedEntries.Next() = 0;
+
+        ExpandedEntries.MarkedOnly(true);
+    end;
+
     internal procedure MarkEntryCreatedOutSideEcommerceFlow(var LogEntry: Record "NPR Spfy Event Log Entry"; OrderTkn: JsonToken)
     var
         LogEntryCreatedOutSideLbl: Label 'Log Entry is created outside Ecommerce flow.';
@@ -203,6 +329,41 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         LogEntry."Document Name" := CopyStr(JsonHelper.GetJText(OrderTkn, 'name', false), 1, MaxStrLen(LogEntry."Document Name"));
         LogEntry."Processing Status" := LogEntry."Processing Status"::Processed;
         LogEntry."Last Error Message" := LogEntryCreatedOutSideLbl;
+    end;
+
+    internal procedure RewindImportMarker(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"; NewDateTime: DateTime) DiscardedCount: Integer
+    var
+        CurrentMarker: DateTime;
+        RollbackTolerance: Duration;
+    begin
+        if NewDateTime = 0DT then
+            exit(0);
+        CurrentMarker := CurrentImportMarker(StoreCode, DocType);
+        if CurrentMarker = 0DT then
+            exit(0);
+        // Shopify's updatedAt has second-level resolution (see SpfyOrderImportTests around the
+        // SetLastOrdersImportedAt_MovedBack test), so any rewind within one second of the current
+        // marker is a no-op setter write, not a real backward step. RollbackTolerance guards
+        // against that spurious rewind.
+        RollbackTolerance := 1000;
+        if NewDateTime >= CurrentMarker - RollbackTolerance then
+            exit(0);
+        DiscardedCount := DiscardStoredOrderData(StoreCode, DocType);
+    end;
+
+    local procedure CurrentImportMarker(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"): DateTime
+    var
+        SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
+    begin
+        SpfyDataSyncPointer.ReadIsolation := IsolationLevel::ReadCommitted;
+        if not SpfyDataSyncPointer.Get(StoreCode) then
+            exit(0DT);
+        case DocType of
+            DocType::Order:
+                exit(SpfyDataSyncPointer."Last Orders Imported At");
+            DocType::"Return Order":
+                exit(SpfyDataSyncPointer."Last Returns Imported At");
+        end;
     end;
 
     var

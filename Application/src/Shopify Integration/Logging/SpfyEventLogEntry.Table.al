@@ -192,6 +192,7 @@ table 6150989 "NPR Spfy Event Log Entry"
         key(Key4; "Document Status", "Processing Status", "Process Retry Count") { }
         key(Key5; "Shopify ID", "Document Status") { }
         key(Key6; "Processing Status", "Process Retry Count", "Not Before Date-Time", "Document Type", "Bucket Id") { }
+        key(Key7; "Type", "Store Code", "Document Type", "Processing Status") { }
 #endif
     }
 

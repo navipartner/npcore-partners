@@ -1249,16 +1249,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     var
         SpfyProductPriceCalc: Codeunit "NPR Spfy Product Price Calc.";
         LineUnitPrice: Decimal;
+        CompareAtPrice: Decimal;
     begin
-        if SalesLine.Type = SalesLine.Type::Item then begin
-            if SpfyIntegrationMgt.OrderLineSalesPriceType(ShopifyStoreCode) = Enum::"NPR Spfy Order Line Price Type"::"Compare-at-Price" then
-                LineUnitPrice := SpfyProductPriceCalc.CalcCompareAtPrice(ShopifyStoreCode, SalesHeader."Currency Code", SalesLine."No.", SalesLine."Variant Code", SalesHeader."Posting Date");
-            if LineUnitPrice < ActualUnitPrice then
-                LineUnitPrice := ActualUnitPrice;
-            if LineUnitPrice > ActualUnitPrice then
-                LineDiscountAmount := LineDiscountAmount + LineUnitPrice * SalesLine.Quantity - ActualUnitPrice * SalesLine.Quantity;
-        end else
-            LineUnitPrice := ActualUnitPrice;
+        if (SalesLine.Type = SalesLine.Type::Item) and (SpfyIntegrationMgt.OrderLineSalesPriceType(ShopifyStoreCode) = Enum::"NPR Spfy Order Line Price Type"::"Compare-at-Price") then
+            CompareAtPrice := SpfyProductPriceCalc.CalcCompareAtPrice(ShopifyStoreCode, SalesHeader."Currency Code", SalesLine."No.", SalesLine."Variant Code", SalesHeader."Posting Date");
+        LineUnitPrice := ResolveUnitPriceAndDiscount(SalesLine.Type = SalesLine.Type::Item, CompareAtPrice, ActualUnitPrice, SalesLine.Quantity, LineDiscountAmount);
 
         GetGLSetup();
         if Round(SalesLine."Unit Price", GLSetup."Unit-Amount Rounding Precision") <> Round(LineUnitPrice, GLSetup."Unit-Amount Rounding Precision") then
@@ -1267,6 +1262,22 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if SalesLine."Unit Price" <> 0 then
             if Round(SalesLine."Line Discount Amount", GLSetup."Amount Rounding Precision") <> Round(LineDiscountAmount, GLSetup."Amount Rounding Precision") then
                 SalesLine.Validate("Line Discount Amount", LineDiscountAmount);
+    end;
+
+    internal procedure ResolveUnitPriceAndDiscount(IsItem: Boolean; CompareAtPrice: Decimal; ActualUnitPrice: Decimal; LineQty: Decimal; var LineDiscountAmount: Decimal) LineUnitPrice: Decimal
+    begin
+        // Shared unit-price / discount resolution for both the Ecommerce-create and update-Sales paths,
+        // so the compare-at logic never drifts between them. CompareAtPrice is 0 unless the store uses
+        // Compare-at pricing for this item line; when it exceeds the actual Shopify price, the difference
+        // is booked as line discount. (The caller owns the price date source and whether it Validates.)
+        if IsItem then begin
+            LineUnitPrice := CompareAtPrice;
+            if LineUnitPrice < ActualUnitPrice then
+                LineUnitPrice := ActualUnitPrice;
+            if LineUnitPrice > ActualUnitPrice then
+                LineDiscountAmount := LineDiscountAmount + LineUnitPrice * LineQty - ActualUnitPrice * LineQty;
+        end else
+            LineUnitPrice := ActualUnitPrice;
     end;
 
     internal procedure GetCustomerIdentifiers(Order: JsonToken; var Email: Text; var Phone: Text; var ShopifyCustomerID: Text[30]; CustomerDefaultPhonePath: Text; UseNumericId: Boolean)

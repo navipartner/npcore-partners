@@ -8,6 +8,11 @@ codeunit 6248657 "NPR Ecom Sales Doc Post"
         PostSalesOrder(Rec);
     end;
 
+    /// <summary>
+    /// The legacy "Spfy Auto-Fulfill" setting is no longer relevant in the ecommerce flow.
+    /// Virtual items are already provisioned and are always posted immediately once payment is captured,
+    /// so there is no longer a meaningful per-voucher-type opt-in.
+    /// </summary>
     local procedure SalesOrderPrepareVirtualItemsForPosting(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header")
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";

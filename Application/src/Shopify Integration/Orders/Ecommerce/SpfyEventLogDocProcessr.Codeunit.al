@@ -7,6 +7,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
     var
         LogEntry: Record "NPR Spfy Event Log Entry";
         SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        SpfyAPIEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
     begin
         ClearLastError();
         Clear(SpfyEcomSalesDocImport);
@@ -15,8 +16,48 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         if not Success then begin
             LogEntry.Get(SpfyEventLogEntry."Entry No.");
             HandleShopifyLog(false, GetLastErrorText(), LogEntry);
+            if SpfyAPIEventLogMgt.MaxRetryLimitReached(LogEntry) then
+                EmitSentryError(LogEntry);
             Commit();
         end;
+    end;
+
+    local procedure EmitSentryError(LogEntry: Record "NPR Spfy Event Log Entry")
+    var
+        Sentry: Codeunit "NPR Sentry";
+        TransactionNameLbl: Label 'Shopify document processing failed (%1): %2', Comment = '%1 = document type, %2 = Shopify store code', Locked = true;
+    begin
+        if not ShouldEmitSentryError(LogEntry."Store Code", LogEntry."Document Type") then
+            exit;
+        Sentry.InitScopeAndTransaction(StrSubstNo(TransactionNameLbl, Format(LogEntry."Document Type"), LogEntry."Store Code"), 'bc.shopify.order.process.error');
+        Sentry.AddTransactionTag('shopify.store_code', LogEntry."Store Code");
+        Sentry.AddTransactionTag('shopify.doc_type', Format(LogEntry."Document Type"));
+        Sentry.AddLastErrorIfProgrammingBug();
+        Sentry.FinalizeScope();
+    end;
+
+    local procedure ShouldEmitSentryError(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"): Boolean
+    begin
+        exit(ShouldEmitSentryError(StoreCode, DocType, CurrentDateTime()));
+    end;
+
+    internal procedure ShouldEmitSentryError(StoreCode: Code[20]; DocType: Enum "NPR SpfyEventLogDocType"; NowDT: DateTime): Boolean
+    var
+        LastEmitAt: DateTime;
+        ThrottleWindow: Duration;
+        ThrottleKey: Text;
+    begin
+        ThrottleWindow := 60 * 60 * 1000;
+        ThrottleKey := StrSubstNo('%1|%2', StoreCode, DocType.AsInteger());
+        if not _LastSentryEmitAt.ContainsKey(ThrottleKey) then begin
+            _LastSentryEmitAt.Add(ThrottleKey, NowDT);
+            exit(true);
+        end;
+        LastEmitAt := _LastSentryEmitAt.Get(ThrottleKey);
+        if (NowDT - LastEmitAt) < ThrottleWindow then
+            exit(false);
+        _LastSentryEmitAt.Set(ThrottleKey, NowDT);
+        exit(true);
     end;
 
     [TryFunction]
@@ -54,31 +95,87 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
     end;
 
     internal procedure ProcessLogEntries(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        PostponedCount: Integer;
     begin
-        SpfyEventLogEntry.SetFilter("Processing Status", '<>%1', SpfyEventLogEntry."Processing Status"::Processed);
+        exit(ProcessLogEntries(SpfyEventLogEntry, PostponedCount));
+    end;
+
+    /// <summary>
+    /// Returns whether the run finished without errors. A postponed entry is not an error, but it is not done either -
+    /// nothing was imported for it yet - so it is counted separately instead of being folded into the success answer.
+    /// </summary>
+    internal procedure ProcessLogEntries(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var PostponedCount: Integer): Boolean
+    var
+        ProcessedEntry: Record "NPR Spfy Event Log Entry";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        AnyError: Boolean;
+    begin
+        PostponedCount := 0;
+        SpfyIntegrationMgt.SetRereadSetup();
         if not SpfyEventLogEntry.FindSet() then
             exit(true);
         repeat
-            ProcessLogEntry(SpfyEventLogEntry);
+            if SpfyEventLogEntry."Processing Status" <> SpfyEventLogEntry."Processing Status"::Processed then
+                TrackEntryOutcome(SpfyEventLogEntry, ProcessedEntry, AnyError, PostponedCount)
+            else
+                if ReopenForProcessing(SpfyEventLogEntry) then
+                    TrackEntryOutcome(SpfyEventLogEntry, ProcessedEntry, AnyError, PostponedCount);
         until SpfyEventLogEntry.Next() = 0;
-
-        exit(CompletedSuccessfully(SpfyEventLogEntry));
+        exit(not AnyError);
     end;
 
-    local procedure CompletedSuccessfully(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
-    var
-        pSpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+    local procedure TrackEntryOutcome(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var ProcessedEntry: Record "NPR Spfy Event Log Entry"; var AnyError: Boolean; var PostponedCount: Integer)
     begin
-        pSpfyEventLogEntry.Copy(SpfyEventLogEntry);
-        pSpfyEventLogEntry.SetRange("Processing Status", pSpfyEventLogEntry."Processing Status"::Error);
-        exit(not pSpfyEventLogEntry.FindFirst());
+        ProcessLogEntry(SpfyEventLogEntry);
+        if not ProcessedEntry.Get(SpfyEventLogEntry."Entry No.") then begin
+            // The outcome cannot be read back, so it must not be reported as a success.
+            AnyError := true;
+            exit;
+        end;
+        case ProcessedEntry."Processing Status" of
+            ProcessedEntry."Processing Status"::Error:
+                AnyError := true;
+            ProcessedEntry."Processing Status"::Postponed:
+                PostponedCount += 1;
+        end;
+    end;
+
+    local procedure ReopenForProcessing(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EntryToReopen: Record "NPR Spfy Event Log Entry";
+    begin
+        if SpfyEventLogEntry."Processing Status" <> SpfyEventLogEntry."Processing Status"::Processed then
+            exit(false);
+        if not (SpfyEventLogEntry."Document Status" in [SpfyEventLogEntry."Document Status"::Open, SpfyEventLogEntry."Document Status"::Closed]) then
+            exit(false);
+        if AnySalesDocumentExists(SpfyEventLogEntry) then
+            exit(false);
+        if EcommerceDocAlreadyProcessed(SpfyEventLogEntry, EcomSalesHeader, false) then
+            exit(false);
+        EntryToReopen.ReadIsolation := IsolationLevel::UpdLock;
+        if not EntryToReopen.Get(SpfyEventLogEntry."Entry No.") then
+            exit(false);
+
+        EntryToReopen."Processing Status" := EntryToReopen."Processing Status"::Ready;
+        EntryToReopen."Process Retry Count" := 0;
+        EntryToReopen.Postponed := false;
+        EntryToReopen."Not Before Date-Time" := 0DT;
+        EntryToReopen."Last Error Message" := '';
+        EntryToReopen."Last Error Date" := 0D;
+        EntryToReopen.Modify();
+
+        Commit();
+        exit(true);
     end;
 
     [TryFunction]
     internal procedure TryCheckForUnprocessedEntry(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
     var
         PSpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
-        WaitingErr: label 'Unprocessed open Shopify document detected — waiting for completion.';
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        WaitingErr: label 'Unprocessed Shopify document detected (entry %1, status %2) — waiting for completion.', Comment = '%1 = Entry No. of the blocking log entry, %2 = its Document Status';
     begin
         PSpfyEventLogEntry.ReadIsolation := IsolationLevel::ReadCommitted;
         PSpfyEventLogEntry.SetCurrentKey("Shopify ID", "Document Status", "Store Code", "Processing Status");
@@ -86,36 +183,22 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         PSpfyEventLogEntry.SetFilter("Document Status", '1..%1', SpfyEventLogEntry."Document Status".AsInteger());
         PSpfyEventLogEntry.SetFilter("Entry No.", '<>%1', SpfyEventLogEntry."Entry No.");
         PSpfyEventLogEntry.SetRange("Store Code", SpfyEventLogEntry."Store Code");
+        PSpfyEventLogEntry.SetRange("Document Type", SpfyEventLogEntry."Document Type");
         PSpfyEventLogEntry.SetFilter("Processing Status", '<>%1', PSpfyEventLogEntry."Processing Status"::Processed);
+        PSpfyEventLogEntry.SetFilter("Process Retry Count", '<=%1', SpfyIntegrationMgt.GetMaxDocRetryCount());
         If PSpfyEventLogEntry.FindFirst() then
-            Error(WaitingErr);
+            Error(WaitingErr, PSpfyEventLogEntry."Entry No.", PSpfyEventLogEntry."Document Status");
     end;
 
     internal procedure ProcessLogEntry(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
     begin
-        ClearLastError();
         if not ProcessEcommerceDocument(SpfyEventLogEntry) then
             LogError(GetLastErrorText());
     end;
 
     local procedure LogError(ErrMsg: text)
-    var
-        ActiveSession: Record "Active Session";
-        CustomDimensions: Dictionary of [Text, Text];
     begin
-        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-            ActiveSession.Init();
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
-        CustomDimensions.Add('NPR_ErrorText', ErrMsg);
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-
-        Session.LogMessage('NPR_ShopifyAPI_OrderCreationFailed', ErrMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+        LogTelemetry(ErrMsg, 'NPR_ShopifyAPI_OrderCreationFailed');
     end;
 
     internal procedure FindIncomingEcommerceDocument(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
@@ -161,7 +244,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         end;
     end;
 
-    internal procedure EmitMessage(MessageInput: Text; EventId: Text)
+    internal procedure LogTelemetry(MessageInput: Text; EventId: Text)
     var
         ActiveSession: Record "Active Session";
         CustomDimensions: Dictionary of [Text, Text];
@@ -199,24 +282,17 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
     end;
 
     internal procedure IsShopifyDocument(EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
-    var
-        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
     begin
-        exit(IsShopifyDocument(EcomSalesHeader, SpfyEventLogEntry));
+        exit(EcomSalesHeader."Document Source" = EcomSalesHeader."Document Source"::Shopify);
     end;
 
-    local procedure IsShopifyDocument(EcomSalesHeader: Record "NPR Ecom Sales Header"; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    internal procedure GetShopifyLogEntry(EcomSalesHeader: Record "NPR Ecom Sales Header"; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
     begin
         Clear(SpfyEventLogEntry);
         SpfyEventLogEntry.SetCurrentKey("Shopify ID", "Document Type", "Document Status");
         SpfyEventLogEntry.SetRange("Shopify ID", EcomSalesHeader."External No.");
         SpfyEventLogEntry.SetRange("Document Type", MapEcommerceDocumentTypeToSpfy(EcomSalesHeader."Document Type"));
         exit(SpfyEventLogEntry.FindFirst());
-    end;
-
-    internal procedure GetShopifyLogEntry(EcomSalesHeader: Record "NPR Ecom Sales Header"; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
-    begin
-        exit(IsShopifyDocument(EcomSalesHeader, SpfyEventLogEntry));
     end;
 
     internal procedure AssignShopifyIDToVoucher(NpRvVoucher: Record "NPR NpRv Voucher"; NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -279,7 +355,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
     var
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
     begin
-        if not IsShopifyDocument(EcomSalesHeader, SpfyEventLogEntry) then
+        if not GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then
             exit;
         if SpfyEventLogEntry."Closed Date-Time" > SpfyEventLogEntry."Event Date-Time" then
             SalesHeader.Validate("Posting Date", DT2Date(SpfyEventLogEntry."Closed Date-Time"))
@@ -294,7 +370,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
-        if not IsShopifyDocument(EcomSalesHeader, SpfyEventLogEntry) then
+        if not GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then
             exit;
         NpEcStore.Get(EcomSalesHeader."Ecommerce Store Code");
         if NpEcStore."Salesperson/Purchaser Code" <> '' then
@@ -343,7 +419,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
     begin
-        if not IsShopifyDocument(EcomSalesHeader, SpfyEventLogEntry) then
+        if not GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then
             exit;
         SpfyEventLogEntry.Modify();
         SpfyEventLogEntry.RegisterEvent(SpfyEventLogEntry);
@@ -363,19 +439,101 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
     var
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
     begin
-        if not IsShopifyDocument(EcomSalesHeader, SpfyEventLogEntry) then
+        if not GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then
             exit;
         CheckIfSalesDocumentCreatedOutsideEcommerceFlow(SpfyEventLogEntry);
     end;
 
+    internal procedure MarkProcessedIfDocumentAlreadyExists(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        NothingToImportMsg: Label 'A Business Central sales document already exists for this Shopify document, so there was nothing left to import.';
+    begin
+        if not DocumentAlreadyHandled(SpfyEventLogEntry) then
+            exit(false);
+        // An Ecommerce document still around means the regular create/update paths own this entry.
+        if EcommerceDocAlreadyProcessed(SpfyEventLogEntry, EcomSalesHeader, false) then
+            exit(false);
+
+        SpfyEventLogEntry."Processing Status" := SpfyEventLogEntry."Processing Status"::Processed;
+        SpfyEventLogEntry."Last Error Date" := 0D;
+        SpfyEventLogEntry."Last Error Message" := CopyStr(NothingToImportMsg, 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
+        SpfyEventLogEntry.Modify();
+        exit(true);
+    end;
+
+    local procedure DocumentAlreadyHandled(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        UnpostedExists: Boolean;
+        PostedExists: Boolean;
+    begin
+        GetSalesDocumentState(SpfyEventLogEntry, UnpostedExists, PostedExists);
+        case SpfyEventLogEntry."Document Status" of
+            SpfyEventLogEntry."Document Status"::Open:
+                exit(PostedExists);
+            SpfyEventLogEntry."Document Status"::Closed:
+                exit(PostedExists and not UnpostedExists);
+        end;
+        // Cancelled keeps its existing behaviour.
+        exit(false);
+    end;
+
+    local procedure GetSalesDocumentState(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var UnpostedExists: Boolean; var PostedExists: Boolean)
+    var
+        PostedTableNo: Integer;
+    begin
+        if SpfyEventLogEntry."Document Type" = SpfyEventLogEntry."Document Type"::Order then
+            PostedTableNo := Database::"Sales Invoice Header"
+        else
+            PostedTableNo := Database::"Sales Cr.Memo Header";
+
+        UnpostedExists := DocumentExistsForStore(Database::"Sales Header", SpfyEventLogEntry);
+        PostedExists := DocumentExistsForStore(PostedTableNo, SpfyEventLogEntry);
+    end;
+
+    local procedure DocumentExistsForStore(TableNo: Integer; SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+        DocumentStoreCode: Code[20];
+    begin
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(TableNo, "NPR Spfy ID Type"::"Entry ID", SpfyEventLogEntry."Shopify ID", ShopifyAssignedID);
+        if not ShopifyAssignedID.FindSet() then
+            exit(false);
+        repeat
+            if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
+                if SpfyEventLogEntry."Store Code" = '' then
+                    exit(true);
+                DocumentStoreCode := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(ShopifyAssignedID."BC Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(DocumentStoreCode));
+                if (DocumentStoreCode = '') or (DocumentStoreCode = SpfyEventLogEntry."Store Code") then
+                    exit(true);
+            end;
+        until ShopifyAssignedID.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure AnySalesDocumentExists(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        UnpostedExists: Boolean;
+        PostedExists: Boolean;
+    begin
+        GetSalesDocumentState(SpfyEventLogEntry, UnpostedExists, PostedExists);
+        exit(UnpostedExists or PostedExists);
+    end;
+
     internal procedure CheckIfSalesDocumentCreatedOutsideEcommerceFlow(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
     var
+        SalesHeader: Record "Sales Header";
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
-        CreatedDocumentErrorLbl: Label 'The Shopify document was created outside of the Ecommerce flow and cannot be processed. Please handle the sales document manually.';
+        CreatedDocumentErrorLbl: Label 'This Shopify document was not created by the Ecommerce flow, so the flow will not change it. Post or cancel %1 %2 manually - once it is posted, processing this log entry again completes it.', Comment = '%1 = Sales document type, %2 = Sales document number';
+        CreatedDocumentNoRefErrorLbl: Label 'This Shopify document was not created by the Ecommerce flow, so the flow will not change it. Please handle the sales document manually - once it is posted, processing this log entry again completes it.';
     begin
-        if SpfyOrderMgt.SalesOrderExists(SpfyEventLogEntry."Store Code", SpfyEventLogEntry."Shopify ID") or
-            SpfyOrderMgt.PostedDocumentExists(SpfyEventLogEntry."Store Code", SpfyEventLogEntry."Shopify ID", SpfyEventLogEntry."Document Type" = SpfyEventLogEntry."Document Type"::Order) then
-            Error(CreatedDocumentErrorLbl);
+        if not AnySalesDocumentExists(SpfyEventLogEntry) then
+            exit;
+        if SpfyOrderMgt.FindSalesOrder(SpfyEventLogEntry."Store Code", SpfyEventLogEntry."Shopify ID", SalesHeader) then
+            Error(CreatedDocumentErrorLbl, SalesHeader."Document Type", SalesHeader."No.");
+        Error(CreatedDocumentNoRefErrorLbl);
     end;
 
     internal procedure EcomStatusOnDrillDown(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
@@ -439,6 +597,7 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
 
     var
         UnSupportedErr: Label 'Unsupported document type. This is a programming issue.';
+        _LastSentryEmitAt: Dictionary of [Text, DateTime];
 
 }
 #endif

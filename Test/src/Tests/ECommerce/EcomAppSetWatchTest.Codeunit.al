@@ -611,10 +611,9 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
     begin
         Initialize();
 
-        // [SCENARIO] Shopify writes its marker one level above the download loop - TryUpdateMarker between
-        // downloads and FinalizeMarker at the end of the run. Both refuse, and FinalizeMarker is the one a test
-        // can drive: TryUpdateMarker is throttled to one write every five minutes.
-        // Leaving the loop is therefore not enough on its own; the write point itself has to refuse.
+        // [SCENARIO] Shopify writes its per-store marker via TryUpdateMarker, called from ProcessStore between order
+        // downloads and after return processing. When the installed app set changed under this session,
+        // TryUpdateMarker must refuse the write.
 
         // [GIVEN] A Shopify store whose orders marker stands at 1 March 2024
         MarkerBefore := CreateDateTime(DMY2Date(1, 3, 2024), 100000T);
@@ -627,7 +626,7 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
 
         // [WHEN] The app set is already known to have changed and the marker write is attempted
         EcomAppSetWatch.SetChangedForTest();
-        GuardHeld := TrySpfyFinalizeMarker(SpfyOrderImportJQ, ShopifyStore);
+        GuardHeld := TrySpfyTryUpdateMarker(SpfyOrderImportJQ, ShopifyStore);
         MarkerAfter := LastOrdersImportedAt(ShopifyStore.Code);
         EcomAppSetWatch.ResetForTest();
 
@@ -636,7 +635,7 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
         _Assert.IsTrue(GuardHeld, 'A guarded marker write must return cleanly.');
 
         // [THEN] The marker has not moved
-        _Assert.AreEqual(MarkerBefore, MarkerAfter, 'A session that stopped paging part way through no longer has a session max that describes a window it finished importing, so it must write no marker at all.');
+        _Assert.AreEqual(MarkerBefore, MarkerAfter, 'When the app set changed under this session, the per-store marker write must not advance the stored marker.');
     end;
 
     [Test]
@@ -649,6 +648,7 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
         SessionMax: DateTime;
     begin
         Initialize();
+
         // [SCENARIO] The control for the case above. Same fixture, clear latch, so the marker MUST move -
         // otherwise the assertion above would hold for a store whose marker cannot be written at all.
 
@@ -658,9 +658,10 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
         InitializeShopifyStore(ShopifyStore, MarkerBefore);
         SpfyOrderImportJQ.SetMarkers(ShopifyStore, "NPR SpfyEventLogDocType"::Order);
         SpfyOrderImportJQ.UpdateSessionMax(ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order, SessionMax);
+        EcomAppSetWatch.ResetForTest();
 
         // [WHEN] The marker write is attempted
-        SpfyOrderImportJQ.FinalizeMarker(ShopifyStore, "NPR SpfyEventLogDocType"::Order);
+        SpfyOrderImportJQ.TryUpdateMarker(ShopifyStore, "NPR SpfyEventLogDocType"::Order);
 
         // [THEN] The marker advances to the session maximum
         _Assert.AreEqual(SessionMax, LastOrdersImportedAt(ShopifyStore.Code), 'Without a change to guard against, the marker must advance to the session maximum - if it does not, the guarded case proves nothing.');
@@ -678,10 +679,12 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
         Initialize();
 
         // [SCENARIO] The outermost Shopify guard. The observable is deliberately NOT the marker: with the
-        // download blocked in a sandbox, LogError sets ErrorsSinceLastMarker and the marker stays put
-        // whether the guard fires or not, so a marker assertion here would pass for the wrong reason. The
-        // dictionary instead names a store that does not exist, and Process reaches ShopifyStore.Get one
-        // statement after the guard. Reaching it is an error; not reaching it is the guard working.
+        // download blocked in a sandbox, LogError calls StopMarker which writes _MarkerStopped[key] = true,
+        // and TryUpdateMarker short-circuits when MarkerStopped(...) is true - so the marker stays put
+        // whether the outer guard fires or not, and a marker assertion here would pass for the wrong
+        // reason. The dictionary instead names a store that does not exist, and Process reaches
+        // ShopifyStore.Get one statement after the guard. Reaching it is an error; not reaching it is
+        // the guard working.
 
         // [GIVEN] A store list naming a store code that has no record
         AreaEnabled.Set("NPR SpfyEventLogDocType"::Order, true);
@@ -754,9 +757,9 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
     end;
 
     [TryFunction]
-    local procedure TrySpfyFinalizeMarker(var SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ"; ShopifyStore: Record "NPR Spfy Store")
+    local procedure TrySpfyTryUpdateMarker(var SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ"; ShopifyStore: Record "NPR Spfy Store")
     begin
-        SpfyOrderImportJQ.FinalizeMarker(ShopifyStore, "NPR SpfyEventLogDocType"::Order);
+        SpfyOrderImportJQ.TryUpdateMarker(ShopifyStore, "NPR SpfyEventLogDocType"::Order);
     end;
 
     [TryFunction]

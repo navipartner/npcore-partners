@@ -15,13 +15,17 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         PaymentLine: Record "NPR Magento Payment Line";
         TempNcTask: Record "NPR Nc Task" temporary;
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
+        BlockedReason: Text;
     begin
         InitNcTaskFromPmtRequest(Request, PaymentLine, TempNcTask);
+        if not CheckPrerequisites(TempNcTask, Response, BlockedReason) then begin
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-        if not EcomSalesHeader.GetBySystemId(PaymentLine."NPR Inc Ecom Sale Id") then //skip for ecommerce flow
+            if (PaymentLine."Date Captured" = 0D) and not PaymentLine."Capture Requested" then
+                if EcomSalesHeader.GetBySystemId(PaymentLine."NPR Inc Ecom Sale Id") then
+                    Error(BlockedReason);
 #endif
-            if not CheckPrerequisites(TempNcTask, Response) then
-                exit;
+            exit;
+        end;
         if not SpfyCapturePayment.CaptureShopifyPayment(PaymentLine, TempNcTask, Response) then
             Error(GetLastErrorText());
     end;
@@ -123,17 +127,17 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         NcTask."Record ID" := PaymentLine.RecordId();
     end;
 
-    local procedure CheckPrerequisites(NcTask: Record "NPR Nc Task"; var Response: Record "NPR PG Payment Response"): Boolean
+    local procedure CheckPrerequisites(NcTask: Record "NPR Nc Task"; var Response: Record "NPR PG Payment Response"; var BlockedReason: Text): Boolean
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        IntegrationNotEnabledMsg: Label 'Either sending capture requests is disabled, or Shopify integration is not enabled for store %1.';
+        IntegrationNotEnabledMsg: Label 'Either sending capture requests is disabled, or Shopify integration is not enabled for store %1.', Comment = '%1 - Shopify store code';
     begin
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Payment Capture Requests", NcTask."Store Code") then begin
-            SetResponse(StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code"), Response, false, Enum::"NPR PG Operation Status"::Failure);
-            if UpdateLastErrorText(StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code")) then;
-            exit;
-        end;
-        exit(true);
+        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Payment Capture Requests", NcTask."Store Code") then
+            exit(true);
+        BlockedReason := StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code");
+        SetResponse(BlockedReason, Response, false, Enum::"NPR PG Operation Status"::Failure);
+        if UpdateLastErrorText(BlockedReason) then;
+        exit(false);
     end;
 
     [TryFunction]

@@ -355,13 +355,26 @@ page 6184704 "NPR Spfy Store Card"
                 field("Last Orders Imported At"; _LastOrdersImportedAt)
                 {
                     Caption = 'Last Orders Imported At';
-                    ToolTip = 'Specifies the date and time sales orders were last imported from the Shopify store. The next time, the system will only import orders created or updated after this time.';
+                    ToolTip = 'Specifies the date and time sales orders were last imported from the Shopify store. The next time, the system will only import orders created or updated after this time. Setting it to an earlier time makes the import job re-read that period, and the stored Shopify order data of the store''s failed log entries is discarded so that they download the order again.';
                     ApplicationArea = NPRShopify;
                     Importance = Additional;
 
                     trigger OnValidate()
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+                    var
+                        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+                        DiscardedCount: Integer;
+                        EntriesGivenAFreshStartMsg: Label '%1 failed log entries of this store were given a fresh start: their downloaded Shopify order data was discarded and they will be retried.', Comment = '%1 = number of log entries';
+#endif
                     begin
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+                        DiscardedCount := SpfyEventLogMgt.RewindImportMarker(Rec.Code, "NPR SpfyEventLogDocType"::Order, _LastOrdersImportedAt);
                         Rec.SetLastOrdersImportedAt(_LastOrdersImportedAt);
+                        if GuiAllowed() and (DiscardedCount > 0) then
+                            Message(EntriesGivenAFreshStartMsg, DiscardedCount);
+#else
+                        Rec.SetLastOrdersImportedAt(_LastOrdersImportedAt);
+#endif
                     end;
                 }
                 field("Spfy C&C Order Workflow Code"; Rec."Spfy C&C Order Workflow Code")
@@ -510,13 +523,20 @@ page 6184704 "NPR Spfy Store Card"
                 field("Last Returns Imported At"; _LastReturnsImportedAt)
                 {
                     Caption = 'Last Returns Imported At';
-                    ToolTip = 'Specifies the date and time returns were last imported from the Shopify store. On the next run, the system scans Shopify orders updated after this point and imports their closed returns.';
+                    ToolTip = 'Specifies the date and time returns were last imported from the Shopify store. On the next run, the system scans Shopify orders updated after this point and imports their closed returns. Setting it to an earlier time makes the import job re-scan that period, and the stored Shopify order data of the store''s failed return log entries is discarded so that they download the return again.';
                     ApplicationArea = NPRShopify;
                     Importance = Additional;
 
                     trigger OnValidate()
+                    var
+                        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+                        DiscardedCount: Integer;
+                        EntriesGivenAFreshStartMsg: Label '%1 failed log entries of this store were given a fresh start: their downloaded Shopify order data was discarded and they will be retried.', Comment = '%1 = number of log entries';
                     begin
+                        DiscardedCount := SpfyEventLogMgt.RewindImportMarker(Rec.Code, "NPR SpfyEventLogDocType"::"Return Order", _LastReturnsImportedAt);
                         Rec.SetLastReturnsImportedAt(_LastReturnsImportedAt);
+                        if GuiAllowed() and (DiscardedCount > 0) then
+                            Message(EntriesGivenAFreshStartMsg, DiscardedCount);
                     end;
                 }
             }

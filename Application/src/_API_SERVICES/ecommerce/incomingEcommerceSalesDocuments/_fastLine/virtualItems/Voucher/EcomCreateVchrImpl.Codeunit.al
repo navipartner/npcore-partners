@@ -220,7 +220,7 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
             NpRvSalesLineRef.Modify();
         end;
 
-        if NpRvSalesLine."Spfy Gift Card ID" <> '' then
+        if (NpRvSalesLine."Spfy Gift Card ID" <> '') and (NpRvSalesLine.Type <> NpRvSalesLine.Type::"Top-up") then
             SpfyEcomSalesDocPrcssr.AssignShopifyIDToVoucher(NpRvVoucher, NpRvSalesLine);
 
         NpRvVoucherOut := NpRvVoucher;
