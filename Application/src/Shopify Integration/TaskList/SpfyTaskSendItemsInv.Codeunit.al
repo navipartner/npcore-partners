@@ -1,5 +1,5 @@
-#if not BC17
-// Native sibling of frozen codeunit "NPR Spfy Send Items&Inventory" — any fix MUST be dual-applied to both.
+﻿#if not BC17
+// Native sibling of frozen codeunit "NPR Spfy Send Items&Inventory": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
 codeunit 6151253 "NPR Spfy Task Send Items&Inv"
 {
     Access = Internal;
@@ -113,6 +113,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         TempIncomingSpfyTasks: Record "NPR Spfy Task" temporary;
         TempSpfyTaskToProcess: Record "NPR Spfy Task" temporary;
         TempRequestedVariantBuffer: Record "NPR Spfy ID/Task Buffer" temporary;
+        SpfyTaskRunContext: Codeunit "NPR Spfy Task Run Context";
         ShopifyRequest: JsonObject;
         ItemsToReorder: Dictionary of [Code[20], Text[30]];
         ItemNoToReorder: Code[20];
@@ -120,6 +121,8 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         ShopifyProductID: Text[30];
         RequestType: Enum "NPR Spfy Task Op";
         RequestTypeOrdinal: Integer;
+        PrepareReturnedFalse: Boolean;
+        StopForDeadline: Boolean;
         VariantInsertProcessed: Boolean;
     begin
         if not SpfyTask.IsTemporary() then
@@ -133,22 +136,33 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
             TempIncomingSpfyTasks.Insert();
         until SpfyTask.Next() = 0;
 
-        while PrepareBulkItemVariantUpdateRequest(TempIncomingSpfyTasks, TempSpfyTaskToProcess, ShopifyProductID, Item) do begin
-            VariantInsertProcessed := false;
-            foreach RequestTypeOrdinal in Enum::"NPR Spfy Task Op".Ordinals() do begin
-                RequestType := Enum::"NPR Spfy Task Op".FromInteger(RequestTypeOrdinal);
-                TempSpfyTaskToProcess.SetRange(Type, RequestType);
-                if not TempSpfyTaskToProcess.IsEmpty() then
-                    if GenerateRequestAndSetSpfyTaskClaimed(TempSpfyTaskToProcess, ShopifyProductID, TempRequestedVariantBuffer, ShopifyRequest) then begin
-                        ProcessAndUpdateNCTasksWithDataFromShopify(TempSpfyTaskToProcess, TempRequestedVariantBuffer, ShopifyRequest);
-                        if RequestType = RequestType::Insert then
-                            VariantInsertProcessed := true;
+        StopForDeadline := false;
+        PrepareReturnedFalse := false;
+        while not (StopForDeadline or PrepareReturnedFalse) do
+            if SpfyTaskRunContext.DeadlineExpired() then
+                StopForDeadline := true
+            else
+                if not PrepareBulkItemVariantUpdateRequest(TempIncomingSpfyTasks, TempSpfyTaskToProcess, ShopifyProductID, Item) then
+                    PrepareReturnedFalse := true
+                else begin
+                    VariantInsertProcessed := false;
+                    foreach RequestTypeOrdinal in Enum::"NPR Spfy Task Op".Ordinals() do begin
+                        RequestType := Enum::"NPR Spfy Task Op".FromInteger(RequestTypeOrdinal);
+                        TempSpfyTaskToProcess.SetRange(Type, RequestType);
+                        if not TempSpfyTaskToProcess.IsEmpty() then
+                            if GenerateRequestAndSetSpfyTaskClaimed(TempSpfyTaskToProcess, ShopifyProductID, TempRequestedVariantBuffer, ShopifyRequest) then begin
+                                ProcessAndUpdateNCTasksWithDataFromShopify(TempSpfyTaskToProcess, TempRequestedVariantBuffer, ShopifyRequest);
+                                if RequestType = RequestType::Insert then
+                                    VariantInsertProcessed := true;
+                            end;
                     end;
-            end;
-            if VariantInsertProcessed and (ShopifyProductID <> '') and (Item."No." <> '') then
-                if not ItemsToReorder.ContainsKey(Item."No.") then
-                    ItemsToReorder.Add(Item."No.", ShopifyProductID);
-        end;
+                    if VariantInsertProcessed and (ShopifyProductID <> '') and (Item."No." <> '') then
+                        if not ItemsToReorder.ContainsKey(Item."No.") then
+                            ItemsToReorder.Add(Item."No.", ShopifyProductID);
+                end;
+
+        if PrepareReturnedFalse then
+            FailAbortedPrepareRow(TempIncomingSpfyTasks);
 
         if not _SpfyIntegrationMgt.ProductVariantSortingEnabled() then
             exit;
@@ -161,7 +175,10 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     var
         TempIncomingSpfyTasks: Record "NPR Spfy Task" temporary;
         TempSpfyTask: Record "NPR Spfy Task" temporary;
+        SpfyTaskRunContext: Codeunit "NPR Spfy Task Run Context";
         BulkUpdateRequest: JsonObject;
+        PrepareReturnedFalse: Boolean;
+        StopForDeadline: Boolean;
     begin
         if not SpfyTask.IsTemporary() then
             FunctionCallOnNonTempVarErr('BulkSendShopifyInventoryUpdate');
@@ -173,9 +190,21 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
             TempIncomingSpfyTasks.Insert();
         until SpfyTask.Next() = 0;
 
-        while PrepareItemUpdateRequest(TempIncomingSpfyTasks, TempSpfyTask) do
-            if GenerateBulkRequestAndSetSpfyTaskClaimed(TempSpfyTask, BulkUpdateRequest) then
-                ProcessShopifyResponseAndUpdateSpfyTask(TempSpfyTask, BulkUpdateRequest);
+        StopForDeadline := false;
+        PrepareReturnedFalse := false;
+        while not (StopForDeadline or PrepareReturnedFalse) do
+            if SpfyTaskRunContext.DeadlineExpired() then
+                StopForDeadline := true
+            else begin
+                if not PrepareItemUpdateRequest(TempIncomingSpfyTasks, TempSpfyTask) then
+                    PrepareReturnedFalse := true
+                else
+                    if GenerateBulkRequestAndSetSpfyTaskClaimed(TempSpfyTask, BulkUpdateRequest) then
+                        ProcessShopifyResponseAndUpdateSpfyTask(TempSpfyTask, BulkUpdateRequest);
+            end;
+
+        if PrepareReturnedFalse then
+            FailAbortedPrepareRow(TempIncomingSpfyTasks);
     end;
 
     [TryFunction]
@@ -228,7 +257,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
                         _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, StrSubstNo(_ItemVariantBlockedOrDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
                     end;
                 if SpfyTaskOut.State <> SpfyTaskOut.State::Completed then begin
-                    PrepareError := not GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", true, SpfyStoreItemLink);  //Check integration is enabled for the item
+                    PrepareError := not GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", false, SpfyStoreItemLink);  //Check integration is enabled for the item
                     if PrepareError then
                         _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, _ItemIntegrNotEnabledErr)
                     else begin
@@ -257,7 +286,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
                                     end else begin
                                         IncludedSpfyTasks += 1;
                                         SpfyTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
-                                        OStream.WriteText(StrSubstNo(UpdateLevelItemRequest, 'NCTask' + Format(SpfyTaskIn."Entry No."), ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel.AvailableInventory(), Format(SpfyTaskIn."Dispatch Id", 0, 4)));
+                                        OStream.WriteText(StrSubstNo(UpdateLevelItemRequest, 'SpfyTask' + Format(SpfyTaskIn."Entry No."), ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel.AvailableInventory(), Format(SpfyTaskIn."Dispatch Id", 0, 4)));
                                     end;
                                 end;
                             end;
@@ -365,7 +394,10 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     var
         TempIncomingSpfyTasks: Record "NPR Spfy Task" temporary;
         TempSpfyTask: Record "NPR Spfy Task" temporary;
+        SpfyTaskRunContext: Codeunit "NPR Spfy Task Run Context";
         productVariantsBulkUpdateRequestString: Text;
+        PrepareReturnedFalse: Boolean;
+        StopForDeadline: Boolean;
     begin
         if not SpfyTask.IsTemporary() then
             FunctionCallOnNonTempVarErr('SendShopifyItemPrices');
@@ -376,9 +408,43 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
             TempIncomingSpfyTasks.Insert();
         until SpfyTask.Next() = 0;
 
-        while PrepareItemPriceUpdateRequest(TempIncomingSpfyTasks, TempSpfyTask) do
-            if SetSpfyTaskClaimed(TempSpfyTask, productVariantsBulkUpdateRequestString) then
-                UpdateNCTasksWithDataFromShopify(TempSpfyTask, productVariantsBulkUpdateRequestString);
+        StopForDeadline := false;
+        PrepareReturnedFalse := false;
+        while not (StopForDeadline or PrepareReturnedFalse) do
+            if SpfyTaskRunContext.DeadlineExpired() then
+                StopForDeadline := true
+            else begin
+                if not PrepareItemPriceUpdateRequest(TempIncomingSpfyTasks, TempSpfyTask) then
+                    PrepareReturnedFalse := true
+                else
+                    if SetSpfyTaskClaimed(TempSpfyTask, productVariantsBulkUpdateRequestString) then
+                        UpdateNCTasksWithDataFromShopify(TempSpfyTask, productVariantsBulkUpdateRequestString);
+            end;
+
+        if PrepareReturnedFalse then
+            FailAbortedPrepareRow(TempIncomingSpfyTasks);
+    end;
+
+    // A preparation that raised leaves its own row unconsumed, so only that row is charged and its group mates stay pending.
+    local procedure FailAbortedPrepareRow(var SpfyTaskIn: Record "NPR Spfy Task")
+    var
+        SpfyTaskToFail: Record "NPR Spfy Task";
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        AbortErrorText: Text;
+        PrepareAbortedNoTextLbl: Label 'The update was not sent: the request preparation was interrupted without an error message.';
+    begin
+        AbortErrorText := GetLastErrorText();
+        if not SpfyTaskIn.IsTemporary() then
+            FunctionCallOnNonTempVarErr('FailAbortedPrepareRow');
+        // Read under the filters the aborted preparation left in place, or a row of another entity could be blamed.
+        if not SpfyTaskIn.FindFirst() then
+            exit;
+        if AbortErrorText = '' then
+            AbortErrorText := PrepareAbortedNoTextLbl;
+        Clear(SpfyTaskToFail);
+        SpfyTaskToFail."Entry No." := SpfyTaskIn."Entry No.";
+        if SpfyTaskQueue.ClaimSingle(SpfyTaskToFail) then
+            SpfyTaskQueue.CompleteSingle(SpfyTaskToFail, false, AbortErrorText);
     end;
 
     local procedure UpdateNCTasksWithDataFromShopify(var SpfyTaskIn: Record "NPR Spfy Task"; productVariantsBulkUpdateRequestString: Text)
@@ -496,9 +562,9 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     [TryFunction]
     local procedure GetSpfyTaskFromResponse(DataKey: Text; var TaskEntryNo: biginteger)
     begin
-        if StrPos(DataKey, 'NCTask') = 0 then
+        if StrPos(DataKey, 'SpfyTask') = 0 then
             Error('');
-        Evaluate(TaskEntryNo, CopyStr(DataKey, StrLen('NCTask') + 1));
+        Evaluate(TaskEntryNo, CopyStr(DataKey, StrLen('SpfyTask') + 1));
     end;
 
     local procedure ProcessAndUpdateNCTasksWithDataFromShopify(var SpfyTaskIn: Record "NPR Spfy Task"; var RequestedVariantBuffer: Record "NPR Spfy ID/Task Buffer"; ShopifyRequest: JsonObject)
@@ -511,11 +577,14 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         ShopifyResponseVariants: JsonToken;
         UserError: JsonToken;
         VariantJToken: JsonToken;
+        MutationUserErrors: TextBuilder;
         OStream: OutStream;
         VariantNo: Integer;
         DataKey: Text;
+        ErrPart: Text;
         RequestErrorText: Text;
         Success: Boolean;
+        BatchNotAppliedErrLbl: Label 'The variant was not confirmed by Shopify because the request failed with the following error(s):\%1', Comment = '%1 = the error messages returned by Shopify for the request';
     begin
         if not SpfyTaskIn.FindFirst() then
             exit;
@@ -534,14 +603,18 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
                 foreach DataKey in ResponseDataSet.AsObject().Keys() do begin
                     if ResponseDataSet.SelectToken(DataKey + '.userErrors', ShopifyResponseUserErrors) and ShopifyResponseUserErrors.IsArray() then
                         if ShopifyResponseUserErrors.AsArray().Count() > 0 then
-                            foreach UserError in ShopifyResponseUserErrors.AsArray() do
+                            foreach UserError in ShopifyResponseUserErrors.AsArray() do begin
+                                ErrPart := _JsonHelper.GetJText(UserError, 'message', false);
+                                if ErrPart <> '' then
+                                    MutationUserErrors.AppendLine(ErrPart);
                                 if _JsonHelper.GetJText(UserError, 'field[0]', false) in ['variants', 'variantsIds'] then
                                     if Evaluate(VariantNo, _JsonHelper.GetJText(UserError, 'field[1]', false)) then
                                         if RequestedVariantBuffer.Get(VariantNo) then
                                             if SpfyTaskIn.Get(RequestedVariantBuffer."Nc Task Entry No.") then begin
-                                                MarkSpfyTaskAsCompleted(SpfyTaskIn."Entry No.", UserError, false, _JsonHelper.GetJText(UserError, 'message', false));
+                                                MarkSpfyTaskAsCompleted(SpfyTaskIn."Entry No.", UserError, false, ErrPart);
                                                 SpfyTaskIn.Delete();
                                             end;
+                            end;
 
                     if ResponseDataSet.SelectToken(DataKey + '.productVariants', ShopifyResponseVariants) and ShopifyResponseVariants.IsArray() then
                         if ShopifyResponseVariants.AsArray().Count() > 0 then
@@ -556,10 +629,16 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
                 end;
 
         //Variants not in response
-        if SpfyTaskIn.FindSet() then
-            repeat
-                MarkSpfyTaskAsCompleted(SpfyTaskIn."Entry No.", ShopifyResponse, Success, RequestErrorText);
-            until SpfyTaskIn.Next() = 0;
+        if not SpfyTaskIn.FindSet() then
+            exit;
+        // A create/update that returned user errors did not apply the variants it left unconfirmed, so completing them would strand rows as sent-but-absent in Shopify.
+        if Success and (MutationUserErrors.Length() > 0) and (SpfyTaskIn.Type <> SpfyTaskIn.Type::Delete) then begin
+            Success := false;
+            RequestErrorText := StrSubstNo(BatchNotAppliedErrLbl, MutationUserErrors.ToText());
+        end;
+        repeat
+            MarkSpfyTaskAsCompleted(SpfyTaskIn."Entry No.", ShopifyResponse, Success, RequestErrorText);
+        until SpfyTaskIn.Next() = 0;
     end;
 
     [TryFunction]
@@ -621,23 +700,25 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         if not SpfyTaskQueue.CompleteFromBatch(SpfyTaskInEntryNo, ShopifyResponse, Success, ErrorText, CompletedTask) then
             exit;
 
-        if Success and (CompletedTask."Table No." = Database::"Item Variant") then
+        if Success and (CompletedTask."Table No." = Database::"Item Variant") then begin
+            RecRef := CompletedTask."Record ID".GetRecord();
+            RecRef.SetTable(ItemVariant);
+            SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
+            SpfyStoreItemVariantLink."Item No." := ItemVariant."Item No.";
+            SpfyStoreItemVariantLink."Variant Code" := ItemVariant."Code";
+            SpfyStoreItemVariantLink."Shopify Store Code" := CompletedTask."Store Code";
             case CompletedTask.Type of
                 CompletedTask.Type::Insert, CompletedTask.Type::Modify:
                     UpdateItemVariantWithDataFromShopify(CompletedTask."Store Code", ShopifyResponse);
                 CompletedTask.Type::Delete:
                     begin
-                        RecRef := CompletedTask."Record ID".GetRecord();
-                        RecRef.SetTable(ItemVariant);
-                        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
-                        SpfyStoreItemVariantLink."Item No." := ItemVariant."Item No.";
-                        SpfyStoreItemVariantLink."Variant Code" := ItemVariant."Code";
-                        SpfyStoreItemVariantLink."Shopify Store Code" := CompletedTask."Store Code";
                         ClearVariantShopifyIDs(SpfyStoreItemVariantLink);
+                        ClearLocationActivations(SpfyStoreItemVariantLink);
                         InventoryLevelMgt.ClearInventoryLevels(SpfyStoreItemVariantLink);
                         ItemPriceMgt.ClearItemPrices(SpfyStoreItemVariantLink);
                     end;
             end;
+        end;
 
         Commit();
     end;
@@ -758,6 +839,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         ShopifyVariantID: Text[30];
         ResponseTxt: Text;
         MaxNoOfVariantsPerRequest: Integer;
+        NoOfRowsProcessed: Integer;
         NoOfVariants: Integer;
         PrepareError: Boolean;
         SetBatchProcessed: Boolean;
@@ -765,6 +847,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         SkipEntry: Boolean;
         ItemDoesNotExistErr: Label 'Item %1 has been removed from the system. The variant request is no longer applicable.', Comment = '%1 - Item No.';
         ItemVariantDoesNotExistErr: Label 'The item %1 variant %2 has been removed from the system. The request is no longer applicable.', Comment = '%1 - Item No., %2 - Variant Code';
+        ProductLookupFailedNoTextLbl: Label 'The Shopify product lookup for item %1 failed without an error message.', Comment = '%1 - Item No.';
         ShopifyProductIdEmptyErr: Label 'The item has not yet been synced with Shopify. The variant will be sent with the item.';
         ShopifyVariantIdEmptyErr: Label 'The variant does not exist in Shopify. No need to send a removal request.';
     begin
@@ -794,13 +877,19 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
                 ResponseTxt := _ItemIntegrNotEnabledErr
             else begin
                 ShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-                if ShopifyProductID = '' then begin
-                    ShopifyProductID := GetShopifyProductID(SpfyStoreItemLink, false);
-                    if ShopifyProductID = '' then begin
-                        ResponseTxt := ShopifyProductIdEmptyErr;
-                        SetBatchProcessed := true;
+                if ShopifyProductID = '' then
+                    if not TryGetShopifyProductVariantRelatedIDs(SpfyStoreItemLink, false, _ShopifyProductID, _ShopifyVariantID, _ShopifyInventoryItemID) then begin
+                        ResponseTxt := GetLastErrorText();
+                        if ResponseTxt = '' then
+                            ResponseTxt := StrSubstNo(ProductLookupFailedNoTextLbl, Item."No.");
+                        SetBatchError := true;
+                    end else begin
+                        ShopifyProductID := _ShopifyProductID;
+                        if ShopifyProductID = '' then begin
+                            ResponseTxt := ShopifyProductIdEmptyErr;
+                            SetBatchProcessed := true;
+                        end;
                     end;
-                end;
             end;
         end;
 
@@ -863,7 +952,8 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
 
             SpfyTaskOut.Insert();
             SpfyTaskIn.Delete();
-        until (SpfyTaskIn.Next() = 0) or (NoOfVariants >= MaxNoOfVariantsPerRequest);
+            NoOfRowsProcessed += 1;
+        until (SpfyTaskIn.Next() = 0) or (NoOfVariants >= MaxNoOfVariantsPerRequest) or (NoOfRowsProcessed >= MaxNoOfVariantsPerRequest);
         SpfyTaskIn.SetRange("Record Value");
     end;
 
@@ -916,27 +1006,15 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     [TryFunction]
     local procedure PrepareItemPriceUpdateRequest(var SpfyTaskIn: Record "NPR Spfy Task"; var SpfyTaskOut: Record "NPR Spfy Task")
     var
-        ItemPrice: Record "NPR Spfy Item Price";
         SpfyStore: Record "NPR Spfy Store";
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        RecRef: RecordRef;
-        OStream: OutStream;
         MaxItemPricesPerRequest: Integer;
         IncludedSpfyTasks: Integer;
-        ShopifyProductID: Text[30];
-        ShopifyVariantID: Text[30];
-        PrepareError: Boolean;
-        FuturePriceErr: Label 'You cannot send prices that far into the future. The price start date cannot be later than tomorrow.';
-        ShopifyProductIDIsMissingLbl: Label 'Item %1 does not have a Shopify Product ID assigned.';
-        ShopifyVariantIDIsMissingLbl: Label 'Variant %1 of Item %2 does not have a Shopify Variant ID assigned.';
-        SourceRecNotFoundErr: Label '%1 Entry No. %2 source record (%3) could not be found.', Comment = '%1 - SpfyTask tablename, %2 - SpfyTask entry number, %3 - task source record id';
-        UpdateProductVariantsMutationLabel: Label '%1: productVariantsBulkUpdate(productId: "gid://shopify/Product/%2", variants: [ { id: "gid://shopify/ProductVariant/%3", price: %4, compareAtPrice: %5 } ]) { productVariants { id price compareAtPrice } userErrors { field message } }', Locked = true, Comment = '%1 = SpfyTask ID, %2 = Shopify Product ID, %3 = Shopify Product Variant ID, %4 = Unit Price, %5 = Compare At Price';
     begin
         if not (SpfyTaskIn.IsTemporary() and SpfyTaskOut.IsTemporary()) then
             FunctionCallOnNonTempVarErr('PrepareItemPriceUpdateRequest');
 
         SpfyTaskOut.DeleteAll();
+        // Unguarded on purpose: a drained set must raise so this try function reports false and the caller's chunk loop ends. A guarded exit would return true and loop forever.
         SpfyTaskIn.FindSet();
 
         SpfyStore.Get(SpfyTaskIn."Store Code");
@@ -946,42 +1024,62 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         repeat
             SpfyTaskOut := SpfyTaskIn;
             SpfyTaskOut."Last Processing Started at" := CurrentDateTime();
-            PrepareError := not RecRef.Get(SpfyTaskIn."Record ID");
-            if PrepareError then
-                _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, StrSubstNo(SourceRecNotFoundErr, SpfyTaskIn.TableCaption(), SpfyTaskIn."Entry No.", SpfyTaskIn."Record ID"))
-            else begin
-                RecRef.SetTable(ItemPrice);
-                PrepareError := ItemPrice."Starting Date" > Today() + 1;
-                if PrepareError then
-                    _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, FuturePriceErr)
-                else begin
-                    PrepareError := not GetStoreItemLink(ItemPrice."Item No.", ItemPrice."Shopify Store Code", false, SpfyStoreItemLink);  //Check integration is enabled for the item
-                    if PrepareError then
-                        _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, _ItemIntegrNotEnabledErr)
-                    else begin
-                        ShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-                        if ShopifyProductID = '' then
-                            ShopifyProductID := GetShopifyProductID(SpfyStoreItemLink, false);
-                        ShopifyVariantID := GetProductVariantForItemPrice(ItemPrice);
-                        PrepareError := (ShopifyProductID = '') or (ShopifyVariantID = '');
-                        if PrepareError then begin
-                            case true of
-                                ShopifyProductID = '':
-                                    _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, StrSubstNo(ShopifyProductIDIsMissingLbl, ItemPrice."Item No."));
-                                ShopifyVariantID = '':
-                                    _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, StrSubstNo(ShopifyVariantIDIsMissingLbl, ItemPrice."Variant Code", ItemPrice."Item No."));
-                            end;
-                        end else begin
-                            SpfyTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
-                            OStream.WriteText(StrSubstNo(UpdateProductVariantsMutationLabel, 'NCTask' + Format(SpfyTaskIn."Entry No."), ShopifyProductID, ShopifyVariantID, Format(ItemPrice."Unit Price", 0, 9), GetCompareAtPrice(ItemPrice)));
-                        end;
-                    end;
-                end;
-            end;
+            StageItemPriceRequest(SpfyTaskIn, SpfyTaskOut);
             IncludedSpfyTasks += 1;
             SpfyTaskOut.Insert();
             SpfyTaskIn.Delete();
         until (SpfyTaskIn.Next() = 0) or (IncludedSpfyTasks >= MaxItemPricesPerRequest);
+    end;
+
+    local procedure StageItemPriceRequest(var SpfyTaskIn: Record "NPR Spfy Task"; var SpfyTaskOut: Record "NPR Spfy Task")
+    var
+        ItemPrice: Record "NPR Spfy Item Price";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+        OStream: OutStream;
+        ShopifyProductID: Text[30];
+        ShopifyVariantID: Text[30];
+        FuturePriceErr: Label 'You cannot send prices that far into the future. The price start date cannot be later than tomorrow.';
+        ShopifyProductIDIsMissingLbl: Label 'Item %1 does not have a Shopify Product ID assigned.';
+        ShopifyVariantIDIsMissingLbl: Label 'Variant %1 of Item %2 does not have a Shopify Variant ID assigned.';
+        SourceRecNotFoundErr: Label '%1 Entry No. %2 source record (%3) could not be found.', Comment = '%1 - SpfyTask tablename, %2 - SpfyTask entry number, %3 - task source record id';
+        UpdateProductVariantsMutationLabel: Label '%1: productVariantsBulkUpdate(productId: "gid://shopify/Product/%2", variants: [ { id: "gid://shopify/ProductVariant/%3", price: %4, compareAtPrice: %5 } ]) { productVariants { id price compareAtPrice } userErrors { field message } }', Locked = true, Comment = '%1 = SpfyTask ID, %2 = Shopify Product ID, %3 = Shopify Product Variant ID, %4 = Unit Price, %5 = Compare At Price';
+    begin
+        if not RecRef.Get(SpfyTaskIn."Record ID") then begin
+            // A source row deleted before the send is no longer applicable, so the task completes instead of retrying.
+            SpfyTaskOut.State := SpfyTaskOut.State::Completed;
+            _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, StrSubstNo(SourceRecNotFoundErr, SpfyTaskIn.TableCaption(), SpfyTaskIn."Entry No.", SpfyTaskIn."Record ID"));
+            exit;
+        end;
+        RecRef.SetTable(ItemPrice);
+
+        if ItemPrice."Starting Date" > Today() + 1 then begin
+            _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, FuturePriceErr);
+            exit;
+        end;
+
+        if not GetStoreItemLink(ItemPrice."Item No.", ItemPrice."Shopify Store Code", false, SpfyStoreItemLink) then begin  //Check integration is enabled for the item
+            _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, _ItemIntegrNotEnabledErr);
+            exit;
+        end;
+
+        ShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if ShopifyProductID = '' then
+            ShopifyProductID := GetShopifyProductID(SpfyStoreItemLink, false);
+        if ShopifyProductID = '' then begin
+            _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, StrSubstNo(ShopifyProductIDIsMissingLbl, ItemPrice."Item No."));
+            exit;
+        end;
+
+        ShopifyVariantID := GetProductVariantForItemPrice(ItemPrice);
+        if ShopifyVariantID = '' then begin
+            _SpfyIntegrationMgt.SetResponse(SpfyTaskOut, StrSubstNo(ShopifyVariantIDIsMissingLbl, ItemPrice."Variant Code", ItemPrice."Item No."));
+            exit;
+        end;
+
+        SpfyTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(StrSubstNo(UpdateProductVariantsMutationLabel, 'SpfyTask' + Format(SpfyTaskIn."Entry No."), ShopifyProductID, ShopifyVariantID, Format(ItemPrice."Unit Price", 0, 9), GetCompareAtPrice(ItemPrice)));
     end;
 
     local procedure GetCompareAtPrice(ItemPrice: Record "NPR Spfy Item Price"): Text
@@ -2203,6 +2301,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
         ClearAllItemVariantsShopifyIDs(SpfyStoreItemLink);
+        ClearLocationActivations(SpfyStoreItemLink);
         InventoryLevelMgt.ClearInventoryLevels(SpfyStoreItemLink);
         ItemPriceMgt.ClearItemPrices(SpfyStoreItemLink);
 
@@ -2233,6 +2332,26 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     begin
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
+    end;
+
+    // Only when the Shopify inventory item is gone: an id re-map on a live product must keep the merchant's Auto-Activation Disabled.
+    // A row that is neither activated nor disabled just says "activate me" and may already belong to the re-created variant, so it stays.
+    internal procedure ClearLocationActivations(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    var
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+    begin
+        LocationInvItem.SetCurrentKey("Shopify Store Code", "Item No.", "Variant Code");
+        LocationInvItem.SetRange("Shopify Store Code", SpfyStoreItemLink."Shopify Store Code");
+        LocationInvItem.SetRange("Item No.", SpfyStoreItemLink."Item No.");
+        if SpfyStoreItemLink."Variant Code" <> '' then
+            LocationInvItem.SetRange("Variant Code", SpfyStoreItemLink."Variant Code");
+        LocationInvItem.SetRange(Activated, true);
+        if not LocationInvItem.IsEmpty() then
+            LocationInvItem.DeleteAll();
+        LocationInvItem.SetRange(Activated);
+        LocationInvItem.SetRange("Auto-Activation Disabled", true);
+        if not LocationInvItem.IsEmpty() then
+            LocationInvItem.DeleteAll();
     end;
 
     local procedure FunctionCallOnNonTempVarErr(ProcedureName: Text)
@@ -2426,12 +2545,12 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         SpfyTaskResultDictionary: Dictionary of [Text[30], Text];
     begin
         Clear(SpfyTaskErrorText);
-        if not ResponseDictionary.ContainsKey(StrSubstNo('NCTask%1', Format(SpfyTaskIn."Entry No."))) then begin
+        if not ResponseDictionary.ContainsKey(StrSubstNo('SpfyTask%1', Format(SpfyTaskIn."Entry No."))) then begin
             SpfyTaskErrorText := StrSubstNo(SpfyTaskNotFoundLbl, Format(SpfyTaskIn."Entry No."));
             exit;
         end;
 
-        SpfyTaskResultDictionary := ResponseDictionary.Get(StrSubstNo('NCTask%1', Format(SpfyTaskIn."Entry No.")));
+        SpfyTaskResultDictionary := ResponseDictionary.Get(StrSubstNo('SpfyTask%1', Format(SpfyTaskIn."Entry No.")));
         case true of
             SpfyTaskResultDictionary.ContainsKey('VariantID'):
                 begin
@@ -2455,6 +2574,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         RecRef: RecordRef;
+        RequestPrepared: Boolean;
         Success: Boolean;
     begin
         Clear(SpfyTask."Data Output");
@@ -2464,7 +2584,8 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
 
         RecRef.Get(SpfyTask."Record ID");
         RecRef.SetTable(InventoryLocation);
-        if PrepareActivateInventoryItemAtLocationRequest(SpfyTask, InventoryLocation) then
+        RequestPrepared := PrepareActivateInventoryItemAtLocationRequest(SpfyTask, InventoryLocation);
+        if RequestPrepared then
             Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
@@ -2473,6 +2594,9 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
             Error(GetLastErrorText());
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
             Error('');
+        // A skipped preparation completes the task with its reason, but must never mark an activation Shopify was not asked for.
+        if not RequestPrepared then
+            exit;
         InventoryLocation.Activated := Success;
         InventoryLocation.Modify();
     end;
@@ -2565,6 +2689,42 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyProductID, false);
+        Commit();
+    end;
+
+    internal procedure TryFindShopifyInventoryItemID(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var ShopifyInventoryItemID: Text[30]): Boolean
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        ShopifyInventoryItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
+        if ShopifyInventoryItemID = '' then
+            ShopifyInventoryItemID := GetShopifyInventoryItemID(SpfyStoreItemLink, false);
+        exit(ShopifyInventoryItemID <> '');
+    end;
+
+    internal procedure AssignShopifyInventoryItemID(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ShopifyInventoryItemID: Text[30])
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID", ShopifyInventoryItemID, false);
+        Commit();
+    end;
+
+    internal procedure TryFindShopifyVariantID(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var ShopifyVariantID: Text[30]): Boolean
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        ShopifyVariantID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if ShopifyVariantID = '' then
+            ShopifyVariantID := GetShopifyVariantID(SpfyStoreItemLink, false);
+        exit(ShopifyVariantID <> '');
+    end;
+
+    internal procedure AssignShopifyVariantID(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ShopifyVariantID: Text[30])
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyVariantID, false);
         Commit();
     end;
 }

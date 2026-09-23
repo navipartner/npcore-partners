@@ -671,6 +671,74 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         NcTask.Get(LegacyEntryNo);
         _Assert.IsTrue(NcTask.Processed, 'The rescued legacy row must be closed');
     end;
+
+    [Test]
+    procedure GivenFutureScheduledPriceNcTask_WhenRecreated_ThenScheduleAndKindKept()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        ItemPrice: Record "NPR Spfy Item Price";
+        NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        NotBeforeDateTime: DateTime;
+        LegacyEntryNo: BigInteger;
+        NewEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A legacy price task that only starts next month is handed over as a new-queue twin keeping its kind, source row and start time, closes the legacy row with a reference to its successor, and is not duplicated by a re-run.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, true, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+
+        // [GIVEN] A legacy price task that only starts next month.
+        _Lib.CreateItemPrice(ItemPrice, Item."No.", StoreCode, 100, CalcDate('<+1M>', Today()));
+        NotBeforeDateTime := CreateDateTime(ItemPrice."Starting Date", 0T);
+        LegacyEntryNo := SeedLegacyPriceTask(StoreCode, ItemPrice, NotBeforeDateTime);
+
+        // [WHEN] The cutover hands the still-scheduled price row over to the new queue.
+        NewEntryNo := RecreateLegacyTask(LegacyEntryNo);
+
+        // [THEN] The twin keeps the price kind and its start time, and points back at the row it replaced.
+        _Assert.IsTrue(NewEntryNo <> 0, 'The hand-over must create a new-queue task');
+        _Assert.IsTrue(SpfyTask.Get(NewEntryNo), 'The new-queue twin must exist');
+        _Assert.IsTrue(SpfyTask.Type = SpfyTask.Type::Modify, 'The twin must keep the legacy op');
+        _Assert.AreEqual(Database::"NPR Spfy Item Price", SpfyTask."Table No.", 'The twin must keep the price table');
+        _Assert.AreEqual(ItemPrice.RecordId(), SpfyTask."Record ID", 'The twin must keep the source record id');
+        _Assert.AreEqual(Item."No.", SpfyTask."Record Value", 'The twin must keep the record value');
+        _Assert.AreEqual(StoreCode, SpfyTask."Store Code", 'The twin must keep the store');
+        _Assert.AreEqual(NotBeforeDateTime, SpfyTask."Not Before Date-Time", 'The twin must keep the price start time');
+        _Assert.IsTrue(SpfyTask.State = SpfyTask.State::Pending, 'The twin must be waiting to be sent');
+        _Assert.AreEqual(0, SpfyTask.Attempts, 'The twin must start with no attempts');
+        _Assert.IsTrue(SpfyTask."Migrated From NC Entry No." = LegacyEntryNo, 'The twin must reference the legacy row it came from');
+
+        // [THEN] The legacy row is closed with a reference to its successor.
+        NcTask.Get(LegacyEntryNo);
+        _Assert.IsTrue(NcTask.Processed, 'The migrated legacy row must be closed');
+        _Assert.IsTrue(StrPos(LegacyResponseText(LegacyEntryNo), Format(NewEntryNo)) > 0, StrSubstNo('The legacy row must name its successor: %1', LegacyResponseText(LegacyEntryNo)));
+
+        // [WHEN] The migration is re-run over the same legacy row. [THEN] nothing is duplicated.
+        _Assert.IsTrue(RecreateLegacyTask(LegacyEntryNo) = 0, 'A closed legacy price row must not be handed over again');
+        _Assert.AreEqual(1, NewQueueCount(), 'A re-run must not duplicate the new-queue price task');
+    end;
+
+    local procedure SeedLegacyPriceTask(StoreCode: Code[20]; ItemPrice: Record "NPR Spfy Item Price"; NotBeforeDateTime: DateTime): BigInteger
+    var
+        NcTask: Record "NPR Nc Task";
+    begin
+        NcTask.Init();
+        NcTask."Entry No." := 0;
+        NcTask."Task Processor Code" := ShopifyTaskProcessorCode();
+        NcTask.Type := NcTask.Type::Modify;
+        NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
+        NcTask."Table No." := Database::"NPR Spfy Item Price";
+        NcTask."Record ID" := ItemPrice.RecordId();
+        NcTask."Record Value" := ItemPrice."Item No.";
+        NcTask."Store Code" := StoreCode;
+        NcTask."Not Before Date-Time" := NotBeforeDateTime;
+        NcTask."Log Date" := CurrentDateTime();
+        NcTask.Insert(true);
+        exit(NcTask."Entry No.");
+    end;
     #endregion
 
     #region Legacy queue drain

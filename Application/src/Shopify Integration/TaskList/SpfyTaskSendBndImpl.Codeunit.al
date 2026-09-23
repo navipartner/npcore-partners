@@ -13,7 +13,10 @@ codeunit 6151224 "NPR Spfy Task Send Bnd Impl" implements "NPR Spfy Task Send Bo
             Database::Item,
             Database::"Item Variant",
             Database::"Inventory Buffer",
-            Database::"NPR Spfy Tag Update Request":
+            Database::"NPR Spfy Tag Update Request",
+            Database::"NPR Spfy Inventory Level",
+            Database::"NPR Spfy Item Price",
+            Database::"NPR Spfy Inv Item Location":
                 begin
                     if Codeunit.Run(Codeunit::"NPR Spfy Task Send Items&Inv", SpfyTaskWork) then
                         exit(true);

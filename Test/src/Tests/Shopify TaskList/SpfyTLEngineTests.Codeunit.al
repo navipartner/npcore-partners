@@ -422,11 +422,14 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         // [WHEN] The cycle reaches a variant whose product has never been sent to Shopify.
         _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime);
 
-        // [THEN] The task is deferred, not attempted.
+        // [THEN] The task is deferred, not attempted, and the failed lookup is recorded in the response, not masked away.
         AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, 'A variant without a Shopify product must wait without spending an attempt');
         _Assert.AreEqual(0, _BndMock.DispatchCount(), 'A deferred variant must never reach the send boundary');
         GetTask(TaskEntryNo, SpfyTask);
-        _Assert.AreEqual(_WaitingForParentLbl, SpfyTask."Waiting Reason", 'The task must record why it is waiting');
+        _Assert.IsTrue(SpfyTask."Waiting Reason" <> '', 'The task must record why it is waiting');
+        _Assert.AreEqual(_WaitingForParentLbl, SpfyTask."Waiting Reason", 'The stable blocker label must be the waiting reason; the lookup error belongs in the response');
+        SpfyTask.CalcFields(Response);
+        _Assert.IsTrue(SpfyTask.Response.HasValue(), 'A failed parent lookup must store the full error for Show Response');
         _Assert.AreEqual(AtDateTime, SpfyTask."Waiting Since", 'The task must record when it started waiting');
     end;
 
@@ -549,8 +552,8 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         GetTask(TaskEntryNo, SpfyTask);
         AssertTask(TaskEntryNo, "NPR Spfy Task State"::Quarantined, 0, 'A task waiting a full day must be given up on without spending an attempt');
         _Assert.AreEqual(WaitingSince, SpfyTask."Waiting Since", 'A quarantined park must keep when it started waiting');
-        _Assert.IsTrue(SpfyTask."Waiting Reason" <> '', 'A quarantined park must record what it was waiting for');
-        _Assert.IsTrue(StrPos(ResponseText(TaskEntryNo), SpfyTask."Waiting Reason") > 0, 'The quarantine response must carry the effective waiting reason');
+        _Assert.AreEqual(_WaitingForParentLbl, SpfyTask."Waiting Reason", 'The stable blocker label must be the waiting reason; the lookup error belongs in the response');
+        _Assert.AreEqual(0, StrPos(ResponseText(TaskEntryNo), _WaitingForParentLbl), 'The quarantine response must carry the lookup error, not the stable label');
 
         // [WHEN] Further cycles run while it keeps waiting.
         SetLastCycleAt(StoreCode, WaitingSince + Hours(25));
@@ -593,6 +596,40 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         // [THEN] Release wins over the give-up path: the task is sent, never quarantined.
         AssertTask(TaskEntryNo, "NPR Spfy Task State"::Completed, 1, 'A task whose precondition is met at the threshold must be sent, not quarantined');
         _Assert.AreEqual(1, _BndMock.DispatchCount(), 'The released task must be sent exactly once');
+    end;
+
+    [Test]
+    procedure AgedRecheckLookupFailureIsRecordedInResponse()
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] An aged waiting task whose one-shot re-check lookup fails is quarantined without spending an attempt, keeping the stable blocker label as its reason and the lookup error in its response.
+        Initialize();
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        CreateSyncedItem(StoreCode, false, Item, SpfyStoreItemLink);
+        _Lib.CreateItemVariant(ItemVariant, Item."No.");
+        // [GIVEN] A task parked a day ago with the benign reason, so only the aged one-shot re-check can change it.
+        TaskEntryNo := EnqueueVariantTask(StoreCode, ItemVariant, "NPR Spfy Task Op"::Modify, AtDateTime);
+        GetTask(TaskEntryNo, SpfyTask);
+        _SpfyTaskQueue.SetWaiting(SpfyTask, _WaitingForParentLbl, AtDateTime - Hours(25));
+        // The engine cycled all along; without that the aging clock restarts and nothing can be given up on.
+        SetLastCycleAt(StoreCode, AtDateTime);
+
+        // [WHEN] The aging cycle runs and the one-shot live lookup itself fails.
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime);
+
+        // [THEN] The park is given up on without spending an attempt; the reason stays the stable label and the lookup error lands in the response.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Quarantined, 0, 'An aged waiting task whose re-check lookup fails must be quarantined without spending an attempt');
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.AreEqual(_WaitingForParentLbl, SpfyTask."Waiting Reason", 'The stable blocker label must be the waiting reason; the lookup error belongs in the response');
+        _Assert.AreEqual(0, StrPos(ResponseText(TaskEntryNo), _WaitingForParentLbl), 'The quarantine response must carry the lookup error, not the stable label');
     end;
 
     [Test]
@@ -894,8 +931,7 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         SetLastCycleAt(StoreCode, WaitingSince + Hours(24));
         _SpfyTaskProcessor.RunStoreCycle(StoreCode, WaitingSince + Hours(24) + Minutes(10));
 
-        // [THEN] The task still ages: a slower schedule must not disable the aging alert altogether.
-        GetTask(TaskEntryNo, SpfyTask);
+        // [THEN] The task still ages out: a slower schedule must not disable the aging threshold altogether.
         AssertTask(TaskEntryNo, "NPR Spfy Task State"::Quarantined, 0, 'A task on a slowly scheduled store must still age out once it has waited a day');
     end;
 
@@ -1009,6 +1045,7 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
     procedure GivenCostTaskWhoseItemExists_WhenCycleRuns_ThenItIsDispatchedNotClosed()
     var
         Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         StoreCode: Code[20];
         AtDateTime: DateTime;
         TaskEntryNo: BigInteger;
@@ -1018,8 +1055,9 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         AtDateTime := CurrentDateTime();
         StoreCode := _Lib.CreateStore(true, false, false, false, false);
 
-        // [GIVEN] A cost task whose item is alive, carried by a buffer row that was never persisted.
-        _Lib.CreateItem(Item);
+        // [GIVEN] A cost task whose item is alive and synced, carried by a buffer row that was never persisted.
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        _Lib.AssignEntryID(SpfyStoreItemLink.RecordId(), CopyStr('gid://p/' + Item."No.", 1, 30));
         TaskEntryNo := EnqueueCostTask(StoreCode, Item, AtDateTime);
 
         // [WHEN] The cycle runs.
@@ -1030,6 +1068,109 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         _Assert.AreEqual(1, _BndMock.DispatchCount(), 'A cost task whose item exists must reach the send boundary');
         _Assert.AreEqual(Database::"Inventory Buffer", _BndMock.LastDispatchTableNo(), 'The dispatched task must be the cost carrier');
         _Assert.AreNotEqual(_SourceGoneLbl, ResponseText(TaskEntryNo), 'A cost task whose item exists must not be closed as no longer applicable');
+    end;
+
+    [Test]
+    procedure GivenCostTaskWithoutProductId_WhenCycleRuns_ThenWaitingWithoutAttempt()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A cost task for an item whose product has never reached Shopify waits without spending an attempt, records the blocker label as its reason and keeps the failed lookup in its response.
+        Initialize();
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+
+        // [GIVEN] A cost task for an item whose product has never reached Shopify.
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        TaskEntryNo := EnqueueCostTask(StoreCode, Item, AtDateTime);
+
+        // [WHEN] The cycle runs.
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime);
+
+        // [THEN] The cost is deferred, not attempted: sent now it would fail on every variant and quarantine.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, 'A cost task without a Shopify product must wait without spending an attempt');
+        _Assert.AreEqual(0, _BndMock.DispatchCount(), 'A deferred cost task must never reach the send boundary');
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.IsTrue(SpfyTask."Waiting Reason" <> '', 'The task must record why it is waiting');
+        // The test container has no Shopify endpoint, so the first-dispatch live lookup fails: the stable label stays the reason and the error goes to the response.
+        _Assert.AreEqual(_WaitingForParentLbl, SpfyTask."Waiting Reason", 'The stable blocker label must be the waiting reason; the lookup error belongs in the response');
+        SpfyTask.CalcFields(Response);
+        _Assert.IsTrue(SpfyTask.Response.HasValue(), 'A failed product lookup must store the full error for Show Response');
+    end;
+
+    [Test]
+    procedure GivenSyncDisabledItemWithoutProductId_WhenCycleRuns_ThenCostDispatchesInsteadOfWaiting()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A cost task of a sync-disabled item is dispatched to the send boundary instead of being parked on a Shopify product lookup.
+        Initialize();
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateItem(Item);
+
+        // [GIVEN] A cost task whose item has no Shopify product and whose store link is sync-disabled.
+        _Lib.CreateItemLink(SpfyStoreItemLink, Item."No.", StoreCode, false, false);
+        TaskEntryNo := EnqueueCostTask(StoreCode, Item, AtDateTime);
+
+        // [WHEN] The cycle runs.
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime);
+
+        // [THEN] The cost task is dispatched instead of parked for a day on a lookup it should never have paid for.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Completed, 1, 'A cost task of a sync-disabled item must be dispatched so the send can fail it fast, not parked on a Shopify lookup');
+        _Assert.AreEqual(1, _BndMock.DispatchCount(), 'A cost task of a sync-disabled item must reach the send boundary');
+        _Assert.AreEqual(Database::"Inventory Buffer", _BndMock.LastDispatchTableNo(), 'The dispatched task must be the cost carrier');
+        GetTask(TaskEntryNo, SpfyTask);
+        SpfyTask.CalcFields(Response);
+        _Assert.IsFalse(SpfyTask.Response.HasValue(), 'No Shopify lookup may be attempted for a sync-disabled item');
+    end;
+
+    [Test]
+    procedure GivenWaitingCostTask_WhenProductIdAssigned_ThenNextCycleSends()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A cost task waiting for its Shopify product keeps waiting while the product is missing and is sent on a single fresh attempt once the product id is assigned.
+        Initialize();
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+
+        // [GIVEN] A cost task already parked because its product was not in Shopify.
+        TaskEntryNo := EnqueueCostTask(StoreCode, Item, AtDateTime);
+        GetTask(TaskEntryNo, SpfyTask);
+        _SpfyTaskQueue.SetWaiting(SpfyTask, _WaitingForParentLbl, AtDateTime);
+
+        // [WHEN] A cycle runs while the product is still missing.
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime + 60000);
+
+        // [THEN] The cost task keeps waiting.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, 'A cost task whose product is still missing must keep waiting');
+        _Assert.AreEqual(0, _BndMock.DispatchCount(), 'A cost task whose product is still missing must never reach the send boundary');
+
+        // [WHEN] The product reaches Shopify and the next cycle runs.
+        _Lib.AssignEntryID(SpfyStoreItemLink.RecordId(), CopyStr('gid://p/' + Item."No.", 1, 30));
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime + 120000);
+
+        // [THEN] The waiting cost task is released and sent on a single fresh attempt.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Completed, 1, 'A waiting cost task must be sent once its product exists in Shopify');
+        _Assert.AreEqual(1, _BndMock.DispatchCount(), 'The released cost task must be sent exactly once');
+        _Assert.AreEqual(Database::"Inventory Buffer", _BndMock.LastDispatchTableNo(), 'The dispatched task must be the cost carrier');
     end;
     #endregion
 

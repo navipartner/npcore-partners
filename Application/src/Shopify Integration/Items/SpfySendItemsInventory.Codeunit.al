@@ -223,7 +223,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                         _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(_ItemVariantBlockedOrDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
                     end;
                 if not NcTaskOut.Processed then begin
-                    NcTaskOut."Process Error" := not GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", true, SpfyStoreItemLink);  //Check integration is enabled for the item
+                    NcTaskOut."Process Error" := not GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", false, SpfyStoreItemLink);  //Check integration is enabled for the item
                     if NcTaskOut."Process Error" then
                         _SpfyIntegrationMgt.SetResponse(NcTaskOut, _ItemIntegrNotEnabledErr)
                     else begin
@@ -2481,6 +2481,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         RecRef: RecordRef;
+        RequestPrepared: Boolean;
         Success: Boolean;
     begin
         Clear(NcTask."Data Output");
@@ -2490,7 +2491,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         RecRef.Get(NcTask."Record ID");
         RecRef.SetTable(InventoryLocation);
-        if PrepareActivateInventoryItemAtLocationRequest(NcTask, InventoryLocation) then
+        RequestPrepared := PrepareActivateInventoryItemAtLocationRequest(NcTask, InventoryLocation);
+        if RequestPrepared then
             Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
         NcTask.Modify();
         Commit();
@@ -2499,6 +2501,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             Error(GetLastErrorText());
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
             Error('');
+        // A skipped preparation completes the task with its reason, but must never mark an activation Shopify was not asked for.
+        if not RequestPrepared then
+            exit;
         InventoryLocation.Activated := Success;
         InventoryLocation.Modify();
     end;

@@ -132,6 +132,88 @@ codeunit 85315 "NPR Spfy TL Switch Tests"
         exit(SpfyScheduleSend.InitNcTask(StoreCode, RecRef, Item."No.", TaskType, NcTask));
     end;
 
+    local procedure CreateInventoryLevel(var Item: Record Item; var SpfyInventoryLevel: Record "NPR Spfy Inventory Level"; StoreCode: Code[20]; var ShopifyLocationId: Text[30]; LastUpdatedAt: DateTime)
+    var
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+    begin
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        _Lib.CreateLocationWithLink(StoreCode, ShopifyLocationId);
+        SpfyInventoryLevel.Init();
+        SpfyInventoryLevel."Shopify Store Code" := StoreCode;
+        SpfyInventoryLevel."Shopify Location ID" := ShopifyLocationId;
+        SpfyInventoryLevel."Item No." := Item."No.";
+        SpfyInventoryLevel."Variant Code" := '';
+        SpfyInventoryLevel.Inventory := 5;
+        SpfyInventoryLevel."Last Updated at" := LastUpdatedAt;
+        SpfyInventoryLevel.Insert(false);
+    end;
+
+    // Without an already activated location the inventory handler ALSO enqueues an activation task, and "exactly one task" stops holding.
+    local procedure ActivateInventoryLocation(StoreCode: Code[20]; ShopifyLocationId: Text[30]; ItemNo: Code[20])
+    var
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+    begin
+        LocationInvItem.Init();
+        LocationInvItem."Shopify Store Code" := StoreCode;
+        LocationInvItem."Shopify Location ID" := ShopifyLocationId;
+        LocationInvItem."Item No." := ItemNo;
+        LocationInvItem."Variant Code" := '';
+        LocationInvItem.Activated := true;
+        LocationInvItem.Insert(false);
+    end;
+
+    local procedure DisableAutoActivation(StoreCode: Code[20]; ShopifyLocationId: Text[30]; ItemNo: Code[20])
+    var
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+    begin
+        LocationInvItem.Init();
+        LocationInvItem."Shopify Store Code" := StoreCode;
+        LocationInvItem."Shopify Location ID" := ShopifyLocationId;
+        LocationInvItem."Item No." := ItemNo;
+        LocationInvItem."Variant Code" := '';
+        LocationInvItem."Auto-Activation Disabled" := true;
+        LocationInvItem.Insert(false);
+    end;
+
+    local procedure AssertNcPriceIntent(ExpectedRecId: RecordId; ExpectedRecordValue: Text; ExpectedStoreCode: Code[20]; ExpectedNotBefore: DateTime; SeamName: Text)
+    var
+        NcTask: Record "NPR Nc Task";
+    begin
+        // The shared intent helper hard-asserts a blank not-before time, and a price schedules one.
+        _Assert.IsTrue(FindNcTask(Database::"NPR Spfy Item Price", NcTask), StrSubstNo('%1: the legacy queue must hold the task', SeamName));
+        _Assert.IsTrue(NcTask.Type = NcTask.Type::Modify, StrSubstNo('%1: expected task type Modify but found %2', SeamName, NcTask.Type));
+        _Assert.AreEqual(Database::"NPR Spfy Item Price", NcTask."Table No.", StrSubstNo('%1: source table', SeamName));
+        _Assert.AreEqual(ExpectedRecId, NcTask."Record ID", StrSubstNo('%1: source record id', SeamName));
+        _Assert.AreEqual(ExpectedRecordValue, NcTask."Record Value", StrSubstNo('%1: record value', SeamName));
+        _Assert.AreEqual(ExpectedStoreCode, NcTask."Store Code", StrSubstNo('%1: store code', SeamName));
+        _Assert.AreEqual(ExpectedNotBefore, NcTask."Not Before Date-Time", StrSubstNo('%1: the price must be scheduled at its start date', SeamName));
+        _Assert.AreNotEqual(0DT, NcTask."Log Date", StrSubstNo('%1: the log date must be stamped', SeamName));
+        _Assert.IsFalse(NcTask.Processed, StrSubstNo('%1: a fresh task must be unprocessed', SeamName));
+    end;
+
+    local procedure AssertSpfyPriceIntent(ExpectedRecId: RecordId; ExpectedRecordValue: Text; ExpectedStoreCode: Code[20]; ExpectedNotBefore: DateTime; SeamName: Text)
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        _Assert.IsTrue(FindSpfyTask(Database::"NPR Spfy Item Price", SpfyTask), StrSubstNo('%1: the new queue must hold the task', SeamName));
+        _Assert.IsTrue(SpfyTask.Type = SpfyTask.Type::Modify, StrSubstNo('%1: expected task type Modify but found %2', SeamName, SpfyTask.Type));
+        _Assert.AreEqual(Database::"NPR Spfy Item Price", SpfyTask."Table No.", StrSubstNo('%1: source table', SeamName));
+        _Assert.AreEqual(ExpectedRecId, SpfyTask."Record ID", StrSubstNo('%1: source record id', SeamName));
+        _Assert.AreEqual(ExpectedRecordValue, SpfyTask."Record Value", StrSubstNo('%1: record value', SeamName));
+        _Assert.AreEqual(ExpectedStoreCode, SpfyTask."Store Code", StrSubstNo('%1: store code', SeamName));
+        _Assert.AreEqual(ExpectedNotBefore, SpfyTask."Not Before Date-Time", StrSubstNo('%1: the price must be scheduled at its start date', SeamName));
+        _Assert.AreNotEqual(0DT, SpfyTask."Log Date", StrSubstNo('%1: the log date must be stamped', SeamName));
+        _Assert.IsTrue(SpfyTask.State = SpfyTask.State::Pending, StrSubstNo('%1: a fresh task must be waiting to be sent', SeamName));
+    end;
+
+    local procedure AssertLogDateWithinWindow(ActualLogDate: DateTime; EnqueuedAt: DateTime; SeamName: Text)
+    begin
+        // The activation seam stamps its log date a short moment ahead of now.
+        _Assert.IsTrue(
+            (ActualLogDate >= EnqueuedAt) and (ActualLogDate <= EnqueuedAt + 10000),
+            StrSubstNo('%1: the log date %2 must fall in the short delay window that starts at %3', SeamName, ActualLogDate, EnqueuedAt));
+    end;
+
     local procedure SeedNewQueueTask(StoreCode: Code[20]; Item: Record Item): BigInteger
     var
         SpfyTask: Record "NPR Spfy Task";
@@ -745,6 +827,220 @@ codeunit 85315 "NPR Spfy TL Switch Tests"
         _Assert.AreEqual(1, SpfyTaskCount(Database::Item), 'The change after the switch must not add a new-queue row');
         _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::NotStarted, 'The feature-off harness write must clear the migration status stamp');
         _Assert.AreEqual(0DT, MigrationStartedAt(), 'The feature-off harness write must clear the migration start-time stamp');
+    end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenInventoryLevelChanges_ThenContentCorrectNcTaskOnly()
+    var
+        Item: Record Item;
+        SpfyInventoryLevel: Record "NPR Spfy Inventory Level";
+        NcTask: Record "NPR Nc Task";
+        DummyNcTask: Record "NPR Nc Task";
+        StoreCode: Code[20];
+        ShopifyLocationId: Text[30];
+        LastUpdatedAt: DateTime;
+    begin
+        // [SCENARIO] An inventory level change with the task list off creates one content-correct legacy level task stamped with the level's last updated time and nothing in the new queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, true, false, false, false);
+        LastUpdatedAt := CreateDateTime(Today(), 080000T);
+        CreateInventoryLevel(Item, SpfyInventoryLevel, StoreCode, ShopifyLocationId, LastUpdatedAt);
+        ActivateInventoryLocation(StoreCode, ShopifyLocationId, Item."No.");
+
+        // [WHEN] An inventory level changes while the task list is off.
+        _Lib.DispatchModify(SpfyInventoryLevel);
+
+        // [THEN] The legacy queue holds one content-correct level task and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR Spfy Inventory Level"), 'One legacy inventory level task must be created for the level change');
+        AssertNcIntent(Database::"NPR Spfy Inventory Level", DummyNcTask.Type::Modify, SpfyInventoryLevel.RecordId(), Item."No.", StoreCode, 'Inventory level');
+        _Assert.IsTrue(FindNcTask(Database::"NPR Spfy Inventory Level", NcTask), 'The legacy level task must be readable');
+        _Assert.AreEqual(LastUpdatedAt, NcTask."Log Date", 'The level task log date must be the level''s last updated time');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No level task may be created in the new queue while the feature is off');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenInventoryLevelChanges_ThenContentCorrectSpfyTaskOnly()
+    var
+        Item: Record Item;
+        SpfyInventoryLevel: Record "NPR Spfy Inventory Level";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        ShopifyLocationId: Text[30];
+        LastUpdatedAt: DateTime;
+    begin
+        // [SCENARIO] An inventory level change with the task list on creates one content-correct new-queue level task stamped with the level's last updated time and nothing in the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, true, false, false, false);
+        LastUpdatedAt := CreateDateTime(Today(), 080000T);
+        CreateInventoryLevel(Item, SpfyInventoryLevel, StoreCode, ShopifyLocationId, LastUpdatedAt);
+        ActivateInventoryLocation(StoreCode, ShopifyLocationId, Item."No.");
+        _Lib.SetTaskListFeatureEnabled(true);
+
+        // [WHEN] An inventory level changes while the task list is on.
+        _Lib.DispatchModify(SpfyInventoryLevel);
+
+        // [THEN] The new queue holds one content-correct level task and the legacy queue holds nothing.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR Spfy Inventory Level"), 'One new-queue inventory level task must be created for the level change');
+        AssertSpfyIntent(Database::"NPR Spfy Inventory Level", "NPR Spfy Task Op"::Modify, SpfyInventoryLevel.RecordId(), Item."No.", StoreCode, 'Inventory level');
+        _Assert.IsTrue(FindSpfyTask(Database::"NPR Spfy Inventory Level", SpfyTask), 'The new-queue level task must be readable');
+        _Assert.AreEqual(LastUpdatedAt, SpfyTask."Log Date", 'The level task log date must be the level''s last updated time');
+        _Assert.AreEqual(0, NcTaskCount(), 'A level change must never also reach the legacy queue while the feature is on');
+    end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenItemPriceChanges_ThenContentCorrectNcTaskOnly_AndExactReuseSchedules()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        ItemPrice: Record "NPR Spfy Item Price";
+        StoreCode: Code[20];
+        FirstStartDate: Date;
+        SecondStartDate: Date;
+    begin
+        // [SCENARIO] A price change with the task list off creates one legacy price task scheduled at its start date, gives a later start date its own task and lets an identical one be absorbed, and never reaches the new queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, true, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        // Anchored to Today: the legacy dedup lookback floor is midnight of the previous REAL day, and the container work date differs from the real date.
+        FirstStartDate := Today();
+        SecondStartDate := CalcDate('<+1M>', Today());
+        _Lib.CreateItemPrice(ItemPrice, Item."No.", StoreCode, 100, FirstStartDate);
+
+        // [WHEN] A price that starts today changes while the task list is off.
+        _Lib.DispatchModify(ItemPrice);
+
+        // [THEN] One legacy price task scheduled at the price start date.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR Spfy Item Price"), 'One legacy price task must be created for the price change');
+        AssertNcPriceIntent(ItemPrice.RecordId(), Item."No.", StoreCode, CreateDateTime(FirstStartDate, 0T), 'Item price');
+
+        // [WHEN] The same price row gets a later start date.
+        ItemPrice."Starting Date" := SecondStartDate;
+        ItemPrice.Modify(false);
+        _Lib.DispatchModify(ItemPrice);
+
+        // [THEN] Each distinct start date keeps its own legacy task.
+        _Assert.AreEqual(2, NcTaskCount(Database::"NPR Spfy Item Price"), 'A second price start date must get its own legacy task under exact reuse');
+        AssertNcPriceIntent(ItemPrice.RecordId(), Item."No.", StoreCode, CreateDateTime(SecondStartDate, 0T), 'Item price rescheduled');
+
+        // [WHEN] The same start date arrives again. [THEN] the pending task absorbs it.
+        _Lib.DispatchModify(ItemPrice);
+        _Assert.AreEqual(2, NcTaskCount(Database::"NPR Spfy Item Price"), 'An identical start date must be absorbed by the pending legacy task');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No price task may be created in the new queue while the feature is off');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenItemPriceChanges_ThenContentCorrectSpfyTaskOnly_AndExactReuseSchedules()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        ItemPrice: Record "NPR Spfy Item Price";
+        StoreCode: Code[20];
+        FirstStartDate: Date;
+        SecondStartDate: Date;
+    begin
+        // [SCENARIO] A price change with the task list on creates one new-queue price task scheduled at its start date, gives a later start date its own task and lets an identical one be absorbed, and never reaches the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, true, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        FirstStartDate := Today();
+        SecondStartDate := CalcDate('<+1M>', Today());
+        _Lib.CreateItemPrice(ItemPrice, Item."No.", StoreCode, 100, FirstStartDate);
+        _Lib.SetTaskListFeatureEnabled(true);
+
+        // [WHEN] A price that starts today changes while the task list is on.
+        _Lib.DispatchModify(ItemPrice);
+
+        // [THEN] One new-queue price task scheduled at the price start date.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR Spfy Item Price"), 'One new-queue price task must be created for the price change');
+        AssertSpfyPriceIntent(ItemPrice.RecordId(), Item."No.", StoreCode, CreateDateTime(FirstStartDate, 0T), 'Item price');
+
+        // [WHEN] The same price row gets a later start date.
+        ItemPrice."Starting Date" := SecondStartDate;
+        ItemPrice.Modify(false);
+        _Lib.DispatchModify(ItemPrice);
+
+        // [THEN] Each distinct start date keeps its own new-queue task.
+        _Assert.AreEqual(2, SpfyTaskCount(Database::"NPR Spfy Item Price"), 'A second price start date must get its own new-queue task under exact reuse');
+        AssertSpfyPriceIntent(ItemPrice.RecordId(), Item."No.", StoreCode, CreateDateTime(SecondStartDate, 0T), 'Item price rescheduled');
+
+        // [WHEN] The same start date arrives again. [THEN] the pending task absorbs it.
+        _Lib.DispatchModify(ItemPrice);
+        _Assert.AreEqual(2, SpfyTaskCount(Database::"NPR Spfy Item Price"), 'An identical start date must be absorbed by the pending new-queue task');
+        _Assert.AreEqual(0, NcTaskCount(), 'A price change must never also reach the legacy queue while the feature is on');
+    end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenLocationActivationEnqueues_ThenContentCorrectNcTaskOnly()
+    var
+        Item: Record Item;
+        DisabledItem: Record Item;
+        SpfyInventoryLevel: Record "NPR Spfy Inventory Level";
+        DisabledInventoryLevel: Record "NPR Spfy Inventory Level";
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+        NcTask: Record "NPR Nc Task";
+        DummyNcTask: Record "NPR Nc Task";
+        SpfyInvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
+        StoreCode: Code[20];
+        ShopifyLocationId: Text[30];
+        DisabledLocationId: Text[30];
+        EnqueuedAt: DateTime;
+    begin
+        // [SCENARIO] A location activation enqueued with the task list off creates one content-correct legacy activation task keyed on the location record and nothing in the new queue, and a location whose auto-activation the merchant disabled adds no task at all.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, true, false, false, false);
+        CreateInventoryLevel(Item, SpfyInventoryLevel, StoreCode, ShopifyLocationId, CurrentDateTime());
+        EnqueuedAt := CurrentDateTime();
+
+        // [WHEN] The activation seam enqueues while the task list is off.
+        _Assert.IsTrue(SpfyInvLocationAct.CreateNcTaskActivateInvLocation(SpfyInventoryLevel, true), 'The activation seam must create a task');
+
+        // [THEN] One legacy activation task keyed on the location record, stamped a short moment ahead.
+        LocationInvItem.Get(StoreCode, ShopifyLocationId, Item."No.", '');
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR Spfy Inv Item Location"), 'One legacy activation task must be created');
+        AssertNcIntent(Database::"NPR Spfy Inv Item Location", DummyNcTask.Type::Insert, LocationInvItem.RecordId(), Item."No.", StoreCode, 'Location activation');
+        _Assert.IsTrue(FindNcTask(Database::"NPR Spfy Inv Item Location", NcTask), 'The legacy activation task must be readable');
+        AssertLogDateWithinWindow(NcTask."Log Date", EnqueuedAt, 'Location activation');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No activation task may be created in the new queue while the feature is off');
+
+        // [WHEN] A location whose auto-activation the merchant switched off is enqueued.
+        CreateInventoryLevel(DisabledItem, DisabledInventoryLevel, StoreCode, DisabledLocationId, CurrentDateTime());
+        DisableAutoActivation(StoreCode, DisabledLocationId, DisabledItem."No.");
+        _Assert.IsFalse(SpfyInvLocationAct.CreateNcTaskActivateInvLocation(DisabledInventoryLevel, true), 'A location with auto-activation disabled must not be activated');
+
+        // [THEN] No further task is created in either queue.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR Spfy Inv Item Location"), 'A location with auto-activation disabled must not add a legacy task');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'A location with auto-activation disabled must not add a new-queue task');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenLocationActivationEnqueues_ThenContentCorrectSpfyTaskOnly()
+    var
+        Item: Record Item;
+        SpfyInventoryLevel: Record "NPR Spfy Inventory Level";
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyInvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
+        StoreCode: Code[20];
+        ShopifyLocationId: Text[30];
+        EnqueuedAt: DateTime;
+    begin
+        // [SCENARIO] A location activation enqueued with the task list on creates one content-correct new-queue activation task keyed on the location record and nothing in the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, true, false, false, false);
+        CreateInventoryLevel(Item, SpfyInventoryLevel, StoreCode, ShopifyLocationId, CurrentDateTime());
+        _Lib.SetTaskListFeatureEnabled(true);
+        EnqueuedAt := CurrentDateTime();
+
+        // [WHEN] The same activation seam enqueues while the task list is on.
+        _Assert.IsTrue(SpfyInvLocationAct.CreateNcTaskActivateInvLocation(SpfyInventoryLevel, true), 'The activation seam must create a task');
+
+        // [THEN] The shared producer routes whole: one content-correct new-queue activation and nothing in the legacy queue.
+        LocationInvItem.Get(StoreCode, ShopifyLocationId, Item."No.", '');
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR Spfy Inv Item Location"), 'One new-queue activation task must be created');
+        AssertSpfyIntent(Database::"NPR Spfy Inv Item Location", "NPR Spfy Task Op"::Insert, LocationInvItem.RecordId(), Item."No.", StoreCode, 'Location activation');
+        _Assert.IsTrue(FindSpfyTask(Database::"NPR Spfy Inv Item Location", SpfyTask), 'The new-queue activation task must be readable');
+        AssertLogDateWithinWindow(SpfyTask."Log Date", EnqueuedAt, 'Location activation');
+        _Assert.AreEqual(0, NcTaskCount(), 'An activation must never also reach the legacy queue while the feature is on');
     end;
     #endregion
 

@@ -57,6 +57,9 @@ table 6151277 "NPR Spfy Inv Item Location"
         {
             Clustered = true;
         }
+        key(StoreItemVariant; "Shopify Store Code", "Item No.", "Variant Code")
+        {
+        }
     }
 }
 #endif

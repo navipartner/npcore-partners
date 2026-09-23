@@ -900,7 +900,7 @@ codeunit 85310 "NPR Spfy TL Queue Tests"
         _Assert.IsTrue(_SpfyTaskQueue.ClaimForBatch(TempSpfyTaskWork), 'test harness: the claim itself must succeed');
         asserterror Error(ForcedRollbackErr);
 
-        // [THEN] The claim survives the rollback, so the sweep and the stale-claim reclaim can see it.
+        // [THEN] The claim survives the rollback, so the unfinished-claim sweep and the stale-claim reclaim can see it.
         SpfyTask.Get(TaskEntryNo);
         _Assert.IsTrue(SpfyTask.State = SpfyTask.State::"In Flight", 'A crashed batch dispatch must leave the committed claim visible');
         _Assert.AreEqual(1, SpfyTask.Attempts, 'The crashed attempt must remain counted');

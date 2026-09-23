@@ -19,6 +19,11 @@ codeunit 6151226 "NPR Spfy Task Run Context"
         exit(_RunDeadline);
     end;
 
+    internal procedure DeadlineExpired(): Boolean
+    begin
+        exit((_RunDeadline <> 0DT) and (CurrentDateTime() > _RunDeadline));
+    end;
+
     internal procedure ClearRunDeadline()
     begin
         _RunDeadline := 0DT;

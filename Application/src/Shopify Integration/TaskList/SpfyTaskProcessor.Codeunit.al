@@ -15,8 +15,12 @@ codeunit 6151214 "NPR Spfy Task Processor"
         _SpfySendItemsInv: Codeunit "NPR Spfy Task Send Items&Inv";
         _SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
         _SpfyTaskRunContext: Codeunit "NPR Spfy Task Run Context";
+        _LookupFailedNoTextLbl: Label 'The Shopify lookup for this task''s precondition failed without an error message.';
         _SourceGoneLbl: Label 'The source record no longer exists. The request is no longer applicable.';
         _WaitingForParentLbl: Label 'Awaiting parent product sync';
+        _WaitingForInventoryItemLbl: Label 'Awaiting inventory item sync';
+        _WaitingForLocationActivationLbl: Label 'Awaiting Shopify location activation';
+        _WaitingForVariantLbl: Label 'Awaiting variant sync';
 
     internal procedure SetSendBoundary(NewBoundary: Interface "NPR Spfy Task Send Boundary")
     begin
@@ -261,21 +265,32 @@ codeunit 6151214 "NPR Spfy Task Processor"
 
     local procedure ReevaluateWaitingTask(var SpfyTask: Record "NPR Spfy Task"; AtDateTime: DateTime; var AgedQuarantineCounts: Dictionary of [Text, Integer]; var AgedQuarantineSamples: Dictionary of [Text, BigInteger])
     var
+        SourceRecRef: RecordRef;
         AgeIsUp: Boolean;
+        LookupErrorText: Text;
+        StableReason: Text;
+        WaitingReasonTxt: Text;
     begin
         AgeIsUp := (SpfyTask."Waiting Since" <> 0DT) and ((AtDateTime - SpfyTask."Waiting Since") >= AgingThresholdMs());
-        if SourceHasVanished(SpfyTask) then begin
+        if SourceHasVanished(SpfyTask, SourceRecRef) then begin
             _SpfyTaskQueue.CompleteNoLongerApplicable(SpfyTask, _SourceGoneLbl);
             exit;
         end;
         // Still a one-shot: a task that reaches the threshold unmet leaves Waiting at once, so it cannot re-query.
-        if PreconditionIsMet(SpfyTask, AgeIsUp) then begin
+        if PreconditionIsMet(SpfyTask, AgeIsUp, false, SourceRecRef, WaitingReasonTxt, LookupErrorText) then begin
             _SpfyTaskQueue.ReleaseWaiting(SpfyTask);
             exit;
         end;
-        if AgeIsUp then
-            if _SpfyTaskQueue.QuarantineAgedWaiting(SpfyTask, SpfyTask."Waiting Reason", AgingThresholdHours()) then
-                RecordAgedQuarantine(SpfyTask, SpfyTask."Waiting Reason", AgedQuarantineCounts, AgedQuarantineSamples);
+        if (WaitingReasonTxt <> '') and (WaitingReasonTxt <> SpfyTask."Waiting Reason") then
+            _SpfyTaskQueue.UpdateWaitingReason(SpfyTask, WaitingReasonTxt);
+        if AgeIsUp then begin
+            // The stable blocker label stays the reason; a failed one-shot re-check goes into the response text.
+            StableReason := WaitingReasonTxt;
+            if StableReason = '' then
+                StableReason := SpfyTask."Waiting Reason";
+            if _SpfyTaskQueue.QuarantineAgedWaiting(SpfyTask, StableReason, LookupErrorText, AgingThresholdHours()) then
+                RecordAgedQuarantine(SpfyTask, StableReason, AgedQuarantineCounts, AgedQuarantineSamples);
+        end;
     end;
 
     local procedure RecordAgedQuarantine(var SpfyTask: Record "NPR Spfy Task"; EffectiveReason: Text; var AgedQuarantineCounts: Dictionary of [Text, Integer]; var AgedQuarantineSamples: Dictionary of [Text, BigInteger])
@@ -332,16 +347,24 @@ codeunit 6151214 "NPR Spfy Task Processor"
     end;
 
     local procedure EvaluateAndClaimOrDefer(var SpfyTask: Record "NPR Spfy Task"; AtDateTime: DateTime): Boolean
+    var
+        SourceRecRef: RecordRef;
+        LookupErrorText: Text;
+        WaitingReasonTxt: Text;
     begin
         if not IntegrationIsEnabledForStore(SpfyTask."Store Code") then
             exit(false);
-        if SourceHasVanished(SpfyTask) then begin
+        if SourceHasVanished(SpfyTask, SourceRecRef) then begin
             _SpfyTaskQueue.CompleteNoLongerApplicable(SpfyTask, _SourceGoneLbl);
             exit(false);
         end;
-        if not PreconditionIsMet(SpfyTask, true) then begin
-            if SpfyTask.State = SpfyTask.State::Pending then
-                _SpfyTaskQueue.SetWaiting(SpfyTask, _WaitingForParentLbl, AtDateTime);
+        if not PreconditionIsMet(SpfyTask, true, true, SourceRecRef, WaitingReasonTxt, LookupErrorText) then begin
+            case SpfyTask.State of
+                SpfyTask.State::Pending:
+                    _SpfyTaskQueue.SetWaiting(SpfyTask, WaitingReasonTxt, AtDateTime, LookupErrorText);
+                SpfyTask.State::Waiting:
+                    _SpfyTaskQueue.RefreshWaiting(SpfyTask, WaitingReasonTxt, LookupErrorText);
+            end;
             exit(false);
         end;
         if SpfyTask.State = SpfyTask.State::Waiting then
@@ -390,6 +413,7 @@ codeunit 6151214 "NPR Spfy Task Processor"
 
         // A batch dispatch runs through Codeunit.Run, which raises at the call site if the ambient transaction has pending writes.
         Commit();
+        // The send codeunit charges the row whose preparation aborted, so a successful dispatch leaves nothing to sweep.
         if SendBoundary().Dispatch(TempSpfyTaskGroup, ErrorText) then
             exit;
         if ErrorText = '' then
@@ -436,12 +460,13 @@ codeunit 6151214 "NPR Spfy Task Processor"
         TempSpfyTaskBatch.Insert();
     end;
 
-    local procedure SourceHasVanished(var SpfyTask: Record "NPR Spfy Task"): Boolean
+    local procedure SourceHasVanished(var SpfyTask: Record "NPR Spfy Task"; var SourceRecRef: RecordRef): Boolean
     var
         InventoryBuffer: Record "Inventory Buffer";
         Item: Record Item;
         RecRef: RecordRef;
     begin
+        Clear(SourceRecRef);
         if SpfyTask.Type = SpfyTask.Type::Delete then
             exit(false);
         case SpfyTask."Table No." of
@@ -454,26 +479,47 @@ codeunit 6151214 "NPR Spfy Task Processor"
                 end;
             Database::Item,
             Database::"Item Variant",
-            Database::"NPR Spfy Tag Update Request":
-                exit(not RecRef.Get(SpfyTask."Record ID"));
+            Database::"NPR Spfy Tag Update Request",
+            Database::"NPR Spfy Inventory Level",
+            Database::"NPR Spfy Item Price",
+            Database::"NPR Spfy Inv Item Location":
+                begin
+                    if not RecRef.Get(SpfyTask."Record ID") then
+                        exit(true);
+                    SourceRecRef := RecRef;
+                    exit(false);
+                end;
         end;
         exit(false);
     end;
 
-    local procedure PreconditionIsMet(var SpfyTask: Record "NPR Spfy Task"; AllowLiveLookup: Boolean): Boolean
+    local procedure PreconditionIsMet(var SpfyTask: Record "NPR Spfy Task"; AllowLiveLookup: Boolean; EnqueueActivation: Boolean; var SourceRecRef: RecordRef; var WaitingReasonTxt: Text; var LookupErrorText: Text): Boolean
     begin
+        WaitingReasonTxt := '';
+        LookupErrorText := '';
         if SpfyTask.Type = SpfyTask.Type::Delete then
             exit(true);
         case SpfyTask."Table No." of
             Database::"Item Variant",
+            Database::"Inventory Buffer",
             Database::"NPR Spfy Tag Update Request":
-                exit(ParentProductExistsInShopify(SpfyTask, AllowLiveLookup));
+                begin
+                    WaitingReasonTxt := _WaitingForParentLbl;
+                    exit(ParentProductExistsInShopify(SpfyTask, AllowLiveLookup, LookupErrorText));
+                end;
+            Database::"NPR Spfy Inventory Level":
+                exit(InventoryLevelPreconditionIsMet(AllowLiveLookup, EnqueueActivation, SourceRecRef, WaitingReasonTxt, LookupErrorText));
+            Database::"NPR Spfy Inv Item Location":
+                exit(InvItemLocationPreconditionIsMet(AllowLiveLookup, SourceRecRef, WaitingReasonTxt, LookupErrorText));
+            Database::"NPR Spfy Item Price":
+                exit(ItemPricePreconditionIsMet(AllowLiveLookup, SourceRecRef, WaitingReasonTxt, LookupErrorText));
         end;
         exit(true);
     end;
 
-    local procedure ParentProductExistsInShopify(var SpfyTask: Record "NPR Spfy Task"; AllowLiveLookup: Boolean): Boolean
+    local procedure ParentProductExistsInShopify(var SpfyTask: Record "NPR Spfy Task"; AllowLiveLookup: Boolean; var LookupErrorText: Text): Boolean
     var
+        SpfyItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         ShopifyProductID: Text[30];
     begin
@@ -483,8 +529,16 @@ codeunit 6151214 "NPR Spfy Task Processor"
             exit(true);
         if not AllowLiveLookup then
             exit(false);
-        if not TryFindParentProductInShopify(SpfyStoreItemLink, ShopifyProductID) then
+        // A disabled or missing item link must not cost a Shopify call: dispatch, and the send fails it fast with its own reason.
+        if not _SpfySendItemsInv.GetStoreItemLink(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Shopify Store Code", false, SpfyItemLink) then
+            exit(true);
+        ClearLastError();
+        if not TryFindParentProductInShopify(SpfyStoreItemLink, ShopifyProductID) then begin
+            LookupErrorText := GetLastErrorText();
+            if LookupErrorText = '' then
+                LookupErrorText := _LookupFailedNoTextLbl;
             exit(false);
+        end;
         if ShopifyProductID = '' then
             exit(false);
         // The lookup stays a pure read inside the try scope; the assignment is persisted here, where a failure rolls back.
@@ -499,14 +553,148 @@ codeunit 6151214 "NPR Spfy Task Processor"
             ShopifyProductID := '';
     end;
 
+    local procedure InventoryLevelPreconditionIsMet(AllowLiveLookup: Boolean; EnqueueActivation: Boolean; var SourceRecRef: RecordRef; var WaitingReasonTxt: Text; var LookupErrorText: Text): Boolean
+    var
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+        SpfyInvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
+    begin
+        // The caller always runs SourceHasVanished first, which either exits or leaves the ref set.
+        SourceRecRef.SetTable(InventoryLevel);
+        if not InventoryItemExistsInShopify(InventoryLevel."Item No.", InventoryLevel."Variant Code", InventoryLevel."Shopify Store Code", AllowLiveLookup, LookupErrorText) then begin
+            WaitingReasonTxt := _WaitingForInventoryItemLbl;
+            exit(false);
+        end;
+        if SpfyInvLocationAct.FindLocationRecord(LocationInvItem, InventoryLevel) then
+            if LocationInvItem."Auto-Activation Disabled" or LocationInvItem.Activated then
+                exit(true);
+        // Only the dispatch-side evaluation may queue the activation: re-evaluation runs every minute, and its aged one-shot quarantines the level in the same pass, so a task queued there would be an orphan.
+        if EnqueueActivation then
+            SpfyInvLocationAct.CreateNcTaskActivateInvLocation(InventoryLevel, false);
+        WaitingReasonTxt := _WaitingForLocationActivationLbl;
+        exit(false);
+    end;
+
+    local procedure InvItemLocationPreconditionIsMet(AllowLiveLookup: Boolean; var SourceRecRef: RecordRef; var WaitingReasonTxt: Text; var LookupErrorText: Text): Boolean
+    var
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+    begin
+        // The caller always runs SourceHasVanished first, which either exits or leaves the ref set.
+        SourceRecRef.SetTable(LocationInvItem);
+        if InventoryItemExistsInShopify(LocationInvItem."Item No.", LocationInvItem."Variant Code", LocationInvItem."Shopify Store Code", AllowLiveLookup, LookupErrorText) then
+            exit(true);
+        WaitingReasonTxt := _WaitingForInventoryItemLbl;
+        exit(false);
+    end;
+
+    local procedure ItemPricePreconditionIsMet(AllowLiveLookup: Boolean; var SourceRecRef: RecordRef; var WaitingReasonTxt: Text; var LookupErrorText: Text): Boolean
+    var
+        ItemPrice: Record "NPR Spfy Item Price";
+    begin
+        // The caller always runs SourceHasVanished first, which either exits or leaves the ref set.
+        SourceRecRef.SetTable(ItemPrice);
+        if VariantExistsInShopify(ItemPrice."Item No.", ItemPrice."Variant Code", ItemPrice."Shopify Store Code", AllowLiveLookup, LookupErrorText) then
+            exit(true);
+        WaitingReasonTxt := _WaitingForVariantLbl;
+        exit(false);
+    end;
+
+    local procedure VariantExistsInShopify(ItemNo: Code[20]; VariantCode: Code[10]; StoreCode: Code[20]; AllowLiveLookup: Boolean; var LookupErrorText: Text): Boolean
+    var
+        SpfyItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        ShopifyVariantID: Text[30];
+    begin
+        SetVariantLink(SpfyStoreItemLink, ItemNo, VariantCode, StoreCode);
+        if _SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '' then
+            exit(true);
+        if not AllowLiveLookup then
+            exit(false);
+        // A disabled or missing item link must not cost a Shopify call: dispatch, and the send fails it fast with its own reason.
+        if not _SpfySendItemsInv.GetStoreItemLink(ItemNo, StoreCode, false, SpfyItemLink) then
+            exit(true);
+        ClearLastError();
+        if not TryFindVariantInShopify(SpfyStoreItemLink, ShopifyVariantID) then begin
+            LookupErrorText := GetLastErrorText();
+            if LookupErrorText = '' then
+                LookupErrorText := _LookupFailedNoTextLbl;
+            exit(false);
+        end;
+        if ShopifyVariantID = '' then
+            exit(false);
+        // The lookup stays a pure read inside the try scope; the assignment is persisted here, where a failure rolls back.
+        _SpfySendItemsInv.AssignShopifyVariantID(SpfyStoreItemLink, ShopifyVariantID);
+        exit(true);
+    end;
+
+    [TryFunction]
+    local procedure TryFindVariantInShopify(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var ShopifyVariantID: Text[30])
+    begin
+        if not _SpfySendItemsInv.TryFindShopifyVariantID(SpfyStoreItemLink, ShopifyVariantID) then
+            ShopifyVariantID := '';
+    end;
+
+    local procedure InventoryItemExistsInShopify(ItemNo: Code[20]; VariantCode: Code[10]; StoreCode: Code[20]; AllowLiveLookup: Boolean; var LookupErrorText: Text): Boolean
+    var
+        SpfyItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        ShopifyInventoryItemID: Text[30];
+    begin
+        SetVariantLink(SpfyStoreItemLink, ItemNo, VariantCode, StoreCode);
+        if _SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID") <> '' then
+            exit(true);
+        if not AllowLiveLookup then
+            exit(false);
+        // A disabled or missing item link must not cost a Shopify call: dispatch, and the send fails it fast with its own reason.
+        if not _SpfySendItemsInv.GetStoreItemLink(ItemNo, StoreCode, false, SpfyItemLink) then
+            exit(true);
+        ClearLastError();
+        if not TryFindInventoryItemInShopify(SpfyStoreItemLink, ShopifyInventoryItemID) then begin
+            LookupErrorText := GetLastErrorText();
+            if LookupErrorText = '' then
+                LookupErrorText := _LookupFailedNoTextLbl;
+            exit(false);
+        end;
+        if ShopifyInventoryItemID = '' then
+            exit(false);
+        // The lookup stays a pure read inside the try scope; the assignment is persisted here, where a failure rolls back.
+        _SpfySendItemsInv.AssignShopifyInventoryItemID(SpfyStoreItemLink, ShopifyInventoryItemID);
+        exit(true);
+    end;
+
+    local procedure SetVariantLink(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ItemNo: Code[20]; VariantCode: Code[10]; StoreCode: Code[20])
+    begin
+        Clear(SpfyStoreItemLink);
+        SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Variant;
+        SpfyStoreItemLink."Item No." := ItemNo;
+        SpfyStoreItemLink."Variant Code" := VariantCode;
+        SpfyStoreItemLink."Shopify Store Code" := StoreCode;
+    end;
+
+    [TryFunction]
+    local procedure TryFindInventoryItemInShopify(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var ShopifyInventoryItemID: Text[30])
+    begin
+        if not _SpfySendItemsInv.TryFindShopifyInventoryItemID(SpfyStoreItemLink, ShopifyInventoryItemID) then
+            ShopifyInventoryItemID := '';
+    end;
+
     local procedure ParentStoreItemLink(var SpfyTask: Record "NPR Spfy Task"; var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Boolean
     var
+        InventoryBuffer: Record "Inventory Buffer";
         ItemVariant: Record "Item Variant";
         RecRef: RecordRef;
     begin
         Clear(SpfyStoreItemLink);
         RecRef := SpfyTask."Record ID".GetRecord();
         case SpfyTask."Table No." of
+            // The cost carrier is a synthetic RecordId over a buffer row that is never persisted; only its Item No. is real.
+            Database::"Inventory Buffer":
+                begin
+                    RecRef.SetTable(InventoryBuffer);
+                    SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
+                    SpfyStoreItemLink."Item No." := InventoryBuffer."Item No.";
+                    SpfyStoreItemLink."Shopify Store Code" := SpfyTask."Store Code";
+                end;
             Database::"Item Variant":
                 begin
                     RecRef.SetTable(ItemVariant);
@@ -533,7 +721,7 @@ codeunit 6151214 "NPR Spfy Task Processor"
 
     local procedure IsBatchKind(TableNo: Integer): Boolean
     begin
-        exit(TableNo = Database::"Item Variant");
+        exit(TableNo in [Database::"Item Variant", Database::"NPR Spfy Inventory Level", Database::"NPR Spfy Item Price"]);
     end;
 
     local procedure ClearRunContext()

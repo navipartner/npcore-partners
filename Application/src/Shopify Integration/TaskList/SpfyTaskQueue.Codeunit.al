@@ -329,6 +329,11 @@ codeunit 6151183 "NPR Spfy Task Queue"
 
     internal procedure SetWaiting(var SpfyTask: Record "NPR Spfy Task"; WaitingReasonTxt: Text; AtDateTime: DateTime)
     begin
+        SetWaiting(SpfyTask, WaitingReasonTxt, AtDateTime, '');
+    end;
+
+    internal procedure SetWaiting(var SpfyTask: Record "NPR Spfy Task"; WaitingReasonTxt: Text; AtDateTime: DateTime; FullErrorText: Text)
+    begin
         SpfyTask.ReadIsolation(IsolationLevel::UpdLock);
         if not SpfyTask.Get(SpfyTask."Entry No.") then
             exit;
@@ -342,7 +347,10 @@ codeunit 6151183 "NPR Spfy Task Queue"
             SpfyTask."Waiting Since" := AtDateTime;
         end;
         SpfyTask."Waiting Reason" := CopyStr(WaitingReasonTxt, 1, MaxStrLen(SpfyTask."Waiting Reason"));
+        if FullErrorText <> '' then
+            WriteResponse(SpfyTask, FullErrorText);
         SpfyTask.Modify(true);
+        Commit();
     end;
 
     internal procedure ReleaseWaiting(var SpfyTask: Record "NPR Spfy Task")
@@ -372,6 +380,34 @@ codeunit 6151183 "NPR Spfy Task Queue"
 
         SpfyTask."Waiting Since" := AtDateTime;
         SpfyTask.Modify(true);
+    end;
+
+    internal procedure UpdateWaitingReason(var SpfyTask: Record "NPR Spfy Task"; WaitingReasonTxt: Text)
+    begin
+        SpfyTask.ReadIsolation(IsolationLevel::UpdLock);
+        if not SpfyTask.Get(SpfyTask."Entry No.") then
+            exit;
+        if SpfyTask.State <> SpfyTask.State::Waiting then
+            exit;
+
+        // No commit: the waiting pass commits once when it ends.
+        SpfyTask."Waiting Reason" := CopyStr(WaitingReasonTxt, 1, MaxStrLen(SpfyTask."Waiting Reason"));
+        SpfyTask.Modify(true);
+    end;
+
+    internal procedure RefreshWaiting(var SpfyTask: Record "NPR Spfy Task"; WaitingReasonTxt: Text; FullErrorText: Text)
+    begin
+        SpfyTask.ReadIsolation(IsolationLevel::UpdLock);
+        if not SpfyTask.Get(SpfyTask."Entry No.") then
+            exit;
+        if SpfyTask.State <> SpfyTask.State::Waiting then
+            exit;
+
+        SpfyTask."Waiting Reason" := CopyStr(WaitingReasonTxt, 1, MaxStrLen(SpfyTask."Waiting Reason"));
+        if FullErrorText <> '' then
+            WriteResponse(SpfyTask, FullErrorText);
+        SpfyTask.Modify(true);
+        Commit();
     end;
 
     internal procedure ShiftWaitingSince(var SpfyTask: Record "NPR Spfy Task"; GapDuration: Duration; AtDateTime: DateTime)
@@ -419,9 +455,10 @@ codeunit 6151183 "NPR Spfy Task Queue"
     end;
 
     // Terminal, not cancelled: cancel would complete the task while detection has already moved its hash baseline.
-    internal procedure QuarantineAgedWaiting(var SpfyTask: Record "NPR Spfy Task"; EffectiveReasonTxt: Text; ThresholdHours: Integer): Boolean
+    internal procedure QuarantineAgedWaiting(var SpfyTask: Record "NPR Spfy Task"; ReasonTxt: Text; LookupErrorText: Text; ThresholdHours: Integer): Boolean
     var
         AgedParkQuarantinedLbl: Label 'The task waited %1 hours or more (engine downtime not counted) for a related update to reach Shopify first and was quarantined: %2', Comment = '%1 = the aging threshold in hours, %2 = what the task was waiting for';
+        ResponseDetail: Text;
     begin
         SpfyTask.ReadIsolation(IsolationLevel::UpdLock);
         if not SpfyTask.Get(SpfyTask."Entry No.") then
@@ -429,8 +466,11 @@ codeunit 6151183 "NPR Spfy Task Queue"
         if SpfyTask.State <> SpfyTask.State::Waiting then
             exit(false);
 
-        SpfyTask."Waiting Reason" := CopyStr(EffectiveReasonTxt, 1, MaxStrLen(SpfyTask."Waiting Reason"));
-        WriteResponse(SpfyTask, StrSubstNo(AgedParkQuarantinedLbl, ThresholdHours, EffectiveReasonTxt));
+        SpfyTask."Waiting Reason" := CopyStr(ReasonTxt, 1, MaxStrLen(SpfyTask."Waiting Reason"));
+        ResponseDetail := LookupErrorText;
+        if ResponseDetail = '' then
+            ResponseDetail := ReasonTxt;
+        WriteResponse(SpfyTask, StrSubstNo(AgedParkQuarantinedLbl, ThresholdHours, ResponseDetail));
         SpfyTask.State := SpfyTask.State::Quarantined;
         ClearClaim(SpfyTask);
         // Attempts and the downtime-discounted clock are kept: the park never spent an attempt.

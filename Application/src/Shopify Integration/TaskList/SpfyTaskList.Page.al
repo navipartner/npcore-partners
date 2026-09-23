@@ -357,6 +357,7 @@ page 6150973 "NPR Spfy Task List"
         SelectedTask: Record "NPR Spfy Task";
         SpfyTask: Record "NPR Spfy Task";
         ShowWaitingMessage: Boolean;
+        ExecutePostponedTasksQst: Label 'You have selected one or more tasks that should be executed later.\Are you sure you want to execute them now?';
         NoneProcessableMsg: Label 'None of the selected tasks can be processed manually. Only a task in state %1 or %2 can.', Comment = '%1 = the Pending state, %2 = the Waiting state';
         ProcessingSuspendedMsg: Label 'Tasks cannot be processed while the migration to the Shopify task list has not completed on this environment. Check the migration status on the Shopify Integration Setup page.';
     begin
@@ -366,6 +367,17 @@ page 6150973 "NPR Spfy Task List"
         end;
         CurrPage.SetSelectionFilter(SelectedTask);
         SelectedTask.SetFilter(State, '%1|%2', SelectedTask.State::Pending, SelectedTask.State::Waiting);
+        // Probed in a spare filter group so clearing it cannot drop the operator's own filter on the same field.
+        SelectedTask.FilterGroup(10);
+        SelectedTask.SetFilter("Not Before Date-Time", '>%1', CurrentDateTime());
+        if not SelectedTask.IsEmpty() then
+            if not Confirm(ExecutePostponedTasksQst) then
+                exit;
+        SelectedTask.SetRange("Not Before Date-Time");
+        SelectedTask.FilterGroup(0);
+        // Sent in creation order: SetSelectionFilter copies the page's descending view, which would send a delete before the modify it precedes.
+        SelectedTask.SetCurrentKey("Entry No.");
+        SelectedTask.Ascending(true);
         if not SelectedTask.FindSet() then begin
             Message(NoneProcessableMsg, SelectedTask.State::Pending, SelectedTask.State::Waiting);
             exit;
