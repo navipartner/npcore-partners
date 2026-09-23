@@ -107,6 +107,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     var
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
+        Tags: List of [Text];
+        SkipImport: Boolean;
     begin
 #if not (BC18 or BC19 or BC20)
         if not EligibleSourceName(JsonHelper.GetJText(Order, 'source_name', true)) then
@@ -116,6 +118,13 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             exit;
         if DocExists(ImportType, ShopifyStore.Code, DocName) then
             exit;
+
+        GetOrderTags(Order, Tags);
+        SpfyIntegrationEvents.OnCheckIfShouldSkipOrderDownload(ShopifyStore.Code, Order, MapOrderStatus(OrderStatus), Tags, SkipImport);
+        if SkipImport then begin
+            LogSkippedOrderDownload(ShopifyStore.Code, Order, MapOrderStatus(OrderStatus), Tags);
+            exit;
+        end;
 
         ImportEntry.Init();
         ImportEntry."Entry No." := 0;
@@ -137,6 +146,88 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(SourceName <> SpfySendBCTransaction.NpRetailPOS_SourceName());
     end;
 #endif
+
+    internal procedure LogSkippedOrderDownload(ShopifyStoreCode: Code[20]; Order: JsonToken; OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; Tags: List of [Text])
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        UpdatedAt: Text;
+        SkippedMsgLbl: Label 'Shopify order download skipped by subscriber', Locked = true;
+    begin
+        UpdatedAt := JsonHelper.GetJText(Order, 'updatedAt', false);
+        if UpdatedAt = '' then
+            UpdatedAt := JsonHelper.GetJText(Order, 'updated_at', false);
+
+        CustomDimensions.Add('NPR_StoreCode', ShopifyStoreCode);
+        CustomDimensions.Add('NPR_OrderId', JsonHelper.GetJText(Order, 'id', false));
+        CustomDimensions.Add('NPR_OrderStatus', Format(OrderStatus));
+        CustomDimensions.Add('NPR_UpdatedAt', UpdatedAt);
+        CustomDimensions.Add('NPR_Tags', JoinTags(Tags));
+
+        Session.LogMessage(
+            'NPR_ShopifyOrderDownloadSkipped', SkippedMsgLbl, Verbosity::Warning,
+            DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
+
+    local procedure JoinTags(Tags: List of [Text]) Result: Text
+    var
+        Tag: Text;
+    begin
+        foreach Tag in Tags do begin
+            if Result <> '' then
+                Result += ',';
+            Result += Tag;
+        end;
+    end;
+
+    internal procedure GetOrderTags(Order: JsonToken; var Tags: List of [Text])
+    var
+        TagsToken: JsonToken;
+        TagToken: JsonToken;
+        RawTags: List of [Text];
+        RawTag: Text;
+    begin
+        Clear(Tags);
+        if not Order.IsObject() then
+            exit;
+        if not Order.AsObject().Get('tags', TagsToken) then
+            exit;
+
+        if TagsToken.IsArray() then begin
+            foreach TagToken in TagsToken.AsArray() do
+                if TagToken.IsValue() then
+                    AddTag(Tags, TagToken.AsValue().AsText());
+            exit;
+        end;
+
+        if not TagsToken.IsValue() then
+            exit;
+        RawTags := TagsToken.AsValue().AsText().Split(',');
+        foreach RawTag in RawTags do
+            AddTag(Tags, RawTag);
+    end;
+
+    local procedure AddTag(var Tags: List of [Text]; Tag: Text)
+    begin
+        Tag := Tag.Trim();
+        if Tag = '' then
+            exit;
+        if Tags.Contains(Tag) then
+            exit;
+        Tags.Add(Tag);
+    end;
+
+    local procedure MapOrderStatus(OrderStatus: Option Open,Closed,Cancelled): Enum "NPR SpfyAPIDocumentStatus"
+    begin
+        case OrderStatus of
+            OrderStatus::Open:
+                exit("NPR SpfyAPIDocumentStatus"::Open);
+            OrderStatus::Closed:
+                exit("NPR SpfyAPIDocumentStatus"::Closed);
+            OrderStatus::Cancelled:
+                exit("NPR SpfyAPIDocumentStatus"::Cancelled);
+        end;
+        exit("NPR SpfyAPIDocumentStatus"::" ");
+    end;
 
     local procedure HasReadyState(ShopifyStore: Record "NPR Spfy Store"; Order: JsonToken; OrderStatus: Option Open,Closed,Cancelled): Boolean
     begin

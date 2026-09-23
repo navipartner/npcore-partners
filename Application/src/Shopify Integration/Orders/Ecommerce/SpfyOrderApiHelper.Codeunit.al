@@ -733,7 +733,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     var
         NcTask: Record "NPR Nc Task";
         ResponseBody: JsonToken;
-        OrderListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id email number displayFinancialStatus createdAt closedAt updatedAt cancelledAt sourceName name customer { firstName lastName } currentTotalPriceSet { presentmentMoney { amount } shopMoney { amount } } presentmentCurrencyCode currencyCode } } pageInfo { endCursor hasNextPage } } }', Locked = true;
+        OrderListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id email number displayFinancialStatus createdAt closedAt updatedAt cancelledAt sourceName name tags customer { firstName lastName } currentTotalPriceSet { presentmentMoney { amount } shopMoney { amount } } presentmentCurrencyCode currencyCode } } pageInfo { endCursor hasNextPage } } }', Locked = true;
     begin
         HasNext := false;
         Clear(OrdersArr);

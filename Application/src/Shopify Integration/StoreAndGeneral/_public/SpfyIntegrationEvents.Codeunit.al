@@ -24,6 +24,11 @@ codeunit 6184824 "NPR Spfy Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnCheckIfShouldSkipOrderDownload(ShopifyStoreCode: Code[20]; Order: JsonToken; OrderStatus: Enum "NPR SpfyAPIDocumentStatus"; Tags: List of [Text]; var SkipImport: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnBeforeFindCustomer(Order: JsonToken; var Customer: Record Customer; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean);
     begin
     end;

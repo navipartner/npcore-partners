@@ -176,6 +176,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
                 exit(OrderProcessed);
 
             OrderTkn.SelectToken('node', CurrNode);
+            UpdateSessionMax(ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order, JsonHelper.GetJDT(CurrNode, 'updatedAt', true));
             GetOrderGID(CurrNode, OrderGID);
             UpdateSessionMax(ShopifyStore.Code, "NPR SpfyEventLogDocType"::Order, JsonHelper.GetJDT(CurrNode, 'updatedAt', true));
             if SaveOrder(ShopifyStore, CurrNode, OrderStatus, OrderGID) then
@@ -645,6 +646,8 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     var
         OrderId: Text[30];
         DocName: Text[100];
+        Tags: List of [Text];
+        SkipImport: Boolean;
     begin
         ClearLastError();
 
@@ -661,6 +664,13 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
 
         if DocExists(ShopifyStore.Code, OrderId, DocName, OrderStatus) then
             exit;
+
+        OrderMgt.GetOrderTags(Order, Tags);
+        SpfyIntegrationEvents.OnCheckIfShouldSkipOrderDownload(ShopifyStore.Code, Order, OrderStatus, Tags, SkipImport);
+        if SkipImport then begin
+            OrderMgt.LogSkippedOrderDownload(ShopifyStore.Code, Order, OrderStatus, Tags);
+            exit;
+        end;
 
         if OrderStatus = OrderStatus::Open then
             if OrderMgt.IsAnonymizedCustomerOrder(JsonHelper.GetJText(Order, 'customer.firstName', false), JsonHelper.GetJText(Order, 'customer.lastName', false)) then
@@ -726,6 +736,7 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyAPIOrderHelper: Codeunit "NPR Spfy Order ApiHelper";
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         LastStoresReload: DateTime;
