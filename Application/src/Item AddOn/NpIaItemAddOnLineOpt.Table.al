@@ -130,6 +130,9 @@
         key(Key1; "AddOn No.", "AddOn Line No.", "Line No.")
         {
         }
+        key(Key2; "Item No.")
+        {
+        }
     }
 
     trigger OnDelete()

@@ -1716,6 +1716,602 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnItemPriceChange()
+    var
+        Assert: Codeunit Assert;
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] A price change on an item that is on the menu refreshes the menu's lastUpdated.
+
+        // [GIVEN] An item on the menu
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The item's unit price changes
+        Sleep(100); // the assertion below is strict, so the new timestamp has to be measurably later
+        PricedItem.Get(PricedItem."No.");
+        PricedItem.Validate("Unit Price", PricedItem."Unit Price" + 10);
+        PricedItem.Modify(true);
+        Commit();
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after item unit price change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_NotUpdatedOnNonPriceItemChange()
+    var
+        Assert: Codeunit Assert;
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] An item change that cannot move the served price leaves the menu alone.
+
+        // [GIVEN] An item on the menu
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] Only the description changes
+        Sleep(100);
+        PricedItem.Get(PricedItem."No.");
+        PricedItem.Validate(Description, 'Renamed by non price test');
+        PricedItem.Modify(true);
+        Commit();
+
+        // [THEN] Last Updated is untouched
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.AreEqual(LastUpdatedBefore, Menu."Last Updated",
+            'Last Updated should not be refreshed by a non price item change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_NotUpdatedForItemOutsideMenus()
+    var
+        Assert: Codeunit Assert;
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        UnrelatedItem: Record Item;
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] An item no menu references never reaches the menu on modify.
+
+        // [GIVEN] A menu, and an item that is on no menu and in no add-on
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(UnrelatedItem, _POSUnit, _POSStore);
+        Commit();
+
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] That item is repriced
+        Sleep(100);
+        UnrelatedItem.Get(UnrelatedItem."No.");
+        UnrelatedItem.Validate("Unit Price", UnrelatedItem."Unit Price" + 10);
+        UnrelatedItem.Modify(true);
+        Commit();
+
+        // [THEN] No menu is touched
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.AreEqual(LastUpdatedBefore, Menu."Last Updated",
+            'Last Updated should not move for an item outside every menu');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnSalesPriceListLine()
+    var
+        Assert: Codeunit Assert;
+        LibraryPriceCalculation: Codeunit "Library - Price Calculation";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] A sales price list line refreshes the menu, since price lists are the primary price source.
+
+        // [GIVEN] An item on the menu with a sales price list line
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, Enum::"Price Type"::Sale,
+            Enum::"Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(PriceListLine, PriceListHeader,
+            Enum::"Price Amount Type"::Price, Enum::"Price Asset Type"::Item, PricedItem."No.");
+        Commit();
+
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The line price changes
+        Sleep(100);
+        PriceListLine."Unit Price" := PriceListLine."Unit Price" + 5;
+        PriceListLine.Modify();
+        Commit();
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after a sales price list line change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnAddOnItemPriceChange()
+    var
+        Assert: Codeunit Assert;
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        PricedItem: Record Item;
+        ModifierItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] An add-on priced off its referenced item refreshes the menus holding the add-on owner.
+
+        // [GIVEN] A menu item whose add-on points at a modifier item with no price of its own
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(ModifierItem, _POSUnit, _POSStore);
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", ModifierItem."No.",
+            ItemAddOnLine."Use Unit Price"::"Non-Zero", 0);
+        LibraryRestaurant.LinkItemToAddon(PricedItem, ItemAddOn."No.");
+        Commit();
+
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The modifier item is repriced
+        Sleep(100);
+        ModifierItem.Get(ModifierItem."No.");
+        ModifierItem.Validate("Unit Price", ModifierItem."Unit Price" + 10);
+        ModifierItem.Modify(true);
+        Commit();
+
+        // [THEN] The menu holding the add-on owner is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after an add-on item price change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnAddOnOptionItemPriceChange()
+    var
+        Assert: Codeunit Assert;
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        PricedItem: Record Item;
+        LineItem: Record Item;
+        OptionItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] An add-on option priced off its referenced item refreshes the menus holding the add-on owner.
+
+        // [GIVEN] A menu item whose add-on reaches the modifier item only through an option row
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(LineItem, _POSUnit, _POSStore);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(OptionItem, _POSUnit, _POSStore);
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", LineItem."No.",
+            ItemAddOnLine."Use Unit Price"::"Non-Zero", 0);
+        LibraryRestaurant.CreateItemAddonLineOption(ItemAddOnLineOpt, ItemAddOnLine, OptionItem."No.",
+            ItemAddOnLineOpt."Use Unit Price"::"Non-Zero", 0);
+        LibraryRestaurant.LinkItemToAddon(PricedItem, ItemAddOn."No.");
+        Commit();
+
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The option's item is repriced
+        Sleep(100);
+        OptionItem.Get(OptionItem."No.");
+        OptionItem.Validate("Unit Price", OptionItem."Unit Price" + 10);
+        OptionItem.Modify(true);
+        Commit();
+
+        // [THEN] The menu holding the add-on owner is refreshed
+        // The add-on line points at a different item, so only the option walk can have done this.
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after an add-on option item price change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnVATBusPostingGroupChange()
+    var
+        Assert: Codeunit Assert;
+        LibraryERM: Codeunit "Library - ERM";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] The price group decides which VAT rate is grossed up, so moving it refreshes the menu.
+
+        // [GIVEN] An item on the menu and a VAT setup carrying a different rate
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        LibraryERM.CreateVATPostingSetupWithAccounts(
+            VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 12);
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The item moves to that price group
+        Sleep(100);
+        PricedItem.Get(PricedItem."No.");
+        PricedItem."VAT Bus. Posting Gr. (Price)" := VATPostingSetup."VAT Bus. Posting Group";
+        PricedItem.Modify(true);
+        Commit();
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after a VAT Bus. Posting Gr. (Price) change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnVATProdPostingGroupChange()
+    var
+        Assert: Codeunit Assert;
+        LibraryERM: Codeunit "Library - ERM";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] The product group is the other half of the VAT setup key, so moving it refreshes the menu.
+
+        // [GIVEN] An item on the menu and a VAT setup carrying a different rate
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        LibraryERM.CreateVATPostingSetupWithAccounts(
+            VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 12);
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The item moves to that product group
+        Sleep(100);
+        PricedItem.Get(PricedItem."No.");
+        PricedItem."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
+        PricedItem.Modify(true);
+        Commit();
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after a VAT Prod. Posting Group change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnPriceIncludesVATChange()
+    var
+        Assert: Codeunit Assert;
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] The flag decides whether the stored price is grossed up, so flipping it refreshes the menu.
+
+        // [GIVEN] An item on the menu
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The flag is flipped
+        Sleep(100);
+        PricedItem.Get(PricedItem."No.");
+        PricedItem."Price Includes VAT" := not PricedItem."Price Includes VAT";
+        PricedItem.Modify(true);
+        Commit();
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after a Price Includes VAT change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnBaseUnitOfMeasureChange()
+    var
+        Assert: Codeunit Assert;
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] The base unit decides which price list rows match and how the price scales.
+
+        // [GIVEN] An item on the menu with a second unit of measure
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        LibraryRestaurant.CreateItemUnitOfMeasure(PricedItem, ItemUnitOfMeasure, 2);
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The base unit of measure changes
+        Sleep(100);
+        PricedItem.Get(PricedItem."No.");
+        PricedItem."Base Unit of Measure" := ItemUnitOfMeasure.Code;
+        PricedItem.Modify(true);
+        Commit();
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after a Base Unit of Measure change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_FlooredAtMidnight()
+    var
+        Assert: Codeunit Assert;
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        FreshMenu: Record "NPR NPRE Menu";
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        MenusArray: JsonArray;
+        MenuToken: JsonToken;
+        JToken: JsonToken;
+        MenuId: Text;
+        Index: Integer;
+        Found: Boolean;
+    begin
+        // [SCENARIO] Date effective prices move with no write, so lastUpdated is never older than today.
+        InitializeMenu();
+
+        POSRestProfile.Get(_POSUnit."POS Restaurant Profile");
+        Restaurant.Get(POSRestProfile."Restaurant Code");
+
+        // [GIVEN] A menu that was inserted and never modified, so Last Updated is blank
+        LibraryRestaurant.CreateMenu(FreshMenu, Restaurant.Code);
+        Commit();
+        Assert.AreEqual(0DT, FreshMenu."Last Updated", 'A newly created menu should have no Last Updated');
+        MenuId := Format(FreshMenu.SystemId, 0, 4).ToLower();
+
+        // [WHEN] The menus are listed
+        Response := LibraryNPRetailAPI.CallApi('GET',
+            '/restaurant/' + Format(Restaurant.SystemId, 0, 4).ToLower() + '/menu',
+            Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'List menus should succeed');
+        MenusArray := LibraryNPRetailAPI.GetResponseBodyAsArray(Response);
+
+        // [THEN] It still reports a lastUpdated, and it is exactly the start of today
+        for Index := 0 to MenusArray.Count() - 1 do begin
+            MenusArray.Get(Index, MenuToken);
+            if MenuToken.AsObject().Get('id', JToken) then
+                if JToken.AsValue().AsText() = MenuId then begin
+                    Found := true;
+                    Assert.IsTrue(MenuToken.AsObject().Get('lastUpdated', JToken),
+                        'An untouched menu should still report lastUpdated');
+                    Assert.AreEqual(CreateDateTime(Today(), 0T), JToken.AsValue().AsDateTime(),
+                        'lastUpdated should be floored at the start of the server day');
+                end;
+        end;
+        Assert.IsTrue(Found, 'The newly created menu should be listed');
+
+        FreshMenu.Delete(true);
+        Commit();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnVATRateChange()
+    var
+        Assert: Codeunit Assert;
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LastUpdatedBefore: DateTime;
+        VATPercentBefore: Decimal;
+    begin
+        // [SCENARIO] A VAT rate change moves the gross price the endpoint serves, so every menu is refreshed.
+
+        // [GIVEN] An item on the menu and the VAT setup its price resolves through
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        VATPostingSetup.Get(PricedItem."VAT Bus. Posting Gr. (Price)", PricedItem."VAT Prod. Posting Group");
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The VAT rate changes
+        Sleep(100);
+        VATPercentBefore := VATPostingSetup."VAT %";
+        VATPostingSetup."VAT %" := VATPostingSetup."VAT %" + 1;
+        VATPostingSetup.Modify(true);
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after a VAT rate change');
+
+        // Every item built by CreateItemForPOSSaleUsage resolves to this one row.
+        VATPostingSetup."VAT %" := VATPercentBefore;
+        VATPostingSetup.Modify(true);
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_NotUpdatedOnNonRateVATChange()
+    var
+        Assert: Codeunit Assert;
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        VATPostingSetup: Record "VAT Posting Setup";
+        LastUpdatedBefore: DateTime;
+        VATIdentifierBefore: Code[20];
+    begin
+        // [SCENARIO] A VAT setup change that cannot move the served price leaves the menus alone.
+
+        // [GIVEN] An item on the menu and the VAT setup its price resolves through
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        VATPostingSetup.Get(PricedItem."VAT Bus. Posting Gr. (Price)", PricedItem."VAT Prod. Posting Group");
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] Only the VAT identifier changes
+        Sleep(100);
+        VATIdentifierBefore := VATPostingSetup."VAT Identifier";
+        VATPostingSetup."VAT Identifier" := 'CORE1383';
+        VATPostingSetup.Modify(true);
+
+        // [THEN] Last Updated is untouched
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.AreEqual(LastUpdatedBefore, Menu."Last Updated",
+            'Last Updated should not move for a VAT setup change that cannot affect the price');
+
+        VATPostingSetup."VAT Identifier" := VATIdentifierBefore;
+        VATPostingSetup.Modify(true);
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnAddOnLineChange()
+    var
+        Assert: Codeunit Assert;
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        PricedItem: Record Item;
+        ModifierItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] Repricing the add-on line itself refreshes the menus holding the add-on owner.
+
+        // [GIVEN] A menu item with an add-on line
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(ModifierItem, _POSUnit, _POSStore);
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", ModifierItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        LibraryRestaurant.LinkItemToAddon(PricedItem, ItemAddOn."No.");
+        Commit();
+
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The add-on line's own price changes
+        Sleep(100);
+        ItemAddOnLine.Get(ItemAddOnLine."AddOn No.", ItemAddOnLine."Line No.");
+        ItemAddOnLine."Unit Price" := ItemAddOnLine."Unit Price" + 5;
+        ItemAddOnLine.Modify(true);
+        Commit();
+
+        // [THEN] The menu holding the add-on owner is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after an add-on line price change');
+
+        RemovePricedMenuCategory();
+    end;
+
+    local procedure CreatePricedMenuItem(var PricedItem: Record Item; var MenuItem: Record "NPR NPRE Menu Item")
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        MenuCategory: Record "NPR NPRE Menu Category";
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+    begin
+        InitializeMenu();
+
+        POSRestProfile.Get(_POSUnit."POS Restaurant Profile");
+        Restaurant.Get(POSRestProfile."Restaurant Code");
+
+        // A dedicated item, so the repricing below never reaches the shared _Item
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(PricedItem, _POSUnit, _POSStore);
+        PricedItem."Unit Price" := 100;
+        PricedItem.Modify();
+        LibraryRestaurant.SetupItemForKitchenOrders(PricedItem);
+
+        RemovePricedMenuCategory();
+        LibraryRestaurant.CreateMenuCategory(MenuCategory, Restaurant.Code, _Menu.Code, 'PRICED');
+        LibraryRestaurant.CreateMenuItem(MenuItem, Restaurant.Code, _Menu.Code, 'PRICED', PricedItem."No.");
+        Commit();
+    end;
+
+    // The shared _Menu is memoised for the whole codeunit and sibling tests pick categories
+    // by sort order, so this one must not outlive the test that created it.
+    local procedure RemovePricedMenuCategory()
+    var
+        MenuCategory: Record "NPR NPRE Menu Category";
+        MenuItem: Record "NPR NPRE Menu Item";
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+    begin
+        POSRestProfile.Get(_POSUnit."POS Restaurant Profile");
+        Restaurant.Get(POSRestProfile."Restaurant Code");
+
+        MenuItem.SetRange("Restaurant Code", Restaurant.Code);
+        MenuItem.SetRange("Menu Code", _Menu.Code);
+        MenuItem.SetRange("Category Code", 'PRICED');
+        MenuItem.DeleteAll(true);
+
+        if MenuCategory.Get(Restaurant.Code, _Menu.Code, 'PRICED') then
+            MenuCategory.Delete(true);
+        Commit();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RestaurantMenu_LastUpdated_UpdatedOnChildChange()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";

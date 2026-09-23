@@ -33,8 +33,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
                     .AddProperty('endTime', Menu."End Time")
                     .AddProperty('timezone', Menu.Timezone)
                     .AddProperty('active', Menu.Active);
-                if Menu."Last Updated" <> 0DT then
-                    JsonArray.AddProperty('lastUpdated', Menu."Last Updated");
+                JsonArray.AddProperty('lastUpdated', EffectiveLastUpdated(Menu));
                 JsonArray.EndObject();
             until Menu.Next() = 0;
         JsonArray.EndArray();
@@ -92,8 +91,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
             .AddProperty('endTime', Menu."End Time")
             .AddProperty('timezone', Menu.Timezone)
             .AddProperty('active', Menu.Active);
-        if Menu."Last Updated" <> 0DT then
-            Json.AddProperty('lastUpdated', Menu."Last Updated");
+        Json.AddProperty('lastUpdated', EffectiveLastUpdated(Menu));
 
         if not TryBuildMenuContent(Restaurant, Menu, PosUnitCode, VATBusPostingGroup, Json) then
             exit(Response.RespondBadRequest(GetLastErrorText()));
@@ -502,6 +500,19 @@ codeunit 6248644 "NPR API Restaurant Menu"
             until ItemAddOnCategory.Next() = 0;
     end;
 
+    local procedure EffectiveLastUpdated(Menu: Record "NPR NPRE Menu"): DateTime
+    var
+        StartOfToday: DateTime;
+    begin
+        // Date effective prices change what is served with no write for a subscriber to catch,
+        // so the timestamp is floored at midnight to force a daily revalidation. Today() is the
+        // session date on purpose - that is the date the price engine resolves against.
+        StartOfToday := CreateDateTime(Today(), 0T);
+        if Menu."Last Updated" > StartOfToday then
+            exit(Menu."Last Updated");
+        exit(StartOfToday);
+    end;
+
     local procedure GetItemPrice(ItemNo: Code[20]; VariantCode: Code[10]; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]): Decimal
     var
         TempRetailJournalLine: Record "NPR Retail Journal Line" temporary;
@@ -541,6 +552,11 @@ codeunit 6248644 "NPR API Restaurant Menu"
         TableIds.Add(Database::"NPR NpIa ItemAddOn Line Opt.");
         TableIds.Add(Database::"NPR NpIa Item AddOn Category");
         TableIds.Add(Database::"NPR NpIa ItemAddOn Cat. Trans.");
+        // GetItemPrice() resolves the price at read time, so these have to bypass the cache too.
+        // Price List Header is deliberately absent: the engine resolves from the line alone.
+        TableIds.Add(Database::Item);
+        TableIds.Add(Database::"Price List Line");
+        TableIds.Add(Database::"VAT Posting Setup");
     end;
 }
 #endif

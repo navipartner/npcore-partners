@@ -294,6 +294,7 @@
     {
         key(Key1; "AddOn No.", "Line No.") { }
         key(Key2; "AddOn No.", "Sort Key") { }
+        key(Key3; "Item No.") { }
     }
 
     trigger OnDelete()

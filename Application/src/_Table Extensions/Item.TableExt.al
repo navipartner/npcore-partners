@@ -642,6 +642,9 @@ tableextension 6014427 "NPR Item" extends Item
         key(MainItemVariationLinks; "NPR Main Item No.", "NPR Main Item/Variation")
         {
         }
+        key("NPR ItemAddOnNo"; "NPR Item AddOn No.")
+        {
+        }
     }
 
     trigger OnAfterInsert()

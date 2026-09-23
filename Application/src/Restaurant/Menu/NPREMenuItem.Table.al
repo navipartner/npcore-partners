@@ -106,6 +106,9 @@ table 6151269 "NPR NPRE Menu Item"
         {
             Unique = true;
         }
+        key(Key3; "Item No.")
+        {
+        }
     }
 
     trigger OnInsert()

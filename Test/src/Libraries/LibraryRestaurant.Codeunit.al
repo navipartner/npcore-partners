@@ -208,6 +208,26 @@ codeunit 85242 "NPR Library - Restaurant"
         ItemAddOnLine.Insert(true);
     end;
 
+    procedure CreateItemAddonLineOption(var ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt."; ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; ItemNo: Code[20]; UseUnitPrice: Option; UnitPrice: Decimal)
+    var
+        ItemAddOnLineOpt2: Record "NPR NpIa ItemAddOn Line Opt.";
+    begin
+        ItemAddOnLineOpt2.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
+        ItemAddOnLineOpt2.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
+        if ItemAddOnLineOpt2.FindLast() then;
+
+        ItemAddOnLineOpt.Init();
+        ItemAddOnLineOpt."AddOn No." := ItemAddOnLine."AddOn No.";
+        ItemAddOnLineOpt."AddOn Line No." := ItemAddOnLine."Line No.";
+        ItemAddOnLineOpt."Line No." := ItemAddOnLineOpt2."Line No." + 10;
+        ItemAddOnLineOpt."Item No." := ItemNo;
+        ItemAddOnLineOpt.Description := 'Test Addon Line Option';
+        ItemAddOnLineOpt."Use Unit Price" := UseUnitPrice;
+        ItemAddOnLineOpt."Unit Price" := UnitPrice;
+        ItemAddOnLineOpt.Quantity := 1;
+        ItemAddOnLineOpt.Insert(true);
+    end;
+
     procedure LinkItemToAddon(var Item: Record Item; AddonNo: Code[20])
     begin
         Item."NPR Item AddOn No." := AddonNo;
