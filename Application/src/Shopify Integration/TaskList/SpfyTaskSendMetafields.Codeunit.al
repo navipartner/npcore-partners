@@ -1,5 +1,4 @@
-﻿#if not BC17
-// Native sibling of frozen codeunit "NPR Spfy Send Metafields": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+﻿// Native sibling of frozen codeunit "NPR Spfy Send Metafields": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
 codeunit 6151466 "NPR Spfy Task Send Metafields"
 {
     Access = Internal;
@@ -94,4 +93,3 @@ codeunit 6151466 "NPR Spfy Task Send Metafields"
         SendToShopify := SpfyMetafieldMgt.ShopifyEntityMetafieldValueUpdateQuery(OwnerRecID, ShopifyOwnerType, ShopifyOwnerID, ShopifyStoreCode, QueryStream);
     end;
 }
-#endif

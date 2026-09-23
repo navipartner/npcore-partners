@@ -1,11 +1,8 @@
-#if not BC17
-codeunit 6184820 "NPR Spfy Send Voucher"
+// Native sibling of frozen codeunit "NPR Spfy Send Voucher": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+codeunit 6151469 "NPR Spfy Task Send Voucher"
 {
     Access = Internal;
-    TableNo = "NPR Nc Task";
-    ObsoleteState = Pending;
-    ObsoleteTag = '2026-08-26';
-    ObsoleteReason = 'Replaced by codeunit "NPR Spfy Task Send Voucher" (the new Shopify Task List queue). This copy keeps serving environments that have not migrated yet. The two codeunits are maintained independently and may diverge: never copy changes blindly between them - apply a fix to each deliberately, only where it belongs.';
+    TableNo = "NPR Spfy Task";
 
     trigger OnRun()
     begin
@@ -24,48 +21,49 @@ codeunit 6184820 "NPR Spfy Send Voucher"
     var
         _JsonHelper: Codeunit "NPR Json Helper";
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        _SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
         _VoucherNotFoundErr: Label 'Retail Voucher %1 could not be found or is not eligible for Shopify integration.', Comment = '%1 - Retail Voucher No.';
 
-    local procedure SendVoucher(var NcTask: Record "NPR Nc Task")
+    local procedure SendVoucher(var SpfyTask: Record "NPR Spfy Task")
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         SendToShopify: Boolean;
         Success: Boolean;
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
         ClearLastError();
         Success := true;
 
-        SendToShopify := PrepareVoucherUpdateRequest(NcTask);
+        SendToShopify := PrepareVoucherUpdateRequest(SpfyTask);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-        NcTask.Modify();
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        SpfyTask.Modify();
         Commit();
 
         if not Success then
             Error(GetLastErrorText());
         if SendToShopify then
-            UpdateVoucherWithDataFromShopify(NcTask, ShopifyResponse);
+            UpdateVoucherWithDataFromShopify(SpfyTask, ShopifyResponse);
     end;
 
-    local procedure SendVoucherAmtUpdate(var NcTask: Record "NPR Nc Task")
+    local procedure SendVoucherAmtUpdate(var SpfyTask: Record "NPR Spfy Task")
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         SendToShopify: Boolean;
         Success: Boolean;
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
         ClearLastError();
         Success := true;
 
-        SendToShopify := PrepareGiftCardBalanceAdjustmentRequest(NcTask);
+        SendToShopify := PrepareGiftCardBalanceAdjustmentRequest(SpfyTask);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-        NcTask.Modify();
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        SpfyTask.Modify();
         Commit();
 
         if not Success then
@@ -75,7 +73,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 Error('');  //The system will record Shopify response as the error message
     end;
 
-    local procedure SendVoucherDisableReq(var NcTask: Record "NPR Nc Task")
+    local procedure SendVoucherDisableReq(var SpfyTask: Record "NPR Spfy Task")
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
@@ -83,15 +81,15 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         SendToShopify: Boolean;
         Success: Boolean;
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
         ClearLastError();
         Success := true;
 
-        SendToShopify := PrepareGiftCardDisableRequest(NcTask, DeactivatedAt);
+        SendToShopify := PrepareGiftCardDisableRequest(SpfyTask, DeactivatedAt);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-        NcTask.Modify();
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        SpfyTask.Modify();
         Commit();
 
         if not Success then
@@ -101,10 +99,10 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 Error('');  //The system will record Shopify response as the error message
             DeactivatedAt := _JsonHelper.GetJDT(ShopifyResponse, 'data.giftCardDeactivate.giftCard.deactivatedAt', false);
         end;
-        MarkVoucherAsDeactivated(NcTask, DeactivatedAt)
+        MarkVoucherAsDeactivated(SpfyTask, DeactivatedAt)
     end;
 
-    local procedure PrepareVoucherUpdateRequest(var NcTask: Record "NPR Nc Task") SendToShopify: Boolean
+    local procedure PrepareVoucherUpdateRequest(var SpfyTask: Record "NPR Spfy Task") SendToShopify: Boolean
     var
         Voucher: Record "NPR NpRv Voucher";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -116,34 +114,34 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         ShopifyGiftCardIdEmptyErr: Label 'Shopify gift card Id must be specified for %1', Comment = '%1 - Retail voucher record id';
         VoucherArchivedErr: Label 'Retail Voucher %1 has already been archived. No need to send the create request to Shopify', Comment = '%1 - Retail Voucher No.';
     begin
-        if not SpfyRetailVoucherMgt.FindVoucher(NcTask, VoucherRecRef, Voucher, ShopifyStoreCode) then
-            Error(_VoucherNotFoundErr, NcTask."Record Value");
+        if not SpfyRetailVoucherMgt.FindVoucher(SpfyTask, VoucherRecRef, Voucher, ShopifyStoreCode) then
+            Error(_VoucherNotFoundErr, SpfyTask."Record Value");
 
         ShopifyGiftCardID := SpfyAssignedIDMgt.GetAssignedShopifyID(VoucherRecRef.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if ShopifyGiftCardID = '' then begin
             if VoucherRecRef.Number = Database::"NPR NpRv Arch. Voucher" then begin
-                _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(VoucherArchivedErr, NcTask."Record Value"));
+                _SpfyIntegrationMgt.SetResponse(SpfyTask, StrSubstNo(VoucherArchivedErr, SpfyTask."Record Value"));
                 exit;
             end;
-            case NcTask.Type of
-                NcTask.Type::Modify:
-                    NcTask.Type := NcTask.Type::Insert;
-                NcTask.Type::Delete:
+            case SpfyTask.Type of
+                SpfyTask.Type::Modify:
+                    SpfyTask.Type := SpfyTask.Type::Insert;
+                SpfyTask.Type::Delete:
                     Error(ShopifyGiftCardIdEmptyErr, Format(VoucherRecRef.RecordId()));
             end;
         end else
-            if NcTask.Type = NcTask.Type::Insert then
-                NcTask.Type := NcTask.Type::Modify;
+            if SpfyTask.Type = SpfyTask.Type::Insert then
+                SpfyTask.Type := SpfyTask.Type::Modify;
 
-        NcTask."Record ID" := VoucherRecRef.RecordId();
-        NcTask."Store Code" := ShopifyStoreCode;
+        SpfyTask."Record ID" := VoucherRecRef.RecordId();
+        SpfyTask."Store Code" := ShopifyStoreCode;
 
-        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        SpfyTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         ShopifyGiftCardUpsertQuery(Voucher, ShopifyGiftCardID, ShopifyStoreCode, OStream);
         SendToShopify := true;
     end;
 
-    local procedure PrepareGiftCardBalanceAdjustmentRequest(var NcTask: Record "NPR Nc Task") SendToShopify: Boolean
+    local procedure PrepareGiftCardBalanceAdjustmentRequest(var SpfyTask: Record "NPR Spfy Task") SendToShopify: Boolean
     var
         Voucher: Record "NPR NpRv Voucher";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -159,14 +157,14 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         MissingShopifyIdErr: Label 'Retail voucher %1 does not have a Shopify gift card ID assigned. It has probably not been synchronised with Shopify yet.', Comment = '%1 - Retail Voucher No.';
         VoucherArchivedErr: Label 'Retail voucher %1 has been archived but never sent to Shopify. No need to send balance update requests to Shopify.', Comment = '%1 - Retail Voucher No.';
     begin
-        if not SpfyRetailVoucherMgt.FindVoucher(NcTask, VoucherRecRef, Voucher, ShopifyStoreCode) then
-            Error(_VoucherNotFoundErr, NcTask."Record Value");
+        if not SpfyRetailVoucherMgt.FindVoucher(SpfyTask, VoucherRecRef, Voucher, ShopifyStoreCode) then
+            Error(_VoucherNotFoundErr, SpfyTask."Record Value");
 
         ShopifyGiftCardID := SpfyAssignedIDMgt.GetAssignedShopifyID(VoucherRecRef.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if ShopifyGiftCardID = '' then begin
             if VoucherRecRef.Number = Database::"NPR NpRv Arch. Voucher" then
-                if not OutstandingVoucherRequestsExist(NcTask, Database::"NPR NpRv Voucher") then begin
-                    _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(VoucherArchivedErr, Voucher."No."));
+                if not _SpfyTaskQueue.OutstandingTasksExist(Database::"NPR NpRv Voucher", SpfyTask."Record Value", SpfyTask."Store Code") then begin
+                    _SpfyIntegrationMgt.SetResponse(SpfyTask, StrSubstNo(VoucherArchivedErr, Voucher."No."));
                     exit;
                 end;
             Error(MissingShopifyIdErr, Voucher."No.");
@@ -187,20 +185,19 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         end;
 
         if CurrentShopifyBalance = NewBalance then begin
-            _SpfyIntegrationMgt.SetResponse(NcTask, BalanceUpToDateErr);
+            _SpfyIntegrationMgt.SetResponse(SpfyTask, BalanceUpToDateErr);
             exit;
         end;
 
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        SpfyTask."Store Code" := ShopifyStoreCode;
+        SpfyTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         ShopifyGiftCardBalanceUpdateQuery(ShopifyGiftCardID, NewBalance - CurrentShopifyBalance, GiftCardCurrCode, CurrentDateTime(), OStream);
         SendToShopify := true;
     end;
 
-    local procedure PrepareGiftCardDisableRequest(var NcTask: Record "NPR Nc Task"; var DeactivatedAt: DateTime) SendToShopify: Boolean
+    local procedure PrepareGiftCardDisableRequest(var SpfyTask: Record "NPR Spfy Task"; var DeactivatedAt: DateTime) SendToShopify: Boolean
     var
         Voucher: Record "NPR NpRv Voucher";
-        VoucherCreateNcTask: Record "NPR Nc Task";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
         VoucherRecRef: RecordRef;
@@ -211,27 +208,26 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         PostponedErr: Label 'Processing has been delayed as there are outstanding requests to update the Shopify gift card amount for the voucher.';
         VoucherArchivedErr: Label 'Retail voucher %1 has been archived but never sent to Shopify. No need to send it now.', Comment = '%1 - Retail Voucher No.';
     begin
-        if OutstandingVoucherRequestsExist(NcTask, Database::"NPR NpRv Voucher Entry") then
+        if _SpfyTaskQueue.OutstandingTasksExist(Database::"NPR NpRv Voucher Entry", SpfyTask."Record Value", SpfyTask."Store Code") then
             Error(PostponedErr);
 
-        if not SpfyRetailVoucherMgt.FindVoucher(NcTask, VoucherRecRef, Voucher, ShopifyStoreCode) then
-            Error(_VoucherNotFoundErr, NcTask."Record Value");
+        if not SpfyRetailVoucherMgt.FindVoucher(SpfyTask, VoucherRecRef, Voucher, ShopifyStoreCode) then
+            Error(_VoucherNotFoundErr, SpfyTask."Record Value");
         ShopifyGiftCardID := SpfyAssignedIDMgt.GetAssignedShopifyID(VoucherRecRef.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if ShopifyGiftCardID = '' then begin
-            if OutstandingVoucherRequestsExist(NcTask, Database::"NPR NpRv Voucher", VoucherCreateNcTask) then
-                CancelOutstandingNcTasks(VoucherCreateNcTask, StrSubstNo(VoucherArchivedErr, Voucher."No."));
-            _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(VoucherArchivedErr, Voucher."No."));
+            _SpfyTaskQueue.CancelOutstandingTasks(Database::"NPR NpRv Voucher", SpfyTask."Record Value", SpfyTask."Store Code", StrSubstNo(VoucherArchivedErr, Voucher."No."));
+            _SpfyIntegrationMgt.SetResponse(SpfyTask, StrSubstNo(VoucherArchivedErr, Voucher."No."));
             exit;
         end;
 
         DeactivatedAt := GetShopifyGiftCardDeactivatedAt(Voucher."No.", ShopifyGiftCardID, ShopifyStoreCode);
         if DeactivatedAt <> 0DT then begin
-            _SpfyIntegrationMgt.SetResponse(NcTask, AlreadyDeactivatedErr);
+            _SpfyIntegrationMgt.SetResponse(SpfyTask, AlreadyDeactivatedErr);
             exit;
         end;
 
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        SpfyTask."Store Code" := ShopifyStoreCode;
+        SpfyTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         ShopifyGiftCardDeactivateRequestQuery(ShopifyGiftCardID, OStream);
         SendToShopify := true;
     end;
@@ -241,7 +237,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         Customer: Record Customer;
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+        SpfyTaskSendCustomers: Codeunit "NPR Spfy Task Send Customers";
         RecipientAttributesJson: JsonObject;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
@@ -277,7 +273,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                         If Customer."E-Mail" = '' then
                             Customer."E-Mail" := Voucher."E-mail";
                         If Customer."E-Mail" <> '' then
-                            ShopifyBillToCustGID := SpfySendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
+                            ShopifyBillToCustGID := SpfyTaskSendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
                     end;
                     if ShopifyBillToCustGID <> '' then
                         VoucherJson.Add('customerId', ShopifyBillToCustGID);
@@ -289,12 +285,12 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 Customer.Name := CopyStr(Voucher."Spfy Recipient Name", 1, MaxStrLen(Customer.Name));
                 Customer."Name 2" := CopyStr(Voucher."Spfy Recipient Name", MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2"));
 
-                ShopifyShipToCustGID := SpfySendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
+                ShopifyShipToCustGID := SpfyTaskSendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
 
                 RecipientAttributesJson.Add('id', ShopifyShipToCustGID);
                 if Voucher."Voucher Message" <> '' then
                     RecipientAttributesJson.Add('message', Voucher."Voucher Message");
-                RecipientPreferredName := SpfySendCustomers.GetFullName(Customer.Name, Customer."Name 2");
+                RecipientPreferredName := SpfyTaskSendCustomers.GetFullName(Customer.Name, Customer."Name 2");
                 if RecipientPreferredName <> '' then
                     RecipientAttributesJson.Add('preferredName', RecipientPreferredName);
                 if Voucher."Spfy Send on" <> 0DT then
@@ -309,18 +305,18 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson.WriteTo(QueryStream);
     end;
 
-    local procedure UpdateVoucherWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken)
+    local procedure UpdateVoucherWithDataFromShopify(SpfyTask: Record "NPR Spfy Task"; ShopifyResponse: JsonToken)
     var
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         FullShopifyGiftCardID: Text;
         ShopifyGiftCardID: Text[30];
     begin
-        if not (NcTask.Type in [NcTask.Type::Insert, NcTask.Type::Modify]) then
+        if not (SpfyTask.Type in [SpfyTask.Type::Insert, SpfyTask.Type::Modify]) then
             exit;
-        case NcTask.Type of
-            NcTask.Type::Insert:
+        case SpfyTask.Type of
+            SpfyTask.Type::Insert:
                 FullShopifyGiftCardID := _JsonHelper.GetJText(ShopifyResponse, 'data.giftCardCreate.giftCard.id', MaxStrLen(FullShopifyGiftCardID), false);
-            NcTask.Type::Modify:
+            SpfyTask.Type::Modify:
                 FullShopifyGiftCardID := _JsonHelper.GetJText(ShopifyResponse, 'data.giftCardUpdate.giftCard.id', MaxStrLen(FullShopifyGiftCardID), false);
         end;
 #pragma warning disable AA0139
@@ -332,7 +328,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         if ShopifyGiftCardID = '' then
             Error('');  //The system will record Shopify response as the error message
 
-        SpfyAssignedIDMgt.AssignShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID", ShopifyGiftCardID, false);
+        SpfyAssignedIDMgt.AssignShopifyID(SpfyTask."Record ID", "NPR Spfy ID Type"::"Entry ID", ShopifyGiftCardID, false);
     end;
 
     local procedure GetShopifyGiftCardBalance(VoucherNo: Code[20]; ShopifyGiftCardID: Text[30]; ShopifyStoreCode: Code[20]; var Amount: Decimal; var CurrencyCode: Code[10])
@@ -356,7 +352,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
     local procedure GetShopifyGiftCard(VoucherNo: Code[20]; ShopifyGiftCardID: Text[30]; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
     var
-        NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         RequestJson: JsonObject;
@@ -368,12 +364,12 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson.Add('query', QueryTok);
         RequestJson.Add('variables', VariablesJson);
 
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        SpfyTask."Store Code" := ShopifyStoreCode;
+        SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
 
         ClearLastError();
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
+        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse) then
             Error(GiftCardQueryFailedErr, VoucherNo, GetLastErrorText());
     end;
 
@@ -416,15 +412,15 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson.WriteTo(QueryStream);
     end;
 
-    local procedure MarkVoucherAsDeactivated(NcTask: Record "NPR Nc Task"; DeactivatedAt: DateTime)
+    local procedure MarkVoucherAsDeactivated(SpfyTask: Record "NPR Spfy Task"; DeactivatedAt: DateTime)
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         xArchVoucher: Record "NPR NpRv Arch. Voucher";
         RecRef: RecordRef;
     begin
-        if NcTask."Record ID".TableNo() <> Database::"NPR NpRv Arch. Voucher" then
+        if SpfyTask."Record ID".TableNo() <> Database::"NPR NpRv Arch. Voucher" then
             exit;
-        if not RecRef.Get(NcTask."Record ID") then
+        if not RecRef.Get(SpfyTask."Record ID") then
             exit;
         RecRef.SetTable(ArchVoucher);
         xArchVoucher := ArchVoucher;
@@ -458,45 +454,4 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 ReservedAmountLCY += MagentoPaymentLine.AmountLCY(CurrencyCode, CurrencyFactor);
             until MagentoPaymentLine.Next() = 0;
     end;
-
-    local procedure OutstandingVoucherRequestsExist(NcTask: Record "NPR Nc Task"; TableNo: Integer): Boolean
-    var
-        NcTask2: Record "NPR Nc Task";
-    begin
-        exit(OutstandingVoucherRequestsExist(NcTask, TableNo, NcTask2));
-    end;
-
-    local procedure OutstandingVoucherRequestsExist(NcTask: Record "NPR Nc Task"; TableNo: Integer; var OutstandingNcTask: Record "NPR Nc Task"): Boolean
-    begin
-        Clear(OutstandingNcTask);
-        OutstandingNcTask.SetRange(Processed, false);
-        OutstandingNcTask.SetRange("Table No.", TableNo);
-        OutstandingNcTask.SetRange("Company Name", NcTask."Company Name");
-        OutstandingNcTask.SetRange("Record Value", NcTask."Record Value");
-        OutstandingNcTask.SetRange("Task Processor Code", NcTask."Task Processor Code");
-        OutstandingNcTask.SetRange("Store Code", NcTask."Store Code");
-        exit(not OutstandingNcTask.IsEmpty);
-    end;
-
-    local procedure CancelOutstandingNcTasks(var NcTask: Record "NPR Nc Task"; ReasonTxt: Text)
-    var
-        NcTask2: Record "NPR Nc Task";
-        OutStr: OutStream;
-    begin
-        if NcTask.FindSet(true) then
-            repeat
-                if not NcTask.Processed then begin
-                    NcTask2 := NcTask;
-                    NcTask2.Processed := true;
-                    NcTask2."Process Error" := false;
-                    NcTask2."Last Processing Started at" := 0DT;
-                    NcTask2."Last Processing Completed at" := CurrentDateTime();
-                    NcTask2."Last Processing Duration" := 0;
-                    NcTask2.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
-                    OutStr.WriteText(ReasonTxt);
-                    NcTask2.Modify();
-                end;
-            until NcTask.Next() = 0;
-    end;
 }
-#endif

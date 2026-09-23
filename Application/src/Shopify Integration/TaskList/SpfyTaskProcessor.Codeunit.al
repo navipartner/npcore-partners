@@ -22,6 +22,8 @@ codeunit 6151214 "NPR Spfy Task Processor"
         _WaitingForLocationActivationLbl: Label 'Awaiting Shopify location activation';
         _WaitingForVariantLbl: Label 'Awaiting variant sync';
         _WaitingForOwnerLbl: Label 'Awaiting Shopify owner entity sync';
+        _WaitingForBalanceUpdatesLbl: Label 'Awaiting outstanding gift card balance updates';
+        _WaitingForGiftCardLbl: Label 'Awaiting Shopify gift card creation';
 
     internal procedure SetSendBoundary(NewBoundary: Interface "NPR Spfy Task Send Boundary")
     begin
@@ -530,6 +532,16 @@ codeunit 6151214 "NPR Spfy Task Processor"
                     WaitingReasonTxt := _WaitingForOwnerLbl;
                     exit(_SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyTask."Record ID", "NPR Spfy ID Type"::"Entry ID") <> '');
                 end;
+            Database::"NPR NpRv Arch. Voucher":
+                begin
+                    WaitingReasonTxt := _WaitingForBalanceUpdatesLbl;
+                    exit(not _SpfyTaskQueue.OutstandingTasksExist(Database::"NPR NpRv Voucher Entry", SpfyTask."Record Value", SpfyTask."Store Code"));
+                end;
+            Database::"NPR NpRv Voucher Entry":
+                begin
+                    WaitingReasonTxt := _WaitingForGiftCardLbl;
+                    exit(VoucherBalancePreconditionIsMet(SpfyTask));
+                end;
         end;
         exit(true);
     end;
@@ -614,6 +626,29 @@ codeunit 6151214 "NPR Spfy Task Processor"
             exit(true);
         WaitingReasonTxt := _WaitingForVariantLbl;
         exit(false);
+    end;
+
+    local procedure VoucherBalancePreconditionIsMet(var SpfyTask: Record "NPR Spfy Task"): Boolean
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        PrerequisiteTask: Record "NPR Spfy Task";
+        SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
+        VoucherRecRef: RecordRef;
+        ShopifyStoreCode: Code[20];
+    begin
+        // Unresolvable here means the send reports its own eligibility error; parking it would hide that.
+        if not SpfyRetailVoucherMgt.FindVoucher(SpfyTask, VoucherRecRef, Voucher, ShopifyStoreCode) then
+            exit(true);
+        if _SpfyAssignedIDMgt.GetAssignedShopifyID(VoucherRecRef.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '' then
+            exit(true);
+        // With no gift card id yet, an outstanding voucher create or upsert is the prerequisite: the send promotes Modify to Insert.
+        PrerequisiteTask.SetCurrentKey("Table No.", "Store Code", "Record Value", State);
+        PrerequisiteTask.SetRange("Table No.", Database::"NPR NpRv Voucher");
+        PrerequisiteTask.SetRange("Store Code", SpfyTask."Store Code");
+        PrerequisiteTask.SetRange("Record Value", Voucher."No.");
+        PrerequisiteTask.SetFilter(Type, '%1|%2', PrerequisiteTask.Type::Insert, PrerequisiteTask.Type::Modify);
+        PrerequisiteTask.SetFilter(State, '<>%1', PrerequisiteTask.State::Completed);
+        exit(PrerequisiteTask.IsEmpty());
     end;
 
     local procedure VariantExistsInShopify(ItemNo: Code[20]; VariantCode: Code[10]; StoreCode: Code[20]; AllowLiveLookup: Boolean; var LookupErrorText: Text): Boolean

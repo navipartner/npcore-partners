@@ -1,5 +1,4 @@
-﻿#if not BC17
-// Native sibling of frozen codeunit "NPR Spfy Send Items&Inventory": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+﻿// Native sibling of frozen codeunit "NPR Spfy Send Items&Inventory": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
 codeunit 6151253 "NPR Spfy Task Send Items&Inv"
 {
     Access = Internal;
@@ -2719,4 +2718,3 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         Commit();
     end;
 }
-#endif

@@ -1,5 +1,4 @@
-﻿#if not BC17
-// Native sibling of frozen codeunit "NPR Spfy Send Customers": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+﻿// Native sibling of frozen codeunit "NPR Spfy Send Customers": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
 codeunit 6151461 "NPR Spfy Task Send Customers"
 {
     Access = Internal;
@@ -523,10 +522,8 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         SpfyStoreCustomerLink."Synchronization Is Enabled" := SpfyStoreCustomerLink."Sync. to this Store";
         ModifySpfyStoreCustomerLink(SpfyStoreCustomerLink, true);
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyCustomerID, false);
-#if not (BC18 or BC19 or BC20)
         if SpfyStoreCustomerLink."Synchronization Is Enabled" and (SpfyStoreCustomerLink."Synchronization Is Enabled" <> xSpfyStoreCustomerLink."Synchronization Is Enabled") then
             SyncCustomerOfflineOrderHistory(SpfyStoreCustomerLink."No.", SpfyStoreCustomerLink."Shopify Store Code");
-#endif
         if TriggeredExternally and not xSpfyStoreCustomerLink."Sync. to this Store" then
             SpfyMetafieldMgt.InitStoreCustomerLinkMetafields(SpfyStoreCustomerLink);
         UpdateMetafieldsFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID);
@@ -969,7 +966,6 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         SpfyStoreCustomerLink."Synchronization Is Enabled" := false;
     end;
 
-#if not (BC18 or BC19 or BC20)
     local procedure SyncCustomerOfflineOrderHistory(CustomerNo: Code[20]; ShopifyStoreCode: Code[20])
     var
         POSEntry: Record "NPR POS Entry";
@@ -985,6 +981,4 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         POSEntry.SetRange("Customer No.", CustomerNo);
         SpfyPOSEntryExportMgt.ProcessOutstandingPOSEntries(POSEntry, TempSpfyExportPointerBuffer);
     end;
-#endif
 }
-#endif

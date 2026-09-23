@@ -37,6 +37,15 @@ codeunit 6151224 "NPR Spfy Task Send Bnd Impl" implements "NPR Spfy Task Send Bo
                     ErrorText := GetLastErrorText();
                     exit(false);
                 end;
+            Database::"NPR NpRv Voucher",
+            Database::"NPR NpRv Voucher Entry",
+            Database::"NPR NpRv Arch. Voucher":
+                begin
+                    if Codeunit.Run(Codeunit::"NPR Spfy Task Send Voucher", SpfyTaskWork) then
+                        exit(true);
+                    ErrorText := GetLastErrorText();
+                    exit(false);
+                end;
             else begin
                 ErrorText := StrSubstNo(UnmappedTaskKindErr, SpfyTaskWork."Table No.");
                 Sentry.InitScopeAndTransaction('Shopify task list unmapped task kind', 'bc.spfy.task_list.unmapped_kind');

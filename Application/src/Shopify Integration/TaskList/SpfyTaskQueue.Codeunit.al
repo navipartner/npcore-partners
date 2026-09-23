@@ -70,6 +70,34 @@ codeunit 6151183 "NPR Spfy Task Queue"
         exit(true);
     end;
 
+    internal procedure OutstandingTasksExist(TableNo: Integer; RecordValue: Text; StoreCode: Code[20]): Boolean
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        SpfyTask.SetCurrentKey("Table No.", "Store Code", "Record Value", State);
+        SpfyTask.SetRange("Table No.", TableNo);
+        SpfyTask.SetRange("Store Code", StoreCode);
+        SpfyTask.SetRange("Record Value", CopyStr(RecordValue, 1, MaxStrLen(SpfyTask."Record Value")));
+        SpfyTask.SetFilter(State, '<>%1', SpfyTask.State::Completed);
+        exit(not SpfyTask.IsEmpty());
+    end;
+
+    internal procedure CancelOutstandingTasks(TableNo: Integer; RecordValue: Text; StoreCode: Code[20]; CancellationReasonTxt: Text)
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        SpfyTask.SetCurrentKey("Table No.", "Store Code", "Record Value", State);
+        SpfyTask.SetRange("Table No.", TableNo);
+        SpfyTask.SetRange("Store Code", StoreCode);
+        SpfyTask.SetRange("Record Value", CopyStr(RecordValue, 1, MaxStrLen(SpfyTask."Record Value")));
+        SpfyTask.SetFilter(State, '%1|%2|%3', SpfyTask.State::Pending, SpfyTask.State::Waiting, SpfyTask.State::Quarantined);
+        SpfyTask.SetLoadFields("Entry No.");
+        if SpfyTask.FindSet() then
+            repeat
+                CancelUnsentTask(SpfyTask."Entry No.", CancellationReasonTxt);
+            until SpfyTask.Next() = 0;
+    end;
+
     internal procedure TaskIsUnprocessed(SpfyTaskEntryNo: BigInteger): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";

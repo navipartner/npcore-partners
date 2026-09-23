@@ -1134,6 +1134,175 @@ codeunit 85315 "NPR Spfy TL Switch Tests"
         AssertSpfyIntent(Database::"NPR Spfy Entity Metafield", "NPR Spfy Task Op"::Modify, SpfyStoreCustomerLink.RecordId(), Customer."No.", StoreCode, 'Entity Metafield');
         _Assert.AreEqual(0, NcTaskCount(), 'A metafield change must never also reach the legacy queue while the feature is on');
     end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenSyncedVoucherEndingDateChanges_ThenContentCorrectNcTaskOnly()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        DummyNcTask: Record "NPR Nc Task";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A synced voucher's ending date change with the task list off creates one content-correct legacy voucher task and nothing in the new queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, false, true);
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        SpfySyncStateMgt.SeedVoucherBaseline(Voucher, StoreCode);
+
+        // [WHEN] A synced voucher's ending date changes while the task list is off.
+        Voucher."Ending Date" := CreateDateTime(CalcDate('<+2M>', WorkDate()), 120000T);
+        Voucher.Modify(false);
+        _Lib.DispatchModify(Voucher);
+
+        // [THEN] The legacy queue holds one content-correct voucher task and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR NpRv Voucher"), 'One legacy voucher task must be created for the ending date change');
+        AssertNcIntent(Database::"NPR NpRv Voucher", DummyNcTask.Type::Modify, Voucher.RecordId(), Voucher."No.", StoreCode, 'Voucher ending date');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No voucher task may be created in the new queue while the feature is off');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenSyncedVoucherEndingDateChanges_ThenContentCorrectSpfyTaskOnly()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A synced voucher's ending date change with the task list on creates one content-correct new-queue voucher task and nothing in the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, false, true);
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        SpfySyncStateMgt.SeedVoucherBaseline(Voucher, StoreCode);
+        _Lib.SetTaskListFeatureEnabled(true);
+
+        // [WHEN] A synced voucher's ending date changes while the task list is on.
+        Voucher."Ending Date" := CreateDateTime(CalcDate('<+2M>', WorkDate()), 120000T);
+        Voucher.Modify(false);
+        _Lib.DispatchModify(Voucher);
+
+        // [THEN] The new queue holds one content-correct voucher task and the legacy queue holds nothing.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR NpRv Voucher"), 'One new-queue voucher task must be created for the ending date change');
+        AssertSpfyIntent(Database::"NPR NpRv Voucher", "NPR Spfy Task Op"::Modify, Voucher.RecordId(), Voucher."No.", StoreCode, 'Voucher ending date');
+        _Assert.AreEqual(0, NcTaskCount(), 'A voucher change must never also reach the legacy queue while the feature is on');
+    end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenEntryOnUnsyncedLiveVoucher_ThenNcInsertOnVoucherAndNcModifyOnEntry()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        DummyNcTask: Record "NPR Nc Task";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A balance entry on a voucher with no gift card, with the task list off, creates the legacy create on the voucher and the legacy balance update on the entry, both keyed on the voucher no.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, false, true);
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, false);
+        InsertVoucherEntry(VoucherEntry, Voucher, false);
+
+        // [WHEN] A balance entry appears on a voucher with no gift card while the task list is off.
+        _Lib.DispatchModify(VoucherEntry);
+
+        // [THEN] The legacy queue holds the create on the voucher and the balance update on the entry, both keyed on the voucher no.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR NpRv Voucher"), 'One legacy gift card create must be created for the first entry');
+        AssertNcIntent(Database::"NPR NpRv Voucher", DummyNcTask.Type::Insert, Voucher.RecordId(), Voucher."No.", StoreCode, 'Voucher gift card create');
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR NpRv Voucher Entry"), 'One legacy balance update must be created for the entry');
+        AssertNcIntent(Database::"NPR NpRv Voucher Entry", DummyNcTask.Type::Modify, VoucherEntry.RecordId(), Voucher."No.", StoreCode, 'Voucher entry balance');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No voucher pair may be created in the new queue while the feature is off');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenEntryOnUnsyncedLiveVoucher_ThenSpfyInsertOnVoucherAndSpfyModifyOnEntry()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] The same balance entry with the task list on creates that pair in the new queue and nothing in the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, false, true);
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, false);
+        InsertVoucherEntry(VoucherEntry, Voucher, false);
+        _Lib.SetTaskListFeatureEnabled(true);
+
+        // [WHEN] A balance entry appears on a voucher with no gift card while the task list is on.
+        _Lib.DispatchModify(VoucherEntry);
+
+        // [THEN] The new queue holds the same pair and the legacy queue holds nothing.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR NpRv Voucher"), 'One new-queue gift card create must be created for the first entry');
+        AssertSpfyIntent(Database::"NPR NpRv Voucher", "NPR Spfy Task Op"::Insert, Voucher.RecordId(), Voucher."No.", StoreCode, 'Voucher gift card create');
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR NpRv Voucher Entry"), 'One new-queue balance update must be created for the entry');
+        AssertSpfyIntent(Database::"NPR NpRv Voucher Entry", "NPR Spfy Task Op"::Modify, VoucherEntry.RecordId(), Voucher."No.", StoreCode, 'Voucher entry balance');
+        _Assert.AreEqual(0, NcTaskCount(), 'A voucher pair must never also reach the legacy queue while the feature is on');
+    end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenFreshArchiveDetected_ThenContentCorrectNcTaskOnly()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        DummyNcTask: Record "NPR Nc Task";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A fresh archival with the task list off creates one legacy deactivation carrying the archived record and the original voucher no, and nothing in the new queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, false, true);
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        ArchiveVoucher(ArchVoucher, Voucher, false);
+
+        // [WHEN] A fresh archival is detected while the task list is off.
+        _Lib.DispatchModify(ArchVoucher);
+
+        // [THEN] The legacy queue holds one deactivation carrying the archived record and the original voucher no.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR NpRv Arch. Voucher"), 'One legacy deactivation must be created for the fresh archive');
+        AssertNcIntent(Database::"NPR NpRv Arch. Voucher", DummyNcTask.Type::Modify, ArchVoucher.RecordId(), Voucher."No.", StoreCode, 'Archived voucher deactivation');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No deactivation may be created in the new queue while the feature is off');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenFreshArchiveDetected_ThenContentCorrectSpfyTaskOnly()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] The same fresh archival with the task list on creates one new-queue deactivation and nothing in the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, false, true);
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        ArchiveVoucher(ArchVoucher, Voucher, false);
+        _Lib.SetTaskListFeatureEnabled(true);
+
+        // [WHEN] The same fresh archival is detected while the task list is on.
+        _Lib.DispatchModify(ArchVoucher);
+
+        // [THEN] The new queue holds the one deactivation and the legacy queue holds nothing.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR NpRv Arch. Voucher"), 'One new-queue deactivation must be created for the fresh archive');
+        AssertSpfyIntent(Database::"NPR NpRv Arch. Voucher", "NPR Spfy Task Op"::Modify, ArchVoucher.RecordId(), Voucher."No.", StoreCode, 'Archived voucher deactivation');
+        _Assert.AreEqual(0, NcTaskCount(), 'A deactivation must never also reach the legacy queue while the feature is on');
+    end;
+
+    local procedure InsertVoucherEntry(var VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher"; InitiatedInShopify: Boolean)
+    begin
+        VoucherEntry.Init();
+        VoucherEntry."Entry No." := 0;
+        VoucherEntry."Voucher No." := Voucher."No.";
+        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
+        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
+        VoucherEntry.Amount := 100;
+        VoucherEntry."Spfy Initiated in Shopify" := InitiatedInShopify;
+        VoucherEntry.Insert(false);
+    end;
+
+    local procedure ArchiveVoucher(var ArchVoucher: Record "NPR NpRv Arch. Voucher"; Voucher: Record "NPR NpRv Voucher"; DeleteLive: Boolean)
+    begin
+        ArchVoucher.Init();
+        ArchVoucher."No." := _Lib.NextCode('AR', MaxStrLen(ArchVoucher."No."));
+        ArchVoucher."Arch. No." := Voucher."No.";
+        ArchVoucher."Voucher Type" := Voucher."Voucher Type";
+        ArchVoucher.Insert(false);
+        if DeleteLive then
+            Voucher.Delete(false);
+    end;
     #endregion
 
     local procedure NcTaskCount(TableNo: Integer; RecordValue: Code[20]): Integer
