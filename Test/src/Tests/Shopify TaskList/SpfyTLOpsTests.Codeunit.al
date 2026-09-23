@@ -11,7 +11,7 @@ codeunit 85314 "NPR Spfy TL Ops Tests"
         _BndMock: Codeunit "NPR Spfy TL Bnd Mock";
         _SpfyTaskProcessor: Codeunit "NPR Spfy Task Processor";
         _SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
-        _NavigatedToStoreCode: Code[20];
+        _NavigatedToItemNo: Code[20];
         _NotClosedMessage: Text[1024];
         _ClaimDuringConfirmTask: BigInteger;
         _SourceGoneMessages: Integer;
@@ -21,7 +21,7 @@ codeunit 85314 "NPR Spfy TL Ops Tests"
         SpfyTask: Record "NPR Spfy Task";
     begin
         _SourceGoneMessages := 0;
-        _NavigatedToStoreCode := '';
+        _NavigatedToItemNo := '';
         if not SpfyTask.IsEmpty() then
             SpfyTask.DeleteAll(false);
         _Lib.ResetState();
@@ -607,7 +607,7 @@ codeunit 85314 "NPR Spfy TL Ops Tests"
     end;
 
     [Test]
-    [HandlerFunctions('SourceGoneMessageHandler,StoreItemLinksPageHandler')]
+    [HandlerFunctions('SourceGoneMessageHandler,ItemCardPageHandler')]
     procedure SourceNavigationResolvesRecordId()
     var
         GoneItem: Record Item;
@@ -629,6 +629,8 @@ codeunit 85314 "NPR Spfy TL Ops Tests"
         LiveTask := EnqueueTagTask(StoreCode, SpfyStoreItemLink, AtDateTime);
         GoneTask := EnqueueItemTask(StoreCode, GoneItem, AtDateTime);
         _Assert.AreNotEqual(LiveTask, GoneTask, 'The two tasks must refer to different source records');
+        // Opening the item card was observed to lose this test's uncommitted fixture rows (mechanism unconfirmed); the commit pins them.
+        Commit();
 
         // [WHEN] The operator opens the source record of a task whose record still exists.
         OpenTaskList(LiveTask, SpfyTaskList);
@@ -637,10 +639,11 @@ codeunit 85314 "NPR Spfy TL Ops Tests"
 
         // [THEN] The record id resolves, so the operator is taken to the record instead of being told it is missing.
         _Assert.AreEqual(0, _SourceGoneMessages, 'The source record of a live task must be navigated to, not reported as missing');
-        _Assert.AreEqual(StoreCode, _NavigatedToStoreCode, 'The navigation must land on the record the task refers to');
+        _Assert.AreEqual(LiveItem."No.", _NavigatedToItemNo, 'The navigation must land on the card of the item the task refers to');
 
         // [WHEN] The same is asked for a task whose record is gone.
         GoneItem.Delete(false);
+        Commit();
         OpenTaskList(GoneTask, SpfyTaskList);
         SpfyTaskList.OpenSourceRecord.Invoke();
         SpfyTaskList.Close();
@@ -804,9 +807,10 @@ codeunit 85314 "NPR Spfy TL Ops Tests"
     end;
 
     [PageHandler]
-    procedure StoreItemLinksPageHandler(var SpfyStoreItemLinks: TestPage "NPR Spfy Store-Item Links")
+    procedure ItemCardPageHandler(var ItemCard: TestPage "Item Card")
     begin
-        _NavigatedToStoreCode := CopyStr(SpfyStoreItemLinks."Shopify Store Code".Value(), 1, MaxStrLen(_NavigatedToStoreCode));
+        // The page arrives filtered by RunSourceRecord's SetRecFilter; read the identity from the filter, not from a positioned row.
+        _NavigatedToItemNo := CopyStr(ItemCard.Filter.GetFilter("No."), 1, MaxStrLen(_NavigatedToItemNo));
     end;
 
     [ConfirmHandler]

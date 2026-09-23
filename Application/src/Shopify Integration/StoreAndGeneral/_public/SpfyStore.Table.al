@@ -44,7 +44,7 @@ table 6150810 "NPR Spfy Store"
                     TestField("Shopify Url");
                 Modify();
 
-                // CORE-433 §8.1 — auto-adopt the RowVersion poll on a fresh environment (shared checked-enable guard). On a
+                // Auto-adopt the RowVersion poll on a fresh environment (shared checked-enable guard). On a
                 // non-fresh environment this is a no-op and the legacy Data-Log path is used until the Phase 6c seeding migration.
                 if Enabled then
                     SpfyRowVersionFeature.MaybeAutoAdoptFreshEnvironment("Code");
@@ -611,7 +611,7 @@ table 6150810 "NPR Spfy Store"
         _SpfyWebhookMgt: Codeunit "NPR Spfy Webhook Mgt.";
 
     /// <summary>
-    /// CORE-433 §8.1 — per-area enable routing. Auto-adopt first (so a fresh customer who toggles an area flag BEFORE the
+    /// Per-area enable routing. Auto-adopt first (so a fresh customer who toggles an area flag BEFORE the
     /// master "Enabled" still adopts RowVersion rather than creating legacy Data Log setup that would poison the fresh
     /// predicate). With the RowVersion feature on, register that area's polled tables + ensure the monitored detection job;
     /// with the feature off (existing Data-Log integration), fall back to the legacy Data-Log path unchanged.

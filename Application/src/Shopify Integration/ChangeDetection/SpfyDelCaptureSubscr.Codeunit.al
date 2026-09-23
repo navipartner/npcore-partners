@@ -146,7 +146,7 @@ codeunit 6151235 "NPR Spfy Del. Capture Subscr."
         DeletionLog.SetRange("Table No.", Database::"Item Variant");
         DeletionLog.SetRange("Item No.", ItemNo);
         DeletionLog.SetRange("Shopify Store Code", ShopifyStoreCode);
-        // Include Processed: a drained-but-unsent delete is still cancellable via CancelDeleteForEntity/CancelOutstandingNcTask.
+        // Include Processed: a drained-but-unsent delete is still cancellable via CancelDeleteForEntity/CancelOutstandingTask.
         DeletionLog.SetFilter(Status, '%1|%2|%3', DeletionLog.Status::Pending, DeletionLog.Status::Processed, DeletionLog.Status::Quarantined);
         if DeletionLog.FindSet() then
             repeat

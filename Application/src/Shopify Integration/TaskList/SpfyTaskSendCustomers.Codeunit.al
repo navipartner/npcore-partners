@@ -1,11 +1,9 @@
-#if not BC17
-codeunit 6248540 "NPR Spfy Send Customers"
+﻿#if not BC17
+// Native sibling of frozen codeunit "NPR Spfy Send Customers": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+codeunit 6151461 "NPR Spfy Task Send Customers"
 {
     Access = Internal;
-    TableNo = "NPR Nc Task";
-    ObsoleteState = Pending;
-    ObsoleteTag = '2026-08-19';
-    ObsoleteReason = 'Replaced by codeunit "NPR Spfy Task Send Customers" (the new Shopify Task List queue). This copy keeps serving environments that have not migrated yet. The two codeunits are maintained independently and may diverge: never copy changes blindly between them - apply a fix to each deliberately, only where it belongs.';
+    TableNo = "NPR Spfy Task";
 
     trigger OnRun()
     begin
@@ -24,7 +22,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         _QueryingShopifyLbl: Label 'Querying Shopify...';
 
 
-    local procedure SendCustomer(var NcTask: Record "NPR Nc Task")
+    local procedure SendCustomer(var SpfyTask: Record "NPR Spfy Task")
     var
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
@@ -32,13 +30,13 @@ codeunit 6248540 "NPR Spfy Send Customers"
         ShopifyCustomerID: Text[30];
         Success: Boolean;
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
         ClearLastError();
 
-        PrepareCustomerUpdateRequest(NcTask, SpfyStoreCustomerLink);
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-        NcTask.Modify();
+        PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink);
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        SpfyTask.Modify();
         Commit();
 
         if not Success then
@@ -47,23 +45,23 @@ codeunit 6248540 "NPR Spfy Send Customers"
             Error('');  //The system will record Shopify response as the error message
 
 #pragma warning disable AA0139
-        case NcTask.Type of
-            NcTask.Type::Insert:
+        case SpfyTask.Type of
+            SpfyTask.Type::Insert:
                 ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyResponse, 'data.customerCreate.customer.id', true), '/');
-            NcTask.Type::Modify:
+            SpfyTask.Type::Modify:
                 ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyResponse, 'data.customerUpdate.customer.id', true), '/');
-            NcTask.Type::Delete:
+            SpfyTask.Type::Delete:
                 ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyResponse, 'data.customerDelete.deletedCustomerId', true), '/');
         end;
 #pragma warning restore AA0139
-        if NcTask.Type = NcTask.Type::Insert then
+        if SpfyTask.Type = SpfyTask.Type::Insert then
             CaptureCustomerCreateDefaultAddressId(SpfyStoreCustomerLink, ShopifyResponse);
-        if NcTask.Type <> NcTask.Type::Delete then
-            SyncAddressIfPending(SpfyStoreCustomerLink, ShopifyCustomerID, NcTask);
-        RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, NcTask.Type = NcTask.Type::Delete, false, false);
+        if SpfyTask.Type <> SpfyTask.Type::Delete then
+            SyncAddressIfPending(SpfyStoreCustomerLink, ShopifyCustomerID, SpfyTask);
+        RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, SpfyTask.Type = SpfyTask.Type::Delete, false, false);
     end;
 
-    local procedure PrepareCustomerUpdateRequest(var NcTask: Record "NPR Nc Task"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    local procedure PrepareCustomerUpdateRequest(var SpfyTask: Record "NPR Spfy Task"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
     var
         Customer: Record Customer;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -71,30 +69,30 @@ codeunit 6248540 "NPR Spfy Send Customers"
         ShopifyCustomerID: Text[30];
         ShopifyCustomerIDEmptyErr: Label 'Shopify Customer Id must be specified for %1, %2 = %3', Comment = '%1 - Customer record id, %2 - Shopify store code field name, %3 - Shopify store code';
     begin
-        RecRef.Get(NcTask."Record ID");
+        RecRef.Get(SpfyTask."Record ID");
         RecRef.SetTable(Customer);
 
-        GetStoreCustomerLink(Customer."No.", NcTask."Store Code", SpfyStoreCustomerLink);
+        GetStoreCustomerLink(Customer."No.", SpfyTask."Store Code", SpfyStoreCustomerLink);
         UpdateFromCustomer(Customer, SpfyStoreCustomerLink);
 
         ShopifyCustomerID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if ShopifyCustomerID = '' then
             ShopifyCustomerID := GetShopifyCustomerID(SpfyStoreCustomerLink, false);
         if ShopifyCustomerID = '' then begin
-            case NcTask.Type of
-                NcTask.Type::Modify:
-                    NcTask.Type := NcTask.Type::Insert;
-                NcTask.Type::Delete:
+            case SpfyTask.Type of
+                SpfyTask.Type::Modify:
+                    SpfyTask.Type := SpfyTask.Type::Insert;
+                SpfyTask.Type::Delete:
                     Error(ShopifyCustomerIDEmptyErr, Format(Customer.RecordId()), SpfyStoreCustomerLink.FieldCaption("Shopify Store Code"), SpfyStoreCustomerLink."Shopify Store Code");
             end;
         end else
-            if NcTask.Type = NcTask.Type::Insert then
-                NcTask.Type := NcTask.Type::Modify;
+            if SpfyTask.Type = SpfyTask.Type::Insert then
+                SpfyTask.Type := SpfyTask.Type::Modify;
 
-        PrepareCustomerUpdateRequest(NcTask, SpfyStoreCustomerLink, ShopifyCustomerID);
+        PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink, ShopifyCustomerID);
     end;
 
-    local procedure PrepareCustomerUpdateRequest(var NcTask: Record "NPR Nc Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30])
+    local procedure PrepareCustomerUpdateRequest(var SpfyTask: Record "NPR Spfy Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30])
     var
         InputJson: JsonObject;
         Request: JsonObject;
@@ -106,44 +104,43 @@ codeunit 6248540 "NPR Spfy Send Customers"
         CustomerUpdate_QueryTok: Label 'mutation UpdateCustomer(%1) {customerUpdate(input: $customerInput) {customer{id} userErrors{field message}}%2}', Locked = true;
         EmailMarketingConsentUpdate_QueryTok: Label 'customerEmailMarketingConsentUpdate(input: $emailMarketingConsentInput) {customer{id defaultEmailAddress{emailAddress marketingState marketingOptInLevel marketingUpdatedAt}} userErrors{field message}}', Locked = true;
     begin
-        AddCustomerInfo(SpfyStoreCustomerLink, NcTask.Type, ShopifyCustomerID, InputJson);
+        AddCustomerInfo(SpfyStoreCustomerLink, SpfyTask.Type, ShopifyCustomerID, InputJson);
         Variables.Add('customerInput', InputJson);
-        if (ShopifyCustomerID <> '') and (NcTask.Type = NcTask.Type::Modify) then begin
+        if (ShopifyCustomerID <> '') and (SpfyTask.Type = SpfyTask.Type::Modify) then begin
             Clear(InputJson);
             EmailMarketingConsentIncluded := AddEmailMarketingConsentInfo(SpfyStoreCustomerLink, ShopifyCustomerID, InputJson);
             if EmailMarketingConsentIncluded then
                 Variables.Add('emailMarketingConsentInput', InputJson);
         end;
 
-        case NcTask.Type of
-            NcTask.Type::Insert:
+        case SpfyTask.Type of
+            SpfyTask.Type::Insert:
                 Request.Add('query', CustomerCreate_QueryTok);
-            NcTask.Type::Modify:
+            SpfyTask.Type::Modify:
                 begin
                     if EmailMarketingConsentIncluded then
                         Request.Add('query', StrSubstNo(CustomerUpdate_QueryTok, '$customerInput: CustomerInput!, $emailMarketingConsentInput: CustomerEmailMarketingConsentUpdateInput!', EmailMarketingConsentUpdate_QueryTok))
                     else
                         Request.Add('query', StrSubstNo(CustomerUpdate_QueryTok, '$customerInput: CustomerInput!', ''));
                 end;
-            NcTask.Type::Delete:
+            SpfyTask.Type::Delete:
                 Request.Add('query', CustomerDelete_QueryTok);
         end;
         Request.Add('variables', Variables);
 
-        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        SpfyTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         Request.WriteTo(OStream);
     end;
 
-    local procedure AddCustomerInfo(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; NcTaskType: Integer; ShopifyCustomerID: Text[30]; var CustomerJson: JsonObject)
+    local procedure AddCustomerInfo(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; SpfyTaskType: Enum "NPR Spfy Task Op"; ShopifyCustomerID: Text[30]; var CustomerJson: JsonObject)
     var
-        NcTask: Record "NPR Nc Task";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         RemoveMetafields: JsonArray;
         UpdateMetafields: JsonArray;
     begin
         if ShopifyCustomerID <> '' then
             CustomerJson.Add('id', 'gid://shopify/Customer/' + ShopifyCustomerID);
-        if NcTaskType = NcTask.Type::Delete then
+        if SpfyTaskType = SpfyTaskType::Delete then
             exit;
         CustomerJson.Add('email', SpfyStoreCustomerLink."E-Mail");
         if SpfyStoreCustomerLink."Phone No." <> '' then
@@ -153,7 +150,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         if SpfyStoreCustomerLink."First Name" <> '' then
             CustomerJson.Add('firstName', SpfyStoreCustomerLink."First Name");
         CustomerJson.Add('lastName', SpfyStoreCustomerLink."Last Name");
-        if (NcTaskType = NcTask.Type::Insert) and not AddressIsBlank(SpfyStoreCustomerLink) then
+        if (SpfyTaskType = SpfyTaskType::Insert) and not AddressIsBlank(SpfyStoreCustomerLink) then
             CustomerJson.Add('addresses', BuildAddressArray(SpfyStoreCustomerLink));
 
         if ShopifyCustomerID = '' then  // Marketing consent must be sent as a separate request when updating an existing customer
@@ -312,7 +309,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
 
     local procedure FindShopifyCustomerByEmail(Email: Text; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
-        NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         RequestJson: JsonObject;
@@ -323,21 +320,21 @@ codeunit 6248540 "NPR Spfy Send Customers"
         RequestJson.Add('query', QueryTok);
         RequestJson.Add('variables', VariablesJson);
 
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        SpfyTask."Store Code" := ShopifyStoreCode;
+        SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse));
     end;
 
     local procedure CreateShopifyCustomer(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; var ShopifyResponse: JsonToken): Boolean
     var
-        NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
     begin
-        NcTask."Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
-        NcTask.Type := NcTask.Type::Insert;
-        PrepareCustomerUpdateRequest(NcTask, SpfyStoreCustomerLink, '');
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
+        SpfyTask."Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
+        SpfyTask.Type := SpfyTask.Type::Insert;
+        PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink, '');
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse));
     end;
 
     local procedure UpdateFromCustomer(Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
@@ -460,21 +457,21 @@ codeunit 6248540 "NPR Spfy Send Customers"
 
     local procedure GetCustomerDataFromShopify(ShopifyCustomerID: Text[30]; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
-        NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
         QueryTok: Label 'query GetCustomer($customerID: ID!) {customer(id: $customerID) {id firstName lastName defaultEmailAddress{emailAddress marketingOptInLevel marketingState marketingUpdatedAt} defaultPhoneNumber{phoneNumber} defaultAddress{id address1 address2 city province zip countryCode}}}', Locked = true;
     begin
-        NcTask."Store Code" := ShopifyStoreCode;
+        SpfyTask."Store Code" := ShopifyStoreCode;
         Variables.Add('customerID', 'gid://shopify/Customer/' + ShopifyCustomerID);
         Request.Add('query', QueryTok);
         Request.Add('variables', Variables);
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         Request.WriteTo(QueryStream);
 
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse));
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, false, ShopifyResponse));
     end;
 
     local procedure UpdateCustomerWithDataFromShopify(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; Removed: Boolean; ShopifyResponse: JsonToken; TriggeredExternally: Boolean)
@@ -733,7 +730,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         end;
     end;
 
-    local procedure SyncAddressIfPending(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; var OuterNcTask: Record "NPR Nc Task")
+    local procedure SyncAddressIfPending(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; var OuterSpfyTask: Record "NPR Spfy Task")
     var
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         DataLogMgt: Codeunit "NPR Data Log Management";
@@ -750,19 +747,19 @@ codeunit 6248540 "NPR Spfy Send Customers"
 
         if AddressIsBlank(SpfyStoreCustomerLink) then begin
             if ShopifyAddressID <> '' then begin
-                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, OuterNcTask.Type::Delete, ShopifyResponse, OuterNcTask);
+                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, OuterSpfyTask.Type::Delete, ShopifyResponse, OuterSpfyTask);
                 SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID");
             end;
             // else: blank link + no Shopify address — nothing to sync
         end else
             if ShopifyAddressID = '' then begin
-                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, '', OuterNcTask.Type::Insert, ShopifyResponse, OuterNcTask);
+                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, '', OuterSpfyTask.Type::Insert, ShopifyResponse, OuterSpfyTask);
 #pragma warning disable AA0139
                 NewShopifyAddressID := ExtractAddressID(_JsonHelper.GetJText(ShopifyResponse, 'data.customerAddressCreate.address.id', true));
 #pragma warning restore AA0139
                 SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Default Address ID", NewShopifyAddressID, false);
             end else
-                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, OuterNcTask.Type::Modify, ShopifyResponse, OuterNcTask);
+                ExecuteAddressRequest(SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, OuterSpfyTask.Type::Modify, ShopifyResponse, OuterSpfyTask);
 
         DataLogMgt.DisableDataLog(true);
         SpfyStoreCustomerLink."Address Updated in BC" := false;
@@ -770,19 +767,19 @@ codeunit 6248540 "NPR Spfy Send Customers"
         DataLogMgt.DisableDataLog(false);
     end;
 
-    local procedure ExecuteAddressRequest(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; ShopifyAddressID: Text[30]; TaskType: Option; var ShopifyResponse: JsonToken; var OuterNcTask: Record "NPR Nc Task")
+    local procedure ExecuteAddressRequest(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; ShopifyAddressID: Text[30]; TaskType: Enum "NPR Spfy Task Op"; var ShopifyResponse: JsonToken; var OuterSpfyTask: Record "NPR Spfy Task")
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
         Success: Boolean;
     begin
-        PrepareAddressRequest(NcTask, SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, TaskType);
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-        // Append the address request/response to the outer customer NcTask so the user can review
-        // both the customer mutation and the follow-up address mutation in the same NcTask record.
+        PrepareAddressRequest(SpfyTask, SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, TaskType);
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        // Append the address request/response to the outer customer SpfyTask so the user can review
+        // both the customer mutation and the follow-up address mutation in the same SpfyTask record.
         // Commit before any Error() so the diagnostic data survives the transaction rollback.
-        AppendNcTaskBlobs(OuterNcTask, NcTask);
-        OuterNcTask.Modify();
+        AppendSpfyTaskBlobs(OuterSpfyTask, SpfyTask);
+        OuterSpfyTask.Modify();
         Commit();
         if not Success then
             Error(GetLastErrorText());
@@ -790,7 +787,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
             Error('');
     end;
 
-    local procedure AppendNcTaskBlobs(var OuterNcTask: Record "NPR Nc Task"; LocalNcTask: Record "NPR Nc Task")
+    local procedure AppendSpfyTaskBlobs(var OuterSpfyTask: Record "NPR Spfy Task"; LocalSpfyTask: Record "NPR Spfy Task")
     var
         TypeHelper: Codeunit "Type Helper";
         InStr: InStream;
@@ -800,40 +797,40 @@ codeunit 6248540 "NPR Spfy Send Customers"
         Separator: Text;
     begin
         Separator := TypeHelper.CRLFSeparator() + TypeHelper.CRLFSeparator();
-        OuterNcTask.CalcFields("Data Output", Response);
+        OuterSpfyTask.CalcFields("Data Output", Response);
 
-        if OuterNcTask."Data Output".HasValue() then begin
-            OuterNcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+        if OuterSpfyTask."Data Output".HasValue() then begin
+            OuterSpfyTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
             DataOutputBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
         end;
-        if LocalNcTask."Data Output".HasValue() then begin
+        if LocalSpfyTask."Data Output".HasValue() then begin
             if DataOutputBuilder.Length() > 0 then
                 DataOutputBuilder.Append(Separator);
-            LocalNcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+            LocalSpfyTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
             DataOutputBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
         end;
 
-        if OuterNcTask.Response.HasValue() then begin
-            OuterNcTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
+        if OuterSpfyTask.Response.HasValue() then begin
+            OuterSpfyTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
             ResponseBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
         end;
-        if LocalNcTask.Response.HasValue() then begin
+        if LocalSpfyTask.Response.HasValue() then begin
             if ResponseBuilder.Length() > 0 then
                 ResponseBuilder.Append(Separator);
-            LocalNcTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
+            LocalSpfyTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
             ResponseBuilder.Append(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator()));
         end;
 
-        Clear(OuterNcTask."Data Output");
-        OuterNcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
+        Clear(OuterSpfyTask."Data Output");
+        OuterSpfyTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
         OutStr.WriteText(DataOutputBuilder.ToText());
 
-        Clear(OuterNcTask.Response);
-        OuterNcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
+        Clear(OuterSpfyTask.Response);
+        OuterSpfyTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
         OutStr.WriteText(ResponseBuilder.ToText());
     end;
 
-    local procedure PrepareAddressRequest(var NcTask: Record "NPR Nc Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; ShopifyAddressID: Text[30]; TaskType: Option)
+    local procedure PrepareAddressRequest(var SpfyTask: Record "NPR Spfy Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; ShopifyAddressID: Text[30]; TaskType: Enum "NPR Spfy Task Op")
     var
         AddressJson: JsonObject;
         Variables: JsonObject;
@@ -843,25 +840,25 @@ codeunit 6248540 "NPR Spfy Send Customers"
         UpdateAddressQueryTok: Label 'mutation UpdateCustomerAddress($address: MailingAddressInput!, $addressId: ID!, $customerId: ID!) {customerAddressUpdate(address: $address, addressId: $addressId, customerId: $customerId) {address{id} userErrors{field message}}}', Locked = true;
         DeleteAddressQueryTok: Label 'mutation DeleteCustomerAddress($addressId: ID!, $customerId: ID!) {customerAddressDelete(addressId: $addressId, customerId: $customerId) {deletedAddressId userErrors{field message}}}', Locked = true;
     begin
-        Clear(NcTask);
-        NcTask."Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
+        Clear(SpfyTask);
+        SpfyTask."Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
         Variables.Add('customerId', 'gid://shopify/Customer/' + ShopifyCustomerID);
 
         case TaskType of
-            NcTask.Type::Insert:
+            SpfyTask.Type::Insert:
                 begin
                     BuildAddressInput(SpfyStoreCustomerLink, AddressJson);
                     Variables.Add('address', AddressJson);
                     Request.Add('query', CreateAddressQueryTok);
                 end;
-            NcTask.Type::Modify:
+            SpfyTask.Type::Modify:
                 begin
                     BuildAddressInput(SpfyStoreCustomerLink, AddressJson);
                     Variables.Add('address', AddressJson);
                     Variables.Add('addressId', BuildAddressGID(ShopifyAddressID, ShopifyCustomerID));
                     Request.Add('query', UpdateAddressQueryTok);
                 end;
-            NcTask.Type::Delete:
+            SpfyTask.Type::Delete:
                 begin
                     Variables.Add('addressId', BuildAddressGID(ShopifyAddressID, ShopifyCustomerID));
                     Request.Add('query', DeleteAddressQueryTok);
@@ -869,7 +866,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         end;
 
         Request.Add('variables', Variables);
-        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        SpfyTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         Request.WriteTo(OStream);
     end;
 
@@ -989,30 +986,5 @@ codeunit 6248540 "NPR Spfy Send Customers"
         SpfyPOSEntryExportMgt.ProcessOutstandingPOSEntries(POSEntry, TempSpfyExportPointerBuffer);
     end;
 #endif
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'RunSourceCardEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", RunSourceCardEvent, '', false, false)]
-#endif
-    local procedure OpenRelatedPage(var RecRef: RecordRef; var RunCardExecuted: Boolean)
-    var
-        Customer: Record Customer;
-        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
-    begin
-        if RunCardExecuted or (RecRef.Number() <> Database::"NPR Spfy Store-Customer Link") then
-            exit;
-        RunCardExecuted := true;
-
-        RecRef.SetTable(SpfyStoreCustomerLink);
-        case SpfyStoreCustomerLink.Type of
-            SpfyStoreCustomerLink.Type::Customer:
-                begin
-                    Customer.Get(SpfyStoreCustomerLink."No.");
-                    Customer.SetRecFilter();
-                    Page.Run(Page::"Customer Card", Customer);
-                end;
-        end;
-    end;
 }
 #endif

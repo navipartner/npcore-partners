@@ -21,6 +21,7 @@ codeunit 6151214 "NPR Spfy Task Processor"
         _WaitingForInventoryItemLbl: Label 'Awaiting inventory item sync';
         _WaitingForLocationActivationLbl: Label 'Awaiting Shopify location activation';
         _WaitingForVariantLbl: Label 'Awaiting variant sync';
+        _WaitingForOwnerLbl: Label 'Awaiting Shopify owner entity sync';
 
     internal procedure SetSendBoundary(NewBoundary: Interface "NPR Spfy Task Send Boundary")
     begin
@@ -479,6 +480,7 @@ codeunit 6151214 "NPR Spfy Task Processor"
                 end;
             Database::Item,
             Database::"Item Variant",
+            Database::Customer,
             Database::"NPR Spfy Tag Update Request",
             Database::"NPR Spfy Inventory Level",
             Database::"NPR Spfy Item Price",
@@ -488,6 +490,13 @@ codeunit 6151214 "NPR Spfy Task Processor"
                         exit(true);
                     SourceRecRef := RecRef;
                     exit(false);
+                end;
+            // The task's Record ID is the metafield owner link; owners outside the two link tables are exempt, mirroring PreconditionIsMet.
+            Database::"NPR Spfy Entity Metafield":
+                begin
+                    if not (SpfyTask."Record ID".TableNo() in [Database::"NPR Spfy Store-Item Link", Database::"NPR Spfy Store-Customer Link"]) then
+                        exit(false);
+                    exit(not RecRef.Get(SpfyTask."Record ID"));
                 end;
         end;
         exit(false);
@@ -513,6 +522,14 @@ codeunit 6151214 "NPR Spfy Task Processor"
                 exit(InvItemLocationPreconditionIsMet(AllowLiveLookup, SourceRecRef, WaitingReasonTxt, LookupErrorText));
             Database::"NPR Spfy Item Price":
                 exit(ItemPricePreconditionIsMet(AllowLiveLookup, SourceRecRef, WaitingReasonTxt, LookupErrorText));
+            Database::"NPR Spfy Entity Metafield":
+                begin
+                    // The task's Record ID is the owner link; owners outside the two known link tables are exempt.
+                    if not (SpfyTask."Record ID".TableNo() in [Database::"NPR Spfy Store-Item Link", Database::"NPR Spfy Store-Customer Link"]) then
+                        exit(true);
+                    WaitingReasonTxt := _WaitingForOwnerLbl;
+                    exit(_SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyTask."Record ID", "NPR Spfy ID Type"::"Entry ID") <> '');
+                end;
         end;
         exit(true);
     end;

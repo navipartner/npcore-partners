@@ -5,7 +5,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     TableNo = "NPR Nc Task";
     ObsoleteState = Pending;
     ObsoleteTag = '2026-07-25';
-    ObsoleteReason = 'Frozen legacy copy of codeunit "NPR Spfy Task Send Items&Inv" — serves the NC path until fleet migration. Any fix MUST be dual-applied to both codeunits.';
+    ObsoleteReason = 'Replaced by codeunit "NPR Spfy Task Send Items&Inv" (the new Shopify Task List queue). This copy keeps serving environments that have not migrated yet. The two codeunits have diverged: never copy changes blindly between them - apply a fix to each deliberately, only where it belongs.';
 
     trigger OnRun()
     begin
@@ -2182,7 +2182,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             DataLogMgt.DisableDataLog(false);
             // Self-write convergence (CORE-433): advance the rowversion-poll baseline to this post-writeback state so
             // mirroring Shopify's product response (Name/Description/Vendor) back here doesn't re-trigger a sync.
-            // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected. §5.4.
+            // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected.
             SpfySyncStateMgt.AdvanceStoreItemLinkBaseline(SpfyStoreItemLink);
         end;
     end;

@@ -293,7 +293,7 @@ table 6150807 "NPR Spfy Integration Setup"
         field(174; "RowVersion Pld. Ver. Seeded"; Integer)
         {
             // The SpfySyncStateMgt.PayloadVersion() captured at seeding completion. 6d accepts Completed only when this
-            // equals the current PayloadVersion() — a PayloadVersion bump invalidates a stale Completed (design §8.2).
+            // equals the current PayloadVersion() — a PayloadVersion bump invalidates a stale Completed.
             Caption = 'RowVersion Payload Version Seeded';
             DataClassification = CustomerContent;
         }

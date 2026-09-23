@@ -1,11 +1,9 @@
-#if not BC17
-codeunit 6248554 "NPR Spfy Send Metafields"
+﻿#if not BC17
+// Native sibling of frozen codeunit "NPR Spfy Send Metafields": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+codeunit 6151466 "NPR Spfy Task Send Metafields"
 {
     Access = Internal;
-    TableNo = "NPR Nc Task";
-    ObsoleteState = Pending;
-    ObsoleteTag = '2026-08-19';
-    ObsoleteReason = 'Replaced by codeunit "NPR Spfy Task Send Metafields" (the new Shopify Task List queue). This copy keeps serving environments that have not migrated yet. The two codeunits are maintained independently and may diverge: never copy changes blindly between them - apply a fix to each deliberately, only where it belongs.';
+    TableNo = "NPR Spfy Task";
 
     trigger OnRun()
     begin
@@ -16,7 +14,7 @@ codeunit 6248554 "NPR Spfy Send Metafields"
         end;
     end;
 
-    local procedure SendMetafields(var NcTask: Record "NPR Nc Task")
+    local procedure SendMetafields(var SpfyTask: Record "NPR Spfy Task")
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
@@ -26,16 +24,16 @@ codeunit 6248554 "NPR Spfy Send Metafields"
         SendToShopify: Boolean;
         Success: Boolean;
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
         Clear(SpfyMetafieldMgt);
         ClearLastError();
 
-        Success := PrepareMetafieldUpdateRequest(NcTask, SpfyMetafieldMgt, ShopifyOwnerType, ShopifyOwnerID, SendToShopify);
+        Success := PrepareMetafieldUpdateRequest(SpfyTask, SpfyMetafieldMgt, ShopifyOwnerType, ShopifyOwnerID, SendToShopify);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
 
-        NcTask.Modify();
+        SpfyTask.Modify();
         Commit();
 
         if not Success then
@@ -44,11 +42,11 @@ codeunit 6248554 "NPR Spfy Send Metafields"
             exit;
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
             Error('');
-        SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(NcTask."Record ID", ShopifyOwnerType, ShopifyOwnerID, NcTask."Store Code");
+        SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(SpfyTask."Record ID", ShopifyOwnerType, ShopifyOwnerID, SpfyTask."Store Code");
     end;
 
     [TryFunction]
-    local procedure PrepareMetafieldUpdateRequest(var NcTask: Record "NPR Nc Task"; var SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt."; var ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var ShopifyOwnerID: Text[30]; var SendToShopify: Boolean)
+    local procedure PrepareMetafieldUpdateRequest(var SpfyTask: Record "NPR Spfy Task"; var SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt."; var ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var ShopifyOwnerID: Text[30]; var SendToShopify: Boolean)
     var
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
@@ -60,7 +58,7 @@ codeunit 6248554 "NPR Spfy Send Metafields"
         ShopifyStoreCode: Code[20];
         Handled: Boolean;
     begin
-        RecRef := NcTask."Record ID".GetRecord();
+        RecRef := SpfyTask."Record ID".GetRecord();
         SpfyMetafieldMgtPublic.OnPrepareMetafieldUpdateRequest(RecRef, OwnerRecID, ShopifyOwnerType, ShopifyOwnerID, ShopifyStoreCode, Handled);
         if not Handled then
             case RecRef.Number() of
@@ -92,7 +90,7 @@ codeunit 6248554 "NPR Spfy Send Metafields"
         if (ShopifyOwnerType = ShopifyOwnerType::" ") or (ShopifyOwnerID = '') or (ShopifyStoreCode = '') then
             exit;
 
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         SendToShopify := SpfyMetafieldMgt.ShopifyEntityMetafieldValueUpdateQuery(OwnerRecID, ShopifyOwnerType, ShopifyOwnerID, ShopifyStoreCode, QueryStream);
     end;
 }

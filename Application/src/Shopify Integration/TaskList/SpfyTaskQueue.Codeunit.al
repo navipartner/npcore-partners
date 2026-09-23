@@ -493,6 +493,66 @@ codeunit 6151183 "NPR Spfy Task Queue"
         Commit();
     end;
 
+    internal procedure TryGetSourceCardRecord(SpfyTask: Record "NPR Spfy Task"; var SourceRecRef: RecordRef): Boolean
+    var
+        Customer: Record Customer;
+        InventoryBuffer: Record "Inventory Buffer";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        CostRecRef: RecordRef;
+        LinkRecRef: RecordRef;
+    begin
+        Clear(SourceRecRef);
+        if Format(SpfyTask."Record ID") = '' then
+            exit(false);
+        case SpfyTask."Record ID".TableNo() of
+            // The cost carrier is a synthetic RecordId over a buffer row that is never persisted; only its Item No. is real.
+            Database::"Inventory Buffer":
+                begin
+                    CostRecRef := SpfyTask."Record ID".GetRecord();
+                    CostRecRef.SetTable(InventoryBuffer);
+                    if Item.Get(InventoryBuffer."Item No.") then begin
+                        SourceRecRef.GetTable(Item);
+                        exit(true);
+                    end;
+                end;
+            Database::"NPR Spfy Store-Customer Link":
+                begin
+                    if not LinkRecRef.Get(SpfyTask."Record ID") then
+                        exit(false);
+                    LinkRecRef.SetTable(SpfyStoreCustomerLink);
+                    case SpfyStoreCustomerLink.Type of
+                        SpfyStoreCustomerLink.Type::Customer:
+                            if Customer.Get(SpfyStoreCustomerLink."No.") then begin
+                                SourceRecRef.GetTable(Customer);
+                                exit(true);
+                            end;
+                    end;
+                end;
+            Database::"NPR Spfy Store-Item Link":
+                begin
+                    if not LinkRecRef.Get(SpfyTask."Record ID") then
+                        exit(false);
+                    LinkRecRef.SetTable(SpfyStoreItemLink);
+                    case SpfyStoreItemLink.Type of
+                        SpfyStoreItemLink.Type::Item:
+                            if Item.Get(SpfyStoreItemLink."Item No.") then begin
+                                SourceRecRef.GetTable(Item);
+                                exit(true);
+                            end;
+                        SpfyStoreItemLink.Type::Variant:
+                            if ItemVariant.Get(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code") then begin
+                                SourceRecRef.GetTable(ItemVariant);
+                                exit(true);
+                            end;
+                    end;
+                end;
+        end;
+        exit(false);
+    end;
+
     local procedure SetCompleted(var SpfyTask: Record "NPR Spfy Task")
     begin
         SpfyTask.State := SpfyTask.State::Completed;

@@ -15,8 +15,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
                 BulkSendItemVariants(Rec);
             Database::"Inventory Buffer":
                 SendItemCost(Rec);
-            Database::"NPR Spfy Entity Metafield":
-                SendMetafields();
             Database::"NPR Spfy Tag Update Request":
                 SendTags(Rec);
             Database::"NPR Spfy Inventory Level":
@@ -381,13 +379,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
             Error(GetLastErrorText());
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
             Error('');
-    end;
-
-    local procedure SendMetafields()
-    var
-        WrongCodeunitErr: Label 'The codeunit specified in the NaviConnect Task Setup for Metafield updates (table 6150951 "NPR Spfy Entity Metafield") is incorrect. Please change it from codeunit 6184819 "NPR Spfy Send Items&Inventory" to codeunit 6248554 "NPR Spfy Send Metafields".';
-    begin
-        Error(WrongCodeunitErr);
     end;
 
     local procedure SendShopifyItemPrices(var SpfyTask: Record "NPR Spfy Task")
@@ -2282,7 +2273,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
             DataLogMgt.DisableDataLog(false);
             // Self-write convergence (CORE-433): advance the rowversion-poll baseline to this post-writeback state so
             // mirroring Shopify's product response (Name/Description/Vendor) back here doesn't re-trigger a sync.
-            // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected. §5.4.
+            // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected.
             SpfySyncStateMgt.AdvanceStoreItemLinkBaseline(SpfyStoreItemLink);
         end;
     end;

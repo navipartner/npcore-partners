@@ -704,6 +704,21 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         exit(SpfyTask.Count());
     end;
 
+    // Counts EVERY task type of the table: the typed overload above cannot express that, and a hand-rolled type loop would silently drop the legacy Rename type.
+    procedure TaskCountByStatus(TableNo: Integer; Unprocessed: Boolean): Integer
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCountByStatus(TableNo, Unprocessed));
+        SpfyTask.SetRange("Table No.", TableNo);
+        if Unprocessed then
+            SpfyTask.SetFilter(State, '<>%1', SpfyTask.State::Completed)
+        else
+            SpfyTask.SetRange(State, SpfyTask.State::Completed);
+        exit(SpfyTask.Count());
+    end;
+
     // Keeps its NcTask-typed signature in both modes: the caller only reads the identity fields, which the new queue mirrors one to one.
     procedure FindLastTask(TableNo: Integer; var NcTask: Record "NPR Nc Task"): Boolean
     var
@@ -829,6 +844,15 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
     begin
         NcTask.SetRange("Table No.", TableNo);
         NcTask.SetRange(Type, TaskType);
+        NcTask.SetRange(Processed, not Unprocessed);
+        exit(NcTask.Count());
+    end;
+
+    local procedure NcTaskCountByStatus(TableNo: Integer; Unprocessed: Boolean): Integer
+    var
+        NcTask: Record "NPR Nc Task";
+    begin
+        NcTask.SetRange("Table No.", TableNo);
         NcTask.SetRange(Processed, not Unprocessed);
         exit(NcTask.Count());
     end;

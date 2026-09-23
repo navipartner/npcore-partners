@@ -1042,6 +1042,98 @@ codeunit 85315 "NPR Spfy TL Switch Tests"
         AssertLogDateWithinWindow(SpfyTask."Log Date", EnqueuedAt, 'Location activation');
         _Assert.AreEqual(0, NcTaskCount(), 'An activation must never also reach the legacy queue while the feature is on');
     end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenStoreCustomerLinkChanges_ThenContentCorrectNcTaskOnly()
+    var
+        Customer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        DummyNcTask: Record "NPR Nc Task";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A customer change with the task list off creates one content-correct legacy customer task keyed on the customer and nothing in the new queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, true, false);
+        _Lib.CreateCustomerWithLink(Customer, SpfyStoreCustomerLink, StoreCode, true, true);
+
+        // [WHEN] A synced customer's payload changes while the task list is off.
+        _Lib.DispatchModify(SpfyStoreCustomerLink);
+
+        // [THEN] The legacy queue holds one content-correct customer task keyed on the customer, and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::Customer), 'One legacy customer task must be created for the customer change');
+        AssertNcIntent(Database::Customer, DummyNcTask.Type::Modify, Customer.RecordId(), Customer."No.", StoreCode, 'Customer');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No customer task may be created in the new queue while the feature is off');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenStoreCustomerLinkChanges_ThenContentCorrectSpfyTaskOnly()
+    var
+        Customer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A customer change with the task list on creates one content-correct new-queue customer task and nothing in the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, true, false);
+        _Lib.CreateCustomerWithLink(Customer, SpfyStoreCustomerLink, StoreCode, true, true);
+        _Lib.SetTaskListFeatureEnabled(true);
+
+        // [WHEN] A synced customer's payload changes while the task list is on.
+        _Lib.DispatchModify(SpfyStoreCustomerLink);
+
+        // [THEN] The new queue holds one content-correct customer task, and the legacy queue holds nothing.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::Customer), 'One new-queue customer task must be created for the customer change');
+        AssertSpfyIntent(Database::Customer, "NPR Spfy Task Op"::Modify, Customer.RecordId(), Customer."No.", StoreCode, 'Customer');
+        _Assert.AreEqual(0, NcTaskCount(), 'A customer change must never also reach the legacy queue while the feature is on');
+    end;
+
+    [Test]
+    procedure GivenFeatureOff_WhenMetafieldChanges_ThenContentCorrectNcTaskOnly()
+    var
+        Customer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        DummyNcTask: Record "NPR Nc Task";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A metafield change with the task list off creates one content-correct legacy metafield task keyed on the owner link and nothing in the new queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, true, false);
+        _Lib.CreateCustomerWithLink(Customer, SpfyStoreCustomerLink, StoreCode, true, true);
+        _Lib.CreateMetafield(SpfyEntityMetafield, Database::"NPR Spfy Store-Customer Link", SpfyStoreCustomerLink.RecordId(), 'switch fence value');
+
+        // [WHEN] A metafield of that customer changes while the task list is off.
+        _Lib.DispatchModify(SpfyEntityMetafield);
+
+        // [THEN] The legacy queue holds one metafield task keyed on the OWNER LINK, and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR Spfy Entity Metafield"), 'One legacy metafield task must be created for the metafield change');
+        AssertNcIntent(Database::"NPR Spfy Entity Metafield", DummyNcTask.Type::Modify, SpfyStoreCustomerLink.RecordId(), Customer."No.", StoreCode, 'Entity Metafield');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No metafield task may be created in the new queue while the feature is off');
+    end;
+
+    [Test]
+    procedure GivenFeatureOn_WhenMetafieldChanges_ThenContentCorrectSpfyTaskOnly()
+    var
+        Customer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A metafield change with the task list on creates one content-correct new-queue metafield task keyed on the owner link and nothing in the legacy queue.
+        Initialize();
+        StoreCode := _Lib.CreateStore(false, false, false, true, false);
+        _Lib.CreateCustomerWithLink(Customer, SpfyStoreCustomerLink, StoreCode, true, true);
+        _Lib.CreateMetafield(SpfyEntityMetafield, Database::"NPR Spfy Store-Customer Link", SpfyStoreCustomerLink.RecordId(), 'switch fence value');
+        _Lib.SetTaskListFeatureEnabled(true);
+
+        // [WHEN] A metafield of that customer changes while the task list is on.
+        _Lib.DispatchModify(SpfyEntityMetafield);
+
+        // [THEN] The new queue holds one metafield task keyed on the OWNER LINK, and the legacy queue holds nothing.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR Spfy Entity Metafield"), 'One new-queue metafield task must be created for the metafield change');
+        AssertSpfyIntent(Database::"NPR Spfy Entity Metafield", "NPR Spfy Task Op"::Modify, SpfyStoreCustomerLink.RecordId(), Customer."No.", StoreCode, 'Entity Metafield');
+        _Assert.AreEqual(0, NcTaskCount(), 'A metafield change must never also reach the legacy queue while the feature is on');
+    end;
     #endregion
 
     local procedure NcTaskCount(TableNo: Integer; RecordValue: Code[20]): Integer

@@ -202,7 +202,7 @@ page 6184553 "NPR Spfy Integration Setup"
                 action(SeedRowVersionBaselines)
                 {
                     Caption = 'Seed RowVersion Baselines';
-                    ToolTip = 'Runs the initial RowVersion baseline seeding sweep (CORE-433 §8.2) for already-synced Shopify entities. Choose foreground (blocking, with progress) or a background Job Queue entry. This does NOT enable the RowVersion change-detection feature; it only warms up the baselines so the first poll after go-live is a clean no-op. This is a pre-cutover migration tool only: it fast-forwards ALL tracker marks and rewinds the migration status. After cut-over, use Quiet-Seed Baselines instead.';
+                    ToolTip = 'Runs the initial RowVersion baseline seeding sweep for already-synced Shopify entities. Choose foreground (blocking, with progress) or a background Job Queue entry. This does NOT enable the RowVersion change-detection feature; it only warms up the baselines so the first poll after go-live is a clean no-op. This is a pre-cutover migration tool only: it fast-forwards ALL tracker marks and rewinds the migration status. After cut-over, use Quiet-Seed Baselines instead.';
                     ApplicationArea = NPRShopify;
                     Image = Migration;
                     Visible = ShowRowVersionSeedingUI;

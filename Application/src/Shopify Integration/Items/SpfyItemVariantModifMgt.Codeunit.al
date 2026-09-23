@@ -33,7 +33,7 @@ codeunit 6248412 "NPR Spfy ItemVariantModif Mgt."
             // Self-write convergence (CORE-433): DisableDataLog = "this is the integration's own write" (e.g. mirroring
             // Shopify's inventoryPolicy/tracked/weight back here). Advance the rowversion-poll baseline to this
             // post-writeback state so it does NOT re-trigger a sync. No-op when the RowVersion feature is off; a real
-            // USER edit comes in with DisableDataLog=false and is NOT advanced → still detected. (Design §5.4.)
+            // USER edit comes in with DisableDataLog=false and is NOT advanced → still detected.
             SpfySyncStateMgt.AdvanceItemVariantModifBaseline(SpfyItemVariantModif);
         end;
     end;

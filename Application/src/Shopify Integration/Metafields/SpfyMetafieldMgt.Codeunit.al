@@ -643,12 +643,12 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         MetafieldVersionCheck := IsMetafieldVersionCheckEnabled();
         if MetafieldVersionCheck then
             NullJsonValue.SetValueToNull();
-        if _TempSpfyMetafieldDef.IsEmpty() then
-            GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, false);
-
         FilterSpfyEntityMetafields(EntityRecID, ShopifyOwnerType, SpfyEntityMetafield);
         SpfyEntityMetafield.SetFilter("Metafield ID", '<>%1', '');
-        if SpfyEntityMetafield.FindSet() then
+        if SpfyEntityMetafield.FindSet() then begin
+            // The definition fetch is a Shopify round trip; an owner with no metafield rows must not pay for it.
+            if _TempSpfyMetafieldDef.IsEmpty() then
+                GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, false);
             repeat
                 if _TempSpfyMetafieldDef.Get(SpfyEntityMetafield."Metafield ID") then begin
                     Clear(Metafield);
@@ -671,6 +671,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
                         RemoveMetafields.Add(Metafield);
                 end;
             until SpfyEntityMetafield.Next() = 0;
+        end;
     end;
 
     local procedure IsMetafieldVersionCheckEnabled(): Boolean

@@ -564,11 +564,18 @@ page 6150973 "NPR Spfy Task List"
     var
         PageMgt: Codeunit "Page Management";
         RecRef: RecordRef;
+        SourceCardRecRef: RecordRef;
         SourceFound: Boolean;
         SourceGoneMsg: Label 'The record this task refers to no longer exists.';
     begin
-        if Format(Rec."Record ID") <> '' then
+        if Format(Rec."Record ID") <> '' then begin
+            if _SpfyTaskQueue.TryGetSourceCardRecord(Rec, SourceCardRecRef) then begin
+                SourceCardRecRef.SetRecFilter();
+                PageMgt.PageRun(SourceCardRecRef);
+                exit;
+            end;
             SourceFound := RecRef.Get(Rec."Record ID");
+        end;
         if not SourceFound then begin
             Message(SourceGoneMsg);
             exit;

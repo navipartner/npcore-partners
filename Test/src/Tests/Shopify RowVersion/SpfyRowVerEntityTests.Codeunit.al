@@ -736,22 +736,13 @@ codeunit 85284 "NPR Spfy RowVer Entity Tests"
     end;
 
     local procedure CountProcessedModifies(): Integer
-    var
-        NcTask: Record "NPR Nc Task";
     begin
-        NcTask.SetRange("Table No.", Database::Customer);
-        NcTask.SetRange(Type, NcTask.Type::Modify);
-        NcTask.SetRange(Processed, true);
-        exit(NcTask.Count());
+        exit(_Lib.TaskCountByStatus(Database::Customer, "NPR Spfy Task Op"::Modify.AsInteger(), false));
     end;
 
     local procedure CountUnprocessedCustomerTasks(): Integer
-    var
-        NcTask: Record "NPR Nc Task";
     begin
-        NcTask.SetRange("Table No.", Database::Customer);
-        NcTask.SetRange(Processed, false);
-        exit(NcTask.Count());
+        exit(_Lib.TaskCountByStatus(Database::Customer, true));
     end;
     #endregion
 

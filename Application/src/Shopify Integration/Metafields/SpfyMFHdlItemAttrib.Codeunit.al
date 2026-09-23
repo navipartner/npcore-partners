@@ -48,7 +48,7 @@ codeunit 6248508 "NPR Spfy M/F Hdl.-Item Attrib."
         ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
         ItemAttributeValueMapping.SetRange("Item Attribute ID", ItemAttribute.ID);
         if ItemAttributeValueMapping.IsEmpty() then begin
-            // CORE-433 §6.4 (resolution #6): tombstone (empty value, keep row) instead of hard-deleting, so the poll sends
+            // Tombstone (empty value, keep row) instead of hard-deleting, so the poll sends
             // metafieldsDelete for the now-unmapped item-attribute metafields — same treatment as the item/customer path.
             if xMetafieldID <> '' then
                 SpfyMetafieldMgt.ClearEntityMetafieldValuesAsTombstones(SpfyEntityMetafield);
