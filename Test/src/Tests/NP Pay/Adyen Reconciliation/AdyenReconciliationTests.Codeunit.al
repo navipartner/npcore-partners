@@ -6,6 +6,7 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
     var
         _LibraryERM: Codeunit "Library - ERM";
         _LibraryUtility: Codeunit "Library - Utility";
+        _LibraryDimension: Codeunit "Library - Dimension";
         _Assert: Codeunit Assert;
         _AdyenSetup: Record "NPR Adyen Setup";
         _AdyenMerchantSetup: Record "NPR Adyen Merchant Setup";
@@ -508,6 +509,325 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         SubscrPaymentRequest.TestField(Reversed, true);
         ReverseSubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID");
         _Assert.AreEqual(-BookedAmountLCY, ReverseSubscrPaymentRequest."Amount (LCY)", 'The reversal should inherit the negated booked Amount (LCY).');
+    end;
+
+    [Test]
+    procedure PostingProcess_PostAsMissingRefundWithFees()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        LinesToPost: Record "NPR Adyen Recon. Line";
+        TransactionGLEntry: Record "G/L Entry";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        AmountType: Enum "NPR Adyen Recon. Amount Type";
+        RefundAmount: Decimal;
+        MarkupAmount: Decimal;
+        OtherCommissionsAmount: Decimal;
+        PostedEntries: Integer;
+    begin
+        // [Scenario] 'Post as Missing' must post an unmatched line the way the matched posting
+        //            (NPR Adyen EFT Trans. Posting) does, with the Missing Transaction account standing in for the
+        //            POS paid-in account that a missing transaction has no document for: the signed Amount (TCY)
+        //            on the Reconciled Payment account, its opposite on the Missing Transaction account, and each
+        //            fee leg on its own G/L account balanced against Reconciled Payment.
+        Initialize();
+        RefundAmount := 1474;
+        MarkupAmount := 3;
+        OtherCommissionsAmount := 2;
+
+        // [Given] An unmatched ('Failed to Match') refund line carrying markup and other commissions
+        CreateReconHeader(ReconciliationHeader);
+        InsertFailedToMatchRefundReconLine(ReconciliationLine, ReconciliationHeader, GenerateUniquePSPReference(), RefundAmount, MarkupAmount, OtherCommissionsAmount);
+        ReconciliationLine.TestField("Amount (TCY)", -RefundAmount);
+
+        // [When] Posting it through the 'Post as Missing' entry point
+        LinesToPost.SetRange("Document No.", ReconciliationLine."Document No.");
+        LinesToPost.SetRange("Line No.", ReconciliationLine."Line No.");
+        PostedEntries := AdyenTransMatching.PostUnmatchedEntries(LinesToPost);
+
+        // [Then] The line is posted and bound to the G/L Entry it created
+        AssertPostedAsMissing(PostedEntries, ReconciliationLine);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::"Posted Failed to Match");
+        ReconciliationLine.TestField("Matching Table Name", ReconciliationLine."Matching Table Name"::"G/L Entry");
+
+        // [Then] Transaction leg: the refund credits Reconciled Payment and debits the Missing Transaction account
+        AssertReconLegAndBalancingGLEntry(ReconciliationLine, AmountType::Transaction, _AdyenMerchantSetup."Reconciled Payment Acc. No.", -RefundAmount, _AdyenMerchantSetup."Missing Transaction Acc. No.");
+
+        // [Then] Markup leg: hits the Markup G/L account, balanced against Reconciled Payment as in the matched path
+        AssertReconLegAndBalancingGLEntry(ReconciliationLine, AmountType::Markup, _AdyenMerchantSetup."Markup G/L Account", MarkupAmount, _AdyenMerchantSetup."Reconciled Payment Acc. No.");
+
+        // [Then] Other commissions leg: same account pairing
+        AssertReconLegAndBalancingGLEntry(ReconciliationLine, AmountType::"Other commissions", _AdyenMerchantSetup."Other commissions G/L Account", OtherCommissionsAmount, _AdyenMerchantSetup."Reconciled Payment Acc. No.");
+
+        // [Then] The entry the line links to - what the Matched Entry action drills into - is the transaction leg,
+        //        not whichever fee leg happened to post last
+        TransactionGLEntry.GetBySystemId(ReconciliationLine."Matching Entry System ID");
+        TransactionGLEntry.TestField("G/L Account No.", _AdyenMerchantSetup."Reconciled Payment Acc. No.");
+        TransactionGLEntry.TestField(Amount, -RefundAmount);
+
+        // [Then] Reconciled Payment is left holding the line's net Adyen movement (the refund plus the fees Adyen
+        //        charged on it), while the Missing Transaction account holds the gross the absent POS payment would
+        //        have carried. Balancing the fee legs anywhere else strands their amount on Reconciled Payment and
+        //        the Merchant Payout line never clears it.
+        _Assert.AreEqual(-(RefundAmount + MarkupAmount + OtherCommissionsAmount), SumPostedAmount(ReconciliationLine."Posting No.", _AdyenMerchantSetup."Reconciled Payment Acc. No."), 'Reconciled Payment must end up with the net of the line, not its gross.');
+        _Assert.AreEqual(RefundAmount, SumPostedAmount(ReconciliationLine."Posting No.", _AdyenMerchantSetup."Missing Transaction Acc. No."), 'The Missing Transaction account must hold the gross amount, standing in for the missing POS payment.');
+
+        // [Then] The single line was the whole document, so the header follows it to Posted
+        ReconciliationHeader.Find();
+        ReconciliationHeader.TestField(Status, ReconciliationHeader.Status::Posted);
+    end;
+
+    [Test]
+    procedure PostingProcess_PostAsMissingDimensionsAndBalancingLeg()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        LinesToPost: Record "NPR Adyen Recon. Line";
+        ReconRelation: Record "NPR Adyen Recons.Line Relation";
+        DimensionValue: Record "Dimension Value";
+        GenBusPostingGroup: Record "Gen. Business Posting Group";
+        GenProdPostingGroup: Record "Gen. Product Posting Group";
+        MarkupGLEntry: Record "G/L Entry";
+        BalancingGLEntry: Record "G/L Entry";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        AmountType: Enum "NPR Adyen Recon. Amount Type";
+        RefundAmount: Decimal;
+        MarkupAmount: Decimal;
+        PostedEntries: Integer;
+    begin
+        // [Scenario] Two things the matched posting does that this path has to do as well: the journal lines carry
+        //            dimensions, and the balancing leg is stripped of the primary leg's VAT setup. A matched line
+        //            takes its dimensions from the payment document; an unmatched line has none, so the Missing
+        //            Transaction account - the account standing in for that payment - is the source, and every leg
+        //            inherits from it.
+        Initialize();
+        RefundAmount := 500;
+        MarkupAmount := 4;
+
+        // [Given] A default dimension on the Missing Transaction account
+        CreateGlobalDimension1Value(DimensionValue);
+        SetDefaultDimensionOnGLAccount(_AdyenMerchantSetup."Missing Transaction Acc. No.", DimensionValue."Dimension Code", DimensionValue.Code);
+
+        // [Given] A full posting setup on the Markup account, which the markup leg copies because it posts with
+        //         'Copy VAT Setup to Jnl. Lines' - the way a real commission account is configured. The VAT rate is
+        //         held at 0 so the amounts stay whole and the posting groups alone tell the story.
+        SetPostingGroupsOnGLAccount(_AdyenMerchantSetup."Markup G/L Account", GenBusPostingGroup, GenProdPostingGroup);
+
+        // [Given] An unmatched refund line carrying markup
+        CreateReconHeader(ReconciliationHeader);
+        InsertFailedToMatchRefundReconLine(ReconciliationLine, ReconciliationHeader, GenerateUniquePSPReference(), RefundAmount, MarkupAmount, 0);
+
+        // [When] Posting it as missing
+        LinesToPost.SetRange("Document No.", ReconciliationLine."Document No.");
+        LinesToPost.SetRange("Line No.", ReconciliationLine."Line No.");
+        PostedEntries := AdyenTransMatching.PostUnmatchedEntries(LinesToPost);
+
+        AssertPostedAsMissing(PostedEntries, ReconciliationLine);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::"Posted Failed to Match");
+
+        // [Then] Every entry of the posting carries the Missing Transaction account's dimension - transaction leg,
+        //        markup leg and both their balancing halves
+        AssertDimensionOnPostedEntries(ReconciliationLine."Posting No.", DimensionValue."Dimension Code", DimensionValue.Code);
+
+        // [Then] The markup leg copied the account's posting groups...
+        ReconRelation.SetRange("Document No.", ReconciliationLine."Document No.");
+        ReconRelation.SetRange("Document Line No.", ReconciliationLine."Line No.");
+        ReconRelation.SetRange("Amount Type", AmountType::Markup);
+        ReconRelation.FindFirst();
+        MarkupGLEntry.Get(ReconRelation."GL Entry No.");
+        MarkupGLEntry.TestField("Gen. Bus. Posting Group", GenBusPostingGroup.Code);
+        MarkupGLEntry.TestField("Gen. Prod. Posting Group", GenProdPostingGroup.Code);
+
+        // [Then] ...and its balancing half on Reconciled Payment did not inherit them
+        BalancingGLEntry.SetRange("Transaction No.", MarkupGLEntry."Transaction No.");
+        BalancingGLEntry.SetRange("G/L Account No.", _AdyenMerchantSetup."Reconciled Payment Acc. No.");
+        BalancingGLEntry.FindFirst();
+        BalancingGLEntry.TestField("Gen. Bus. Posting Group", '');
+        BalancingGLEntry.TestField("Gen. Prod. Posting Group", '');
+        BalancingGLEntry.TestField("Gen. Posting Type", BalancingGLEntry."Gen. Posting Type"::" ");
+    end;
+
+    [Test]
+    procedure PostingProcess_PostAsMissingCrossCurrency()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        LinesToPost: Record "NPR Adyen Recon. Line";
+        TransactionGLEntry: Record "G/L Entry";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        AmountType: Enum "NPR Adyen Recon. Amount Type";
+        TransactionCurrency: Code[10];
+        Amount: Decimal;
+        ExchangeRate: Decimal;
+        AcquirerCurrencyGross: Decimal;
+        PostedEntries: Integer;
+    begin
+        // [Scenario] A cross-currency line posted as missing settles in the acquirer currency, as the matched
+        //            posting does. Posting the transaction leg in the transaction currency instead would leave it
+        //            on a different basis than the fee legs it balances against and than the Merchant Payout line
+        //            that has to clear it, both of which are always in acquirer currency.
+        Initialize();
+        TransactionCurrency := 'NPMISSFX'; // synthetic currency this test controls, so no demo data can hold a rate for it
+        EnsureCurrencyWithExchangeRate(TransactionCurrency);
+
+        Amount := 100;
+        ExchangeRate := 1.2;
+        AcquirerCurrencyGross := Round(ExchangeRate * Amount);
+
+        // [Given] An unmatched settled line whose transaction currency differs from the acquirer currency. A
+        //         settlement report states the gross in both currencies, so the two figures have to differ here -
+        //         otherwise the test could not tell which of them the posting used.
+        CreateReconHeader(ReconciliationHeader);
+        InsertFCYSettledReconLine(ReconciliationLine, ReconciliationHeader, GenerateUniquePSPReference(), Amount, TransactionCurrency, ExchangeRate);
+        ReconciliationLine.Validate("Net Credit", AcquirerCurrencyGross);
+        ReconciliationLine.Modify();
+        MarkReconLineFailedToMatch(ReconciliationLine);
+        ReconciliationLine.TestField("Amount (TCY)", Amount);
+        ReconciliationLine.TestField("Amount(AAC)", AcquirerCurrencyGross);
+
+        // [When] Posting it as missing
+        LinesToPost.SetRange("Document No.", ReconciliationLine."Document No.");
+        LinesToPost.SetRange("Line No.", ReconciliationLine."Line No.");
+        PostedEntries := AdyenTransMatching.PostUnmatchedEntries(LinesToPost);
+
+        AssertPostedAsMissing(PostedEntries, ReconciliationLine);
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::"Posted Failed to Match");
+
+        // [Then] The transaction leg posts the acquirer-currency gross, not the transaction-currency one, between
+        //        Reconciled Payment and the Missing Transaction account (the fixture holds the acquirer currency at
+        //        1:1, so the LCY amount equals it)
+        AssertReconLegAndBalancingGLEntry(ReconciliationLine, AmountType::Transaction, _AdyenMerchantSetup."Reconciled Payment Acc. No.", AcquirerCurrencyGross, _AdyenMerchantSetup."Missing Transaction Acc. No.");
+
+        // [Then] And it posted in that currency
+        TransactionGLEntry.GetBySystemId(ReconciliationLine."Matching Entry System ID");
+        if _NetCurrency <> _LCYCode then
+            TransactionGLEntry.TestField("Source Currency Code", _NetCurrency);
+    end;
+
+    local procedure CreateGlobalDimension1Value(var DimensionValue: Record "Dimension Value")
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        GLSetup.Get();
+        GLSetup.TestField("Global Dimension 1 Code");
+        _LibraryDimension.CreateDimensionValue(DimensionValue, GLSetup."Global Dimension 1 Code");
+    end;
+
+    local procedure SetDefaultDimensionOnGLAccount(GLAccountNo: Code[20]; DimensionCode: Code[20]; DimensionValueCode: Code[20])
+    var
+        DefaultDimension: Record "Default Dimension";
+    begin
+        if DefaultDimension.Get(Database::"G/L Account", GLAccountNo, DimensionCode) then
+            DefaultDimension.Delete();
+        _LibraryDimension.CreateDefaultDimension(DefaultDimension, Database::"G/L Account", GLAccountNo, DimensionCode, DimensionValueCode);
+    end;
+
+    local procedure SetPostingGroupsOnGLAccount(GLAccountNo: Code[20]; var GenBusPostingGroup: Record "Gen. Business Posting Group"; var GenProdPostingGroup: Record "Gen. Product Posting Group")
+    var
+        GLAccount: Record "G/L Account";
+        GeneralPostingSetup: Record "General Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        // The full setup is needed, not just the Gen. Bus./Prod. groups: Gen. Jnl.-Check Line rejects a line that
+        // carries posting groups with a blank Gen. Posting Type, and any other type pulls in the General and VAT
+        // Posting Setup for the combination. The VAT rate stays at 0 so no VAT splits the posted amounts.
+        _LibraryERM.CreateGenBusPostingGroup(GenBusPostingGroup);
+        _LibraryERM.CreateGenProdPostingGroup(GenProdPostingGroup);
+        _LibraryERM.CreateGeneralPostingSetup(GeneralPostingSetup, GenBusPostingGroup.Code, GenProdPostingGroup.Code);
+        _LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 0);
+
+        GLAccount.Get(GLAccountNo);
+        GLAccount.Validate("Gen. Posting Type", GLAccount."Gen. Posting Type"::Purchase);
+        GLAccount.Validate("Gen. Bus. Posting Group", GenBusPostingGroup.Code);
+        GLAccount.Validate("Gen. Prod. Posting Group", GenProdPostingGroup.Code);
+        GLAccount.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+        GLAccount.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
+        GLAccount.Modify(true);
+    end;
+
+    local procedure AssertPostedAsMissing(PostedEntries: Integer; ReconciliationLine: Record "NPR Adyen Recon. Line")
+    begin
+        if PostedEntries = 1 then
+            exit;
+        // PostUnmatchedEntries runs the posting codeunit inside an if, so a failure only surfaces as a count of 0.
+        // Replay it here to put the swallowed error into the test result.
+        _Assert.Fail(StrSubstNo('Expected the line to post as missing, %1 posted. NPR Adyen Missing Trans. Post reported: %2', PostedEntries, PostAsMissingErrorText(ReconciliationLine)));
+    end;
+
+    local procedure PostAsMissingErrorText(ReconciliationLine: Record "NPR Adyen Recon. Line"): Text
+    var
+        PostMissingTransaction: Codeunit "NPR Adyen Missing Trans. Post";
+    begin
+        ReconciliationLine.Find();
+        PostMissingTransaction.PrepareRecords(ReconciliationLine);
+        if PostMissingTransaction.Run() then
+            exit('no error when replayed');
+        exit(GetLastErrorText());
+    end;
+
+    local procedure AssertDimensionOnPostedEntries(PostingNo: Code[20]; DimensionCode: Code[20]; ExpectedDimensionValueCode: Code[20])
+    var
+        GLEntry: Record "G/L Entry";
+        DimensionSetEntry: Record "Dimension Set Entry";
+    begin
+        // Asserted on the dimension set, not on Global Dimension 1 Code: GetRecDefaultDimID merges an inherited set
+        // into the Dimension Set ID but only fills the shortcut codes from the leg account's own default dimensions,
+        // so an inherited dimension reaches the entry through its set. The matched path behaves the same way.
+        GLEntry.SetRange("Document No.", PostingNo);
+        _Assert.IsFalse(GLEntry.IsEmpty(), 'Expected the posting to have created G/L entries.');
+        GLEntry.FindSet();
+        repeat
+            if not DimensionSetEntry.Get(GLEntry."Dimension Set ID", DimensionCode) then
+                _Assert.Fail(StrSubstNo('G/L Entry %1 on account %2 (Dimension Set ID %3) carries no %4 dimension - it did not inherit from the Missing Transaction account.', GLEntry."Entry No.", GLEntry."G/L Account No.", GLEntry."Dimension Set ID", DimensionCode));
+            _Assert.AreEqual(ExpectedDimensionValueCode, DimensionSetEntry."Dimension Value Code", StrSubstNo('G/L Entry %1 on account %2 inherited the wrong %3 value.', GLEntry."Entry No.", GLEntry."G/L Account No.", DimensionCode));
+        until GLEntry.Next() = 0;
+    end;
+
+    local procedure MarkReconLineFailedToMatch(var ReconciliationLine: Record "NPR Adyen Recon. Line")
+    begin
+        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
+        ReconciliationLine.Modify();
+    end;
+
+    local procedure SumPostedAmount(PostingNo: Code[20]; GLAccountNo: Code[20]) Total: Decimal
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        // Summed by iteration rather than CalcSums: the filter combination has no SumIndexField key on G/L Entry.
+        GLEntry.SetRange("Document No.", PostingNo);
+        GLEntry.SetRange("G/L Account No.", GLAccountNo);
+        if GLEntry.FindSet() then
+            repeat
+                Total += GLEntry.Amount;
+            until GLEntry.Next() = 0;
+    end;
+
+    local procedure AssertReconLegAndBalancingGLEntry(ReconciliationLine: Record "NPR Adyen Recon. Line"; AmountType: Enum "NPR Adyen Recon. Amount Type"; ExpectedAccountNo: Code[20]; ExpectedAmountLCY: Decimal; ExpectedBalancingAccountNo: Code[20])
+    var
+        ReconRelation: Record "NPR Adyen Recons.Line Relation";
+        GLEntry: Record "G/L Entry";
+        BalancingGLEntry: Record "G/L Entry";
+    begin
+        // [Then] A recon-line-relation row exists for this amount type, pointing at the leg's primary G/L Entry
+        ReconRelation.SetRange("Document No.", ReconciliationLine."Document No.");
+        ReconRelation.SetRange("Document Line No.", ReconciliationLine."Line No.");
+        ReconRelation.SetRange("Amount Type", AmountType);
+        ReconRelation.FindFirst();
+
+        // [Then] That entry hit the expected account with the expected amount in LCY (the fixture rate is 1:1)
+        GLEntry.Get(ReconRelation."GL Entry No.");
+        GLEntry.TestField("G/L Account No.", ExpectedAccountNo);
+        GLEntry.TestField(Amount, ExpectedAmountLCY);
+
+        // [Then] The balancing half carries the opposite amount. Each leg is posted through its own
+        //        Gen. Jnl.-Post Line instance, so a leg's two halves share a Transaction No. that no other leg uses.
+        BalancingGLEntry.SetRange("Transaction No.", GLEntry."Transaction No.");
+        BalancingGLEntry.SetRange("G/L Account No.", ExpectedBalancingAccountNo);
+        BalancingGLEntry.FindFirst();
+        BalancingGLEntry.TestField(Amount, -ExpectedAmountLCY);
     end;
 
     local procedure AssertFeePostingPostsToFeeAccount()
@@ -1388,6 +1708,8 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         AdyenMerchantSetup."Merchant Payout Acc. No." := _LibraryERM.CreateGLAccountNo();
         AdyenMerchantSetup."Reconciled Payment Acc. Type" := AdyenMerchantSetup."Reconciled Payment Acc. Type"::"G/L Account";
         AdyenMerchantSetup."Reconciled Payment Acc. No." := _LibraryERM.CreateGLAccountNo();
+        AdyenMerchantSetup."Missing Transaction Acc. Type" := AdyenMerchantSetup."Missing Transaction Acc. Type"::"G/L Account";
+        AdyenMerchantSetup."Missing Transaction Acc. No." := _LibraryERM.CreateGLAccountNo();
         AdyenMerchantSetup."Chargeback Fees G/L Account" := _LibraryERM.CreateGLAccountNo();
         AdyenMerchantSetup.Insert();
     end;
@@ -1586,6 +1908,29 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::Fee;
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"G/L Entry";
         ReconciliationLine.Status := ReconciliationLine.Status::"Not to be Matched";
+        ReconciliationLine.Insert();
+    end;
+
+    local procedure InsertFailedToMatchRefundReconLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; PSPReference: Code[16]; RefundAmount: Decimal; MarkupAmount: Decimal; OtherCommissionsAmount: Decimal)
+    begin
+        // A refund the matcher could not bind to a payment. The Debit columns are what an Adyen settlement report
+        // fills for a refund, and they drive Amount (TCY)/Amount(AAC) negative - the sign that made the
+        // 'Post as Missing' orientation visible. Status 'Failed to Match' is the only status that action accepts.
+        InitReconLineForHeader(ReconciliationLine, ReconciliationHeader);
+        ReconciliationLine."PSP Reference" := PSPReference;
+        ReconciliationLine."Merchant Reference" := CopyStr('REFUND-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
+        ReconciliationLine."Merchant Order Reference" := CopyStr('REFUNDORD-' + Format(ReconciliationLine."Line No."), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
+        ReconciliationLine."Transaction Date" := CreateDateTime(Today(), Time());
+        ReconciliationLine."Transaction Currency Code" := _NetCurrency;
+        ReconciliationLine."Adyen Acc. Currency Code" := _NetCurrency;
+        ReconciliationLine.Validate("Gross Debit", RefundAmount);
+        ReconciliationLine.Validate("Net Debit", RefundAmount);
+        ReconciliationLine."Amount (LCY)" := ReconciliationLine."Amount(AAC)";
+        ReconciliationLine."Markup (LCY)" := MarkupAmount;
+        ReconciliationLine."Other Commissions (LCY)" := OtherCommissionsAmount;
+        ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::Refunded;
+        ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"To Be Determined";
+        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
         ReconciliationLine.Insert();
     end;
 
