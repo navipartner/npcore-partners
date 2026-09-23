@@ -680,6 +680,28 @@
 
     end;
 
+    internal procedure FindSingleVoucherMaxPointsRate(LoyaltySetup: Record "NPR MM Loyalty Setup"; Points: Integer): Decimal
+    var
+        LoyaltyPointSetup: Record "NPR MM Loyalty Point Setup";
+    begin
+        LoyaltyPointSetup.SetCurrentKey(Code, "Points Threshold");
+        LoyaltyPointSetup.SetRange(Code, LoyaltySetup.Code);
+        LoyaltyPointSetup.SetFilter("Points Threshold", '0..%1', Points);
+
+        case LoyaltySetup."Voucher Creation" of
+            LoyaltySetup."Voucher Creation"::SV_MP_HVC:
+                if not LoyaltyPointSetup.FindLast() then
+                    exit(0);
+            LoyaltySetup."Voucher Creation"::SV_MP_LVC:
+                if not LoyaltyPointSetup.FindFirst() then
+                    exit(0);
+            else
+                exit(0);
+        end;
+
+        exit(LoyaltyPointSetup."Point Rate");
+    end;
+
     local procedure CalculateCurrentExpiryDate(LoyaltySetup: Record "NPR MM Loyalty Setup"; var ExpirePointStart: Date; var ExpirePointEnd: Date; var ReasonText: Text): Boolean
     var
         ReferenceDate: Date;

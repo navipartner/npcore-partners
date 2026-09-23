@@ -37,4 +37,12 @@ codeunit 6184727 "NPR MM Loyalty Point Facade"
     begin
         exit(LoyaltyPointMgt.ValidateFixedPeriodCalculation(LoyaltySetup, ReasonText));
     end;
+
+    procedure FindSingleVoucherMaxPointsRate(LoyaltySetup: Record "NPR MM Loyalty Setup"; Points: Integer): Decimal
+    var
+        LoyaltyPointMgt: Codeunit "NPR MM Loyalty Point Mgt.";
+    begin
+        exit(LoyaltyPointMgt.FindSingleVoucherMaxPointsRate(LoyaltySetup, Points));
+    end;
+
 }
