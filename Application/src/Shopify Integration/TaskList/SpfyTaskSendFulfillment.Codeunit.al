@@ -1,11 +1,8 @@
-#if not BC17
-codeunit 6184818 "NPR Spfy Send Fulfillment"
+// Native sibling of frozen codeunit "NPR Spfy Send Fulfillment": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+codeunit 6151471 "NPR Spfy Task Send Fulfillment"
 {
     Access = Internal;
-    TableNo = "NPR Nc Task";
-    ObsoleteState = Pending;
-    ObsoleteTag = '2026-08-28';
-    ObsoleteReason = 'Replaced by codeunit "NPR Spfy Task Send Fulfillment" (the new Shopify Task List queue). This copy keeps serving environments that have not migrated yet. The two codeunits are maintained independently and may diverge: never copy changes blindly between them - apply a fix to each deliberately, only where it belongs.';
+    TableNo = "NPR Spfy Task";
 
     trigger OnRun()
     begin
@@ -18,12 +15,12 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     end;
 
     var
-        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        OrderMgt: Codeunit "NPR Spfy Order Mgt.";
-        JsonHelper: Codeunit "NPR Json Helper";
+        _SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
+        _SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        _SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        _OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        _JsonHelper: Codeunit "NPR Json Helper";
         _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
         _GraphQLClientSet: Boolean;
 
@@ -44,34 +41,34 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         exit(_GraphQLClient);
     end;
 
-    local procedure SendShopifyFulfillment(var NcTask: Record "NPR Nc Task")
+    local procedure SendShopifyFulfillment(var SpfyTask: Record "NPR Spfy Task")
     var
         TempCalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer" temporary;
         FailureErrorText: Text;
         AnyFailure: Boolean;
         NoFulfillmentAvailableErr: Label 'There are no Shopify fulfillment order lines available to process. Everything may have already been fulfilled. Please check fulfillment status in Shopify.';
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
         ClearLastError();
         TempCalculatedFulfillmentLines.DeleteAll();
 
-        if not PrepareFulfillment(NcTask, TempCalculatedFulfillmentLines) then begin
-            NcTask.Modify();
+        if not PrepareFulfillment(SpfyTask, TempCalculatedFulfillmentLines) then begin
+            SpfyTask.Modify();
             Commit();
-            Error(GetTransportErrorText(NcTask));
+            Error(GetTransportErrorText(SpfyTask));
         end;
 
         if TempCalculatedFulfillmentLines.IsEmpty() then begin
-            SpfyIntegrationMgt.SetResponse(NcTask, NoFulfillmentAvailableErr);
-            NcTask.Modify();
+            _SpfyIntegrationMgt.SetResponse(SpfyTask, NoFulfillmentAvailableErr);
+            SpfyTask.Modify();
             Commit();
             exit;
         end;
 
-        AnyFailure := SendFulfillmentsPerLocation(NcTask, TempCalculatedFulfillmentLines, FailureErrorText);
+        AnyFailure := SendFulfillmentsPerLocation(SpfyTask, TempCalculatedFulfillmentLines, FailureErrorText);
 
-        NcTask.Modify();
+        SpfyTask.Modify();
         Commit();
 
         // On any failure, fail the task so it retries. The retry recalculates from Shopify's remaining quantities and
@@ -83,7 +80,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     end;
 
     [TryFunction]
-    local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
+    local procedure PrepareFulfillment(var SpfyTask: Record "NPR Spfy Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
     var
         TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer" temporary;
         FulfillmentOrderIds: List of [Text[30]];
@@ -92,18 +89,18 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         TempAvailableFulfillmentLines.Reset();
         TempAvailableFulfillmentLines.DeleteAll();
 
-        if NcTask."Store Code" = '' then
-            NcTask."Store Code" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
+        if SpfyTask."Store Code" = '' then
+            SpfyTask."Store Code" := CopyStr(_SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(SpfyTask."Store Code"));
 
-        CollectFulfillmentOrders(NcTask, FulfillmentOrderIds);
+        CollectFulfillmentOrders(SpfyTask, FulfillmentOrderIds);
 
         foreach FulfillmentOrderId in FulfillmentOrderIds do
-            LoadFulfillmentOrderLines(NcTask, FulfillmentOrderId, TempAvailableFulfillmentLines);
+            LoadFulfillmentOrderLines(SpfyTask, FulfillmentOrderId, TempAvailableFulfillmentLines);
 
-        CalculateFulfillmentLines(NcTask, TempAvailableFulfillmentLines, CalculatedFulfillmentLines);
+        CalculateFulfillmentLines(SpfyTask, TempAvailableFulfillmentLines, CalculatedFulfillmentLines);
     end;
 
-    local procedure SendFulfillmentsPerLocation(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var ErrorText: Text) AnyFailure: Boolean
+    local procedure SendFulfillmentsPerLocation(var SpfyTask: Record "NPR Spfy Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var ErrorText: Text) AnyFailure: Boolean
     var
         ShopifyResponse: JsonToken;
         LocationIds: List of [Text];
@@ -125,21 +122,21 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             Clear(ShopifyResponse);
             ClearLastError();
             FulfillmentId := '';
-            GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines, SendToShopify);
+            GenerateFulfillmentPayloadJson(SpfyTask, CalculatedFulfillmentLines, SendToShopify);
             if SendToShopify then begin
-                Success := GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse);
+                Success := GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse);
                 if Success then
                     FulfillmentId := GetCreatedFulfillmentId(ShopifyResponse);
-                if Success and (FulfillmentId <> '') and not SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then begin
+                if Success and (FulfillmentId <> '') and not _SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then begin
                     SaveFulfillmentEntries(CalculatedFulfillmentLines, FulfillmentId);
                     Commit();
                 end else begin
                     AnyFailure := true;
                     if not Success then begin
                         TransportFailureOccurred := true;
-                        TransportErrorText := AppendLocationDiagnostic(TransportErrorText, LocationId, GetTransportErrorText(NcTask));
+                        TransportErrorText := AppendLocationDiagnostic(TransportErrorText, LocationId, GetTransportErrorText(SpfyTask));
                     end else
-                        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+                        if _SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
                             UserErrorText := AppendLocationDiagnostic(UserErrorText, LocationId, GetUserErrorMessages(ShopifyResponse))
                         else begin
                             // 2xx with no fulfillment and no userErrors means the Shopify API contract broke (e.g. a version
@@ -157,7 +154,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             ErrorText := CombineDiagnostics(TransportErrorText, UserErrorText)
         else
             if UserErrorText <> '' then
-                SpfyIntegrationMgt.SetResponse(NcTask, UserErrorText);
+                _SpfyIntegrationMgt.SetResponse(SpfyTask, UserErrorText);
     end;
 
     local procedure CollectDistinctLocationIds(var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var LocationIds: List of [Text])
@@ -179,7 +176,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         UserError: JsonToken;
         Message: Text;
     begin
-        if not SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse, UserErrors) then
+        if not _SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse, UserErrors) then
             exit('');
         foreach UserError in UserErrors.AsArray() do begin
             Message := FormatUserError(UserError);
@@ -198,7 +195,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         RejectedPath: Text;
         FieldContextLbl: Label '%1 (field: %2)', Comment = '%1 = Shopify userError message, %2 = rejected input field path';
     begin
-        FormattedError := JsonHelper.GetJText(UserError, 'message', false);
+        FormattedError := _JsonHelper.GetJText(UserError, 'message', false);
         // Shopify returns the rejected input path in "field" (an array of segments); keep it for troubleshooting.
         if not (UserError.SelectToken('field', PathToken) and PathToken.IsArray()) then
             exit;
@@ -211,7 +208,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             FormattedError := StrSubstNo(FieldContextLbl, FormattedError, RejectedPath);
     end;
 
-    local procedure GetTransportErrorText(var NcTask: Record "NPR Nc Task") ErrorText: Text
+    local procedure GetTransportErrorText(var SpfyTask: Record "NPR Spfy Task") ErrorText: Text
     var
         InStr: InStream;
         Body: TextBuilder;
@@ -221,12 +218,12 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         ErrorText := GetLastErrorText();
         if ErrorText <> '' then
             exit;
-        if not NcTask.Response.HasValue() then
+        if not SpfyTask.Response.HasValue() then
             exit;
         // Bound the snippet: this text is emitted to error telemetry (which truncates anyway) and shown on the task list,
         // so avoid dumping a multi-KB proxy HTML page — its useful part (status/message) is at the top.
         MaxLen := 2048;
-        NcTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
+        SpfyTask.Response.CreateInStream(InStr, TextEncoding::UTF8);
         while (not InStr.EOS()) and (Body.Length() < MaxLen) do begin
             InStr.ReadText(Line);
             if Body.Length() > 0 then
@@ -263,7 +260,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         exit(TransportErrorText + '; ' + UserErrorText);
     end;
 
-    local procedure CollectFulfillmentOrders(var NcTask: Record "NPR Nc Task"; var FulfillmentOrderIds: List of [Text[30]])
+    local procedure CollectFulfillmentOrders(var SpfyTask: Record "NPR Spfy Task"; var FulfillmentOrderIds: List of [Text[30]])
     var
         FulfillmentOrder: JsonToken;
         ShopifyResponse: JsonToken;
@@ -273,23 +270,23 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         RequestString: Label 'query GetFulfillmentOrders($OrderId: ID!,$afterCursor: String){order(id:$OrderId){fulfillmentOrders(after:$afterCursor,first:50){pageInfo{hasNextPage endCursor} edges{node{id status}}}}}', Locked = true;
     begin
         Clear(FulfillmentOrderIds);
-        SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
+        _SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         repeat
-            SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, NcTask."Store Code", RequestString, 'gid://shopify/Order/' + NcTask."Record Value", true);
-            if not GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse) then
+            _SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(SpfyTask, Cursor, SpfyTask."Store Code", RequestString, 'gid://shopify/Order/' + SpfyTask."Record Value", true);
+            if not GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse) then
                 Error(GetLastErrorText());
             if not ParsePageInfo(ShopifyResponse, 'data.order.fulfillmentOrders', HasNext, Cursor) then
                 Error(GetLastErrorText());
             foreach FulfillmentOrder in GetFulfillmentOrderNodes(ShopifyResponse) do
-                if JsonHelper.GetJText(FulfillmentOrder, 'status', true).ToLower() <> 'closed' then begin
-                    FulfillmentOrderID := OrderMgt.GetNumericId(JsonHelper.GetJText(FulfillmentOrder, 'id', true));
+                if _JsonHelper.GetJText(FulfillmentOrder, 'status', true).ToLower() <> 'closed' then begin
+                    FulfillmentOrderID := _OrderMgt.GetNumericId(_JsonHelper.GetJText(FulfillmentOrder, 'id', true));
                     if not FulfillmentOrderIds.Contains(FulfillmentOrderID) then
                         FulfillmentOrderIds.Add(FulfillmentOrderID);
                 end;
         until not HasNext;
     end;
 
-    local procedure LoadFulfillmentOrderLines(var NcTask: Record "NPR Nc Task"; FulfillmentOrderId: Text[30]; var TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
+    local procedure LoadFulfillmentOrderLines(var SpfyTask: Record "NPR Spfy Task"; FulfillmentOrderId: Text[30]; var TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
     var
         FulfillmentOrderLine: JsonToken;
         FulfillmentOrderLines: JsonToken;
@@ -300,27 +297,27 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         LocationCaptured: Boolean;
         RequestString: Label 'query GetFulfilmentOrder($OrderId:ID!,$afterCursor:String){fulfillmentOrder(id:$OrderId){assignedLocation{location{id}} lineItems(first:50,after:$afterCursor){pageInfo{hasNextPage endCursor} edges{node{id remainingQuantity lineItem{id}}}}}}', Locked = true;
     begin
-        SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
+        _SpfyCommunicationHandler.InitializePagingState(Cursor, HasNext);
         repeat
-            Clear(NcTask."Data Output");
-            SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, NcTask."Store Code", RequestString, 'gid://shopify/FulfillmentOrder/' + FulfillmentOrderId, true);
-            if not GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse) then
+            Clear(SpfyTask."Data Output");
+            _SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(SpfyTask, Cursor, SpfyTask."Store Code", RequestString, 'gid://shopify/FulfillmentOrder/' + FulfillmentOrderId, true);
+            if not GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse) then
                 Error(GetLastErrorText());
             if not ParsePageInfo(ShopifyResponse, 'data.fulfillmentOrder.lineItems', HasNext, Cursor) then
                 Error(GetLastErrorText());
             if not LocationCaptured then begin
-                FulfillmentOrderLocationId := OrderMgt.GetNumericId(JsonHelper.GetJText(ShopifyResponse, 'data.fulfillmentOrder.assignedLocation.location.id', false));
+                FulfillmentOrderLocationId := _OrderMgt.GetNumericId(_JsonHelper.GetJText(ShopifyResponse, 'data.fulfillmentOrder.assignedLocation.location.id', false));
                 LocationCaptured := true;
             end;
             ShopifyResponse.SelectToken('data.fulfillmentOrder.lineItems.edges', FulfillmentOrderLines);
             foreach FulfillmentOrderLine in FulfillmentOrderLines.AsArray() do begin
                 TempAvailableFulfillmentLines.Init();
-                TempAvailableFulfillmentLines."Fulfillable Quantity" := JsonHelper.GetJDecimal(FulfillmentOrderLine, 'node.remainingQuantity', false);
+                TempAvailableFulfillmentLines."Fulfillable Quantity" := _JsonHelper.GetJDecimal(FulfillmentOrderLine, 'node.remainingQuantity', false);
                 if TempAvailableFulfillmentLines."Fulfillable Quantity" > 0 then begin
                     TempAvailableFulfillmentLines."Location ID" := FulfillmentOrderLocationId;
                     TempAvailableFulfillmentLines."Fulfillment Order ID" := FulfillmentOrderId;
-                    TempAvailableFulfillmentLines."Fulfillment Order Line ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(FulfillmentOrderLine, 'node.id', true));
-                    TempAvailableFulfillmentLines."Order Line ID" := OrderMgt.GetNumericId(JsonHelper.GetJText(FulfillmentOrderLine, 'node.lineItem.id', true));
+                    TempAvailableFulfillmentLines."Fulfillment Order Line ID" := _OrderMgt.GetNumericId(_JsonHelper.GetJText(FulfillmentOrderLine, 'node.id', true));
+                    TempAvailableFulfillmentLines."Order Line ID" := _OrderMgt.GetNumericId(_JsonHelper.GetJText(FulfillmentOrderLine, 'node.lineItem.id', true));
                     TempAvailableFulfillmentLines."Entry No." += 1;
                     TempAvailableFulfillmentLines.Insert();
                 end;
@@ -328,7 +325,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         until not HasNext;
     end;
 
-    local procedure CalculateFulfillmentLines(NcTask: Record "NPR Nc Task"; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
+    local procedure CalculateFulfillmentLines(SpfyTask: Record "NPR Spfy Task"; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
         ReturnReceiptLine: Record "Return Receipt Line";
@@ -338,10 +335,10 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         SpfyOrderLineId: Text[30];
         CurrentQty: Decimal;
     begin
-        case NcTask."Table No." of
+        case SpfyTask."Table No." of
             Database::"Sales Shipment Header":
                 begin
-                    RecRef.Get(NcTask."Record ID");
+                    RecRef.Get(SpfyTask."Record ID");
                     RecRef.SetTable(SalesShipmentHeader);
                     SalesShipmentLine.SetRange("Document No.", SalesShipmentHeader."No.");
                     if SalesShipmentLine.FindSet() then
@@ -353,7 +350,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
                 end;
             Database::"Return Receipt Header":
                 begin
-                    RecRef.Get(NcTask."Record ID");
+                    RecRef.Get(SpfyTask."Record ID");
                     RecRef.SetTable(ReturnReceiptHeader);
                     ReturnReceiptLine.SetRange("Document No.", ReturnReceiptHeader."No.");
                     if ReturnReceiptLine.FindSet() then
@@ -364,7 +361,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
                         until ReturnReceiptLine.Next() = 0;
                 end;
             else
-                SpfyIntegrationMgt.UnsupportedIntegrationTable(NcTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Send Fulfillment"), 'PrepareFulfillmentLines'));
+                _SpfyIntegrationMgt.UnsupportedIntegrationTable(SpfyTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Task Send Fulfillment"), 'PrepareFulfillmentLines'));
         end;
     end;
 
@@ -374,24 +371,17 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         FulfillMaxAvailableQty: Boolean;
     begin
         Qty := LineQuantity - AlreadyFulfilledQuantity(RecID);
-        SpfyIntegrationEvents.OnCalculateFulfillmentQuantity(RecID, SpfyOrderLineId, Qty, FulfillMaxAvailableQty);
+        _SpfyIntegrationEvents.OnCalculateFulfillmentQuantity(RecID, SpfyOrderLineId, Qty, FulfillMaxAvailableQty);
         if (not FulfillMaxAvailableQty) and (Qty <= 0) then
             exit;
         UpdateFulfillmentBuffer(RecID, AvailableFulfillmentLines, SpfyOrderLineId, Qty, FulfillMaxAvailableQty, CalculatedFulfillmentLines);
     end;
 
-    local procedure IsEligibleForFulfillmentSending(RecID: RecordId; Qty: Decimal): Boolean
-    var
-        SpfyOrderLineId: Text[30];
-    begin
-        exit(IsEligibleForFulfillmentSending(RecID, Qty, SpfyOrderLineId));
-    end;
-
     local procedure IsEligibleForFulfillmentSending(RecID: RecordId; Qty: Decimal; var SpfyOrderLineId: Text[30]) Eligible: Boolean
     begin
-        SpfyOrderLineId := SpfyAssignedIDMgt.GetAssignedShopifyID(RecID, "NPR Spfy ID Type"::"Entry ID");
+        SpfyOrderLineId := _SpfyAssignedIDMgt.GetAssignedShopifyID(RecID, "NPR Spfy ID Type"::"Entry ID");
         Eligible := (SpfyOrderLineId <> '') and (Qty <> 0);
-        SpfyIntegrationEvents.OnCheckIfIsEligibleForFulfillmentSending(RecID, SpfyOrderLineId, Eligible);
+        _SpfyIntegrationEvents.OnCheckIfIsEligibleForFulfillmentSending(RecID, SpfyOrderLineId, Eligible);
     end;
 
     local procedure UpdateFulfillmentBuffer(RecID: RecordId; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; SpfyOrderLineId: Text[30]; Qty: Decimal; FulfillMaxAvailableQty: Boolean; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
@@ -452,17 +442,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
 
     local procedure GetCreatedFulfillmentId(ShopifyResponse: JsonToken): Text[30]
     begin
-        exit(CopyStr(OrderMgt.GetNumericId(JsonHelper.GetJText(ShopifyResponse, 'data.fulfillmentCreate.fulfillment.id', false)), 1, 30));
-    end;
-
-    local procedure DeleteFulfillmentEntries(RecID: RecordId)
-    var
-        ShopifyFulfillmentEntry: Record "NPR Spfy Fulfillment Entry";
-    begin
-        ShopifyFulfillmentEntry.SetRange("Table No.", RecID.TableNo());
-        ShopifyFulfillmentEntry.SetRange("BC Record ID", RecID);
-        if not ShopifyFulfillmentEntry.IsEmpty() then
-            ShopifyFulfillmentEntry.DeleteAll();
+        exit(CopyStr(_OrderMgt.GetNumericId(_JsonHelper.GetJText(ShopifyResponse, 'data.fulfillmentCreate.fulfillment.id', false)), 1, 30));
     end;
 
     /// <summary>
@@ -488,7 +468,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     /// The caller is expected to have applied a "Location ID" filter, since a Shopify fulfillment must belong to a
     /// single location. Sets SendToShopify to false when the filtered set is empty.
     /// </summary>
-    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean)
+    local procedure GenerateFulfillmentPayloadJson(var SpfyTask: Record "NPR Spfy Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean)
     var
         RootObj: JsonObject;
         VariablesObj: JsonObject;
@@ -504,8 +484,8 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         MutationTxt: Label 'mutation fulfillmentCreate($fulfillment: FulfillmentInput!) {fulfillmentCreate(fulfillment: $fulfillment) {fulfillment { id status } userErrors { field message }}}', Locked = true;
     begin
         SendToShopify := false;
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
 
         CalculatedFulfillmentLines.SetCurrentKey("Location ID", "Fulfillment Order ID", "Fulfillment Order Line ID");
         if not CalculatedFulfillmentLines.FindSet() then
@@ -530,7 +510,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         Clear(FulfillmentObj);
         FulfillmentObj.Add('lineItemsByFulfillmentOrder', ItemsByFulfillmentOrder);
         FulfillmentObj.Add('notifyCustomer', true);
-        if GenerateTrackingInfo(NcTask, TrackingInfo) then
+        if GenerateTrackingInfo(SpfyTask, TrackingInfo) then
             FulfillmentObj.Add('trackingInfo', TrackingInfo);
 
         Clear(VariablesObj);
@@ -540,13 +520,13 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         RootObj.Add('query', MutationTxt);
         RootObj.Add('variables', VariablesObj);
 
-        NcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
+        SpfyTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
         RootObj.WriteTo(OutStr);
 
         SendToShopify := true;
     end;
 
-    local procedure GenerateTrackingInfo(var NcTask: Record "NPR Nc Task"; var TrackingInfo: JsonObject): Boolean
+    local procedure GenerateTrackingInfo(var SpfyTask: Record "NPR Spfy Task"; var TrackingInfo: JsonObject): Boolean
     var
         SalesShipmentHeader: Record "Sales Shipment Header";
         ShippingAgent: Record "Shipping Agent";
@@ -557,16 +537,16 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         Handled: Boolean;
     begin
         Clear(TrackingInfo);
-        case NcTask."Table No." of
+        case SpfyTask."Table No." of
             Database::"Sales Shipment Header":
                 begin
-                    RecRef.Get(NcTask."Record ID");
+                    RecRef.Get(SpfyTask."Record ID");
                     RecRef.SetTable(SalesShipmentHeader);
                     if SalesShipmentHeader."Package Tracking No." = '' then
                         exit(false);
 
                     Handled := false;
-                    SpfyIntegrationEvents.OnGetTrackingCompanyName(SalesShipmentHeader, TrackingCompanyName, Handled);
+                    _SpfyIntegrationEvents.OnGetTrackingCompanyName(SalesShipmentHeader, TrackingCompanyName, Handled);
                     if not Handled or (TrackingCompanyName = '') then
                         if SalesShipmentHeader."Shipping Agent Code" <> '' then begin
                             ShippingAgent.Get(SalesShipmentHeader."Shipping Agent Code");
@@ -584,7 +564,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
                     TrackingInfo.Add('number', SalesShipmentHeader."Package Tracking No.");
 
                     Handled := false;
-                    SpfyIntegrationEvents.OnGetTrackingUrl(SalesShipmentHeader, TrackingUrl, Handled);
+                    _SpfyIntegrationEvents.OnGetTrackingUrl(SalesShipmentHeader, TrackingUrl, Handled);
                     if not Handled then
                         if ShippingAgent."Internet Address" <> '' then
                             TrackingUrl := ShippingAgent.GetTrackingInternetAddr(SalesShipmentHeader."Package Tracking No.");
@@ -624,8 +604,8 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
 
         LinesJObj := LinesJToken.AsObject();
         if LinesJObj.SelectToken('pageInfo', PageInfo) then begin
-            HasNext := JsonHelper.GetJBoolean(PageInfo, 'hasNextPage', true);
-            Cursor := JsonHelper.GetJText(PageInfo, 'endCursor', false);
+            HasNext := _JsonHelper.GetJBoolean(PageInfo, 'hasNextPage', true);
+            Cursor := _JsonHelper.GetJText(PageInfo, 'endCursor', false);
         end;
     end;
 
@@ -636,76 +616,4 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             Quantity := Round(RemainingUnfulfilledQty, 1, '<');
         exit(Quantity);
     end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnRunOnBeforeFinalizePosting, '', true, false)]
-#endif
-    local procedure ScheduleSendShopifyFulfillment(var SalesHeader: Record "Sales Header"; var SalesShipmentHeader: Record "Sales Shipment Header"; var ReturnReceiptHeader: Record "Return Receipt Header")
-    var
-        NcTask: Record "NPR Nc Task";
-        ReturnReceiptLine: Record "Return Receipt Line";
-        SalesShipmentLine: Record "Sales Shipment Line";
-        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
-        RecRef: RecordRef;
-        ShopifyOrderID: Text[30];
-        Found: Boolean;
-    begin
-        if not (SalesHeader.Ship or SalesHeader.Receive) then
-            exit;
-
-        NcTask."Store Code" :=
-            CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
-
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Order Fulfillments", NcTask."Store Code") then
-            exit;
-
-        ShopifyOrderID := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-        if ShopifyOrderID = '' then
-            exit;
-
-        Found := false;
-        if SalesHeader.Ship then begin
-            SalesShipmentLine.SetRange("Document No.", SalesShipmentHeader."No.");
-            if SalesShipmentLine.FindSet() then
-                repeat
-                    Found := IsEligibleForFulfillmentSending(SalesShipmentLine.RecordId(), SalesShipmentLine.Quantity);
-                until (SalesShipmentLine.Next() = 0) or Found;
-            if not Found then
-                exit;
-            RecRef.GetTable(SalesShipmentHeader);
-        end else begin
-            ReturnReceiptLine.SetRange("Document No.", ReturnReceiptHeader."No.");
-            if ReturnReceiptLine.FindSet() then
-                repeat
-                    Found := IsEligibleForFulfillmentSending(ReturnReceiptLine.RecordId(), ReturnReceiptLine.Quantity);
-                until (ReturnReceiptLine.Next() = 0) or Found;
-            if not Found then
-                exit;
-            RecRef.GetTable(ReturnReceiptHeader);
-        end;
-        SpfyScheduleSend.InitNcTask(NcTask."Store Code", RecRef, ShopifyOrderID, NcTask.Type::Insert, NcTask);
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", 'OnAfterDeleteEvent', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", OnAfterDeleteEvent, '', true, false)]
-#endif
-    local procedure OnAfterDeleteSalesShipmentLine_CleanUpFulfillmentEntries(var Rec: Record "Sales Shipment Line")
-    begin
-        DeleteFulfillmentEntries(Rec.RecordId());
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"Return Receipt Line", 'OnAfterDeleteEvent', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"Return Receipt Line", OnAfterDeleteEvent, '', true, false)]
-#endif
-    local procedure OnAfterDeleteReturnReceiptLine_CleanUpFulfillmentEntries(var Rec: Record "Return Receipt Line")
-    begin
-        DeleteFulfillmentEntries(Rec.RecordId());
-    end;
 }
-#endif

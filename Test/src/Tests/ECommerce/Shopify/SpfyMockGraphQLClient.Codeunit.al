@@ -1,6 +1,8 @@
 #if not BC17
 codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Client"
 {
+    Access = Internal;
+
     // Reusable, endpoint-agnostic test double for "NPR Spfy IGraphQL Client".
     // Configure canned responses keyed by substring(s) of the outgoing request body, inject it into
     // any Shopify GraphQL caller that exposes the interface, then inspect what was sent. Every request
@@ -49,17 +51,35 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
     procedure ExecuteRequest(var NcTask: Record "NPR Nc Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken): Boolean
     var
         InStr: InStream;
-        RequestJson: JsonObject;
-        RequestText: Text;
-        i: Integer;
         NoRequestBodyErr: Label 'Mock GraphQL client received a request with no body attached.', Locked = true;
-        NoCannedResponseErr: Label 'Mock GraphQL client has no canned response matching request: %1', Comment = '%1 = request body', Locked = true;
     begin
         if not NcTask."Data Output".HasValue() then
             Error(NoRequestBodyErr);
 
         NcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
-        RequestJson.ReadFrom(InStr);
+        exit(Execute(InStr, ShopifyResponse));
+    end;
+
+    procedure ExecuteRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken): Boolean
+    var
+        InStr: InStream;
+        NoRequestBodyErr: Label 'Mock GraphQL client received a request with no body attached.', Locked = true;
+    begin
+        if not SpfyTask."Data Output".HasValue() then
+            Error(NoRequestBodyErr);
+
+        SpfyTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+        exit(Execute(InStr, ShopifyResponse));
+    end;
+
+    local procedure Execute(RequestStream: InStream; var ShopifyResponse: JsonToken): Boolean
+    var
+        RequestJson: JsonObject;
+        RequestText: Text;
+        i: Integer;
+        NoCannedResponseErr: Label 'Mock GraphQL client has no canned response matching request: %1', Comment = '%1 = request body', Locked = true;
+    begin
+        RequestJson.ReadFrom(RequestStream);
         RequestJson.WriteTo(RequestText);
         _RecordedRequests.Add(RequestText);
 

@@ -3,6 +3,9 @@ codeunit 6248688 "NPR Spfy Ord Ready For Pickup"
 {
     Access = Internal;
     TableNo = "NPR Nc Task";
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-08-28';
+    ObsoleteReason = 'Replaced by codeunit "NPR Spfy Task Ready For Pickup" (the new Shopify Task List queue). This copy keeps serving environments that have not migrated yet. The two codeunits are maintained independently and may diverge: never copy changes blindly between them - apply a fix to each deliberately, only where it belongs.';
 
     trigger OnRun()
     begin

@@ -1,11 +1,8 @@
-#if not (BC17 or BC18 or BC19 or BC20)
-codeunit 6248589 "NPR Spfy Send BC Transaction"
+// Native sibling of frozen codeunit "NPR Spfy Send BC Transaction": only sanctioned legacy defect fixes are dual-applied, new-queue behavior changes are not.
+codeunit 6151486 "NPR Spfy Task Send POS Entry"
 {
     Access = Internal;
-    TableNo = "NPR Nc Task";
-    ObsoleteState = Pending;
-    ObsoleteTag = '2026-08-28';
-    ObsoleteReason = 'Replaced by codeunit "NPR Spfy Task Send POS Entry" (the new Shopify Task List queue). This copy keeps serving environments that have not migrated yet. The two codeunits are maintained independently and may diverge: never copy changes blindly between them - apply a fix to each deliberately, only where it belongs.';
+    TableNo = "NPR Spfy Task";
 
     trigger OnRun()
     begin
@@ -19,10 +16,29 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
     var
         _GLSetup: Record "General Ledger Setup";
         _SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
         _GLSetupRetrieved: Boolean;
+        _GraphQLClientSet: Boolean;
         _OrderCreateQueryTok: Label 'mutation orderCreate($order: OrderCreateOrderInput!, $options: OrderCreateOptionsInput) {orderCreate(order: $order, options : $options) {userErrors{field message} order{id}}}', Locked = true;
 
-    local procedure SendPOSEntry(var NcTask: Record "NPR Nc Task")
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
+
+    local procedure SendPOSEntry(var SpfyTask: Record "NPR Spfy Task")
     var
         TempSpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link" temporary;
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
@@ -30,15 +46,15 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         SendToShopify: Boolean;
         Success: Boolean;
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        Clear(SpfyTask."Data Output");
+        Clear(SpfyTask.Response);
         ClearLastError();
         Success := true;
 
-        SendToShopify := PrepareShopifyOrderCreateRequest(NcTask, TempSpfyStorePOSEntryLink);
+        SendToShopify := PrepareShopifyOrderCreateRequest(SpfyTask, TempSpfyStorePOSEntryLink);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-        NcTask.Modify();
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
+        SpfyTask.Modify();
         Commit();
 
         if not Success then
@@ -65,13 +81,13 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
             SpfyAssignedIDMgt.AssignShopifyID(SpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyOrderID, false);
     end;
 
-    local procedure PrepareShopifyOrderCreateRequest(var NcTask: Record "NPR Nc Task"; var SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link") SendToShopify: Boolean
+    local procedure PrepareShopifyOrderCreateRequest(var SpfyTask: Record "NPR Spfy Task"; var SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link") SendToShopify: Boolean
     var
         POSEntry: Record "NPR POS Entry";
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SpfySendCustomer: Codeunit "NPR Spfy Send Customers";
+        SpfyTaskSendCustomers: Codeunit "NPR Spfy Task Send Customers";
         RecRef: RecordRef;
         QueryStream: OutStream;
         ShopifyCustomerID: Text[30];
@@ -80,31 +96,31 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         POSEntryNotEligibleMsg: Label 'The POS entry number %1 is not eligible for synchronization. The entry will not be sent to Shopify.', Comment = '%1 - POS entry number';
         POSEntryAlreadySyncedMsg: Label 'The POS entry number %1 has already been synchronized with Shopify store code %2.', Comment = '%1 - POS entry number, %2 - Shopify store code';
     begin
-        NcTask.TestField("Store Code");
-        RecRef.Get(NcTask."Record ID");
+        SpfyTask.TestField("Store Code");
+        RecRef.Get(SpfyTask."Record ID");
         RecRef.SetTable(POSEntry);
 
         if POSEntry."Customer No." = '' then begin
-            SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(CustomerlessPOSEntryMsg, POSEntry."Entry No."));
+            SpfyIntegrationMgt.SetResponse(SpfyTask, StrSubstNo(CustomerlessPOSEntryMsg, POSEntry."Entry No."));
             exit;
         end;
 
         SpfyStorePOSEntryLink."POS Entry No." := POSEntry."Entry No.";
-        SpfyStorePOSEntryLink."Shopify Store Code" := NcTask."Store Code";
+        SpfyStorePOSEntryLink."Shopify Store Code" := SpfyTask."Store Code";
         if SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '' then begin
-            SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(POSEntryAlreadySyncedMsg, POSEntry."Entry No.", NcTask."Store Code"));
+            SpfyIntegrationMgt.SetResponse(SpfyTask, StrSubstNo(POSEntryAlreadySyncedMsg, POSEntry."Entry No.", SpfyTask."Store Code"));
             exit;
         end;
 
-        if not SpfySendCustomer.GetStoreCustomerLink(POSEntry."Customer No.", NcTask."Store Code", false, SpfyStoreCustomerLink) then
-            Error(CustomerNotSyncedErr, POSEntry."Customer No.", NcTask."Store Code");
+        if not SpfyTaskSendCustomers.GetStoreCustomerLink(POSEntry."Customer No.", SpfyTask."Store Code", false, SpfyStoreCustomerLink) then
+            Error(CustomerNotSyncedErr, POSEntry."Customer No.", SpfyTask."Store Code");
         ShopifyCustomerID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if ShopifyCustomerID = '' then
-            Error(CustomerNotSyncedErr, POSEntry."Customer No.", NcTask."Store Code");
+            Error(CustomerNotSyncedErr, POSEntry."Customer No.", SpfyTask."Store Code");
 
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         if not PrepareShopifyOrderCreateRequestQuery(POSEntry, SpfyStoreCustomerLink."Shopify Store Code", ShopifyCustomerID, QueryStream) then begin
-            SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(POSEntryNotEligibleMsg, POSEntry."Entry No."));
+            SpfyIntegrationMgt.SetResponse(SpfyTask, StrSubstNo(POSEntryNotEligibleMsg, POSEntry."Entry No."));
             exit;
         end;
         SendToShopify := true;
@@ -329,7 +345,7 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         exit(Round(Quantity, 1, '>'));
     end;
 
-    internal procedure NpRetailPOS_SourceName(): Text
+    local procedure NpRetailPOS_SourceName(): Text
     begin
         exit('NPRetailPOS');
     end;
@@ -338,12 +354,11 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
-        SpfyIntegrationMgt.FunctionCallOnNonTempVarErr(StrSubstNo('[Codeunit::NPR Spfy Send BC Transaction(%1)].%2', CurrCodeunitID(), ProcedureName));
+        SpfyIntegrationMgt.FunctionCallOnNonTempVarErr(StrSubstNo('[Codeunit::NPR Spfy Task Send POS Entry(%1)].%2', CurrCodeunitID(), ProcedureName));
     end;
 
     local procedure CurrCodeunitID(): Integer
     begin
-        exit(Codeunit::"NPR Spfy Send BC Transaction");
+        exit(Codeunit::"NPR Spfy Task Send POS Entry");
     end;
 }
-#endif

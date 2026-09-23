@@ -1281,6 +1281,380 @@ codeunit 85315 "NPR Spfy TL Switch Tests"
         _Assert.AreEqual(0, NcTaskCount(), 'A deactivation must never also reach the legacy queue while the feature is on');
     end;
 
+    [Test]
+    procedure GivenFulfillmentProducerShape_WhenFeatureOffThenOn_ThenNcThenSpfyTaskOnly()
+    var
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        DummyNcTask: Record "NPR Nc Task";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A posted shipment for a Shopify order goes to the legacy queue while the task list is off and to the new queue once it is on, never to both.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A posted shipment for a Shopify order. The posting subscriber that builds this task is local, so the seam is exercised through the router call it makes.
+        SalesShipmentHeader.Init();
+        SalesShipmentHeader."No." := _Lib.NextCode('SH', MaxStrLen(SalesShipmentHeader."No."));
+        SalesShipmentHeader.Insert(false);
+        RecRef.GetTable(SalesShipmentHeader);
+
+        // [WHEN] The fulfillment is enqueued while the task list is off.
+        EnqueueOrderFlowTask(StoreCode, RecRef, '5001', DummyNcTask.Type::Insert, DummyNcTask);
+
+        // [THEN] The legacy queue holds the fulfillment and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::"Sales Shipment Header"), 'One legacy fulfillment must be created while the feature is off');
+        AssertNcIntent(Database::"Sales Shipment Header", DummyNcTask.Type::Insert, SalesShipmentHeader.RecordId(), '5001', StoreCode, 'Fulfillment');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No fulfillment may be created in the new queue while the feature is off');
+
+        // [WHEN] The task list is switched on and the same fulfillment is enqueued.
+        _Lib.SetTaskListFeatureEnabled(true);
+        EnqueueOrderFlowTask(StoreCode, RecRef, '5001', DummyNcTask.Type::Insert, DummyNcTask);
+
+        // [THEN] The new queue holds the same intent and the legacy queue does not grow.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"Sales Shipment Header"), 'One new-queue fulfillment must be created while the feature is on');
+        AssertSpfyIntent(Database::"Sales Shipment Header", "NPR Spfy Task Op"::Insert, SalesShipmentHeader.RecordId(), '5001', StoreCode, 'Fulfillment');
+        _Assert.AreEqual(1, NcTaskCount(), 'A fulfillment must never also reach the legacy queue while the feature is on');
+    end;
+
+    [Test]
+    procedure GivenReadyForPickupConfirmed_WhenFeatureOffThenOn_ThenNcThenSpfyTaskOnly()
+    var
+        SalesHeader: Record "Sales Header";
+        UnlinkedSalesHeader: Record "Sales Header";
+        NpCsDocument: Record "NPR NpCs Document";
+        QuoteNpCsDocument: Record "NPR NpCs Document";
+        UnlinkedNpCsDocument: Record "NPR NpCs Document";
+        DummyNcTask: Record "NPR Nc Task";
+        SpfyOrdReadyForPickup: Codeunit "NPR Spfy Ord Ready For Pickup";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A confirmed collect document notifies through the legacy queue while the task list is off and through the new queue once it is on, and an unhandled or unlinked document notifies through neither.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A collect document confirmed against a Shopify-linked sales order.
+        SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
+        SalesHeader."No." := _Lib.NextCode('SO', MaxStrLen(SalesHeader."No."));
+        _Lib.AssignEntryID(SalesHeader.RecordId(), '5503');
+        AssignStoreCode(SalesHeader.RecordId(), StoreCode);
+        CreateNpCsDocument(NpCsDocument, SalesHeader."No.", "NPR NpCs Document Type"::Order);
+
+        // [WHEN] The collect confirmation runs while the task list is off.
+        SpfyOrdReadyForPickup.ScheduleOrderReadyForPickup(NpCsDocument);
+
+        // [THEN] The legacy queue holds the pickup notification and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR NpCs Document"), 'One legacy pickup notification must be created while the feature is off');
+        AssertNcIntent(Database::"NPR NpCs Document", DummyNcTask.Type::Insert, NpCsDocument.RecordId(), '5503', StoreCode, 'Ready for pickup');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No pickup notification may be created in the new queue while the feature is off');
+
+        // [WHEN] The task list is switched on and the same confirmation runs.
+        _Lib.SetTaskListFeatureEnabled(true);
+        SpfyOrdReadyForPickup.ScheduleOrderReadyForPickup(NpCsDocument);
+
+        // [THEN] The new queue holds the same intent and the legacy queue does not grow.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR NpCs Document"), 'One new-queue pickup notification must be created while the feature is on');
+        AssertSpfyIntent(Database::"NPR NpCs Document", "NPR Spfy Task Op"::Insert, NpCsDocument.RecordId(), '5503', StoreCode, 'Ready for pickup');
+        _Assert.AreEqual(1, NcTaskCount(), 'A pickup notification must never also reach the legacy queue while the feature is on');
+
+        // [WHEN] A document shape the integration does not handle is confirmed.
+        CreateNpCsDocument(QuoteNpCsDocument, SalesHeader."No.", "NPR NpCs Document Type"::Quote);
+        SpfyOrdReadyForPickup.ScheduleOrderReadyForPickup(QuoteNpCsDocument);
+
+        // [THEN] It exits silently rather than notifying Shopify about a document it cannot resolve.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR NpCs Document"), 'A collect document that is not an order or a posted invoice must not be enqueued');
+
+        // [WHEN] A confirmed order that was never linked to Shopify is confirmed.
+        UnlinkedSalesHeader."Document Type" := UnlinkedSalesHeader."Document Type"::Order;
+        UnlinkedSalesHeader."No." := _Lib.NextCode('SO', MaxStrLen(UnlinkedSalesHeader."No."));
+        CreateNpCsDocument(UnlinkedNpCsDocument, UnlinkedSalesHeader."No.", "NPR NpCs Document Type"::Order);
+        SpfyOrdReadyForPickup.ScheduleOrderReadyForPickup(UnlinkedNpCsDocument);
+
+        // [THEN] It exits silently too: there is no Shopify order to notify about.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR NpCs Document"), 'An order with no Shopify id must not be enqueued');
+    end;
+
+    [Test]
+    procedure GivenCloseOrderProducer_WhenFeatureOffThenOn_ThenNcDeleteThenSpfyDeleteOnly()
+    var
+        SalesHeader: Record "Sales Header";
+        UninvoicedSalesHeader: Record "Sales Header";
+        SalesInvHeader: Record "Sales Invoice Header";
+        DummyNcTask: Record "NPR Nc Task";
+        SpfyCloseOrder: Codeunit "NPR Spfy Close Order";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] Deleting an invoiced Shopify order enqueues the close in the legacy queue while the task list is off and in the new queue once it is on, and an order that was never invoiced enqueues nothing.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A Shopify-linked sales order that has been invoiced. The page-open gate that guards the delete trigger is UI state and is out of reach here.
+        SalesHeader.Init();
+        SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
+        SalesHeader."No." := _Lib.NextCode('SO', MaxStrLen(SalesHeader."No."));
+        SalesHeader.Insert(false);
+        _Lib.AssignEntryID(SalesHeader.RecordId(), '5502');
+        AssignStoreCode(SalesHeader.RecordId(), StoreCode);
+        SalesInvHeader.Init();
+        SalesInvHeader."No." := _Lib.NextCode('PI', MaxStrLen(SalesInvHeader."No."));
+        SalesInvHeader."Order No." := SalesHeader."No.";
+        SalesInvHeader.Insert(false);
+
+        // [WHEN] The order is deleted while the task list is off.
+        SpfyCloseOrder.InitSendCloseRequestTaskBeforeDeleteSalesHeader(SalesHeader);
+
+        // [THEN] The legacy queue holds a delete carrying the order that is about to disappear.
+        _Assert.AreEqual(1, NcTaskCount(Database::"Sales Header"), 'One legacy close order must be created while the feature is off');
+        AssertNcIntent(Database::"Sales Header", DummyNcTask.Type::Delete, SalesHeader.RecordId(), '5502', StoreCode, 'Close order');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No close order may be created in the new queue while the feature is off');
+
+        // [WHEN] The task list is switched on and the same delete runs.
+        _Lib.SetTaskListFeatureEnabled(true);
+        SpfyCloseOrder.InitSendCloseRequestTaskBeforeDeleteSalesHeader(SalesHeader);
+
+        // [THEN] The new queue holds the same delete and the legacy queue does not grow.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"Sales Header"), 'One new-queue close order must be created while the feature is on');
+        AssertSpfyIntent(Database::"Sales Header", "NPR Spfy Task Op"::Delete, SalesHeader.RecordId(), '5502', StoreCode, 'Close order');
+        _Assert.AreEqual(1, NcTaskCount(), 'A close order must never also reach the legacy queue while the feature is on');
+
+        // [WHEN] A Shopify-linked order that was never invoiced is deleted.
+        UninvoicedSalesHeader.Init();
+        UninvoicedSalesHeader."Document Type" := UninvoicedSalesHeader."Document Type"::Order;
+        UninvoicedSalesHeader."No." := _Lib.NextCode('SO', MaxStrLen(UninvoicedSalesHeader."No."));
+        UninvoicedSalesHeader.Insert(false);
+        _Lib.AssignEntryID(UninvoicedSalesHeader.RecordId(), '5504');
+        AssignStoreCode(UninvoicedSalesHeader.RecordId(), StoreCode);
+        SpfyCloseOrder.InitSendCloseRequestTaskBeforeDeleteSalesHeader(UninvoicedSalesHeader);
+
+        // [THEN] Nothing is enqueued: closing an order Shopify never saw invoiced would be wrong.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"Sales Header"), 'An order with no posted invoice must not be enqueued');
+    end;
+
+    [Test]
+    procedure GivenInvoiceCaptureStage1_WhenFeatureOffThenOn_ThenNcStage1_ThenSpfyStage1AndStage2Rows()
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        GatewaylessPaymentLine: Record "NPR Magento Payment Line";
+        SpfyTask: Record "NPR Spfy Task";
+        DummyNcTask: Record "NPR Nc Task";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        LegacyNcTaskCount: Integer;
+        ErrorText: Text;
+    begin
+        // [SCENARIO] A posted invoice enqueues stage 1 in the legacy queue while the task list is off, and once it is on stage 1 lands in the new queue and creates exactly one stage-2 row, for the capturable line only.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A posted invoice with one capturable Shopify payment line and one line that has no gateway at all.
+        CreateInvoiceWithPaymentLine(SalesInvHeader, PaymentLine, StoreCode);
+        GatewaylessPaymentLine.Init();
+        GatewaylessPaymentLine."Document Table No." := Database::"Sales Invoice Header";
+        GatewaylessPaymentLine."Document Type" := Enum::"Sales Document Type".FromInteger(0);
+        GatewaylessPaymentLine."Document No." := SalesInvHeader."No.";
+        GatewaylessPaymentLine."Line No." := 20000;
+        GatewaylessPaymentLine.Amount := 250;
+        GatewaylessPaymentLine.Insert(false);
+        _Lib.AssignEntryID(GatewaylessPaymentLine.RecordId(), '778');
+        RecRef.GetTable(SalesInvHeader);
+
+        // [WHEN] The posting seam enqueues the capture while the task list is off.
+        EnqueueOrderFlowTask(StoreCode, RecRef, '5501', DummyNcTask.Type::Insert, DummyNcTask);
+
+        // [THEN] The legacy queue holds stage 1 and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::"Sales Invoice Header"), 'One legacy capture stage 1 must be created while the feature is off');
+        AssertNcIntent(Database::"Sales Invoice Header", DummyNcTask.Type::Insert, SalesInvHeader.RecordId(), '5501', StoreCode, 'Capture stage 1');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No capture may be created in the new queue while the feature is off');
+        LegacyNcTaskCount := NcTaskCount();
+
+        // [WHEN] The task list is switched on and the same capture is enqueued and then dispatched.
+        _Lib.SetTaskListFeatureEnabled(true);
+        EnqueueOrderFlowTask(StoreCode, RecRef, '5501', DummyNcTask.Type::Insert, DummyNcTask);
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"Sales Invoice Header"), 'One new-queue capture stage 1 must be created while the feature is on');
+        AssertSpfyIntent(Database::"Sales Invoice Header", "NPR Spfy Task Op"::Insert, SalesInvHeader.RecordId(), '5501', StoreCode, 'Capture stage 1');
+        _Assert.IsTrue(FindSpfyTask(Database::"Sales Invoice Header", SpfyTask), 'The new-queue capture stage 1 must be readable');
+        _Assert.IsTrue(DispatchForReal(SpfyTask."Entry No.", ErrorText), StrSubstNo('Capture stage 1 must schedule its follow-ups without failing: %1', ErrorText));
+
+        // [THEN] Stage 1 creates exactly one stage-2 row, in the new queue, for the line that can actually be captured.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR Magento Payment Line"), 'Stage 1 must create exactly one stage-2 capture, skipping the line with no payment gateway');
+        AssertSpfyIntent(Database::"NPR Magento Payment Line", "NPR Spfy Task Op"::Insert, PaymentLine.RecordId(), '5501', StoreCode, 'Capture stage 2');
+        _Assert.AreEqual(LegacyNcTaskCount, NcTaskCount(), 'Neither capture stage may reach the legacy queue while the feature is on');
+    end;
+
+    [Test]
+    procedure GivenEligiblePOSEntry_WhenFeatureOffThenOn_ThenNcThenSpfyTaskOnly_AndWatermarkAdvances()
+    var
+        Customer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        POSEntry: Record "NPR POS Entry";
+        CustomerlessPOSEntry: Record "NPR POS Entry";
+        TempSpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer" temporary;
+        DummyNcTask: Record "NPR Nc Task";
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        StoreCode: Code[20];
+        WatermarkAfterEligibleEntry: BigInteger;
+    begin
+        // [SCENARIO] An eligible POS entry exports through the legacy queue while the task list is off and through the new queue once it is on, advancing the watermark both times, while a customerless entry enqueues nothing and leaves it.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] An eligible POS entry for a customer synced to the store, and the export watermark still at zero.
+        _Lib.CreateCustomerWithLink(Customer, SpfyStoreCustomerLink, StoreCode, true, true);
+        CreatePOSEntry(POSEntry, Customer."No.", 120);
+        TempSpfyExportPointerBuffer.Add(StoreCode, 0D, 0);
+        FilterCustomerLinks(SpfyStoreCustomerLink, Customer."No.", TempSpfyExportPointerBuffer);
+
+        // [WHEN] The export walks the entry while the task list is off.
+        SpfyPOSEntryExportMgt.ProcessPOSEntry(POSEntry, SpfyStoreCustomerLink, TempSpfyExportPointerBuffer);
+
+        // [THEN] The legacy queue holds the export and the new queue holds nothing.
+        _Assert.AreEqual(1, NcTaskCount(Database::"NPR POS Entry"), 'One legacy POS entry export must be created while the feature is off');
+        AssertNcIntent(Database::"NPR POS Entry", DummyNcTask.Type::Insert, POSEntry.RecordId(), Format(POSEntry."Entry No."), StoreCode, 'POS entry export');
+        _Assert.AreEqual(0, SpfyTaskCount(), 'No POS entry export may be created in the new queue while the feature is off');
+
+        // [THEN] The watermark moved to the exported entry, so the hourly scan does not re-read it.
+        TempSpfyExportPointerBuffer.Get(StoreCode);
+        _Assert.AreEqual(POSEntry.SystemRowVersion, TempSpfyExportPointerBuffer."New Last POS Entry Row Version", 'An eligible, linked POS entry must advance the export watermark');
+        WatermarkAfterEligibleEntry := TempSpfyExportPointerBuffer."New Last POS Entry Row Version";
+
+        // [WHEN] The task list is switched on and the export walks the same entry.
+        _Lib.SetTaskListFeatureEnabled(true);
+        FilterCustomerLinks(SpfyStoreCustomerLink, Customer."No.", TempSpfyExportPointerBuffer);
+        SpfyPOSEntryExportMgt.ProcessPOSEntry(POSEntry, SpfyStoreCustomerLink, TempSpfyExportPointerBuffer);
+
+        // [THEN] The new queue holds the same intent and the legacy queue does not grow.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR POS Entry"), 'One new-queue POS entry export must be created while the feature is on');
+        AssertSpfyIntent(Database::"NPR POS Entry", "NPR Spfy Task Op"::Insert, POSEntry.RecordId(), Format(POSEntry."Entry No."), StoreCode, 'POS entry export');
+        _Assert.AreEqual(1, NcTaskCount(), 'A POS entry export must never also reach the legacy queue while the feature is on');
+
+        // [WHEN] The export walks an entry that was posted without a customer.
+        CreatePOSEntry(CustomerlessPOSEntry, '', 120);
+        FilterCustomerLinks(SpfyStoreCustomerLink, Customer."No.", TempSpfyExportPointerBuffer);
+        SpfyPOSEntryExportMgt.ProcessPOSEntry(CustomerlessPOSEntry, SpfyStoreCustomerLink, TempSpfyExportPointerBuffer);
+
+        // [THEN] Nothing is enqueued and the watermark stays put, so the entry is simply re-read next hour.
+        _Assert.AreEqual(1, SpfyTaskCount(Database::"NPR POS Entry"), 'An ineligible POS entry must not be enqueued');
+        TempSpfyExportPointerBuffer.Get(StoreCode);
+        _Assert.AreEqual(WatermarkAfterEligibleEntry, TempSpfyExportPointerBuffer."New Last POS Entry Row Version", 'An ineligible POS entry must not advance the export watermark');
+    end;
+
+    local procedure CreateOrderStore(): Code[20]
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        // Every order-flow area is set at insert: the SingleInstance integration mgt caches per-store area reads, so flags are never flipped afterwards.
+        ShopifyStore.Init();
+        ShopifyStore.Code := _Lib.NextCode('S', MaxStrLen(ShopifyStore.Code));
+        ShopifyStore.Enabled := true;
+        ShopifyStore."Sales Order Integration" := true;
+        ShopifyStore."Send Order Fulfillments" := true;
+        ShopifyStore."Send Payment Capture Requests" := true;
+        ShopifyStore."Send Close Order Requets" := true;
+        ShopifyStore."Send Order Ready for Pickup" := true;
+        ShopifyStore."BC Customer Transactions" := true;
+        // Refreshing payment lines from Shopify would turn capture stage 1 into an HTTP call.
+        ShopifyStore."Get Payment Lines from Shopify" := ShopifyStore."Get Payment Lines from Shopify"::ON_ORDER_IMPORT;
+        ShopifyStore.Insert(false);
+        exit(ShopifyStore.Code);
+    end;
+
+    local procedure EnqueueOrderFlowTask(StoreCode: Code[20]; RecRef: RecordRef; RecordValue: Text; TaskType: Option; var NcTask: Record "NPR Nc Task"): Boolean
+    var
+        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+    begin
+        // The router caches a sticky TRUE per instance (an ON verdict is never re-evaluated), so each enqueue uses a fresh local instance.
+        exit(SpfyScheduleSend.InitNcTask(StoreCode, RecRef, RecordValue, TaskType, NcTask));
+    end;
+
+    local procedure AssignStoreCode(RecId: RecordId; StoreCode: Code[20])
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyAssignedIDMgt.AssignShopifyID(RecId, "NPR Spfy ID Type"::"Store Code", StoreCode, false);
+    end;
+
+    local procedure CreateNpCsDocument(var NpCsDocument: Record "NPR NpCs Document"; SalesOrderNo: Code[20]; DocumentType: Enum "NPR NpCs Document Type")
+    begin
+        NpCsDocument.Init();
+        NpCsDocument."Entry No." := 0;
+        NpCsDocument."From Document Type" := NpCsDocument."From Document Type"::Order;
+        NpCsDocument."From Document No." := SalesOrderNo;
+        NpCsDocument."Document Type" := DocumentType;
+        NpCsDocument."Document No." := SalesOrderNo;
+        NpCsDocument.Insert(false);
+    end;
+
+    local procedure CreateInvoiceWithPaymentLine(var SalesInvHeader: Record "Sales Invoice Header"; var PaymentLine: Record "NPR Magento Payment Line"; StoreCode: Code[20])
+    var
+        SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
+    begin
+        SalesInvHeader.Init();
+        SalesInvHeader."No." := _Lib.NextCode('PI', MaxStrLen(SalesInvHeader."No."));
+        SalesInvHeader.Insert(false);
+
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := Database::"Sales Invoice Header";
+        PaymentLine."Document Type" := Enum::"Sales Document Type".FromInteger(0);
+        PaymentLine."Document No." := SalesInvHeader."No.";
+        PaymentLine."Line No." := 10000;
+        PaymentLine.Amount := 500;
+        // A shared utility on the frozen sender, not a send: it creates the SPFY-<CUR> gateway pair a capturable line requires.
+        PaymentLine."Payment Gateway Code" := SpfyCapturePayment.ShopifyPaymentGateway('DKK');
+        PaymentLine."Date Captured" := 0D;
+        PaymentLine.Insert(false);
+        _Lib.AssignEntryID(PaymentLine.RecordId(), '777');
+        AssignStoreCode(SalesInvHeader.RecordId(), StoreCode);
+    end;
+
+    local procedure CreatePOSEntry(var POSEntry: Record "NPR POS Entry"; CustomerNo: Code[20]; SaleAmount: Decimal)
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        LastPOSEntry: Record "NPR POS Entry";
+    begin
+        POSEntry.Init();
+        if LastPOSEntry.FindLast() then
+            POSEntry."Entry No." := LastPOSEntry."Entry No." + 1
+        else
+            POSEntry."Entry No." := 1;
+        POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
+        POSEntry."Entry Date" := Today();
+        POSEntry."Customer No." := CustomerNo;
+        POSEntry."Amount Excl. Tax" := SaleAmount;
+        POSEntry."System Entry" := false;
+        POSEntry.Insert(false);
+
+        POSEntrySalesLine.Init();
+        POSEntrySalesLine."POS Entry No." := POSEntry."Entry No.";
+        POSEntrySalesLine."Line No." := 10000;
+        POSEntrySalesLine.Type := POSEntrySalesLine.Type::Item;
+        POSEntrySalesLine.Quantity := 1;
+        POSEntrySalesLine.Insert(false);
+        // The row version is what the export watermark tracks, and it is only stamped once the row is on disk.
+        POSEntry.Get(POSEntry."Entry No.");
+    end;
+
+    local procedure FilterCustomerLinks(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; CustomerNo: Code[20]; var SpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer")
+    begin
+        SpfyStoreCustomerLink.Reset();
+        SpfyStoreCustomerLink.SetCurrentKey("Sync. to this Store");
+        SpfyStoreCustomerLink.SetRange("Sync. to this Store", true);
+        SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
+        SpfyStoreCustomerLink.SetFilter("Shopify Store Code", SpfyExportPointerBuffer.GetSpfyStoreFilter());
+        SpfyStoreCustomerLink.SetRange("No.", CustomerNo);
+    end;
+
+    local procedure DispatchForReal(EntryNo: BigInteger; var ErrorText: Text): Boolean
+    var
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyTaskSendBndImpl: Codeunit "NPR Spfy Task Send Bnd Impl";
+    begin
+        // A direct dispatch runs through Codeunit.Run, which raises at the call site if the ambient transaction has pending writes.
+        Commit();
+        SpfyTask.Get(EntryNo);
+        exit(SpfyTaskSendBndImpl.Dispatch(SpfyTask, ErrorText));
+    end;
+
     local procedure InsertVoucherEntry(var VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher"; InitiatedInShopify: Boolean)
     begin
         VoucherEntry.Init();

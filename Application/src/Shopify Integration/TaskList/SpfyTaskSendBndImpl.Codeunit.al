@@ -46,6 +46,43 @@ codeunit 6151224 "NPR Spfy Task Send Bnd Impl" implements "NPR Spfy Task Send Bo
                     ErrorText := GetLastErrorText();
                     exit(false);
                 end;
+            Database::"Sales Shipment Header",
+            Database::"Return Receipt Header":
+                begin
+                    if Codeunit.Run(Codeunit::"NPR Spfy Task Send Fulfillment", SpfyTaskWork) then
+                        exit(true);
+                    ErrorText := GetLastErrorText();
+                    exit(false);
+                end;
+            Database::"NPR NpCs Document":
+                begin
+                    if Codeunit.Run(Codeunit::"NPR Spfy Task Ready For Pickup", SpfyTaskWork) then
+                        exit(true);
+                    ErrorText := GetLastErrorText();
+                    exit(false);
+                end;
+            Database::"Sales Header":
+                begin
+                    if Codeunit.Run(Codeunit::"NPR Spfy Task Close Order", SpfyTaskWork) then
+                        exit(true);
+                    ErrorText := GetLastErrorText();
+                    exit(false);
+                end;
+            Database::"Sales Invoice Header",
+            Database::"NPR Magento Payment Line":
+                begin
+                    if Codeunit.Run(Codeunit::"NPR Spfy Task Capture Payment", SpfyTaskWork) then
+                        exit(true);
+                    ErrorText := GetLastErrorText();
+                    exit(false);
+                end;
+            Database::"NPR POS Entry":
+                begin
+                    if Codeunit.Run(Codeunit::"NPR Spfy Task Send POS Entry", SpfyTaskWork) then
+                        exit(true);
+                    ErrorText := GetLastErrorText();
+                    exit(false);
+                end;
             else begin
                 ErrorText := StrSubstNo(UnmappedTaskKindErr, SpfyTaskWork."Table No.");
                 Sentry.InitScopeAndTransaction('Shopify task list unmapped task kind', 'bc.spfy.task_list.unmapped_kind');

@@ -133,6 +133,17 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         RequestJson.WriteTo(QueryStream);
     end;
 
+    internal procedure CompleteGraphQLRequest(RequestString: Text; VariablesJson: JsonObject; var SpfyTask: Record "NPR Spfy Task")
+    var
+        RequestJson: JsonObject;
+        QueryStream: OutStream;
+    begin
+        RequestJson.Add('query', RequestString);
+        RequestJson.Add('variables', VariablesJson);
+        SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        RequestJson.WriteTo(QueryStream);
+    end;
+
     [Obsolete('This procedure is part of the Shopify REST API , which is deprecated. Use the GraphQL query instead.', '2026-01-15')]
     local procedure SendShopifyRequest(ShopifyStoreCode: Code[20]; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text
     var
@@ -153,6 +164,17 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         if IncludeCursor then // Cursor is added only for paginated GraphQL queries. Header-level queries do not support pagination parameters.
             AddGraphQLCursor(VariablesJson, Cursor);
         CompleteGraphQLRequest(RequestString, VariablesJson, NcTask);
+    end;
+
+    internal procedure CreateGraphQLRequestWithOrderIdFilter(var SpfyTask: Record "NPR Spfy Task"; Cursor: Text; ShopifyStoreCode: Code[20]; RequestString: Text; OrderGID: Text; IncludeCursor: Boolean)
+    var
+        VariablesJson: JsonObject;
+    begin
+        SpfyTask."Store Code" := ShopifyStoreCode;
+        VariablesJson.Add('OrderId', OrderGID);
+        if IncludeCursor then
+            AddGraphQLCursor(VariablesJson, Cursor);
+        CompleteGraphQLRequest(RequestString, VariablesJson, SpfyTask);
     end;
 
     internal procedure InitializePagingState(var Cursor: Text; var HasNext: Boolean)

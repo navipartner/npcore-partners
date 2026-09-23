@@ -10,5 +10,10 @@ codeunit 6151278 "NPR Spfy GraphQL Client" implements "NPR Spfy IGraphQL Client"
     begin
         exit(_SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, CheckIntegrationIsEnabled, ShopifyResponse));
     end;
+
+    procedure ExecuteRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken): Boolean
+    begin
+        exit(_SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, CheckIntegrationIsEnabled, ShopifyResponse));
+    end;
 }
 #endif

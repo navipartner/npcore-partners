@@ -102,6 +102,16 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
+    [IntegrationEvent(false, false, true)]
+    internal procedure OnModifyPaymentLineAfterSpfyTaskCaptureIsolated(var PaymentLine: Record "NPR Magento Payment Line"; var SpfyTask: Record "NPR Spfy Task")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeSendOrderReadyForPickup(NpCsDocument: Record "NPR NpCs Document"; ShopifyOrderId: Text; ShopifyStoreCode: Code[20])
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     internal procedure LocationCardOnCheckIfShopifyIntegrationIsEnabled(Rec: Record Location; var IsEnabled: Boolean)
     begin

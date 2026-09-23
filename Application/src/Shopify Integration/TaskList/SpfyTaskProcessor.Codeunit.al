@@ -486,10 +486,17 @@ codeunit 6151214 "NPR Spfy Task Processor"
             Database::"NPR Spfy Tag Update Request",
             Database::"NPR Spfy Inventory Level",
             Database::"NPR Spfy Item Price",
-            Database::"NPR Spfy Inv Item Location":
+            Database::"NPR Spfy Inv Item Location",
+            Database::"Sales Shipment Header",
+            Database::"Return Receipt Header",
+            Database::"Sales Invoice Header",
+            Database::"NPR POS Entry":
                 begin
-                    if not RecRef.Get(SpfyTask."Record ID") then
+                    if not RecRef.Get(SpfyTask."Record ID") then begin
+                        if SpfyTask."Table No." = Database::"Sales Invoice Header" then
+                            LogVanishedCaptureDocument(SpfyTask);
                         exit(true);
+                    end;
                     SourceRecRef := RecRef;
                     exit(false);
                 end;
@@ -500,8 +507,23 @@ codeunit 6151214 "NPR Spfy Task Processor"
                         exit(false);
                     exit(not RecRef.Get(SpfyTask."Record ID"));
                 end;
+            // The capture sibling re-resolves a moved payment line itself; the pickup send does not need its document (its event gets an empty record when it is gone).
+            Database::"NPR Magento Payment Line",
+            Database::"NPR NpCs Document":
+                exit(false);
         end;
         exit(false);
+    end;
+
+    local procedure LogVanishedCaptureDocument(SpfyTask: Record "NPR Spfy Task")
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        VanishedInvoiceLbl: Label 'Shopify capture task %1 completed because its sales invoice no longer exists.', Locked = true;
+    begin
+        CustomDimensions.Add('SpfyTaskEntryNo', Format(SpfyTask."Entry No."));
+        CustomDimensions.Add('ShopifyStoreCode', SpfyTask."Store Code");
+        Session.LogMessage('NPR_SpfyTaskList_VanishedCaptureDocument', StrSubstNo(VanishedInvoiceLbl, SpfyTask."Entry No."),
+            Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     local procedure PreconditionIsMet(var SpfyTask: Record "NPR Spfy Task"; AllowLiveLookup: Boolean; EnqueueActivation: Boolean; var SourceRecRef: RecordRef; var WaitingReasonTxt: Text; var LookupErrorText: Text): Boolean
