@@ -26,6 +26,7 @@ table 6150807 "NPR Spfy Integration Setup"
                 SpfyExportBCTransJQ: Codeunit "NPR Spfy Export BC Trans. JQ";
 #endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+                SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
                 ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
                 SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
@@ -33,6 +34,7 @@ table 6150807 "NPR Spfy Integration Setup"
             begin
                 Modify();
                 SpfyScheduleSend.SetupTaskProcessingJobQueues();
+                SpfyTaskJQSetup.SetupTaskProcessingJobQueues();
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
                 if ShopifyEcommOrderExp.IsFeatureEnabled() then
                     SpfyEcomSalesDocPrcssr.SetupJobQueues()
@@ -293,6 +295,18 @@ table 6150807 "NPR Spfy Integration Setup"
             // The SpfySyncStateMgt.PayloadVersion() captured at seeding completion. 6d accepts Completed only when this
             // equals the current PayloadVersion() — a PayloadVersion bump invalidates a stale Completed (design §8.2).
             Caption = 'RowVersion Payload Version Seeded';
+            DataClassification = CustomerContent;
+        }
+        field(180; "Task List Migration Status"; Option)
+        {
+            Caption = 'Task List Migration Status';
+            DataClassification = CustomerContent;
+            OptionMembers = NotStarted,Migrating,Completed,Failed;
+            OptionCaption = 'Not Started,Migrating,Completed,Failed';
+        }
+        field(181; "Task List Migr. Started At"; DateTime)
+        {
+            Caption = 'Task List Migration Started At';
             DataClassification = CustomerContent;
         }
     }

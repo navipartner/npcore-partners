@@ -26,6 +26,7 @@ codeunit 6151192 "NPR Spfy Chg Hdlr Sales Orders" implements "NPR Spfy Change Ha
         NcTask: Record "NPR Nc Task";
         SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
         RecRef: RecordRef;
+        CreatedTaskQueue: Enum "NPR Spfy Task Dest Queue";
     begin
         if DetectedChange.TableNo() <> Database::Customer then
             exit(false);
@@ -37,10 +38,11 @@ codeunit 6151192 "NPR Spfy Chg Hdlr Sales Orders" implements "NPR Spfy Change Ha
 
         Customer."No." := DetectedChange.CustomerNo();
         RecRef.GetTable(Customer);
-        SpfyScheduleSend.InitNcTask(DetectedChange.StoreCode(), RecRef, Customer."No.", NcTask.Type::Delete, NcTask);
+        SpfyScheduleSend.InitNcTask(DetectedChange.StoreCode(), RecRef, RecRef.RecordId(), Customer."No.", NcTask.Type::Delete, CurrentDateTime(), 0DT, Enum::"NPR Spfy Reuse Delayed NC Task"::Any, CreatedTaskQueue, NcTask);
         if NcTask."Entry No." = 0 then
             exit(false);
         DetectedChange.SetCreatedNcTaskEntryNo(NcTask."Entry No.");
+        DetectedChange.SetCreatedTaskQueue(CreatedTaskQueue);
         exit(true);
     end;
 

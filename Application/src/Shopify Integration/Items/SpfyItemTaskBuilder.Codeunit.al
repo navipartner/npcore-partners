@@ -85,7 +85,7 @@ codeunit 6151225 "NPR Spfy Item Task Builder"
         end;
     end;
 
-    internal procedure ScheduleProductDelete(ItemNo: Code[20]; ShopifyStoreCode: Code[20]) NcTaskEntryNo: BigInteger
+    internal procedure ScheduleProductDelete(ItemNo: Code[20]; ShopifyStoreCode: Code[20]; var CreatedTaskQueue: Enum "NPR Spfy Task Dest Queue") NcTaskEntryNo: BigInteger
     var
         Item: Record Item;
         NcTask: Record "NPR Nc Task";
@@ -94,11 +94,11 @@ codeunit 6151225 "NPR Spfy Item Task Builder"
     begin
         Item."No." := ItemNo;
         RecRef.GetTable(Item);
-        SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, ItemNo, NcTask.Type::Delete, NcTask);
+        SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), ItemNo, NcTask.Type::Delete, CurrentDateTime(), 0DT, Enum::"NPR Spfy Reuse Delayed NC Task"::Any, CreatedTaskQueue, NcTask);
         NcTaskEntryNo := NcTask."Entry No.";
     end;
 
-    internal procedure ScheduleItemVariantDelete(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]) NcTaskEntryNo: BigInteger
+    internal procedure ScheduleItemVariantDelete(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]; var CreatedTaskQueue: Enum "NPR Spfy Task Dest Queue") NcTaskEntryNo: BigInteger
     var
         ItemVariant: Record "Item Variant";
         NcTask: Record "NPR Nc Task";
@@ -108,7 +108,7 @@ codeunit 6151225 "NPR Spfy Item Task Builder"
         ItemVariant."Item No." := ItemNo;
         ItemVariant.Code := VariantCode;
         RecRef.GetTable(ItemVariant);
-        SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, GetProductVariantSku(ItemNo, VariantCode), NcTask.Type::Delete, NcTask);
+        SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), GetProductVariantSku(ItemNo, VariantCode), NcTask.Type::Delete, CurrentDateTime(), 0DT, Enum::"NPR Spfy Reuse Delayed NC Task"::Any, CreatedTaskQueue, NcTask);
         NcTaskEntryNo := NcTask."Entry No.";
     end;
 
@@ -160,7 +160,7 @@ codeunit 6151225 "NPR Spfy Item Task Builder"
             TagUpdateRequest.SetRange("Table No.", RecID.TableNo());
             TagUpdateRequest.SetRange("BC Record ID", RecID);
             TagUpdateRequest.SetRange("Tag Value", ItemCategory.Description);
-            if not TagUpdateRequest.FindFirst() or (TagUpdateRequest."Nc Task Entry No." <> 0) then begin
+            if not TagUpdateRequest.FindFirst() or (TagUpdateRequest."Nc Task Entry No." <> 0) or (TagUpdateRequest."Spfy Task Entry No." <> 0) then begin
                 TagUpdateRequest.Init();
                 TagUpdateRequest."Table No." := RecID.TableNo();
                 TagUpdateRequest."BC Record ID" := RecID;

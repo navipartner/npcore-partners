@@ -520,6 +520,23 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             NcTask."Last Processing Completed at" := ProcessingCompletedAt;
     end;
 
+    procedure SetResponse(var SpfyTask: Record "NPR Spfy Task"; ResponseTxt: Text)
+    begin
+        SetResponse(SpfyTask, CurrentDateTime(), 0DT, ResponseTxt);
+    end;
+
+    procedure SetResponse(var SpfyTask: Record "NPR Spfy Task"; ProcessingStartedAt: DateTime; ProcessingCompletedAt: DateTime; ResponseTxt: Text)
+    var
+        OutStr: OutStream;
+    begin
+        SpfyTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(ResponseTxt);
+        if ProcessingStartedAt <> 0DT then
+            SpfyTask."Last Processing Started at" := ProcessingStartedAt;
+        if ProcessingCompletedAt <> 0DT then
+            SpfyTask."Last Processing Completed at" := ProcessingCompletedAt;
+    end;
+
     internal procedure RemoveUntil(Input: Text; UntilChr: Char) Output: Text
     var
         Position: Integer;
@@ -545,6 +562,14 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     begin
         NcTask.CalcFields("Table Name");
         Error(UnsupportedErr, CallerFunction, NcTask."Table No.", NcTask."Table Name");
+    end;
+
+    procedure UnsupportedIntegrationTable(SpfyTask: Record "NPR Spfy Task"; CallerFunction: Text)
+    var
+        UnsupportedTableErr: Label '%1: unsupported integration table %2 %3', Comment = '%1 - calling function name, %2 - table no., %3 - table name';
+    begin
+        SpfyTask.CalcFields("Table Name");
+        Error(UnsupportedTableErr, CallerFunction, SpfyTask."Table No.", SpfyTask."Table Name");
     end;
 
     procedure LongRunningProcessConfirmQst(): Text

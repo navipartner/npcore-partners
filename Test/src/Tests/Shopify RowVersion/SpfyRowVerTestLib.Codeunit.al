@@ -2,11 +2,13 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
 {
     // Fixture harness for the Shopify RowVersion flow tier: real rows, real detection entry points, real result tables (no mock seam exists).
     Access = Internal;
+    SingleInstance = true;
 
     var
         _Seq: Integer;
         _SessionSeed: Integer;
         _FeatureIdTok: Label 'ShopifyRowVersionChangeDetection', Locked = true;
+        _TaskListFeatureIdTok: Label 'ShopifyTaskList', Locked = true;
         _Seam: Codeunit "NPR Spfy RowVer Fail Seam";
 
     procedure ResetState()
@@ -17,7 +19,9 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         DeletionLog: Record "NPR Spfy Deletion Log";
         ResyncRun: Record "NPR Spfy Resync Run";
         NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
         TagUpdateRequest: Record "NPR Spfy Tag Update Request";
+        SpfyTaskRunContext: Codeunit "NPR Spfy Task Run Context";
     begin
         ChangeTracker.DeleteAll(false);
         ChangeQuarantine.DeleteAll(false);
@@ -25,7 +29,12 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         DeletionLog.DeleteAll(false);
         ResyncRun.DeleteAll(false);
         NcTask.DeleteAll(false);
+        SpfyTask.DeleteAll(false);
         TagUpdateRequest.DeleteAll(false);
+        SpfyTaskRunContext.ClearCycleTime();
+        SpfyTaskRunContext.ClearRunDeadline();
+        SpfyTaskRunContext.ClearSendBoundary();
+        SetTaskListFeatureEnabled(false);
         DeleteDetectionJobQueueEntries();
         // Every test codeunit in this suite calls ResetState() from its own Initialize(), so this is what
         // actually guarantees a seam left armed by a failed poison-row test (which does not delete its own
@@ -38,7 +47,7 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         JobQueueEntry: Record "Job Queue Entry";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
-        // ZERO Shopify JQ entries may exist during a run: detection and NC-task processing happen ONLY via direct calls - a live JQ session would race the tests.
+        // ZERO Shopify JQ entries may exist during a run: detection and task processing happen ONLY via direct calls - a live JQ session would race the tests.
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetFilter(Status, '<>%1', JobQueueEntry.Status::"In Process");
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Change Detection");
@@ -49,6 +58,57 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         JobQueueEntry.SetFilter("Parameter String", '@*SPFY*');
         if not JobQueueEntry.IsEmpty() then
             JobQueueEntry.DeleteAll(true);
+        // Reset first: the parameter-string filter above stays applied otherwise and hides the task list processors.
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetFilter(Status, '<>%1', JobQueueEntry.Status::"In Process");
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Task Processor");
+        if not JobQueueEntry.IsEmpty() then
+            JobQueueEntry.DeleteAll(true);
+    end;
+
+    procedure SetTaskListFeatureEnabled(Enabled: Boolean)
+    var
+        Feature: Record "NPR Feature";
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+    begin
+        // Raw writes: every supported activation path is blocked by the hardcoded availability gate. Enabling also stamps the
+        // migration as completed so engine cycles run; disabling clears it again, or the stamp leaks into later feature-off tests.
+        if not Feature.Get(_TaskListFeatureIdTok) then begin
+            Feature.Init();
+            Feature.Id := CopyStr(_TaskListFeatureIdTok, 1, MaxStrLen(Feature.Id));
+            Feature.Enabled := Enabled;
+            Feature.Insert(false);
+        end else
+            if Feature.Enabled <> Enabled then begin
+                Feature.Enabled := Enabled;
+                Feature.Modify(false);
+            end;
+        if not ShopifySetup.Get() then
+            exit;
+        if Enabled then
+            ShopifySetup."Task List Migration Status" := ShopifySetup."Task List Migration Status"::Completed
+        else begin
+            ShopifySetup."Task List Migration Status" := ShopifySetup."Task List Migration Status"::NotStarted;
+            ShopifySetup."Task List Migr. Started At" := 0DT;
+        end;
+        ShopifySetup.Modify(false);
+    end;
+
+    procedure TaskListFeatureId(): Text[50]
+    begin
+        exit(CopyStr(_TaskListFeatureIdTok, 1, 50));
+    end;
+
+    local procedure TaskListQueueActive(): Boolean
+    var
+        Feature: Record "NPR Feature";
+    begin
+        // Read the persisted state on every call: this library is SingleInstance, so a cached flag would outlive ResetState and drift from the database.
+        Feature.SetLoadFields(Enabled);
+        if not Feature.Get(_TaskListFeatureIdTok) then
+            exit(false);
+        exit(Feature.Enabled);
     end;
 
     procedure NextCode(Prefix: Text; MaxLen: Integer): Code[20]
@@ -126,6 +186,44 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         ShopifyStore."Retail Voucher Integration" := VouchersEnabled;
         ShopifyStore.Insert(false);
         exit(ShopifyStore.Code);
+    end;
+
+    // Safe at any point: the SetRereadSetup() below drops the SingleInstance integration mgt's cached setup and store rows, so a mid-test flip cannot be read stale.
+    procedure DisableStore(StoreCode: Code[20])
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyStore.Get(StoreCode);
+        ShopifyStore.Enabled := false;
+        ShopifyStore.Modify(false);
+        SpfyIntegrationMgt.SetRereadSetup();
+    end;
+
+    procedure EnableStore(StoreCode: Code[20])
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyStore.Get(StoreCode);
+        ShopifyStore.Enabled := true;
+        ShopifyStore.Modify(false);
+        SpfyIntegrationMgt.SetRereadSetup();
+    end;
+
+    procedure DisableIntegration()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        if not ShopifySetup.Get() then begin
+            ShopifySetup.Init();
+            ShopifySetup.Insert(true);
+        end;
+        ShopifySetup."Enable Integration" := false;
+        ShopifySetup.Modify(false);
+        // The integration mgt codeunit is SingleInstance and caches the setup row for the session.
+        SpfyIntegrationMgt.SetRereadSetup();
     end;
 
     procedure CreateItem(var Item: Record Item)
@@ -473,6 +571,7 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
     procedure DumpDetectionState(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Text
     var
         NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
         ChangeTracker: Record "NPR Change Tracker";
         ChangeQuarantine: Record "NPR Change Quarantine";
         FreshLink: Record "NPR Spfy Store-Item Link";
@@ -490,6 +589,15 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
             until NcTask.Next() = 0
         else
             Builder.Append(' <none>');
+        if TaskListQueueActive() then begin
+            Builder.Append(' | SPFYTASKS:');
+            if SpfyTask.FindSet() then
+                repeat
+                    Builder.Append(StrSubstNo(' [#%1 tbl=%2 type=%3 val=%4 store=%5 state=%6]', SpfyTask."Entry No.", SpfyTask."Table No.", SpfyTask.Type, SpfyTask."Record Value", SpfyTask."Store Code", SpfyTask.State));
+                until SpfyTask.Next() = 0
+            else
+                Builder.Append(' <none>');
+        end;
         if ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link") then
             Builder.Append(StrSubstNo(' | TRACKER: mark=%1 max=%2 fails=%3 failingRV=%4', ChangeTracker."Last Row Version", CurrentMaxRowVersion(Database::"NPR Spfy Store-Item Link"), ChangeTracker."Consecutive Failures", ChangeTracker."Failing Row Version"))
         else
@@ -516,12 +624,162 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
 
     procedure TaskCount(): Integer
     var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCount());
+        exit(SpfyTask.Count());
+    end;
+
+    procedure TaskCount(TableNo: Integer): Integer
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCount(TableNo));
+        SpfyTask.SetRange("Table No.", TableNo);
+        exit(SpfyTask.Count());
+    end;
+
+    procedure TaskCountTyped(TableNo: Integer; TaskType: Option): Integer
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCountTyped(TableNo, TaskType));
+        if TaskType > "NPR Spfy Task Op"::Delete.AsInteger() then
+            exit(0);   // Rename has no counterpart in the new queue
+        SpfyTask.SetRange("Table No.", TableNo);
+        SpfyTask.SetRange(Type, Enum::"NPR Spfy Task Op".FromInteger(TaskType));
+        exit(SpfyTask.Count());
+    end;
+
+    procedure TaskCountForValue(TableNo: Integer; RecordValue: Text): Integer
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCountForValue(TableNo, RecordValue));
+        SpfyTask.SetRange("Table No.", TableNo);
+        SpfyTask.SetRange("Record Value", CopyStr(RecordValue, 1, MaxStrLen(SpfyTask."Record Value")));
+        exit(SpfyTask.Count());
+    end;
+
+    procedure TaskCountForStore(TableNo: Integer; StoreCode: Code[20]): Integer
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCountForStore(TableNo, StoreCode));
+        SpfyTask.SetRange("Table No.", TableNo);
+        SpfyTask.SetRange("Store Code", StoreCode);
+        exit(SpfyTask.Count());
+    end;
+
+    procedure TaskCountForRecordId(TableNo: Integer; RecId: RecordId): Integer
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCountForRecordId(TableNo, RecId));
+        SpfyTask.SetRange("Table No.", TableNo);
+        SpfyTask.SetRange("Record ID", RecId);
+        exit(SpfyTask.Count());
+    end;
+
+    procedure TaskCountByStatus(TableNo: Integer; TaskType: Option; Unprocessed: Boolean): Integer
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(NcTaskCountByStatus(TableNo, TaskType, Unprocessed));
+        if TaskType > "NPR Spfy Task Op"::Delete.AsInteger() then
+            exit(0);
+        SpfyTask.SetRange("Table No.", TableNo);
+        SpfyTask.SetRange(Type, Enum::"NPR Spfy Task Op".FromInteger(TaskType));
+        if Unprocessed then
+            SpfyTask.SetFilter(State, '<>%1', SpfyTask.State::Completed)
+        else
+            SpfyTask.SetRange(State, SpfyTask.State::Completed);
+        exit(SpfyTask.Count());
+    end;
+
+    // Keeps its NcTask-typed signature in both modes: the caller only reads the identity fields, which the new queue mirrors one to one.
+    procedure FindLastTask(TableNo: Integer; var NcTask: Record "NPR Nc Task"): Boolean
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then
+            exit(FindLastNcTask(TableNo, NcTask));
+        SpfyTask.SetRange("Table No.", TableNo);
+        if not SpfyTask.FindLast() then
+            exit(false);
+        NcTask.Init();
+        NcTask."Entry No." := SpfyTask."Entry No.";
+        NcTask."Table No." := SpfyTask."Table No.";
+        NcTask.Type := SpfyTask.Type.AsInteger();
+        NcTask."Record ID" := SpfyTask."Record ID";
+        NcTask."Record Value" := SpfyTask."Record Value";
+        NcTask."Store Code" := SpfyTask."Store Code";
+        NcTask."Not Before Date-Time" := SpfyTask."Not Before Date-Time";
+        NcTask."Log Date" := SpfyTask."Log Date";
+        NcTask.Processed := SpfyTask.State = SpfyTask.State::Completed;
+        exit(true);
+    end;
+
+    procedure MarkAllTasksProcessed()
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not TaskListQueueActive() then begin
+            MarkAllNcTasksProcessed();
+            exit;
+        end;
+        SpfyTask.SetFilter(State, '<>%1', SpfyTask.State::Completed);
+        if not SpfyTask.IsEmpty() then
+            SpfyTask.ModifyAll(State, SpfyTask.State::Completed, false);
+    end;
+
+    // Mode-agnostic: the outbox stamps exactly one of the two provenance fields, so following the populated one needs no flag branch.
+    procedure TaskLinkedToDeletionLog(DeletionLogEntryNo: BigInteger): Boolean
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not DeletionLog.Get(DeletionLogEntryNo) then
+            exit(false);
+        if DeletionLog."NC Task Entry No." <> 0 then
+            exit(NcTaskExists(DeletionLog."NC Task Entry No."));
+        if DeletionLog."Spfy Task Entry No." <> 0 then
+            exit(SpfyTask.Get(DeletionLog."Spfy Task Entry No."));
+        exit(false);
+    end;
+
+    procedure TaskIsDefused(DeletionLogEntryNo: BigInteger): Boolean
+    var
+        DeletionLog: Record "NPR Spfy Deletion Log";
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not DeletionLog.Get(DeletionLogEntryNo) then
+            exit(false);
+        if DeletionLog."NC Task Entry No." <> 0 then
+            exit(NcTaskIsDefused(DeletionLog."NC Task Entry No."));
+        if DeletionLog."Spfy Task Entry No." = 0 then
+            exit(false);
+        if not SpfyTask.Get(DeletionLog."Spfy Task Entry No.") then
+            exit(false);
+        exit(SpfyTask.State = SpfyTask.State::Completed);
+    end;
+
+    #region NC Task coexistence — DELETE at NC phase-out
+    local procedure NcTaskCount(): Integer
+    var
         NcTask: Record "NPR Nc Task";
     begin
         exit(NcTask.Count());
     end;
 
-    procedure TaskCount(TableNo: Integer): Integer
+    local procedure NcTaskCount(TableNo: Integer): Integer
     var
         NcTask: Record "NPR Nc Task";
     begin
@@ -529,7 +787,7 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         exit(NcTask.Count());
     end;
 
-    procedure TaskCountTyped(TableNo: Integer; TaskType: Option): Integer
+    local procedure NcTaskCountTyped(TableNo: Integer; TaskType: Option): Integer
     var
         NcTask: Record "NPR Nc Task";
     begin
@@ -538,7 +796,7 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         exit(NcTask.Count());
     end;
 
-    procedure TaskCountForValue(TableNo: Integer; RecordValue: Text): Integer
+    local procedure NcTaskCountForValue(TableNo: Integer; RecordValue: Text): Integer
     var
         NcTask: Record "NPR Nc Task";
     begin
@@ -547,7 +805,7 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         exit(NcTask.Count());
     end;
 
-    procedure TaskCountForStore(TableNo: Integer; StoreCode: Code[20]): Integer
+    local procedure NcTaskCountForStore(TableNo: Integer; StoreCode: Code[20]): Integer
     var
         NcTask: Record "NPR Nc Task";
     begin
@@ -556,7 +814,7 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         exit(NcTask.Count());
     end;
 
-    procedure TaskCountForRecordId(TableNo: Integer; RecId: RecordId): Integer
+    local procedure NcTaskCountForRecordId(TableNo: Integer; RecId: RecordId): Integer
     var
         NcTask: Record "NPR Nc Task";
     begin
@@ -565,14 +823,24 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         exit(NcTask.Count());
     end;
 
-    procedure FindLastTask(TableNo: Integer; var NcTask: Record "NPR Nc Task"): Boolean
+    local procedure NcTaskCountByStatus(TableNo: Integer; TaskType: Option; Unprocessed: Boolean): Integer
+    var
+        NcTask: Record "NPR Nc Task";
+    begin
+        NcTask.SetRange("Table No.", TableNo);
+        NcTask.SetRange(Type, TaskType);
+        NcTask.SetRange(Processed, not Unprocessed);
+        exit(NcTask.Count());
+    end;
+
+    local procedure FindLastNcTask(TableNo: Integer; var NcTask: Record "NPR Nc Task"): Boolean
     begin
         NcTask.Reset();
         NcTask.SetRange("Table No.", TableNo);
         exit(NcTask.FindLast());
     end;
 
-    procedure MarkAllTasksProcessed()
+    local procedure MarkAllNcTasksProcessed()
     var
         NcTask: Record "NPR Nc Task";
     begin
@@ -580,6 +848,23 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         if not NcTask.IsEmpty() then
             NcTask.ModifyAll(Processed, true, false);
     end;
+
+    local procedure NcTaskExists(NcTaskEntryNo: BigInteger): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+    begin
+        exit(NcTask.Get(NcTaskEntryNo));
+    end;
+
+    local procedure NcTaskIsDefused(NcTaskEntryNo: BigInteger): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+    begin
+        if not NcTask.Get(NcTaskEntryNo) then
+            exit(false);
+        exit(NcTask.Processed and not NcTask."Process Error");
+    end;
+    #endregion
 
     procedure InsertPendingDelete(EntityTableNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; CustomerNo: Code[20]; StoreCode: Code[20]; ShopifyId: Text[30]) EntryNo: BigInteger
     var

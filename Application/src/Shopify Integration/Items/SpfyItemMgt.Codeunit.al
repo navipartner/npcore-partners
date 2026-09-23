@@ -617,7 +617,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             TagUpdateRequest.SetRange("Table No.", RecID.TableNo());
             TagUpdateRequest.SetRange("BC Record ID", RecID);
             TagUpdateRequest.SetRange("Tag Value", ItemCategory.Description);
-            if not TagUpdateRequest.FindFirst() or (TagUpdateRequest."Nc Task Entry No." <> 0) then begin
+            if not TagUpdateRequest.FindFirst() or (TagUpdateRequest."Nc Task Entry No." <> 0) or (TagUpdateRequest."Spfy Task Entry No." <> 0) then begin
                 TagUpdateRequest.Init();
                 TagUpdateRequest."Table No." := RecID.TableNo();
                 TagUpdateRequest."BC Record ID" := RecID;

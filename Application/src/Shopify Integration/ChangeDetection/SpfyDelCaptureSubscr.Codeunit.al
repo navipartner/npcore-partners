@@ -331,12 +331,14 @@ codeunit 6151235 "NPR Spfy Del. Capture Subscr."
     local procedure ItemOnAfterDelete_CleanupBaseline(var Rec: Record Item)
     begin
         RemoveEntityBaseline(Rec.IsTemporary(), Database::Item, Rec.SystemId);
+        DeleteInventoryLevels(Rec.IsTemporary(), Rec."No.", '');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", OnAfterDeleteEvent, '', false, false)]
     local procedure ItemVariantOnAfterDelete_CleanupBaseline(var Rec: Record "Item Variant")
     begin
         RemoveEntityBaseline(Rec.IsTemporary(), Database::"Item Variant", Rec.SystemId);
+        DeleteInventoryLevels(Rec.IsTemporary(), Rec."Item No.", Rec.Code);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Spfy Store-Item Link", OnAfterDeleteEvent, '', false, false)]
@@ -368,5 +370,20 @@ codeunit 6151235 "NPR Spfy Del. Capture Subscr."
         if RecIsTemporary then
             exit;
         SpfySyncStateMgt.RemoveBaselineAllStores(TableNo, EntitySystemIdParam);
+    end;
+
+    // A level row must not outlive its item: nothing else deletes it, and a task parked on it can never become sendable.
+    local procedure DeleteInventoryLevels(RecIsTemporary: Boolean; ItemNo: Code[20]; VariantCode: Code[10])
+    var
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+    begin
+        if RecIsTemporary or not SpfyRowVersionFeature.IsFeatureEnabled() then
+            exit;
+        InventoryLevel.SetCurrentKey("Item No.", "Variant Code");
+        InventoryLevel.SetRange("Item No.", ItemNo);
+        if VariantCode <> '' then
+            InventoryLevel.SetRange("Variant Code", VariantCode);
+        if not InventoryLevel.IsEmpty() then
+            InventoryLevel.DeleteAll();
     end;
 }

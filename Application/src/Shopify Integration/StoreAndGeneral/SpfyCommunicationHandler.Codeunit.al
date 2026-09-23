@@ -76,6 +76,17 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
+    [TryFunction]
+    procedure ExecuteShopifyGraphQLRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken)
+    var
+        ResponseText: Text;
+        Url: Text;
+    begin
+        Url := GetShopifyUrl(SpfyTask."Store Code", CheckIntegrationIsEnabled) + 'graphql.json';
+        ResponseText := SendShopifyRequest(SpfyTask, Enum::"Http Request Type"::POST, Url);
+        ShopifyResponse.ReadFrom(ResponseText);
+    end;
+
     procedure UserErrorsExistInGraphQLResponse(ShopifyResponse: JsonToken): Boolean
     var
         ResponseDataItemUserErrors: JsonToken;
@@ -160,6 +171,16 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             Error(NoRequestBodyErr);
     end;
 
+    internal procedure CheckRequestContent(var SpfyTask: Record "NPR Spfy Task")
+    var
+        SpfyTaskNoRequestBodyErr: Label 'Each request must have a json formatted content attached';
+    begin
+        SpfyTask.TestField("Store Code");
+        SpfyTask.TestField("Record Value");
+        if not SpfyTask."Data Output".HasValue then
+            Error(SpfyTaskNoRequestBodyErr);
+    end;
+
     local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text
     var
         NextLink: Text;
@@ -167,9 +188,22 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
     end;
 
+    local procedure SendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text
+    var
+        NextLink: Text;
+    begin
+        ResponseText := SendShopifyRequest(SpfyTask, RestMethod, Url, NextLink);
+    end;
+
     local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text) ResponseText: Text
     begin
         if not TrySendShopifyRequest(NcTask, RestMethod, Url, NextLink, ResponseText) then
+            Error(GetLastErrorText());
+    end;
+
+    local procedure SendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text) ResponseText: Text
+    begin
+        if not TrySendShopifyRequest(SpfyTask, RestMethod, Url, NextLink, ResponseText) then
             Error(GetLastErrorText());
     end;
 
@@ -233,6 +267,66 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             NextLink := ParseNextLink(Links[1]);
     end;
 
+    [TryFunction]
+    local procedure TrySendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text; var ResponseText: Text)
+    var
+        Client: HttpClient;
+        RequestMsg: HttpRequestMessage;
+        ResponseMsg: HttpResponseMessage;
+        Links: array[1] of Text;
+        ErrorTxt: Text;
+        MaxRetries: Integer;
+        RetryCounter: Integer;
+        Retry: Boolean;
+        Success: Boolean;
+    begin
+        CheckHttpClientRequestsAllowed();
+
+        Clear(NextLink);
+        MaxRetries := 3;
+        RetryCounter := 0;
+
+        repeat
+            RetryCounter += 1;
+            Clear(Client);
+            Clear(RequestMsg);
+            Clear(ResponseMsg);
+
+            CreateRequestMsg(SpfyTask, RestMethod, Url, RequestMsg);
+            if not Client.Send(RequestMsg, ResponseMsg) then
+                Error(GetLastErrorText());
+
+            Success := ResponseMsg.IsSuccessStatusCode();
+            if not Success then
+                case true of
+                    RetryCounter >= MaxRetries:
+                        Retry := false;
+                    TreatAsSuccess(SpfyTask, ResponseMsg):
+                        Retry := false;
+                    else
+                        Retry := ResponseAllowsRetries(ResponseMsg);
+                end;
+        until Success or not Retry;
+
+        SaveResponse(SpfyTask, ResponseMsg);
+
+        if not ResponseMsg.Content().ReadAs(ResponseText) then
+            ResponseText := '';
+        if ResponseText = '' then
+            ResponseText := '{}';
+
+        if Success then
+            if TreatAsError(SpfyTask, ResponseMsg, ResponseText, ErrorTxt) then
+                Error(ErrorTxt);
+
+        if not Success then
+            if not TreatAsSuccess(SpfyTask, ResponseMsg, ResponseText, ErrorTxt) then
+                Error(ErrorTxt);
+
+        if ResponseMsg.Headers().GetValues('Link', Links) then
+            NextLink := ParseNextLink(Links[1]);
+    end;
+
     local procedure CreateRequestMsg(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text; var RequestMsg: HttpRequestMessage)
     var
         Content: HttpContent;
@@ -259,6 +353,32 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Headers.Add('User-Agent', 'NPRetail-BC');
     end;
 
+    local procedure CreateRequestMsg(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; var RequestMsg: HttpRequestMessage)
+    var
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        InStr: InStream;
+    begin
+        if SpfyTask."Data Output".HasValue() then begin
+            SpfyTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+            Content.WriteFrom(InStr);
+
+            Content.GetHeaders(Headers);
+            if Headers.Contains('Content-Type') then
+                Headers.Remove('Content-Type');
+            Headers.Add('Content-Type', 'application/json');
+
+            RequestMsg.Content := Content;
+        end;
+
+        RequestMsg.SetRequestUri(Url);
+        RequestMsg.Method(Format(RestMethod));
+        RequestMsg.GetHeaders(Headers);
+        Headers.Add('X-Shopify-Access-Token', GetShopifyAccessToken(SpfyTask."Store Code"));
+        Headers.Add('Accept', 'application/json');
+        Headers.Add('User-Agent', 'NPRetail-BC');
+    end;
+
     local procedure SaveResponse(var NcTask: Record "NPR Nc Task"; var ResponseMsg: HttpResponseMessage)
     var
         InStr: InStream;
@@ -267,6 +387,17 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ResponseMsg.Content().ReadAs(InStr);
         Clear(NcTask.Response);
         NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
+        CopyStream(OutStr, InStr);
+    end;
+
+    local procedure SaveResponse(var SpfyTask: Record "NPR Spfy Task"; var ResponseMsg: HttpResponseMessage)
+    var
+        InStr: InStream;
+        OutStr: OutStream;
+    begin
+        ResponseMsg.Content().ReadAs(InStr);
+        Clear(SpfyTask.Response);
+        SpfyTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
         CopyStream(OutStr, InStr);
     end;
 
@@ -352,6 +483,29 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         exit(IsError);
     end;
 
+    local procedure TreatAsError(SpfyTask: Record "NPR Spfy Task"; ResponseMsg: HttpResponseMessage; ResponseText: Text; var ErrorTxt: Text): Boolean
+    var
+        ErrorJToken: JsonToken;
+        ResponseJToken: JsonToken;
+        Handled: Boolean;
+        IsError: Boolean;
+        SpfyTaskUnknownErrorTxt: Label 'An error has occurred while processing the request. The system did not provide any details of the error.';
+    begin
+        if not ResponseJToken.ReadFrom(ResponseText) then
+            exit(false);
+        SpfyIntegrationEvents.OnTreatSuccessfulSpfyTaskResponseAsError(SpfyTask, ResponseMsg, ResponseJToken, ErrorTxt, IsError, Handled);
+        if not Handled then begin
+            IsError := ResponseJToken.SelectToken('errors', ErrorJToken);
+            if IsError then begin
+                ResponseJToken.SelectToken('errors[0].message', ErrorJToken);
+                ErrorTxt := ErrorJToken.AsValue().AsText();
+            end;
+        end;
+        if IsError and (ErrorTxt = '') then
+            ErrorTxt := SpfyTaskUnknownErrorTxt;
+        exit(IsError);
+    end;
+
     local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage): Boolean
     var
         ResponseText: Text;
@@ -363,6 +517,19 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             ResponseText := '{}';
         ErrorTxt := 'n/a';
         exit(TreatAsSuccess(NcTask, ResponseMsg, ResponseText, ErrorTxt));
+    end;
+
+    local procedure TreatAsSuccess(SpfyTask: Record "NPR Spfy Task"; ResponseMsg: HttpResponseMessage): Boolean
+    var
+        ResponseText: Text;
+        ErrorTxt: Text;
+    begin
+        if not ResponseMsg.Content().ReadAs(ResponseText) then
+            ResponseText := '';
+        if ResponseText = '' then
+            ResponseText := '{}';
+        ErrorTxt := 'n/a';
+        exit(TreatAsSuccess(SpfyTask, ResponseMsg, ResponseText, ErrorTxt));
     end;
 
     local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage; ResponseText: Text; var ErrorTxt: Text): Boolean
@@ -386,6 +553,33 @@ codeunit 6184924 "NPR Spfy Communication Handler"
                 (NcTask."Table No." = Database::"NPR NpRv Voucher Entry") and (ResponseMsg.HttpStatusCode() = 422):
                     if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
                         IsSuccess := ErrorJToken.AsValue().AsText() = AlreadyDisabledTok;
+            end;
+        if not IsSuccess and (ErrorTxt = '') then
+            ErrorTxt := StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseText);
+        exit(IsSuccess);
+    end;
+
+    local procedure TreatAsSuccess(SpfyTask: Record "NPR Spfy Task"; ResponseMsg: HttpResponseMessage; ResponseText: Text; var ErrorTxt: Text): Boolean
+    var
+        ErrorJToken: JsonToken;
+        ResponseJToken: JsonToken;
+        Handled: Boolean;
+        IsSuccess: Boolean;
+        SpfyTaskAlreadyCapturedTok: Label 'The authorized transaction has already been captured', Locked = true;
+        SpfyTaskAlreadyDisabledTok: Label 'Gift card is disabled', Locked = true;
+    begin
+        if not ResponseJToken.ReadFrom(ResponseText) then
+            exit(false);
+        SpfyIntegrationEvents.OnTreatErroneousSpfyTaskResponseAsSuccess(SpfyTask, ResponseMsg, ResponseJToken, ErrorTxt, IsSuccess, Handled);
+        if not Handled then
+            case true of
+                (SpfyTask."Table No." = Database::"NPR Magento Payment Line") and (ResponseMsg.HttpStatusCode() = 422):
+                    if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
+                        IsSuccess := ErrorJToken.AsValue().AsText() = SpfyTaskAlreadyCapturedTok;
+
+                (SpfyTask."Table No." = Database::"NPR NpRv Voucher Entry") and (ResponseMsg.HttpStatusCode() = 422):
+                    if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
+                        IsSuccess := ErrorJToken.AsValue().AsText() = SpfyTaskAlreadyDisabledTok;
             end;
         if not IsSuccess and (ErrorTxt = '') then
             ErrorTxt := StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseText);

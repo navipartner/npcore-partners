@@ -124,7 +124,6 @@ codeunit 85277 "NPR Spfy RowVer Deletion Tests"
     procedure CancelDelete_ProcessedCancelsUnsentTaskButLeavesSent()
     var
         DeletionLog: Record "NPR Spfy Deletion Log";
-        NcTask: Record "NPR Nc Task";
         SpfyDeletionLogMgt: Codeunit "NPR Spfy Deletion Log Mgt";
         UnsentTaskNo: BigInteger;
         SentTaskNo: BigInteger;
@@ -147,8 +146,7 @@ codeunit 85277 "NPR Spfy RowVer Deletion Tests"
         SpfyDeletionLogMgt.CancelDeleteForEntity(Database::"NPR Spfy Store-Item Link", 'S', DeletionLog."Entity System Id");
         DeletionLog.Get(UnsentEntryNo);
         _Assert.IsTrue(DeletionLog.Status = DeletionLog.Status::Cancelled, 'An unsent Processed delete must be cancelled');
-        NcTask.Get(UnsentTaskNo);
-        _Assert.IsTrue(NcTask.Processed, 'The outstanding NC delete task must be cancelled (marked Processed)');
+        _Assert.IsTrue(_Lib.TaskIsDefused(UnsentEntryNo), 'The outstanding delete task must be cancelled cleanly, never sent');
 
         // [WHEN] The entity is reactivated for the already-sent case. [THEN] it is left; poll-Insert re-creates it.
         DeletionLog.Get(SentEntryNo);
@@ -215,7 +213,7 @@ codeunit 85277 "NPR Spfy RowVer Deletion Tests"
         IRetentionPolicy: Interface "NPR IRetention Policy V2";
         ReferenceDateTime: DateTime;
     begin
-        // [SCENARIO] Retention keeps every delete-log row inside the retention window and, once it has elapsed, prunes only the Processed and Cancelled rows while Pending and Quarantined survive.
+        // [SCENARIO] Retention prunes terminal delete-log rows on their own period, quarantined rows only on a longer one, and Pending never.
         Initialize();
         RetentionPolicy.DeleteAll();
         RetentionPolicy.Init();
@@ -231,18 +229,27 @@ codeunit 85277 "NPR Spfy RowVer Deletion Tests"
         IRetentionPolicy := RetentionPolicy."Implementation V2";
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, CurrentDateTime());
         _Assert.AreEqual(4, DeletionLog.Count(), 'Rows inside the retention window must survive regardless of status');
-        // [WHEN] Retention is applied far enough in the future that the default -3M window has elapsed.
-        ReferenceDateTime := CreateDateTime(CalcDate('<+7M>', DT2Date(CurrentDateTime())), DT2Time(CurrentDateTime()));
+        // [WHEN] Retention is applied past the terminal -3M window but inside the quarantined -1Y one.
+        ReferenceDateTime := CreateDateTime(CalcDate('<+4M>', DT2Date(CurrentDateTime())), DT2Time(CurrentDateTime()));
         IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
         // [THEN] terminal Processed/Cancelled pruned; Pending and Quarantined survive.
         DeletionLog.SetRange(Status, DeletionLog.Status::Pending);
         _Assert.AreEqual(1, DeletionLog.Count(), 'Pending must never be pruned');
         DeletionLog.SetRange(Status, DeletionLog.Status::Quarantined);
-        _Assert.AreEqual(1, DeletionLog.Count(), 'Quarantined must not be auto-pruned');
+        _Assert.AreEqual(1, DeletionLog.Count(), 'Quarantined must outlive the terminal retention period');
         DeletionLog.SetRange(Status, DeletionLog.Status::Processed);
         _Assert.AreEqual(0, DeletionLog.Count(), 'Processed must be pruned');
         DeletionLog.SetRange(Status, DeletionLog.Status::Cancelled);
         _Assert.AreEqual(0, DeletionLog.Count(), 'Cancelled must be pruned');
+
+        // [WHEN] Retention is applied past the quarantined -1Y window as well.
+        ReferenceDateTime := CreateDateTime(CalcDate('<+14M>', DT2Date(CurrentDateTime())), DT2Time(CurrentDateTime()));
+        IRetentionPolicy.DeleteExpiredRecords(RetentionPolicy, ReferenceDateTime);
+        // [THEN] the quarantined row is pruned too, and Pending still is not.
+        DeletionLog.SetRange(Status, DeletionLog.Status::Quarantined);
+        _Assert.AreEqual(0, DeletionLog.Count(), 'Quarantined must be pruned once its own period has elapsed');
+        DeletionLog.SetRange(Status, DeletionLog.Status::Pending);
+        _Assert.AreEqual(1, DeletionLog.Count(), 'Pending must never be pruned, at any age');
     end;
 
     local procedure SeedStatus(NewStatus: Integer; ShopifyId: Text[30])
@@ -511,7 +518,6 @@ codeunit 85277 "NPR Spfy RowVer Deletion Tests"
         ItemVariant: Record "Item Variant";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         DeletionLog: Record "NPR Spfy Deletion Log";
-        NcTask: Record "NPR Nc Task";
         DummyDeletionLog: Record "NPR Spfy Deletion Log";
         DummyNcTask: Record "NPR Nc Task";
         StoreCode: Code[20];
@@ -566,11 +572,70 @@ codeunit 85277 "NPR Spfy RowVer Deletion Tests"
         // [THEN] The drain-raced Processed row is STILL cancelled and its unsent NC task is defused.
         DeletionLog.Get(DrainedEntryNo);
         _Assert.IsTrue(DeletionLog.Status = DeletionLog.Status::Cancelled, 'A drained-but-unsent delete must still be cancelled by the parent re-sync');
-        NcTask.Get(DeletionLog."NC Task Entry No.");
-        _Assert.IsTrue(NcTask.Processed, 'The outstanding NC delete task must be cancelled, never sent');
-        _Assert.IsFalse(NcTask."Process Error", 'The cancelled task must not be flagged as an error');
+        _Assert.IsTrue(_Lib.TaskLinkedToDeletionLog(DrainedEntryNo), 'The cancelled delete must still reference the task it produced');
+        _Assert.IsTrue(_Lib.TaskIsDefused(DrainedEntryNo), 'The outstanding delete task must be cancelled cleanly, never sent');
 
         _Lib.ConsumeConfirm();   // the unsync Confirms above fire only when GuiAllowed() is true
+    end;
+
+    [Test]
+    procedure GivenInventoryLevelRows_WhenItemOrVariantDeleted_ThenTheirLevelRowsGoToo()
+    var
+        Item: Record Item;
+        OtherItem: Record Item;
+        ItemVariant: Record "Item Variant";
+        FirstStoreCode: Code[20];
+        SecondStoreCode: Code[20];
+    begin
+        // [SCENARIO] Deleting a variant removes only its own inventory level rows in every store and leaves the item level row, and deleting the item removes all of its level rows while another item keeps its own.
+        Initialize();
+        FirstStoreCode := _Lib.CreateStore(true, false, false, false, false);
+        SecondStoreCode := _Lib.CreateStore(true, false, false, false, false);
+        // Level rows are minted for items merely planned for sync, so the fixture needs no store link at all.
+        _Lib.CreateItem(Item);
+        _Lib.CreateItemVariant(ItemVariant, Item."No.");
+        _Lib.CreateItem(OtherItem);
+
+        // [GIVEN] The item is planned for inventory levels in two stores, at variant and item level, and another item has rows of its own.
+        SeedInventoryLevel(FirstStoreCode, 'gid://loc/1', Item."No.", '');
+        SeedInventoryLevel(FirstStoreCode, 'gid://loc/1', Item."No.", ItemVariant.Code);
+        SeedInventoryLevel(SecondStoreCode, 'gid://loc/2', Item."No.", ItemVariant.Code);
+        SeedInventoryLevel(FirstStoreCode, 'gid://loc/1', OtherItem."No.", '');
+
+        // [WHEN] The variant is deleted.
+        ItemVariant.Delete(true);
+
+        // [THEN] Only the variant's level rows are gone, in every store.
+        _Assert.AreEqual(0, InventoryLevelCount(Item."No.", ItemVariant.Code), 'A deleted variant must not leave inventory level rows behind');
+        _Assert.AreEqual(1, InventoryLevelCount(Item."No.", ''), 'A variant delete must leave the item level row alone');
+
+        // [WHEN] The item itself is deleted.
+        Item.Delete(true);
+
+        // [THEN] Every level row of that item is gone, and other items keep theirs.
+        _Assert.AreEqual(0, InventoryLevelCount(Item."No.", ''), 'A deleted item must not leave inventory level rows behind');
+        _Assert.AreEqual(1, InventoryLevelCount(OtherItem."No.", ''), 'Deleting one item must not touch the level rows of another');
+    end;
+
+    local procedure SeedInventoryLevel(StoreCode: Code[20]; ShopifyLocationId: Text[30]; ItemNo: Code[20]; VariantCode: Code[10])
+    var
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+    begin
+        InventoryLevel.Init();
+        InventoryLevel."Shopify Store Code" := StoreCode;
+        InventoryLevel."Shopify Location ID" := ShopifyLocationId;
+        InventoryLevel."Item No." := ItemNo;
+        InventoryLevel."Variant Code" := VariantCode;
+        InventoryLevel.Insert(false);
+    end;
+
+    local procedure InventoryLevelCount(ItemNo: Code[20]; VariantCode: Code[10]): Integer
+    var
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+    begin
+        InventoryLevel.SetRange("Item No.", ItemNo);
+        InventoryLevel.SetRange("Variant Code", VariantCode);
+        exit(InventoryLevel.Count());
     end;
     #endregion
 

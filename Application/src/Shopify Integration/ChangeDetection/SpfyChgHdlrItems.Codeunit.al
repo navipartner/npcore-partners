@@ -32,20 +32,22 @@ codeunit 6151189 "NPR Spfy Chg Hdlr Items" implements "NPR Spfy Change Handler"
     local procedure ProcessDelete(var DetectedChange: Codeunit "NPR Spfy Detected Change"): Boolean
     var
         NcTaskEntryNo: BigInteger;
+        CreatedTaskQueue: Enum "NPR Spfy Task Dest Queue";
     begin
         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, DetectedChange.StoreCode()) then
             exit(false);
         case DetectedChange.TableNo() of
             Database::Item:
-                NcTaskEntryNo := SpfyItemTaskBuilder.ScheduleProductDelete(DetectedChange.ItemNo(), DetectedChange.StoreCode());
+                NcTaskEntryNo := SpfyItemTaskBuilder.ScheduleProductDelete(DetectedChange.ItemNo(), DetectedChange.StoreCode(), CreatedTaskQueue);
             Database::"Item Variant":
-                NcTaskEntryNo := SpfyItemTaskBuilder.ScheduleItemVariantDelete(DetectedChange.ItemNo(), DetectedChange.VariantCode(), DetectedChange.StoreCode());
+                NcTaskEntryNo := SpfyItemTaskBuilder.ScheduleItemVariantDelete(DetectedChange.ItemNo(), DetectedChange.VariantCode(), DetectedChange.StoreCode(), CreatedTaskQueue);
             else
                 exit(false);
         end;
         if NcTaskEntryNo = 0 then
             exit(false);
         DetectedChange.SetCreatedNcTaskEntryNo(NcTaskEntryNo);
+        DetectedChange.SetCreatedTaskQueue(CreatedTaskQueue);
         exit(true);
     end;
 

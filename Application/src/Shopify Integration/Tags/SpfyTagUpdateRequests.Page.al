@@ -48,6 +48,11 @@ page 6184964 "NPR Spfy Tag Update Requests"
                     ToolTip = 'Specifies the NaviConnect task entry number created for the Shopify tag update request.';
                     ApplicationArea = NPRShopify;
                 }
+                field("Spfy Task Entry No."; Rec."Spfy Task Entry No.")
+                {
+                    ToolTip = 'Specifies the Shopify task list entry number created for the Shopify tag update request.';
+                    ApplicationArea = NPRShopify;
+                }
             }
         }
     }

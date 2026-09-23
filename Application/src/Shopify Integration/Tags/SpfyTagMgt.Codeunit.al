@@ -20,6 +20,23 @@ codeunit 6248287 "NPR Spfy Tag Mgt."
         RequestJson.WriteTo(QueryStream);
     end;
 
+    internal procedure ShopifyEntityTagsUpdateQuery(SpfyTask: Record "NPR Spfy Task"; ShopifyOwnerType: Enum "NPR Spfy Tag Owner Type"; ShopifyOwnerID: Text[30]; var QueryStream: OutStream) SendToShopify: Boolean
+    var
+        CurrentEntityTags: JsonArray;
+        RequestJson: JsonObject;
+        TagUpdateSet: JsonObject;
+        OwnerTypeTxt: Text;
+        TagsUpdateQueryTok: Label 'mutation UdpateTags($ownerId: ID!, $removeTags: [String!]!, $addTags: [String!]!) { tagsRemove(id: $ownerId, tags: $removeTags) { node { id } userErrors{ field message }} tagsAdd(id: $ownerId, tags: $addTags) { node { id } userErrors{ field message }}}', Locked = true;
+    begin
+        OwnerTypeTxt := GetOwnerTypeAsText(ShopifyOwnerType);
+        GetShopifyEntityTags(OwnerTypeTxt, ShopifyOwnerID, SpfyTask."Store Code", false, CurrentEntityTags);
+        SendToShopify := GenerateSpfyTaskTagSet(SpfyTask."Entry No.", SpfyTask."Record ID", OwnerTypeTxt, ShopifyOwnerID, CurrentEntityTags, TagUpdateSet);
+
+        RequestJson.Add('query', TagsUpdateQueryTok);
+        RequestJson.Add('variables', TagUpdateSet);
+        RequestJson.WriteTo(QueryStream);
+    end;
+
     local procedure GetShopifyEntityTags(OwnerTypeTxt: Text; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20]; WithDialog: Boolean; var ShopifyEntityTags: JsonArray)
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
@@ -115,11 +132,74 @@ codeunit 6248287 "NPR Spfy Tag Mgt."
         end;
     end;
 
+    local procedure GenerateSpfyTaskTagSet(SpfyTaskEntryNo: BigInteger; EntityRecID: RecordId; OwnerTypeTxt: Text; ShopifyOwnerID: Text[30]; CurrentEntityTags: JsonArray; var TagUpdateSet: JsonObject): Boolean
+    var
+        TagUpdateRequest: Record "NPR Spfy Tag Update Request";
+        AddTags: JsonArray;
+        RemoveTags: JsonArray;
+    begin
+        Clear(TagUpdateSet);
+#if not (BC18 or BC19 or BC20 or BC21)
+        TagUpdateRequest.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        TagUpdateRequest.LockTable();
+#endif
+        TagUpdateRequest.SetCurrentKey("Table No.", "BC Record ID", Type);
+        TagUpdateRequest.SetRange("Table No.", EntityRecID.TableNo());
+        TagUpdateRequest.SetRange("BC Record ID", EntityRecID);
+        TagUpdateRequest.SetRange(Type, TagUpdateRequest.Type::Remove);
+        TagUpdateRequest.SetFilter("Spfy Task Entry No.", '%1|%2', 0, SpfyTaskEntryNo);
+        if TagUpdateRequest.FindSet() then
+            repeat
+                TouchSpfyTaskTagUpdateRequest(TagUpdateRequest, SpfyTaskEntryNo, CurrentEntityTags.IndexOf(TagUpdateRequest."Tag Value") <> -1, RemoveTags);  // Tag is present in Shopify, but should be removed
+            until TagUpdateRequest.Next() = 0;
+
+        TagUpdateRequest.SetRange(Type, TagUpdateRequest.Type::"Add");
+        if TagUpdateRequest.FindSet() then
+            repeat
+                TouchSpfyTaskTagUpdateRequest(TagUpdateRequest, SpfyTaskEntryNo, CurrentEntityTags.IndexOf(TagUpdateRequest."Tag Value") = -1, AddTags); // Tag is not present in Shopify, but should be added
+            until TagUpdateRequest.Next() = 0;
+
+        TagUpdateSet.Add('ownerId', StrSubstNo('gid://shopify/%1/%2', OwnerTypeTxt, ShopifyOwnerID));
+        TagUpdateSet.Add('addTags', AddTags);
+        TagUpdateSet.Add('removeTags', RemoveTags);
+        exit((AddTags.Count() > 0) or (RemoveTags.Count() > 0));
+    end;
+
+    local procedure TouchSpfyTaskTagUpdateRequest(TagUpdateRequest: Record "NPR Spfy Tag Update Request"; SpfyTaskEntryNo: BigInteger; AddTagToArray: Boolean; var TagsToUpdate: JsonArray)
+    var
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+    begin
+        if not (TagUpdateRequest."Spfy Task Entry No." in [0, SpfyTaskEntryNo]) then begin
+            if SpfyTaskQueue.TaskExists(TagUpdateRequest."Spfy Task Entry No.") then
+                exit;
+            TagUpdateRequest."Spfy Task Entry No." := 0;
+        end;
+        if AddTagToArray then
+            if TagsToUpdate.IndexOf(TagUpdateRequest."Tag Value") = -1 then
+                TagsToUpdate.Add(TagUpdateRequest."Tag Value");
+
+        if TagUpdateRequest."Spfy Task Entry No." = 0 then begin
+            TagUpdateRequest."Spfy Task Entry No." := SpfyTaskEntryNo;
+            TagUpdateRequest."Nc Task Entry No." := 0;
+            TagUpdateRequest.Modify();
+        end;
+    end;
+
     internal procedure RemoveTagUpdateRequests(NcTaskEntryNo: BigInteger)
     var
         TagUpdateRequest: Record "NPR Spfy Tag Update Request";
     begin
         TagUpdateRequest.SetRange("Nc Task Entry No.", NcTaskEntryNo);
+        if not TagUpdateRequest.IsEmpty() then
+            TagUpdateRequest.DeleteAll();
+    end;
+
+    internal procedure RemoveSpfyTaskTagUpdateRequests(SpfyTaskEntryNo: BigInteger)
+    var
+        TagUpdateRequest: Record "NPR Spfy Tag Update Request";
+    begin
+        TagUpdateRequest.SetRange("Spfy Task Entry No.", SpfyTaskEntryNo);
         if not TagUpdateRequest.IsEmpty() then
             TagUpdateRequest.DeleteAll();
     end;

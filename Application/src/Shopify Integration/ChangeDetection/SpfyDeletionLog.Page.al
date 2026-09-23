@@ -79,6 +79,11 @@ page 6150971 "NPR Spfy Deletion Log"
                     ApplicationArea = NPRShopify;
                     ToolTip = 'Specifies the task that carries the delete request to Shopify, once the entry has been processed.';
                 }
+                field("Spfy Task Entry No."; Rec."Spfy Task Entry No.")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies the Shopify task list entry number that carries the delete request to Shopify, once the entry has been processed.';
+                }
                 field("Record ID"; Format(Rec."Record ID"))
                 {
                     ApplicationArea = NPRShopify;

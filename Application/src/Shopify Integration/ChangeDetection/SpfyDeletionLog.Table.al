@@ -34,6 +34,9 @@ table 6151227 "NPR Spfy Deletion Log"
         field(9; "NC Task Entry No."; BigInteger)
         {
             Caption = 'NC Task Entry No.';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-07-25';
+            ObsoleteReason = 'Replaced by "Spfy Task Entry No." after the Shopify Task List migration; still written on the legacy path until NC phase-out.';
         }
         field(10; "Item No."; Code[20])
         {
@@ -64,6 +67,11 @@ table 6151227 "NPR Spfy Deletion Log"
             Caption = 'Dispatch Failure Count';
             Editable = false;
         }
+        field(25; "Spfy Task Entry No."; BigInteger)
+        {
+            Caption = 'Shopify Task Entry No.';
+            TableRelation = "NPR Spfy Task"."Entry No.";
+        }
     }
 
     keys
@@ -79,6 +87,12 @@ table 6151227 "NPR Spfy Deletion Log"
         {
         }
         key(Entity; "Table No.", "Entity System Id", "Shopify Store Code", Status)
+        {
+        }
+        key(NcTask; "NC Task Entry No.")
+        {
+        }
+        key(SpfyTask; "Spfy Task Entry No.", Status)
         {
         }
     }

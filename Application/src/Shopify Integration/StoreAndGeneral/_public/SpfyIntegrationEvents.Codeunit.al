@@ -128,6 +128,16 @@ codeunit 6184824 "NPR Spfy Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnTreatSuccessfulSpfyTaskResponseAsError(SpfyTask: Record "NPR Spfy Task"; ResponseMsg: HttpResponseMessage; ResponseJToken: JsonToken; var ErrorTxt: Text; var IsError: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnTreatErroneousSpfyTaskResponseAsSuccess(SpfyTask: Record "NPR Spfy Task"; ResponseMsg: HttpResponseMessage; ResponseJToken: JsonToken; var ErrorTxt: Text; var IsSuccess: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnAfterGenerateVariantJObject(ItemVariant: Record "Item Variant"; var VariantJObject: JsonObject)
     begin
     end;

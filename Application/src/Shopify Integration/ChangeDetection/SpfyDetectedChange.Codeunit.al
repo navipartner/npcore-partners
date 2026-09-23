@@ -16,6 +16,7 @@ codeunit 6151184 "NPR Spfy Detected Change"
         _CustomerNo: Code[20];
         _DeletionLogEntryNo: BigInteger;
         _CreatedNcTaskEntryNo: BigInteger;
+        _CreatedTaskQueue: Enum "NPR Spfy Task Dest Queue";
 
     procedure Init(IntegrationAreaParam: Enum "NPR Spfy Integration Area"; ChangeTypeParam: Enum "NPR Spfy Change Type"; TableNoParam: Integer; RecordIdParam: RecordId; SystemIdParam: Guid)
     begin
@@ -26,6 +27,7 @@ codeunit 6151184 "NPR Spfy Detected Change"
         Clear(_CustomerNo);
         Clear(_DeletionLogEntryNo);
         Clear(_CreatedNcTaskEntryNo);
+        Clear(_CreatedTaskQueue);
         _IntegrationArea := IntegrationAreaParam;
         _ChangeType := ChangeTypeParam;
         _TableNo := TableNoParam;
@@ -116,5 +118,15 @@ codeunit 6151184 "NPR Spfy Detected Change"
     procedure CreatedNcTaskEntryNo(): BigInteger
     begin
         exit(_CreatedNcTaskEntryNo);
+    end;
+
+    procedure SetCreatedTaskQueue(TaskQueueParam: Enum "NPR Spfy Task Dest Queue")
+    begin
+        _CreatedTaskQueue := TaskQueueParam;
+    end;
+
+    procedure CreatedTaskQueue(): Enum "NPR Spfy Task Dest Queue"
+    begin
+        exit(_CreatedTaskQueue);
     end;
 }

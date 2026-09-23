@@ -9,6 +9,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        _SpfyTaskQueueIsActive: Boolean;
 
     procedure SetupTaskProcessingJobQueues()
     var
@@ -36,6 +37,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         FilterPlaceholderTok: Label '@*%1?%2*', Locked = true;
     begin
+        if TaskListMigrationStarted() then
+            Enable := false;
         if Enable then begin
             JobQueueMgt.SetStoreCode(ShopifyStoreCode);
             JobQueueMgt.SetProtected(true);
@@ -49,6 +52,27 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             if not JobQueueEntry.IsEmpty() then
                 JobQueueMgt.CancelNpManagedJobs(JobQueueEntry);
         end;
+    end;
+
+    local procedure TaskListMigrationStarted(): Boolean
+    var
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+    begin
+        SpfyIntegrationSetup.SetLoadFields("Task List Migration Status");
+        if not SpfyIntegrationSetup.Get() then
+            exit(false);
+        exit(SpfyIntegrationSetup."Task List Migration Status" in
+            [SpfyIntegrationSetup."Task List Migration Status"::Migrating, SpfyIntegrationSetup."Task List Migration Status"::Completed]);
+    end;
+
+    local procedure TaskListMigrationCompleted(): Boolean
+    var
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+    begin
+        SpfyIntegrationSetup.SetLoadFields("Task List Migration Status");
+        if not SpfyIntegrationSetup.Get() then
+            exit(false);
+        exit(SpfyIntegrationSetup."Task List Migration Status" = SpfyIntegrationSetup."Task List Migration Status"::Completed);
     end;
 
     procedure GetShopifyTaskProcessorCode(AutoCreate: Boolean): Code[20]
@@ -109,54 +133,92 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     /// <returns>Whether a new task has been created. The procedure will return false, if an existing task is found.</returns>
     procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; RecID: RecordId; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; NotBeforeDateTime: DateTime; ReuseExistingDelayed: Enum "NPR Spfy Reuse Delayed NC Task"; var NcTask: Record "NPR Nc Task"): Boolean
     var
-        NcTask2: Record "NPR Nc Task";
+        CreatedTaskQueue: Enum "NPR Spfy Task Dest Queue";
     begin
-        NcTask.Init();
-        NcTask."Entry No." := 0;
-        NcTask."Task Processor Code" := GetShopifyTaskProcessorCode(true);
-        NcTask.Type := TaskType;
-        NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
-        NcTask."Table No." := RecRef.Number();
-        NcTask."Table Name" := CopyStr(RecRef.Name(), 1, MaxStrLen(NcTask."Table Name"));
-        NcTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NcTask."Record Position"));
-        NcTask."Record ID" := RecID;
-        NcTask."Record Value" := CopyStr(TaskRecordValue, 1, MaxStrLen(NcTask."Record Value"));
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Not Before Date-Time" := NotBeforeDateTime;
+        exit(InitNcTask(ShopifyStoreCode, RecRef, RecID, TaskRecordValue, TaskType, LogDateTime, NotBeforeDateTime, ReuseExistingDelayed, CreatedTaskQueue, NcTask));
+    end;
 
-        NcTask2.SetCurrentKey(Type, "Table No.", "Record Position");
-        if NcTask.Type = NcTask.Type::Modify then
-            NcTask2.SetRange(Type, NcTask.Type::Insert, NcTask.Type::Modify)
-        else
-            NcTask2.SetRange(Type, NcTask.Type);
-        NcTask2.SetRange("Table No.", NcTask."Table No.");
-        NcTask2.SetRange(Processed, false);
-        NcTask2.SetRange("Task Processor Code", NcTask."Task Processor Code");
-        NcTask2.SetRange("Company Name", NcTask."Company Name");
-        NcTask2.SetRange("Record ID", NcTask."Record ID");
-        NcTask2.SetRange("Record Value", NcTask."Record Value");
-        NcTask2.SetRange("Store Code", NcTask."Store Code");
-        case ReuseExistingDelayed of
-            ReuseExistingDelayed::No:
-                NcTask2.SetRange("Not Before Date-Time", NcTask."Not Before Date-Time");
-            ReuseExistingDelayed::Later:
-                if NcTask."Not Before Date-Time" <> 0DT then
-                    NcTask2.SetFilter("Not Before Date-Time", '%1..', NcTask."Not Before Date-Time");
-            ReuseExistingDelayed::Any:
-                ; // No filter on Not Before Date-Time  
-        end;
-        NcTask2.SetFilter("Log Date", '%1..', CreateDateTime(Today() - 1, 0T));
-        if NcTask2.FindLast() then begin
-            NcTask := NcTask2;
-            exit(false);
-        end;
+    procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; RecID: RecordId; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; NotBeforeDateTime: DateTime; ReuseExistingDelayed: Enum "NPR Spfy Reuse Delayed NC Task"; var CreatedTaskQueue: Enum "NPR Spfy Task Dest Queue"; var NcTask: Record "NPR Nc Task"): Boolean
+    var
+        NcTask2: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        TaskCreated: Boolean;
+    begin
+        if SpfyTaskQueueIsActive() then begin
+            CreatedTaskQueue := "NPR Spfy Task Dest Queue"::"Spfy Task";
+            TaskCreated := SpfyTaskQueue.Enqueue(ShopifyStoreCode, RecRef, RecID, TaskRecordValue, Enum::"NPR Spfy Task Op".FromInteger(TaskType), LogDateTime, NotBeforeDateTime, ReuseExistingDelayed, CurrentDateTime(), SpfyTask);
+            // In-memory mirror of the enqueued row for callers still typed on "NPR Nc Task": never inserted or modified.
+            NcTask.Init();
+            NcTask."Entry No." := SpfyTask."Entry No.";
+            NcTask.Type := SpfyTask.Type.AsInteger();
+            NcTask."Table No." := SpfyTask."Table No.";
+            NcTask."Table Name" := CopyStr(RecRef.Name(), 1, MaxStrLen(NcTask."Table Name"));
+            NcTask."Record ID" := SpfyTask."Record ID";
+            NcTask."Record Value" := SpfyTask."Record Value";
+            NcTask."Store Code" := SpfyTask."Store Code";
+            NcTask."Log Date" := SpfyTask."Log Date";
+            NcTask."Not Before Date-Time" := SpfyTask."Not Before Date-Time";
+            exit(TaskCreated);
+        end else begin
+            CreatedTaskQueue := "NPR Spfy Task Dest Queue"::"Nc Task";
+            NcTask.Init();
+            NcTask."Entry No." := 0;
+            NcTask."Task Processor Code" := GetShopifyTaskProcessorCode(true);
+            NcTask.Type := TaskType;
+            NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
+            NcTask."Table No." := RecRef.Number();
+            NcTask."Table Name" := CopyStr(RecRef.Name(), 1, MaxStrLen(NcTask."Table Name"));
+            NcTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NcTask."Record Position"));
+            NcTask."Record ID" := RecID;
+            NcTask."Record Value" := CopyStr(TaskRecordValue, 1, MaxStrLen(NcTask."Record Value"));
+            NcTask."Store Code" := ShopifyStoreCode;
+            NcTask."Not Before Date-Time" := NotBeforeDateTime;
 
-        if LogDateTime <> 0DT then
-            NcTask."Log Date" := LogDateTime
-        else
-            NcTask."Log Date" := CurrentDateTime();
-        NcTask.Insert(true);
-        exit(true);
+            NcTask2.SetCurrentKey(Type, "Table No.", "Record Position");
+            if NcTask.Type = NcTask.Type::Modify then
+                NcTask2.SetRange(Type, NcTask.Type::Insert, NcTask.Type::Modify)
+            else
+                NcTask2.SetRange(Type, NcTask.Type);
+            NcTask2.SetRange("Table No.", NcTask."Table No.");
+            NcTask2.SetRange(Processed, false);
+            NcTask2.SetRange("Task Processor Code", NcTask."Task Processor Code");
+            NcTask2.SetRange("Company Name", NcTask."Company Name");
+            NcTask2.SetRange("Record ID", NcTask."Record ID");
+            NcTask2.SetRange("Record Value", NcTask."Record Value");
+            NcTask2.SetRange("Store Code", NcTask."Store Code");
+            case ReuseExistingDelayed of
+                ReuseExistingDelayed::No:
+                    NcTask2.SetRange("Not Before Date-Time", NcTask."Not Before Date-Time");
+                ReuseExistingDelayed::Later:
+                    if NcTask."Not Before Date-Time" <> 0DT then
+                        NcTask2.SetFilter("Not Before Date-Time", '%1..', NcTask."Not Before Date-Time");
+                ReuseExistingDelayed::Any:
+                    ; // No filter on Not Before Date-Time  
+            end;
+            NcTask2.SetFilter("Log Date", '%1..', CreateDateTime(Today() - 1, 0T));
+            if NcTask2.FindLast() then begin
+                NcTask := NcTask2;
+                exit(false);
+            end;
+
+            if LogDateTime <> 0DT then
+                NcTask."Log Date" := LogDateTime
+            else
+                NcTask."Log Date" := CurrentDateTime();
+            NcTask.Insert(true);
+            exit(true);
+        end;
+    end;
+
+    // Only a true is cached: the migration flips the feature mid-session, so a cached false would keep routing to the legacy queue.
+    local procedure SpfyTaskQueueIsActive(): Boolean
+    var
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+    begin
+        if not _SpfyTaskQueueIsActive then
+            _SpfyTaskQueueIsActive := SpfyTaskListFeature.IsFeatureEnabled();
+        exit(_SpfyTaskQueueIsActive);
     end;
 
     procedure ToggleSpfyItemPriceSyncJobQueue(Enabled: Boolean)
@@ -269,6 +331,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     local procedure CreateTaskSetup(var Task: Record "NPR Nc Task")
     begin
         if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> GetShopifyTaskProcessorCode(false)) then
+            exit;
+        if TaskListMigrationCompleted() then
             exit;
         case Task."Table No." of
             Database::Item,

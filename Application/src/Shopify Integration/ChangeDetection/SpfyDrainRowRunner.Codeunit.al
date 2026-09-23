@@ -23,7 +23,7 @@ codeunit 6151276 "NPR Spfy Drain Row Runner"
         DetectedChange.SetDeleteRouting(LockedRow."Item No.", LockedRow."Variant Code", LockedRow."Customer No.", LockedRow."Entry No.");
 
         if SpfyChangeDispatcher.Dispatch(DetectedChange) and (DetectedChange.CreatedNcTaskEntryNo() <> 0) then
-            SpfyDeletionLogMgt.MarkProcessed(LockedRow."Entry No.", DetectedChange.CreatedNcTaskEntryNo());
+            SpfyDeletionLogMgt.MarkProcessed(LockedRow."Entry No.", DetectedChange.CreatedNcTaskEntryNo(), DetectedChange.CreatedTaskQueue());
 
         // Per-row commit: a later-row failure must not roll back rows already drained this cycle.
         Commit();

@@ -386,7 +386,8 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
         _Assert.AreEqual(1, _Lib.TaskCountForValue(Database::Item, Item."No."), 'The deferred modify must be sent on the next cycle');
         DeletionLog.Get(DeleteEntryNo);
         _Assert.IsTrue(DeletionLog.Status = DeletionLog.Status::Processed, 'The deferred delete must drain on the next cycle');
-        _Assert.IsTrue(NcTask.Get(DeletionLog."NC Task Entry No."), 'The drained delete must reference its NC task');
+        _Assert.IsTrue(_Lib.TaskLinkedToDeletionLog(DeleteEntryNo), 'The drained delete must reference the task it produced');
+        _Assert.IsTrue(_Lib.FindLastTask(Database::"Item Variant", NcTask), 'The drained delete must have produced a task');
         _Assert.IsTrue(NcTask.Type = NcTask.Type::Delete, 'The drained task must be a Delete task');
     end;
 

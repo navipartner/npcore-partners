@@ -80,6 +80,23 @@ page 6184553 "NPR Spfy Integration Setup"
                     Editable = false;
                 }
             }
+            group(TaskListMigration)
+            {
+                Caption = 'Shopify Task List Migration';
+                Visible = _ShowTaskListMigrationUI;
+                field("Task List Migration Status"; Rec."Task List Migration Status")
+                {
+                    ToolTip = 'Specifies the status of the one-way migration from the NaviConnect task list to the Shopify task list. A failed migration can be run again with the "Migrate to Shopify Task List" action.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+                field("Task List Migr. Started At"; Rec."Task List Migr. Started At")
+                {
+                    ToolTip = 'Specifies when the most recent Shopify task list migration run started.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+            }
             part(ShopifyStores; "NPR Spfy Stores Subpage")
             {
                 ApplicationArea = NPRShopify;
@@ -213,6 +230,23 @@ page 6184553 "NPR Spfy Integration Setup"
                     begin
                         CurrPage.SaveRecord();
                         SpfyRowVersionMigration.MigrateAndEnable();
+                        CurrPage.Update(false);
+                    end;
+                }
+                action(MigrateToShopifyTaskList)
+                {
+                    Caption = 'Migrate to Shopify Task List';
+                    ToolTip = 'Runs the one-way migration of this environment from the NaviConnect task list to the Shopify task list, in a single step. Choose foreground (runs now, blocking) or background (recommended when there is a large backlog of unprocessed tasks). It switches every Shopify store in this environment over to the new queue, stops the NaviConnect task processing jobs, processes the remaining NaviConnect tasks, re-creates the ones scheduled for a later time in the new queue, and finally schedules the new task processing jobs. Safe to re-run if interrupted.';
+                    ApplicationArea = NPRShopify;
+                    Image = Migration;
+                    Visible = _ShowTaskListMigrationUI;
+
+                    trigger OnAction()
+                    var
+                        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+                    begin
+                        CurrPage.SaveRecord();
+                        SpfyTaskListMigration.MigrateAndEnable();
                         CurrPage.Update(false);
                     end;
                 }
@@ -353,11 +387,32 @@ page 6184553 "NPR Spfy Integration Setup"
         end;
         PreparexDataSet();
         HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
+        NotifyOfTaskListResiduals();
+    end;
+
+    // A completed migration leaves no legacy row with attempts still to spend, so any unprocessed row left is a residual.
+    local procedure NotifyOfTaskListResiduals()
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        ResidualNotification: Notification;
+        ResidualNotificationMsg: Label 'Some NaviConnect task(s) were left behind by the Shopify task list migration. The updates they carry have not been sent to Shopify. Use a re-sync to recover the affected records.';
+    begin
+        if Rec."Task List Migration Status" <> Rec."Task List Migration Status"::Completed then
+            exit;
+        if not NcTask.ReadPermission() then
+            exit;
+        SpfyTaskListMigration.FilterUnprocessedLegacyRows(NcTask);
+        if NcTask.IsEmpty() then
+            exit;
+        ResidualNotification.Message(ResidualNotificationMsg);
+        ResidualNotification.Send();
     end;
 
     trigger OnAfterGetCurrRecord()
     var
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
     begin
         RowVersionFeatureEnabled := SpfyRowVersionFeature.IsFeatureEnabled();
         // Seeding fast-forwards every tracker mark, so it stays on the pre-cutover predicate and unreachable once the Data Log wiring is gone.
@@ -369,6 +424,9 @@ page 6184553 "NPR Spfy Integration Setup"
             ShowRowVersionSeedingUI or
             ((Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::Completed) and
             (Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::NotStarted));
+        _ShowTaskListMigrationUI :=
+            SpfyTaskListFeature.AllPhasesShipped() and
+            (Rec."Task List Migration Status" <> Rec."Task List Migration Status"::Completed);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -432,5 +490,6 @@ page 6184553 "NPR Spfy Integration Setup"
         RowVersionFeatureEnabled: Boolean;
         ShowRowVersionMigrationUI: Boolean;
         ShowRowVersionSeedingUI: Boolean;
+        _ShowTaskListMigrationUI: Boolean;
 }
 #endif

@@ -37,6 +37,7 @@ table 6150810 "NPR Spfy Store"
                 SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
 #endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+                SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
                 SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
             begin
                 if Enabled then
@@ -51,6 +52,7 @@ table 6150810 "NPR Spfy Store"
                 ShopifyStore.Get("Code");
                 ShopifyStore.SetRecFilter();
                 SpfyScheduleSend.SetupTaskProcessingJobQueues(ShopifyStore);
+                SpfyTaskJQSetup.SetupTaskProcessingJobQueues();
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
                 if ShopifyEcommOrderExp.IsFeatureEnabled() then
                     SpfyEcomSalesDocPrcssr.SetupJobQueues()
@@ -640,6 +642,8 @@ table 6150810 "NPR Spfy Store"
         SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
         SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
     begin
         SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
         if not SpfyAllowedFinStatus.IsEmpty() then
@@ -648,6 +652,8 @@ table 6150810 "NPR Spfy Store"
         if not SpfyDataSyncPointer.IsEmpty() then
             SpfyDataSyncPointer.DeleteAll();
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        SpfyTaskJQSetup.CancelTaskProcessingJobQueue(Rec.Code);
+        SpfyTaskQueue.DeleteAllForStore(Rec.Code);
     end;
 
     internal procedure NoOfPriceUpdatesPerRequest(): Integer

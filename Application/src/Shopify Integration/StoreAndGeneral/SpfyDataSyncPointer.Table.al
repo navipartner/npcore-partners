@@ -33,6 +33,11 @@ table 6151261 "NPR Spfy Data Sync. Pointer"
             DataClassification = CustomerContent;
         }
 #endif
+        field(21; "Last Task List Cycle At"; DateTime)
+        {
+            Caption = 'Last Task List Cycle At';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

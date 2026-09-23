@@ -38,6 +38,15 @@ table 6151049 "NPR Spfy Tag Update Request"
             Caption = 'Nc Task Entry No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR Nc Task"."Entry No.";
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-07-25';
+            ObsoleteReason = 'Replaced by "Spfy Task Entry No." after the Shopify Task List migration; still written on the legacy path until NC phase-out.';
+        }
+        field(45; "Spfy Task Entry No."; BigInteger)
+        {
+            Caption = 'Shopify Task Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Spfy Task"."Entry No.";
         }
         field(50; Type; Option)
         {
@@ -61,6 +70,7 @@ table 6151049 "NPR Spfy Tag Update Request"
         key(Key2; "Table No.", "BC Record ID", Type) { }
         key(Key3; "Table No.", "BC Record ID", "Tag Value") { }
         key(Key4; "Nc Task Entry No.") { }
+        key(Key5; "Spfy Task Entry No.") { }
     }
 }
 #endif
