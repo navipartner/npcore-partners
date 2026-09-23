@@ -257,6 +257,45 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         ReconciliationHeader.TestField(Status, ReconciliationHeader.Status::Matched);
     end;
 
+    [Test]
+    procedure MatchingProcess_POSAPI()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        PSPReference: Code[16];
+        Amount: Decimal;
+    begin
+        // [Scenario] A card payment captured through the POS API gets matched, which requires POS_API to be part of the
+        // Adyen integration type filter that SetEFTAdyenIntegrationFilter applies before the matcher looks up the PSP
+        // reference. Without it the request is invisible to the EFT matcher and the line falls through as unmatched.
+        Initialize();
+        PSPReference := GenerateUniquePSPReference();
+        Amount := 250;
+
+        // [Given] An EFT Transaction Request created the way the POS API payment endpoint creates one
+        CreatePOSAPIEFTTransactionRequest(EFTTransactionRequest, PSPReference, Amount);
+
+        // [Given] A recon header and an unmatched Settled line for the same PSP reference + amount
+        CreateReconHeader(ReconciliationHeader);
+        InsertSettledReconLine(ReconciliationLine, ReconciliationHeader, PSPReference, Amount);
+
+        // [When] Running the matching pass
+        AdyenTransMatching.MatchEntries(ReconciliationHeader);
+
+        // [Then] The recon line is bound to the POS API EFT transaction record and marked Matched
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField("Matching Table Name", ReconciliationLine."Matching Table Name"::"EFT Transaction");
+        ReconciliationLine.TestField("Matching Entry System ID", EFTTransactionRequest.SystemId);
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::Matched);
+
+        // [Then] The header now reflects the matched status
+        ReconciliationHeader.Find();
+        ReconciliationHeader.TestField(Status, ReconciliationHeader.Status::Matched);
+        ReconciliationHeader.TestField("Failed Lines Exist", false);
+    end;
+
     #endregion
 
     #region [Posting Process]
@@ -1595,6 +1634,40 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         EFTTransactionRequest."Transaction Time" := Time();
         EFTTransactionRequest.Finished := CurrentDateTime();
         EFTTransactionRequest.Insert();
+    end;
+
+    local procedure CreatePOSAPIEFTTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; PSPReference: Code[16]; Amount: Decimal)
+    var
+        ApiPOSPaymentLine: Codeunit "NPR API POS Payment Line";
+        SalesTicketNo: Code[20];
+    begin
+        // Mirrors the field set that "NPR API POS Payment Line".CreateEFTPayment writes for a successful card payment.
+        // See CreateEFTTransactionRequest for why the request needs a matching POS Entry.
+        SalesTicketNo := CopyStr('POSAPI-' + DelChr(Format(CreateGuid()), '=', '{}-'), 1, 20);
+        EnsurePOSEntryFor(SalesTicketNo);
+
+        EFTTransactionRequest.Init();
+        EFTTransactionRequest."Entry No." := 0;
+        EFTTransactionRequest."Integration Type" := ApiPOSPaymentLine.IntegrationType();
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::PAYMENT;
+        EFTTransactionRequest."PSP Reference" := PSPReference;
+        EFTTransactionRequest."External Transaction ID" := PSPReference;
+        EFTTransactionRequest."Reference Number Output" := PSPReference;
+        EFTTransactionRequest."Sales Ticket No." := SalesTicketNo;
+        EFTTransactionRequest."Currency Code" := _NetCurrency;
+        EFTTransactionRequest.Started := CurrentDateTime();
+        EFTTransactionRequest.Finished := CurrentDateTime();
+        EFTTransactionRequest."Transaction Date" := Today();
+        EFTTransactionRequest."Transaction Time" := Time();
+        EFTTransactionRequest.Successful := true;
+        EFTTransactionRequest."Amount Input" := Amount;
+        EFTTransactionRequest."Amount Output" := Amount;
+        EFTTransactionRequest."Result Amount" := Amount;
+        EFTTransactionRequest."Financial Impact" := true;
+        EFTTransactionRequest."External Result Known" := true;
+        EFTTransactionRequest."Result Processed" := true;
+        EFTTransactionRequest."Sales Line ID" := CreateGuid();
+        EFTTransactionRequest.Insert(true);
     end;
 
     local procedure CreatePostableEFTTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; PSPReference: Code[16]; Amount: Decimal) PaymentAccountNo: Code[20]

@@ -3,6 +3,11 @@ codeunit 6248629 "NPR API POS Payment Line"
 {
     Access = Internal;
 
+    procedure IntegrationType(): Code[20]
+    begin
+        exit('POS_API');
+    end;
+
     procedure ListPaymentLines(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         SaleId: Text;
@@ -282,7 +287,7 @@ codeunit 6248629 "NPR API POS Payment Line"
         EFTTransactionRequest."POS Description" := Description;
         EFTTransactionRequest."POS Payment Type Code" := ActualPaymentMethodCode;
         EFTTransactionRequest."Original POS Payment Type Code" := PaymentMethodCode;
-        EFTTransactionRequest."Integration Type" := 'POS_API';
+        EFTTransactionRequest."Integration Type" := IntegrationType();
         RecordedAt := CurrentDateTime;
         EFTTransactionRequest.Started := RecordedAt;
         EFTTransactionRequest.Finished := RecordedAt;
