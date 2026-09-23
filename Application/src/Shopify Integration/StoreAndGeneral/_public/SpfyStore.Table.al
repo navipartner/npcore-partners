@@ -38,16 +38,16 @@ table 6150810 "NPR Spfy Store"
 #endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
                 SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
-                SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+                SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
             begin
                 if Enabled then
                     TestField("Shopify Url");
                 Modify();
 
-                // Auto-adopt the RowVersion poll on a fresh environment (shared checked-enable guard). On a
-                // non-fresh environment this is a no-op and the legacy Data-Log path is used until the Phase 6c seeding migration.
+                // Auto-adopt the RowVersion poll and the Shopify task list on a fresh environment (shared coordinator).
+                // On a non-fresh environment this is a no-op and the legacy paths are used until the migrations are run.
                 if Enabled then
-                    SpfyRowVersionFeature.MaybeAutoAdoptFreshEnvironment("Code");
+                    SpfyTaskListFeature.MaybeAutoAdoptFreshEnvironment("Code");
 
                 ShopifyStore.Get("Code");
                 ShopifyStore.SetRecFilter();
@@ -611,18 +611,22 @@ table 6150810 "NPR Spfy Store"
         _SpfyWebhookMgt: Codeunit "NPR Spfy Webhook Mgt.";
 
     /// <summary>
-    /// Per-area enable routing. Auto-adopt first (so a fresh customer who toggles an area flag BEFORE the
-    /// master "Enabled" still adopts RowVersion rather than creating legacy Data Log setup that would poison the fresh
-    /// predicate). With the RowVersion feature on, register that area's polled tables + ensure the monitored detection job;
-    /// with the feature off (existing Data-Log integration), fall back to the legacy Data-Log path unchanged.
+    /// Per-area enable routing. Auto-adopt first, so a caller that enables an area before the feature still adopts
+    /// rather than creating legacy Data Log setup, whose subscriber rows are themselves what the freshness predicate
+    /// reads - once written, auto-adoption can never fire again. Not reachable that way from the UI (the NPRShopify
+    /// application area is off until the Shopify feature is enabled), but ApplicationArea does not gate code, and the
+    /// upgrade codeunit and the test fixtures validate these fields directly. With the RowVersion feature on, register
+    /// that area's polled tables + ensure the monitored detection job; with the feature off (existing Data-Log
+    /// integration), fall back to the legacy Data-Log path unchanged.
     /// </summary>
     local procedure SetupIntegrationArea(IntegrationArea: Enum "NPR Spfy Integration Area")
     var
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
         SpfyScheduleDetectionJQ: Codeunit "NPR Spfy Schedule Detection JQ";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
     begin
-        SpfyRowVersionFeature.MaybeAutoAdoptFreshEnvironment("Code");
+        SpfyTaskListFeature.MaybeAutoAdoptFreshEnvironment("Code");
         if SpfyRowVersionFeature.IsFeatureEnabled() then begin
             SpfyChangeTrackerMgt.RegisterArea(IntegrationArea);   // per-area, mirroring CreateDataLogSetup(area) granularity
             SpfyScheduleDetectionJQ.EnsureChangeDetectionJobScheduled();

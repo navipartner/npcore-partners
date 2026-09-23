@@ -110,7 +110,8 @@ codeunit 6151214 "NPR Spfy Task Processor"
                 if NeverCycled then
                     _SpfyTaskQueue.RestartWaitingSince(SpfyTaskToUpdate, AtDateTime)
                 else
-                    _SpfyTaskQueue.ShiftWaitingSince(SpfyTaskToUpdate, CycleGap, AtDateTime);
+                    // Forgive all but one grace of the silence: the clock then always advances, so a store queued behind busy siblings still ages, only slower than wall clock.
+                    _SpfyTaskQueue.ShiftWaitingSince(SpfyTaskToUpdate, CycleGap - EffectiveGrace, AtDateTime);
             until SpfyTask.Next() = 0;
         // One transaction, no deadline bail: the discount and its stamp land together or the error retries them whole.
         StampCycleRun(StoreCode, AtDateTime);
@@ -380,11 +381,15 @@ codeunit 6151214 "NPR Spfy Task Processor"
     local procedure DispatchSingle(var SpfyTask: Record "NPR Spfy Task")
     var
         ErrorText: Text;
+        DispatchFailedLbl: Label 'The task could not be sent to Shopify.';
     begin
-        if SendBoundary().Dispatch(SpfyTask, ErrorText) then
-            _SpfyTaskQueue.CompleteSingle(SpfyTask, true, '')
-        else
-            _SpfyTaskQueue.CompleteSingle(SpfyTask, false, ErrorText);
+        if SendBoundary().Dispatch(SpfyTask, ErrorText) then begin
+            _SpfyTaskQueue.CompleteSingle(SpfyTask, true, '');
+            exit;
+        end;
+        if ErrorText = '' then
+            ErrorText := DispatchFailedLbl;
+        _SpfyTaskQueue.CompleteSingle(SpfyTask, false, ErrorText);
     end;
 
     local procedure DispatchBatchGroups(var TempSpfyTaskBatch: Record "NPR Spfy Task" temporary; Deadline: DateTime)
@@ -409,6 +414,8 @@ codeunit 6151214 "NPR Spfy Task Processor"
         ClaimFloor: DateTime;
         ErrorText: Text;
         DispatchFailedLbl: Label 'The task could not be sent to Shopify. See the Shopify task list for the response of the other tasks sent in the same request.';
+        UnfinishedClaimLbl: Label 'The task was claimed by a subscriber extension but never completed. It has been failed so the standard retry handling applies.';
+        HandledWithoutClaimLbl: Label 'A subscriber extension reported the task group as handled but claimed none of its tasks.';
     begin
         ClaimFloor := _SpfyTaskRunContext.CycleTime();
         if ClaimFloor = 0DT then
@@ -416,12 +423,28 @@ codeunit 6151214 "NPR Spfy Task Processor"
 
         // A batch dispatch runs through Codeunit.Run, which raises at the call site if the ambient transaction has pending writes.
         Commit();
+        _SpfyTaskRunContext.ClearBatchClaims();
         // The send codeunit charges the row whose preparation aborted, so a successful dispatch leaves nothing to sweep.
-        if SendBoundary().Dispatch(TempSpfyTaskGroup, ErrorText) then
+        if SendBoundary().Dispatch(TempSpfyTaskGroup, ErrorText) then begin
+            // A subscriber extension owns no sweep of its own, so a claim it left open would sit In Flight until the dead-claim reaper.
+            if _SpfyTaskRunContext.GetPTEHandled() then begin
+                SweepUnfinishedClaims(TempSpfyTaskGroup, ClaimFloor, UnfinishedClaimLbl);
+                // Handled with no claim at all re-dispatches the same rows every cycle in silence; after the deadline the refusal is ours, not the subscriber's.
+                if not _SpfyTaskRunContext.DeadlineExpired() then
+                    if not _SpfyTaskRunContext.AnyBatchClaimIn(TempSpfyTaskGroup) then
+                        ChargeUnclaimedGroup(TempSpfyTaskGroup, HandledWithoutClaimLbl);
+            end;
             exit;
+        end;
         if ErrorText = '' then
             ErrorText := DispatchFailedLbl;
-        SweepUnfinishedClaims(TempSpfyTaskGroup, ClaimFloor, ErrorText);
+        if GroupHasUnfinishedClaim(TempSpfyTaskGroup, ClaimFloor) then begin
+            SweepUnfinishedClaims(TempSpfyTaskGroup, ClaimFloor, ErrorText);
+            exit;
+        end;
+        // Nothing was claimed at all (no subscriber, an unmapped kind, a send that failed before its first claim):
+        // without charging the group here it would re-dispatch every cycle in silence.
+        ChargeUnclaimedGroup(TempSpfyTaskGroup, ErrorText);
     end;
 
     local procedure SweepUnfinishedClaims(var TempSpfyTaskGroup: Record "NPR Spfy Task" temporary; ClaimFloor: DateTime; ErrorText: Text)
@@ -430,15 +453,8 @@ codeunit 6151214 "NPR Spfy Task Processor"
         SpfyTask: Record "NPR Spfy Task";
         ResponseJson: JsonToken;
     begin
-        if not TempSpfyTaskGroup.FindFirst() then
+        if not FilterUnfinishedClaims(SpfyTask, TempSpfyTaskGroup, ClaimFloor) then
             exit;
-        SpfyTask.SetCurrentKey("Store Code", State, "Not Before Date-Time");
-        SpfyTask.SetRange("Store Code", TempSpfyTaskGroup."Store Code");
-        SpfyTask.SetRange(State, SpfyTask.State::"In Flight");
-        SpfyTask.SetRange("Claimed By Server Instance", ServiceInstanceId());
-        SpfyTask.SetRange("Claimed By Session", SessionId());
-        SpfyTask.SetFilter("Claimed At", '>=%1', ClaimFloor);
-        SpfyTask.SetLoadFields("Entry No.");
         if not SpfyTask.FindSet() then
             exit;
         repeat
@@ -447,19 +463,45 @@ codeunit 6151214 "NPR Spfy Task Processor"
         until SpfyTask.Next() = 0;
     end;
 
+    local procedure GroupHasUnfinishedClaim(var TempSpfyTaskGroup: Record "NPR Spfy Task" temporary; ClaimFloor: DateTime): Boolean
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if not FilterUnfinishedClaims(SpfyTask, TempSpfyTaskGroup, ClaimFloor) then
+            exit(false);
+        exit(not SpfyTask.IsEmpty());
+    end;
+
+    local procedure FilterUnfinishedClaims(var SpfyTask: Record "NPR Spfy Task"; var TempSpfyTaskGroup: Record "NPR Spfy Task" temporary; ClaimFloor: DateTime): Boolean
+    begin
+        if not TempSpfyTaskGroup.FindFirst() then
+            exit(false);
+        SpfyTask.SetCurrentKey("Store Code", State, "Not Before Date-Time");
+        SpfyTask.SetRange("Store Code", TempSpfyTaskGroup."Store Code");
+        // The group is one table kind, so a claim of another kind this session made in the same cycle is not ours to sweep.
+        SpfyTask.SetRange("Table No.", TempSpfyTaskGroup."Table No.");
+        SpfyTask.SetRange(State, SpfyTask.State::"In Flight");
+        SpfyTask.SetRange("Claimed By Server Instance", ServiceInstanceId());
+        SpfyTask.SetRange("Claimed By Session", SessionId());
+        SpfyTask.SetFilter("Claimed At", '>=%1', ClaimFloor);
+        SpfyTask.SetLoadFields("Entry No.");
+        exit(true);
+    end;
+
+    local procedure ChargeUnclaimedGroup(var TempSpfyTaskGroup: Record "NPR Spfy Task" temporary; ErrorText: Text)
+    begin
+        if not TempSpfyTaskGroup.FindSet() then
+            exit;
+        repeat
+            if _SpfyTaskQueue.RecordUnclaimedFailure(TempSpfyTaskGroup."Entry No.", TempSpfyTaskGroup.Attempts, ErrorText) then
+                Commit();
+        until TempSpfyTaskGroup.Next() = 0;
+    end;
+
     local procedure CopyToWorkList(var SpfyTask: Record "NPR Spfy Task"; var TempSpfyTaskBatch: Record "NPR Spfy Task" temporary)
     begin
-        TempSpfyTaskBatch.Init();
-        TempSpfyTaskBatch."Entry No." := SpfyTask."Entry No.";
-        TempSpfyTaskBatch.Type := SpfyTask.Type;
-        TempSpfyTaskBatch."Table No." := SpfyTask."Table No.";
-        TempSpfyTaskBatch."Record ID" := SpfyTask."Record ID";
-        TempSpfyTaskBatch."Record Value" := SpfyTask."Record Value";
-        TempSpfyTaskBatch."Store Code" := SpfyTask."Store Code";
-        TempSpfyTaskBatch."Not Before Date-Time" := SpfyTask."Not Before Date-Time";
-        TempSpfyTaskBatch."Log Date" := SpfyTask."Log Date";
-        TempSpfyTaskBatch.Attempts := SpfyTask.Attempts;
-        TempSpfyTaskBatch."Dispatch Id" := SpfyTask."Dispatch Id";
+        // Whole row, so a subscriber sees every field the engine read, extension fields included.
+        TempSpfyTaskBatch := SpfyTask;
         TempSpfyTaskBatch.Insert();
     end;
 
@@ -794,6 +836,28 @@ codeunit 6151214 "NPR Spfy Task Processor"
     end;
 
     local procedure IsBatchKind(TableNo: Integer): Boolean
+    var
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
+        SpfyTaskSendBndImpl: Codeunit "NPR Spfy Task Send Bnd Impl";
+        Handled: Boolean;
+        IsBatch: Boolean;
+    begin
+        if IsStandardBatchKind(TableNo) then
+            exit(true);
+        // Only the kinds the boundary does not map are the extension's to classify; the standard ones answer for themselves.
+        if SpfyTaskSendBndImpl.IsBoundaryMappedKind(TableNo) then
+            exit(false);
+        if _SpfyTaskRunContext.TryGetKindIsBatched(TableNo, IsBatch) then
+            exit(IsBatch);
+        // Pending writes silently degrade the isolated event into a normal one, and a classification error would then kill the cycle.
+        Commit();
+        SpfyIntegrationEvents.OnCheckIfTaskKindIsBatched(TableNo, IsBatch, Handled);
+        _SpfyTaskRunContext.SetKindIsBatched(TableNo, Handled and IsBatch);
+        exit(Handled and IsBatch);
+    end;
+
+    // Deliberately not overridable: the batch semantics of the standard Shopify kinds are load-bearing engine contracts.
+    local procedure IsStandardBatchKind(TableNo: Integer): Boolean
     begin
         exit(TableNo in [Database::"Item Variant", Database::"NPR Spfy Inventory Level", Database::"NPR Spfy Item Price"]);
     end;
@@ -801,7 +865,10 @@ codeunit 6151214 "NPR Spfy Task Processor"
     local procedure ClearRunContext()
     begin
         _SpfyTaskRunContext.ClearRunDeadline();
+        _SpfyTaskRunContext.ClearBatchClaims();
         _SpfyTaskRunContext.ClearCycleTime();
+        _SpfyTaskRunContext.ClearPTEHandled();
+        _SpfyTaskRunContext.ClearKindIsBatched();
     end;
 
     local procedure RunBudgetMs(): Integer

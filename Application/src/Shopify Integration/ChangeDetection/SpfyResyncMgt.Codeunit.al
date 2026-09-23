@@ -745,6 +745,7 @@ codeunit 6151446 "NPR Spfy Resync Mgt"
     internal procedure StartQuietSeed()
     var
         ResyncRun: Record "NPR Spfy Resync Run";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         RunForeground: Boolean;
         QuietSeedQst: Label 'Quiet-seed overwrites ALL Shopify sync baselines with the current computed BC state WITHOUT sending anything to Shopify. Use it when the baselines are wrong but Shopify is already correct.\\WARNING: any genuinely pending, un-sent change to a baseline-tracked value is absorbed and will NOT be sent.\\Continue?';
@@ -752,7 +753,7 @@ codeunit 6151446 "NPR Spfy Resync Mgt"
     begin
         CheckFeatureEnabled();
         // Post-cutover gate: feature ON and Shopify no longer on Data Log (also holds for born-on-RowVersion).
-        if not (SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyRowVersionFeature.RunsShopifyOnDataLog()) then
+        if not (SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyIntegrationMgt.RunsShopifyOnDataLog()) then
             Error(PreCutoverErr);
         if not Confirm(QuietSeedQst, false) then
             exit;

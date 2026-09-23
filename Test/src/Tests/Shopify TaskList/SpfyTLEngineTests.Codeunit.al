@@ -964,9 +964,97 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime + Hours(48));
 
         // [THEN] A gap that cannot be explained by the schedule is still treated as downtime.
+        // The tolerance absorbs the one widened grace the discount keeps charging plus date-time rounding; an
+        // undiscounted clock would still sit two days below this.
         GetTask(TaskEntryNo, SpfyTask);
-        _Assert.IsTrue(SpfyTask."Waiting Since" >= AtDateTime + Hours(48) - Minutes(10), 'A real outage must still discount the waiting clock');
+        _Assert.IsTrue(SpfyTask."Waiting Since" >= AtDateTime + Hours(48) - Minutes(25), StrSubstNo('A real outage must still discount the waiting clock but it stood at %1 after a cycle at %2', SpfyTask."Waiting Since", AtDateTime + Hours(48)));
         AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, 'A real outage must not age parked tasks on a slowly scheduled store');
+    end;
+
+    [Test]
+    procedure GivenAGapBeyondTheGrace_WhenTheCycleDiscountsIt_ThenTheClockAdvancesByExactlyOneGrace()
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        ExpectedWaitingSince: DateTime;
+        ParkedWaitingSince: DateTime;
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A processing gap longer than the grace advances a waiting task's clock by exactly one grace period, never by the whole gap.
+        Initialize();
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        CreateSyncedItem(StoreCode, false, Item, SpfyStoreItemLink);
+        _Lib.CreateItemVariant(ItemVariant, Item."No.");
+        TaskEntryNo := EnqueueVariantTask(StoreCode, ItemVariant, "NPR Spfy Task Op"::Modify, AtDateTime);
+
+        // [GIVEN] A parked task on a store running at the fixed 5 minute grace, and a recorded cycle at that same moment.
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime);
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, 'The task must be waiting before the gap');
+        GetTask(TaskEntryNo, SpfyTask);
+        ParkedWaitingSince := SpfyTask."Waiting Since";
+        SetLastCycleAt(StoreCode, AtDateTime);
+
+        // [WHEN] The next cycle runs an hour later, a gap twelve times the grace.
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime + Minutes(60));
+
+        // [THEN] One grace of the silence stays charged to the task: 55 of the 60 minutes are forgiven, never all 60.
+        // Every store shares one processing category, so a busy environment overruns the grace on every single cycle;
+        // forgiving the whole gap would freeze the measured age and no park would ever reach quarantine.
+        GetTask(TaskEntryNo, SpfyTask);
+        ExpectedWaitingSince := ParkedWaitingSince + Minutes(55);
+        _Assert.IsTrue(
+            (SpfyTask."Waiting Since" >= ExpectedWaitingSince - Seconds(1)) and (SpfyTask."Waiting Since" <= ExpectedWaitingSince + Seconds(1)),
+            StrSubstNo('A discounted cycle must advance the waiting clock by exactly one grace: expected %1 but found %2 (parked at %3)', ExpectedWaitingSince, SpfyTask."Waiting Since", ParkedWaitingSince));
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, 'A discounted gap must not age the parked task out');
+    end;
+
+    [Test]
+    procedure GivenRepeatedGapsBeyondTheGrace_WhenTheCyclesKeepRunning_ThenTheClockKeepsAdvancingUntilQuarantine()
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        PreviousWaitingSince: DateTime;
+        CycleIndex: Integer;
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] Repeated gaps beyond the grace keep advancing the clock cycle after cycle until the task quarantines, so a stalled environment cannot park a task for ever.
+        Initialize();
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        CreateSyncedItem(StoreCode, false, Item, SpfyStoreItemLink);
+        _Lib.CreateItemVariant(ItemVariant, Item."No.");
+        TaskEntryNo := EnqueueVariantTask(StoreCode, ItemVariant, "NPR Spfy Task Op"::Modify, AtDateTime);
+
+        // [GIVEN] A store scheduled every three hours, so its grace is six, with a parked task and a recorded cycle.
+        SetProcessingInterval(StoreCode, 180);
+        _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime);
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, 'The task must be waiting before the gaps start');
+        SetLastCycleAt(StoreCode, AtDateTime);
+
+        // [WHEN] Cycle after cycle runs twelve hours apart, twice the grace, so every one of them is discounted.
+        for CycleIndex := 1 to 5 do begin
+            GetTask(TaskEntryNo, SpfyTask);
+            PreviousWaitingSince := SpfyTask."Waiting Since";
+            _SpfyTaskProcessor.RunStoreCycle(StoreCode, AtDateTime + Hours(12 * CycleIndex));
+            // [THEN] Each of the early cycles nets the task one more grace of age instead of writing the gap off whole.
+            if CycleIndex <= 3 then begin
+                GetTask(TaskEntryNo, SpfyTask);
+                _Assert.IsTrue(SpfyTask."Waiting Since" > PreviousWaitingSince, StrSubstNo('Cycle %1 must advance the waiting clock past %2 but left it at %3', CycleIndex, PreviousWaitingSince, SpfyTask."Waiting Since"));
+                AssertTask(TaskEntryNo, "NPR Spfy Task State"::Waiting, 0, StrSubstNo('The task must still be waiting after cycle %1', CycleIndex));
+            end;
+        end;
+
+        // [THEN] The graces accumulate to the aging threshold, so the park is quarantined instead of waiting for ever.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Quarantined, 0, 'Repeated gaps beyond the grace must still age a park out');
     end;
     #endregion
 

@@ -17,9 +17,27 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         _LastQueriedSpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         _JsonHelper: Codeunit "NPR Json Helper";
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
         _ShopifyCustomerID: Text[30];
+        _GraphQLClientSet: Boolean;
         _QueryingShopifyLbl: Label 'Querying Shopify...';
 
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
 
     local procedure SendCustomer(var SpfyTask: Record "NPR Spfy Task")
     var
@@ -34,7 +52,7 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         ClearLastError();
 
         PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink);
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
 
@@ -309,7 +327,6 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
     local procedure FindShopifyCustomerByEmail(Email: Text; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
@@ -322,18 +339,17 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         SpfyTask."Store Code" := ShopifyStoreCode;
         SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse));
     end;
 
     local procedure CreateShopifyCustomer(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; var ShopifyResponse: JsonToken): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
     begin
         SpfyTask."Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
         SpfyTask.Type := SpfyTask.Type::Insert;
         PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink, '');
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse));
     end;
 
     local procedure UpdateFromCustomer(Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
@@ -457,7 +473,6 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
     local procedure GetCustomerDataFromShopify(ShopifyCustomerID: Text[30]; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
@@ -470,7 +485,7 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         Request.WriteTo(QueryStream);
 
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, false, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse));
     end;
 
     local procedure UpdateCustomerWithDataFromShopify(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; Removed: Boolean; ShopifyResponse: JsonToken; TriggeredExternally: Boolean)
@@ -771,7 +786,7 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         Success: Boolean;
     begin
         PrepareAddressRequest(SpfyTask, SpfyStoreCustomerLink, ShopifyCustomerID, ShopifyAddressID, TaskType);
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         // Append the address request/response to the outer customer SpfyTask so the user can review
         // both the customer mutation and the follow-up address mutation in the same SpfyTask record.
         // Commit before any Error() so the diagnostic data survives the transaction rollback.

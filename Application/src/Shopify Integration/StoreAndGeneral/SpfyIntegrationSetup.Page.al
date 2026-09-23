@@ -97,6 +97,19 @@ page 6184553 "NPR Spfy Integration Setup"
                     Editable = false;
                 }
             }
+            group(TaskListProcessorOnHold)
+            {
+                Caption = 'Shopify Task Processing';
+                Visible = _ShowProcessorOnHoldWarning;
+                field(ProcessorOnHoldWarning; _ProcessorOnHoldWarningTxt)
+                {
+                    Caption = 'Task Processing On Hold';
+                    ToolTip = 'Specifies that at least one Shopify task processing job queue entry is on hold, so Shopify updates are collected but not sent.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                    Style = Attention;
+                }
+            }
             part(ShopifyStores; "NPR Spfy Stores Subpage")
             {
                 ApplicationArea = NPRShopify;
@@ -236,7 +249,7 @@ page 6184553 "NPR Spfy Integration Setup"
                 action(MigrateToShopifyTaskList)
                 {
                     Caption = 'Migrate to Shopify Task List';
-                    ToolTip = 'Runs the one-way migration of this environment from the NaviConnect task list to the Shopify task list, in a single step. Choose foreground (runs now, blocking) or background (recommended when there is a large backlog of unprocessed tasks). It switches every Shopify store in this environment over to the new queue, stops the NaviConnect task processing jobs, processes the remaining NaviConnect tasks, re-creates the ones scheduled for a later time in the new queue, and finally schedules the new task processing jobs. Safe to re-run if interrupted.';
+                    ToolTip = 'Runs the one-way migration of this environment from the NaviConnect task list to the Shopify task list, in a single step. Choose foreground (runs now, blocking) or background (recommended when there is a large backlog of unprocessed tasks). It switches every Shopify store in this environment over to the new queue, stops the NaviConnect task processing jobs, processes the remaining NaviConnect tasks, re-creates the ones scheduled for a later time in the new queue, and finally schedules the new task processing jobs. The cutover permanently removes the NaviConnect Shopify registrations, and NaviConnect Shopify tasks must not be processed manually while it runs. Safe to re-run if interrupted.';
                     ApplicationArea = NPRShopify;
                     Image = Migration;
                     Visible = _ShowTaskListMigrationUI;
@@ -411,22 +424,27 @@ page 6184553 "NPR Spfy Integration Setup"
 
     trigger OnAfterGetCurrRecord()
     var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
-        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+        SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
     begin
         RowVersionFeatureEnabled := SpfyRowVersionFeature.IsFeatureEnabled();
         // Seeding fast-forwards every tracker mark, so it stays on the pre-cutover predicate and unreachable once the Data Log wiring is gone.
         ShowRowVersionSeedingUI :=
-            SpfyRowVersionFeature.RunsShopifyOnDataLog() and
+            SpfyIntegrationMgt.RunsShopifyOnDataLog() and
             (Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::Completed);
         // A started migration stays offered once its Data Log wiring is gone, or a run that failed mid-cutover would have no action left to finish it.
         ShowRowVersionMigrationUI :=
             ShowRowVersionSeedingUI or
             ((Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::Completed) and
             (Rec."RowVersion Migration Status" <> Rec."RowVersion Migration Status"::NotStarted));
+        // One migration action at a time, in step order: the task list migration removes the jobs that pump the Data Log,
+        // so it may only be offered once the environment detects changes with RowVersion.
         _ShowTaskListMigrationUI :=
-            SpfyTaskListFeature.AllPhasesShipped() and
-            (Rec."Task List Migration Status" <> Rec."Task List Migration Status"::Completed);
+            (Rec."Task List Migration Status" <> Rec."Task List Migration Status"::Completed) and
+            (Rec."RowVersion Migration Status" = Rec."RowVersion Migration Status"::Completed);
+        _ProcessorOnHoldWarningTxt := SpfyTaskJQSetup.ProcessorOnHoldWarning();
+        _ShowProcessorOnHoldWarning := _ProcessorOnHoldWarningTxt <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -491,5 +509,7 @@ page 6184553 "NPR Spfy Integration Setup"
         ShowRowVersionMigrationUI: Boolean;
         ShowRowVersionSeedingUI: Boolean;
         _ShowTaskListMigrationUI: Boolean;
+        _ShowProcessorOnHoldWarning: Boolean;
+        _ProcessorOnHoldWarningTxt: Text;
 }
 #endif

@@ -13,6 +13,27 @@ codeunit 6151466 "NPR Spfy Task Send Metafields"
         end;
     end;
 
+    var
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
+        _GraphQLClientSet: Boolean;
+
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
+
     local procedure SendMetafields(var SpfyTask: Record "NPR Spfy Task")
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
@@ -30,7 +51,7 @@ codeunit 6151466 "NPR Spfy Task Send Metafields"
 
         Success := PrepareMetafieldUpdateRequest(SpfyTask, SpfyMetafieldMgt, ShopifyOwnerType, ShopifyOwnerID, SendToShopify);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
 
         SpfyTask.Modify();
         Commit();

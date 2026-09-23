@@ -1,7 +1,7 @@
 // Ordinals are parity-locked with the "NPR Nc Task".Type option (minus Rename).
 enum 6014625 "NPR Spfy Task Op"
 {
-    Access = Internal;
+    Access = Public;
     Extensible = false;
 
     value(0; Insert)

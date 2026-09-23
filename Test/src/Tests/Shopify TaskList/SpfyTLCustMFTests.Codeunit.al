@@ -724,4 +724,52 @@ codeunit 85388 "NPR Spfy TL Cust&MF Tests"
         _Assert.AreEqual(Item."No.", ResolvedItem."No.", 'A cost task must resolve to the item it carries');
     end;
     #endregion
+
+    #region Customer sibling against the mock GraphQL client (DF14 retrofit)
+    [Test]
+    procedure GivenUnsyncedCustomer_WhenCustomerSiblingRunsAgainstMock_ThenCustomerCreatedAndIdAssigned()
+    var
+        Customer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendCustomers: Codeunit "NPR Spfy Task Send Customers";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        CustomerCreateTok: Label 'customerCreate', Locked = true;
+    begin
+        // [SCENARIO] An unsynced customer is created in Shopify by the customer sibling and the id Shopify returns is assigned to the BC record.
+        Initialize();
+        StoreCode := CreateCustomerStore();
+
+        // [GIVEN] A sync-enabled customer with no Shopify id and its Insert task.
+        _Lib.CreateCustomerWithLink(Customer, SpfyStoreCustomerLink, StoreCode, true, true);
+        TaskEntryNo := EnqueueCustomerTask(StoreCode, Customer, "NPR Spfy Task Op"::Insert, CurrentDateTime());
+
+        // [GIVEN] Shopify has no customer by that email, confirms the create, and answers the post-create read-back.
+        MockClient.AddResponse('customers(', '{"data":{"customers":{"edges":[]}}}');
+        MockClient.AddResponse(CustomerCreateTok, '{"data":{"customerCreate":{"customer":{"id":"gid://shopify/Customer/3001","defaultAddress":{"id":"gid://shopify/MailingAddress/4001"}},"userErrors":[]}}}');
+        MockClient.AddResponse('GetCustomer', '{"data":{"customer":{"id":"gid://shopify/Customer/3001","firstName":"Test","lastName":"Customer","defaultEmailAddress":{"emailAddress":"test@example.com","marketingState":"NOT_SUBSCRIBED"},"defaultPhoneNumber":null,"defaultAddress":{"id":"gid://shopify/MailingAddress/4001","address1":"","address2":"","city":"","province":"","zip":"","countryCode":"DK"}}}}');
+
+        // [WHEN] The customer sibling runs for real.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendCustomers.SetGraphQLClient(MockClient);
+        SendCustomers.Run(SpfyTask);
+
+        // [THEN] The create was sent and the returned customer id is assigned to the store-customer link.
+        _Assert.AreEqual(1, MockClient.CountRequestsContaining(CustomerCreateTok), 'Exactly one customerCreate must be sent');
+        _Assert.AreEqual('3001', AssignedEntryId(SpfyStoreCustomerLink.RecordId()), 'The Shopify customer id must be assigned to the store-customer link');
+    end;
+
+    // A metafield-sibling round-trip test is NOT possible within the DF14 seam: SendMetafields' payload prep fetches
+    // metafield DEFINITIONS through the un-seamed SpfyMetafieldMgt (straight HTTP, needs a real Shopify Url), and
+    // seaming that shared utility codeunit is outside DF14's sibling-only rule. Recorded as a DF14 residual.
+
+    local procedure AssignedEntryId(BCRecID: RecordId): Text
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(BCRecID, "NPR Spfy ID Type"::"Entry ID"));
+    end;
+    #endregion
 }

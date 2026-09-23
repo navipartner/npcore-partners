@@ -22,11 +22,29 @@ codeunit 6151469 "NPR Spfy Task Send Voucher"
         _JsonHelper: Codeunit "NPR Json Helper";
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         _SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
+        _GraphQLClientSet: Boolean;
         _VoucherNotFoundErr: Label 'Retail Voucher %1 could not be found or is not eligible for Shopify integration.', Comment = '%1 - Retail Voucher No.';
+
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
 
     local procedure SendVoucher(var SpfyTask: Record "NPR Spfy Task")
     var
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         SendToShopify: Boolean;
         Success: Boolean;
@@ -38,7 +56,7 @@ codeunit 6151469 "NPR Spfy Task Send Voucher"
 
         SendToShopify := PrepareVoucherUpdateRequest(SpfyTask);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
 
@@ -62,7 +80,7 @@ codeunit 6151469 "NPR Spfy Task Send Voucher"
 
         SendToShopify := PrepareGiftCardBalanceAdjustmentRequest(SpfyTask);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
 
@@ -88,7 +106,7 @@ codeunit 6151469 "NPR Spfy Task Send Voucher"
 
         SendToShopify := PrepareGiftCardDisableRequest(SpfyTask, DeactivatedAt);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
 
@@ -353,7 +371,6 @@ codeunit 6151469 "NPR Spfy Task Send Voucher"
     local procedure GetShopifyGiftCard(VoucherNo: Code[20]; ShopifyGiftCardID: Text[30]; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
@@ -369,7 +386,7 @@ codeunit 6151469 "NPR Spfy Task Send Voucher"
         RequestJson.WriteTo(QueryStream);
 
         ClearLastError();
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse) then
+        if not GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse) then
             Error(GiftCardQueryFailedErr, VoucherNo, GetLastErrorText());
     end;
 

@@ -29,15 +29,33 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         _LastQueriedSpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         _JsonHelper: Codeunit "NPR Json Helper";
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
         _ShopifyInventoryItemID: Text[30];
         _ShopifyProductID: Text[30];
         _ShopifyVariantID: Text[30];
         _InventoryIntegrIsEnabled, _ItemPriceIntegrIsEnabled : Boolean;
+        _GraphQLClientSet: Boolean;
         _InventoryItemIDNotFoundErr: Label 'Shopify Inventory Item ID could not be found for %1=%2, %3=%4 at Shopify Store %5', Comment = '%1 = Item No. fieldcaption, %2 = Item No., %3 = Variant Code fieldcaption, %4 = Variant Code, %5 = Shopify Store Code';
         _ItemIntegrNotEnabledErr: Label 'Shopify integration is not enabled for the item.';
         _ItemVariantBlockedOrDoesNotExistErr: Label 'The item %1 variant %2 is blocked or has been removed from the system. The request is no longer applicable.', Comment = '%1 - Item No., %2 - Variant Code';
         _QueryingShopifyLbl: Label 'Querying Shopify...';
 
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
 
     local procedure SendItem(var SpfyTask: Record "NPR Spfy Task")
     var
@@ -53,7 +71,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         Success := true;
 
         PrepareItemUpdateRequest(SpfyTask, Item);
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
 
@@ -93,7 +111,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
 
         PrepareTagUpdateRequest(SpfyTask, SendToShopify);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
 
         SpfyTask.Modify();
         Commit();
@@ -373,7 +391,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         Success: Boolean;
     begin
         SpfyCommunicationHandler.CheckRequestContent(SpfyTask);
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, false, ShopifyResponse);
+        Success := GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse);
         if not Success then
             Error(GetLastErrorText());
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
@@ -440,7 +458,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     local procedure UpdateNCTasksWithDataFromShopify(var SpfyTaskIn: Record "NPR Spfy Task"; productVariantsBulkUpdateRequestString: Text)
     var
         SpfyTaskParam: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         ResponseDictionary: Dictionary of [Text[30], Dictionary of [Text[30], Text]];
         Found: Boolean;
@@ -456,7 +473,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         Clear(ShopifyResponse);
 
         if (SpfyTaskParam."Store Code" <> '') and (SpfyTaskParam."Data Output".HasValue()) then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTaskParam, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTaskParam, true, ShopifyResponse);
 
         if Success then
             Success := PopulateResponseDictionary(ShopifyResponse, ResponseDictionary);
@@ -474,7 +491,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     var
         SpfyTask: Record "NPR Spfy Task";
         InventoryLevel: Record "NPR Spfy Inventory Level";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyInvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
         ResponseDictionary: Dictionary of [BigInteger, Text];
         RecRef: RecordRef;
@@ -499,7 +515,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         SpfyTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         ShopifyRequest.WriteTo(OStream);
         ClearLastError();
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
 
         if not Success then begin
             repeat
@@ -560,7 +576,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     local procedure ProcessAndUpdateNCTasksWithDataFromShopify(var SpfyTaskIn: Record "NPR Spfy Task"; var RequestedVariantBuffer: Record "NPR Spfy ID/Task Buffer"; ShopifyRequest: JsonObject)
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ResponseDataSet: JsonToken;
         ShopifyResponse: JsonToken;
         ShopifyResponseUserErrors: JsonToken;
@@ -584,7 +599,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         ShopifyRequest.WriteTo(OStream);
 
         ClearLastError();
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+        Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         if not Success then
             RequestErrorText := GetLastErrorText();
 
@@ -1613,7 +1628,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     local procedure GetProductOptionsFromShopify(ShopifyProductID: Text[30]; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
@@ -1625,13 +1639,12 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         Request.Add('variables', Variables);
         SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         Request.WriteTo(QueryStream);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, false, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse));
     end;
 
     local procedure SendProductOptionsReorder(ShopifyProductID: Text[30]; ShopifyStoreCode: Code[20]; OptionsJArray: JsonArray; var ShopifyResponse: JsonToken): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
@@ -1644,7 +1657,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         Request.Add('variables', Variables);
         SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         Request.WriteTo(QueryStream);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse));
     end;
 
     local procedure GetItemReference(ItemVariant: Record "Item Variant"): Code[50]
@@ -1747,7 +1760,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     local procedure GetProductDataFromShopify(ShopifyProductID: Text[30]; ShopifyStoreCode: Code[20]; Cursor: Text; var ShopifyResponse: JsonToken): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
@@ -1766,7 +1778,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         Request.WriteTo(QueryStream);
 
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, false, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse));
     end;
 
     local procedure UpdateItemWithDataFromShopify(SpfyTask: Record "NPR Spfy Task"; ShopifyResponse: JsonToken; TriggeredExternally: Boolean; var Cursor: Text)
@@ -2005,7 +2017,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     local procedure GetShopifyLocations(ShopifyStoreCode: Code[20]; var TempShopifyLocation: Record "NPR Spfy Location" temporary)
     var
         SpfyTask: Record "NPR Spfy Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         Cursor: Text;
         HasNext: Boolean;
         ShopifyResponse: JsonToken;
@@ -2015,7 +2026,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         HasNext := true;
         repeat
             CreateRequest(SpfyTask, Cursor, ShopifyStoreCode, LocationRequest);
-            if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, false, ShopifyResponse) then
+            if not GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse) then
                 Error(GetLastErrorText());
             Cursor := _JsonHelper.GetJText(ShopifyResponse, 'data.locations.pageInfo.endCursor', false);
             HasNext := _JsonHelper.GetJBoolean(ShopifyResponse, 'data.locations.pageInfo.hasNextPage', true);
@@ -2099,7 +2110,6 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
     local procedure TryGetShopifyProductVariantRelatedIDs(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; WithDialog: Boolean; var ShopifyProductID: Text[30]; var ShopifyVariantID: Text[30]; var ShopifyInventoryItemID: Text[30]): Boolean
     var
         TempSpfyTask: Record "NPR Spfy Task" temporary;
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         OStream: OutStream;
         ShopifyResponse: JsonToken;
@@ -2125,7 +2135,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         Request.WriteTo(OStream);
 
         ClearLastError();
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempSpfyTask, true, ShopifyResponse);
+        Success := GetGraphQLClient().ExecuteRequest(TempSpfyTask, true, ShopifyResponse);
         if Success then begin
 #pragma warning disable AA0139
             ShopifyProductID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyResponse, '$.data.productVariants.edges[0].node.product.id', false), '/');
@@ -2145,7 +2155,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
                 Request.WriteTo(OStream);
 
                 ClearLastError();
-                Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempSpfyTask, true, ShopifyResponse);
+                Success := GetGraphQLClient().ExecuteRequest(TempSpfyTask, true, ShopifyResponse);
                 if Success then
 #pragma warning disable AA0139
                     ShopifyProductID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyResponse, '$.data.productVariants.edges[0].node.product.id', false), '/');
@@ -2576,7 +2586,7 @@ codeunit 6151253 "NPR Spfy Task Send Items&Inv"
         RecRef.SetTable(InventoryLocation);
         RequestPrepared := PrepareActivateInventoryItemAtLocationRequest(SpfyTask, InventoryLocation);
         if RequestPrepared then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
 

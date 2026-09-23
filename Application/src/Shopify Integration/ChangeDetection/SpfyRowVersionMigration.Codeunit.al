@@ -7,6 +7,7 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
     trigger OnRun()
     var
         SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         NotViaJobQueueErr: Label 'The RowVersion cutover cannot be started directly. Use the migration action on the Shopify Integration Setup page.';
     begin
@@ -22,7 +23,7 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
             RunCutoverBody(SpfyIntegrationSetup);
             exit;
         end;
-        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyRowVersionFeature.RunsShopifyOnDataLog() then
+        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyIntegrationMgt.RunsShopifyOnDataLog() then
             exit;
         // Free pre-filter for a parked entry activated under a live cutover, so it doesn't seed for hours before RunCutover stands it down; Seeding is where a legitimately scheduled entry starts and is never refused.
         if (SpfyIntegrationSetup."RowVersion Migration Status" = SpfyIntegrationSetup."RowVersion Migration Status"::Migrating) and
@@ -55,9 +56,10 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
     local procedure SeedModePromptNeeded(): Boolean
     var
         SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
     begin
-        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyRowVersionFeature.RunsShopifyOnDataLog() then
+        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyIntegrationMgt.RunsShopifyOnDataLog() then
             exit(false);
         if not SpfyIntegrationSetup.Get() then
             exit(false);
@@ -92,13 +94,14 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
 
     local procedure AcquireLock(var SpfyIntegrationSetup: Record "NPR Spfy Integration Setup")
     var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         MigrationInProgressErr: Label 'A RowVersion migration is already in progress.';
     begin
         SpfyIntegrationSetup.LockTable();
         SpfyIntegrationSetup.GetRecordOnce(true);
         // Past its own TeardownDataLog a run has only ClassifyAndDispatch's own two steps left, so refusing here would strand a run killed in that window for the whole staleness threshold with nothing able to finish it.
-        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyRowVersionFeature.RunsShopifyOnDataLog() then
+        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyIntegrationMgt.RunsShopifyOnDataLog() then
             exit;
         case SpfyIntegrationSetup."RowVersion Migration Status" of
             SpfyIntegrationSetup."RowVersion Migration Status"::Seeding,
@@ -110,9 +113,10 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
 
     local procedure ClassifyAndDispatch(var SpfyIntegrationSetup: Record "NPR Spfy Integration Setup"; RunForeground: Boolean)
     var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
     begin
-        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyRowVersionFeature.RunsShopifyOnDataLog() then begin
+        if SpfyRowVersionFeature.IsFeatureEnabled() and not SpfyIntegrationMgt.RunsShopifyOnDataLog() then begin
             EnsureDetectionJobScheduled();
             SetStatus(SpfyIntegrationSetup, SpfyIntegrationSetup."RowVersion Migration Status"::Completed);
             exit;
@@ -204,6 +208,7 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
     local procedure RunCutover(var SpfyIntegrationSetup: Record "NPR Spfy Integration Setup")
     var
         JobQueueEntry: Record "Job Queue Entry";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         CutoverErrorText: Text;
         CutoverOk: Boolean;
@@ -240,7 +245,7 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
         // Completed is the only status another run has finished on; every other one still owes this run's compensation.
         if SpfyIntegrationSetup."RowVersion Migration Status" = SpfyIntegrationSetup."RowVersion Migration Status"::Completed then begin
             // Completed beside torn-down wiring is the post-teardown recovery finishing this run's own remaining bookkeeping - expected, not an admission-control failure. Completed WITH wiring still live is the inconsistent state worth a developer's time.
-            if SpfyRowVersionFeature.RunsShopifyOnDataLog() then
+            if SpfyIntegrationMgt.RunsShopifyOnDataLog() then
                 EmitCutoverFailureAlert(StrSubstNo(SupersededRunLbl, CutoverErrorText));
         end else begin
             // Recorded BEFORE the compensation, which has no error isolation: an error in there would otherwise discard the status, the text and every alert below, leaving the row on Migrating with no signal at all.
@@ -250,9 +255,13 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
                     CopyStr(CutoverErrorText, 1, MaxStrLen(SpfyIntegrationSetup."RowVersion Seeding Error Text"));
                 SetStatus(SpfyIntegrationSetup, SpfyIntegrationSetup."RowVersion Migration Status"::Failed);
             end;
+            // The flag stays on across the compensation: the feature codeunit's after-modify cleanup reads it to tell
+            // this run's own disable from an operator's, and would otherwise refuse the rollback and abort the alerts below.
+            SetMigrationInProgress(true);
             SwitchedFeatureOff := CompensateFailedCutover();
+            SetMigrationInProgress(false);
             // Read after the compensation so the text describes what this run actually left behind.
-            DataLogStillWired := SpfyRowVersionFeature.RunsShopifyOnDataLog();
+            DataLogStillWired := SpfyIntegrationMgt.RunsShopifyOnDataLog();
             FeatureFlagIsOn := SpfyRowVersionFeature.IsFeatureEnabled();
             // Persists the compensation's feature-flag write, which has none of its own.
             Commit();
@@ -288,13 +297,14 @@ codeunit 6151217 "NPR Spfy RowVersion Migration"
     // both engines capture the same change. Once the wiring is gone the flag is the only detection left and must stay on.
     local procedure CompensateFailedCutover(): Boolean
     var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
     begin
         // A loser that found the flag already on must not switch it off under the live run that owns it.
         if not _FeatureEnabledByThisRun then
             exit(false);
         _FeatureEnabledByThisRun := false;
-        if not (SpfyRowVersionFeature.IsFeatureEnabled() and SpfyRowVersionFeature.RunsShopifyOnDataLog()) then
+        if not (SpfyRowVersionFeature.IsFeatureEnabled() and SpfyIntegrationMgt.RunsShopifyOnDataLog()) then
             exit(false);
         SpfyRowVersionFeature.SetFeatureEnabled(false);
         exit(true);

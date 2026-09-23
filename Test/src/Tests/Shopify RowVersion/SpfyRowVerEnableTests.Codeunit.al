@@ -13,6 +13,12 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
     begin
         _Lib.ResetState();
         _Lib.EnsureIntegrationEnabled();
+        // Cleared BEFORE the feature is switched off: Modify(false) still raises OnAfterModifyEvent, so the disable
+        // write below reaches the new cleanup arm, which refuses on a non-pristine environment. Clearing first means
+        // the arm sees an empty environment whatever xRec turns out to carry on a code-driven modify.
+        NeutralizeSyncedArtifacts();
+        DeleteAllShopifyStores();
+        SetShopifyIntegrationFeatureEnabled(true);
         _Lib.SetFeatureEnabled(false);
         ResetMigrationState();
     end;
@@ -89,6 +95,7 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         ShopifyStore: Record "NPR Spfy Store";
         ShopifySetup: Record "NPR Spfy Integration Setup";
         JobQueueEntry: Record "Job Queue Entry";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         StoreCode: Code[20];
     begin
@@ -110,7 +117,7 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         _Assert.IsFalse(SpfyRowVersionFeature.IsFeatureEnabled(), 'A fresh environment must no longer adopt RowVersion detection');
         _Assert.IsTrue(SpfyDataLogSubscribersExist(), 'A fresh environment must fall back to the legacy Data Log setup');
         // [THEN] The environment answers the migration action's visibility predicate, so an operator can still start the migration.
-        _Assert.IsTrue(SpfyRowVersionFeature.RunsShopifyOnDataLog(), 'The environment must run Shopify on the Data Log, which is what keeps the migration action reachable');
+        _Assert.IsTrue(SpfyIntegrationMgt.RunsShopifyOnDataLog(), 'The environment must run Shopify on the Data Log, which is what keeps the migration action reachable');
         ShopifySetup.Get();
         _Assert.IsTrue(
             ShopifySetup."RowVersion Migration Status" = ShopifySetup."RowVersion Migration Status"::NotStarted,
@@ -136,27 +143,177 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         Commit();
 
         // [WHEN] An admin flips the feature on from the page (the guard is CurrFieldNo-gated: UI edits only).
-        FeatureMgmt.OpenEdit();
-        FeatureMgmt.Filter.SetFilter(Id, _Lib.FeatureId());
+        OpenRowVersionFeature(FeatureMgmt);
         asserterror FeatureMgmt.Enabled.SetValue(true);
         _Assert.ExpectedError('requires running the RowVersion migration');
         FeatureMgmt.Close();
         Feature.Get(_Lib.FeatureId());
         _Assert.IsFalse(Feature.Enabled, 'The blocked enable must leave the feature disabled');
 
-        // [GIVEN] The feature enabled (post-migration state).
+        // [GIVEN] The feature enabled on an environment that has already run on it (a baseline exists).
         DeleteSpfyDataLogSubscribers();
         _Lib.SetFeatureEnabled(true);
+        InsertSyncStateRow();
         Commit();
 
-        // [WHEN] An admin tries to disable it from the page. [THEN] the feature is one-way.
-        FeatureMgmt.OpenEdit();
-        FeatureMgmt.Filter.SetFilter(Id, _Lib.FeatureId());
+        // [WHEN] An admin tries to disable it from the page. [THEN] the switch is closed for good.
+        OpenRowVersionFeature(FeatureMgmt);
         asserterror FeatureMgmt.Enabled.SetValue(false);
-        _Assert.ExpectedError('one-way and cannot be disabled');
+        _Assert.ExpectedError('can no longer be disabled');
         FeatureMgmt.Close();
         Feature.Get(_Lib.FeatureId());
         _Assert.IsTrue(Feature.Enabled, 'The blocked disable must leave the feature enabled');
+    end;
+
+    [Test]
+    procedure GivenPristineAdoption_WhenTheFeatureIsDisabledFromThePage_ThenItIsOffTheJobIsGoneAndTheStampIsCleared()
+    var
+        Feature: Record "NPR Feature";
+        JobQueueEntry: Record "Job Queue Entry";
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+        FeatureMgmt: TestPage "NPR Feature Management";
+    begin
+        // [SCENARIO] A RowVersion adoption that nothing has run on yet can be undone from the page, and the undo takes the detection job and the migration stamp with it.
+        Initialize();
+        // [GIVEN] A pristine environment that adopted RowVersion through the app's own enable.
+        SpfyRowVersionFeature.SetFeatureEnabled(true);
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Change Detection");
+        _Assert.AreEqual(1, JobQueueEntry.Count(), 'The adoption must leave exactly one detection job to undo');
+        ShopifySetup.Get();
+        _Assert.IsTrue(
+            ShopifySetup."RowVersion Migration Status" = ShopifySetup."RowVersion Migration Status"::Completed,
+            StrSubstNo('The adoption must stamp the migration Completed, actual status %1', ShopifySetup."RowVersion Migration Status"));
+        // [GIVEN] Seeding residue from an earlier attempt. The pristine enable never writes these three, so without
+        // seeding them here the "must be cleared" assertions below could not go red however the cleanup changed.
+        ShopifySetup."RowVersion Seeding Started At" := CurrentDateTime();
+        ShopifySetup."RowVersion Seeding Compl. At" := CurrentDateTime();
+        ShopifySetup."RowVersion Seeding Error Text" := 'residue from an earlier attempt';
+        ShopifySetup.Modify(false);
+        Commit();
+
+        // [WHEN] An admin unticks the feature on the page. The Modify - and the side effects - run when the page closes, not on SetValue.
+        OpenRowVersionFeature(FeatureMgmt);
+        FeatureMgmt.Enabled.SetValue(false);
+        FeatureMgmt.Close();
+
+        // [THEN] The feature is off again.
+        Feature.Get(_Lib.FeatureId());
+        _Assert.IsFalse(Feature.Enabled, 'A pristine adoption must be undoable');
+        // [THEN] The detection job is gone, so an environment with no Shopify integration stops polling every minute.
+        _Assert.AreEqual(0, JobQueueEntry.Count(), 'The disable must remove the detection job');
+        // [THEN] The migration stamp the adoption wrote is fully rolled back, so the Setup page offers the migration again.
+        ShopifySetup.Get();
+        _Assert.IsTrue(
+            ShopifySetup."RowVersion Migration Status" = ShopifySetup."RowVersion Migration Status"::NotStarted,
+            StrSubstNo('The disable must reset the migration status, actual status %1', ShopifySetup."RowVersion Migration Status"));
+        _Assert.AreEqual(0, ShopifySetup."RowVersion Pld. Ver. Seeded", 'The disable must clear the seeded payload version');
+        _Assert.AreEqual(0DT, ShopifySetup."RowVersion Seeding Started At", 'The disable must clear the seeding start stamp');
+        _Assert.AreEqual(0DT, ShopifySetup."RowVersion Seeding Compl. At", 'The disable must clear the seeding completion stamp');
+        _Assert.AreEqual('', ShopifySetup."RowVersion Seeding Error Text", 'The disable must clear the seeding error text');
+    end;
+
+    [Test]
+    procedure GivenAStoreAppearsBeforeThePageSaves_WhenTheDisableIsPersisted_ThenItIsRolledBack()
+    var
+        Feature: Record "NPR Feature";
+        JobQueueEntry: Record "Job Queue Entry";
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+        FeatureMgmt: TestPage "NPR Feature Management";
+    begin
+        // [SCENARIO] The page validates the untick on one round trip and saves it on a later one; an environment that stops being pristine in between must not lose its detection.
+        Initialize();
+        // [GIVEN] A pristine adoption with its detection job.
+        SpfyRowVersionFeature.SetFeatureEnabled(true);
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Change Detection");
+        _Assert.AreEqual(1, JobQueueEntry.Count(), 'The adoption must leave one detection job for the disable to threaten');
+        Commit();
+
+        // [WHEN] An admin unticks the feature, and a store appears before the page persists the change.
+        OpenRowVersionFeature(FeatureMgmt);
+        FeatureMgmt.Enabled.SetValue(false);
+        _Lib.CreateStore(true, false, false, false, false);
+        asserterror FeatureMgmt.Close();
+
+        // [THEN] The save is refused, so the whole disable rolls back rather than stranding that store.
+        _Assert.ExpectedError('can no longer be disabled');
+        Feature.Get(_Lib.FeatureId());
+        _Assert.IsTrue(Feature.Enabled, 'The refused save must leave the feature enabled');
+        _Assert.AreEqual(1, JobQueueEntry.Count(), 'The refused save must leave the detection job in place');
+        ShopifySetup.Get();
+        _Assert.IsTrue(
+            ShopifySetup."RowVersion Migration Status" = ShopifySetup."RowVersion Migration Status"::Completed,
+            StrSubstNo('The refused save must leave the migration stamp intact, actual status %1', ShopifySetup."RowVersion Migration Status"));
+    end;
+
+    [Test]
+    procedure GivenTaskListAdopted_WhenTheFeatureIsDisabledFromThePage_ThenItIsRefused()
+    var
+        Feature: Record "NPR Feature";
+        FeatureMgmt: TestPage "NPR Feature Management";
+    begin
+        // [SCENARIO] The Shopify task list is layered on RowVersion detection, so an environment that adopted it can no longer step back off RowVersion.
+        Initialize();
+        // [GIVEN] An otherwise pristine environment that has also adopted the task list.
+        _Lib.SetFeatureEnabled(true);
+        _Lib.SetTaskListFeatureEnabled(true);
+        Commit();
+
+        // [WHEN] An admin tries to untick RowVersion. [THEN] the disable is refused.
+        OpenRowVersionFeature(FeatureMgmt);
+        asserterror FeatureMgmt.Enabled.SetValue(false);
+        _Assert.ExpectedError('can no longer be disabled');
+        FeatureMgmt.Close();
+        Feature.Get(_Lib.FeatureId());
+        _Assert.IsTrue(Feature.Enabled, 'The refused disable must leave the feature enabled');
+    end;
+
+    [Test]
+    procedure GivenDisabledStoreWithAreas_WhenTheFeatureIsDisabledFromThePage_ThenItIsRefused()
+    var
+        Feature: Record "NPR Feature";
+        FeatureMgmt: TestPage "NPR Feature Management";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A disabled store keeps its integration area flags, and re-enabling it never replays the area setup - so a store row at all closes the disable.
+        Initialize();
+        // [GIVEN] An otherwise pristine environment with one disabled store that still carries the Items area.
+        _Lib.SetFeatureEnabled(true);
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.DisableStore(StoreCode);
+        Commit();
+
+        // [WHEN] An admin tries to untick RowVersion. [THEN] the disable is refused.
+        OpenRowVersionFeature(FeatureMgmt);
+        asserterror FeatureMgmt.Enabled.SetValue(false);
+        _Assert.ExpectedError('can no longer be disabled');
+        FeatureMgmt.Close();
+        Feature.Get(_Lib.FeatureId());
+        _Assert.IsTrue(Feature.Enabled, 'The refused disable must leave the feature enabled');
+    end;
+
+    [Test]
+    procedure GivenShopifyFeatureOff_WhenTheFeatureIsEnabledFromThePage_ThenItIsRefused()
+    var
+        Feature: Record "NPR Feature";
+        FeatureMgmt: TestPage "NPR Feature Management";
+    begin
+        // [SCENARIO] RowVersion detection is a Shopify feature: it cannot be switched on before the Shopify integration itself is, which is what created the unrecoverable state this guard closes.
+        Initialize();
+        // [GIVEN] A pristine environment with no Data Log wiring and the Shopify Integration feature off.
+        SetShopifyIntegrationFeatureEnabled(false);
+        Commit();
+
+        // [WHEN] An admin ticks RowVersion on the page. [THEN] the enable is refused.
+        OpenRowVersionFeature(FeatureMgmt);
+        asserterror FeatureMgmt.Enabled.SetValue(true);
+        _Assert.ExpectedError('before enabling');
+        FeatureMgmt.Close();
+        Feature.Get(_Lib.FeatureId());
+        _Assert.IsFalse(Feature.Enabled, 'The refused enable must leave the feature disabled');
     end;
 
     [Test]
@@ -238,6 +395,7 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         ShopifySetup: Record "NPR Spfy Integration Setup";
         JobQueueEntry: Record "Job Queue Entry";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyDLogSubscrMgtImpl: Codeunit "NPR Spfy DLog Subscr.Mgt.Impl.";
         SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
@@ -249,7 +407,7 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         // [GIVEN] An existing Data Log driven integration with one synced item and no baselines.
         DeleteSpfyDataLogSubscribers();
         SpfyDLogSubscrMgtImpl.CreateDataLogSetup("NPR Spfy Integration Area"::Items);
-        _Assert.IsTrue(SpfyRowVersionFeature.RunsShopifyOnDataLog(), 'The migration must start from a Data Log driven integration');
+        _Assert.IsTrue(SpfyIntegrationMgt.RunsShopifyOnDataLog(), 'The migration must start from a Data Log driven integration');
         StoreCode := _Lib.CreateStore(true, false, false, false, false);
         _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
         _Assert.IsFalse(_Lib.HasBaseline(Database::Item, Item.SystemId, StoreCode), 'The migration must start without a baseline for the synced item');
@@ -268,7 +426,7 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         _Assert.AreEqual(SpfySyncStateMgt.PayloadVersion(), ShopifySetup."RowVersion Pld. Ver. Seeded", 'The migration must stamp the payload version it seeded');
         // [THEN] The sweep seeded the synced item and the cutover removed the legacy Data Log route.
         _Assert.IsTrue(_Lib.HasBaseline(Database::Item, Item.SystemId, StoreCode), 'The seeding sweep must leave a baseline for the synced item');
-        _Assert.IsFalse(SpfyRowVersionFeature.RunsShopifyOnDataLog(), 'The cutover must tear down the Shopify Data Log setup');
+        _Assert.IsFalse(SpfyIntegrationMgt.RunsShopifyOnDataLog(), 'The cutover must tear down the Shopify Data Log setup');
         // [THEN] Detection is provisioned exactly once.
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Change Detection");
@@ -351,6 +509,52 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
         if not SpfyStoreCustomerLink.IsEmpty() then
             SpfyStoreCustomerLink.ModifyAll("Synchronization Is Enabled", false, false);
         DeleteSpfyDataLogSubscribers();
+    end;
+
+    // Mirrors OpenTaskListFeature in the task list suite: every page-driven test opens the same filtered row.
+    local procedure OpenRowVersionFeature(var FeatureMgmt: TestPage "NPR Feature Management")
+    begin
+        FeatureMgmt.OpenEdit();
+        FeatureMgmt.Filter.SetFilter(Id, _Lib.FeatureId());
+    end;
+
+    local procedure DeleteAllShopifyStores()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        // Trigger-free: the OnDelete side effects are not what these tests are about, and the disable guard only reads the rows.
+        if not ShopifyStore.IsEmpty() then
+            ShopifyStore.DeleteAll(false);
+    end;
+
+    local procedure SetShopifyIntegrationFeatureEnabled(Enabled: Boolean)
+    var
+        Feature: Record "NPR Feature";
+        ShopifyFeatureIdTok: Label 'Shopify', Locked = true;
+    begin
+        if not Feature.Get(ShopifyFeatureIdTok) then begin
+            Feature.Init();
+            Feature.Id := CopyStr(ShopifyFeatureIdTok, 1, MaxStrLen(Feature.Id));
+            Feature.Enabled := Enabled;
+            Feature.Insert(false);
+            exit;
+        end;
+        if Feature.Enabled = Enabled then
+            exit;
+        Feature.Enabled := Enabled;
+        Feature.Modify(false);
+    end;
+
+    // The cheapest artifact that proves the environment has already run on RowVersion: one sync baseline.
+    local procedure InsertSyncStateRow()
+    var
+        SpfySyncState: Record "NPR Spfy Sync State";
+    begin
+        SpfySyncState.Init();
+        SpfySyncState."Table No." := Database::Item;
+        SpfySyncState."Entity System Id" := CreateGuid();
+        SpfySyncState."Shopify Store Code" := '';
+        SpfySyncState.Insert(false);
     end;
 
     local procedure InsertSpfyDataLogSubscriber(TableNo: Integer)

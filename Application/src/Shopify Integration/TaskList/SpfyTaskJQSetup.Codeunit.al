@@ -56,7 +56,7 @@ codeunit 6151243 "NPR Spfy Task JQ Setup"
             JobQueueEntry."Object Type to Run"::Codeunit, TaskProcessorCodeunitId(),
             ShopifyStoreCode, StrSubstNo(JobQueueDescrLbl, ShopifyStoreCode),
             JobQueueMgt.NowWithDelayInSeconds(60), 1,
-            '', JobQueueEntry)
+            TaskProcessingJQCategoryCode(), JobQueueEntry)
         then
             if JobQueueMgt.ActivateJobQueueEntry(JobQueueEntry) then
                 exit;
@@ -66,6 +66,36 @@ codeunit 6151243 "NPR Spfy Task JQ Setup"
         if JobQueueEntry.Get(JobQueueEntry.ID) and not JobQueueEntry."NPR Manually Set On Hold" then
             exit;
         Error(CouldNotActivateErr, ShopifyStoreCode);
+    end;
+
+    // Empty unless there is something to say, so a caller needs no second question. The delegated admin this warning
+    // exists for is exactly the user who may not read Job Queue Entry, and an unguarded probe would error their page open.
+    internal procedure ProcessorOnHoldWarning(): Text
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+        ProcessorOnHoldTxt: Label 'A Shopify task processing job queue entry is on hold. Shopify updates are collected but not sent until an administrator sets it to Ready on the Job Queue Entries page.';
+    begin
+        if not SpfyIntegrationSetup.Get() then
+            exit('');
+        if SpfyIntegrationSetup."Task List Migration Status" <> SpfyIntegrationSetup."Task List Migration Status"::Completed then
+            exit('');
+        if not JobQueueEntry.ReadPermission() then
+            exit('');
+        if not AnyTaskProcessorOnHold() then
+            exit('');
+        exit(ProcessorOnHoldTxt);
+    end;
+
+    // Any store, so the migration can tell the operator that sending stays parked until someone activates the job.
+    internal procedure AnyTaskProcessorOnHold(): Boolean
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", TaskProcessorCodeunitId());
+        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"On Hold");
+        exit(not JobQueueEntry.IsEmpty());
     end;
 
     // Zero when there is no entry. The two scheduling fields are mutually exclusive; whichever drives the entry answers.
@@ -110,6 +140,19 @@ codeunit 6151243 "NPR Spfy Task JQ Setup"
     local procedure TaskProcessorCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR Spfy Task Processor");
+    end;
+
+    // One category shared by every store, so the per-store processors take turns instead of exhausting the
+    // background-session cap and racing each other in RecoverNcResiduals; Shopify-specific so they are not also
+    // serialized behind the unrelated NaviConnect processors. The code is at the Code[10] limit of the category table.
+    local procedure TaskProcessingJQCategoryCode(): Code[10]
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        TaskListJQCategoryCode: Label 'NPR-SPFY', MaxLength = 10, Locked = true;
+        TaskListJQCategoryDescrLbl: Label 'Shopify task list proc.', MaxLength = 30;
+    begin
+        JobQueueCategory.InsertRec(TaskListJQCategoryCode, TaskListJQCategoryDescrLbl);
+        exit(JobQueueCategory.Code);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]

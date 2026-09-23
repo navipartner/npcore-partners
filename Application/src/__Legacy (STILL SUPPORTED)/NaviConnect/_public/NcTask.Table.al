@@ -130,6 +130,9 @@ table 6151502 "NPR Nc Task"
         {
             Caption = 'Store Code';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-02';
+            ObsoleteReason = 'Shopify has its own task list (CORE-1242). This Shopify-only column is deleted at the NaviConnect phase-out.';
 #if not BC17
             TableRelation = "NPR Spfy Store".Code;
 #endif
@@ -174,7 +177,12 @@ table 6151502 "NPR Nc Task"
         key(Key4; "Record Value")
         {
         }
-        key(Key5; "Task Processor Code", Processed, Postponed, "Store Code", "Not Before Date-Time") { }
+        key(Key5; "Task Processor Code", Processed, Postponed, "Store Code", "Not Before Date-Time")
+        {
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-02';
+            ObsoleteReason = 'Shopify has its own task list (CORE-1242). This Shopify-only key is deleted at the NaviConnect phase-out.';
+        }
     }
 
     trigger OnDelete()
@@ -192,6 +200,8 @@ table 6151502 "NPR Nc Task"
         NcTaskOutput.DeleteAll();
 
 #if not BC17
+        // Phase-out 2026-09-02 (CORE-1242): Shopify has its own task list, and tag requests raised there carry their own
+        // task reference. This Shopify-only cascade is deleted at the NaviConnect phase-out.
         SpfyTagMgt.RemoveTagUpdateRequests("Entry No.");
 #endif
     end;

@@ -1,6 +1,6 @@
 enum 6014623 "NPR Spfy Task State"
 {
-    Access = Internal;
+    Access = Public;
     Extensible = false;
 
     value(0; Pending)

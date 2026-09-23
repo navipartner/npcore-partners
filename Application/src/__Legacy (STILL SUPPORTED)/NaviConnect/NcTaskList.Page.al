@@ -143,6 +143,9 @@ page 6151502 "NPR Nc Task List"
                     Editable = false;
                     ToolTip = 'Specifies the Shopify store code the task is created for.';
                     ApplicationArea = NPRShopify;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2026-09-02';
+                    ObsoleteReason = 'Shopify has its own task list (CORE-1242). This Shopify-only column is deleted at the NaviConnect phase-out.';
                 }
                 field("Log Date"; Rec."Log Date")
                 {

@@ -62,17 +62,22 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         if not SpfyIntegrationSetup.Get() then
             exit(false);
         exit(SpfyIntegrationSetup."Task List Migration Status" in
-            [SpfyIntegrationSetup."Task List Migration Status"::Migrating, SpfyIntegrationSetup."Task List Migration Status"::Completed]);
+            [SpfyIntegrationSetup."Task List Migration Status"::Migrating,
+             SpfyIntegrationSetup."Task List Migration Status"::Finalizing,
+             SpfyIntegrationSetup."Task List Migration Status"::Completed]);
     end;
 
-    local procedure TaskListMigrationCompleted(): Boolean
+    // Not Migrating: the migration's own drain processes legacy tasks through this subscriber and needs the setup rows it drains through.
+    // Failed is not retired: the cutover failed before the hand-over, so the legacy path is intact and must stay usable.
+    local procedure LegacySendPathIsRetired(): Boolean
     var
         SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
     begin
         SpfyIntegrationSetup.SetLoadFields("Task List Migration Status");
         if not SpfyIntegrationSetup.Get() then
             exit(false);
-        exit(SpfyIntegrationSetup."Task List Migration Status" = SpfyIntegrationSetup."Task List Migration Status"::Completed);
+        exit(SpfyIntegrationSetup."Task List Migration Status" in
+            [SpfyIntegrationSetup."Task List Migration Status"::Finalizing, SpfyIntegrationSetup."Task List Migration Status"::Completed]);
     end;
 
     procedure GetShopifyTaskProcessorCode(AutoCreate: Boolean): Code[20]
@@ -329,12 +334,24 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     end;
 
     local procedure CreateTaskSetup(var Task: Record "NPR Nc Task")
+    var
+        CodeunitId: Integer;
     begin
         if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> GetShopifyTaskProcessorCode(false)) then
             exit;
-        if TaskListMigrationCompleted() then
+        if LegacySendPathIsRetired() then
             exit;
-        case Task."Table No." of
+        CodeunitId := StandardLegacySendCodeunitId(Task."Table No.");
+        if CodeunitId = 0 then
+            exit;
+        CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", CodeunitId);
+    end;
+
+    // The single source of the standard table-to-send-codeunit mapping: the setup creation above and the task list
+    // migration's override detection must never read two lists that can drift apart.
+    internal procedure StandardLegacySendCodeunitId(TableNo: Integer): Integer
+    begin
+        case TableNo of
             Database::Item,
             Database::"Item Variant",
             Database::"Item Reference",
@@ -343,35 +360,33 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"NPR Spfy Inventory Level",
             Database::"NPR Spfy Item Price",
             Database::"NPR Spfy Inv Item Location":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Items&Inventory");
+                exit(Codeunit::"NPR Spfy Send Items&Inventory");
 
             Database::"NPR Spfy Entity Metafield":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Metafields");
+                exit(Codeunit::"NPR Spfy Send Metafields");
 
             Database::Customer:
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Customers");
+                exit(Codeunit::"NPR Spfy Send Customers");
 
             Database::"NPR NpRv Voucher",
             Database::"NPR NpRv Arch. Voucher",
             Database::"NPR NpRv Voucher Entry":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Voucher");
+                exit(Codeunit::"NPR Spfy Send Voucher");
 
             Database::"Sales Shipment Header",
             Database::"Return Receipt Header":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Fulfillment");
+                exit(Codeunit::"NPR Spfy Send Fulfillment");
 
             Database::"Sales Invoice Header",
             Database::"NPR Magento Payment Line":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Capture Payment");
-#if not (BC18 or BC19 or BC20)
+                exit(Codeunit::"NPR Spfy Capture Payment");
 
             Database::"NPR POS Entry":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send BC Transaction");
-#endif
+                exit(Codeunit::"NPR Spfy Send BC Transaction");
             Database::"NPR NpCs Document":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Ord Ready For Pickup");
+                exit(Codeunit::"NPR Spfy Ord Ready For Pickup");
             Database::"Sales Header":
-                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Close Order");
+                exit(Codeunit::"NPR Spfy Close Order");
         end;
     end;
 

@@ -36,6 +36,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         exit(_GraphQLClient);
     end;
 
+    [Obsolete('Data Log producer replaced by RowVersion change detection; deleted at the NaviConnect phase-out.', '2026-09-02')]
     procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     begin
         case DataLogEntry."Table ID" of

@@ -141,6 +141,7 @@ codeunit 6151183 "NPR Spfy Task Queue"
         SpfyTask."Last Processing Duration" := 0;
         SpfyTask.Modify();
         Commit();
+        SpfyTaskRunContext.RecordBatchClaim(SpfyTask."Entry No.");
         exit(true);
     end;
 
@@ -170,6 +171,27 @@ codeunit 6151183 "NPR Spfy Task Queue"
             RecordFailure(SpfyTask, ErrorText);
         SpfyTask.Modify(true);
         CompletedTask := SpfyTask;
+        exit(true);
+    end;
+
+    // For a batch group no one claimed: the attempt count is passed in as it was when the group was handed out, so a row
+    // another session has meanwhile claimed, sent or failed is left alone.
+    internal procedure RecordUnclaimedFailure(SpfyTaskEntryNo: BigInteger; DispatchedAttempts: Integer; ErrorText: Text): Boolean
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        SpfyTask.ReadIsolation(IsolationLevel::UpdLock);
+        if not SpfyTask.Get(SpfyTaskEntryNo) then
+            exit(false);
+        if SpfyTask.State <> SpfyTask.State::Pending then
+            exit(false);
+        if SpfyTask.Attempts <> DispatchedAttempts then
+            exit(false);
+
+        SpfyTask.Attempts += 1;
+        WriteResponse(SpfyTask, ErrorText);
+        RecordFailure(SpfyTask, ErrorText);
+        SpfyTask.Modify(true);
         exit(true);
     end;
 

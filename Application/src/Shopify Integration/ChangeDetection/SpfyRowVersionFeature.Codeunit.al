@@ -11,7 +11,7 @@ codeunit 6151216 "NPR Spfy RowVersion Feature" implements "NPR Feature Managemen
     procedure AddFeature()
     var
         Feature: Record "NPR Feature";
-        PageDescriptionLbl: Label 'Shopify RowVersion Change Detection — a managed, one-way switch. Enable it here only on a new environment, while no Shopify integration area has been switched on yet; detection then starts immediately and there is nothing to migrate. Once any integration area is on, this environment detects Shopify changes with the Data Log and must be moved across with the "Migrate to RowVersion detection" action on the Shopify Integration Setup page, which also removes the Data Log wiring.', MaxLength = 2048;
+        PageDescriptionLbl: Label 'Shopify RowVersion Change Detection — a managed switch. Enable it here only on a new environment that has the Shopify Integration feature on and no Shopify integration area switched on yet. It can be switched back off only while nothing has run on it: no Shopify store, the Shopify Task List off, and nothing detected or synchronized. Otherwise use the "Migrate to RowVersion detection" action on the Shopify Integration Setup page.', MaxLength = 2048;
     begin
         Feature.Init();
         Feature.Id := GetFeatureId();
@@ -86,63 +86,108 @@ codeunit 6151216 "NPR Spfy RowVersion Feature" implements "NPR Feature Managemen
     internal procedure IsFreshRowVersionCandidate(CurrentStoreCode: Code[20]): Boolean
     var
         ShopifyStore: Record "NPR Spfy Store";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
         ShopifyStore.SetRange(Enabled, true);
         ShopifyStore.SetFilter(Code, '<>%1', CurrentStoreCode);
         if not ShopifyStore.IsEmpty() then
             exit(false);
-        exit(not HasSyncedShopifyData());
-    end;
-
-    internal procedure RunsShopifyOnDataLog(): Boolean
-    var
-        DataLogSubscriber: Record "NPR Data Log Subscriber";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SpfyHandlerId: Code[20];
-    begin
-        SpfyHandlerId := SpfyIntegrationMgt.DataProcessingHandlerID(false);
-        if SpfyHandlerId = '' then
-            exit(false);
-        DataLogSubscriber.SetRange(Code, SpfyHandlerId);
-        exit(not DataLogSubscriber.IsEmpty());
-    end;
-
-    internal procedure HasSyncedShopifyData(): Boolean
-    var
-        SpfyAssignedID: Record "NPR Spfy Assigned ID";
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
-    begin
-        if RunsShopifyOnDataLog() then
-            exit(true);
-        if not SpfyAssignedID.IsEmpty() then
-            exit(true);
-        SpfyStoreItemLink.SetRange("Synchronization Is Enabled", true);
-        if not SpfyStoreItemLink.IsEmpty() then
-            exit(true);
-        SpfyStoreCustomerLink.SetRange("Synchronization Is Enabled", true);
-        if not SpfyStoreCustomerLink.IsEmpty() then
-            exit(true);
-        exit(false);
+        exit(not SpfyIntegrationMgt.HasSyncedShopifyData());
     end;
 
     // Uses RunsShopifyOnDataLog (not HasSyncedShopifyData) so a RowVersion-adopted env's install/upgrade re-enable isn't blocked.
     [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnBeforeValidateEvent', 'Enabled', false, false)]
     local procedure NPRFeatureOnBeforeValidateEnabled(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature"; CurrFieldNo: Integer)
     var
+        SpfyIntegrationFeature: Codeunit "NPR Spfy Integration Feature";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
-        CannotDisableErr: Label 'The %1 feature is one-way and cannot be disabled once enabled.', Comment = '%1 = feature description';
         ExistingIntegrationErr: Label 'Enabling %1 here is only possible before this environment has any Shopify Data Log wiring, which switching on an integration area creates. This environment still has that wiring, so it requires running the RowVersion migration instead. Use the "Migrate to RowVersion detection" action on the Shopify Integration Setup page.', Comment = '%1 = feature description';
+        ShopifyFeatureOffErr: Label 'Enable the %1 feature before enabling %2.', Comment = '%1 = Shopify Integration feature description, %2 = feature description';
     begin
         if Rec.Id <> GetFeatureId() then
             exit;
         if CurrFieldNo = 0 then
             exit;
-        if xRec.Enabled and not Rec.Enabled then
-            Error(CannotDisableErr, GetFeatureDescription());
-        if Rec.Enabled and not xRec.Enabled then
-            if RunsShopifyOnDataLog() and not SpfyRowVersionMigration.MigrationInProgress() and not IsInstallUpgradeRestore() then
+        if xRec.Enabled and not Rec.Enabled then begin
+            if not IsPristineAdoption() then
+                CannotDisableError();
+            exit;
+        end;
+        if Rec.Enabled and not xRec.Enabled then begin
+            // Precondition first: the migration message names an action on the Shopify Integration Setup page, which
+            // the NPRShopify application area hides while this feature is off - naming it there would dead-end.
+            if not SpfyIntegrationFeature.IsFeatureEnabled() then
+                Error(ShopifyFeatureOffErr, SpfyIntegrationFeature.GetFeatureDescription(), GetFeatureDescription());
+            if SpfyIntegrationMgt.RunsShopifyOnDataLog() and not SpfyRowVersionMigration.MigrationInProgress() and not IsInstallUpgradeRestore() then
                 Error(ExistingIntegrationErr, GetFeatureDescription());
+        end;
+    end;
+
+    // One Label, two raisers: the validate guard refuses the tick, and the after-modify guard refuses a disable whose
+    // environment stopped being pristine between the two round trips. It names the blocking artifact, because the
+    // operator otherwise has no way to find out which one it is.
+    local procedure CannotDisableError()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+        CannotDisableErr: Label 'The %1 feature can no longer be disabled: %2.', Comment = '%1 = feature description, %2 = the reason, a sentence fragment';
+        NotEmptyTxt: Label 'this environment is no longer empty - it has a Shopify store, or change detection has already recorded something here';
+        SyncedTxt: Label 'this environment already detects Shopify changes with it, and switching it off would leave no change detection at all';
+        TaskListOnTxt: Label 'the Shopify Task List is switched on and rides on this detection. Switch the task list off first';
+    begin
+        if SpfyIntegrationMgt.HasSyncedShopifyData() then
+            Error(CannotDisableErr, GetFeatureDescription(), SyncedTxt);
+        if SpfyTaskListFeature.IsFeatureEnabled() then
+            Error(CannotDisableErr, GetFeatureDescription(), TaskListOnTxt);
+        // Store and detection rows share one reason: naming deletion first sent operators to delete a live store that was never the blocker.
+        Error(CannotDisableErr, GetFeatureDescription(), NotEmptyTxt);
+    end;
+
+    // A disable is destructive as soon as anything has run on RowVersion: the capture subscribers and the poll are then
+    // the only detection left, so switching them off would silently stop sending. It is permitted only while the
+    // adoption is still untouched. Keeping the predicate that strict is also what keeps RunPostDisableSideEffects down
+    // to the detection job and the migration stamp.
+    local procedure IsPristineAdoption(): Boolean
+    var
+        ChangeQuarantine: Record "NPR Change Quarantine";
+        ChangeTracker: Record "NPR Change Tracker";
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyDeletionLog: Record "NPR Spfy Deletion Log";
+        SpfyResyncRun: Record "NPR Spfy Resync Run";
+        SpfySyncState: Record "NPR Spfy Sync State";
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+    begin
+        if SpfyIntegrationMgt.HasSyncedShopifyData() then
+            exit(false);
+        // The task list adoption layers on RowVersion detection and is itself one-way; its own freshness test is reused because it already covers the unprocessed legacy NC task backlog.
+        if SpfyTaskListFeature.IsFeatureEnabled() then
+            exit(false);
+        if not SpfyTaskListFeature.IsFreshTaskListCandidate() then
+            exit(false);
+        // Any store row at all, enabled or not: a disabled store keeps its integration area flags, and re-enabling it runs only the Enabled OnValidate, which never replays SetupIntegrationArea - the Data Log wiring would then never come back.
+        if not ShopifyStore.IsEmpty() then
+            exit(false);
+        if not SpfySyncState.IsEmpty() then
+            exit(false);
+        if not SpfyDeletionLog.IsEmpty() then
+            exit(false);
+        if not SpfyTask.IsEmpty() then
+            exit(false);
+        ChangeTracker.SetRange("Integration Type", "NPR Integration Type"::Shopify);
+        if not ChangeTracker.IsEmpty() then
+            exit(false);
+        ChangeQuarantine.SetRange("Integration Type", "NPR Integration Type"::Shopify);
+        if not ChangeQuarantine.IsEmpty() then
+            exit(false);
+        // Not IsResyncActive: that one deliberately ignores a stale Running row so a crashed run cannot block detection. Here any Running row means a worker may still be live.
+        SpfyResyncRun.SetRange(Status, SpfyResyncRun.Status::Running);
+        if not SpfyResyncRun.IsEmpty() then
+            exit(false);
+        // "RowVersion Migration Status" is deliberately not tested: it is derived state, not work, and every status that could mean a live worker is already refused above.
+        exit(true);
     end;
 
     local procedure IsInstallUpgradeRestore(): Boolean
@@ -156,21 +201,23 @@ codeunit 6151216 "NPR Spfy RowVersion Feature" implements "NPR Feature Managemen
         exit(SpfyIntegrationSetup."RowVersion Migration Status" = SpfyIntegrationSetup."RowVersion Migration Status"::Migrating);
     end;
 
-    // UI-enable path only: xRec carries the real before-image just for page-driven modifies; code-driven enables get the side effects from SetFeatureEnabled.
+    // UI paths only: xRec carries the real before-image just for page-driven modifies; code-driven flips get their side effects from SetFeatureEnabled.
     [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnAfterModifyEvent', '', false, false)]
     local procedure NPRFeatureOnAfterModifyEnabled(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature")
     begin
         if Rec.Id <> GetFeatureId() then
             exit;
-        if not (Rec.Enabled and not xRec.Enabled) then
-            exit;
-        RunPostEnableSideEffects();
+        if Rec.Enabled and not xRec.Enabled then
+            RunPostEnableSideEffects();
+        if xRec.Enabled and not Rec.Enabled then
+            RunPostDisableSideEffects();
     end;
 
     local procedure RunPostEnableSideEffects()
     var
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
         SpfyScheduleDetectionJQ: Codeunit "NPR Spfy Schedule Detection JQ";
     begin
@@ -179,18 +226,39 @@ codeunit 6151216 "NPR Spfy RowVersion Feature" implements "NPR Feature Managemen
         if SpfyRowVersionMigration.MigrationInProgress() then
             ChangeTrackerMgt.ReseedAllMarksToCurrentMax("NPR Integration Type"::Shopify);
         SpfyScheduleDetectionJQ.EnsureChangeDetectionJobScheduled();
-        if not RunsShopifyOnDataLog() then
+        if not SpfyIntegrationMgt.RunsShopifyOnDataLog() then
             MarkMigrationCompletedForNonDataLogEnable();
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnAfterModifyEvent', '', false, false)]
-    local procedure AutoAdoptRowVersionOnShopifyFeatureEnabled(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature")
+    // Reached only through the validate guard, which permits the disable only while the adoption is pristine - so this
+    // undoes exactly what the pristine enable did, and nothing else. Deliberately not called from SetFeatureEnabled:
+    // the only code-driven disable is the cutover rollback, which owns its own status handling.
+    local procedure RunPostDisableSideEffects()
+    var
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+        SpfyRowVersionMigration: Codeunit "NPR Spfy RowVersion Migration";
+        SpfyScheduleDetectionJQ: Codeunit "NPR Spfy Schedule Detection JQ";
     begin
-        if Rec.Feature <> Enum::"NPR Feature"::Shopify then
+        // The cutover rollback disables the feature itself and owns the Failed stamp it just wrote - never clean up after it.
+        if SpfyRowVersionMigration.MigrationInProgress() then
             exit;
-        if not (Rec.Enabled and not xRec.Enabled) then
+        // Re-checked, not trusted from the validate guard: a page persists the Modify on a later round trip, so the
+        // environment can have gained a store - and its only detection path - in between. Erroring rolls the disable
+        // back with it; merely skipping the cleanup would still leave that store with no detection at all.
+        if not IsPristineAdoption() then
+            CannotDisableError();
+        SpfyScheduleDetectionJQ.SetupChangeDetectionJobQueue(false);
+        if not SpfyIntegrationSetup.Get() then
             exit;
-        MaybeAutoAdoptFreshEnvironment('');
+        if SpfyIntegrationSetup."RowVersion Migration Status" = SpfyIntegrationSetup."RowVersion Migration Status"::NotStarted then
+            exit;
+        SpfyIntegrationSetup."RowVersion Migration Status" := SpfyIntegrationSetup."RowVersion Migration Status"::NotStarted;
+        Clear(SpfyIntegrationSetup."RowVersion Pld. Ver. Seeded");
+        Clear(SpfyIntegrationSetup."RowVersion Seeding Started At");
+        Clear(SpfyIntegrationSetup."RowVersion Seeding Compl. At");
+        Clear(SpfyIntegrationSetup."RowVersion Seeding Error Text");
+        SpfyIntegrationSetup.Modify();
+        // No Commit: runs inside the page's modify chain, so it must ride the ambient transaction.
     end;
 
     local procedure GetFeatureId(): Text[50]

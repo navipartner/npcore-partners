@@ -692,6 +692,8 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if Handled then
             exit;
 #if not BC17
+        // Phase-out 2026-09-02 (CORE-1242): the Shopify task list keeps this list of its own; this Shopify-only
+        // branch is deleted at the NaviConnect phase-out.
         if Task."Task Processor Code" <> '' then
             if Task."Task Processor Code" = SpfyScheduleSend.GetShopifyTaskProcessorCode(false) then
                 BatchProcessing := Task."Table No." in [Database::"Item Variant", Database::"NPR Spfy Item Price", Database::"NPR Spfy Inventory Level"];

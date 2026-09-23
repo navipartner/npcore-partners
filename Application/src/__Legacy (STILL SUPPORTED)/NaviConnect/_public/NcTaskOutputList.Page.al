@@ -36,11 +36,17 @@ page 6151510 "NPR Nc Task Output List"
                 {
                     ToolTip = 'Specifies the status of the task output entry.';
                     ApplicationArea = NPRShopify;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2026-09-02';
+                    ObsoleteReason = 'Shopify has its own task list (CORE-1242). This Shopify-only column is deleted at the NaviConnect phase-out.';
                 }
                 field("Spfy Error Message"; Rec."Error Message")
                 {
                     ToolTip = 'Specifies the error message, if the task output entry execution failed.';
                     ApplicationArea = NPRShopify;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2026-09-02';
+                    ObsoleteReason = 'Shopify has its own task list (CORE-1242). This Shopify-only column is deleted at the NaviConnect phase-out.';
                 }
                 field("Entry No."; Rec."Entry No.")
                 {

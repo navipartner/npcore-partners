@@ -301,13 +301,20 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Task List Migration Status';
             DataClassification = CustomerContent;
-            OptionMembers = NotStarted,Migrating,Completed,Failed;
-            OptionCaption = 'Not Started,Migrating,Completed,Failed';
+            // Finalizing is appended, never inserted: the ordinals of the existing values are persisted data.
+            OptionMembers = NotStarted,Migrating,Completed,Failed,Finalizing;
+            OptionCaption = 'Not Started,Migrating,Completed,Failed,Finalizing';
         }
         field(181; "Task List Migr. Started At"; DateTime)
         {
             Caption = 'Task List Migration Started At';
             DataClassification = CustomerContent;
+        }
+        field(182; "Task List Migration Run ID"; Guid)
+        {
+            Caption = 'Task List Migration Run ID';
+            DataClassification = SystemMetadata;
+            Editable = false;
         }
     }
 

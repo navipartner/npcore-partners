@@ -147,6 +147,30 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
+    /// <summary>
+    /// Raised before NP Retail sends a Shopify task, so a subscriber can take the send over.
+    /// </summary>
+    /// <param name="SpfyTask">The task to send. For a kind classified as batched this is a temporary work list carrying every row of the group.</param>
+    /// <param name="Handled">Set to true when the subscriber owns the dispatch. The standard sender is then skipped for this task or group.</param>
+    /// <remarks>
+    /// A single task is already claimed by the engine when the subscriber sees it, and the engine completes it, so the
+    /// subscriber must neither claim nor complete it. A batch group is not claimed: the subscriber claims every row it
+    /// sends with ClaimShopifyTaskForBatch and finishes it with CompleteShopifyTaskFromBatch, both on
+    /// "NPR Spfy Integration Public". Rows left unclaimed stay pending for the next cycle. To discard a row without
+    /// sending it, claim it and complete it as successful. A group reported as handled with no claim at all is charged
+    /// one attempt per cycle and quarantines at the cap, except when the run deadline has already passed.
+    /// </remarks>
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeDispatchShopifyTask(var SpfyTask: Record "NPR Spfy Task"; var Handled: Boolean)
+    begin
+    end;
+
+    // Raised isolated, so a failing subscriber still leaves what it had assigned: set Handled last, and a kind counts as batched only when both were set.
+    [IntegrationEvent(false, false, true)]
+    internal procedure OnCheckIfTaskKindIsBatched(TaskTableNo: Integer; var IsBatch: Boolean; var Handled: Boolean)
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     internal procedure OnAfterGenerateVariantJObject(ItemVariant: Record "Item Variant"; var VariantJObject: JsonObject)
     begin

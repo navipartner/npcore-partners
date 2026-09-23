@@ -8,6 +8,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyGifCardRefNoRequirementTxt: Label 'Shopify integrated voucher reference numbers must be 8-20 characters long and contain only unaccented alphabetical letters (a-z) and numbers (0-9).';
 
+    [Obsolete('Data Log producer replaced by RowVersion change detection; deleted at the NaviConnect phase-out.', '2026-09-02')]
     procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     begin
         if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Retail Vouchers") then

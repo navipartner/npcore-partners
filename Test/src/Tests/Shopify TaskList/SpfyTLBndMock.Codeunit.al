@@ -1,6 +1,7 @@
 codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
 {
     // Scriptable stand-in for the Shopify send boundary: no HTTP, never raises for a dispatch outcome, and touches real rows only through the queue facade.
+    // Also holds the migration suite's scripted interleaves: the legacy hand-over seam and the creation of the migration's own background entry.
     Access = Internal;
     SingleInstance = true;
 
@@ -14,6 +15,8 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
         _DispatchTemporary: List of [Boolean];
         _FailureErrorText: Text;
         _HandOverFailureText: Text;
+        _HandOverLeaseTakeover: Guid;
+        _SchedulingLeaseTakeover: Guid;
         _WaitingRoundTripEntryNo: BigInteger;
         _SilentDropAfterNRows: Integer;
         _ThrowAfterNRows: Integer;
@@ -23,6 +26,8 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
         _ExpireRunDeadlineOnTaskWrite: Boolean;
         _LastWasTemporary: Boolean;
         _WholeCallFailure: Boolean;
+        _ParkMigrationEntry: Boolean;
+        _ParkedEntryIsManuallyHeld: Boolean;
 
     procedure Dispatch(var SpfyTaskWork: Record "NPR Spfy Task"; var ErrorText: Text): Boolean
     begin
@@ -61,6 +66,26 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
         _HandOverFailureText := ErrorText;
     end;
 
+    // Simulates another run taking the migration lease over while this one is inside the legacy hand-over.
+    procedure SetHandOverLeaseTakeover(RunId: Guid)
+    begin
+        _HandOverLeaseTakeover := RunId;
+    end;
+
+    // Simulates a user who cannot start scheduled tasks: the migration's background entry is created and left parked.
+    // Manually held is the variant the production code re-reads and turns into a scheduling error.
+    procedure SetParkMigrationEntry(ManuallyHeld: Boolean)
+    begin
+        _ParkMigrationEntry := true;
+        _ParkedEntryIsManuallyHeld := ManuallyHeld;
+    end;
+
+    // Simulates another administrator taking the migration lease over while this run is still scheduling its entry.
+    procedure SetSchedulingLeaseTakeover(RunId: Guid)
+    begin
+        _SchedulingLeaseTakeover := RunId;
+    end;
+
     procedure SetThrowMidBatch(AfterNRows: Integer; ErrorText: Text)
     begin
         _ThrowAfterNRows := AfterNRows;
@@ -95,6 +120,10 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
         Clear(_DispatchTemporary);
         _FailureErrorText := '';
         _HandOverFailureText := '';
+        Clear(_HandOverLeaseTakeover);
+        Clear(_SchedulingLeaseTakeover);
+        _ParkMigrationEntry := false;
+        _ParkedEntryIsManuallyHeld := false;
         _WaitingRoundTripEntryNo := 0;
         _SilentDropAfterNRows := 0;
         _ThrowAfterNRows := 0;
@@ -255,9 +284,71 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Spfy Task List Migration", OnBeforeHandOverLegacyQueue, '', false, false)]
     local procedure OnBeforeHandOverLegacyQueue(var FailWithErrorText: Text)
+    var
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
     begin
+        // Committed so the take-over outlives the cutover's rollback, exactly as a real superseding run's would.
+        if not IsNullGuid(_HandOverLeaseTakeover) then begin
+            SpfyIntegrationSetup.Get();
+            SpfyIntegrationSetup."Task List Migration Run ID" := _HandOverLeaseTakeover;
+            SpfyIntegrationSetup.Modify(false);
+            Commit();
+            Clear(_HandOverLeaseTakeover);
+        end;
         if _HandOverFailureText <> '' then
             FailWithErrorText := _HandOverFailureText;
+    end;
+
+    // Inert unless a test asks for it, and never reaches any job but the migration's own.
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnBeforeInitRecurringJobQueueEntry', '', false, false)]
+    local procedure ScriptMigrationEntryCreation(Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry"; var Success: Boolean; var Handled: Boolean)
+    begin
+        if Parameters."Object Type to Run" <> Parameters."Object Type to Run"::Codeunit then
+            exit;
+        if Parameters."Object ID to Run" <> Codeunit::"NPR Spfy Task List Migration" then
+            exit;
+        if not IsNullGuid(_SchedulingLeaseTakeover) then
+            TakeMigrationLeaseOver();
+        if not _ParkMigrationEntry then
+            exit;
+        ParkMigrationEntry(Parameters, JobQueueEntryOut);
+        _ParkMigrationEntry := false;
+        _ParkedEntryIsManuallyHeld := false;
+        Success := true;
+        Handled := true;
+    end;
+
+    // Committed so the take-over outlives the scheduling failure, exactly as a real superseding run's would.
+    local procedure TakeMigrationLeaseOver()
+    var
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
+    begin
+        SpfyIntegrationSetup.Get();
+        SpfyIntegrationSetup."Task List Migration Run ID" := _SchedulingLeaseTakeover;
+        SpfyIntegrationSetup."Task List Migr. Started At" := CurrentDateTime();
+        SpfyIntegrationSetup.Modify(false);
+        Commit();
+        Clear(_SchedulingLeaseTakeover);
+    end;
+
+    // The row is committed so the half-created entry outlives the scheduling error, and the copy handed back reports the
+    // declined activation the production code then re-reads the row to classify.
+    local procedure ParkMigrationEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry")
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.Init();
+        JobQueueEntry.ID := CreateGuid();
+        JobQueueEntry."Object Type to Run" := Parameters."Object Type to Run";
+        JobQueueEntry."Object ID to Run" := Parameters."Object ID to Run";
+        JobQueueEntry."Parameter String" := Parameters."Parameter String";
+        JobQueueEntry.Description := Parameters.Description;
+        JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
+        JobQueueEntry."NPR Manually Set On Hold" := _ParkedEntryIsManuallyHeld;
+        JobQueueEntry.Insert(false);
+        Commit();
+        JobQueueEntryOut := JobQueueEntry;
+        JobQueueEntryOut."NPR Manually Set On Hold" := true;
     end;
 
     // The injected boundary is session-lived state: without this, sending from the same session after a test run would dispatch into the mock instead of Shopify.

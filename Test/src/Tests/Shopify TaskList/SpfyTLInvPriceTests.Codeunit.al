@@ -1833,4 +1833,270 @@
         LocationInvItem.Insert(false);
     end;
     #endregion
+
+    #region Items&Inv sibling against the mock GraphQL client (DF14 retrofit)
+    [Test]
+    procedure GivenTwoVariantModifies_WhenItemsSiblingRunsAgainstMock_ThenOneBulkMutationAndBothRowsCompleteBySku()
+    var
+        Item: Record Item;
+        ItemVariant1: Record "Item Variant";
+        ItemVariant2: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        TempWorkList: Record "NPR Spfy Task" temporary;
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendItemsInv: Codeunit "NPR Spfy Task Send Items&Inv";
+        StoreCode: Code[20];
+        Task1EntryNo: BigInteger;
+        Task2EntryNo: BigInteger;
+        VariantsBulkUpdateTok: Label 'productVariantsBulkUpdate', Locked = true;
+    begin
+        // [SCENARIO] Two variant modifies leave as one bulk mutation and both rows complete, each matched back to its own SKU.
+        Initialize();
+        StoreCode := CreateInventoryStore();
+
+        // [GIVEN] A synced item (with one variety set) carrying an assigned Shopify product id and two variants with variety values and assigned variant ids.
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        AddVarietySetToItem(Item);
+        _Lib.AssignEntryID(SpfyStoreItemLink.RecordId(), '1001');
+        CreateVariantWithAssignedId(Item."No.", StoreCode, '2001', ItemVariant1);
+        CreateVariantWithAssignedId(Item."No.", StoreCode, '2002', ItemVariant2);
+
+        // [GIVEN] Two pending Modify tasks for the variants, staged the way the engine stages a batch group.
+        Task1EntryNo := EnqueueVariantTask(StoreCode, Item."No.", ItemVariant1.Code);
+        Task2EntryNo := EnqueueVariantTask(StoreCode, Item."No.", ItemVariant2.Code);
+        StageWorkList(TempWorkList, Task1EntryNo);
+        StageWorkList(TempWorkList, Task2EntryNo);
+
+        // [GIVEN] Shopify confirms both variants in one bulk response, echoing their skus.
+        MockClient.AddResponse(VariantsBulkUpdateTok, StrSubstNo('{"data":{"productVariantsBulkUpdate":{"product":{"id":"gid://shopify/Product/1001"},"productVariants":[{"id":"gid://shopify/ProductVariant/2001","sku":"%1","inventoryItem":{"id":"gid://shopify/InventoryItem/9001","tracked":true}},{"id":"gid://shopify/ProductVariant/2002","sku":"%2","inventoryItem":{"id":"gid://shopify/InventoryItem/9002","tracked":true}}],"userErrors":[]}}}', VariantRecordValue(Item."No.", ItemVariant1.Code), VariantRecordValue(Item."No.", ItemVariant2.Code)));
+
+        // [WHEN] The items sibling runs the batch for real.
+        RunItemsSibling(SendItemsInv, MockClient, TempWorkList);
+
+        // [THEN] One bulk mutation carried both variants and each row was completed from the response by sku match.
+        _Assert.AreEqual(1, MockClient.CountRequestsContaining(VariantsBulkUpdateTok), StrSubstNo('Both variants of one product must be sent in a single bulk mutation (row 1 response: %1)', ResponseText(Task1EntryNo)));
+        AssertState(Task1EntryNo, "NPR Spfy Task State"::Completed, 'First variant row must complete from the sku-matched response');
+        AssertState(Task2EntryNo, "NPR Spfy Task State"::Completed, 'Second variant row must complete from the sku-matched response');
+    end;
+
+    [Test]
+    procedure GivenPerRowUserError_WhenItemsSiblingRunsAgainstMock_ThenRejectedRowFailsWithShopifyMessageAndOtherSucceeds()
+    var
+        Item: Record Item;
+        ItemVariant1: Record "Item Variant";
+        ItemVariant2: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        FailedTask: Record "NPR Spfy Task";
+        TempWorkList: Record "NPR Spfy Task" temporary;
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendItemsInv: Codeunit "NPR Spfy Task Send Items&Inv";
+        StoreCode: Code[20];
+        Task1EntryNo: BigInteger;
+        Task2EntryNo: BigInteger;
+        VariantsBulkUpdateTok: Label 'productVariantsBulkUpdate', Locked = true;
+    begin
+        // [SCENARIO] A per-row user error from Shopify fails only the rejected row, carrying Shopify's own message, while its sibling still succeeds.
+        Initialize();
+        StoreCode := CreateInventoryStore();
+
+        // [GIVEN] Two variant Modify tasks for one product (with one variety set and variety values on the variants).
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        AddVarietySetToItem(Item);
+        _Lib.AssignEntryID(SpfyStoreItemLink.RecordId(), '1001');
+        CreateVariantWithAssignedId(Item."No.", StoreCode, '2001', ItemVariant1);
+        CreateVariantWithAssignedId(Item."No.", StoreCode, '2002', ItemVariant2);
+        Task1EntryNo := EnqueueVariantTask(StoreCode, Item."No.", ItemVariant1.Code);
+        Task2EntryNo := EnqueueVariantTask(StoreCode, Item."No.", ItemVariant2.Code);
+        StageWorkList(TempWorkList, Task1EntryNo);
+        StageWorkList(TempWorkList, Task2EntryNo);
+
+        // [GIVEN] Shopify confirms the first variant and rejects the second with a per-row userError (0-based variants index).
+        MockClient.AddResponse(VariantsBulkUpdateTok, StrSubstNo('{"data":{"productVariantsBulkUpdate":{"product":{"id":"gid://shopify/Product/1001"},"productVariants":[{"id":"gid://shopify/ProductVariant/2001","sku":"%1","inventoryItem":{"id":"gid://shopify/InventoryItem/9001","tracked":true}}],"userErrors":[{"field":["variants","1"],"message":"Variant price out of range"}]}}}', VariantRecordValue(Item."No.", ItemVariant1.Code)));
+
+        // [WHEN] The items sibling runs the batch for real.
+        RunItemsSibling(SendItemsInv, MockClient, TempWorkList);
+
+        // [THEN] The confirmed row completes; the rejected row records the Shopify message and stays retryable.
+        AssertState(Task1EntryNo, "NPR Spfy Task State"::Completed, 'The sku-confirmed row must complete');
+        FailedTask.Get(Task2EntryNo);
+        _Assert.IsTrue(FailedTask.State <> FailedTask.State::Completed, 'The userError row must not complete as sent');
+        _Assert.IsTrue(FailedTask.Attempts > 0, 'The userError row must have burned an attempt');
+        _Assert.IsTrue(StrPos(ResponseText(Task2EntryNo), 'Variant price out of range') > 0, StrSubstNo('The rejected row must carry the Shopify userError message, but carried: %1', ResponseText(Task2EntryNo)));
+    end;
+
+    [Test]
+    procedure GivenItemNeverSyncedToShopify_WhenItemsSiblingRunsAgainstMock_ThenVariantTaskCompletesUnsentWithoutHttp()
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        TempWorkList: Record "NPR Spfy Task" temporary;
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendItemsInv: Codeunit "NPR Spfy Task Send Items&Inv";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        NotSyncedYetTok: Label 'has not yet been synced with Shopify', Locked = true;
+    begin
+        // [SCENARIO] A variant task for an item that was never synced to Shopify completes unsent, without any HTTP call.
+        Initialize();
+        StoreCode := CreateInventoryStore();
+
+        // [GIVEN] A linked item with NO assigned Shopify product id and a variant Modify task for it.
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        _Lib.CreateItemVariant(ItemVariant, Item."No.");
+        TaskEntryNo := EnqueueVariantTask(StoreCode, Item."No.", ItemVariant.Code);
+        StageWorkList(TempWorkList, TaskEntryNo);
+
+        // [GIVEN] Shopify has no product for the item's sku either (the prep queries by sku before declaring not-synced).
+        MockClient.AddResponse('FindProductVariantBySku', '{"data":{"productVariants":{"edges":[]}}}');
+
+        // [WHEN] The items sibling runs the batch for real.
+        RunItemsSibling(SendItemsInv, MockClient, TempWorkList);
+
+        // [THEN] The one-shot: the task completes unsent with the not-yet-synced response and no bulk mutation is sent.
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining('productVariantsBulkUpdate'), 'A variant of a never-synced product must not produce a bulk mutation');
+        AssertState(TaskEntryNo, "NPR Spfy Task State"::Completed, 'The variant task must complete unsent (the variant travels with the item)');
+        _Assert.IsTrue(StrPos(ResponseText(TaskEntryNo), NotSyncedYetTok) > 0, StrSubstNo('The response must say the item is not yet synced, but was: %1', ResponseText(TaskEntryNo)));
+    end;
+
+    [Test]
+    procedure GivenTwoItemPriceTasks_WhenItemsSiblingRunsAgainstMock_ThenAliasedRequestAndPerAliasOutcomes()
+    var
+        Item1: Record Item;
+        Item2: Record Item;
+        ItemPrice1: Record "NPR Spfy Item Price";
+        ItemPrice2: Record "NPR Spfy Item Price";
+        Link1: Record "NPR Spfy Store-Item Link";
+        Link2: Record "NPR Spfy Store-Item Link";
+        FailedTask: Record "NPR Spfy Task";
+        TempWorkList: Record "NPR Spfy Task" temporary;
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendItemsInv: Codeunit "NPR Spfy Task Send Items&Inv";
+        StoreCode: Code[20];
+        Task1EntryNo: BigInteger;
+        Task2EntryNo: BigInteger;
+        AliasedRequest: Text;
+        VariantsBulkUpdateTok: Label 'productVariantsBulkUpdate', Locked = true;
+    begin
+        // [SCENARIO] Two item price tasks are sent as one aliased request and each alias's outcome is applied to its own row.
+        Initialize();
+        StoreCode := CreatePriceStore();
+
+        // [GIVEN] Two priced items, both with assigned product and variant ids.
+        CreatePricedItem(StoreCode, Item1, Link1, ItemPrice1, '1001', '2001', 100.0);
+        CreatePricedItem(StoreCode, Item2, Link2, ItemPrice2, '1002', '2002', 200.0);
+        Task1EntryNo := EnqueueItemPriceTask(StoreCode, ItemPrice1, CurrentDateTime());
+        Task2EntryNo := EnqueueItemPriceTask(StoreCode, ItemPrice2, CurrentDateTime());
+        StageWorkList(TempWorkList, Task1EntryNo);
+        StageWorkList(TempWorkList, Task2EntryNo);
+
+        // [GIVEN] Shopify answers per alias: the first price applies, the second is rejected.
+        MockClient.AddResponse(VariantsBulkUpdateTok, StrSubstNo('{"data":{"SpfyTask%1":{"productVariants":[{"id":"gid://shopify/ProductVariant/2001","price":"100.0"}],"userErrors":[]},"SpfyTask%2":{"productVariants":null,"userErrors":[{"field":["variants"],"message":"Price must be positive"}]}}}', Task1EntryNo, Task2EntryNo));
+
+        // [WHEN] The items sibling runs the price batch for real.
+        RunItemsSibling(SendItemsInv, MockClient, TempWorkList);
+
+        // [THEN] One request carries both SpfyTask<n> aliases and each row is completed from its own alias.
+        AliasedRequest := MockClient.GetRequestContaining(VariantsBulkUpdateTok);
+        _Assert.IsTrue(AliasedRequest.Contains('SpfyTask' + Format(Task1EntryNo)), StrSubstNo('The bulk request must alias the first task, but was: %1', AliasedRequest));
+        _Assert.IsTrue(AliasedRequest.Contains('SpfyTask' + Format(Task2EntryNo)), StrSubstNo('The bulk request must alias the second task, but was: %1', AliasedRequest));
+        AssertState(Task1EntryNo, "NPR Spfy Task State"::Completed, 'The alias-confirmed price row must complete');
+        FailedTask.Get(Task2EntryNo);
+        _Assert.IsTrue(FailedTask.State <> FailedTask.State::Completed, 'The alias-rejected price row must not complete as sent');
+        _Assert.IsTrue(StrPos(ResponseText(Task2EntryNo), 'Price must be positive') > 0, StrSubstNo('The rejected price row must carry the Shopify userError, but carried: %1', ResponseText(Task2EntryNo)));
+    end;
+
+    local procedure CreateVariantWithAssignedId(ItemNo: Code[20]; StoreCode: Code[20]; ShopifyVariantId: Text[30]; var ItemVariant: Record "Item Variant")
+    var
+        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        LibraryVariety: Codeunit "NPR Library - Variety";
+    begin
+        _Lib.CreateItemVariant(ItemVariant, ItemNo);
+        // The variant payload builder resolves Shopify option values from the NPR Variety tables, so the variant needs real variety values.
+        LibraryVariety.CreateVarietyValuesAndAddToItemVariant(ItemVariant);
+        // The variant needs its own sync-enabled link row: the payload builder resolves the variant THROUGH the link, not just the assigned id.
+        SpfyStoreItemVariantLink.Init();
+        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
+        SpfyStoreItemVariantLink."Item No." := ItemNo;
+        SpfyStoreItemVariantLink."Variant Code" := ItemVariant.Code;
+        SpfyStoreItemVariantLink."Shopify Store Code" := StoreCode;
+        SpfyStoreItemVariantLink."Sync. to this Store" := true;
+        SpfyStoreItemVariantLink."Synchronization Is Enabled" := true;
+        SpfyStoreItemVariantLink.Insert(false);
+        _Lib.AssignEntryID(SpfyStoreItemVariantLink.RecordId(), ShopifyVariantId);
+    end;
+
+    local procedure CreatePricedItem(StoreCode: Code[20]; var Item: Record Item; var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; var ItemPrice: Record "NPR Spfy Item Price"; ShopifyProductId: Text[30]; ShopifyVariantId: Text[30]; UnitPrice: Decimal)
+    begin
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        _Lib.AssignEntryID(SpfyStoreItemLink.RecordId(), ShopifyProductId);
+        _Lib.AssignEntryID(_Lib.VariantLinkRecordId(Item."No.", '', StoreCode), ShopifyVariantId);
+        _Lib.CreateItemPrice(ItemPrice, Item."No.", StoreCode, UnitPrice, Today());
+    end;
+
+    local procedure AddVarietySetToItem(var Item: Record Item)
+    var
+        LibraryVariety: Codeunit "NPR Library - Variety";
+    begin
+        LibraryVariety.CreateVarietySetsAndAddToItem(1, Item);
+    end;
+
+    local procedure VariantRecordValue(ItemNo: Code[20]; VariantCode: Code[10]): Text
+    begin
+        exit(ItemNo + '_' + VariantCode);
+    end;
+
+    local procedure EnqueueVariantTask(StoreCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]): BigInteger
+    var
+        ItemVariant: Record "Item Variant";
+        SpfyTask: Record "NPR Spfy Task";
+        RecRef: RecordRef;
+    begin
+        ItemVariant.Get(ItemNo, VariantCode);
+        RecRef.GetTable(ItemVariant);
+        _SpfyTaskQueue.Enqueue(
+            StoreCode, RecRef, ItemVariant.RecordId(), VariantRecordValue(ItemNo, VariantCode), "NPR Spfy Task Op"::Modify, 0DT, 0DT,
+            "NPR Spfy Reuse Delayed NC Task"::Any, CurrentDateTime(), SpfyTask);
+        exit(SpfyTask."Entry No.");
+    end;
+
+    local procedure StageWorkList(var TempWorkList: Record "NPR Spfy Task" temporary; TaskEntryNo: BigInteger)
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        // Mirrors the engine's CopyToWorkList staging of a batch group.
+        SpfyTask.Get(TaskEntryNo);
+        TempWorkList.Init();
+        TempWorkList."Entry No." := SpfyTask."Entry No.";
+        TempWorkList.Type := SpfyTask.Type;
+        TempWorkList."Table No." := SpfyTask."Table No.";
+        TempWorkList."Record ID" := SpfyTask."Record ID";
+        TempWorkList."Record Value" := SpfyTask."Record Value";
+        TempWorkList."Store Code" := SpfyTask."Store Code";
+        TempWorkList."Not Before Date-Time" := SpfyTask."Not Before Date-Time";
+        TempWorkList."Log Date" := SpfyTask."Log Date";
+        TempWorkList.Attempts := SpfyTask.Attempts;
+        TempWorkList."Dispatch Id" := SpfyTask."Dispatch Id";
+        TempWorkList.Insert();
+    end;
+
+    local procedure RunItemsSibling(var SendItemsInv: Codeunit "NPR Spfy Task Send Items&Inv"; var MockClient: Codeunit "NPR Spfy Mock GraphQL Client"; var TempWorkList: Record "NPR Spfy Task" temporary)
+    begin
+        TempWorkList.Reset();
+        TempWorkList.FindFirst();
+        TempWorkList.SetRange("Table No.", TempWorkList."Table No.");
+        TempWorkList.SetRange("Store Code", TempWorkList."Store Code");
+        SendItemsInv.SetGraphQLClient(MockClient);
+        Commit();
+        SendItemsInv.Run(TempWorkList);
+    end;
+
+    local procedure AssertState(EntryNo: BigInteger; ExpectedState: Enum "NPR Spfy Task State"; FailureMsg: Text)
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        SpfyTask.Get(EntryNo);
+        _Assert.IsTrue(SpfyTask.State = ExpectedState, StrSubstNo('%1: expected state %2 but found %3 with %4 attempt(s), response: %5', FailureMsg, ExpectedState, SpfyTask.State, SpfyTask.Attempts, ResponseText(EntryNo)));
+    end;
+    #endregion
 }

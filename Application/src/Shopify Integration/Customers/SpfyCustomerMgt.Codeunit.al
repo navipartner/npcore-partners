@@ -7,6 +7,7 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
 
+    [Obsolete('Data Log producer replaced by RowVersion change detection; deleted at the NaviConnect phase-out.', '2026-09-02')]
     internal procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     var
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";

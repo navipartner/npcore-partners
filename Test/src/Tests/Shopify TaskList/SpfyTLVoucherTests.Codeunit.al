@@ -1077,4 +1077,163 @@ codeunit 85443 "NPR Spfy TL Voucher Tests"
         _Assert.AreEqual(Database::"NPR NpRv Voucher", _BndMock.DispatchTableNoAt(2), 'The fresh create must be dispatched after the reused balance update');
     end;
     #endregion
+
+    #region Voucher sibling Shopify round-trips against the mock GraphQL client (DF14 retrofit)
+    [Test]
+    procedure GivenUnsyncedVoucherInsert_WhenVoucherSiblingRunsAgainstMock_ThenGiftCardIdFromResponseIsAssigned()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Task Send Voucher";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] An unsynced voucher insert creates the gift card and assigns the id Shopify returns.
+        Initialize();
+        StoreCode := CreateVoucherStore();
+
+        // [GIVEN] A Shopify-integrated voucher with no gift card id and its Insert task.
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, false);
+        RecRef.GetTable(Voucher);
+        TaskEntryNo := EnqueueVoucherTask(StoreCode, RecRef, Voucher.RecordId(), Voucher."No.", "NPR Spfy Task Op"::Insert, CurrentDateTime());
+
+        // [GIVEN] Shopify answers the create with a gift card id.
+        MockClient.AddResponse(_GiftCardCreateTok, '{"data":{"giftCardCreate":{"giftCard":{"id":"gid://shopify/GiftCard/7001"},"userErrors":[]}}}');
+
+        // [WHEN] The voucher sibling runs for real.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(SpfyTask);
+
+        // [THEN] The create was sent and the returned gift card id is assigned to the voucher.
+        _Assert.AreEqual(1, MockClient.CountRequestsContaining(_GiftCardCreateTok), 'Exactly one giftCardCreate must be sent');
+        _Assert.AreEqual('7001', AssignedGiftCardId(Voucher.RecordId()), 'The gift card id returned by Shopify must be assigned to the voucher');
+    end;
+
+    [Test]
+    procedure GivenSyncedVoucherEntry_WhenVoucherSiblingRunsAgainstMock_ThenBalanceUpdateSendsWithoutError()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Task Send Voucher";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A voucher worth less than the gift card currently holds sends exactly one debit transaction and raises nothing.
+        Initialize();
+        StoreCode := CreateVoucherStore();
+
+        // [GIVEN] A synced voucher (gift card id assigned) and a balance-update task for one of its entries.
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        InsertVoucherEntry(VoucherEntry, Voucher, false);
+        RecRef.GetTable(VoucherEntry);
+        TaskEntryNo := EnqueueVoucherTask(StoreCode, RecRef, VoucherEntry.RecordId(), Voucher."No.", "NPR Spfy Task Op"::Modify, CurrentDateTime());
+
+        // [GIVEN] Shopify reports a balance above the voucher amount (the prep queries the gift card first), so the sibling sends a DEBIT transaction; Shopify confirms it.
+        MockClient.AddResponse('GetGiftCard', '{"data":{"giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":40.0,"currencyCode":""},"deactivatedAt":null}}}');
+        MockClient.AddResponse('giftCardDebit', '{"data":{"giftCardDebit":{"giftCardDebitTransaction":{"id":"gid://shopify/GiftCardDebitTransaction/1","amount":{"amount":"40","currencyCode":""},"processedAt":"2026-09-01T15:00:00Z","note":"test","giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":"0","currencyCode":""}}},"userErrors":[]}}}');
+        MockClient.AddResponse('giftCardCredit', '{"data":{"giftCardCredit":{"giftCardCreditTransaction":{"id":"gid://shopify/GiftCardCreditTransaction/1","amount":{"amount":"40","currencyCode":""},"processedAt":"2026-09-01T15:00:00Z","note":"test","giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":"140","currencyCode":""}}},"userErrors":[]}}}');
+
+        // [WHEN] The voucher sibling runs for real.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(SpfyTask);
+
+        // [THEN] Exactly one balance transaction was sent and the run raised nothing.
+        _Assert.AreEqual(1, MockClient.CountRequestsContaining('giftCardDebit'), 'Exactly one gift card debit transaction must be sent');
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining('giftCardCredit'), 'A balance above the voucher amount must not send a credit transaction');
+    end;
+
+    [Test]
+    procedure GivenSyncedVoucherEntryWorthMoreThanShopifyHolds_WhenVoucherSiblingRunsAgainstMock_ThenTheDeltaIsCredited()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Task Send Voucher";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A voucher worth more than the gift card currently holds tops the gift card up with a credit transaction for exactly the difference.
+        Initialize();
+        StoreCode := CreateVoucherStore();
+
+        // [GIVEN] A synced voucher whose remaining amount is 100, and a balance-update task for its entry.
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        InsertVoucherEntry(VoucherEntry, Voucher, false);
+        VoucherEntry."Remaining Amount" := 100;
+        VoucherEntry.Modify(false);
+        RecRef.GetTable(VoucherEntry);
+        TaskEntryNo := EnqueueVoucherTask(StoreCode, RecRef, VoucherEntry.RecordId(), Voucher."No.", "NPR Spfy Task Op"::Modify, CurrentDateTime());
+
+        // [GIVEN] Shopify reports a balance of 40, below the voucher amount, so the sibling must send a CREDIT transaction; Shopify confirms it.
+        MockClient.AddResponse('GetGiftCard', '{"data":{"giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":40.0,"currencyCode":""},"deactivatedAt":null}}}');
+        MockClient.AddResponse('giftCardCredit', '{"data":{"giftCardCredit":{"giftCardCreditTransaction":{"id":"gid://shopify/GiftCardCreditTransaction/1","amount":{"amount":"60","currencyCode":""},"processedAt":"2026-09-01T15:00:00Z","note":"test","giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":"100","currencyCode":""}}},"userErrors":[]}}}');
+
+        // [WHEN] The voucher sibling runs for real.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(SpfyTask);
+
+        // [THEN] Exactly one credit transaction was sent, for the difference between the two balances and not for the whole voucher.
+        _Assert.AreEqual(1, MockClient.CountRequestsContaining('giftCardCredit'), 'Exactly one gift card credit transaction must be sent');
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining('giftCardDebit'), 'A balance below the voucher amount must not send a debit transaction');
+        _Assert.AreNotEqual(
+            '', MockClient.GetRequestContaining('giftCardCredit', '"creditAmount":{"amount":"60"'),
+            StrSubstNo('The credit must carry the 60 difference but the request was: %1', MockClient.GetRequestContaining('giftCardCredit')));
+    end;
+
+    [Test]
+    procedure GivenArchivedSyncedVoucherDisable_WhenVoucherSiblingRunsAgainstMock_ThenArchRowStampedDisabledAtShopify()
+    var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        Voucher: Record "NPR NpRv Voucher";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Task Send Voucher";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        GiftCardDeactivateTok: Label 'giftCardDeactivate', Locked = true;
+    begin
+        // [SCENARIO] Disabling an archived synced voucher deactivates the gift card and stamps the archive row as disabled at Shopify.
+        Initialize();
+        StoreCode := CreateVoucherStore();
+
+        // [GIVEN] A synced voucher archived with its gift card id (assigned against the ARCH record — the disable prep resolves the id off the arch row), and its deactivation task.
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        ArchiveVoucher(ArchVoucher, Voucher, true);
+        _Lib.AssignEntryID(ArchVoucher.RecordId(), '7001');
+        RecRef.GetTable(ArchVoucher);
+        TaskEntryNo := EnqueueVoucherTask(StoreCode, RecRef, ArchVoucher.RecordId(), Voucher."No.", "NPR Spfy Task Op"::Insert, CurrentDateTime());
+
+        // [GIVEN] Shopify reports the gift card as not yet deactivated (the prep queries it first), then confirms the deactivation with a timestamp.
+        MockClient.AddResponse('GetGiftCard', '{"data":{"giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":100.0,"currencyCode":""},"deactivatedAt":null}}}');
+        MockClient.AddResponse(GiftCardDeactivateTok, '{"data":{"giftCardDeactivate":{"giftCard":{"id":"gid://shopify/GiftCard/7001","deactivatedAt":"2026-09-01T10:00:00Z"},"userErrors":[]}}}');
+
+        // [WHEN] The voucher sibling runs for real.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(SpfyTask);
+
+        // [THEN] One giftCardDeactivate was sent and the archived voucher is stamped as disabled at Shopify.
+        _Assert.AreEqual(1, MockClient.CountRequestsContaining(GiftCardDeactivateTok), 'Exactly one giftCardDeactivate must be sent');
+        ArchVoucher.Get(ArchVoucher."No.");
+        _Assert.IsTrue(ArchVoucher."Disabled at Shopify", 'The archived voucher must be stamped Disabled at Shopify from the response');
+    end;
+
+    local procedure AssignedGiftCardId(BCRecID: RecordId): Text
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(BCRecID, "NPR Spfy ID Type"::"Entry ID"));
+    end;
+    #endregion
 }

@@ -13,10 +13,17 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         _DeadRemainderMessage: Text[1024];
         _ResidualNotificationMessage: Text[1024];
         _ResidualNotificationCount: Integer;
-        _NotYetAvailableErr: Label '%1 ships across several releases and cannot be activated yet.', Locked = true;
-        _CannotDisableErr: Label 'The %1 feature is one-way and cannot be disabled once enabled.', Locked = true;
+        _CannotDisableErr: Label 'The %1 feature can no longer be disabled: this environment already runs Shopify sends through the task list, and switching it off would strand that work.', Locked = true;
+        _ExistingIntegrationErr: Label 'Enabling %1 on an environment that already synchronizes Shopify data requires running the task list migration. Use the "Migrate to Shopify Task List" action on the Shopify Integration Setup page.', Locked = true;
+        _RowVersionMigrationActionTok: Label 'Migrate to RowVersion detection', Locked = true;
         _MigrationInProgressErr: Label 'A Shopify task list migration is already in progress.', Locked = true;
         _SimulatedHandOverErr: Label 'Simulated hand-over failure.', Locked = true;
+        _CouldNotScheduleErr: Label 'The background migration could not be scheduled.', Locked = true;
+        _NeedsActivationTok: Label 'your user cannot start scheduled tasks', Locked = true;
+        _ProcessorOnHoldTok: Label 'the Shopify task processing job could not be started and is on hold', Locked = true;
+        _ParkedStoreTok: Label 'ZZPARKED', Locked = true;
+        _OverridesNotConfirmedTok: Label 'did not confirm their removal', Locked = true;
+        _RunModeOptionsTok: Label 'Run in foreground,Run in background', Locked = true;
         _ResidualMsg: Label '%1 NaviConnect task(s) could not be processed because they had already exhausted their processing attempts. They were left untouched and the updates they carry have not been sent to Shopify. Use a re-sync to recover the affected records.', Locked = true;
 
     local procedure Initialize()
@@ -27,6 +34,27 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         _BndMock.Reset();
         _SpfyTaskProcessor.SetSendBoundary(_BndMock);
         Clear(_DeadRemainderMessage);
+        // The migration refuses an environment that still detects Shopify changes on the Data Log, and the shared
+        // container carries subscriber rows from other suites: the suite starts from a RowVersion-detecting state.
+        DeleteSpfyDataLogSubscribers();
+        // The activation gate now has a Shopify Integration precondition ahead of its own message.
+        SetShopifyIntegrationFeatureEnabled(true);
+        // ResetState does not clear item/customer links or assigned IDs, and the first test in this codeunit commits a
+        // synced item link it never removes. The disable predicate reads exactly those tables, so without this every
+        // later test inherits a non-pristine environment and fails on run order rather than on its own subject.
+        NeutralizeSyncedArtifacts();
+    end;
+
+    // The cheapest artifact that proves the task list has already carried work.
+    local procedure InsertSpfyTaskRow()
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        SpfyTask.Init();
+        SpfyTask."Entry No." := 0;
+        SpfyTask."Table No." := Database::Item;
+        SpfyTask."Log Date" := CurrentDateTime();
+        SpfyTask.Insert(true);
     end;
 
     local procedure FeatureDescription(): Text
@@ -60,6 +88,14 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
     begin
         ShopifySetup.Get();
         exit(ShopifySetup."Task List Migration Status");
+    end;
+
+    local procedure RowVersionMigrationStatus(): Integer
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+    begin
+        ShopifySetup.Get();
+        exit(ShopifySetup."RowVersion Migration Status");
     end;
 
     local procedure ShopifyTaskProcessorCode(): Code[20]
@@ -163,6 +199,8 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
     local procedure ArmCutover(var ShopifySetup: Record "NPR Spfy Integration Setup")
     begin
         _Lib.SetTaskListFeatureEnabled(true);
+        // The cutover executes at Migrating: at Completed the legacy send path counts as retired and the drain's task setup is never rebuilt.
+        SetStatus(ShopifySetup."Task List Migration Status"::Migrating);
         Commit();
         SelectLatestVersion();
         ShopifySetup.Get();
@@ -216,6 +254,14 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         SpfyTask: Record "NPR Spfy Task";
     begin
         exit(SpfyTask.Count());
+    end;
+
+    local procedure LegacyQueueCount(TableNo: Integer): Integer
+    var
+        NcTask: Record "NPR Nc Task";
+    begin
+        NcTask.SetRange("Table No.", TableNo);
+        exit(NcTask.Count());
     end;
 
     local procedure EnqueueNewQueueTask(StoreCode: Code[20]; Item: Record Item): BigInteger
@@ -283,104 +329,373 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         FeatureManagement.First();
     end;
 
-    #region Activation gate
+    #region Activation
     [Test]
-    procedure GivenGateDown_WhenFeatureIsEnabledByAnAdministrator_ThenActivationIsRefused()
+    procedure GivenExistingIntegration_WhenFeatureIsEnabledByAnAdministrator_ThenDirectedToTheMigrationAction()
     var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         FeatureManagement: TestPage "NPR Feature Management";
+        StoreCode: Code[20];
     begin
         // [SCENARIO] Turning the task list on before it has fully shipped is refused and leaves the feature off.
         Initialize();
 
-        // [WHEN] An administrator turns the task list on while it has not fully shipped.
+        // [GIVEN] An environment that already synchronizes Shopify data.
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        Commit();
+
+        // [WHEN] An administrator turns the task list on directly on the features page.
         OpenTaskListFeature(FeatureManagement);
         asserterror FeatureManagement.Enabled.SetValue(true);
 
-        // [THEN] The activation is refused and the feature stays off.
-        _Assert.ExpectedError(StrSubstNo(_NotYetAvailableErr, FeatureDescription()));
+        // [THEN] The enable is refused with a message pointing at the migration action, and the feature stays off.
+        _Assert.ExpectedError(StrSubstNo(_ExistingIntegrationErr, FeatureDescription()));
         _Assert.IsFalse(TaskListFeatureEnabled(), 'A refused activation must leave the feature off');
+        _Assert.AreEqual(0, MigrationStatus(), 'A refused activation must not stamp a migration status');
     end;
 
     [Test]
-    procedure GivenFeatureEnabled_WhenAnAdministratorTurnsItOff_ThenOneWayRefusal()
+    procedure GivenTaskListHasCarriedWork_WhenAnAdministratorTurnsItOff_ThenRefused()
     var
         FeatureManagement: TestPage "NPR Feature Management";
     begin
-        // [SCENARIO] Turning an enabled task list back off is refused because the switch is one way.
+        // [SCENARIO] Turning the task list back off is refused once it has carried work, because the legacy queue no longer covers that work.
         Initialize();
         _Lib.SetTaskListFeatureEnabled(true);
+        // One task is enough: the adoption is no longer pristine.
+        InsertSpfyTaskRow();
         // Committed on purpose: the refused change rolls the transaction back, and the given has to survive that.
         Commit();
 
-        // [WHEN] An administrator turns an enabled task list back off.
+        // [WHEN] An administrator turns the task list back off.
         OpenTaskListFeature(FeatureManagement);
         asserterror FeatureManagement.Enabled.SetValue(false);
 
-        // [THEN] The switch is one way and the feature stays on.
+        // [THEN] The switch is closed for good and the feature stays on.
         _Assert.ExpectedError(StrSubstNo(_CannotDisableErr, FeatureDescription()));
         _Assert.IsTrue(TaskListFeatureEnabled(), 'A refused deactivation must leave the feature on');
     end;
 
     [Test]
-    procedure GivenGateDown_WhenShopifyFeatureIsEnabled_ThenTaskListIsNotAutoAdopted()
+    procedure GivenPristineTaskListAdoption_WhenAnAdministratorTurnsItOff_ThenItIsOffAndTheLegacySenderIsBack()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+        FeatureManagement: TestPage "NPR Feature Management";
+    begin
+        // [SCENARIO] A task list adoption that nothing has gone through yet can be undone, and the undo hands sending back to the legacy engine it displaced.
+        Initialize();
+        // [GIVEN] One enabled store, and a pristine adoption through the app's own enable, which stamps the migration Completed.
+        _Lib.CreateStore(true, false, false, false, false);
+        SpfyTaskListFeature.SetFeatureEnabled(true);
+        _Assert.AreEqual(2, MigrationStatus(), 'The adoption must stamp the migration Completed');
+        // No arrange assertion on the legacy sender: this fixture creates the store with a direct Insert, so no legacy
+        // entry ever exists here and asserting it is empty would hold whether or not the suppression works. The
+        // suppression has its own coverage in GivenMigrationStarted_WhenLegacyJobQueuesRefresh_ThenTheyAreNotRecreated.
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
+        Commit();
+
+        // [WHEN] An administrator turns it back off. The Modify - and the side effects - run when the page closes, not on SetValue.
+        OpenTaskListFeature(FeatureManagement);
+        FeatureManagement.Enabled.SetValue(false);
+        FeatureManagement.Close();
+
+        // [THEN] The feature is off and the stamp it wrote is rolled back, so the Setup page offers the migration again.
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'A pristine adoption must be undoable');
+        _Assert.AreEqual(0, MigrationStatus(), 'The disable must reset the migration status');
+        // [THEN] The enabled store has a sender again. Without the re-arm it would have neither engine.
+        _Assert.IsFalse(JobQueueEntry.IsEmpty(), 'The disable must re-arm the legacy sender for the enabled store');
+    end;
+
+    [Test]
+    procedure GivenRowVersionOff_WhenTheTaskListIsEnabledFromThePage_ThenItIsRefused()
+    var
+        FeatureManagement: TestPage "NPR Feature Management";
+    begin
+        // [SCENARIO] The task list rides on RowVersion detection, so it cannot be switched on before RowVersion is - the same precondition the migration enforces.
+        Initialize();
+        // [GIVEN] An environment that does not detect Shopify changes with RowVersion.
+        _Lib.SetFeatureEnabled(false);
+        Commit();
+
+        // [WHEN] An administrator ticks the task list on the page. [THEN] the enable is refused.
+        OpenTaskListFeature(FeatureManagement);
+        asserterror FeatureManagement.Enabled.SetValue(true);
+        _Assert.ExpectedError('requires this environment to detect Shopify changes with RowVersion');
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'A refused activation must leave the feature off');
+    end;
+
+    [Test]
+    procedure GivenShopifyFeatureOff_WhenTheTaskListIsEnabledFromThePage_ThenItIsRefused()
+    var
+        FeatureManagement: TestPage "NPR Feature Management";
+    begin
+        // [SCENARIO] The task list is a Shopify feature: it cannot be switched on before the Shopify integration itself is.
+        Initialize();
+        // [GIVEN] The Shopify Integration feature off.
+        SetShopifyIntegrationFeatureEnabled(false);
+        Commit();
+
+        // [WHEN] An administrator ticks the task list on the page. [THEN] the enable is refused.
+        OpenTaskListFeature(FeatureManagement);
+        asserterror FeatureManagement.Enabled.SetValue(true);
+        _Assert.ExpectedError('before enabling');
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'A refused activation must leave the feature off');
+    end;
+
+    [Test]
+    procedure GivenFreshEnvironment_WhenShopifyFeatureIsEnabled_ThenNeitherSwitchIsAutoAdopted()
     var
         ShopifyFeature: Record "NPR Feature";
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
         WasEnabled: Boolean;
     begin
-        // [SCENARIO] Enabling the Shopify integration adopts neither the task list nor a migration status while the task list has not shipped.
+        // [SCENARIO] Enabling the Shopify integration on a fresh environment adopts neither one-way switch and stamps neither migration, because adoption is operator-triggered.
         Initialize();
+        NeutralizeSyncedArtifacts();
+        // Both one-way switches start unadopted: the coordinator would adopt RowVersion first and the task list only after it completed.
+        _Lib.SetFeatureEnabled(false);
+        ShopifySetup.Get();
+        ShopifySetup."RowVersion Migration Status" := ShopifySetup."RowVersion Migration Status"::NotStarted;
+        ShopifySetup.Modify(false);
         ShopifyFeature.SetRange(Feature, Enum::"NPR Feature"::Shopify);
         _Assert.IsTrue(ShopifyFeature.FindFirst(), 'The Shopify feature row must exist');
         WasEnabled := ShopifyFeature.Enabled;
         ShopifyFeature.Enabled := false;
         ShopifyFeature.Modify(false);
 
-        // [WHEN] The Shopify integration feature is turned on, which is what a fresh environment adopts from.
+        // [WHEN] The Shopify integration feature is turned on, which is the entry point a fresh environment would adopt from.
         ShopifyFeature.Validate(Enabled, true);
         ShopifyFeature.Modify(true);
 
-        // [THEN] The task list is not adopted while it has not fully shipped.
-        _Assert.IsFalse(TaskListFeatureEnabled(), 'Enabling the Shopify feature must not auto-adopt the task list while the gate is down');
-        _Assert.AreEqual(0, MigrationStatus(), 'An auto-adopt that did not happen must not stamp a migration status');
+        // [THEN] The environment stays on the legacy queue: RowVersion detection is left off and unmigrated.
+        _Assert.IsFalse(SpfyRowVersionFeature.IsFeatureEnabled(), 'Enabling the Shopify feature must not auto-adopt RowVersion detection');
+        _Assert.IsTrue(RowVersionMigrationStatus() = ShopifySetup."RowVersion Migration Status"::NotStarted, StrSubstNo('A suspended auto-adoption must leave the RowVersion migration unstarted but the status was %1', RowVersionMigrationStatus()));
+
+        // [THEN] The task list is left to the operator-run migration, with nothing stamped on its behalf.
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'Enabling the Shopify feature must not auto-adopt the task list');
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::NotStarted, StrSubstNo('A suspended auto-adoption must leave the task list migration unstarted but the status was %1', MigrationStatus()));
 
         ShopifyFeature.Get(ShopifyFeature.Id);
         ShopifyFeature.Enabled := WasEnabled;
         ShopifyFeature.Modify(false);
         _Lib.DeleteDetectionJobQueueEntries();
+        _Lib.SetTaskListFeatureEnabled(false);
     end;
 
     [Test]
-    procedure GivenGateDown_WhenMigrationActionRuns_ThenRefusedBeforeAnyPrompt()
+    procedure GivenCompletedRowVersionMigration_WhenAnIntegrationAreaIsEnabled_ThenTaskListIsNotAutoAdopted()
+    var
+        Item: Record Item;
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+        StoreCode: Code[20];
+        WasEnabled: Boolean;
+    begin
+        // [SCENARIO] An environment that has completed the RowVersion migration on its own does not pick up the task list when a further integration area is switched on.
+        Initialize();
+        NeutralizeSyncedArtifacts();
+
+        // [GIVEN] A completed RowVersion migration, the Shopify integration on, and a task list that is still off and still a fresh candidate.
+        WasEnabled := SetShopifyIntegrationFeatureEnabled(true);
+        _Lib.SetFeatureEnabled(true);
+        ShopifySetup.Get();
+        ShopifySetup."RowVersion Migration Status" := ShopifySetup."RowVersion Migration Status"::Completed;
+        ShopifySetup.Modify(false);
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'The task list must start off');
+        _Assert.IsTrue(SpfyTaskListFeature.IsFreshTaskListCandidate(), 'The environment must still qualify as a fresh task list candidate, or the decline proves nothing');
+
+        // [WHEN] A further integration area is switched on for the store, and a synced item changes afterwards.
+        ShopifyStore.Get(StoreCode);
+        ShopifyStore.Validate("Retail Voucher Integration", true);
+        ShopifyStore.Modify(true);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        _Lib.DispatchModify(SpfyStoreItemLink);
+
+        // [THEN] A completed RowVersion migration does not carry the task list into adoption.
+        _Assert.IsFalse(SpfyTaskListFeature.IsFeatureEnabled(), 'Enabling an integration area after the RowVersion migration must not auto-adopt the task list');
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::NotStarted, StrSubstNo('A declined adoption must leave the task list migration unstarted but the status was %1', MigrationStatus()));
+
+        // [THEN] The NaviConnect send path is still the one that carries the change.
+        _Assert.AreEqual(1, LegacyQueueCount(Database::Item), 'The change must still be sent over the NaviConnect queue');
+        _Assert.AreEqual(0, NewQueueCount(), 'No change may reach the task list queue while the task list is unadopted');
+
+        SetShopifyIntegrationFeatureEnabled(WasEnabled);
+        _Lib.DeleteDetectionJobQueueEntries();
+    end;
+
+    [Test]
+    procedure GivenEveryAdoptionPreconditionMet_WhenTheCoordinatorRuns_ThenTheSuspendedSwitchDeclines()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyRowVersionFeature: Codeunit "NPR Spfy RowVersion Feature";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+        WasEnabled: Boolean;
+    begin
+        // [SCENARIO] The suspended adoption switch declines even when every other precondition for a fresh-environment adoption is met, so restoring it cannot pass unnoticed.
+        Initialize();
+        NeutralizeSyncedArtifacts();
+
+        // [GIVEN] The Shopify integration on, both one-way switches off, neither migration started and both freshness tests satisfied.
+        WasEnabled := SetShopifyIntegrationFeatureEnabled(true);
+        _Lib.SetFeatureEnabled(false);
+        ShopifySetup.Get();
+        ShopifySetup."RowVersion Migration Status" := ShopifySetup."RowVersion Migration Status"::NotStarted;
+        ShopifySetup.Modify(false);
+        _Assert.IsTrue(SpfyRowVersionFeature.IsFreshRowVersionCandidate(''), 'The environment must qualify as a fresh RowVersion candidate');
+        _Assert.IsTrue(SpfyTaskListFeature.IsFreshTaskListCandidate(), 'The environment must qualify as a fresh task list candidate');
+
+        // [WHEN] The shared adoption coordinator runs on it.
+        SpfyTaskListFeature.MaybeAutoAdoptFreshEnvironment('');
+
+        // [THEN] Nothing is adopted: the go-live switch is the only thing standing between this environment and both migrations.
+        _Assert.IsFalse(SpfyRowVersionFeature.IsFeatureEnabled(), 'The suspended coordinator must not adopt RowVersion detection');
+        _Assert.IsFalse(SpfyTaskListFeature.IsFeatureEnabled(), 'The suspended coordinator must not adopt the task list');
+        _Assert.IsTrue(RowVersionMigrationStatus() = ShopifySetup."RowVersion Migration Status"::NotStarted, StrSubstNo('The suspended coordinator must leave the RowVersion migration unstarted but the status was %1', RowVersionMigrationStatus()));
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::NotStarted, StrSubstNo('The suspended coordinator must leave the task list migration unstarted but the status was %1', MigrationStatus()));
+
+        SetShopifyIntegrationFeatureEnabled(WasEnabled);
+    end;
+
+    // Raw write: the enable subscriber routes into the adoption coordinator, and these tests own when that runs.
+    local procedure SetShopifyIntegrationFeatureEnabled(NewEnabled: Boolean) WasEnabled: Boolean
+    var
+        ShopifyFeature: Record "NPR Feature";
+    begin
+        ShopifyFeature.SetRange(Feature, Enum::"NPR Feature"::Shopify);
+        _Assert.IsTrue(ShopifyFeature.FindFirst(), 'The Shopify feature row must exist');
+        WasEnabled := ShopifyFeature.Enabled;
+        if WasEnabled = NewEnabled then
+            exit;
+        ShopifyFeature.Enabled := NewEnabled;
+        ShopifyFeature.Modify(false);
+    end;
+
+    local procedure NeutralizeSyncedArtifacts()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+    begin
+        // The shared container carries synced leftovers from other suites; per-codeunit isolation rolls these writes back.
+        // Any other enabled store disqualifies the RowVersion freshness test the adoption now also has to pass.
+        ShopifyStore.SetRange(Enabled, true);
+        if not ShopifyStore.IsEmpty() then
+            ShopifyStore.ModifyAll(Enabled, false, false);
+        if not SpfyAssignedID.IsEmpty() then
+            SpfyAssignedID.DeleteAll(false);
+        SpfyStoreItemLink.SetRange("Synchronization Is Enabled", true);
+        if not SpfyStoreItemLink.IsEmpty() then
+            SpfyStoreItemLink.ModifyAll("Synchronization Is Enabled", false, false);
+        SpfyStoreCustomerLink.SetRange("Synchronization Is Enabled", true);
+        if not SpfyStoreCustomerLink.IsEmpty() then
+            SpfyStoreCustomerLink.ModifyAll("Synchronization Is Enabled", false, false);
+        DeleteSpfyDataLogSubscribers();
+    end;
+
+    local procedure InsertSpfyDataLogSubscriber(TableNo: Integer)
+    var
+        DataLogSubscriber: Record "NPR Data Log Subscriber";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        DataLogSubscriber.Init();
+        DataLogSubscriber.Code := SpfyIntegrationMgt.DataProcessingHandlerID(true);
+        DataLogSubscriber."Table ID" := TableNo;
+        DataLogSubscriber."Company Name" := '';
+        DataLogSubscriber.Insert(false);
+    end;
+
+    local procedure DeleteSpfyDataLogSubscribers()
+    var
+        DataLogSubscriber: Record "NPR Data Log Subscriber";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        DataLogSubscriber.SetRange(Code, SpfyIntegrationMgt.DataProcessingHandlerID(false));
+        if not DataLogSubscriber.IsEmpty() then
+            DataLogSubscriber.DeleteAll(false);
+    end;
+    #endregion
+
+    #region Migration prerequisites
+    [Test]
+    procedure GivenShopifyStillDetectingOnTheDataLog_WhenMigrationRuns_ThenRefusedBeforeAnyStateChange()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        StoreCode: Code[20];
+        ErrorText: Text;
+        RunId: Guid;
+    begin
+        // [SCENARIO] A migration on an environment that still detects Shopify changes on the Data Log is refused before it changes any state.
+        Initialize();
+
+        // [GIVEN] An environment whose Shopify change detection still runs on the Data Log, with its legacy processing registered.
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        InsertSpfyDataLogSubscriber(Database::Item);
+        SeedShopifyTaskSetupEntry(Database::Item);
+        SeedLegacyProcessingJobQueue(StoreCode);
+        Commit();
+
+        // [WHEN] An administrator starts the migration from the setup page.
+        asserterror SpfyTaskListMigration.MigrateAndEnable();
+
+        // [THEN] It is refused before the run-mode prompt, and the message sends the administrator to the RowVersion migration first.
+        _Assert.ExpectedError(_RowVersionMigrationActionTok);
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'A refused migration must leave the feature off');
+        _Assert.AreEqual(0, MigrationStatus(), 'A refused migration must not stamp a migration status');
+
+        // [WHEN] A background entry that owns the run reaches the cutover instead.
+        RunId := CreateGuid();
+        StampMigrationRunId(RunId);
+        _Assert.IsFalse(RunMigrationInBackgroundWithParameter(SpfyTaskListMigration.RunParameterString(RunId, false), ErrorText), 'A Data-Log environment must not be allowed to cut over in the background either');
+
+        // [THEN] The refusal is trapped inside the cutover, so the run is recorded as failed instead of wedging the entry.
+        _Assert.IsTrue(StrPos(ErrorText, _RowVersionMigrationActionTok) > 0, StrSubstNo('The refusal must direct the administrator to the RowVersion migration: %1', ErrorText));
+        SelectLatestVersion();
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Failed, StrSubstNo('A cutover refused by its prerequisites must be recorded as failed but the status was %1', MigrationStatus()));
+
+        // [THEN] Failed means the legacy path is intact: the feature is left off and nothing was deregistered.
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'A failed cutover must leave the task list feature off');
+        _Assert.IsTrue(ShopifyTaskProcessorExists(), 'A failed cutover must leave the legacy Shopify task processor registered');
+        _Assert.AreEqual(1, ShopifyTaskSetupCount(), 'A failed cutover must leave the legacy Shopify send registration in place');
+        _Assert.AreEqual(1, LegacyProcessingJobQueueCount(StoreCode), 'A failed cutover must leave the legacy Shopify processing job in place');
+        RemoveLegacyProcessingJobQueues(StoreCode);
+        ClearShopifyTaskSetup();
+        DeleteSpfyDataLogSubscribers();
+        // The background leg commits its Failed status, so the cleanup has to be committed too or it leaks into every later test.
+        SetStatus(ShopifySetup."Task List Migration Status"::NotStarted);
+        Commit();
+    end;
+
+    [Test]
+    procedure GivenRowVersionDetectionNotEnabled_WhenMigrationRuns_ThenRefusedBeforeAnyStateChange()
     var
         SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
     begin
         // [SCENARIO] Starting the migration from the setup page is refused before any prompt, leaving the feature off and no migration status stamped.
         Initialize();
 
+        // [GIVEN] An environment where nothing detects Shopify changes: the RowVersion feature is off and no Data Log wiring is left.
+        DeleteSpfyDataLogSubscribers();
+        _Lib.SetFeatureEnabled(false);
+
         // [WHEN] An administrator starts the migration from the setup page.
         asserterror SpfyTaskListMigration.MigrateAndEnable();
 
-        // [THEN] It is refused before the run-mode prompt and before any state is touched.
-        _Assert.ExpectedError(StrSubstNo(_NotYetAvailableErr, FeatureDescription()));
+        // [THEN] The half-state is refused too, and the administrator is sent to the RowVersion migration that repairs it.
+        _Assert.ExpectedError(_RowVersionMigrationActionTok);
         _Assert.IsFalse(TaskListFeatureEnabled(), 'A refused migration must leave the feature off');
         _Assert.AreEqual(0, MigrationStatus(), 'A refused migration must not stamp a migration status');
-    end;
-
-    [Test]
-    procedure GivenGateDown_WhenTheBackgroundMigrationRuns_ThenRefusedBeforeAnyStateChange()
-    var
-        ErrorText: Text;
-    begin
-        // [SCENARIO] The queued background migration is refused before the feature is enabled or the migration lease is taken.
-        Initialize();
-
-        // [WHEN] The queued background migration reaches the cutover.
-        _Assert.IsFalse(RunMigrationInBackground(ErrorText), 'A gate-down migration must not be allowed to run');
-
-        // [THEN] It is refused before the feature is enabled or the lease is taken.
-        _Assert.IsTrue(StrPos(ErrorText, StrSubstNo(_NotYetAvailableErr, FeatureDescription())) > 0, StrSubstNo('The refusal must carry the gate error: %1', ErrorText));
-        _Assert.IsFalse(TaskListFeatureEnabled(), 'A refused cutover must leave the feature off');
-        _Assert.AreEqual(0, MigrationStatus(), 'A refused cutover must not take the migration lease');
+        _Lib.SetFeatureEnabled(true);
     end;
     #endregion
 
@@ -459,6 +774,156 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         // [THEN] The stale lease is taken over instead of blocking the environment for good.
         // Direct call: LOCKTABLE is forbidden inside a [TryFunction] under the test runner, so a raised error fails the test naturally.
         SpfyTaskListMigration.AcquireLock(ShopifySetup);
+    end;
+
+    [Test]
+    [HandlerFunctions('BackgroundRunModeStrMenuHandler')]
+    procedure GivenTaskSchedulingUnavailable_WhenTheBackgroundMigrationIsStarted_ThenTheLeaseIsReleasedForTheNextAttempt()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+    begin
+        // [SCENARIO] A background migration that could not be scheduled at all releases its lease, so a run that never started cannot block the next attempt.
+        Initialize();
+        DeleteMigrationJobQueueEntries();
+
+        // [GIVEN] A run resuming past the legacy hand-over whose holder has been gone for longer than an hour.
+        MarkStatus(ShopifySetup."Task List Migration Status"::Finalizing, CurrentDateTime() - 90 * 60 * 1000);
+
+        // [GIVEN] An environment whose background entry is created but cannot be started, and is left manually on hold.
+        _BndMock.SetParkMigrationEntry(true);
+
+        // [WHEN] An administrator starts the migration in the background.
+        asserterror SpfyTaskListMigration.MigrateAndEnable();
+
+        // [THEN] The refusal surfaces instead of reporting a migration that never started.
+        _Assert.ExpectedError(_CouldNotScheduleErr);
+
+        SelectLatestVersion();
+        ShopifySetup.Get();
+        // [THEN] The lease taken moments earlier is released, because nothing is running to hold it.
+        _Assert.AreEqual(0DT, ShopifySetup."Task List Migr. Started At", 'A migration that never started must not leave a live heartbeat behind');
+        _Assert.IsTrue(ShopifySetup."Task List Migration Status" = ShopifySetup."Task List Migration Status"::Finalizing, StrSubstNo('A scheduling refusal must leave the status as it found it but it was %1', ShopifySetup."Task List Migration Status"));
+        _Assert.AreEqual(0, MigrationJobQueueEntryCount(), 'A migration that never started must leave no background entry behind');
+
+        // [THEN] The next attempt is admitted at once rather than waiting an hour for the lease to go stale.
+        // Direct call: LOCKTABLE is forbidden inside a [TryFunction] under the test runner, so a raised error fails the test naturally.
+        SpfyTaskListMigration.AcquireLock(ShopifySetup);
+        ResetCommittedMigrationState();
+    end;
+
+    [Test]
+    [HandlerFunctions('BackgroundRunModeStrMenuHandler,BackgroundNeedsActivationHandler')]
+    procedure GivenTheBackgroundEntryIsLeftOnHold_WhenTheBackgroundMigrationIsStarted_ThenTheLeaseIsReleasedForTheNextAttempt()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        ParkedRunId: Guid;
+    begin
+        // [SCENARIO] A background migration whose job queue entry is left on hold releases its lease and tells the operator the migration has not started.
+        Initialize();
+        DeleteMigrationJobQueueEntries();
+
+        // [GIVEN] A run resuming past the legacy hand-over whose holder has been gone for longer than an hour.
+        MarkStatus(ShopifySetup."Task List Migration Status"::Finalizing, CurrentDateTime() - 90 * 60 * 1000);
+
+        // [GIVEN] A delegated administrator: the background entry is created and left parked rather than refused.
+        _BndMock.SetParkMigrationEntry(false);
+
+        // [WHEN] An administrator starts the migration in the background.
+        SpfyTaskListMigration.MigrateAndEnable();
+
+        SelectLatestVersion();
+        ShopifySetup.Get();
+        // [THEN] Nothing is running, so the heartbeat must not hold the environment against the next attempt.
+        _Assert.AreEqual(0DT, ShopifySetup."Task List Migr. Started At", 'A parked background entry must not leave a live heartbeat behind');
+        _Assert.IsTrue(ShopifySetup."Task List Migration Status" = ShopifySetup."Task List Migration Status"::Finalizing, StrSubstNo('A parked background entry must leave the status as it found it but it was %1', ShopifySetup."Task List Migration Status"));
+
+        // [THEN] The parked entry is kept: it is what an administrator sets to Ready, and the next run cancels it first.
+        _Assert.AreEqual(1, MigrationJobQueueEntryCount(), 'The parked background entry must be left for an administrator to start');
+
+        // [THEN] It carries the run id of the lease that dispatched it, so the run an administrator starts later can
+        // still prove it owns the cutover instead of standing down as a hand-made entry.
+        ParkedRunId := ShopifySetup."Task List Migration Run ID";
+        _Assert.IsFalse(IsNullGuid(ParkedRunId), 'The dispatching run must have stamped a run id to hand over');
+        _Assert.AreEqual(SpfyTaskListMigration.RunParameterString(ParkedRunId, false), MigrationJobQueueEntryParameterString(), 'The parked background entry must carry the run id and override decision of the run that dispatched it');
+
+        // [THEN] The next attempt is admitted at once rather than waiting an hour for the lease to go stale.
+        // Direct call: LOCKTABLE is forbidden inside a [TryFunction] under the test runner, so a raised error fails the test naturally.
+        SpfyTaskListMigration.AcquireLock(ShopifySetup);
+        ResetCommittedMigrationState();
+    end;
+
+    [MessageHandler]
+    procedure BackgroundNeedsActivationHandler(Message: Text[1024])
+    begin
+        _Assert.IsTrue(StrPos(Message, _NeedsActivationTok) > 0, StrSubstNo('The operator must be told the migration has not started: %1', Message));
+    end;
+
+    [StrMenuHandler]
+    procedure BackgroundRunModeStrMenuHandler(Options: Text[1024]; var Choice: Integer; Instruction: Text[1024])
+    begin
+        _Assert.AreEqual(_RunModeOptionsTok, Options, 'The migration must offer exactly the foreground and background run modes');
+        _Assert.AreNotEqual('', Instruction, 'The run mode prompt must explain the choice');
+        Choice := 2;
+    end;
+
+    local procedure MarkStatus(NewStatus: Option; StartedAt: DateTime)
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+    begin
+        ShopifySetup.Get();
+        ShopifySetup."Task List Migration Status" := NewStatus;
+        ShopifySetup."Task List Migr. Started At" := StartedAt;
+        ShopifySetup.Modify(false);
+        Commit();
+    end;
+
+    local procedure MigrationJobQueueEntryCount(): Integer
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        FilterMigrationJobQueueEntries(JobQueueEntry);
+        exit(JobQueueEntry.Count());
+    end;
+
+    local procedure MigrationJobQueueEntryParameterString(): Text
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        FilterMigrationJobQueueEntries(JobQueueEntry);
+        if not JobQueueEntry.FindFirst() then
+            exit('<no migration entry>');
+        exit(JobQueueEntry."Parameter String");
+    end;
+
+    local procedure DeleteMigrationJobQueueEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        FilterMigrationJobQueueEntries(JobQueueEntry);
+        if not JobQueueEntry.IsEmpty() then
+            JobQueueEntry.DeleteAll(false);
+    end;
+
+    local procedure FilterMigrationJobQueueEntries(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Task List Migration");
+    end;
+
+    // These tests commit the state the migration commits, so the reset has to be committed too or it leaks into every later test.
+    local procedure ResetCommittedMigrationState()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+    begin
+        _Lib.SetTaskListFeatureEnabled(false);
+        ShopifySetup.Get();
+        Clear(ShopifySetup."Task List Migration Run ID");
+        ShopifySetup.Modify(false);
+        Commit();
+        _Lib.DeleteDetectionJobQueueEntries();
+        DeleteMigrationJobQueueEntries();
     end;
     #endregion
 
@@ -953,6 +1418,71 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         _Assert.AreEqual(1, _ResidualNotificationCount, 'An unprocessed legacy row must be surfaced whatever its attempt count');
     end;
 
+    [Test]
+    procedure GivenACompletedMigrationWhoseProcessorIsOnHold_WhenTheSetupWarningIsEvaluated_ThenTheParkedProcessingIsReported()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
+    begin
+        // [SCENARIO] A migration that completed while its task processing job is parked reports a warning for the setup page, and stops reporting it once the job is started.
+        Initialize();
+
+        // [GIVEN] A task processing job queue entry left on hold while the migration is still under way.
+        ParkTaskProcessorJobQueueEntry(_ParkedStoreTok);
+        SetStatus(ShopifySetup."Task List Migration Status"::Migrating);
+
+        // [THEN] Nothing is reported yet: until the migration has completed it owns its own reporting.
+        _Assert.AreEqual('', SpfyTaskJQSetup.ProcessorOnHoldWarning(), 'A migration that has not completed must not raise the parked-processor warning');
+
+        // [WHEN] The migration completes with the job still parked.
+        SetStatus(ShopifySetup."Task List Migration Status"::Completed);
+
+        // [THEN] The warning is reported, and it tells the operator what to do about it.
+        _Assert.AreNotEqual('', SpfyTaskJQSetup.ProcessorOnHoldWarning(), 'A completed migration whose processing job is parked must raise the warning');
+        _Assert.IsTrue(StrPos(SpfyTaskJQSetup.ProcessorOnHoldWarning(), 'Ready on the Job Queue Entries page') > 0, 'The warning must tell the operator how to start the job');
+
+        // [WHEN] An administrator starts the job.
+        ReadyTaskProcessorJobQueueEntries();
+
+        // [THEN] The warning stops, so it can never outlive the condition it reports.
+        _Assert.AreEqual('', SpfyTaskJQSetup.ProcessorOnHoldWarning(), 'A started processing job must raise no warning');
+    end;
+
+    // A store code no cutover manages, so the entry survives the run and the warning is arranged
+    // rather than inherited from whatever the test session's task-scheduler rights happen to be.
+    local procedure ParkTaskProcessorJobQueueEntry(StoreCode: Code[20])
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.Init();
+        JobQueueEntry.ID := CreateGuid();
+        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+        JobQueueEntry."Object ID to Run" := Codeunit::"NPR Spfy Task Processor";
+        JobQueueEntry."Parameter String" := StoreCode;
+        JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
+        JobQueueEntry."NPR Manually Set On Hold" := true;
+        JobQueueEntry.Insert(false);
+    end;
+
+    local procedure ReadyTaskProcessorJobQueueEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Spfy Task Processor");
+        if JobQueueEntry.FindSet() then
+            repeat
+                JobQueueEntry.Status := JobQueueEntry.Status::Ready;
+                JobQueueEntry.Modify(false);
+            until JobQueueEntry.Next() = 0;
+    end;
+
+    [MessageHandler]
+    procedure ProcessorOnHoldMessageHandler(Message: Text[1024])
+    begin
+        _Assert.IsTrue(StrPos(Message, _ProcessorOnHoldTok) > 0, StrSubstNo('The only message a completed cutover may raise here is the parked-processor warning: %1', Message));
+    end;
+
     [SendNotificationHandler]
     procedure ResidualNotificationHandler(var ResidualNotification: Notification): Boolean
     begin
@@ -1041,6 +1571,7 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
     end;
 
     [Test]
+    [HandlerFunctions('ProcessorOnHoldMessageHandler')]
     procedure GivenAProcessorJobOnManualHold_WhenTheCutoverRuns_ThenTheMigrationFailsInsteadOfReportingSuccess()
     var
         Item: Record Item;
@@ -1069,9 +1600,19 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
         // [WHEN] The cutover runs through the wrapper that owns the failure handling.
         asserterror SpfyTaskListMigration.RunCutoverIsolated();
 
-        // [THEN] The declined activation is recorded as a failure, not left mid-run.
+        // [THEN] The declined activation is not reported as success, and because the legacy hand-over is already done the run stays Finalizing rather than claiming the legacy path is back.
         SelectLatestVersion();
-        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Failed, StrSubstNo('A declined job queue activation must set the migration status to Failed but it was %1', MigrationStatus()));
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Finalizing, StrSubstNo('A job queue activation declined after the legacy hand-over must leave the migration Finalizing but it was %1', MigrationStatus()));
+
+        // [WHEN] The held job is released and the migration is run again, with a processor for another store left parked.
+        _Lib.DeleteDetectionJobQueueEntries();
+        ParkTaskProcessorJobQueueEntry(_ParkedStoreTok);
+        Commit();
+        SpfyTaskListMigration.RunCutoverIsolated();
+
+        // [THEN] The re-run resumes from Finalizing and finishes, so a failure past the hand-over stays recoverable.
+        SelectLatestVersion();
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Completed, StrSubstNo('A re-run after a failure past the hand-over must complete the migration but the status was %1', MigrationStatus()));
         _Lib.DeleteDetectionJobQueueEntries();
     end;
 
@@ -1244,5 +1785,401 @@ codeunit 85316 "NPR Spfy TL Migration Tests"
                 JobQueueEntry.Delete(false);
         until JobQueueEntry.Next() = 0;
     end;
+    #endregion
+
+    #region Legacy processing deregistration
+    [Test]
+    procedure GivenLegacyShopifyRegistration_WhenCutoverRuns_ThenItIsRemovedAndTheHandlerIdIsKept()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        StoreCode: Code[20];
+        HandlerIdBefore: Code[20];
+    begin
+        // [SCENARIO] The cutover removes the legacy Shopify registration while keeping its handler id.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+
+        // [GIVEN] A registered Shopify legacy processor with its send registrations, a legacy job, and a drainable task.
+        SeedSettlingLegacyVariantTask(StoreCode);
+        SeedShopifyTaskSetupEntry(Database::Item);
+        SeedLegacyProcessingJobQueue(StoreCode);
+        HandlerIdBefore := ShopifyDataProcessingHandlerId();
+        _Assert.AreNotEqual('', HandlerIdBefore, 'The environment must have a Shopify data processing handler before the cutover');
+        _Assert.IsTrue(ShopifyTaskProcessorExists(), 'The Shopify legacy task processor must exist before the cutover');
+        // The task-setup insert re-registers a Data Log subscriber for the handler, which the cutover's prerequisite reads as "still detecting on the Data Log".
+        DeleteSpfyDataLogSubscribers();
+        ArmCutover(ShopifySetup);
+
+        // [WHEN] The cutover runs.
+        SpfyTaskListMigration.RunEnvironmentCutover(ShopifySetup);
+
+        // [THEN] The environment's Shopify legacy processing registration is gone, so no legacy Shopify send can run again.
+        _Assert.AreEqual(0, AllShopifyTaskSetupCount(), 'The cutover must delete every Shopify legacy send registration');
+        _Assert.IsFalse(ShopifyTaskProcessorExists(), 'The cutover must delete the Shopify legacy task processor');
+        _Assert.AreEqual(0, LegacyProcessingJobQueueCount(StoreCode), 'The cutover must leave no legacy Shopify processing job behind');
+
+        // [THEN] The handler id itself is kept: the residual watch and the fresh-environment check still resolve it.
+        _Assert.AreEqual(HandlerIdBefore, ShopifyDataProcessingHandlerId(), 'The cutover must not clear the Shopify data processing handler id');
+
+        // [THEN] Only then does the new queue start processing, and the migration is complete.
+        _Assert.AreEqual(1, TaskProcessingJobQueueCount(StoreCode), 'The cutover must schedule the new queue processor for the store');
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Completed, StrSubstNo('A deregistered environment must complete the migration but the status was %1', MigrationStatus()));
+        RemoveLegacyProcessingJobQueues(StoreCode);
+        _Lib.DeleteDetectionJobQueueEntries();
+    end;
+
+    [Test]
+    procedure GivenAShopifyDataLogSubscription_WhenCutoverRunsPastThePrerequisite_ThenTheSubscriptionIsRemoved()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] A cutover that gets past its prerequisite removes the Shopify Data Log subscription rows.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+
+        // [GIVEN] A registered Shopify legacy processor with its send registration.
+        SeedShopifyTaskSetupEntry(Database::Item);
+        DeleteSpfyDataLogSubscribers();
+
+        // [GIVEN] A run resuming past the legacy hand-over, which is where the Data Log prerequisite is asked, so the
+        // cutover reaches the deregistration with the subscription still in place.
+        _Lib.SetTaskListFeatureEnabled(true);
+        MarkStatus(ShopifySetup."Task List Migration Status"::Finalizing, CurrentDateTime());
+        SelectLatestVersion();
+        ShopifySetup.Get();
+        InsertSpfyDataLogSubscriber(Database::Item);
+        Commit();
+        _Assert.AreEqual(1, SpfyDataLogSubscriberCount(), 'The environment must still detect Shopify changes on the Data Log before the cutover');
+
+        // [WHEN] The cutover runs.
+        SpfyTaskListMigration.RunEnvironmentCutover(ShopifySetup);
+
+        // [THEN] The Shopify Data Log subscription is gone: the pump that fills the legacy queue must not outlive the
+        // processing job that drains it, or every logged change would pile up unsent.
+        _Assert.AreEqual(0, SpfyDataLogSubscriberCount(), 'The cutover must remove every Shopify Data Log subscription');
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Completed, StrSubstNo('A deregistered environment must complete the migration but the status was %1', MigrationStatus()));
+        RemoveLegacyProcessingJobQueues(StoreCode);
+        ClearShopifyTaskSetup();
+        DeleteSpfyDataLogSubscribers();
+        _Lib.DeleteDetectionJobQueueEntries();
+        ResetCommittedMigrationState();
+    end;
+
+    local procedure SpfyDataLogSubscriberCount(): Integer
+    var
+        DataLogSubscriber: Record "NPR Data Log Subscriber";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        DataLogSubscriber.SetRange(Code, SpfyIntegrationMgt.DataProcessingHandlerID(false));
+        exit(DataLogSubscriber.Count());
+    end;
+
+    [Test]
+    procedure GivenActionableStragglerAfterDeregistration_WhenTheReverifyPassRuns_ThenItIsRecreatedAndTheDeadRemainderIsLeft()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        NcTask: Record "NPR Nc Task";
+        StragglerTask: Record "NPR Nc Task";
+        DeadTask: Record "NPR Nc Task";
+        RenameTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        StoreCode: Code[20];
+        StragglerEntryNo: BigInteger;
+        DeadEntryNo: BigInteger;
+        RenameEntryNo: BigInteger;
+    begin
+        // [SCENARIO] The re-verify pass recreates a still-actionable legacy straggler in the new queue and leaves an exhausted one alone.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+
+        // [GIVEN] A legacy row that committed after the drain had already verified the queue, plus rows the verify must ignore.
+        StragglerEntryNo := SeedLegacyTask(StoreCode, Item, NcTask.Type::Modify, 0DT, CurrentDateTime());
+        DeadEntryNo := SeedLegacyTask(StoreCode, Item, NcTask.Type::Modify, 0DT, CurrentDateTime());
+        ExhaustLegacyTask(DeadEntryNo);
+        RenameEntryNo := SeedLegacyTask(StoreCode, Item, NcTask.Type::Rename, 0DT, CurrentDateTime());
+
+        // [WHEN] The migration re-verifies after removing the legacy processing registration.
+        SpfyTaskListMigration.ReverifyAndResolveStragglers();
+
+        // [THEN] The straggler is rescued into the new queue rather than left stranded with no legacy job to drain it.
+        SpfyTask.SetRange("Migrated From NC Entry No.", StragglerEntryNo);
+        _Assert.AreEqual(1, SpfyTask.Count(), 'An actionable straggler must be re-created in the new queue');
+        LegacyTask(StragglerEntryNo, StragglerTask);
+        _Assert.IsTrue(StragglerTask.Processed, 'The rescued straggler must be closed');
+
+        // [THEN] The reported dead remainder is exempt, and a rename still has no counterpart to be re-created into.
+        LegacyTask(DeadEntryNo, DeadTask);
+        _Assert.IsFalse(DeadTask.Processed, 'An exhausted legacy row must be left exactly as it was found');
+        SpfyTask.SetRange("Migrated From NC Entry No.", DeadEntryNo);
+        _Assert.AreEqual(0, SpfyTask.Count(), 'An exhausted legacy row must not be re-created in the new queue');
+        LegacyTask(RenameEntryNo, RenameTask);
+        _Assert.IsFalse(RenameTask.Processed, 'A rename must be left untouched by the re-verify pass');
+        SpfyTask.SetRange("Migrated From NC Entry No.", RenameEntryNo);
+        _Assert.AreEqual(0, SpfyTask.Count(), 'A rename must not be re-created in the new queue');
+    end;
+
+    [Test]
+    procedure GivenMigrationFailed_WhenLegacyTaskIsProcessed_ThenTaskSetupIsRecreated()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        StoreCode: Code[20];
+        FailedEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A failed migration leaves the legacy path running: processing a legacy task recreates its task setup.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        FailedEntryNo := SeedBurningLegacyItemTask(StoreCode);
+        ClearShopifyTaskSetup();
+
+        // [WHEN] An operator manually processes a legacy row while a crashed migration sits at Failed.
+        SetStatus(ShopifySetup."Task List Migration Status"::Failed);
+        ProcessLegacyTask(FailedEntryNo);
+
+        // [THEN] Failed means the cutover stopped before the hand-over, so the legacy send path is intact and rebuilt on demand.
+        _Assert.AreEqual(1, ShopifyTaskSetupCount(), 'A failed migration must leave the legacy send path usable, so processing a legacy row rebuilds its task setup');
+        ClearShopifyTaskSetup();
+    end;
+
+    local procedure SeedShopifyTaskSetupEntry(TableNo: Integer)
+    begin
+        SeedShopifyTaskSetupEntry(TableNo, Codeunit::"NPR Spfy Send Items&Inventory");
+    end;
+
+    local procedure SeedShopifyTaskSetupEntry(TableNo: Integer; SendCodeunitId: Integer)
+    var
+        NcTaskSetup: Record "NPR Nc Task Setup";
+    begin
+        NcTaskSetup.SetRange("Task Processor Code", ShopifyTaskProcessorCode());
+        NcTaskSetup.SetRange("Table No.", TableNo);
+        if not NcTaskSetup.IsEmpty() then
+            exit;
+        NcTaskSetup.Init();
+        NcTaskSetup."Entry No." := 0;
+        NcTaskSetup."Task Processor Code" := ShopifyTaskProcessorCode();
+        NcTaskSetup."Table No." := TableNo;
+        NcTaskSetup."Codeunit ID" := SendCodeunitId;
+        NcTaskSetup.Insert(true);
+    end;
+
+    local procedure AllShopifyTaskSetupCount(): Integer
+    var
+        NcTaskSetup: Record "NPR Nc Task Setup";
+    begin
+        NcTaskSetup.SetRange("Task Processor Code", ShopifyDataProcessingHandlerId());
+        exit(NcTaskSetup.Count());
+    end;
+
+    local procedure ShopifyTaskProcessorExists(): Boolean
+    var
+        NcTaskProcessor: Record "NPR Nc Task Processor";
+    begin
+        exit(NcTaskProcessor.Get(ShopifyDataProcessingHandlerId()));
+    end;
+
+    // Read only: the auto-creating overload would put back the very processor row the deregistration deleted.
+    local procedure ShopifyDataProcessingHandlerId(): Code[20]
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        exit(SpfyIntegrationMgt.DataProcessingHandlerID(false));
+    end;
+    #endregion
+
+    #region Migration lease ownership
+    [Test]
+    procedure GivenAForeignRunIdAndAFreshLease_WhenTheBackgroundMigrationRuns_ThenItDoesNotCutOver()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        ErrorText: Text;
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A background run carrying another run's id stands down while that lease is still fresh, instead of cutting over beside it.
+        Initialize();
+
+        // [GIVEN] A live migration run owns the lease, and another entry that carries a run id of its own is dispatched.
+        StampMigrationRunId(CreateGuid());
+        MarkMigrating(CurrentDateTime());
+
+        // [WHEN] That entry reaches the cutover.
+        Succeeded := RunMigrationInBackgroundWithParameter(SpfyTaskListMigration.RunParameterString(CreateGuid(), false), ErrorText);
+
+        // [THEN] It stands down quietly instead of failing, so the platform does not keep retrying a run it does not own.
+        _Assert.IsTrue(Succeeded, StrSubstNo('An entry that does not own the lease must stand down without failing: %1', ErrorText));
+
+        // [THEN] It leaves the live run's lease and the feature alone rather than cutting the environment over twice.
+        SelectLatestVersion();
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Migrating, StrSubstNo('An entry that does not own the lease must leave it untouched but the status was %1', MigrationStatus()));
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'An entry that does not own the lease must not enable the feature');
+    end;
+
+    [Test]
+    procedure GivenAnEntryWithoutARunId_WhenTheBackgroundMigrationRuns_ThenItDoesNotCutOver()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        ErrorText: Text;
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A hand-made background entry that carries no run id never cuts the environment over.
+        Initialize();
+
+        // [GIVEN] A live migration run owns the lease, and a hand-made entry carrying no run token at all is dispatched.
+        StampMigrationRunId(CreateGuid());
+        MarkMigrating(CurrentDateTime());
+
+        // [WHEN] That entry reaches the cutover.
+        Succeeded := RunMigrationInBackgroundWithParameter('', ErrorText);
+
+        // [THEN] A tokenless entry can neither own nor adopt a run, so it stands down without failing the platform retry.
+        _Assert.IsTrue(Succeeded, StrSubstNo('An entry carrying no run token must stand down without failing: %1', ErrorText));
+
+        // [THEN] It leaves the live run's lease and the feature alone rather than cutting the environment over twice.
+        SelectLatestVersion();
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Migrating, StrSubstNo('An entry carrying no run token must leave the lease untouched but the status was %1', MigrationStatus()));
+        _Assert.IsFalse(TaskListFeatureEnabled(), 'An entry carrying no run token must not enable the feature');
+    end;
+
+    [Test]
+    [HandlerFunctions('ProcessorOnHoldMessageHandler')]
+    procedure GivenAForeignRunIdAndAStaleLease_WhenTheBackgroundMigrationRuns_ThenItAdoptsTheRunAndCompletes()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        StoreCode: Code[20];
+        ErrorText: Text;
+    begin
+        // [SCENARIO] A stale lease is adopted by the next background run and the migration completes, so a crashed run cannot block the environment for good.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+
+        // [GIVEN] A lease whose holder has been gone for longer than an hour, stamped with a run id nobody carries, and a processor for another store left parked.
+        StampMigrationRunId(CreateGuid());
+        MarkMigrating(CurrentDateTime() - 90 * 60 * 1000);
+        ParkTaskProcessorJobQueueEntry(_ParkedStoreTok);
+
+        // [WHEN] A dispatched entry carrying a run id of its own, rather than the stamped one, reaches the cutover.
+        _Assert.IsTrue(RunMigrationInBackgroundWithParameter(SpfyTaskListMigration.RunParameterString(CreateGuid(), false), ErrorText), StrSubstNo('A stale lease must be adopted rather than blocking the environment for good: %1', ErrorText));
+
+        // [THEN] The run is adopted and carried through, so a crashed migration is never stuck at Migrating.
+        SelectLatestVersion();
+        _Assert.IsTrue(MigrationStatus() = ShopifySetup."Task List Migration Status"::Completed, StrSubstNo('An adopted stale run must complete the migration but the status was %1', MigrationStatus()));
+        _Assert.IsTrue(TaskListFeatureEnabled(), 'An adopted stale run must enable the feature');
+        _Assert.AreEqual(1, TaskProcessingJobQueueCount(StoreCode), 'An adopted stale run must schedule the new queue processor for the store');
+        _Lib.DeleteDetectionJobQueueEntries();
+    end;
+
+    [Test]
+    procedure GivenTheLeaseTakenOverMidCutover_WhenTheSupersededRunFails_ThenItLeavesTheEnvironmentUntouched()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        StoreCode: Code[20];
+        ErrorText: Text;
+        LeaseHolderRunId: Guid;
+        SupersededRunId: Guid;
+    begin
+        // [SCENARIO] A run whose lease was taken over mid-cutover writes nothing when it fails, leaving the environment to the run that now holds it.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        LeaseHolderRunId := CreateGuid();
+        SupersededRunId := CreateGuid();
+
+        // [GIVEN] A legacy processing job for the store and a send registration this run may not remove, so the cutover
+        // quiesces and cancels the legacy senders and only then fails, with the re-creation branch in reach.
+        ClearShopifyTaskSetup();
+        SeedShopifyTaskSetupEntry(Database::Item, Codeunit::"NPR Spfy Send Customers");
+        DeleteSpfyDataLogSubscribers();
+        SeedLegacyProcessingJobQueue(StoreCode);
+        _Assert.AreEqual(1, LegacyProcessingJobQueueCount(StoreCode), 'The legacy processing job must exist before the cutover cancels it');
+
+        // [GIVEN] A live migration that owns the lease when it starts.
+        ArmCutover(ShopifySetup);
+        StampMigrationRunId(SupersededRunId);
+
+        // [GIVEN] Another run takes the lease over while the failing one is inside the hand-over.
+        _BndMock.SetHandOverLeaseTakeover(LeaseHolderRunId);
+
+        // [WHEN] The superseded run reaches its failure handler.
+        _Assert.IsFalse(RunMigrationInBackgroundWithParameter(SpfyTaskListMigration.RunParameterString(SupersededRunId, false), ErrorText), 'A failing cutover must surface its error to the caller');
+        _Assert.IsTrue(StrPos(ErrorText, _OverridesNotConfirmedTok) > 0, StrSubstNo('The unconfirmed custom send registration must be the error that surfaces: %1', ErrorText));
+
+        SelectLatestVersion();
+        ShopifySetup.Get();
+        // [THEN] Only the run that owns the lease may write: no status, no heartbeat, no compensation, no sender re-creation.
+        _Assert.IsTrue(ShopifySetup."Task List Migration Status" = ShopifySetup."Task List Migration Status"::Migrating, StrSubstNo('A superseded run must leave the owning run''s status alone but it was %1', ShopifySetup."Task List Migration Status"));
+        _Assert.AreNotEqual(0DT, ShopifySetup."Task List Migr. Started At", 'A superseded run must leave the owning run''s heartbeat alone');
+        _Assert.IsTrue(TaskListFeatureEnabled(), 'A superseded run must not switch the feature off under the run that owns the lease');
+        _Assert.AreEqual(0, LegacyProcessingJobQueueCount(StoreCode), 'A superseded run must leave the legacy processing jobs it cancelled cancelled');
+
+        // [THEN] The lease belongs to the run that took it, which is what made the failing run a non-owner.
+        _Assert.AreEqual(LeaseHolderRunId, ShopifySetup."Task List Migration Run ID", 'The take-over must leave the lease with the run that claimed it');
+        RemoveLegacyProcessingJobQueues(StoreCode);
+        ClearShopifyTaskSetup();
+        DeleteSpfyDataLogSubscribers();
+        ResetCommittedMigrationState();
+    end;
+
+    [Test]
+    [HandlerFunctions('BackgroundRunModeStrMenuHandler')]
+    procedure GivenTheLeaseTakenOverBeforeScheduling_WhenTheBackgroundStartFails_ThenTheNewHolderIsLeftAlone()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyTaskListMigration: Codeunit "NPR Spfy Task List Migration";
+        LeaseHolderRunId: Guid;
+    begin
+        // [SCENARIO] A run that lost its lease before scheduling leaves the new holder's state alone when its own start then fails.
+        Initialize();
+        DeleteMigrationJobQueueEntries();
+        LeaseHolderRunId := CreateGuid();
+
+        // [GIVEN] A second administrator takes the lease over and leaves a background entry of their own behind while
+        // the first run is still scheduling, and the first run's own scheduling then fails.
+        _BndMock.SetSchedulingLeaseTakeover(LeaseHolderRunId);
+        _BndMock.SetParkMigrationEntry(true);
+
+        // [WHEN] The first run reaches its scheduling-failure branch.
+        asserterror SpfyTaskListMigration.MigrateAndEnable();
+
+        // [THEN] The refusal surfaces instead of reporting a migration that never started.
+        _Assert.ExpectedError(_CouldNotScheduleErr);
+
+        SelectLatestVersion();
+        ShopifySetup.Get();
+        // [THEN] A run whose lease was taken cancels and clears nothing: the new holder's lease, heartbeat and entry stand.
+        _Assert.AreEqual(LeaseHolderRunId, ShopifySetup."Task List Migration Run ID", 'A superseded run must leave the lease with the run that claimed it');
+        _Assert.AreNotEqual(0DT, ShopifySetup."Task List Migr. Started At", 'A superseded run must not clear the new lease holder''s heartbeat');
+        _Assert.AreEqual(1, MigrationJobQueueEntryCount(), 'A superseded run must not cancel the new lease holder''s pending entry');
+        ResetCommittedMigrationState();
+    end;
+
+    local procedure StampMigrationRunId(RunId: Guid)
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+    begin
+        ShopifySetup.Get();
+        ShopifySetup."Task List Migration Run ID" := RunId;
+        ShopifySetup.Modify(false);
+        Commit();
+    end;
+
+    local procedure RunMigrationInBackgroundWithParameter(ParameterString: Text; var ErrorText: Text) Succeeded: Boolean
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        Clear(ErrorText);
+        // The migration commits as it goes, which a savepoint from the fixture writes would otherwise invalidate.
+        Commit();
+        JobQueueEntry."Parameter String" := CopyStr(ParameterString, 1, MaxStrLen(JobQueueEntry."Parameter String"));
+        Succeeded := Codeunit.Run(Codeunit::"NPR Spfy Task List Migration", JobQueueEntry);
+        if not Succeeded then
+            ErrorText := GetLastErrorText();
+    end;
+
     #endregion
 }

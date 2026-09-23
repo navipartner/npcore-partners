@@ -4,6 +4,8 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
     Access = Internal;
     TableNo = "NPR Data Log Record";
 
+    // Phase-out 2026-09-02: Data Log producer replaced by RowVersion change detection; deleted at the NaviConnect
+    // phase-out. A trigger takes no Obsolete attribute, so this marker is the clock.
     trigger OnRun()
     var
         TempInventoryLevel: Record "NPR Spfy Inventory Level" temporary;

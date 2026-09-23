@@ -114,6 +114,7 @@ codeunit 6184805 "NPR Spfy Integration Public"
     /// <param name="CheckIntegrationIsEnabled">When true, the call exits early if integration is disabled for the store.</param>
     /// <param name="ShopifyResponse">Out: the parsed JSON response.</param>
     /// <returns>True on a successful HTTP exchange. False on transport failure or when integration was disabled; call GetLastErrorText for details.</returns>
+    [Obsolete('Replaced by the NPR Spfy Task-typed overload; the NaviConnect-typed API is deleted at the NC phase-out.', '2026-09-02')]
     procedure ExecuteShopifyGraphQLRequest(var NcTask: Record "NPR Nc Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken) Success: Boolean
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
@@ -167,6 +168,7 @@ codeunit 6184805 "NPR Spfy Integration Public"
     /// <param name="RequestQueryString">GraphQL query text.</param>
     /// <param name="OrderGID">Shopify GraphQL global ID (e.g. gid://shopify/Order/...).</param>
     /// <param name="IncludeCursor">Specifies whether the paging cursor should be included in the request as Header-level queries do not support pagination parameters.</param>
+    [Obsolete('Replaced by the NPR Spfy Task-typed overload; the NaviConnect-typed API is deleted at the NC phase-out.', '2026-09-02')]
     procedure CreateGraphQLRequestWithOrderIdFilter(var NcTask: Record "NPR Nc Task"; endCursor: Text; ShopifyStoreCode: Code[20]; RequestQueryString: Text; OrderGID: Text; IncludeCursor: Boolean)
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
@@ -191,6 +193,145 @@ codeunit 6184805 "NPR Spfy Integration Public"
         SpfyWebhookMgt: Codeunit "NPR Spfy Webhook Mgt.";
     begin
         WebhookSubscrEntryNo := SpfyWebhookMgt.ToggleWebhook(ShopifyStoreCode, Topic, IncludeFields, Enable);
+    end;
+
+    /// <summary>
+    /// Claims a Shopify task that is part of a batch group handed to a subscriber of
+    /// SpfyIntegrationEvents.OnBeforeDispatchShopifyTask, marking it In Flight so the standard engine
+    /// does not send it again. Pass the row exactly as read from the work list: the claim is written on the
+    /// stored task and reads Entry No., Type, Data Output and Last Processing Started at from the passed row.
+    /// The passed row itself is not written back, so it still carries the work-list values after the call.
+    /// </summary>
+    /// <param name="SpfyTask">The task row to claim.</param>
+    /// <returns>True if this session now owns the task; false if another session claimed it first.</returns>
+    procedure ClaimShopifyTaskForBatch(var SpfyTask: Record "NPR Spfy Task"): Boolean
+    var
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+    begin
+        exit(SpfyTaskQueue.ClaimForBatch(SpfyTask));
+    end;
+
+    /// <summary>
+    /// Completes a task previously claimed with ClaimShopifyTaskForBatch, recording the Shopify response
+    /// and either finishing the task or charging it a failed attempt (retry/quarantine handled by the engine).
+    /// </summary>
+    /// <param name="SpfyTaskEntryNo">Entry No. of the claimed task.</param>
+    /// <param name="ResponseJson">The Shopify response to store on the task. May be uninitialized when Success is false.</param>
+    /// <param name="Success">True to complete the task; false to record a failed attempt.</param>
+    /// <param name="ErrorText">Diagnostic stored on the task whenever it is non-empty, whatever Success says.</param>
+    /// <returns>True if the task was completed or failed as requested; false if it was not claimed by this session.</returns>
+    procedure CompleteShopifyTaskFromBatch(SpfyTaskEntryNo: BigInteger; ResponseJson: JsonToken; Success: Boolean; ErrorText: Text): Boolean
+    var
+        CompletedSpfyTask: Record "NPR Spfy Task";
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        FailedWithoutErrorLbl: Label 'The subscriber extension failed the task without a diagnostic.';
+        NoResponseLbl: Label 'The task was completed by a subscriber extension without a Shopify response.';
+    begin
+        // The response is only written from the token when no error text is given, and writing an uninitialized token errors.
+        if ErrorText = '' then
+            if not Success then
+                ErrorText := FailedWithoutErrorLbl
+            else
+                if not (ResponseJson.IsObject() or ResponseJson.IsArray() or ResponseJson.IsValue()) then
+                    ErrorText := NoResponseLbl;
+        if not SpfyTaskQueue.CompleteFromBatch(SpfyTaskEntryNo, ResponseJson, Success, ErrorText, CompletedSpfyTask) then
+            exit(false);
+        // The outcome of a row the subscriber has already sent must survive a later failure of the same group.
+        Commit();
+        exit(true);
+    end;
+
+    /// <summary>
+    /// Enqueues a Shopify task for the given source record.
+    /// </summary>
+    /// <param name="ShopifyStoreCode">Target Shopify store.</param>
+    /// <param name="SourceRecordID">Record ID of the source record the task is about. The record may already be deleted.</param>
+    /// <param name="RecordValue">Dedup discriminator for the source record (e.g. the key value the send codeunit needs).</param>
+    /// <param name="TaskType">Insert, Modify or Delete.</param>
+    /// <param name="NotBeforeDateTime">Earliest send time; pass 0DT to send at the next processing cycle.</param>
+    /// <param name="ReuseExistingDelayed">True to merge into an existing future-scheduled task for the same record; false to always create a new row, subject only to ordinary dedup.</param>
+    /// <param name="SpfyTaskEntryNo">Out: Entry No. of the task that now covers the request, whether newly created or reused.</param>
+    /// <returns>True when a task row now exists for the request; false when nothing was enqueued. False also when the
+    /// Shopify task list is not the active send queue in this environment.</returns>
+    procedure EnqueueShopifyTask(ShopifyStoreCode: Code[20]; SourceRecordID: RecordId; RecordValue: Text[50]; TaskType: Enum "NPR Spfy Task Op"; NotBeforeDateTime: DateTime; ReuseExistingDelayed: Boolean; var SpfyTaskEntryNo: BigInteger): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        ReuseDelayed: Enum "NPR Spfy Reuse Delayed NC Task";
+        SourceRecRef: RecordRef;
+    begin
+        Clear(SpfyTaskEntryNo);
+        if not ShopifyStore.Get(ShopifyStoreCode) then
+            exit(false);
+        // An environment still sending through NaviConnect would strand the row: nothing drains this queue there.
+        if not SpfyTaskListFeature.IsFeatureEnabled() then
+            exit(false);
+        // TableNo() raises on a blank RecordId, so the emptiness test has to come first for this facade to stay defensive.
+        if Format(SourceRecordID) = '' then
+            exit(false);
+        // Only the table number of the source is used: the request may well be about a record that is already gone.
+        SourceRecRef.Open(SourceRecordID.TableNo());
+        if ReuseExistingDelayed then
+            ReuseDelayed := ReuseDelayed::Later
+        else
+            ReuseDelayed := ReuseDelayed::No;
+        // The queue reports an insert, not coverage: it returns false when it hands back a task it reused instead.
+        SpfyTaskQueue.Enqueue(
+            ShopifyStoreCode, SourceRecRef, SourceRecordID, RecordValue, TaskType, 0DT, NotBeforeDateTime, ReuseDelayed, 0DT, SpfyTask);
+        SpfyTaskEntryNo := SpfyTask."Entry No.";
+        exit(SpfyTaskEntryNo <> 0);
+    end;
+
+    /// <summary>
+    /// Cancels a Shopify task that has not been sent yet.
+    /// </summary>
+    /// <param name="SpfyTaskEntryNo">Entry No. of the task to cancel.</param>
+    /// <param name="CancellationReasonTxt">Reason recorded on the cancelled task.</param>
+    /// <returns>True if the task was cancelled; false if it no longer exists, is currently In Flight, or has already been
+    /// completed. A quarantined task is still cancellable, even though its last attempt may have reached Shopify.</returns>
+    procedure CancelShopifyTask(SpfyTaskEntryNo: BigInteger; CancellationReasonTxt: Text): Boolean
+    var
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+    begin
+        exit(SpfyTaskQueue.CancelUnsentTask(SpfyTaskEntryNo, CancellationReasonTxt));
+    end;
+
+    /// <summary>
+    /// Sends a pre-built Shopify GraphQL request carried by a Shopify task and parses the response.
+    /// The request payload must already be written to SpfyTask."Data Output" (use
+    /// CreateGraphQLRequestWithOrderIdFilter or build the payload directly). SpfyTask."Store Code"
+    /// must be set so the handler can resolve credentials and endpoints. The HTTP response is
+    /// stored on SpfyTask.Response and parsed into ShopifyResponse for the caller.
+    /// </summary>
+    /// <param name="SpfyTask">Shopify task carrying the request payload, store code, and target for the response.</param>
+    /// <param name="CheckIntegrationIsEnabled">When true, the call exits early if integration is disabled for the store.</param>
+    /// <param name="ShopifyResponse">Out: the parsed JSON response.</param>
+    /// <returns>True on a successful HTTP exchange. False on transport failure or when integration was disabled; call GetLastErrorText for details.</returns>
+    procedure ExecuteShopifyGraphQLRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken): Boolean
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+    begin
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(SpfyTask, CheckIntegrationIsEnabled, ShopifyResponse));
+    end;
+
+    /// <summary>
+    /// Builds a Shopify GraphQL request for queries filtered by a specific Order GID (e.g. gid://shopify/Order/...).
+    /// The generated request payload is written to SpfyTask."Data Output" and can be executed using
+    /// ExecuteShopifyGraphQLRequest.
+    /// </summary>
+    /// <param name="SpfyTask">Shopify task record used to store the generated GraphQL request payload.</param>
+    /// <param name="endCursor">Paging cursor (endCursor) from the previous page; leave empty if this is the first page.</param>
+    /// <param name="ShopifyStoreCode">Shopify store code used to resolve credentials and endpoints.</param>
+    /// <param name="RequestQueryString">GraphQL query text.</param>
+    /// <param name="OrderGID">Shopify GraphQL global ID (e.g. gid://shopify/Order/...).</param>
+    /// <param name="IncludeCursor">Specifies whether the paging cursor should be included in the request as Header-level queries do not support pagination parameters.</param>
+    procedure CreateGraphQLRequestWithOrderIdFilter(var SpfyTask: Record "NPR Spfy Task"; endCursor: Text; ShopifyStoreCode: Code[20]; RequestQueryString: Text; OrderGID: Text; IncludeCursor: Boolean)
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+    begin
+        SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(SpfyTask, endCursor, ShopifyStoreCode, RequestQueryString, OrderGID, IncludeCursor);
     end;
 }
 #endif

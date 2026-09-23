@@ -376,6 +376,46 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifySetup."Data Processing Handler ID");
     end;
 
+    /// <summary>
+    /// True while this environment still detects Shopify changes with the Data Log, i.e. the Shopify Data Log
+    /// subscriber rows exist. Deliberately NOT cached: the RowVersion cutover removes those rows mid-session.
+    /// </summary>
+    internal procedure RunsShopifyOnDataLog(): Boolean
+    var
+        DataLogSubscriber: Record "NPR Data Log Subscriber";
+        SpfyHandlerId: Code[20];
+    begin
+        SpfyHandlerId := DataProcessingHandlerID(false);
+        if SpfyHandlerId = '' then
+            exit(false);
+        DataLogSubscriber.SetRange(Code, SpfyHandlerId);
+        exit(not DataLogSubscriber.IsEmpty());
+    end;
+
+    /// <summary>
+    /// True once this environment has exchanged anything with Shopify - Data Log wiring, an assigned Shopify ID, or
+    /// a link marked for synchronization. Both managed switches read it to decide whether an adoption is still
+    /// undone, so it is deliberately conservative: any one of those classes is enough.
+    /// </summary>
+    internal procedure HasSyncedShopifyData(): Boolean
+    var
+        SpfyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+    begin
+        if RunsShopifyOnDataLog() then
+            exit(true);
+        if not SpfyAssignedID.IsEmpty() then
+            exit(true);
+        SpfyStoreItemLink.SetRange("Synchronization Is Enabled", true);
+        if not SpfyStoreItemLink.IsEmpty() then
+            exit(true);
+        SpfyStoreCustomerLink.SetRange("Synchronization Is Enabled", true);
+        if not SpfyStoreCustomerLink.IsEmpty() then
+            exit(true);
+        exit(false);
+    end;
+
 #if not (BC18 or BC19 or BC20)
     procedure BCCustomerTransactionSyncIsEnabledForAnyStore(): Boolean
     begin

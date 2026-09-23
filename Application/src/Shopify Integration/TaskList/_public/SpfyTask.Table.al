@@ -1,6 +1,15 @@
+/// <summary>
+/// The Shopify task queue. Readable by extensions. Lifecycle writes — enqueue, cancel, claim and complete — must go
+/// through the write facade on codeunit "NPR Spfy Integration Public" (EnqueueShopifyTask / CancelShopifyTask /
+/// ClaimShopifyTaskForBatch / CompleteShopifyTaskFromBatch); performing those directly bypasses the claim/complete
+/// handshake and the dedup rules. A subscriber to OnBeforeDispatchShopifyTask is passed the stored row on single
+/// dispatch and may write Response on it, persisted with Modify; on batch dispatch it is passed a temporary copy of
+/// the group, where a write is not persisted - each row's response is reported through CompleteShopifyTaskFromBatch.
+/// </summary>
 table 6059914 "NPR Spfy Task"
 {
-    Access = Internal;
+    Access = Public;
+    Extensible = true;
     Caption = 'Shopify Task';
     DataClassification = CustomerContent;
 
@@ -152,6 +161,9 @@ table 6059914 "NPR Spfy Task"
     var
         SpfyTagMgt: Codeunit "NPR Spfy Tag Mgt.";
     begin
+        // A work-list copy carries the real entry numbers: cleaning up after it must never touch the real rows.
+        if IsTemporary() then
+            exit;
         SpfyTagMgt.RemoveSpfyTaskTagUpdateRequests("Entry No.");
     end;
 }
