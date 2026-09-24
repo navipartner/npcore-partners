@@ -6266,6 +6266,47 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(LowerPrioritySaleLinePOS."Discount Amount", 0, 'Discount not calcualted properly.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueCouponWithDigitReferenceNoPattern()
+    // [SCENARIO] A Coupon Type using a digit Reference No. Pattern issues coupons with distinct digits-only reference nos.
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        ReferenceNoPattern: Code[20];
+        FirstReferenceNo: Text[50];
+        CouponQty: Integer;
+        DigitCount: Integer;
+    begin
+        Initialize();
+
+        // [GIVEN] Coupon Type with a Reference No. Pattern of 8 random digits
+        DigitCount := 8;
+        CouponQty := 2;
+        ReferenceNoPattern := CopyStr(StrSubstNo('[N*%1]', DigitCount), 1, MaxStrLen(ReferenceNoPattern));
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 10, ReferenceNoPattern);
+
+        // [WHEN] Coupons are issued
+        LibraryCoupon.IssueCouponDefaultHandler(CouponType, CouponQty, TempCoupon);
+
+        // [THEN] Every reference no. is replaced by the requested number of random digits
+        Assert.IsTrue(TempCoupon.FindSet(), 'No coupon was issued.');
+        Assert.AreEqual(CouponQty, TempCoupon.Count(), 'Issued coupon count not according to test scenario.');
+        repeat
+            Assert.AreEqual(DigitCount, StrLen(TempCoupon."Reference No."), 'Coupon Reference No. length not according to test scenario.');
+            Assert.IsTrue(DelChr(TempCoupon."Reference No.", '=', '0123456789') = '', 'Coupon Reference No. is expected to contain digits only.');
+        until TempCoupon.Next() = 0;
+
+        // [THEN] The digits are drawn per coupon, not a repeated constant
+        TempCoupon.FindFirst();
+        FirstReferenceNo := TempCoupon."Reference No.";
+        TempCoupon.FindLast();
+        Assert.AreNotEqual(FirstReferenceNo, TempCoupon."Reference No.", 'Coupon Reference No. is expected to differ per issued coupon.');
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";

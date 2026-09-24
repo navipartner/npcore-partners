@@ -29,7 +29,7 @@
                 field("Reference No. Pattern"; Rec."Reference No. Pattern")
                 {
 
-                    ToolTip = 'Specifies the value of the Reference No. Pattern field';
+                    ToolTip = 'Specifies the default Reference No. Pattern that is copied to new coupon types.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Template Code"; Rec."Print Template Code")

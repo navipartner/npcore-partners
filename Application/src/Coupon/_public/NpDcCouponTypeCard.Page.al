@@ -139,7 +139,7 @@
                     {
 
                         ShowMandatory = true;
-                        ToolTip = 'Specifies the pattern used to create the coupon external number, which will later be scanned ([S] ~ Coupon No. [AN] ~ Random Char [AN*3] ~ 3 Random Chars).';
+                        ToolTip = 'Specifies the pattern used to create the coupon external number, which will later be scanned ([S] ~ Coupon No. [N] ~ Random Digit [N*8] ~ 8 Random Digits [AN] ~ Random Char [AN*3] ~ 3 Random Chars). Counts higher than 9 are not supported.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Customer No."; Rec."Customer No.")

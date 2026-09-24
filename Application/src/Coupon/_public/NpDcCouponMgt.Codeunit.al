@@ -999,6 +999,7 @@
 
         for i := 1 to 100 do begin
             ReferenceNo := CouponType."Reference No. Pattern";
+            ReferenceNo := NpRegEx.RegExReplaceN(ReferenceNo);
             ReferenceNo := NpRegEx.RegExReplaceAN(ReferenceNo);
             ReferenceNo := NpRegEx.RegExReplaceS(ReferenceNo, Coupon."No.");
             ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Coupon."Reference No.")));
