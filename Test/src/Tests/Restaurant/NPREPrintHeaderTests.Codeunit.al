@@ -33,6 +33,7 @@ codeunit 85300 "NPR NPRE Print Header Tests"
         // [THEN] The header carries the seating of the originating waiter pad
         Assert.AreEqual(Seating.Code, TempRestaurantPrintHeader."Seating Code", 'Header should resolve the seating code from the POS entry.');
         Assert.AreEqual(SeatingDescription, TempRestaurantPrintHeader."Seating Description", 'Header should resolve the seating description from the POS entry.');
+        Assert.AreEqual(Seating."Seating No.", TempRestaurantPrintHeader."Seating No.", 'Header should resolve the seating no. (table no.) from the POS entry.');
     end;
 
     local procedure CreateBareWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -48,7 +49,7 @@ codeunit 85300 "NPR NPRE Print Header Tests"
     begin
         Seating.Init();
         Seating.Code := CopyStr(LibraryUtility.GenerateRandomCode(Seating.FieldNo(Code), Database::"NPR NPRE Seating"), 1, MaxStrLen(Seating.Code));
-        Seating."Seating No." := Seating.Code;
+        Seating."Seating No." := 'T-42'; // distinct from Code so assertions can tell the fields apart
         Seating.Description := SeatingDescription;
         Seating.Insert(false); // bypass dimension / seating-no. triggers not needed here
 

@@ -30,6 +30,7 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         B22FontLbl: Label 'B22', Locked = true;
         B12FontLbl: Label 'B12', Locked = true;
         NumberOfGuestsLbl: Label 'Number of Guests: ';
+        TableNoLbl: Label 'Table No.';
         KitchenDescriptionLineMaxLength: Integer;
         LastLineNo: Integer;
     begin
@@ -44,6 +45,18 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         Printer.AddLine('', 0);
         Printer.AddLine('', 0);
         Printer.AddLine('', 0);
+
+        // Table (seating) no. - printed large and bold so the waiter knows where to serve.
+        // Caption and value on separate lines: AddLine truncates to page width (B22 = 21 chars on 58mm), and Seating No. is up to 20 chars.
+        if TempRestaurantPrintHeader."Seating No." <> '' then begin
+            Printer.SetBold(true);
+            Printer.AddLine(TableNoLbl, 1);
+            Printer.SetFont(B22FontLbl);
+            Printer.AddLine(TempRestaurantPrintHeader."Seating No.", 1);
+            Printer.SetBold(false);
+            Printer.SetFont(B21FontLbl);
+            Printer.AddLine('', 0);
+        end;
 
         //CurrentDateTime
         Printer.AddLine(Format(TempRestaurantPrintHeader."Print Date Time"), 1);
