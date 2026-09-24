@@ -441,6 +441,7 @@ page 6151504 "NPR Nc Import List"
 
     local procedure ImportSelected()
     var
+        SelectedImportEntry: Record "NPR Nc Import Entry";
         ImportEntry: Record "NPR Nc Import Entry";
         ImportEntry2: Record "NPR Nc Import Entry";
         ImportedCount: Integer;
@@ -449,9 +450,17 @@ page 6151504 "NPR Nc Import List"
         ConfirmReimportMsg: Label 'Some of the selected entries have already been imported. Are you sure you want to import them again?';
         ConfirmSkipFutureMsg: Label 'Some of the selected entries have an "Earliest Import Datetime" in the future.\Do you want to skip them and continue importing the rest?';
     begin
+        CurrPage.SetSelectionFilter(SelectedImportEntry);
+        SelectedImportEntry.SetLoadFields("Entry No.");
+        if SelectedImportEntry.FindSet() then
+            repeat
+                ImportEntry := SelectedImportEntry;
+                ImportEntry.Mark(true);
+            until SelectedImportEntry.Next() = 0;
+        ImportEntry.MarkedOnly(true);
+
         ImportedCount := 0;
         StartedAt := CurrentDateTime();
-        CurrPage.SetSelectionFilter(ImportEntry);
         ImportEntry.SetFilter("Earliest Import Datetime", '>%1', StartedAt);
         if not ImportEntry.IsEmpty() then
             if not Confirm(ConfirmSkipFutureMsg, true) then
