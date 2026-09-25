@@ -892,6 +892,7 @@
     internal procedure IsTicketSalesLine(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
         Item: Record Item;
     begin
         Item.SetLoadFields("NPR Ticket Type");
@@ -903,6 +904,11 @@
 
         TicketType.SetLoadFields(Code);
         if (not TicketType.Get(Item."NPR Ticket Type")) then
+            exit(false);
+
+        TicketBom.SetFilter("Item No.", '=%1', SaleLinePOS."No.");
+        TicketBom.SetFilter("Variant Code", '=%1', SaleLinePOS."Variant Code");
+        if (TicketBom.IsEmpty()) then
             exit(false);
 
         exit(true);
