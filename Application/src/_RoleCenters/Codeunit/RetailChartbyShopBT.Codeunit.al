@@ -79,8 +79,8 @@ codeunit 6150806 "NPR Retail Chart by Shop BT"
                     while Query1.Read() do begin
                         I += 1;
                         Result.Add('DimCode ' + Format(I - 1), Query1.Global_Dimension_1_Code);
-                        Result.Add('Margin ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual));
-                        Result.Add('Turnover ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual));
+                        Result.Add('Margin ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual, 0, '<Precision,2:2><Standard Format,9>'));
+                        Result.Add('Turnover ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual, 0, '<Precision,2:2><Standard Format,9>'));
                     end;
                     Query1.Close();
                 end;
@@ -91,8 +91,8 @@ codeunit 6150806 "NPR Retail Chart by Shop BT"
                     while Query2.Read() do begin
                         I += 1;
                         Result.Add('DimCode ' + Format(I - 1), Query2.Global_Dimension_2_Code);
-                        Result.Add('Margin ' + Format(I - 1), Format(Query2.Sum_Sales_Amount_Actual + Query2.Sum_Cost_Amount_Actual));
-                        Result.Add('Turnover ' + Format(I - 1), Format(Query2.Sum_Sales_Amount_Actual));
+                        Result.Add('Margin ' + Format(I - 1), Format(Query2.Sum_Sales_Amount_Actual + Query2.Sum_Cost_Amount_Actual, 0, '<Precision,2:2><Standard Format,9>'));
+                        Result.Add('Turnover ' + Format(I - 1), Format(Query2.Sum_Sales_Amount_Actual, 0, '<Precision,2:2><Standard Format,9>'));
                     end;
                     Query2.Close();
                 end;
