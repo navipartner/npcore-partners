@@ -310,6 +310,177 @@ codeunit 85417 "NPR NPRE POS View Data Tests"
 
     #endregion
 
+    #region Colour resolution matches the table helpers
+
+    // The payload no longer asks each seating and each pad for its own colour. It resolves them from one cached copy of
+    // the status and colour setup instead, which is what takes the per-table round trips out of a refresh. These tests
+    // exist to keep that copy honest: each one builds a case where the resolution rules actually bite, then asserts the
+    // pushed value against the table helper the front end used to be painted from. If the two ever diverge, tables on a
+    // real floor plan change colour, and that is not something a smaller-payload change is allowed to do.
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadStatusOutranksSeatingStatus_StatusRefreshed_PadColourPaintsTheTable()
+    var
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        FrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
+        POSSession: Codeunit "NPR POS Session";
+        Statuses: JsonObject;
+        PadHexTok: Label 'AA0000', Locked = true;
+        SeatingHexTok: Label '00AA00', Locked = true;
+    begin
+        // [SCENARIO] A table occupied by a pad whose status outranks the table's own is painted in the pad's colour
+        // [GIVEN] A seating status and a waiter pad status with colours of their own, the pad status ranked higher
+        Initialize();
+        StartPOSSession(POSSession, FrontEnd);
+        SetFlowStatusColour(
+            "NPR NPRE Status Object"::Seating, _LibraryRestaurant.SeatingStatusReady(), SeatingHexTok, 10, true);
+        SetFlowStatusColour(
+            "NPR NPRE Status Object"::WaiterPad, _LibraryRestaurant.WaiterPadStatusReadyForPmt(), PadHexTok, 20, true);
+
+        // [GIVEN] A ready table with an open pad waiting to be paid
+        _LibraryRestaurant.CreateSeating(Seating, _SeatingLocation.Code);
+        _LibraryRestaurant.CreateWaiterPadForSeating(Seating.Code, WaiterPad);
+        SetSeatingStatus(Seating, _LibraryRestaurant.SeatingStatusReady());
+        SetWaiterPadStatus(WaiterPad, _LibraryRestaurant.WaiterPadStatusReadyForPmt());
+
+        // [WHEN] Statuses are refreshed
+        DrainFrontEndQueue(POSSession);
+        FrontendAssistant.RefreshStatus(FrontEnd, _Restaurant.Code, '', '');
+
+        // [THEN] The table is painted in the pad's colour, not its own
+        Statuses := PopFrontEndObject(POSSession, StatusRefreshMethodTok, 'seating');
+        AssertStatusAndColour(
+            Statuses, Seating.Code, _LibraryRestaurant.SeatingStatusReady(), PadHexTok, 'occupied table');
+
+        // [THEN] And that is the same colour the seating itself reports
+        AssertSeatingColourMatchesHelper(Statuses, Seating);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure StatusHiddenFromTheFrontEnd_StatusRefreshed_ItsColourIsIgnored()
+    var
+        Seating: Record "NPR NPRE Seating";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        FrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
+        POSSession: Codeunit "NPR POS Session";
+        Statuses: JsonObject;
+        HiddenHexTok: Label 'BB0000', Locked = true;
+    begin
+        // [SCENARIO] A status that is not available in the front end contributes no colour, however it is configured
+        // [GIVEN] A seating status carrying a colour but flagged as unavailable in the front end
+        Initialize();
+        StartPOSSession(POSSession, FrontEnd);
+        SetFlowStatusColour(
+            "NPR NPRE Status Object"::Seating, _LibraryRestaurant.SeatingStatusReady(), HiddenHexTok, 10, false);
+
+        // [GIVEN] A table in that status
+        _LibraryRestaurant.CreateSeating(Seating, _SeatingLocation.Code);
+        SetSeatingStatus(Seating, _LibraryRestaurant.SeatingStatusReady());
+
+        // [WHEN] Statuses are refreshed
+        DrainFrontEndQueue(POSSession);
+        FrontendAssistant.RefreshStatus(FrontEnd, _Restaurant.Code, '', '');
+
+        // [THEN] The table comes back with no colour at all
+        Statuses := PopFrontEndObject(POSSession, StatusRefreshMethodTok, 'seating');
+        AssertStatusAndColour(Statuses, Seating.Code, _LibraryRestaurant.SeatingStatusReady(), '', 'hidden-status table');
+
+        // [THEN] And that is the same colour the seating itself reports
+        AssertSeatingColourMatchesHelper(Statuses, Seating);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SeatingAndPadStatusRankedEqually_StatusRefreshed_SeatingColourKeepsTheTable()
+    var
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        FrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
+        POSSession: Codeunit "NPR POS Session";
+        Statuses: JsonObject;
+        PadHexTok: Label 'CC0000', Locked = true;
+        SeatingHexTok: Label '00CC00', Locked = true;
+    begin
+        // [SCENARIO] When two statuses are ranked equally the one resolved first keeps the table, so a tie does not repaint it
+        // [GIVEN] A seating status and a waiter pad status carrying the same colour priority
+        Initialize();
+        StartPOSSession(POSSession, FrontEnd);
+        SetFlowStatusColour(
+            "NPR NPRE Status Object"::Seating, _LibraryRestaurant.SeatingStatusReady(), SeatingHexTok, 10, true);
+        SetFlowStatusColour(
+            "NPR NPRE Status Object"::WaiterPad, _LibraryRestaurant.WaiterPadStatusReadyForPmt(), PadHexTok, 10, true);
+
+        // [GIVEN] A ready table with an open pad waiting to be paid
+        _LibraryRestaurant.CreateSeating(Seating, _SeatingLocation.Code);
+        _LibraryRestaurant.CreateWaiterPadForSeating(Seating.Code, WaiterPad);
+        SetSeatingStatus(Seating, _LibraryRestaurant.SeatingStatusReady());
+        SetWaiterPadStatus(WaiterPad, _LibraryRestaurant.WaiterPadStatusReadyForPmt());
+
+        // [WHEN] Statuses are refreshed
+        DrainFrontEndQueue(POSSession);
+        FrontendAssistant.RefreshStatus(FrontEnd, _Restaurant.Code, '', '');
+
+        // [THEN] The table keeps the colour of its own status, which is the one resolved first
+        Statuses := PopFrontEndObject(POSSession, StatusRefreshMethodTok, 'seating');
+        AssertStatusAndColour(
+            Statuses, Seating.Code, _LibraryRestaurant.SeatingStatusReady(), SeatingHexTok, 'evenly ranked table');
+
+        // [THEN] And that is the same colour the seating itself reports
+        AssertSeatingColourMatchesHelper(Statuses, Seating);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure OpenPadWithAStatus_StatusRefreshed_PadStatusAndColourMatchThePadHelpers()
+    var
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        FrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
+        POSSession: Codeunit "NPR POS Session";
+        PadStatuses: JsonObject;
+        PadEntry: JsonObject;
+        PadToken: JsonToken;
+        PadHexTok: Label 'DD0000', Locked = true;
+    begin
+        // [SCENARIO] A pad is listed with the status and colour its own record reports, so the badge on it does not drift
+        // [GIVEN] A waiter pad status with a colour, on an open pad
+        Initialize();
+        StartPOSSession(POSSession, FrontEnd);
+        SetFlowStatusColour(
+            "NPR NPRE Status Object"::WaiterPad, _LibraryRestaurant.WaiterPadStatusReadyForPmt(), PadHexTok, 20, true);
+        _LibraryRestaurant.CreateSeating(Seating, _SeatingLocation.Code);
+        _LibraryRestaurant.CreateWaiterPadForSeating(Seating.Code, WaiterPad);
+        SetWaiterPadStatus(WaiterPad, _LibraryRestaurant.WaiterPadStatusReadyForPmt());
+
+        // [WHEN] Statuses are refreshed
+        DrainFrontEndQueue(POSSession);
+        FrontendAssistant.RefreshStatus(FrontEnd, _Restaurant.Code, '', '');
+
+        // [THEN] The pad entry carries the configured colour
+        PadStatuses := PopFrontEndObject(POSSession, StatusRefreshMethodTok, 'waiterPad');
+        if not PadStatuses.Get(WaiterPad."No.", PadToken) then
+            _Assert.Fail('The open pad should have a status entry.');
+        PadEntry := PadToken.AsObject();
+        _Assert.AreEqual(PadHexTok, GetText(PadEntry, 'color'), 'The pad should carry the colour configured for its status.');
+
+        // [THEN] And both its status and its colour are what the pad record itself reports
+        WaiterPad.Find();
+        _Assert.AreEqual(
+            WaiterPad.WaiterPadFrontEndStatus(), GetText(PadEntry, 'status'),
+            'The pushed pad status should be the one the pad record resolves.');
+        _Assert.AreEqual(
+            WaiterPad.RGBColorCodeHex(false), GetText(PadEntry, 'color'),
+            'The pushed pad colour should be the one the pad record resolves.');
+    end;
+
+    #endregion
+
     #region Front-end payload capture
 
     local procedure DrainFrontEndQueue(var POSSession: Codeunit "NPR POS Session")
@@ -432,6 +603,12 @@ codeunit 85417 "NPR NPRE POS View Data Tests"
     #endregion
 
     local procedure SetSeatingStatusColour(StatusCode: Code[10]; RGBHexCode: Code[6])
+    begin
+        // A status only contributes a colour when it is flagged as available in the front end.
+        SetFlowStatusColour("NPR NPRE Status Object"::Seating, StatusCode, RGBHexCode, 10, true);
+    end;
+
+    local procedure SetFlowStatusColour(StatusObject: Enum "NPR NPRE Status Object"; StatusCode: Code[10]; RGBHexCode: Code[6]; ColorPriority: Integer; AvailableInFrontEnd: Boolean)
     var
         ColorTable: Record "NPR NPRE Color Table";
         FlowStatus: Record "NPR NPRE Flow Status";
@@ -446,12 +623,42 @@ codeunit 85417 "NPR NPRE POS View Data Tests"
         ColorTable."RGB Color Code (Hex)" := RGBHexCode;
         ColorTable.Modify();
 
-        // A status only contributes a colour when it is flagged as available in the front end.
-        FlowStatus.Get(StatusCode, FlowStatus."Status Object"::Seating);
-        FlowStatus."Available in Front-End" := true;
+        // Every field the resolution rules read is written here rather than left as it was, because the flow statuses
+        // are shared across the whole suite and a test that only set some of them would inherit the rest from whichever
+        // test happened to run before it.
+        FlowStatus.Get(StatusCode, StatusObject);
+        FlowStatus."Available in Front-End" := AvailableInFrontEnd;
         FlowStatus.Color := ColorDescription;
-        FlowStatus."Status Color Priority" := 10;
+        FlowStatus."Status Color Priority" := ColorPriority;
         FlowStatus.Modify();
+    end;
+
+    local procedure SetSeatingStatus(var Seating: Record "NPR NPRE Seating"; StatusCode: Code[10])
+    begin
+        // Assigned rather than routed through "NPR NPRE Seating Mgt.", which refuses some transitions while a pad is
+        // open. These tests need a named status on the table regardless of what is sitting on it.
+        Seating.Find();
+        Seating.Status := StatusCode;
+        Seating.Modify();
+    end;
+
+    local procedure SetWaiterPadStatus(var WaiterPad: Record "NPR NPRE Waiter Pad"; StatusCode: Code[10])
+    begin
+        WaiterPad.Find();
+        WaiterPad.Status := StatusCode;
+        WaiterPad.Modify();
+    end;
+
+    local procedure AssertSeatingColourMatchesHelper(Statuses: JsonObject; var Seating: Record "NPR NPRE Seating")
+    var
+        SeatingToken: JsonToken;
+    begin
+        if not Statuses.Get(Seating.Code, SeatingToken) then
+            _Assert.Fail('The status payload carried no entry for the seating under test.');
+        Seating.Find();
+        _Assert.AreEqual(
+            Seating.RGBColorCodeHex(false), GetText(SeatingToken.AsObject(), 'color'),
+            'The pushed colour should be the one the seating record resolves for itself.');
     end;
 
     local procedure StartPOSSession(var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management")

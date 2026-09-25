@@ -297,6 +297,7 @@
         UserSetup: Record "User Setup";
         Request: Codeunit "NPR Front-End: Generic";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        StatusResolver: Codeunit "NPR NPRE View Status Resolver";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
         ComponentList: JsonArray;
@@ -415,7 +416,7 @@
                                         ComponentContent.Add('blocked', Seating.Blocked);
                                         ComponentContent.Add('statusId', Seating.Status);
                                         ComponentContent.Add('capacity', Seating.Capacity);
-                                        ComponentContent.Add('color', Seating.RGBColorCodeHex(true));
+                                        ComponentContent.Add('color', StatusResolver.SeatingColorHex(Seating.Code, Seating.Status, true));
                                     end;
 
                                     ComponentList.Add(ComponentContent);
@@ -443,7 +444,7 @@
 
         FrontEnd.InvokeFrontEndMethod2(Request);
 
-        RefreshStatus(FrontEnd, RestaurantCode, '', '');
+        PushStatusUpdate(FrontEnd, StatusResolver, RestaurantCode, '', '');
 
         Span.Finish();
     end;
@@ -553,13 +554,24 @@
 
     procedure RefreshStatus(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantFilter: Text; SeatingLocationFilter: Text; SeatingFilter: Text)
     var
+        StatusResolver: Codeunit "NPR NPRE View Status Resolver";
+    begin
+        PushStatusUpdate(FrontEnd, StatusResolver, RestaurantFilter, SeatingLocationFilter, SeatingFilter);
+    end;
+
+    /// <summary>
+    /// Takes the resolver from the caller so that a refresh which has already resolved statuses while assembling its own
+    /// payload does not resolve them a second time for this push.
+    /// </summary>
+    local procedure PushStatusUpdate(FrontEnd: Codeunit "NPR POS Front End Management"; var StatusResolver: Codeunit "NPR NPRE View Status Resolver"; RestaurantFilter: Text; SeatingLocationFilter: Text; SeatingFilter: Text)
+    var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        WaiterPad: Record "NPR NPRE Waiter Pad";
         Request: Codeunit "NPR Front-End: Generic";
         SeatingStatus: JsonObject;
         WaiterPadStatus: JsonObject;
+        WaiterPadNos: List of [Code[20]];
+        WaiterPadNo: Code[20];
     begin
         Request.SetMethod('UpdateRestaurantStatuses');
 
@@ -576,16 +588,14 @@
                 if Seating.FindSet() then
                     repeat
                         if not SeatingStatus.Contains(Seating.Code) then
-                            SeatingStatus.Add(Seating.Code, StatusAndColor(Seating.Status, Seating.RGBColorCodeHex(false)));
+                            SeatingStatus.Add(Seating.Code, StatusAndColor(Seating.Status, StatusResolver.SeatingColorHex(Seating.Code, Seating.Status, false)));
 
-                        SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
-                        SeatingWaiterPadLink.SetRange(Closed, false);
-                        if SeatingWaiterPadLink.FindSet() then
-                            repeat
-                                if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") and not WaiterPad.Closed then
-                                    if not WaiterPadStatus.Contains(WaiterPad."No.") then
-                                        WaiterPadStatus.Add(WaiterPad."No.", StatusAndColor(WaiterPad.WaiterPadFrontEndStatus(), WaiterPad.RGBColorCodeHex(false)));
-                            until SeatingWaiterPadLink.Next() = 0;
+                        StatusResolver.GetOpenWaiterPadNos(Seating.Code, WaiterPadNos);
+                        foreach WaiterPadNo in WaiterPadNos do
+                            if not WaiterPadStatus.Contains(WaiterPadNo) then
+                                WaiterPadStatus.Add(
+                                    WaiterPadNo,
+                                    StatusAndColor(StatusResolver.WaiterPadFrontEndStatus(WaiterPadNo), StatusResolver.WaiterPadColorHex(WaiterPadNo, false)));
                     until Seating.Next() = 0;
             until SeatingLocation.Next() = 0;
 
