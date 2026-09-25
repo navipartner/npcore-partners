@@ -318,7 +318,6 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     internal procedure RequestMetafieldValuesFromShopifyAndUpdateBCData(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20])
     var
         NcTask: Record "NPR Nc Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
         QueryStream: OutStream;
@@ -334,7 +333,11 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         ShopifyEntityMetafieldsSetRequestQuery(ShopifyOwnerType, ShopifyOwnerID, OwnerTypeTxt, QueryStream);
-        if SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
+        // Through the seam rather than straight at the communication handler, so an injected client reaches
+        // this call too. The default client wraps the same handler with the same argument, so production is
+        // unchanged. The other direct calls in this codeunit are not reachable from the gift card flow and
+        // are left alone rather than widening this change into a metafield one.
+        if GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse) then
             if ShopifyResponse.SelectToken(StrSubstNo('data.%1.metafields.edges', SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt)), MetafieldsSet) then
                 UpdateBCMetafieldData(EntityRecID, ShopifyOwnerType, ShopifyStoreCode, MetafieldsSet);
     end;

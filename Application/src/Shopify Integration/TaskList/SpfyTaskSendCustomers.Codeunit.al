@@ -20,12 +20,15 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
         _ShopifyCustomerID: Text[30];
         _GraphQLClientSet: Boolean;
+        _GraphQLClientInjected: Boolean;
+        _CustomerGIDTok: Label 'gid://shopify/Customer/%1', Comment = '%1 - Shopify customer id', Locked = true;
         _QueryingShopifyLbl: Label 'Querying Shopify...';
 
     internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
     begin
         _GraphQLClient := GraphQLClient;
         _GraphQLClientSet := true;
+        _GraphQLClientInjected := true;
     end;
 
     local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
@@ -173,6 +176,11 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         if ShopifyCustomerID = '' then  // Marketing consent must be sent as a separate request when updating an existing customer
             AddEmailMarketingConsentInfo(SpfyStoreCustomerLink, ShopifyCustomerID, CustomerJson);
 
+        // The metafield codeunit talks to Shopify through a client this one does not own, so a caller
+        // that injected a client has to reach that one too. Only an injected client is forwarded, so
+        // production builds its own exactly as before.
+        if _GraphQLClientInjected then
+            SpfyMetafieldMgt.SetGraphQLClient(_GraphQLClient);
         SpfyMetafieldMgt.GenerateMetafieldUpdateArrays(SpfyStoreCustomerLink.RecordId(), "NPR Spfy Metafield Owner Type"::CUSTOMER, '', SpfyStoreCustomerLink."Shopify Store Code", UpdateMetafields, RemoveMetafields);
         if UpdateMetafields.Count() > 0 then
             CustomerJson.Add('metafields', UpdateMetafields);
@@ -268,24 +276,111 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         exit(_ShopifyCustomerID);
     end;
 
-    internal procedure GetCustomerGIDFromShopify(Customer: Record Customer; ShopifyStoreCode: Code[20]; CreateMissing: Boolean): Text
+    /// <summary>
+    /// Resolves the Shopify customer GID to use for a BC customer at a given Shopify store.
+    /// The id assigned to the store-customer link is authoritative, so a customer synced to several
+    /// stores resolves to the id belonging to ShopifyStoreCode. Only when the link carries no id does
+    /// the system fall back to looking the customer up in Shopify by e-mail.
+    /// CustomerNo may be blank, for a party that exists only as an e-mail address (a gift card recipient,
+    /// for instance); FallbackEmail and FallbackName then carry everything we know about them.
+    /// CreateMissing turns this into a write path: when the search matches nobody the customer is created in
+    /// Shopify, and if the link carries a "No." the store-customer link is written and the BC customer card
+    /// can be updated with what Shopify returns. Pass false to resolve without writing anything anywhere.
+    /// A blank GID comes back in exactly two cases: there was no e-mail to search by, or the search matched
+    /// nobody and CreateMissing was false. Everything else raises - a failed search, a failed create and a
+    /// create that returned no id all abort the caller's task rather than degrading to a blank.
+    /// </summary>
+    internal procedure GetShopifyCustomerGID(CustomerNo: Code[20]; ShopifyStoreCode: Code[20]; FallbackEmail: Text; FallbackName: Text; CreateMissing: Boolean): Text
     var
+        Customer: Record Customer;
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyCustomerID: Text[30];
+        Email: Text;
+        CustomerFound: Boolean;
     begin
-        SpfyStoreCustomerLink.Type := SpfyStoreCustomerLink.Type::Customer;
-        SpfyStoreCustomerLink."No." := Customer."No.";
-        SpfyStoreCustomerLink."Shopify Store Code" := ShopifyStoreCode;
-        if not SpfyStoreCustomerLink.Find() then
-            SpfyStoreCustomerLink.Init();
-        UpdateFromCustomer(Customer, SpfyStoreCustomerLink);
+        if CustomerNo <> '' then
+            CustomerFound := Customer.Get(CustomerNo);  //AL evaluates both sides of "and", so this cannot be folded into the test below
+
+        if CustomerFound then begin
+            GetStoreCustomerLink(CustomerNo, ShopifyStoreCode, false, SpfyStoreCustomerLink);
+            UpdateFromCustomer(Customer, SpfyStoreCustomerLink);
+            ShopifyCustomerID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+            if ShopifyCustomerID <> '' then
+                exit(CustomerGID(ShopifyCustomerID));
+        end else begin
+            SpfyStoreCustomerLink.Type := SpfyStoreCustomerLink.Type::Customer;
+            SpfyStoreCustomerLink."Shopify Store Code" := ShopifyStoreCode;
+        end;
+
+        Email := ChooseEmail(SpfyStoreCustomerLink."E-Mail", Customer."E-Mail", FallbackEmail);  //Customer is blank when none was found
+        if Email = '' then
+            exit('');
+        SpfyStoreCustomerLink."E-Mail" := CopyStr(Email, 1, MaxStrLen(SpfyStoreCustomerLink."E-Mail"));
+        if SpfyStoreCustomerLink."First Name" + SpfyStoreCustomerLink."Last Name" = '' then
+            ParseFullName(FallbackName, SpfyStoreCustomerLink);
+
         exit(GetCustomerGIDFromShopify(SpfyStoreCustomerLink, CreateMissing));
+    end;
+
+    /// <summary>
+    /// The address GetShopifyCustomerGID would resolve for this customer, without contacting Shopify and
+    /// without writing anything anywhere.
+    /// A caller that has to decide something about a customer before resolving them - whether a nominated
+    /// address names the buyer themselves, for instance - has to compare against this rather than against
+    /// its own fallback, because the fallback is only the last of the three candidates ChooseEmail weighs.
+    /// </summary>
+    internal procedure GetCustomerEmail(CustomerNo: Code[20]; ShopifyStoreCode: Code[20]; FallbackEmail: Text): Text
+    var
+        Customer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        CustomerFound: Boolean;
+    begin
+        if CustomerNo <> '' then
+            CustomerFound := Customer.Get(CustomerNo);  //AL evaluates both sides of "and", so this cannot be folded into the test below
+        if CustomerFound then begin
+            GetStoreCustomerLink(CustomerNo, ShopifyStoreCode, false, SpfyStoreCustomerLink);
+            UpdateFromCustomer(Customer, SpfyStoreCustomerLink);
+        end;
+        exit(ChooseEmail(SpfyStoreCustomerLink."E-Mail", Customer."E-Mail", FallbackEmail));
+    end;
+
+    /// <summary>
+    /// The address precedence behind GetShopifyCustomerGID and GetCustomerEmail, so those two always resolve
+    /// the same address for the same customer: the link's own address, else the customer card's, else the
+    /// caller's. A candidate counts only if something remains once it is trimmed, so an address of only spaces
+    /// never wins, never hides the next candidate, and never reaches Shopify from those two entry points.
+    /// It is not the only such fallback in the file. GetCustomerGIDFromShopify falls back from the link to the
+    /// customer card a second time, untrimmed, for callers that reach it without coming through here, which
+    /// the customer sync path does by way of GetShopifyCustomerID. A link address of only spaces still becomes
+    /// a search key on that path. Routing it through here would be a customer sync change, not a gift card one.
+    /// CustomerEmail is not redundant: UpdateFromCustomer copies the card address only when the link's is
+    /// empty, not when it is whitespace.
+    /// </summary>
+    local procedure ChooseEmail(LinkEmail: Text; CustomerEmail: Text; FallbackEmail: Text) Email: Text
+    begin
+        Email := LinkEmail.Trim();
+        if Email = '' then
+            Email := CustomerEmail.Trim();
+        if Email = '' then
+            Email := FallbackEmail.Trim();
+    end;
+
+    local procedure CustomerGID(ShopifyCustomerID: Text[30]): Text
+    begin
+        if ShopifyCustomerID = '' then
+            exit('');
+        exit(StrSubstNo(_CustomerGIDTok, ShopifyCustomerID));
     end;
 
     internal procedure GetCustomerGIDFromShopify(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; CreateMissing: Boolean) ShopifyCustomerGID: Text
     var
         Customer: Record Customer;
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
+        UserErrors: JsonToken;
         ShopifyCustomerID: Text[30];
+        UserErrorsTxt: Text;
         CustomerCreateQueryErr: Label 'The system was unable to create a customer with email %1 in Shopify. The following error occurred:\%2', Comment = '%1 - customer email address, %2 - Shopify API call error details';
         CustomerSearchQueryErr: Label 'The system was unable to retrieve information from Shopify about the customer with email %1. The following error occurred:\%2', Comment = '%1 - customer email address, %2 - Shopify API call error details';
     begin
@@ -314,6 +409,13 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         Clear(ShopifyResponse);
         if not CreateShopifyCustomer(SpfyStoreCustomerLink, ShopifyResponse) then
             Error(CustomerCreateQueryErr, SpfyStoreCustomerLink."E-Mail", GetLastErrorText());
+        // A mutation Shopify refuses still answers 200 with the reason in userErrors and the customer left
+        // null, so the transport test above passes. Without this the id read below is what fails, raising
+        // "required value missing" and nothing else, and the task retries on the same input.
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse, UserErrors) then begin
+            UserErrors.WriteTo(UserErrorsTxt);
+            Error(CustomerCreateQueryErr, SpfyStoreCustomerLink."E-Mail", UserErrorsTxt);
+        end;
         ShopifyCustomerGID := _JsonHelper.GetJText(ShopifyResponse, 'data.customerCreate.customer.id', true);
 
         If SpfyStoreCustomerLink."No." <> '' then begin
@@ -396,11 +498,15 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
     end;
 
     local procedure ParseCustomerName(Customer: Record Customer; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    begin
+        ParseFullName(GetFullName(Customer.Name, Customer."Name 2"), SpfyStoreCustomerLink);
+    end;
+
+    local procedure ParseFullName(FullName: Text; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
     var
-        FullName: Text;
         LastSpacePosition: Integer;
     begin
-        FullName := GetFullName(Customer.Name, Customer."Name 2");
+        FullName := FullName.Trim();  //padding would otherwise split into a first or last name that is only spaces
         LastSpacePosition := FullName.LastIndexOf(' ');
         if LastSpacePosition > 1 then begin
             SpfyStoreCustomerLink."First Name" := CopyStr(FullName.Substring(1, LastSpacePosition - 1), 1, MaxStrLen(SpfyStoreCustomerLink."First Name"));
@@ -557,6 +663,11 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
             else
                 exit;
         end;
+        // The metafield codeunit talks to Shopify through a client this one does not own, so a caller
+        // that injected a client has to reach that one too. Only an injected client is forwarded, so
+        // production builds its own exactly as before.
+        if _GraphQLClientInjected then
+            SpfyMetafieldMgt.SetGraphQLClient(_GraphQLClient);
         SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(SpfyStoreCustomerLink.RecordId(), ShopifyOwnerType, ShopifyOwnerID, SpfyStoreCustomerLink."Shopify Store Code");
     end;
 

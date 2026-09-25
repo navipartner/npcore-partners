@@ -8,6 +8,7 @@ codeunit 85443 "NPR Spfy TL Voucher Tests"
     var
         _Assert: Codeunit Assert;
         _Lib: Codeunit "NPR Spfy RowVer Test Lib";
+        _LibrarySpfyVoucher: Codeunit "NPR Library - Spfy Voucher";
         _BndMock: Codeunit "NPR Spfy TL Bnd Mock";
         _SpfyTaskProcessor: Codeunit "NPR Spfy Task Processor";
         _SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
@@ -1227,6 +1228,89 @@ codeunit 85443 "NPR Spfy TL Voucher Tests"
         _Assert.AreEqual(1, MockClient.CountRequestsContaining(GiftCardDeactivateTok), 'Exactly one giftCardDeactivate must be sent');
         ArchVoucher.Get(ArchVoucher."No.");
         _Assert.IsTrue(ArchVoucher."Disabled at Shopify", 'The archived voucher must be stamped Disabled at Shopify from the response');
+    end;
+
+    [Test]
+    procedure GivenVoucherWithEmailButNoCustomer_WhenVoucherSiblingRuns_ThenTheBuyerIsStillResolved()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Task Send Voucher";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the queue as on the legacy path, a voucher carrying an e-mail but no customer still puts a customer on the gift card.
+        Initialize();
+        StoreCode := CreateVoucherStore();
+
+        // [GIVEN] A voucher to be sent from Shopify that carries an address but no Customer No.
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, false);
+        Voucher."Spfy Send from Shopify" := true;
+        Voucher."E-mail" := 'tlbuyer990@npretail.test';
+        Voucher.Modify(false);
+        RecRef.GetTable(Voucher);
+        TaskEntryNo := EnqueueVoucherTask(StoreCode, RecRef, Voucher.RecordId(), Voucher."No.", "NPR Spfy Task Op"::Insert, CurrentDateTime());
+
+        // [GIVEN] Shopify knows somebody at that address
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('990'));
+        MockClient.AddResponse(_GiftCardCreateTok, _LibrarySpfyVoucher.ResponseGiftCardCreated('7101'));
+
+        // [WHEN] The voucher sibling runs
+        GetTask(TaskEntryNo, SpfyTask);
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(SpfyTask);
+
+        // [THEN] The gift card carries that customer, where before the blank Customer No. meant nobody was attached
+        _Assert.AreEqual(
+            _LibrarySpfyVoucher.CustomerGID('990'),
+            _LibrarySpfyVoucher.GiftCardInputValue(MockClient.GetRequestContaining(_GiftCardCreateTok), 'customerId'),
+            'A voucher with an e-mail and no Customer No. must still resolve a customer on the queue path.');
+    end;
+
+    [Test]
+    procedure GivenSyncedBuyer_WhenVoucherSiblingRuns_ThenTheStoreLinkIdIsUsedWithoutQueryingShopify()
+    var
+        Customer: Record Customer;
+        Voucher: Record "NPR NpRv Voucher";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Task Send Voucher";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] The buyer's Shopify id is read from the store-customer link, not from the Customer record where it no longer lives.
+        Initialize();
+        StoreCode := CreateVoucherStore();
+
+        // [GIVEN] A buyer whose Shopify id sits on the store-customer link for this store
+        _LibrarySpfyVoucher.CreateCustomerWithStoreLink('TLC991', StoreCode, 'tlbuyer991@npretail.test', 'Queue Buyer', '991', Customer);
+
+        // [GIVEN] A voucher for that buyer, to be sent from Shopify
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, false);
+        Voucher."Spfy Send from Shopify" := true;
+        Voucher."Customer No." := Customer."No.";
+        Voucher."E-mail" := 'tlbuyer991@npretail.test';
+        Voucher.Modify(false);
+        RecRef.GetTable(Voucher);
+        TaskEntryNo := EnqueueVoucherTask(StoreCode, RecRef, Voucher.RecordId(), Voucher."No.", "NPR Spfy Task Op"::Insert, CurrentDateTime());
+        MockClient.AddResponse(_GiftCardCreateTok, _LibrarySpfyVoucher.ResponseGiftCardCreated('7102'));
+
+        // [WHEN] The voucher sibling runs
+        GetTask(TaskEntryNo, SpfyTask);
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(SpfyTask);
+
+        // [THEN] The link's id is on the gift card, and Shopify was never asked to look the buyer up
+        _Assert.AreEqual(
+            _LibrarySpfyVoucher.CustomerGID('991'),
+            _LibrarySpfyVoucher.GiftCardInputValue(MockClient.GetRequestContaining(_GiftCardCreateTok), 'customerId'),
+            'The buyer id must come from the store-customer link for this store.');
+        _Assert.AreEqual(
+            0, MockClient.CountRequestsContaining('FindCustomerByEmail'),
+            'A buyer whose link carries an id must not be looked up in Shopify.');
     end;
 
     local procedure AssignedGiftCardId(BCRecID: RecordId): Text

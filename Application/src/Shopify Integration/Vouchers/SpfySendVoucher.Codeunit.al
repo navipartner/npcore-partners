@@ -24,11 +24,31 @@ codeunit 6184820 "NPR Spfy Send Voucher"
     var
         _JsonHelper: Codeunit "NPR Json Helper";
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        _SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
+        _GraphQLClientSet: Boolean;
         _VoucherNotFoundErr: Label 'Retail Voucher %1 could not be found or is not eligible for Shopify integration.', Comment = '%1 - Retail Voucher No.';
+
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+        _SpfySendCustomers.SetGraphQLClient(GraphQLClient);  //customer resolution calls Shopify from inside the gift card request build
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
 
     local procedure SendVoucher(var NcTask: Record "NPR Nc Task")
     var
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         SendToShopify: Boolean;
         Success: Boolean;
@@ -40,7 +60,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
         SendToShopify := PrepareVoucherUpdateRequest(NcTask);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse);
         NcTask.Modify();
         Commit();
 
@@ -64,7 +84,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
         SendToShopify := PrepareGiftCardBalanceAdjustmentRequest(NcTask);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse);
         NcTask.Modify();
         Commit();
 
@@ -90,7 +110,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
         SendToShopify := PrepareGiftCardDisableRequest(NcTask, DeactivatedAt);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+            Success := GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse);
         NcTask.Modify();
         Commit();
 
@@ -238,17 +258,9 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
     local procedure ShopifyGiftCardUpsertQuery(Voucher: Record "NPR NpRv Voucher"; ShopifyGiftCardID: Text[30]; ShopifyStoreCode: Code[20]; var QueryStream: OutStream)
     var
-        Customer: Record Customer;
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
-        RecipientAttributesJson: JsonObject;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
         VoucherJson: JsonObject;
-        RecipientPreferredName: Text;
-        ShopifyBillToCustGID: Text;
-        ShopifyShipToCustGID: Text;
         CreateQueryTok: Label 'mutation CreateGiftCard($input: GiftCardCreateInput!) {giftCardCreate(input: $input) {giftCard {id} userErrors {message field code}}}', Locked = true;
         UpdateQueryTok: Label 'mutation UpdateGiftCard($id: ID!, $input: GiftCardUpdateInput!) {giftCardUpdate(id: $id, input: $input) {giftCard {id} userErrors {message field}}}', Locked = true;
     begin
@@ -267,46 +279,133 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         if Voucher."Ending Date" <> 0DT then
             VoucherJson.Add('expiresOn', Format(DT2Date(Voucher."Ending Date"), 0, 9));
 
-        if (ShopifyGiftCardID = '') and Voucher."Spfy Send from Shopify" then begin
-            if Voucher."Customer No." <> '' then
-                if Customer.Get(Voucher."Customer No.") then begin
-                    ShopifyBillToCustGID := SpfyAssignedIDMgt.GetAssignedShopifyID(Customer.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-                    if ShopifyBillToCustGID <> '' then
-                        ShopifyBillToCustGID := StrSubstNo('gid://shopify/Customer/%1', ShopifyBillToCustGID)
-                    else begin
-                        If Customer."E-Mail" = '' then
-                            Customer."E-Mail" := Voucher."E-mail";
-                        If Customer."E-Mail" <> '' then
-                            ShopifyBillToCustGID := SpfySendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
-                    end;
-                    if ShopifyBillToCustGID <> '' then
-                        VoucherJson.Add('customerId', ShopifyBillToCustGID);
-                end;
-
-            if Voucher."Spfy Recipient E-mail" <> '' then begin
-                Clear(Customer);
-                Customer."E-Mail" := Voucher."Spfy Recipient E-mail";
-                Customer.Name := CopyStr(Voucher."Spfy Recipient Name", 1, MaxStrLen(Customer.Name));
-                Customer."Name 2" := CopyStr(Voucher."Spfy Recipient Name", MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2"));
-
-                ShopifyShipToCustGID := SpfySendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
-
-                RecipientAttributesJson.Add('id', ShopifyShipToCustGID);
-                if Voucher."Voucher Message" <> '' then
-                    RecipientAttributesJson.Add('message', Voucher."Voucher Message");
-                RecipientPreferredName := SpfySendCustomers.GetFullName(Customer.Name, Customer."Name 2");
-                if RecipientPreferredName <> '' then
-                    RecipientAttributesJson.Add('preferredName', RecipientPreferredName);
-                if Voucher."Spfy Send on" <> 0DT then
-                    if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
-                        RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
-                VoucherJson.Add('recipientAttributes', RecipientAttributesJson);
-            end;
-        end;
+        if (ShopifyGiftCardID = '') and Voucher."Spfy Send from Shopify" then
+            AddGiftCardCustomerAndRecipient(Voucher, ShopifyStoreCode, VoucherJson);
 
         VariablesJson.Add('input', VoucherJson);
         RequestJson.Add('variables', VariablesJson);
         RequestJson.WriteTo(QueryStream);
+    end;
+
+    /// <summary>
+    /// Attaches the buyer (customerId) and, when there is a recipient notification to send, the recipient
+    /// (recipientAttributes) to a gift card create request.
+    /// Shopify notifies the customer named in customerId. The Admin API version we call describes that field
+    /// as "The ID of the customer who will receive the gift card", and its giftCardSendNotificationToCustomer
+    /// mutation exists to "resend the purchase confirmation", which presupposes one was already sent. A later
+    /// schema than ours says it outright, with a notify field defaulting to true that governs "notifications
+    /// to the customer and recipient". So the buyer's own id is what delivers the gift card to the buyer.
+    /// recipientAttributes is a second notification, sent from a different Shopify template: the customerId
+    /// mail reads as a purchase confirmation, the recipient mail as "you have received a gift card". It is
+    /// attached in the two cases where the user asked for it, and naming the buyer in both fields is one of
+    /// them rather than something to be prevented:
+    ///  - the buyer nominated a recipient, whoever that turns out to be. A buyer who nominates their own
+    ///    address wants the recipient mail too, typically to pass it on themselves rather than hand us the
+    ///    real recipient's address.
+    ///  - the buyer nominated nobody but wrote a message or set a send date. Shopify carries message and
+    ///    sendNotificationAt only inside recipientAttributes, so there is nowhere else to put them.
+    /// The gift card is what the buyer paid for, so resolving their id matters: with no customerId and no
+    /// recipient, Shopify has nobody to notify and the card is created but never sent.
+    /// </summary>
+    local procedure AddGiftCardCustomerAndRecipient(Voucher: Record "NPR NpRv Voucher"; ShopifyStoreCode: Code[20]; var VoucherJson: JsonObject)
+    var
+        BuyerEmail: Text;
+        BuyerName: Text;
+        PersonalMessage: Text;
+        RecipientEmail: Text;
+        RecipientName: Text;
+        ShopifyBillToCustGID: Text;
+        ShopifyShipToCustGID: Text;
+        NominationExists: Boolean;
+        NomineeIsTheBuyer: Boolean;
+        ScheduleTheSend: Boolean;
+        RecipientGIDMissingErr: Label 'The gift card recipient for voucher %1 resolved to a blank Shopify customer id although the customer was to be created when missing. This is a programming bug.', Locked = true;
+    begin
+        // Trim everything: whitespace-only fields must not count as a nomination or a message.
+        BuyerEmail := Voucher."E-mail".Trim();
+        BuyerName := _SpfySendCustomers.GetFullName(Voucher.Name, Voucher."Name 2");  //GetFullName trims
+        RecipientEmail := Voucher."Spfy Recipient E-mail".Trim();
+        RecipientName := Voucher."Spfy Recipient Name".Trim();
+        PersonalMessage := Voucher."Voucher Message".Trim();
+        NominationExists := RecipientEmail <> '';
+        // Read once; both decisions below must agree.
+        ScheduleTheSend := ScheduledSendIsInTheFuture(Voucher);
+        // Against the address the buyer resolves to, not the voucher's own field, which is only the last of
+        // three candidates.
+        if NominationExists then
+            NomineeIsTheBuyer :=
+                UpperCase(RecipientEmail) = UpperCase(_SpfySendCustomers.GetCustomerEmail(Voucher."Customer No.", ShopifyStoreCode, BuyerEmail));
+
+        // Create the buyer only when they are the one being notified. When somebody else was nominated the
+        // buyer's id earns nothing but a duplicate confirmation, and an address that matches nothing would
+        // leave a stray Shopify customer behind, so an existing id is used and none is created.
+        // Exception: if the nominee is the buyer, create them here, since the recipient pass would create
+        // them anyway without a BC link.
+        ShopifyBillToCustGID :=
+            _SpfySendCustomers.GetShopifyCustomerGID(
+                Voucher."Customer No.", ShopifyStoreCode, BuyerEmail, BuyerName, (not NominationExists) or NomineeIsTheBuyer);
+        if ShopifyBillToCustGID <> '' then
+            VoucherJson.Add('customerId', ShopifyBillToCustGID);
+
+        if not NominationExists then begin
+            // customerId alone delivers the gift card. Name the buyer a second time only for something
+            // recipientAttributes is the sole carrier of, and only when there is an id to hang it on.
+            if (ShopifyBillToCustGID <> '') and HasSendInstructions(PersonalMessage, ScheduleTheSend) then
+                AddRecipientAttributes(Voucher, ShopifyBillToCustGID, BuyerName, PersonalMessage, ScheduleTheSend, VoucherJson);
+            exit;
+        end;
+
+        // A nominee who is the buyer resolves to the id already in hand, so Shopify is not searched twice and
+        // both fields carry the one id.
+        if NomineeIsTheBuyer and (ShopifyBillToCustGID <> '') then begin
+            ShopifyShipToCustGID := ShopifyBillToCustGID;
+            // Fall back to the buyer's name when the nomination has none.
+            if RecipientName = '' then
+                RecipientName := BuyerName;
+        end else
+            ShopifyShipToCustGID := _SpfySendCustomers.GetShopifyCustomerGID('', ShopifyStoreCode, RecipientEmail, RecipientName, true);
+
+        // Defensive: Shopify rejects a blank recipient id. Raises rather than exits because customerId is
+        // already on the request, so a quiet exit would drop the recipient and still report success.
+        if ShopifyShipToCustGID = '' then
+            Error(RecipientGIDMissingErr, Voucher."No.");
+
+        AddRecipientAttributes(Voucher, ShopifyShipToCustGID, RecipientName, PersonalMessage, ScheduleTheSend, VoucherJson);
+    end;
+
+    /// <summary>
+    /// A message or a future send date needs recipientAttributes; a name alone does not.
+    /// </summary>
+    local procedure HasSendInstructions(PersonalMessage: Text; ScheduleTheSend: Boolean): Boolean
+    begin
+        exit((PersonalMessage <> '') or ScheduleTheSend);
+    end;
+
+    /// <summary>
+    /// Whether "Spfy Send on" is far enough ahead for Shopify to act on it. A date already past, or within
+    /// the next minute, would have Shopify send immediately, so it is not passed on at all.
+    /// </summary>
+    local procedure ScheduledSendIsInTheFuture(Voucher: Record "NPR NpRv Voucher"): Boolean
+    var
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+    begin
+        if Voucher."Spfy Send on" = 0DT then
+            exit(false);
+        exit(Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60));
+    end;
+
+    local procedure AddRecipientAttributes(Voucher: Record "NPR NpRv Voucher"; ShopifyShipToCustGID: Text; RecipientName: Text; PersonalMessage: Text; ScheduleTheSend: Boolean; var VoucherJson: JsonObject)
+    var
+        RecipientAttributesJson: JsonObject;
+    begin
+        RecipientAttributesJson.Add('id', ShopifyShipToCustGID);
+        if PersonalMessage <> '' then
+            RecipientAttributesJson.Add('message', PersonalMessage);
+        if RecipientName <> '' then
+            RecipientAttributesJson.Add('preferredName', RecipientName);
+        if ScheduleTheSend then
+            RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
+        VoucherJson.Add('recipientAttributes', RecipientAttributesJson);
     end;
 
     local procedure UpdateVoucherWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken)
@@ -357,7 +456,6 @@ codeunit 6184820 "NPR Spfy Send Voucher"
     local procedure GetShopifyGiftCard(VoucherNo: Code[20]; ShopifyGiftCardID: Text[30]; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
     var
         NcTask: Record "NPR Nc Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
@@ -373,7 +471,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson.WriteTo(QueryStream);
 
         ClearLastError();
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
+        if not GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse) then
             Error(GiftCardQueryFailedErr, VoucherNo, GetLastErrorText());
     end;
 
