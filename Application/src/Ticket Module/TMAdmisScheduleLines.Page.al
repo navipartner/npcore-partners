@@ -65,6 +65,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Capacity Control field';
                 }
+                field("Notify At Remaining Qty."; Rec."Notify At Remaining Qty.")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies how many places may remain on a time slot before each change to it raises the ticket capacity webhook. Zero disables the webhook for this admission schedule. This is the value the webhook reads, whichever level it was set on.';
+                }
                 field("Concurrency Code"; Rec."Concurrency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;

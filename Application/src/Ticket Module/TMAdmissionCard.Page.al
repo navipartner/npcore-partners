@@ -116,6 +116,12 @@ page 6150765 "NPR TM Admission Card"
                     ToolTip = 'Specifies whether it???s possible to sell an indefinite number of tickets, if the capacity is limited by the number of seats in the admission, or if the capacity is governed by the number of entries/the difference between the number of admitted and departed customers.';
                     Editable = _ManagedByAdmission;
                 }
+                field("Notify At Remaining Qty."; Rec."Notify At Remaining Qty.")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies how many places may remain on a time slot before each change to it raises the ticket capacity webhook. Zero disables the webhook for this admission.';
+                    Editable = _ManagedByAdmission;
+                }
                 field("Prebook From"; Rec."Prebook From")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

@@ -99,6 +99,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
     local procedure Handle(ApiFunction: Enum "NPR TicketingApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         TicketingApiHandler: Codeunit "NPR TicketingApiHandler";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         StartTime: Time;
         ResponseMessage: Text;
         CallStack: Text;
@@ -125,6 +126,8 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
             Span.Finish();
             exit(Response);
         end;
+
+        CapacityWebHook.ClearTouchedEntries();
 
         // When the code throws an error, the response is not set by the handler
         ResponseMessage := GetLastErrorText();

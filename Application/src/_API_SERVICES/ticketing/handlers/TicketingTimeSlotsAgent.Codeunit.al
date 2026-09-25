@@ -685,6 +685,11 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         if (CapacityControl = Admission."Capacity Control"::"NONE") then
             exit;
 
+        // Both numbers are this ticket product's share of the slot, so a consumer can render one against the
+        // other without knowing how the share is configured. The capacity webhook reports the admission total
+        // instead, having no product to scale by, so the two ceilings differ wherever a share is in play.
+        ResponseJson.AddProperty('maxCapacity', MaxCapacity);
+
         CurrentCapacity := _TicketManagement.CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntry."Entry No.");
         RemainingCapacity := MaxCapacity - CurrentCapacity;
         if (RemainingCapacity < 0) then

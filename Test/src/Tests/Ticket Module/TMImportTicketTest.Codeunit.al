@@ -7,6 +7,7 @@ codeunit 85174 "NPR TM ImportTicketTest"
     [TestPermissions(TestPermissions::Disabled)]
     procedure ImportSingleTicket()
     var
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         ItemNo: Code[20];
         Import: Codeunit "NPR TM Import Ticket Facade";
         ResponseMessage: Text;
@@ -22,8 +23,13 @@ codeunit 85174 "NPR TM ImportTicketTest"
         Schedules.Get('ALL_DAY', EventTime);
 
         CreateTicketsToImport(ItemNo, Today(), CalcDate('<+5D>'), EventTime, 1, 1, true, TempTicketImport, TempTicketImportLine);
+        CapacityWebHook.ClearLastFlushedEntries();
         Success := Import.ImportTicketsFromJson(GenerateJson(TempTicketImport, TempTicketImportLine), false, ResponseMessage, JobId);
         Assert.AreEqual(true, Success, ResponseMessage);
+
+        // The import path issues per request line and flushes at the import boundary, not at the token,
+        // so the flush record is what shows an imported ticket reported its slot.
+        Assert.IsTrue(CapacityWebHook.GetLastFlushedEntries().Count() > 0, 'Importing a ticket must report the slot to the capacity webhook.');
 
         ValidateLog(JobId, Success, 1 * 1, ResponseMessage);
         ValidateHeader(JobId, Success, TempTicketImport);

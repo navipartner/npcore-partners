@@ -10,6 +10,7 @@ permissionset 6014416 "NPR All Webhooks"
         codeunit "NPR Retail Voucher Webhooks" = X,
         codeunit "NPR POS Webhooks" = X,
         codeunit "NPR MM MembershipWebHooks" = X,
-        codeunit "NPR Entria Integr. Webhooks" = X;
+        codeunit "NPR Entria Integr. Webhooks" = X,
+        codeunit "NPR TM Ticket Webhooks" = X;
 }
 #endif

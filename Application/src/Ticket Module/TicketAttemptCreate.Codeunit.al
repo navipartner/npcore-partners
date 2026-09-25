@@ -47,6 +47,7 @@
 
     local procedure InvokeAttemptAction(var ResponseMessage: Text): Boolean
     var
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         IsSuccess: Boolean;
     begin
 
@@ -54,8 +55,10 @@
         ClearLastError();
 
         IsSuccess := _TicketAttemptCreate.Run();
-        if (not IsSuccess) then
+        if (not IsSuccess) then begin
             ResponseMessage := GetLastErrorText();
+            CapacityWebHook.ClearTouchedEntries();
+        end;
 
         if (_AttemptFunction = _AttemptFunction::REUSE) then
             _ReusedTokenId := _TicketAttemptCreate.GetReusedTokenId();

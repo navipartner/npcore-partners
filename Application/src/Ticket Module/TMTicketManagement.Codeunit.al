@@ -884,7 +884,6 @@
         ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntryNo, _TicketExecutionContext::ADMISSION, AllowAdmissionOverAllocation);
 
         OnAfterRegisterArrival(Ticket, AdmissionCode, AdmissionEntryNo);
-
         Span.Finish();
     end;
 
@@ -1032,6 +1031,7 @@
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         MaxCapacity: Integer;
         CapacityControl: Option;
         ResponseMessage: Text;
@@ -1097,6 +1097,8 @@
 
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", AdmissionSchEntry."Admission Start Date");
 
+        CapacityWebHook.TouchConsumedEntry(AdmissionSchEntry, DetailedTicketAccessEntry.Quantity);
+
     end;
 
     procedure CreateAdmissionAccessEntryDynamicTicket(var Ticket: Record "NPR TM Ticket"; TicketQty: Integer; AdmissionCode: Code[20]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; var TicketAccessEntry: Record "NPR TM Ticket Access Entry"; var AllowAdmissionOverAllocation: Enum "NPR TM Ternary")
@@ -1104,6 +1106,7 @@
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         MaxCapacity: Integer;
         CapacityControl: Option;
         ResponseMessage: Text;
@@ -1169,6 +1172,8 @@
 
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", AdmissionSchEntry."Admission Start Date");
 
+        CapacityWebHook.TouchConsumedEntry(AdmissionSchEntry, DetailedTicketAccessEntry.Quantity);
+
     end;
 
 
@@ -1180,9 +1185,12 @@
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         OldDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         NewDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         CapacityControl: Option;
         MaxCapacity: Integer;
         AllowAdmissionAllowOverAllocation: Enum "NPR TM Ternary";
+        TouchedQuantity: Decimal;
+        OriginalScheduleEntryNo: Integer;
     begin
 
         Ticket.Get(TicketNo);
@@ -1226,6 +1234,9 @@
         NewDetTicketAccessEntry.Open := false;
         NewDetTicketAccessEntry.Insert();
 
+        TouchedQuantity := OldDetTicketAccessEntry.Quantity;
+        OriginalScheduleEntryNo := OldDetTicketAccessEntry."External Adm. Sch. Entry No.";
+
         // link original entry with reversal entry instead of payment entry
         OldDetTicketAccessEntry."Closed By Entry No." := NewDetTicketAccessEntry."Entry No.";
         OldDetTicketAccessEntry.Open := false;
@@ -1254,6 +1265,9 @@
         ValidateTicketAdmissionReservationDate(TicketAccessEntry."Entry No.", NewAdmissionScheduleEntry."Entry No.");
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", NewAdmissionScheduleEntry."Admission Start Date");
 
+        CapacityWebHook.TouchConsumedEntry(NewAdmissionScheduleEntry, TouchedQuantity);
+        CapacityWebHook.TouchReleasedExternalEntry(OriginalScheduleEntryNo, TouchedQuantity);
+
     end;
 
     procedure RescheduleDynamicTicketAdmission(TicketNo: Code[20]; NewExtScheduleEntryNo: Integer; EnforceReschedulePolicy: Boolean; ReferenceDateTime: DateTime; POSSession: Codeunit "NPR POS Session"; var SalesTicketNo: Code[20]; EntryNo: Integer)
@@ -1264,9 +1278,12 @@
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         OldDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         NewDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary";
         CapacityControl: Option;
         MaxCapacity: Integer;
+        TouchedQuantity: Decimal;
+        OriginalScheduleEntryNo: Integer;
     begin
         Ticket.Get(TicketNo);
 
@@ -1312,6 +1329,9 @@
             NewDetTicketAccessEntry.Quantity := OldDetTicketAccessEntry.Quantity * -1;
             NewDetTicketAccessEntry.Insert();
 
+            TouchedQuantity := OldDetTicketAccessEntry.Quantity;
+            OriginalScheduleEntryNo := OldDetTicketAccessEntry."External Adm. Sch. Entry No.";
+
             // link original entry with reversal entry instead of payment entry
             OldDetTicketAccessEntry."Closed By Entry No." := NewDetTicketAccessEntry."Entry No.";
             OldDetTicketAccessEntry.Modify();
@@ -1338,6 +1358,12 @@
 
         ValidateTicketBaseCalendar(TicketAccessEntry."Admission Code", Ticket."Item No.", Ticket."Variant Code", NewAdmissionScheduleEntry."Admission Start Date");
 
+        // Recorded only after every check has passed - a refused reschedule rolls the rows back but not the buffer.
+        if (OriginalScheduleEntryNo <> 0) then begin
+            CapacityWebHook.TouchConsumedEntry(NewAdmissionScheduleEntry, TouchedQuantity);
+            CapacityWebHook.TouchReleasedExternalEntry(OriginalScheduleEntryNo, TouchedQuantity);
+        end;
+
     end;
 
     internal procedure ReplanReservation(DetTicketAccessEntryNo: Integer; NewExternalEntryNo: Integer; IncludeInitialEntry: Boolean): Boolean
@@ -1346,6 +1372,7 @@
         OldDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         NewDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         NewAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
         if (not OldDetTicketAccessEntry.Get(DetTicketAccessEntryNo)) then
             exit(false);
@@ -1391,6 +1418,9 @@
             OldDetTicketAccessEntry."Closed By Entry No." := NewDetTicketAccessEntry."Entry No.";
             OldDetTicketAccessEntry.Open := false;
             OldDetTicketAccessEntry.Modify();
+
+            CapacityWebHook.TouchConsumedEntry(NewAdmissionScheduleEntry, OldDetTicketAccessEntry.Quantity);
+            CapacityWebHook.TouchReleasedExternalEntry(OldDetTicketAccessEntry."External Adm. Sch. Entry No.", OldDetTicketAccessEntry.Quantity);
         end;
 
         exit(true);
@@ -1567,11 +1597,13 @@
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TicketBom: Record "NPR TM Ticket Admission BOM";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         TicketAccessEntryNo: Integer;
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
         PaidQty: Integer;
         CurrentQty: Integer;
         ExtAdmSchEntryNo: Integer;
+        InitialEntryExtSchEntryNo: Integer;
         QTY_CHANGE_NOT_ALLOWED: Label 'Ticket %1 has been used and quantity cannot be changed. %2 %3.';
         ENTRY_NOT_FOUND: Label 'Ticket %1 has been paid and quantity cannot be changed. %2 %3.';
     begin
@@ -1616,6 +1648,7 @@
 
             CurrentQty := DetTicketAccessEntry.Quantity;
             ExtAdmSchEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+            InitialEntryExtSchEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
 
             DetTicketAccessEntry.Quantity := NewTicketQuantity;
             DetTicketAccessEntry.Modify();
@@ -1640,7 +1673,11 @@
                 ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionOverAllocation);
             end;
 
+            CapacityWebHook.TouchConsumedExternalEntry(InitialEntryExtSchEntryNo, NewTicketQuantity - CurrentQty);
+
         until (TicketAccessEntry.Next() = 0);
+
+        CapacityWebHook.EmitTouchedEntries();
     end;
 
     local procedure RegisterDefaultAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"; ScannerStationId: Text[30]): Boolean
@@ -2745,7 +2782,6 @@
         AdmittedTicketAccessEntry.AdmittedTime := DT2Time(EventDateTime);
 
         AdmittedTicketAccessEntry.Modify();
-
         OnDetailedTicketEvent(AdmittedTicketAccessEntry);
         CloseReservationEntry(AdmittedTicketAccessEntry);
 
@@ -2950,6 +2986,7 @@
 
     local procedure RegisterCancel_Worker(TicketAccessEntryNo: Integer)
     var
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         CancelTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         OpenTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -3061,6 +3098,8 @@
                                 CancelTicketAccessEntry.Quantity := -QtyToCancel;
                                 CancelTicketAccessEntry."External Adm. Sch. Entry No." := InitialTicketAccessEntry."External Adm. Sch. Entry No.";
                                 CancelTicketAccessEntry.Insert(true);
+
+                                CapacityWebHook.TouchReleasedExternalEntry(CancelTicketAccessEntry."External Adm. Sch. Entry No.", QtyToCancel);
                             end;
                         end;
                 end;

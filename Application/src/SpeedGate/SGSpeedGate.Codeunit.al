@@ -146,6 +146,7 @@ codeunit 6185130 "NPR SG SpeedGate"
     internal procedure CheckAdmit(Token: Guid; Quantity: Integer; var ResponseMessage: Text): Boolean
     var
         ThisCodeunit: Codeunit "NPR SG SpeedGate";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
 
         ThisCodeunit.SetAdmitToken(Token, Quantity);
@@ -153,6 +154,10 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         if (ThisCodeunit.Run()) then
             exit(true);
+
+        // A gate session is long lived, and the rollback does not reach the capacity webhook's buffer. A
+        // quantity change that touched but failed before its own flush would otherwise be carried forward.
+        CapacityWebHook.ClearTouchedEntries();
 
         ResponseMessage := GetLastErrorText();
         MarkAsDenied(Token, _ApiErrors::denied_by_speedgate, ResponseMessage);

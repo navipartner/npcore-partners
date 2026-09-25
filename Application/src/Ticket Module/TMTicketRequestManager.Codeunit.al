@@ -214,6 +214,7 @@
     local procedure DetailedTicketAccessEntryDelete(TicketNo: Code[20])
     var
         DetailedTicketAccessEntry, DetailedTicketAccessEntryUpdate : Record "NPR TM Det. Ticket AccessEntry";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
 
         DetailedTicketAccessEntry.ReadIsolation := IsolationLevel::ReadUnCommitted;
@@ -225,6 +226,9 @@
             DetailedTicketAccessEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
             repeat
                 DetailedTicketAccessEntryUpdate.Get(DetailedTicketAccessEntry."Entry No.");
+                if (DetailedTicketAccessEntryUpdate.Type = DetailedTicketAccessEntryUpdate.Type::INITIAL_ENTRY) then
+                    CapacityWebHook.TouchReleasedExternalEntry(DetailedTicketAccessEntryUpdate."External Adm. Sch. Entry No.", DetailedTicketAccessEntryUpdate.Quantity);
+
                 DetailedTicketAccessEntryUpdate.Delete();
             until (DetailedTicketAccessEntry.Next() = 0);
         end;
@@ -347,6 +351,8 @@
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        DetailedTicketAccessEntryRelease: Record "NPR TM Det. Ticket AccessEntry";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -368,6 +374,13 @@
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetRange("Admission Code", TicketReservationRequest."Admission Code");
                     if TicketAccessEntry.FindFirst() then begin
+                        DetailedTicketAccessEntryRelease.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                        DetailedTicketAccessEntryRelease.SetFilter(Type, '=%1', DetailedTicketAccessEntryRelease.Type::INITIAL_ENTRY);
+                        if (DetailedTicketAccessEntryRelease.FindSet()) then
+                            repeat
+                                CapacityWebHook.TouchReleasedExternalEntry(DetailedTicketAccessEntryRelease."External Adm. Sch. Entry No.", DetailedTicketAccessEntryRelease.Quantity);
+                            until (DetailedTicketAccessEntryRelease.Next() = 0);
+
                         DetailedTicketAccessEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
                         DetailedTicketAccessEntry.DeleteAll();
                         TicketAccessEntry.Delete(true);
@@ -377,6 +390,8 @@
             until (TicketReservationRequest.Next() = 0);
 
         end;
+
+        CapacityWebHook.EmitTouchedEntries();
     end;
 
     local procedure ReverseInitialEntryStatistics(DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; MaxAccessEntryNo: Integer)
@@ -424,6 +439,7 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         RequestCount: Integer;
         NO_SCHEDULE_ENTRY: Label 'A schedule entry for admission %1 is missing and the settings prevents the system to select one for for you.';
     begin
@@ -456,6 +472,8 @@
 
             TicketReservationRequest.Modify();
             IssueTicketFromReservation(TicketReservationRequest);
+
+            CapacityWebHook.EmitTouchedEntries();
             exit(0);
         end;
 
@@ -468,6 +486,7 @@
             IssueTicketFromReservation(TicketReservationRequest);
         until (TicketReservationRequest.Next() = 0);
 
+        CapacityWebHook.EmitTouchedEntries();
         exit(0);
     end;
 
@@ -1384,6 +1403,7 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         DateTimeLbl: Label '%1 - %2', Locked = true;
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
 
         TicketReservationRequest.Reset();
@@ -1405,6 +1425,7 @@
         until (TicketReservationRequest.Next() = 0);
 
         OnAfterConfirmTicketChangeRequestPublisher(Token);
+        CapacityWebHook.EmitTouchedEntries();
 
     end;
 
@@ -1413,6 +1434,7 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         DateTimeLbl: Label '%1 - %2', Locked = true;
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
 
         TicketReservationRequest.Reset();
@@ -1434,6 +1456,7 @@
         until (TicketReservationRequest.Next() = 0);
 
         OnAfterConfirmTicketChangeRequestPublisher(Token);
+        CapacityWebHook.EmitTouchedEntries();
 
     end;
 
@@ -1469,6 +1492,7 @@
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
 
         // revoke a ticket request when a ticket has been issued. This will block the created tickets
@@ -1486,29 +1510,40 @@
 
         end;
 
+        CapacityWebHook.EmitTouchedEntries();
     end;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-    internal procedure ExpireReservationRequestsV2_Inline(): Integer
+    internal procedure ExpireReservationRequestsV2_Inline() ExpiredCount: Integer
     var
         TicketSetup: Record "NPR TM Ticket Setup";
-    begin
-        if (not TicketSetup.Get()) then
-            TicketSetup.Init();
-
-        if (not TicketSetup.ExpireReservationWithJobQueue) then
-            exit(ExpireReservationRequestsV2_Worker(30));
-    end;
-
-    internal procedure ExpireReservationRequestsV2_JobQueue(): Integer
-    var
-        TicketSetup: Record "NPR TM Ticket Setup";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
         if (not TicketSetup.Get()) then
             TicketSetup.Init();
 
         if (TicketSetup.ExpireReservationWithJobQueue) then
-            exit(ExpireReservationRequestsV2_Worker(30));
+            exit;
+
+        ExpiredCount := ExpireReservationRequestsV2_Worker(30);
+
+        CapacityWebHook.EmitTouchedEntries();
+    end;
+
+    internal procedure ExpireReservationRequestsV2_JobQueue() ExpiredCount: Integer
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
+    begin
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (not TicketSetup.ExpireReservationWithJobQueue) then
+            exit;
+
+        ExpiredCount := ExpireReservationRequestsV2_Worker(30);
+
+        CapacityWebHook.EmitTouchedEntries();
     end;
 
 

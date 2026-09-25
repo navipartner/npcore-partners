@@ -193,6 +193,7 @@ page 6151377 "NPR TM Replan Schedule"
                 var
                     DetTicketEntry: Record "NPR TM Det. Ticket AccessEntry";
                     TicketManagement: Codeunit "NPR TM Ticket Management";
+                    CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
                 begin
                     if (_TargetExternalEntryNo = 0) then
                         Error('Selected target time slot is not valid.');
@@ -206,6 +207,7 @@ page 6151377 "NPR TM Replan Schedule"
                         TicketManagement.ReplanReservation(DetTicketEntry."Entry No.", _TargetExternalEntryNo, _TargetIncludeInitialEntry);
                     until (DetTicketEntry.Next() = 0);
 
+                    CapacityWebHook.EmitTouchedEntries();
                 end;
             }
         }

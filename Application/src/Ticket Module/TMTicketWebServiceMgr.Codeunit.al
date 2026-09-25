@@ -107,6 +107,7 @@
         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         TicketCreated: Boolean;
         Line: Integer;
     begin
@@ -146,6 +147,8 @@
 
         if (not TicketCreated) then
             TicketRequestManager.DeleteReservationRequest(Token, false);
+
+        CapacityWebHook.EmitTouchedEntries();
 
         exit(TicketCreated);
     end;

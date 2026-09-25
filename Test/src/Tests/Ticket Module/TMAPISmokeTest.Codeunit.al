@@ -132,6 +132,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     [TestPermissions(TestPermissions::Disabled)]
     procedure ConfirmTicketReservation()
     var
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -154,8 +155,12 @@ codeunit 85013 "NPR TM API SmokeTest"
         NumberOfTicketOrders := Random(2) + 1;
         TicketQuantityPerOrder := Random(5) + 1;
 
+        CapacityWebHook.ClearLastFlushedEntries();
         ReservationOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Issuance flushes the buffer, so the flush record is what shows the touch sites fired.
+        Assert.IsTrue(CapacityWebHook.GetLastFlushedEntries().Count() > 0, 'Issuing tickets must report the slot to the capacity webhook.');
 
         // [Test]
         ExternalOrderNo := 'abc'; // Note: Without External Order No., the ticket will not be valid for arrival, capacity will be allocated only.
@@ -364,6 +369,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CancelReservedTicketReservation()
     var
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
         TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary;
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -411,8 +417,12 @@ codeunit 85013 "NPR TM API SmokeTest"
 
         // [Test]
         // Cancel is OK.
+        CapacityWebHook.ClearTouchedEntries();
         ReservationOk := TicketApiLibrary.CancelTicketReservation(ResponseToken, ScannerStation, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Cancelling releases capacity and nothing on this path flushes, so the release is still buffered.
+        Assert.IsTrue(CapacityWebHook.GetTouchedEntries().Count() > 0, 'Cancelling a reservation must report the released slot to the capacity webhook.');
 
         // Test
         // All ticket transactional data should be deleted

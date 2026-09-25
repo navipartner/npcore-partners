@@ -197,6 +197,15 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
                 }
+                field("Notify At Remaining Qty."; Rec."Notify At Remaining Qty.")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies how many places may remain on a time slot before each change to it raises the ticket capacity webhook. Zero disables the webhook for this schedule.';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
+                }
                 field("Unbookable Before Start (Secs)"; Rec."Unbookable Before Start (Secs)")
                 {
                     ApplicationArea = NPRTicketAdvanced;

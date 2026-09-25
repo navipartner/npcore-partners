@@ -132,10 +132,12 @@ codeunit 6185083 "NPR TicketingReservationAgent"
     internal procedure CancelReservation(Token: Code[100]) Response: Codeunit "NPR API Response"
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         ResponseJson: Codeunit "NPR Json Builder";
     begin
         TicketRequestManager.DeleteReservationTokenRequestV2(Token);
+        CapacityWebHook.EmitTouchedEntries();
 
         ResponseJson.StartObject()
             .AddProperty('token', Token)

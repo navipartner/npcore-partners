@@ -123,6 +123,17 @@
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
+        field(49; "Notify At Remaining Qty."; Integer)
+        {
+            Caption = 'Notify At Remaining Qty.';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+
+            trigger OnValidate()
+            begin
+                IfAllowOverride();
+            end;
+        }
         field(50; "Schedule Generated At"; Date)
         {
             Caption = 'Schedule Generated At';
@@ -369,6 +380,7 @@
         if (Admission."Capacity Limits By" = Admission."Capacity Limits By"::ADMISSION) then begin
             "Prebook Is Required" := Admission."Prebook Is Required";
             "Max Capacity Per Sch. Entry" := Admission."Max Capacity Per Sch. Entry";
+            "Notify At Remaining Qty." := Admission."Notify At Remaining Qty.";
             "Capacity Control" := Admission."Capacity Control";
             "Prebook From" := Admission."Prebook From";
 
@@ -395,6 +407,7 @@
         if (Admission."Capacity Limits By" = Admission."Capacity Limits By"::SCHEDULE) then begin
             "Prebook Is Required" := AdmissionSchedule."Prebook Is Required";
             "Max Capacity Per Sch. Entry" := AdmissionSchedule."Max Capacity Per Sch. Entry";
+            "Notify At Remaining Qty." := AdmissionSchedule."Notify At Remaining Qty.";
             "Capacity Control" := AdmissionSchedule."Capacity Control";
             "Prebook From" := AdmissionSchedule."Prebook From";
 

@@ -10,6 +10,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
         TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
         TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
         ImportTicket: Codeunit "NPR TM ImportTicketWorker";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         StartTime: Time;
         ImportDuration: Duration;
     begin
@@ -19,6 +20,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
         ImportTicket.SetImportBuffer(TempTicketImport, TempTicketImportLine);
         StartTime := Time;
         ImportTicket.Import();
+        CapacityWebHook.EmitTouchedEntries();
         ImportDuration := Time() - StartTime;
         LogImport(JobId, '', ImportDuration, TempTicketImportLine.Count(), true, '');
     end;
@@ -72,6 +74,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
         CallStack: Text;
         ImportPreview: Page "NPR TM ImportTicketsPreview";
         ImportTicket: Codeunit "NPR TM ImportTicketWorker";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         StartTime: Time;
         ImportDuration: Duration;
     begin
@@ -96,7 +99,10 @@ codeunit 6184689 "NPR TM ImportTicketControl"
             ResponseMessage := GetLastErrorText();
             CallStack := GetLastErrorCallStack();
             ImportTicket.CleanUpFailedImport(JobId);
+            CapacityWebHook.ClearTouchedEntries();
         end;
+
+        CapacityWebHook.EmitTouchedEntries();
 
         LogImport(JobId, FileName, ImportDuration, TempTicketImportLine.Count(), Imported, ResponseMessage);
         Commit();

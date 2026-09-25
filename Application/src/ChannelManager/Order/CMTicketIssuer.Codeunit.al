@@ -24,22 +24,26 @@ codeunit 6151055 "NPR CMTicketIssuer"
         var FailureMessage: Text): Boolean
     var
         ImportTicket: Codeunit "NPR TM ImportTicketWorker";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
         ClearLastError();
         ImportTicket.SetImportBuffer(TempImportHeader, TempImportLine);
         if (not ImportTicket.Run()) then begin
             FailureMessage := GetLastErrorText();
             ImportTicket.CleanUpFailedImport(JobId);
+            CapacityWebHook.ClearTouchedEntries();
             exit(false);
         end;
 
+        CapacityWebHook.EmitTouchedEntries();
+
         // TODO: Capacity hold for draft tickets.
-        //   Mirror the tour-reservation override at TMTicketBOM.Page.al MakeTourTicket
-        //   lines 426-434: close DetTicketAccessEntry rows of type INITIAL_ENTRY so unpaid
-        //   draft tickets count toward admission capacity. The "Initial Entry" flow field
-        //   on Admission Schedule Entry only sums closed entries — without this override a
-        //   draft order does not hold capacity until ConfirmOrder runs and FinalizePayment
-        //   closes the rows naturally.
+        //   Drafts already hold capacity: SALES sums "Initial Entry (All)", which has no Open filter,
+        //   so the import's unpaid INITIAL_ENTRY rows count from the moment they are written - the same
+        //   number ValidateTicketAdmissionCapacityExceeded refuses on. What they do not do is show in
+        //   the "Initial Entry" field on the Admission Schedule Entry page, which counts closed rows
+        //   only; the tour-reservation override at TMTicketBOM.Page.al MakeTourTicket exists for that
+        //   display, not for capacity.
         //   Open question: should CM drafts hold capacity at all, or only once confirmed?
         //   Capacity-limited interactions with OTA/CM partners are non-trivial — settle the
         //   policy with stakeholders before implementing. Until then a stale draft sitting
@@ -100,6 +104,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
     internal procedure DeleteTicketImportJob(JobId: Code[40])
     var
         ImportHeader: Record "NPR TM ImportTicketHeader";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
         Token: Text[100];
     begin
         if (JobId = '') then
@@ -117,6 +122,8 @@ codeunit 6151055 "NPR CMTicketIssuer"
 
         DeleteImportArchiveLinesByJobId(JobId);
         DeleteImportArchiveHeaderByJobId(JobId);
+
+        CapacityWebHook.EmitTouchedEntries();
     end;
 
     local procedure PatchConfirmedReservationsToCancelled(Token: Text[100])

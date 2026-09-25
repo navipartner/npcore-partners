@@ -98,6 +98,12 @@
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
+        field(49; "Notify At Remaining Qty."; Integer)
+        {
+            Caption = 'Notify At Remaining Qty.';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
         field(50; "Dependent Admission Code"; Code[20])
         {
             Caption = 'Dependent Admission Code';

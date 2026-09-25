@@ -5,5 +5,8 @@ permissionset 6014414 "NPR API Ticketing"
     Assignable = true;
     Caption = 'NPR API - Ticketing';
     IncludedPermissionSets = "NPR API Core";
+    Permissions =
+        Codeunit "NPR TM CapacityWebHook" = X,
+        Codeunit "NPR TM Ticket Webhooks" = X;
 }
 #endif

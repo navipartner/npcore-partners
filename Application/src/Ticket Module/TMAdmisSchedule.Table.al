@@ -230,6 +230,12 @@
             Caption = 'Bookable Passed Start (Secs)';
             DataClassification = CustomerContent;
         }
+        field(49; "Notify At Remaining Qty."; Integer)
+        {
+            Caption = 'Notify At Remaining Qty.';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
         field(70; "Notify Stakeholder"; Option)
         {
             Caption = 'Notify Stakeholder';
