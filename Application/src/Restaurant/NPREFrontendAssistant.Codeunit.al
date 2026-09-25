@@ -147,6 +147,8 @@
         if Method in
             ['RequestWaiterPadData',
              'RequestRestaurantLayout',
+             'RequestRestaurantViewSetup',
+             'RequestRestaurantViewUpdate',
              'RestaurantLayoutType',
              'RequestKitchenOrders',
              'RequestKDSData',
@@ -171,6 +173,11 @@
                 end;
             'RequestRestaurantLayout':
                 RefreshRestaurantLayout(FrontEnd, GetRestaurantCode(Context, false));
+            'RequestRestaurantViewSetup':
+                RefreshRestaurantViewSetup(FrontEnd, GetRestaurantCode(Context, false));
+            'RequestRestaurantViewUpdate':
+                RefreshRestaurantViewUpdate(
+                    FrontEnd, GetRestaurantCode(Context, false), _JsonHelper.GetJText(Context.AsToken(), 'layoutVersion', false));
             'RestaurantLayoutType':
                 GetRestaurantLayoutType(Context, FrontEnd);
             'RequestKitchenOrders':
@@ -215,19 +222,35 @@
     internal procedure RefreshWaiterPadData(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20])
     var
         Seating: Record "NPR NPRE Seating";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+    begin
+        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.refresh-wp-data');
+
+        PushWaiterPadData(FrontEnd, RestaurantCode, Seating);
+
+        Seating.MarkedOnly(true);
+        if not Seating.IsEmpty() then
+            RefreshStatus(FrontEnd, RestaurantCode, '', Seating.GetSelectionFilter());
+
+        Span.Finish();
+    end;
+
+    /// <summary>
+    /// Pushes the pads and their seating links. Seatings that carry an open pad come back marked, so the caller can
+    /// follow up with a status refresh narrowed to them.
+    /// </summary>
+    local procedure PushWaiterPadData(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; var Seating: Record "NPR NPRE Seating")
+    var
         SeatingLocation: Record "NPR NPRE Seating Location";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         Request: Codeunit "NPR Front-End: Generic";
-        Sentry: Codeunit "NPR Sentry";
-        Span: Codeunit "NPR Sentry Span";
         WaiterPadList: JsonArray;
         WaiterPadContent: JsonObject;
         WaiterPadSeatingList: JsonArray;
         WaiterPadSeatingContent: JsonObject;
     begin
-        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.refresh-wp-data');
-
         Request.SetMethod('UpdateWaiterPadData');
 
         if RestaurantCode <> '' then begin
@@ -251,7 +274,6 @@
                                 Clear(WaiterPadSeatingContent);
                                 Clear(WaiterPadContent);
                                 WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.");
-                                WaiterPad.CalcFields("Status Description FF");
 
                                 WaiterPadSeatingContent.Add('restaurantId', SeatingLocation."Restaurant Code");
                                 WaiterPadSeatingContent.Add('locationId', SeatingLocation.Code);
@@ -278,28 +300,83 @@
         Request.GetContent().Add('waiterPadSeatingLinks', WaiterPadSeatingList);
 
         FrontEnd.InvokeFrontEndMethod2(Request);
-
-        Seating.MarkedOnly(true);
-        if not Seating.IsEmpty() then
-            RefreshStatus(FrontEnd, RestaurantCode, '', Seating.GetSelectionFilter());
-
-        Span.Finish();
     end;
 
     local procedure RefreshRestaurantLayout(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
     var
-        FlowStatus: Record "NPR NPRE Flow Status";
-        LocationLayout: Record "NPR NPRE Location Layout";
-        Restaurant: Record "NPR NPRE Restaurant";
-        TempRestaurant: Record "NPR NPRE Restaurant" temporary;
-        Seating: Record "NPR NPRE Seating";
-        SeatingLocation: Record "NPR NPRE Seating Location";
-        UserSetup: Record "User Setup";
-        Request: Codeunit "NPR Front-End: Generic";
-        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         StatusResolver: Codeunit "NPR NPRE View Status Resolver";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+    begin
+        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.refresh-layout');
+
+        StatusResolver.SetRestaurantScope(RestaurantCode);
+        PushRestaurantLayout(FrontEnd, RestaurantCode, StatusResolver);
+        PushStatusUpdate(FrontEnd, StatusResolver, RestaurantCode, '', '');
+
+        Span.Finish();
+    end;
+
+    /// <summary>
+    /// Loads the whole restaurant view. Called once, when the front end first mounts the view in a POS session.
+    /// </summary>
+    internal procedure RefreshRestaurantViewSetup(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
+    var
+        Seating: Record "NPR NPRE Seating";
+        StatusResolver: Codeunit "NPR NPRE View Status Resolver";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+    begin
+        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.setup');
+
+        StatusResolver.SetRestaurantScope(RestaurantCode);
+        PushRestaurantLayout(FrontEnd, RestaurantCode, StatusResolver);
+        PushWaiterPadData(FrontEnd, RestaurantCode, Seating);
+        PushStatusUpdate(FrontEnd, StatusResolver, RestaurantCode, '', '');
+
+        Span.Finish();
+    end;
+
+    /// <summary>
+    /// Brings the restaurant view up to date. Called on every later switch back into the view, and by any polling the
+    /// front end does while it is open.
+    /// </summary>
+    /// <param name="KnownLayoutVersion">The layout version the front end was last given. Blank on a caller that has none.</param>
+    internal procedure RefreshRestaurantViewUpdate(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; KnownLayoutVersion: Text)
+    var
+        Seating: Record "NPR NPRE Seating";
+        StatusResolver: Codeunit "NPR NPRE View Status Resolver";
+        Sentry: Codeunit "NPR Sentry";
+        Span: Codeunit "NPR Sentry Span";
+    begin
+        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.update');
+
+        StatusResolver.SetRestaurantScope(RestaurantCode);
+
+        // Self-healing rather than reporting staleness back: the front end echoes the version it holds and never has to
+        // reason about whether it is current. A layout edited in Business Central or on another POS arrives here as a
+        // version that no longer matches, and the full layout goes out ahead of the operational payload.
+        if (KnownLayoutVersion = '') or (KnownLayoutVersion <> CurrentLayoutVersion(RestaurantCode, StatusResolver)) then
+            PushRestaurantLayout(FrontEnd, RestaurantCode, StatusResolver);
+
+        PushWaiterPadData(FrontEnd, RestaurantCode, Seating);
+        PushStatusUpdate(FrontEnd, StatusResolver, RestaurantCode, '', '');
+
+        Span.Finish();
+    end;
+
+    /// <summary>
+    /// Assembles and pushes the static part of the restaurant view: the restaurants on offer, their seating locations,
+    /// the components drawn on each, and the status catalogue the front end paints from.
+    /// </summary>
+    local procedure PushRestaurantLayout(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; var StatusResolver: Codeunit "NPR NPRE View Status Resolver")
+    var
+        FlowStatus: Record "NPR NPRE Flow Status";
+        LocationLayout: Record "NPR NPRE Location Layout";
+        TempRestaurant: Record "NPR NPRE Restaurant" temporary;
+        Seating: Record "NPR NPRE Seating";
+        SeatingLocation: Record "NPR NPRE Seating Location";
+        Request: Codeunit "NPR Front-End: Generic";
         ComponentList: JsonArray;
         LocationList: JsonArray;
         RestaurantList: JsonArray;
@@ -311,31 +388,34 @@
         SeatingFrontEndSetup: JsonObject;
         StatusContent: JsonObject;
         Instr: InStream;
+        LayoutVersion: Text;
         PropertiesString: Text;
         AddToList: Boolean;
         IsTable: Boolean;
     begin
-        Sentry.StartSpan(Span, 'bc.restaurant.pos-restview.refresh-layout');
-
-        if not UserSetup.Get(UserId()) then
-            Clear(UserSetup);
+        GetRestaurantsInScope(RestaurantCode, TempRestaurant);
         if RestaurantCode <> '' then begin
             SeatingLocation.FilterGroup(2);
             SeatingLocation.SetRange("Restaurant Code", RestaurantCode);
             SeatingLocation.FilterGroup(0);
-
-            if not UserSetup."NPR Allow Restaurant Switch" then begin
-                Restaurant.Get(RestaurantCode);
-                TempRestaurant := Restaurant;
-                TempRestaurant.Insert();
-            end;
-        end;
-        if TempRestaurant.IsEmpty() then begin
-            SetupProxy.GetRestaurantList(TempRestaurant);
-            if UserSetup."NPR Restaurant Switch Filter" <> '' then
-                TempRestaurant.SetFilter(Code, UserSetup."NPR Restaurant Switch Filter");
         end;
         SeatingLocation.SetCurrentKey("Restaurant Code");
+
+        ReportMissingRestaurant(RestaurantCode, TempRestaurant);
+
+        // Three passes, and the order is the whole point.
+        //
+        // The backfill writes, and those writes move the timestamps the version is built from, so the version cannot be
+        // taken before it. The assembly reads, and a setup change committed by another session while it runs would be
+        // absent from the payload, so the version cannot be taken after it either: the front end would store an older
+        // payload under a current token and every later update would match, pinning the stale layout on screen until
+        // some unrelated edit moved the timestamp again.
+        //
+        // Between the two is the only safe place. A change that lands during assembly then makes the payload newer than
+        // its token, which costs one redundant reload on the next update and corrects itself.
+        BackfillLayoutRows(TempRestaurant, SeatingLocation);
+        LayoutVersion := CurrentLayoutVersion(RestaurantCode, StatusResolver);
+
         Request.SetMethod('UpdateRestaurantLayout');
 
         if TempRestaurant.FindSet() then
@@ -352,26 +432,6 @@
                         LocationContent.Add('id', SeatingLocation.Code);
                         LocationContent.Add('caption', SeatingLocation.Description);
                         LocationContent.Add('restaurantId', SeatingLocation."Restaurant Code");
-
-                        Seating.SetCurrentKey("Seating Location");
-                        Seating.SetRange("Seating Location", SeatingLocation.Code);
-                        if Seating.FindSet() then
-                            repeat
-                                if not LocationLayout.Get(Seating.Code) then begin
-                                    LocationLayout.Code := Seating.Code;
-                                    LocationLayout.Type := 'table';
-                                    LocationLayout.Insert();
-                                end;
-                                if (LocationLayout."Seating No." <> Seating."Seating No.") or
-                                   (LocationLayout.Description <> Seating.Description) or
-                                   (LocationLayout."Seating Location" <> SeatingLocation.Code)
-                                then begin
-                                    LocationLayout."Seating No." := Seating."Seating No.";
-                                    LocationLayout.Description := Seating.Description;
-                                    LocationLayout."Seating Location" := SeatingLocation.Code;
-                                    LocationLayout.Modify();
-                                end;
-                            until Seating.Next() = 0;
 
                         Clear(ComponentList);
                         LocationLayout.SetCurrentKey("Seating Location");
@@ -442,11 +502,122 @@
         Request.GetContent().Add('locations', LocationList);
         Request.GetContent().Add('statuses', StatusContent);
 
+        // Emitted on every layout push, not only the ones the new methods make. SetRestaurant reaches this through
+        // RefreshRestaurantLayout when an operator picks a restaurant or saves a floor plan, and a migrated front end
+        // receiving a layout with no version beside it has no good option: keeping its old token pins a token that the
+        // save just invalidated, and dropping it turns the optimisation off for the rest of the session. An unmigrated
+        // front end ignores a JSON property it does not know.
+        Request.GetContent().Add('layoutVersion', LayoutVersion);
+
         FrontEnd.InvokeFrontEndMethod2(Request);
+    end;
 
-        PushStatusUpdate(FrontEnd, StatusResolver, RestaurantCode, '', '');
+    /// <summary>
+    /// Materialises a layout row for any seating that lacks one, so the assembly pass that follows is a pure read.
+    /// </summary>
+    local procedure BackfillLayoutRows(var TempRestaurant: Record "NPR NPRE Restaurant" temporary; var SeatingLocation: Record "NPR NPRE Seating Location")
+    var
+        LocationLayout: Record "NPR NPRE Location Layout";
+        Seating: Record "NPR NPRE Seating";
+    begin
+        if not TempRestaurant.FindSet() then
+            exit;
+        repeat
+            SeatingLocation.SetRange("Restaurant Code", TempRestaurant.Code);
+            if SeatingLocation.FindSet() then
+                repeat
+                    Seating.SetCurrentKey("Seating Location");
+                    Seating.SetRange("Seating Location", SeatingLocation.Code);
+                    if Seating.FindSet() then
+                        repeat
+                            // The whole row is written on the insert rather than left for the sync below to correct.
+                            // Inserting a blank "Seating Location" and fixing it a moment later cost two writes per
+                            // backfilled seating and two passes through the subscriber that stamps the restaurant.
+                            if not LocationLayout.Get(Seating.Code) then begin
+                                LocationLayout.Init();
+                                LocationLayout.Code := Seating.Code;
+                                LocationLayout.Type := 'table';
+                                LocationLayout."Seating No." := Seating."Seating No.";
+                                LocationLayout.Description := Seating.Description;
+                                LocationLayout."Seating Location" := SeatingLocation.Code;
+                                LocationLayout.Insert();
+                            end else
+                                if (LocationLayout."Seating No." <> Seating."Seating No.") or
+                                   (LocationLayout.Description <> Seating.Description) or
+                                   (LocationLayout."Seating Location" <> SeatingLocation.Code)
+                                then begin
+                                    LocationLayout."Seating No." := Seating."Seating No.";
+                                    LocationLayout.Description := Seating.Description;
+                                    LocationLayout."Seating Location" := SeatingLocation.Code;
+                                    LocationLayout.Modify();
+                                end;
+                        until Seating.Next() = 0;
+                until SeatingLocation.Next() = 0;
+        until TempRestaurant.Next() = 0;
+    end;
 
-        Span.Finish();
+    /// <summary>
+    /// Reports a request naming a restaurant that is not there. The view degrades to an empty floor plan rather than
+    /// erroring, so without this the only trace would be a till showing nothing.
+    /// </summary>
+    local procedure ReportMissingRestaurant(RestaurantCode: Code[20]; var TempRestaurant: Record "NPR NPRE Restaurant" temporary)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        MissingRestaurantTok: Label 'The POS restaurant view was requested for restaurant %1, which does not exist. An empty floor plan was pushed instead.', Locked = true;
+    begin
+        if RestaurantCode = '' then
+            exit;
+        if not TempRestaurant.IsEmpty() then
+            exit;
+        Sentry.AddError(StrSubstNo(MissingRestaurantTok, RestaurantCode));
+    end;
+
+    /// <summary>
+    /// The restaurants the front end may switch between, which is the whole list unless the user is pinned to one.
+    /// </summary>
+    local procedure GetRestaurantsInScope(RestaurantCode: Code[20]; var TempRestaurant: Record "NPR NPRE Restaurant" temporary)
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+        UserSetup: Record "User Setup";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+    begin
+        if not UserSetup.Get(UserId()) then
+            Clear(UserSetup);
+
+        if (RestaurantCode <> '') and not UserSetup."NPR Allow Restaurant Switch" then begin
+            // A pinned restaurant that no longer exists leaves the list empty instead of erroring. The update method is
+            // called on every switch back into the view and may be polled while it is open, so a deleted restaurant
+            // would otherwise throw on every tick rather than once.
+            if Restaurant.Get(RestaurantCode) then begin
+                TempRestaurant := Restaurant;
+                TempRestaurant.Insert();
+            end;
+            // Returns here even when nothing was found. Falling through would hand a POS that is pinned to one
+            // restaurant the full list, and with it another restaurant's floor plan.
+            exit;
+        end;
+
+        if TempRestaurant.IsEmpty() then begin
+            SetupProxy.GetRestaurantList(TempRestaurant);
+            if UserSetup."NPR Restaurant Switch Filter" <> '' then
+                TempRestaurant.SetFilter(Code, UserSetup."NPR Restaurant Switch Filter");
+        end;
+    end;
+
+    /// <summary>
+    /// A token covering everything the layout payload is assembled from. The front end hands back the one it last
+    /// received and gets a fresh layout whenever it no longer matches.
+    /// </summary>
+    local procedure CurrentLayoutVersion(RestaurantCode: Code[20]; var StatusResolver: Codeunit "NPR NPRE View Status Resolver"): Text
+    var
+        TempRestaurant: Record "NPR NPRE Restaurant" temporary;
+        SetupVersion: Codeunit "NPR NPRE View Setup Version";
+        StatusSetupLastModifiedAt: DateTime;
+        StatusSetupRowCount: Integer;
+    begin
+        GetRestaurantsInScope(RestaurantCode, TempRestaurant);
+        StatusResolver.GetStatusSetupFingerprint(StatusSetupRowCount, StatusSetupLastModifiedAt);
+        exit(SetupVersion.Calculate(RestaurantCode, TempRestaurant, StatusSetupRowCount, StatusSetupLastModifiedAt));
     end;
 
     local procedure GetRestaurantLayoutType(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -556,12 +727,17 @@
     var
         StatusResolver: Codeunit "NPR NPRE View Status Resolver";
     begin
+        // Most callers here are refreshing one table after a status tap, or the handful a waiter pad touches. Handing
+        // the resolver that scope keeps it from reading every open link in the company to answer for one seating, which
+        // is the shape the per-seating reads it replaced already had right.
+        StatusResolver.SetSeatingFilter(SeatingFilter);
         PushStatusUpdate(FrontEnd, StatusResolver, RestaurantFilter, SeatingLocationFilter, SeatingFilter);
     end;
 
     /// <summary>
-    /// Takes the resolver from the caller so that a refresh which has already resolved statuses while assembling its own
-    /// payload does not resolve them a second time for this push.
+    /// Takes the resolver from the caller so that a refresh which has already built its own payload does not load the
+    /// status and colour setup a second time for this push. The per-seating resolution itself does run again, since the
+    /// resolver caches the sets it reads rather than the answers it gives; the saving is the database work behind them.
     /// </summary>
     local procedure PushStatusUpdate(FrontEnd: Codeunit "NPR POS Front End Management"; var StatusResolver: Codeunit "NPR NPRE View Status Resolver"; RestaurantFilter: Text; SeatingLocationFilter: Text; SeatingFilter: Text)
     var

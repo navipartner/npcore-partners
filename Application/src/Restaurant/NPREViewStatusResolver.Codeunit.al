@@ -1,4 +1,4 @@
-codeunit 6151126 "NPR NPRE View Status Resolver"
+﻿codeunit 6151126 "NPR NPRE View Status Resolver"
 {
     Access = Internal;
 
@@ -24,15 +24,45 @@ codeunit 6151126 "NPR NPRE View Status Resolver"
         _TempOpenWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink" temporary;
         _TempWaiterPad: Record "NPR NPRE Waiter Pad" temporary;
 #pragma warning restore AA0073
+        _StatusSetupLastModifiedAt: DateTime;
+        _RestaurantCode: Code[20];
+        _SeatingFilter: Text;
         _Loaded: Boolean;
+        _StatusSetupRowCount: Integer;
+        FilterAfterLoadErr: Label 'The seating scope of a restaurant view status resolver cannot be narrowed after it has loaded. This is a programming bug.', Locked = true;
 
-    internal procedure Load()
+    /// <summary>
+    /// Narrows the open links this resolver loads to the seatings the caller is going to ask about. Must be called
+    /// before the first query, and the caller must then ask about nothing outside the filter: a seating outside it has
+    /// no cached links and would resolve to a blank colour rather than its real one.
+    /// </summary>
+    internal procedure SetSeatingFilter(SeatingFilter: Text)
+    begin
+        if _Loaded then
+            Error(FilterAfterLoadErr);
+        _SeatingFilter := SeatingFilter;
+    end;
+
+    /// <summary>
+    /// Narrows the open links this resolver loads to one restaurant. Same rule as the seating filter: set it before the
+    /// first query, and ask about nothing outside it.
+    /// </summary>
+    internal procedure SetRestaurantScope(RestaurantCode: Code[20])
+    begin
+        if _Loaded then
+            Error(FilterAfterLoadErr);
+        _RestaurantCode := RestaurantCode;
+    end;
+
+    local procedure Load()
     begin
         if _Loaded then
             exit;
-        _Loaded := true;
         LoadFlowStatuses();
         LoadOpenWaiterPads();
+        // Set last, so an error part way through leaves the instance unloaded rather than quietly answering from a
+        // half-built cache.
+        _Loaded := true;
     end;
 
     /// <summary>
@@ -96,8 +126,10 @@ codeunit 6151126 "NPR NPRE View Status Resolver"
         if not _TempWaiterPad.Get(WaiterPadNo) then
             exit('');
 
-        // The serving step contributes its flow order even when it is hidden from the front end, which is what makes a
-        // hidden serving step outrank a visible pad status. Reproduced deliberately.
+        // The serving step's flow order is captured even when the step itself is hidden from the front end, but that
+        // does not let a hidden step win: a hidden step leaves StatusCode blank, and the blank test below then lets the
+        // visible pad status through whatever the orders are. The captured order only decides anything when the step is
+        // visible, where it stops a lower-ordered pad status from replacing it.
         if _TempFlowStatus.Get(_TempWaiterPad."Serving Step Code", _TempFlowStatus."Status Object"::WaiterPadLineMealFlow) then begin
             ServingStepFlowOrder := _TempFlowStatus."Flow Order";
             if _TempFlowStatus."Available in Front-End" then
@@ -161,45 +193,84 @@ codeunit 6151126 "NPR NPRE View Status Resolver"
         exit(ColorHex);
     end;
 
+    /// <summary>
+    /// How many status and colour rows the view is built from and when the newest of them last changed. Enough to tell
+    /// whether the status catalogue in a layout payload has gone out of date.
+    /// </summary>
+    internal procedure GetStatusSetupFingerprint(var RowCount: Integer; var LastModifiedAt: DateTime)
+    begin
+        Load();
+        RowCount := _StatusSetupRowCount;
+        LastModifiedAt := _StatusSetupLastModifiedAt;
+    end;
+
     local procedure LoadFlowStatuses()
     var
         ColorTable: Record "NPR NPRE Color Table";
         FlowStatus: Record "NPR NPRE Flow Status";
     begin
         // Only the colours the statuses actually name are cached. "NPR NPRE Color Table" carries a few hundred rows of
-        // named colours and a restaurant uses a handful of them.
+        // named colours and a restaurant uses a handful of them. That also keeps the fingerprint honest: a colour no
+        // status names cannot change what the front end is shown, so it has no business invalidating anything.
+        //
+        // The fingerprint is accumulated while loading simply because the rows are in hand here; a temporary copy would
+        // have served equally, since Learn is explicit that a record copied into a temporary table keeps its data audit
+        // field values and the server does not restamp them on insert.
         if FlowStatus.FindSet() then
             repeat
                 _TempFlowStatus := FlowStatus;
                 _TempFlowStatus.Insert();
+                CountTowardsStatusSetup(FlowStatus.SystemModifiedAt);
 
                 if not _TempColorTable.Get(FlowStatus.Color) then
                     if ColorTable.Get(FlowStatus.Color) then begin
                         _TempColorTable := ColorTable;
                         _TempColorTable.Insert();
+                        CountTowardsStatusSetup(ColorTable.SystemModifiedAt);
                     end;
             until FlowStatus.Next() = 0;
     end;
 
+    local procedure CountTowardsStatusSetup(ModifiedAt: DateTime)
+    begin
+        _StatusSetupRowCount += 1;
+        if ModifiedAt > _StatusSetupLastModifiedAt then
+            _StatusSetupLastModifiedAt := ModifiedAt;
+    end;
+
     local procedure LoadOpenWaiterPads()
     var
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        WaiterPad: Record "NPR NPRE Waiter Pad";
+        OpenWaiterPadLinks: Query "NPR NPRE Open W/Pad Links";
     begin
-        // One read of every open link in the company rather than one read per seating. The open links are only as many
-        // as there are occupied tables, and the per-seating reads this replaces already scanned the same index.
-        SeatingWaiterPadLink.SetCurrentKey(Closed);
-        SeatingWaiterPadLink.SetRange(Closed, false);
-        if SeatingWaiterPadLink.FindSet() then
-            repeat
-                _TempOpenWaiterPadLink := SeatingWaiterPadLink;
-                _TempOpenWaiterPadLink.Insert();
+        // One read for the whole refresh rather than one per seating on screen, and the pad fields come back with it
+        // rather than costing a lookup per open pad.
+        //
+        // Scoped to the restaurant, and to the seatings, when the caller has said which it will ask about. Without that
+        // a caller refreshing a single table after a status tap would read every open link in the company to answer for
+        // one of them, which is slower than the per-seating primary key seek this replaces.
+        if _RestaurantCode <> '' then
+            OpenWaiterPadLinks.SetRange(RestaurantCode, _RestaurantCode);
+        if _SeatingFilter <> '' then
+            OpenWaiterPadLinks.SetFilter(SeatingCode, _SeatingFilter);
 
-                if not _TempWaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then
-                    if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then begin
-                        _TempWaiterPad := WaiterPad;
-                        _TempWaiterPad.Insert();
-                    end;
-            until SeatingWaiterPadLink.Next() = 0;
+        OpenWaiterPadLinks.Open();
+        while OpenWaiterPadLinks.Read() do begin
+            _TempOpenWaiterPadLink.Init();
+            _TempOpenWaiterPadLink."Seating Code" := OpenWaiterPadLinks.SeatingCode;
+            _TempOpenWaiterPadLink."Waiter Pad No." := OpenWaiterPadLinks.WaiterPadNo;
+            _TempOpenWaiterPadLink.Insert();
+
+            // Only the four fields the resolution rules read are carried over. Anything else on the cached pad is
+            // blank, so a later reader wanting another field must widen the query rather than assume a full copy.
+            if not _TempWaiterPad.Get(OpenWaiterPadLinks.WaiterPadNo) then begin
+                _TempWaiterPad.Init();
+                _TempWaiterPad."No." := OpenWaiterPadLinks.WaiterPadNo;
+                _TempWaiterPad.Status := OpenWaiterPadLinks.PadStatus;
+                _TempWaiterPad."Serving Step Code" := OpenWaiterPadLinks.PadServingStepCode;
+                _TempWaiterPad.Closed := OpenWaiterPadLinks.PadClosed;
+                _TempWaiterPad.Insert();
+            end;
+        end;
+        OpenWaiterPadLinks.Close();
     end;
 }
