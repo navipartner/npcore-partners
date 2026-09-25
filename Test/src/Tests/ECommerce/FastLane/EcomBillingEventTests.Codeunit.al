@@ -1480,6 +1480,8 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
     local procedure AssertSingleQueueEntry(EventId: Guid; EventType: Enum "NPR Billing Event Type"; ExpectedQuantity: Decimal)
     var
         BillingQueueEntry: Record "NPR Billing Queue Entry";
+        MetadataJson: JsonObject;
+        StoreCodeToken: JsonToken;
     begin
         BillingQueueEntry.Reset();
         BillingQueueEntry.SetRange("Event ID", EventId);
@@ -1490,6 +1492,9 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
             'The queued billing event must carry the feature id of the expected event type - the billing system charges by feature id, so a wrong one bills the merchant for another feature.');
         _Assert.AreEqual(ExpectedQuantity, BillingQueueEntry.Quantity,
             'The queued billing event must carry the expected quantity - the quantity is what the merchant is charged for.');
+        MetadataJson.ReadFrom(BillingQueueEntry.GetMetadata());
+        _Assert.IsTrue(MetadataJson.Get('entria_store_code', StoreCodeToken),
+            'The queued billing event metadata must carry the store code under the entria_store_code key - the billing backend attributes the charge to a store by that key, so any other spelling routes the charge to no store at all.');
     end;
 
     local procedure LastBillingQueueEntryNo(): BigInteger

@@ -206,15 +206,16 @@ codeunit 6151515 "NPR Ecom Billing Mgt."
     end;
 
     local procedure BuildEventMetadata(EcomBillingEvent: Record "NPR Ecom Billing Event") MetadataJson: JsonObject
-    var
-        ChannelName: Text;
     begin
-        if EcomBillingEvent."Store Code" <> '' then begin
-            ChannelName := Format(EcomBillingEvent.Channel, 0, 9).ToLower();
-            MetadataJson.Add(StrSubstNo(_MetadataStoreCodeTok, ChannelName), EcomBillingEvent."Store Code");
-        end;
+        if EcomBillingEvent."Store Code" <> '' then
+            MetadataJson.Add(StrSubstNo(_MetadataStoreCodeTok, GetChannelName(EcomBillingEvent.Channel)), EcomBillingEvent."Store Code");
         MetadataJson.Add(_MetadataExternalNoTok, EcomBillingEvent."External No.");
         MetadataJson.Add(_MetadataCurrencyTok, EcomBillingEvent."Currency Code");
+    end;
+
+    local procedure GetChannelName(Channel: Enum "NPR Ecom Sales Doc Source"): Text
+    begin
+        exit(Channel.Names().Get(Channel.Ordinals().IndexOf(Channel.AsInteger())).ToLower());
     end;
 
     /// <summary>
@@ -259,7 +260,7 @@ codeunit 6151515 "NPR Ecom Billing Mgt."
         if not EcomBillingEvent.FindFirst() then
             exit(false);
 
-        CheckSingleOrderEvent(EcomBillingEvent, StoreCode, ExternalNo, StrSubstNo('%1/%2/%3', Format(ChannelParam, 0, 9), StoreCode, ExternalNo));
+        CheckSingleOrderEvent(EcomBillingEvent, StoreCode, ExternalNo, StrSubstNo('%1/%2/%3', GetChannelName(ChannelParam), StoreCode, ExternalNo));
         exit(true);
     end;
 
