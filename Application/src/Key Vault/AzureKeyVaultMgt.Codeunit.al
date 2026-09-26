@@ -8,6 +8,7 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
     var
         GetSecretFailedErr: Label 'Failed to retrieve Azure KeyVault secret %1', Comment = '%1 = Azure KeyVault secret name';
         WrongModuleErr: Label 'This procedure cannot be called from another application.';
+        ModuleInfoUnavailableErr: Label 'Unable to validate the calling application.';
         CallerModuleInfo: ModuleInfo;
         CurrentModuleInfo: ModuleInfo;
         SandboxSecretInjection: Codeunit "NPR Sandbox Secret Injection";
@@ -15,9 +16,9 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
         Span: Codeunit "NPR Sentry Span";
     begin
         if not NavApp.GetCallerModuleInfo(CallerModuleInfo) then
-            exit;
+            Error(ModuleInfoUnavailableErr);
         if not NavApp.GetCurrentModuleInfo(CurrentModuleInfo) then
-            exit;
+            Error(ModuleInfoUnavailableErr);
         if CurrentModuleInfo.Id <> CallerModuleInfo.Id then
             Error(WrongModuleErr);
 
@@ -51,7 +52,19 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
     [TryFunction]
     [NonDebuggable]
     procedure TryGetAzureKeyVaultSecret(Name: Text; var KeyValueOut: Text)
+    var
+        WrongModuleErr: Label 'This procedure cannot be called from another application.';
+        ModuleInfoUnavailableErr: Label 'Unable to validate the calling application.';
+        CallerModuleInfo: ModuleInfo;
+        CurrentModuleInfo: ModuleInfo;
     begin
+        if not NavApp.GetCallerModuleInfo(CallerModuleInfo) then
+            Error(ModuleInfoUnavailableErr);
+        if not NavApp.GetCurrentModuleInfo(CurrentModuleInfo) then
+            Error(ModuleInfoUnavailableErr);
+        if CurrentModuleInfo.Id <> CallerModuleInfo.Id then
+            Error(WrongModuleErr);
+
         KeyValueOut := GetAzureKeyVaultSecret(Name);
     end;
 
