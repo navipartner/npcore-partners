@@ -507,7 +507,7 @@ page 6184704 "NPR Spfy Store Card"
             group(SalesReturnIntegrationArea)
             {
                 Caption = 'Sales Return Order Integration';
-
+                Visible = _EcomFeatureEnabled;
                 field("Sales Return Order Integration"; Rec."Sales Return Order Integration")
                 {
                     Caption = 'Enabled';
@@ -762,9 +762,15 @@ page 6184704 "NPR Spfy Store Card"
     trigger OnOpenPage()
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+#endif
     begin
         PreparexDataSet();
         _HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        _EcomFeatureEnabled := ShopifyEcommOrderExp.IsFeatureEnabled();
+#endif
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -920,6 +926,9 @@ page 6184704 "NPR Spfy Store Card"
         _BCCustomerTransactionsEnabled: Boolean;
 #endif
         _HasAzureADConnection: Boolean;
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        _EcomFeatureEnabled: Boolean;
+#endif
         _InvalidCurrencyCode: Boolean;
         _InventoryIntegrationIsEnabled: Boolean;
         _ItemListIntegrationIsEnabled: Boolean;

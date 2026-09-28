@@ -86,12 +86,16 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
     var
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
+        SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
     begin
         if Rec.Enabled then begin
             DisableJobQueues(Format(Codeunit::"NPR Spfy Order Mgt."), Rec);
             SpfyEcomSalesDocPrcssr.SetupJobQueues();
         end else begin
-            DisableJobQueues(StrSubstNo('%1|%2', Codeunit::"NPR Spfy Order Import JQ", Codeunit::"NPR Spfy Event Doc ProcessorJQ"), Rec);
+            CheckForUnprocessedEntries(Rec);
+            SpfyOrderImportJQ.SetupJobQueue(false);
+            SpfyEventDocProcessorJQ.SetupJobQueue(false);
             if SpfyIntegrationFeature.IsFeatureEnabled() then
                 OrderMgt.SetupJobQueues();
         end;

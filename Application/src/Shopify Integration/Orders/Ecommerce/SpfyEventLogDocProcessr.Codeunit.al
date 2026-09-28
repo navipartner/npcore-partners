@@ -275,10 +275,8 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
         if not EnableJobQueues then
             EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns");
-        if EnableJobQueues then begin
-            SpfyOrderImportJQ.SetupJobQueue(true);
-            SpfyEcomSalesImportJQ.SetupJobQueue(true);
-        end;
+        SpfyOrderImportJQ.SetupJobQueue(EnableJobQueues);
+        SpfyEcomSalesImportJQ.SetupJobQueue(EnableJobQueues);
     end;
 
     internal procedure IsShopifyDocument(EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean

@@ -36,12 +36,7 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
     begin
         SpfyIntegrationMgt.SetRereadSetup();
 
-        SpfyEventLogEntry.SetCurrentKey("Processing Status", "Process Retry Count", "Not Before Date-Time", "Document Type", "Bucket Id");
-        SpfyEventLogEntry.SetFilter("Processing Status", '<>%1', SpfyEventLogEntry."Processing Status"::Processed);
-        SpfyEventLogEntry.SetFilter("Process Retry Count", '<=%1', SpfyIntegrationMgt.GetMaxDocRetryCount());
-        SpfyEventLogEntry.SetFilter("Not Before Date-Time", '<=%1', CurrentDateTime());
-        SpfyEventLogEntry.SetRange("Document Type", SpfyEventLogEntry."Document Type"::Order);
-        SpfyEventLogEntry.SetFilter("Bucket Id", BucketFilter);
+        ApplyProcessableEventLogFilters(SpfyEventLogEntry, BucketFilter);
         if SpfyEventLogEntry.FindSet() then
             repeat
                 if EcomJobManagement.ApplicationChanged() then
@@ -55,10 +50,38 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
         SpfyEcomSalesDocPrcssr.ProcessLogEntry(SpfyEventLogEntry);
     end;
 
+    internal procedure ApplyProcessableEventLogFilters(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; BucketFilter: Text)
+    begin
+        SpfyEventLogEntry.SetCurrentKey("Processing Status", "Process Retry Count", "Not Before Date-Time", "Document Type", "Bucket Id");
+        SpfyEventLogEntry.SetFilter("Processing Status", '<>%1', SpfyEventLogEntry."Processing Status"::Processed);
+        SpfyEventLogEntry.SetFilter("Process Retry Count", '<=%1', SpfyIntegrationMgt.GetMaxDocRetryCount());
+        SpfyEventLogEntry.SetFilter("Not Before Date-Time", '<=%1', CurrentDateTime());
+        SpfyEventLogEntry.SetRange("Document Type", SpfyEventLogEntry."Document Type"::Order);
+        SpfyEventLogEntry.SetFilter("Bucket Id", BucketFilter);
+    end;
+
     internal procedure SetupJobQueues()
     begin
+        SetupJobQueue(IsJobQueueNeeded(false));
+    end;
+
+    internal procedure CancelJobQueueIfNotEligible()
+    begin
+        if IsJobQueueNeeded(true) then
+            exit;
+        SetupJobQueue(false);
+    end;
+
+    local procedure IsJobQueueNeeded(CommittedRead: Boolean): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
         SpfyIntegrationMgt.SetRereadSetup();
-        SetupJobQueue(SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders"));
+        if CommittedRead then
+            ShopifyStore.ReadIsolation := IsolationLevel::ReadCommitted;
+        if SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders", ShopifyStore) then
+            exit(true);
+        exit(SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns", ShopifyStore));
     end;
 
     local procedure ParamBucketFilter(): Text
@@ -72,42 +95,56 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+        ParameterString: Text[250];
     begin
-        if Enable then begin
-            JobQueueEntry.SetCurrentKey("Object Type to Run", "Object ID to Run");
-            JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-            JobQueueEntry.SetRange("Object ID to Run", CurrCodeunitId());
-            if not JobQueueEntry.FindFirst() then begin
-                JobQueueEntry."Parameter String" := CopyStr(CreateParameterString(), 1, MaxStrLen(JobQueueEntry."Parameter String"));
-                JobQueueEntry.Description := CopyStr(GetOrdersFromShopifyLbl, 1, MaxStrLen(JobQueueEntry.Description));
-                JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-                JobQueueEntry."Object ID to Run" := CurrCodeunitId();
-                ScheduleJobQueue(JobQueueEntry);
-            end else
-                ScheduleJobQueue(JobQueueEntry);
-        end else
+        if not Enable then begin
             JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
-    end;
+            RemoveOrphanedMonitoredJQEntries();
+            exit;
+        end;
 
-    local procedure ScheduleJobQueue(JobQueueEntry: Record "Job Queue Entry")
-    var
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-    begin
+        //Purge before creating, never after: if the registration below is ever reached with a blank job queue
+        //entry, a purge running afterwards would judge the row it had just created to be orphaned and delete it.
+        RemoveOrphanedMonitoredJQEntries();
+
+        //Reuse an existing entry's Parameter String when present so that a manually-created row (whose
+        //OnValidate subscriber wrote just 'bucket id' without the '=1..100' range, or a sharded
+        //deployment that partitioned the buckets across entries) is updated in place. JQEntryExists
+        //filters "Parameter String" exactly, so passing CreateParameterString() unconditionally would
+        //miss such a row and insert a duplicate that then processes all buckets.
+        if not TryGetExistingBucketParameterString(ParameterString) then
+            ParameterString := CopyStr(CreateParameterString(), 1, MaxStrLen(JobQueueEntry."Parameter String"));
+
         JobQueueMgt.SetJobTimeout(7, 0); //shouldn't be less than loop in the specific job queue
-        JobQueueMgt.SetProtected(true);
         JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
         if JobQueueMgt.InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit,
-            JobQueueEntry."Object ID to Run",
-            JobQueueEntry."Parameter String",
-             JobQueueEntry.Description,
-             CreateDateTime(Today(), 070000T),
-                1,
-                '',
-                JobQueueEntry)
-        then
+            JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(),
+            ParameterString, GetOrdersFromShopifyLbl,
+            CreateDateTime(Today(), 070000T), 1,
+            '', JobQueueEntry)
+        then begin
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            if not IsNullGuid(JobQueueEntry.ID) then
+                MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(false, true, JobQueueEntry);
+        end;
+    end;
 
+    // Deletes this codeunit's monitored rows whose job queue entry no longer exists. When the refresher is not allowed to recreate the entry, such a row fails on every refresh cycle.
+    local procedure RemoveOrphanedMonitoredJQEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+    begin
+        MonitoredJQEntry.SetCurrentKey("Object ID to Run", "Object Type to Run");
+        MonitoredJQEntry.SetRange("Object ID to Run", CurrCodeunitId());
+        MonitoredJQEntry.SetRange("Object Type to Run", MonitoredJQEntry."Object Type to Run"::Codeunit);
+        if not MonitoredJQEntry.FindSet(true) then
+            exit;
+        repeat
+            if not JobQueueEntry.Get(MonitoredJQEntry."Job Queue Entry ID") then
+                MonitoredJQEntry.Delete(true);
+        until MonitoredJQEntry.Next() = 0;
     end;
 
     internal procedure CreateParameterString(): text
@@ -117,16 +154,54 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
         exit(ParamBucketFilter() + ParamScope);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
-    local procedure RefreshJobQueueEntry()
+    local procedure TryGetExistingBucketParameterString(var ParameterString: Text[250]): Boolean
     var
-        ShopifySetup: Record "NPR Spfy Integration Setup";
+        JobQueueEntry: Record "Job Queue Entry";
+        FirstParameterString: Text[250];
+    begin
+        JobQueueEntry.SetCurrentKey("Object Type to Run", "Object ID to Run");
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", CurrCodeunitId());
+        if not JobQueueEntry.FindSet() then
+            exit(false);
+        FirstParameterString := JobQueueEntry."Parameter String";
+        repeat
+            if StrPos(JobQueueEntry."Parameter String", ParamBucketFilter()) > 0 then begin
+                ParameterString := CopyStr(JobQueueEntry."Parameter String", 1, MaxStrLen(ParameterString));
+                exit(true);
+            end;
+            if JobQueueEntry."Parameter String" = '' then begin
+                JobQueueEntry."Parameter String" := CopyStr(CreateParameterString(), 1, MaxStrLen(JobQueueEntry."Parameter String"));
+                JobQueueEntry.Modify(false);
+                ParameterString := JobQueueEntry."Parameter String";
+                exit(true);
+            end;
+        until JobQueueEntry.Next() = 0;
+
+        //No entry carries a bucket filter: reuse the first one's Parameter String as it is, so it is updated in
+        //place rather than duplicated by an entry with the default bucket filter.
+        ParameterString := FirstParameterString;
+        exit(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnBeforeValidateCreateMissingCustomJQs, '', false, false)]
+    local procedure SkipValidateCreateMissingCustomJQs(JobQueueEntry: Record "Job Queue Entry"; var SkipValidation: Boolean)
+    var
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
     begin
-        If ShopifySetup.IsEmpty() then
+        if JobQueueEntry."Object Type to Run" <> JobQueueEntry."Object Type to Run"::Codeunit then
             exit;
-        if ShopifyEcommOrderExp.IsFeatureEnabled() then
-            SetupJobQueues();
+        if JobQueueEntry."Object ID to Run" <> CurrCodeunitId() then
+            exit;
+
+        if not ShopifyEcommOrderExp.IsFeatureEnabled() then
+            exit;
+
+        SpfyIntegrationMgt.SetRereadSetup();
+        if SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders") or
+           SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns")
+        then
+            SkipValidation := true;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
@@ -143,7 +218,7 @@ codeunit 6248591 "NPR Spfy Event Doc ProcessorJQ"
             Rec.Description := CopyStr(GetOrdersFromShopifyLbl, 1, MaxStrLen(Rec.Description));
     end;
 
-    local procedure CurrCodeunitId(): Integer
+    internal procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR Spfy Event Doc ProcessorJQ");
     end;

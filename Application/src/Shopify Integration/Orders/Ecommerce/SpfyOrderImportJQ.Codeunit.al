@@ -689,38 +689,99 @@ codeunit 6248579 "NPR Spfy Order Import JQ"
     end;
 
     internal procedure SetupJobQueues()
+    begin
+        SetupJobQueue(IsJobQueueNeeded(false));
+    end;
+
+    internal procedure CancelJobQueueIfNotEligible()
+    begin
+        if IsJobQueueNeeded(true) then
+            exit;
+        SetupJobQueue(false);
+    end;
+
+    local procedure IsJobQueueNeeded(CommittedRead: Boolean): Boolean
     var
-        EnableJobQueues: Boolean;
+        ShopifyStore: Record "NPR Spfy Store";
     begin
         SpfyIntegrationMgt.SetRereadSetup();
-        EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
-        if not EnableJobQueues then
-            EnableJobQueues := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns");
-        SetupJobQueue(EnableJobQueues);
+        if CommittedRead then
+            ShopifyStore.ReadIsolation := IsolationLevel::ReadCommitted;
+        if SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders", ShopifyStore) then
+            exit(true);
+        exit(SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns", ShopifyStore));
     end;
 
     internal procedure SetupJobQueue(Enable: Boolean)
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
         GetOrdersFromShopifyLbl: Label 'Get Sales Orders from Shopify';
     begin
-        if Enable then begin
-            JobQueueMgt.SetJobTimeout(2, 0); //shouldn't be less than loop in the specific job queue
-            JobQueueMgt.SetProtected(true);
-            JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
-            if JobQueueMgt.InitRecurringJobQueueEntry(
-                JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(),
-                '', GetOrdersFromShopifyLbl,
-                CreateDateTime(Today(), 070000T), 1,
-                '', JobQueueEntry)
-            then
-                JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-        end else
+        if not Enable then begin
             JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
+            RemoveOrphanedMonitoredJQEntries();
+            exit;
+        end;
+
+        //Purge before creating, never after: if the registration below is ever reached with a blank job queue
+        //entry, a purge running afterwards would judge the row it had just created to be orphaned and delete it.
+        RemoveOrphanedMonitoredJQEntries();
+
+        JobQueueMgt.SetJobTimeout(2, 0); //shouldn't be less than loop in the specific job queue
+        JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 30, '');
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(),
+            '', GetOrdersFromShopifyLbl,
+            CreateDateTime(Today(), 070000T), 1,
+            '', JobQueueEntry)
+        then begin
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            if not IsNullGuid(JobQueueEntry.ID) then
+                MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(false, true, JobQueueEntry);
+        end;
     end;
 
-    local procedure CurrCodeunitId(): Integer
+    // Deletes this codeunit's monitored rows whose job queue entry no longer exists. When the refresher is not allowed to recreate the entry, such a row fails on every refresh cycle.
+    local procedure RemoveOrphanedMonitoredJQEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+    begin
+        MonitoredJQEntry.SetCurrentKey("Object ID to Run", "Object Type to Run");
+        MonitoredJQEntry.SetRange("Object ID to Run", CurrCodeunitId());
+        MonitoredJQEntry.SetRange("Object Type to Run", MonitoredJQEntry."Object Type to Run"::Codeunit);
+        if not MonitoredJQEntry.FindSet(true) then
+            exit;
+        repeat
+            if not JobQueueEntry.Get(MonitoredJQEntry."Job Queue Entry ID") then
+                MonitoredJQEntry.Delete(true);
+        until MonitoredJQEntry.Next() = 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnBeforeValidateCreateMissingCustomJQs, '', false, false)]
+    local procedure SkipValidateCreateMissingCustomJQs(JobQueueEntry: Record "Job Queue Entry"; var SkipValidation: Boolean)
+    var
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+    begin
+        if JobQueueEntry."Object Type to Run" <> JobQueueEntry."Object Type to Run"::Codeunit then
+            exit;
+        if JobQueueEntry."Object ID to Run" <> CurrCodeunitId() then
+            exit;
+
+        // Feature gate first.
+        if not ShopifyEcommOrderExp.IsFeatureEnabled() then
+            exit;
+
+        SpfyIntegrationMgt.SetRereadSetup();
+        if SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders") or
+           SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns")
+        then
+            SkipValidation := true;
+    end;
+
+    internal procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR Spfy Order Import JQ");
     end;

@@ -36,6 +36,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         RemoveEmptyShopifyStoreItemLinks();
 #if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         PrepareForEcomFlow();
+        ConvertEcomJQsToMonitoredNonProtected();
 #endif
         UpdateGetPaymentLineOption();
         DisableSendCloseOrderRequest();
@@ -618,6 +619,65 @@ codeunit 6184802 "NPR Spfy App Upgrade"
 
         SetUpgradeTag();
         LogFinish();
+    end;
+
+    local procedure ConvertEcomJQsToMonitoredNonProtected()
+    begin
+        _UpgradeStep := 'ConvertEcomJQsToMonitoredNonProtected';
+        if HasUpgradeTag() then
+            exit;
+
+        LogStart();
+
+        ConvertEcomJQs();
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    internal procedure ConvertEcomJQs()
+    var
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+    begin
+        if not ShopifyEcommOrderExp.IsFeatureEnabled() then
+            exit;
+
+        ConvertOneEcomJQ(Codeunit::"NPR Spfy Order Import JQ");
+        ConvertOneEcomJQ(Codeunit::"NPR Spfy Event Doc ProcessorJQ");
+    end;
+
+    local procedure ConvertOneEcomJQ(JQCodeunitId: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+    begin
+        MonitoredJQEntry.SetRange("Object Type to Run", MonitoredJQEntry."Object Type to Run"::Codeunit);
+        MonitoredJQEntry.SetRange("Object ID to Run", JQCodeunitId);
+        MonitoredJQEntry.SetRange("NP Protected Job", true);
+        if MonitoredJQEntry.FindSet(true) then
+            repeat
+                if not JobQueueEntry.Get(MonitoredJQEntry."Job Queue Entry ID") then begin
+                    MonitoredJQEntry."NP Protected Job" := false;
+                    MonitoredJQEntry.Modify();
+                end;
+            until MonitoredJQEntry.Next() = 0;
+
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", JQCodeunitId);
+        JobQueueEntry.SetRange("Recurring Job", true);
+        if not JobQueueEntry.FindSet() then
+            exit;
+        repeat
+            if JobQueueEntry."NPR NP Protected Job" then begin
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+                JobQueueEntry."NPR NP Protected Job" := false;
+                JobQueueEntry.Modify();
+                if not JobQueueEntry."NPR Manually Set On Hold" then
+                    JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
+            end;
+            MonitoredJobQueueMgt.AssignJobQueueEntryToManagedAndMonitored(false, true, JobQueueEntry);
+        until JobQueueEntry.Next() = 0;
     end;
 #endif
     local procedure UpdateGetPaymentLineOption()

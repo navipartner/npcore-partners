@@ -296,7 +296,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SetupJobQueues(SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders"));
     end;
 
-    local procedure SetupJobQueues(Enable: Boolean)
+    internal procedure SetupJobQueues(Enable: Boolean)
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
@@ -342,18 +342,46 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 #if not (BC18 or BC19 or BC20 or BC21 or BC22)
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
+        SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
 #endif
     begin
         If ShopifySetup.IsEmpty() then
             exit;
 #if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        //With the ecom feature on, this refresh only removes jobs that should not exist: the ecom jobs when no store imports orders or returns, and the leftover legacy import job. It never re-creates the ecom jobs, so admin edits on them are kept.
         if ShopifyEcommOrderExp.IsFeatureEnabled() then begin
-            SpfyOrderImportJQ.SetupJobQueues();
+            SpfyOrderImportJQ.CancelJobQueueIfNotEligible();
+            SpfyEventDocProcessorJQ.CancelJobQueueIfNotEligible();
+            RemoveLegacyOrderImportJobs();
             exit;
         end;
+        //With the ecom feature off, remove ecom jobs left behind before setting up the legacy jobs.
+        SpfyOrderImportJQ.SetupJobQueue(false);
+        SpfyEventDocProcessorJQ.SetupJobQueue(false);
 #endif
         SetupJobQueues();
     end;
+
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+    local procedure RemoveLegacyOrderImportJobs()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+    begin
+        JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID());
+
+        MonitoredJQEntry.SetCurrentKey("Object ID to Run", "Object Type to Run");
+        MonitoredJQEntry.SetRange("Object ID to Run", CurrCodeunitID());
+        MonitoredJQEntry.SetRange("Object Type to Run", MonitoredJQEntry."Object Type to Run"::Codeunit);
+        if not MonitoredJQEntry.FindSet(true) then
+            exit;
+        repeat
+            if not JobQueueEntry.Get(MonitoredJQEntry."Job Queue Entry ID") then
+                MonitoredJQEntry.Delete(true);
+        until MonitoredJQEntry.Next() = 0;
+    end;
+#endif
 
     local procedure DocExists(ImportType: Record "NPR Nc Import Type"; ShopifyStoreCode: Code[20]; DocName: Text[100]): Boolean
     var

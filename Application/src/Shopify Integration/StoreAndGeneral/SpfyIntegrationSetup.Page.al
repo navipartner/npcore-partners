@@ -284,6 +284,40 @@ page 6184553 "NPR Spfy Integration Setup"
                         end;
                     }
                 }
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                action(ConfigureOrderImportJQ)
+                {
+                    Caption = 'Configure Order Import JQ';
+                    ToolTip = 'Sets up the Shopify Order Import job queue entry for this tenant. Checks the ecommerce feature toggle, the integration master switch and the store area gate, then creates or updates the recurring, monitored job queue entry and reports whether it is running.';
+                    ApplicationArea = NPRShopifyEcommerce;
+                    Image = SetupList;
+                    Visible = _EcomOrderExpFeatureEnabled;
+
+                    trigger OnAction()
+                    var
+                        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+                        SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
+                    begin
+                        SpfyIntegrationMgt.SetupSpfyJQWithConfirmation(SpfyOrderImportJQ.CurrCodeunitId());
+                    end;
+                }
+                action(ConfigureDocumentProcessingJQ)
+                {
+                    Caption = 'Configure Document Processing JQ';
+                    ToolTip = 'Sets up the Shopify Event Log Document Processing job queue entry for this tenant. Checks the ecommerce feature toggle, the integration master switch and the store area gate, then creates or updates the recurring, monitored job queue entry and reports whether it is running.';
+                    ApplicationArea = NPRShopifyEcommerce;
+                    Image = SetupList;
+                    Visible = _EcomOrderExpFeatureEnabled;
+
+                    trigger OnAction()
+                    var
+                        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+                        SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
+                    begin
+                        SpfyIntegrationMgt.SetupSpfyJQWithConfirmation(SpfyEventDocProcessorJQ.CurrCodeunitId());
+                    end;
+                }
+#endif
             }
             group(Resync)
             {
@@ -392,6 +426,9 @@ page 6184553 "NPR Spfy Integration Setup"
     trigger OnOpenPage()
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+#endif
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -401,6 +438,9 @@ page 6184553 "NPR Spfy Integration Setup"
         PreparexDataSet();
         HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
         NotifyOfTaskListResiduals();
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        _EcomOrderExpFeatureEnabled := ShopifyEcommOrderExp.IsFeatureEnabled();
+#endif
     end;
 
     // A completed migration leaves no legacy row with attempts still to spend, so any unprocessed row left is a residual.
@@ -511,5 +551,8 @@ page 6184553 "NPR Spfy Integration Setup"
         _ShowTaskListMigrationUI: Boolean;
         _ShowProcessorOnHoldWarning: Boolean;
         _ProcessorOnHoldWarningTxt: Text;
+#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        _EcomOrderExpFeatureEnabled: Boolean;
+#endif
 }
 #endif

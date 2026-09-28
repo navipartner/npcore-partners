@@ -648,6 +648,9 @@ table 6150810 "NPR Spfy Store"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
         SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
     begin
         SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
         if not SpfyAllowedFinStatus.IsEmpty() then
@@ -658,6 +661,12 @@ table 6150810 "NPR Spfy Store"
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyTaskJQSetup.CancelTaskProcessingJobQueue(Rec.Code);
         SpfyTaskQueue.DeleteAllForStore(Rec.Code);
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        // BC23+ ecommerce JQs are monitored (not NP-protected); the refresher would otherwise heal a
+        // job for a store that just went away. SetupJobQueuesOnStoreDeletion excludes this row by SystemId.
+        SpfyIntegrationMgt.SetupJobQueuesOnStoreDeletion(Rec);
+#endif
     end;
 
     internal procedure NoOfPriceUpdatesPerRequest(): Integer

@@ -121,7 +121,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             exit(false);
 
 #if not (BC18 or BC19 or BC20 or BC21)
-        ShopifyStore.ReadIsolation := IsolationLevel::ReadUncommitted;
+        if ShopifyStore.ReadIsolation = IsolationLevel::Default then
+            ShopifyStore.ReadIsolation := IsolationLevel::ReadUncommitted;
 #endif
         if ShopifyStore.Find('-') then
             repeat
@@ -129,6 +130,39 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                     exit(true);
             until ShopifyStore.Next() = 0;
     end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    procedure IsEnabledForAnyStore(IntegrationArea: Enum "NPR Spfy Integration Area"; ExcludedSystemIds: List of [Guid]): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        ExcludedId: Guid;
+        ExclusionFilter: Text;
+        NotEqualLbl: Label '<>%1', Locked = true;
+        AndLbl: Label '&', Locked = true;
+    begin
+        if _ShopifySetup.IsEmpty() then
+            exit(false);
+        _ShopifySetup.GetRecordOnce(false);
+        if not _ShopifySetup."Enable Integration" then
+            exit(false);
+
+        ShopifyStore.ReadIsolation := IsolationLevel::ReadUncommitted;
+
+        foreach ExcludedId in ExcludedSystemIds do begin
+            if ExclusionFilter <> '' then
+                ExclusionFilter += AndLbl;
+            ExclusionFilter += StrSubstNo(NotEqualLbl, ExcludedId);
+        end;
+        if ExclusionFilter <> '' then
+            ShopifyStore.SetFilter(SystemId, ExclusionFilter);
+
+        if ShopifyStore.Find('-') then
+            repeat
+                if IsEnabled(IntegrationArea, ShopifyStore) then
+                    exit(true);
+            until ShopifyStore.Next() = 0;
+    end;
+#endif
 
     procedure ShopifyApiVersion(): Text
     begin
@@ -865,6 +899,119 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     end;
 #endif
     #endregion
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    /// <summary>
+    /// Recomputes ecommerce Shopify JQ setup after a store is deleted. OnDelete fires while the row is still
+    /// readable, so the scan excludes it explicitly by SystemId.
+    /// </summary>
+    internal procedure SetupJobQueuesOnStoreDeletion(DeletedStore: Record "NPR Spfy Store")
+    var
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+        SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
+        SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
+        OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        ExcludedSystemIds: List of [Guid];
+        EcomEligible: Boolean;
+    begin
+        ExcludedSystemIds.Add(DeletedStore.SystemId);
+        SetRereadSetup();
+
+        EcomEligible :=
+            IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders", ExcludedSystemIds) or
+            IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns", ExcludedSystemIds);
+
+        if ShopifyEcommOrderExp.IsFeatureEnabled() then begin
+            SpfyOrderImportJQ.SetupJobQueue(EcomEligible);
+            SpfyEventDocProcessorJQ.SetupJobQueue(EcomEligible);
+            exit;
+        end;
+
+        // Legacy path: pass an explicit Sales-Orders eligibility computed with the deleted store excluded, so
+        // deleting the last enabled store does not transiently re-create the NP-protected legacy job queue.
+        OrderMgt.SetupJobQueues(IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders", ExcludedSystemIds));
+    end;
+
+    internal procedure SetupSpfyJQWithConfirmation(JQCodeunitId: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+        SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
+        SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
+        EnableJobQueue: Boolean;
+        FeatureDisabledLbl: Label 'Shopify Ecommerce Order Experience feature is disabled. Enable it before configuring the job queue.';
+        IntegrationDisabledLbl: Label 'Enable Shopify integration first, then configure the job queue. Any existing Shopify %1 Job Queue entry has been removed.', Comment = '%1 = friendly name of the job queue (Order Import / Document Processing)';
+        NoEligibleStoreLbl: Label 'No enabled Shopify store has Sales Order Integration or Sales Return Order Integration turned on. Enable at least one store before configuring the job queue. Any existing Shopify %1 Job Queue entry has been removed.', Comment = '%1 = friendly name of the job queue (Order Import / Document Processing)';
+        JobRunningLbl: Label 'Shopify %1 Job Queue is now running.', Comment = '%1 = friendly name of the job queue (Order Import / Document Processing)';
+        JobOnHoldLbl: Label 'Shopify %1 Job Queue was created but is on hold. Start it manually from the Job Queue Entries page.', Comment = '%1 = friendly name of the job queue (Order Import / Document Processing)';
+    begin
+        if not ShopifyEcommOrderExp.IsFeatureEnabled() then begin
+            Message(FeatureDisabledLbl);
+            exit;
+        end;
+
+        // The store area gate decides, not the caller: with the integration off or no eligible store the job
+        // queue entry and its orphaned monitored rows are torn down, the same way the master switch does it.
+        SetRereadSetup();
+        EnableJobQueue :=
+            IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders") or
+            IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns");
+
+        case JQCodeunitId of
+            SpfyOrderImportJQ.CurrCodeunitId():
+                SpfyOrderImportJQ.SetupJobQueue(EnableJobQueue);
+            SpfyEventDocProcessorJQ.CurrCodeunitId():
+                SpfyEventDocProcessorJQ.SetupJobQueue(EnableJobQueue);
+            else
+                Error('Unknown Shopify JQ codeunit id %1. This is a programming bug', JQCodeunitId);
+        end;
+
+        // Read back from the entry, never from the gate: the gate says what was asked for, not what runs.
+        JobQueueEntry.SetCurrentKey("Object Type to Run", "Object ID to Run");
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", JQCodeunitId);
+        JobQueueEntry.SetFilter(Status, '%1|%2', JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process");
+        if not JobQueueEntry.IsEmpty() then begin
+            Message(JobRunningLbl, GetJQFriendlyName(JQCodeunitId));
+            exit;
+        end;
+
+        if not IsEnabledIntegration() then begin
+            Message(IntegrationDisabledLbl, GetJQFriendlyName(JQCodeunitId));
+            exit;
+        end;
+        if not EnableJobQueue then begin
+            Message(NoEligibleStoreLbl, GetJQFriendlyName(JQCodeunitId));
+            exit;
+        end;
+        Message(JobOnHoldLbl, GetJQFriendlyName(JQCodeunitId));
+    end;
+
+    local procedure IsEnabledIntegration(): Boolean
+    begin
+        if _ShopifySetup.IsEmpty() then
+            exit(false);
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Enable Integration");
+    end;
+
+    local procedure GetJQFriendlyName(JQCodeunitId: Integer): Text
+    var
+        SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
+        SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
+        OrderImportLbl: Label 'Order Import';
+        DocumentProcessingLbl: Label 'Document Processing';
+    begin
+        case JQCodeunitId of
+            SpfyOrderImportJQ.CurrCodeunitId():
+                exit(OrderImportLbl);
+            SpfyEventDocProcessorJQ.CurrCodeunitId():
+                exit(DocumentProcessingLbl);
+            else
+                Error('Unknown Shopify JQ codeunit id %1. This is a programming bug', JQCodeunitId);
+        end;
+    end;
+#endif
 #endif
 }
 #endif
