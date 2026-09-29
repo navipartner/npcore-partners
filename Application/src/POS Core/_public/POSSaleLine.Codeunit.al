@@ -598,6 +598,9 @@
         if TempItemVariantBuffer.IsEmpty() then
             exit('');
 
+        if not GuiAllowed() then
+            Error(ITEM_REQUIRES_VARIANT, ItemNo);
+
         Sentry.StartSpan(SentryVariantLookupSpan, 'ui.bc.pos.item-variant-lookup');
         TempItemVariantBuffer.SetRange("Location Filter", LocationCode);
         if Page.RunModal(Page::"NPR Item Variants Lookup", TempItemVariantBuffer) = ACTION::LookupOK then begin
@@ -618,6 +621,9 @@
         FillVariantLotNoBuffer(ItemNo, TempItemVariantBuffer, LotNo);
         if TempItemVariantBuffer.IsEmpty() then
             exit('');
+
+        if not GuiAllowed() then
+            Error(ITEM_REQUIRES_VARIANT, ItemNo);
 
         Sentry.StartSpan(SentryVariantLookupSpan, 'ui.bc.pos.item-variant-lookup');
         TempItemVariantBuffer.SetRange("Location Filter", LocationCode);
