@@ -5,6 +5,14 @@ codeunit 85389 "NPR Spfy Order Import Tests"
     Subtype = Test;
     TestPermissions = Disabled;
 
+    var
+        _Assert: Codeunit "Assert";
+        _MemberModuleLib: Codeunit "NPR Library - Member Module";
+        _MembershipItemNoLbl: Label 'T-SPFY-MMSHIP', Locked = true;
+        _AlterationItemNoLbl: Label 'T-SPFY-MMALTER', Locked = true;
+        _MembershipIdLbl: Label '{6F9619FF-8B86-D011-B42D-00CF4FC964FF}', Locked = true;
+        _OptionIdLbl: Label '{9A1C0E52-4A6D-4B2E-9C1E-2F0E5A7B3D41}', Locked = true;
+
     [Test]
     procedure GiftCardSearchBoundUsesCreatedAtNotUpdatedAt()
     var
@@ -3689,6 +3697,559 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         Assert.AreEqual(NewMarker, LastReturnsImportedAt(StoreCode), 'The new marker must be stored - the setter is a pure write.');
         Assert.IsTrue(LibrarySpfyImport.HasOrderData(FailedEntry."Entry No."), 'Direct setter call must not discard Order Data on failed return entries - that side effect belongs on the store card OnValidate only.');
     end;
+
+    // [Feature] Shopify order import - membership lines
+    // Line subtype classification, the membership/alteration id contract, and the member creation attributes read
+    // from the Shopify line customAttributes. This block stays at the end of the codeunit: CreateAlterationItem runs
+    // LibraryMemberModule.Initialize(), which changes WorkDate and posting setup for every later test in the codeunit.
+
+    #region Subtype classification
+
+    [Test]
+    procedure DetermineItemSubtype_MembershipItem_IsMembership()
+    var
+        Item: Record Item;
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        Subtype: Enum "NPR Ecom Sales Line Subtype";
+    begin
+        // [Scenario] A membership item is classified for membership provisioning.
+
+        // [Given] An item with a membership sales setup
+        CreateMembershipItem(Item);
+
+        // [When] The importer classifies the line
+        Subtype := SpfyEcomSalesDocImport.DetermineItemSubtype(Item);
+
+        // [Then] The line is a membership line
+        _Assert.AreEqual(Subtype::Membership, Subtype, 'A membership item must be classified as a membership line.');
+    end;
+
+    [Test]
+    procedure DetermineItemSubtype_AlterationItem_IsMembership()
+    var
+        Item: Record Item;
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        Subtype: Enum "NPR Ecom Sales Line Subtype";
+    begin
+        // [Scenario] An item is also a membership item when only an alteration setup points at it.
+
+        // [Given] An item with no membership sales setup, but with an alteration setup
+        CreateAlterationItem(Item);
+
+        // [When] The importer classifies the line
+        Subtype := SpfyEcomSalesDocImport.DetermineItemSubtype(Item);
+
+        // [Then] The line is a membership line
+        _Assert.AreEqual(Subtype::Membership, Subtype, 'An alteration item must be classified as a membership line.');
+    end;
+
+    [Test]
+    procedure DetermineItemSubtype_StockItem_IsPlainItem()
+    var
+        Item: Record Item;
+        LibraryInventory: Codeunit "NPR Library - Inventory";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        Subtype: Enum "NPR Ecom Sales Line Subtype";
+    begin
+        // [Scenario] An item with no ticket, membership sales or alteration setup is not routed into virtual item processing.
+
+        // [Given] A new item with none of that setup
+        LibraryInventory.CreateItem(Item);
+
+        // [When] The importer classifies the line
+        Subtype := SpfyEcomSalesDocImport.DetermineItemSubtype(Item);
+
+        // [Then] The line is an ordinary item line
+        _Assert.AreEqual(Subtype::Item, Subtype, 'An item without virtual item setup must stay an ordinary item line.');
+    end;
+
+    [Test]
+    procedure DetermineItemSubtype_TicketAndMembershipItem_IsTicket()
+    var
+        Item: Record Item;
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        Subtype: Enum "NPR Ecom Sales Line Subtype";
+        TicketMembershipItemNoLbl: Label 'T-SPFY-TKMM', Locked = true;
+    begin
+        // [Scenario] An item set up both as a ticket and as a membership sale is classified as a ticket.
+
+        // [Given] An item with a membership sales setup and a ticket type
+        CreateMembershipItem(TicketMembershipItemNoLbl, 'Shopify ticket and membership item', Item);
+        LibrarySpfyImport.MakeItemATicketItem(Item."No.");
+        // MakeItemATicketItem modifies its own copy of the item, so the ticket type is only visible after a re-read.
+        Item.Get(Item."No.");
+
+        // [When] The importer classifies the line
+        Subtype := SpfyEcomSalesDocImport.DetermineItemSubtype(Item);
+
+        // [Then] The ticket setup takes precedence
+        _Assert.AreEqual(Subtype::Ticket, Subtype, 'An item that is both a ticket and a membership item must be classified as a ticket line.');
+    end;
+
+    [Test]
+    procedure DetermineItemSubtype_ReturnOrder_VirtualItem_IsItem()
+    var
+        Item: Record Item;
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        Subtype: Enum "NPR Ecom Sales Line Subtype";
+        TicketMembershipItemNoLbl: Label 'T-SPFY-TKMM', Locked = true;
+    begin
+        // [Scenario] On a return the item is only credited, so a virtual item is classified as a plain item.
+
+        // [Given] An item with a membership sales setup and a ticket type
+        CreateMembershipItem(TicketMembershipItemNoLbl, 'Shopify ticket and membership item', Item);
+        LibrarySpfyImport.MakeItemATicketItem(Item."No.");
+        Item.Get(Item."No.");
+
+        // [When] The importer classifies the line for a return order
+        Subtype := SpfyEcomSalesDocImport.DetermineItemSubtype(Item, "NPR Ecom Sales Doc Type"::"Return Order");
+
+        // [Then] The line is an ordinary item line
+        _Assert.AreEqual(Subtype::Item, Subtype, 'A virtual item on a return order must be classified as an ordinary item line.');
+
+        // [When] The importer classifies the same item for an order
+        Subtype := SpfyEcomSalesDocImport.DetermineItemSubtype(Item, "NPR Ecom Sales Doc Type"::Order);
+
+        // [Then] The order path still sees the ticket
+        _Assert.AreEqual(Subtype::Ticket, Subtype, 'The same item on an order must still be classified as a ticket line.');
+    end;
+
+    [Test]
+    procedure EcomImport_ReturnOrder_VirtualItemLine_IsPlainItem()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Item: Record Item;
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        ItemNo: Code[20];
+        ShopifyId: Text[30];
+        ReturnItemNoLbl: Label 'T-SPFY-RETVI', Locked = true;
+    begin
+        // [Scenario] A Shopify return line for a ticket and membership item is imported on the ecom create path as a
+        // plain item line, so the return posts as a credit memo and no ticket reservation is required for it.
+
+        // [Given] A Shopify store and an item with a membership sales setup and a ticket type
+        ShopifyId := '939000000001';
+        LibrarySpfyImport.SetupSimpleItemOrder(StoreCode, Sku, ItemNo);
+        CreateMembershipItem(ReturnItemNoLbl, 'Shopify return virtual item', Item);
+        LibrarySpfyImport.MakeItemATicketItem(Item."No.");
+        Item.Get(Item."No.");
+
+        // [Given] An open return order log entry
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::"Return Order", "NPR SpfyAPIDocumentStatus"::Open, CurrentDateTime());
+
+        // [When] The create path runs from the order JSON, with the line SKU pointing at that item
+        _Assert.IsTrue(
+            SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, LibrarySpfyImport.BuildSimpleItemOrderJson(ShopifyId, Item."No.", 100), EcomSalesHeader),
+            'CreateEcommerceDocumentFromJson should succeed for a return order with a virtual item line.');
+
+        // [Then] The line is an ordinary item line
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        _Assert.IsTrue(EcomSalesLine.FindFirst(), 'The return order must have an ecom sales line.');
+        _Assert.AreEqual(EcomSalesLine.Subtype::Item, EcomSalesLine.Subtype, 'A virtual item line on a return order must be imported as an ordinary item line.');
+
+        // [Then] The header carries no virtual item flags
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        _Assert.IsFalse(EcomSalesHeader."Virtual Items Exist", 'A return order must not be flagged as having virtual items.');
+        _Assert.IsFalse(EcomSalesHeader."Tickets Exist", 'A return order must not be flagged as having tickets.');
+        _Assert.IsFalse(EcomSalesHeader."Memberships Exist", 'A return order must not be flagged as having memberships.');
+    end;
+
+    #endregion
+
+    #region Membership and alteration ids
+
+    [Test]
+    procedure AlterationFields_OptionWithoutMembership_Errors()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] An alteration option without a membership is a contract violation, not absent data - most
+        // likely the storefront misspelled the key. Exiting quietly would classify the line as CreateMembership
+        // and the failure would surface at capture as 'Item %1 is not set up as a membership sale item.', which
+        // points at item setup where nothing is wrong. Fail here, while the real cause is still visible.
+
+        // [Given] Line custom attributes holding only the alteration option
+        EcomSalesLine."Shopify ID" := '917000000701';
+        PropertyDict.Add('optionid', _OptionIdLbl);
+
+        // [When] The importer parses the alteration fields
+        asserterror SpfyEcomSalesDocImport.ParseMembershipAlterationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The line is rejected, naming the Shopify line and both attribute keys
+        _Assert.ExpectedError('917000000701');
+        _Assert.ExpectedError('optionid');
+        _Assert.ExpectedError('membershipid');
+    end;
+
+    [Test]
+    procedure AlterationFields_OptionWithBlankMembership_Errors()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] An empty membershipid is the same contract violation as a missing one.
+        // This pins the defensive contract of the internal procedure, not a reachable payload: GetOrderLineProperties
+        // never yields an empty value, because AddPropertyToDict returns early on one. The production equivalent is
+        // the key being absent, covered by AlterationFields_OptionWithoutMembership_Errors.
+
+        // [Given] An empty membership id together with an alteration option
+        EcomSalesLine."Shopify ID" := '917000000701';
+        PropertyDict.Add('membershipid', '');
+        PropertyDict.Add('optionid', _OptionIdLbl);
+
+        // [When] The importer parses the alteration fields
+        asserterror SpfyEcomSalesDocImport.ParseMembershipAlterationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The line is rejected, naming the Shopify line and the missing key
+        _Assert.ExpectedError('917000000701');
+        _Assert.ExpectedError('membershipid');
+    end;
+
+    [Test]
+    procedure AlterationFields_SurroundingWhitespace_IsTrimmed()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+        ExpectedMembershipId: Guid;
+        ExpectedOptionId: Guid;
+    begin
+        // [Scenario] Custom attributes are free text from the storefront, so stray whitespace must not fail the order.
+
+        // [Given] Both ids padded with spaces, as a theme template easily produces
+        PropertyDict.Add('membershipid', '  ' + _MembershipIdLbl + ' ');
+        PropertyDict.Add('optionid', ' ' + _OptionIdLbl + '  ');
+        Evaluate(ExpectedMembershipId, _MembershipIdLbl);
+        Evaluate(ExpectedOptionId, _OptionIdLbl);
+
+        // [When] The importer parses the alteration fields
+        SpfyEcomSalesDocImport.ParseMembershipAlterationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] Both ids are read correctly
+        _Assert.AreEqual(ExpectedMembershipId, EcomSalesLine."Membership Id", 'A padded membership id must be trimmed before it is evaluated.');
+        _Assert.AreEqual(ExpectedOptionId, EcomSalesLine."Alteration Option System Id", 'A padded alteration option id must be trimmed before it is evaluated.');
+    end;
+
+    [Test]
+    procedure AlterationFields_WhitespaceOnlyMembershipId_IsIgnored()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] A membershipid holding nothing but spaces counts as "not supplied", not as a malformed id -
+        // it must not be pushed into Evaluate and reported as an invalid GUID. No alteration option is supplied
+        // here, so this isolates the trimming rule from the option-without-membership contract violation.
+
+        // [Given] A whitespace-only membership id, and nothing else
+        PropertyDict.Add('membershipid', '   ');
+
+        // [When] The importer parses the alteration fields
+        SpfyEcomSalesDocImport.ParseMembershipAlterationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] Nothing is stored and no error is raised
+        _Assert.IsTrue(IsNullGuid(EcomSalesLine."Membership Id"), 'A whitespace-only membershipid must be treated as absent, not as a malformed id.');
+    end;
+
+    [Test]
+    procedure AlterationFields_InvalidMembershipId_Errors()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] A membership id that is not a GUID fails the import instead of being silently dropped.
+
+        // [Given] A malformed membership id
+        EcomSalesLine."Shopify ID" := '917000000701';
+        PropertyDict.Add('membershipid', 'not-a-guid');
+
+        // [When] The importer parses the alteration fields
+        asserterror SpfyEcomSalesDocImport.ParseMembershipAlterationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The line is rejected, naming the Shopify line, the field and the offending value
+        _Assert.ExpectedError('917000000701');
+        _Assert.ExpectedError(EcomSalesLine.FieldCaption("Membership Id"));
+        _Assert.ExpectedError('not-a-guid');
+    end;
+
+    [Test]
+    procedure AlterationFields_InvalidOptionId_Errors()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] An alteration option id that is not a GUID fails the import.
+
+        // [Given] A valid membership id and a malformed alteration option id
+        EcomSalesLine."Shopify ID" := '917000000701';
+        PropertyDict.Add('membershipid', _MembershipIdLbl);
+        PropertyDict.Add('optionid', 'not-a-guid-either');
+
+        // [When] The importer parses the alteration fields
+        asserterror SpfyEcomSalesDocImport.ParseMembershipAlterationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The order is rejected, naming the Shopify line and the offending value
+        _Assert.ExpectedError('917000000701');
+        _Assert.ExpectedError('not-a-guid-either');
+    end;
+
+    #endregion
+
+    #region Member creation attributes
+
+    [Test]
+    procedure MemberFields_AllSupportedKeys_AreMapped()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+        ExpectedBirthday: Date;
+    begin
+        // [Scenario] The documented Shopify member attribute contract maps onto the ecom sales line.
+
+        // [Given] Line custom attributes holding every supported member key
+        PropertyDict.Add('first_name', 'Ada');
+        PropertyDict.Add('last_name', 'Lovelace');
+        PropertyDict.Add('email', 'ada@example.com');
+        PropertyDict.Add('phone', '+4512345678');
+        PropertyDict.Add('city', 'Copenhagen');
+        PropertyDict.Add('zip_code', '1050');
+        PropertyDict.Add('country', 'DK');
+        PropertyDict.Add('date_of_birth', '1815-12-10');
+        ExpectedBirthday := DMY2Date(10, 12, 1815);
+
+        // [When] The importer parses the member creation fields
+        SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] Every value lands on its field
+        _Assert.AreEqual('Ada', EcomSalesLine."Member First Name", 'first_name must map to Member First Name.');
+        _Assert.AreEqual('Lovelace', EcomSalesLine."Member Last Name", 'last_name must map to Member Last Name.');
+        _Assert.AreEqual('ada@example.com', EcomSalesLine."Member Email", 'email must map to Member Email.');
+        _Assert.AreEqual('+4512345678', EcomSalesLine."Member Phone No.", 'phone must map to Member Phone No.');
+        _Assert.AreEqual('Copenhagen', EcomSalesLine."Member City", 'city must map to Member City.');
+        _Assert.AreEqual('1050', EcomSalesLine."Member Post Code", 'zip_code must map to Member Post Code.');
+        _Assert.AreEqual('DK', EcomSalesLine."Member Country", 'country must map to Member Country.');
+        _Assert.AreEqual(ExpectedBirthday, EcomSalesLine."Member Birthday", 'date_of_birth must be read as an XML format date.');
+    end;
+
+    [Test]
+    procedure MemberFields_UnknownKey_IsIgnored()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] Attribute keys outside the agreed contract are dropped without failing the import.
+        // GetOrderLineProperties lowercases keys, so a camelCase 'firstName' arrives as 'firstname' and
+        // matches nothing. This test pins that behaviour: a key mismatch is silent, which is why the
+        // storefront contract has to be kept in sync by hand.
+
+        // [Given] A camelCase-derived key alongside a supported one
+        PropertyDict.Add('firstname', 'Ada');
+        PropertyDict.Add('last_name', 'Lovelace');
+
+        // [When] The importer parses the member creation fields
+        SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] Only the supported key is mapped
+        _Assert.AreEqual('', EcomSalesLine."Member First Name", 'An unsupported attribute key must not populate a member field.');
+        _Assert.AreEqual('Lovelace', EcomSalesLine."Member Last Name", 'A supported attribute key must still be mapped.');
+    end;
+
+    [Test]
+    procedure MemberFields_EmptyValue_IsSkipped()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+        ExistingBirthday: Date;
+    begin
+        // [Scenario] An empty attribute value does not blank out or fail anything, in particular the date.
+        // Like the blank membership id above, this pins the defensive contract of the internal procedure rather than
+        // a reachable payload - AddPropertyToDict drops empty values before they ever reach the dictionary, so from
+        // production's point of view an empty value is indistinguishable from an absent key.
+
+        // [Given] A line that already holds a first name and a birthday
+        ExistingBirthday := DMY2Date(10, 12, 1815);
+        EcomSalesLine."Member First Name" := 'Ada';
+        EcomSalesLine."Member Birthday" := ExistingBirthday;
+
+        // [Given] Supported keys carrying empty values
+        PropertyDict.Add('first_name', '');
+        PropertyDict.Add('date_of_birth', '');
+
+        // [When] The importer parses the member creation fields
+        SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The line is untouched and no error is raised
+        _Assert.AreEqual('Ada', EcomSalesLine."Member First Name", 'An empty attribute value must not overwrite the field.');
+        _Assert.AreEqual(ExistingBirthday, EcomSalesLine."Member Birthday", 'An empty date_of_birth must not overwrite the birthday.');
+    end;
+
+    [Test]
+    procedure MemberFields_SurroundingWhitespace_IsTrimmed()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] Member attributes are free text from the storefront. Padding is removed, and a value that is
+        // only whitespace counts as not supplied.
+
+        // [Given] A line that already holds a last name
+        EcomSalesLine."Member Last Name" := 'Lovelace';
+
+        // [Given] Padded values and a whitespace-only last name
+        PropertyDict.Add('first_name', ' Ada ');
+        PropertyDict.Add('email', ' ada@example.com ');
+        PropertyDict.Add('last_name', '   ');
+
+        // [When] The importer parses the member creation fields
+        SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The padded values are stored trimmed and the last name is kept
+        _Assert.AreEqual('Ada', EcomSalesLine."Member First Name", 'A padded first_name must be stored trimmed.');
+        _Assert.AreEqual('ada@example.com', EcomSalesLine."Member Email", 'A padded email must be stored trimmed.');
+        _Assert.AreEqual('Lovelace', EcomSalesLine."Member Last Name", 'A whitespace-only last_name must not overwrite the field.');
+    end;
+
+    [Test]
+    procedure MemberFields_DateOfBirthWithTimePart_IsAccepted()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] A Shopify date picker commonly appends a time component. That must not abort the order:
+        // the failure rolls back the whole document, and the log entry burns a retry (bounded by
+        // "Max Doc Process Retry Count", default 5) before parking in Error for manual intervention.
+
+        // [Given] A date of birth carrying a time component and stray whitespace
+        PropertyDict.Add('date_of_birth', ' 1815-12-10T00:00:00Z ');
+
+        // [When] The importer parses the member creation fields
+        SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The date part is read and the order survives
+        _Assert.AreEqual(DMY2Date(10, 12, 1815), EcomSalesLine."Member Birthday", 'A date of birth with a time component must be reduced to its date part.');
+    end;
+
+    [Test]
+    procedure MemberFields_DateOfBirthWithTrailingDigit_Errors()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] Only a real time component may be dropped. A value that is too long for any other reason
+        // must fail, not be truncated into a date the member never entered - the birthday decides eligibility
+        // in ValidateMemberDataForDirectCreation, and a fabricated one is undetectable afterwards.
+
+        // [Given] A date of birth with a stray extra digit, as a mistyped hidden theme field produces
+        EcomSalesLine."Shopify ID" := '917000000701';
+        PropertyDict.Add('date_of_birth', '1990-01-023');
+
+        // [When] The importer parses the member creation fields
+        asserterror SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The line is rejected instead of being read as 1990-01-02, naming the Shopify line and the value
+        _Assert.ExpectedError('917000000701');
+        _Assert.ExpectedError('1990-01-023');
+    end;
+
+    [Test]
+    procedure MemberFields_DateOfBirthWithSpaceSeparator_IsAccepted()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] A space is as common a date/time separator as 'T' and must be handled the same way.
+
+        // [Given] A date of birth whose time component is separated by a space
+        PropertyDict.Add('date_of_birth', '1815-12-10 00:00:00');
+
+        // [When] The importer parses the member creation fields
+        SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The date part is read
+        _Assert.AreEqual(DMY2Date(10, 12, 1815), EcomSalesLine."Member Birthday", 'A space-separated time component must be dropped like a T-separated one.');
+    end;
+
+    [Test]
+    procedure MemberFields_InvalidDateOfBirth_ErrorsNamingTheValue()
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        PropertyDict: Dictionary of [Text, Text];
+    begin
+        // [Scenario] A genuinely unparseable date still fails, but the message names the offending value so the
+        // operator can tell which line and which attribute to fix on a multi-line order.
+
+        // [Given] A date of birth in a format the contract does not allow
+        EcomSalesLine."Shopify ID" := '917000000701';
+        PropertyDict.Add('date_of_birth', '10/12/1815');
+
+        // [When] The importer parses the member creation fields
+        asserterror SpfyEcomSalesDocImport.ParseMemberCreationFields(PropertyDict, EcomSalesLine);
+
+        // [Then] The line is rejected, naming the Shopify line, the field and the received value
+        _Assert.ExpectedError('917000000701');
+        _Assert.ExpectedError(EcomSalesLine.FieldCaption("Member Birthday"));
+        _Assert.ExpectedError('10/12/1815');
+    end;
+
+    #endregion
+
+    #region Membership setup helpers
+
+    local procedure CreateMembershipItem(var Item: Record Item)
+    begin
+        CreateMembershipItem(_MembershipItemNoLbl, 'Shopify membership item', Item);
+    end;
+
+    local procedure CreateMembershipItem(ItemNo: Code[20]; Description: Text[50]; var Item: Record Item)
+    var
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+    begin
+        _MemberModuleLib.CreateItem(ItemNo, '', Description, 100);
+        Item.Get(ItemNo);
+
+        if MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, Item."No.") then
+            exit;
+        MembershipSalesSetup.Init();
+        MembershipSalesSetup.Type := MembershipSalesSetup.Type::ITEM;
+        MembershipSalesSetup."No." := Item."No.";
+        MembershipSalesSetup.Insert();
+    end;
+
+    local procedure CreateAlterationItem(var Item: Record Item)
+    var
+        CommunityCode: Code[20];
+        MembershipCodeTok: Label 'T-SPFY-MC', Locked = true;
+    begin
+        // Initialize creates the number series the community and membership setup draw from.
+        _MemberModuleLib.Initialize();
+        CommunityCode := _MemberModuleLib.SetupCommunity_Simple();
+        _MemberModuleLib.SetupMembership_Simple(CommunityCode, MembershipCodeTok, '', 'Shopify membership');
+        _MemberModuleLib.CreateItem(_AlterationItemNoLbl, '', 'Shopify membership alteration item', 50);
+        _MemberModuleLib.SetupRenew_NoGraceNotStackable(MembershipCodeTok, _AlterationItemNoLbl, '', 'Shopify membership renewal');
+        Item.Get(_AlterationItemNoLbl);
+    end;
+
+    #endregion
 
     /// <summary>The unsaved Event Log Entry shape InsertShopifyLog is handed by the poller: store, document type and
     /// document status only - everything else is read off the order JSON.</summary>

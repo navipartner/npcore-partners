@@ -1203,7 +1203,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
         EcomSalesLine."No." := ItemVariant."Item No.";
         EcomSalesLine."Variant Code" := ItemVariant.Code;
-        EcomSalesLine.Subtype := DetermineItemSubtype(Item);
+        EcomSalesLine.Subtype := DetermineItemSubtype(Item, EcomSalesLine."Document Type");
     end;
 
     local procedure ResolveShopifyItem(ShopifyStoreCode: Code[20]; SalesLineJsonToken: JsonToken; ShopifyLineId: Text; var ItemVariant: Record "Item Variant"; var Item: Record Item)
@@ -1290,46 +1290,64 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
         IncEcomSalesLine."Membership Operation" := EcomCreateMMShipImpl.DetermineMembershipOperation(IncEcomSalesLine);
         if IncEcomSalesLine."Membership Operation" = IncEcomSalesLine."Membership Operation"::CreateMembership then
-#pragma warning disable AA0139
             ParseMemberCreationFields(PropertyDict, IncEcomSalesLine);
 
         // Membership lines are not fulfillment-driven, so they take the ordered quantity directly rather than
         // going through the fulfillment cache the item and ticket paths use.
         IncEcomSalesLine.Quantity := JsonHelper.GetJDecimal(SalesLineJsonToken, 'currentQuantity', true);
+#pragma warning disable AA0139
         IncEcomSalesLine.Description := JsonHelper.GetJText(SalesLineJsonToken, 'title', MaxStrLen(IncEcomSalesLine.Description), true);
         IncEcomSalesLine."Description 2" := JsonHelper.GetJText(SalesLineJsonToken, 'variantTitle', MaxStrLen(IncEcomSalesLine."Description 2"), false);
-        PopulateAmounts(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
 #pragma warning restore AA0139
+        PopulateAmounts(EcomSalesHeader, SalesLineJsonToken, IncEcomSalesLine, LogEntry);
     end;
 
-    local procedure ParseMembershipAlterationFields(var PropertyDict: Dictionary of [Text, Text]; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    internal procedure ParseMembershipAlterationFields(var PropertyDict: Dictionary of [Text, Text]; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
-        PropertyValue: Text;
-        InvalidAlterationOptionIdErr: Label 'The membership alteration option id ''%1'' is not a valid id.', Comment = '%1 - alteration option id received from Shopify';
-        InvalidMembershipIdErr: Label 'The membership id ''%1'' is not a valid id.', Comment = '%1 - membership id received from Shopify';
+        MembershipId: Text;
+        OptionId: Text;
+        InvalidAlterationOptionIdErr: Label 'The %1 ''%2'' on Shopify line item "%3" is not a valid id.', Comment = '%1 - Alteration Option System Id field caption, %2 - alteration option id received from Shopify, %3 - Shopify line item id';
+        InvalidMembershipIdErr: Label 'The %1 ''%2'' on Shopify line item "%3" is not a valid id.', Comment = '%1 - Membership Id field caption, %2 - membership id received from Shopify, %3 - Shopify line item id';
+        MembershipIdKeyTok: Label 'membershipid', Locked = true;
+        OptionIdKeyTok: Label 'optionid', Locked = true;
+        OptionWithoutMembershipErr: Label 'The line custom attribute ''%1'' on Shopify line item "%2" was supplied without ''%3''. An alteration option can only be applied to an existing membership.', Comment = '%1 - alteration option attribute key, %2 - Shopify line item id, %3 - membership id attribute key';
     begin
         // GetOrderLineProperties strips the leading underscore Shopify uses to hide an attribute from the
-        // customer and lowercases the key, so '_membershipId' and '_optionId' arrive here as shown below.
-        if PropertyDict.Get('membershipid', PropertyValue) and (PropertyValue <> '') then
-            if not Evaluate(EcomSalesLine."Membership Id", PropertyValue) then
-                Error(InvalidMembershipIdErr, PropertyValue);
+        // customer and lowercases the key, so '_membershipId' and '_optionId' arrive here as shown above.
+        MembershipId := GetTrimmedProperty(PropertyDict, MembershipIdKeyTok);
+        OptionId := GetTrimmedProperty(PropertyDict, OptionIdKeyTok);
 
-        if PropertyDict.Get('optionid', PropertyValue) and (PropertyValue <> '') then
-            if not Evaluate(EcomSalesLine."Alteration Option System Id", PropertyValue) then
-                Error(InvalidAlterationOptionIdErr, PropertyValue);
+        if MembershipId = '' then begin
+            if OptionId <> '' then
+                Error(OptionWithoutMembershipErr, OptionIdKeyTok, EcomSalesLine."Shopify ID", MembershipIdKeyTok);
+            exit;
+        end;
+
+        if not Evaluate(EcomSalesLine."Membership Id", MembershipId) then
+            Error(InvalidMembershipIdErr, EcomSalesLine.FieldCaption("Membership Id"), MembershipId, EcomSalesLine."Shopify ID");
+
+        if OptionId <> '' then
+            if not Evaluate(EcomSalesLine."Alteration Option System Id", OptionId) then
+                Error(InvalidAlterationOptionIdErr, EcomSalesLine.FieldCaption("Alteration Option System Id"), OptionId, EcomSalesLine."Shopify ID");
     end;
 
-    local procedure ParseMemberCreationFields(var PropertyDict: Dictionary of [Text, Text]; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    local procedure GetTrimmedProperty(var PropertyDict: Dictionary of [Text, Text]; PropertyKey: Text) PropertyValue: Text
+    begin
+        if not PropertyDict.Get(PropertyKey, PropertyValue) then
+            exit('');
+        exit(PropertyValue.Trim());
+    end;
+
+    internal procedure ParseMemberCreationFields(var PropertyDict: Dictionary of [Text, Text]; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         PropertyKey: Text;
         PropertyValue: Text;
-        InvalidBirthdayErr: Label 'The member date of birth is not a valid date.';
     begin
         if PropertyDict.Count() = 0 then
             exit;
 
         foreach PropertyKey in PropertyDict.Keys() do begin
-            PropertyValue := PropertyDict.Get(PropertyKey);
+            PropertyValue := PropertyDict.Get(PropertyKey).Trim();
             if PropertyValue <> '' then
                 case PropertyKey of
                     'first_name':
@@ -1347,11 +1365,23 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
                     'country':
                         EcomSalesLine."Member Country" := CopyStr(PropertyValue, 1, MaxStrLen(EcomSalesLine."Member Country"));
                     'date_of_birth':
-                        if not Evaluate(EcomSalesLine."Member Birthday", PropertyValue, 9) then
-                            Error(InvalidBirthdayErr);
-
+                        EcomSalesLine."Member Birthday" := ParseMemberBirthday(PropertyValue, EcomSalesLine);
                 end;
         end;
+    end;
+
+    local procedure ParseMemberBirthday(PropertyValue: Text; var EcomSalesLine: Record "NPR Ecom Sales Line") Birthday: Date
+    var
+        DatePart: Text;
+        InvalidBirthdayErr: Label 'The %1 ''%2'' on Shopify line item "%3" is not a valid date. Expected format: yyyy-mm-dd.', Comment = '%1 - Member Birthday field caption, %2 - date of birth received from Shopify, %3 - Shopify line item id';
+    begin
+        DatePart := PropertyValue.Trim();
+        if StrLen(DatePart) > 10 then
+            if DatePart[11] in ['T', ' '] then
+                DatePart := CopyStr(DatePart, 1, 10);
+
+        if not Evaluate(Birthday, DatePart, 9) then
+            Error(InvalidBirthdayErr, EcomSalesLine.FieldCaption("Member Birthday"), PropertyValue, EcomSalesLine."Shopify ID");
     end;
 
     local procedure PopulateVoucherLine(SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry"; var PropertyDict: Dictionary of [Text, Text])
@@ -1551,7 +1581,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         exit(LineType::Item);
     end;
 
-    local procedure DetermineItemSubtype(Item: Record Item) Subtype: Enum "NPR Ecom Sales Line Subtype"
+    internal procedure DetermineItemSubtype(Item: Record Item) Subtype: Enum "NPR Ecom Sales Line Subtype"
     var
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
@@ -1565,6 +1595,15 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             exit(Subtype::Membership);
 
         exit(Subtype::Item);
+    end;
+
+    // Return lines are only credited. Virtual items (tickets, memberships) are neither provisioned nor reversed
+    // on a return, and the ecom virtual-item processors reject Return Orders, so a return line is a plain item.
+    internal procedure DetermineItemSubtype(Item: Record Item; DocumentType: Enum "NPR Ecom Sales Doc Type") Subtype: Enum "NPR Ecom Sales Line Subtype"
+    begin
+        if DocumentType = DocumentType::"Return Order" then
+            exit(Subtype::Item);
+        exit(DetermineItemSubtype(Item));
     end;
 
     local procedure CheckIsNpGiftCard(PropertyDict: Dictionary of [Text, Text]): Boolean
