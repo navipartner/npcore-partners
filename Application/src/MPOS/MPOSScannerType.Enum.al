@@ -29,4 +29,16 @@
     {
         Caption = 'HID', Locked = true;
     }
+    value(6; PointMobile)
+    {
+        Caption = 'Point Mobile', Locked = true;
+    }
+    value(7; Bluebird)
+    {
+        Caption = 'Bluebird', Locked = true;
+    }
+    value(8; Urovo)
+    {
+        Caption = 'Urovo', Locked = true;
+    }
 }
