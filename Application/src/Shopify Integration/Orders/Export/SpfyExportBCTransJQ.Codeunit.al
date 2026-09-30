@@ -14,8 +14,10 @@ codeunit 6248624 "NPR Spfy Export BC Trans. JQ"
         POSEntry: Record "NPR POS Entry";
         TempSpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer" temporary;
         SpfyStore: Record "NPR Spfy Store";
+        ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        Boundary: BigInteger;
         LastRowVersion: BigInteger;
         Success: Boolean;
     begin
@@ -30,10 +32,13 @@ codeunit 6248624 "NPR Spfy Export BC Trans. JQ"
         TempSpfyExportPointerBuffer.CheckIfScopeIsNotEmpty();
         Commit();
 
+        // Freeze the committed boundary once: rows of still-open transactions (an unposted POS sale) lie above
+        // it, so no store mark can pass them. Pinned window = defer the whole run, marks unchanged.
+        Boundary := ChangeTrackerMgt.CommittedBoundary();
         LastRowVersion := TempSpfyExportPointerBuffer.GetMinLastPOSEntryRowVersion();
-        POSEntry.SetCurrentKey(SystemRowVersion);
-        if LastRowVersion > 0 then
-            POSEntry.SetFilter(SystemRowVersion, '>%1', LastRowVersion);
+        if Boundary <= LastRowVersion then
+            exit;
+        SetPOSEntryRowVersionWindow(POSEntry, LastRowVersion, Boundary);
 
         Clear(SpfyPOSEntryExportMgt);
         SpfyPOSEntryExportMgt.SetExportPointerBuffer(TempSpfyExportPointerBuffer);
@@ -43,13 +48,22 @@ codeunit 6248624 "NPR Spfy Export BC Trans. JQ"
         TempSpfyExportPointerBuffer.FindSet();
         repeat
             SpfyStore.Get(TempSpfyExportPointerBuffer."Shopify Store Code");
-            if TempSpfyExportPointerBuffer."New Last POS Entry Row Version" > SpfyStore."Last POS Entry Row Version" then
-                SpfyStore.SetLastPOSRowVersion(TempSpfyExportPointerBuffer."New Last POS Entry Row Version");
+            // Raise-only under lock: comparing against the FlowField here raced a concurrent writer.
+            SpfyStore.SetLastPOSRowVersionIfHigher(TempSpfyExportPointerBuffer."New Last POS Entry Row Version");
         until TempSpfyExportPointerBuffer.Next() = 0;
         Commit();
 
         if not Success then
             Error(GetLastErrorText());
+    end;
+
+    internal procedure SetPOSEntryRowVersionWindow(var POSEntry: Record "NPR POS Entry"; AfterRowVersion: BigInteger; UpToRowVersion: BigInteger)
+    begin
+        POSEntry.SetCurrentKey(SystemRowVersion);
+        POSEntry.ReadIsolation(IsolationLevel::ReadCommitted);
+        // Explicit AND range (After, UpTo], also when After = 0: an entry of a still-open posting lies above the
+        // frozen upper bound and stays next run's work.
+        POSEntry.SetFilter(SystemRowVersion, '>%1&<=%2', AfterRowVersion, UpToRowVersion);
     end;
 
     local procedure ParamStoreFilterName(): Text

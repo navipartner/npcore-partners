@@ -114,24 +114,51 @@ codeunit 6151218 "NPR Spfy Change Detection"
         TempStagedRow: Record "NPR Change Quarantine" temporary;
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
+        Boundary: BigInteger;
+        Lowered: Boolean;
+        Strikes: Integer;
     begin
         LockedTracker.ReadIsolation(IsolationLevel::UpdLock);
         if not LockedTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
             exit;
-        StageChunk(LockedTracker."Table No.", LockedTracker."Last Row Version", 1, TempStagedRow);
+        Boundary := ChangeTrackerMgt.CommittedBoundary();
+        if Boundary <= LockedTracker."Last Row Version" then begin
+            // Pinned: the row is not provably vanished and must not gain a strike - defer, everything unchanged.
+            ChangeTracker := LockedTracker;
+            exit;
+        end;
+        StageChunk(LockedTracker."Table No.", LockedTracker."Last Row Version", 1, Boundary, TempStagedRow);
         if not TempStagedRow.FindFirst() then begin
-            // The failing row vanished (entity deleted / re-sync consumed it): forget the streak and release the lock.
+            // The failing row vanished or was re-modified (its rowversion was <= an earlier boundary, and the
+            // boundary never decreases): both forget the streak. Release the lock.
             ChangeTrackerMgt.ClearRowFailure(LockedTracker);
             Commit();
             ChangeTracker := LockedTracker;
             exit;
         end;
-        if ChangeTrackerMgt.RecordRowFailure(LockedTracker, TempStagedRow."Row Version") >= SpfyChangeTrackerMgt.QuarantineThreshold() then begin
-            ChangeTrackerMgt.QuarantineRow(LockedTracker, TempStagedRow."Row Version", TempStagedRow."Record ID", TempStagedRow."Entity System Id", RowErrorText);
-            EmitQuarantineSentry(LockedTracker."Table No.", TempStagedRow."Record ID", TempStagedRow."Row Version", RowErrorText, RowCallStack);
-        end;
+        Strikes := ChangeTrackerMgt.RecordRowFailure(LockedTracker, TempStagedRow."Row Version", Lowered);
+        if not Lowered and (Strikes >= SpfyChangeTrackerMgt.QuarantineThreshold()) then
+            if ChangeTrackerMgt.QuarantineRow(LockedTracker, TempStagedRow."Row Version", TempStagedRow."Record ID", TempStagedRow."Entity System Id", RowErrorText) then
+                EmitQuarantineSentry(LockedTracker."Table No.", TempStagedRow."Record ID", TempStagedRow."Row Version", RowErrorText, RowCallStack);
         Commit();
         ChangeTracker := LockedTracker;
+    end;
+
+    local procedure EmitPinnedSentry(TableNo: Integer; Mark: BigInteger; Boundary: BigInteger)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        OwnsTransaction: Boolean;
+    begin
+        // Info-level signal, zero schema: a pinned cycle is the fix WORKING. Only a LONG pin (hung session,
+        // runaway batch) matters, and Sentry's Performance view makes it readable as "pinned since HH:MM".
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('Shopify change-detection pinned', 'bc.spfy.change_detection.pinned');
+        Sentry.AddTransactionTag('table_no', Format(TableNo));
+        Sentry.AddTransactionTag('mark', Format(Mark));
+        Sentry.AddTransactionTag('boundary', Format(Boundary));
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     local procedure EmitQuarantineSentry(TableNo: Integer; QuarRecordId: RecordId; RowVersion: BigInteger; ErrorText: Text; CallStack: Text)
@@ -226,6 +253,7 @@ codeunit 6151218 "NPR Spfy Change Detection"
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
         SpfyChangeDispatcher: Codeunit "NPR Spfy Change Dispatcher";
         DetectedChange: Codeunit "NPR Spfy Detected Change";
+        Boundary: BigInteger;
         StagingMark: BigInteger;
         BatchSize: Integer;
         ChunkSize: Integer;
@@ -237,6 +265,17 @@ codeunit 6151218 "NPR Spfy Change Detection"
         LockedTracker.ReadIsolation(IsolationLevel::UpdLock);
         if not LockedTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
             exit;
+        // Freeze the boundary ONCE per window: re-reading per chunk would move the window after each Commit,
+        // and a transaction that first writes after this capture is simply next cycle's work.
+        Boundary := ChangeTrackerMgt.CommittedBoundary();
+        if Boundary <= LockedTracker."Last Row Version" then begin
+            // Pinned: an open transaction holds the window shut. Nothing staged, mark unchanged, no failure
+            // recorded. Diagnosable in Sentry when the pin actually delays work (a long pin = a hung session).
+            // Dirty-read probe: a committed read cannot see the pinning row, so it could never answer "is work waiting?".
+            if ChangeTrackerMgt.UncommittedMaxRowVersion(LockedTracker."Table No.") > LockedTracker."Last Row Version" then
+                EmitPinnedSentry(LockedTracker."Table No.", LockedTracker."Last Row Version", Boundary);
+            exit;
+        end;
         BatchSize := SpfyChangeTrackerMgt.BatchSizeForTable(LockedTracker."Table No.");
         // Local staging cursor: tracks the last staged rowversion so each chunk resumes where the previous ended.
         StagingMark := LockedTracker."Last Row Version";
@@ -245,9 +284,13 @@ codeunit 6151218 "NPR Spfy Change Detection"
             ChunkSize := BatchSize;
             if MaxRows() - RowsThisCycle < ChunkSize then
                 ChunkSize := MaxRows() - RowsThisCycle;
-            StagedCount := StageChunk(LockedTracker."Table No.", StagingMark, ChunkSize, TempStagedRow);
-            if StagedCount = 0 then
+            StagedCount := StageChunk(LockedTracker."Table No.", StagingMark, ChunkSize, Boundary, TempStagedRow);
+            if StagedCount = 0 then begin
+                // Empty bounded window: still claim it up to the boundary, or the mark never moves on a quiet table.
+                if ChangeTrackerMgt.AdvanceMark(LockedTracker, Boundary) then;
+                Commit();
                 exit;
+            end;
             TempStagedRow.FindSet();
             repeat
                 DetectedChange.Init(SpfyChangeTrackerMgt.IntegrationAreaForTable(LockedTracker."Table No."), "NPR Spfy Change Type"::Modify, LockedTracker."Table No.", TempStagedRow."Record ID", TempStagedRow."Entity System Id");
@@ -260,9 +303,15 @@ codeunit 6151218 "NPR Spfy Change Detection"
             AbortPoll := not ChangeTrackerMgt.AdvanceMark(LockedTracker, StagingMark);
             Commit();
         until (StagedCount < ChunkSize) or (RowsThisCycle >= MaxRows()) or AbortPoll;
+        // Drained (short chunk): every visible row up to the frozen boundary is dispatched - claim the whole
+        // window. A cut (row budget) keeps the last processed row instead.
+        if not AbortPoll and (StagedCount < ChunkSize) then begin
+            if ChangeTrackerMgt.AdvanceMark(LockedTracker, Boundary) then;
+            Commit();
+        end;
     end;
 
-    local procedure StageChunk(TableNo: Integer; FromMark: BigInteger; MaxStageCount: Integer; var TempStagedRow: Record "NPR Change Quarantine" temporary) StagedCount: Integer
+    local procedure StageChunk(TableNo: Integer; FromMark: BigInteger; MaxStageCount: Integer; UpperBound: BigInteger; var TempStagedRow: Record "NPR Change Quarantine" temporary) StagedCount: Integer
     var
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
         RecRef: RecordRef;
@@ -273,7 +322,7 @@ codeunit 6151218 "NPR Spfy Change Detection"
         TempStagedRow.DeleteAll();
         RecRef.Open(TableNo);
         RecRef.ReadIsolation(IsolationLevel::ReadCommitted);
-        ChangeTrackerMgt.SetFilterOnRowVersion(RecRef, FromMark);
+        ChangeTrackerMgt.SetFilterOnRowVersion(RecRef, FromMark, UpperBound);
         RowVerFieldNo := ChangeTrackerMgt.RowVersionFieldNo(RecRef);
         if RecRef.FindSet() then
             repeat
@@ -296,20 +345,43 @@ codeunit 6151218 "NPR Spfy Change Detection"
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
         PollRowRunner: Codeunit "NPR Spfy Poll Row Runner";
+        Boundary: BigInteger;
+        Lowered: Boolean;
+        BatchSize: Integer;
+        StagedCount: Integer;
+        Strikes: Integer;
         RowCallStack: Text;
         RowErrorText: Text;
     begin
         LockedTracker.ReadIsolation(IsolationLevel::UpdLock);
         if not LockedTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
             exit(false);
-        StageChunk(LockedTracker."Table No.", LockedTracker."Last Row Version", SpfyChangeTrackerMgt.BatchSizeForTable(LockedTracker."Table No."), TempStagedRow);
-        if not TempStagedRow.FindSet() then begin
-            // The failing row vanished (entity deleted / re-sync consumed it): forget the streak.
+        Boundary := ChangeTrackerMgt.CommittedBoundary();
+        if Boundary <= LockedTracker."Last Row Version" then begin
+            // Deferred, unchanged: an open transaction pins the window. Do NOT treat the failing row as vanished -
+            // clearing here would reset a poison row's streak every pinned cycle and the table stalls with no
+            // quarantine and no alert. Mark, streak and error state survive; false skips this cycle's poll -
+            // which is why the pinned signal must also be sent from HERE: a streak table never reaches the poll.
+            if ChangeTrackerMgt.UncommittedMaxRowVersion(LockedTracker."Table No.") > LockedTracker."Last Row Version" then
+                EmitPinnedSentry(LockedTracker."Table No.", LockedTracker."Last Row Version", Boundary);
+            ChangeTracker := LockedTracker;
+            exit(false);
+        end;
+        BatchSize := SpfyChangeTrackerMgt.BatchSizeForTable(LockedTracker."Table No.");
+        StagedCount := StageChunk(LockedTracker."Table No.", LockedTracker."Last Row Version", BatchSize, Boundary, TempStagedRow);
+        if StagedCount = 0 then begin
+            // The failing row vanished or was re-modified past the boundary (its rowversion was <= an earlier
+            // boundary, and the boundary never decreases): claim the empty window and forget the streak.
+            if not ChangeTrackerMgt.AdvanceMark(LockedTracker, Boundary) then begin
+                ChangeTracker := LockedTracker;
+                exit(false);
+            end;
             ChangeTrackerMgt.ClearRowFailure(LockedTracker);
             Commit();
             ChangeTracker := LockedTracker;
             exit(true);
         end;
+        TempStagedRow.FindSet();
         repeat
             PollRowRunner.SetStagedRow(LockedTracker."Table No.", TempStagedRow."Record ID", TempStagedRow."Entity System Id");
             // Per-row commit: the previous row's writes must survive this row's rollback, and Codeunit.Run
@@ -326,15 +398,25 @@ codeunit 6151218 "NPR Spfy Change Detection"
             end else begin
                 CaptureRowError(RowErrorText, RowCallStack);
                 CaptureFirstError(FirstErrorText);
-                if ChangeTrackerMgt.RecordRowFailure(LockedTracker, TempStagedRow."Row Version") >= SpfyChangeTrackerMgt.QuarantineThreshold() then begin
-                    ChangeTrackerMgt.QuarantineRow(LockedTracker, TempStagedRow."Row Version", TempStagedRow."Record ID", TempStagedRow."Entity System Id", RowErrorText);
-                    EmitQuarantineSentry(LockedTracker."Table No.", TempStagedRow."Record ID", TempStagedRow."Row Version", RowErrorText, RowCallStack);
-                end;
+                // Lowered = concurrent re-sync: abort without a strike and without quarantining the lowered range.
+                Strikes := ChangeTrackerMgt.RecordRowFailure(LockedTracker, TempStagedRow."Row Version", Lowered);
+                if not Lowered and (Strikes >= SpfyChangeTrackerMgt.QuarantineThreshold()) then
+                    if ChangeTrackerMgt.QuarantineRow(LockedTracker, TempStagedRow."Row Version", TempStagedRow."Record ID", TempStagedRow."Entity System Id", RowErrorText) then
+                        EmitQuarantineSentry(LockedTracker."Table No.", TempStagedRow."Record ID", TempStagedRow."Row Version", RowErrorText, RowCallStack);
                 Commit();
                 ChangeTracker := LockedTracker;
                 exit(false);
             end;
         until TempStagedRow.Next() = 0;
+        // Drained pinpoint chunk (fewer rows than requested, all succeeded): claim the whole bounded window -
+        // this path is not always followed by a poll. A FULL chunk was cut short: keep the last row (already
+        // advanced per-row). An AdvanceMark refusal (concurrent lowering) aborts BEFORE the failure state clears.
+        if StagedCount < BatchSize then
+            if not ChangeTrackerMgt.AdvanceMark(LockedTracker, Boundary) then begin
+                Commit();
+                ChangeTracker := LockedTracker;
+                exit(false);
+            end;
         ChangeTrackerMgt.ClearRowFailure(LockedTracker);
         Commit();
         ChangeTracker := LockedTracker;
@@ -343,6 +425,17 @@ codeunit 6151218 "NPR Spfy Change Detection"
 
     local procedure MaxRows(): Integer
     begin
+        if _MaxRowsOverride > 0 then
+            exit(_MaxRowsOverride);
         exit(100000);
     end;
+
+    internal procedure SetMaxRowsForTest(MaxRowsOverride: Integer)
+    begin
+        // Test seam: the 100 000 default row budget is not exercisable in a test.
+        _MaxRowsOverride := MaxRowsOverride;
+    end;
+
+    var
+        _MaxRowsOverride: Integer;
 }

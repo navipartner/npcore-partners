@@ -7,12 +7,15 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
 
     var
         _Assert: Codeunit Assert;
+        _BndSeam: Codeunit "NPR Spfy RowVer Boundary Seam";
         _Lib: Codeunit "NPR Spfy RowVer Test Lib";
         _Seam: Codeunit "NPR Spfy RowVer Fail Seam";
+        _BndBound: Boolean;
 
     local procedure Initialize()
     begin
-        _Lib.ResetState();   // also disarms the RowVer fail seam - see SpfyRowVerTestLib.ResetState()
+        // Binds the codeunit-owned boundary seam and arms LastAllocated; also disarms the RowVer fail seam.
+        _Lib.ResetState(_BndSeam, _BndBound);
         _Lib.EnsureIntegrationEnabled();
         _Lib.SetFeatureEnabled(true);
     end;
@@ -112,16 +115,46 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
     var
         ChangeTracker: Record "NPR Change Tracker";
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+        Lowered: Boolean;
     begin
         // [SCENARIO] Repeated failures of the same row version count up as one streak, and a different failing row version restarts the count at one.
         Initialize();
         CreateTracker(Database::Item, 100, ChangeTracker);
         // [WHEN] The same poison rowversion fails three cycles. [THEN] the streak counts 1,2,3.
-        _Assert.AreEqual(1, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123), 'First failure');
-        _Assert.AreEqual(2, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123), 'Second failure');
-        _Assert.AreEqual(3, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123), 'Third failure');
+        _Assert.AreEqual(1, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered), 'First failure');
+        _Assert.AreEqual(2, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered), 'Second failure');
+        _Assert.AreEqual(3, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered), 'Third failure');
         // [WHEN] A different rowversion fails. [THEN] the streak re-anchors to 1.
-        _Assert.AreEqual(1, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 456), 'A new failing rowversion restarts the streak');
+        _Assert.AreEqual(1, ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 456, Lowered), 'A new failing rowversion restarts the streak');
+        _Assert.IsFalse(Lowered, 'No concurrent lowering happened');
+    end;
+
+    [Test]
+    procedure RecordRowFailure_ConcurrentLoweringRefused()
+    var
+        StaleTracker: Record "NPR Change Tracker";
+        DbTracker: Record "NPR Change Tracker";
+        ChangeQuarantine: Record "NPR Change Quarantine";
+        ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+        Lowered: Boolean;
+        Strikes: Integer;
+    begin
+        // [SCENARIO] A failure recorded by a poller holding a stale high mark is refused when a re-sync lowered the DB mark: no streak, no quarantine, and the reset survives.
+        Initialize();
+        CreateTracker(Database::Item, 500, StaleTracker);
+        // [GIVEN] A re-sync lowers the DB mark to 0 under the stale poller's high in-memory copy.
+        DbTracker.Get(StaleTracker."Integration Type", StaleTracker."Table No.");
+        DbTracker."Last Row Version" := 0;
+        DbTracker.Modify(false);
+        // [WHEN] The stale poller records a row failure. [THEN] the call refuses and writes nothing.
+        Strikes := ChangeTrackerMgt.RecordRowFailure(StaleTracker, 123, Lowered);
+        _Assert.IsTrue(Lowered, 'A concurrently-lowered mark must set the Lowered signal');
+        _Assert.AreEqual(0, Strikes, 'A refused failure must not count as a strike');
+        DbTracker.Get(DbTracker."Integration Type", DbTracker."Table No.");
+        _Assert.IsTrue(DbTracker."Last Row Version" = 0, 'The re-sync reset (0) must survive the refused failure');
+        _Assert.AreEqual(0, DbTracker."Consecutive Failures", 'A refused failure must not persist a streak');
+        _Assert.IsTrue(DbTracker."Failing Row Version" = 0, 'A refused failure must not persist a failing row version');
+        _Assert.IsTrue(ChangeQuarantine.IsEmpty(), 'A refused failure must not quarantine anything');
     end;
 
     [Test]
@@ -130,12 +163,13 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
         ChangeTracker: Record "NPR Change Tracker";
         ChangeQuarantine: Record "NPR Change Quarantine";
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+        Lowered: Boolean;
     begin
         // [SCENARIO] A row that dispatches cleanly after failures has its failure streak and failing row version cleared, and nothing is quarantined.
         Initialize();
         CreateTracker(Database::Item, 100, ChangeTracker);
-        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123);
-        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123);
+        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered);
+        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered);
         // [WHEN] The row later dispatches cleanly. [THEN] the failure state resets and nothing was quarantined.
         ChangeTrackerMgt.ClearRowFailure(ChangeTracker);
         _Assert.AreEqual(0, ChangeTracker."Consecutive Failures", 'Consecutive failures must reset to 0');
@@ -152,6 +186,7 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
         EntityRecordId: RecordId;
         EntityId: Guid;
+        Lowered: Boolean;
     begin
         // [SCENARIO] Quarantining a poison row writes one quarantine entry carrying the entity identity and error, advances the mark past that row and clears the failure streak.
         Initialize();
@@ -160,9 +195,9 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
         EntityItem."No." := 'QUARITEM';
         EntityRecordId := EntityItem.RecordId();
         CreateTracker(Database::Item, 100, ChangeTracker);
-        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123);
-        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123);
-        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123);
+        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered);
+        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered);
+        ChangeTrackerMgt.RecordRowFailure(ChangeTracker, 123, Lowered);
         // [WHEN] The poison row is quarantined on the third strike.
         ChangeTrackerMgt.QuarantineRow(ChangeTracker, 123, EntityRecordId, EntityId, 'boom');
         // [THEN] exactly one quarantine row capturing the entity identity an operator needs for recovery.
@@ -317,7 +352,7 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
         AssertProductTaskCount(1, Item1."No.", Link1, 'Changed link 1 must produce a product task');
         AssertProductTaskCount(1, Item2."No.", Link2, 'Changed link 2 must produce a product task');
         AssertProductTaskCount(0, Item3."No.", Link3, 'Unchanged link must not be dispatched');
-        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = _Lib.CurrentMaxRowVersion(Database::"NPR Spfy Store-Item Link"), 'Mark must advance to the max scanned rowversion');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") >= _Lib.CurrentMaxRowVersion(Database::"NPR Spfy Store-Item Link"), 'Mark must cover the max scanned rowversion (a drained window claims the DB-wide committed boundary)');
 
         // [THEN] A repeated poll re-dispatches nothing.
         _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
@@ -328,7 +363,7 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
         Link3.Modify(false);
         _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
         AssertProductTaskCount(0, Item3."No.", Link3, 'An excluded-field change must not create a task');
-        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = _Lib.CurrentMaxRowVersion(Database::"NPR Spfy Store-Item Link"), 'A no-op row must still advance the mark');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") >= _Lib.CurrentMaxRowVersion(Database::"NPR Spfy Store-Item Link"), 'A no-op row must still advance the mark');
     end;
 
     local procedure AssertProductTaskCount(Expected: Integer; ItemNo: Code[20]; SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Context: Text)
@@ -536,6 +571,496 @@ codeunit 85283 "NPR Spfy RowVer Engine Tests"
 
         // [THEN] With the poison row behind the mark the next cycle raises nothing (an error here fails the test) and quarantines nothing more.
         _Assert.AreEqual(1, ChangeQuarantine.Count(), 'The cycle after the quarantine must not quarantine the same row again');
+    end;
+    #endregion
+
+    #region Committed Boundary (CORE-2227)
+    [Test]
+    procedure SetFilterOnRowVersion_UpperBoundExcludesLaterRows()
+    var
+        Item1: Record Item;
+        Item2: Record Item;
+        Item3: Record Item;
+        ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+        RecRef: RecordRef;
+        Boundary: BigInteger;
+    begin
+        // [SCENARIO] The bounded rowversion filter selects only rows inside (Mark, UpperBound]; rows above the bound stay outside, and an inverted range is empty.
+        Initialize();
+        _Lib.CreateItem(Item1);
+        _Lib.CreateItem(Item2);
+        _Lib.CreateItem(Item3);
+        Commit();
+        Item1.Get(Item1."No.");
+        Item2.Get(Item2."No.");
+        Item3.Get(Item3."No.");
+        // The bound is a chosen, fixture-derived rowversion: rows 1 and 2 sit at or below it, row 3 above it.
+        Boundary := Item2.SystemRowVersion;
+
+        // [WHEN] Filtering (below row 1, Boundary]. [THEN] the two early rows are inside, the late row is outside.
+        RecRef.Open(Database::Item);
+        ChangeTrackerMgt.SetFilterOnRowVersion(RecRef, Item1.SystemRowVersion - 1, Boundary);
+        _Assert.IsTrue(RecRefContainsItem(RecRef, Item1."No."), 'A committed row inside the window must be selected');
+        _Assert.IsTrue(RecRefContainsItem(RecRef, Item2."No."), 'The second committed row inside the window must be selected');
+        _Assert.IsFalse(RecRefContainsItem(RecRef, Item3."No."), 'A row above the upper bound must be excluded');
+        RecRef.Close();
+
+        // [WHEN] The upper bound does not exceed the mark. [THEN] the window is empty.
+        RecRef.Open(Database::Item);
+        ChangeTrackerMgt.SetFilterOnRowVersion(RecRef, Boundary, Boundary);
+        _Assert.IsTrue(RecRef.IsEmpty(), 'An empty window (UpperBound <= Mark) must select nothing');
+        RecRef.Close();
+    end;
+
+    local procedure RecRefContainsItem(var RecRef: RecordRef; ItemNo: Code[20]): Boolean
+    var
+        Item: Record Item;
+        NoFRef: FieldRef;
+        Found: Boolean;
+    begin
+        NoFRef := RecRef.Field(Item.FieldNo("No."));
+        NoFRef.SetRange(ItemNo);
+        Found := not RecRef.IsEmpty();
+        NoFRef.SetRange();
+        exit(Found);
+    end;
+
+    [Test]
+    procedure GivenDrainedWindow_WhenTablePolled_ThenMarkClaimsCommittedBoundary()
+    var
+        Item: Record Item;
+        Link: Record "NPR Spfy Store-Item Link";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        Boundary: BigInteger;
+    begin
+        // [SCENARIO] A poll that drains its window persists the frozen boundary, not merely the last row it saw, so a quiet table's mark still reaches the boundary.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, Link, StoreCode);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link);
+        _Lib.RegisterTable(Database::"NPR Spfy Store-Item Link");
+        // [GIVEN] One committed pending change and a fixed boundary strictly above it (armed after setup).
+        Link."Shopify Name" := 'Drained change';
+        Link.Modify(false);
+        Commit();
+        Link.GetBySystemId(Link.SystemId);
+        Boundary := Link.SystemRowVersion + 1000;
+        _BndSeam.SetFixedBoundary(Boundary);
+        _BndSeam.ResetBoundaryReadCount();
+
+        // [WHEN] The poll drains the window.
+        _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
+
+        // [THEN] The change dispatched, the mark claims exactly the frozen window, and the boundary was captured once.
+        AssertProductTaskCount(1, Item."No.", Link, 'The pending change must be dispatched');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = Boundary, StrSubstNo('A drained window must claim exactly the boundary %1, was %2', Boundary, _Lib.GetMark(Database::"NPR Spfy Store-Item Link")));
+        _Assert.AreEqual(1, _BndSeam.BoundaryReadCount(), 'The poll must capture the boundary exactly once per window');
+    end;
+
+    [Test]
+    procedure GivenRowBudgetCut_WhenPolled_ThenMarkKeepsLastProcessedRowUntilDrained()
+    var
+        Item1: Record Item;
+        Item2: Record Item;
+        Link1: Record "NPR Spfy Store-Item Link";
+        Link2: Record "NPR Spfy Store-Item Link";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        Boundary: BigInteger;
+    begin
+        // [SCENARIO] A poll cut by the row budget persists the last processed row (never the boundary, never a skipped row); later polls work the backlog off and only an empty poll claims the boundary.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item1, Link1, StoreCode);
+        _Lib.CreateSyncedItemWithLink(Item2, Link2, StoreCode);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link1);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link2);
+        _Lib.RegisterTable(Database::"NPR Spfy Store-Item Link");
+        // [GIVEN] Two committed pending changes, ONE fixed boundary above both, and a one-row cycle budget.
+        Link1."Shopify Name" := 'Cut change 1';
+        Link1.Modify(false);
+        Link2."Shopify Name" := 'Cut change 2';
+        Link2.Modify(false);
+        Commit();
+        Link1.GetBySystemId(Link1.SystemId);
+        Link2.GetBySystemId(Link2.SystemId);
+        Boundary := Link2.SystemRowVersion + 1000;
+        _BndSeam.SetFixedBoundary(Boundary);
+        _Lib.SetMaxPollRows(1);
+
+        // [WHEN] Poll 1 is cut after one row. [THEN] the mark is exactly the processed row - never the boundary, never a skipped row.
+        _BndSeam.ResetBoundaryReadCount();
+        _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = Link1.SystemRowVersion, StrSubstNo('A cut poll must keep the last processed row %1, was %2', Link1.SystemRowVersion, _Lib.GetMark(Database::"NPR Spfy Store-Item Link")));
+        AssertProductTaskCount(1, Item1."No.", Link1, 'Poll 1 must dispatch the first pending row');
+        AssertProductTaskCount(0, Item2."No.", Link2, 'Poll 1 must not dispatch past the cut');
+        _Assert.AreEqual(1, _BndSeam.BoundaryReadCount(), 'A cut poll must capture the boundary exactly once');
+
+        // [WHEN] Poll 2 processes the second row, again cut at the budget. [THEN] the mark is that row.
+        _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = Link2.SystemRowVersion, StrSubstNo('Poll 2 must keep the second processed row %1, was %2', Link2.SystemRowVersion, _Lib.GetMark(Database::"NPR Spfy Store-Item Link")));
+        AssertProductTaskCount(1, Item2."No.", Link2, 'Poll 2 must dispatch the second pending row');
+
+        // [WHEN] Poll 3 finds the window empty. [THEN] it claims exactly the boundary.
+        _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = Boundary, StrSubstNo('An empty poll must claim exactly the boundary %1, was %2', Boundary, _Lib.GetMark(Database::"NPR Spfy Store-Item Link")));
+    end;
+
+    [Test]
+    procedure GivenPinnedWindow_WhenPolledAndPinpointed_ThenNothingMovesAndStreakSurvives()
+    var
+        Item: Record Item;
+        Link: Record "NPR Spfy Store-Item Link";
+        ChangeTracker: Record "NPR Change Tracker";
+        ChangeQuarantine: Record "NPR Change Quarantine";
+        SpfyChangeDetection: Codeunit "NPR Spfy Change Detection";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        PinnedMark: BigInteger;
+        TasksBefore: Integer;
+        FirstErrorText: Text;
+    begin
+        // [SCENARIO] While the boundary sits at or below the mark (window pinned by an open transaction), the poll dispatches nothing and records no failure, and the pinpoint walk defers without touching the failure streak - a boundary pinned every other cycle must never reset a poison row's streak.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, Link, StoreCode);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link);
+        _Lib.RegisterTable(Database::"NPR Spfy Store-Item Link");
+        // [GIVEN] A committed pending change ABOVE the mark (work is waiting) and a fixed boundary AT the mark: Boundary <= mark < pending row.
+        Link."Shopify Name" := 'Pinned-out change';
+        Link.Modify(false);
+        Commit();
+        Link.GetBySystemId(Link.SystemId);
+        PinnedMark := Link.SystemRowVersion - 1;
+        _Lib.SetMark(Database::"NPR Spfy Store-Item Link", PinnedMark);
+        _BndSeam.SetFixedBoundary(PinnedMark);
+        TasksBefore := _Lib.TaskCount();
+
+        // [WHEN] The poll runs against the pinned window (Boundary = mark). [THEN] nothing dispatches, nothing moves, no failure is recorded.
+        _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(TasksBefore, _Lib.TaskCount(), 'A pinned poll must dispatch nothing');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = PinnedMark, 'A pinned poll must not move the mark');
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(0, ChangeTracker."Consecutive Failures", 'A pinned poll must not record a failure');
+
+        // [WHEN] The boundary sits strictly below the mark. [THEN] the poll still defers unchanged.
+        _BndSeam.SetFixedBoundary(PinnedMark - 5);
+        _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(TasksBefore, _Lib.TaskCount(), 'A strictly-below boundary must also dispatch nothing');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = PinnedMark, 'A strictly-below boundary must not move the mark');
+
+        // [GIVEN] A pre-existing failure streak on the pinned table.
+        ChangeTracker."Failing Row Version" := PinnedMark + 1;
+        ChangeTracker."Consecutive Failures" := 2;
+        ChangeTracker.Modify(false);
+        Commit();
+
+        // [WHEN] The pinpoint walk runs against the pinned window. [THEN] it defers: streak, anchor and mark survive, nothing is quarantined.
+        _Assert.IsFalse(SpfyChangeDetection.RunPinpointWindow(ChangeTracker, FirstErrorText), 'A pinned pinpoint window must defer (skip the poll this cycle)');
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(2, ChangeTracker."Consecutive Failures", 'A pinned pinpoint must not clear the failure streak');
+        _Assert.IsTrue(ChangeTracker."Failing Row Version" = PinnedMark + 1, 'A pinned pinpoint must keep the failing row anchor');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = PinnedMark, 'A pinned pinpoint must not move the mark');
+        _Assert.IsTrue(ChangeQuarantine.IsEmpty(), 'A pinned pinpoint must not quarantine anything');
+        _Assert.AreEqual('', FirstErrorText, 'A deferred pinpoint must not record an error');
+    end;
+
+    [Test]
+    procedure ReseedAllMarks_SeedsAtTheCommittedBoundaryNotTheTableMax()
+    var
+        Item: Record Item;
+        LaterItem: Record Item;
+        ChangeTracker: Record "NPR Change Tracker";
+        SecondTracker: Record "NPR Change Tracker";
+        ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+        BoundaryBefore: BigInteger;
+    begin
+        // [SCENARIO] A reseed lands every mark on the committed boundary, never on the table max: a row of a still-open transaction lies above the boundary and must stay next cycle's work.
+        Initialize();
+        // Two trackers, so a reseed that walks only the first one cannot pass.
+        CreateTracker(Database::Item, 0, ChangeTracker);
+        CreateTracker(Database::"Item Variant", 0, SecondTracker);
+        // [GIVEN] Two committed Item rows and a fixed boundary at the FIRST row: the table max lies above the boundary.
+        _Lib.CreateItem(Item);
+        _Lib.CreateItem(LaterItem);
+        Commit();
+        Item.Get(Item."No.");
+        LaterItem.Get(LaterItem."No.");
+        BoundaryBefore := Item.SystemRowVersion;
+        _BndSeam.SetFixedBoundary(BoundaryBefore);
+
+        // [WHEN] Every Shopify mark is reseeded.
+        ChangeTrackerMgt.ReseedAllMarksToCurrentMax("NPR Integration Type"::Shopify);
+
+        // [THEN] EVERY mark is exactly the boundary; a seed at the table max would land on the later row.
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::Item);
+        SecondTracker.Get("NPR Integration Type"::Shopify, Database::"Item Variant");
+        _Assert.IsTrue(ChangeTracker."Last Row Version" = BoundaryBefore, StrSubstNo('The reseed must land exactly on the boundary %1, was %2', BoundaryBefore, ChangeTracker."Last Row Version"));
+        _Assert.IsTrue(SecondTracker."Last Row Version" = BoundaryBefore, StrSubstNo('The reseed must land EVERY mark on the boundary %1, the second tracker was %2', BoundaryBefore, SecondTracker."Last Row Version"));
+        _Assert.IsTrue(ChangeTracker."Last Row Version" < LaterItem.SystemRowVersion, 'The reseed must never pass the boundary up to the table max');
+    end;
+
+    [Test]
+    procedure FastForward_RaisesToCommittedMaxButNeverLowers()
+    var
+        Item: Record Item;
+        LaterItem: Record Item;
+        ChangeTracker: Record "NPR Change Tracker";
+        DbTracker: Record "NPR Change Tracker";
+        ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+        Boundary: BigInteger;
+        HighMark: BigInteger;
+    begin
+        // [SCENARIO] The tracker page's fast-forward raises a low mark to exactly the boundary when the table max lies above it, and refuses to lower a mark that is already higher - the UI promises a raise.
+        Initialize();
+        CreateTracker(Database::Item, 0, ChangeTracker);
+        // [GIVEN] Two committed Item rows and a fixed boundary at the FIRST row.
+        _Lib.CreateItem(Item);
+        _Lib.CreateItem(LaterItem);
+        Commit();
+        Item.Get(Item."No.");
+        LaterItem.Get(LaterItem."No.");
+        Boundary := Item.SystemRowVersion;
+        _BndSeam.SetFixedBoundary(Boundary);
+        // [WHEN] Fast-forwarding a zero mark. [THEN] it raises to exactly the boundary; an uncapped fast-forward would land on the later row.
+        _Assert.IsTrue(ChangeTrackerMgt.FastForwardToCommittedMax(ChangeTracker), 'Fast-forward must raise a low mark');
+        _Assert.IsTrue(ChangeTracker."Last Row Version" = Boundary, StrSubstNo('Fast-forward must cap at exactly the boundary %1, was %2', Boundary, ChangeTracker."Last Row Version"));
+        _Assert.IsTrue(ChangeTracker."Last Row Version" < LaterItem.SystemRowVersion, 'Fast-forward must never pass the boundary up to the table max');
+        // [GIVEN] A mark above the boundary. [WHEN] fast-forwarding again. [THEN] refused, the mark survives.
+        HighMark := Boundary + 100000;
+        DbTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.");
+        DbTracker."Last Row Version" := HighMark;
+        DbTracker.Modify(false);
+        Commit();
+        _Assert.IsFalse(ChangeTrackerMgt.FastForwardToCommittedMax(DbTracker), 'Fast-forward must never lower an existing higher mark');
+        DbTracker.Get(DbTracker."Integration Type", DbTracker."Table No.");
+        _Assert.IsTrue(DbTracker."Last Row Version" = HighMark, 'The higher mark must survive a refused fast-forward');
+    end;
+
+    [Test]
+    procedure GivenVanishedFailingRow_WhenWindowEmpty_ThenPinpointClearsAndClaims_RecorderClearsWithoutAdvance()
+    var
+        Item: Record Item;
+        Link: Record "NPR Spfy Store-Item Link";
+        ChangeTracker: Record "NPR Change Tracker";
+        SpfyChangeDetection: Codeunit "NPR Spfy Change Detection";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        MarkBefore: BigInteger;
+        Boundary: BigInteger;
+        FirstErrorText: Text;
+    begin
+        // [SCENARIO] An empty bounded window ABOVE the mark means the failing row vanished: the pinpoint walk clears the streak and claims the window; the failure recorder clears the streak WITHOUT advancing the mark.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, Link, StoreCode);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link);
+        _Lib.RegisterTable(Database::"NPR Spfy Store-Item Link");
+        Commit();
+        // [GIVEN] A failure streak, no rows past the mark, and a fixed boundary above the mark (window open but empty).
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        MarkBefore := ChangeTracker."Last Row Version";
+        ChangeTracker."Failing Row Version" := MarkBefore + 1;
+        ChangeTracker."Consecutive Failures" := 2;
+        ChangeTracker.Modify(false);
+        Commit();
+        Boundary := MarkBefore + 500;
+        _BndSeam.SetFixedBoundary(Boundary);
+
+        // [WHEN] The failure recorder finds the window empty. [THEN] streak cleared, mark UNCHANGED (no-advance contract).
+        SpfyChangeDetection.RecordFailedRowWithoutRedispatch(ChangeTracker, 'boom', '');
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(0, ChangeTracker."Consecutive Failures", 'The recorder must clear the streak for a vanished row');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = MarkBefore, 'The recorder must not advance the mark');
+
+        // [GIVEN] The streak again. [WHEN] the pinpoint walk finds the window empty. [THEN] streak cleared AND the window claimed exactly.
+        ChangeTracker."Failing Row Version" := MarkBefore + 1;
+        ChangeTracker."Consecutive Failures" := 2;
+        ChangeTracker.Modify(false);
+        Commit();
+        _Assert.IsTrue(SpfyChangeDetection.RunPinpointWindow(ChangeTracker, FirstErrorText), 'A vanished-row pinpoint must report continue');
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(0, ChangeTracker."Consecutive Failures", 'The pinpoint must clear the streak for a vanished row');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = Boundary, StrSubstNo('The pinpoint must claim exactly the boundary %1, was %2', Boundary, _Lib.GetMark(Database::"NPR Spfy Store-Item Link")));
+    end;
+
+    [Test]
+    procedure GivenRowAboveTheBoundary_WhenPolled_ThenExcludedAndMarkStopsAtBoundary()
+    var
+        Item1: Record Item;
+        Item2: Record Item;
+        Link1: Record "NPR Spfy Store-Item Link";
+        Link2: Record "NPR Spfy Store-Item Link";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        Boundary: BigInteger;
+    begin
+        // [SCENARIO] The poll's call site passes the frozen boundary as the scan's upper bound: a committed row above the boundary is not staged, and the drained mark stops exactly at the boundary, never at the table max.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item1, Link1, StoreCode);
+        _Lib.CreateSyncedItemWithLink(Item2, Link2, StoreCode);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link1);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link2);
+        _Lib.RegisterTable(Database::"NPR Spfy Store-Item Link");
+        // [GIVEN] Two committed pending changes and a fixed boundary AT the first one: the second lies above the window.
+        Link1."Shopify Name" := 'Inside the window';
+        Link1.Modify(false);
+        Link2."Shopify Name" := 'Above the window';
+        Link2.Modify(false);
+        Commit();
+        Link1.GetBySystemId(Link1.SystemId);
+        Link2.GetBySystemId(Link2.SystemId);
+        Boundary := Link1.SystemRowVersion;
+        _BndSeam.SetFixedBoundary(Boundary);
+
+        // [WHEN] The poll drains the bounded window.
+        _Lib.PollTable(Database::"NPR Spfy Store-Item Link");
+
+        // [THEN] Only the row inside the window is dispatched, and the mark is exactly the boundary.
+        AssertProductTaskCount(1, Item1."No.", Link1, 'The row inside the window must be dispatched');
+        AssertProductTaskCount(0, Item2."No.", Link2, 'A row above the boundary must not be dispatched');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = Boundary, StrSubstNo('The mark must stop exactly at the boundary %1, was %2', Boundary, _Lib.GetMark(Database::"NPR Spfy Store-Item Link")));
+    end;
+
+    [Test]
+    procedure GivenPinnedWindow_WhenFailureRecorderRuns_ThenStreakAndMarkSurvive()
+    var
+        Item: Record Item;
+        Link: Record "NPR Spfy Store-Item Link";
+        ChangeTracker: Record "NPR Change Tracker";
+        SpfyChangeDetection: Codeunit "NPR Spfy Change Detection";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        MarkBefore: BigInteger;
+    begin
+        // [SCENARIO] The failure recorder defers on a pinned window: an empty pinned window does not mean the failing row vanished, so the streak and the mark survive untouched.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, Link, StoreCode);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link);
+        _Lib.RegisterTable(Database::"NPR Spfy Store-Item Link");
+        Commit();
+        // [GIVEN] A failure streak and a fixed boundary AT the mark (pinned).
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        MarkBefore := ChangeTracker."Last Row Version";
+        ChangeTracker."Failing Row Version" := MarkBefore + 1;
+        ChangeTracker."Consecutive Failures" := 2;
+        ChangeTracker.Modify(false);
+        Commit();
+        _BndSeam.SetFixedBoundary(MarkBefore);
+
+        // [WHEN] The recorder runs against the pinned window. [THEN] streak, anchor and mark survive.
+        SpfyChangeDetection.RecordFailedRowWithoutRedispatch(ChangeTracker, 'boom', '');
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(2, ChangeTracker."Consecutive Failures", 'A pinned recorder must not clear the failure streak');
+        _Assert.IsTrue(ChangeTracker."Failing Row Version" = MarkBefore + 1, 'A pinned recorder must keep the failing row anchor');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = MarkBefore, 'A pinned recorder must not move the mark');
+    end;
+
+    [Test]
+    procedure GivenStreakAndRowBelowBoundary_WhenPinpointWalks_ThenMarkClaimsBoundaryExactly()
+    var
+        Item: Record Item;
+        Link: Record "NPR Spfy Store-Item Link";
+        ChangeTracker: Record "NPR Change Tracker";
+        SpfyChangeDetection: Codeunit "NPR Spfy Change Detection";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        Boundary: BigInteger;
+        FirstErrorText: Text;
+    begin
+        // [SCENARIO] A pinpoint walk whose short chunk succeeds claims exactly the frozen boundary, never just the last walked row - this path is not always followed by a poll.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, Link, StoreCode);
+        SpfySyncStateMgt.SeedStoreItemLinkBaseline(Link);
+        _Lib.RegisterTable(Database::"NPR Spfy Store-Item Link");
+        // [GIVEN] A streak, one committed row past the mark, and a fixed boundary above that row.
+        Link."Shopify Name" := 'Walked row';
+        Link.Modify(false);
+        Commit();
+        Link.GetBySystemId(Link.SystemId);
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        ChangeTracker."Failing Row Version" := Link.SystemRowVersion;
+        ChangeTracker."Consecutive Failures" := 2;
+        ChangeTracker.Modify(false);
+        Commit();
+        Boundary := Link.SystemRowVersion + 500;
+        _BndSeam.SetFixedBoundary(Boundary);
+
+        // [WHEN] The pinpoint walk succeeds over the short chunk. [THEN] the streak clears and the mark is exactly the boundary.
+        _Assert.IsTrue(SpfyChangeDetection.RunPinpointWindow(ChangeTracker, FirstErrorText), 'A successful pinpoint walk must report continue');
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"NPR Spfy Store-Item Link");
+        _Assert.AreEqual(0, ChangeTracker."Consecutive Failures", 'A successful walk must clear the streak');
+        _Assert.IsTrue(_Lib.GetMark(Database::"NPR Spfy Store-Item Link") = Boundary, StrSubstNo('A drained pinpoint chunk must claim exactly the boundary %1, was %2', Boundary, _Lib.GetMark(Database::"NPR Spfy Store-Item Link")));
+        _Assert.AreEqual('', FirstErrorText, 'A successful walk must not record an error');
+    end;
+
+    [Test]
+    procedure GivenFullPinpointChunk_WhenWalkSucceeds_ThenMarkStopsAtTheWalkedRow()
+    var
+        Item: Record Item;
+        Variant1: Record "Item Variant";
+        Variant2: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        ChangeTracker: Record "NPR Change Tracker";
+        SpfyChangeDetection: Codeunit "NPR Spfy Change Detection";
+        SpfySyncStateMgt: Codeunit "NPR Spfy Sync State Mgt";
+        StoreCode: Code[20];
+        Boundary: BigInteger;
+        FirstErrorText: Text;
+    begin
+        // [SCENARIO] A FULL pinpoint chunk keeps the mark at the walked row. Item Variant walks one row at a time, so claiming the whole window would skip every later row inside it.
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateSyncedItemWithLink(Item, SpfyStoreItemLink, StoreCode);
+        _Lib.CreateItemVariant(Variant1, Item."No.");
+        _Lib.CreateItemVariant(Variant2, Item."No.");
+        _Lib.AssignEntryID(_Lib.VariantLinkRecordId(Item."No.", Variant1.Code, StoreCode), 'gid://var/full1');
+        _Lib.AssignEntryID(_Lib.VariantLinkRecordId(Item."No.", Variant2.Code, StoreCode), 'gid://var/full2');
+        SpfySyncStateMgt.SeedItemVariantBaseline(Variant1);
+        SpfySyncStateMgt.SeedItemVariantBaseline(Variant2);
+        _Lib.RegisterTable(Database::"Item Variant");
+        // [GIVEN] Two changed variants below the boundary and a streak anchored at the first: the chunk of 1 is FULL.
+        Variant1.Description := 'First walked';
+        Variant1.Modify(false);
+        Variant2.Description := 'Still pending';
+        Variant2.Modify(false);
+        Commit();
+        Variant1.Get(Variant1."Item No.", Variant1.Code);
+        Variant2.Get(Variant2."Item No.", Variant2.Code);
+        _Lib.SetMark(Database::"Item Variant", Variant1.SystemRowVersion - 1);
+        ChangeTracker.Get("NPR Integration Type"::Shopify, Database::"Item Variant");
+        ChangeTracker."Failing Row Version" := Variant1.SystemRowVersion;
+        ChangeTracker."Consecutive Failures" := 2;
+        ChangeTracker.Modify(false);
+        Commit();
+        Boundary := Variant2.SystemRowVersion + 500;
+        _BndSeam.SetFixedBoundary(Boundary);
+
+        // [WHEN] The pinpoint walks its full one-row chunk.
+        _Assert.IsTrue(SpfyChangeDetection.RunPinpointWindow(ChangeTracker, FirstErrorText), 'A successful pinpoint walk must report continue');
+
+        // [THEN] The mark stops at the walked row, so the second variant stays next cycle's work.
+        _Assert.IsTrue(_Lib.GetMark(Database::"Item Variant") = Variant1.SystemRowVersion, StrSubstNo('A full chunk must leave the mark at the walked row %1, was %2', Variant1.SystemRowVersion, _Lib.GetMark(Database::"Item Variant")));
+        _Assert.IsTrue(_Lib.GetMark(Database::"Item Variant") < Variant2.SystemRowVersion, 'A full chunk must never claim the boundary: the second variant must stay inside the pending window');
+    end;
+
+    [Test]
+    procedure CommittedBoundary_RealModeIsMinimumActiveRowVersionMinusOne()
+    var
+        ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
+    begin
+        // [SCENARIO] With the seam unarmed, the production wiring holds: the boundary is the real MinimumActiveRowVersion - 1. No writes happen between the two reads.
+        Initialize();
+        // [GIVEN] The boundary seam is unarmed, so the override event leaves the real read in place.
+        _BndSeam.UseRealBoundary();
+
+        // [WHEN] The boundary is read. [THEN] it is exactly MinimumActiveRowVersion - 1.
+        _Assert.IsTrue(ChangeTrackerMgt.CommittedBoundary() = Database.MinimumActiveRowVersion() - 1, 'CommittedBoundary must be MinimumActiveRowVersion - 1 on the real path');
+        _BndSeam.UseLastAllocatedBoundary();
     end;
     #endregion
 }

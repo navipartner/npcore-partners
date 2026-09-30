@@ -29,7 +29,13 @@ codeunit 85185 "NPR Test Runner FF Enabled"
     end;
 
     trigger OnAfterTestRun(CodeunitID: Integer; CodeunitName: Text; FunctionName: Text; FunctionTestPermissions: TestPermissions; IsSuccess: Boolean)
+    var
+        SpfyRowVerFailSeam: Codeunit "NPR Spfy RowVer Fail Seam";
     begin
+        // The fail seam is SingleInstance and session-lived: without this a failed test could leave the injected
+        // inventory failure armed for interactive work in the same session. (The boundary seam needs no cleanup:
+        // it is manually bound and dies with the owning test codeunit instance.)
+        SpfyRowVerFailSeam.Disarm();
         TestRunnerMgt.PlatformAfterTestRun(
           CodeunitID, COPYSTR(CodeunitName, 1, 30), COPYSTR(FunctionName, 1, 128), FunctionTestPermissions, IsSuccess, ALTestSuite.Name,
           CurrentTestMethodLine.GetFilter("Line No."));

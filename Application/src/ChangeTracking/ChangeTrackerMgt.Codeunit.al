@@ -20,7 +20,9 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         end;
         EnsureTracker(IntegrationType, TableNo, ChangeTracker);
         ChangeTracker."Processing Order" := ProcessingOrder;
-        SeedToCurrentMax(ChangeTracker, CurrentMaxRowVersion(TableNo));
+        // Seed at the boundary, not the table max: everything at or below it is committed, and no row of this
+        // table lies between its own max and the boundary, so both scan the same rows - without a source read.
+        SeedToCurrentMax(ChangeTracker, CommittedBoundary());
     end;
 
     procedure EnsureTracker(IntegrationType: Enum "NPR Integration Type"; TableNo: Integer; var ChangeTracker: Record "NPR Change Tracker")
@@ -53,13 +55,20 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         exit(true);
     end;
 
-    procedure RecordRowFailure(var ChangeTracker: Record "NPR Change Tracker"; FailingRowVersion: BigInteger): Integer
+    procedure RecordRowFailure(var ChangeTracker: Record "NPR Change Tracker"; FailingRowVersion: BigInteger; var Lowered: Boolean): Integer
     var
         FreshTracker: Record "NPR Change Tracker";
     begin
+        Lowered := false;
         FreshTracker.ReadIsolation(IsolationLevel::UpdLock);
         if not FreshTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
             exit(0);
+        // A concurrent lowering (reset/re-sync) wins: recording a strike would cement state the re-sync just cleared.
+        // The lowered tracker is deliberately not copied back (same contract as AdvanceMark).
+        if FreshTracker."Last Row Version" < ChangeTracker."Last Row Version" then begin
+            Lowered := true;
+            exit(0);
+        end;
         // A modified poison row gets a new rowversion -> the streak restarts (the row changed, it may dispatch now).
         if FreshTracker."Failing Row Version" = FailingRowVersion then
             FreshTracker."Consecutive Failures" += 1
@@ -87,10 +96,18 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         ChangeTracker := FreshTracker;
     end;
 
-    procedure QuarantineRow(var ChangeTracker: Record "NPR Change Tracker"; RowVersion: BigInteger; QuarRecordId: RecordId; EntitySystemId: Guid; ErrorText: Text)
+    procedure QuarantineRow(var ChangeTracker: Record "NPR Change Tracker"; RowVersion: BigInteger; QuarRecordId: RecordId; EntitySystemId: Guid; ErrorText: Text): Boolean
     var
         ChangeQuarantine: Record "NPR Change Quarantine";
+        FreshTracker: Record "NPR Change Tracker";
     begin
+        // Check the mark under lock BEFORE inserting: when a re-sync lowered it concurrently, the whole quarantine
+        // aborts. Insert, advance and failure cleanup share one transaction and one Modify - together or not at all.
+        FreshTracker.ReadIsolation(IsolationLevel::UpdLock);
+        if not FreshTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
+            exit(false);
+        if FreshTracker."Last Row Version" < ChangeTracker."Last Row Version" then
+            exit(false);
         ChangeQuarantine.Init();
         ChangeQuarantine."Integration Type" := ChangeTracker."Integration Type";
         ChangeQuarantine."Table No." := ChangeTracker."Table No.";
@@ -100,15 +117,59 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         ChangeQuarantine."Error Text" := CopyStr(ErrorText, 1, MaxStrLen(ChangeQuarantine."Error Text"));
         ChangeQuarantine."Quarantined At" := CurrentDateTime();
         ChangeQuarantine.Insert(true);
-        // Advance past the quarantined row (discarded return intentional; a re-sync racing this narrow window can lose its reset here - accepted).
-        if AdvanceMark(ChangeTracker, RowVersion) then;
-        ClearRowFailure(ChangeTracker);
+        if RowVersion > FreshTracker."Last Row Version" then
+            FreshTracker."Last Row Version" := RowVersion;
+        FreshTracker."Failing Row Version" := 0;
+        FreshTracker."Consecutive Failures" := 0;
+        FreshTracker.Modify(true);
+        ChangeTracker := FreshTracker;
+        exit(true);
     end;
 
     procedure SeedToCurrentMax(var ChangeTracker: Record "NPR Change Tracker"; CurrentMaxRowVersionParam: BigInteger)
     begin
         ChangeTracker."Last Row Version" := CurrentMaxRowVersionParam;
         ChangeTracker.Modify(true);
+    end;
+
+    internal procedure FastForwardToCommittedMax(var ChangeTracker: Record "NPR Change Tracker"): Boolean
+    var
+        FreshTracker: Record "NPR Change Tracker";
+        NewMark: BigInteger;
+    begin
+        // Raise-only against the persisted mark, under lock: the UI promises a raise, never a lowering.
+        FreshTracker.ReadIsolation(IsolationLevel::UpdLock);
+        if not FreshTracker.Get(ChangeTracker."Integration Type", ChangeTracker."Table No.") then
+            exit(false);
+        // Same boundary reasoning as the seed in RegisterTable, and no source-table read under the tracker lock.
+        NewMark := CommittedBoundary();
+        if NewMark <= FreshTracker."Last Row Version" then begin
+            ChangeTracker := FreshTracker;
+            exit(false);
+        end;
+        FreshTracker."Last Row Version" := NewMark;
+        FreshTracker.Modify(true);
+        ChangeTracker := FreshTracker;
+        exit(true);
+    end;
+
+    internal procedure CommittedBoundary(): BigInteger
+    var
+        Boundary: BigInteger;
+        Handled: Boolean;
+    begin
+        // Test seam: TestIsolation holds one open transaction across Commit(), which pins MinimumActiveRowVersion
+        // below every test fixture. Production has no subscriber and always takes the real read below.
+        OnGetCommittedBoundaryOverride(Boundary, Handled);
+        if Handled then
+            exit(Boundary);
+        // Highest rowversion guaranteed committed: rows of every still-open transaction lie above it (DB-wide counter).
+        exit(Database.MinimumActiveRowVersion() - 1);
+    end;
+
+    [InternalEvent(false)]
+    local procedure OnGetCommittedBoundaryOverride(var Boundary: BigInteger; var Handled: Boolean)
+    begin
     end;
 
     procedure ReseedAllMarksToCurrentMax(IntegrationType: Enum "NPR Integration Type")
@@ -118,7 +179,7 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         ChangeTracker.SetRange("Integration Type", IntegrationType);
         if ChangeTracker.FindSet() then
             repeat
-                SeedToCurrentMax(ChangeTracker, CurrentMaxRowVersion(ChangeTracker."Table No."));
+                SeedToCurrentMax(ChangeTracker, CommittedBoundary());
             until ChangeTracker.Next() = 0;
     end;
 
@@ -146,13 +207,30 @@ codeunit 6151219 "NPR Change Tracker Mgt"
         exit(0);
     end;
 
-    internal procedure SetFilterOnRowVersion(var RecRef: RecordRef; Mark: BigInteger)
+    internal procedure UncommittedMaxRowVersion(TableNo: Integer): BigInteger
+    var
+        RecRef: RecordRef;
+        RowVersionFRef: FieldRef;
+    begin
+        // Telemetry probe only: a committed read cannot SEE the pinning row, which is the work this probe asks about.
+        RecRef.Open(TableNo);
+        RecRef.ReadIsolation(IsolationLevel::ReadUncommitted);
+        RowVersionFRef := RowVersionFieldRef(RecRef);
+        SelectRowVersionKey(RecRef, RowVersionFRef);
+        if RecRef.FindLast() then
+            exit(RowVersionFRef.Value());
+        exit(0);
+    end;
+
+    internal procedure SetFilterOnRowVersion(var RecRef: RecordRef; Mark: BigInteger; UpperBound: BigInteger)
     var
         RowVersionFRef: FieldRef;
     begin
         RowVersionFRef := RowVersionFieldRef(RecRef);
         SelectRowVersionKey(RecRef, RowVersionFRef);
-        RowVersionFRef.SetFilter('>%1', Mark);
+        // Explicit AND range (Mark, UpperBound]: rows of still-open transactions lie above the frozen upper
+        // bound and stay invisible to the scan AND to the mark, so they are next cycle's work.
+        RowVersionFRef.SetFilter('>%1&<=%2', Mark, UpperBound);
     end;
 
     internal procedure RowVersionOf(var RecRef: RecordRef): BigInteger

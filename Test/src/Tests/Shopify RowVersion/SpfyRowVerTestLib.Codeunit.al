@@ -5,11 +5,26 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
     SingleInstance = true;
 
     var
+        _MaxPollRows: Integer;
         _Seq: Integer;
         _SessionSeed: Integer;
         _FeatureIdTok: Label 'ShopifyRowVersionChangeDetection', Locked = true;
         _TaskListFeatureIdTok: Label 'ShopifyTaskList', Locked = true;
         _Seam: Codeunit "NPR Spfy RowVer Fail Seam";
+
+    // RowVer overload: binds the caller-OWNED boundary seam (a manual, non-SingleInstance instance whose
+    // binding dies with the test codeunit) and arms the LastAllocated default for every test. The lib must
+    // never store the seam - a SingleInstance holder would make the binding session-long.
+    procedure ResetState(var BndSeam: Codeunit "NPR Spfy RowVer Boundary Seam"; var BndBound: Boolean)
+    begin
+        if not BndBound then begin
+            BindSubscription(BndSeam);
+            BndBound := true;
+        end;
+        BndSeam.UseLastAllocatedBoundary();
+        BndSeam.ResetBoundaryReadCount();
+        ResetState();
+    end;
 
     procedure ResetState()
     var
@@ -35,6 +50,7 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         SpfyTaskRunContext.ClearRunDeadline();
         SpfyTaskRunContext.ClearSendBoundary();
         SetTaskListFeatureEnabled(false);
+        _MaxPollRows := 0;
         DeleteDetectionJobQueueEntries();
         // Every test codeunit in this suite calls ResetState() from its own Initialize(), so this is what
         // actually guarantees a seam left armed by a failed poison-row test (which does not delete its own
@@ -461,6 +477,8 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
     var
         SpfyChangeTrackerMgt: Codeunit "NPR Spfy Change Tracker Mgt.";
     begin
+        // Commit keeps the fixtures visible to the ReadCommitted seeding scans before any poll shell runs.
+        Commit();
         SpfyChangeTrackerMgt.RegisterEnabledTables();
     end;
 
@@ -468,6 +486,8 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
     var
         ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
     begin
+        // Same commit rationale as RegisterEnabledTables().
+        Commit();
         ChangeTrackerMgt.RegisterTable("NPR Integration Type"::Shopify, TableNo);
     end;
 
@@ -524,6 +544,8 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
     var
         SpfyChangeDetection: Codeunit "NPR Spfy Change Detection";
     begin
+        // Same commit rationale as PollTable() below.
+        Commit();
         SpfyChangeDetection.RunDetection();
     end;
 
@@ -535,8 +557,17 @@ codeunit 85279 "NPR Spfy RowVer Test Lib"
         // PollSourceTable requires committed data (its real caller commits before every poll shell and the poll commits mid-loop); polling this transaction's own fresh rows failed without it.
         Commit();
         ChangeTracker.Get("NPR Integration Type"::Shopify, TableNo);
+        if _MaxPollRows > 0 then
+            SpfyChangeDetection.SetMaxRowsForTest(_MaxPollRows);
         SpfyChangeDetection.PollSourceTable(ChangeTracker);
     end;
+
+    procedure SetMaxPollRows(MaxRows: Integer)
+    begin
+        // Applied to the poll instance PollTable() creates; cleared by ResetState().
+        _MaxPollRows := MaxRows;
+    end;
+
 
     procedure DispatchModify(RecVariant: Variant): Boolean
     var

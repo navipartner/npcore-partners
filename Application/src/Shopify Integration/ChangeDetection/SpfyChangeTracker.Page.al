@@ -100,18 +100,20 @@ page 6151227 "NPR Spfy Change Tracker"
                 ApplicationArea = NPRShopify;
                 Caption = 'Fast-forward Mark to Current Max';
                 Image = NextRecord;
-                ToolTip = 'Sets the mark to the current maximum row version, skipping the pending backlog. Use it to recover a mis-edited or mistakenly reset mark, or to deliberately skip processing old changes. Changes committed before this moment will not be detected. Takes effect from the next detection cycle; an in-flight detection cycle may still process up to its row cap from the old backlog. Allowed for every table, including Item Ledger Entry.';
+                ToolTip = 'Raises the mark to the highest row version that is guaranteed committed, skipping the pending backlog. Use it to recover a mistakenly reset or too-low mark, or to deliberately skip processing old changes. The action only ever raises the mark: to lower one that was typed too high, edit the Last Row Version field directly. Changes written by transactions that are still open stay in the backlog and are detected on a later cycle. Takes effect from the next detection cycle; an in-flight detection cycle may still process up to its row cap from the old backlog. Allowed for every table, including Item Ledger Entry.';
 
                 trigger OnAction()
                 var
                     ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
-                    ConfirmFastForwardQst: Label 'Skip the pending backlog and set the mark for table %1 to the current maximum row version? Changes committed before this moment will not be detected.', Comment = '%1 = table caption';
+                    ConfirmFastForwardQst: Label 'Skip the pending backlog and raise the mark for table %1 to the highest row version that is guaranteed committed? Those changes will not be detected. Changes that are still uncommitted stay in the backlog.', Comment = '%1 = table caption';
+                    NothingToDoMsg: Label 'The mark for table %1 is already at or above the highest row version that is guaranteed committed. Nothing was changed.', Comment = '%1 = table caption';
                 begin
                     // No resync marker needed: this only RAISES the mark, which AdvanceMark treats as a monotonic no-op.
                     Rec.CalcFields("Table Name");
                     if not Confirm(ConfirmFastForwardQst, false, Rec."Table Name") then
                         exit;
-                    ChangeTrackerMgt.SeedToCurrentMax(Rec, ChangeTrackerMgt.CurrentMaxRowVersion(Rec."Table No."));
+                    if not ChangeTrackerMgt.FastForwardToCommittedMax(Rec) then
+                        Message(NothingToDoMsg, Rec."Table Name");
                     CurrPage.Update(false);
                 end;
             }

@@ -7,11 +7,13 @@ codeunit 85277 "NPR Spfy RowVer Deletion Tests"
 
     var
         _Assert: Codeunit Assert;
+        _BndSeam: Codeunit "NPR Spfy RowVer Boundary Seam";
         _Lib: Codeunit "NPR Spfy RowVer Test Lib";
+        _BndBound: Boolean;
 
     local procedure Initialize()
     begin
-        _Lib.ResetState();
+        _Lib.ResetState(_BndSeam, _BndBound);
         _Lib.EnsureIntegrationEnabled();
         _Lib.SetFeatureEnabled(true);
     end;

@@ -439,19 +439,18 @@ table 6150810 "NPR Spfy Store"
 
             trigger OnValidate()
             var
-                POSEntry: Record "NPR POS Entry";
                 ShopifyStore: Record "NPR Spfy Store";
+                ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
                 SpfyExportBCTransJQ: Codeunit "NPR Spfy Export BC Trans. JQ";
             begin
                 if "BC Customer Transactions" then begin
                     if "Historical Data Cut-Off Date" = 0D then
                         "Historical Data Cut-Off Date" := CalcDate('<-2Y-CY>', Today());
                     CalcFields("Last POS Entry Row Version");
-                    if "Last POS Entry Row Version" = 0 then begin
-                        POSEntry.SetCurrentKey(SystemRowVersion);
-                        if POSEntry.FindLast() then
-                            SetLastPOSRowVersion(POSEntry.SystemRowVersion);
-                    end;
+                    if "Last POS Entry Row Version" = 0 then
+                        // Seed at the committed boundary, not the table max: FindLast can return a committed
+                        // rowversion above an open posting, and the mark would skip that posting forever.
+                        SetLastPOSRowVersion(ChangeTrackerMgt.CommittedBoundary());
                     Modify();
 
                     ShopifyStore := Rec;
@@ -793,6 +792,18 @@ table 6150810 "NPR Spfy Store"
         SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
     begin
         FindDataSyncPointer(SpfyDataSyncPointer);
+        SpfyDataSyncPointer."Last POS Entry Row Version" := NewRowVersion;
+        SpfyDataSyncPointer.Modify();
+    end;
+
+    internal procedure SetLastPOSRowVersionIfHigher(NewRowVersion: BigInteger)
+    var
+        SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
+    begin
+        // Raise-only variant for the export job: the compare runs on the locked pointer row, never on a FlowField.
+        FindDataSyncPointer(SpfyDataSyncPointer);
+        if NewRowVersion <= SpfyDataSyncPointer."Last POS Entry Row Version" then
+            exit;
         SpfyDataSyncPointer."Last POS Entry Row Version" := NewRowVersion;
         SpfyDataSyncPointer.Modify();
     end;

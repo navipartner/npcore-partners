@@ -490,7 +490,7 @@ page 6184704 "NPR Spfy Store Card"
                     field("Last POS Entry Row Version"; _LastPOSEntryRowVersion)
                     {
                         Caption = 'Last POS Entry Row Version';
-                        ToolTip = 'Specifies the last SystemRowVersionNo up to which customer POS transactions were exported to Shopify by the system during the previous data export background job run. The next time the background job runs, it will only export POS transactions with a higher row version number.';
+                        ToolTip = 'Specifies the SystemRowVersion up to which the data export background job has evaluated customer POS transactions for this store. The next run only evaluates POS transactions with a higher row version number.';
                         ApplicationArea = NPRShopify;
                         Enabled = _SalesOrderIntegrationIsEnabled and _BCCustomerTransactionsEnabled;
                         Importance = Additional;

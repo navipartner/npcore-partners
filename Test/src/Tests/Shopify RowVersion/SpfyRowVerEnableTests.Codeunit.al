@@ -7,11 +7,13 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
 
     var
         _Assert: Codeunit Assert;
+        _BndSeam: Codeunit "NPR Spfy RowVer Boundary Seam";
         _Lib: Codeunit "NPR Spfy RowVer Test Lib";
+        _BndBound: Boolean;
 
     local procedure Initialize()
     begin
-        _Lib.ResetState();
+        _Lib.ResetState(_BndSeam, _BndBound);
         _Lib.EnsureIntegrationEnabled();
         // Cleared BEFORE the feature is switched off: Modify(false) still raises OnAfterModifyEvent, so the disable
         // write below reaches the new cleanup arm, which refuses on a non-pristine environment. Clearing first means
@@ -372,7 +374,7 @@ codeunit 85397 "NPR Spfy RowVer Enable Tests"
 
         // [GIVEN] Feature ON (post-cutover) and a clean tracker slate.
         _Lib.SetFeatureEnabled(true);
-        _Lib.ResetState();
+        _Lib.ResetState(_BndSeam, _BndBound);
         SubscribersBefore := SpfyDataLogSubscriberCount();
 
         // [WHEN] The Items area is enabled on another store.
