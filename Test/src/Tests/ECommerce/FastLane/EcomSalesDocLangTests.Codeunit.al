@@ -74,7 +74,7 @@ codeunit 85391 "NPR Ecom Sales Doc Lang Tests"
     begin
         // [SCENARIO] A Language whose Code equals the Windows abbreviated name wins over a
         // Language that merely carries the same Windows Language ID, even when that other code sorts first.
-        // The old implementation returned 'AAA' here, so this test discriminates old behavior from new.
+        // The old implementation returned 'ABC' here, so this test discriminates old behavior from new.
 
         // [GIVEN] The Windows language for 'sv-SE' and its abbreviated name
         Initialize();
@@ -82,18 +82,19 @@ codeunit 85391 "NPR Ecom Sales Doc Lang Tests"
         AbbreviatedLanguageCode := WindowsLanguage."Abbreviated Name";
         _Assert.AreNotEqual('', AbbreviatedLanguageCode, 'Precondition: the Windows language must have an abbreviated name.');
 
-        // [GIVEN] Two competing Languages: 'AAA' on the tag's Windows Language ID, and one named after the
+        // [GIVEN] Two competing Languages: 'ABC' on the tag's Windows Language ID, and one named after the
         // abbreviation that carries no Windows Language ID at all
         PurgeResolvableLanguages(WindowsLanguage);
-        ForceLanguage('AAA', WindowsLanguage."Language ID");
+        ForceLanguage('ABC', WindowsLanguage."Language ID");
         ForceLanguage(AbbreviatedLanguageCode, 0);
+        AssertCodeSortsBefore('ABC', AbbreviatedLanguageCode);
 
         // [WHEN] The tag is resolved
         LanguageCode := EcomSalesDocUtils.LanguageTagToLanguageCode('sv-SE');
 
-        // [THEN] The abbreviation match wins, even though 'AAA' sorts first
+        // [THEN] The abbreviation match wins, even though 'ABC' sorts first
         _Assert.AreEqual(AbbreviatedLanguageCode, LanguageCode, 'The Language matching the Windows abbreviated name must win.');
-        _Assert.AreNotEqual('AAA', LanguageCode, 'The Windows Language ID match must not win over the abbreviated name match.');
+        _Assert.AreNotEqual('ABC', LanguageCode, 'The Windows Language ID match must not win over the abbreviated name match.');
     end;
 
     [Test]
@@ -135,12 +136,13 @@ codeunit 85391 "NPR Ecom Sales Doc Lang Tests"
         PurgeResolvableLanguages(WindowsLanguage);
 
         // [GIVEN] Two Languages sharing that Windows Language ID
-        ForceLanguage('AAA', WindowsLanguage."Language ID");
+        ForceLanguage('ABC', WindowsLanguage."Language ID");
         ForceLanguage('ZZZ', WindowsLanguage."Language ID");
+        AssertCodeSortsBefore('ABC', 'ZZZ');
 
         // [WHEN] The tag is resolved
         // [THEN] The lowest Code wins
-        _Assert.AreEqual('AAA', EcomSalesDocUtils.LanguageTagToLanguageCode('sv-SE'), 'The lowest Code must win when several Languages share the Windows Language ID.');
+        _Assert.AreEqual('ABC', EcomSalesDocUtils.LanguageTagToLanguageCode('sv-SE'), 'The lowest Code must win when several Languages share the Windows Language ID.');
     end;
 
 
@@ -186,7 +188,7 @@ codeunit 85391 "NPR Ecom Sales Doc Lang Tests"
         // The test runner rolls back per test codeunit, not per test method, so the synthetic Language rows
         // created by one test survive into the next and would make this suite order-dependent. Removing them
         // up front gives every test a deterministic starting state.
-        Language.SetFilter(Code, '%1|%2|%3', 'AAA', 'ZZZ', 'ZZ1');
+        Language.SetFilter(Code, '%1|%2|%3', 'ABC', 'ZZZ', 'ZZ1');
         Language.DeleteAll();
     end;
 
@@ -225,6 +227,15 @@ codeunit 85391 "NPR Ecom Sales Doc Lang Tests"
         Language.Reset();
         Language.SetRange("Windows Language ID", WindowsLanguage."Language ID");
         _Assert.IsTrue(Language.IsEmpty(), StrSubstNo('Arrangement: no Language may be left on Windows language id %1.', WindowsLanguage."Language ID"));
+    end;
+
+    local procedure AssertCodeSortsBefore(LowerCode: Code[10]; HigherCode: Code[10])
+    var
+        Language: Record Language;
+    begin
+        Language.SetFilter(Code, '%1|%2', LowerCode, HigherCode);
+        Language.FindFirst();
+        _Assert.AreEqual(LowerCode, Language.Code, StrSubstNo('Arrangement: the Language ''%1'' must sort before ''%2'' on this database.', LowerCode, HigherCode));
     end;
 
     local procedure ForceLanguage(LanguageCodeParam: Code[10]; WindowsLanguageId: Integer)

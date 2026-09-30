@@ -1009,8 +1009,8 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         _LibEcom.ResetEcomSetupToDefaults();
         ItemNo := _LibEcom.CreateItem();
         Customer.Get(_LibEcom.CreateCustomer());
-        Customer."E-Mail" := CopyStr(CardEmail, 1, MaxStrLen(Customer."E-Mail"));
-        Customer.Modify();
+        Customer.Validate("E-Mail", CopyStr(CardEmail, 1, MaxStrLen(Customer."E-Mail")));
+        Customer.Modify(true);
         SetCustomerMappingByEmailAndCreateOnly();
 
         ExternalNo := _LibEcom.NextExternalNo('TIVCNV');
