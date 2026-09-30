@@ -17,6 +17,9 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         _MissingHitAtIndexErrLbl: Label 'The result must contain a hit at index %1.', Locked = true;
         _EnvelopePropertyErrLbl: Label 'The response envelope must carry the property ''%1''.', Locked = true;
         _NotConvertedErrLbl: Label 'The conversion must reuse the existing customer card whose e-mail differs only by casing, rather than starting to create a second customer. Creation status: %1. Last error: %2', Locked = true;
+        _JsonPropertyErrLbl: Label '%1 must carry %2.', Locked = true;
+        _JsonSingleEntryErrLbl: Label '%1 must carry exactly the one seeded entry in %2.', Locked = true;
+        _JsonNumberErrLbl: Label '%1, %2: expected the JSON number %3, got %4.', Locked = true;
 
     #region Tests
 
@@ -655,6 +658,68 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         _Assert.AreEqual(200, Response.GetStatusCode(), 'GET by id must succeed for a cancelled document.');
         SalesDocumentOf(Response).Get('creationStatus', Token);
         _Assert.AreEqual('canceled', Token.AsValue().AsText(), 'A cancelled document must be returned with creationStatus cancelled.');
+    end;
+
+    #endregion
+
+    #region Numeric fields
+
+    [Test]
+    procedure GivenDocumentWithNumericFields_WhenReadByIdAndByDetailedFind_ThenEachIsSerializedAsAJsonNumber()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        FindResponse: Codeunit "NPR API Response";
+        GetByIdResponse: Codeunit "NPR API Response";
+        Documents: JsonArray;
+        Document: JsonObject;
+        Hit: JsonObject;
+        Email: Text;
+    begin
+        // [SCENARIO] GET by id and the detailed find serialize the exchange rate, the payment amounts and the line figures as JSON numbers, and the find leaves the payments out.
+        // [GIVEN] A document with exchange rate 7.46, a 2000 payment with nothing captured and one line of 2 x 1000 at 25% VAT for 2000, nothing invoiced
+        Email := NextEmail();
+        EcomSalesHeader := InsertEcomDocWithNumericFields(Email);
+        Commit();
+
+        // [WHEN] The document is read through GET by id and through the find by e-mail with details
+        GetByIdResponse := GetById(EcomSalesHeader.SystemId);
+        FindResponse := FindWithDetails(Email, 'true');
+
+        // [THEN] GET by id carries all nine fields as unquoted JSON numbers with the seeded values
+        _Assert.AreEqual(200, GetByIdResponse.GetStatusCode(), 'GET by id must answer HTTP 200.');
+        Document := SalesDocumentOf(GetByIdResponse);
+        AssertRateAndLineFiguresAreJsonNumbers(Document, 'GET by id');
+        AssertPaymentAmountsAreJsonNumbers(Document, 'GET by id');
+
+        // [THEN] The detailed find hit carries the exchange rate and the six line fields as unquoted JSON numbers, and no payments
+        _Assert.AreEqual(200, FindResponse.GetStatusCode(), 'The detailed search must answer HTTP 200.');
+        Documents := SalesDocumentsOf(FindResponse);
+        _Assert.AreEqual(1, Documents.Count(), 'The seeded document must be the single hit.');
+        Hit := HitAt(Documents, 0);
+        AssertRateAndLineFiguresAreJsonNumbers(Hit, 'The detailed find hit');
+        _Assert.IsFalse(Hit.Contains('payments'), 'A detailed search hit must not carry the payments array.');
+    end;
+
+    [Test]
+    procedure GivenDocumentWithNumericFields_WhenReadByIdOnThePreviousApiVersion_ThenEachIsSerializedAsAJsonNumber()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Response: Codeunit "NPR API Response";
+        Document: JsonObject;
+    begin
+        // [SCENARIO] GET by id on the previous API version serializes the exchange rate, the payment amounts and the line figures as JSON numbers.
+        // [GIVEN] A document with exchange rate 7.46, a 2000 payment with nothing captured and one line of 2 x 1000 at 25% VAT for 2000, nothing invoiced
+        EcomSalesHeader := InsertEcomDocWithNumericFields(NextEmail());
+        Commit();
+
+        // [WHEN] The document is read through GET by id on the previous API version
+        Response := GetByIdOnPreviousApiVersion(EcomSalesHeader.SystemId);
+
+        // [THEN] The document carries all nine fields as unquoted JSON numbers with the seeded values
+        _Assert.AreEqual(200, Response.GetStatusCode(), 'GET by id on the previous API version must answer HTTP 200.');
+        Document := SalesDocumentOf(Response);
+        AssertRateAndLineFiguresAreJsonNumbers(Document, 'GET by id on the previous API version');
+        AssertPaymentAmountsAreJsonNumbers(Document, 'GET by id on the previous API version');
     end;
 
     #endregion
@@ -1644,6 +1709,22 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
     var
         ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
         Request: Codeunit "NPR API Request";
+    begin
+        InitGetByIdRequest(DocumentId, Request);
+        Response := ApiAgent.GetIncomingEcomDocumentById(Request);
+    end;
+
+    local procedure GetByIdOnPreviousApiVersion(DocumentId: Guid) Response: Codeunit "NPR API Response"
+    var
+        ApiAgent: Codeunit "NPR EcomSalesDocApiAgent";
+        Request: Codeunit "NPR API Request";
+    begin
+        InitGetByIdRequest(DocumentId, Request);
+        Response := ApiAgent.GetIncomingEcomDocumentById(Request);
+    end;
+
+    local procedure InitGetByIdRequest(DocumentId: Guid; var Request: Codeunit "NPR API Request")
+    var
         EmptyBody: JsonToken;
         Headers: Dictionary of [Text, Text];
         QueryParams: Dictionary of [Text, Text];
@@ -1655,7 +1736,6 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         PathSegments.Add('documents');
         PathSegments.Add(DocumentIdText);
         Request.Init("Http Method"::GET, '/ecommerce/documents/' + DocumentIdText, PathSegments, QueryParams, Headers, EmptyBody);
-        Response := ApiAgent.GetIncomingEcomDocumentById(Request);
     end;
 
     // A try method, so that an endpoint that refuses the document yields an outcome the Then can assert instead of aborting the test.
@@ -1841,6 +1921,58 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         _Assert.IsTrue(Token.AsObject().Contains('email'), 'The summary sellToCustomer must carry email.');
         _Assert.IsTrue(Token.AsObject().Contains('phone'), 'The summary sellToCustomer must carry phone.');
         _Assert.AreEqual(4, Token.AsObject().Keys().Count(), 'The summary sellToCustomer must be trimmed to no, name, email and phone.');
+    end;
+
+    local procedure AssertRateAndLineFiguresAreJsonNumbers(Document: JsonObject; Source: Text)
+    var
+        Line: JsonObject;
+    begin
+        AssertJsonNumber(Document, 'currencyExchangeRate', 7.46, Source);
+        Line := OnlyEntryOf(Document, 'salesDocumentLines', Source);
+        AssertJsonNumber(Line, 'unitPrice', 1000, Source);
+        AssertJsonNumber(Line, 'quantity', 2, Source);
+        AssertJsonNumber(Line, 'vatPercent', 25, Source);
+        AssertJsonNumber(Line, 'lineAmount', 2000, Source);
+        AssertJsonNumber(Line, 'invoicedQuantity', 0, Source);
+        AssertJsonNumber(Line, 'invoicedAmount', 0, Source);
+    end;
+
+    local procedure AssertPaymentAmountsAreJsonNumbers(Document: JsonObject; Source: Text)
+    var
+        Payment: JsonObject;
+    begin
+        Payment := OnlyEntryOf(Document, 'payments', Source);
+        AssertJsonNumber(Payment, 'paymentAmount', 2000, Source);
+        AssertJsonNumber(Payment, 'capturedPaymentAmount', 0, Source);
+    end;
+
+    // Checks the serialized token itself, because AsDecimal() also converts a quoted string.
+    local procedure AssertJsonNumber(Container: JsonObject; PropertyName: Text; Expected: Decimal; Source: Text)
+    var
+        Token: JsonToken;
+        Actual: Decimal;
+        SerializedValue: Text;
+        ErrorMessage: Text;
+    begin
+        _Assert.IsTrue(Container.Get(PropertyName, Token), StrSubstNo(_JsonPropertyErrLbl, Source, PropertyName));
+        Token.WriteTo(SerializedValue);
+        ErrorMessage := StrSubstNo(_JsonNumberErrLbl, Source, PropertyName, Format(Expected, 0, 9), SerializedValue);
+        // A JSON string starts with a quote; a JSON number does not.
+        _Assert.IsFalse(SerializedValue.StartsWith('"'), ErrorMessage);
+        _Assert.IsTrue(Evaluate(Actual, SerializedValue, 9), ErrorMessage);
+        _Assert.AreEqual(Expected, Actual, ErrorMessage);
+    end;
+
+    local procedure OnlyEntryOf(Document: JsonObject; ArrayName: Text; Source: Text) Entry: JsonObject
+    var
+        Entries: JsonArray;
+        Token: JsonToken;
+    begin
+        _Assert.IsTrue(Document.Get(ArrayName, Token), StrSubstNo(_JsonPropertyErrLbl, Source, ArrayName));
+        Entries := Token.AsArray();
+        _Assert.AreEqual(1, Entries.Count(), StrSubstNo(_JsonSingleEntryErrLbl, Source, ArrayName));
+        Entries.Get(0, Token);
+        Entry := Token.AsObject();
     end;
 
     local procedure GrantEcomApiPermission()
@@ -2087,7 +2219,21 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         EcomSalesHeader.Insert(true);
     end;
 
+    local procedure InsertEcomDocWithNumericFields(Email: Text) EcomSalesHeader: Record "NPR Ecom Sales Header"
+    begin
+        EcomSalesHeader := InsertEcomDoc(Email, "NPR Ecom Sales Doc Type"::Order, "NPR EcomSalesDocCrtStatus"::Created, "NPR EcomSalesDocPostStatus"::Pending, '');
+        EcomSalesHeader."Currency Exchange Rate" := 7.46;
+        EcomSalesHeader.Modify();
+        InsertEcomSalesPmtLine(EcomSalesHeader, '', 2000);
+        InsertEcomSalesLine(EcomSalesHeader, 10000, 1000, 2, 25, 2000);
+    end;
+
     local procedure InsertEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; LineNo: Integer)
+    begin
+        InsertEcomSalesLine(EcomSalesHeader, LineNo, 100, 1, 0, 100);
+    end;
+
+    local procedure InsertEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; LineNo: Integer; UnitPrice: Decimal; Quantity: Decimal; VatPercent: Decimal; LineAmount: Decimal)
     var
         EcomSalesLine: Record "NPR Ecom Sales Line";
     begin
@@ -2098,13 +2244,19 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         EcomSalesLine."Line No." := LineNo;
         EcomSalesLine.Type := EcomSalesLine.Type::Item;
         EcomSalesLine.Description := 'Line ' + Format(LineNo);
-        EcomSalesLine.Quantity := 1;
-        EcomSalesLine."Unit Price" := 100;
-        EcomSalesLine."Line Amount" := 100;
+        EcomSalesLine.Quantity := Quantity;
+        EcomSalesLine."Unit Price" := UnitPrice;
+        EcomSalesLine."VAT %" := VatPercent;
+        EcomSalesLine."Line Amount" := LineAmount;
         EcomSalesLine.Insert(true);
     end;
 
     local procedure InsertEcomSalesPmtLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PspToken: Text)
+    begin
+        InsertEcomSalesPmtLine(EcomSalesHeader, PspToken, 100);
+    end;
+
+    local procedure InsertEcomSalesPmtLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PspToken: Text; Amount: Decimal)
     var
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
     begin
@@ -2113,7 +2265,7 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         EcomSalesPmtLine."Document Type" := EcomSalesHeader."Document Type";
         EcomSalesPmtLine."Line No." := 10000;
         EcomSalesPmtLine."Payment Method Type" := EcomSalesPmtLine."Payment Method Type"::"Payment Method";
-        EcomSalesPmtLine.Amount := 100;
+        EcomSalesPmtLine.Amount := Amount;
         EcomSalesPmtLine."PSP Token" := CopyStr(PspToken, 1, MaxStrLen(EcomSalesPmtLine."PSP Token"));
         EcomSalesPmtLine.Insert(true);
     end;

@@ -440,7 +440,7 @@ codeunit 6248617 "NPR EcomSalesDocApiAgent"
                                  .AddProperty('creationStatus', GetSalesDocumentCreationStatusApiType(EcomSalesHeader))
                                  .AddProperty('postingStatus', GetSalesDocumentPostingStatusApiType(EcomSalesHeader))
                                  .AddProperty('currencyCode', EcomSalesHeader."Currency Code")
-                                 .AddProperty('currencyExchangeRate', Format(EcomSalesHeader."Currency Exchange Rate", 0, 9))
+                                 .AddProperty('currencyExchangeRate', EcomSalesHeader."Currency Exchange Rate")
                                  .AddProperty('externalDocumentNo', EcomSalesHeader."External Document No.")
                                  .AddProperty('yourReference', EcomSalesHeader."Your Reference")
                                  .AddProperty('locationCode', EcomSalesHeader."Location Code")
@@ -528,14 +528,14 @@ codeunit 6248617 "NPR EcomSalesDocApiAgent"
                                         .AddProperty('externalPaymentMethodCode', EcomSalesPmtLine."External Payment Method Code")
                                         .AddProperty('externalPaymentType', EcomSalesPmtLine."External Payment Type")
                                         .AddProperty('paymentReference', EcomSalesPmtLine."Payment Reference")
-                                        .AddProperty('paymentAmount', Format(EcomSalesPmtLine.Amount, 0, 9))
+                                        .AddProperty('paymentAmount', EcomSalesPmtLine.Amount)
                                         .AddProperty('pspToken', EcomSalesPmtLine."PSP Token")
                                         .AddProperty('cardExpiryDate', EcomSalesPmtLine."Card Expiry Date")
                                         .AddProperty('cardBrand', EcomSalesPmtLine."Card Brand")
                                         .AddProperty('maskedCardNumber', EcomSalesPmtLine."Masked Card Number")
                                         .AddProperty('parToken', (EcomSalesPmtLine."PAR Token"))
                                         .AddProperty('cardAliasToken', (EcomSalesPmtLine."Card Alias Token"))
-                                        .AddProperty('capturedPaymentAmount', Format(EcomSalesPmtLine."Captured Amount", 0, 9));
+                                        .AddProperty('capturedPaymentAmount', EcomSalesPmtLine."Captured Amount");
 
         EcomSalesLine.SetRange("Created From Pmt. Line Id", EcomSalesPmtLine.SystemId);
         EcomSalesLine.SetLoadFields(SystemId);
@@ -573,14 +573,14 @@ codeunit 6248617 "NPR EcomSalesDocApiAgent"
                                   .AddProperty('variantCode', EcomSalesLine."Variant Code")
                                   .AddProperty('barcodeNo', EcomSalesLine."Barcode No.")
                                   .AddProperty('description', EcomSalesLine.Description)
-                                  .AddProperty('unitPrice', Format(EcomSalesLine."Unit Price", 0, 9))
-                                  .AddProperty('quantity', Format(EcomSalesLine.Quantity, 0, 9))
+                                  .AddProperty('unitPrice', EcomSalesLine."Unit Price")
+                                  .AddProperty('quantity', EcomSalesLine.Quantity)
                                   .AddProperty('unitOfMeasure', Format(EcomSalesLine."Unit of Measure Code", 0, 9))
-                                  .AddProperty('vatPercent', Format(EcomSalesLine."VAT %", 0, 9))
-                                  .AddProperty('lineAmount', Format(EcomSalesLine."Line Amount", 0, 9))
+                                  .AddProperty('vatPercent', EcomSalesLine."VAT %")
+                                  .AddProperty('lineAmount', EcomSalesLine."Line Amount")
                                   .AddProperty('requestedDeliveryDate', Format(EcomSalesLine."Requested Delivery Date", 0, 9))
-                                  .AddProperty('invoicedQuantity', Format(EcomSalesLine."Invoiced Qty.", 0, 9))
-                                  .AddProperty('invoicedAmount', Format(EcomSalesLine."Invoiced Amount", 0, 9));
+                                  .AddProperty('invoicedQuantity', EcomSalesLine."Invoiced Qty.")
+                                  .AddProperty('invoicedAmount', EcomSalesLine."Invoiced Amount");
         EcomSalesDocApiEvents.OnCreateAddSalesLineDetailsJsonObjectBeforeEndObject(EcomSalesLine, SalesLineDetailsJsonObject);
         SalesLineDetailsJsonObject.EndObject();
     end;
