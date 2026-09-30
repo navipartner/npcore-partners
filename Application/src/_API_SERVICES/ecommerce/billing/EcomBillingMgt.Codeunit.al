@@ -251,6 +251,8 @@ codeunit 6151515 "NPR Ecom Billing Mgt."
     /// per-store lock is the whole protection - if it is ever removed or narrowed, this read needs rethinking.
     /// </summary>
     local procedure GetOrderEvent(var EcomBillingEvent: Record "NPR Ecom Billing Event"; ChannelParam: Enum "NPR Ecom Sales Doc Source"; StoreCode: Code[20]; ExternalNo: Code[20]): Boolean
+    var
+        DuplicateOrderEventTok: Label 'More than one ecommerce billing count row exists for %1. This is a programming bug.', Locked = true;
     begin
         EcomBillingEvent.Reset();
         EcomBillingEvent.SetRange(Channel, ChannelParam);
@@ -260,17 +262,9 @@ codeunit 6151515 "NPR Ecom Billing Mgt."
         if not EcomBillingEvent.FindFirst() then
             exit(false);
 
-        CheckSingleOrderEvent(EcomBillingEvent, StoreCode, ExternalNo, StrSubstNo('%1/%2/%3', GetChannelName(ChannelParam), StoreCode, ExternalNo));
+        if EcomBillingEvent.Count() > 1 then
+            EmitSentryError(StrSubstNo(DuplicateOrderEventTok, StrSubstNo('%1/%2/%3', GetChannelName(ChannelParam), StoreCode, ExternalNo)), StoreCode, ExternalNo, 0D, '');
         exit(true);
-    end;
-
-    local procedure CheckSingleOrderEvent(EcomBillingEvent: Record "NPR Ecom Billing Event"; StoreCode: Code[20]; ExternalNo: Code[20]; Identity: Text)
-    var
-        DuplicateOrderEventTok: Label 'More than one ecommerce billing count row exists for %1. This is a programming bug.', Locked = true;
-    begin
-        if EcomBillingEvent.Next() = 0 then
-            exit;
-        EmitSentryError(StrSubstNo(DuplicateOrderEventTok, Identity), StoreCode, ExternalNo, 0D, '');
     end;
 
     /// <summary>

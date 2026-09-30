@@ -201,7 +201,7 @@ codeunit 6248499 "NPR Sentry Transaction"
 
         EventDimensions.Add('NPRSentryDsn', _dsn);
         AddJsonChunks(EventDimensions, JsonText);
-        Session.LogMessage('NPRSentryTransaction', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, EventDimensions);
+        SendSentryPayload('NPRSentryTransaction', JsonText, EventDimensions);
 
         foreach Error in Errors do begin
             ErrorJson := Error.ToJson();
@@ -212,8 +212,26 @@ codeunit 6248499 "NPR Sentry Transaction"
             AddJsonChunks(ExceptionDimensions, JsonText);
             ExceptionDimensions.Add('NPRSentryTraceId', _traceId);
             ExceptionDimensions.Add('NPRSentrySpanId', Error.GetParentId());
-            Session.LogMessage('NPRSentryException', 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, ExceptionDimensions);
+            SendSentryPayload('NPRSentryException', JsonText, ExceptionDimensions);
         end;
+    end;
+
+    /// <summary>Sends one Sentry payload to telemetry unless an OnBeforeSendSentryPayload subscriber has handled it.</summary>
+    local procedure SendSentryPayload(EventId: Text; PayloadJson: Text; var Dimensions: Dictionary of [Text, Text])
+    var
+        Handled: Boolean;
+    begin
+        Handled := false;
+        OnBeforeSendSentryPayload(PayloadJson, Handled);
+        if Handled then
+            exit;
+        Session.LogMessage(EventId, 'sentryPayload', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, Dimensions);
+    end;
+
+    /// <summary>Lets tests capture a Sentry payload; setting Handled skips the telemetry call.</summary>
+    [InternalEvent(false, false)]
+    local procedure OnBeforeSendSentryPayload(PayloadJson: Text; var Handled: Boolean)
+    begin
     end;
 
     local procedure AddJsonChunks(var Dimensions: Dictionary of [Text, Text]; JsonText: Text)

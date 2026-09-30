@@ -289,6 +289,7 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomBillingMgt: Codeunit "NPR Ecom Billing Mgt.";
+        SentryCapture: Codeunit "NPR Library - Sentry Capture";
         QueueBaselineEntryNo: BigInteger;
     begin
         // [SCENARIO] An Entria order that has no order event row is captured. RegisterCapturedAmount must not
@@ -302,7 +303,9 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
         QueueBaselineEntryNo := LastBillingQueueEntryNo();
 
         // [WHEN] RegisterCapturedAmount runs (reached from both the capture wave and the posting-time subscriber)
+        SentryCapture.Start();
         EcomBillingMgt.RegisterCapturedAmount(EcomSalesHeader);
+        SentryCapture.Stop();
 
         // [THEN] No order event row was created by the wave
         _Assert.AreEqual(0, CountOrderEvents('ZZ-BILL-NOLOG'),
@@ -312,7 +315,101 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
         _Assert.AreEqual(0, CountBillingEventRowsForStore(),
             'Without an order event row there is nothing to hang an event on, so no billing event row may be written.');
         AssertNoEcomBillingQueueEntryAfter(QueueBaselineEntryNo,
-            'An order with no order event row must register nothing at all - RegisterCapturedAmount reports the gap to Sentry instead, so the missing row gets fixed rather than worked around.');
+            'An order with no order event row must register nothing at all. RegisterCapturedAmount reports the gap as an error instead, so the missing row gets fixed rather than worked around.');
+
+        // [THEN] The gap was reported, and captured here instead of going to Sentry
+        _Assert.IsTrue(SentryCapture.Contains('No ecommerce billing order event row exists'),
+            'RegisterCapturedAmount must report a missing order event row.');
+        _Assert.IsTrue(SentryCapture.Contains('Ecommerce Billing Registration: ZZ-BILL-NOLOG'),
+            'The report of a missing order event row must also send its Sentry transaction, named after the order.');
+    end;
+
+    [Test]
+    procedure OrderEventCheckIgnoresOtherRowsOfTheStore()
+    var
+        EcomSalesHeaderA: Record "NPR Ecom Sales Header";
+        EcomSalesHeaderB: Record "NPR Ecom Sales Header";
+        OrderEventA: Record "NPR Ecom Billing Event";
+        OrderEventB: Record "NPR Ecom Billing Event";
+        EcomBillingEvent: Record "NPR Ecom Billing Event";
+        EcomBillingMgt: Codeunit "NPR Ecom Billing Mgt.";
+        SentryCapture: Codeunit "NPR Library - Sentry Capture";
+    begin
+        // [SCENARIO] An order with one order event is captured while the store has later rows: its own amount row
+        //            and another order's order event. RegisterCapturedAmount must not report a duplicate order event
+        //            and must bill the delta.
+
+        // [GIVEN] Order A tendered and captured at 100, with its order event and a queued amount row of 30
+        Initialize();
+        _LibraryEntria.EnsureLcyCode();
+        PlantEntriaEcomDocument(EcomSalesHeaderA, EcomSalesHeaderA."Document Type"::Order, 'ZZ-BILL-NODUP', 'medusa-bill-nodup');
+        PlantPaymentLine(EcomSalesHeaderA, 100, 100);
+        PlantOrderEvent(OrderEventA, EcomSalesHeaderA);
+        PlantAmountEvent(OrderEventA, 30, true);
+
+        // [GIVEN] Order B in the same store, with its own order event
+        PlantEntriaEcomDocument(EcomSalesHeaderB, EcomSalesHeaderB."Document Type"::Order, 'ZZ-BILL-NODUP-B', 'medusa-bill-nodup-b');
+        PlantOrderEvent(OrderEventB, EcomSalesHeaderB);
+
+        // [WHEN] RegisterCapturedAmount runs for order A
+        SentryCapture.Start();
+        EcomBillingMgt.RegisterCapturedAmount(EcomSalesHeaderA);
+        SentryCapture.Stop();
+
+        // [THEN] No duplicate order event was reported
+        _Assert.IsFalse(SentryCapture.Contains('More than one ecommerce billing count row'),
+            'An order with one order event must not be reported as a duplicate because other rows of the store come after it.');
+
+        // [THEN] The wave added one amount row for the remaining 70
+        FilterAmountEvents(EcomBillingEvent, 'ZZ-BILL-NODUP');
+        _Assert.AreEqual(2, EcomBillingEvent.Count(),
+            'The wave must add one amount row next to the planted one.');
+        EcomBillingEvent.SetRange(Amount, 70);
+        _Assert.AreEqual(1, EcomBillingEvent.Count(),
+            'The new amount row must carry 70, the captured 100 minus the 30 already billed.');
+    end;
+
+    [Test]
+    procedure RealDuplicateOrderEventIsReportedAndBilledOnce()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        OrderEvent1: Record "NPR Ecom Billing Event";
+        OrderEvent2: Record "NPR Ecom Billing Event";
+        EcomBillingEvent: Record "NPR Ecom Billing Event";
+        EcomBillingMgt: Codeunit "NPR Ecom Billing Mgt.";
+        SentryCapture: Codeunit "NPR Library - Sentry Capture";
+    begin
+        // [SCENARIO] An order has two order event rows. RegisterCapturedAmount must report the duplicate and still
+        //            bill the captured amount once.
+
+        // [GIVEN] An order tendered and captured at 100, with two order event rows
+        Initialize();
+        _LibraryEntria.EnsureLcyCode();
+        PlantEntriaEcomDocument(EcomSalesHeader, EcomSalesHeader."Document Type"::Order, 'ZZ-BILL-DUPCOUNT', 'medusa-bill-dupcount');
+        PlantPaymentLine(EcomSalesHeader, 100, 100);
+        PlantOrderEvent(OrderEvent1, EcomSalesHeader);
+        PlantOrderEvent(OrderEvent2, EcomSalesHeader);
+        _Assert.AreEqual(2, CountOrderEvents('ZZ-BILL-DUPCOUNT'),
+            'Setup: the order must have two order event rows.');
+
+        // [WHEN] RegisterCapturedAmount runs
+        SentryCapture.Start();
+        EcomBillingMgt.RegisterCapturedAmount(EcomSalesHeader);
+        SentryCapture.Stop();
+
+        // [THEN] The duplicate was reported
+        _Assert.IsTrue(SentryCapture.Contains('More than one ecommerce billing count row'),
+            'RegisterCapturedAmount must report an order with more than one order event row.');
+        _Assert.IsTrue(SentryCapture.Contains('Ecommerce Billing Registration: ZZ-BILL-DUPCOUNT'),
+            'The duplicate report must also send its Sentry transaction, named after the order.');
+
+        // [THEN] The captured 100 was billed once
+        FilterAmountEvents(EcomBillingEvent, 'ZZ-BILL-DUPCOUNT');
+        _Assert.AreEqual(1, EcomBillingEvent.Count(),
+            'The wave must add exactly one amount row, even with two order event rows.');
+        EcomBillingEvent.FindFirst();
+        _Assert.AreEqual(100, EcomBillingEvent.Amount,
+            'The amount row must carry the full captured 100.');
     end;
 
     [Test]
