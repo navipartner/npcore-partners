@@ -14,6 +14,7 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
         SandboxSecretInjection: Codeunit "NPR Sandbox Secret Injection";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        InitializeErrorText: Text;
     begin
         if not NavApp.GetCallerModuleInfo(CallerModuleInfo) then
             Error(ModuleInfoUnavailableErr);
@@ -26,17 +27,17 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
             if Sentry.HasActiveTransaction() then
                 Sentry.StartSpan(Span, StrSubstNo('keyvault: %1', Name));
 
-            if SandboxSecretInjection.TryGetSecret(Name, KeyValue) then begin
-                Span.Finish();
-                exit;
-            end;
-
             if not AppKeyVaultSecretProviderInitialised then
                 AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
             if not AppKeyVaultSecretProviderInitialised then begin
+                InitializeErrorText := GetLastErrorText();
+                if SandboxSecretInjection.TryGetSecret(Name, KeyValue) then begin
+                    Span.Finish();
+                    exit;
+                end;
                 Span.Finish();
-                Error(GetLastErrorText());
+                Error(InitializeErrorText);
             end;
 
             if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then begin

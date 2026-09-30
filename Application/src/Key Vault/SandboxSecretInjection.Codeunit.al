@@ -7,6 +7,7 @@ codeunit 6150930 "NPR Sandbox Secret Injection"
     [NonDebuggable]
     procedure AddSecret(SecretName: Text; SecretValue: Text)
     begin
+        CheckInjectionAllowed();
         IsolatedStorage.Set(SecretNameWithPrefix(SecretName), SecretValue, DataScope::Module);
     end;
 
@@ -24,10 +25,28 @@ codeunit 6150930 "NPR Sandbox Secret Injection"
     [NonDebuggable]
     procedure TryGetSecret(SecretName: Text; var OutSecretValue: Text): Boolean
     begin
+        if not InjectionAllowed() then
+            exit(false);
+
         if not IsolatedStorage.Contains(SecretNameWithPrefix(SecretName)) then
             exit(false);
 
         exit(IsolatedStorage.Get(SecretNameWithPrefix(SecretName), OutSecretValue));
+    end;
+
+    procedure CheckInjectionAllowed()
+    var
+        ProductionNotAllowedErr: Label 'Secret injection is not available in production environments.';
+    begin
+        if not InjectionAllowed() then
+            Error(ProductionNotAllowedErr);
+    end;
+
+    local procedure InjectionAllowed(): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        exit(not (EnvironmentInformation.IsSaaSInfrastructure() and EnvironmentInformation.IsProduction()));
     end;
 
     [NonDebuggable]

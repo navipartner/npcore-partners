@@ -572,6 +572,7 @@ codeunit 6184830 "NPR DocLXCityCard"
         end;
     end;
 
+    [NonDebuggable]
     internal procedure CheckServiceHealth(CityCode: Code[10]) Result: JsonObject
     var
         MessageBody: JsonObject;
@@ -589,7 +590,7 @@ codeunit 6184830 "NPR DocLXCityCard"
 
         SendProxyRequest(HelloUrl, PayloadText, Result);
 
-        MessageBody.Add('helloUrl', HelloUrl);
+        MessageBody.Add('helloUrl', HelloUrl.Split('?').Get(1));
         Result.Add('request', MessageBody);
 
     end;
@@ -688,11 +689,12 @@ codeunit 6184830 "NPR DocLXCityCard"
         CityName: Text;
         EnvironmentName: Text;
         HostKeyName: Label 'DocLXCityCard%1%2Host', Locked = true, Comment = 'The key name in Azure Key Vault for the validation endpoint, 1=CityName, 2=Environment';
+        HelloUrlTok: Label 'https://npdoclxcitycardapi.azurewebsites.net/api/hello?code=%1', Locked = true, Comment = '%1 = Azure function code';
     begin
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
-        HelloUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardHelloUrl');
+        HelloUrl := StrSubstNo(HelloUrlTok, AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardHelloUrlCode'));
 
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardValidatePath := '/v1.1/coupon/validate/';
@@ -711,11 +713,12 @@ codeunit 6184830 "NPR DocLXCityCard"
         EnvironmentName: Text;
         HostKeyName: Label 'DocLXCityCard%1%2Host', Locked = true, Comment = 'The key name in Azure Key Vault for the validation endpoint, 1=CityName, 2=Environment';
         CipherKeyName: Label 'DocLXCityCard%1%2CipherKey', Locked = true, Comment = 'The key name in Azure Key Vault for the cipher key, 1=CityName, 2=Environment';
+        ProxyUrlTok: Label 'https://npdoclxcitycardapi.azurewebsites.net/api/cityCard?code=%1', Locked = true, Comment = '%1 = Azure function code';
     begin
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
-        ProxyUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrl');
+        ProxyUrl := StrSubstNo(ProxyUrlTok, AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrlCode'));
 
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardCipherKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(CipherKeyName, CityName, EnvironmentName));
@@ -736,11 +739,12 @@ codeunit 6184830 "NPR DocLXCityCard"
         EnvironmentName: Text;
         HostKeyName: Label 'DocLXCityCard%1%2Host', Locked = true, Comment = 'The key name in Azure Key Vault for the validation endpoint, 1=CityName, 2=Environment';
         CipherKeyName: Label 'DocLXCityCard%1%2CipherKey', Locked = true, Comment = 'The key name in Azure Key Vault for the cipher key, 1=CityName, 2=Environment';
+        ProxyUrlTok: Label 'https://npdoclxcitycardapi.azurewebsites.net/api/cityCard?code=%1', Locked = true, Comment = '%1 = Azure function code';
     begin
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
-        ProxyUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrl');
+        ProxyUrl := StrSubstNo(ProxyUrlTok, AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrlCode'));
 
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardCipherKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(CipherKeyName, CityName, EnvironmentName));

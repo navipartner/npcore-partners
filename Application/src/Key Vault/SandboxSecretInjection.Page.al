@@ -41,7 +41,7 @@ page 6150806 "NPR Sandbox Secret Injection"
                 var
                     SandboxSecretInjection: Codeunit "NPR Sandbox Secret Injection";
                     MissingSecretValuesErr: Label 'Both name and value must be filled out to inject a secret';
-                    SecretInjctedLbl: Label 'Secret injected in current environment successfully!';
+                    SecretInjctedLbl: Label 'Secret saved. It is used only when this environment cannot reach the Key Vault, for example a local container or an app published from Visual Studio Code.';
                 begin
                     if (_SecretName = '') or (_SecretValue = '') then
                         Error(MissingSecretValuesErr);
@@ -83,6 +83,13 @@ page 6150806 "NPR Sandbox Secret Injection"
         }
 #endif
     }
+
+    trigger OnOpenPage()
+    var
+        SandboxSecretInjection: Codeunit "NPR Sandbox Secret Injection";
+    begin
+        SandboxSecretInjection.CheckInjectionAllowed();
+    end;
 
     var
         [NonDebuggable]

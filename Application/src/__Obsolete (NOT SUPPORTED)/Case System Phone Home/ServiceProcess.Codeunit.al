@@ -170,7 +170,7 @@
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
         SoapActionLbl: Label '%1:%2', Locked = true;
-        UriLbl: Label '%1/servicelibrary', Locked = true;
+        UriLbl: Label 'https://api.navipartner.dk/servicelibrary', Locked = true;
     begin
         Content.WriteFrom(CreateXMLRequest(ServiceMethod, BodyXmlText));
         Content.GetHeaders(Headers);
@@ -180,7 +180,7 @@
         Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetAzureKeyVaultSecret('ServiceLibraryKey'));
         RequestMessage.Content(Content);
         RequestMessage.Method('POST');
-        RequestMessage.SetRequestUri(StrSubstNo(UriLbl, AzureKeyVaultMgt.GetAzureKeyVaultSecret('ApiHostUri')));
+        RequestMessage.SetRequestUri(UriLbl);
 
         Client.Timeout(5000);
         if not Client.Send(RequestMessage, ResponseMessage) then

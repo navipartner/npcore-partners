@@ -53,7 +53,7 @@
     local procedure CommonConstruct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Text)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        baseurl: Text;
+        FtpAzureFunctionUrlTok: Label 'https://ftpaf.azurewebsites.net/api/', Locked = true;
     begin
         Destruct();
         gHost := Host;
@@ -63,8 +63,7 @@
         gTimeoutMs := TimeoutMs;
         gPassive := Passive;
         gEncmode := EncMode;
-        baseurl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('FtpAzureFunctionUrl');
-        FtpClient.SetBaseAddress(baseurl);
+        FtpClient.SetBaseAddress(FtpAzureFunctionUrlTok);
         gHttpUrlConst := 'url';
         gHttpUsernameConst := 'username';
         gHttpPasswordConst := 'password';
@@ -395,6 +394,7 @@
         end;
     end;
 
+    [NonDebuggable]
     local procedure HandlePostRequest(AZFunction: Text; Content: HttpContent): JsonObject
     var
         httpResponse: HttpResponseMessage;

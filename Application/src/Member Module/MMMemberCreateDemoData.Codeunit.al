@@ -454,6 +454,7 @@
         MemberNotification: Codeunit "NPR MM Member Notification";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         outstr: OutStream;
+        PassesServerBaseUrlTok: Label 'https://passes.npecommerce.dk/api/v1', Locked = true;
     begin
 
         if (not MemberNotificationSetup.Get(NotificationCode)) then begin
@@ -475,7 +476,7 @@
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
+        MemberNotificationSetup."NP Pass Server Base URL" := PassesServerBaseUrlTok;
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
         MemberNotificationSetup."Pass Token" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
@@ -495,6 +496,7 @@
         MemberNotification: Codeunit "NPR MM Member Notification";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         outstr: OutStream;
+        PassesServerBaseUrlTok: Label 'https://passes.npecommerce.dk/api/v1', Locked = true;
     begin
 
         if (not MemberNotificationSetup.Get(NotificationCode)) then begin
@@ -511,7 +513,7 @@
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
+        MemberNotificationSetup."NP Pass Server Base URL" := PassesServerBaseUrlTok;
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
         MemberNotificationSetup."Pass Token" := CopyStr(AzureKeyVaultMgt.GetAzureKeyVaultSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
