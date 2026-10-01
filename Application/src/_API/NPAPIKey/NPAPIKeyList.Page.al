@@ -125,6 +125,29 @@ page 6185107 "NPR NP API Key List"
                     Message(NewEntraAppRegisteredMsg);
                 end;
             }
+            action(BIAllowedTables)
+            {
+                Caption = 'BI API Allowed Tables';
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Image = Table;
+                ToolTip = 'Opens the list of tables that this API Key is allowed to read through the BI API. A table has to be listed here before the /bi endpoint returns it.';
+                AccessByPermission = tabledata "NPR API BI Allowed Table" = R;
+
+                trigger OnAction()
+                var
+                    BIAllowedTable: Record "NPR API BI Allowed Table";
+                begin
+                    Rec.TestField(Id);
+
+                    BIAllowedTable.FilterGroup(2);
+                    BIAllowedTable.SetRange("Principal Type", BIAllowedTable."Principal Type"::"NP API Key");
+                    BIAllowedTable.SetRange("Principal Id", Rec.Id);
+                    BIAllowedTable.FilterGroup(0);
+                    Page.Run(Page::"NPR API BI Allowed Tables", BIAllowedTable);
+                end;
+            }
             group(ChangeStatus)
             {
                 Caption = 'Change Status';

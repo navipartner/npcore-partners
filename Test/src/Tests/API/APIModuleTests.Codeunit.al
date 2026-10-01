@@ -191,6 +191,40 @@ codeunit 85139 "NPR API Module Tests"
             StrSubstNo('HelloWorld API used %1 SQL roundtrips (max allowed: %2). If you intentionally added DB reads to the generic API path, increase this budget and document why.', SqlRoundtrips, MaxAllowedRoundtrips));
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure HasRowVersionKeyIsTrueWhenAKeyStartsWithRowVersion()
+    var
+        APIRequest: Codeunit "NPR API Request";
+        Assert: Codeunit Assert;
+        RecRef: RecordRef;
+    begin
+        // [SCENARIO] A table whose keys include one that starts with SystemRowVersion is reported as ready for sync mode.
+        // [GIVEN] The Item table, which has such a key through a table extension
+        RecRef.Open(Database::Item);
+
+        // [WHEN] The table is checked for a row version key
+        // [THEN] It reports that it has one
+        Assert.IsTrue(APIRequest.HasRowVersionKey(RecRef), 'Item must report a SystemRowVersion key');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure HasRowVersionKeyIsFalseWithoutSuchAKey()
+    var
+        APIRequest: Codeunit "NPR API Request";
+        Assert: Codeunit Assert;
+        RecRef: RecordRef;
+    begin
+        // [SCENARIO] A table without a key that starts with SystemRowVersion is reported as unavailable for sync mode, rather than raising an error.
+        // [GIVEN] The NaviPartner API Key table, which has no such key
+        RecRef.Open(Database::"NPR NaviPartner API Key");
+
+        // [WHEN] The table is checked for a row version key
+        // [THEN] It reports that it has none
+        Assert.IsFalse(APIRequest.HasRowVersionKey(RecRef), 'The NaviPartner API Key table must not report a SystemRowVersion key');
+    end;
+
     local procedure InitializeData()
     var
         LibrarySales: Codeunit "Library - Sales";

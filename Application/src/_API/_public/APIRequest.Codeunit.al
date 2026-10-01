@@ -103,11 +103,36 @@ codeunit 6185051 "NPR API Request"
     end;
 
     procedure GetData(TableId: Integer; Fields: dictionary of [Integer, Text]): JsonObject
+    begin
+        exit(GetData(TableId, Fields, MaxPageSize()));
+    end;
+
+    /// <summary>
+    /// Reads a page of records from a table. Use this overload when the natural page size of the
+    /// endpoint is smaller than the module maximum, for example because the records are very wide.
+    /// A pageSize supplied by the caller still wins and is still capped at the module maximum.
+    /// </summary>
+    procedure GetData(TableId: Integer; Fields: dictionary of [Integer, Text]; DefaultPageSize: Integer): JsonObject
     var
         RecRef: RecordRef;
     begin
         RecRef.Open(TableId);
-        exit(GetRecords(RecRef, Fields));
+        exit(GetRecords(RecRef, Fields, DefaultPageSize, false));
+    end;
+
+    /// <summary>
+    /// Reads a page in row version order with the delta load window applied, without the caller
+    /// having to pass sync as a query parameter. Use this when an endpoint is incremental by
+    /// definition rather than on request. The table must have a key that starts with
+    /// SystemRowVersion; check HasRowVersionKey first so a missing index can be reported to the
+    /// caller instead of raised as an error.
+    /// </summary>
+    procedure GetDataInRowVersionOrder(TableId: Integer; Fields: dictionary of [Integer, Text]; DefaultPageSize: Integer): JsonObject
+    var
+        RecRef: RecordRef;
+    begin
+        RecRef.Open(TableId);
+        exit(GetRecords(RecRef, Fields, DefaultPageSize, true));
     end;
 
     procedure GetData(Record: Variant; Fields: dictionary of [Integer, Text]): JsonObject
@@ -115,7 +140,7 @@ codeunit 6185051 "NPR API Request"
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Record);
-        exit(GetRecords(RecRef, Fields));
+        exit(GetRecords(RecRef, Fields, MaxPageSize(), false));
     end;
 
     procedure GetData(TableId: Integer; Fields: dictionary of [Integer, Text]; id: Text): JsonObject
@@ -123,7 +148,7 @@ codeunit 6185051 "NPR API Request"
         RecRef: RecordRef;
     begin
         RecRef.Open(TableId);
-        exit(GetData(RecRef, Fields, Id));
+        exit(GetRecord(RecRef, Fields, Id));
     end;
 
     procedure GetData(Record: Variant; Fields: dictionary of [Integer, Text]; id: Text): JsonObject
@@ -168,7 +193,7 @@ codeunit 6185051 "NPR API Request"
         exit(RecordJson);
     end;
 
-    local procedure GetRecords(var RecRef: RecordRef; Fields: Dictionary of [Integer, Text]): JsonObject
+    local procedure GetRecords(var RecRef: RecordRef; Fields: Dictionary of [Integer, Text]; DefaultPageSize: Integer; ForceRowVersionOrder: Boolean): JsonObject
     var
         DataArray: JsonArray;
         RecordJson: JsonObject;
@@ -184,24 +209,31 @@ codeunit 6185051 "NPR API Request"
         PageContinuation: Boolean;
         DataFound: Boolean;
     begin
+        if (DefaultPageSize < 1) or (DefaultPageSize > MaxPageSize()) then
+            DefaultPageSize := MaxPageSize();
+
+        Limit := DefaultPageSize;
         if _QueryParams.ContainsKey('pageSize') then
             Evaluate(Limit, _QueryParams.Get('pageSize'));
 
-        if (limit < 1) or (limit > 20000) then
-            limit := 20000;
+        if (Limit < 1) then
+            Limit := DefaultPageSize;
+        if (Limit > MaxPageSize()) then
+            Limit := MaxPageSize();
 
         if _QueryParams.ContainsKey('pageKey') then begin
             ApplyPageKey(_QueryParams.Get('pageKey'), RecRef);
             PageContinuation := true;
         end;
 
-        if _QueryParams.ContainsKey('sync') then begin
-            Evaluate(Sync, _QueryParams.Get('sync'));
-            if Sync then
-                SetKeyToRowVersion(RecRef);
+        Sync := ForceRowVersionOrder;
+        if not Sync then
+            if _QueryParams.ContainsKey('sync') then
+                Evaluate(Sync, _QueryParams.Get('sync'));
 
-            if _QueryParams.ContainsKey('lastRowVersion') then
-                RecRef.Field(0).SetFilter('>%1', _QueryParams.Get('lastRowVersion'));
+        if Sync then begin
+            SetKeyToRowVersion(RecRef);
+            ApplyRowVersionWindow(RecRef);
         end;
 
         if not Fields.ContainsKey(RecRef.SystemIdNo()) then
@@ -254,21 +286,74 @@ codeunit 6185051 "NPR API Request"
         exit(ResultJson);
     end;
 
+    /// <summary>
+    /// Narrows a sync read to the row versions that are settled, and applies the caller's
+    /// lastRowVersion as the lower bound.
+    ///
+    /// A row version is handed out when a write starts but only becomes visible when it commits, so
+    /// a writer that started later can commit earlier. Reading everything up to the highest visible
+    /// version would step over the row that lost that race, and because the consumer then stores the
+    /// higher version as its watermark it would never come back for it. Anything below the minimum
+    /// active row version is committed and cannot appear later, so the page stops there.
+    ///
+    /// Example: rows 10 and 12 have committed and a still open transaction holds 11. Without the
+    /// upper bound the consumer receives 10 and 12, stores 12, and row 11 is lost for good. With it
+    /// the page stops at 10, and 11 and 12 arrive on the next call.
+    /// </summary>
+    local procedure ApplyRowVersionWindow(var RecRef: RecordRef)
+    var
+        SettledBelow: BigInteger;
+        LowerBound: Text;
+    begin
+        SettledBelow := Database.MinimumActiveRowVersion();
+
+        if not _QueryParams.Get('lastRowVersion', LowerBound) then
+            LowerBound := '';
+
+        if LowerBound = '' then
+            RecRef.Field(0).SetFilter('<%1', Format(SettledBelow, 0, 9))
+        else
+            RecRef.Field(0).SetFilter('>%1&<%2', LowerBound, Format(SettledBelow, 0, 9));
+    end;
+
     procedure SetKeyToRowVersion(var RecRef: RecordRef)
     var
-        KeyRef: keyRef;
+        KeyIndex: Integer;
+    begin
+        KeyIndex := FindRowVersionKeyIndex(RecRef);
+        if KeyIndex = 0 then
+            Error('Cannot use sync mode on %1, missing index on rowVersion. This is a programming bug.', RecRef.Name);
+
+        RecRef.CurrentKeyIndex(KeyIndex);
+        RecRef.Ascending(true);
+    end;
+
+    /// <summary>
+    /// Tells whether the table can be read in sync mode, i.e. whether it has a key that starts with
+    /// SystemRowVersion. Call this before SetKeyToRowVersion when the table is not known up front,
+    /// so a missing index can be reported to the caller instead of raised as an error.
+    /// </summary>
+    procedure HasRowVersionKey(var RecRef: RecordRef): Boolean
+    begin
+        exit(FindRowVersionKeyIndex(RecRef) <> 0);
+    end;
+
+    local procedure FindRowVersionKeyIndex(var RecRef: RecordRef): Integer
+    var
+        KeyRef: KeyRef;
         i: Integer;
     begin
         for i := 1 to RecRef.KeyCount() do begin
             KeyRef := RecRef.KeyIndex(i);
-            if KeyRef.FieldIndex(1).Number = 0 then begin //FieldRef 0 is rowversion
-                RecRef.CurrentKeyIndex(i);
-                RecRef.Ascending(true);
-                exit;
-            end;
+            if KeyRef.FieldIndex(1).Number = 0 then //FieldRef 0 is rowversion
+                exit(i);
         end;
+        exit(0);
+    end;
 
-        Error('Cannot use sync mode on %1, missing index on rowVersion. This is a programming bug.', RecRef.Name);
+    local procedure MaxPageSize(): Integer
+    begin
+        exit(20000);
     end;
 
     procedure GetPageKey(var RecRef: RecordRef): Text
@@ -364,6 +449,15 @@ codeunit 6185051 "NPR API Request"
             exit;
         end;
 
+        // An enum backed field reports its type as Option, because the platform has no separate
+        // Enum field type, so this has to be tested before the case arms below or it can never be
+        // reached. The value name is the same in every language; the caption that Format would
+        // return is translated, which makes it useless as a key for a consumer.
+        if FieldRef.IsEnum() then begin
+            JsonObj.Add(FieldName, FieldRef.GetEnumValueName(FieldRef.Value()));
+            exit;
+        end;
+
         case FieldRef.Type() of
             FieldRef.Type::Integer:
                 begin
@@ -399,12 +493,10 @@ codeunit 6185051 "NPR API Request"
                     JsonObj.Add(FieldName, Format(FieldRef.Value));
                     GlobalLanguage(PrevLanguage);
                 end;
-            else begin
-                if FieldRef.IsEnum() then
-                    JsonObj.Add(FieldName, FieldRef.GetEnumValueName(FieldRef.Value))
-                else
-                    JsonObj.Add(FieldName, Format(FieldRef.Value(), 0, 9));
-            end;
+            else
+                // Date, DateTime, Time, Duration, DateFormula and RecordID land here and are written
+                // in the invariant format, so a consumer can parse them without knowing the locale.
+                JsonObj.Add(FieldName, Format(FieldRef.Value(), 0, 9));
         end;
     end;
 

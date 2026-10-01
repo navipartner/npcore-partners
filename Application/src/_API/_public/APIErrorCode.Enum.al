@@ -23,6 +23,18 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The server timed out while processing the request.', Locked = true;
     }
+    value(5; bi_principal_not_resolved)
+    {
+        Caption = 'The request is not made by an Entra application registered in Business Central. No BI API table allowlist can be applied.', Locked = true;
+    }
+    value(6; bi_table_not_allowed)
+    {
+        Caption = 'The table is not allowed for this API key or Entra application. Add it in the BI API Allowed Tables setup in Business Central.', Locked = true;
+    }
+    value(7; bi_missing_rowversion_index)
+    {
+        Caption = 'The table has no index on SystemRowVersion. Sync mode is not supported for it.', Locked = true;
+    }
     value(10; unsupported_http_method)
     {
         Caption = 'The http method is not supported for this endpoint.', Locked = true;
