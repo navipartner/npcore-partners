@@ -25,6 +25,7 @@
         _REDVATRate: Decimal;
         _CountDocumentNoCounter: Integer;
         _CountDocumentNoPrefix: Code[12];
+        _DocumentVariantCode: Code[10];
 
     #region Setup
     internal procedure InitializeSetup()
@@ -292,10 +293,18 @@
         LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, Vendor."No.");
         LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, ItemNo, Qty);
         PurchaseLine.Validate("Location Code", LocationCode);
+        if _DocumentVariantCode <> '' then
+            PurchaseLine.Validate("Variant Code", _DocumentVariantCode);
         PurchaseLine.Validate("Direct Unit Cost", DirectUnitCost);
         PurchaseLine.Modify(true);
 
         PostedNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+    end;
+
+    // Makes the single-line purchase, sales invoice and sales credit memo helpers post on this item variant until reset with ''.
+    internal procedure SetDocumentVariantCode(VariantCode: Code[10])
+    begin
+        _DocumentVariantCode := VariantCode;
     end;
 
     internal procedure PostRetailPurchase2Lines(Item1: Code[20]; Item2: Code[20]; LocationCode: Code[10]; Qty: Decimal; Cost1: Decimal; Cost2: Decimal) PostedNo: Code[20]
@@ -428,6 +437,8 @@
         SalesHeader.Modify(true);
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, Qty);
         SalesLine.Validate("Location Code", LocationCode);
+        if _DocumentVariantCode <> '' then
+            SalesLine.Validate("Variant Code", _DocumentVariantCode);
         SalesLine.Validate("Unit Price", UnitPriceInclVAT);
         SalesLine.Modify(true);
 
@@ -451,6 +462,8 @@
         SalesHeader.Modify(true);
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, Qty);
         SalesLine.Validate("Location Code", LocationCode);
+        if _DocumentVariantCode <> '' then
+            SalesLine.Validate("Variant Code", _DocumentVariantCode);
         SalesLine.Validate("Unit Price", UnitPriceInclVAT);
         SalesLine.Modify(true);
 

@@ -212,6 +212,12 @@
             ValueEntry.SetFilter("Entry Type", _NotInFilterLbl, "Cost Entry Type"::"NPR RS Retail Calculation", "Cost Entry Type"::"NPR Nivelation");
     end;
 
+    internal procedure SetRetailCorrectionEntryFilter(var ValueEntry: Record "Value Entry")
+    begin
+        ValueEntry.SetRange("Entry Type", "Cost Entry Type"::"NPR RS Retail Calculation");
+        ValueEntry.SetFilter("Invoiced Quantity", '<>0');
+    end;
+
     #endregion RS Retail Synthesised Value Entries
 
     #region RS Retail Localization Helper Procedures
