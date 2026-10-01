@@ -11,6 +11,8 @@ codeunit 85470 "NPR Azure Key Vault Mgt. Tests"
         _CityCodeTok: Label 'KVTEST', Locked = true;
         _LocationCodeTok: Label 'KVLOC', Locked = true;
         _NotificationCodeTok: Label 'KVT-WC', Locked = true;
+        _ShopifyStoreCodeTok: Label 'KVSPFY', Locked = true;
+        _GraphEMailTok: Label 'kvtest@example.com', Locked = true;
         _CapturedUrl: Text;
         _CapturedCode: Text;
         _InjectedSecretNames: List of [Text];
@@ -164,6 +166,43 @@ codeunit 85470 "NPR Azure Key Vault Mgt. Tests"
         MemberNotificationSetup.Delete();
     end;
 
+    [Test]
+    procedure ShopifyRequestRefusesAddressOutsideMyshopify()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        NcTask: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        ShopifyResponse: JsonToken;
+    begin
+        Initialize();
+        CreateShopifyStore(_AttackerUrlTok);
+
+        NcTask."Store Code" := _ShopifyStoreCodeTok;
+        ClearLastError();
+        _Assert.IsFalse(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse), 'A Shopify request to an address outside myshopify.com must fail.');
+        ShopifyStore.Get(_ShopifyStoreCodeTok);
+        ShopifyStore.Delete(false);
+
+        _Assert.IsTrue(GetLastErrorText().Contains('myshopify.com'), StrSubstNo('The request must be refused before it is sent, with the address rule as the error. Got: %1', GetLastErrorText()));
+    end;
+
+    [Test]
+    procedure GraphTokenRefreshRefusesAddressOutsideMicrosoft()
+    var
+        EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail";
+        GraphAPIManagement: Codeunit "NPR Graph API Management";
+    begin
+        Initialize();
+        CreateGraphApiSetup(_AttackerUrlTok + '/common/oauth2/v2.0/token');
+        CreateExpiredExchangeEMail();
+
+        EventExchIntEMail."E-Mail" := _GraphEMailTok;
+        ClearLastError();
+        asserterror GraphAPIManagement.TestConnection(EventExchIntEMail);
+
+        _Assert.IsTrue(GetLastErrorText().Contains('login.microsoftonline.com'), StrSubstNo('The token refresh must be refused before it is sent, with the address rule as the error. Got: %1', GetLastErrorText()));
+    end;
+
     [HttpClientHandler]
     procedure CaptureRequestAndFail(Request: TestHttpRequestMessage; var Response: TestHttpResponseMessage): Boolean
     begin
@@ -197,6 +236,53 @@ codeunit 85470 "NPR Azure Key Vault Mgt. Tests"
         _CapturedUrl := '';
         _CapturedCode := '';
         RemoveInjectedSecrets();
+    end;
+
+    local procedure CreateShopifyStore(ShopifyUrl: Text)
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        if ShopifyStore.Get(_ShopifyStoreCodeTok) then
+            ShopifyStore.Delete(false);
+        ShopifyStore.Init();
+        ShopifyStore.Code := _ShopifyStoreCodeTok;
+        ShopifyStore."Shopify Url" := CopyStr(ShopifyUrl, 1, MaxStrLen(ShopifyStore."Shopify Url"));
+        ShopifyStore."Shopify Access Token" := 'test-token';
+        ShopifyStore.Insert();
+    end;
+
+    local procedure CreateGraphApiSetup(OAuthTokenUrl: Text)
+    var
+        GraphApiSetup: Record "NPR GraphApi Setup";
+    begin
+        if GraphApiSetup.Get() then
+            GraphApiSetup.Delete();
+        GraphApiSetup.Init();
+        GraphApiSetup."Client Id" := 'test-client-id';
+        GraphApiSetup."Client Secret" := 'test-client-secret';
+        GraphApiSetup."OAuth Authority Url" := 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
+        GraphApiSetup."OAuth Token Url" := CopyStr(OAuthTokenUrl, 1, MaxStrLen(GraphApiSetup."OAuth Token Url"));
+        GraphApiSetup."Graph Event Url" := 'https://graph.microsoft.com/v1.0/me/events/';
+        GraphApiSetup."Graph Me Url" := 'https://graph.microsoft.com/v1.0/me';
+        GraphApiSetup.Insert();
+    end;
+
+    local procedure CreateExpiredExchangeEMail()
+    var
+        EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail";
+        OutStr: OutStream;
+    begin
+        if EventExchIntEMail.Get(_GraphEMailTok) then
+            EventExchIntEMail.Delete();
+        EventExchIntEMail.Init();
+        EventExchIntEMail."E-Mail" := _GraphEMailTok;
+        EventExchIntEMail."Time Zone No." := 1;
+        EventExchIntEMail."Access Token".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText('expired-access-token');
+        EventExchIntEMail."Refresh Token".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText('test-refresh-token');
+        EventExchIntEMail."Acces Token Valid Until" := CurrentDateTime() - 60000;
+        EventExchIntEMail.Insert();
     end;
 
     local procedure InjectSecret(SecretName: Text; SecretValue: Text)

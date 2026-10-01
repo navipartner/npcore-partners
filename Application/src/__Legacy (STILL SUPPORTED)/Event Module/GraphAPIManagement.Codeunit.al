@@ -386,7 +386,12 @@ codeunit 6014606 "NPR Graph API Management"
         Content: HttpContent;
         MessageHeaders: HttpHeaders;
         ContentHeaders: HttpHeaders;
+        MicrosoftLoginUrlTok: Label 'https://login.microsoftonline.com/', Locked = true;
+        TokenUrlNotAllowedErr: Label '%1 in %2 must start with %3.', Comment = '%1 = OAuth Token Url field caption, %2 = GraphApi Setup table caption, %3 = the Microsoft login address';
     begin
+        if not _GraphApiSetup."OAuth Token Url".ToLower().StartsWith(MicrosoftLoginUrlTok) then
+            Error(TokenUrlNotAllowedErr, _GraphApiSetup.FieldCaption("OAuth Token Url"), _GraphApiSetup.TableCaption(), MicrosoftLoginUrlTok);
+
         RefreshRequest := GetRefreshTokenRequest(RefreshToken);
 
         Client.Clear();

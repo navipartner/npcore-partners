@@ -668,12 +668,15 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     local procedure GetShopifyUrl(ShopifyStoreCode: Code[20]; CheckIsEnabled: Boolean) ShopifyUrl: Text
     var
         ShopifyStore: Record "NPR Spfy Store";
+        InvalidShopUrlErr: Label '%1 ''%2'' on %3 %4 must refer to the internal shop location at myshopify.com.', Comment = '%1 = Shopify Url field caption, %2 = Shopify Url value, %3 = Shopify Store table caption, %4 = Shopify Store code';
     begin
         if CheckIsEnabled then
             SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ", ShopifyStoreCode);
 
         ShopifyStore.Get(ShopifyStoreCode);
         ShopifyStore.TestField("Shopify Url");
+        if not IsValidShopUrl(ShopifyStore."Shopify Url") then
+            Error(InvalidShopUrlErr, ShopifyStore.FieldCaption("Shopify Url"), ShopifyStore."Shopify Url", ShopifyStore.TableCaption(), ShopifyStoreCode);
 
         ShopifyUrl := StrSubstNo('%1/admin/api/%2/', ShopifyStore."Shopify Url", SpfyIntegrationMgt.ShopifyApiVersion());
     end;
