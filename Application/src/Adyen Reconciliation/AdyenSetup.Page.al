@@ -327,6 +327,8 @@ page 6184531 "NPR Adyen Setup"
                         ReconHeader.Reset();
                         ReconHeader.SetCurrentKey(Status);
                         ReconHeader.SetFilter(Status, '<>%1', ReconHeader.Status::Posted);
+                        if not _AdyenManagement.ExternalSettlementReconEnabled() then
+                            ReconHeader.SetFilter("Document Type", '<>%1', ReconHeader."Document Type"::"External Settlement detail (C)");
                         if ReconHeader.FindSet() then begin
                             repeat
                                 Clear(AdyenRecreateRecDoc);

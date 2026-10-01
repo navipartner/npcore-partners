@@ -17,6 +17,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         DroppedRebookings: Integer;
     begin
         ReportWebhookRequest.TestField(ID);
+        _AdyenManagement.CheckReportTypeSupported(ReportWebhookRequest."Report Type", ReportWebhookRequest."Report Name");
         _GLSetup.Get();
         _GLSetup.TestField("LCY Code");
         _AdyenSetup.Get();
@@ -76,6 +77,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         NoUnpostedEntriesLbl: Label 'Document %1 is not yet posted, however there are no unposted entries to recreate.';
         GLSetupDoesNotExistLbl: Label 'General Ledger Setup does not exist.';
     begin
+        if SkipUnsupportedDocument(RecHeader, _LogType::"Import Lines") then
+            exit(0);
+
         if not _GLSetup.Get() then
             Error(GLSetupDoesNotExistLbl);
 
@@ -477,6 +481,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ProcessedEntries: Integer;
         TotalEntries: Integer;
     begin
+        if SkipUnsupportedDocument(ReconciliationHeader, _LogType::"Match Transactions") then
+            exit(0);
+
         ReconciliationLine.Reset();
         ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
         ReconciliationLine.SetFilter(Status, '%1|%2', ReconciliationLine.Status::" ", ReconciliationLine.Status::"Failed to Match");
@@ -828,6 +835,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconcilingEntriesLbl: Label 'Attempting to Reconcile Entries...\\Reconciling entry #1 of #2.';
         ReconcilingIsNotPossibleLbl: Label 'Reconciling is not possible while Posting is enabled. Please either proceed with Posting or disable it in NP Pay Setup.';
     begin
+        if SkipUnsupportedDocument(ReconciliationHeader, _LogType::"Reconcile Transactions") then
+            exit(false);
+
         if CheckPostedOrReconciled(ReconciliationLine, ReconciliationHeader, Enum::"NPR Adyen Rec. Line Status"::Reconciled) then
             exit(true);
 
@@ -967,6 +977,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         PostingDateIsNotAllowedLbl: Label 'The transaction date of line %1 cannot be earlier than the specified ''%2'' in the NP Pay Setup.', Comment = '%1 - Reconciliation line number, %2 - "Reconciliation Posting Starting Date" from the NP Pay Setup page';
         PostAllowed: Boolean;
     begin
+        if SkipUnsupportedDocument(ReconciliationHeader, _LogType::"Post Transactions") then
+            exit(false);
+
         if CheckPostedOrReconciled(ReconciliationLine, ReconciliationHeader, Enum::"NPR Adyen Rec. Line Status"::Posted) then
             exit(true);
 
@@ -1373,6 +1386,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         AdyenSetup: Record "NPR Adyen Setup";
     begin
         WebhookRequest.TestField(ID);
+        _AdyenManagement.CheckReportTypeSupported(WebhookRequest."Report Type", WebhookRequest."Report Name");
         AdyenSetup.GetRecordOnce();
         AdyenSetup.TestField("Posting Document Nos.");
 
@@ -1441,6 +1455,15 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 #endif
         ReconLine.FindSet();
         repeat
+            if RecHeader."Document No." <> ReconLine."Document No." then begin
+                RecHeader.Get(ReconLine."Document No.");
+                _AdyenManagement.CheckDocumentTypeSupported(RecHeader);
+            end;
+        until ReconLine.Next() = 0;
+        Clear(RecHeader);
+
+        ReconLine.FindSet();
+        repeat
             EntryPosting += 1;
             Window.Update(1, Format(EntryPosting));
             if RecHeader."Document No." <> ReconLine."Document No." then begin
@@ -1468,6 +1491,17 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 RecHeader.Get(TouchedHeader);
             MarkAsPostedIfPossible(RecHeader);
         end;
+    end;
+
+    local procedure SkipUnsupportedDocument(ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LogType: Enum "NPR Adyen Rec. Log Type"): Boolean
+    begin
+        // Skips instead of raising an error: upgrade codeunits and background sessions call these procedures too.
+        // The page actions check the document type first and show the error to the user.
+        if _AdyenManagement.IsReportTypeSupported(ReconciliationHeader."Document Type") then
+            exit(false);
+
+        _AdyenManagement.CreateReconciliationLog(LogType, false, StrSubstNo(DocumentTypeNotSupportedLbl, ReconciliationHeader."Document No.", ReconciliationHeader.FieldCaption("Document Type"), Format(ReconciliationHeader."Document Type")), ReconciliationHeader."Webhook Request ID");
+        exit(true);
     end;
 
     local procedure GetValueAtCell(RowNo: Integer; ColNo: Integer): Text
@@ -2258,4 +2292,5 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         NoSeriesError01: Label 'No. Series in NP Pay Setup is not specified.';
         NoSeriesError02: Label 'Numbers are configured incorrectly for No. Series %1.';
         TransactionNotMatchedLbl: Label 'Transaction %1 is not matched yet.';
+        DocumentTypeNotSupportedLbl: Label 'NP Pay Reconciliation Document %1 was skipped because %2 ''%3'' is not supported.', Comment = '%1 = Document No., %2 = Document Type field caption, %3 = Document Type';
 }

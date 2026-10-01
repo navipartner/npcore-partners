@@ -20,7 +20,14 @@ table 6151208 "NPR Merchant Currency Setup"
             NotBlank = true;
 
             trigger OnValidate()
+            var
+                AdyenManagement: Codeunit "NPR Adyen Management";
+                AccountTypeNotSupportedErr: Label '%1 ''%2'' is not supported.', Comment = '%1 = Reconciliation Account Type field caption, %2 = Reconciliation Account Type';
             begin
+                if AdyenManagement.IsExternalSettlementAccountType("Reconciliation Account Type") then
+                    if not AdyenManagement.ExternalSettlementReconEnabled() then
+                        Error(AccountTypeNotSupportedErr, FieldCaption("Reconciliation Account Type"), Format("Reconciliation Account Type"));
+
                 if (xRec."Reconciliation Account Type" <> Rec."Reconciliation Account Type") and ("Account Type" <> "Account Type"::"G/L Account") then begin
                     "Account Type" := "Account Type"::"G/L Account";
                     "Account No." := '';

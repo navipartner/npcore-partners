@@ -6,6 +6,8 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
     var
         WebhookInStream: InStream;
         ReportURL: Text;
+        ReportName: Text[100];
+        ReportSkipped: Boolean;
         JsonToken: JsonToken;
         JsonObjectToken: JsonToken;
         JsonValueToken: JsonToken;
@@ -17,6 +19,7 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
         RecLogType: Enum "NPR Adyen Rec. Log Type";
         SuccessImportLbl: Label 'NP Pay Reconciliation Webhook Request was successfully imported.';
         WebhookNoDataLbl: Label 'NP Pay Webhook %1 has no data.';
+        ReportTypeNotSupportedLbl: Label 'Report %1 was skipped because its report type is not supported.', Comment = '%1 = Report Name';
     begin
         AdyenWebhook.LockTable();
         AdyenWebhook.Get(AdyenWebhook."Entry No.");
@@ -41,23 +44,29 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
                                 if JsonObjectToken.AsObject().Get('NotificationRequestItem', JsonObjectToken) then begin
                                     if JsonObjectToken.IsObject() then begin
                                         if (JsonObjectToken.AsObject().Get('reason', JsonValueToken)) then begin
-                                            ReconciliationWebhook.Init();
-                                            ReconciliationWebhook.ID := 0;
-                                            ReconciliationWebhook."Adyen Webhook Entry No." := AdyenWebhook."Entry No.";
-                                            ReconciliationWebhook."Webhook Reference" := CopyStr(AdyenWebhook."Webhook Reference", 1, MaxStrLen(ReconciliationWebhook."Webhook Reference"));
-                                            ReconciliationWebhook.Live := Live;
-                                            ReconciliationWebhook.Insert();
                                             ReportURL := JsonValueToken.AsValue().AsText();
-                                            if JsonObjectToken.AsObject().Get('pspReference', JsonValueToken) then
-                                                ReconciliationWebhook."PSP Reference" := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(ReconciliationWebhook."PSP Reference"));
-                                            ReconciliationWebhook."Report Download URL" := CopyStr(ReportURL, 1, MaxStrLen(ReconciliationWebhook."Report Download URL"));
-                                            ReconciliationWebhook.Validate("Report Name", CopyStr(ReportURL.Split('/').Get(ReportURL.Split('/').Count()), 1, MaxStrLen(ReconciliationWebhook."Report Name")));
-                                            ReconciliationWebhook.Modify();
-                                            AdyenWebhook.Status := AdyenWebhook.Status::Processed;
-                                            AdyenWebhook."Processed Date" := CurrentDateTime();
-                                            AdyenWebhook.Modify();
-                                            AdyenManagement.CreateGeneralLog(LogType::Process, true, SuccessImportLbl, AdyenWebhook."Entry No.");
-                                            AdyenManagement.CreateReconciliationLog(RecLogType::"Background Session", true, SuccessImportLbl, ReconciliationWebhook.ID);
+                                            ReportName := CopyStr(ReportURL.Split('/').Get(ReportURL.Split('/').Count()), 1, MaxStrLen(ReconciliationWebhook."Report Name"));
+                                            if not AdyenManagement.IsReportTypeSupported(AdyenManagement.DefineReportType(ReportName)) then begin
+                                                ReportSkipped := true;
+                                                AdyenManagement.CreateGeneralLog(LogType::Process, true, StrSubstNo(ReportTypeNotSupportedLbl, ReportName), AdyenWebhook."Entry No.");
+                                            end else begin
+                                                ReconciliationWebhook.Init();
+                                                ReconciliationWebhook.ID := 0;
+                                                ReconciliationWebhook."Adyen Webhook Entry No." := AdyenWebhook."Entry No.";
+                                                ReconciliationWebhook."Webhook Reference" := CopyStr(AdyenWebhook."Webhook Reference", 1, MaxStrLen(ReconciliationWebhook."Webhook Reference"));
+                                                ReconciliationWebhook.Live := Live;
+                                                ReconciliationWebhook.Insert();
+                                                if JsonObjectToken.AsObject().Get('pspReference', JsonValueToken) then
+                                                    ReconciliationWebhook."PSP Reference" := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(ReconciliationWebhook."PSP Reference"));
+                                                ReconciliationWebhook."Report Download URL" := CopyStr(ReportURL, 1, MaxStrLen(ReconciliationWebhook."Report Download URL"));
+                                                ReconciliationWebhook.Validate("Report Name", ReportName);
+                                                ReconciliationWebhook.Modify();
+                                                AdyenWebhook.Status := AdyenWebhook.Status::Processed;
+                                                AdyenWebhook."Processed Date" := CurrentDateTime();
+                                                AdyenWebhook.Modify();
+                                                AdyenManagement.CreateGeneralLog(LogType::Process, true, SuccessImportLbl, AdyenWebhook."Entry No.");
+                                                AdyenManagement.CreateReconciliationLog(RecLogType::"Background Session", true, SuccessImportLbl, ReconciliationWebhook.ID);
+                                            end;
                                         end;
                                     end;
                                 end;
@@ -65,6 +74,12 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
                         end;
                 end;
             end;
+        end;
+
+        if ReportSkipped and (AdyenWebhook.Status <> AdyenWebhook.Status::Processed) then begin
+            AdyenWebhook.Status := AdyenWebhook.Status::Canceled;
+            AdyenWebhook."Processed Date" := CurrentDateTime();
+            AdyenWebhook.Modify();
         end;
     end;
 }

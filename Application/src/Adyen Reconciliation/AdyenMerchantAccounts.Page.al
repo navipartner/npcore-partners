@@ -48,12 +48,14 @@ page 6184552 "NPR Adyen Merchant Accounts"
                     ApplicationArea = NPRRetail;
                     Caption = 'Acquire Payout Acc. Type';
                     ToolTip = 'Specifies the Acquire Payout Acc. Type.';
+                    Visible = _ExternalSettlementReconEnabled;
                 }
                 field(AcquirerAccountNo; _MerchantAccountSetup."Acquirer Payout Acc. No.")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Acquirer Account No.';
                     ToolTip = 'Specifies the Acquirer Account No.';
+                    Visible = _ExternalSettlementReconEnabled;
                 }
                 field(ReconciledPaymentAccType; _MerchantAccountSetup."Reconciled Payment Acc. Type")
                 {
@@ -168,6 +170,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
 
     trigger OnOpenPage()
     begin
+        _ExternalSettlementReconEnabled := _AdyenManagement.ExternalSettlementReconEnabled();
         if _AdyenManagement.UpdateMerchantList(0) then
             CurrPage.Update(false);
     end;
@@ -180,4 +183,5 @@ page 6184552 "NPR Adyen Merchant Accounts"
     var
         _AdyenManagement: Codeunit "NPR Adyen Management";
         _MerchantAccountSetup: Record "NPR Adyen Merchant Setup";
+        _ExternalSettlementReconEnabled: Boolean;
 }

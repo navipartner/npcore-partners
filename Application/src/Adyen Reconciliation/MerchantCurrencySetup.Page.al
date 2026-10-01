@@ -21,6 +21,14 @@ page 6185081 "NPR Merchant Currency Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Reconciliation Account Type field.';
+                    ValuesAllowed = " ", "Merchant Payout", Fee, Deposit, Markup, "Other commissions", "Invoice Deduction", "Reconciled Payment", "Missing Transaction", "Chargeback Fees";
+                    Visible = not _ExternalSettlementReconEnabled;
+                }
+                field(ReconciliationAccountTypeAll; Rec."Reconciliation Account Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Reconciliation Account Type field.';
+                    Visible = _ExternalSettlementReconEnabled;
                 }
                 field("Currency Code"; Rec."NP Pay Currency Code")
                 {
@@ -41,4 +49,14 @@ page 6185081 "NPR Merchant Currency Setup"
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+    begin
+        _ExternalSettlementReconEnabled := AdyenManagement.ExternalSettlementReconEnabled();
+    end;
+
+    var
+        _ExternalSettlementReconEnabled: Boolean;
 }

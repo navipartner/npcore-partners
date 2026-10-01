@@ -1,3 +1,6 @@
+// When adding a value, also add it to ValuesAllowed on the "Reconciliation Account Type" control of page "NPR Merchant Currency Setup",
+// unless it belongs to the hidden External Settlement path (then add it to "NPR Adyen Management".IsExternalSettlementAccountType instead).
+// Test MerchantCurrencySetupPage_RestrictedAccountTypeOffersEveryNonExternalValue fails until both are in sync.
 enum 6059910 "NPR Merchant Account"
 {
     Extensible = false;

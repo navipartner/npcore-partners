@@ -1206,6 +1206,55 @@ codeunit 6184796 "NPR Adyen Management"
             exit(ReportType::Undefined);
     end;
 
+    #region External Settlement Reconciliation
+    // The External Settlement detail (C) reconciliation path is incomplete and hidden from customers
+    // until the ConfigCat feature flag is enabled. A missing flag means disabled.
+    internal procedure ExternalSettlementReconFeatureFlag(): Text[50]
+    begin
+        exit('adyenExternalSettlementRecon');
+    end;
+
+    internal procedure ExternalSettlementReconEnabled(): Boolean
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        exit(FeatureFlagsManagement.IsEnabled(ExternalSettlementReconFeatureFlag()));
+    end;
+
+    internal procedure IsReportTypeSupported(ReportType: Enum "NPR Adyen Report Type"): Boolean
+    begin
+        if ReportType <> ReportType::"External Settlement detail (C)" then
+            exit(true);
+        exit(ExternalSettlementReconEnabled());
+    end;
+
+    internal procedure IsExternalSettlementAccountType(AccountType: Enum "NPR Merchant Account"): Boolean
+    begin
+        exit(AccountType in
+            [AccountType::"External Merchant Payout",
+            AccountType::"Advancement External Commission",
+            AccountType::"Refunded External Commission",
+            AccountType::"Settled External Commission"]);
+    end;
+
+    internal procedure CheckReportTypeSupported(ReportType: Enum "NPR Adyen Report Type"; ReportName: Text)
+    var
+        WebhookRequest: Record "NPR AF Rec. Webhook Request";
+        ReportTypeNotSupportedErr: Label '%1 ''%2'' is not supported. Report ''%3'' cannot be used to create a reconciliation document.', Comment = '%1 = Report Type field caption, %2 = Report Type, %3 = Report Name';
+    begin
+        if not IsReportTypeSupported(ReportType) then
+            Error(ReportTypeNotSupportedErr, WebhookRequest.FieldCaption("Report Type"), Format(ReportType), ReportName);
+    end;
+
+    internal procedure CheckDocumentTypeSupported(ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr")
+    var
+        DocumentTypeNotSupportedErr: Label '%1 ''%2'' is not supported. %3 %4 cannot be processed.', Comment = '%1 = Document Type field caption, %2 = Document Type, %3 = Reconciliation Document table caption, %4 = Document No.';
+    begin
+        if not IsReportTypeSupported(ReconciliationHeader."Document Type") then
+            Error(DocumentTypeNotSupportedErr, ReconciliationHeader.FieldCaption("Document Type"), Format(ReconciliationHeader."Document Type"), ReconciliationHeader.TableCaption(), ReconciliationHeader."Document No.");
+    end;
+    #endregion
+
     internal procedure CreateDocumentFromFile(): Boolean
     var
         FileName: Text;
@@ -1337,6 +1386,7 @@ codeunit 6184796 "NPR Adyen Management"
         InStr: InStream;
         OutStr: OutStream;
     begin
+        CheckReportTypeSupported(DefineReportType(ReportName), ReportName);
         InitiateAdyenManagement();
 
         HttpClient.DefaultRequestHeaders().Add('x-api-key', _AdyenSetup.GetDownloadReportApiKey());
@@ -1399,14 +1449,18 @@ codeunit 6184796 "NPR Adyen Management"
     end;
 
     internal procedure ManualMatchingAllowed(RecLine: Record "NPR Adyen Recon. Line"): Boolean
+    var
+        RecHeader: Record "NPR Adyen Reconciliation Hdr";
     begin
-        case RecLine.Status of
-            RecLine.Status::"Failed to Match":
-                exit(true);
-            RecLine.Status::Matched,
-            RecLine.Status::"Failed to Post":
-                exit(RecLine."Matched Manually");
-        end;
+        if not (RecLine.Status in [RecLine.Status::"Failed to Match", RecLine.Status::Matched, RecLine.Status::"Failed to Post"]) then
+            exit(false);
+        if (RecLine.Status <> RecLine.Status::"Failed to Match") and (not RecLine."Matched Manually") then
+            exit(false);
+
+        // Read the header only for lines that could be matched manually
+        if RecHeader.Get(RecLine."Document No.") then
+            exit(IsReportTypeSupported(RecHeader."Document Type"));
+        exit(true);
     end;
 
     internal procedure CreateDim(var GenJnlLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; InheritedDimensionSetID: Integer; AccountNo: Code[20]; SourceCode: Code[10])

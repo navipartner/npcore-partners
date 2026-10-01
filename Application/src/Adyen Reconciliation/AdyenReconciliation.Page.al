@@ -195,6 +195,7 @@ page 6184502 "NPR Adyen Reconciliation"
                         UpdatedEntriesSuccessLbl: Label 'Successfully recreated %1 entry/entries.';
                         UpdatedEntriesEmptyLbl: Label 'No entries were updated.';
                     begin
+                        _AdyenManagement.CheckDocumentTypeSupported(Rec);
                         UpdatedEnties := _TransactionMatching.RecreateDocumentEntries(Rec);
                         if UpdatedEnties > 0 then begin
                             Message(UpdatedEntriesSuccessLbl, Format(UpdatedEnties));
@@ -218,6 +219,7 @@ page 6184502 "NPR Adyen Reconciliation"
                         MatchedSuccessResult: Label 'Successfully matched %1 entries.';
                         MatchedNullResult: Label 'No entries were matched.';
                     begin
+                        _AdyenManagement.CheckDocumentTypeSupported(Rec);
                         MatchedEntries := _TransactionMatching.MatchEntries(Rec);
                         if MatchedEntries > 0 then
                             Message(MatchedSuccessResult, Format(MatchedEntries))
@@ -240,6 +242,7 @@ page 6184502 "NPR Adyen Reconciliation"
                         PostedFailedResult: Label 'Couldn''t post some entries.';
                         PostingConfirmationLbl: Label 'Are you sure you want to post the Reconciliation lines?';
                     begin
+                        _AdyenManagement.CheckDocumentTypeSupported(Rec);
                         if not Confirm(PostingConfirmationLbl) then
                             exit;
 
@@ -264,6 +267,7 @@ page 6184502 "NPR Adyen Reconciliation"
                         ReconcilingFailedResult: Label 'Some entries could not be set as reconciled.';
                         ReconcilingConfirmationLbl: Label 'This will set the reconciliation lines as reconciled. This action is irreversible and once you''ve completed it, you won''t be able to change the transaction matching. Are you sure you want to proceed?';
                     begin
+                        _AdyenManagement.CheckDocumentTypeSupported(Rec);
                         if not Confirm(ReconcilingConfirmationLbl) then
                             exit;
 
@@ -354,6 +358,7 @@ page 6184502 "NPR Adyen Reconciliation"
 
     var
         _AdyenSetup: Record "NPR Adyen Setup";
+        _AdyenManagement: Codeunit "NPR Adyen Management";
         _TransactionMatching: Codeunit "NPR Adyen Trans. Matching";
         _HasPostedLines: Boolean;
         _IsExternalReport: Boolean;

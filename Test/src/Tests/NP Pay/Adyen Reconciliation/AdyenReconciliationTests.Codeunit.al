@@ -7,6 +7,7 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         _LibraryERM: Codeunit "Library - ERM";
         _LibraryUtility: Codeunit "Library - Utility";
         _LibraryDimension: Codeunit "Library - Dimension";
+        _LibraryFeatureFlags: Codeunit "NPR Library - Feature Flags";
         _Assert: Codeunit Assert;
         _AdyenSetup: Record "NPR Adyen Setup";
         _AdyenMerchantSetup: Record "NPR Adyen Merchant Setup";
@@ -1145,6 +1146,662 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         ReconciliationLine.FindFirst();
         ReconciliationLine.TestField("PSP Reference", PSPReference);
         ReconciliationLine.TestField("Amount (TCY)", SettledAmount);
+    end;
+
+    #endregion
+
+    #region [External Settlement feature flag]
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_ReportProcessRefusedBeforeDownload()
+    var
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        DedicatedMerchantSetup: Record "NPR Adyen Merchant Setup";
+        AdyenRecReportProcess: Codeunit "NPR Adyen Rec. Report Process";
+        MerchantAccount: Text[80];
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] With the External Settlement flag off, the report processing (job queue) path refuses an External Settlement
+        //            detail report before it downloads anything, so no document can be created from it
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        MerchantAccount := CreateDedicatedMerchant(DedicatedMerchantSetup);
+
+        // [Given] A webhook request for an External Settlement detail report that would have to be downloaded
+        BuildExternalWebhookRequest(AFRecWebhookRequest, MerchantAccount, GenerateUniquePSPReference(), 100, RemoteExternalReportURL());
+
+        // [When] Running the report processing entry point
+        asserterror AdyenRecReportProcess.Run(AFRecWebhookRequest);
+
+        // [Then] The report type is rejected. A gate placed after the download would fail on the unreachable URL instead.
+        //        asserterror rolls back the fixture as well, so only the error itself can be asserted; the rejection runs
+        //        before any insert or commit, so the error guarantees nothing is persisted.
+        AssertReportTypeNotSupportedError(AFRecWebhookRequest."Report Name");
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_CreateSettlementDocumentsRefusedBeforeDownload()
+    var
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        DedicatedMerchantSetup: Record "NPR Adyen Merchant Setup";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        MerchantAccount: Text[80];
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] The document creation funnel itself refuses External Settlement detail reports while the flag is off,
+        //            so a caller that skips the report scheme validation cannot download the report or create a document either
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        MerchantAccount := CreateDedicatedMerchant(DedicatedMerchantSetup);
+        BuildExternalWebhookRequest(AFRecWebhookRequest, MerchantAccount, GenerateUniquePSPReference(), 100, RemoteExternalReportURL());
+
+        // [When] Creating the settlement documents directly
+        asserterror AdyenTransMatching.CreateSettlementDocuments(AFRecWebhookRequest, false, '');
+
+        // [Then] The report type is rejected before the download (see ExternalSettlement_FlagOff_ReportProcessRefusedBeforeDownload)
+        AssertReportTypeNotSupportedError(AFRecWebhookRequest."Report Name");
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOn_CreatesExternalDocument()
+    var
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        DedicatedMerchantSetup: Record "NPR Adyen Merchant Setup";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        NewDocumentsList: JsonArray;
+        MerchantAccount: Text[80];
+        PSPReference: Code[16];
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] With the External Settlement flag on, the hidden path still works: the report passes the scheme
+        //            validation and an External Settlement detail document is created from it
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(true);
+        MerchantAccount := CreateDedicatedMerchant(DedicatedMerchantSetup);
+        PSPReference := GenerateUniquePSPReference();
+        BuildExternalWebhookRequest(AFRecWebhookRequest, MerchantAccount, PSPReference, 100, _LocalFileLbl);
+
+        // [When] Validating the report scheme and creating the settlement documents
+        _Assert.IsTrue(AdyenTransMatching.ValidateReportScheme(AFRecWebhookRequest), 'The External Settlement detail report scheme should be valid while the feature flag is on');
+        NewDocumentsList := AdyenTransMatching.CreateSettlementDocuments(AFRecWebhookRequest, false, '');
+
+        // [Then] One External Settlement detail document with the Settled line is created
+        _Assert.AreEqual(1, NewDocumentsList.Count(), 'Expected exactly one reconciliation document created from the External Settlement detail report');
+        ReconciliationHeader.SetRange("Merchant Account", MerchantAccount);
+        ReconciliationHeader.FindFirst();
+        ReconciliationHeader.TestField("Document Type", ReconciliationHeader."Document Type"::"External Settlement detail (C)");
+
+        ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
+        ReconciliationLine.SetRange("Transaction Type", ReconciliationLine."Transaction Type"::Settled);
+        ReconciliationLine.FindFirst();
+        ReconciliationLine.TestField("PSP Reference", PSPReference);
+        ReconciliationLine.TestField("Amount (TCY)", 100);
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_ImportReportByNameRefusedBeforeDownload()
+    var
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        ReportName: Text[100];
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] 'Import Report by Name' refuses an External Settlement detail report name before it downloads anything
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        ReportName := CopyStr('external_settlement_detail_report_' + Format(GenerateUniqueBatchNumber()) + '.xlsx', 1, MaxStrLen(ReportName));
+
+        // [When] Emulating the webhook request for the External Settlement detail report
+        asserterror AdyenManagement.EmulateWebhookRequest(ReportName, _MerchantAccount, false, AFRecWebhookRequest);
+
+        // [Then] The report type is rejected (no HTTP call is reachable in tests, so any other outcome would be a download failure)
+        AssertReportTypeNotSupportedError(ReportName);
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure WebhookChain_ExternalReport_FlagOff_CancelsWebhook()
+    var
+        AdyenWebhook: Record "NPR Adyen Webhook";
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        ProcessReportReady: Codeunit "NPR Adyen Process Report Ready";
+        WebhookReference: Code[80];
+        ReportURL: Text;
+        BatchNumber: Integer;
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] A REPORT_AVAILABLE webhook for an External Settlement detail report is canceled while the flag is off,
+        //            without creating a reconciliation report request (so nothing is downloaded or shown as failed)
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        BatchNumber := GenerateUniqueBatchNumber();
+        WebhookReference := CopyStr('WHREF-EXT-' + Format(BatchNumber), 1, MaxStrLen(WebhookReference));
+        ReportURL := 'https://test.invalid/' + Format(BatchNumber) + '/external_settlement_detail_report_' + Format(BatchNumber) + '.xlsx';
+        InitAdyenWebhookRecord(AdyenWebhook, WebhookReference, ReportURL, GenerateUniquePSPReference());
+
+        // [When] The job-queue handler for REPORT_AVAILABLE processes the webhook
+        ProcessReportReady.ProcessReportReadyWebhook(AdyenWebhook);
+
+        // [Then] The webhook is canceled and no reconciliation report request exists for it
+        AdyenWebhook.Find();
+        AdyenWebhook.TestField(Status, AdyenWebhook.Status::Canceled);
+        AFRecWebhookRequest.SetRange("Adyen Webhook Entry No.", AdyenWebhook."Entry No.");
+        _Assert.IsTrue(AFRecWebhookRequest.IsEmpty(), 'No reconciliation report request should be created for an External Settlement detail report while the feature flag is off');
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure WebhookChain_ExternalReport_FlagOn_CreatesRequest()
+    var
+        AdyenWebhook: Record "NPR Adyen Webhook";
+        AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request";
+        ProcessReportReady: Codeunit "NPR Adyen Process Report Ready";
+        WebhookReference: Code[80];
+        ReportURL: Text;
+        BatchNumber: Integer;
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] With the flag on, a REPORT_AVAILABLE webhook for an External Settlement detail report is imported as before
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(true);
+        BatchNumber := GenerateUniqueBatchNumber();
+        WebhookReference := CopyStr('WHREF-EXT-' + Format(BatchNumber), 1, MaxStrLen(WebhookReference));
+        ReportURL := 'https://test.invalid/' + Format(BatchNumber) + '/external_settlement_detail_report_' + Format(BatchNumber) + '.xlsx';
+        InitAdyenWebhookRecord(AdyenWebhook, WebhookReference, ReportURL, GenerateUniquePSPReference());
+
+        // [When] The job-queue handler for REPORT_AVAILABLE processes the webhook
+        ProcessReportReady.ProcessReportReadyWebhook(AdyenWebhook);
+
+        // [Then] The webhook is processed and an External Settlement detail report request was created from it
+        AdyenWebhook.Find();
+        AdyenWebhook.TestField(Status, AdyenWebhook.Status::Processed);
+        AFRecWebhookRequest.SetRange("Adyen Webhook Entry No.", AdyenWebhook."Entry No.");
+        AFRecWebhookRequest.FindFirst();
+        AFRecWebhookRequest.TestField("Report Type", AFRecWebhookRequest."Report Type"::"External Settlement detail (C)");
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_DocumentActionsBlockedOnExternalDocument()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationPage: TestPage "NPR Adyen Reconciliation";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] An existing External Settlement detail document cannot be matched while the flag is off
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ReconciliationHeader);
+
+        // [When] Invoking 'Match Entries' on the document
+        ReconciliationPage.OpenEdit();
+        ReconciliationPage.GoToRecord(ReconciliationHeader);
+        asserterror ReconciliationPage."Match Entries".Invoke();
+
+        // [Then] The document type is rejected
+        AssertDocumentTypeNotSupportedError(ReconciliationHeader."Document No.");
+        ReconciliationPage.Close();
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_RecreateBlockedOnExternalDocument()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationPage: TestPage "NPR Adyen Reconciliation";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] An existing External Settlement detail document cannot be recreated (re-imported) while the flag is off
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ReconciliationHeader);
+
+        // [When] Invoking 'Recreate Document' on the document
+        ReconciliationPage.OpenEdit();
+        ReconciliationPage.GoToRecord(ReconciliationHeader);
+        asserterror ReconciliationPage."Recreate Document".Invoke();
+
+        // [Then] The document type is rejected
+        AssertDocumentTypeNotSupportedError(ReconciliationHeader."Document No.");
+        ReconciliationPage.Close();
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_PostEntriesBlockedOnExternalDocument()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationPage: TestPage "NPR Adyen Reconciliation";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] An existing External Settlement detail document cannot be posted while the flag is off
+        //            (the check runs before the posting confirmation, so no ConfirmHandler is involved)
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ReconciliationHeader);
+
+        // [When] Invoking 'Post Entries' on the document
+        ReconciliationPage.OpenEdit();
+        ReconciliationPage.GoToRecord(ReconciliationHeader);
+        asserterror ReconciliationPage."Post Entries".Invoke();
+
+        // [Then] The document type is rejected
+        AssertDocumentTypeNotSupportedError(ReconciliationHeader."Document No.");
+        ReconciliationPage.Close();
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_SetAsReconciledBlockedOnExternalDocument()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationPage: TestPage "NPR Adyen Reconciliation";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] An existing External Settlement detail document cannot be set as reconciled while the flag is off
+        //            (the check runs before the reconciling confirmation, so no ConfirmHandler is involved)
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ReconciliationHeader);
+
+        // [When] Invoking 'Set as Reconciled' on the document
+        ReconciliationPage.OpenEdit();
+        ReconciliationPage.GoToRecord(ReconciliationHeader);
+        asserterror ReconciliationPage."Set as Reconciled".Invoke();
+
+        // [Then] The document type is rejected
+        AssertDocumentTypeNotSupportedError(ReconciliationHeader."Document No.");
+        ReconciliationPage.Close();
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_PostAsMissingBlockedOnExternalDocument()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        ReconciliationPage: TestPage "NPR Adyen Reconciliation";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] Failed-to-match lines of an existing External Settlement detail document cannot be posted as missing
+        //            while the flag is off, so the path cannot be used as a workaround for missing transactions
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ReconciliationHeader);
+        InsertSettledReconLine(ReconciliationLine, ReconciliationHeader, GenerateUniquePSPReference(), 100);
+        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
+        ReconciliationLine.Modify();
+
+        // [When] Invoking 'Post as Missing' on the failed-to-match line
+        ReconciliationPage.OpenEdit();
+        ReconciliationPage.GoToRecord(ReconciliationHeader);
+        ReconciliationPage."Reconciliation Lines".First();
+        asserterror ReconciliationPage."Reconciliation Lines"."Post as Missing".Invoke();
+
+        // [Then] The document type is rejected before anything is posted
+        //        (asserterror rolls back the fixture as well, so only the error itself can be asserted)
+        AssertDocumentTypeNotSupportedError(ReconciliationHeader."Document No.");
+        ReconciliationPage.Close();
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_TransMatchingSkipsExternalDocument()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        OriginalHeaderStatus: Enum "NPR Adyen Rec. Header Status";
+        LogId: Integer;
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] Callers other than the page actions (upgrade steps, background sessions, future callers) cannot process an
+        //            existing External Settlement detail document either: the procedures skip it and log why, without raising an error
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ReconciliationHeader);
+        OriginalHeaderStatus := ReconciliationHeader.Status;
+        InsertSettledReconLine(ReconciliationLine, ReconciliationHeader, GenerateUniquePSPReference(), 100);
+        LogId := LastReconLogId();
+
+        // [When] Recreating, matching, reconciling and posting the document directly
+        _Assert.AreEqual(0, AdyenTransMatching.RecreateDocumentEntries(ReconciliationHeader), 'RecreateDocumentEntries should skip an External Settlement detail document while the flag is off');
+        _Assert.AreEqual(0, AdyenTransMatching.MatchEntries(ReconciliationHeader), 'MatchEntries should skip an External Settlement detail document while the flag is off');
+        _Assert.IsFalse(AdyenTransMatching.ReconcileEntries(ReconciliationHeader), 'ReconcileEntries should skip an External Settlement detail document while the flag is off');
+        _Assert.IsFalse(AdyenTransMatching.PostEntries(ReconciliationHeader), 'PostEntries should skip an External Settlement detail document while the flag is off');
+
+        // [Then] The document is untouched
+        ReconciliationLine.Find();
+        ReconciliationLine.TestField(Status, ReconciliationLine.Status::" ");
+        ReconciliationHeader.Find();
+        ReconciliationHeader.TestField(Status, OriginalHeaderStatus);
+
+        // [Then] Each operation logged its own skip. ReconcileEntries and PostEntries would also return false without the guard
+        //        (there is nothing matched to process), so the per-operation skip log is what proves each guard ran.
+        _Assert.IsTrue(DocumentSkipLoggedFor(LogId, Enum::"NPR Adyen Rec. Log Type"::"Import Lines", ReconciliationHeader), 'Expected RecreateDocumentEntries to log that the External Settlement detail document was skipped');
+        _Assert.IsTrue(DocumentSkipLoggedFor(LogId, Enum::"NPR Adyen Rec. Log Type"::"Match Transactions", ReconciliationHeader), 'Expected MatchEntries to log that the External Settlement detail document was skipped');
+        _Assert.IsTrue(DocumentSkipLoggedFor(LogId, Enum::"NPR Adyen Rec. Log Type"::"Reconcile Transactions", ReconciliationHeader), 'Expected ReconcileEntries to log that the External Settlement detail document was skipped');
+        _Assert.IsTrue(DocumentSkipLoggedFor(LogId, Enum::"NPR Adyen Rec. Log Type"::"Post Transactions", ReconciliationHeader), 'Expected PostEntries to log that the External Settlement detail document was skipped');
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_PostUnmatchedEntriesRefusesExternalDocument()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] Posting failed-to-match lines as missing is refused inside the procedure itself, not only by the page action
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ReconciliationHeader);
+        InsertSettledReconLine(ReconciliationLine, ReconciliationHeader, GenerateUniquePSPReference(), 100);
+        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
+        ReconciliationLine.Modify();
+
+        // [When] Posting the document's failed-to-match lines as missing
+        ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
+        asserterror AdyenTransMatching.PostUnmatchedEntries(ReconciliationLine);
+
+        // [Then] The document type is rejected (asserterror rolls back the fixture, so only the error can be asserted)
+        AssertDocumentTypeNotSupportedError(ReconciliationHeader."Document No.");
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_PostUnmatchedEntriesPostsNothingWhenSelectionIncludesExternalDocument()
+    var
+        SettlementHeader: Record "NPR Adyen Reconciliation Hdr";
+        ExternalHeader: Record "NPR Adyen Reconciliation Hdr";
+        SettlementLine: Record "NPR Adyen Recon. Line";
+        ExternalLine: Record "NPR Adyen Recon. Line";
+        LinesToPost: Record "NPR Adyen Recon. Line";
+        GLEntry: Record "G/L Entry";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        LastGLEntryNoBefore: Integer;
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] When a 'Post as Missing' selection spans a Settlement details document followed by an External Settlement
+        //            detail document, the External document is rejected before anything is posted, so the Settlement document's
+        //            lines are not posted either (each line is posted in its own Codeunit.Run, so a check inside the loop would come
+        //            too late for the lines before it)
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+
+        // [Given] A postable failed-to-match line on a Settlement details document, and one on a later External document
+        CreateReconHeader(SettlementHeader);
+        InsertFailedToMatchRefundReconLine(SettlementLine, SettlementHeader, GenerateUniquePSPReference(), 100, 0, 0);
+        CreateExternalReconHeader(ExternalHeader);
+        InsertSettledReconLine(ExternalLine, ExternalHeader, GenerateUniquePSPReference(), 100);
+        ExternalLine.Status := ExternalLine.Status::"Failed to Match";
+        ExternalLine.Modify();
+        _Assert.IsTrue(SettlementHeader."Document No." < ExternalHeader."Document No.", 'The Settlement details document must be processed before the External one for this scenario');
+
+        // [Given] The fixture is committed, so the rollback of the expected error cannot hide a posting that already happened
+        Commit();
+        if GLEntry.FindLast() then
+            LastGLEntryNoBefore := GLEntry."Entry No.";
+
+        // [When] Posting both documents' failed-to-match lines as missing
+        LinesToPost.SetFilter("Document No.", '%1|%2', SettlementHeader."Document No.", ExternalHeader."Document No.");
+        LinesToPost.SetRange(Status, LinesToPost.Status::"Failed to Match");
+        asserterror AdyenTransMatching.PostUnmatchedEntries(LinesToPost);
+
+        // [Then] The External document is rejected and no G/L entry was posted for the Settlement document's line
+        AssertDocumentTypeNotSupportedError(ExternalHeader."Document No.");
+        GLEntry.Reset();
+        if GLEntry.FindLast() then;
+        _Assert.AreEqual(LastGLEntryNoBefore, GLEntry."Entry No.", 'No G/L entries may be posted when the selection includes an unsupported External Settlement detail document');
+        SettlementLine.Find();
+        SettlementLine.TestField(Status, SettlementLine.Status::"Failed to Match");
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_ManualMatchingNotAllowedOnExternalDocument()
+    var
+        ExternalHeader: Record "NPR Adyen Reconciliation Hdr";
+        SettlementHeader: Record "NPR Adyen Reconciliation Hdr";
+        ExternalLine: Record "NPR Adyen Recon. Line";
+        SettlementLine: Record "NPR Adyen Recon. Line";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] Failed-to-match lines can be matched manually on Settlement details documents, but not on
+        //            External Settlement detail documents while the flag is off (the lookup opens read-only instead)
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateExternalReconHeader(ExternalHeader);
+        InsertSettledReconLine(ExternalLine, ExternalHeader, GenerateUniquePSPReference(), 100);
+        ExternalLine.Status := ExternalLine.Status::"Failed to Match";
+        ExternalLine.Modify();
+        CreateReconHeader(SettlementHeader);
+        InsertSettledReconLine(SettlementLine, SettlementHeader, GenerateUniquePSPReference(), 100);
+        SettlementLine.Status := SettlementLine.Status::"Failed to Match";
+        SettlementLine.Modify();
+
+        // [When] / [Then]
+        _Assert.IsFalse(AdyenManagement.ManualMatchingAllowed(ExternalLine), 'Manual matching must not be allowed on an External Settlement detail document while the flag is off');
+        _Assert.IsTrue(AdyenManagement.ManualMatchingAllowed(SettlementLine), 'Manual matching must stay allowed on a Settlement details document');
+
+        // [When] The flag is on, [Then] manual matching is allowed on the External Settlement detail document again
+        SetExternalSettlementFlag(true);
+        _Assert.IsTrue(AdyenManagement.ManualMatchingAllowed(ExternalLine), 'Manual matching should be allowed on an External Settlement detail document while the flag is on');
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_FlagOff_SettlementDetailsDocumentNotBlocked()
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] The flag only gates the External Settlement detail path: Settlement details documents and reports stay supported while it is off
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        CreateReconHeader(ReconciliationHeader);
+
+        // [When] / [Then] The checks used by the gated actions pass for the Settlement details document and report type
+        AdyenManagement.CheckDocumentTypeSupported(ReconciliationHeader);
+        AdyenManagement.CheckReportTypeSupported(Enum::"NPR Adyen Report Type"::"Settlement details", 'settlement_detail_report.xlsx');
+        _Assert.IsTrue(AdyenManagement.IsReportTypeSupported(Enum::"NPR Adyen Report Type"::"Settlement details"), 'Settlement details must stay supported while the External Settlement flag is off');
+        _Assert.IsFalse(AdyenManagement.IsReportTypeSupported(Enum::"NPR Adyen Report Type"::"External Settlement detail (C)"), 'External Settlement detail must not be supported while the flag is off');
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure MerchantCurrencySetup_FlagOff_RejectsExternalAccountTypes()
+    var
+        MerchantCurrencySetup: Record "NPR Merchant Currency Setup";
+        ExternalAccountTypes: List of [Enum "NPR Merchant Account"];
+        ExternalAccountType: Enum "NPR Merchant Account";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] External-only Reconciliation Account Types cannot be set up while the flag is off; regular types still can
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+        MerchantCurrencySetup.Init();
+        MerchantCurrencySetup."Merchant Account Name" := _MerchantAccount;
+
+        // [When] / [Then] A regular account type validates fine
+        MerchantCurrencySetup.Validate("Reconciliation Account Type", MerchantCurrencySetup."Reconciliation Account Type"::"Merchant Payout");
+
+        // [When] Validating each External-only account type, [Then] it is rejected
+        ExternalAccountTypes.Add(ExternalAccountType::"External Merchant Payout");
+        ExternalAccountTypes.Add(ExternalAccountType::"Advancement External Commission");
+        ExternalAccountTypes.Add(ExternalAccountType::"Refunded External Commission");
+        ExternalAccountTypes.Add(ExternalAccountType::"Settled External Commission");
+        foreach ExternalAccountType in ExternalAccountTypes do begin
+            // asserterror rolls back the flag row too, so pin the flag again before every attempt
+            SetExternalSettlementFlag(false);
+            asserterror MerchantCurrencySetup.Validate("Reconciliation Account Type", ExternalAccountType);
+            _Assert.IsTrue(StrPos(GetLastErrorText(), Format(ExternalAccountType)) > 0, 'Expected account type ' + Format(ExternalAccountType) + ' to be rejected, got: ' + GetLastErrorText());
+        end;
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure ExternalSettlement_MissingFlagIsTreatedAsOff()
+    var
+        FeatureFlag: Record "NPR Feature Flag";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        FlagExisted: Boolean;
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] A tenant that never got the ConfigCat flag (no row in NPR Feature Flag) keeps the External Settlement path hidden
+        Initialize();
+        PreviousFlagValue := AdyenManagement.ExternalSettlementReconEnabled();
+        FlagExisted := FeatureFlag.Get(AdyenManagement.ExternalSettlementReconFeatureFlag());
+
+        // [Given] The flag row does not exist
+        if FlagExisted then
+            FeatureFlag.Delete();
+
+        // [Then] The path is disabled and only the External Settlement detail report type is unsupported
+        _Assert.IsFalse(AdyenManagement.ExternalSettlementReconEnabled(), 'A missing feature flag must mean the External Settlement path is disabled');
+        _Assert.IsFalse(AdyenManagement.IsReportTypeSupported(Enum::"NPR Adyen Report Type"::"External Settlement detail (C)"), 'External Settlement detail must not be supported without the feature flag');
+        _Assert.IsTrue(AdyenManagement.IsReportTypeSupported(Enum::"NPR Adyen Report Type"::"Settlement details"), 'Settlement details must be supported without the feature flag');
+
+        if FlagExisted then
+            SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure MerchantCurrencySetup_FlagOn_AcceptsExternalAccountType()
+    var
+        MerchantCurrencySetup: Record "NPR Merchant Currency Setup";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] External-only Reconciliation Account Types can be set up again once the flag is on
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(true);
+        MerchantCurrencySetup.Init();
+        MerchantCurrencySetup."Merchant Account Name" := _MerchantAccount;
+
+        MerchantCurrencySetup.Validate("Reconciliation Account Type", MerchantCurrencySetup."Reconciliation Account Type"::"External Merchant Payout");
+        MerchantCurrencySetup.Validate("Reconciliation Account Type", MerchantCurrencySetup."Reconciliation Account Type"::"Advancement External Commission");
+        MerchantCurrencySetup.Validate("Reconciliation Account Type", MerchantCurrencySetup."Reconciliation Account Type"::"Refunded External Commission");
+        MerchantCurrencySetup.Validate("Reconciliation Account Type", MerchantCurrencySetup."Reconciliation Account Type"::"Settled External Commission");
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure MerchantCurrencySetupPage_RestrictedAccountTypeOffersEveryNonExternalValue()
+    var
+        MerchantCurrencySetup: Record "NPR Merchant Currency Setup";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        MerchantCurrencySetupPage: TestPage "NPR Merchant Currency Setup";
+        AccountType: Enum "NPR Merchant Account";
+        OfferedAccountTypes: List of [Text];
+        OfferedAccountTypesText: Text;
+        AccountTypeCaption: Text;
+        Ordinal: Integer;
+        i: Integer;
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] The restricted Reconciliation Account Type control (the one every tenant sees while the flag is off) lists its
+        //            values explicitly in ValuesAllowed. It must offer every account type except the External-only ones, so a value
+        //            added to "NPR Merchant Account" later fails this test until the ValuesAllowed list is updated as well.
+        //            The External-only check also proves the TestPage options reflect ValuesAllowed, so the test is not vacuous.
+        Initialize();
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+
+        // [Given] A setup row, so the repeater has a current row whose control options can be read (a fresh database has none)
+        CreateMerchantCurrencySetup(_MerchantAccount, _NetCurrency, Enum::"NPR Merchant Account"::"Merchant Payout", _LibraryERM.CreateGLAccountNo());
+        MerchantCurrencySetup.Get(_MerchantAccount, Enum::"NPR Merchant Account"::"Merchant Payout", _NetCurrency);
+
+        // [Given] The values the restricted control offers (trimmed: the blank option is not reported as an empty text)
+        MerchantCurrencySetupPage.OpenEdit();
+        MerchantCurrencySetupPage.GoToRecord(MerchantCurrencySetup);
+        for i := 1 to MerchantCurrencySetupPage."Reconciliation Account Type".OptionCount() do begin
+            OfferedAccountTypes.Add(DelChr(MerchantCurrencySetupPage."Reconciliation Account Type".GetOption(i), '<>', ' '));
+            OfferedAccountTypesText += '[' + MerchantCurrencySetupPage."Reconciliation Account Type".GetOption(i) + ']';
+        end;
+        MerchantCurrencySetupPage.Close();
+
+        // [Then] Every account type is offered unless it is External-only. The blank value is skipped: it is not an account type
+        //        (the field is NotBlank) and the control does not offer it. It is compared as a value, because Format() of an enum
+        //        value with an empty caption returns its ordinal ('0'), not an empty text.
+        foreach Ordinal in Enum::"NPR Merchant Account".Ordinals() do begin
+            AccountType := Enum::"NPR Merchant Account".FromInteger(Ordinal);
+            AccountTypeCaption := Format(AccountType);
+            if AccountType <> AccountType::" " then
+                if AdyenManagement.IsExternalSettlementAccountType(AccountType) then
+                    _Assert.IsFalse(OfferedAccountTypes.Contains(AccountTypeCaption), StrSubstNo('External-only account type ''%1'' must not be offered while the flag is off. Offered: %2', AccountTypeCaption, OfferedAccountTypesText))
+                else
+                    _Assert.IsTrue(OfferedAccountTypes.Contains(AccountTypeCaption), StrSubstNo('Account type ''%1'' is missing from ValuesAllowed on page "NPR Merchant Currency Setup". Offered: %2', AccountTypeCaption, OfferedAccountTypesText));
+        end;
+
+        SetExternalSettlementFlag(PreviousFlagValue);
+    end;
+
+    [Test]
+    procedure MerchantSetupPages_ExternalMerchantPayoutFieldsFollowFlag()
+    var
+        MerchantSetupPage: TestPage "NPR Adyen Merchant Setup";
+        MerchantCurrencySetupPage: TestPage "NPR Merchant Currency Setup";
+        PreviousFlagValue: Boolean;
+    begin
+        // [Scenario] The External Merchant Payout setup is hidden while the flag is off and shown while it is on
+        Initialize();
+
+        // [Given] The flag is off
+        PreviousFlagValue := SetExternalSettlementFlag(false);
+
+        // [Then] Merchant Setup hides the External Merchant Payout fields but keeps the Merchant Payout ones
+        MerchantSetupPage.OpenEdit();
+        _Assert.IsFalse(MerchantSetupPage."Acquirer Payout Acc. Type".Visible(), 'External Merchant Payout Account Type should be hidden while the flag is off');
+        _Assert.IsFalse(MerchantSetupPage."Acquirer Payout Acc. No.".Visible(), 'External Merchant Payout Account No. should be hidden while the flag is off');
+        _Assert.IsTrue(MerchantSetupPage."Merchant Payout Acc. No.".Visible(), 'Merchant Payout Account No. must stay visible');
+        MerchantSetupPage.Close();
+
+        // [Then] Merchant Currency Setup shows only the restricted Reconciliation Account Type control
+        MerchantCurrencySetupPage.OpenEdit();
+        _Assert.IsTrue(MerchantCurrencySetupPage."Reconciliation Account Type".Visible(), 'The restricted Reconciliation Account Type control should be visible while the flag is off');
+        _Assert.IsFalse(MerchantCurrencySetupPage.ReconciliationAccountTypeAll.Visible(), 'The unrestricted Reconciliation Account Type control should be hidden while the flag is off');
+        MerchantCurrencySetupPage.Close();
+
+        // [Given] The flag is on
+        SetExternalSettlementFlag(true);
+
+        // [Then] Both pages show the External Merchant Payout setup
+        MerchantSetupPage.OpenEdit();
+        _Assert.IsTrue(MerchantSetupPage."Acquirer Payout Acc. Type".Visible(), 'External Merchant Payout Account Type should be visible while the flag is on');
+        _Assert.IsTrue(MerchantSetupPage."Acquirer Payout Acc. No.".Visible(), 'External Merchant Payout Account No. should be visible while the flag is on');
+        MerchantSetupPage.Close();
+
+        MerchantCurrencySetupPage.OpenEdit();
+        _Assert.IsFalse(MerchantCurrencySetupPage."Reconciliation Account Type".Visible(), 'The restricted Reconciliation Account Type control should be hidden while the flag is on');
+        _Assert.IsTrue(MerchantCurrencySetupPage.ReconciliationAccountTypeAll.Visible(), 'The unrestricted Reconciliation Account Type control should be visible while the flag is on');
+        MerchantCurrencySetupPage.Close();
+
+        SetExternalSettlementFlag(PreviousFlagValue);
     end;
 
     #endregion
@@ -2648,6 +3305,164 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
     begin
         // The import only requires the cell to be parseable into a DateTime; ISO works.
         exit(Format(Value, 0, 9));
+    end;
+
+    local procedure BuildExternalWebhookRequest(var AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request"; MerchantAccount: Text[80]; PSPReference: Code[16]; SettledAmount: Decimal; ReportDownloadURL: Text)
+    var
+        TempExcelBuf: Record "Excel Buffer" temporary;
+        TempBlob: Codeunit "Temp Blob";
+        BlobInStr: InStream;
+        BlobOutStr: OutStream;
+        ReportOutStr: OutStream;
+        FileName: Text;
+    begin
+        // The report type is derived from the file name, exactly as for a real External Settlement detail report
+        FileName := 'external_settlement_detail_report_' + Format(GenerateUniqueBatchNumber()) + '.xlsx';
+        AFRecWebhookRequest.Init();
+        AFRecWebhookRequest.ID := 0;
+        AFRecWebhookRequest.Validate("Report Name", CopyStr(FileName, 1, MaxStrLen(AFRecWebhookRequest."Report Name")));
+        AFRecWebhookRequest.TestField("Report Type", AFRecWebhookRequest."Report Type"::"External Settlement detail (C)");
+        AFRecWebhookRequest."Report Download URL" := CopyStr(ReportDownloadURL, 1, MaxStrLen(AFRecWebhookRequest."Report Download URL"));
+        AFRecWebhookRequest.Insert();
+
+        // Only a local file carries its report data; any other URL would have to be downloaded
+        if ReportDownloadURL <> _LocalFileLbl then
+            exit;
+
+        WriteExternalSettlementWorkbook(TempExcelBuf, MerchantAccount, PSPReference, SettledAmount);
+        TempBlob.CreateOutStream(BlobOutStr);
+        TempExcelBuf.SaveToStream(BlobOutStr, true);
+        TempBlob.CreateInStream(BlobInStr);
+
+        AFRecWebhookRequest."Report Data".CreateOutStream(ReportOutStr);
+        CopyStream(ReportOutStr, BlobInStr);
+        AFRecWebhookRequest.Modify();
+    end;
+
+    local procedure RemoteExternalReportURL(): Text
+    begin
+        // Unreachable in tests: any code path that tries to download the report fails with a different error
+        exit('https://test.invalid/reports/download/MerchantAccount/external_settlement_detail_report.xlsx');
+    end;
+
+    local procedure WriteExternalSettlementWorkbook(var TempExcelBuf: Record "Excel Buffer" temporary; MerchantAccount: Text[80]; PSPReference: Code[16]; SettledAmount: Decimal)
+    begin
+        // External Settlement detail (C) layout: report metadata on top, column headers on row 4, data from row 5
+        TempExcelBuf.DeleteAll();
+        SetCell(TempExcelBuf, 1, 1, 'External Settlement Detail Report');
+        WriteExternalHeaderRow(TempExcelBuf, 4);
+        WriteExternalSettledRow(TempExcelBuf, 5, MerchantAccount, PSPReference, SettledAmount);
+
+        TempExcelBuf.CreateNewBook(_DataSheetLbl);
+        TempExcelBuf.WriteSheet(_DataSheetLbl, CompanyName(), UserId());
+        TempExcelBuf.CloseBook();
+    end;
+
+    local procedure WriteExternalHeaderRow(var TempExcelBuf: Record "Excel Buffer" temporary; RowNo: Integer)
+    begin
+        SetCell(TempExcelBuf, RowNo, 1, 'Company Account');
+        SetCell(TempExcelBuf, RowNo, 2, 'Merchant Account');
+        SetCell(TempExcelBuf, RowNo, 3, 'Psp Reference');
+        SetCell(TempExcelBuf, RowNo, 4, 'Merchant Reference');
+        SetCell(TempExcelBuf, RowNo, 5, 'Payment Method');
+        SetCell(TempExcelBuf, RowNo, 6, 'Creation Date');
+        SetCell(TempExcelBuf, RowNo, 7, 'TimeZone');
+        SetCell(TempExcelBuf, RowNo, 8, 'Type');
+        SetCell(TempExcelBuf, RowNo, 9, 'Modification Reference');
+        SetCell(TempExcelBuf, RowNo, 10, 'Gross Currency');
+        SetCell(TempExcelBuf, RowNo, 11, 'Gross Debit (GC)');
+        SetCell(TempExcelBuf, RowNo, 12, 'Gross Credit (GC)');
+        SetCell(TempExcelBuf, RowNo, 13, 'Exchange Rate');
+        SetCell(TempExcelBuf, RowNo, 14, 'Net Currency');
+        SetCell(TempExcelBuf, RowNo, 15, 'Net Debit (NC)');
+        SetCell(TempExcelBuf, RowNo, 16, 'Net Credit (NC)');
+        SetCell(TempExcelBuf, RowNo, 17, 'Commission (NC)');
+        SetCell(TempExcelBuf, RowNo, 18, 'Markup (NC)');
+        SetCell(TempExcelBuf, RowNo, 19, 'Payment Method Variant');
+        SetCell(TempExcelBuf, RowNo, 20, 'Modification Merchant Reference');
+        SetCell(TempExcelBuf, RowNo, 21, 'Merchant Order Reference');
+        SetCell(TempExcelBuf, RowNo, 22, 'Scheme Fees (NC)');
+        SetCell(TempExcelBuf, RowNo, 23, 'Interchange (NC)');
+    end;
+
+    local procedure WriteExternalSettledRow(var TempExcelBuf: Record "Excel Buffer" temporary; RowNo: Integer; MerchantAccount: Text[80]; PSPReference: Code[16]; SettledAmount: Decimal)
+    begin
+        SetCell(TempExcelBuf, RowNo, 1, _CompanyAccountLbl);
+        SetCell(TempExcelBuf, RowNo, 2, MerchantAccount);
+        SetCell(TempExcelBuf, RowNo, 3, PSPReference);
+        SetCell(TempExcelBuf, RowNo, 4, 'REF-' + PSPReference);
+        SetCell(TempExcelBuf, RowNo, 5, 'mc');
+        SetCell(TempExcelBuf, RowNo, 6, FormatDateTimeIso(CurrentDateTime()));
+        SetCell(TempExcelBuf, RowNo, 7, 'UTC');
+        SetCell(TempExcelBuf, RowNo, 8, _SettledTypeLbl);
+        SetCell(TempExcelBuf, RowNo, 9, '');
+        SetCell(TempExcelBuf, RowNo, 10, _NetCurrency);
+        SetCell(TempExcelBuf, RowNo, 11, '0');
+        SetCell(TempExcelBuf, RowNo, 12, FormatDecimal(SettledAmount));
+        SetCell(TempExcelBuf, RowNo, 13, '1');
+        SetCell(TempExcelBuf, RowNo, 14, _NetCurrency);
+        SetCell(TempExcelBuf, RowNo, 15, '0');
+        SetCell(TempExcelBuf, RowNo, 16, FormatDecimal(SettledAmount));
+        SetCell(TempExcelBuf, RowNo, 17, '0');
+        SetCell(TempExcelBuf, RowNo, 18, '0');
+        SetCell(TempExcelBuf, RowNo, 19, 'mc_credit');
+        SetCell(TempExcelBuf, RowNo, 20, '');
+        SetCell(TempExcelBuf, RowNo, 21, 'ORD-' + PSPReference);
+        SetCell(TempExcelBuf, RowNo, 22, '0');
+        SetCell(TempExcelBuf, RowNo, 23, '0');
+    end;
+
+    #endregion
+
+    #region [External Settlement feature flag helpers]
+
+    local procedure SetExternalSettlementFlag(Enabled: Boolean) PreviousValue: Boolean
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+    begin
+        PreviousValue := AdyenManagement.ExternalSettlementReconEnabled();
+        _LibraryFeatureFlags.SetFeatureFlag(AdyenManagement.ExternalSettlementReconFeatureFlag(), Enabled);
+    end;
+
+    local procedure CreateExternalReconHeader(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr")
+    var
+        DedicatedMerchantSetup: Record "NPR Adyen Merchant Setup";
+    begin
+        // An External Settlement detail document as created before the path was hidden: Batch Number is always 0
+        CreateReconHeaderForMerchantAndCurrency(ReconciliationHeader, CreateDedicatedMerchant(DedicatedMerchantSetup), _NetCurrency);
+        ReconciliationHeader."Document Type" := ReconciliationHeader."Document Type"::"External Settlement detail (C)";
+        ReconciliationHeader."Batch Number" := 0;
+        ReconciliationHeader.Modify();
+    end;
+
+    local procedure DocumentSkipLoggedFor(AfterLogId: Integer; LogType: Enum "NPR Adyen Rec. Log Type"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
+    var
+        ReconciliationLog: Record "NPR Adyen Reconciliation Log";
+    begin
+        // The skip log names the document and its unsupported Document Type; the Type tells which operation wrote it
+        ReconciliationLog.SetFilter(ID, '>%1', AfterLogId);
+        ReconciliationLog.SetRange(Type, LogType);
+        ReconciliationLog.SetRange(Success, false);
+        if not ReconciliationLog.FindSet() then
+            exit;
+        repeat
+            if (StrPos(ReconciliationLog.Description, ReconciliationHeader."Document No.") > 0) and
+               (StrPos(ReconciliationLog.Description, Format(ReconciliationHeader."Document Type")) > 0)
+            then
+                exit(true);
+        until ReconciliationLog.Next() = 0;
+    end;
+
+    local procedure AssertReportTypeNotSupportedError(ReportName: Text)
+    begin
+        _Assert.IsTrue(StrPos(GetLastErrorText(), Format(Enum::"NPR Adyen Report Type"::"External Settlement detail (C)")) > 0, 'Expected the External Settlement detail report type to be rejected, got: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), ReportName) > 0, 'Expected the rejected report name in the error, got: ' + GetLastErrorText());
+    end;
+
+    local procedure AssertDocumentTypeNotSupportedError(DocumentNo: Code[20])
+    begin
+        _Assert.IsTrue(StrPos(GetLastErrorText(), Format(Enum::"NPR Adyen Report Type"::"External Settlement detail (C)")) > 0, 'Expected the External Settlement detail document type to be rejected, got: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), DocumentNo) > 0, 'Expected the rejected document no. in the error, got: ' + GetLastErrorText());
     end;
 
     #endregion

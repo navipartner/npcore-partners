@@ -421,11 +421,14 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                 var
                     AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
                     Line: Record "NPR Adyen Recon. Line";
+                    ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
                     PostedEntries: Integer;
                     ConfirmPostingLbl: Label 'Do you wish to proceed with posting selected transaction/s skipping the matching process?';
                     SuccessfullyPostedLbl: Label 'Successfully posted %1 entries bypassing the Matching process.';
                     NothingToPostLbl: Label 'Nothing to post.';
                 begin
+                    if ReconciliationHeader.Get(Rec."Document No.") then
+                        _AdyenManagement.CheckDocumentTypeSupported(ReconciliationHeader);
                     CurrPage.SetSelectionFilter(Line);
                     Line.FilterGroup(10);
                     Line.SetRange(Status, Line.Status::"Failed to Match");
