@@ -16,6 +16,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
 #endif
         _Enabled: Boolean;
         _CertificateLoaded: Boolean;
+        _SigningKeySize: Integer;
         _Initialized: Boolean;
         _DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
         AdditionalInfoLbl: Label '%1:%2:%3', Locked = true, Comment = '%1 - specifies Item No., %2 - specifies old Unit Price, %3 - specifies new Unit Price';
@@ -257,6 +258,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
     procedure FillSignatureBaseValues(var POSAuditLog: Record "NPR POS Audit Log"; IsInitialHandling: Boolean)
     var
         PreviousEventLogRecord: Record "NPR POS Audit Log";
+        CertificateImplementationLbl: Label 'RSA-SHA512-%1', Locked = true, Comment = '%1 = RSA key size in bits';
         InStream: InStream;
         OutStream: OutStream;
         BaseValue: Text;
@@ -267,7 +269,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
             if GetLastUnitEventSignature(POSAuditLog."Active POS Unit No.", PreviousEventLogRecord, POSAuditLog."External Type") then
                 POSAuditLog."Previous Electronic Signature" := PreviousEventLogRecord."Electronic Signature";
             POSAuditLog."External Implementation" := HandlerCode();
-            POSAuditLog."Certificate Implementation" := 'RSA-SHA256-2048';
+            POSAuditLog."Certificate Implementation" := StrSubstNo(CertificateImplementationLbl, Format(_SigningKeySize, 0, 9));
             POSAuditLog."Certificate Thumbprint" := _DKFiscalizationSetup."Signing Certificate Thumbprint";
             POSAuditLog."Handled by External Impl." := true;
         end;
@@ -465,6 +467,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
             PasswordSecretText := _DKFiscalizationSetup."Signing Certificate Password";
             if not X509Certificate2.VerifyCertificate(Base64Cert, PasswordSecretText, "X509 Content Type"::Cert) then
                 exit;
+            LoadSigningKeySize(Base64Cert2, PasswordSecretText);
             _SignatureKey.FromBase64String(Base64Cert2, PasswordSecretText, true);
 #ELSE
             if not X509Certificate2.VerifyCertificate(Base64Cert, _DKFiscalizationSetup."Signing Certificate Password", "X509 Content Type"::Cert) then
@@ -473,6 +476,57 @@ codeunit 6184669 "NPR DK Audit Mgt."
 #ENDIF
             _CertificateLoaded := true;
         end;
+    end;
+
+    local procedure LoadSigningKeySize(Base64Cert: Text; Password: SecretText)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        KeySizeUnknownErr: Label 'Could not determine the RSA key size of DK signing certificate %1: %2. This is a programming bug', Locked = true, Comment = '%1 = certificate thumbprint, %2 = error text';
+    begin
+        if TryGetRSAKeySize(Base64Cert, Password, _SigningKeySize) then
+            exit;
+        // The stored certificate already signs sales, so a key that cannot be read is a bug. Report it and keep signing so sales are not interrupted.
+        _SigningKeySize := 0;
+        Sentry.AddError(StrSubstNo(KeySizeUnknownErr, _DKFiscalizationSetup."Signing Certificate Thumbprint", GetLastErrorText()), GetLastErrorCallStack());
+    end;
+
+    [TryFunction]
+    local procedure TryGetRSAKeySize(Base64Cert: Text; Password: SecretText; var KeySize: Integer)
+    var
+        X509Certificate2: Codeunit X509Certificate2;
+        PublicKey: XmlDocument;
+        PublicKeyRoot: XmlElement;
+        ModulusNode: XmlNode;
+        Modulus: Text;
+        NotRSAPublicKeyErr: Label 'The public key is not an RSA key.';
+    begin
+        // An RSA public key is returned as <RSAKeyValue><Modulus>base64</Modulus>...; other key types throw or return other XML.
+        XmlDocument.ReadFrom(X509Certificate2.GetCertificatePublicKey(Base64Cert, Password), PublicKey);
+        PublicKey.GetRoot(PublicKeyRoot);
+        if PublicKeyRoot.LocalName() <> 'RSAKeyValue' then
+            Error(NotRSAPublicKeyErr);
+        PublicKeyRoot.SelectSingleNode('Modulus', ModulusNode);
+        Modulus := ModulusNode.AsXmlElement().InnerText();
+        // The modulus is exactly key size / 8 bytes, so the key size follows from the base64 length minus its padding.
+        KeySize := ((StrLen(Modulus) div 4) * 3 - (StrLen(Modulus) - StrLen(DelChr(Modulus, '=', '=')))) * 8;
+    end;
+
+    local procedure ConfirmSigningKeySize(KeySize: Integer): Boolean
+    var
+        WrongKeySizeQst: Label 'The selected certificate has a %1-bit RSA key. Skattestyrelsen requires a %2-bit RSA key (RSA-SHA512-%2), so signatures made with this certificate are not compliant.\\Do you want to use this certificate anyway?', Comment = '%1 = RSA key size of the selected certificate in bits, %2 = required RSA key size in bits';
+    begin
+        if KeySize = RequiredSigningKeySize() then
+            exit(true);
+        // Existing customers must be able to keep using a certificate with another key size until they replace it.
+        if not GuiAllowed() then
+            exit(true);
+        exit(Confirm(StrSubstNo(WrongKeySizeQst, Format(KeySize, 0, 9), Format(RequiredSigningKeySize(), 0, 9)), false));
+    end;
+
+    local procedure RequiredSigningKeySize(): Integer
+    begin
+        // Skattestyrelsen, Guideline for implementing digital signature in digital cash registers v1.5.2, section 1: RSA-SHA512-3072 is the only accepted variant.
+        exit(3072);
     end;
 
     procedure VerifySignature(Data: Text; HashAlgo: Enum "Hash Algorithm"; SignatureBase64: Text): Boolean
@@ -499,7 +553,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
         OutStr: OutStream;
     begin
         TempBLOB.CreateOutStream(OutStr, TextEncoding::UTF8);
-        CryptoMgt.SignData(BaseValue, _SignatureKey, Enum::"Hash Algorithm"::SHA256, OutStr);
+        CryptoMgt.SignData(BaseValue, _SignatureKey, Enum::"Hash Algorithm"::SHA512, OutStr);
         TempBLOB.CreateInStream(InStr, TextEncoding::UTF8);
         exit(ConvertBase64.ToBase64(InStr));
     end;
@@ -516,19 +570,11 @@ codeunit 6184669 "NPR DK Audit Mgt."
         Base64Convert: Codeunit "Base64 Convert";
         FileMgt: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
-        X509Certificate2: Codeunit X509Certificate2;
         IStream: InStream;
         DialCaptionLbl: Label 'Upload Certificate';
         ExtFilterLbl: Label 'pfx';
         FileFilterLbl: Label 'Certificate File (*.PFX)|*.PFX';
-        OStream: OutStream;
-        Base64Cert: Text;
-        Base64Cert2: Text;
-        CertificateThumbprint: Text;
         FileName: Text;
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
-        PasswordSecretText: SecretText;
-#ENDIF
     begin
         _DKFiscalizationSetup.Get();
         if _DKFiscalizationSetup."Signing Certificate".HasValue() then begin
@@ -542,34 +588,45 @@ codeunit 6184669 "NPR DK Audit Mgt."
             exit;
 
         TempBlob.CreateInStream(IStream);
-        Base64Cert := Base64Convert.ToBase64(IStream);
+        if not SetSigningCertificate(Base64Convert.ToBase64(IStream)) then
+            exit;
+
+        Message(CERT_SUCCESS_Msg, _DKFiscalizationSetup."Signing Certificate Thumbprint");
+    end;
+
+    internal procedure SetSigningCertificate(Base64Cert: Text): Boolean
+    var
+        X509Certificate2: Codeunit X509Certificate2;
+        OStream: OutStream;
+        Base64Cert2: Text;
+        CertificateThumbprint: Text;
+        PasswordSecretText: SecretText;
+        KeySize: Integer;
+        UnreadableRSAKeyErr: Label 'The selected certificate does not have a readable RSA key (%1). Skattestyrelsen requires a %2-bit RSA key (RSA-SHA512-%2).', Comment = '%1 = reason the key could not be read, %2 = required RSA key size in bits';
+    begin
+        _DKFiscalizationSetup.Get();
         Base64Cert2 := Base64Cert;
 
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         PasswordSecretText := _DKFiscalizationSetup."Signing Certificate Password";
         X509Certificate2.VerifyCertificate(Base64Cert2, PasswordSecretText, Enum::"X509 Content Type"::Cert);
         if (not X509Certificate2.HasPrivateKey(Base64Cert, PasswordSecretText)) then
-#ELSE
-        X509Certificate2.VerifyCertificate(Base64Cert2, _DKFiscalizationSetup."Signing Certificate Password", Enum::"X509 Content Type"::Cert);
-        if (not X509Certificate2.HasPrivateKey(Base64Cert, _DKFiscalizationSetup."Signing Certificate Password")) then
-#ENDIF
             Error(MISSING_KEY_Err);
+        if not TryGetRSAKeySize(Base64Cert, PasswordSecretText, KeySize) then
+            Error(UnreadableRSAKeyErr, GetLastErrorText(), Format(RequiredSigningKeySize(), 0, 9));
+        if not ConfirmSigningKeySize(KeySize) then
+            exit(false);
 
         _DKFiscalizationSetup."Signing Certificate".CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.Write(Base64Cert);
 
         CertificateThumbprint := _DKFiscalizationSetup."Signing Certificate Thumbprint";
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         X509Certificate2.GetCertificateThumbprint(Base64Cert, PasswordSecretText, CertificateThumbprint);
-#ELSE
-        X509Certificate2.GetCertificateThumbprint(Base64Cert, _DKFiscalizationSetup."Signing Certificate Password", CertificateThumbprint);
-#ENDIF
 #pragma warning disable AA0139
         _DKFiscalizationSetup."Signing Certificate Thumbprint" := CertificateThumbprint;
 #pragma warning restore AA0139
         _DKFiscalizationSetup.Modify(true);
-
-        Message(CERT_SUCCESS_Msg, _DKFiscalizationSetup."Signing Certificate Thumbprint");
+        _CertificateLoaded := false;
+        exit(true);
     end;
 #else
     local procedure LoadCertificate()
@@ -595,6 +652,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
             CopyStream(MemoryStream, InStream);
             _X509Certificate2 := _X509Certificate2.X509Certificate2(MemoryStream.ToArray(), _DKFiscalizationSetup."Signing Certificate Password");
             _RSACryptoServiceProvider := _X509Certificate2.PrivateKey;
+            _SigningKeySize := _RSACryptoServiceProvider.KeySize;
 #if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
             _SignatureKey.FromBase64String(Base64Cert2, _DKFiscalizationSetup."Signing Certificate Password", true);
 #endif
@@ -618,7 +676,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
         Convert: DotNet NPRNetConvert;
         Encoding: DotNet Encoding;
     begin
-        exit(Convert.ToBase64String(_RSACryptoServiceProvider.SignData(Encoding.UTF8.GetBytes(BaseValue), CryptoConfig.MapNameToOID('SHA256'))));
+        exit(Convert.ToBase64String(_RSACryptoServiceProvider.SignData(Encoding.UTF8.GetBytes(BaseValue), CryptoConfig.MapNameToOID('SHA512'))));
     end;
 
     procedure CalculateHash(BaseValue: Text): Text
