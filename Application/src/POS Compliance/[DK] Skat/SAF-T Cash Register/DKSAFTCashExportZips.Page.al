@@ -5,6 +5,10 @@ page 6151329 "NPR DK SAF-T Cash Export Zips"
     PageType = List;
     SourceTable = "NPR DK SAF-T Cash Export Zip";
     UsageCategory = None;
+    Editable = false;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-09-29';
+    ObsoleteReason = 'The SAF-T file is delivered as one XML file stored on the export line, not as a ZIP archive.';
 
     layout
     {
@@ -17,31 +21,6 @@ page 6151329 "NPR DK SAF-T Cash Export Zips"
                     ApplicationArea = NPRDKFiscal;
                     ToolTip = 'Specifies the number of the file.';
                 }
-            }
-        }
-    }
-
-    actions
-    {
-        area(Processing)
-        {
-            action(DownloadFile)
-            {
-                ApplicationArea = NPRDKFiscal;
-                Caption = 'Download ZIP File';
-                Image = ExportFile;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                ToolTip = 'Download the generated SAF-T ZIP file.';
-
-                trigger OnAction()
-                var
-                    SAFTExportMgt: Codeunit "NPR DK SAF-T Cash Export Mgt.";
-                begin
-                    SAFTExportMgt.DownloadExportFile(Rec);
-                end;
             }
         }
     }

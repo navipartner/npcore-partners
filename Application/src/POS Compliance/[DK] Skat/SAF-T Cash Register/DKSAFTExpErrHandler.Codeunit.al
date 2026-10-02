@@ -18,6 +18,5 @@ codeunit 6184673 "NPR DK SAF-T Exp. Err. Handler"
 
         SAFTExportHeader.Get(Rec.ID);
         SAFTExportMgt.UpdateExportStatus(SAFTExportHeader);
-        SAFTExportMgt.StartExportLinesNotStartedYet(SAFTExportHeader);
     end;
 }

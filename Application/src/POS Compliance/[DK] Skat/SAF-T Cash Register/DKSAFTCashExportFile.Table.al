@@ -3,6 +3,9 @@ table 6150747 "NPR DK SAF-T Cash Export File"
     Access = Internal;
     Caption = 'SAF-T Cash Export File';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-09-29';
+    ObsoleteReason = 'The SAF-T file is delivered as one XML file stored on the export line, not as a ZIP archive.';
 
     fields
     {

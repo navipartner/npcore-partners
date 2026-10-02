@@ -113,8 +113,6 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
     local procedure ExportCompanyInfo(SAFTExportLine: Record "NPR DK SAF-T Cash Export Line")
     var
         POSStore: Record "NPR POS Store";
-        IncludeEvents: Boolean;
-        IncludeTransactions: Boolean;
         GeneratingCompanyInfoLbl: Label 'Generating XML Company element...';
     begin
         if GuiAllowed() then
@@ -134,20 +132,15 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
             'postalAddress', CombineWithSpace(CompanyInformation.Address, CompanyInformation."Address 2", 0),
             CompanyInformation.City, CompanyInformation."Post Code", CompanyInformation.County, GetCountryISOCode(CompanyInformation."Country/Region Code"));
 
-        if SAFTExportLine."Master Data" then begin
-            ExportBusinessPartners();
-            ExportChartOfAccounts();
-            // ExportVATCodes(); (optional)
-            // ExportPeriods (optional)
-            ExportSalespersons();
-            ExportItems();
-            // ExportBasics (optional)
-        end;
+        ExportBusinessPartners();
+        ExportChartOfAccounts();
+        // ExportVATCodes(); (optional)
+        // ExportPeriods (optional)
+        ExportSalespersons();
+        ExportItems();
+        // ExportBasics (optional)
 
-        IncludeTransactions := not SAFTExportLine."Master Data";
-        IncludeEvents := not SAFTExportLine."Master Data";
-        if IncludeTransactions or IncludeEvents then
-            ExportLocations(POSStore, SAFTExportLine, IncludeTransactions, IncludeEvents);
+        ExportLocations(POSStore, SAFTExportLine, true, true);
 
         SAFTXMLHelper.FinalizeXMLNode();
     end;
@@ -586,16 +579,9 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
 
         Commit();
 
+        SAFTExportHeader.Get(SAFTExportHeader.ID);
         SAFTExportMgt.UpdateExportStatus(SAFTExportHeader);
         SAFTExportMgt.LogSuccess(SAFTExportLine);
-        SAFTExportMgt.StartExportLinesNotStartedYet(SAFTExportHeader);
-
-        SAFTExportHeader.Get(SAFTExportHeader.ID);
-        if SAFTExportHeader.Status = SAFTExportHeader.Status::Completed then
-            if SAFTExportHeader.AllowedToExportIntoFolder() then
-                SAFTExportMgt.GenerateZipFileFromSavedFiles(SAFTExportHeader)
-            else
-                SAFTExportMgt.BuildZipFilesWithAllRelatedXmlFiles(SAFTExportHeader);
     end;
 
     local procedure GetCountryISOCode(CountryCode: Code[10]): Code[2]

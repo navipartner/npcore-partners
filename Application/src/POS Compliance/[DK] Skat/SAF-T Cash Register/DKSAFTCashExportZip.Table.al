@@ -3,8 +3,9 @@ table 6150750 "NPR DK SAF-T Cash Export Zip"
     Access = Internal;
     Caption = 'SAF-T Cash Export Zip';
     DataClassification = CustomerContent;
-    DrillDownPageId = "NPR DK SAF-T Cash Export Zips";
-    LookupPageId = "NPR DK SAF-T Cash Export Zips";
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-09-29';
+    ObsoleteReason = 'The SAF-T file is delivered as one XML file stored on the export line, not as a ZIP archive.';
 
     fields
     {

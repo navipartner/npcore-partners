@@ -41,18 +41,18 @@ table 6150748 "NPR DK SAF-T Cash Exp. Header"
             DataClassification = CustomerContent;
             InitValue = 3;
             MinValue = 1;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-29';
+            ObsoleteReason = 'Only one background job is created per export, because the export is always generated as one complete XML file.';
         }
         field(7; "Split By Month"; Boolean)
         {
             Caption = 'Split By Month';
             DataClassification = CustomerContent;
             InitValue = true;
-
-            trigger OnValidate()
-            begin
-                if "Split By Month" then
-                    "Split By Date" := false;
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-29';
+            ObsoleteReason = 'The Danish SAF-T Cash Register export is always generated as one complete XML file.';
         }
         field(8; "Earliest Start Date/Time"; DateTime)
         {
@@ -72,6 +72,9 @@ table 6150748 "NPR DK SAF-T Cash Exp. Header"
         {
             Caption = 'Folder Path';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-29';
+            ObsoleteReason = 'Exporting SAF-T files into a server folder is not supported in Business Central SaaS.';
         }
         field(10; Status; Enum "NPR DK SAF-T Cash Exp. Status")
         {
@@ -100,35 +103,25 @@ table 6150748 "NPR DK SAF-T Cash Exp. Header"
         {
             Caption = 'Split By Date';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Split By Date" then
-                    "Split By Month" := false;
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-29';
+            ObsoleteReason = 'The Danish SAF-T Cash Register export is always generated as one complete XML file.';
         }
         field(33; "Disable Zip File Generation"; Boolean)
         {
             Caption = 'Disable Zip File Generation';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Disable Zip File Generation" then
-                    TestField("Folder Path");
-                "Create Multiple Zip Files" := false;
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-29';
+            ObsoleteReason = 'The SAF-T file is delivered as one XML file, not as a ZIP archive.';
         }
         field(34; "Create Multiple Zip Files"; Boolean)
         {
             Caption = 'Create Multiple Zip Files';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Create Multiple Zip Files" then
-                    "Disable Zip File Generation" := false;
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-29';
+            ObsoleteReason = 'The SAF-T file is delivered as one XML file, not as a ZIP archive.';
         }
     }
 
@@ -150,14 +143,5 @@ table 6150748 "NPR DK SAF-T Cash Exp. Header"
         SAFTExportMgt: Codeunit "NPR DK SAF-T Cash Export Mgt.";
     begin
         SAFTExportMgt.DeleteExport(Rec);
-    end;
-
-    procedure AllowedToExportIntoFolder(): Boolean
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        if EnvironmentInformation.IsSaaS() then
-            exit(false);
-        exit("Folder Path" <> '');
     end;
 }

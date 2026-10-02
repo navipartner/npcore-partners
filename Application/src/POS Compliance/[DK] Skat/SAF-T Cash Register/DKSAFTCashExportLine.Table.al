@@ -37,6 +37,9 @@ table 6150749 "NPR DK SAF-T Cash Export Line"
         {
             Caption = 'Master Data';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-09-29';
+            ObsoleteReason = 'Master data and transactions are always exported together in one complete XML file.';
         }
         field(7; Description; Text[250])
         {

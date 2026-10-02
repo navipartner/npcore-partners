@@ -5,7 +5,6 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
     var
         Depth: Integer;
         InsertElementErr: Label 'Not possible to insert element %1', Comment = '%1 - element name';
-        NoFileGeneratedErr: Label 'No file generated';
         SAFTNameSpaceTxt: Label 'urn:StandardAuditFile-Taxation-CashRegister:DK', Locked = true;
         NamespaceFullName: Text;
         XMLDoc: XmlDocument;
@@ -97,26 +96,6 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
         XMLDoc.WriteTo(FileOutStream);
     end;
 
-    internal procedure ExportSAFTExportLineBlobToFile(SAFTExportLine: Record "NPR DK SAF-T Cash Export Line"; FilePath: Text[512])
-    var
-        EntryTempBlob: Codeunit "Temp Blob";
-        SAFTCashExportFile: Record "NPR DK SAF-T Cash Export File";
-        SAFTCashExportMgt: Codeunit "NPR DK SAF-T Cash Export Mgt.";
-        OutStr: OutStream;
-        InStr: InStream;
-    begin
-        SAFTExportLine.CalcFields("SAF-T File");
-        if not SAFTExportLine."SAF-T File".HasValue() then
-            Error(NoFileGeneratedErr);
-        EntryTempBlob.FromRecord(SAFTExportLine, SAFTExportLine.FieldNo("SAF-T File"));
-        EntryTempBlob.CreateInStream(InStr);
-        SAFTCashExportMgt.InitExportFile(SAFTCashExportFile, SAFTExportLine.ID);
-        SAFTCashExportFile."File Name" := FilePath;
-        SAFTCashExportFile."SAF-T File".CreateOutStream(OutStr);
-        CopyStream(OutStr, InStr);
-        SAFTCashExportFile.Insert();
-    end;
-
     internal procedure GetFilePath(VATRegistrationNo: Text[20]; CreatedDateTime: DateTime; NumberOfFile: Integer; TotalNumberOfFiles: Integer): Text[512];
     var
         SAFTXMLFileNameLbl: Label 'SAF-T Cash Register_%1_%2_%3_%4.xml', Comment = '%1 - VAT Registration No., %2 - Date and Time of creation, %3 - No. of file, %4 - Total number of files';
@@ -128,7 +107,7 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
 
     local procedure DateTimeOfFileCreation(CreatedDateTime: DateTime): Text
     begin
-        exit(Format(CreatedDateTime, 0, '<Year4><Month,2><Day,2><Hours24><Minutes,2><Seconds,2>'));
+        exit(Format(CreatedDateTime, 0, '<Year4><Month,2><Day,2><Hours24,2><Filler Character,0><Minutes,2><Seconds,2>'));
     end;
 
     local procedure PrepareNodeTextForXML(var RawXmlText: Text)
