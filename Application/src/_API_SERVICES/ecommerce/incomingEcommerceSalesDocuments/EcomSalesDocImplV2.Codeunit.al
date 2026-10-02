@@ -357,6 +357,8 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
             Customer."NPR External Customer No." := EcomSalesHeader."Sell-to Customer No.";
 
+            InitCustomerFromTemplate(Customer, CustomerTemplateCode);
+
             //Conditional insert rather than a read first: the platform duplicate key error quotes
             //Customer."No.", which the customer mapping may have derived from a personal identifier such as
             //the phone no., and a separate read would leave a window for a concurrent import deriving the
@@ -1414,18 +1416,29 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         end;
     end;
 
+    local procedure InitCustomerFromTemplate(var Customer: Record Customer; CustomerTemplateCode: Code[20])
+    var
+        CustomerTemplate: Record "Customer Templ.";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+    begin
+        if CustomerTemplateCode = '' then
+            exit;
+        if not CustomerTemplate.Get(CustomerTemplateCode) then
+            exit;
+        EcomSalesDocUtils.InitCustomerFromTemplate(Customer, CustomerTemplate);
+    end;
+
     local procedure UpdateCustomerFromTemplates(var Customer: Record Customer; CustomerTemplateCode: Code[20]; ConfigTemplateCode: Code[10])
     var
         CustomerTemplate: Record "Customer Templ.";
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
+        CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
         RecRef: RecordRef;
     begin
         if CustomerTemplateCode <> '' then begin
-            if CustomerTemplate.Get(CustomerTemplateCode) then begin
-                Customer.CopyFromNewCustomerTemplate(CustomerTemplate);
-                Customer.Modify(true);
-            end;
+            if CustomerTemplate.Get(CustomerTemplateCode) then
+                CustomerTemplMgt.ApplyCustomerTemplate(Customer, CustomerTemplate);
         end else if ConfigTemplateCode <> '' then begin
             if ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
                 RecRef.GetTable(Customer);

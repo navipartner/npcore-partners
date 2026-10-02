@@ -426,6 +426,16 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         TemplateCode := IncEcomSalesDocSetup."Def. Customer Template Code";
     end;
 
+    internal procedure InitCustomerFromTemplate(var Customer: Record Customer; CustomerTemplate: Record "Customer Templ.")
+    var
+        CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
+    begin
+        // A number derived from the order is kept; the template series only numbers customers without one.
+        if Customer."No." = '' then
+            CustomerTemplMgt.InitCustomerNo(Customer, CustomerTemplate);
+        Customer."Contact Type" := CustomerTemplate."Contact Type";
+    end;
+
     internal procedure GetCustomerTemplateAndConfigCode(EcomSalesHeader: Record "NPR Ecom Sales Header"; var CustTemplateCode: Code[20]; var ConfigTemplateCode: Code[10])
     var
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";

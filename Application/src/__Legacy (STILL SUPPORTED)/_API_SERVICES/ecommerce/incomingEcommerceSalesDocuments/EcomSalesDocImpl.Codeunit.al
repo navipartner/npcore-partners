@@ -77,11 +77,14 @@ codeunit 6248616 "NPR Ecom Sales Doc Impl"
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomDocManualSubs: Codeunit "NPR Ecom Doc Manual Subs";
         LocationCode: Code[10];
         RecordRef: RecordRef;
         PaymentMethodCodeUpdated: Boolean;
     begin
+        BindSubscription(EcomDocManualSubs);
         InsertCustomer(EcomSalesHeader, Customer);
+        UnbindSubscription(EcomDocManualSubs);
 
         SalesHeader.Init();
         case EcomSalesHeader."Document Type" of
@@ -238,6 +241,7 @@ codeunit 6248616 "NPR Ecom Sales Doc Impl"
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
+        CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
         UpdateContFromCust: Codeunit "CustCont-Update";
         RecRef: RecordRef;
         NewCustomer: Boolean;
@@ -264,26 +268,20 @@ codeunit 6248616 "NPR Ecom Sales Doc Impl"
             InitCustomer(EcomSalesHeader, Customer);
 
             Customer."NPR External Customer No." := EcomSalesHeader."Sell-to Customer No.";
+
+            CustomerTemplateCode := EcomSalesDocUtils.GetCustTemplate(Customer);
+            if CustomerTemplateCode <> '' then begin
+                CustomerTemplate.Get(CustomerTemplateCode);
+                EcomSalesDocUtils.InitCustomerFromTemplate(Customer, CustomerTemplate);
+            end;
+
             Customer.Insert(true);
 
             Customer."Post Code" := EcomSalesHeader."Sell-to Post Code";
             Customer."Country/Region Code" := EcomSalesHeader."Sell-to Country Code";
 
-            CustomerTemplateCode := EcomSalesDocUtils.GetCustTemplate(Customer);
-            if CustomerTemplateCode <> '' then begin
-                CustomerTemplate.Get(CustomerTemplateCode);
-                Customer."Gen. Bus. Posting Group" := CustomerTemplate."Gen. Bus. Posting Group";
-                Customer."VAT Bus. Posting Group" := CustomerTemplate."VAT Bus. Posting Group";
-                Customer."Customer Posting Group" := CustomerTemplate."Customer Posting Group";
-                Customer."Currency Code" := CustomerTemplate."Currency Code";
-                Customer."Customer Price Group" := CustomerTemplate."Customer Price Group";
-                Customer."Invoice Disc. Code" := CustomerTemplate."Invoice Disc. Code";
-                Customer."Customer Disc. Group" := CustomerTemplate."Customer Disc. Group";
-                Customer."Allow Line Disc." := CustomerTemplate."Allow Line Disc.";
-                Customer."Payment Terms Code" := CustomerTemplate."Payment Terms Code";
-                Customer."Payment Method Code" := CustomerTemplate."Payment Method Code";
-                Customer."Shipment Method Code" := CustomerTemplate."Shipment Method Code";
-            end;
+            if CustomerTemplateCode <> '' then
+                CustomerTemplMgt.ApplyCustomerTemplate(Customer, CustomerTemplate);
         end;
 
         EcomSalesDocImplEvents.OnBeforeHandleCustomerUpdateMode(EcomSalesHeader, CustomerTemplateCode, VATBusPostingGroupCode, IncEcomSalesDocSetup, Customer, NewCustomer, CustomerUpdateHandled);
