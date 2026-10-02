@@ -111,6 +111,8 @@ table 6059977 "NPR DE Audit Buffer"
         InStream: InStream;
         OutStream: OutStream;
     begin
+        if QRData = '' then
+            exit;
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(QRData);
         TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
