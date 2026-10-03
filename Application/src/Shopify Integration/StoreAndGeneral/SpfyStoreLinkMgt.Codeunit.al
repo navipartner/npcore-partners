@@ -325,5 +325,30 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
         until SpfyStoreItemLink.Next() = 0;
     end;
     #endregion
+
+    internal procedure FindLocationCodeByShopifyLocationID(ShopifyStoreCode: Code[20]; ShopifyLocationID: Text[30]; var LocationCode: Code[10]): Boolean
+    var
+        SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+    begin
+        Clear(LocationCode);
+        if ShopifyLocationID = '' then
+            exit(false);
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Spfy Store-Location Link", "NPR Spfy ID Type"::"Entry ID", ShopifyLocationID, ShopifyAssignedID);
+        if not ShopifyAssignedID.FindSet() then
+            exit(false);
+        repeat
+            if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
+                RecRef.SetTable(SpfyStoreLocationLink);
+                if SpfyStoreLocationLink."Shopify Store Code" = ShopifyStoreCode then begin
+                    LocationCode := SpfyStoreLocationLink."Location Code";
+                    exit(true);
+                end;
+            end;
+        until ShopifyAssignedID.Next() = 0;
+        exit(false);
+    end;
 }
 #endif

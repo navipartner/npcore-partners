@@ -291,9 +291,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     end;
 
     procedure SetupJobQueues()
+    var
+        SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
     begin
         SpfyIntegrationMgt.SetRereadSetup();
         SetupJobQueues(SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders"));
+        SpfyLegacyReturnPollJQ.SetupJobQueues();
     end;
 
     internal procedure SetupJobQueues(Enable: Boolean)
@@ -1288,7 +1291,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if NpEcDocument.FindFirst() then
             if NpEcStore.Get(NpEcDocument."Store Code") then;
 
-        ExistingLineFound := FindExistingSalesLine(OrderLineID, SalesLine);
+        ExistingLineFound := FindExistingSalesLine(SalesHeader."Document Type", OrderLineID, SalesLine);
         if not ExistingLineFound then begin
             LastLineNo += 10000;
             SalesLine.Init();
@@ -1639,13 +1642,14 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     local procedure OrderLineIsGiftCard(OrderLine: JsonToken; PropertyDict: Dictionary of [Text, Text]; var IsNPGiftCard: Boolean): Boolean
     var
+        SpfyOrderApiHelper: Codeunit "NPR Spfy Order ApiHelper";
         PropertyValue: Text;
     begin
         IsNPGiftCard := false;
         if JsonHelper.GetJBoolean(OrderLine, 'gift_card', false) then
             exit(true);
         if PropertyDict.Get('is_giftcard', PropertyValue) then
-            IsNPGiftCard := PropertyValue.ToLower() in ['1', 'true', 'on'];
+            IsNPGiftCard := SpfyOrderApiHelper.IsGiftCardPropertyValue(PropertyValue);
         exit(IsNPGiftCard);
     end;
 
@@ -1776,7 +1780,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
         ShippingLineID := GetOrderID(ShippingLine);
 
-        ExistingLineFound := FindExistingSalesLine(ShippingLineID, SalesLine);
+        ExistingLineFound := FindExistingSalesLine(SalesHeader."Document Type", ShippingLineID, SalesLine);
         if not ExistingLineFound then begin
             LastLineNo += 10000;
             SalesLine.Init();
@@ -1995,17 +1999,19 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesLine.SetRange("Document No.", SalesHeader."No.");
     end;
 
-    local procedure FindExistingSalesLine(OrderLineID: Text[30]; var SalesLine: Record "Sales Line"): Boolean
+    internal procedure FindExistingSalesLine(DocumentType: Enum "Sales Document Type"; OrderLineID: Text[30]; var SalesLine: Record "Sales Line"): Boolean
     var
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         ExistingLineFound: Boolean;
     begin
+        // A Return Order line carries the Shopify id of the order line it returns, so only a line of the document type being imported counts.
         SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Line", "NPR Spfy ID Type"::"Entry ID", OrderLineID, ShopifyAssignedID);
         if ShopifyAssignedID.Find('+') then
             repeat
-                ExistingLineFound := SalesLine.Get(ShopifyAssignedID."BC Record ID");
-                if not ExistingLineFound then
+                if SalesLine.Get(ShopifyAssignedID."BC Record ID") then
+                    ExistingLineFound := SalesLine."Document Type" = DocumentType
+                else
                     ShopifyAssignedID.Delete(true);
             until ExistingLineFound or (ShopifyAssignedID.Next(-1) = 0);
 

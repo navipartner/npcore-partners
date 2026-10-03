@@ -629,6 +629,34 @@
             ExtendVoucherEndingDate(VoucherEntry."Posting Date", Voucher);
     end;
 
+    /// <summary>
+    /// Tops up a voucher for a refund already paid to its gift card, linked to the posted credit memo. The carrier sales line is never inserted.
+    /// </summary>
+    internal procedure PostTopUpForCreditMemo(var Voucher: Record "NPR NpRv Voucher"; AmountLCY: Decimal; PostingDate: Date; CreditMemoNo: Code[20]; ExternalDocumentNo: Code[50]; InitiatedInShopify: Boolean)
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        CarrierSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        if AmountLCY <= 0 then
+            exit;
+        Voucher.TestField("No.");
+        VoucherType.Get(Voucher."Voucher Type");
+        CarrierSalesLine.Init();
+        CarrierSalesLine.Id := CreateGuid();
+        CarrierSalesLine.Type := CarrierSalesLine.Type::"Top-up";
+        CarrierSalesLine."Document Source" := CarrierSalesLine."Document Source"::"Payment Line";
+        CarrierSalesLine."Document Type" := CarrierSalesLine."Document Type"::"Return Order";
+        CarrierSalesLine."Posting No." := CreditMemoNo;
+        CarrierSalesLine."Sale Date" := PostingDate;
+        CarrierSalesLine."Voucher Type" := Voucher."Voucher Type";
+        CarrierSalesLine."Voucher No." := Voucher."No.";
+        CarrierSalesLine."Reference No." := Voucher."Reference No.";
+        CarrierSalesLine."External Document No." := ExternalDocumentNo;
+        CarrierSalesLine.Amount := AmountLCY;
+        CarrierSalesLine."Spfy Initiated in Shopify" := InitiatedInShopify;
+        PostIssueVoucher(Voucher, VoucherType, AmountLCY, CarrierSalesLine);
+    end;
+
     local procedure PostIssueForeignVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -1005,6 +1033,21 @@
     end;
 
     local procedure ArchiveVoucher(var Voucher: Record "NPR NpRv Voucher")
+    begin
+        WriteOffRemainingAmount(Voucher);
+        ArchiveClosedVoucher(Voucher, false);
+    end;
+
+    /// <summary>
+    /// Archives a voucher whose sale was reversed: writes off what it still holds and archives it even when its type allows top-up.
+    /// </summary>
+    internal procedure ArchiveRevokedVoucher(var Voucher: Record "NPR NpRv Voucher")
+    begin
+        WriteOffRemainingAmount(Voucher);
+        ArchiveClosedVoucher(Voucher, true);
+    end;
+
+    local procedure WriteOffRemainingAmount(var Voucher: Record "NPR NpRv Voucher")
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         HasReservationErr: Label 'Voucher %1 cannot be archived as it has one or more reservation entries.';
@@ -1034,11 +1077,14 @@
 
             ApplyEntry(VoucherEntry);
         end;
-
-        ArchiveClosedVoucher(Voucher);
     end;
 
     internal procedure ArchiveClosedVoucher(var Voucher: Record "NPR NpRv Voucher")
+    begin
+        ArchiveClosedVoucher(Voucher, false);
+    end;
+
+    local procedure ArchiveClosedVoucher(var Voucher: Record "NPR NpRv Voucher"; IgnoreAllowTopUp: Boolean)
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -1048,7 +1094,7 @@
         if Voucher.Open then
             exit;
 
-        if Voucher."Allow Top-up" then
+        if Voucher."Allow Top-up" and not IgnoreAllowTopUp then
             exit;
 
         InsertArchivedVoucher(Voucher, ArchVoucher);
@@ -1212,13 +1258,13 @@
         if Voucher."No." = '' then
             Voucher."No." := ArchVoucher."No.";
         Voucher.SystemId := ArchVoucher.SystemId;
+        // The archive row keeps the reference number, so it must go before the insert runs the reference check.
+        ArchVoucher.Delete();
         Voucher.Insert(true, true);
 
         UnarchiveVoucherEntries(ArchVoucher."No.", Voucher."No.", RemoveLastEntry);
         UnarchiveVoucherSendingLogs(ArchVoucher."No.", Voucher."No.");
         OnAfterUnArchiveVoucher(ArchVoucher, Voucher);
-
-        ArchVoucher.Delete();
     end;
 
     local procedure UnarchiveVoucherEntries(ArchVoucherNo: Code[20]; RestoredVoucherNo: Code[20]; RemoveLastEntry: Boolean)

@@ -65,45 +65,64 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
         if Rec.Enabled then begin
             if not SpfyIntegrationFeature.IsFeatureEnabled() then
                 RaiseError(StrSubstNo(SpfyIntNotEnabledErr, SpfyIntegrationFeature.GetFeatureDescription()));
-        end else
-            DisableSalesReturnIntegrationOnStores();
+        end;
         HandleJobQueues(Rec);
     end;
 
-    local procedure DisableSalesReturnIntegrationOnStores()
-    var
-        ShopifyStore: Record "NPR Spfy Store";
-        ReturnsNotSupportedOnLegacyQst: Label 'Sales return integration is enabled on one or more Shopify stores. Sales returns are not supported on the legacy order import, so disabling the %1 feature will also disable sales return integration on those stores. Do you want to continue?', Comment = '%1 = Shopify Ecommerce Order Experience feature description';
+    // A page saves the flag on a later round trip than the validate check, so the queue is checked again when the row is saved.
+    [EventSubscriber(ObjectType::Table, Database::"NPR Feature", 'OnAfterModifyEvent', '', false, false)]
+    local procedure NPRFeatureOnAfterModify(var Rec: Record "NPR Feature"; RunTrigger: Boolean)
     begin
-        ShopifyStore.SetRange("Sales Return Order Integration", true);
-        if ShopifyStore.IsEmpty() then
+        if not RunTrigger or not Rec.Enabled or (Rec.Id <> GetFeatureId()) then
             exit;
-        if GetUserResponse(StrSubstNo(ReturnsNotSupportedOnLegacyQst, GetFeatureDescription())) then
-            ShopifyStore.ModifyAll("Sales Return Order Integration", false, false);
+        RefuseWhileLegacyReturnsPending(Rec, true);
     end;
 
-    local procedure HandleJobQueues(Rec: Record "NPR Feature")
+    /// <summary>
+    /// Under the lock the legacy poll and job take before they write: a row committed first refuses the switch, a switch committed first stops them.
+    /// </summary>
+    local procedure RefuseWhileLegacyReturnsPending(Feature: Record "NPR Feature"; UnderLock: Boolean)
+    var
+        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        PendingLegacyReturnsErr: Label 'Enabling the %2 feature is not possible because there are unprocessed entries in the %1 that must be handled first.', Comment = '%1 = table caption, %2 = feature description';
+    begin
+        if UnderLock then
+            if SpfyLegacyReturnMgt.FeatureSwitchedOn() then;
+        LegacyReturnQueue.SetCurrentKey(Status);
+        LegacyReturnQueue.ReadIsolation := IsolationLevel::ReadUncommitted;
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::"Draft Created");
+        if not LegacyReturnQueue.IsEmpty() then
+            RaiseError(StrSubstNo(PendingLegacyReturnsErr, LegacyReturnQueue.TableCaption(), Feature.Description));
+    end;
+
+    internal procedure HandleJobQueues(Feature: Record "NPR Feature")
     var
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
         SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
         SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
+        SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
     begin
-        if Rec.Enabled then begin
-            DisableJobQueues(Format(Codeunit::"NPR Spfy Order Mgt."), Rec);
+        if Feature.Enabled then begin
+            DisableJobQueues(StrSubstNo('%1|%2|%3', Codeunit::"NPR Spfy Order Mgt.", Codeunit::"NPR Spfy Legacy Return Poll JQ", Codeunit::"NPR Spfy Legacy Return Proc JQ"), Feature);
             SpfyEcomSalesDocPrcssr.SetupJobQueues();
         end else begin
-            CheckForUnprocessedEntries(Rec);
+            CheckForUnprocessedEntries(Feature);
             SpfyOrderImportJQ.SetupJobQueue(false);
             SpfyEventDocProcessorJQ.SetupJobQueue(false);
-            if SpfyIntegrationFeature.IsFeatureEnabled() then
+            if SpfyIntegrationFeature.IsFeatureEnabled() then begin
                 OrderMgt.SetupJobQueues();
+                // Pass the new state: the feature row is not saved yet, so OrderMgt still reads the old one.
+                SpfyLegacyReturnPollJQ.SetupJobQueues(false);
+            end;
         end;
     end;
 
     local procedure DisableJobQueues(FormatedCodeunitId: Text; Rec: Record "NPR Feature")
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         JobQueueDict: Dictionary of [Guid, Boolean];
         JobQueueKey: Guid;
     begin
@@ -119,23 +138,32 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
 
         Clear(JobQueueEntry);
         CheckForUnprocessedEntries(Rec);
+        // Deleting the entry alone leaves its monitored row, from which the refresher recreates a protected job.
         foreach JobQueueKey in JobQueueDict.Keys do
             if JobQueueEntry.Get(JobQueueKey) then
-                JobQueueEntry.Delete(true);
+                JobQueueMgt.CancelNpManagedJob(JobQueueEntry);
     end;
 
-    local procedure CheckForUnprocessedEntries(Rec: Record "NPR Feature")
+    internal procedure CheckForUnprocessedEntries(Feature: Record "NPR Feature")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         ShopifySetup: Record "NPR Spfy Integration Setup";
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
         UserContinued: Boolean;
         ContrinueDisableCarefullyMsg: Label 'There are Orders in the %1 that were processed with errors. Disabling %2 feature may cause those orders in the %1 to remain unprocessed. Do you want to continue?', Comment = '%1= tablecaption;%2 = Feature description';
         ContrinueEnableCarefullyMsg: Label 'There are Orders in the %1 that were processed with errors. Enabling %2 feature may cause those orders in the %1 to remain unprocessed. Do you want to continue?', Comment = '%1= tablecaption;%2 = Feature description';
         PendingEventLogEntriesErr: Label 'Disabling the %1 feature is not possible because there are unprocessed event log entries in Ready status that must be handled first.', Comment = '%1 = Feature description';
         PendingImportEntriesErr: Label 'Enabling the %1 feature is not possible because there are unprocessed import types that must be handled first.', Comment = '%1=Feature description';
+        ContinueEnableWithFailedLegacyReturnsMsg: Label 'There are returns in the %1 that failed or were dismissed. Enabling the %2 feature may leave the failed ones unprocessed and import the dismissed ones again through e-commerce documents, since a return handled by hand carries no document the e-commerce import recognises. Do you want to continue?', Comment = '%1 = Shopify Legacy Return Queue table caption, %2 = feature description';
     begin
-        If Rec.Enabled then begin
+        If Feature.Enabled then begin
+            RefuseWhileLegacyReturnsPending(Feature, false);
+            LegacyReturnQueue.SetCurrentKey(Status);
+            LegacyReturnQueue.ReadIsolation := IsolationLevel::ReadUncommitted;
+            LegacyReturnQueue.SetFilter(Status, '%1|%2', LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::Dismissed);
+            if not LegacyReturnQueue.IsEmpty() then
+                UserContinued := GetUserResponse(StrSubstNo(ContinueEnableWithFailedLegacyReturnsMsg, LegacyReturnQueue.TableCaption(), Feature.Description));
             If not ShopifySetup.Get() then
                 exit;
             ImportEntry.SetCurrentKey("Import Type", Imported);
@@ -144,23 +172,23 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
             ImportEntry.SetRange(Imported, false);
             ImportEntry.SetRange("Runtime Error", true);
             if not ImportEntry.IsEmpty() then
-                UserContinued := GetUserResponse(StrSubstNo(ContrinueEnableCarefullyMsg, ImportEntry.TableCaption(), Rec.Description));
+                UserContinued := GetUserResponse(StrSubstNo(ContrinueEnableCarefullyMsg, ImportEntry.TableCaption(), Feature.Description));
             ImportEntry.SetRange("Runtime Error");
             if not ImportEntry.IsEmpty() then
-                RaiseError(StrSubstNo(PendingImportEntriesErr, Rec.Description));
+                RaiseError(StrSubstNo(PendingImportEntriesErr, Feature.Description));
             if UserContinued then
-                EmitUserDecisionToTelemetry(Rec.Description);
+                EmitUserDecisionToTelemetry(Feature.Description);
         end else begin
             SpfyEventLogEntry.SetCurrentKey("Processing Status");
             SpfyEventLogEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
             SpfyEventLogEntry.SetRange("Processing Status", SpfyEventLogEntry."Processing Status"::Error);
             IF not SpfyEventLogEntry.IsEmpty() then
-                UserContinued := GetUserResponse(StrSubstNo(ContrinueDisableCarefullyMsg, SpfyEventLogEntry.TableCaption(), Rec.Description));
+                UserContinued := GetUserResponse(StrSubstNo(ContrinueDisableCarefullyMsg, SpfyEventLogEntry.TableCaption(), Feature.Description));
             SpfyEventLogEntry.SetRange("Processing Status", SpfyEventLogEntry."Processing Status"::Ready);
             IF not SpfyEventLogEntry.IsEmpty() then
-                RaiseError(StrSubstNo(PendingEventLogEntriesErr, Rec.Description));
+                RaiseError(StrSubstNo(PendingEventLogEntriesErr, Feature.Description));
             if UserContinued then
-                EmitUserDecisionToTelemetry(Rec.Description);
+                EmitUserDecisionToTelemetry(Feature.Description);
         end;
     end;
 

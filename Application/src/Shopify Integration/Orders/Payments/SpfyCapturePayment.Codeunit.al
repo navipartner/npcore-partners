@@ -697,26 +697,31 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
     internal procedure GetPaymentMapping(Transaction: JsonToken; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
     var
-        ExternalPaymentTypeID: Record "NPR External Payment Type ID";
         CreditCardCompany: Text;
         ShopifyPmtGateway: Text;
-        ExternalPmtTypeFormatTok: Label '%1_%2', Locked = true;
         MappingNotFoundErr: Label 'There is no payment mapping set for Shopify store %1, payment gateway "%2" and credit card company "%3".', Comment = '%1 - Shopify store code, %2 - payment gateway, %3 - credit card company';
     begin
-        Clear(PaymentMapping);
         ShopifyPmtGateway := JsonHelper.GetJText(Transaction, 'gateway', false);
         CreditCardCompany := JsonHelper.GetJText(Transaction, 'paymentDetails.company', false);
+        if not FindPaymentMapping(ShopifyPmtGateway, CreditCardCompany, ShopifyStoreCode, PaymentMapping) then
+            Error(MappingNotFoundErr, ShopifyStoreCode, ShopifyPmtGateway, CreditCardCompany);
+    end;
 
+    internal procedure FindPaymentMapping(ShopifyPmtGateway: Text; CreditCardCompany: Text; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping"): Boolean
+    var
+        ExternalPaymentTypeID: Record "NPR External Payment Type ID";
+        ExternalPmtTypeFormatTok: Label '%1_%2', Locked = true;
+    begin
+        Clear(PaymentMapping);
         ExternalPaymentTypeID.SetCurrentKey("Store Code", "Payment Gateway", "Credit Card Company");
         ExternalPaymentTypeID.SetRange("Store Code", ShopifyStoreCode);
         ExternalPaymentTypeID.SetRange("Payment Gateway", CopyStr(ShopifyPmtGateway, 1, MaxStrLen(ExternalPaymentTypeID."Payment Gateway")));
         ExternalPaymentTypeID.SetRange("Credit Card Company", CopyStr(CreditCardCompany, 1, MaxStrLen(ExternalPaymentTypeID."Credit Card Company")));
         if ExternalPaymentTypeID.FindFirst() then
             if PaymentMapping.Get('Shopify', ExternalPaymentTypeID."External Payment Type ID") then
-                exit;
+                exit(true);
 
-        if not PaymentMapping.Get('Shopify', LowerCase(StrSubstNo(ExternalPmtTypeFormatTok, ShopifyStoreCode, ShopifyPmtGateway))) then
-            Error(MappingNotFoundErr, ShopifyStoreCode, ShopifyPmtGateway, CreditCardCompany);
+        exit(PaymentMapping.Get('Shopify', LowerCase(StrSubstNo(ExternalPmtTypeFormatTok, ShopifyStoreCode, ShopifyPmtGateway))));
     end;
 
     local procedure SetDateAuthorized(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")

@@ -15,6 +15,13 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
         _Body: List of [Text];
         _Fail: List of [Boolean];
         _RecordedRequests: List of [Text];
+        _AdvanceCursor: Boolean;
+
+    /// <summary>Makes every response's endCursor token CURSOR1 unique per request, so paging advances instead of repeating a cursor.</summary>
+    procedure AdvanceCursorPerRequest()
+    begin
+        _AdvanceCursor := true;
+    end;
 
     /// <summary>Adds a canned response returned when the request body contains RequestMatch.</summary>
     procedure AddResponse(RequestMatch: Text; ResponseBody: Text)
@@ -76,6 +83,7 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
     var
         RequestJson: JsonObject;
         RequestText: Text;
+        Body: Text;
         i: Integer;
         NoCannedResponseErr: Label 'Mock GraphQL client has no canned response matching request: %1', Comment = '%1 = request body', Locked = true;
     begin
@@ -90,7 +98,10 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
                     if SetSimulatedError() then;
                     exit(false);
                 end;
-                ShopifyResponse.ReadFrom(_Body.Get(i));
+                Body := _Body.Get(i);
+                if _AdvanceCursor then
+                    Body := Body.Replace('CURSOR1', 'CURSOR' + Format(_RecordedRequests.Count()));
+                ShopifyResponse.ReadFrom(Body);
                 exit(true);
             end;
 

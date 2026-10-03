@@ -911,6 +911,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         SpfyOrderImportJQ: Codeunit "NPR Spfy Order Import JQ";
         SpfyEventDocProcessorJQ: Codeunit "NPR Spfy Event Doc ProcessorJQ";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         ExcludedSystemIds: List of [Guid];
         EcomEligible: Boolean;
     begin
@@ -930,6 +931,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         // Legacy path: pass an explicit Sales-Orders eligibility computed with the deleted store excluded, so
         // deleting the last enabled store does not transiently re-create the NP-protected legacy job queue.
         OrderMgt.SetupJobQueues(IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders", ExcludedSystemIds));
+        SpfyLegacyReturnPollJQ.SetupJobQueues(false, ExcludedSystemIds);
     end;
 
     internal procedure SetupSpfyJQWithConfirmation(JQCodeunitId: Integer)

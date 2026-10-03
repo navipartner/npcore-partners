@@ -167,7 +167,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         ClearLastError();
         Clear(NcTask);
         SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, '', ShopifyStoreCode, ReturnRequest, ReturnGID, false);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ReturnResponse));
+        exit(GetGraphQLClient().ExecuteRequest(NcTask, false, ReturnResponse));
     end;
 
     // Reshapes the Shopify return/refund response into the same unified order JSON shape the importer consumes:
@@ -760,7 +760,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         Clear(OrdersArr);
         ClearLastError();
         CreateRequestForList(NcTask, Cursor, ShopifyStore.Code, ReturnListRequest, QueryFilters);
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+        if not GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse) then
             Error(GetLastErrorText());
         Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.orders.pageInfo.endCursor', false);
         HasNext := JsonHelper.GetJBoolean(ShopifyResponse, 'data.orders.pageInfo.hasNextPage', true);
@@ -780,7 +780,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         Clear(ReturnsArr);
         ClearLastError();
         SpfyCommunicationHandler.CreateGraphQLRequestWithOrderIdFilter(NcTask, Cursor, ShopifyStore.Code, OrderReturnsRequest, OrderGID, true);
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+        if not GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse) then
             Error(GetLastErrorText());
         Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.order.returns.pageInfo.endCursor', false);
         HasNext := JsonHelper.GetJBoolean(ShopifyResponse, 'data.order.returns.pageInfo.hasNextPage', false);
@@ -1030,8 +1030,34 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         if not (JsonHelper.GetJsonToken(OrderLine, 'customAttributes', OrderLineProperties) and OrderLineProperties.IsArray()) then
             exit(false);
         foreach OrderLineProperty in OrderLineProperties.AsArray() do
-            if JsonHelper.GetJText(OrderLineProperty, 'key', false) = '_is_giftcard' then
-                exit(JsonHelper.GetJInteger(OrderLineProperty, 'value', false) <> 0);
+            // The legacy order import reads the key without its leading underscores; the same key rule applies here.
+            if JsonHelper.GetJText(OrderLineProperty, 'key', false).TrimStart('_') = 'is_giftcard' then
+                exit(IsGiftCardPropertyValue(JsonHelper.GetJText(OrderLineProperty, 'value', false)));
+    end;
+
+    /// <summary>
+    /// The storefront writes the NP gift card property as 1, true or on; both order imports and the return import read it with this one rule.
+    /// </summary>
+    internal procedure IsGiftCardPropertyValue(PropertyValue: Text): Boolean
+    begin
+        exit(PropertyValue.Trim().ToLower() in ['1', 'true', 'on']);
+    end;
+
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
     end;
 
     var
@@ -1041,6 +1067,8 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         _FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
         _ShopifyResponse: JsonToken;
         _HasExternalCache: Boolean;
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
+        _GraphQLClientSet: Boolean;
         TooLongValueErr: Label 'Incoming Shopify %1 "%2" exceeds maximum allowed length of %3 characters', Comment = '%1 - incoming field name, %2 - incoming field value, %3 - number of characters';
 
 }

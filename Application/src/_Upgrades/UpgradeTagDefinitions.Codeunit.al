@@ -253,6 +253,7 @@
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpdateGetPaymentLineOption'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'DisableSendCloseOrderRequest'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetPostReturnsAutomatically'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
@@ -1025,6 +1026,8 @@
                         exit('NPR-Spfy-UpdateGetPaymentLineOption-20260105');
                     'DisableSendCloseOrderRequest':
                         exit('NPR-Spfy-DisableSendCloseOrderRequest-20260116');
+                    'SetPostReturnsAutomatically':
+                        exit('NPR-Spfy-SetPostReturnsAutomatically-20260927');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":

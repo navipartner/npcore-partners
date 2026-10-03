@@ -645,6 +645,8 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     local procedure ScheduleSendShopifyFulfillment(var SalesHeader: Record "Sales Header"; var SalesShipmentHeader: Record "Sales Shipment Header"; var ReturnReceiptHeader: Record "Return Receipt Header")
     var
         NcTask: Record "NPR Nc Task";
+        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         ReturnReceiptLine: Record "Return Receipt Line";
         SalesShipmentLine: Record "Sales Shipment Line";
         SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
@@ -654,6 +656,10 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     begin
         if not (SalesHeader.Ship or SalesHeader.Receive) then
             exit;
+        // A legacy return's Return Order is not fulfilled in Shopify (its Entry ID is the return id); other Return Orders keep the module's behaviour.
+        if SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order" then
+            if SpfyLegacyReturnMgt.FindQueueRowBySalesHeader(SalesHeader, LegacyReturnQueue) then
+                exit;
 
         NcTask."Store Code" :=
             CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));

@@ -111,6 +111,15 @@ table 6150810 "NPR Spfy Store"
         {
             Caption = 'Get Returns Starting From';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                StartDateRequiredErr: Label '%1 must have a value while %2 is on.', Comment = '%1 = Get Returns Starting From field caption, %2 = Sales Return Order Integration field caption';
+            begin
+                // A blank start date would let the return poll queue every closed return in its lookback window, including those credited before go-live.
+                if ("Get Returns Starting From" = 0DT) and "Sales Return Order Integration" then
+                    Error(StartDateRequiredErr, FieldCaption("Get Returns Starting From"), FieldCaption("Sales Return Order Integration"));
+            end;
         }
 #endif
         field(50; "Last Orders Imported At"; DateTime)
@@ -324,21 +333,91 @@ table 6150810 "NPR Spfy Store"
             trigger OnValidate()
             var
                 SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
+                SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
                 ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
-                FeatureEnabled: Boolean;
-                FeatureNotEnabledErr: Label 'Please enable %1 first before enabling %2.', Comment = '%1 = Shopify Ecommerce Order Experience feature description, %2 = Sales Return Order Integration field caption';
             begin
-                FeatureEnabled := ShopifyEcommOrderExp.IsFeatureEnabled();
-                if "Sales Return Order Integration" and not FeatureEnabled then
-                    Error(FeatureNotEnabledErr, ShopifyEcommOrderExp.GetFeatureDescription(), FieldCaption("Sales Return Order Integration"));
                 if "Sales Return Order Integration" then
                     TestField("Get Returns Starting From");
                 Modify();
-                if FeatureEnabled then
-                    SpfyEcomSalesDocPrcssr.SetupJobQueues();
+                if ShopifyEcommOrderExp.IsFeatureEnabled() then
+                    SpfyEcomSalesDocPrcssr.SetupJobQueues()
+                else
+                    SpfyLegacyReturnPollJQ.SetupJobQueues();
             end;
         }
 #endif
+        field(3; "Return Refund G/L Account No."; Code[20])
+        {
+            Caption = 'Return Refund G/L Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+            trigger OnValidate()
+            begin
+                CheckReturnGLAccount("Return Refund G/L Account No.");
+            end;
+        }
+        field(4; "Ret. Gift Card Refund G/L Acc."; Code[20])
+        {
+            Caption = 'Return Gift Card Refund G/L Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+            trigger OnValidate()
+            begin
+                CheckReturnGLAccount("Ret. Gift Card Refund G/L Acc.");
+            end;
+        }
+        field(5; "Ret. Shipping Refund G/L Acc."; Code[20])
+        {
+            Caption = 'Return Shipping Refund G/L Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+            trigger OnValidate()
+            begin
+                CheckReturnGLAccount("Ret. Shipping Refund G/L Acc.");
+            end;
+        }
+        field(6; "Return Fee G/L Account No."; Code[20])
+        {
+            Caption = 'Return Fee G/L Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+            trigger OnValidate()
+            begin
+                CheckReturnGLAccount("Return Fee G/L Account No.");
+            end;
+        }
+        field(7; "Post Returns Automatically"; Boolean)
+        {
+            Caption = 'Post Returns Automatically';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(8; "Return Poll Lookback (Days)"; Integer)
+        {
+            Caption = 'Return Poll Lookback (Days)';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
+        field(9; "Return Generic Item No."; Code[20])
+        {
+            Caption = 'Return Generic Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item;
+            trigger OnValidate()
+            var
+                Item: Record Item;
+            begin
+                if "Return Generic Item No." = '' then
+                    exit;
+                Item.Get("Return Generic Item No.");
+                Item.TestField(Blocked, false);
+            end;
+        }
+        field(11; "Return Generic SKU Prefix"; Text[20])
+        {
+            Caption = 'Return Generic SKU Prefix';
+            DataClassification = CustomerContent;
+        }
         field(100; "Send Payment Capture Requests"; Boolean)
         {
             Caption = 'Send Payment Capture Requests';
@@ -647,10 +726,12 @@ table 6150810 "NPR Spfy Store"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
         SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
 #endif
     begin
+        SpfyLegacyReturnMgt.DeleteQueueRowsOfStore(Code);
         SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
         if not SpfyAllowedFinStatus.IsEmpty() then
             SpfyAllowedFinStatus.DeleteAll();
@@ -818,6 +899,17 @@ table 6150810 "NPR Spfy Store"
             SpfyDataSyncPointer.Init();
             SpfyDataSyncPointer.Insert();
         end;
+    end;
+
+    local procedure CheckReturnGLAccount(GLAccountNo: Code[20])
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        if GLAccountNo = '' then
+            exit;
+        GLAccount.Get(GLAccountNo);
+        GLAccount.TestField(Blocked, false);
+        GLAccount.TestField("Direct Posting", true);
     end;
 }
 #endif

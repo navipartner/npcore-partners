@@ -40,6 +40,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
 #endif
         UpdateGetPaymentLineOption();
         DisableSendCloseOrderRequest();
+        SetPostReturnsAutomatically();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -719,6 +720,33 @@ codeunit 6184802 "NPR Spfy App Upgrade"
 
         SetUpgradeTag();
         LogFinish();
+    end;
+
+    local procedure SetPostReturnsAutomatically()
+    begin
+        _UpgradeStep := 'SetPostReturnsAutomatically';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        SwitchPostReturnsAutomaticallyOn();
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    /// <summary>
+    /// Stores that existed before "Post Returns Automatically" get the value a new store starts with.
+    /// </summary>
+    internal procedure SwitchPostReturnsAutomaticallyOn()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        if ShopifyStore.FindSet(true) then
+            repeat
+                ShopifyStore."Post Returns Automatically" := true;
+                ShopifyStore.Modify();
+            until ShopifyStore.Next() = 0;
     end;
 
     local procedure HasUpgradeTag(): Boolean

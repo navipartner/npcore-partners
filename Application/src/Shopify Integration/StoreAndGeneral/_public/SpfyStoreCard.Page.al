@@ -507,22 +507,22 @@ page 6184704 "NPR Spfy Store Card"
             group(SalesReturnIntegrationArea)
             {
                 Caption = 'Sales Return Order Integration';
-                Visible = _EcomFeatureEnabled;
                 field("Sales Return Order Integration"; Rec."Sales Return Order Integration")
                 {
                     Caption = 'Enabled';
-                    ToolTip = 'Specifies whether the system imports completed (closed) sales returns from the Shopify store. Imported returns are created as sales return orders in Business Central and posted automatically, producing posted sales credit memos, with the Shopify refund recorded as a payment line.';
+                    ToolTip = 'Specifies whether the system imports completed (closed) sales returns from the Shopify store as sales return orders.';
                     ApplicationArea = NPRShopify;
                 }
                 field("Get Returns Starting From"; Rec."Get Returns Starting From")
                 {
-                    ToolTip = 'Specifies the date and time from which completed returns are imported from the Shopify store on the first run. Returns are located by scanning Shopify orders updated since this point, so the value filters on when an order was last updated, not on when a return was closed.';
+                    ToolTip = 'Specifies from when completed returns are imported. With the Shopify Ecommerce Order Experience on, orders updated since then are scanned; otherwise returns closed before then are skipped.';
                     ApplicationArea = NPRShopify;
                     ShowMandatory = true;
                 }
                 field("Last Returns Imported At"; _LastReturnsImportedAt)
                 {
                     Caption = 'Last Returns Imported At';
+                    Visible = _EcomFeatureEnabled;
                     ToolTip = 'Specifies the date and time returns were last imported from the Shopify store. On the next run, the system scans Shopify orders updated after this point and imports their closed returns. Setting it to an earlier time makes the import job re-scan that period, and the stored Shopify order data of the store''s failed return log entries is discarded so that they download the return again.';
                     ApplicationArea = NPRShopify;
                     Importance = Additional;
@@ -538,6 +538,20 @@ page 6184704 "NPR Spfy Store Card"
                         if GuiAllowed() and (DiscardedCount > 0) then
                             Message(EntriesGivenAFreshStartMsg, DiscardedCount);
                     end;
+                }
+                group(LegacyReturnImport)
+                {
+                    Caption = 'Legacy Order Import';
+                    Visible = not _EcomFeatureEnabled;
+
+                    field("Post Returns Automatically"; Rec."Post Returns Automatically") { ToolTip = 'Specifies whether imported returns are posted at once. Switch it off to review the Sales Return Orders before posting.'; ApplicationArea = NPRShopify; }
+                    field("Return Poll Lookback (Days)"; Rec."Return Poll Lookback (Days)") { ToolTip = 'Specifies how many days back the return poll searches for orders whose returns closed. 0 means 30.'; ApplicationArea = NPRShopify; }
+                    field("Return Refund G/L Account No."; Rec."Return Refund G/L Account No.") { ToolTip = 'Specifies the clearing account that settles the card part of a Shopify refund against the credit memo.'; ApplicationArea = NPRShopify; }
+                    field("Ret. Gift Card Refund G/L Acc."; Rec."Ret. Gift Card Refund G/L Acc.") { ToolTip = 'Specifies the liability account that settles the part of a refund that went back to a gift card or to Shopify store credit. Blank uses the refund account.'; ApplicationArea = NPRShopify; }
+                    field("Ret. Shipping Refund G/L Acc."; Rec."Ret. Shipping Refund G/L Acc.") { ToolTip = 'Specifies the account for a refunded shipping cost. Blank skips the line, which the total check will then report.'; ApplicationArea = NPRShopify; }
+                    field("Return Fee G/L Account No."; Rec."Return Fee G/L Account No.") { ToolTip = 'Specifies the account for fees Shopify withheld from the refund. Its VAT posting setup decides whether the fee carries VAT.'; ApplicationArea = NPRShopify; }
+                    field("Return Generic Item No."; Rec."Return Generic Item No.") { ToolTip = 'Specifies the non-inventory item used for returned products whose SKU starts with the generic prefix and never exists in Business Central.'; ApplicationArea = NPRShopify; }
+                    field("Return Generic SKU Prefix"; Rec."Return Generic SKU Prefix") { ToolTip = 'Specifies the SKU prefix that marks per-order products to import on the generic item.'; ApplicationArea = NPRShopify; }
                 }
             }
 #endif
@@ -741,6 +755,16 @@ page 6184704 "NPR Spfy Store Card"
                 ApplicationArea = NPRShopify;
                 Image = List;
                 RunObject = Page "NPR Spfy Sales Channels";
+                RunPageLink = "Shopify Store Code" = field(Code);
+            }
+            action(LegacyReturnQueue)
+            {
+                Caption = 'Shopify Legacy Return Queue';
+                Image = ReturnOrder;
+                ToolTip = 'View the returns found for this store by the legacy order import engine and what happened to each.';
+                ApplicationArea = NPRShopify;
+                Visible = not _EcomFeatureEnabled;
+                RunObject = page "NPR Spfy Legacy Return Queue";
                 RunPageLink = "Shopify Store Code" = field(Code);
             }
         }

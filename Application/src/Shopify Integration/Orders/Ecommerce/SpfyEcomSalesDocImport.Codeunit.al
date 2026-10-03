@@ -1612,7 +1612,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     begin
         if not PropertyDict.Get('is_giftcard', PropertyValue) then
             exit(false);
-        exit(PropertyValue <> '0');
+        exit(_SpfyAPIOrderHelper.IsGiftCardPropertyValue(PropertyValue));
     end;
 
 

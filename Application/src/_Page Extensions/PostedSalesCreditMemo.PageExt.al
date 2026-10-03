@@ -18,6 +18,22 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 Visible = false;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            field("NPR Spfy Return ID"; _SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+            {
+                Caption = 'Shopify Return ID';
+                Editable = false;
+                Visible = _ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify Return ID assigned to the document.';
+            }
+            field("NPR Shopify Store Code"; _SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"))
+            {
+                Caption = 'Shopify Store Code';
+                Editable = false;
+                Visible = _ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify store the document has been created at.';
+            }
         }
         addafter(Cancelled)
         {
@@ -330,16 +346,20 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
         IsDigitalNotifSetupValid: Boolean;
 #endif
         OIOUBLInstalled: Boolean;
+        _SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        _ShopifyIntegrationIsEnabled: Boolean;
 
     trigger OnOpenPage()
     var
         OIOUBLSetup: Record "NPR OIOUBL Setup";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         DigitalOrderNotifMgt: Codeunit "NPR Digital Order Notif. Mgt.";
         ErrorMessage: Text;
 #endif
     begin
         OIOUBLInstalled := OIOUBLSetup.IsOIOUBLInstalled();
+        _ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Returns");
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         IsDigitalNotifSetupValid := DigitalOrderNotifMgt.ValidateDigitalNotifSetup(ErrorMessage);
 #endif
