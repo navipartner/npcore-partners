@@ -450,6 +450,21 @@
                             RevokeTicketRequest();
                         end;
                     }
+                    action("Clear Ticket Holder")
+                    {
+                        ToolTip = 'Remove the personal data from the selected ticket requests: the ticket holder name is cleared and the notification address is replaced by one that cannot receive mail. The clear follows through to the tickets issued from the request and their associated records, and cancels anything still queued to the holder. Irreversible.';
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        Caption = 'Clear Ticket Holder';
+                        Image = ClearLog;
+                        Promoted = true;
+                        PromotedOnly = true;
+                        PromotedCategory = Process;
+                        Scope = Repeater;
+                        trigger OnAction()
+                        begin
+                            AnonymizeSelected();
+                        end;
+                    }
                 }
             }
         }
@@ -528,5 +543,42 @@
         until (TicketReservationRequest.Next() = 0);
 
     end;
-}
 
+    local procedure AnonymizeSelected()
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        AnonymizeMgt: Codeunit "NPR TM Anonymize";
+        ClearedHolders: List of [Text];
+        AffectedTickets: List of [Code[20]];
+        ClearedTickets: List of [Code[20]];
+        AffectedTicketNo: Code[20];
+        HolderKey: Text;
+        SelectedCount: Integer;
+        DONE_CLEAR_TICKET_HOLDER: Label 'The personal data was removed from %1 ticket(s).', Comment = '%1 = the number of tickets cleared';
+        CONFIRM_CLEAR_TICKET_HOLDER: Label 'Remove the personal data from %1 selected ticket request(s) and the tickets issued from them?\\This cannot be undone.', Comment = '%1 = the number of ticket requests selected';
+    begin
+        CurrPage.SetSelectionFilter(TicketReservationRequest);
+        SelectedCount := TicketReservationRequest.Count();
+        if (SelectedCount < 1) then
+            exit;
+
+        if (not Confirm(CONFIRM_CLEAR_TICKET_HOLDER, false, SelectedCount)) then
+            exit;
+
+        TicketReservationRequest.FindSet();
+        repeat
+            // Rows of an imported batch share a token but not a holder.
+            HolderKey := AnonymizeMgt.GetHolderKey(TicketReservationRequest);
+            if (not ClearedHolders.Contains(HolderKey)) then begin
+                ClearedHolders.Add(HolderKey);
+                AnonymizeMgt.AnonymizeRequest(TicketReservationRequest, ClearedTickets);
+                foreach AffectedTicketNo in ClearedTickets do
+                    if (not AffectedTickets.Contains(AffectedTicketNo)) then
+                        AffectedTickets.Add(AffectedTicketNo);
+            end;
+        until (TicketReservationRequest.Next() = 0);
+
+        CurrPage.Update(false);
+        Message(DONE_CLEAR_TICKET_HOLDER, AffectedTickets.Count());
+    end;
+}

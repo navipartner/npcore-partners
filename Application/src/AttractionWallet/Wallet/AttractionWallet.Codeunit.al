@@ -1,4 +1,4 @@
-codeunit 6185062 "NPR AttractionWallet"
+﻿codeunit 6185062 "NPR AttractionWallet"
 {
     Access = Internal;
     internal procedure IsWalletEnabled(): boolean
@@ -1833,6 +1833,99 @@ codeunit 6185062 "NPR AttractionWallet"
         end;
 
         exit(ListOfAssetSystemIds.Count() > 0);
+    end;
+    #endregion
+
+    #region Clear Holder
+    /// <summary>
+    /// Anonymizes one holder in a wallet - the reference naming them and the tickets issued to them, each
+    /// followed to its reservation. The wallet has no holder of its own, so the caller names one.
+    /// </summary>
+    internal procedure ClearWalletReference(WalletEntryNo: Integer; Reference: Text[100]; var AffectedAssets: Dictionary of [Guid, Integer]) AnonymizedReference: Text[100]
+    var
+        Wallet: Record "NPR AttractionWallet";
+        TicketAnonymize: Codeunit "NPR TM Anonymize";
+    begin
+        Clear(AffectedAssets);
+        if (Reference = '') then
+            exit('');
+
+        if (not Wallet.Get(WalletEntryNo)) then
+            exit('');
+
+        AnonymizedReference := TicketAnonymize.GetAnonymizedAddress(Wallet.ReferenceNumber);
+
+        ClearWalletHeaderReferences(Wallet, Reference, AnonymizedReference, AffectedAssets);
+        ClearWalletTicketAssets(WalletEntryNo, Reference, AffectedAssets);
+    end;
+
+    local procedure ClearWalletHeaderReferences(Wallet: Record "NPR AttractionWallet"; Reference: Text[100]; AnonymizedReference: Text[100]; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
+        WalletAssetHeaderRefWalk: Record "NPR WalletAssetHeaderReference";
+        WalletAssetHeaderRefUpdate: Record "NPR WalletAssetHeaderReference";
+        HeaderEntryNos: List of [Integer];
+        HeaderEntryNo: Integer;
+        NullGuid: Guid;
+    begin
+        WalletAssetHeaderRef.SetCurrentKey(LinkToTableId, LinkToSystemId);
+        WalletAssetHeaderRef.SetFilter(LinkToTableId, '=%1', Database::"NPR AttractionWallet");
+        WalletAssetHeaderRef.SetFilter(LinkToSystemId, '=%1', Wallet.SystemId);
+        WalletAssetHeaderRef.SetLoadFields(WalletHeaderEntryNo);
+        if (WalletAssetHeaderRef.FindSet()) then
+            repeat
+                if (not HeaderEntryNos.Contains(WalletAssetHeaderRef.WalletHeaderEntryNo)) then
+                    HeaderEntryNos.Add(WalletAssetHeaderRef.WalletHeaderEntryNo);
+            until (WalletAssetHeaderRef.Next() = 0);
+
+        foreach HeaderEntryNo in HeaderEntryNos do begin
+            // A typed reference is a structural link; the free-form slot is where a caller puts an identity.
+            WalletAssetHeaderRefWalk.Reset();
+            WalletAssetHeaderRefWalk.SetCurrentKey(WalletHeaderEntryNo, SupersededBy, LinkToTableId, LinkToReference);
+            WalletAssetHeaderRefWalk.SetLoadFields(LinkToReference);
+            WalletAssetHeaderRefWalk.SetFilter(WalletHeaderEntryNo, '=%1', HeaderEntryNo);
+            WalletAssetHeaderRefWalk.SetFilter(SupersededBy, '=%1', 0);
+            WalletAssetHeaderRefWalk.SetFilter(LinkToTableId, '=%1', 0);
+            WalletAssetHeaderRefWalk.SetFilter(LinkToSystemId, '=%1', NullGuid);
+            if (WalletAssetHeaderRefWalk.FindSet()) then
+                repeat
+                    // The reference is part of the key being walked, so the row moves if updated in place.
+                    if (LowerCase(WalletAssetHeaderRefWalk.LinkToReference) = LowerCase(Reference)) then
+                        if (WalletAssetHeaderRefUpdate.Get(WalletAssetHeaderRefWalk.EntryNo)) then begin
+                            WalletAssetHeaderRefUpdate.LinkToReference := AnonymizedReference;
+                            WalletAssetHeaderRefUpdate.Modify();
+                            AffectedAssets.Set(Wallet.SystemId, Database::"NPR AttractionWallet");
+                        end;
+                until (WalletAssetHeaderRefWalk.Next() = 0);
+        end;
+    end;
+
+    // Driving another module's cleaning
+    local procedure ClearWalletTicketAssets(WalletEntryNo: Integer; Reference: Text[100]; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        Ticket: Record "NPR TM Ticket";
+        ClearedTicket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketAnonymize: Codeunit "NPR TM Anonymize";
+        TicketSystemIds: List of [Guid];
+        TicketSystemId: Guid;
+        ClearedTickets: List of [Code[20]];
+        ClearedTicketNo: Code[20];
+    begin
+        if (not GetAssetsInWallet(Enum::"NPR WalletLineType"::TICKET, WalletEntryNo, TicketSystemIds)) then
+            exit;
+
+        foreach TicketSystemId in TicketSystemIds do
+            if (Ticket.GetBySystemId(TicketSystemId)) then
+                if (TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
+                    // A wallet can hold tickets issued to other people.
+                    if (LowerCase(TicketReservationRequest."Notification Address") = LowerCase(Reference)) then begin
+                        TicketAnonymize.AnonymizeRequest(TicketReservationRequest, ClearedTickets);
+                        // The clear reaches every ticket of that holder, not only the ones in this wallet.
+                        foreach ClearedTicketNo in ClearedTickets do
+                            if (ClearedTicket.Get(ClearedTicketNo)) then
+                                AffectedAssets.Set(ClearedTicket.SystemId, Database::"NPR TM Ticket");
+                    end;
     end;
     #endregion
 

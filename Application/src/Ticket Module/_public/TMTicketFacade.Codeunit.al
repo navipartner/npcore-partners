@@ -1,4 +1,4 @@
-codeunit 6248436 "NPR TM Ticket Facade"
+﻿codeunit 6248436 "NPR TM Ticket Facade"
 {
     /// <summary>
     /// Finds every distinct ticket holder associated with a notification address (email or phone) by matching ticket reservation requests, returning one holder per unique reservation session token.
@@ -177,4 +177,31 @@ codeunit 6248436 "NPR TM Ticket Facade"
         exit(TimeHelper.GetLocalTimeAtAdmissionAsText(AdmissionCode));
     end;
 
+    /// <summary>
+    /// Anonymizes the ticket holder on an entire reservation, so that the holder can no longer be reached or identified.
+    /// An imported batch holds a reservation per order rather than per holder, so clear those by ticket number instead.
+    /// </summary>
+    /// <param name="ReservationToken">The reservation token, as carried by the ReservationToken field of "NPR TM TicketHolder".</param>
+    /// <param name="AffectedTickets">Output (cleared on entry): the numbers of the tickets the clear covered. This, not the return value, says what actually changed.</param>
+    /// <returns>The pseudonym, or a blank string when no reservation carries that token.</returns>
+    procedure Anonymize(ReservationToken: Text[100]; var AffectedTickets: List of [Code[20]]): Text[100]
+    var
+        AnonymizeMgt: Codeunit "NPR TM Anonymize";
+    begin
+        exit(AnonymizeMgt.Anonymize(ReservationToken, AffectedTickets));
+    end;
+
+    /// <summary>
+    /// Anonymizes the holder of the given ticket, so that the holder can no longer be reached or identified.
+    /// Other holders on the same reservation are left alone.
+    /// </summary>
+    /// <param name="ExternalTicketNo">The external number of the ticket whose holder is anonymized.</param>
+    /// <param name="AffectedTickets">Output (cleared on entry): the numbers of the tickets the clear covered. This, not the return value, says what actually changed.</param>
+    /// <returns>The pseudonym, or a blank string when no ticket carries that external number.</returns>
+    procedure AnonymizeByExternalTicketNo(ExternalTicketNo: Code[30]; var AffectedTickets: List of [Code[20]]): Text[100]
+    var
+        AnonymizeMgt: Codeunit "NPR TM Anonymize";
+    begin
+        exit(AnonymizeMgt.AnonymizeByExternalTicketNo(ExternalTicketNo, AffectedTickets));
+    end;
 }

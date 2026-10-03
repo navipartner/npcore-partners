@@ -1,4 +1,4 @@
-page 6150944 "NPR CMOrders"
+﻿page 6150944 "NPR CMOrders"
 {
     Extensible = false;
     Caption = 'OTA Channel Manager Orders';
@@ -117,6 +117,19 @@ page 6150944 "NPR CMOrders"
                     CurrPage.Update(false);
                 end;
             }
+            action(AnonymizeOrderAction)
+            {
+                Caption = 'Clear Personal Data';
+                Image = ClearLog;
+                ToolTip = 'Remove the personal data from the selected orders: the sell-to and line names are cleared and the e-mail addresses are replaced by ones that cannot receive mail. The clear follows through to the tickets issued from the order and their associated records. The order and payment references are kept. Irreversible.';
+                ApplicationArea = NPRRetail;
+                Scope = Repeater;
+
+                trigger OnAction()
+                begin
+                    AnonymizeSelected();
+                end;
+            }
             action(DeleteOrder)
             {
                 Caption = 'Delete Order';
@@ -163,4 +176,40 @@ page 6150944 "NPR CMOrders"
         PartnerName: Text[100];
         StatusStyle: Text;
         CanProcess: Boolean;
+
+
+    local procedure AnonymizeSelected()
+    var
+        Order: Record "NPR CMOrder";
+        OrderIssuer: Codeunit "NPR CMOrderIssuer";
+        AffectedAssets: Dictionary of [Guid, Integer];
+        OrderAssets: Dictionary of [Guid, Integer];
+        SelectedCount: Integer;
+        RecordCount: Integer;
+        ConfirmClear: Label 'Remove the personal data from %1 selected order(s) and the tickets issued from them?\\This cannot be undone.', Comment = '%1 = the number of orders selected';
+        DoneClear: Label 'The personal data was removed from %1 record(s).', Comment = '%1 = the number of records changed';
+        NothingToClear: Label 'There was no personal data left to remove.';
+    begin
+        CurrPage.SetSelectionFilter(Order);
+        SelectedCount := Order.Count();
+        if (SelectedCount = 0) then
+            exit;
+
+        if (not Confirm(ConfirmClear, false, SelectedCount)) then
+            exit;
+
+        Order.FindSet();
+        repeat
+            OrderIssuer.AnonymizeOrder(Order, OrderAssets);
+            OrderIssuer.MergeAffectedAssets(OrderAssets, AffectedAssets);
+        until (Order.Next() = 0);
+
+        RecordCount := AffectedAssets.Count();
+
+        CurrPage.Update(false);
+        if (RecordCount = 0) then
+            Message(NothingToClear)
+        else
+            Message(DoneClear, RecordCount);
+    end;
 }

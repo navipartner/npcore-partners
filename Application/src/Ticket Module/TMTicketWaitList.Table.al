@@ -113,6 +113,9 @@
         key(Key3; "Temp Notified At")
         {
         }
+        key(Key4; Token)
+        {
+        }
     }
 
     fieldgroups

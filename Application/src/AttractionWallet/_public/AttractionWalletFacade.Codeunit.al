@@ -1,4 +1,4 @@
-codeunit 6185061 "NPR AttractionWalletFacade"
+﻿codeunit 6185061 "NPR AttractionWalletFacade"
 {
 
     procedure PrintWallet(WalletEntryNoList: List of [Integer]; PrintContext: Enum "NPR WalletPrintType");
@@ -332,4 +332,19 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         exit(WalletManagement.GetAssetsInWallet("NPR WalletLineType"::VOUCHER, WalletEntryNo, ListOfVouchers));
     end;
 
+    /// <summary>
+    /// Anonymizes one holder in a wallet - the reference naming them and the tickets issued to them - so
+    /// that they can no longer be reached or identified. Anything belonging to anybody else is left alone,
+    /// but each ticket is followed to its reservation, so the clear reaches tickets outside this wallet.
+    /// </summary>
+    /// <param name="WalletEntryNo">The wallet to clear.</param>
+    /// <param name="Reference">The holder to anonymize, matched without regard to case. A wallet has no holder of its own, so the caller names one.</param>
+    /// <param name="AffectedAssets">Output (cleared on entry): the assets the clear covered, each system id mapped to its table number.</param>
+    /// <returns>The pseudonym written on the wallet reference - the tickets get one of their own - or a blank string when the wallet does not exist.</returns>
+    procedure ClearWalletReference(WalletEntryNo: Integer; Reference: Text[100]; var AffectedAssets: Dictionary of [Guid, Integer]): Text[100]
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.ClearWalletReference(WalletEntryNo, Reference, AffectedAssets));
+    end;
 }

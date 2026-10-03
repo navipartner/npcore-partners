@@ -1,4 +1,4 @@
-codeunit 6151056 "NPR CMOrderIssuer"
+﻿codeunit 6151056 "NPR CMOrderIssuer"
 {
     Access = Internal;
     TableNo = "NPR CMOrder";
@@ -472,4 +472,146 @@ codeunit 6151056 "NPR CMOrderIssuer"
         NoSeriesMgt.InitSeries(NoSeries, '', Today(), Number, NoSeries);
     end;
 #ENDIF
+
+    #region Clear Holder
+    /// <summary>
+    /// Anonymizes an order and every asset it issued.
+    /// </summary>
+    internal procedure AnonymizeOrder(OrderParam: Record "NPR CMOrder"; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        Order: Record "NPR CMOrder";
+        OrderLine: Record "NPR CMOrderLine";
+        TicketAnonymize: Codeunit "NPR TM Anonymize";
+        ClearedTickets: List of [Code[20]];
+        AnonymizedReference: Text[100];
+        SellToAddress: Text[100];
+        HolderAddresses: Dictionary of [Integer, Text[100]];
+        HasChanges: Boolean;
+        OrderNotFinal: Label 'Personal data can only be removed from an order with status %1 or %2. Order ''%3'' has status %4.', Comment = '%1 = Issued status caption, %2 = Cancelled status caption, %3 = sell-to order reference, %4 = the order''s current status caption';
+    begin
+        Clear(AffectedAssets);
+        if (not Order.Get(OrderParam.OrderId)) then
+            exit;
+
+        // An order that can still be processed would issue its tickets to the pseudonym.
+        if (not (Order.Status in [Order.Status::Issued, Order.Status::Cancelled])) then
+            Error(OrderNotFinal, Format(Order.Status::Issued), Format(Order.Status::Cancelled), Order.SellToOrderReference, Format(Order.Status));
+
+        AnonymizedReference := TicketAnonymize.GetAnonymizedAddress(Order.DocumentNo);
+        SellToAddress := Order.SellToEmail;
+
+        if (not (Order.SellToEmail in ['', AnonymizedReference])) then begin
+            Order.SellToEmail := AnonymizedReference;
+            HasChanges := true;
+        end;
+
+        if (Order.SellToName <> '') then begin
+            Order.SellToName := '';
+            HasChanges := true;
+        end;
+
+        if (HasChanges) then begin
+            Order.Modify();
+            AffectedAssets.Set(Order.SystemId, Database::"NPR CMOrder");
+        end;
+
+        OrderLine.SetFilter(OrderId, '=%1', Order.OrderId);
+        if (OrderLine.FindSet(true)) then
+            repeat
+                HasChanges := false;
+                AddHolderAddress(HolderAddresses, OrderLine, SellToAddress, AnonymizedReference);
+
+                if (not (OrderLine.NotificationAddress in ['', AnonymizedReference])) then begin
+                    OrderLine.NotificationAddress := AnonymizedReference;
+                    HasChanges := true;
+                end;
+
+                if (OrderLine.Name <> '') then begin
+                    OrderLine.Name := '';
+                    HasChanges := true;
+                end;
+
+                if (HasChanges) then begin
+                    OrderLine.Modify();
+                    AffectedAssets.Set(OrderLine.SystemId, Database::"NPR CMOrderLine");
+                end;
+            until (OrderLine.Next() = 0);
+
+        ClearOrderWallets(Order, HolderAddresses, AffectedAssets);
+
+        if (TicketAnonymize.Anonymize(GetOrderToken(Order), ClearedTickets) <> '') then
+            ReportClearedTickets(ClearedTickets, AffectedAssets);
+    end;
+
+    // Driving another module's cleaning of the order's wallets, since the wallet module owns the wallet and its assets.
+    local procedure ClearOrderWallets(Order: Record "NPR CMOrder"; HolderAddresses: Dictionary of [Integer, Text[100]]; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        OrderWallet: Record "NPR CMOrderWallet";
+        WalletManagement: Codeunit "NPR AttractionWallet";
+        WalletAssets: Dictionary of [Guid, Integer];
+    begin
+        if (HolderAddresses.Count() = 0) then
+            exit;
+
+        OrderWallet.SetFilter(OrderId, '=%1', Order.OrderId);
+        OrderWallet.SetFilter(WalletEntryNo, '<>%1', 0);
+        if (not OrderWallet.FindSet()) then
+            exit;
+
+        repeat
+            if (HolderAddresses.ContainsKey(OrderWallet.LineNo)) then begin
+                WalletManagement.ClearWalletReference(OrderWallet.WalletEntryNo, HolderAddresses.Get(OrderWallet.LineNo), WalletAssets);
+                MergeAffectedAssets(WalletAssets, AffectedAssets);
+            end;
+        until (OrderWallet.Next() = 0);
+    end;
+
+    local procedure AddHolderAddress(var HolderAddresses: Dictionary of [Integer, Text[100]]; OrderLine: Record "NPR CMOrderLine"; SellToAddress: Text[100]; AnonymizedReference: Text[100])
+    var
+        Address: Text[100];
+    begin
+        Address := OrderLine.NotificationAddress;
+        if (Address = '') then
+            Address := SellToAddress;
+
+        if (Address in ['', AnonymizedReference]) then
+            exit;
+
+        HolderAddresses.Set(OrderLine.LineNo, Address);
+    end;
+
+    local procedure ReportClearedTickets(ClearedTickets: List of [Code[20]]; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        ClearedTicket: Record "NPR TM Ticket";
+        ClearedTicketNo: Code[20];
+    begin
+        foreach ClearedTicketNo in ClearedTickets do
+            if (ClearedTicket.Get(ClearedTicketNo)) then
+                AffectedAssets.Set(ClearedTicket.SystemId, Database::"NPR TM Ticket");
+    end;
+
+    internal procedure MergeAffectedAssets(SourceAssets: Dictionary of [Guid, Integer]; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        AssetSystemId: Guid;
+    begin
+        foreach AssetSystemId in SourceAssets.Keys() do
+            AffectedAssets.Set(AssetSystemId, SourceAssets.Get(AssetSystemId));
+    end;
+
+    local procedure GetOrderToken(Order: Record "NPR CMOrder"): Text[100]
+    var
+        ImportHeader: Record "NPR TM ImportTicketHeader";
+    begin
+        if (Order.JobId = '') then
+            exit('');
+
+        ImportHeader.SetLoadFields(TicketRequestToken);
+        if (not ImportHeader.Get(Order.DocumentNo, Order.JobId)) then
+            exit('');
+
+        exit(ImportHeader.TicketRequestToken);
+    end;
+
+    #endregion
+
 }

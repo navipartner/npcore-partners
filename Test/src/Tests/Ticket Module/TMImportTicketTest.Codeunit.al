@@ -1,4 +1,4 @@
-codeunit 85174 "NPR TM ImportTicketTest"
+﻿codeunit 85174 "NPR TM ImportTicketTest"
 {
 
     Subtype = Test;
@@ -1211,4 +1211,182 @@ codeunit 85174 "NPR TM ImportTicketTest"
         Commit();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AnonymizeScopesToAddressOnCollidingLineNumbers()
+    var
+        TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        Import: Codeunit "NPR TM Import Ticket Facade";
+        TicketFacade: Codeunit "NPR TM Ticket Facade";
+        Assert: Codeunit Assert;
+        Schedules: Dictionary of [Code[20], Time];
+        AffectedTickets: List of [Code[20]];
+        ItemNo: Code[20];
+        JobId: Code[40];
+        EventTime: Time;
+        Token: Text[100];
+        AnonymizedAddress: Text[100];
+        ResponseMessage: Text;
+    begin
+        // [Scenario] An order import that reuses one order line number for every ticket - the misconfiguration a
+        // PTE produces - still clears exactly one holder, because the clear scopes on the notification address
+        // rather than on the line reference.
+
+        // [GIVEN] One order of five tickets under a single order line number: a family of three sharing an
+        // address, and two friends on their own
+        ItemNo := SelectImportTestScenario(Schedules);
+        Schedules.Get('ALL_DAY', EventTime);
+
+        CreateCollidingLineNumberImport(ItemNo, EventTime, TempTicketImport, TempTicketImportLine);
+        Assert.IsTrue(Import.ImportTicketsFromJson(GenerateJson(TempTicketImport, TempTicketImportLine), false, ResponseMessage, JobId), ResponseMessage);
+
+        Token := GetImportToken(JobId);
+        Assert.AreNotEqual('', Token, 'Expected the import archive to carry a reservation token.');
+
+        // [GIVEN] The misconfiguration is reproduced - every request row shares one line reference
+        Assert.AreEqual(1, CountDistinctLineReferences(Token), 'Expected every ticket to collapse onto a single line reference.');
+        Assert.AreEqual(3, CountRequestsWithAddress(Token, FamilyEmail()), 'Expected three family tickets before the clear.');
+
+        // [WHEN] One of the three family tickets is cleared
+        AnonymizedAddress := TicketFacade.AnonymizeByExternalTicketNo(FamilyTicketNo(), AffectedTickets);
+
+        // [THEN] All three go, and neither friend is touched
+        Assert.AreEqual(3, AffectedTickets.Count(), 'Expected the whole family to be cleared from one of its tickets.');
+        Assert.AreEqual(0, CountRequestsWithAddress(Token, FamilyEmail()), 'Expected no family address to survive.');
+        Assert.AreEqual(3, CountRequestsWithAddress(Token, AnonymizedAddress), 'Expected the three family rows to carry the pseudonym.');
+        Assert.AreEqual(1, CountRequestsWithAddress(Token, FriendOneEmail()), 'Expected the first friend to be untouched.');
+        Assert.AreEqual(1, CountRequestsWithAddress(Token, FriendTwoEmail()), 'Expected the second friend to be untouched.');
+
+        // [WHEN] One of the friends is cleared
+        Assert.AreNotEqual('', TicketFacade.AnonymizeByExternalTicketNo(FriendOneTicketNo(), AffectedTickets), 'Expected the friend ticket to be found.');
+
+        // [THEN] Only that one ticket goes
+        Assert.AreEqual(1, AffectedTickets.Count(), 'Expected a friend to be cleared on their own.');
+        Assert.AreEqual(0, CountRequestsWithAddress(Token, FriendOneEmail()), 'Expected the cleared friend address to be gone.');
+        Assert.AreEqual(1, CountRequestsWithAddress(Token, FriendTwoEmail()), 'Expected the remaining friend to still be untouched.');
+    end;
+
+    local procedure CreateCollidingLineNumberImport(
+        ItemReference: Code[20];
+        ExpectedVisitTime: Time;
+        var TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary)
+    begin
+        TempTicketImport.Init();
+        TempTicketImport.OrderId := 'CLEAR-SCOPE';
+        TempTicketImport.SalesDate := Today();
+        TempTicketImport.CurrencyCode := 'EUR';
+        TempTicketImport.PaymentReference := 'CLEAR-SCOPE-PAID';
+        TempTicketImport.TicketHolderEMail := FamilyEmail();
+        TempTicketImport.TicketHolderName := 'Family Buyer';
+        TempTicketImport.TotalAmount := 5 * 10;
+        TempTicketImport.TotalAmountInclVat := 5 * 12.5;
+        TempTicketImport.Insert();
+
+        AddCollidingLine(TempTicketImport, TempTicketImportLine, ItemReference, ExpectedVisitTime, FamilyTicketNo(), FamilyEmail(), 'Family One');
+        AddCollidingLine(TempTicketImport, TempTicketImportLine, ItemReference, ExpectedVisitTime, 'FAM-2', FamilyEmail(), 'Family Two');
+        AddCollidingLine(TempTicketImport, TempTicketImportLine, ItemReference, ExpectedVisitTime, 'FAM-3', FamilyEmail(), 'Family Three');
+        AddCollidingLine(TempTicketImport, TempTicketImportLine, ItemReference, ExpectedVisitTime, FriendOneTicketNo(), FriendOneEmail(), 'Friend One');
+        AddCollidingLine(TempTicketImport, TempTicketImportLine, ItemReference, ExpectedVisitTime, 'FRIEND-2', FriendTwoEmail(), 'Friend Two');
+    end;
+
+    local procedure AddCollidingLine(
+        var TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        ItemReference: Code[20];
+        ExpectedVisitTime: Time;
+        PreAssignedTicketNumber: Code[30];
+        TicketHolderEMail: Text[100];
+        TicketHolderName: Text[100])
+    begin
+        TempTicketImportLine.Init();
+        TempTicketImportLine.OrderId := TempTicketImport.OrderId;
+        TempTicketImportLine.PreAssignedTicketNumber := PreAssignedTicketNumber;
+        // Every ticket under the same order line number - this is what a PTE sends and what the core counter
+        // is overridden with, so all request rows end up sharing one line reference.
+        TempTicketImportLine.TicketRequestTokenLine := 100;
+        TempTicketImportLine.ItemReferenceNumber := ItemReference;
+        TempTicketImportLine.ExpectedVisitDate := Today();
+        TempTicketImportLine.ExpectedVisitTime := ExpectedVisitTime;
+        TempTicketImportLine.TicketHolderEMail := TicketHolderEMail;
+        TempTicketImportLine.TicketHolderName := TicketHolderName;
+        TempTicketImportLine.Amount := 10;
+        TempTicketImportLine.AmountInclVat := 12.5;
+        TempTicketImportLine.CurrencyCode := TempTicketImport.CurrencyCode;
+        TempTicketImportLine.Insert();
+    end;
+
+    local procedure GetImportToken(JobIdParam: Code[40]): Text[100]
+    var
+        ImportHeader: Record "NPR TM ImportTicketHeader";
+    begin
+        ImportHeader.SetCurrentKey(JobId);
+        ImportHeader.SetFilter(JobId, '=%1', JobIdParam);
+        if (not ImportHeader.FindFirst()) then
+            exit('');
+
+        exit(ImportHeader.TicketRequestToken);
+    end;
+
+    local procedure CountRequestsWithAddress(Token: Text[100]; Address: Text[100]): Integer
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        MatchCount: Integer;
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (not TicketReservationRequest.FindSet()) then
+            exit(0);
+
+        repeat
+            if (LowerCase(TicketReservationRequest."Notification Address") = LowerCase(Address)) then
+                MatchCount += 1;
+        until (TicketReservationRequest.Next() = 0);
+
+        exit(MatchCount);
+    end;
+
+    local procedure CountDistinctLineReferences(Token: Text[100]): Integer
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        LineReferences: List of [Integer];
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (not TicketReservationRequest.FindSet()) then
+            exit(0);
+
+        repeat
+            if (not LineReferences.Contains(TicketReservationRequest."Ext. Line Reference No.")) then
+                LineReferences.Add(TicketReservationRequest."Ext. Line Reference No.");
+        until (TicketReservationRequest.Next() = 0);
+
+        exit(LineReferences.Count());
+    end;
+
+    local procedure FamilyEmail(): Text[100]
+    begin
+        exit('family@example.com');
+    end;
+
+    local procedure FriendOneEmail(): Text[100]
+    begin
+        exit('friend.one@example.com');
+    end;
+
+    local procedure FriendTwoEmail(): Text[100]
+    begin
+        exit('friend.two@example.com');
+    end;
+
+    local procedure FamilyTicketNo(): Code[30]
+    begin
+        exit('FAM-1');
+    end;
+
+    local procedure FriendOneTicketNo(): Code[30]
+    begin
+        exit('FRIEND-1');
+    end;
 }

@@ -187,6 +187,9 @@
         key(Key2; "Applies To Schedule Entry No.")
         {
         }
+        key(Key3; "Ticket No.")
+        {
+        }
     }
 
     fieldgroups

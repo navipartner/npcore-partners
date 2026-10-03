@@ -1,4 +1,4 @@
-#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+﻿#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
 codeunit 85248 "NPR CM Lifecycle Test"
 {
     Subtype = Test;
@@ -22,6 +22,9 @@ codeunit 85248 "NPR CM Lifecycle Test"
         PartnerId: Guid;
         ItemNo: Code[20];
         DocumentNoBefore: Code[20];
+        OrderLine: Record "NPR CMOrderLine";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        AffectedAssets: Dictionary of [Guid, Integer];
     begin
         // [SCENARIO] Create a draft order with 2 lines, 1 wallet each (2 tickets total), then
         // replace its contents with 1 line carrying 2 wallets (still 2 tickets). Confirm.
@@ -85,6 +88,31 @@ codeunit 85248 "NPR CM Lifecycle Test"
                 Assert.IsTrue(DetAccessEntry.FindFirst(), 'Payment entry exists for ticket ' + Ticket."No.");
                 Assert.AreEqual(Order.DocumentNo, DetAccessEntry."Sales Channel No.", 'Det entry Sales Channel No.');
             until (Ticket.Next() = 0);
+
+        // [WHEN] The personal data is removed from the issued order
+        OrderIssuer.AnonymizeOrder(Order, AffectedAssets);
+
+        // [THEN] Nothing left on the order reaches the customer, and the order is still identifiable
+        Order.Get(OrderId);
+        Assert.AreEqual('', Order.SellToName, 'Sell-to name cleared');
+        Assert.AreEqual(LowerCase(DocumentNoBefore) + '@anonymized.invalid', Order.SellToEmail, 'Sell-to e-mail replaced by the pseudonym');
+        Assert.AreEqual(DocumentNoBefore, Order.DocumentNo, 'DocumentNo kept across anonymization');
+
+        OrderLine.SetFilter(OrderId, '=%1', OrderId);
+        Assert.IsTrue(OrderLine.FindSet(), 'Order lines still exist after anonymization');
+        repeat
+            Assert.AreEqual('', OrderLine.Name, 'Line name cleared');
+            Assert.AreEqual(LowerCase(DocumentNoBefore) + '@anonymized.invalid', OrderLine.NotificationAddress, 'Line address replaced by the pseudonym');
+        until (OrderLine.Next() = 0);
+
+        // [THEN] The clear followed through to the tickets the order issued
+        Ticket.FindSet();
+        repeat
+            TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
+            Assert.AreEqual('', TicketRequest.TicketHolderName, 'Ticket holder name cleared');
+            Assert.AreNotEqual('test@navipartner.dk', TicketRequest."Notification Address", 'Ticket holder address replaced');
+        until (Ticket.Next() = 0);
+
     end;
 
     [Test]
@@ -184,6 +212,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         PartnerId: Guid;
         ItemNo: Code[20];
         HeaderDeleted: Boolean;
+        AffectedAssets: Dictionary of [Guid, Integer];
     begin
         // [SCENARIO] Deleting an Issued order destroys downstream assets but keeps the order
         // header as a Cancelled audit record. While that header still exists, the partner
@@ -224,6 +253,14 @@ codeunit 85248 "NPR CM Lifecycle Test"
         PartnerSetup.Get(PartnerId);
         asserterror PartnerSetup.Delete(true);
         Assert.ExpectedError('Cannot delete partner');
+
+        // [WHEN/THEN] A cancelled order is final, so the audit row it left behind can still be anonymized
+        Order.Get(OrderId);
+        OrderIssuer.AnonymizeOrder(Order, AffectedAssets);
+        Order.Get(OrderId);
+        Assert.AreEqual('', Order.SellToName, 'Sell-to name cleared on the cancelled header');
+        Assert.AreNotEqual('test@navipartner.dk', Order.SellToEmail, 'Sell-to e-mail replaced on the cancelled header');
+
     end;
 
     [Test]
@@ -243,6 +280,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         PartnerId: Guid;
         ItemNo: Code[20];
         HeaderDeleted: Boolean;
+        AffectedAssets: Dictionary of [Guid, Integer];
     begin
         // [SCENARIO] Deleting a Draft order destroys assets and removes the header row too —
         // unlike Issued, no audit row is kept. After the header is gone, the partner setup
@@ -261,6 +299,10 @@ codeunit 85248 "NPR CM Lifecycle Test"
 
         Order.Get(OrderId);
         Assert.AreEqual(Order.Status::Draft, Order.Status, 'Pre-delete: Status = Draft');
+
+        // [WHEN/THEN] A draft can still be processed, so anonymizing it is refused
+        asserterror OrderIssuer.AnonymizeOrder(Order, AffectedAssets);
+        Assert.ExpectedError('Personal data can only be removed');
 
         // [WHEN] DeleteOrder is called
         HeaderDeleted := OrderIssuer.DeleteOrder(Order);
@@ -286,6 +328,7 @@ codeunit 85248 "NPR CM Lifecycle Test"
         OrderId: Guid;
         PartnerId: Guid;
         ItemNo: Code[20];
+        AffectedAssets: Dictionary of [Guid, Integer];
     begin
         // [SCENARIO] A visit date in the past is rejected by the TM import worker (a guest cannot want to
         // visit in the past). The CMOrderIssuer should catch the failure, commit Status = Error + StatusMessage,
@@ -324,6 +367,11 @@ codeunit 85248 "NPR CM Lifecycle Test"
 
         // [THEN] No JobId persisted (worker cleaned up its import buffers before re-raising)
         Assert.AreEqual('', Order.JobId, 'JobId not set after failure');
+
+        // [WHEN/THEN] An order in Error can be re-processed, so anonymizing it is refused
+        asserterror OrderIssuer.AnonymizeOrder(Order, AffectedAssets);
+        Assert.ExpectedError('Personal data can only be removed');
+
     end;
 
     [Test]

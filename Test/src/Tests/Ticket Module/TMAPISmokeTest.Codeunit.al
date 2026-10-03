@@ -1,4 +1,4 @@
-codeunit 85013 "NPR TM API SmokeTest"
+﻿codeunit 85013 "NPR TM API SmokeTest"
 {
     Subtype = Test;
 
@@ -1618,7 +1618,147 @@ codeunit 85013 "NPR TM API SmokeTest"
         CustomizedCalendar.Insert();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AnonymizeStopsAtTheSelectedLine()
+    var
+        Ticket: Record "NPR TM Ticket";
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Assert: Codeunit "Assert";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        TicketFacade: Codeunit "NPR TM Ticket Facade";
+        AffectedTickets: List of [Code[20]];
+        ItemNo: Code[20];
+        MemberNumber: Code[20];
+        AffectedTicketNo: Code[20];
+        ScannerStation: Code[10];
+        SelectedTicketNo: Code[30];
+        AnonymizedAddress: Text[100];
+        ResponseMessage: Text;
+        ResponseToken: Text;
+    begin
+        ItemNo := SelectSmokeTestScenario();
+
+        Assert.IsTrue(
+            TicketApiLibrary.MakeReservation(3, ItemNo, 3, MemberNumber, ScannerStation, ResponseToken, ResponseMessage), ResponseMessage);
+
+        GiveEachLineItsOwnHolder(ResponseToken);
+
+        Assert.IsTrue(
+            TicketApiLibrary.ConfirmTicketReservation(
+                ResponseToken, 'confirmed@anonymize.test', 'abc', 'Foo Bar Baz', ScannerStation, TmpCreatedTickets, ResponseMessage),
+            ResponseMessage);
+
+        TicketRequest.SetFilter("Session Token ID", '=%1', ResponseToken);
+        Assert.IsTrue(TicketRequest.FindSet(), 'The confirmed reservation must hold request lines.');
+        repeat
+            Assert.AreEqual(
+                LineHolderAddress(TicketRequest."Ext. Line Reference No."), TicketRequest."Notification Address",
+                'Confirming must not replace an address the line already carried.');
+        until (TicketRequest.Next() = 0);
+
+        SelectedTicketNo := SelectTicketOfLine(TmpCreatedTickets, 1);
+        Assert.AreNotEqual('', SelectedTicketNo, 'The first line must have issued a ticket.');
+
+        AnonymizedAddress := TicketFacade.AnonymizeByExternalTicketNo(SelectedTicketNo, AffectedTickets);
+        Assert.AreNotEqual('', AnonymizedAddress, 'The clear must resolve the selected ticket.');
+
+        TicketRequest.FindSet();
+        repeat
+            if (TicketRequest."Ext. Line Reference No." = 1) then
+                Assert.AreEqual(
+                    AnonymizedAddress, TicketRequest."Notification Address", 'The selected line must be anonymized.')
+            else
+                Assert.AreEqual(
+                    LineHolderAddress(TicketRequest."Ext. Line Reference No."), TicketRequest."Notification Address",
+                    'A line belonging to another holder must be left alone.');
+        until (TicketRequest.Next() = 0);
+
+        foreach AffectedTicketNo in AffectedTickets do begin
+            Ticket.Get(AffectedTicketNo);
+            TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
+            Assert.AreEqual(1, TicketRequest."Ext. Line Reference No.", 'The clear must report only tickets of the selected line.');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AnonymizeByTokenClearsEveryLine()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Assert: Codeunit "Assert";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        TicketFacade: Codeunit "NPR TM Ticket Facade";
+        AffectedTickets: List of [Code[20]];
+        ItemNo: Code[20];
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        AnonymizedAddress: Text[100];
+        ResponseMessage: Text;
+        ResponseToken: Text;
+    begin
+        ItemNo := SelectSmokeTestScenario();
+
+        Assert.IsTrue(
+            TicketApiLibrary.MakeReservation(3, ItemNo, 3, MemberNumber, ScannerStation, ResponseToken, ResponseMessage), ResponseMessage);
+
+        GiveEachLineItsOwnHolder(ResponseToken);
+
+        Assert.IsTrue(
+            TicketApiLibrary.ConfirmTicketReservation(
+                ResponseToken, 'confirmed@anonymize.test', 'abc', 'Foo Bar Baz', ScannerStation, TmpCreatedTickets, ResponseMessage),
+            ResponseMessage);
+
+        AnonymizedAddress := TicketFacade.Anonymize(CopyStr(ResponseToken, 1, MaxStrLen(AnonymizedAddress)), AffectedTickets);
+        Assert.AreNotEqual('', AnonymizedAddress, 'The clear must resolve the token.');
+
+        TicketRequest.SetFilter("Session Token ID", '=%1', ResponseToken);
+        Assert.IsTrue(TicketRequest.FindSet(), 'The confirmed reservation must hold request lines.');
+        repeat
+            Assert.AreEqual(
+                AnonymizedAddress, TicketRequest."Notification Address",
+                'A clear of the whole reservation must reach every line.');
+        until (TicketRequest.Next() = 0);
+    end;
+
+    // The v2 reservation agent keeps a notification address per line, which the XML port has no attribute for.
     [Normal]
+    local procedure GiveEachLineItsOwnHolder(Token: Text)
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Assert: Codeunit "Assert";
+    begin
+        TicketRequest.SetFilter("Session Token ID", '=%1', Token);
+        Assert.IsTrue(TicketRequest.FindSet(), 'The reservation must hold request lines.');
+        repeat
+            TicketRequest."Notification Address" := LineHolderAddress(TicketRequest."Ext. Line Reference No.");
+            TicketRequest.Modify();
+        until (TicketRequest.Next() = 0);
+    end;
+
+    local procedure LineHolderAddress(LineReferenceNo: Integer) Address: Text[100]
+    begin
+        Address := CopyStr(StrSubstNo('holder%1@anonymize.test', LineReferenceNo), 1, MaxStrLen(Address));
+    end;
+
+    local procedure SelectTicketOfLine(var TmpCreatedTickets: Record "NPR TM Ticket" temporary; LineReferenceNo: Integer) ExternalTicketNo: Code[30]
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        if (not TmpCreatedTickets.FindSet()) then
+            exit('');
+
+        repeat
+            if (TicketRequest.Get(TmpCreatedTickets."Ticket Reservation Entry No.")) then
+                if (TicketRequest."Ext. Line Reference No." = LineReferenceNo) then
+                    exit(TmpCreatedTickets."External Ticket No.");
+        until (TmpCreatedTickets.Next() = 0);
+
+        exit('');
+    end;
+
     local procedure SelectSmokeTestScenario() ItemNo: Code[20]
     var
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
