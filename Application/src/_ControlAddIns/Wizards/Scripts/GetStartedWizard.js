@@ -47,7 +47,7 @@ function createlayout(TitleTxt,SubTitleTxt,ExplanationTxt,IntroTxt,IntroDescTxt,
     welcomeimageDiv.className = "welcomeimagediv";
     var welcomeImage = document.createElement('div');
     var image = new Image();
-    image.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddins/Wizards/Images/NP-small-logo.png");
+    image.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddIns/Wizards/Images/NP-small-logo.png");
     image.className = "welcomeimage";
     welcomeImage.appendChild(image);
     welcomeimageDiv.appendChild(welcomeImage);
@@ -76,7 +76,7 @@ function createlayout(TitleTxt,SubTitleTxt,ExplanationTxt,IntroTxt,IntroDescTxt,
     var anchor1 = document.createElement('a');
     var videoImage = new Image();
     videoImage.id = 'videoImage';
-    videoImage.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddins/Wizards/Images/VideoButton.png"); 
+    videoImage.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddIns/Wizards/Images/VideoButton.png"); 
     anchor1.appendChild(videoImage);
     video1div.appendChild(anchor1);
     anchor1.onclick = function (){
@@ -103,7 +103,7 @@ function createlayout(TitleTxt,SubTitleTxt,ExplanationTxt,IntroTxt,IntroDescTxt,
     var anchor2 = document.createElement('a');
     var outLookVideo = new Image();
     outLookVideo.id = 'outlookVideo';
-    outLookVideo.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddins/Wizards/Images/OutlookVideo.png");
+    outLookVideo.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddIns/Wizards/Images/OutlookVideo.png");
     anchor2.appendChild(outLookVideo);
     video2div.appendChild(anchor2);
     anchor2.onclick = function (){
@@ -130,7 +130,7 @@ function createlayout(TitleTxt,SubTitleTxt,ExplanationTxt,IntroTxt,IntroDescTxt,
     var anchor3 = document.createElement('a');
     var assistanceVideo = new Image();
     assistanceVideo.id = 'assistanceVideo';
-    assistanceVideo.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddins/Wizards/Images/GetAssistanceVideo.png");
+    assistanceVideo.src = Microsoft.Dynamics.NAV.GetImageResource("src/_ControlAddIns/Wizards/Images/GetAssistanceVideo.png");
     anchor3.appendChild(assistanceVideo);
     video3div.appendChild(anchor3);
     anchor3.onclick = function (){

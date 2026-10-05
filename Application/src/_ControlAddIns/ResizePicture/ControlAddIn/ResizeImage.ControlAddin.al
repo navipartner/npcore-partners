@@ -11,7 +11,7 @@ controladdin "NPR ResizeImage"
     HorizontalStretch = false;
     HorizontalShrink = false;
     Scripts =
-        'src/_ControlAddins/ResizePicture/JsScript/ResizeImage.js';
+        'src/_ControlAddIns/ResizePicture/JsScript/ResizeImage.js';
 
     event OnCtrlReady();
     event returnImage(resizedImage: Text; escpos: Text; Hi: Integer; Lo: Integer; CmdHi: Integer; CmdLo: Integer);

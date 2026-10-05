@@ -1,21 +1,21 @@
 controladdin "NPR JsonEditor"
 {
     Scripts =
-        'src/_ControlAddins/JsonEditor/Scripts/polyfill.min.js',
-        'src/_ControlAddins/JsonEditor/Scripts/jsoneditor.min.js',
-        'src/_ControlAddins/JsonEditor/Scripts/view.sale.js',
-        'src/_ControlAddins/JsonEditor/Scripts/view.payment.js',
-        'src/_ControlAddins/JsonEditor/Scripts/view.login.js',
-        'src/_ControlAddins/JsonEditor/Scripts/NaviPartner.Retail.Controls.JsonEditor.js';
+        'src/_ControlAddIns/JsonEditor/Scripts/polyfill.min.js',
+        'src/_ControlAddIns/JsonEditor/Scripts/jsoneditor.min.js',
+        'src/_ControlAddIns/JsonEditor/Scripts/view.sale.js',
+        'src/_ControlAddIns/JsonEditor/Scripts/view.payment.js',
+        'src/_ControlAddIns/JsonEditor/Scripts/view.login.js',
+        'src/_ControlAddIns/JsonEditor/Scripts/NaviPartner.Retail.Controls.JsonEditor.js';
 
-    StartupScript = 'src/_ControlAddins/JsonEditor/Scripts/startup.js';
+    StartupScript = 'src/_ControlAddIns/JsonEditor/Scripts/startup.js';
 
     StyleSheets =
-        'src/_ControlAddins/JsonEditor/Stylesheets/jsoneditor.min.css',
-        'src/_ControlAddins/JsonEditor/Stylesheets/NaviPartner.Retail.Controls.JsonEditor.css';
+        'src/_ControlAddIns/JsonEditor/Stylesheets/jsoneditor.min.css',
+        'src/_ControlAddIns/JsonEditor/Stylesheets/NaviPartner.Retail.Controls.JsonEditor.css';
 
     Images =
-        'src/_ControlAddins/JsonEditor/Images/jsoneditor-icons.svg';
+        'src/_ControlAddIns/JsonEditor/Images/jsoneditor-icons.svg';
 
     RequestedHeight = 500;
     RequestedWidth = 800;

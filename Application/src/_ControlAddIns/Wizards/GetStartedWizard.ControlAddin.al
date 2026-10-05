@@ -4,16 +4,16 @@ controladdin "NPR Get Started Wizard"
     VerticalShrink = true;
     HorizontalStretch = true;
     HorizontalShrink = true;
-    Scripts = 'src/_ControlAddins/Wizards/Scripts/GetStartedWizard.js';
-    StyleSheets = 'src/_ControlAddins/Wizards/StyleSheets/styleSheet.css';
-    StartupScript = 'src/_ControlAddins/Wizards/Scripts/StartUp.js';
+    Scripts = 'src/_ControlAddIns/Wizards/Scripts/GetStartedWizard.js';
+    StyleSheets = 'src/_ControlAddIns/Wizards/StyleSheets/styleSheet.css';
+    StartupScript = 'src/_ControlAddIns/Wizards/Scripts/StartUp.js';
 
     Images =
-       'src/_ControlAddins/Wizards/Images/npretaillogo_med.png',
-        'src/_ControlAddins/Wizards/Images/VideoButton.png',
-        'src/_ControlAddins/Wizards/Images/OutlookVideo.png',
-        'src/_ControlAddins/Wizards/Images/GetAssistanceVideo.png',
-        'src/_ControlAddins/Wizards/Images/NP-small-logo.png';
+       'src/_ControlAddIns/Wizards/Images/npretaillogo_med.png',
+        'src/_ControlAddIns/Wizards/Images/VideoButton.png',
+        'src/_ControlAddIns/Wizards/Images/OutlookVideo.png',
+        'src/_ControlAddIns/Wizards/Images/GetAssistanceVideo.png',
+        'src/_ControlAddIns/Wizards/Images/NP-small-logo.png';
 
     event Ready()
     event ThumbnailClicked(selection: Integer)
