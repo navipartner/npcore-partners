@@ -5,6 +5,46 @@ codeunit 6185111 "NPR MM Subscr. Pay Req Proc JQ"
     trigger OnRun()
     begin
         ProcessSubscriptionPaymentRequests();
+        RetryPayByLinkCancellation();
+    end;
+
+    internal procedure RetryPayByLinkCancellation()
+    var
+        PayByLinkPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+        ResolvePayByLink: Codeunit "NPR MM Subscr. Resolve PBL";
+        SubsRenewalMgt: Codeunit "NPR MM Subs. Renewal Mgt.";
+        ScheduleModes: Dictionary of [Code[20], Boolean];
+        CursorText: Text;
+        Cursor: BigInteger;
+        ProcessedCount: Integer;
+        StartedAt: DateTime;
+        CursorKeyLbl: Label 'MM-PayByLink-Cleanup-Cursor', Locked = true;
+    begin
+        StartedAt := CurrentDateTime();
+        if IsolatedStorage.Get(CursorKeyLbl, DataScope::Company, CursorText) then
+            if not Evaluate(Cursor, CursorText) then
+                Clear(Cursor);
+        PayByLinkPaymentRequest.SetCurrentKey(Type, Status, PSP, "Entry No.");
+        PayByLinkPaymentRequest.SetRange(Type, PayByLinkPaymentRequest.Type::PayByLink);
+        PayByLinkPaymentRequest.SetRange(Status, PayByLinkPaymentRequest.Status::Requested);
+        PayByLinkPaymentRequest.SetRange(PSP, PayByLinkPaymentRequest.PSP::Adyen);
+        PayByLinkPaymentRequest.SetFilter("Entry No.", '>%1', Cursor);
+        if PayByLinkPaymentRequest.FindSet() then
+            repeat
+                IsolatedStorage.Set(CursorKeyLbl, Format(PayByLinkPaymentRequest."Entry No."), DataScope::Company);
+                ProcessedCount += 1;
+                if SubscrRequestUtils.HasCapturedTokenPayment(PayByLinkPaymentRequest, ScheduleModes) then begin
+                    Commit();
+                    Clear(ResolvePayByLink);
+                    ResolvePayByLink.SetAfterTokenSuccess(true);
+                    if not ResolvePayByLink.Run(PayByLinkPaymentRequest) then
+                        SubsRenewalMgt.LogPayByLinkError(PayByLinkPaymentRequest, GetLastErrorText());
+                end;
+                if (ProcessedCount >= 100) or (CurrentDateTime() - StartedAt >= 120 * 1000) then
+                    exit;
+            until PayByLinkPaymentRequest.Next() = 0;
+        IsolatedStorage.Set(CursorKeyLbl, '0', DataScope::Company);
     end;
 
     local procedure ProcessSubscriptionPaymentRequests()

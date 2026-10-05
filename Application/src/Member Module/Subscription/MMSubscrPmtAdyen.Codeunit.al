@@ -4,6 +4,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
     var
         PaymentRequestSkippedErr: Label 'The payment request has been skipped and cannot be processed.';
+        _UnknownLinkSubmissionLbl: Label 'PBL_SUBMISSION_UNKNOWN', Locked = true;
 
     internal procedure ProcessPaymentRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean;
     begin
@@ -379,6 +380,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         0,
                         Manual);
 
+        CancelOutstandingPayByLinkAfterTokenSuccess(SubscrPaymentRequest);
+
         Success := true;
     end;
 
@@ -657,7 +660,14 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Success := true;
     end;
 
-    local procedure ProcessNewPayByLinkStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean
+    local procedure ProcessNewPayByLinkStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean): Boolean
+    var
+        CreationFailed: Boolean;
+    begin
+        exit(ProcessNewPayByLinkStatus(SubscrPaymentRequest, SkipTryCountUpdate, Manual, CreationFailed));
+    end;
+
+    local procedure ProcessNewPayByLinkStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean; var CreationFailed: Boolean) Success: Boolean
     var
         SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
         RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
@@ -671,7 +681,13 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PayByLinkID: Code[50];
         PayByLinkUrl: Text[2048];
         PayByLinkExpiresAt: DateTime;
+        ResponseStatusCode: Integer;
+        CreationResultCode: Code[50];
+        UnknownSubmissionErr: Label 'The result of creating %1 %2 is uncertain. Reconcile the payment link before retrying.', Comment = '%1 = payment request table caption, %2 = entry number';
     begin
+        if SubscrPaymentRequest."Result Code" = _UnknownLinkSubmissionLbl then
+            Error(UnknownSubmissionErr, SubscrPaymentRequest.TableCaption, SubscrPaymentRequest."Entry No.");
+        CreationFailed := true;
         SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest,
                                     '',
                                     '',
@@ -730,7 +746,11 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             exit;
         end;
 
-        if not SendPayByLinkRequest(Request, SubsAdyenPGSetup, Response) then begin
+        CreationFailed := false;
+        if not SendPayByLinkRequest(Request, SubsAdyenPGSetup, Response, ResponseStatusCode) then begin
+            CreationFailed := ResponseStatusCode in [400, 401, 403, 404, 422];
+            if not CreationFailed and IsScheduledRenewalLink(SubscrPaymentRequest) then
+                CreationResultCode := _UnknownLinkSubmissionLbl;
             ErrorMessage := GetErrorMessageFromResponse(Response);
             if ErrorMessage = '' then
                 ErrorMessage := GetLastErrorText();
@@ -748,7 +768,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             0,
                             '',
                             '',
-                            '',
+                            CreationResultCode,
                             SubsAdyenPGSetup.Code,
                             true,
                             PSPReference,
@@ -842,11 +862,22 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     end;
 
 
-    local procedure ProcessRejectedStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean
+    local procedure ProcessRejectedStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean): Boolean
+    var
+        CreationFailed: Boolean;
+    begin
+        exit(ProcessRejectedStatus(SubscrPaymentRequest, SkipTryCountUpdate, Manual, CreationFailed));
+    end;
+
+    internal procedure ProcessRejectedRenewal(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var CreationFailed: Boolean) Success: Boolean
+    begin
+        Success := ProcessRejectedStatus(SubscrPaymentRequest, false, false, CreationFailed);
+        Commit();
+    end;
+
+    local procedure ProcessRejectedStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean; var CreationFailed: Boolean) Success: Boolean
     var
         SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
-        PayByLinkSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
-        PayByLinkSubscrRequest: Record "NPR MM Subscr. Request";
         SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
         RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
@@ -884,6 +915,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             exit;
         end;
 
+        CreationFailed := false;
+        CheckUncertainPayByLinkCreation(SubscrPaymentRequest);
         if not CheckRejectedStatusCanBeProcessed(SubscrPaymentRequest) then begin
             Success := true;
             exit;
@@ -916,62 +949,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             exit;
         end;
 
-        if ExecutePayByLinkFunctionality(SubscrPaymentRequest, RecurPaymSetup) then begin
-            if not CreatePayByLinkSubscriptionRequest(SubscrPaymentRequest, PayByLinkSubscrPaymentRequest, PayByLinkSubscrRequest) then begin
-                ErrorMessage := GetLastErrorText();
-                ProcessResponse(SubscrPaymentRequest,
-                                SubsPayReqLogEntry,
-                                '',
-                                '',
-                                ErrorMessage,
-                                SubscrPaymentRequest.Status::Rejected,
-                                SubsPayReqLogEntry."Processing Status"::Error,
-                                0,
-                                SubscrPaymentRequest."Rejected Reason Code",
-                                SubscrPaymentRequest."Rejected Reason Description",
-                                SubscrPaymentRequest."Result Code",
-                                SubsAdyenPGSetup.Code,
-                                SkipTryCountUpdate,
-                                SubscrPaymentRequest."PSP Reference",
-                                SubscrPaymentRequest."Payment PSP Reference",
-                                SubscrPaymentRequest."Pay by Link ID",
-                                SubscrPaymentRequest."Pay by Link URL",
-                                SubscrPaymentRequest."Pay By Link Expires At",
-                                0,
-                                Manual);
+        if ExecutePayByLinkFunctionality(SubscrPaymentRequest, RecurPaymSetup) then
+            if not IssueNewPayByLink(SubscrPaymentRequest, SubsAdyenPGSetup, SubsPayReqLogEntry, SkipTryCountUpdate, Manual, CreationFailed) then
                 exit;
-            end;
-
-            Commit();
-
-            if not ProcessPaymentRequest(PayByLinkSubscrPaymentRequest, SkipTryCountUpdate, Manual) then begin
-                PayByLinkSubscrPaymentRequest.Get(PayByLinkSubscrPaymentRequest.RecordId);
-                ErrorMessage := GetLastErrorText();
-                ProcessResponse(SubscrPaymentRequest,
-                                SubsPayReqLogEntry,
-                                '',
-                                '',
-                                ErrorMessage,
-                                SubscrPaymentRequest.Status::Rejected,
-                                SubsPayReqLogEntry."Processing Status"::Error,
-                                0,
-                                SubscrPaymentRequest."Rejected Reason Code",
-                                SubscrPaymentRequest."Rejected Reason Description",
-                                SubscrPaymentRequest."Result Code",
-                                SubsAdyenPGSetup.Code,
-                                SkipTryCountUpdate,
-                                SubscrPaymentRequest."PSP Reference",
-                                SubscrPaymentRequest."Payment PSP Reference",
-                                SubscrPaymentRequest."Pay by Link ID",
-                                SubscrPaymentRequest."Pay by Link URL",
-                                SubscrPaymentRequest."Pay By Link Expires At",
-                                0,
-                                Manual);
-                PayByLinkSubscrPaymentRequest.Validate(Status, PayByLinkSubscrPaymentRequest.Status::Cancelled);
-                PayByLinkSubscrPaymentRequest.Modify(true);
-                exit;
-            end;
-        end;
 
         ErrorMessage := '';
         ProcessResponse(SubscrPaymentRequest,
@@ -1532,16 +1512,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
     local procedure GetMerchantName() MerchantName: Text[50];
     var
-        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
         SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
     begin
-        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
-        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
-        SubsPaymentGateway.SetLoadFields("Integration Type", Status, Code);
-        SubsPaymentGateway.FindFirst();
-
-        SubsAdyenPGSetup.SetLoadFields("Merchant Name");
-        SubsAdyenPGSetup.Get(SubsPaymentGateway.Code);
+        TryGetAdyenPaymentGatewaySetup(SubsAdyenPGSetup);
         MerchantName := SubsAdyenPGSetup."Merchant Name";
     end;
 
@@ -1614,10 +1587,12 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Headers.Add('x-api-key', APIKey);
         Http.Timeout := TimeoutMs;
 
-        HttpRequest.Content.WriteFrom(Request);
-        HttpRequest.Content.GetHeaders(Headers);
-        Headers.Remove('Content-Type');
-        Headers.Add('Content-Type', 'application/json');
+        if Method <> 'GET' then begin
+            HttpRequest.Content.WriteFrom(Request);
+            HttpRequest.Content.GetHeaders(Headers);
+            Headers.Remove('Content-Type');
+            Headers.Add('Content-Type', 'application/json');
+        end;
 
         Http.Send(HttpRequest, HttpResponse);
         ResponseStatusCode := HttpResponse.HttpStatusCode;
@@ -1634,13 +1609,22 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     local procedure TryGetAdyenPaymentGatewaySetup(var SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup")
     var
         SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
+        Handled: Boolean;
     begin
+        OnBeforeGetAdyenPaymentGatewaySetup(SubsAdyenPGSetup, Handled);
+        if Handled then
+            exit;
         SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
         SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
         SubsPaymentGateway.SetLoadFields("Integration Type", Status, Code);
         SubsPaymentGateway.FindFirst();
 
         SubsAdyenPGSetup.Get(SubsPaymentGateway.Code);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetAdyenPaymentGatewaySetup(var SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var Handled: Boolean)
+    begin
     end;
 
     [TryFunction]
@@ -1851,14 +1835,19 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
     end;
 
-    local procedure SendCancelPayByLinkRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; RequestJsonText: Text; MMSubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var Response: Text) Success: Boolean
+    local procedure SendCancelPayByLinkRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; RequestJsonText: Text; MMSubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var Response: Text): Boolean
+    begin
+        exit(SendCancelPayByLinkRequest(SubscrPaymentRequest, RequestJsonText, MMSubsAdyenPGSetup, Response, 1000 * 60 * 5));
+    end;
+
+    local procedure SendCancelPayByLinkRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; RequestJsonText: Text; MMSubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var Response: Text; TimeoutMs: Integer) Success: Boolean
     var
         URL: Text;
         StatusCode: Integer;
     begin
         Url := MMSubsAdyenPGSetup.GetAPIPayByLinkUrl() + '/' + SubscrPaymentRequest."Pay by Link ID";
 
-        Success := TryInvokeAPI(RequestJsonText, MMSubsAdyenPGSetup.GetApiKey(), URL, 1000 * 60 * 5, Response, StatusCode, 'Patch');
+        Success := TryInvokeAPI(RequestJsonText, MMSubsAdyenPGSetup.GetApiKey(), URL, TimeoutMs, Response, StatusCode, 'Patch');
     end;
 
     local procedure ProcessCancelledPayByLinkStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean
@@ -2096,11 +2085,14 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         RequestJsonText := Json.GetJSonAsText();
     end;
 
-    local procedure SendPayByLinkRequest(RequestJsonText: Text; MMSubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var Response: Text) Success: Boolean
+    local procedure SendPayByLinkRequest(RequestJsonText: Text; MMSubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var Response: Text; var StatusCode: Integer) Success: Boolean
     var
         URL: Text;
-        StatusCode: Integer;
+        Handled: Boolean;
     begin
+        OnBeforeSendPayByLinkRequest(Response, StatusCode, Success, Handled);
+        if Handled then
+            exit;
         URL := MMSubsAdyenPGSetup.GetAPIPayByLinkUrl();
 
         Success := TryInvokeAPI(RequestJsonText, MMSubsAdyenPGSetup.GetApiKey(), URL, 1000 * 60 * 5, Response, StatusCode, 'POST');
@@ -2360,19 +2352,366 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         SubsTryMethods.GetPayByLinkSubscriptionPaymentRequest(PayByLinkSubscrPaymentRequest);
     end;
 
-    local procedure ExecutePayByLinkFunctionality(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; RecurPaymSetup: Record "NPR MM Recur. Paym. Setup") PayByLinkCanBeExecuted: Boolean
+    internal procedure ExecutePayByLinkFunctionality(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; RecurPaymSetup: Record "NPR MM Recur. Paym. Setup") PayByLinkCanBeExecuted: Boolean
     var
         SubscrRequest: Record "NPR MM Subscr. Request";
         SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+        SubsRenewalMgt: Codeunit "NPR MM Subs. Renewal Mgt.";
     begin
         if RecurPaymSetup."Subscr. Auto-Renewal On" <> RecurPaymSetup."Subscr. Auto-Renewal On"::Schedule then begin
             PayByLinkCanBeExecuted := true;
             exit;
         end;
 
+        if SubscrPaymentRequest.Type <> SubscrPaymentRequest.Type::Payment then
+            exit(false);
         SubscrRequest.SetLoadFields("Renew Schedule Id");
         SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
-        PayByLinkCanBeExecuted := SubscrRequestUtils.LastRenewSchedPeriod(SubscrRequest, RecurPaymSetup);
+        if IsNullGuid(SubscrRequest."Renew Schedule Id") then
+            exit(false);
+        PayByLinkCanBeExecuted := SubsRenewalMgt.IsCustomerActionableDecline(SubscrPaymentRequest) or SubscrRequestUtils.LastRenewSchedPeriod(SubscrRequest, RecurPaymSetup);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Subs. Renewal Mgt.", 'OnResolveOutstandingPayByLink', '', false, false)]
+    local procedure OnResolveOutstandingPayByLink(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SkipRenewal: Boolean)
+    begin
+        if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
+            exit;
+        SkipRenewal := ResolveOutstandingPayByLink(SubscrPaymentRequest, false);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Subs. Renewal Mgt.", 'OnCheckOutstandingPayByLinkPaid', '', false, false)]
+    local procedure OnCheckOutstandingPayByLinkPaid(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var IsPaid: Boolean; var CheckSucceeded: Boolean; var ErrorMessage: Text)
+    var
+        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
+        LinkStatus: Text;
+    begin
+        if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
+            exit;
+        CheckSucceeded := TryGetPayByLinkStatus(SubscrPaymentRequest, SubsAdyenPGSetup, LinkStatus);
+        if not CheckSucceeded then
+            ErrorMessage := GetLastErrorText();
+        Commit();
+        if not CheckSucceeded then
+            exit;
+        IsPaid := LinkStatus = 'completed';
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Subs. Renewal Mgt.", 'OnCheckPaymentTechnicalError', '', false, false)]
+    local procedure OnCheckPaymentTechnicalError(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var IsTechnicalError: Boolean)
+    var
+        TechnicalErrorResultCodeLbl: Label 'ERROR', Locked = true;
+    begin
+        if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
+            exit;
+        IsTechnicalError := UpperCase(SubscrPaymentRequest."Result Code") = TechnicalErrorResultCodeLbl;
+    end;
+
+    internal procedure ResolveOutstandingPayByLink(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; AfterTokenSuccess: Boolean) SkipRenewal: Boolean
+    begin
+        exit(ResolveOutstandingPayByLink(SubscrPaymentRequest, AfterTokenSuccess, false));
+    end;
+
+    internal procedure ResolveOutstandingPayByLink(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; AfterTokenSuccess: Boolean; OnlyIfExpired: Boolean) SkipRenewal: Boolean
+    var
+        ErrorMessage: Text;
+    begin
+        exit(ResolveOutstandingPayByLink(SubscrPaymentRequest, AfterTokenSuccess, OnlyIfExpired, true, ErrorMessage));
+    end;
+
+    internal procedure ConfirmPayByLinkCancellation(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var ErrorMessage: Text) Success: Boolean
+    begin
+        Success := not ResolveOutstandingPayByLink(SubscrPaymentRequest, false, false, false, ErrorMessage);
+        if not Success then
+            Commit();
+    end;
+
+    local procedure ResolveOutstandingPayByLink(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; AfterTokenSuccess: Boolean; OnlyIfExpired: Boolean; UpdateLocalStatus: Boolean; var ErrorMessage: Text) SkipRenewal: Boolean
+    var
+        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
+        SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
+        SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
+        SubsRenewalMgt: Codeunit "NPR MM Subs. Renewal Mgt.";
+        LinkStatus: Text;
+        Request: Text;
+        Response: Text;
+        Success: Boolean;
+        CannotCancelPaidErr: Label 'The payment link has already been paid and cannot be cancelled. Please request a refund instead.';
+        CannotConfirmCancellationErr: Label 'The payment link cancellation could not be confirmed. The request status has not been changed.';
+    begin
+        SkipRenewal := true;
+        ErrorMessage := CannotConfirmCancellationErr;
+        if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
+            exit;
+        Success := TryGetPayByLinkStatus(SubscrPaymentRequest, SubsAdyenPGSetup, LinkStatus);
+        if not Success then
+            ErrorMessage := GetLastErrorText();
+        Commit();
+        if not Success then begin
+            if SubscrPaymentRequest."Pay by Link ID" = '' then
+                Error('%1', ErrorMessage);
+            SubsRenewalMgt.LogPayByLinkError(SubscrPaymentRequest, ErrorMessage);
+            exit;
+        end;
+
+        if LinkStatus = 'completed' then begin
+            ErrorMessage := CannotCancelPaidErr;
+            if AfterTokenSuccess then
+                ReportDuplicatePayment(SubscrPaymentRequest);
+            exit;
+        end;
+
+        if OnlyIfExpired and (LinkStatus <> 'expired') then
+            exit;
+
+        if LinkStatus <> 'expired' then begin
+            if not TryGetPayByLinkCancelRequestJsonText(Request) then begin
+                ErrorMessage := GetLastErrorText();
+                SubsRenewalMgt.LogPayByLinkError(SubscrPaymentRequest, ErrorMessage);
+                exit;
+            end;
+            Success := SendCancelPayByLinkRequest(SubscrPaymentRequest, Request, SubsAdyenPGSetup, Response, 30 * 1000);
+            if not Success then
+                ErrorMessage := GetLastErrorText();
+            Commit();
+            if Success then begin
+                Success := ConfirmPayByLinkExpired(Response);
+                if not Success then
+                    ErrorMessage := GetLastErrorText();
+            end;
+            if not Success then begin
+                SubsRenewalMgt.LogPayByLinkError(SubscrPaymentRequest, ErrorMessage);
+                exit;
+            end;
+        end;
+
+        SubscrPaymentRequest.ReadIsolation := IsolationLevel::UpdLock;
+        SubscrPaymentRequest.Get(SubscrPaymentRequest.RecordId);
+        if SubscrPaymentRequest.Status = SubscrPaymentRequest.Status::Cancelled then
+            exit(false);
+        if not UpdateLocalStatus then
+            exit(SubscrPaymentRequest.Status in [SubscrPaymentRequest.Status::Captured, SubscrPaymentRequest.Status::Authorized, SubscrPaymentRequest.Status::Skipped]);
+        if not (SubscrPaymentRequest.Status in [SubscrPaymentRequest.Status::New, SubscrPaymentRequest.Status::Requested]) then
+            exit;
+        SubscrPaymentRequest.Validate(Status, SubscrPaymentRequest.Status::Cancelled);
+        SubscrPaymentRequest.Modify(true);
+        SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest, '', SubsAdyenPGSetup.Code, false, SubsPayReqLogEntry);
+        SkipRenewal := false;
+    end;
+
+    local procedure ReportDuplicatePayment(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        LogEntry: Record "NPR MM Subs Pay Req Log Entry";
+        SubsRenewalMgt: Codeunit "NPR MM Subs. Renewal Mgt.";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        DuplicatePaymentErr: Label 'A pay-by-link was paid in addition to a successful token renewal payment. Reconcile the payments. This is a programming bug', Locked = true;
+    begin
+        SubscrPaymentRequest.ReadIsolation := IsolationLevel::UpdLock;
+        SubscrPaymentRequest.Get(SubscrPaymentRequest.RecordId);
+        LogEntry.SetCurrentKey("Payment Request Entry No.", "Entry No.");
+        LogEntry.SetRange("Payment Request Entry No.", SubscrPaymentRequest."Entry No.");
+        LogEntry.SetRange("Error Message", DuplicatePaymentErr);
+        if not LogEntry.IsEmpty() then
+            exit;
+        SubsRenewalMgt.LogPayByLinkError(SubscrPaymentRequest, DuplicatePaymentErr);
+        SubscriptionMgtImpl.ReportPaymentRequestTerminalError(SubscrPaymentRequest, DuplicatePaymentErr, '');
+    end;
+
+    [TryFunction]
+    local procedure ConfirmPayByLinkExpired(Response: Text)
+    var
+        UnconfirmedCancellationErr: Label 'The payment provider did not confirm that the payment link has expired.';
+    begin
+        if GetPayByLinkStatusFromResponse(Response) <> 'expired' then
+            Error(UnconfirmedCancellationErr);
+    end;
+
+    [TryFunction]
+    local procedure TryGetPayByLinkStatus(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var LinkStatus: Text)
+    var
+        URL: Text;
+        Response: Text;
+        StatusCode: Integer;
+        UnknownStatusErr: Label 'The payment link status could not be confirmed. Processing will be retried.';
+        MissingLinkIdErr: Label '%1 %2 has a payment URL but no %3. Reconcile the payment link before retrying.', Comment = '%1 = payment request table caption, %2 = entry number, %3 = payment link ID field caption';
+        UncertainCreationErr: Label 'The payment link creation result is unknown. Reconcile the payment before cancelling or retrying.';
+    begin
+        Clear(LinkStatus);
+        if SubscrPaymentRequest."Pay by Link ID" = '' then begin
+            if SubscrPaymentRequest."Result Code" = _UnknownLinkSubmissionLbl then
+                Error(UncertainCreationErr);
+            if SubscrPaymentRequest."Pay by Link URL" <> '' then
+                Error(MissingLinkIdErr, SubscrPaymentRequest.TableCaption, SubscrPaymentRequest."Entry No.", SubscrPaymentRequest.FieldCaption("Pay by Link ID"));
+            LinkStatus := 'expired';
+            exit;
+        end;
+        TryGetAdyenPaymentGatewaySetup(SubsAdyenPGSetup);
+        if HasPendingPaidPayByLinkWebhook(SubscrPaymentRequest."Pay by Link ID", SubsAdyenPGSetup) then begin
+            LinkStatus := 'completed';
+            exit;
+        end;
+        URL := SubsAdyenPGSetup.GetAPIPayByLinkUrl() + '/' + SubscrPaymentRequest."Pay by Link ID";
+        TryInvokeAPI('', SubsAdyenPGSetup.GetApiKey(), URL, 30 * 1000, Response, StatusCode, 'GET');
+        LinkStatus := GetPayByLinkStatusFromResponse(Response);
+        if not (LinkStatus in ['active', 'expired', 'completed']) then
+            Error(UnknownStatusErr);
+    end;
+
+    local procedure HasPendingPaidPayByLinkWebhook(PaymentLinkId: Text; SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"): Boolean
+    var
+        Webhook: Record "NPR Adyen Webhook";
+        IsPaid: Boolean;
+    begin
+        Webhook.SetCurrentKey("PSP Reference", "Event Code", "Webhook Type", Status);
+        Webhook.SetRange("PSP Reference", PaymentLinkId);
+        Webhook.SetRange("Webhook Type", Webhook."Webhook Type"::"Pay by Link");
+        Webhook.SetRange("Event Code", Webhook."Event Code"::AUTHORISATION);
+        Webhook.SetFilter(Status, '%1|%2', Webhook.Status::New, Webhook.Status::Error);
+        Webhook.SetRange(Success, true);
+        Webhook.SetRange("Merchant Account Name", SubsAdyenPGSetup."Merchant Name");
+        Webhook.SetRange(Live, SubsAdyenPGSetup.Environment = SubsAdyenPGSetup.Environment::Production);
+        if Webhook.FindSet() then
+            repeat
+                if TryIsPaidWebhookForLink(Webhook, PaymentLinkId, IsPaid) then
+                    if IsPaid then
+                        exit(true);
+            until Webhook.Next() = 0;
+        exit(false);
+    end;
+
+    [TryFunction]
+    local procedure TryIsPaidWebhookForLink(Webhook: Record "NPR Adyen Webhook"; PaymentLinkId: Text; var IsPaid: Boolean)
+    var
+        Root: JsonObject;
+        Items: JsonToken;
+        Item: JsonToken;
+        Notification: JsonToken;
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
+        IsPaid := false;
+        Webhook.CalcFields("Webhook Data");
+        if not Root.ReadFrom(Webhook.GetAdyenData()) then
+            exit;
+        if not Root.Get('notificationItems', Items) then
+            exit;
+        foreach Item in Items.AsArray() do
+            if Item.AsObject().Get('NotificationRequestItem', Notification) then
+                if (JsonHelper.GetJText(Notification, 'eventCode', false) = 'AUTHORISATION') and
+                   (LowerCase(JsonHelper.GetJText(Notification, 'success', false)) = 'true') and
+                   (JsonHelper.GetJText(Notification, 'merchantAccountCode', false) = Webhook."Merchant Account Name") and
+                   (UpperCase(JsonHelper.GetJText(Notification, 'additionalData.paymentLinkId', false)) = UpperCase(PaymentLinkId))
+                then begin
+                    IsPaid := true;
+                    exit;
+                end;
+    end;
+
+    local procedure IssueNewPayByLink(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; var SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry"; SkipTryCountUpdate: Boolean; Manual: Boolean; var CreationFailed: Boolean) Success: Boolean
+    var
+        PayByLinkSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        PayByLinkSubscrRequest: Record "NPR MM Subscr. Request";
+        ErrorMessage: Text;
+    begin
+        CreationFailed := true;
+        if not CreatePayByLinkSubscriptionRequest(SubscrPaymentRequest, PayByLinkSubscrPaymentRequest, PayByLinkSubscrRequest) then begin
+            ErrorMessage := GetLastErrorText();
+            ProcessResponse(SubscrPaymentRequest,
+                            SubsPayReqLogEntry,
+                            '',
+                            '',
+                            ErrorMessage,
+                            SubscrPaymentRequest.Status::Rejected,
+                            SubsPayReqLogEntry."Processing Status"::Error,
+                            0,
+                            SubscrPaymentRequest."Rejected Reason Code",
+                            SubscrPaymentRequest."Rejected Reason Description",
+                            SubscrPaymentRequest."Result Code",
+                            SubsAdyenPGSetup.Code,
+                            SkipTryCountUpdate,
+                            SubscrPaymentRequest."PSP Reference",
+                            SubscrPaymentRequest."Payment PSP Reference",
+                            SubscrPaymentRequest."Pay by Link ID",
+                            SubscrPaymentRequest."Pay by Link URL",
+                            SubscrPaymentRequest."Pay By Link Expires At",
+                            0,
+                            Manual);
+            exit(false);
+        end;
+
+        Commit();
+
+        if not ProcessNewPayByLinkStatus(PayByLinkSubscrPaymentRequest, SkipTryCountUpdate, Manual, CreationFailed) then begin
+            PayByLinkSubscrPaymentRequest.Get(PayByLinkSubscrPaymentRequest.RecordId);
+            ErrorMessage := GetLastErrorText();
+            ProcessResponse(SubscrPaymentRequest,
+                            SubsPayReqLogEntry,
+                            '',
+                            '',
+                            ErrorMessage,
+                            SubscrPaymentRequest.Status::Rejected,
+                            SubsPayReqLogEntry."Processing Status"::Error,
+                            0,
+                            SubscrPaymentRequest."Rejected Reason Code",
+                            SubscrPaymentRequest."Rejected Reason Description",
+                            SubscrPaymentRequest."Result Code",
+                            SubsAdyenPGSetup.Code,
+                            SkipTryCountUpdate,
+                            SubscrPaymentRequest."PSP Reference",
+                            SubscrPaymentRequest."Payment PSP Reference",
+                            SubscrPaymentRequest."Pay by Link ID",
+                            SubscrPaymentRequest."Pay by Link URL",
+                            SubscrPaymentRequest."Pay By Link Expires At",
+                            0,
+                            Manual);
+            if CreationFailed or not IsScheduledRenewalLink(PayByLinkSubscrPaymentRequest) then begin
+                PayByLinkSubscrPaymentRequest.Validate(Status, PayByLinkSubscrPaymentRequest.Status::Cancelled);
+                PayByLinkSubscrPaymentRequest.Modify(true);
+            end;
+            exit(false);
+        end;
+
+        Success := true;
+    end;
+
+    local procedure GetPayByLinkStatusFromResponse(ResponseText: Text) StatusValue: Text
+    var
+        JsonObject: JsonObject;
+        JsonToken: JsonToken;
+    begin
+        if ResponseText = '' then
+            exit;
+        if not JsonObject.ReadFrom(ResponseText) then
+            exit;
+        if JsonObject.Get('status', JsonToken) then
+            StatusValue := JsonToken.AsValue().AsText();
+    end;
+
+    local procedure CancelOutstandingPayByLinkAfterTokenSuccess(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        OutstandingPayByLink: Record "NPR MM Subscr. Payment Request";
+        TempPayment: Record "NPR MM Subscr. Payment Request" temporary;
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+        ResolvePayByLink: Codeunit "NPR MM Subscr. Resolve PBL";
+        SubsRenewalMgt: Codeunit "NPR MM Subs. Renewal Mgt.";
+    begin
+        SubscrRequest.SetLoadFields("Subscription Entry No.");
+        if not SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.") then
+            exit;
+        if not SubscrRequestUtils.UsesRenewalSchedule(SubscrRequest) then
+            exit;
+        SubscrRequestUtils.CollectPayByLinksToResolve(SubscrRequest."Subscription Entry No.", TempPayment);
+        if TempPayment.FindSet() then
+            repeat
+                OutstandingPayByLink.Get(TempPayment."Entry No.");
+                if SubscrRequestUtils.HasCapturedTokenPayment(OutstandingPayByLink) then begin
+                    Commit();
+                    Clear(ResolvePayByLink);
+                    ResolvePayByLink.SetAfterTokenSuccess(true);
+                    if not ResolvePayByLink.Run(OutstandingPayByLink) then
+                        SubsRenewalMgt.LogPayByLinkError(OutstandingPayByLink, GetLastErrorText());
+                end;
+            until TempPayment.Next() = 0;
     end;
 
     [TryFunction]
@@ -2630,5 +2969,40 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     [IntegrationEvent(false, false)]
     procedure OnBeforeInvokeAPI(var Request: Text; var Response: Text; var Handled: Boolean)
     begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendPayByLinkRequest(var Response: Text; var StatusCode: Integer; var Success: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    local procedure CheckUncertainPayByLinkCreation(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        ChildRequest: Record "NPR MM Subscr. Request";
+        ChildPayment: Record "NPR MM Subscr. Payment Request";
+        ReconcileErr: Label 'The result of creating a payment link for %1 %2 is uncertain. Reconcile the payment link before retrying.', Comment = '%1 = payment request table caption, %2 = entry number';
+    begin
+        ChildRequest.SetRange("Created from Entry No.", SubscrPaymentRequest."Entry No.");
+        ChildRequest.SetRange(Type, ChildRequest.Type::Renew);
+        ChildRequest.SetRange(Status, ChildRequest.Status::"Request Error");
+        if ChildRequest.FindSet() then
+            repeat
+                ChildPayment.SetRange("Subscr. Request Entry No.", ChildRequest."Entry No.");
+                ChildPayment.SetRange(Type, ChildPayment.Type::PayByLink);
+                ChildPayment.SetRange(Status, ChildPayment.Status::Error);
+                ChildPayment.SetRange("Result Code", _UnknownLinkSubmissionLbl);
+                if not ChildPayment.IsEmpty() then
+                    Error(ReconcileErr, SubscrPaymentRequest.TableCaption, SubscrPaymentRequest."Entry No.");
+            until ChildRequest.Next() = 0;
+    end;
+
+    local procedure IsScheduledRenewalLink(PaymentRequest: Record "NPR MM Subscr. Payment Request"): Boolean
+    var
+        Request: Record "NPR MM Subscr. Request";
+        RequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+    begin
+        if not Request.Get(PaymentRequest."Subscr. Request Entry No.") then
+            exit(false);
+        exit((Request.Type = Request.Type::Renew) and (Request."Created from Entry No." <> 0) and RequestUtils.UsesRenewalSchedule(Request));
     end;
 }

@@ -28,6 +28,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
     var
         SubscriptionRequest: Record "NPR MM Subscr. Request";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
         RenewWithItemNo: Code[20];
         RenewDescrTxt: Label '%1 membership renewal: %2-%3', Comment = '%1 - membership code, %2 - from date, %3 - to date';
     begin
@@ -36,6 +37,11 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
             _RecurPaymentSetup.FieldError("Subscr. Auto-Renewal On");
 
         CheckSubscriptionCanBeProcessed(Subscription);
+
+        if _RecurPaymentSetup."Subscr. Auto-Renewal On" = _RecurPaymentSetup."Subscr. Auto-Renewal On"::Schedule then
+            if SubscrRequestUtils.HasCapturedPayByLinkAwaitingRenewal(Subscription) then
+                exit;
+
         if IsTerminationDue(Subscription) then
             exit;
         GetRenewalScheduleLine(Subscription);

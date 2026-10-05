@@ -253,6 +253,7 @@ table 6150921 "NPR MM Subscr. Payment Request"
         key(Key5; "Reversed by Entry No.") { }
         key(Key6; "PSP Reference", PSP, Reconciled, Reversed) { }
         key(Key7; "Pay by Link ID", Status) { }
+        key(PayByLinkCleanup; Type, Status, PSP, "Entry No.") { }
     }
 
     trigger OnInsert()

@@ -36,6 +36,13 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         if SubscrRequest.Status = NewStatus then
             exit;
 
+        if NewStatus = NewStatus::Cancelled then begin
+            ConfirmAdyenPayByLinksCancelled(SubscrRequest);
+            SubscrRequest.ReadIsolation := IsolationLevel::UpdLock;
+            SubscrRequest.Get(SubscrRequest.RecordId);
+            CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
+        end;
+
         SubscrRequest.Validate(Status, NewStatus);
         SubscrRequest.Validate("Processing Status", SubscrRequest."Processing Status"::Success);
         SubscrRequest.Modify(true);
@@ -44,14 +51,35 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
             SubscrPaymentRequest.Reset();
             SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
             if SubscrPaymentRequest.FindLast() then begin
-                ClearLastError();
-                SubsPaymentIHandler := SubscrPaymentRequest.PSP;
-                if not SubsPaymentIHandler.ProcessPaymentRequest(SubscrPaymentRequest, SkipTryCountUpdate, true) then
-                    Error(GetLastErrorText());
+                if not ((SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::PayByLink) and
+                        (SubscrPaymentRequest.PSP = SubscrPaymentRequest.PSP::Adyen))
+                then begin
+                    ClearLastError();
+                    SubsPaymentIHandler := SubscrPaymentRequest.PSP;
+                    if not SubsPaymentIHandler.ProcessPaymentRequest(SubscrPaymentRequest, SkipTryCountUpdate, true) then
+                        Error(GetLastErrorText());
+                end;
             end;
         end;
 
         SubsReqLogUtils.LogEntry(SubscrRequest, true, SubsReqLogEntry);
+    end;
+
+    local procedure ConfirmAdyenPayByLinksCancelled(SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        PaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrPmtAdyen: Codeunit "NPR MM Subscr.Pmt.: Adyen";
+        ErrorMessage: Text;
+    begin
+        PaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
+        PaymentRequest.SetRange(Type, PaymentRequest.Type::PayByLink);
+        PaymentRequest.SetRange(PSP, PaymentRequest.PSP::Adyen);
+        PaymentRequest.SetFilter(Status, '<>%1', PaymentRequest.Status::Skipped);
+        if PaymentRequest.FindSet() then
+            repeat
+                if not SubscrPmtAdyen.ConfirmPayByLinkCancellation(PaymentRequest, ErrorMessage) then
+                    Error('%1', ErrorMessage);
+            until PaymentRequest.Next() = 0;
     end;
 
     local procedure SetSubscriptionRequestStatusCancelled(var SubscrRequest: Record "NPR MM Subscr. Request"; SkipTryCountUpdate: Boolean)
@@ -341,6 +369,188 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         RenewalSchedLine.SetRange("Schedule Code", RecurPaymSetup."Subscr Auto-Renewal Sched Code");
         RenewalSchedLine.SetFilter("Date Formula Duration (Days)", '>%1', CurrRenewalSchedLine."Date Formula Duration (Days)");
         IsLastRenewSchedPeriod := RenewalSchedLine.IsEmpty();
+    end;
+
+    internal procedure UsesRenewalSchedule(SubscrRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
+        Subscription: Record "NPR MM Subscription";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
+        MembershipCode: Code[20];
+    begin
+        MembershipCode := SubscrRequest."Membership Code";
+        if MembershipCode = '' then
+            if Subscription.Get(SubscrRequest."Subscription Entry No.") then
+                MembershipCode := Subscription."Membership Code";
+        if MembershipSetup.Get(MembershipCode) then
+            if RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code") then
+                exit(RecurPaymSetup."Subscr. Auto-Renewal On" = RecurPaymSetup."Subscr. Auto-Renewal On"::Schedule);
+        exit(not IsNullGuid(SubscrRequest."Renew Schedule Id"));
+    end;
+
+    internal procedure HasCapturedTokenPayment(PayByLinkPaymentRequest: Record "NPR MM Subscr. Payment Request"): Boolean
+    var
+        ScheduleModes: Dictionary of [Code[20], Boolean];
+    begin
+        exit(HasCapturedTokenPayment(PayByLinkPaymentRequest, ScheduleModes));
+    end;
+
+    internal procedure HasCapturedTokenPayment(PayByLinkPaymentRequest: Record "NPR MM Subscr. Payment Request"; var ScheduleModes: Dictionary of [Code[20], Boolean]): Boolean
+    var
+        PayByLinkRequest: Record "NPR MM Subscr. Request";
+        TokenRequest: Record "NPR MM Subscr. Request";
+        TokenPayment: Record "NPR MM Subscr. Payment Request";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
+        UsesSchedule: Boolean;
+    begin
+        if not PayByLinkRequest.Get(PayByLinkPaymentRequest."Subscr. Request Entry No.") then
+            exit(false);
+        if (PayByLinkRequest.Type <> PayByLinkRequest.Type::Renew) or (PayByLinkRequest."Created from Entry No." = 0) then
+            exit(false);
+
+        TokenRequest.SetRange("Subscription Entry No.", PayByLinkRequest."Subscription Entry No.");
+        TokenRequest.SetRange(Type, TokenRequest.Type::Renew);
+        TokenRequest.SetRange("Created from Entry No.", 0);
+        TokenRequest.SetRange("New Valid From Date", PayByLinkRequest."New Valid From Date");
+        TokenRequest.SetRange("New Valid Until Date", PayByLinkRequest."New Valid Until Date");
+        TokenPayment.SetRange(Type, TokenPayment.Type::Payment);
+        TokenPayment.SetRange(Status, TokenPayment.Status::Captured);
+        TokenPayment.SetRange(PSP, PayByLinkPaymentRequest.PSP);
+        if TokenRequest.FindSet() then
+            repeat
+                TokenPayment.SetRange("Subscr. Request Entry No.", TokenRequest."Entry No.");
+                if HasCapturedPaymentAwaitingRefund(TokenPayment) then begin
+                    if not ScheduleModes.Get(TokenRequest."Membership Code", UsesSchedule) then begin
+                        if (TokenRequest."Membership Code" <> '') and MembershipSetup.Get(TokenRequest."Membership Code") then begin
+                            if RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code") then begin
+                                UsesSchedule := RecurPaymSetup."Subscr. Auto-Renewal On" = RecurPaymSetup."Subscr. Auto-Renewal On"::Schedule;
+                                ScheduleModes.Set(TokenRequest."Membership Code", UsesSchedule);
+                            end else
+                                UsesSchedule := UsesRenewalSchedule(TokenRequest);
+                        end else
+                            UsesSchedule := UsesRenewalSchedule(TokenRequest);
+                    end;
+                    if UsesSchedule then
+                        exit(true);
+                end;
+            until TokenRequest.Next() = 0;
+        exit(false);
+    end;
+
+    internal procedure HasCapturedPayByLinkForRenewal(RenewalRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
+        LinkRequest: Record "NPR MM Subscr. Request";
+        LinkPayment: Record "NPR MM Subscr. Payment Request";
+    begin
+        LinkRequest.SetCurrentKey("Subscription Entry No.");
+        LinkRequest.SetRange("Subscription Entry No.", RenewalRequest."Subscription Entry No.");
+        LinkRequest.SetRange(Type, LinkRequest.Type::Renew);
+        LinkRequest.SetFilter("Created from Entry No.", '<>%1', 0);
+        LinkRequest.SetFilter(Status, '<>%1&<>%2', LinkRequest.Status::Cancelled, LinkRequest.Status::Skipped);
+        LinkRequest.SetRange("New Valid From Date", RenewalRequest."New Valid From Date");
+        LinkRequest.SetRange("New Valid Until Date", RenewalRequest."New Valid Until Date");
+        LinkRequest.SetLoadFields("Entry No.");
+        LinkPayment.SetCurrentKey("Subscr. Request Entry No.", Status);
+        LinkPayment.SetRange(Type, LinkPayment.Type::PayByLink);
+        LinkPayment.SetRange(Status, LinkPayment.Status::Captured);
+        if LinkRequest.FindSet() then
+            repeat
+                LinkPayment.SetRange("Subscr. Request Entry No.", LinkRequest."Entry No.");
+                if HasCapturedPaymentAwaitingRefund(LinkPayment) then
+                    exit(true);
+            until LinkRequest.Next() = 0;
+        exit(false);
+    end;
+
+    internal procedure HasCapturedPayByLinkAwaitingRenewal(Subscription: Record "NPR MM Subscription"): Boolean
+    var
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        PaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        SubscrRequest.SetCurrentKey("Subscription Entry No.");
+        SubscrRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscrRequest.SetRange(Type, SubscrRequest.Type::Renew);
+        SubscrRequest.SetFilter("Created from Entry No.", '<>%1', 0);
+        SubscrRequest.SetFilter("Processing Status", '%1|%2', SubscrRequest."Processing Status"::Pending, SubscrRequest."Processing Status"::Error);
+        SubscrRequest.SetFilter(Status, '<>%1&<>%2', SubscrRequest.Status::Cancelled, SubscrRequest.Status::Skipped);
+        SubscrRequest.SetFilter("New Valid Until Date", '>%1', Subscription."Valid Until Date");
+        SubscrRequest.SetLoadFields("Entry No.");
+        PaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
+        PaymentRequest.SetRange(Type, PaymentRequest.Type::PayByLink);
+        PaymentRequest.SetRange(Status, PaymentRequest.Status::Captured);
+        if SubscrRequest.FindSet() then
+            repeat
+                PaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
+                if HasCapturedPaymentAwaitingRefund(PaymentRequest) then
+                    exit(true);
+            until SubscrRequest.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure HasCapturedPaymentAwaitingRefund(var PaymentRequest: Record "NPR MM Subscr. Payment Request"): Boolean
+    var
+        Refund: Record "NPR MM Subscr. Payment Request";
+    begin
+        if PaymentRequest.FindSet() then
+            repeat
+                // Reversed is set when the refund is requested, before the provider confirms it.
+                if not PaymentRequest.Reversed then
+                    exit(true);
+                if not Refund.Get(PaymentRequest."Reversed by Entry No.") then
+                    exit(true);
+                if (Refund.Type <> Refund.Type::Refund) or
+                   (Refund.Status <> Refund.Status::Captured) or
+                   (Refund.PSP <> PaymentRequest.PSP) or
+                   (Refund."Currency Code" <> PaymentRequest."Currency Code") or
+                   (Refund.Amount <> -PaymentRequest.Amount)
+                then
+                    exit(true);
+            until PaymentRequest.Next() = 0;
+        exit(false);
+    end;
+
+    internal procedure CollectPayByLinksToResolve(SubscriptionEntryNo: Integer; var TempPayment: Record "NPR MM Subscr. Payment Request" temporary)
+    var
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        Subscription: Record "NPR MM Subscription";
+        PayByLinkPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        IncludeCancelled: Boolean;
+    begin
+        TempPayment.Reset();
+        TempPayment.DeleteAll();
+        if not Subscription.Get(SubscriptionEntryNo) then
+            exit;
+        SubscrRequest.SetRange("Subscription Entry No.", SubscriptionEntryNo);
+        SubscrRequest.SetRange(Type, SubscrRequest.Type::Renew);
+        SubscrRequest.SetFilter("Created from Entry No.", '<>%1', 0);
+        SubscrRequest.SetFilter(Status, '%1|%2', SubscrRequest.Status::Requested, SubscrRequest.Status::Cancelled);
+        SubscrRequest.SetLoadFields("Entry No.", Status, "New Valid Until Date", "Subscription Entry No.", "Membership Code", "Renew Schedule Id");
+        if SubscrRequest.FindSet() then
+            repeat
+                IncludeCancelled := (SubscrRequest.Status = SubscrRequest.Status::Cancelled) and
+                    (SubscrRequest."New Valid Until Date" > Subscription."Valid Until Date");
+                if IncludeCancelled then
+                    IncludeCancelled := UsesRenewalSchedule(SubscrRequest);
+                PayByLinkPaymentRequest.Reset();
+                PayByLinkPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
+                PayByLinkPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
+                PayByLinkPaymentRequest.SetRange(Type, PayByLinkPaymentRequest.Type::PayByLink);
+                PayByLinkPaymentRequest.SetRange(Status, PayByLinkPaymentRequest.Status::Requested);
+                if IncludeCancelled then begin
+                    PayByLinkPaymentRequest.SetRange(Status, PayByLinkPaymentRequest.Status::Cancelled);
+                    PayByLinkPaymentRequest.SetRange(PSP, PayByLinkPaymentRequest.PSP::Adyen);
+                    PayByLinkPaymentRequest.SetRange(Reversed, false);
+                end;
+                if (SubscrRequest.Status = SubscrRequest.Status::Requested) or IncludeCancelled then
+                    if PayByLinkPaymentRequest.FindSet() then
+                        repeat
+                            if not IncludeCancelled or (PayByLinkPaymentRequest."Pay by Link ID" <> '') or (PayByLinkPaymentRequest."Pay by Link URL" <> '') then begin
+                                TempPayment := PayByLinkPaymentRequest;
+                                TempPayment.Insert();
+                            end;
+                        until PayByLinkPaymentRequest.Next() = 0;
+            until SubscrRequest.Next() = 0;
     end;
 
 

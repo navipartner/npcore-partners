@@ -69,6 +69,13 @@ table 6150918 "NPR MM Subscription"
             FieldClass = FlowField;
             CalcFormula = exist("NPR MM Subscr. Request" where("Subscription Entry No." = field("Entry No."), Type = field("Subscr. Request Type Filter"), "Processing Status" = Filter(Pending | Error), Status = filter(<> Cancelled & <> Skipped)));
         }
+        field(201; "Outst. Token Renew Req. Exist"; Boolean)
+        {
+            Caption = 'Outstanding Token Renewal Requests Exist';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR MM Subscr. Request" where("Subscription Entry No." = field("Entry No."), Type = const(Renew), "Created from Entry No." = const(0), "Processing Status" = filter(Pending | Error), Status = filter(<> Cancelled & <> Skipped)));
+        }
         field(210; "Subscr. Request Type Filter"; Enum "NPR MM Subscr. Request Type")
         {
             Caption = 'Subscr. Request Type Filter';

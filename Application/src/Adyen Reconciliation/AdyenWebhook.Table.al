@@ -97,6 +97,9 @@ table 6150880 "NPR Adyen Webhook"
         key(Key3; "Event Code", "Webhook Type", Status)
         {
         }
+        key(PaymentLink; "PSP Reference", "Event Code", "Webhook Type", Status)
+        {
+        }
     }
 
     trigger OnInsert()

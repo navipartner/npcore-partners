@@ -49,6 +49,108 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
         SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+        SubsRenewalMgt: Codeunit "NPR MM Subs. Renewal Mgt.";
+        SubscrPmtAdyen: Codeunit "NPR MM Subscr.Pmt.: Adyen";
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
+        PaymentLinkUrl: Text[2048];
+        IsLastRenewSchedPeriod: Boolean;
+        NotifyCustomer: Boolean;
+        CreationFailed: Boolean;
+        PaymentProcessed: Boolean;
+        IsScheduledTokenParent: Boolean;
+        PaymentProcessingFailedErr: Label '%1 %2 could not be processed. Check the payment request log for details.', Comment = '%1 = payment request table caption, %2 = entry number';
+    begin
+        if not SubscrRequestUtils.UsesRenewalSchedule(SubscriptionRequest) then begin
+            ProcessRejectedWithoutSchedule(SubscriptionRequest);
+            exit;
+        end;
+        if HandleOutstandingPayByLink(SubscriptionRequest) then
+            exit;
+
+        SubscrPaymentRequest.Reset();
+        SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscriptionRequest."Entry No.");
+        SubscrPaymentRequest.SetRange(Status, SubscrPaymentRequest.Status::Rejected);
+        SubscrPaymentRequest.FindLast();
+
+        NotifyCustomer := SubsRenewalMgt.IsCustomerActionableDecline(SubscrPaymentRequest);
+
+        IsScheduledTokenParent := IsParentRenewalRequest(SubscriptionRequest) and
+            (SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::Payment) and
+            not IsNullGuid(SubscriptionRequest."Renew Schedule Id");
+        if IsScheduledTokenParent then begin
+            Subscription.Get(SubscriptionRequest."Subscription Entry No.");
+            Membership.Get(Subscription."Membership Entry No.");
+            MembershipSetup.Get(Membership."Membership Code");
+            RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code");
+            IsLastRenewSchedPeriod := SubscrRequestUtils.LastRenewSchedPeriod(SubscriptionRequest, RecurPaymSetup);
+        end;
+
+        if IsScheduledTokenParent and (SubscrPaymentRequest.PSP = SubscrPaymentRequest.PSP::Adyen) then
+            PaymentProcessed := SubscrPmtAdyen.ProcessRejectedRenewal(SubscrPaymentRequest, CreationFailed)
+        else begin
+            SubscrPaymentIHandler := SubscrPaymentRequest.PSP;
+            PaymentProcessed := SubscrPaymentIHandler.ProcessPaymentRequest(SubscrPaymentRequest, false, false);
+        end;
+        if not PaymentProcessed then begin
+            if IsScheduledTokenParent and not IsLastRenewSchedPeriod and CreationFailed then begin
+                SubscriptionRequest.Get(SubscriptionRequest.RecordId);
+                SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+                SubscriptionRequest.Modify(true);
+                exit;
+            end;
+            if GetLastErrorText() = '' then
+                Error(PaymentProcessingFailedErr, SubscrPaymentRequest.TableCaption, SubscrPaymentRequest."Entry No.");
+            Error(GetLastErrorText());
+        end;
+
+        if not IsParentRenewalRequest(SubscriptionRequest) then begin
+            SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+            SubscriptionRequest.Modify(true);
+            exit;
+        end;
+
+        Subscription.Get(SubscriptionRequest."Subscription Entry No.");
+        Membership.Get(Subscription."Membership Entry No.");
+        MembershipSetup.Get(Membership."Membership Code");
+        RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code");
+        if (RecurPaymSetup."Subscr. Auto-Renewal On" <> RecurPaymSetup."Subscr. Auto-Renewal On"::Schedule) or
+           not IsNullGuid(SubscriptionRequest."Renew Schedule Id")
+        then
+            IsLastRenewSchedPeriod := SubscrRequestUtils.LastRenewSchedPeriod(SubscriptionRequest, RecurPaymSetup);
+
+        if not NotifyCustomer and not IsLastRenewSchedPeriod then begin
+            SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+            SubscriptionRequest.Modify(true);
+            exit;
+        end;
+
+        Subscription."Termination Reason" := Subscription."Termination Reason"::FORCED_TERMINATION;
+        Subscription.Modify(true);
+
+        if IsLastRenewSchedPeriod then begin
+            Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+            Membership.Modify(true);
+        end;
+
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+        SubscriptionRequest.Modify(true);
+
+        if NotifyCustomer or IsLastRenewSchedPeriod then begin
+            PaymentLinkUrl := FindPayByLink(SubscrPaymentRequest);
+            MemberNotification.AddMembershipRenewalFailureNotification(Subscription."Membership Entry No.", Subscription."Membership Code", SubscrPaymentRequest."Rejected Reason Code", SubscrPaymentRequest."Rejected Reason Description", PaymentLinkUrl);
+        end;
+    end;
+
+    local procedure ProcessRejectedWithoutSchedule(var SubscriptionRequest: Record "NPR MM Subscr. Request")
+    var
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
         SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
         PaymentLinkUrl: Text[2048];
         IsLastRenewSchedPeriod: Boolean;
@@ -261,6 +363,9 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
     begin
+        if HandlePaidOrLastDayRequestError(SubscriptionRequest) then
+            exit;
+
         SubscrPaymentRequest.Reset();
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
         SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscriptionRequest."Entry No.");
@@ -277,6 +382,112 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
 
         //Refresh subscription request
         SubscriptionRequest.Get(SubscriptionRequest.RecordId);
+    end;
+
+    local procedure HandlePaidOrLastDayRequestError(var SubscriptionRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
+        Subscription: Record "NPR MM Subscription";
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+        PaymentLinkUrl: Text[2048];
+        RejectedReasonCode: Text[50];
+        RejectedReasonDescription: Text[250];
+        RenewalFailedErr: Label 'The membership renewal could not be completed. Please contact the membership provider.';
+    begin
+        if not IsParentRenewalRequest(SubscriptionRequest) then
+            exit(false);
+        if not SubscrRequestUtils.UsesRenewalSchedule(SubscriptionRequest) then
+            exit(false);
+
+        if HandleOutstandingPayByLink(SubscriptionRequest) then
+            exit(true);
+
+        if _Manual then
+            exit(false);
+
+        if not Subscription.Get(SubscriptionRequest."Subscription Entry No.") then
+            exit(false);
+
+        if not Membership.Get(Subscription."Membership Entry No.") then
+            exit(false);
+        if not MembershipSetup.Get(Membership."Membership Code") then
+            exit(false);
+        if not RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code") then
+            exit(false);
+
+        if RecurPaymSetup."Subscr. Auto-Renewal On" <> RecurPaymSetup."Subscr. Auto-Renewal On"::Schedule then
+            exit(false);
+        if IsNullGuid(SubscriptionRequest."Renew Schedule Id") then
+            exit(false);
+        if not SubscrRequestUtils.LastRenewSchedPeriod(SubscriptionRequest, RecurPaymSetup) then
+            exit(false);
+
+        Subscription."Termination Reason" := Subscription."Termination Reason"::FORCED_TERMINATION;
+        Subscription.Modify(true);
+
+        Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+        Membership.Modify(true);
+
+        SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscriptionRequest."Entry No.");
+        SubscrPaymentRequest.SetRange(Status, SubscrPaymentRequest.Status::Error);
+        RejectedReasonDescription := RenewalFailedErr;
+        if SubscrPaymentRequest.FindLast() then begin
+            PaymentLinkUrl := FindPayByLink(SubscrPaymentRequest);
+            RejectedReasonCode := SubscrPaymentRequest."Rejected Reason Code";
+            if SubscrPaymentRequest."Rejected Reason Description" <> '' then
+                RejectedReasonDescription := SubscrPaymentRequest."Rejected Reason Description";
+        end;
+
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+        SubscriptionRequest.Modify(true);
+
+        MemberNotification.AddMembershipRenewalFailureNotification(Subscription."Membership Entry No.", Subscription."Membership Code", RejectedReasonCode, RejectedReasonDescription, PaymentLinkUrl);
+        exit(true);
+    end;
+
+    local procedure IsParentRenewalRequest(SubscriptionRequest: Record "NPR MM Subscr. Request"): Boolean
+    begin
+        exit((SubscriptionRequest.Type = SubscriptionRequest.Type::Renew) and (SubscriptionRequest."Created from Entry No." = 0));
+    end;
+
+    local procedure HandleOutstandingPayByLink(var SubscriptionRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
+        SubsRenewalMgt: Codeunit "NPR MM Subs. Renewal Mgt.";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+        OriginalStatus: Enum "NPR MM Subscr. Request Status";
+        IsPaid: Boolean;
+        CheckSucceeded: Boolean;
+        ErrorMessage: Text;
+    begin
+        if not IsParentRenewalRequest(SubscriptionRequest) then
+            exit(false);
+        if not SubscrRequestUtils.UsesRenewalSchedule(SubscriptionRequest) then
+            exit(false);
+
+        OriginalStatus := SubscriptionRequest.Status;
+        IsPaid := SubscrRequestUtils.HasCapturedPayByLinkForRenewal(SubscriptionRequest);
+        if IsPaid then
+            CheckSucceeded := true
+        else
+            CheckSucceeded := SubsRenewalMgt.TryIsOutstandingPayByLinkPaid(SubscriptionRequest."Subscription Entry No.", IsPaid, ErrorMessage);
+        SubscriptionRequest.Get(SubscriptionRequest.RecordId);
+        if (SubscriptionRequest.Status <> OriginalStatus) or
+           (SubscriptionRequest."Processing Status" = SubscriptionRequest."Processing Status"::Success)
+        then
+            exit(true);
+        if not CheckSucceeded then
+            Error('%1', ErrorMessage);
+        if not IsPaid then
+            exit(false);
+
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+        SubscriptionRequest.Modify(true);
+        exit(true);
     end;
 
     local procedure ProcessCancelStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")

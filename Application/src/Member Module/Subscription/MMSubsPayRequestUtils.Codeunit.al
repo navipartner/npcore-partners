@@ -20,15 +20,19 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
     end;
 
     local procedure SetSubscrPaymentRequestStatusWithConfirmation(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status"; LogChange: Boolean) Success: Boolean
+    begin
+        if not ConfirmPaymentRequestStatus(SubscrPaymentRequest, NewStatus) then
+            exit;
+        SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewStatus, LogChange);
+        Success := true;
+    end;
+
+    local procedure ConfirmPaymentRequestStatus(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status"): Boolean
     var
         ConfirmManagement: Codeunit "Confirm Management";
         NewStatusConfirmLbl: Label 'Are you sure you want to set the status of entry no. %1 to %2?', Comment = '%1 - entry no., %2 - Status';
     begin
-        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(NewStatusConfirmLbl, SubscrPaymentRequest."Entry No.", NewStatus), true) then
-            exit;
-        SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewStatus, LogChange);
-
-        Success := true;
+        exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(NewStatusConfirmLbl, SubscrPaymentRequest."Entry No.", NewStatus), true));
     end;
 
     internal procedure SetSubscrPaymentRequestStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status"; LogChange: Boolean)
@@ -72,11 +76,24 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
     internal procedure SetSubscrPaymentRequestStatusCancelled(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean)
     var
         SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
+        SubscrPmtAdyen: Codeunit "NPR MM Subscr.Pmt.: Adyen";
+        ErrorMessage: Text;
         CannotCancelCapturedErr: Label 'Captured subscription payment requests cannot be cancelled. Please request a refund instead.';
 
     begin
         if SubscrPaymentRequest.Status = SubscrPaymentRequest.Status::Captured then
             Error(CannotCancelCapturedErr);
+
+        if (SubscrPaymentRequest.PSP = SubscrPaymentRequest.PSP::Adyen) and
+           (SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::PayByLink)
+        then begin
+            if not ConfirmPaymentRequestStatus(SubscrPaymentRequest, SubscrPaymentRequest.Status::Cancelled) then
+                exit;
+            if not SubscrPmtAdyen.ConfirmPayByLinkCancellation(SubscrPaymentRequest, ErrorMessage) then
+                Error('%1', ErrorMessage);
+            SetSubscrPaymentRequestStatus(SubscrPaymentRequest, SubscrPaymentRequest.Status::Cancelled, true);
+            exit;
+        end;
 
         if not SetSubscrPaymentRequestStatusWithConfirmation(SubscrPaymentRequest, Enum::"NPR MM Payment Request Status"::Cancelled, false) then
             exit;

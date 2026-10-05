@@ -65,21 +65,48 @@ codeunit 6185033 "NPR MM Subscr. Renew Req. JQ"
                 Subscription.SetRange("Valid Until Date", RenewalDate);
                 Subscription.SetRange("Postpone Renewal Attempt Until", 0D, WorkDate());
                 Subscription.SetRange("Subscr. Request Type Filter", Subscription."Subscr. Request Type Filter"::Renew);
-                Subscription.SetRange("Outst. Subscr. Requests Exist", false);
+                Subscription.SetRange("Outst. Token Renew Req. Exist", false);
                 Subscription.SetFilter("Auto-Renew", '%1|%2', Subscription."Auto-Renew"::YES_INTERNAL, Subscription."Auto-Renew"::TERMINATION_REQUESTED);
                 Subscription.SetRange("Subscr Renew Sched Date Filter", WorkDate());
                 Subscription.SetRange("Subscr Renew Sched Id Filter", RenewalSchedLine.SystemId);
                 Subscription.SetRange("Subscr Renew Sched Req Exist", false);
-                Subscription.SetAutoCalcFields("Outst. Subscr. Requests Exist", "Subscr Renew Sched Req Exist");
+                Subscription.SetAutoCalcFields("Outst. Token Renew Req. Exist", "Subscr Renew Sched Req Exist");
                 if Subscription.FindSet() then
                     repeat
-                        RequestSubscrRenewal.SetRenewalSchedLine(RenewalSchedLine);
-                        if not RequestSubscrRenewal.Run(Subscription) then begin
-                            Subscription.Find();
-                            SubscriptionMgtImpl.ReportSubscriptionRenewalCreationErrorFromLastError(Subscription, '');
+                        if not ResolveExistingPayByLink(Subscription) then begin
+                            RequestSubscrRenewal.SetRenewalSchedLine(RenewalSchedLine);
+                            if not RequestSubscrRenewal.Run(Subscription) then begin
+                                Subscription.Find();
+                                SubscriptionMgtImpl.ReportSubscriptionRenewalCreationErrorFromLastError(Subscription, '');
+                            end;
                         end;
                     until Subscription.Next() = 0;
             until RenewalSchedLine.Next() = 0;
+    end;
+
+    internal procedure ResolveExistingPayByLink(Subscription: Record "NPR MM Subscription") SkipRenewal: Boolean
+    var
+        OutstandingPayByLink: Record "NPR MM Subscr. Payment Request";
+        TempPayment: Record "NPR MM Subscr. Payment Request" temporary;
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+        ResolvePayByLink: Codeunit "NPR MM Subscr. Resolve PBL";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        if SubscrRequestUtils.HasCapturedPayByLinkAwaitingRenewal(Subscription) then
+            exit(true);
+        SubscrRequestUtils.CollectPayByLinksToResolve(Subscription."Entry No.", TempPayment);
+        if TempPayment.FindSet() then
+            repeat
+                OutstandingPayByLink.Get(TempPayment."Entry No.");
+                Clear(ResolvePayByLink);
+                Commit();
+                if not ResolvePayByLink.Run(OutstandingPayByLink) then begin
+                    SubscriptionMgtImpl.ReportSubscriptionRenewalCreationErrorFromLastError(Subscription, '');
+                    exit(true);
+                end;
+                if ResolvePayByLink.SkipRenewal() then
+                    exit(true);
+            until TempPayment.Next() = 0;
     end;
 
     local procedure ProcessRecurringPaymentWithRetryCount(RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup"; MembershipSetup: Record "NPR MM Membership Setup")

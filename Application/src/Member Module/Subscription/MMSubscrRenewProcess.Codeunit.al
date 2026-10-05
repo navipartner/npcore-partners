@@ -9,6 +9,7 @@ codeunit 6185036 "NPR MM Subscr. Renew: Process"
         NpPaySetup: Record "NPR Adyen Setup";
         SubsReqLogEntry: Record "NPR MM Subs Req Log Entry";
         SubsTryRenewProcess: Codeunit "NPR MM Subs Try Renew Process";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
     begin
         NpPaySetup.Get();
 
@@ -20,6 +21,16 @@ codeunit 6185036 "NPR MM Subscr. Renew: Process"
         SubscriptionRequest.Get(SubscriptionRequest.RecordId);
         if SubscriptionRequest."Processing Status" = SubscriptionRequest."Processing Status"::Success then
             exit(true);
+
+        if not Manual and
+           (SubscriptionRequest.Type = SubscriptionRequest.Type::Renew) and
+           (SubscriptionRequest.Status in [SubscriptionRequest.Status::Rejected, SubscriptionRequest.Status::"Request Error"]) and
+           (SubscriptionRequest."Created from Entry No." = 0) and
+           (SubscriptionRequest."Processing Status" = SubscriptionRequest."Processing Status"::Error) and
+           (SubscriptionRequest.SystemModifiedAt > CurrentDateTime() - 30 * 60 * 1000)
+        then
+            if SubscrRequestUtils.UsesRenewalSchedule(SubscriptionRequest) then
+                exit(false);
 
         PrepareRecords(SubscriptionRequest, SubsReqLogEntry, SkipTryCountUpdate, Manual);
         ClearLastError();

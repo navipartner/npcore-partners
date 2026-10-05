@@ -74,6 +74,7 @@ table 6150963 "NPR MM Subs Pay Req Log Entry"
         key(Key1; "Entry No.")
         {
         }
+        key(PaymentRequest; "Payment Request Entry No.", "Entry No.") { }
     }
 
     internal procedure SetRequest(RequestText: Text)
