@@ -710,9 +710,9 @@
 
         if NOT Rec."Custom Descr" then begin
             if (Rec.Description = '') or (Rec.Description = ' ') then
-                Rec.Description := CopyStr(Item.Description, 1, 30);
+                Rec.Description := CopyStr(Item.Description, 1, MaxStrLen(Rec.Description));
 
-            Rec."Description 2" := CopyStr(Item."Description 2", 1, 30);
+            Rec."Description 2" := CopyStr(Item."Description 2", 1, MaxStrLen(Rec."Description 2"));
         end;
     end;
 

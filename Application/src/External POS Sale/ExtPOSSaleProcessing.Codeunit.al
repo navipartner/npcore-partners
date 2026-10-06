@@ -82,7 +82,10 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
                 begin
                     ExternalPOSSaleLine."Gen. Bus. Posting Group" := ExternalPOSSale."Gen. Bus. Posting Group";
                     if (Item.Get(ExternalPOSSaleLine."No.")) then begin
-
+                        if ExternalPOSSaleLine.Description = '' then
+                            ExternalPOSSaleLine.Description := Item.Description;
+                        if ExternalPOSSaleLine."Description 2" = '' then
+                            ExternalPOSSaleLine."Description 2" := Item."Description 2";
                         ExternalPOSSaleLine."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
                         ExternalPOSSaleLine."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
                         ExternalPOSSaleLine."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";

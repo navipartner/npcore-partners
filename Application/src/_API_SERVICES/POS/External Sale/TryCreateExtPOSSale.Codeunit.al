@@ -154,10 +154,12 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
 #pragma warning restore AA0139
 
         SaleLine.SelectToken('description', TempJToken);
-        ExternalPOSSaleLine.Description := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSSaleLine.Description));
+        if TempJToken.AsValue().AsText() <> '' then
+            ExternalPOSSaleLine.Description := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSSaleLine.Description));
 
         if (SaleLine.SelectToken('description2', TempJToken)) then
-            ExternalPOSSaleLine."Description 2" := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSSaleLine."Description 2"));
+            if TempJToken.AsValue().AsText() <> '' then
+                ExternalPOSSaleLine."Description 2" := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSSaleLine."Description 2"));
 
         if (SaleLine.SelectToken('returnReasonCode', TempJToken)) then
 #pragma warning disable AA0139
@@ -187,7 +189,8 @@ codeunit 6248183 "NPR Try Create Ext POS Sale"
 #pragma warning restore AA0139
 
         PaymentLine.SelectToken('description', TempJToken);
-        ExternalPOSPaymentLine.Description := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSPaymentLine.Description));
+        if TempJToken.AsValue().AsText() <> '' then
+            ExternalPOSPaymentLine.Description := CopyStr(TempJToken.AsValue().AsText(), 1, MaxStrLen(ExternalPOSPaymentLine.Description));
 
         PaymentLine.SelectToken('amountIncludingVAT', TempJToken);
         ExternalPOSPaymentLine."Amount Including VAT" := TempJToken.AsValue().AsDecimal();

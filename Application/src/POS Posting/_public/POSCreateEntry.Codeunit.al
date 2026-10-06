@@ -2329,6 +2329,7 @@
         POSSalesLine."Location Code" := ExtSaleLinePOS."Location Code";
         POSSalesLine."Posting Group" := ExtSaleLinePOS."Posting Group";
         POSSalesLine.Description := ExtSaleLinePOS.Description;
+        POSSalesLine."Description 2" := ExtSaleLinePOS."Description 2";
 
         POSSalesLine."Gen. Posting Type" := ExtSaleLinePOS."Gen. Posting Type";
         POSSalesLine."Gen. Bus. Posting Group" := ExtSaleLinePOS."Gen. Bus. Posting Group";
