@@ -110,10 +110,14 @@ codeunit 6151471 "NPR Spfy Task Send Fulfillment"
         UserErrorText: Text;
         TransportFailureOccurred: Boolean;
         SendToShopify: Boolean;
+        NotifyCustomer: Boolean;
         Success: Boolean;
         MissingFulfillmentIdErr: Label 'Shopify fulfillmentCreate returned no fulfillment id and no userErrors. This is a programming bug', Locked = true;
     begin
         CollectDistinctLocationIds(CalculatedFulfillmentLines, LocationIds);
+
+        NotifyCustomer := true;
+        _SpfyIntegrationEvents.OnSetFulfillmentNotifyCustomer(SpfyTask."Record ID", SpfyTask."Store Code", NotifyCustomer);
 
         foreach LocationId in LocationIds do begin
             CalculatedFulfillmentLines.Reset();
@@ -122,7 +126,7 @@ codeunit 6151471 "NPR Spfy Task Send Fulfillment"
             Clear(ShopifyResponse);
             ClearLastError();
             FulfillmentId := '';
-            GenerateFulfillmentPayloadJson(SpfyTask, CalculatedFulfillmentLines, SendToShopify);
+            GenerateFulfillmentPayloadJson(SpfyTask, CalculatedFulfillmentLines, SendToShopify, NotifyCustomer);
             if SendToShopify then begin
                 Success := GetGraphQLClient().ExecuteRequest(SpfyTask, false, ShopifyResponse);
                 if Success then
@@ -468,7 +472,7 @@ codeunit 6151471 "NPR Spfy Task Send Fulfillment"
     /// The caller is expected to have applied a "Location ID" filter, since a Shopify fulfillment must belong to a
     /// single location. Sets SendToShopify to false when the filtered set is empty.
     /// </summary>
-    local procedure GenerateFulfillmentPayloadJson(var SpfyTask: Record "NPR Spfy Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean)
+    local procedure GenerateFulfillmentPayloadJson(var SpfyTask: Record "NPR Spfy Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean; NotifyCustomer: Boolean)
     var
         RootObj: JsonObject;
         VariablesObj: JsonObject;
@@ -509,7 +513,7 @@ codeunit 6151471 "NPR Spfy Task Send Fulfillment"
 
         Clear(FulfillmentObj);
         FulfillmentObj.Add('lineItemsByFulfillmentOrder', ItemsByFulfillmentOrder);
-        FulfillmentObj.Add('notifyCustomer', true);
+        FulfillmentObj.Add('notifyCustomer', NotifyCustomer);
         if GenerateTrackingInfo(SpfyTask, TrackingInfo) then
             FulfillmentObj.Add('trackingInfo', TrackingInfo);
 

@@ -113,10 +113,14 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         UserErrorText: Text;
         TransportFailureOccurred: Boolean;
         SendToShopify: Boolean;
+        NotifyCustomer: Boolean;
         Success: Boolean;
         MissingFulfillmentIdErr: Label 'Shopify fulfillmentCreate returned no fulfillment id and no userErrors. This is a programming bug', Locked = true;
     begin
         CollectDistinctLocationIds(CalculatedFulfillmentLines, LocationIds);
+
+        NotifyCustomer := true;
+        SpfyIntegrationEvents.OnSetFulfillmentNotifyCustomer(NcTask."Record ID", NcTask."Store Code", NotifyCustomer);
 
         foreach LocationId in LocationIds do begin
             CalculatedFulfillmentLines.Reset();
@@ -125,7 +129,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             Clear(ShopifyResponse);
             ClearLastError();
             FulfillmentId := '';
-            GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines, SendToShopify);
+            GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines, SendToShopify, NotifyCustomer);
             if SendToShopify then begin
                 Success := GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse);
                 if Success then
@@ -488,7 +492,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     /// The caller is expected to have applied a "Location ID" filter, since a Shopify fulfillment must belong to a
     /// single location. Sets SendToShopify to false when the filtered set is empty.
     /// </summary>
-    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean)
+    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean; NotifyCustomer: Boolean)
     var
         RootObj: JsonObject;
         VariablesObj: JsonObject;
@@ -529,7 +533,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
 
         Clear(FulfillmentObj);
         FulfillmentObj.Add('lineItemsByFulfillmentOrder', ItemsByFulfillmentOrder);
-        FulfillmentObj.Add('notifyCustomer', true);
+        FulfillmentObj.Add('notifyCustomer', NotifyCustomer);
         if GenerateTrackingInfo(NcTask, TrackingInfo) then
             FulfillmentObj.Add('trackingInfo', TrackingInfo);
 

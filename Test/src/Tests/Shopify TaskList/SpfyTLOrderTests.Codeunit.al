@@ -568,6 +568,7 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         SendRequest := MockClient.GetRequestContaining(_FulfillmentCreateTok);
         _Assert.IsTrue(SendRequest.Contains('FulfillmentOrderLineItem/7001'), StrSubstNo('The mutation must carry the first fulfillment-order line, but the request was: %1', SendRequest));
         _Assert.IsTrue(SendRequest.Contains('FulfillmentOrderLineItem/7002'), StrSubstNo('The mutation must carry the second fulfillment-order line, but the request was: %1', SendRequest));
+        _Assert.IsTrue(SendRequest.Contains('"notifyCustomer":true'), StrSubstNo('Without a subscriber override the customer must be notified, but the request was: %1', SendRequest));
 
         // [THEN] One fulfillment entry per shipment line is persisted with the Shopify fulfillment id.
         _Assert.AreEqual(1, FulfillmentEntryCount(ShipmentLineRecordId(SalesShipmentHeader."No.", 10000)), 'One fulfillment entry expected for the first shipment line');

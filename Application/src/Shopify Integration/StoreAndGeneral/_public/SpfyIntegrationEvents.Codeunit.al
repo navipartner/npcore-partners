@@ -202,6 +202,11 @@ codeunit 6184824 "NPR Spfy Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnSetFulfillmentNotifyCustomer(DocumentRecID: RecordId; ShopifyStoreCode: Code[20]; var NotifyCustomer: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnCheckIfShouldSkipOrderImport(ShopifyStoreCode: Code[20]; Order: JsonToken; var SkipImport: Boolean)
     begin
     end;
