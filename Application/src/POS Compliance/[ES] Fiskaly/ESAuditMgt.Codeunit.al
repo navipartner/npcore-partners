@@ -293,6 +293,8 @@ codeunit 6184866 "NPR ES Audit Mgt."
         POSUnit: Record "NPR POS Unit";
         ESFiskalyCommunication: Codeunit "NPR ES Fiskaly Communication";
         ESFiscalThermalPrint: Codeunit "NPR ES Fiscal Thermal Print";
+        ESOfflineInvoiceMgt: Codeunit "NPR ES Offline Invoice Mgt.";
+        ForceOfflineIssuance: Boolean;
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -306,6 +308,15 @@ codeunit 6184866 "NPR ES Audit Mgt."
         if not ESPOSAuditLogAuxInfo.FindAuditLog(POSEntry."Entry No.") then
             exit;
 
+        if IsOfflineIssuanceSupported(ESPOSAuditLogAuxInfo."ES Organization Code") then begin
+            if ESOfflineInvoiceMgt.HasPendingOfflineInvoices(ESPOSAuditLogAuxInfo."ES Client Id") then
+                if ESOfflineInvoiceMgt.IsSaleRetryDue(ESPOSAuditLogAuxInfo."ES Client Id") then
+                    ForceOfflineIssuance := not ESOfflineInvoiceMgt.SubmitPendingOfflineInvoices(ESPOSAuditLogAuxInfo."ES Client Id", MaxOfflineInvoicesSubmittedOnSale())
+                else
+                    ForceOfflineIssuance := true;
+
+            ESFiskalyCommunication.SetOfflineFallback(true, ForceOfflineIssuance);
+        end;
         ESFiskalyCommunication.CreateInvoice(ESPOSAuditLogAuxInfo);
 
         if IsPrintReceiptEnabled() then
@@ -533,6 +544,20 @@ codeunit 6184866 "NPR ES Audit Mgt."
         Initialized := true;
         Enabled := true;
         exit(true);
+    end;
+
+    local procedure MaxOfflineInvoicesSubmittedOnSale(): Integer
+    begin
+        exit(10);
+    end;
+
+    local procedure IsOfflineIssuanceSupported(ESOrganizationCode: Code[20]): Boolean
+    var
+        ESOrganization: Record "NPR ES Organization";
+    begin
+        if not ESOrganization.Get(ESOrganizationCode) then
+            exit(false);
+        exit(ESOrganization.IsVerifactuCompliance());
     end;
 
     internal procedure HandlerCode(): Code[20]

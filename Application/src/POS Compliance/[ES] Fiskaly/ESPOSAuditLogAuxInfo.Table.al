@@ -19,6 +19,31 @@ table 6150894 "NPR ES POS Audit Log Aux. Info"
             DataClassification = CustomerContent;
             AutoIncrement = true;
         }
+        field(3; "Issued Offline"; Boolean)
+        {
+            Caption = 'Issued Offline';
+            DataClassification = CustomerContent;
+        }
+        field(4; "Offline Issued At"; DateTime)
+        {
+            Caption = 'Offline Issued At';
+            DataClassification = CustomerContent;
+        }
+        field(5; "Submission Attempts"; Integer)
+        {
+            Caption = 'Submission Attempts';
+            DataClassification = CustomerContent;
+        }
+        field(6; "Last Submission Attempt At"; DateTime)
+        {
+            Caption = 'Last Submission Attempt At';
+            DataClassification = CustomerContent;
+        }
+        field(7; "Last Submission Error"; Text[2048])
+        {
+            Caption = 'Last Submission Error';
+            DataClassification = CustomerContent;
+        }
         field(10; "POS Entry No."; Integer)
         {
             Caption = 'POS Entry No.';
@@ -194,6 +219,9 @@ table 6150894 "NPR ES POS Audit Log Aux. Info"
         key(Key1; "Audit Entry Type", "Audit Entry No.")
         {
         }
+        key(Key2; "Issued Offline", "Invoice State", "Audit Entry No.")
+        {
+        }
     }
 
     fieldgroups
@@ -221,6 +249,18 @@ table 6150894 "NPR ES POS Audit Log Aux. Info"
         SetRange("Audit Entry Type", "Audit Entry Type"::"Customer Information");
         SetRange("Source Document No.", SourceDocumentNo);
         exit(FindFirst());
+    end;
+
+    internal procedure IsPendingOfflineSubmission(): Boolean
+    begin
+        exit("Issued Offline" and ("Invoice State" = "Invoice State"::" "));
+    end;
+
+    internal procedure SetPendingOfflineSubmissionFilter()
+    begin
+        SetCurrentKey("Issued Offline", "Invoice State", "Audit Entry No.");
+        SetRange("Issued Offline", true);
+        SetRange("Invoice State", "Invoice State"::" ");
     end;
 
     internal procedure GetQRCode() QRCode: Text

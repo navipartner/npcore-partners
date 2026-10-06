@@ -28,6 +28,13 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         if not ESPOSAuditLogAuxInfo.FindAuditLog(POSEntry."Entry No.") then
             exit;
 
+        if ESPOSAuditLogAuxInfo.IsPendingOfflineSubmission() then begin
+            AddOfflineComplianceInformation(ESPOSAuditLogAuxInfo);
+            AddReceiptInformation(POSEntry);
+            AddPapercutCommand();
+            exit;
+        end;
+
         VerifactuCompliance := IsVerifactuCompliance(ESPOSAuditLogAuxInfo."ES Organization Code");
 
         if VerifactuCompliance then
@@ -354,6 +361,35 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         foreach ValidationTextPart in ValidationText do
             Printer.AddLine(ValidationTextPart, 1);
 
+        Printer.AddLine('', 0);
+    end;
+
+    local procedure AddOfflineComplianceInformation(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info")
+    var
+        QRFontLbl: Label 'QR', Locked = true;
+        B21FontLbl: Label 'B21', Locked = true;
+        A11FontLbl: Label 'A11', Locked = true;
+        TaxQRCodeLbl: Label 'QR tributario:', Locked = true;
+        VerifactuLbl: Label 'VERI*FACTU', Locked = true;
+        InvoiceNoLbl: Label 'Invoice No. %1', Comment = '%1 - Invoice No. value';
+        PendingSubmissionLbl: Label 'Issued offline, fiscal registration pending';
+    begin
+        // Invoice issued during a Fiskaly outage: the AEAT QR code is built locally from the same data that is submitted later.
+        if ESPOSAuditLogAuxInfo."Validation URL" <> '' then begin
+            Printer.SetFont(B21FontLbl);
+            Printer.AddLine(TaxQRCodeLbl, 1);
+
+            Printer.SetFont(QRFontLbl);
+            Printer.AddBarcode(QRFontLbl, ESPOSAuditLogAuxInfo."Validation URL", 4, true, 4);
+
+            Printer.SetFont(B21FontLbl);
+            Printer.AddLine(VerifactuLbl, 1);
+        end;
+
+        Printer.SetFont(A11FontLbl);
+        Printer.AddLine(StrSubstNo(InvoiceNoLbl, ESPOSAuditLogAuxInfo."Invoice No."), 1);
+        if ESPOSAuditLogAuxInfo."Validation URL" = '' then
+            Printer.AddLine(PendingSubmissionLbl, 1);
         Printer.AddLine('', 0);
     end;
 

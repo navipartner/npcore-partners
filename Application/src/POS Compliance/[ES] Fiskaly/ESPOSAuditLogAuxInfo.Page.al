@@ -143,6 +143,32 @@ page 6184711 "NPR ES POS Audit Log Aux. Info"
                     ApplicationArea = NPRESFiscal;
                     ToolTip = 'Specifies the validation description of invoice at Fiskaly.';
                 }
+                field("Issued Offline"; Rec."Issued Offline")
+                {
+                    ApplicationArea = NPRESFiscal;
+                    ToolTip = 'Specifies whether the invoice was issued offline because Fiskaly could not be reached when the sale ended. Such invoices are submitted to Fiskaly later with an incident annotation.';
+                }
+                field("Offline Issued At"; Rec."Offline Issued At")
+                {
+                    ApplicationArea = NPRESFiscal;
+                    ToolTip = 'Specifies the date and time when the invoice was issued offline. This value is sent to Fiskaly as the issue date and time.';
+                }
+                field("Submission Attempts"; Rec."Submission Attempts")
+                {
+                    ApplicationArea = NPRESFiscal;
+                    BlankZero = true;
+                    ToolTip = 'Specifies how many times sending the invoice to Fiskaly has failed.';
+                }
+                field("Last Submission Attempt At"; Rec."Last Submission Attempt At")
+                {
+                    ApplicationArea = NPRESFiscal;
+                    ToolTip = 'Specifies the date and time of the last failed attempt to send the invoice to Fiskaly.';
+                }
+                field("Last Submission Error"; Rec."Last Submission Error")
+                {
+                    ApplicationArea = NPRESFiscal;
+                    ToolTip = 'Specifies the error from the last failed attempt to send the invoice to Fiskaly.';
+                }
                 field(SystemId; Rec.SystemId)
                 {
                     ApplicationArea = NPRESFiscal;
@@ -173,6 +199,48 @@ page 6184711 "NPR ES POS Audit Log Aux. Info"
                 begin
                     CurrPage.SaveRecord();
                     ESFiskalyCommunication.CreateInvoice(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
+            action(SubmitOfflineInvoice)
+            {
+                ApplicationArea = NPRESFiscal;
+                Caption = 'Submit Offline Invoice';
+                Enabled = _SubmitOfflineInvoiceEnabled;
+                Image = SendTo;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Submits an invoice that was issued offline to Fiskaly. Older offline invoices of the same client are submitted first.';
+
+                trigger OnAction()
+                var
+                    ESOfflineInvoiceMgt: Codeunit "NPR ES Offline Invoice Mgt.";
+                    SubmittedMsg: Label 'All offline invoices of this client have been submitted to Fiskaly.';
+                    NotSubmittedErr: Label 'Not all offline invoices of this client could be submitted to Fiskaly. Check %1 on the oldest pending invoice.', Comment = '%1 - Last Submission Error field caption';
+                begin
+                    CurrPage.SaveRecord();
+                    if not ESOfflineInvoiceMgt.SubmitPendingOfflineInvoices(Rec."ES Client Id", 1000) then begin
+                        CurrPage.Update(false);
+                        Error(NotSubmittedErr, Rec.FieldCaption("Last Submission Error"));
+                    end;
+                    CurrPage.Update(false);
+                    Message(SubmittedMsg);
+                end;
+            }
+            action(ShowPendingOfflineInvoices)
+            {
+                ApplicationArea = NPRESFiscal;
+                Caption = 'Show Pending Offline Invoices';
+                Image = FilterLines;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Shows only invoices that were issued offline and are not yet accepted by Fiskaly.';
+
+                trigger OnAction()
+                begin
+                    Rec.SetPendingOfflineSubmissionFilter();
                     CurrPage.Update(false);
                 end;
             }
@@ -240,9 +308,11 @@ page 6184711 "NPR ES POS Audit Log Aux. Info"
     begin
         CreateInvoiceEnabled := (Rec."Invoice No." = '') and (Rec."Invoice State" = Rec."Invoice State"::" ");
         RetrieveInvoiceEnabled := Rec."Invoice No." <> '';
+        _SubmitOfflineInvoiceEnabled := Rec.IsPendingOfflineSubmission();
     end;
 
     var
         CreateInvoiceEnabled: Boolean;
+        _SubmitOfflineInvoiceEnabled: Boolean;
         RetrieveInvoiceEnabled: Boolean;
 }

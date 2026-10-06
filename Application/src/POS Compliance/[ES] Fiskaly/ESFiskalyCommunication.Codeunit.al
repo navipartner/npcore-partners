@@ -4,6 +4,11 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
 
     var
         ESSecretMgt: Codeunit "NPR ES Secret Mgt.";
+        _LastHttpStatusCode: Integer;
+        _OfflineFallbackAllowed: Boolean;
+        _ForceOfflineIssuance: Boolean;
+        _WaitingForRefundedInvoice: Boolean;
+        _RequestTimeout: Duration;
 
     #region JWT Token
     local procedure GetJWT(ESOrganization: Record "NPR ES Organization"): Text
@@ -504,11 +509,14 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
         ESFiscalizationSetup: Record "NPR ES Fiscalization Setup";
         ESOrganization: Record "NPR ES Organization";
         ESSigner: Record "NPR ES Signer";
+        ESOfflineInvoiceMgt: Codeunit "NPR ES Offline Invoice Mgt.";
         IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         CreateInvoiceErr: Label 'Create invoice failed.';
         CreateInvoiceLbl: Label 'clients/%1/invoices/%2', Locked = true, Comment = '%1 - Client Id value, %2 - Invoice Id value';
         UseRetrieveInvoiceErr: Label '%1 %2 is already assigned on Fiskaly''s end. Therefore you should use Retrieve Invoice in order to populate missing fields.', Comment = '%1 - Invoice Number field caption, %2 - Invoice Number field value';
+        PendingOfflineInvoicesLbl: Label 'Issued offline because earlier offline invoices of this client are still waiting to be submitted to Fiskaly.';
+        RefundedInvoicePendingOfflineLbl: Label 'Issued offline because the invoice it corrects was issued offline and is still waiting to be submitted to Fiskaly.';
         JsonBody: Text;
         ResponseText: Text;
         Url: Text;
@@ -531,18 +539,40 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
         ESFiscalizationSetup.GetWithCheck();
         ESFiscalizationSetup.TestField("Invoice Description");
 
+        // Outside the sale path nothing submits the offline backlog first, so creating now would overtake it.
+        if not _OfflineFallbackAllowed then
+            CheckNoOfflineInvoicesPendingBefore(ESPOSAuditLogAuxInfo, ESClient);
+
         SetInvoiceFieldsOnESPOSAuditLogAuxInfo(ESPOSAuditLogAuxInfo, ESClient);
+
+        if _OfflineFallbackAllowed then begin
+            if _ForceOfflineIssuance then begin
+                IssueInvoiceOffline(ESPOSAuditLogAuxInfo, PendingOfflineInvoicesLbl + ' ' + ESOfflineInvoiceMgt.GetOldestPendingOfflineInvoiceError(ESPOSAuditLogAuxInfo."ES Client Id"), false);
+                exit;
+            end;
+            // A correcting invoice must not reach Fiskaly before the invoice it corrects, which may belong to another client.
+            if IsRefundedInvoicePendingOffline(ESPOSAuditLogAuxInfo) then begin
+                IssueInvoiceOffline(ESPOSAuditLogAuxInfo, RefundedInvoicePendingOfflineLbl, false);
+                exit;
+            end;
+        end;
 
         Url := CreateUrl(ESFiscalizationSetup, StrSubstNo(CreateInvoiceLbl, Format(ESPOSAuditLogAuxInfo."ES Client Id", 0, 4).ToLower(), Format(ESPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForCreateInvoice(ESPOSAuditLogAuxInfo, ESFiscalizationSetup."Invoice Description");
-        PrepareHttpRequest(ESOrganization, true, RequestMessage, JsonBody, Url, Enum::"Http Request Type"::PUT);
+        _LastHttpStatusCode := -1;
+        if not TryPrepareHttpRequest(ESOrganization, RequestMessage, JsonBody, Url, Enum::"Http Request Type"::PUT) then begin
+            HandleCreateInvoiceRequestFailure(ESPOSAuditLogAuxInfo, CreateInvoiceErr);
+            exit;
+        end;
 
         OnBeforeSendHttpRequestForCreateInvoice(RequestMessage, ResponseText, ESPOSAuditLogAuxInfo, IsHandled);
         if IsHandled then
             exit;
 
-        if not SendHttpRequest(RequestMessage, ResponseText) then
-            Error('%1\\%2', CreateInvoiceErr, GetLastErrorText());
+        if not SendHttpRequest(RequestMessage, ResponseText) then begin
+            HandleCreateInvoiceRequestFailure(ESPOSAuditLogAuxInfo, CreateInvoiceErr);
+            exit;
+        end;
 
         PopulateESPOSAuditLogAuxInfoForCreateInvoice(ESPOSAuditLogAuxInfo, ResponseText);
         if ESPOSAuditLogAuxInfo."Invoice Registration State" = ESPOSAuditLogAuxInfo."Invoice Registration State"::PENDING then begin
@@ -589,6 +619,159 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
             Error('%1\\%2', RetrieveInvoiceErr, GetLastErrorText());
 
         PopulateESPOSAuditLogAuxInfo(ESPOSAuditLogAuxInfo, ResponseText);
+    end;
+
+    internal procedure SubmitOfflineInvoice(var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info")
+    var
+        ESClient: Record "NPR ES Client";
+        ESFiscalizationSetup: Record "NPR ES Fiscalization Setup";
+        ESOrganization: Record "NPR ES Organization";
+        ESSigner: Record "NPR ES Signer";
+        IsHandled: Boolean;
+        RequestMessage: HttpRequestMessage;
+        SubmitOfflineInvoiceErr: Label 'Submit offline invoice failed.';
+        SubmitOfflineInvoiceLbl: Label 'clients/%1/invoices/%2', Locked = true, Comment = '%1 - Client Id value, %2 - Invoice Id value';
+        WaitingForRefundedInvoiceErr: Label 'The invoice that this invoice corrects has not been submitted to Fiskaly yet. It will be submitted after that invoice.';
+        JsonBody: Text;
+        ResponseText: Text;
+        Url: Text;
+    begin
+        _LastHttpStatusCode := -1;
+        _WaitingForRefundedInvoice := false;
+
+        if IsRefundedInvoicePendingOffline(ESPOSAuditLogAuxInfo) then begin
+            _WaitingForRefundedInvoice := true;
+            Error(WaitingForRefundedInvoiceErr);
+        end;
+
+        ESPOSAuditLogAuxInfo.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ESPOSAuditLogAuxInfo.SystemId);
+        ESPOSAuditLogAuxInfo.TestField("Issued Offline", true);
+        ESPOSAuditLogAuxInfo.TestField("Invoice State", ESPOSAuditLogAuxInfo."Invoice State"::" ");
+        ESPOSAuditLogAuxInfo.TestField("Invoice No.");
+        ESPOSAuditLogAuxInfo.TestField("Offline Issued At");
+        ESPOSAuditLogAuxInfo.TestField("POS Entry No.");
+        ESPOSAuditLogAuxInfo.TestField("ES Organization Code");
+        ESPOSAuditLogAuxInfo.TestField("ES Signer Code");
+        ESPOSAuditLogAuxInfo.TestField("ES Client Id");
+        CheckIsGUIDAccordingToUUIDv4Standard(ESPOSAuditLogAuxInfo."ES Client Id");
+        ESClient.GetWithCheck(ESPOSAuditLogAuxInfo."POS Unit No.");
+        ESSigner.GetWithCheck(ESPOSAuditLogAuxInfo."ES Signer Code");
+        ESOrganization.GetWithCheck(ESPOSAuditLogAuxInfo."ES Organization Code");
+        ESOrganization.TestField(Disabled, false);
+        ESFiscalizationSetup.GetWithCheck();
+        ESFiscalizationSetup.TestField("Invoice Description");
+
+        // The invoice id, number and issue timestamp were fixed when the invoice was issued offline, so the request is repeatable.
+        Url := CreateUrl(ESFiscalizationSetup, StrSubstNo(SubmitOfflineInvoiceLbl, Format(ESPOSAuditLogAuxInfo."ES Client Id", 0, 4).ToLower(), Format(ESPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
+        JsonBody := CreateJSONBodyForCreateInvoice(ESPOSAuditLogAuxInfo, ESFiscalizationSetup."Invoice Description");
+        PrepareHttpRequest(ESOrganization, true, RequestMessage, JsonBody, Url, Enum::"Http Request Type"::PUT);
+
+        OnBeforeSendHttpRequestForSubmitOfflineInvoice(RequestMessage, ResponseText, ESPOSAuditLogAuxInfo, IsHandled);
+        if IsHandled then
+            exit;
+
+        if not SendHttpRequest(RequestMessage, ResponseText) then begin
+            // Fiskaly already holds this invoice id, e.g. the original request timed out after Fiskaly created it.
+            if _LastHttpStatusCode = 409 then begin
+                RetrieveInvoice(ESPOSAuditLogAuxInfo);
+                exit;
+            end;
+            Error('%1\\%2', SubmitOfflineInvoiceErr, GetLastErrorText());
+        end;
+
+        PopulateESPOSAuditLogAuxInfo(ESPOSAuditLogAuxInfo, ResponseText);
+    end;
+
+    internal procedure SetOfflineFallback(OfflineFallbackAllowed: Boolean; ForceOfflineIssuance: Boolean)
+    begin
+        _OfflineFallbackAllowed := OfflineFallbackAllowed;
+        _ForceOfflineIssuance := ForceOfflineIssuance;
+        if OfflineFallbackAllowed then
+            SetLimitedRequestTimeout();
+    end;
+
+    internal procedure SetLimitedRequestTimeout()
+    begin
+        _RequestTimeout := OfflineFallbackRequestTimeout();
+    end;
+
+    internal procedure IsLastSubmissionFailureTransient(): Boolean
+    begin
+        // Anything that is not an outage (validation errors, disabled setup, unexpected payload) needs a person to fix it.
+        exit(_WaitingForRefundedInvoice or IsProviderUnavailable(_LastHttpStatusCode));
+    end;
+
+    internal procedure IsRefundedInvoicePendingOffline(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"): Boolean
+    var
+        ESPOSAuditLogAuxInfoToRefund: Record "NPR ES POS Audit Log Aux. Info";
+    begin
+        if ESPOSAuditLogAuxInfo."Invoice Type" <> ESPOSAuditLogAuxInfo."Invoice Type"::CORRECTING then
+            exit(false);
+
+        FindESPOSAuditLogAuxInfoToRefund(ESPOSAuditLogAuxInfo."POS Entry No.", ESPOSAuditLogAuxInfoToRefund);
+        exit(ESPOSAuditLogAuxInfoToRefund.IsPendingOfflineSubmission());
+    end;
+
+    local procedure CheckNoOfflineInvoicesPendingBefore(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; ESClient: Record "NPR ES Client")
+    var
+        ESPOSAuditLogAuxInfoToRefund: Record "NPR ES POS Audit Log Aux. Info";
+        ESOfflineInvoiceMgt: Codeunit "NPR ES Offline Invoice Mgt.";
+        OfflineInvoicesPendingErr: Label 'You cannot create this invoice at Fiskaly while invoices of %1 %2 that were issued offline are still waiting to be submitted. Use Submit Offline Invoice first.', Comment = '%1 - ES Client table caption, %2 - POS Unit No. value';
+        RefundedInvoicePendingErr: Label 'You cannot create this invoice at Fiskaly while the invoice it corrects is still waiting to be submitted. Use Submit Offline Invoice on %1 %2 first.', Comment = '%1 - Invoice No. field caption, %2 - Invoice No. value';
+    begin
+        if ESOfflineInvoiceMgt.HasPendingOfflineInvoices(ESPOSAuditLogAuxInfo."ES Client Id") then
+            Error(OfflineInvoicesPendingErr, ESClient.TableCaption(), ESClient."POS Unit No.");
+
+        if IsRefundedInvoicePendingOffline(ESPOSAuditLogAuxInfo) then begin
+            FindESPOSAuditLogAuxInfoToRefund(ESPOSAuditLogAuxInfo."POS Entry No.", ESPOSAuditLogAuxInfoToRefund);
+            Error(RefundedInvoicePendingErr, ESPOSAuditLogAuxInfoToRefund.FieldCaption("Invoice No."), ESPOSAuditLogAuxInfoToRefund."Invoice No.");
+        end;
+    end;
+
+    local procedure HandleCreateInvoiceRequestFailure(var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; CreateInvoiceErr: Text)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        LastErrorText: Text;
+    begin
+        LastErrorText := GetLastErrorText();
+        if not (_OfflineFallbackAllowed and IsProviderUnavailable(_LastHttpStatusCode)) then
+            Error('%1\\%2', CreateInvoiceErr, LastErrorText);
+
+        // This invoice starts the offline backlog of its client. Report why, so a misconfiguration that only looks like an outage is noticed.
+        Sentry.AddLastErrorInEnglish();
+        IssueInvoiceOffline(ESPOSAuditLogAuxInfo, CreateInvoiceErr + ' ' + LastErrorText, true);
+    end;
+
+    local procedure IssueInvoiceOffline(var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; Reason: Text; SubmissionAttempted: Boolean)
+    var
+        ESOfflineInvoiceMgt: Codeunit "NPR ES Offline Invoice Mgt.";
+    begin
+        ESPOSAuditLogAuxInfo."Issued Offline" := true;
+        ESPOSAuditLogAuxInfo."Offline Issued At" := CurrentDateTime();
+        if SubmissionAttempted then begin
+            ESPOSAuditLogAuxInfo."Submission Attempts" += 1;
+            ESPOSAuditLogAuxInfo."Last Submission Attempt At" := ESPOSAuditLogAuxInfo."Offline Issued At";
+        end;
+        ESPOSAuditLogAuxInfo."Last Submission Error" := CopyStr(Reason, 1, MaxStrLen(ESPOSAuditLogAuxInfo."Last Submission Error"));
+
+        // The number is consumed now because it is printed on the customer's receipt and must be reused when the invoice is submitted later.
+        PopulateInvoiceNoOnESPOSAuditLogAuxInfoForCreateInvoice(ESPOSAuditLogAuxInfo);
+
+        ESPOSAuditLogAuxInfo."Validation URL" := CopyStr(ESOfflineInvoiceMgt.CreateOfflineValidationUrl(ESPOSAuditLogAuxInfo), 1, MaxStrLen(ESPOSAuditLogAuxInfo."Validation URL"));
+        ESPOSAuditLogAuxInfo.Modify(true);
+        Commit();
+    end;
+
+    local procedure OfflineFallbackRequestTimeout(): Duration
+    begin
+        exit(30 * 1000);
+    end;
+
+    local procedure IsProviderUnavailable(HttpStatusCode: Integer): Boolean
+    begin
+        // 0 means no response was received at all (DNS, connection or timeout failure).
+        exit((HttpStatusCode = 0) or (HttpStatusCode in [408, 429]) or ((HttpStatusCode >= 500) and (HttpStatusCode <= 599)));
     end;
 
     internal procedure UpdateInvoiceMetadata(var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info")
@@ -972,6 +1155,7 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
 
         JsonTextWriter.WriteEndObject(); // content
 
+        AddIncidentAnnotationForCreateInvoice(ESPOSAuditLogAuxInfo, JsonTextWriter);
         AddMetadataForInvoice(ESPOSAuditLogAuxInfo, JsonTextWriter);
 
         JsonTextWriter.WriteEndObject();
@@ -1025,8 +1209,40 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
             JsonTextWriter.WriteStringProperty('series', ESPOSAuditLogAuxInfo."Invoice No. Series");
         JsonTextWriter.WriteStringProperty('text', InvoiceDescription);
         JsonTextWriter.WriteStringProperty('full_amount', Format(ESPOSAuditLogAuxInfo."Amount Incl. Tax", 0, '<Precision,2:2><Standard Format,2>'));
+        if ESPOSAuditLogAuxInfo."Issued Offline" then
+            JsonTextWriter.WriteStringProperty('issued_at', GetOfflineIssuedAtTimestamp(ESPOSAuditLogAuxInfo));
 
         AddItemsJSONArrayForCreateInvoice(ESPOSAuditLogAuxInfo, JsonTextWriter);
+    end;
+
+    local procedure GetOfflineIssuedAtTimestamp(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"): Text
+    var
+        ESOrganization: Record "NPR ES Organization";
+        ESOfflineInvoiceMgt: Codeunit "NPR ES Offline Invoice Mgt.";
+    begin
+        ESOrganization.Get(ESPOSAuditLogAuxInfo."ES Organization Code");
+        exit(ESOfflineInvoiceMgt.GetLocalIssuedAtTimestamp(ESPOSAuditLogAuxInfo."Offline Issued At", ESOrganization));
+    end;
+
+    local procedure AddIncidentAnnotationForCreateInvoice(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; var JsonTextWriter: Codeunit "Json Text Reader/Writer")
+    var
+        ESOrganization: Record "NPR ES Organization";
+        IncidentReasonLbl: Label 'The invoice could not be transmitted to Fiskaly SIGN ES when it was issued', Locked = true, MaxLength = 120;
+    begin
+        if not ESPOSAuditLogAuxInfo."Issued Offline" then
+            exit;
+        // Fiskaly maps the INCIDENT annotation to the Verifactu "Incidencia" field, so it only applies to Verifactu territories.
+        ESOrganization.Get(ESPOSAuditLogAuxInfo."ES Organization Code");
+        if not ESOrganization.IsVerifactuCompliance() then
+            exit;
+
+        JsonTextWriter.WriteStartArray('annotations');
+        JsonTextWriter.WriteStartObject('');
+        JsonTextWriter.WriteStringProperty('type', 'INCIDENT');
+        JsonTextWriter.WriteStringProperty('reason', IncidentReasonLbl);
+        JsonTextWriter.WriteStringProperty('incident_type', 'OFFLINE');
+        JsonTextWriter.WriteEndObject();
+        JsonTextWriter.WriteEndArray(); // annotations
     end;
 
     local procedure AddItemsJSONArrayForCreateInvoice(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; var JsonTextWriter: Codeunit "Json Text Reader/Writer")
@@ -1600,12 +1816,35 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
     end;
 
     [TryFunction]
+    local procedure TryPrepareHttpRequest(ESOrganization: Record "NPR ES Organization"; var RequestMessage: HttpRequestMessage; JsonBody: Text; Url: Text; HttpRequestType: Enum "Http Request Type")
+    begin
+        // Retrieving the JWT is itself a call to Fiskaly, so it can fail during an outage as well.
+        PrepareHttpRequest(ESOrganization, true, RequestMessage, JsonBody, Url, HttpRequestType);
+    end;
+
+    [TryFunction]
     local procedure SendHttpRequest(RequestMessage: HttpRequestMessage; var ResponseText: Text)
     var
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
+        IsHandled: Boolean;
+        StatusCode: Integer;
     begin
+        _LastHttpStatusCode := 0;
+
+        OnBeforeSendHttpRequest(RequestMessage, ResponseText, StatusCode, IsHandled);
+        if IsHandled then begin
+            _LastHttpStatusCode := StatusCode;
+            if (StatusCode < 200) or (StatusCode > 299) then
+                Error(ResponseText);
+            exit;
+        end;
+
+        // On the sale path a hanging connection must not block the POS; the invoice is issued offline instead.
+        if _RequestTimeout > 0 then
+            Client.Timeout(_RequestTimeout);
         Client.Send(RequestMessage, ResponseMessage);
+        _LastHttpStatusCode := ResponseMessage.HttpStatusCode();
         ResponseMessage.Content.ReadAs(ResponseText);
         if not ResponseMessage.IsSuccessStatusCode() then
             Error(ResponseText);
@@ -1661,7 +1900,13 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
         DateAsText: Text;
         TimeAsText: Text;
         Time: Time;
+        Result: DateTime;
     begin
+        if DateTimeAsText.Contains('T') then begin
+            Evaluate(Result, DateTimeAsText, 9);
+            exit(Result);
+        end;
+
         // according to documentation string for datetime is in format DD-MM-YYYY hh:mm:ss
         DateTimeSplit := DateTimeAsText.Split(' ');
 
@@ -1770,6 +2015,16 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeSendHttpRequestForCancelInvoice(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSubmitOfflineInvoice(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendHttpRequest(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var StatusCode: Integer; var IsHandled: Boolean)
     begin
     end;
     #endregion

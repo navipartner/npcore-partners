@@ -5,6 +5,10 @@ codeunit 85207 "NPR Library ES Fiscal"
     var
         InvoiceRegistrationState: Enum "NPR ES Inv. Registration State";
         InvoiceCancellationState: Enum "NPR ES Inv. Cancellation State";
+        _SimulateFiskalyFailure: Boolean;
+        _SimulatedFiskalyStatusCode: Integer;
+        _LastSubmittedOfflineInvoiceBody: Text;
+        _SubmittedOfflineInvoiceCount: Integer;
         PEMCertificateLbl: Label '-----BEGIN CERTIFICATE-----\nMIIJKDCCBxCgAwIBAgIQcldo1BIzMxBkXgjXnpvsNTANBgkqhkiG9w0BAQsFADCB\nnTELMAkGA1UEBhMCRVMxFDASBgNVBAoMC0laRU5QRSBTLkEuMTowOAYDVQQLDDFB\nWlogWml1cnRhZ2lyaSBwdWJsaWtvYSAtIENlcnRpZmljYWRvIHB1YmxpY28gU0NB\nMTwwOgYDVQQDDDNFQUVrbyBIZXJyaSBBZG1pbmlzdHJhemlvZW4gQ0EgLSBDQSBB\nQVBQIFZhc2NhcyAoMikwHhcNMjMwNTEyMDkzNzI3WhcNMzMwNTEyMDkzNzI3WjCB\nvTELMAkGA1UEBhMCRVMxKTAnBgNVBAoMIEZJU0tBTFkgSUJFUklBIFNPQ0lFREFE\nIExJTUlUQURBMTcwNQYDVQQLDC5HYWlsdSB6aXVydGFnaXJpYSAtIENlcnRpZmlj\nYWRvIGRlIGRpc3Bvc2l0aXZvMRIwEAYDVQQLDAlCNDQ3NTIyMTAxHTAbBgNVBAsM\nFFBVTlRPIERFIEZBQ1RVUkFDSU9OMRcwFQYDVQQDDA5QUk9ELVRFU1QtMDAwMzCC\nAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAMfukwMyhk76x42/FP8kRxSX\nTHpPdPfZ3XwcwmQ6kydLjCcwBqRT5M+hsvrY/Kh4rBH7T/mXP7Zd7taLdhMPghFx\nnOlQc/z2EH+bW3uBWtAiP95V5byKw/iOSGfejG0CbazxH4kkJweU9UwjPeMJJ1B7\nZpBpBslcQOJRHxs/nabxn80T9LD54LPeXps/fppYaGVSCweRqvn2ekUFfI+udI0V\n/e0pHcrSRimTKux77Og9GKPfbX2TV8n3PmRMvfH5qa517So8zt8L5dtaYFLLfyQA\nI/H0M8Dm0lUL7olnfDCRD5SODSskgnPw7ND5LFkOUcRjYPokfOqWK/puoa5cmbCs\nmDYsotrXKFKIcJ30U/1sfrMDwqafVBpz16+lAyUtzhFJQFAh1qsJjtHKGQ6AfAtS\nZ3LQbYaKMqdzfq6s8ajgB9PJUx0MC+J2me5IRz06De9cgoj2xvZ8TnLITjpkZuwM\nWwR1spSIK7BEFY7BZT+TVMrRwggQ7Yiz4nq2wcMbVN1yt3FMRi6MYDXXoh5KIvis\nsZ/u7p/S9dk+dqEIbIgJ5lY4HInKAlbCSuBvJz1W+gCN/3U77tD1Ku3B6kQgI00a\nqwtXGw2iHpQHDd8m9gxZBivCk1D1NsJHMq4DUKDq1pZ1hrKb56pef30BxHMWlC3l\nQ6HteIEZRIzcmnGyj9kVAgMBAAGjggNAMIIDPDCBxwYDVR0SBIG/MIG8hhVodHRw\nOi8vd3d3Lml6ZW5wZS5jb22BD2luZm9AaXplbnBlLmNvbaSBkTCBjjFHMEUGA1UE\nCgw+SVpFTlBFIFMuQS4gLSBDSUYgQTAxMzM3MjYwLVJNZXJjLlZpdG9yaWEtR2Fz\ndGVpeiBUMTA1NSBGNjIgUzgxQzBBBgNVBAkMOkF2ZGEgZGVsIE1lZGl0ZXJyYW5l\nbyBFdG9yYmlkZWEgMTQgLSAwMTAxMCBWaXRvcmlhLUdhc3RlaXowDgYDVR0PAQH/\nBAQDAgWgMB0GA1UdDgQWBBR2YYsQTacvEZd/osj10i0VtF7Y1zAfBgNVHSMEGDAW\ngBTAqUr3RyWH/7y1ponOgtJGqInrozCCAR4GA1UdIASCARUwggERMIIBDQYKKwYB\nBAHzOQEDAjCB/jAlBggrBgEFBQcCARYZaHR0cDovL3d3dy5pemVucGUuY29tL2Nw\nczCB1AYIKwYBBQUHAgIwgccMgcRCZXJtZWVuIG11Z2FrIGV6YWd1dHpla28gd3d3\nLml6ZW5wZS5jb20gWml1cnRhZ2lyaWFuIGtvbmZpYW50emEgaXphbiBhdXJyZXRp\nayBrb250cmF0dWEgaXJha3VycmkuTGltaXRhY2lvbmVzIGRlIGdhcmFudGlhcyBl\nbiB3d3cuaXplbnBlLmNvbSBDb25zdWx0ZSBlbCBjb250cmF0byBhbnRlcyBkZSBj\nb25maWFyIGVuIGVsIGNlcnRpZmljYWRvMB8GA1UdJQQYMBYGCCsGAQUFBwMCBgor\nBgEEAYI3CgMMMIGgBggrBgEFBQcBAQSBkzCBkDAiBggrBgEFBQcwAYYWaHR0cDov\nL29jc3AuaXplbnBlLmNvbTBqBggrBgEFBQcwAoZeaHR0cDovL3d3dy5pemVucGUu\nY29tL2NvbnRlbmlkb3MvaW5mb3JtYWNpb24vY2FzX2l6ZW5wZS9lc19jYXMvYWRq\ndW50b3MvQUFQUE5SX2NlcnRfc2hhMjU2LmNydDA6BgNVHR8EMzAxMC+gLaArhilo\ndHRwOi8vY3JsLml6ZW5wZS5jb20vY2dpLWJpbi9jcmxpbnRlcm5hMjANBgkqhkiG\n9w0BAQsFAAOCAgEAMYb6hCNF2pKRY7TT2LFW2bDCV7idPrxsTToCELF0RENUZIfh\nav0I3rexM7z/qHKFC3T7H65S8wzJ55ItM5j99cHs8iz8Kr6ktrsYHcfLBEFcnmGo\nV86XNG2UM0hYO9fsEEMJJSCEvNljfdPtJAce0JxeVxD+QMRCKnNQoFK9b3D/Hd7c\nprVNYl+u/U7NxQJqbhO7s6WJJkMnMlan9KsH7X9/+9kBC59pvDum+z0Tvo61LUqE\nlGIe12cuCPkF7rZ/vuccPfZ1xaPmMDEL0eMJ68L/SB9Ek8wxZ9yvc1JVNSxPovNK\n+VLc4Pg3ffl4AawAk25CYyeczXE/epcYnRLESw4ra8l4B/1Zxr6N9BQR3XJOXt+n\n5xJyVSy6icp5qC5+I4KmsXbDOGW7jj0A0DRMNyJAG3ovQm7JkWAvkJLRTBuOuzc3\neRs7uKeBR6iCWLEGh/f+iRGJjoePbfCjOwCG/eQMalVlAP67uBykkmPzDd405s3e\nLDy+f5PFh2dN56DjOzyurSDSlNb6tsaD1hkD/glZK8HnnfTc/5eXsOGh9hH/xQ6N\ninmlf5NT4wfUSzmIAexBmIKNCbBukketavZxePDRGmTxirQOrWBxQfm84plWC7WS\nGuKjGhaoRqUM9WWF4BU+1tLq+9z2iE8WOibSOBHeRHxUYR1FDpi3ygSPpJU=\n-----END CERTIFICATE-----\n', Locked = true;
 
     internal procedure CreateAuditProfileAndESSetups(var POSAuditProfile: Record "NPR POS Audit Profile"; var VATPostingSetup: Record "VAT Posting Setup"; var POSUnit: Record "NPR POS Unit")
@@ -225,6 +229,113 @@ codeunit 85207 "NPR Library ES Fiscal"
         InvoiceCancellationState := NewInvoiceCancellationState;
     end;
 
+    internal procedure SetSimulatedFiskalyFailure(StatusCode: Integer)
+    begin
+        // StatusCode 0 simulates that no response was received at all (connection failure or timeout).
+        _SimulateFiskalyFailure := true;
+        _SimulatedFiskalyStatusCode := StatusCode;
+    end;
+
+    internal procedure ClearSimulatedFiskalyFailure()
+    begin
+        _SimulateFiskalyFailure := false;
+        _SimulatedFiskalyStatusCode := 0;
+    end;
+
+    internal procedure GetLastSubmittedOfflineInvoiceBody(): Text
+    begin
+        exit(_LastSubmittedOfflineInvoiceBody);
+    end;
+
+    internal procedure GetSubmittedOfflineInvoiceCount(): Integer
+    begin
+        exit(_SubmittedOfflineInvoiceCount);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR ES Fiskaly Communication", 'OnBeforeSendHttpRequest', '', false, false)]
+    local procedure HandleOnBeforeSendHttpRequest(var ResponseText: Text; var StatusCode: Integer; var IsHandled: Boolean)
+    begin
+        if not _SimulateFiskalyFailure then
+            exit;
+
+        StatusCode := _SimulatedFiskalyStatusCode;
+        ResponseText := '{"content":{"code":"E_SIMULATED","message":"Simulated Fiskaly failure","status":' + Format(StatusCode) + ',"error":"Simulated"}}';
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR ES Fiskaly Communication", 'OnBeforeSendHttpRequestForSubmitOfflineInvoice', '', false, false)]
+    local procedure HandleOnBeforeSendHttpRequestForSubmitOfflineInvoice(sender: Codeunit "NPR ES Fiskaly Communication"; var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; var IsHandled: Boolean)
+    begin
+        // Leave the request unhandled so it reaches the simulated failure in OnBeforeSendHttpRequest.
+        if _SimulateFiskalyFailure then
+            exit;
+
+        RequestMessage.Content.ReadAs(_LastSubmittedOfflineInvoiceBody);
+        _SubmittedOfflineInvoiceCount += 1;
+
+        ResponseText := GetIssuedInvoiceResponseText(ESPOSAuditLogAuxInfo);
+        sender.PopulateESPOSAuditLogAuxInfo(ESPOSAuditLogAuxInfo, ResponseText);
+        IsHandled := true;
+    end;
+
+    local procedure GetIssuedInvoiceResponseText(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"): Text
+    begin
+        exit(
+            '{' +
+            '   "content": {' +
+            '       "client": {' +
+            '           "id": "' + Format(ESPOSAuditLogAuxInfo."ES Client Id", 0, 4) + '"' +
+            '       },' +
+            '       "compliance": {' +
+            '           "code": {' +
+            '               "image": {' +
+            '                   "data": "iVBORw0KGgoAAAANSUhEUgAAAC0AAAAtEAAAAABP4WEFAAAAAElFTkSuQmCC",' +
+            '                   "format": "image/png",' +
+            '                   "measurements": {' +
+            '                       "height": 45,' +
+            '                       "unit": "px",' +
+            '                       "width": 45' +
+            '                   }' +
+            '               },' +
+            '           "type": "QR_CODE"' +
+            '           },' +
+            '           "text": "QR tributario:|VERI*FACTU",' +
+            '           "url": "https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=B00000000&numserie=' + ESPOSAuditLogAuxInfo."Invoice No." + '&fecha=01-01-2027&importe=10.00"' +
+            '       },' +
+            '       "data": "",' +
+            '       "id": "' + Format(ESPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower() + '",' +
+            '       "issued_at": "' + GetIssuedAtResponseText(ESPOSAuditLogAuxInfo) + '",' +
+            '       "signer": {' +
+            '           "id": "' + ESPOSAuditLogAuxInfo."ES Signer Id" + '"' +
+            '       },' +
+            '       "state": "ISSUED",' +
+            '       "transmission": {' +
+            '           "cancellation": "NOT_CANCELLED",' +
+            '           "registration": "' + Enum::"NPR ES Inv. Registration State".Names().Get(Enum::"NPR ES Inv. Registration State".Ordinals().IndexOf(InvoiceRegistrationState.AsInteger())) + '"' +
+            '       },' +
+            '       "validations": []' +
+            '   },' +
+            '   "metadata": {' +
+            '       "bc_company_name": "' + CompanyName() + '",' +
+            '       "bc_client_code": "' + ESPOSAuditLogAuxInfo."POS Unit No." + '",' +
+            '       "bc_signer_code": "' + ESPOSAuditLogAuxInfo."ES Signer Code" + '"' +
+            '   }' +
+            '}');
+    end;
+
+    local procedure GetIssuedAtResponseText(ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"): Text
+    var
+        ESOrganization: Record "NPR ES Organization";
+        ESOfflineInvoiceMgt: Codeunit "NPR ES Offline Invoice Mgt.";
+    begin
+        // Fiskaly answers issued_at in the format the invoice was created with, and offline invoices are created with a timestamp with timezone
+        if not ESPOSAuditLogAuxInfo."Issued Offline" then
+            exit('16-08-2024 11:17:28');
+
+        ESOrganization.Get(ESPOSAuditLogAuxInfo."ES Organization Code");
+        exit(ESOfflineInvoiceMgt.GetLocalIssuedAtTimestamp(ESPOSAuditLogAuxInfo."Offline Issued At", ESOrganization));
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR ES Fiskaly Communication", 'OnBeforeSetAuthorizationOnPrepareHttpRequest', '', false, false)]
     local procedure HandleOnBeforeSetAuthorizationOnPrepareHttpRequest(var RequestHeaders: HttpHeaders; var IsHandled: Boolean)
     begin
@@ -234,6 +345,10 @@ codeunit 85207 "NPR Library ES Fiscal"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR ES Fiskaly Communication", 'OnBeforeSendHttpRequestForCreateInvoice', '', false, false)]
     local procedure HandleOnBeforeSendHttpRequestForCreateInvoice(sender: Codeunit "NPR ES Fiskaly Communication"; var ResponseText: Text; var ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info"; var IsHandled: Boolean)
     begin
+        // Leave the request unhandled so it reaches the simulated failure in OnBeforeSendHttpRequest.
+        if _SimulateFiskalyFailure then
+            exit;
+
         ResponseText :=
             '{' +
             '   "content": {' +
@@ -307,7 +422,7 @@ codeunit 85207 "NPR Library ES Fiscal"
             '       },' +
             '       "data": "",' + // this is irrelevant for us at the moment, so we can leave it blank
             '       "id": "67fcf146-5626-45f3-b6b4-0a32da12f89f",' +
-            '       "issued_at": "16-08-2024 11:17:28",' +
+            '       "issued_at": "' + GetIssuedAtResponseText(ESPOSAuditLogAuxInfo) + '",' +
             '       "signer": {' +
             '           "id": "' + ESPOSAuditLogAuxInfo."ES Signer Id" + '"' +
             '       },' +
