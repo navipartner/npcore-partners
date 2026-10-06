@@ -16,6 +16,14 @@ codeunit 6151084 "NPR MM Retail Integration"
             exit(MMPOSSalesInfo."Membership Entry No.");
     end;
 
+    procedure GetScannedCardDataPOSSalesInfo(AssociationType: Option; SalesTicketNo: Code[20]; LineNo: Integer): Text[200]
+    var
+        MMPOSSalesInfo: Record "NPR MM POS Sales Info";
+    begin
+        if MMPOSSalesInfo.Get(AssociationType, SalesTicketNo, LineNo) then
+            exit(MMPOSSalesInfo."Scanned Card Data");
+    end;
+
     procedure InsertMembershipPOSSalesInfo(AssociationType: Option; SalesTicketNo: Code[20]; LineNo: Integer; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200])
     var
         POSSalesInfo: Record "NPR MM POS Sales Info";
