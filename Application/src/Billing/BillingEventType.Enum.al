@@ -48,5 +48,9 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'Ecommerce Entria Orders Amount Shop', Locked = true;
     }
+    value(11; POS_ACTIVE_UNITS_7D_COUNT)
+    {
+        Caption = 'POS Active Units 7 Days Count', Locked = true;
+    }
 }
 #endif

@@ -707,6 +707,10 @@
         key(Key15; "Posting Date", "Amount Excl. Tax", "Return Sales Quantity", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code") { }
         key(Key16; "Post Entry Status") { }
         key(Key17; "Post Sales Document Status") { }
+        key(Key18; "POS Unit No.", "Entry Date")
+        {
+            IncludedFields = "System Entry", "Entry Type";
+        }
 #if not (BC17 or BC18 or BC19 or BC20)
         key(RowVersion; SystemRowVersion) { }
 #endif
