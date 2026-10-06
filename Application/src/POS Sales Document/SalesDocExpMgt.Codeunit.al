@@ -492,6 +492,7 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         SalesLine: Record "Sales Line";
         ReservationEntry: Record "Reservation Entry";
+        TempAllocatedItemLedgerEntry: Record "Item Ledger Entry" temporary;
         Item: Record Item;
         SerialNoInfo: Record "Serial No. Information";
         ItemTrackingCode: Record "Item Tracking Code";
@@ -551,9 +552,13 @@
                         SalesLine.Validate("Line Discount %", SaleLinePOS."Discount %");
 
                     TransferInfoFromSaleLinePOS(SaleLinePOS, SalesLine);
+                    if (SalesLine.Type = SalesLine.Type::Item) and SalesHeader.IsCreditDocType() and (SaleLinePOS."Serial No." = '') and (SaleLinePOS."Lot No." = '') then
+                        SetApplFromItemEntry(SaleLinePOS, SalesLine, TempAllocatedItemLedgerEntry);
                     SalesLine.Modify();
                 end;
-                if (SaleLinePOS."Serial No." <> '') or (SaleLinePOS."Lot No." <> '') then begin
+                if ((SaleLinePOS."Serial No." <> '') or (SaleLinePOS."Lot No." <> '')) and SalesHeader.IsCreditDocType() then
+                    CreateInboundItemTracking(SaleLinePOS, SalesLine, TempAllocatedItemLedgerEntry);
+                if ((SaleLinePOS."Serial No." <> '') or (SaleLinePOS."Lot No." <> '')) and not SalesHeader.IsCreditDocType() then begin
                     ReservationEntry.SetCurrentKey("Entry No.", Positive);
                     ReservationEntry.SetRange(Positive, false);
                     if ReservationEntry.Find('+') then;
@@ -795,6 +800,76 @@
             if SalePOS."Tax Liable" then
                 SalesHeader.Validate("Tax Liable", true);
         end;
+    end;
+
+    local procedure SetApplFromItemEntry(SaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line"; var TempAllocatedItemLedgerEntry: Record "Item Ledger Entry" temporary)
+    var
+        ApplFromItemEntryNo: Integer;
+    begin
+        ApplFromItemEntryNo := FindImportedInvoiceItemLedgerEntryNo(SaleLinePOS, SalesLine."Quantity (Base)", TempAllocatedItemLedgerEntry);
+        if ApplFromItemEntryNo <> 0 then
+            SalesLine.Validate("Appl.-from Item Entry", ApplFromItemEntryNo);
+    end;
+
+    local procedure CreateInboundItemTracking(SaleLinePOS: Record "NPR POS Sale Line"; SalesLine: Record "Sales Line"; var TempAllocatedItemLedgerEntry: Record "Item Ledger Entry" temporary)
+    var
+        TrackingReservationEntry: Record "Reservation Entry";
+        CreateReservEntry: Codeunit "Create Reserv. Entry";
+        ApplFromItemEntryNo: Integer;
+    begin
+        TrackingReservationEntry."Serial No." := SaleLinePOS."Serial No.";
+        TrackingReservationEntry."Lot No." := SaleLinePOS."Lot No.";
+
+        CreateReservEntry.CreateReservEntryFor(
+            Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", '', 0, SalesLine."Line No.",
+            SalesLine."Qty. per Unit of Measure", SalesLine.Quantity, SalesLine."Quantity (Base)", TrackingReservationEntry);
+
+        ApplFromItemEntryNo := FindImportedInvoiceItemLedgerEntryNo(SaleLinePOS, SalesLine."Quantity (Base)", TempAllocatedItemLedgerEntry);
+        if ApplFromItemEntryNo <> 0 then
+            CreateReservEntry.SetApplyFromEntryNo(ApplFromItemEntryNo);
+
+        CreateReservEntry.CreateEntry(
+            SalesLine."No.", SalesLine."Variant Code", SalesLine."Location Code", SalesLine.Description,
+            SalesLine."Shipment Date", 0D, 0, "Reservation Status"::Surplus);
+    end;
+
+    local procedure FindImportedInvoiceItemLedgerEntryNo(SaleLinePOS: Record "NPR POS Sale Line"; ReturnQtyBase: Decimal; var TempAllocatedItemLedgerEntry: Record "Item Ledger Entry" temporary): Integer
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
+    begin
+        if SaleLinePOS."Imported from Invoice No." = '' then
+            exit(0);
+        if ReturnQtyBase <= 0 then
+            exit(0);
+
+        SalesInvoiceLine.SetRange("Document No.", SaleLinePOS."Imported from Invoice No.");
+        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
+        SalesInvoiceLine.SetRange("No.", SaleLinePOS."No.");
+        SalesInvoiceLine.SetRange("Variant Code", SaleLinePOS."Variant Code");
+        if SalesInvoiceLine.FindSet() then
+            repeat
+                SalesInvoiceLine.GetItemLedgEntries(TempItemLedgerEntry, false);
+            until SalesInvoiceLine.Next() = 0;
+
+        TempItemLedgerEntry.SetRange(Positive, false);
+        TempItemLedgerEntry.SetRange("Serial No.", SaleLinePOS."Serial No.");
+        TempItemLedgerEntry.SetRange("Lot No.", SaleLinePOS."Lot No.");
+        TempItemLedgerEntry.SetRange("Package No.", '');
+        if TempItemLedgerEntry.FindSet() then
+            repeat
+                if not TempAllocatedItemLedgerEntry.Get(TempItemLedgerEntry."Entry No.") then begin
+                    TempAllocatedItemLedgerEntry.Init();
+                    TempAllocatedItemLedgerEntry."Entry No." := TempItemLedgerEntry."Entry No.";
+                    TempAllocatedItemLedgerEntry.Insert();
+                end;
+                if Abs(TempItemLedgerEntry."Shipped Qty. Not Returned") - TempAllocatedItemLedgerEntry.Quantity >= ReturnQtyBase then begin
+                    TempAllocatedItemLedgerEntry.Quantity += ReturnQtyBase;
+                    TempAllocatedItemLedgerEntry.Modify();
+                    exit(TempItemLedgerEntry."Entry No.");
+                end;
+            until TempItemLedgerEntry.Next() = 0;
+        exit(0);
     end;
 
     local procedure TransferInfoFromSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line")
