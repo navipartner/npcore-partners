@@ -7,19 +7,24 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         Printer: Codeunit "NPR RP Line Print";
 
     trigger OnRun()
+    begin
+        Print(Rec, Codeunit::"NPR NPRE Static Kitchen Print");
+    end;
+
+    internal procedure Print(var TempWPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary; OutputCodeunitId: Integer)
     var
         TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
     begin
-        KitchenPrintMgt.GetPrintLines(Rec);
+        KitchenPrintMgt.GetPrintLines(TempWPadLineOutBuffer);
 
         Printer.SetAutoLineBreak(true);
         Printer.SetTwoColumnDistribution(0.15, 0.85);
         Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
 
-        AddReceiptInformation(Rec);
+        AddReceiptInformation(TempWPadLineOutBuffer);
 
-        Printer.ProcessBuffer(Codeunit::"NPR NPRE Static Kitchen Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
+        Printer.ProcessBuffer(OutputCodeunitId, Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     local procedure AddReceiptInformation(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
@@ -33,6 +38,8 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         TableNoLbl: Label 'Table No.';
         KitchenDescriptionLineMaxLength: Integer;
         LastLineNo: Integer;
+        BottomMarginLineCount: Integer;
+        i: Integer;
     begin
         if WPadLineOutBuffer.IsEmpty() then
             exit;
@@ -40,6 +47,7 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         KitchenPrintMgt.GetPrintHeader(WPadLineOutBuffer."Waiter Pad No.", false, TempRestaurantPrintHeader);
 
         KitchenDescriptionLineMaxLength := 20; // B22/B12 on 80mm paper = 28 chars/line; col 2 gets 85% = ~20
+        BottomMarginLineCount := 5;
 
         Printer.SetFont(B21FontLbl);
         Printer.AddLine('', 0);
@@ -100,6 +108,10 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
                         Printer.AddLine('', 0);
                 end;
             until WPadLineOutBuffer.Next() = 0;
+
+        Printer.SetFont(B21FontLbl);
+        for i := 1 to BottomMarginLineCount do
+            Printer.AddLine('', 0);
 
         Printer.SetFont('COMMAND');
         Printer.AddLine('PAPERCUT', 0);
