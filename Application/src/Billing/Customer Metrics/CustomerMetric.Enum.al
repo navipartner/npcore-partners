@@ -8,4 +8,9 @@ enum 6014660 "NPR Customer Metric" implements "NPR ICustomer Metric"
         Caption = 'Active POS Units (7 Days)';
         Implementation = "NPR ICustomer Metric" = "NPR Active POS Units Metric";
     }
+    value(2; GLRevenue)
+    {
+        Caption = 'G/L Revenue';
+        Implementation = "NPR ICustomer Metric" = "NPR GL Revenue Metric";
+    }
 }

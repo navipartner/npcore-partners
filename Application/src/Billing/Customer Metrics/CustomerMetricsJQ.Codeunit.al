@@ -31,7 +31,7 @@ codeunit 6151251 "NPR Customer Metrics JQ"
         ErrorText: Text;
         FailedMetricLbl: Label '\%1, %2: %3', Comment = '%1 = metric, %2 = business date, %3 = error text';
     begin
-        for BusinessDate := FirstBusinessDateToSend(Metric, Yesterday) to Yesterday do begin
+        for BusinessDate := FirstBusinessDateToSend(Metric, MetricImplementation, Yesterday) to Yesterday do begin
             // TrySendMetric can isolate a failure only when no write transaction is open
             Commit();
             if not TrySendMetric(Metric, MetricImplementation, Sender, BusinessDate, ErrorText) then
@@ -41,10 +41,12 @@ codeunit 6151251 "NPR Customer Metrics JQ"
         Commit();
     end;
 
-    local procedure FirstBusinessDateToSend(Metric: Enum "NPR Customer Metric"; Yesterday: Date): Date
+    local procedure FirstBusinessDateToSend(Metric: Enum "NPR Customer Metric"; MetricImplementation: Interface "NPR ICustomer Metric"; Yesterday: Date): Date
     var
         MetricSync: Record "NPR Customer Metric Sync";
     begin
+        if MetricImplementation.IsDelta() then
+            exit(Yesterday);
         // Catches up on the dates missed in the last 7 days, but not before the metric was first sent, so a new install or a new metric does not backfill history
         MetricSync.SetRange(Metric, Metric);
         if not MetricSync.FindFirst() then

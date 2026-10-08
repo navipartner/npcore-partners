@@ -20,6 +20,14 @@ table 6059943 "NPR Customer Metric Sync"
             Caption = 'Business Date';
             DataClassification = CustomerContent;
         }
+        /// <summary>
+        /// For a delta metric, the last source entry the event covers.
+        /// </summary>
+        field(3; "Last Entry No."; Integer)
+        {
+            Caption = 'Last Entry No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -27,6 +35,9 @@ table 6059943 "NPR Customer Metric Sync"
         key(PK; Metric, "Business Date")
         {
             Clustered = true;
+        }
+        key(LastEntryNo; Metric, "Last Entry No.")
+        {
         }
     }
 }

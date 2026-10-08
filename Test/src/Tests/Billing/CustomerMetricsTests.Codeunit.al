@@ -279,6 +279,59 @@ codeunit 85496 "NPR Customer Metrics Tests"
     begin
         CustomerMetric := Enum::"NPR Customer Metric"::ActivePOSUnits7D;
         _Assert.AreEqual(Enum::"NPR Billing Event Type"::POS_ACTIVE_UNITS_7D_COUNT.AsInteger(), CustomerMetric.GetEventType().AsInteger(), 'Active POS Units (7 Days) must be sent as POS_ACTIVE_UNITS_7D_COUNT');
+        _Assert.IsFalse(CustomerMetric.IsDelta(), 'Active POS Units (7 Days) is a full count, so missed dates must be caught up');
+    end;
+
+    [Test]
+    procedure CustomerMetric_GLRevenue_IsADeltaSentAsGLRevenueAmountLCY()
+    var
+        CustomerMetric: Interface "NPR ICustomer Metric";
+    begin
+        CustomerMetric := Enum::"NPR Customer Metric"::GLRevenue;
+        _Assert.AreEqual(Enum::"NPR Billing Event Type"::GL_REVENUE_AMOUNT_LCY.AsInteger(), CustomerMetric.GetEventType().AsInteger(), 'G/L Revenue must be sent as GL_REVENUE_AMOUNT_LCY');
+        _Assert.IsTrue(CustomerMetric.IsDelta(), 'G/L Revenue is a delta, so missed dates must not be caught up');
+    end;
+
+    [Test]
+    procedure SendMetric_DeltaMetric_SendsOnlyYesterday()
+    var
+        MockMetric: Codeunit "NPR Mock Customer Metric";
+        FirstRunSender: Codeunit "NPR Mock Cust. Metric Sender";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        Yesterday: Date;
+        ErrorText: Text;
+        FailedMetrics: Text;
+    begin
+        Yesterday := PrepareBusinessDate(170);
+        MockMetric.SetValue(1, '', '');
+        MockMetric.SetDelta();
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(Enum::"NPR Customer Metric"::ActivePOSUnits7D, MockMetric, FirstRunSender, Yesterday - 3, ErrorText), 'The first run should succeed: ' + ErrorText);
+
+        CustomerMetricsJQ.SendMetric(Enum::"NPR Customer Metric"::ActivePOSUnits7D, MockMetric, MockSender, Yesterday, FailedMetrics);
+
+        _Assert.AreEqual(1, MockSender.EventCount(), 'A delta covers everything since its previous event, so only yesterday may be sent');
+        AssertEventBusinessDate(MockSender, 1, Yesterday);
+    end;
+
+    [Test]
+    procedure TrySendMetric_StoresTheSyncRowAsTheMetricLeftIt()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MockMetric: Codeunit "NPR Mock Customer Metric";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        BusinessDate: Date;
+        ErrorText: Text;
+    begin
+        BusinessDate := PrepareBusinessDate(41);
+        MockMetric.SetValue(1, '', '');
+        MockMetric.SetLastEntryNo(42);
+
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(Enum::"NPR Customer Metric"::ActivePOSUnits7D, MockMetric, MockSender, BusinessDate, ErrorText), 'Sending the metric should succeed: ' + ErrorText);
+
+        MetricSync.Get(Enum::"NPR Customer Metric"::ActivePOSUnits7D, BusinessDate);
+        _Assert.AreEqual(42, MetricSync."Last Entry No.", 'The sync row must keep the last entry no. the metric set, so the next delta starts after it');
     end;
 
     #endregion
@@ -288,78 +341,213 @@ codeunit 85496 "NPR Customer Metrics Tests"
     [Test]
     procedure ActivePOSUnits_CountsUnitsWithASaleInTheLast7Days()
     var
-        ActivePOSUnitsMetric: Codeunit "NPR Active POS Units Metric";
-        Metadata: JsonObject;
         BusinessDate: Date;
         StoreCode: Code[10];
         POSUnitNo: Code[10];
         Expected: Decimal;
     begin
         BusinessDate := DMY2Date(15, 6, 2001);
-        Expected := ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata);
+        Expected := CalculateActivePOSUnits(BusinessDate);
         StoreCode := NewStoreCode();
 
         InsertSale(CreatePOSUnit(StoreCode), StoreCode, BusinessDate);
         Expected += 1;
-        _Assert.AreEqual(Expected, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'A sale on the business date must count');
+        _Assert.AreEqual(Expected, CalculateActivePOSUnits(BusinessDate), 'A sale on the business date must count');
 
         InsertCreditSale(CreatePOSUnit(StoreCode), StoreCode, BusinessDate - 6);
         Expected += 1;
-        _Assert.AreEqual(Expected, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'A Credit Sale 6 days before the business date must count');
+        _Assert.AreEqual(Expected, CalculateActivePOSUnits(BusinessDate), 'A Credit Sale 6 days before the business date must count');
 
         InsertSale(CreatePOSUnit(StoreCode), StoreCode, BusinessDate - 7);
-        _Assert.AreEqual(Expected, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'A sale 7 days before the business date must not count');
+        _Assert.AreEqual(Expected, CalculateActivePOSUnits(BusinessDate), 'A sale 7 days before the business date must not count');
 
         InsertSale(CreatePOSUnit(StoreCode), StoreCode, BusinessDate + 1);
-        _Assert.AreEqual(Expected, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'A sale after the business date must not count');
+        _Assert.AreEqual(Expected, CalculateActivePOSUnits(BusinessDate), 'A sale after the business date must not count');
 
         POSUnitNo := CreatePOSUnit(StoreCode);
         InsertSale(POSUnitNo, StoreCode, BusinessDate - 1);
         InsertSale(POSUnitNo, StoreCode, BusinessDate);
         Expected += 1;
-        _Assert.AreEqual(Expected, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'A unit with several sales must count once');
+        _Assert.AreEqual(Expected, CalculateActivePOSUnits(BusinessDate), 'A unit with several sales must count once');
 
         InsertSystemEntry(CreatePOSUnit(StoreCode), StoreCode, BusinessDate);
         InsertCancelledSale(CreatePOSUnit(StoreCode), StoreCode, BusinessDate);
         CreatePOSUnit(StoreCode);
-        _Assert.AreEqual(Expected, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'System entries, other entry types and units without entries must not count');
+        _Assert.AreEqual(Expected, CalculateActivePOSUnits(BusinessDate), 'System entries, other entry types and units without entries must not count');
     end;
 
     [Test]
     procedure ActivePOSUnits_CountsSalesMadeUnderAnotherStore()
     var
-        ActivePOSUnitsMetric: Codeunit "NPR Active POS Units Metric";
-        Metadata: JsonObject;
         BusinessDate: Date;
         Baseline: Decimal;
     begin
         BusinessDate := DMY2Date(15, 7, 2001);
-        Baseline := ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata);
+        Baseline := CalculateActivePOSUnits(BusinessDate);
 
         InsertSale(CreatePOSUnit(NewStoreCode()), NewStoreCode(), BusinessDate - 2);
 
-        _Assert.AreEqual(Baseline + 1, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'A unit must count for a sale made under another store, for example before the unit was moved to its current store');
+        _Assert.AreEqual(Baseline + 1, CalculateActivePOSUnits(BusinessDate), 'A unit must count for a sale made under another store, for example before the unit was moved to its current store');
     end;
 
     [Test]
     procedure ActivePOSUnits_OlderSaleInsertedAfterARecentOne_StillCountsTheUnit()
     var
-        ActivePOSUnitsMetric: Codeunit "NPR Active POS Units Metric";
-        Metadata: JsonObject;
         BusinessDate: Date;
         StoreCode: Code[10];
         POSUnitNo: Code[10];
         Baseline: Decimal;
     begin
         BusinessDate := DMY2Date(15, 8, 2001);
-        Baseline := ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata);
+        Baseline := CalculateActivePOSUnits(BusinessDate);
         StoreCode := NewStoreCode();
         POSUnitNo := CreatePOSUnit(StoreCode);
 
         InsertSale(POSUnitNo, StoreCode, BusinessDate - 1);
         InsertSale(POSUnitNo, StoreCode, BusinessDate - 30);
 
-        _Assert.AreEqual(Baseline + 1, ActivePOSUnitsMetric.Calculate(BusinessDate, Metadata), 'A sale inside the 7 days must count even when an older sale, such as a late external sale, was inserted after it');
+        _Assert.AreEqual(Baseline + 1, CalculateActivePOSUnits(BusinessDate), 'A sale inside the 7 days must count even when an older sale, such as a late external sale, was inserted after it');
+    end;
+
+    #endregion
+
+    #region [G/L revenue]
+
+    [Test]
+    procedure GLRevenue_CountsSaleEntriesOnIncomeStatementAccountsAsPositiveRevenue()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Metadata: JsonObject;
+        IncomeAccountNo: Code[20];
+        BalanceAccountNo: Code[20];
+        LastEntryNo: Integer;
+    begin
+        StartGLRevenueAfterLastEntry(MetricSync);
+        IncomeAccountNo := CreateGLAccount(Enum::"G/L Account Report Type"::"Income Statement");
+        BalanceAccountNo := CreateGLAccount(Enum::"G/L Account Report Type"::"Balance Sheet");
+
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -100, Today(), '', '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, 30, Today(), '', '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Purchase, -50, Today(), '', '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::" ", -40, Today(), '', '');
+        LastEntryNo := InsertGLEntry(BalanceAccountNo, Enum::"General Posting Type"::Sale, -70, Today(), '', '');
+
+        _Assert.AreEqual(70, CalculateGLRevenue(MetricSync, Metadata), 'Only Sale entries on income statement accounts may count, with a credit as positive revenue');
+        _Assert.AreEqual(LastEntryNo, MetricSync."Last Entry No.", 'The sync row must keep the last G/L entry, so the next event starts after it');
+    end;
+
+    [Test]
+    procedure GLRevenue_LeavesOutYearEndClosingCompressionAndConsolidation()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        SourceCodeSetup: Record "Source Code Setup";
+        Metadata: JsonObject;
+        IncomeAccountNo: Code[20];
+    begin
+        StartGLRevenueAfterLastEntry(MetricSync);
+        SetCloseIncomeStatementAndCompressSourceCodes(SourceCodeSetup);
+        IncomeAccountNo := CreateGLAccount(Enum::"G/L Account Report Type"::"Income Statement");
+
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -100, Today(), '', '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, 500, ClosingDate(Today()), SourceCodeSetup."Close Income Statement", '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -300, Today() - 400, SourceCodeSetup."Compress G/L", '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -200, Today(), '', NewBusinessUnitCode());
+
+        _Assert.AreEqual(100, CalculateGLRevenue(MetricSync, Metadata), 'Year-end closing, date compression and consolidated entries must not count');
+    end;
+
+    [Test]
+    procedure GLRevenue_ReversalOfAnAlreadySentEntry_ReducesTheNextEvent()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Metadata: JsonObject;
+        IncomeAccountNo: Code[20];
+        OriginalEntryNo: Integer;
+    begin
+        DeleteGLRevenueSyncRows();
+        IncomeAccountNo := CreateGLAccount(Enum::"G/L Account Report Type"::"Income Statement");
+        OriginalEntryNo := InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -100, Today(), '', '');
+        InsertSentGLRevenue(Today() - 1, OriginalEntryNo);
+
+        MarkReversed(OriginalEntryNo, InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, 100, Today(), '', ''));
+        InitGLRevenueSync(MetricSync, Today());
+
+        _Assert.AreEqual(-100, CalculateGLRevenue(MetricSync, Metadata), 'The reversal of revenue that was already sent must reduce the next event, so the reported total cancels out');
+    end;
+
+    [Test]
+    procedure GLRevenue_StartsAfterTheHighestSentEntryNo()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Metadata: JsonObject;
+        IncomeAccountNo: Code[20];
+        SentEntryNo: Integer;
+    begin
+        DeleteGLRevenueSyncRows();
+        IncomeAccountNo := CreateGLAccount(Enum::"G/L Account Report Type"::"Income Statement");
+        SentEntryNo := InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -100, Today(), '', '');
+        InsertSentGLRevenue(Today() - 2, SentEntryNo);
+        InsertSentGLRevenue(Today() - 1, SentEntryNo - 1);
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -40, Today(), '', '');
+        InitGLRevenueSync(MetricSync, Today());
+
+        _Assert.AreEqual(40, CalculateGLRevenue(MetricSync, Metadata), 'Only entries after the highest sent entry no. may count, so no entry is sent twice');
+    end;
+
+    [Test]
+    procedure GLRevenue_FirstEventStartsAtTheBusinessDate()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Metadata: JsonObject;
+        IncomeAccountNo: Code[20];
+        Baseline: Decimal;
+    begin
+        DeleteGLRevenueSyncRows();
+        IncomeAccountNo := CreateGLAccount(Enum::"G/L Account Report Type"::"Income Statement");
+        InitGLRevenueSync(MetricSync, Today());
+        Baseline := CalculateGLRevenue(MetricSync, Metadata);
+
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -100, Today() - 30, '', '');
+
+        _Assert.AreEqual(Baseline + 100, CalculateGLRevenue(MetricSync, Metadata), 'The first event must count the entries registered since the start of the business date, whatever their posting date');
+        InitGLRevenueSync(MetricSync, Today() + 1);
+        _Assert.AreEqual(0, CalculateGLRevenue(MetricSync, Metadata), 'The first event must not count entries registered before the business date');
+    end;
+
+    [Test]
+    procedure GLRevenue_MetadataCarriesCurrencyCodeAndPostingDateRange()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Metadata: JsonObject;
+        IncomeAccountNo: Code[20];
+    begin
+        StartGLRevenueAfterLastEntry(MetricSync);
+        IncomeAccountNo := CreateGLAccount(Enum::"G/L Account Report Type"::"Income Statement");
+        GeneralLedgerSetup.Get();
+
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -10, Today() - 5, '', '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Sale, -10, Today() - 1, '', '');
+        InsertGLEntry(IncomeAccountNo, Enum::"General Posting Type"::Purchase, -10, Today() - 9, '', '');
+        CalculateGLRevenue(MetricSync, Metadata);
+
+        _Assert.AreEqual(GeneralLedgerSetup."LCY Code", GetMetadataText(Metadata, 'currency'), 'The event must carry the local currency code');
+        _Assert.AreEqual(Format(Today() - 5, 0, 9), GetMetadataText(Metadata, 'posting_date_from'), 'The posting date range must start at the earliest counted entry');
+        _Assert.AreEqual(Format(Today() - 1, 0, 9), GetMetadataText(Metadata, 'posting_date_to'), 'The posting date range must end at the latest counted entry');
+    end;
+
+    [Test]
+    procedure GLRevenue_NothingNewSinceTheLastEvent_SendsZeroAndKeepsThePosition()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        GLEntry: Record "G/L Entry";
+        Metadata: JsonObject;
+    begin
+        StartGLRevenueAfterLastEntry(MetricSync);
+
+        _Assert.AreEqual(0, CalculateGLRevenue(MetricSync, Metadata), 'With no new G/L entries the revenue must be zero');
+        _Assert.AreEqual(GLEntry.GetLastEntryNo(), MetricSync."Last Entry No.", 'The next event must still start after the last sent entry');
+        _Assert.IsFalse(Metadata.Contains('posting_date_from'), 'Without counted entries there is no posting date range');
     end;
 
     #endregion
@@ -396,6 +584,115 @@ codeunit 85496 "NPR Customer Metrics Tests"
         if not Metadata.Get(KeyName, Token) then
             exit('');
         exit(Token.AsValue().AsText());
+    end;
+
+    local procedure CalculateActivePOSUnits(BusinessDate: Date): Decimal
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        ActivePOSUnitsMetric: Codeunit "NPR Active POS Units Metric";
+        Metadata: JsonObject;
+    begin
+        MetricSync.Metric := Enum::"NPR Customer Metric"::ActivePOSUnits7D;
+        MetricSync."Business Date" := BusinessDate;
+        exit(ActivePOSUnitsMetric.Calculate(MetricSync, Metadata));
+    end;
+
+    local procedure CalculateGLRevenue(var MetricSync: Record "NPR Customer Metric Sync"; var Metadata: JsonObject): Decimal
+    var
+        GLRevenueMetric: Codeunit "NPR GL Revenue Metric";
+    begin
+        Clear(Metadata);
+        exit(GLRevenueMetric.Calculate(MetricSync, Metadata));
+    end;
+
+    local procedure StartGLRevenueAfterLastEntry(var MetricSync: Record "NPR Customer Metric Sync")
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        DeleteGLRevenueSyncRows();
+        InsertSentGLRevenue(Today() - 1, GLEntry.GetLastEntryNo());
+        InitGLRevenueSync(MetricSync, Today());
+    end;
+
+    local procedure InitGLRevenueSync(var MetricSync: Record "NPR Customer Metric Sync"; BusinessDate: Date)
+    begin
+        MetricSync.Init();
+        MetricSync.Metric := Enum::"NPR Customer Metric"::GLRevenue;
+        MetricSync."Business Date" := BusinessDate;
+    end;
+
+    local procedure InsertSentGLRevenue(BusinessDate: Date; LastEntryNo: Integer)
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+    begin
+        InitGLRevenueSync(MetricSync, BusinessDate);
+        MetricSync."Last Entry No." := LastEntryNo;
+        MetricSync.Insert();
+    end;
+
+    local procedure DeleteGLRevenueSyncRows()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+    begin
+        MetricSync.SetRange(Metric, Enum::"NPR Customer Metric"::GLRevenue);
+        MetricSync.DeleteAll();
+    end;
+
+    local procedure CreateGLAccount(IncomeBalance: Enum "G/L Account Report Type"): Code[20]
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        GLAccount.Init();
+        GLAccount."No." := CopyStr(_LibraryUtility.GenerateRandomCode(GLAccount.FieldNo("No."), Database::"G/L Account"), 1, MaxStrLen(GLAccount."No."));
+        GLAccount."Income/Balance" := IncomeBalance;
+        GLAccount.Insert();
+        exit(GLAccount."No.");
+    end;
+
+    local procedure InsertGLEntry(GLAccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; Amount: Decimal; PostingDate: Date; SourceCode: Code[10]; BusinessUnitCode: Code[20]): Integer
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        GLEntry.Init();
+        GLEntry."Entry No." := GLEntry.GetLastEntryNo() + 1;
+        GLEntry."G/L Account No." := GLAccountNo;
+        GLEntry."Gen. Posting Type" := GenPostingType;
+        GLEntry.Amount := Amount;
+        GLEntry."Posting Date" := PostingDate;
+        GLEntry."Source Code" := SourceCode;
+        GLEntry."Business Unit Code" := BusinessUnitCode;
+        GLEntry.Insert();
+        exit(GLEntry."Entry No.");
+    end;
+
+    local procedure MarkReversed(OriginalEntryNo: Integer; ReversalEntryNo: Integer)
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        GLEntry.Get(OriginalEntryNo);
+        GLEntry.Reversed := true;
+        GLEntry."Reversed by Entry No." := ReversalEntryNo;
+        GLEntry.Modify();
+        GLEntry.Get(ReversalEntryNo);
+        GLEntry.Reversed := true;
+        GLEntry."Reversed Entry No." := OriginalEntryNo;
+        GLEntry.Modify();
+    end;
+
+    local procedure SetCloseIncomeStatementAndCompressSourceCodes(var SourceCodeSetup: Record "Source Code Setup")
+    begin
+        if not SourceCodeSetup.Get() then
+            SourceCodeSetup.Insert();
+        SourceCodeSetup."Close Income Statement" := CopyStr(_LibraryUtility.GenerateRandomCode(SourceCodeSetup.FieldNo("Close Income Statement"), Database::"Source Code Setup"), 1, MaxStrLen(SourceCodeSetup."Close Income Statement"));
+        SourceCodeSetup."Compress G/L" := CopyStr(_LibraryUtility.GenerateRandomCode(SourceCodeSetup.FieldNo("Compress G/L"), Database::"Source Code Setup"), 1, MaxStrLen(SourceCodeSetup."Compress G/L"));
+        SourceCodeSetup.Modify();
+    end;
+
+    local procedure NewBusinessUnitCode(): Code[20]
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        exit(CopyStr(_LibraryUtility.GenerateRandomCode(GLEntry.FieldNo("Business Unit Code"), Database::"G/L Entry"), 1, MaxStrLen(GLEntry."Business Unit Code")));
     end;
 
     local procedure NewStoreCode(): Code[10]

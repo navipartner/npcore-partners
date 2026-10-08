@@ -20,11 +20,12 @@ codeunit 6151257 "NPR Customer Metric Runner"
         if MetricSync.Get(_Metric, _BusinessDate) then
             exit;
 
-        Quantity := _MetricImplementation.Calculate(_BusinessDate, Metadata);
-        Metadata.Add(BusinessDateKeyTok, Format(_BusinessDate, 0, 9));
-
+        MetricSync.Init();
         MetricSync.Metric := _Metric;
         MetricSync."Business Date" := _BusinessDate;
+        Quantity := _MetricImplementation.Calculate(MetricSync, Metadata);
+        Metadata.Add(BusinessDateKeyTok, Format(_BusinessDate, 0, 9));
+
         if not MetricSync.Insert() then
             exit;
         _Sender.RegisterEvent(MetricSync.SystemId, _MetricImplementation.GetEventType(), Quantity, Metadata);

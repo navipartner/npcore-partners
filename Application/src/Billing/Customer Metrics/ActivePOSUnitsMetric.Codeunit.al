@@ -7,7 +7,12 @@ codeunit 6151258 "NPR Active POS Units Metric" implements "NPR ICustomer Metric"
         exit(Enum::"NPR Billing Event Type"::POS_ACTIVE_UNITS_7D_COUNT);
     end;
 
-    procedure Calculate(BusinessDate: Date; var Metadata: JsonObject): Decimal
+    procedure IsDelta(): Boolean
+    begin
+        exit(false);
+    end;
+
+    procedure Calculate(var MetricSync: Record "NPR Customer Metric Sync"; var Metadata: JsonObject): Decimal
     var
         POSUnit: Record "NPR POS Unit";
         ActivePOSUnits: Integer;
@@ -15,7 +20,7 @@ codeunit 6151258 "NPR Active POS Units Metric" implements "NPR ICustomer Metric"
         POSUnit.SetLoadFields("No.");
         if POSUnit.FindSet() then
             repeat
-                if HasSaleInPeriod(POSUnit."No.", BusinessDate - 6, BusinessDate) then
+                if HasSaleInPeriod(POSUnit."No.", MetricSync."Business Date" - 6, MetricSync."Business Date") then
                     ActivePOSUnits += 1;
             until POSUnit.Next() = 0;
         exit(ActivePOSUnits);

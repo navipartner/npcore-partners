@@ -52,5 +52,9 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'POS Active Units 7 Days Count', Locked = true;
     }
+    value(12; GL_REVENUE_AMOUNT_LCY)
+    {
+        Caption = 'G/L Revenue Amount LCY', Locked = true;
+    }
 }
 #endif
