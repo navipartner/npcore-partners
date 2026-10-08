@@ -7,7 +7,6 @@ report 6014515 "NPR NpRv Voucher Cloud 2 C39"
     ApplicationArea = NPRRetail;
     DefaultLayout = Word;
     Caption = 'Voucher Cloud 2 Code 39';
-    DataAccessIntent = ReadOnly;
 
     dataset
     {

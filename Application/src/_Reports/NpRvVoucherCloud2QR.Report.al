@@ -7,7 +7,6 @@ report 6014517 "NPR NpRv Voucher Cloud 2 QR"
     ApplicationArea = NPRRetail;
     DefaultLayout = Word;
     Caption = 'Voucher Cloud 2 QR';
-    DataAccessIntent = ReadOnly;
 
     dataset
     {

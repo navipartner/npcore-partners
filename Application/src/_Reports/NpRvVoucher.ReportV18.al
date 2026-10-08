@@ -9,7 +9,6 @@ report 6151013 "NPR NpRv Voucher"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Voucher';
-    DataAccessIntent = ReadOnly;
     DefaultLayout = Word;
     ObsoleteState = Pending;
     ObsoleteTag = '2023-06-28';

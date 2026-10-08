@@ -10,7 +10,6 @@ report 6151015 "NPR NpRv Voucher 3"
     ApplicationArea = NPRRetail;
     Caption = 'Voucher';
     DefaultLayout = Word;
-    DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
     ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Will be removed in the next version.';

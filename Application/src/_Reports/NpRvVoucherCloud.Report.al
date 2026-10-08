@@ -7,7 +7,6 @@ report 6014466 "NPR NpRv Voucher Cloud"
     ApplicationArea = NPRRetail;
     DefaultLayout = Word;
     Caption = 'Voucher Cloud';
-    DataAccessIntent = ReadOnly;
 
     dataset
     {

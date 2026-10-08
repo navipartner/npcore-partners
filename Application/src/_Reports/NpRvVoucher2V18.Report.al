@@ -9,7 +9,6 @@ report 6151014 "NPR NpRv Voucher 2"
     Caption = 'Voucher';
     UsageCategory = None;
     DefaultLayout = Word;
-    DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
     ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Will be removed in the next version.';
