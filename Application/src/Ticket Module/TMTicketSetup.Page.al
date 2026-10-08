@@ -456,6 +456,15 @@
                     end;
                 }
 
+                action(BlockUnusedTickets)
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    Caption = 'Block Unused Expired Tickets';
+                    ToolTip = 'Blocks tickets that expired before the cutoff set by Retire Tickets After without being fully used, so that the obsolete ticket data cleanup deletes them on its next run.';
+                    Image = Lock;
+                    Ellipsis = true;
+                    RunObject = report "NPR TM Block Unused Tickets";
+                }
                 action(RetireTicketData)
                 {
                     ApplicationArea = NPRTicketAdvanced;

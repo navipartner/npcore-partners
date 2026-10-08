@@ -90,7 +90,7 @@ table 6150753 "NPR TM ImportTicketHeader"
     var
         ImportLines: Record "NPR TM ImportTicketLine";
     begin
-        ImportLines.SetCurrentKey(JobId);
+        ImportLines.SetFilter(OrderId, '=%1', Rec.OrderId);
         ImportLines.SetFilter(JobId, '=%1', Rec.JobId);
         ImportLines.DeleteAll(true);
     end;

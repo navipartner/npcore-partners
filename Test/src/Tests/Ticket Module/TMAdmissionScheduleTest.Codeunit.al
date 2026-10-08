@@ -1434,6 +1434,107 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         Assert.IsTrue(CountAfterForce >= CountAfterSecond, 'Force regenerate should not early-exit and may add/cancel entries.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RetentionKeepsOldSlotOfKeptTicket()
+    var
+        Ticket: Record "NPR TM Ticket";
+        Retention: Codeunit "NPR TM Retention Ticket Data";
+        Assert: Codeunit Assert;
+        TicketNos: List of [Code[20]];
+        TicketNo: Code[20];
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ExtScheduleEntryNo: Integer;
+        SlotRowsBefore: Integer;
+        CutoffDate: Date;
+    begin
+        // Unused tickets and their slot, both expired before the retention cutoff
+        ReserveTickets(TicketNos, AdmissionCode, ScheduleCode, ExtScheduleEntryNo);
+        SetRetentionPeriod('<2Y>');
+        CutoffDate := Retention.GetCutoffDate();
+        foreach TicketNo in TicketNos do
+            ExpireTicket(TicketNo, CalcDate('<-1D>', CutoffDate));
+        BackdateSlot(ExtScheduleEntryNo, CalcDate('<-1D>', CutoffDate));
+        SlotRowsBefore := CountSlotRows(ExtScheduleEntryNo);
+
+        Retention.Main();
+
+        foreach TicketNo in TicketNos do
+            Assert.IsTrue(Ticket.Get(TicketNo), 'An unused ticket that is not blocked must be kept.');
+        Assert.AreEqual(SlotRowsBefore, CountSlotRows(ExtScheduleEntryNo), 'A slot that kept tickets point at must be kept, however old.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RetentionKeepsCancelledSlotWithTickets()
+    var
+        Ticket: Record "NPR TM Ticket";
+        Retention: Codeunit "NPR TM Retention Ticket Data";
+        Assert: Codeunit Assert;
+        TicketNos: List of [Code[20]];
+        TicketNo: Code[20];
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ExtScheduleEntryNo: Integer;
+        SlotRowsBefore: Integer;
+    begin
+        // Tickets on a slot that blocking its schedule line cancelled more than a month ago
+        ReserveTickets(TicketNos, AdmissionCode, ScheduleCode, ExtScheduleEntryNo);
+        SetRetentionPeriod('<2Y>');
+        AddOpenScheduleLine(AdmissionCode);
+        BlockScheduleLine(AdmissionCode, ScheduleCode, true);
+        Assert.AreEqual(0, CountSlotRows(ExtScheduleEntryNo, false), 'Blocking the schedule line must have cancelled the slot.');
+        BackdateSlot(ExtScheduleEntryNo, CalcDate('<-2M>'));
+        SlotRowsBefore := CountSlotRows(ExtScheduleEntryNo);
+
+        Retention.Main();
+
+        Assert.AreEqual(SlotRowsBefore, CountSlotRows(ExtScheduleEntryNo), 'A cancelled slot that tickets point at must be kept.');
+        foreach TicketNo in TicketNos do
+            Assert.IsTrue(Ticket.Get(TicketNo), 'Releasing slots must not touch tickets.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RetentionReleasesReplacedSlotAndKeepsItsReplacement()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Retention: Codeunit "NPR TM Retention Ticket Data";
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        OtherScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        ExtScheduleEntryNo: Integer;
+    begin
+        // A slot cancelled by blocking its schedule line and replaced by unblocking it, more than a month ago
+        CreateMinimalSetup();
+        CreateTicketSetup();
+        SetRetentionPeriod('<2Y>');
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 0);
+        CreateTimeSlot(AdmissionCode, OtherScheduleCode, Today(), 130000T, 160000T, 0);
+        SoftRegenerateSchedule(AdmissionCode, Today());
+        BlockScheduleLine(AdmissionCode, ScheduleCode, true);
+        BlockScheduleLine(AdmissionCode, ScheduleCode, false);
+
+        ScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        ScheduleEntry.SetFilter("Schedule Code", '=%1', ScheduleCode);
+        ScheduleEntry.SetFilter("Admission Start Date", '=%1', Today());
+        ScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        ScheduleEntry.FindFirst();
+        ExtScheduleEntryNo := ScheduleEntry."External Schedule Entry No.";
+        Assert.AreEqual(1, CountSlotRows(ExtScheduleEntryNo, true), 'Unblocking the schedule line must have replaced the cancelled slot under the same number.');
+        BackdateSlot(ExtScheduleEntryNo, CalcDate('<-2M>'));
+
+        Retention.Main();
+
+        Assert.AreEqual(1, CountSlotRows(ExtScheduleEntryNo, false), 'The live version of a slot must be kept.');
+        Assert.AreEqual(0, CountSlotRows(ExtScheduleEntryNo, true), 'A replaced version of a slot must be released.');
+    end;
+
 
 
     [Test]
@@ -1732,6 +1833,137 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         TicketTestLibrary: Codeunit "NPR Library - Ticket Module";
     begin
         TicketTestLibrary.CreateMinimalSetup();
+    end;
+
+    local procedure CreateTicketSetup()
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+        if (not TicketSetup.Get()) then begin
+            TicketSetup.Init();
+            TicketSetup.Insert();
+        end;
+    end;
+
+    // The company's own setup may hold a testing value such as <0D>, which would move the cutoff to today.
+    local procedure SetRetentionPeriod(Period: Text)
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+        TicketSetup.Get();
+        Evaluate(TicketSetup."Retire Used Tickets After", Period);
+        TicketSetup.Modify();
+    end;
+
+    // One confirmed reservation of 3 tickets on today's slot of the smoke-test scenario.
+    local procedure ReserveTickets(var TicketNos: List of [Code[20]]; var AdmissionCode: Code[20]; var ScheduleCode: Code[20]; var ExtScheduleEntryNo: Integer)
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        Ticket: Record "NPR TM Ticket";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit Assert;
+        ItemNo: Code[20];
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        Token: Text[100];
+        ResponseMessage: Text;
+    begin
+        ItemNo := TicketLibrary.CreateScenario_SmokeTest();
+        Assert.IsTrue(TicketApiLibrary.MakeReservation(1, ItemNo, 3, MemberNumber, ScannerStation, Token, ResponseMessage), ResponseMessage);
+        Assert.IsTrue(TicketApiLibrary.ConfirmTicketReservation(Token, 'retention@test.invalid', 'abc', 'Foo Bar Baz', ScannerStation, TmpCreatedTickets, ResponseMessage), ResponseMessage);
+
+        TicketRequest.SetCurrentKey("Session Token ID");
+        TicketRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketRequest.FindSet();
+        repeat
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+            if (Ticket.FindSet()) then
+                repeat
+                    TicketNos.Add(Ticket."No.");
+                until (Ticket.Next() = 0);
+        until (TicketRequest.Next() = 0);
+        Assert.AreEqual(3, TicketNos.Count(), 'The reservation must have issued 3 tickets.');
+
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBom.FindFirst();
+        AdmissionCode := TicketBom."Admission Code";
+        ScheduleLine.SetFilter("Admission Code", '=%1', AdmissionCode);
+        ScheduleLine.FindFirst();
+        ScheduleCode := ScheduleLine."Schedule Code";
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNos.Get(1));
+        TicketAccessEntry.FindFirst();
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        DetTicketAccessEntry.FindFirst();
+        ExtScheduleEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+        Assert.AreNotEqual(0, ExtScheduleEntryNo, 'The tickets must be on a slot.');
+    end;
+
+    // The scheduler regenerates an admission through its unblocked lines, so this only cancels the line's slots while the
+    // admission has another line.
+    local procedure BlockScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; Block: Boolean)
+    var
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+    begin
+        ScheduleLine.Get(AdmissionCode, ScheduleCode);
+        ScheduleLine.Validate(Blocked, Block);
+        ScheduleLine.Modify();
+        SoftRegenerateSchedule(AdmissionCode, Today());
+    end;
+
+    // A second all-day line like the smoke-test scenario's own.
+    local procedure AddOpenScheduleLine(AdmissionCode: Code[20])
+    var
+        Schedule: Record "NPR TM Admis. Schedule";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        ScheduleCode: Code[20];
+    begin
+        ScheduleCode := TicketLibrary.CreateSchedule(TicketLibrary.GenerateCode20(), Schedule."Schedule Type"::LOCATION, Schedule."Admission Is"::OPEN, Today(), Schedule."Recurrence Until Pattern"::NO_END_DATE, 000000.010T, 235959.990T, true, true, true, true, true, true, true, '');
+        TicketLibrary.CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0, '');
+    end;
+
+    local procedure ExpireTicket(TicketNo: Code[20]; ValidTo: Date)
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        Ticket.Get(TicketNo);
+        Ticket."Valid To Date" := ValidTo;
+        Ticket.Modify();
+    end;
+
+    local procedure BackdateSlot(ExtScheduleEntryNo: Integer; AdmissionDate: Date)
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtScheduleEntryNo);
+        ScheduleEntry.ModifyAll("Admission Start Date", AdmissionDate);
+        ScheduleEntry.ModifyAll("Admission End Date", AdmissionDate);
+    end;
+
+    local procedure CountSlotRows(ExtScheduleEntryNo: Integer): Integer
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtScheduleEntryNo);
+        exit(ScheduleEntry.Count());
+    end;
+
+    local procedure CountSlotRows(ExtScheduleEntryNo: Integer; CancelledParam: Boolean): Integer
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtScheduleEntryNo);
+        ScheduleEntry.SetFilter(Cancelled, '=%1', CancelledParam);
+        exit(ScheduleEntry.Count());
     end;
 
 }
