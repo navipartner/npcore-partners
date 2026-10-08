@@ -7,41 +7,49 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         _Assert: Codeunit Assert;
         _Lib: Codeunit "NPR Library Spfy Legacy Return";
-        _LibrarySpfyVoucher: Codeunit "NPR Library - Spfy Voucher";
         _CapturedMessage: Text;
 
     [Test]
-    procedure VoucherFacade_TopUpForCreditMemo_RaisesBalanceWithoutSalesLineRows()
+    procedure VoucherFacade_PaymentReversalForCreditMemo_RaisesBalanceKeepsInitialAmount()
     var
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        LibrarySpfyVoucher: Codeunit "NPR Library - Spfy Voucher";
     begin
-        // [SCENARIO] Topping up a voucher for a posted credit memo raises its balance by the amount, writes a Top-up entry of document type Credit Memo flagged as initiated in Shopify, and leaves no voucher sales line behind.
+        // [SCENARIO] Reversing a gift card payment for a posted credit memo gives the amount back to the card's balance as a corrective payment entry, keeps its initial amount, needs no top-up permission and leaves no voucher sales line behind.
         // [GIVEN] A Shopify store with a gift card voucher type
-        _LibrarySpfyVoucher.CreateShopifyStore('SPFYLRV');
-        _LibrarySpfyVoucher.CreateVoucherType('SPFYLRGIFT', 'SPFYLRV', VoucherType);
+        LibrarySpfyVoucher.CreateShopifyStore('SPFYLRV');
+        LibrarySpfyVoucher.CreateVoucherType('SPFYLRGIFT', 'SPFYLRV', VoucherType);
 
-        // [GIVEN] A voucher with an initial balance of 100
-        _LibrarySpfyVoucher.CreateVoucher('SPFYLRV01', VoucherType.Code, 'SPFYLRVREF0001', 100, Voucher);
+        // [GIVEN] A voucher of 100 that does not allow top-up, of which 60 was spent
+        LibrarySpfyVoucher.CreateVoucher('SPFYLRV01', VoucherType.Code, 'SPFYLRVREF0001', 100, Voucher);
+        Voucher."Allow Top-up" := false;
+        Voucher.Modify();
+        _Lib.UseVoucherAmount(Voucher."No.", 60);
 
-        // [WHEN] The facade posts a 40 top-up for credit memo SCM-1
-        NpRvVoucherMgt.PostTopUpForCreditMemo(Voucher, 40, WorkDate(), 'SCM-1', '1001-R1', true);
+        // [WHEN] The facade reverses 40 of the payment for credit memo SCM-1
+        NpRvVoucherMgt.PostPaymentReversalForCreditMemo(Voucher, 40, WorkDate(), 'SCM-1', '1001-R1');
 
-        // [THEN] The balance is 140
-        Voucher.CalcFields(Amount);
-        _Assert.AreEqual(140, Voucher.Amount, 'The voucher balance must grow by the refunded amount.');
+        // [THEN] The balance is back up to 80 and the initial amount is still 100
+        Voucher.CalcFields(Amount, "Initial Amount");
+        _Assert.AreEqual(80, Voucher.Amount, 'The voucher balance must grow by the refunded amount.');
+        _Assert.AreEqual(100, Voucher."Initial Amount", 'A reversed payment must not change the initial amount.');
 
-        // [THEN] The new entry is a Top-up for the credit memo, initiated in Shopify so the balance sync skips it
+        // [THEN] The new entry is a corrective payment of 40 for the credit memo, and no top-up entry exists
         VoucherEntry.SetRange("Voucher No.", Voucher."No.");
-        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Top-up");
-        _Assert.IsTrue(VoucherEntry.FindFirst(), 'A Top-up entry must exist.');
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::Payment);
+        VoucherEntry.SetRange(Correction, true);
+        _Assert.IsTrue(VoucherEntry.FindFirst(), 'A corrective payment entry must exist.');
+        _Assert.AreEqual(40, VoucherEntry.Amount, 'The reversal gives back the refunded amount.');
         _Assert.AreEqual(VoucherEntry."Document Type"::"Credit Memo", VoucherEntry."Document Type", 'The entry must reference a credit memo.');
         _Assert.AreEqual('SCM-1', VoucherEntry."Document No.", 'The entry must carry the credit memo number.');
-        _Assert.IsTrue(VoucherEntry."Spfy Initiated in Shopify", 'The entry must be marked as initiated in Shopify.');
-        _Assert.IsFalse(VoucherEntry.Correction, 'A refund to a gift card is a real top-up, not a correction.');
+        _Assert.AreEqual('1001-R1', VoucherEntry."External Document No.", 'The entry must carry the Shopify document.');
+        VoucherEntry.SetRange(Correction);
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Top-up");
+        _Assert.IsTrue(VoucherEntry.IsEmpty(), 'A refund to a gift card is no top-up.');
 
         // [THEN] No voucher sales line was persisted
         NpRvSalesLine.SetRange("Voucher No.", Voucher."No.");
@@ -301,7 +309,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Lib.InsertPostedCrMemoWithReturnIds('SCM-LR1', 'SPFYLRM1', '777');
 
         // [WHEN] Looking the return up for store 1
-        Succeeded := SpfyLegacyReturnMgt.FindPostedDocumentForReturn('SPFYLRM1', '777', PostedDocNo);
+        Succeeded := SpfyLegacyReturnMgt.FindPostedDocumentForReturn('SPFYLRM1', "NPR Spfy Legacy Return Source"::Return, '777', PostedDocNo);
 
         // [THEN] The credit memo must be found for its own store
         _Assert.IsTrue(Succeeded, 'The credit memo must be found for its own store.');
@@ -327,7 +335,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Lib.InsertPostedCrMemoWithReturnIds('SCM-LR2', 'SPFYLRM4', '777');
 
         // [WHEN] Looking the return up for store 2
-        Succeeded := SpfyLegacyReturnMgt.FindPostedDocumentForReturn('SPFYLRM5', '777', PostedDocNo);
+        Succeeded := SpfyLegacyReturnMgt.FindPostedDocumentForReturn('SPFYLRM5', "NPR Spfy Legacy Return Source"::Return, '777', PostedDocNo);
 
         // [THEN] Another store must not match on the return id alone
         _Assert.IsFalse(Succeeded, 'Another store must not match on the return id alone.');
@@ -341,7 +349,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         SalesHeader: Record "Sales Header";
         PaymentLine: Record "NPR Magento Payment Line";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
     begin
@@ -362,10 +370,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         QueueRow."Sales Header Doc. No." := SalesHeader."No.";
         QueueRow."Location Fallback Used" := true;
         QueueRow."Not Restocked" := true;
-        QueueRow."Gift Card Refund" := true;
-        QueueRow."Voucher No." := 'V-OLD';
-        QueueRow."Gift Card Refund Amount" := 50;
         QueueRow.Modify();
+        _Lib.SetSettlement(QueueRow, 50, 'V-OLD');
 
         // [WHEN] The draft is discarded
         SpfyLegacyReturnMgt.DiscardDraft(QueueRow);
@@ -377,9 +383,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Assert.AreEqual('', QueueRow."Sales Header Doc. No.", 'The row must forget the draft.');
         _Assert.IsFalse(QueueRow."Location Fallback Used", 'The row must forget the location fallback flag.');
         _Assert.IsFalse(QueueRow."Not Restocked", 'The row must forget the not-restocked flag.');
-        _Assert.IsFalse(QueueRow."Gift Card Refund", 'The row must forget the gift card refund flag.');
-        _Assert.AreEqual('', QueueRow."Voucher No.", 'The row must forget the voucher.');
-        _Assert.AreEqual(0, QueueRow."Gift Card Refund Amount", 'The row must forget the gift card share.');
+        _Assert.IsFalse(_Lib.SettlementExists(QueueRow), 'The row must forget the gift card share and the voucher: the draft''s settlement row is removed with it.');
     end;
 
     [Test]
@@ -387,7 +391,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         SalesHeader: Record "Sales Header";
         PaymentLine: Record "NPR Magento Payment Line";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
     begin
         // [SCENARIO] Deleting a queue row whose return has no posted document deletes its draft Return Order and payment line from the OnDelete trigger, through the OnDelete trigger alone.
@@ -414,14 +418,14 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Assert.IsFalse(SalesHeader.Get(SalesHeader."Document Type"::"Return Order", 'RO-LR2'), 'The draft must be deleted.');
         PaymentLine.SetRange("Document No.", 'RO-LR2');
         _Assert.IsTrue(PaymentLine.IsEmpty(), 'Payment lines of the draft must be deleted.');
-        _Assert.IsFalse(QueueRow.Get('SPFYLRM6', '779'), 'The queue row must be deleted.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc('SPFYLRM6', QueueRow."Source Doc. Type"::Return, '779'), 'The queue row must be deleted.');
     end;
 
     [Test]
     procedure Mgt_DeletingQueueRowOfPostedReturn_LeavesDocumentsAlone()
     var
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
     begin
         // [SCENARIO] Deleting a queue row whose return was already posted, but whose row had not yet recorded the posted document, succeeds without error and leaves the posted document alone.
@@ -437,14 +441,14 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] No error is raised, the credit memo still exists and the queue row is gone
         _Assert.IsTrue(SalesCrMemoHeader.Get('SCM-LR3'), 'The posted credit memo must be left alone.');
-        _Assert.IsFalse(QueueRow.Get('SPFYLRM7', '780'), 'The queue row must be deleted.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc('SPFYLRM7', QueueRow."Source Doc. Type"::Return, '780'), 'The queue row must be deleted.');
     end;
 
     [Test]
     procedure Import_CardRefund_BuildsDraftWithGrossLinesPaymentLinesAndIds()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PaymentLine: Record "NPR Magento Payment Line";
@@ -514,7 +518,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_UnknownSku_RollsBackEverything()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
@@ -550,7 +554,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_NoRefundTransaction_IsRefusedWithoutADocument()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
@@ -586,7 +590,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_ExchangeLine_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
         StoreCode: Code[20];
@@ -622,7 +626,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_ForeignCurrency_SetsPresentmentCurrencyOnHeader()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         Currency: Record Currency;
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -665,7 +669,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_UnevenQuantity_PinsLineAmountToGross()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesLine: Record "Sales Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
@@ -701,21 +705,21 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Import_TwoGiftCards_SettlesShareButTopsUpNoVoucher()
+    procedure Import_TwoGiftCards_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher1: Record "NPR NpRv Voucher";
         Voucher2: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
-        SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
         StoreCode: Code[20];
         Sku: Code[20];
         CustomerNo: Code[20];
         LocationCode: Code[10];
         TransactionsJson: Text;
+        Succeeded: Boolean;
     begin
-        // [SCENARIO] A return refunded to two gift cards records the combined gift card share but tops up no voucher, not even the one paid on the original order, because the money cannot be attributed to a single card.
+        // [SCENARIO] A return refunded to two gift cards is refused for manual handling, because the money cannot be credited back to the right vouchers and a card left short would have its refund taken back by the balance sync.
         // [GIVEN] A legacy-path store with a posting-capable customer, item and location
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
 
@@ -735,23 +739,23 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Lib.InsertQueueRow(StoreCode, '807', '9807', QueueRow);
         TransactionsJson := _Lib.RefundTxnJson('71', 'gift_card', 100, _Lib.Lcy(), '9001') + ',' + _Lib.RefundTxnJson('72', 'gift_card', 50, _Lib.Lcy(), '9002') + ',' + _Lib.RefundTxnJson('73', 'shopify_payments', 50, _Lib.Lcy(), '');
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('807', '9807', '#9807', Sku, '607', 1, 160, 40, 25, '71001', TransactionsJson, _Lib.Lcy()));
-        SpfyLegacyReturnImport.SetGraphQLClient(MockClient);
 
         // [WHEN] The import runs
-        SpfyLegacyReturnImport.Run(QueueRow);
+        Succeeded := _Lib.RunImport(QueueRow, MockClient);
 
-        // [THEN] The row records the 150 gift card share and no voucher to top up
+        // [THEN] The import is refused naming the return and the gift cards, and no draft is left
+        _Assert.IsFalse(Succeeded, 'Gift cards that cannot be told apart must be refused.');
+        _Assert.IsTrue(StrPos(GetLastErrorText(), '#9807-R1') > 0, 'The refusal must name the return: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'gift cards') > 0, 'The refusal must name the gift cards: ' + GetLastErrorText());
         QueueRow.Find();
-        _Assert.IsTrue(QueueRow."Gift Card Refund", 'The row must flag the gift card refund.');
-        _Assert.AreEqual(150, QueueRow."Gift Card Refund Amount", 'The gift card share is the sum of both gift card transactions.');
-        _Assert.AreEqual('', QueueRow."Voucher No.", 'No voucher may be topped up when two gift cards share the refund.');
+        _Assert.AreEqual('', QueueRow."Sales Header Doc. No.", 'No draft may be left.');
     end;
 
     [Test]
-    procedure Import_SameGiftCardTwice_TopsUpThatCardOnce()
+    procedure Import_SameGiftCardTwice_CreditsThatCardBackOnce()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
@@ -761,7 +765,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         TransactionsJson: Text;
     begin
-        // [SCENARIO] A return refunded to the same gift card in two transactions counts as one gift card, so the row records the combined share and names that card's voucher for the top-up.
+        // [SCENARIO] A return refunded to the same gift card in two transactions counts as one gift card, so the row records the combined share and names that card's voucher to credit back.
         // [GIVEN] A legacy-path store with a posting-capable customer, item and location
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
 
@@ -784,16 +788,16 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] The row records the 150 gift card share and names the voucher behind gift card 9003
         QueueRow.Find();
-        _Assert.IsTrue(QueueRow."Gift Card Refund", 'The row must flag the gift card refund.');
-        _Assert.AreEqual(150, QueueRow."Gift Card Refund Amount", 'The gift card share is the sum of both transactions to the card.');
-        _Assert.AreEqual(Voucher."No.", QueueRow."Voucher No.", 'One card refunded twice must still resolve to its voucher.');
+        _Assert.IsTrue((_Lib.SettledGiftCardAmount(QueueRow) <> 0), 'The row must flag the gift card refund.');
+        _Assert.AreEqual(150, _Lib.SettledGiftCardAmount(QueueRow), 'The gift card share is the sum of both transactions to the card.');
+        _Assert.AreEqual(Voucher."No.", _Lib.SettledVoucherNo(QueueRow), 'One card refunded twice must still resolve to its voucher.');
     end;
 
     [Test]
     procedure Import_AdoptedDraft_RederivesGiftCardShareBeforePosting()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         Voucher: Record "NPR NpRv Voucher";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
@@ -830,11 +834,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         SalesHeader."Payment Method Code" := PaymentMethod.Code;
         SalesHeader.Modify();
         QueueRow.Find();
-        QueueRow."Gift Card Refund" := false;
-        QueueRow."Gift Card Refund Amount" := 0;
-        QueueRow."Voucher No." := '';
         QueueRow."Order No." := '';
         QueueRow.Modify();
+        _Lib.SetSettlement(QueueRow, 0, '');
 
         // [GIVEN] A mock answering the detail query the adoption makes
         MockClient.AddResponse('GetReturn', ResponseText);
@@ -846,8 +848,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] The row links the adopted document and carries the re-derived gift card share and voucher
         QueueRow.Find();
         _Assert.AreEqual(SalesHeader."No.", QueueRow."Sales Header Doc. No.", 'The row must link the adopted draft.');
-        _Assert.AreEqual(200, QueueRow."Gift Card Refund Amount", 'The gift card share must be re-derived from the detail.');
-        _Assert.AreEqual(Voucher."No.", QueueRow."Voucher No.", 'The voucher behind the gift card must be re-derived.');
+        _Assert.AreEqual(200, _Lib.SettledGiftCardAmount(QueueRow), 'The gift card share must be re-derived from the detail.');
+        _Assert.AreEqual(Voucher."No.", _Lib.SettledVoucherNo(QueueRow), 'The voucher behind the gift card must be re-derived.');
         _Assert.AreEqual('#9808', QueueRow."Order No.", 'The order number comes from the detail''s order name.');
 
         // [THEN] The adopted draft no longer carries a payment method, so BC does not balance the credit memo itself
@@ -863,7 +865,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_AdoptedDraftWithUndatedPaymentLine_IsDatedAndSettledOnce()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         PaymentLine: Record "NPR Magento Payment Line";
@@ -928,7 +930,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_AdoptedDraftShortOfTheRefund_IsRefusedAndKept()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -967,7 +969,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_WithheldFee_AddsNegativeFeeLineAtAccountVat()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesLine: Record "Sales Line";
         Customer: Record Customer;
         GLAccount: Record "G/L Account";
@@ -1020,7 +1022,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_ShippingRefundWithoutAccount_FailsNamingTheAccount()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
         StoreCode: Code[20];
@@ -1058,7 +1060,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_StoreSendsFulfillments_NoFulfillmentTaskForTheReturnReceipt()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ReturnReceiptHeader: Record "Return Receipt Header";
         NcTask: Record "NPR Nc Task";
         SpfyTask: Record "NPR Spfy Task";
@@ -1108,7 +1110,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_TaxesIncludedWithReturnShippingFee_CreditsTheRefundedAmount()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -1149,7 +1151,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_NoRefundOnTheReturn_IsRefusedWithoutADocument()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         ResponseObj: JsonObject;
         RefundsToken: JsonToken;
@@ -1187,10 +1189,10 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Import_UnknownGiftCardId_TopsUpNoVoucher()
+    procedure Import_UnknownGiftCardId_CreditsNoVoucherBack()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         OrderVoucher: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -1199,7 +1201,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A refund to a gift card BC does not know tops up no voucher, not even the one that paid the original order, because it may be a different card.
+        // [SCENARIO] A refund to a gift card BC does not know credits no voucher back, not even the one that paid the original order, because it may be a different card.
         // [GIVEN] A legacy-path store with automatic posting off
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
@@ -1222,15 +1224,15 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] The gift card refund is flagged but no voucher is chosen
         QueueRow.Find();
-        _Assert.IsTrue(QueueRow."Gift Card Refund", 'The row must flag the gift card refund.');
-        _Assert.AreEqual('', QueueRow."Voucher No.", 'The order voucher must not be guessed for an unknown gift card.');
+        _Assert.IsTrue((_Lib.SettledGiftCardAmount(QueueRow) <> 0), 'The row must flag the gift card refund.');
+        _Assert.AreEqual('', _Lib.SettledVoucherNo(QueueRow), 'The order voucher must not be guessed for an unknown gift card.');
     end;
 
     [Test]
     procedure ProcessJQ_AutomaticPostingOff_RowIsDraftCreatedNotImported()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -1271,9 +1273,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [HandlerFunctions('CaptureMessage')]
     procedure FeatureFlagOn_IsRefusedWhileALegacyDraftIsNotPosted()
     var
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -1282,7 +1284,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] Enabling the feature is refused while a legacy return row still has an unposted draft, so the other engine cannot build a second document for it.
         // [GIVEN] No unprocessed legacy return queue rows are left over from other tests that commit rows, since the pre-flight check scans the whole table regardless of store
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off
@@ -1308,7 +1310,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure StoreDeleted_WithUnfinishedReturns_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
         CustomerNo: Code[20];
@@ -1331,8 +1333,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure StoreDeleted_OnlyImportedReturns_RemovesThem()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        LeftoverRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        LeftoverRow: Record "NPR Spfy NC Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
         CustomerNo: Code[20];
@@ -1360,7 +1362,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_CardRefund_EndToEnd_PostsSettlesAndMarksRow()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
@@ -1419,7 +1421,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_OneOrderLineInTwoParcels_SplitsTheRefundAcrossBothCreditMemoLines()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -1458,7 +1460,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_TwoParcelsInWholeUnitCurrency_SharesSumToTheGross()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
@@ -1498,7 +1500,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_FourParcelsOfASmallGross_NoCreditMemoLineGoesNegative()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
@@ -1544,7 +1546,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_LcyKeptOnTheDocument_SharesUseTheLcyCurrencyPrecision()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -1631,10 +1633,10 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Posting_GiftCardRefund_TopsUpReceiptVoucherAndSplitsSettlement()
+    procedure Posting_GiftCardRefund_CreditsReceiptVoucherBackAndSplitsSettlement()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherA: Record "NPR NpRv Voucher";
         VoucherB: Record "NPR NpRv Voucher";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -1648,7 +1650,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A refund split between a card and gift card A tops up exactly voucher A by the gift-card share, books that share on the gift-card account and the rest on the card account, and leaves voucher B, which paid the original order, untouched.
+        // [SCENARIO] A refund split between a card and gift card A credits exactly voucher A back by the gift-card share, books that share on the gift-card account and the rest on the card account, and leaves voucher B, which also paid the original order, untouched.
         // [GIVEN] A legacy-path store with automatic posting, a posting-capable customer, item and location
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
@@ -1658,8 +1660,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Lib.CreateVoucherWithGiftCardId('SPFYLRVB', StoreCode, '9922', VoucherB);
         _Lib.InsertQueueRow(StoreCode, '902', '9902', QueueRow);
 
-        // [GIVEN] The original order's posted invoice was paid with voucher B, so the order fallback alone would pick B
+        // [GIVEN] The original order's posted invoice was paid with voucher B first, so the order fallback alone would pick B, and with 200 from voucher A
         _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR902', StoreCode, '9902', VoucherB."No.");
+        _Lib.AddVoucherPaymentToPostedInvoice('SI-LR902', VoucherA."No.", 200);
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('902', '9902', '#9902', Sku, '702', 2, 400, 100, 25, '71001',
             _Lib.RefundTxnJson('12', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('13', 'gift_card', 200, _Lib.Lcy(), '9921'), _Lib.Lcy()));
 
@@ -1669,21 +1672,23 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] Import and posting must succeed
         _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
 
-        // [THEN] Voucher A grew by 200, voucher B did not move, and the row names voucher A
-        VoucherA.CalcFields(Amount);
+        // [THEN] Voucher A's balance grew by 200 while its initial amount stayed, voucher B did not move, and the row names voucher A
+        VoucherA.CalcFields(Amount, "Initial Amount");
         VoucherB.CalcFields(Amount);
         _Assert.AreEqual(300, VoucherA.Amount, 'The card Shopify credited must gain the refund.');
+        _Assert.AreEqual(100, VoucherA."Initial Amount", 'Giving a payment back must not change the initial amount.');
         _Assert.AreEqual(100, VoucherB.Amount, 'The other card must be untouched.');
-        _Assert.AreEqual(VoucherA."No.", QueueRow."Voucher No.", 'The row must name the topped-up voucher.');
-        _Assert.IsTrue(QueueRow."Gift Card Refund", 'The gift card flag must be set.');
+        _Assert.AreEqual(VoucherA."No.", _Lib.SettledVoucherNo(QueueRow), 'The row must name the voucher credited back.');
+        _Assert.IsTrue((_Lib.SettledGiftCardAmount(QueueRow) <> 0), 'The gift card flag must be set.');
 
-        // [THEN] The top-up entry references the credit memo and is marked as initiated in Shopify, so the balance sync does not send it back
+        // [THEN] The reversal is a corrective payment entry that references the credit memo
         _Lib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
         VoucherEntry.SetRange("Voucher No.", VoucherA."No.");
-        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Top-up");
-        _Assert.IsTrue(VoucherEntry.FindFirst(), 'A Top-up entry must exist on voucher A.');
-        _Assert.AreEqual(SalesCrMemoHeader."No.", VoucherEntry."Document No.", 'The top-up must reference the credit memo.');
-        _Assert.IsTrue(VoucherEntry."Spfy Initiated in Shopify", 'The top-up must be marked as initiated in Shopify.');
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::Payment);
+        VoucherEntry.SetRange(Correction, true);
+        _Assert.IsTrue(VoucherEntry.FindFirst(), 'A corrective payment entry must exist on voucher A.');
+        _Assert.AreEqual(SalesCrMemoHeader."No.", VoucherEntry."Document No.", 'The reversal must reference the credit memo.');
+        _Assert.AreEqual(200, VoucherEntry.Amount, 'The reversal gives back the gift card share.');
 
         // [THEN] Settlement is split 300 on the card account and 200 on the gift-card account
         GLEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
@@ -1729,7 +1734,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_GiftCardReturn_CreditsTheSaleAccountAndArchivesBothVouchers()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         CustLedgerEntry: Record "Cust. Ledger Entry";
@@ -1807,7 +1812,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_GiftCardReturn_OneOfTwo_RevokesOneVoucherAndLeavesTheOther()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -1855,7 +1860,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_GiftCardReturn_UsedVoucher_IsRefusedWithoutADocument()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         Voucher: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -1897,7 +1902,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_GiftCardReturn_WithoutPostedSale_IsRefusedWithoutADocument()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -1929,7 +1934,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_SettlementFailure_AbortsPostingAndKeepsDraft()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -1975,7 +1980,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_RetryAfterSettlementFailure_ReusesTheDraftWithoutShopify()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         EmptyMock: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -2025,7 +2030,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ForeignCurrency_SettlesInDocumentCurrency()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         GLEntry: Record "G/L Entry";
         Currency: Record Currency;
         CurrencyExchangeRate: Record "Currency Exchange Rate";
@@ -2082,7 +2087,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_PartialInvoicing_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -2094,7 +2099,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         PostResult: Boolean;
     begin
-        // [SCENARIO] Posting an imported Return Order with only part of its quantity invoiced is refused and rolled back, because settlement and top-up would otherwise apply the whole refund to each partial credit memo.
+        // [SCENARIO] Posting an imported Return Order with only part of its quantity invoiced is refused and rolled back, because settlement and the voucher credit would otherwise apply the whole refund to each partial credit memo.
         // [GIVEN] A legacy-path store with a posting-capable customer, item and location
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
 
@@ -2138,7 +2143,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_WithheldFee_PostsFeeLineAndSettlesTotal()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         GLEntry: Record "G/L Entry";
@@ -2202,7 +2207,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ManualPostingAfterFailedAutoPost_MarksRowImported()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -2254,7 +2259,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1501');
+        QueueRow.SetFilter("Source Doc. ID", '1501');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2263,7 +2268,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ReceiveOnly_StampsReceiptAndKeepsStatus()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
         GLEntry: Record "G/L Entry";
@@ -2319,7 +2324,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1503');
+        QueueRow.SetFilter("Source Doc. ID", '1503');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2329,7 +2334,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         ShopifyStore: Record "NPR Spfy Store";
         SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
@@ -2372,7 +2377,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1001');
+        QueueRow.SetFilter("Source Doc. ID", '1001');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2381,7 +2386,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_FailingRow_IsAttemptedOncePerRun()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -2414,7 +2419,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1004');
+        QueueRow.SetFilter("Source Doc. ID", '1004');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2423,7 +2428,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_StaleProcessingRow_IsPickedUpAgain()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -2459,7 +2464,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1002');
+        QueueRow.SetFilter("Source Doc. ID", '1002');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2468,8 +2473,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_RowForMissingStore_FailsWithProgrammingBugText()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        HealthyQueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        HealthyQueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -2484,8 +2489,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [GIVEN] A row for a store code that has no store
         QueueRow.Init();
+        QueueRow."Entry No." := 0;
         QueueRow."Shopify Store Code" := 'SPFYLRGONE';
-        QueueRow."Return Id" := '1003';
+        QueueRow."Source Doc. ID" := '1003';
         QueueRow.Status := QueueRow.Status::New;
         QueueRow.Insert(true);
 
@@ -2510,10 +2516,10 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", 'SPFYLRGONE');
-        QueueRow.SetFilter("Return Id", '1003');
+        QueueRow.SetFilter("Source Doc. ID", '1003');
         QueueRow.DeleteAll();
         HealthyQueueRow.SetRange("Shopify Store Code", StoreCode);
-        HealthyQueueRow.SetFilter("Return Id", '1005');
+        HealthyQueueRow.SetFilter("Source Doc. ID", '1005');
         HealthyQueueRow.DeleteAll();
         Commit();
     end;
@@ -2521,7 +2527,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_RowWithPostedCreditMemo_IsMarkedImportedNotRetried()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -2556,7 +2562,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1502');
+        QueueRow.SetFilter("Source Doc. ID", '1502');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2565,7 +2571,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_SettlementFailure_ShowsTheErrorOnTheRow()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -2615,7 +2621,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1605');
+        QueueRow.SetFilter("Source Doc. ID", '1605');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2623,7 +2629,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_ReceivedOnlyReturnOfAnotherEngine_EndsInErrorNotImported()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -2670,7 +2676,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1604');
+        QueueRow.SetFilter("Source Doc. ID", '1604');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2678,7 +2684,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure PollJQ_InsertsOneNewRowPerClosedReturn()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         StoreCode: Code[20];
@@ -2702,14 +2708,14 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] Exactly one New row exists with numeric ids and the return name
         _Assert.AreEqual(1, QueueRow.Count(), 'One row per closed return.');
         QueueRow.FindFirst();
-        _Assert.AreEqual('1101', QueueRow."Return Id", 'Return id must be numeric.');
+        _Assert.AreEqual('1101', QueueRow."Source Doc. ID", 'Return id must be numeric.');
         _Assert.AreEqual('9201', QueueRow."Order Id", 'Order id must be numeric.');
-        _Assert.AreEqual('#9201-R1', QueueRow."Return Name", 'Return name is kept for the queue page.');
+        _Assert.AreEqual('#9201-R1', QueueRow."Source Doc. Name", 'Return name is kept for the queue page.');
         _Assert.AreEqual(QueueRow.Status::New, QueueRow.Status, 'New rows start at New.');
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1101');
+        QueueRow.SetFilter("Source Doc. ID", '1101');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2717,7 +2723,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure PollJQ_PollingAgain_AddsNothingForAQueuedReturn()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         StoreCode: Code[20];
@@ -2744,7 +2750,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Assert.AreEqual(1, QueueRow.Count(), 'A return that is already queued must not be queued twice.');
 
         // Cleanup: remove the committed rows.
-        QueueRow.SetFilter("Return Id", '1506');
+        QueueRow.SetFilter("Source Doc. ID", '1506');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2753,7 +2759,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure PollJQ_OneStoreFailing_DoesNotStopTheOthers()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
@@ -2805,7 +2811,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed row.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1102');
+        QueueRow.SetFilter("Source Doc. ID", '1102');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -2814,7 +2820,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure PollJQ_ReturnClosedBeforeStartDate_IsNotQueued()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         StoreCode: Code[20];
@@ -2838,7 +2844,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         SpfyLegacyReturnPollJQ.PollAllStores();
 
         // [THEN] No row is queued for the return
-        _Assert.IsFalse(QueueRow.Get(StoreCode, '1504'), 'A return closed before the start date must not be queued.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1504'), 'A return closed before the start date must not be queued.');
     end;
 
     [Test]
@@ -2962,7 +2968,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         ShopifyStore: Record "NPR Spfy Store";
         OtherStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
@@ -2998,7 +3004,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_RemovesTheLegacyReturnJobs()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         JobQueueEntry: Record "Job Queue Entry";
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
@@ -3011,7 +3017,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] Turning the Shopify Ecommerce Order Experience feature on removes the legacy return job queue entries together with their monitored rows, so the job refresher cannot recreate them.
         // [GIVEN] No unprocessed legacy return queue rows are left over from other tests that commit rows, since the pre-flight check scans the whole table regardless of store
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off and both legacy return jobs registered
@@ -3098,9 +3104,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [HandlerFunctions('CaptureMessage')]
     procedure FeatureFlagOn_IsRefusedWhileLegacyReturnRowsAreUnprocessed()
     var
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -3109,7 +3115,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] Enabling the feature is refused while a legacy return row is still New, so a half-imported return cannot be picked up by the other engine.
         // [GIVEN] No unprocessed legacy return queue rows are left over from other tests that commit rows, since the pre-flight check scans the whole table regardless of store
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off
@@ -3167,7 +3173,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Exclusivity_LegacyPostedReturn_NewEngineMarksItsEntryProcessed()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         LogEntry: Record "NPR Spfy Event Log Entry";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -3208,7 +3214,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Exclusivity_NewEngineDraft_IsAdoptedByTheLegacyImport()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -3253,7 +3259,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure AlreadyPosted_CreditMemoWithIds_MarksRowWithoutTouchingShopify()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -3329,10 +3335,10 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Import_RefundBeyondTheLines_IsRefusedWithoutBlamingTheShippingAccount()
+    procedure Import_RefundBeyondTheLines_WithoutDiscrepancyAccount_IsRefusedNamingTheField()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -3340,14 +3346,17 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         CustomerNo: Code[20];
         LocationCode: Code[10];
         ShippingAccountNo: Code[20];
+        DiscrepancyAccountNo: Code[20];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A return whose merchant refunded 20 more than the returned line (a negative order adjustment) is refused with an error about the amount paid beyond the lines, not about a missing shipping account, and leaves no Return Order.
-        // [GIVEN] A legacy-path store with no shipping refund account, so a refusal that blamed it could be told apart, and a queued return of one line worth 100, refunded 120 with an order adjustment of -20
+        // [SCENARIO] A return refunded 20 beyond its line, on a store without a discrepancy account, is refused with an error naming that field, not the shipping account, and leaves no Return Order.
+        // [GIVEN] A legacy-path store with neither a shipping refund account nor a discrepancy account, and a queued return of one line worth 100, refunded 120 with an order adjustment of -20
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
         ShippingAccountNo := ShopifyStore."Ret. Shipping Refund G/L Acc.";
+        DiscrepancyAccountNo := ShopifyStore."Refund Discrepancy G/L Acc.";
         ShopifyStore."Ret. Shipping Refund G/L Acc." := '';
+        ShopifyStore."Refund Discrepancy G/L Acc." := '';
         ShopifyStore.Modify();
         _Lib.InsertQueueRow(StoreCode, '812', '9812', QueueRow);
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('812', '9812', '#9812', Sku, '612', 1, 80, 20, 25, '71001', _Lib.RefundTxnJson('22', 'shopify_payments', 120, _Lib.Lcy(), ''), _Lib.Lcy(), _Lib.SingleRestockedDispositionJson('71001', 1), '[]', '', _Lib.OrderAdjustmentJson(-20, 0, 'REFUND_DISCREPANCY')));
@@ -3358,14 +3367,16 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // Cleanup: restore the committed store before asserting.
         ShopifyStore.Find();
         ShopifyStore."Ret. Shipping Refund G/L Acc." := ShippingAccountNo;
+        ShopifyStore."Refund Discrepancy G/L Acc." := DiscrepancyAccountNo;
         ShopifyStore.Modify();
         Commit();
 
-        // [THEN] A refund beyond the lines must be refused
-        _Assert.IsFalse(Succeeded, 'A refund beyond the lines must be refused.');
+        // [THEN] A refund beyond the lines without an account must be refused
+        _Assert.IsFalse(Succeeded, 'A refund beyond the lines without a discrepancy account must be refused.');
 
-        // [THEN] The error names the return and does not blame the shipping account, and no Return Order exists
+        // [THEN] The error names the return and the discrepancy field, does not blame the shipping account, and no Return Order exists
         _Assert.IsTrue(StrPos(GetLastErrorText(), '#9812-R1') > 0, 'The error must name the return: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), ShopifyStore.FieldCaption("Refund Discrepancy G/L Acc.")) > 0, 'The error must name the discrepancy account field: ' + GetLastErrorText());
         _Assert.IsTrue(StrPos(GetLastErrorText(), ShopifyStore.FieldCaption("Ret. Shipping Refund G/L Acc.")) = 0, 'The error must not blame the shipping account: ' + GetLastErrorText());
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
         SalesHeader.SetRange("Sell-to Customer No.", CustomerNo);
@@ -3376,7 +3387,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_WithheldAdjustmentOnTaxesIncludedOrder_TakesTheGrossAmount()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -3409,10 +3420,10 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Posting_StoreCreditRefund_SettlesOnTheLiabilityAccountWithoutATopUp()
+    procedure Posting_StoreCreditRefund_SettlesOnTheLiabilityAccountWithoutCreditingAVoucher()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherB: Record "NPR NpRv Voucher";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         GLEntry: Record "G/L Entry";
@@ -3423,7 +3434,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A refund of 300 to the card and 200 to Shopify store credit settles 300 on the card account and 200 on the gift card liability account, and tops up no voucher although the order was paid with one.
+        // [SCENARIO] A refund of 300 to the card and 200 to Shopify store credit settles 300 on the card account and 200 on the gift card liability account, and credits no voucher back although the order was paid with one.
         // [GIVEN] A legacy-path store with automatic posting, voucher B that paid the original order, and a return refunded 300 by card and 200 to store credit
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
@@ -3449,19 +3460,161 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         GLEntry.CalcSums(Amount);
         _Assert.AreEqual(-200, GLEntry.Amount, 'Store credit is a customer liability, like a gift card.');
 
-        // [THEN] No voucher was topped up and the row shows the share without a voucher
+        // [THEN] No voucher was credited back and the row shows the share without a voucher
         VoucherB.CalcFields(Amount);
         _Assert.AreEqual(100, VoucherB.Amount, 'The voucher that paid the order must not gain the store credit.');
-        _Assert.AreEqual('', QueueRow."Voucher No.", 'Store credit has no retail voucher behind it.');
-        _Assert.IsTrue(QueueRow."Gift Card Refund", 'The row must show that part of the refund stayed with Shopify as credit.');
-        _Assert.AreEqual(200, QueueRow."Gift Card Refund Amount", 'The liability share is the store credit amount.');
+        _Assert.AreEqual('', _Lib.SettledVoucherNo(QueueRow), 'Store credit has no retail voucher behind it.');
+        _Assert.IsTrue((_Lib.SettledGiftCardAmount(QueueRow) <> 0), 'The row must show that part of the refund stayed with Shopify as credit.');
+        _Assert.AreEqual(200, _Lib.SettledGiftCardAmount(QueueRow), 'The liability share is the store credit amount.');
+    end;
+
+    [Test]
+    procedure Posting_GiftCardAndStoreCreditRefund_CreditsTheCardItsOwnShare()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        VoucherC: Record "NPR NpRv Voucher";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        GLEntry: Record "G/L Entry";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A refund of 250 to the card, 50 to gift card 9942 and 200 to Shopify store credit settles 250 on the card account and 250 on the liability account, and gives gift card 9942 back its own 50.
+        // [GIVEN] A legacy-path store with automatic posting, voucher C behind gift card 9942 that paid 100 on the order
+        _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.GetStore(StoreCode, ShopifyStore);
+        _Lib.CreateVoucherWithGiftCardId('SPFYLRVC2', StoreCode, '9942', VoucherC);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR942', StoreCode, '9942', VoucherC."No.", 100);
+        // [GIVEN] A return of that order refunded 250 by card, 50 to gift card 9942 and 200 to store credit
+        _Lib.InsertQueueRow(StoreCode, '942', '9942', QueueRow);
+        MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('942', '9942', '#9942', Sku, '742', 2, 400, 100, 25, '71001',
+            _Lib.RefundTxnJson('43', 'shopify_payments', 250, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('44', 'gift_card', 50, _Lib.Lcy(), '9942') + ',' + _Lib.RefundTxnJson('45', 'shopify_store_credit', 200, _Lib.Lcy(), ''), _Lib.Lcy()));
+
+        // [WHEN] The import runs with automatic posting
+        Succeeded := _Lib.RunImport(QueueRow, MockClient);
+
+        // [THEN] Import and posting must succeed
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        // [THEN] The card share sits on the clearing account and the gift card and store credit shares on the liability account
+        _Lib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        GLEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
+        GLEntry.SetRange("G/L Account No.", ShopifyStore."Return Refund G/L Account No.");
+        GLEntry.CalcSums(Amount);
+        _Assert.AreEqual(-250, GLEntry.Amount, 'Only the card share belongs on the clearing account.');
+        GLEntry.SetRange("G/L Account No.", ShopifyStore."Ret. Gift Card Refund G/L Acc.");
+        GLEntry.CalcSums(Amount);
+        _Assert.AreEqual(-250, GLEntry.Amount, 'The gift card and store credit shares are a customer liability.');
+        // [THEN] Gift card 9942 gets back its own 50, not the store credit
+        VoucherC.CalcFields(Amount);
+        _Assert.AreEqual(150, VoucherC.Amount, 'The card must get back exactly what Shopify put back on it.');
+    end;
+
+    [Test]
+    procedure Posting_StoreCreditRefundOnAnOrderPaidWithTwoVouchers_SettlesWithoutAVoucher()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        VoucherU: Record "NPR NpRv Voucher";
+        VoucherV: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A refund to Shopify store credit puts nothing back on a gift card, so it settles without a voucher even when the order was paid with two vouchers BC could not tell apart.
+        // [GIVEN] A legacy-path store with automatic posting, and vouchers U and V that each paid 100 on the order's invoice
+        _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.CreateVoucherWithGiftCardId('SPFYLRVU', StoreCode, '99979', VoucherU);
+        _Lib.CreateVoucherWithGiftCardId('SPFYLRVV', StoreCode, '99980', VoucherV);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR979', StoreCode, '9979', VoucherU."No.", 100);
+        _Lib.AddVoucherPaymentToPostedInvoice('SI-LR979', VoucherV."No.", 100);
+
+        // [GIVEN] A return refunded 300 by card and 200 to store credit
+        _Lib.InsertQueueRow(StoreCode, '979', '9979', QueueRow);
+        MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('979', '9979', '#9979', Sku, '7979', 2, 400, 100, 25, '71001',
+            _Lib.RefundTxnJson('97901', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('97902', 'shopify_store_credit', 200, _Lib.Lcy(), ''), _Lib.Lcy()));
+
+        // [WHEN] The import runs with automatic posting
+        Succeeded := _Lib.RunImport(QueueRow, MockClient);
+
+        // [THEN] Import and posting must succeed
+        _Assert.IsTrue(Succeeded, 'Store credit must not be refused for gift cards it does not touch: ' + GetLastErrorText());
+        // [THEN] The row names no voucher and neither voucher gained anything
+        QueueRow.Find();
+        _Assert.AreEqual('', _Lib.SettledVoucherNo(QueueRow), 'Store credit has no retail voucher behind it.');
+        VoucherU.CalcFields(Amount);
+        _Assert.AreEqual(100, VoucherU.Amount, 'Voucher U must not gain the store credit.');
+        VoucherV.CalcFields(Amount);
+        _Assert.AreEqual(100, VoucherV.Amount, 'Voucher V must not gain the store credit.');
+    end;
+
+    [Test]
+    procedure Posting_SettlementWithoutTheCardsOwnShare_GivesTheCardTheWholeGiftCardShare()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        VoucherT: Record "NPR NpRv Voucher";
+        Settlement: Record "NPR Spfy Refund Settlement";
+        SalesHeader: Record "Sales Header";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SalesPost: Codeunit "Sales-Post";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A settlement row from before the card's own share was recorded, as the upgrade copies it from a released queue row, gives the card the whole gift card share: 200 back on a card that paid 200.
+        // [GIVEN] A store posting manually, voucher T behind gift card 99978 that paid 200 on the order's invoice, and a draft built for a refund of 300 by card and 200 to that card
+        _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.GetStore(StoreCode, ShopifyStore);
+        ShopifyStore."Post Returns Automatically" := false;
+        ShopifyStore.Modify();
+        _Lib.CreateVoucherWithGiftCardId('SPFYLRVT', StoreCode, '99978', VoucherT);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR978', StoreCode, '9978', VoucherT."No.", 200);
+        _Lib.InsertQueueRow(StoreCode, '978', '9978', QueueRow);
+        MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('978', '9978', '#9978', Sku, '7978', 2, 400, 100, 25, '71001',
+            _Lib.RefundTxnJson('97801', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('97802', 'gift_card', 200, _Lib.Lcy(), '99978'), _Lib.Lcy()));
+        _Assert.IsTrue(_Lib.RunImport(QueueRow, MockClient), 'The draft must build: ' + GetLastErrorText());
+        QueueRow.Find();
+
+        // [GIVEN] The settlement row lacks the card's own share, as a row the upgrade copied from a released queue row does
+        Settlement.Get(StoreCode, QueueRow."Source Doc. Type", QueueRow."Source Doc. ID");
+        _Assert.AreEqual(200, Settlement."Voucher Refund Amount", 'Precondition: the import records the card''s own share.');
+        Settlement."Voucher Refund Amount" := 0;
+        Settlement."Voucher Refund Amount (LCY)" := 0;
+        Settlement.Modify();
+        SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No.");
+        SalesHeader.Receive := true;
+        SalesHeader.Invoice := true;
+        Commit();
+
+        // [WHEN] A user posts the Return Order
+        Succeeded := SalesPost.Run(SalesHeader);
+
+        // [THEN] Posting must succeed
+        _Assert.IsTrue(Succeeded, 'Posting must succeed: ' + GetLastErrorText());
+        // [THEN] The card gets back the whole 200
+        VoucherT.CalcFields(Amount);
+        _Assert.AreEqual(300, VoucherT.Amount, 'Without its own share recorded the card must get the whole gift card share, as the released build gave it.');
+
+        // Cleanup: remove the committed rows.
+        QueueRow.SetRange("Shopify Store Code", StoreCode);
+        QueueRow.SetFilter("Source Doc. ID", '978');
+        QueueRow.DeleteAll();
+        Commit();
     end;
 
     [Test]
     procedure ProcessJQ_StoreWithReturnsSwitchedOff_LeavesItsRowsNew()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
@@ -3501,7 +3654,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ProcessingRowOfAnotherSession_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -3526,7 +3679,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_StaleProcessingRow_IsNotRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -3552,7 +3705,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_IsCreditMemoPosted_IgnoresACreditMemoWithoutTheReturnId()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -3584,7 +3737,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_GiftCardReturn_WithoutRefundForTheLine_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         VoucherNos: List of [Code[20]];
@@ -3629,7 +3782,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_GiftCardReturn_SoldAcrossTwoInvoices_RevokesACardFromEach()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         VouchersA: List of [Code[20]];
@@ -3667,7 +3820,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_GiftCardRefund_VoucherGoneBeforePosting_FailsNamingTheReturn()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherA: Record "NPR NpRv Voucher";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -3689,7 +3842,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
             _Lib.RefundTxnJson('51', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('52', 'gift_card', 200, _Lib.Lcy(), '9951'), _Lib.Lcy()));
         _Assert.IsTrue(_Lib.RunImport(QueueRow, MockClient), 'The draft must build: ' + GetLastErrorText());
         QueueRow.Find();
-        _Assert.AreEqual(VoucherA."No.", QueueRow."Voucher No.", 'Precondition: the row names the voucher.');
+        _Assert.AreEqual(VoucherA."No.", _Lib.SettledVoucherNo(QueueRow), 'Precondition: the row names the voucher.');
 
         // [GIVEN] The voucher is deleted and automatic posting is switched on
         _Lib.DeleteVoucher(VoucherA."No.");
@@ -3716,7 +3869,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_VoucherGoneAfterReceipt_FailsNamingTheReceiptInsteadOfAdvisingDiscard()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherA: Record "NPR NpRv Voucher";
         SalesHeader: Record "Sales Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
@@ -3741,7 +3894,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
             _Lib.RefundTxnJson('53', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('54', 'gift_card', 200, _Lib.Lcy(), '9952'), _Lib.Lcy()));
         _Assert.IsTrue(_Lib.RunImport(QueueRow, MockClient), 'The draft must build: ' + GetLastErrorText());
         QueueRow.Find();
-        _Assert.AreEqual(VoucherA."No.", QueueRow."Voucher No.", 'Precondition: the row names the voucher.');
+        _Assert.AreEqual(VoucherA."No.", _Lib.SettledVoucherNo(QueueRow), 'Precondition: the row names the voucher.');
 
         // [GIVEN] The Return Order is received without being invoiced, so a return receipt is posted and stamped on the row
         SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No.");
@@ -3779,15 +3932,15 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '952');
+        QueueRow.SetFilter("Source Doc. ID", '952');
         QueueRow.DeleteAll();
         Commit();
     end;
 
     [Test]
-    procedure Posting_ForeignCurrencyGiftCardRefund_TopsUpTheVoucherInLcy()
+    procedure Posting_ForeignCurrencyGiftCardRefund_CreditsTheVoucherBackInLcy()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherA: Record "NPR NpRv Voucher";
         Currency: Record Currency;
         CurrencyExchangeRate: Record "Currency Exchange Rate";
@@ -3799,7 +3952,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A gift card share of 20 in a currency worth 7.5 LCY per unit tops the voucher up by 150 LCY, the share converted at the credit memo's rate.
+        // [SCENARIO] A gift card share of 20 in a currency worth 7.5 LCY per unit gives the voucher back 150 LCY, the share converted at the credit memo's rate.
         // [GIVEN] A legacy-path store with automatic posting, a currency at 7.5, and voucher A behind gift card 9961 holding 100
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         LibraryERM.CreateCurrency(Currency);
@@ -3810,8 +3963,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         CurrencyExchangeRate.Modify(true);
         _Lib.CreateVoucherWithGiftCardId('SPFYLRVF', StoreCode, '9961', VoucherA);
 
-        // [GIVEN] A return of 100 in that currency refunded 80 by card and 20 to gift card 9961
+        // [GIVEN] A return of 100 in that currency refunded 80 by card and 20 to gift card 9961, which paid 20 on the order's invoice
         _Lib.InsertQueueRow(StoreCode, '961', '9961', QueueRow);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR961', StoreCode, '9961', VoucherA."No.", 20);
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('961', '9961', '#9961', Sku, '7961', 1, 80, 20, 25, '71001',
             _Lib.RefundTxnJson('61', 'shopify_payments', 80, Currency.Code, '') + ',' + _Lib.RefundTxnJson('62', 'gift_card', 20, Currency.Code, '9961'), Currency.Code));
 
@@ -3827,9 +3981,100 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
+    procedure Posting_ForeignCurrencyGiftCardRefund_CreditsTheVoucherWhatShopifyBookedInLcy()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        VoucherG: Record "NPR NpRv Voucher";
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        LibraryERM: Codeunit "Library - ERM";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A gift card share of 20 in a foreign currency that Shopify booked as 151.20 in the shop currency, which is the LCY, gives the voucher back 151.20, as Shopify credited the card, and not the 150 the credit memo's rate gives.
+        // [GIVEN] A legacy-path store with automatic posting, a currency at 7.5, and voucher G holding 100 that paid 20 on the order's invoice
+        _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        LibraryERM.CreateCurrency(Currency);
+        LibraryERM.CreateExchangeRate(Currency.Code, 20260101D, 1, 1);
+        CurrencyExchangeRate.Get(Currency.Code, 20260101D);
+        CurrencyExchangeRate.Validate("Relational Exch. Rate Amount", 7.5);
+        CurrencyExchangeRate.Validate("Relational Adjmt Exch Rate Amt", 7.5);
+        CurrencyExchangeRate.Modify(true);
+        _Lib.CreateVoucherWithGiftCardId('SPFYLRVG2', StoreCode, '99962', VoucherG);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR962', StoreCode, '9962', VoucherG."No.", 20);
+        // [GIVEN] A return of 100 in that currency refunded 80 by card and 20 to the gift card, booked by the shop as 151.20 LCY
+        _Lib.InsertQueueRow(StoreCode, '962', '9962', QueueRow);
+        MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('962', '9962', '#9962', Sku, '7962', 1, 80, 20, 25, '71001',
+            _Lib.RefundTxnJson('63', 'shopify_payments', 80, Currency.Code, '') + ',' + _Lib.RefundTxnJsonWithShopMoney('64', 'gift_card', 20, Currency.Code, 151.20, _Lib.Lcy()), Currency.Code));
+
+        // [WHEN] The import runs with automatic posting
+        Succeeded := _Lib.RunImport(QueueRow, MockClient);
+
+        // [THEN] Import and posting must succeed
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        // [THEN] The voucher gained the 151.20 Shopify booked
+        VoucherG.CalcFields(Amount);
+        _Assert.AreEqual(251.20, VoucherG.Amount, 'The voucher must move by what Shopify put back on the card in the shop currency.');
+    end;
+
+    [Test]
+    procedure Posting_SecondForeignCurrencyGiftCardRefund_ReadsTheFirstBackAtShopifysRate()
+    var
+        QueueRowA: Record "NPR Spfy NC Return Queue";
+        QueueRowB: Record "NPR Spfy NC Return Queue";
+        VoucherG: Record "NPR NpRv Voucher";
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        MockClientA: Codeunit "NPR Spfy Mock GraphQL Client";
+        MockClientB: Codeunit "NPR Spfy Mock GraphQL Client";
+        LibraryERM: Codeunit "Library - ERM";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] Two returns of one order put a 100 gift card payment back in two parts, in a currency BC rates at 7.5 and Shopify booked at 7.56; the second part is within what the card paid, because the first reads back as the 60 Shopify refunded and not as the 60.48 BC's rate makes of its 453.60 LCY.
+        // [GIVEN] A legacy-path store with automatic posting, a currency at 7.5, and voucher G holding 100 that paid 100 on the order's invoice
+        _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        LibraryERM.CreateCurrency(Currency);
+        LibraryERM.CreateExchangeRate(Currency.Code, 20260101D, 1, 1);
+        CurrencyExchangeRate.Get(Currency.Code, 20260101D);
+        CurrencyExchangeRate.Validate("Relational Exch. Rate Amount", 7.5);
+        CurrencyExchangeRate.Validate("Relational Adjmt Exch Rate Amt", 7.5);
+        CurrencyExchangeRate.Modify(true);
+        _Lib.CreateVoucherWithGiftCardId('SPFYLRVG4', StoreCode, '99976', VoucherG);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR976', StoreCode, '9976', VoucherG."No.", 100);
+
+        // [GIVEN] A first return of the order, refunded 40 by card and 60 to the gift card, booked by the shop as 453.60 LCY, imported and posted
+        _Lib.InsertQueueRow(StoreCode, '976', '9976', QueueRowA);
+        MockClientA.AddResponse('GetReturn', _Lib.ReturnDetailResponse('976', '9976', '#9976', Sku, '7976', 1, 80, 20, 25, '71001',
+            _Lib.RefundTxnJson('97601', 'shopify_payments', 40, Currency.Code, '') + ',' + _Lib.RefundTxnJsonWithShopMoney('97602', 'gift_card', 60, Currency.Code, 453.60, _Lib.Lcy()), Currency.Code));
+        _Assert.IsTrue(_Lib.RunImport(QueueRowA, MockClientA), 'The first return must post: ' + GetLastErrorText());
+
+        // [GIVEN] A second return of the order, refunded 60 by card and the last 40 to the gift card, booked as 302.40 LCY
+        _Lib.InsertQueueRow(StoreCode, '977', '9976', QueueRowB);
+        MockClientB.AddResponse('GetReturn', _Lib.ReturnDetailResponse('977', '9976', '#9976', Sku, '7977', 1, 80, 20, 25, '71001',
+            _Lib.RefundTxnJson('97701', 'shopify_payments', 60, Currency.Code, '') + ',' + _Lib.RefundTxnJsonWithShopMoney('97702', 'gift_card', 40, Currency.Code, 302.40, _Lib.Lcy()), Currency.Code));
+
+        // [WHEN] The second return's import runs with automatic posting
+        Succeeded := _Lib.RunImport(QueueRowB, MockClientB);
+
+        // [THEN] Import and posting must succeed
+        _Assert.IsTrue(Succeeded, 'The rest of what the card paid must go back on it: ' + GetLastErrorText());
+        // [THEN] The voucher gained the 453.60 and the 302.40 Shopify booked
+        VoucherG.CalcFields(Amount);
+        _Assert.AreEqual(856.00, VoucherG.Amount, 'The voucher must move by what Shopify put back on the card in the shop currency, both times.');
+    end;
+
+    [Test]
     procedure Import_GiftCardReturn_ToppedUpVoucher_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         VoucherNos: List of [Code[20]];
@@ -3887,7 +4132,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DiscardDraft_ProcessingRowOfAnotherSession_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -3922,7 +4167,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_GiftCardReturn_TwoParcels_RevokesEachCardOnce()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
@@ -4007,7 +4252,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_GiftCardRefundWithoutId_FindsTheVoucherOnALaterInvoice()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherB: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -4039,14 +4284,14 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] The row names voucher B
         QueueRow.Find();
-        _Assert.AreEqual(VoucherB."No.", QueueRow."Voucher No.", 'The voucher on the later invoice must be found.');
+        _Assert.AreEqual(VoucherB."No.", _Lib.SettledVoucherNo(QueueRow), 'The voucher on the later invoice must be found.');
     end;
 
     [Test]
     procedure Posting_WithheldAdjustmentWithTax_OnTaxExclusiveOrder_TakesAmountPlusTax()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -4082,8 +4327,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_GiftCardReturn_SecondOpenDraftOfTheSameLine_TakesTheOtherCard()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        FirstQueueRow: Record "NPR Spfy Legacy Return Queue";
-        SecondQueueRow: Record "NPR Spfy Legacy Return Queue";
+        FirstQueueRow: Record "NPR Spfy NC Return Queue";
+        SecondQueueRow: Record "NPR Spfy NC Return Queue";
         FirstMockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SecondMockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         VoucherNos: List of [Code[20]];
@@ -4293,7 +4538,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_OppositeAdjustmentsThatCancelOut_PostWithoutAFeeLine()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -4356,7 +4601,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_FreshProcessingRow_IsLeftAlone()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -4398,8 +4643,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_WithFailedLegacyReturns_AsksAndStopsWhenDeclined()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -4408,7 +4653,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] Enabling the feature while a legacy return row sits at Error asks the user to confirm, naming the queue, and stops when the user declines.
         // [GIVEN] No unprocessed legacy return queue rows are left over from other tests that commit rows, since the pre-flight check scans the whole table regardless of store
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off and one row at Error
@@ -4431,7 +4676,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ErrorIfAlreadyPosted_ReceiptWithIds_SaysReceivedNotInvoiced()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -4457,7 +4702,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ErrorIfAlreadyPosted_ReceiptWithoutIds_IsNotCalledReceived()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -4483,7 +4728,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ErrorIfAlreadyPosted_CreditMemoWithIds_SaysAlreadyPosted()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -4510,7 +4755,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Mgt_ErrorIfEcommerceFeatureEnabled_RefusesWhileTheFeatureIsOn()
     var
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         ErrorText: Text;
@@ -4533,10 +4778,10 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Import_GiftCardRefundWithoutId_TwoVoucherPaymentsOnTheOrder_TopsUpNoVoucher()
+    procedure Import_GiftCardRefundWithoutId_TwoVoucherPaymentsOnTheOrder_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherA: Record "NPR NpRv Voucher";
         VoucherB: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -4546,7 +4791,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A gift card refund that names no card resolves no voucher when the order was paid with two vouchers, on two invoices, since the import never guesses between cards.
+        // [SCENARIO] A gift card refund that names no card is refused for manual handling when the order was paid with two vouchers, on two invoices, since the import never guesses between cards.
         // [GIVEN] A store posting manually, vouchers A and B, and an order invoiced twice with one voucher payment on each invoice
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
@@ -4562,23 +4807,56 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('972', '9972', '#9972', Sku, '772', 2, 400, 100, 25, '71001',
             _Lib.RefundTxnJson('81', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('82', 'gift_card', 200, _Lib.Lcy(), ''), _Lib.Lcy()));
 
-        // [WHEN] The import builds the draft
+        // [WHEN] The import runs
         Succeeded := _Lib.RunImport(QueueRow, MockClient);
 
-        // [THEN] The draft must build
-        _Assert.IsTrue(Succeeded, 'The draft must build: ' + GetLastErrorText());
-
-        // [THEN] The row keeps the gift card flag with no voucher
+        // [THEN] The import is refused naming the return and the gift cards, and no draft is left
+        _Assert.IsFalse(Succeeded, 'Gift cards that cannot be told apart must be refused.');
+        _Assert.IsTrue(StrPos(GetLastErrorText(), '#9972-R1') > 0, 'The refusal must name the return: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'gift cards') > 0, 'The refusal must name the gift cards: ' + GetLastErrorText());
         QueueRow.Find();
-        _Assert.IsTrue(QueueRow."Gift Card Refund", 'The gift card share must stay visible.');
-        _Assert.AreEqual('', QueueRow."Voucher No.", 'Two vouchers on the order resolve no card.');
+        _Assert.AreEqual('', QueueRow."Sales Header Doc. No.", 'No draft may be left.');
     end;
 
     [Test]
-    procedure Import_TwoGiftCardRefundsWithoutIds_TopUpNoVoucher()
+    procedure Import_GiftCardRefundWithoutId_OneVoucherOnTwoPaymentLines_CreditsThatVoucher()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        VoucherQ: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A gift card refund that names no card goes back to the order's voucher when that one voucher paid in two transactions, which leaves two payment lines on the invoice: one card on two lines is not two cards.
+        // [GIVEN] A legacy-path store with automatic posting, and voucher Q holding 100 that paid 120 and 80 on the order's invoice in two transactions
+        _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.CreateVoucherWithGiftCardId('SPFYLRVQ', StoreCode, '99750', VoucherQ);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR975', StoreCode, '9975', VoucherQ."No.", 120);
+        _Lib.AddVoucherPaymentToPostedInvoice('SI-LR975', VoucherQ."No.", 80);
+
+        // [GIVEN] A return refunded 300 by card and 200 to a gift card that carries no id
+        _Lib.InsertQueueRow(StoreCode, '975', '9975', QueueRow);
+        MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('975', '9975', '#9975', Sku, '7975', 2, 400, 100, 25, '71001',
+            _Lib.RefundTxnJson('97501', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('97502', 'gift_card', 200, _Lib.Lcy(), ''), _Lib.Lcy()));
+
+        // [WHEN] The import runs with automatic posting
+        Succeeded := _Lib.RunImport(QueueRow, MockClient);
+
+        // [THEN] Import and posting must succeed
+        _Assert.IsTrue(Succeeded, 'One voucher on two payment lines must not be taken for two cards: ' + GetLastErrorText());
+        // [THEN] The voucher gained the 200
+        VoucherQ.CalcFields(Amount);
+        _Assert.AreEqual(300, VoucherQ.Amount, 'The gift card share must go back on the order''s one voucher.');
+    end;
+
+    [Test]
+    procedure Import_TwoGiftCardRefundsWithoutIds_AreRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherB: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -4587,7 +4865,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] Two gift card refund transactions without ids count as two cards, so no voucher is resolved even though the order was paid with exactly one.
+        // [SCENARIO] Two gift card refund transactions without ids count as two cards, so the return is refused for manual handling even though the order was paid with exactly one voucher.
         // [GIVEN] A store posting manually, voucher B that paid the order on its single invoice
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
@@ -4601,16 +4879,15 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('973', '9973', '#9973', Sku, '773', 2, 400, 100, 25, '71001',
             _Lib.RefundTxnJson('83', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('84', 'gift_card', 100, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('85', 'gift_card', 100, _Lib.Lcy(), ''), _Lib.Lcy()));
 
-        // [WHEN] The import builds the draft
+        // [WHEN] The import runs
         Succeeded := _Lib.RunImport(QueueRow, MockClient);
 
-        // [THEN] The draft must build
-        _Assert.IsTrue(Succeeded, 'The draft must build: ' + GetLastErrorText());
-
-        // [THEN] The row shows the full gift card share with no voucher
+        // [THEN] The import is refused naming the return and the gift cards, and no draft is left
+        _Assert.IsFalse(Succeeded, 'Gift cards that cannot be told apart must be refused.');
+        _Assert.IsTrue(StrPos(GetLastErrorText(), '#9973-R1') > 0, 'The refusal must name the return: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'gift cards') > 0, 'The refusal must name the gift cards: ' + GetLastErrorText());
         QueueRow.Find();
-        _Assert.AreEqual(200, QueueRow."Gift Card Refund Amount", 'Both gift card transactions belong to the liability share.');
-        _Assert.AreEqual('', QueueRow."Voucher No.", 'Two cards without ids resolve no voucher.');
+        _Assert.AreEqual('', QueueRow."Sales Header Doc. No.", 'No draft may be left.');
     end;
 
     [Test]
@@ -4677,7 +4954,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ShippingRefund_PostsTheShippingLine()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -4713,7 +4990,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_RestockingFee_PostsAFeeLine()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -4749,7 +5026,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_MixedDispositions_FlagsTheRowNotRestocked()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -4781,7 +5058,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_GiftCardRefund_WithoutLiabilityAccount_SettlesAllOnTheCardAccount()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         VoucherA: Record "NPR NpRv Voucher";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         GLEntry: Record "G/L Entry";
@@ -4792,14 +5069,15 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] With no gift card liability account on the store, the gift card share settles on the card account like the rest, and the voucher is still topped up.
-        // [GIVEN] A legacy-path store with automatic posting and a blank gift card account, voucher A behind gift card 9981, and a return refunded 300 by card and 200 to that card
+        // [SCENARIO] With no gift card liability account on the store, the gift card share settles on the card account like the rest, and the voucher is still credited back.
+        // [GIVEN] A legacy-path store with automatic posting and a blank gift card account, voucher A behind gift card 9981, and a return refunded 300 by card and 200 to that card, which paid 200 on the order's invoice
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
         ShopifyStore."Ret. Gift Card Refund G/L Acc." := '';
         ShopifyStore.Modify();
         _Lib.CreateVoucherWithGiftCardId('SPFYLRVP', StoreCode, '9981', VoucherA);
         _Lib.InsertQueueRow(StoreCode, '981', '9981', QueueRow);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR981', StoreCode, '9981', VoucherA."No.", 200);
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('981', '9981', '#9981', Sku, '781', 2, 400, 100, 25, '71001',
             _Lib.RefundTxnJson('91', 'shopify_payments', 300, _Lib.Lcy(), '') + ',' + _Lib.RefundTxnJson('92', 'gift_card', 200, _Lib.Lcy(), '9981'), _Lib.Lcy()));
 
@@ -4816,13 +5094,13 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         GLEntry.CalcSums(Amount);
         _Assert.AreEqual(-500, GLEntry.Amount, 'Without a liability account both shares settle on the card account.');
         VoucherA.CalcFields(Amount);
-        _Assert.AreEqual(300, VoucherA.Amount, 'The voucher is topped up regardless of the account.');
+        _Assert.AreEqual(300, VoucherA.Amount, 'The voucher is credited back regardless of the account.');
     end;
 
     [Test]
     procedure Mgt_FindQueueRowBySalesHeader_IgnoresAHeaderWithoutTheReturnId()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -4854,8 +5132,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_FindQueueRowBySalesHeader_TakesTheRowWithTheHeadersReturnIdWhenTwoShareTheNumber()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        OtherRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -4881,7 +5159,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] The row of return 1024 is the one matched
         _Assert.IsTrue(Found, 'The row carrying the header''s return id must be found.');
-        _Assert.AreEqual('1024', QueueRow."Return Id", 'The lookup must return the row whose return id the header carries.');
+        _Assert.AreEqual('1024', QueueRow."Source Doc. ID", 'The lookup must return the row whose return id the header carries.');
     end;
 
     [Test]
@@ -5002,7 +5280,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_GiftCardReturn_RefundedBelowFaceValue_ArchivesTheCardAndWritesOffTheRest()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -5068,7 +5346,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_AdoptedDraft_WithAnExchangeLine_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -5103,7 +5381,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DeletingQueueRowOfReceivedReturn_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ReturnReceiptHeader: Record "Return Receipt Header";
         SalesHeader: Record "Sales Header";
         LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
@@ -5124,7 +5402,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] The deletion is refused naming the receipt and the Return Order, and the row still exists
         _Assert.IsTrue(StrPos(GetLastErrorText(), 'RR-LR1016') > 0, 'The error must name the receipt: ' + GetLastErrorText());
         _Assert.IsTrue(StrPos(GetLastErrorText(), 'RO-LR1016') > 0, 'The error must name the Return Order to invoice: ' + GetLastErrorText());
-        _Assert.IsTrue(QueueRow.Get('SPFYLRM8', '1016'), 'The row must survive a refused deletion.');
+        _Assert.IsTrue(QueueRow.FindSourceDoc('SPFYLRM8', QueueRow."Source Doc. Type"::Return, '1016'), 'The row must survive a refused deletion.');
 
         // Cleanup: remove the committed row, receipt and Return Order.
         QueueRow.Delete();
@@ -5139,7 +5417,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_DefaultQuantityToShipBlank_PostsTheFullReturn()
     var
         SalesSetup: Record "Sales & Receivables Setup";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -5182,7 +5460,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure QueuePage_Process_RefusesWhileTheEcommerceFeatureIsOn()
     var
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         ErrorText: Text;
@@ -5216,7 +5494,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure QueuePage_DiscardDraft_RefusesWhileTheEcommerceFeatureIsOn()
     var
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         ErrorText: Text;
@@ -5364,7 +5642,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ErrorIfAlreadyPosted_SharedNumber_PrefersTheReceiptWithIds()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -5395,7 +5673,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_IsCreditMemoPosted_IgnoresACreditMemoOfAnotherStore()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         IsPosted: Boolean;
         StoreCode: Code[20];
@@ -5422,7 +5700,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ShippingRefund_TaxesIncluded_AddsTheTaxToTheSubtotal()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -5458,7 +5736,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ShippingRefundAndReturnFee_TaxesIncluded_PostsTheRefundedTotal()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -5500,7 +5778,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Posting_ParcelsWithUnequalQuantities_SplitTheGrossByQuantity()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -5537,7 +5815,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         ShopifyStore: Record "NPR Spfy Store";
         GenericItem: Record Item;
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesLine: Record "Sales Line";
         LibraryInventory: Codeunit "Library - Inventory";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -5612,8 +5890,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_IsRefusedWhileALegacyRowIsProcessing()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -5622,7 +5900,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] Enabling the feature is refused while a legacy return row is being processed, so the other engine cannot take over a return mid-import.
         // [GIVEN] No unprocessed legacy return queue rows are left over from other tests that commit rows, since the pre-flight check scans the whole table regardless of store
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off and a row at Processing
@@ -5646,7 +5924,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_DraftCreatedRow_IsNotRevisited()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -5709,7 +5987,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         SalesSetup: Record "Sales & Receivables Setup";
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesLine: Record "Sales Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         OriginalDefault: Integer;
@@ -5758,7 +6036,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_RetryOfAnEditedDraft_IsRefusedWhenItsTotalFallsBelowThePayments()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -5806,7 +6084,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1041');
+        QueueRow.SetFilter("Source Doc. ID", '1041');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -5839,7 +6117,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DeletingQueueRowOfReceivedReturnInvoicedElsewhere_IsAllowed()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ReturnReceiptHeader: Record "Return Receipt Header";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -5860,7 +6138,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         QueueRow.Delete(true);
 
         // [THEN] The row is gone
-        _Assert.IsFalse(QueueRow.Get(StoreCode, '1043'), 'A row with nothing left to settle must be deletable.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1043'), 'A row with nothing left to settle must be deletable.');
 
         // Cleanup: remove the committed receipt.
         if ReturnReceiptHeader.Get('RR-LR1043') then
@@ -5871,7 +6149,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ProcessingAReceivedReturnInvoicedElsewhere_SaysToDismissTheRow()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ReturnReceiptHeader: Record "Return Receipt Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -5900,7 +6178,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DeletingTheRowAnotherSessionIsProcessing_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -5923,7 +6201,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] The error names the return and both the row and the draft survive
         _Assert.IsTrue(StrPos(GetLastErrorText(), '#9145-R1') > 0, 'The error must name the return: ' + GetLastErrorText());
-        _Assert.IsTrue(QueueRow.Get(StoreCode, '1045'), 'The row must survive a refused deletion.');
+        _Assert.IsTrue(QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1045'), 'The row must survive a refused deletion.');
         _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::"Return Order", 'RO-LR1045'), 'The draft must survive a refused deletion.');
 
         // Cleanup: remove the committed row and draft.
@@ -5937,7 +6215,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         ShopifyStore: Record "NPR Spfy Store";
         SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -5986,7 +6264,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1046');
+        QueueRow.SetFilter("Source Doc. ID", '1046');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -5995,7 +6273,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_TheSameBugOnTwoRowsOfOneStore_IsReportedToSentryOnce()
     var
         SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         SentryCapture: Codeunit "NPR Library - Sentry Capture";
@@ -6010,13 +6288,15 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         SpfyIntegrationSetup."Max Doc Process Retry Count" := 1;
         SpfyIntegrationSetup.Modify();
         QueueRow.Init();
+        QueueRow."Entry No." := 0;
         QueueRow."Shopify Store Code" := 'SPFYLRGON2';
-        QueueRow."Return Id" := '1047';
+        QueueRow."Source Doc. ID" := '1047';
         QueueRow.Status := QueueRow.Status::New;
         QueueRow.Insert(true);
         QueueRow.Init();
+        QueueRow."Entry No." := 0;
         QueueRow."Shopify Store Code" := 'SPFYLRGON2';
-        QueueRow."Return Id" := '1048';
+        QueueRow."Source Doc. ID" := '1048';
         QueueRow.Status := QueueRow.Status::New;
         QueueRow.Insert(true);
         Commit();
@@ -6043,7 +6323,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_SuccessfulPostingThroughTheJob_MarksTheRowImported()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
@@ -6086,7 +6366,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // Cleanup: remove the committed rows.
         QueueRow.SetRange("Shopify Store Code", StoreCode);
-        QueueRow.SetFilter("Return Id", '1049');
+        QueueRow.SetFilter("Source Doc. ID", '1049');
         QueueRow.DeleteAll();
         Commit();
     end;
@@ -6095,7 +6375,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_RefundInAnotherShopCurrency_KeepsTheShopAmountOnThePaymentLine()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         PaymentLine: Record "NPR Magento Payment Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -6134,7 +6414,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_WithheldFee_OnAnAccountWithoutVat_PostsTheFeeWithoutVat()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         Customer: Record Customer;
@@ -6191,7 +6471,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         NpEcStore: Record "NPR NpEc Store";
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -6237,7 +6517,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ProcessingRowYoungerThanTwiceTheJobInterval_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
@@ -6271,7 +6551,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ProcessingRowOlderThanTwiceTheJobInterval_IsNotRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
@@ -6369,10 +6649,10 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Import_GiftCardRefundsWithAndWithoutId_TopUpNoVoucher()
+    procedure Import_GiftCardRefundsWithAndWithoutId_AreRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -6381,7 +6661,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A return refunded to one gift card that Shopify names and one it does not counts as a refund to two cards: the gift card share is settled on the liability account and no voucher is topped up, since the id-less card cannot be matched.
+        // [SCENARIO] A return refunded to one gift card that Shopify names and one it does not counts as a refund to two cards, so it is refused for manual handling.
         // [GIVEN] A store posting manually, a voucher behind gift card 91550, and a return refunded 60 to that card and 40 to a card without an id
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
@@ -6392,23 +6672,21 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('1055', '9155', '#9155', Sku, '1055', 1, 80, 20, 25, '71001',
             _Lib.RefundTxnJson('1055', 'gift_card', 60, _Lib.Lcy(), '91550') + ',' + _Lib.RefundTxnJson('1056', 'gift_card', 40, _Lib.Lcy(), ''), _Lib.Lcy()));
 
-        // [WHEN] The import builds the draft
+        // [WHEN] The import runs
         Succeeded := _Lib.RunImport(QueueRow, MockClient);
 
-        // [THEN] The draft must build
-        _Assert.IsTrue(Succeeded, 'The draft must build: ' + GetLastErrorText());
-
-        // [THEN] The row carries the whole gift card share and names no voucher
+        // [THEN] The import is refused naming the return and the gift cards, and no draft is left
+        _Assert.IsFalse(Succeeded, 'Gift cards that cannot be told apart must be refused.');
+        _Assert.IsTrue(StrPos(GetLastErrorText(), '#9155-R1') > 0, 'The refusal must name the return: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'gift cards') > 0, 'The refusal must name the gift cards: ' + GetLastErrorText());
         QueueRow.Find();
-        _Assert.IsTrue(QueueRow."Gift Card Refund", 'The row must flag the gift card refund.');
-        _Assert.AreEqual(100, QueueRow."Gift Card Refund Amount", 'Both gift card refunds belong to the liability share.');
-        _Assert.AreEqual('', QueueRow."Voucher No.", 'With one card unnamed, no voucher can be chosen.');
+        _Assert.AreEqual('', QueueRow."Sales Header Doc. No.", 'No draft may be left.');
     end;
 
     [Test]
     procedure Mgt_DismissReturn_ErrorRow_IsDismissedAndTheJobLeavesIt()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
@@ -6450,7 +6728,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure PollJQ_DismissedReturn_IsNotQueuedAgain()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         StoreCode: Code[20];
@@ -6488,7 +6766,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_WithAnOpenDraft_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -6523,7 +6801,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_ReceivedNotInvoiced_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
@@ -6559,7 +6837,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_ProcessingRowOfAnotherSession_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -6584,7 +6862,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_ImportedReturn_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -6621,8 +6899,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure StoreDeleted_WithDismissedReturns_RemovesThem()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        LeftoverRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        LeftoverRow: Record "NPR Spfy NC Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
         CustomerNo: Code[20];
@@ -6654,8 +6932,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_WithDismissedLegacyReturns_AsksAndStopsWhenDeclined()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -6664,7 +6942,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] A dismissed legacy return does not refuse the Ecommerce feature switch but asks the user to confirm, since the e-commerce import may import a return handled by hand again, and stops when the user declines.
         // [GIVEN] No unprocessed or failed legacy return rows left over from other tests, since the pre-flight check scans the whole table
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off and one committed row at Dismissed
@@ -6695,7 +6973,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Import_ReturnNoLongerClosed_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         ResponseText: Text;
@@ -6730,7 +7008,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DeletingADismissedRow_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
         CustomerNo: Code[20];
@@ -6749,7 +7027,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] The refusal names the return and the row survives, still Dismissed
         _Assert.IsTrue(StrPos(GetLastErrorText(), '#9170-R1') > 0, 'The refusal must name the return: ' + GetLastErrorText());
-        _Assert.IsTrue(QueueRow.Get(StoreCode, '1070'), 'A dismissed row must survive a deletion attempt.');
+        _Assert.IsTrue(QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1070'), 'A dismissed row must survive a deletion attempt.');
         _Assert.AreEqual(QueueRow.Status::Dismissed, QueueRow.Status, 'The row must stay Dismissed.');
 
         // Cleanup: reopen and remove the committed row.
@@ -6762,7 +7040,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_ErrorIfDismissed_DismissedRow_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -6787,7 +7065,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_UnrecordedCreditMemoWithTheIds_IsRefusedAndRecorded()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -6823,7 +7101,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_UnlinkedDraftWithTheIds_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -6847,7 +7125,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DiscardDraft_DismissedRowWithoutDraft_IsAllowed()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -6865,14 +7143,14 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         SpfyLegacyReturnMgt.DiscardDraft(QueueRow);
 
         // [THEN] The row survives for the page to reset
-        _Assert.IsTrue(QueueRow.Get(StoreCode, '1074'), 'The discard of a dismissed row without a draft must leave the row for the reset to New.');
+        _Assert.IsTrue(QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1074'), 'The discard of a dismissed row without a draft must leave the row for the reset to New.');
     end;
 
     [Test]
     procedure Import_SingleRestockLocationDifferentFromTheStoreDefault_IsTakenWithoutFallback()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
@@ -6910,7 +7188,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         NpEcStore: Record "NPR NpEc Store";
         Location: Record Location;
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -6950,7 +7228,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure QueuePage_Dismiss_MarksAnErrorRowDismissed()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -6980,7 +7258,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure QueuePage_DiscardDraftAndRetry_ReopensADismissedRow()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -7014,7 +7292,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure QueuePage_Process_RefusesADismissedRow()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         ErrorText: Text;
         StoreCode: Code[20];
@@ -7046,7 +7324,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_UnlinkedRestockLocationWithAStoreLocation_UsesTheStoreLocationAndFlagsIt()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -7088,7 +7366,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     var
         NpEcStore: Record "NPR NpEc Store";
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -7131,7 +7409,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DiscardDraft_UnrecordedCreditMemoWithTheIds_IsRefusedAndRecorded()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -7255,21 +7533,21 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_ProcessRow_RowClaimedByAnotherSessionMeanwhile_IsLeftAlone()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
         Sku: Code[20];
         CustomerNo: Code[20];
         LocationCode: Code[10];
-        OtherSessionRow: Record "NPR Spfy Legacy Return Queue";
+        OtherSessionRow: Record "NPR Spfy NC Return Queue";
         Claimed: Boolean;
     begin
         // [SCENARIO] The process row re-reads the row under a lock before claiming it, so a row another session claimed after the caller's guard is left to that session and not imported a second time.
         // [GIVEN] A row read as New by this session, which another session has since set to Processing in the database
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.InsertQueueRow(StoreCode, '1083', '9183', QueueRow);
-        OtherSessionRow.Get(StoreCode, '1083');
+        OtherSessionRow.FindSourceDoc(StoreCode, OtherSessionRow."Source Doc. Type"::Return, '1083');
         OtherSessionRow.Status := OtherSessionRow.Status::Processing;
         OtherSessionRow."Processed At" := CurrentDateTime();
         OtherSessionRow.Modify();
@@ -7291,8 +7569,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_ProcessRow_RowDeletedMeanwhile_IsSkipped()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        OtherSessionRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherSessionRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -7305,7 +7583,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [GIVEN] A row read by this session that another session has since deleted
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.InsertQueueRow(StoreCode, '1085', '9185', QueueRow);
-        OtherSessionRow.Get(StoreCode, '1085');
+        OtherSessionRow.FindSourceDoc(StoreCode, OtherSessionRow."Source Doc. Type"::Return, '1085');
         OtherSessionRow.Delete();
 
         // [WHEN] The process row runs with the stale copy
@@ -7313,7 +7591,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
 
         // [THEN] Nothing was built and the row stays gone
         _Assert.IsFalse(Claimed, 'The stale copy must not claim the row.');
-        _Assert.IsFalse(OtherSessionRow.Get(StoreCode, '1085'), 'A deleted row must not be recreated by the claim.');
+        _Assert.IsFalse(OtherSessionRow.FindSourceDoc(StoreCode, OtherSessionRow."Source Doc. Type"::Return, '1085'), 'A deleted row must not be recreated by the claim.');
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
         SalesHeader.SetRange("Sell-to Customer No.", CustomerNo);
         _Assert.IsTrue(SalesHeader.IsEmpty(), 'No Return Order may be built for a deleted row.');
@@ -7322,7 +7600,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_ReceivedReturnInvoicedElsewhere_IsDismissed()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ReturnReceiptHeader: Record "Return Receipt Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -7359,8 +7637,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_ProcessRow_RowDismissedMeanwhile_IsLeftAlone()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        OtherSessionRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherSessionRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -7373,7 +7651,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [GIVEN] A row read as New by this session that another session has since dismissed
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.InsertQueueRow(StoreCode, '1086', '9186', QueueRow);
-        OtherSessionRow.Get(StoreCode, '1086');
+        OtherSessionRow.FindSourceDoc(StoreCode, OtherSessionRow."Source Doc. Type"::Return, '1086');
         OtherSessionRow.Status := OtherSessionRow.Status::Dismissed;
         OtherSessionRow.Modify();
 
@@ -7392,7 +7670,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DiscardDraft_DismissedReturnInvoicedElsewhere_IsRefusedAsDismissed()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ReturnReceiptHeader: Record "Return Receipt Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
@@ -7425,8 +7703,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_WithDismissedLegacyReturns_ContinuesWhenAccepted()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -7435,7 +7713,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] A dismissed legacy return only asks: when the user accepts the question, enabling the Ecommerce feature goes ahead and the row stays Dismissed.
         // [GIVEN] No unprocessed, failed or dismissed legacy return rows left over from other tests
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off and one row at Dismissed
@@ -7460,8 +7738,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_ProcessRow_RowImportedMeanwhile_IsLeftAlone()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        OtherSessionRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherSessionRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -7474,7 +7752,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [GIVEN] A row read as New by this session that another session has since set to Imported
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.InsertQueueRow(StoreCode, '1089', '9189', QueueRow);
-        OtherSessionRow.Get(StoreCode, '1089');
+        OtherSessionRow.FindSourceDoc(StoreCode, OtherSessionRow."Source Doc. Type"::Return, '1089');
         OtherSessionRow.Status := OtherSessionRow.Status::Imported;
         OtherSessionRow.Modify();
 
@@ -7493,7 +7771,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure QueuePage_Process_RefusesARowAnotherSessionIsProcessing()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         ErrorText: Text;
@@ -7526,7 +7804,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure QueuePage_Process_RefusesARowOfAStoreWithReturnsSwitchedOff()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         ErrorText: Text;
@@ -7558,30 +7836,30 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure PollJQ_InsertNewRows_StoreDeletedMeanwhile_InsertsNothing()
     var
-        TempQueueRow: Record "NPR Spfy Legacy Return Queue" temporary;
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        TempQueueRow: Record "NPR Spfy NC Return Queue" temporary;
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
     begin
         // [SCENARIO] Rows listed for a store that was deleted while its returns were being fetched are not inserted, so no orphan row is left for the import to report as a bug.
         // [GIVEN] A listed return of a store that no longer exists
         TempQueueRow.Init();
         TempQueueRow."Shopify Store Code" := 'SPFYLRGONE3';
-        TempQueueRow."Return Id" := '1092';
-        TempQueueRow."Return Name" := '#9192-R1';
+        TempQueueRow."Source Doc. ID" := '1092';
+        TempQueueRow."Source Doc. Name" := '#9192-R1';
         TempQueueRow.Insert();
-        _Assert.IsFalse(QueueRow.Get('SPFYLRGONE3', '1092'), 'Precondition: no row exists for the deleted store.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc('SPFYLRGONE3', QueueRow."Source Doc. Type"::Return, '1092'), 'Precondition: no row exists for the deleted store.');
 
         // [WHEN] The poll inserts its new rows
         SpfyLegacyReturnPollJQ.InsertNewRows(TempQueueRow);
 
         // [THEN] No row was inserted for the deleted store
-        _Assert.IsFalse(QueueRow.Get('SPFYLRGONE3', '1092'), 'A return of a deleted store must not be queued.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc('SPFYLRGONE3', QueueRow."Source Doc. Type"::Return, '1092'), 'A return of a deleted store must not be queued.');
     end;
 
     [Test]
     procedure Import_GiftCardReturn_ReservedCard_IsRefusedWithoutADocument()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         Voucher: Record "NPR NpRv Voucher";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -7659,7 +7937,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure PollJQ_StoreWithReturnsSwitchedOff_IsNotPolled()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         StoreCode: Code[20];
@@ -7689,7 +7967,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure PollJQ_DisabledStore_IsNotPolled()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         StoreCode: Code[20];
@@ -7719,8 +7997,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_WithImportedLegacyReturns_PassesWithoutAQuestion()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -7729,7 +8007,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] An imported legacy return neither refuses the Ecommerce feature switch nor asks about it: with only imported rows the check passes silently.
         // [GIVEN] No unprocessed, failed or dismissed legacy return rows left over from other tests
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off and one row at Imported
@@ -7784,7 +8062,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         Response: JsonToken;
         TransactionsJson: Text;
     begin
-        // [SCENARIO] Only transactions of kind REFUND with status SUCCESS become refund transactions: a pending refund and a sale transaction on the same refund are left out.
+        // [SCENARIO] Only transactions of kind REFUND with status SUCCESS become refund transactions: a pending refund and a sale transaction on the same refund are left out, and the pending refund is counted.
         // [GIVEN] A detail response whose refund carries a successful refund of 100, a pending refund of 50 and a successful sale of 30
         TransactionsJson := _Lib.RefundTxnJson('3001', 'shopify_payments', 100, _Lib.Lcy(), '') + ',' +
             _Lib.RefundTxnJson('3002', 'shopify_payments', 50, _Lib.Lcy(), '').Replace('"status":"SUCCESS"', '"status":"PENDING"') + ',' +
@@ -7799,13 +8077,17 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         TempRefundTxnBuffer.FindFirst();
         _Assert.AreEqual(100, TempRefundTxnBuffer.Amount, 'The recorded transaction is the successful refund.');
         _Assert.AreEqual('3001', TempRefundTxnBuffer."Transaction Id", 'The recorded transaction is the successful refund by id.');
+
+        // [THEN] The pending refund is counted, so the import waits for it
+        TempReturnBuffer.FindFirst();
+        _Assert.AreEqual(1, TempReturnBuffer."Pending Refund Txns", 'The pending refund transaction must be counted.');
     end;
 
     [Test]
     procedure Import_TwoReturnedOrderLines_BuildTwoLinesCoveringTheRefund()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -7854,7 +8136,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure QueuePage_Process_MarksTheRowImportedWhenItsCreditMemoExists()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         StoreCode: Code[20];
@@ -7888,9 +8170,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_WithPendingAndFailedLegacyReturns_RefusesWithoutAsking()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        FailedRow: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        FailedRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -7899,7 +8181,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] Enabling the feature while the queue holds both an unprocessed row and a failed row refuses outright, without first asking about the failed row.
         // [GIVEN] No legacy return queue rows are left over from other tests that commit rows, since the pre-flight check scans the whole table regardless of store
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off, one row at New and one at Error
@@ -7925,7 +8207,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_InvoiceRounding_PostsTheRoundedTotalAndKeepsTheRefundOnThePaymentLine()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         GLEntry: Record "G/L Entry";
@@ -8092,7 +8374,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure QueuePage_Process_UnderAStatusFilter_StillWritesTheOutcome()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         StoreCode: Code[20];
@@ -8167,7 +8449,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_RefundProcessedAndCreatedOnDifferentDays_DatesThePaymentLineByTheProcessedDay()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         PaymentLine: Record "NPR Magento Payment Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         TransactionJson: Text;
@@ -8208,7 +8490,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_RefundWithoutAProcessedDate_DatesThePaymentLineByTheCreationDay()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         PaymentLine: Record "NPR Magento Payment Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         TransactionJson: Text;
@@ -8247,7 +8529,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_RefundWithoutAnyDate_DatesThePaymentLineByThePostingDate()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         PaymentLine: Record "NPR Magento Payment Line";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
@@ -8287,7 +8569,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_FindQueueRowBySalesHeader_IgnoresAHeaderStampedForAnotherStore()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
@@ -8323,7 +8605,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_DraftWorthMoreThanTheRefund_IsRefusedBeforeSettlement()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
@@ -8401,10 +8683,61 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
-    procedure Posting_GiftCardRefund_ToAnArchivedCard_RestoresTheCardAndTopsItUp()
+    procedure Posting_DraftWorthLessThanTheRefund_IsRefusedBeforeSettlement()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SalesPost: Codeunit "Sales-Post";
+        ErrorText: Text;
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A draft a user made worth less than Shopify refunded is refused at posting, naming the return, so the settlement never books less than the refund and never gives a gift card back less than Shopify put on it.
+        // [GIVEN] A legacy-path store posting manually and a draft built for a return refunded 125
+        _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.GetStore(StoreCode, ShopifyStore);
+        ShopifyStore."Post Returns Automatically" := false;
+        ShopifyStore.Modify();
+        Commit();
+        _Lib.InsertQueueRow(StoreCode, '1139', '9239', QueueRow);
+        MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('1139', '9239', '#9239', Sku, '1139', 1, 100, 25, 25, '71001', _Lib.RefundTxnJson('1139', 'shopify_payments', 125, _Lib.Lcy(), ''), _Lib.Lcy()));
+        _Assert.IsTrue(_Lib.RunImport(QueueRow, MockClient), 'The draft must build: ' + GetLastErrorText());
+
+        // [GIVEN] A user lowers the returned item's price on the draft to 75
+        QueueRow.Find();
+        SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No.");
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        SalesLine.FindFirst();
+        SalesLine.Validate("Unit Price", 75);
+        SalesLine.Modify(true);
+        SalesHeader.Receive := true;
+        SalesHeader.Invoice := true;
+        Commit();
+
+        // [WHEN] The user posts the draft from the Return Order
+        Succeeded := SalesPost.Run(SalesHeader);
+        ErrorText := GetLastErrorText();
+
+        // [THEN] The posting is refused naming the return and the shortfall, and the draft survives
+        _Assert.IsFalse(Succeeded, 'The posting must be refused: ' + ErrorText);
+        _Assert.IsTrue(StrPos(ErrorText, '#9239-R1') > 0, 'The refusal must name the return: ' + ErrorText);
+        _Assert.IsTrue(StrPos(ErrorText, 'is below the') > 0, 'The refusal must name the shortfall: ' + ErrorText);
+        _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No."), 'The draft must survive the refused posting.');
+    end;
+
+    [Test]
+    procedure Posting_GiftCardRefund_ToAnArchivedCard_RestoresTheCardAndCreditsItBack()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         VoucherFilter: Record "NPR NpRv Voucher";
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -8418,7 +8751,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         VoucherNo: Code[20];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A refund to a gift card whose voucher was spent to zero and archived restores the voucher with its Shopify id and tops it up by the refund, instead of importing with no voucher.
+        // [SCENARIO] A refund to a gift card whose voucher was spent to zero and archived restores the voucher with its Shopify id and gives it back the refund, instead of importing with no voucher.
         // [GIVEN] A legacy-path store with automatic posting and Shopify gift card 9006 mapped to a voucher that is spent and archived
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
@@ -8433,8 +8766,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Assert.IsTrue(ArchVoucher.FindFirst(), 'Precondition: the archive holds the voucher.');
         _Assert.AreEqual('9006', SpfyAssignedIDMgt.GetAssignedShopifyID(ArchVoucher.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 'Precondition: the Shopify id moved to the archive.');
 
-        // [GIVEN] A queued return of gross 125 refunded wholly to that gift card
+        // [GIVEN] A queued return of gross 125 refunded wholly to that gift card, which paid 125 on the order's invoice
         _Lib.InsertQueueRow(StoreCode, '1131', '9231', QueueRow);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR1131', StoreCode, '9231', 'SPFYLRVARCH', 125);
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('1131', '9231', '#9231', Sku, '1131', 1, 100, 25, 25, '71001', _Lib.RefundTxnJson('1131', 'gift_card', 125, _Lib.Lcy(), '9006'), _Lib.Lcy()));
 
         // [WHEN] The import runs with automatic posting
@@ -8534,7 +8868,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_ReturnNotClosedWithAShortRefund_IsRefusedAsNotClosed()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         ResponseText: Text;
         StoreCode: Code[20];
@@ -8647,7 +8981,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure PollJQ_StoreWithABlankStartDate_IsReportedAndNotPolled()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         StoreCode: Code[20];
@@ -8671,7 +9005,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Assert.ExpectedError(StoreCode);
         _Assert.ExpectedError(ShopifyStore.FieldCaption("Get Returns Starting From"));
         _Assert.AreEqual(0, MockClient.RequestCount(), 'A store without a start date must not be polled.');
-        _Assert.IsFalse(QueueRow.Get(StoreCode, '1138'), 'No return may be queued for a store without a start date.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1138'), 'No return may be queued for a store without a start date.');
     end;
 
     [Test]
@@ -8741,7 +9075,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_WithTheEcommerceFeatureOn_LeavesTheRows()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         Feature: Record "NPR Feature";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
@@ -8777,7 +9111,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_ProcessRowOnAFilteredRecord_WritesTheSuccessOutcome()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -8809,7 +9143,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] The row is Draft Created, although the claim moved it out of the filter
         _Assert.IsTrue(Claimed, 'The row must be claimed for the attempt.');
         QueueRow.Reset();
-        QueueRow.Get(StoreCode, '1142');
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1142');
         _Assert.AreEqual(QueueRow.Status::"Draft Created", QueueRow.Status, 'The successful outcome must be written through the filtered record.');
     end;
 
@@ -8817,7 +9151,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_ProcessRowOnAFilteredRecord_PostingAutomatically_MarksTheRowImported()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -8854,7 +9188,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] The row is Imported with no error and its credit memo is posted
         _Assert.IsTrue(Claimed, 'The row must be claimed for the attempt.');
         QueueRow.Reset();
-        QueueRow.Get(StoreCode, '1176');
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1176');
         _Assert.AreEqual(QueueRow.Status::Imported, QueueRow.Status, 'A posted return must end Imported: ' + QueueRow."Last Error");
         _Assert.AreEqual('', QueueRow."Last Error", 'A posted return must carry no error.');
         _Assert.AreNotEqual('', QueueRow."Posted Doc. No.", 'The credit memo must be recorded.');
@@ -8863,7 +9197,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure QueuePage_Dismiss_OnARowAnotherSessionClaimedSinceTheList_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -8901,7 +9235,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure QueuePage_DiscardDraftAndRetry_OnARowAnotherSessionClaimedSinceTheList_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
@@ -8942,7 +9276,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_GiftCardRefund_ToACardArchivedUnderItsOwnSeries_RestoresTheCardUnderItsNumber()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         VoucherFilter: Record "NPR NpRv Voucher";
@@ -8979,8 +9313,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Assert.IsTrue(ArchVoucher.FindFirst(), 'Precondition: the archive holds the voucher.');
         _Assert.AreNotEqual(VoucherNo, ArchVoucher."No.", 'Precondition: the archive uses a number of its own.');
 
-        // [GIVEN] A queued return of gross 125 refunded wholly to that gift card
+        // [GIVEN] A queued return of gross 125 refunded wholly to that gift card, which paid 125 on the order's invoice
         _Lib.InsertQueueRow(StoreCode, '1145', '9245', QueueRow);
+        _Lib.InsertPostedInvoiceWithVoucherPayment('SI-LR1145', StoreCode, '9245', 'SPFYLRVARCS', 125);
         MockClient.AddResponse('GetReturn', _Lib.ReturnDetailResponse('1145', '9245', '#9245', Sku, '1145', 1, 100, 25, 25, '71001', _Lib.RefundTxnJson('1145', 'gift_card', 125, _Lib.Lcy(), '9007'), _Lib.Lcy()));
 
         // [WHEN] The import runs with automatic posting
@@ -8994,7 +9329,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         Voucher.CalcFields(Amount);
         _Assert.AreEqual(125, Voucher.Amount, 'The restored voucher holds the refund.');
         QueueRow.Find();
-        _Assert.AreEqual(VoucherNo, QueueRow."Voucher No.", 'The row names the voucher by its own number.');
+        _Assert.AreEqual(VoucherNo, _Lib.SettledVoucherNo(QueueRow), 'The row names the voucher by its own number.');
         _Assert.IsFalse(ArchVoucher.Find(), 'The archive row is gone.');
     end;
 
@@ -9002,7 +9337,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_DraftOverTheRefundByACent_WithoutInvoiceRounding_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
@@ -9126,7 +9461,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ThreeDecimalCurrency_WithoutInvoiceRounding_PostsTheExactRefund()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         PaymentMapping: Record "NPR Magento Payment Mapping";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
@@ -9207,7 +9542,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_GiftCardRefund_ToACardDeactivatedAtShopify_IsRefusedNamingTheReturn()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         VoucherFilter: Record "NPR NpRv Voucher";
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -9260,7 +9595,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_RefundPaymentLine_TakesAllowAdjustFromACompanyKeyedMapping()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
         GenericMapping: Record "NPR Magento Payment Mapping";
@@ -9327,8 +9662,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure PollJQ_InsertNewRows_FeatureSwitchedOnDuringTheListing_InsertsNothing()
     var
-        TempQueueRow: Record "NPR Spfy Legacy Return Queue" temporary;
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        TempQueueRow: Record "NPR Spfy NC Return Queue" temporary;
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Feature: Record "NPR Feature";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
@@ -9342,9 +9677,9 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         TempQueueRow.Init();
         TempQueueRow."Shopify Store Code" := StoreCode;
-        TempQueueRow."Return Id" := '1150';
+        TempQueueRow."Source Doc. ID" := '1150';
         TempQueueRow."Order Id" := '9250';
-        TempQueueRow."Return Name" := '#9250-R1';
+        TempQueueRow."Source Doc. Name" := '#9250-R1';
         TempQueueRow.Insert();
         Feature.Get(ShopifyEcommOrderExp.GetFeatureId());
         Feature.Enabled := true;
@@ -9356,7 +9691,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] No row was queued
         Feature.Enabled := false;
         Feature.Modify();
-        _Assert.IsFalse(QueueRow.Get(StoreCode, '1150'), 'No row may be queued once the feature is on.');
+        _Assert.IsFalse(QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1150'), 'No row may be queued once the feature is on.');
     end;
 
     [Test]
@@ -9392,7 +9727,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ReturnOrderWithoutAQueueRow_StillSchedulesTheFulfillmentTask()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
         NcTask: Record "NPR Nc Task";
@@ -9404,8 +9739,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] Posting a Return Order that carries Shopify ids but belongs to no legacy queue row still schedules the module's fulfillment task for its return receipt, so the legacy exit does not silence the other engine's Return Orders.
-        // [GIVEN] A store that sends order fulfillments, and a Return Order built from a return whose queue row is gone
+        // [SCENARIO] Posting a Return Order that carries Shopify ids but has no settlement row, and so is not this engine's document, still schedules the module's fulfillment task for its return receipt, so the legacy exit does not silence the other engine's Return Orders.
+        // [GIVEN] A store that sends order fulfillments, and a Return Order built from a return whose queue row and settlement row are gone
         _Lib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.GetStore(StoreCode, ShopifyStore);
         ShopifyStore."Send Order Fulfillments" := true;
@@ -9413,6 +9748,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Lib.InsertQueueRow(StoreCode, '1152', '9252', QueueRow);
         _Lib.BuildUnlinkedDraft(QueueRow, _Lib.ReturnDetailResponse('1152', '9252', '#9252', Sku, '1152', 2, 400, 100, 25, '71001', _Lib.RefundTxnJson('1152', 'shopify_payments', 500, _Lib.Lcy(), ''), _Lib.Lcy()), SalesHeader);
         QueueRow.Delete(false);
+        _Lib.DeleteSettlement(StoreCode, '1152');
         SalesHeader.Find();
         SalesHeader.Receive := true;
         SalesHeader.Invoice := true;
@@ -9443,8 +9779,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DismissReturn_OnAStaleCopyAnotherSessionClaimed_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        OtherSessionRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherSessionRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -9459,7 +9795,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         QueueRow.Status := QueueRow.Status::Error;
         QueueRow.Modify();
         Commit();
-        OtherSessionRow.Get(StoreCode, '1153');
+        OtherSessionRow.FindSourceDoc(StoreCode, OtherSessionRow."Source Doc. Type"::Return, '1153');
         OtherSessionRow.Status := OtherSessionRow.Status::Processing;
         OtherSessionRow."Processed At" := CurrentDateTime();
         OtherSessionRow.Modify();
@@ -9483,8 +9819,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DiscardDraft_OnAStaleCopyAnotherSessionClaimed_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        OtherSessionRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherSessionRow: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -9499,7 +9835,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         QueueRow.Status := QueueRow.Status::Error;
         QueueRow.Modify();
         Commit();
-        OtherSessionRow.Get(StoreCode, '1154');
+        OtherSessionRow.FindSourceDoc(StoreCode, OtherSessionRow."Source Doc. Type"::Return, '1154');
         OtherSessionRow.Status := OtherSessionRow.Status::Processing;
         OtherSessionRow."Processed At" := CurrentDateTime();
         OtherSessionRow.Modify();
@@ -9524,7 +9860,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_DraftOverTheRefundByACent_WithCentInvoiceRounding_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
@@ -9624,7 +9960,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure ProcessJQ_ProcessRow_WithTheEcommerceFeatureOn_DoesNotClaim()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Feature: Record "NPR Feature";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
@@ -9662,7 +9998,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_SuccessfulAttempt_ResetsTheRetryCount()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -9729,7 +10065,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_IsBeingProcessed_WithoutAJobEntry_UsesTheRegisteredInterval()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         JobQueueEntry: Record "Job Queue Entry";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
@@ -9737,7 +10073,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         Sku: Code[20];
         CustomerNo: Code[20];
         LocationCode: Code[10];
-        YoungerRow: Record "NPR Spfy Legacy Return Queue";
+        YoungerRow: Record "NPR Spfy NC Return Queue";
         HeldByAnotherSession: Boolean;
         YoungerHeld: Boolean;
     begin
@@ -9772,7 +10108,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [HandlerFunctions('ArchVoucherCardHandler')]
     procedure QueuePage_OpenVoucher_OnAnArchivedCard_OpensTheArchivedVoucher()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Voucher: Record "NPR NpRv Voucher";
         VoucherFilter: Record "NPR NpRv Voucher";
         QueuePage: TestPage "NPR Spfy Legacy Return Queue";
@@ -9809,8 +10145,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         _Assert.IsTrue(ArchVoucher.FindFirst(), 'Precondition: the archive holds the voucher.');
         _Assert.AreNotEqual(VoucherNo, ArchVoucher."No.", 'Precondition: the archive uses a number of its own.');
         _Lib.InsertQueueRow(StoreCode, '1160', '9260', QueueRow);
-        QueueRow."Voucher No." := VoucherNo;
-        QueueRow.Modify();
+        _Lib.SetSettlement(QueueRow, 0, VoucherNo);
         _CapturedMessage := '';
 
         // [WHEN] Open Voucher is invoked on the row
@@ -9834,7 +10169,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_InvoiceRoundingUp_PostsTheLiftedTotal()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         PaymentMapping: Record "NPR Magento Payment Mapping";
@@ -9933,7 +10268,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_InvoiceRoundingDown_DraftOverTheRefund_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
@@ -10047,7 +10382,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ThreeDecimalCurrency_RoundedUp_PostsTheLiftedTotal()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         PaymentMapping: Record "NPR Magento Payment Mapping";
         Customer: Record Customer;
@@ -10145,7 +10480,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_DraftCreated_ResetsTheRetryCount()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         StoreCode: Code[20];
@@ -10185,7 +10520,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_InvoiceRoundingUp_DraftOverTheRefundByAUnit_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
@@ -10299,7 +10634,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ThreeDecimalCurrency_RoundedToTheNearestHalfCent_PostsTheLiftedTotal()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         PaymentMapping: Record "NPR Magento Payment Mapping";
         Customer: Record Customer;
@@ -10398,8 +10733,8 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOn_RowQueuedBetweenTheValidateCheckAndTheSave_RefusesTheSave()
     var
         Feature: Record "NPR Feature";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -10408,7 +10743,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     begin
         // [SCENARIO] A return queued after the feature switch's validate check passed, but before the row is saved, refuses the save with the unprocessed-rows message, because a page saves the flag a round trip after it validated it.
         // [GIVEN] No legacy return queue rows are left over from other tests, since the check scans the whole table regardless of store
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed);
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4|%5|%6', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::Error, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Dismissed, LegacyReturnQueue.Status::Waiting);
         LegacyReturnQueue.DeleteAll();
 
         // [GIVEN] A legacy-path store with the feature off, the feature validated on with an empty queue, and a New row queued since
@@ -10431,7 +10766,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     [Test]
     procedure Mgt_DiscardDraft_WithTheEcommerceFeatureOn_IsRefused()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Feature: Record "NPR Feature";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
@@ -10469,7 +10804,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ThreeDecimalCurrency_RoundedUpToFiveCents_PostsTheLiftedTotal()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         PaymentMapping: Record "NPR Magento Payment Mapping";
         Customer: Record Customer;
@@ -10567,7 +10902,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ThreeDecimalCurrency_DraftOverTheRefundByACent_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
@@ -10680,7 +11015,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlag_SavingAnotherFeatureWithALegacyReturnPending_IsNotRefused()
     var
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         StoreCode: Code[20];
         Sku: Code[20];
         CustomerNo: Code[20];
@@ -10715,7 +11050,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure FeatureFlagOff_SavedWithALegacyReturnPending_IsNotRefused()
     var
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -10743,7 +11078,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Posting_ThreeDecimalCurrency_RoundedUpToFiveCents_DraftOverTheRefund_IsRefused()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         Currency: Record Currency;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
@@ -10856,7 +11191,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure Import_OnARecordFilteredToError_PostingAutomatically_Succeeds()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -10891,7 +11226,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] The import succeeds and the posting marked the row Imported
         _Assert.IsTrue(Succeeded, 'The import must not fail after its own posting: ' + GetLastErrorText());
         QueueRow.Reset();
-        QueueRow.Get(StoreCode, '1178');
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1178');
         _Assert.AreEqual(QueueRow.Status::Imported, QueueRow.Status, 'The posting marks the row Imported.');
     end;
 
@@ -10899,7 +11234,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     procedure ProcessJQ_FailureAfterTheCreditMemoCommitted_MarksTheRowImported()
     var
         ShopifyStore: Record "NPR Spfy Store";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
         SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
         FailAfterPost: Codeunit "NPR Spfy LR Fail After Post";
@@ -10940,7 +11275,7 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
         // [THEN] The row is Imported with its credit memo, no error and a reset retry count
         UnbindSubscription(FailAfterPost);
         _Assert.IsTrue(Claimed, 'The row must be claimed for the attempt.');
-        QueueRow.Get(StoreCode, '1179');
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Return, '1179');
         _Assert.AreEqual(QueueRow.Status::Imported, QueueRow.Status, 'A posted return must end Imported: ' + QueueRow."Last Error");
         _Assert.AreNotEqual('', QueueRow."Posted Doc. No.", 'The credit memo must be recorded.');
         _Assert.AreEqual('', QueueRow."Last Error", 'A posted return must carry no error.');

@@ -9,6 +9,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         _UpgradeTag: Codeunit "Upgrade Tag";
         _UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
         _UpgradeStep: Text;
+        _PreReleaseRefundPrefixTok: Label 'Refund/', Locked = true;
 
     trigger OnUpgradePerCompany()
     begin
@@ -41,6 +42,10 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpdateGetPaymentLineOption();
         DisableSendCloseOrderRequest();
         SetPostReturnsAutomatically();
+        CopyLegacyReturnSettlement();
+        SetRefundsStartingFrom();
+        MoveLegacyReturnQueue();
+        RestampPreReleaseRefundDocs();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -745,6 +750,235 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         if ShopifyStore.FindSet(true) then
             repeat
                 ShopifyStore."Post Returns Automatically" := true;
+                ShopifyStore.Modify();
+            until ShopifyStore.Next() = 0;
+    end;
+
+    local procedure CopyLegacyReturnSettlement()
+    begin
+        _UpgradeStep := 'CopyLegacyReturnSettlement';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        CopyLegacyReturnQueueToSettlement();
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    /// <summary>
+    /// Drafts built before the settlement table existed still settle: their queue rows' settlement values are copied.
+    /// </summary>
+    internal procedure CopyLegacyReturnQueueToSettlement()
+    var
+#pragma warning disable AL0432
+        QueueRow: Record "NPR Spfy Legacy Return Queue";
+#pragma warning restore AL0432
+        Settlement: Record "NPR Spfy Refund Settlement";
+        SpfyLegacyReturnAPI: Codeunit "NPR Spfy Legacy Return API";
+    begin
+        QueueRow.SetFilter("Sales Header Doc. No.", '<>%1', '');
+        if QueueRow.FindSet() then
+            repeat
+                if not HasSettlement(QueueRow) then begin
+                    Settlement.Init();
+                    Settlement."Shopify Store Code" := QueueRow."Shopify Store Code";
+                    Settlement."Source Doc. Type" := QueueRow."Source Type";
+                    Settlement."Shopify Id" := PlainSourceDocId(QueueRow);
+                    Settlement."Display Name" := SpfyLegacyReturnAPI.DocumentCaption(QueueRow."Source Type", QueueRow."Return Name", PlainSourceDocId(QueueRow));
+                    Settlement."Order Id" := QueueRow."Order Id";
+                    Settlement."Return Order No." := QueueRow."Sales Header Doc. No.";
+#pragma warning disable AL0432
+                    Settlement."Gift Card Refund Amount" := QueueRow."Gift Card Refund Amount";
+                    Settlement."Voucher No." := QueueRow."Voucher No.";
+#pragma warning restore AL0432
+                    Settlement.Insert();
+                end;
+            until QueueRow.Next() = 0;
+    end;
+
+    local procedure MoveLegacyReturnQueue()
+    begin
+        _UpgradeStep := 'MoveLegacyReturnQueue';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        MoveLegacyReturnQueueRows();
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    /// <summary>
+    /// Copies the rows of the obsolete queue, keyed by store and id, to the queue keyed by entry number, where a return and a refund may share an id.
+    /// </summary>
+    internal procedure MoveLegacyReturnQueueRows()
+    var
+#pragma warning disable AL0432
+        OldQueueRow: Record "NPR Spfy Legacy Return Queue";
+#pragma warning restore AL0432
+        QueueRow: Record "NPR Spfy NC Return Queue";
+    begin
+        if OldQueueRow.FindSet() then
+            repeat
+                if not QueueRow.FindSourceDoc(OldQueueRow."Shopify Store Code", OldQueueRow."Source Type", PlainSourceDocId(OldQueueRow)) then begin
+                    QueueRow.Init();
+                    QueueRow."Entry No." := 0;
+                    QueueRow."Shopify Store Code" := OldQueueRow."Shopify Store Code";
+                    QueueRow."Source Doc. Type" := OldQueueRow."Source Type";
+                    QueueRow."Source Doc. ID" := PlainSourceDocId(OldQueueRow);
+                    QueueRow."Source Doc. Name" := OldQueueRow."Return Name";
+                    QueueRow."Order Id" := OldQueueRow."Order Id";
+                    QueueRow."Order No." := OldQueueRow."Order No.";
+                    QueueRow.Status := OldQueueRow.Status;
+                    QueueRow."Detected At" := OldQueueRow."Detected At";
+                    QueueRow."Processed At" := OldQueueRow."Processed At";
+                    QueueRow."Retry Count" := OldQueueRow."Retry Count";
+                    QueueRow."Last Error" := OldQueueRow."Last Error";
+                    QueueRow."Sales Header Doc. No." := OldQueueRow."Sales Header Doc. No.";
+                    QueueRow."Posted Doc. No." := OldQueueRow."Posted Doc. No.";
+                    QueueRow."Location Fallback Used" := OldQueueRow."Location Fallback Used";
+                    QueueRow."Not Restocked" := OldQueueRow."Not Restocked";
+                    QueueRow."Outcome Note" := OldQueueRow."Outcome Note";
+                    QueueRow.Insert(false);
+                end;
+            until OldQueueRow.Next() = 0;
+    end;
+
+    /// <summary>
+    /// A row already settles under its plain id, or, for a pre-release refund, still under the prefixed id it was written with; the restamp rekeys that one, so a copy here would shadow it.
+    /// </summary>
+#pragma warning disable AL0432
+    local procedure HasSettlement(OldQueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+#pragma warning restore AL0432
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+    begin
+        if Settlement.Get(OldQueueRow."Shopify Store Code", OldQueueRow."Source Type", PlainSourceDocId(OldQueueRow)) then
+            exit(true);
+        exit(Settlement.Get(OldQueueRow."Shopify Store Code", Settlement."Source Doc. Type"::Return, OldQueueRow."Return Id"));
+    end;
+
+    /// <summary>
+    /// The plain Shopify id of an obsolete queue row. Refund rows of a pre-release build were keyed by "Refund/" and the id; released rows are returns with the plain id.
+    /// </summary>
+#pragma warning disable AL0432
+    local procedure PlainSourceDocId(OldQueueRow: Record "NPR Spfy Legacy Return Queue"): Text[30]
+#pragma warning restore AL0432
+    begin
+        if (OldQueueRow."Source Type" = OldQueueRow."Source Type"::Refund) and OldQueueRow."Return Id".StartsWith(_PreReleaseRefundPrefixTok) then
+            exit(WithoutPrefix(OldQueueRow."Return Id", _PreReleaseRefundPrefixTok));
+        exit(OldQueueRow."Return Id");
+    end;
+
+    local procedure RestampPreReleaseRefundDocs()
+    begin
+        _UpgradeStep := 'RestampPreReleaseRefundDocs';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        RestampPreReleaseRefundIds();
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    /// <summary>
+    /// Pre-release builds stamped a refund's documents with "Refund/" and the refund id, and post-sale discount lines with "Discount/" and the line item id, both as Entry ID; this gives them the types and plain ids the engine reads.
+    /// </summary>
+    internal procedure RestampPreReleaseRefundIds()
+    var
+        PreReleaseDiscountPrefixTok: Label 'Discount/', Locked = true;
+    begin
+        RestampPreReleaseIds(StrSubstNo('%1|%2|%3', Database::"Sales Header", Database::"Sales Cr.Memo Header", Database::"Return Receipt Header"), _PreReleaseRefundPrefixTok, "NPR Spfy ID Type"::"Refund ID");
+        RestampPreReleaseIds(StrSubstNo('%1|%2|%3', Database::"Sales Line", Database::"Sales Cr.Memo Line", Database::"Return Receipt Line"), PreReleaseDiscountPrefixTok, "NPR Spfy ID Type"::"Post-Sale Disc. Line Item ID");
+        RekeyPreReleaseRefundSettlements();
+    end;
+
+    local procedure RestampPreReleaseIds(TableNoFilter: Text; Prefix: Text; NewIdType: Enum "NPR Spfy ID Type")
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        TempShopifyAssignedID: Record "NPR Spfy Assigned ID" temporary;
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        ShopifyAssignedID.SetFilter("Table No.", TableNoFilter);
+        ShopifyAssignedID.SetRange("Shopify ID Type", "NPR Spfy ID Type"::"Entry ID");
+        ShopifyAssignedID.SetFilter("Shopify ID", Prefix + '*');
+        if not ShopifyAssignedID.FindSet() then
+            exit;
+        repeat
+            TempShopifyAssignedID := ShopifyAssignedID;
+            TempShopifyAssignedID.Insert();
+        until ShopifyAssignedID.Next() = 0;
+
+        TempShopifyAssignedID.FindSet();
+        repeat
+            if SpfyAssignedIDMgt.GetAssignedShopifyID(TempShopifyAssignedID."BC Record ID", NewIdType) = '' then
+                SpfyAssignedIDMgt.AssignShopifyID(TempShopifyAssignedID."BC Record ID", NewIdType, WithoutPrefix(TempShopifyAssignedID."Shopify ID", Prefix), false);
+            ShopifyAssignedID.Get(TempShopifyAssignedID."Entry No.");
+            ShopifyAssignedID.Delete();
+        until TempShopifyAssignedID.Next() = 0;
+    end;
+
+    local procedure RekeyPreReleaseRefundSettlements()
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+        TempSettlement: Record "NPR Spfy Refund Settlement" temporary;
+        ExistingSettlement: Record "NPR Spfy Refund Settlement";
+        PlainId: Text[30];
+    begin
+        Settlement.SetRange("Source Doc. Type", Settlement."Source Doc. Type"::Return);
+        Settlement.SetFilter("Shopify Id", _PreReleaseRefundPrefixTok + '*');
+        if not Settlement.FindSet() then
+            exit;
+        repeat
+            TempSettlement := Settlement;
+            TempSettlement.Insert();
+        until Settlement.Next() = 0;
+
+        TempSettlement.FindSet();
+        repeat
+            Settlement.Get(TempSettlement."Shopify Store Code", TempSettlement."Source Doc. Type", TempSettlement."Shopify Id");
+            PlainId := WithoutPrefix(TempSettlement."Shopify Id", _PreReleaseRefundPrefixTok);
+            if ExistingSettlement.Get(TempSettlement."Shopify Store Code", ExistingSettlement."Source Doc. Type"::Refund, PlainId) then
+                Settlement.Delete()
+            else
+                Settlement.Rename(TempSettlement."Shopify Store Code", Settlement."Source Doc. Type"::Refund, PlainId);
+        until TempSettlement.Next() = 0;
+    end;
+
+    local procedure WithoutPrefix(ShopifyId: Text; Prefix: Text): Text[30]
+    begin
+        exit(CopyStr(ShopifyId.Substring(StrLen(Prefix) + 1), 1, 30));
+    end;
+
+    local procedure SetRefundsStartingFrom()
+    begin
+        _UpgradeStep := 'SetRefundsStartingFrom';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        StampRefundsStartingFrom(CurrentDateTime());
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    /// <summary>
+    /// Refunds made without a return before the upgrade were credited by hand, so existing stores import refunds from the upgrade on.
+    /// </summary>
+    internal procedure StampRefundsStartingFrom(StartingFrom: DateTime)
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        ShopifyStore.SetRange("Get Refunds Starting From", 0DT);
+        if ShopifyStore.FindSet(true) then
+            repeat
+                ShopifyStore."Get Refunds Starting From" := StartingFrom;
                 ShopifyStore.Modify();
             until ShopifyStore.Next() = 0;
     end;

@@ -630,31 +630,44 @@
     end;
 
     /// <summary>
-    /// Tops up a voucher for a refund already paid to its gift card, linked to the posted credit memo. The carrier sales line is never inserted.
+    /// Reverses the consumption of a voucher for a refund already paid back to its gift card, linked to the posted credit memo: a positive payment entry marked as a correction, as a corrective credit memo posts it, so the initial amount stays. The carrier sales line is never inserted.
     /// </summary>
-    internal procedure PostTopUpForCreditMemo(var Voucher: Record "NPR NpRv Voucher"; AmountLCY: Decimal; PostingDate: Date; CreditMemoNo: Code[20]; ExternalDocumentNo: Code[50]; InitiatedInShopify: Boolean)
+    internal procedure PostPaymentReversalForCreditMemo(var Voucher: Record "NPR NpRv Voucher"; AmountLCY: Decimal; PostingDate: Date; CreditMemoNo: Code[20]; ExternalDocumentNo: Code[50])
     var
-        VoucherType: Record "NPR NpRv Voucher Type";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
         CarrierSalesLine: Record "NPR NpRv Sales Line";
     begin
         if AmountLCY <= 0 then
             exit;
         Voucher.TestField("No.");
-        VoucherType.Get(Voucher."Voucher Type");
         CarrierSalesLine.Init();
         CarrierSalesLine.Id := CreateGuid();
-        CarrierSalesLine.Type := CarrierSalesLine.Type::"Top-up";
+        CarrierSalesLine.Type := CarrierSalesLine.Type::Payment;
         CarrierSalesLine."Document Source" := CarrierSalesLine."Document Source"::"Payment Line";
         CarrierSalesLine."Document Type" := CarrierSalesLine."Document Type"::"Return Order";
         CarrierSalesLine."Posting No." := CreditMemoNo;
-        CarrierSalesLine."Sale Date" := PostingDate;
         CarrierSalesLine."Voucher Type" := Voucher."Voucher Type";
         CarrierSalesLine."Voucher No." := Voucher."No.";
         CarrierSalesLine."Reference No." := Voucher."Reference No.";
         CarrierSalesLine."External Document No." := ExternalDocumentNo;
         CarrierSalesLine.Amount := AmountLCY;
-        CarrierSalesLine."Spfy Initiated in Shopify" := InitiatedInShopify;
-        PostIssueVoucher(Voucher, VoucherType, AmountLCY, CarrierSalesLine);
+
+        InitVoucherEntry(Voucher, VoucherEntry);
+        VoucherEntry."Document Type" := VoucherEntry."Document Type"::"Credit Memo";
+        VoucherEntry."Document No." := CreditMemoNo;
+        VoucherEntry."External Document No." := ExternalDocumentNo;
+        VoucherEntry."Posting Date" := PostingDate;
+        VoucherEntry.Amount := AmountLCY;
+        VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
+        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
+        VoucherEntry.Positive := true;
+        VoucherEntry.Open := true;
+        VoucherEntry.Correction := true;
+
+        OnBeforeInsertPaymentVoucherEntry(VoucherEntry, CarrierSalesLine);
+        VoucherEntry.Insert();
+
+        FinalizePostedVoucherPayment(VoucherEntry, Voucher, CarrierSalesLine);
     end;
 
     local procedure PostIssueForeignVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")

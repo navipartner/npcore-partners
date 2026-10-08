@@ -20,5 +20,14 @@ enum 6014657 "NPR Spfy ID Type"
     {
         Caption = 'Default Address ID';
     }
+    // 4 is kept for a Return ID, so return, refund and discount ids can sit together.
+    value(5; "Refund ID")
+    {
+        Caption = 'Refund ID';
+    }
+    value(6; "Post-Sale Disc. Line Item ID")
+    {
+        Caption = 'Post-Sale Discount Line Item ID';
+    }
 }
 #endif

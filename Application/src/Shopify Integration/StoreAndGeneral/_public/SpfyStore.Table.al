@@ -418,6 +418,27 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Return Generic SKU Prefix';
             DataClassification = CustomerContent;
         }
+        field(12; "Refund Discrepancy G/L Acc."; Code[20])
+        {
+            Caption = 'Refund Discrepancy G/L Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+            trigger OnValidate()
+            begin
+                CheckReturnGLAccount("Refund Discrepancy G/L Acc.");
+            end;
+        }
+        field(13; "Refund Item Charge No."; Code[20])
+        {
+            Caption = 'Refund Item Charge No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Item Charge";
+        }
+        field(14; "Get Refunds Starting From"; DateTime)
+        {
+            Caption = 'Get Refunds Starting From';
+            DataClassification = CustomerContent;
+        }
         field(100; "Send Payment Capture Requests"; Boolean)
         {
             Caption = 'Send Payment Capture Requests';

@@ -1,8 +1,11 @@
 table 6059922 "NPR Spfy Legacy Return Queue"
 {
     Access = Internal;
-    Caption = 'Shopify Legacy Return Queue';
+    Caption = 'Shopify Legacy Return Queue (Obsolete)';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2026-10-06';
+    ObsoleteReason = 'Replaced by NPR Spfy NC Return Queue, keyed by an entry number so a return and a refund may carry the same Shopify id (CORE-2301).';
 
     fields
     {
@@ -23,6 +26,9 @@ table 6059922 "NPR Spfy Legacy Return Queue"
         field(150; "Gift Card Refund"; Boolean) { Caption = 'Gift Card Refund'; DataClassification = CustomerContent; Editable = false; }
         field(160; "Voucher No."; Code[20]) { Caption = 'Voucher'; TableRelation = "NPR NpRv Voucher"; DataClassification = CustomerContent; Editable = false; }
         field(170; "Gift Card Refund Amount"; Decimal) { Caption = 'Gift Card Refund Amount'; DataClassification = CustomerContent; Editable = false; }
+        // Rows of a pre-release build may be refunds, keyed by "Refund/" and the refund id; the upgrade reads the kind from here.
+        field(180; "Source Type"; Enum "NPR Spfy Legacy Return Source") { Caption = 'Source Type'; DataClassification = CustomerContent; Editable = false; }
+        field(210; "Outcome Note"; Text[2048]) { Caption = 'Outcome Note'; DataClassification = CustomerContent; Editable = false; }
     }
 
     keys
@@ -36,12 +42,5 @@ table 6059922 "NPR Spfy Legacy Return Queue"
     begin
         if "Detected At" = 0DT then
             "Detected At" := CurrentDateTime();
-    end;
-
-    trigger OnDelete()
-    var
-        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
-    begin
-        SpfyLegacyReturnMgt.OnDeleteQueueRow(Rec);
     end;
 }

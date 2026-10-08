@@ -254,6 +254,10 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpdateGetPaymentLineOption'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'DisableSendCloseOrderRequest'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetPostReturnsAutomatically'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'CopyLegacyReturnSettlement'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetRefundsStartingFrom'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'MoveLegacyReturnQueue'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'RestampPreReleaseRefundDocs'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
@@ -1028,6 +1032,14 @@
                         exit('NPR-Spfy-DisableSendCloseOrderRequest-20260116');
                     'SetPostReturnsAutomatically':
                         exit('NPR-Spfy-SetPostReturnsAutomatically-20260927');
+                    'CopyLegacyReturnSettlement':
+                        exit('NPR-Spfy-CopyLegacyReturnSettlement-20261003');
+                    'SetRefundsStartingFrom':
+                        exit('NPR-Spfy-SetRefundsStartingFrom-20261005');
+                    'MoveLegacyReturnQueue':
+                        exit('NPR-Spfy-MoveLegacyReturnQueue-20261006');
+                    'RestampPreReleaseRefundDocs':
+                        exit('NPR-Spfy-RestampPreReleaseRefundDocs-20261006');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":

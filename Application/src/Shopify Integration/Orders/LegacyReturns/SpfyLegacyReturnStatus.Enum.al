@@ -7,7 +7,9 @@ enum 6014638 "NPR Spfy Legacy Return Status"
     value(0; New) { Caption = 'New'; }
     value(5; Dismissed) { Caption = 'Dismissed'; }
     value(10; Processing) { Caption = 'Processing'; }
+    value(12; Waiting) { Caption = 'Waiting'; }
     value(15; "Draft Created") { Caption = 'Draft Created'; }
     value(20; Imported) { Caption = 'Imported'; }
+    value(25; "Nothing to Credit") { Caption = 'Nothing to Credit'; }
     value(30; Error) { Caption = 'Error'; }
 }

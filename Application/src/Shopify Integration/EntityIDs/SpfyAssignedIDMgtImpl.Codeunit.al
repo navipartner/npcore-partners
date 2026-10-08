@@ -288,6 +288,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
             exit;
 
         RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Refund ID");
         RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code");
     end;
 
@@ -302,6 +303,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
             exit;
 
         RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Post-Sale Disc. Line Item ID");
     end;
 
 #if BC18 or BC19 or BC20 or BC21
@@ -336,6 +338,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     local procedure ReturnRcptHdrCopyAssignedShopifyID(SalesHeader: Record "Sales Header"; var ReturnReceiptHeader: Record "Return Receipt Header")
     begin
         CopyAssignedShopifyID(SalesHeader.RecordId(), ReturnReceiptHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        CopyAssignedShopifyID(SalesHeader.RecordId(), ReturnReceiptHeader.RecordId(), "NPR Spfy ID Type"::"Refund ID");
         CopyAssignedShopifyID(SalesHeader.RecordId(), ReturnReceiptHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
     end;
 
@@ -358,6 +361,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     local procedure SalesCrMemoHdrCopyAssignedShopifyID(SalesHeader: Record "Sales Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
         CopyAssignedShopifyID(SalesHeader.RecordId(), SalesCrMemoHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        CopyAssignedShopifyID(SalesHeader.RecordId(), SalesCrMemoHeader.RecordId(), "NPR Spfy ID Type"::"Refund ID");
         CopyAssignedShopifyID(SalesHeader.RecordId(), SalesCrMemoHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
     end;
 
@@ -379,6 +383,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     local procedure ReturnRcptLineCopyAssignedShopifyID(SalesLine: Record "Sales Line"; var ReturnRcptLine: Record "Return Receipt Line")
     begin
         CopyAssignedShopifyID(SalesLine.RecordId(), ReturnRcptLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        CopyAssignedShopifyID(SalesLine.RecordId(), ReturnRcptLine.RecordId(), "NPR Spfy ID Type"::"Post-Sale Disc. Line Item ID");
     end;
 
 #if BC18 or BC19 or BC20 or BC21
@@ -399,6 +404,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     local procedure SalesCrMemoLineCopyAssignedShopifyID(SalesLine: Record "Sales Line"; var SalesCrMemoLine: Record "Sales Cr.Memo Line")
     begin
         CopyAssignedShopifyID(SalesLine.RecordId(), SalesCrMemoLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        CopyAssignedShopifyID(SalesLine.RecordId(), SalesCrMemoLine.RecordId(), "NPR Spfy ID Type"::"Post-Sale Disc. Line Item ID");
     end;
 
 #if BC18 or BC19 or BC20 or BC21

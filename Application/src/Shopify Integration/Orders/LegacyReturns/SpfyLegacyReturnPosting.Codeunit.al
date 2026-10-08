@@ -2,63 +2,71 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
 {
     Access = Internal;
 
-    var
-        _RefundAccountMissingErr: Label '%1 must be set on %2 %3 before Shopify return %4 can be settled.', Comment = '%1 = Return Refund G/L Account No. caption, %2 = Shopify Store table caption, %3 = store code, %4 = Shopify return name';
-        _PartialInvoicingErr: Label 'Shopify return %1 must be invoiced in one go. %2 %3 was invoiced in part, which the Shopify return import does not support.', Comment = '%1 = Shopify return name, %2 = Sales Header table caption, %3 = Return Order number';
-        _RefundAppliedLbl: Label 'Shopify refund %1', Comment = '%1 = Shopify return name';
-        _GiftCardRefundAppliedLbl: Label 'Shopify gift card refund %1', Comment = '%1 = Shopify return name';
-        _OverRefundErr: Label '%1 %2 is worth %3 but Shopify refunded %4 for return %5, so the settlement would pay out more than was refunded. The %6 was changed after it was built; discard the draft and retry, or handle the return manually.', Comment = '%1 = Sales Cr.Memo Header table caption, %2 = credit memo no., %3 = credit memo total, %4 = refunded total, %5 = Shopify return name, %6 = Sales Header table caption';
-        _VoucherMissingErr: Label '%1 %2, which Shopify return %3 refunds to, no longer exists, so the refund cannot be topped up onto it. Discard the draft and retry, or handle the return manually.', Comment = '%1 = Voucher table caption, %2 = voucher no., %3 = Shopify return name';
-        _VoucherMissingReceivedErr: Label '%1 %2, which Shopify return %3 refunds to, no longer exists, so the refund cannot be topped up onto it. The return has already been received as %4, so the draft cannot be discarded; handle the return manually.', Comment = '%1 = Voucher table caption, %2 = voucher no., %3 = Shopify return name, %4 = return receipt no.';
-        _VoucherDeactivatedErr: Label '%1 %2, which Shopify return %3 refunds to, was archived and then deactivated at Shopify, so it cannot be restored for the refund. Handle the return manually and dismiss the queue row.', Comment = '%1 = Voucher table caption, %2 = voucher no., %3 = Shopify return name';
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', false, false)]
     local procedure OnAfterFinalizePostingOnBeforeCommit(var SalesHeader: Record "Sales Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var ReturnReceiptHeader: Record "Return Receipt Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var PreviewMode: Boolean; var EverythingInvoiced: Boolean)
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        Settlement: Record "NPR Spfy Refund Settlement";
         ShopifyStore: Record "NPR Spfy Store";
-        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         PostedGiftCardShare: Decimal;
+        PartialInvoicingErr: Label 'Shopify %1 must be invoiced in one go. %2 %3 was invoiced in part, which the Shopify return and refund import does not support.', Comment = '%1 = Shopify document caption, %2 = Sales Header table caption, %3 = Return Order number';
     begin
         if PreviewMode then
             exit;
         if SalesHeader."Document Type" <> SalesHeader."Document Type"::"Return Order" then
             exit;
-        if not SpfyLegacyReturnMgt.FindQueueRowBySalesHeader(SalesHeader, QueueRow) then
+        if not Settlement.FindForSalesHeader(SalesHeader) then
             exit;
         // A second partial credit memo would settle the refund twice; the error rolls the posting back.
         if (SalesCrMemoHeader."No." <> '') and not EverythingInvoiced then
-            Error(_PartialInvoicingErr, QueueRow."Return Name", SalesHeader.TableCaption(), SalesHeader."No.");
-        if SalesCrMemoHeader."No." <> '' then begin
-            QueueRow."Posted Doc. No." := SalesCrMemoHeader."No.";
-            QueueRow.Status := QueueRow.Status::Imported;
-            QueueRow."Last Error" := '';
-        end else
-            if ReturnReceiptHeader."No." <> '' then
-                QueueRow."Posted Doc. No." := ReturnReceiptHeader."No."
-            else
-                exit;
-        QueueRow.Modify();
+            Error(PartialInvoicingErr, Settlement."Display Name", SalesHeader.TableCaption(), SalesHeader."No.");
         if SalesCrMemoHeader."No." = '' then
             exit;
-        ShopifyStore.Get(QueueRow."Shopify Store Code");
-        CheckCreditMemoWithinRefund(QueueRow, SalesCrMemoHeader);
-        PostedGiftCardShare := SettleCreditMemo(ShopifyStore, QueueRow, SalesCrMemoHeader, GenJnlPostLine);
-        TopUpVoucher(QueueRow, SalesCrMemoHeader, PostedGiftCardShare, ReturnReceiptHeader."No.");
+        ShopifyStore.Get(Settlement."Shopify Store Code");
+        CheckCreditMemoWithinRefund(Settlement, SalesCrMemoHeader);
+        PostedGiftCardShare := SettleCreditMemo(ShopifyStore, Settlement, SalesCrMemoHeader, GenJnlPostLine);
+        CreditVoucherBack(Settlement, SalesCrMemoHeader, PostedGiftCardShare, ReturnReceiptHeader."No.");
         ArchiveRevokedVouchers(SalesCrMemoHeader);
     end;
 
     /// <summary>
-    /// A draft edited by hand can be worth more than Shopify refunded; the Magento payment check skips that once the payment line allows adjusting.
+    /// A draft edited by hand below what Shopify refunded is refused before posting: the Magento posting caps the copied payments at the document total, so a short credit memo cannot be seen afterwards. An excess is refused after posting, within invoice rounding.
     /// </summary>
-    local procedure CheckCreditMemoWithinRefund(QueueRow: Record "NPR Spfy Legacy Return Queue"; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
+    local procedure CheckDraftNotShortOfRefund(var SalesHeader: Record "Sales Header")
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyRefundDocBuilder: Codeunit "NPR Spfy Refund Doc. Builder";
+    begin
+        if SalesHeader."Document Type" <> SalesHeader."Document Type"::"Return Order" then
+            exit;
+        if not SalesHeader.Invoice then
+            exit;
+        if not Settlement.FindForSalesHeader(SalesHeader) then
+            exit;
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.CalcSums(Amount);
+        SpfyRefundDocBuilder.VerifyDocumentNotShort(SalesHeader, Settlement."Display Name", PaymentLine.Amount + Settlement."Applied Amount");
+    end;
+
+    /// <summary>
+    /// BC must have applied the credit memo as the import planned, and a draft edited by hand can be worth more than Shopify refunded; what BC's application leaves must be covered by the payment lines.
+    /// </summary>
+    local procedure CheckCreditMemoWithinRefund(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
         PaymentLine: Record "NPR Magento Payment Line";
         CustLedgerEntry: Record "Cust. Ledger Entry";
+        Customer: Record Customer;
         GLSetup: Record "General Ledger Setup";
         SalesHeader: Record "Sales Header";
         Total: Decimal;
         Paid: Decimal;
+        Applied: Decimal;
+        Tolerance: Decimal;
+        OverRefundErr: Label '%1 %2 is worth %3 but Shopify refunded %4 for Shopify %5, so the settlement would pay out more than was refunded. The %6 was changed after it was built; discard the draft and retry, or handle it manually.', Comment = '%1 = Sales Cr.Memo Header table caption, %2 = credit memo no., %3 = credit memo total, %4 = refunded total, %5 = Shopify document caption, %6 = Sales Header table caption';
+        ApplicationDiffersErr: Label '%1 %2 for Shopify %3 was applied to %4 of open entries when posted, but it was built to settle %5 that way, so the settlement would not match what Shopify paid out. Business Central applied it differently, for example through an Applies-to ID or the %6 of %7 %8. Set the %6 to Manual or clear the application on the %9 and post again, or handle the refund manually.', Comment = '%1 = Sales Cr.Memo Header table caption, %2 = credit memo no., %3 = Shopify document caption, %4 = amount applied at posting, %5 = amount the import planned to apply, %6 = Application Method field caption, %7 = Customer table caption, %8 = customer no., %9 = Sales Header table caption';
     begin
         PaymentLine.SetRange("Document Table No.", Database::"Sales Cr.Memo Header");
         PaymentLine.SetRange("Document No.", SalesCrMemoHeader."No.");
@@ -67,13 +75,21 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
         CustLedgerEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
         CustLedgerEntry.FindFirst();
-        CustLedgerEntry.CalcFields(Amount);
+        CustLedgerEntry.CalcFields(Amount, "Remaining Amount");
         // The Magento module rounds the total to the G/L precision and truncates the payment copy to it, so both sides compare at that precision.
         GLSetup.Get();
-        Total := Round(Abs(CustLedgerEntry.Amount), GLSetup."Amount Rounding Precision");
+        Tolerance := InvoiceRoundingTolerance(SalesCrMemoHeader."Currency Code");
+        // Only the planned application is settled by the open invoice; anything else BC applied (Apply to Oldest, an Applies-to ID set by hand,
+        // an invoice that is more open than when the draft was built) would leave the refund unpaid and the gift card share unreversed.
+        Applied := Round(Abs(CustLedgerEntry.Amount) - Abs(CustLedgerEntry."Remaining Amount"), GLSetup."Amount Rounding Precision");
+        if Abs(Applied - Round(Settlement."Applied Amount", GLSetup."Amount Rounding Precision")) > Tolerance then
+            Error(ApplicationDiffersErr, SalesCrMemoHeader.TableCaption(), SalesCrMemoHeader."No.", Settlement."Display Name", Applied, Settlement."Applied Amount",
+                Customer.FieldCaption("Application Method"), Customer.TableCaption(), SalesCrMemoHeader."Bill-to Customer No.", SalesHeader.TableCaption());
+        // What BC applied to an open invoice at posting is settled; only the rest has to be covered by the payment lines.
+        Total := Round(Abs(CustLedgerEntry."Remaining Amount"), GLSetup."Amount Rounding Precision");
         Paid := Round(PaymentLine.Amount, GLSetup."Amount Rounding Precision");
-        if Total - Paid > InvoiceRoundingTolerance(SalesCrMemoHeader."Currency Code") then
-            Error(_OverRefundErr, SalesCrMemoHeader.TableCaption(), SalesCrMemoHeader."No.", Total, Paid, QueueRow."Return Name", SalesHeader.TableCaption());
+        if Total - Paid > Tolerance then
+            Error(OverRefundErr, SalesCrMemoHeader.TableCaption(), SalesCrMemoHeader."No.", Total, Paid, Settlement."Display Name", SalesHeader.TableCaption());
     end;
 
     /// <summary>
@@ -113,15 +129,18 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
         exit(Tolerance);
     end;
 
-    local procedure SettleCreditMemo(ShopifyStore: Record "NPR Spfy Store"; QueueRow: Record "NPR Spfy Legacy Return Queue"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line") PostedGiftCardShare: Decimal
+    local procedure SettleCreditMemo(ShopifyStore: Record "NPR Spfy Store"; Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line") PostedGiftCardShare: Decimal
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
         TotalToSettle: Decimal;
         CardShare: Decimal;
         GiftCardAccountNo: Code[20];
+        RefundAccountMissingErr: Label '%1 must be set on %2 %3 before Shopify %4 can be settled.', Comment = '%1 = Return Refund G/L Account No. caption, %2 = Shopify Store table caption, %3 = store code, %4 = Shopify document caption';
+        RefundAppliedLbl: Label 'Refund for Shopify %1', Comment = '%1 = Shopify document caption';
+        GiftCardRefundAppliedLbl: Label 'Gift card refund for Shopify %1', Comment = '%1 = Shopify document caption';
     begin
         if ShopifyStore."Return Refund G/L Account No." = '' then
-            Error(_RefundAccountMissingErr, ShopifyStore.FieldCaption("Return Refund G/L Account No."), ShopifyStore.TableCaption(), ShopifyStore.Code, QueueRow."Return Name");
+            Error(RefundAccountMissingErr, ShopifyStore.FieldCaption("Return Refund G/L Account No."), ShopifyStore.TableCaption(), ShopifyStore.Code, Settlement."Display Name");
         // The ledger amount, not the line sum: invoice rounding can differ.
         CustLedgerEntry.SetRange("Customer No.", SalesCrMemoHeader."Bill-to Customer No.");
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
@@ -131,7 +150,7 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
         TotalToSettle := Abs(CustLedgerEntry."Remaining Amount");
         if TotalToSettle = 0 then
             exit(0);
-        PostedGiftCardShare := QueueRow."Gift Card Refund Amount";
+        PostedGiftCardShare := Settlement."Gift Card Refund Amount";
         if PostedGiftCardShare > TotalToSettle then
             PostedGiftCardShare := TotalToSettle;
         if PostedGiftCardShare < 0 then
@@ -140,8 +159,8 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
         GiftCardAccountNo := ShopifyStore."Ret. Gift Card Refund G/L Acc.";
         if GiftCardAccountNo = '' then
             GiftCardAccountNo := ShopifyStore."Return Refund G/L Account No.";
-        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", ShopifyStore."Return Refund G/L Account No.", CardShare, StrSubstNo(_RefundAppliedLbl, QueueRow."Return Name"), GenJnlPostLine);
-        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", GiftCardAccountNo, PostedGiftCardShare, StrSubstNo(_GiftCardRefundAppliedLbl, QueueRow."Return Name"), GenJnlPostLine);
+        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", ShopifyStore."Return Refund G/L Account No.", CardShare, StrSubstNo(RefundAppliedLbl, Settlement."Display Name"), GenJnlPostLine);
+        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", GiftCardAccountNo, PostedGiftCardShare, StrSubstNo(GiftCardRefundAppliedLbl, Settlement."Display Name"), GenJnlPostLine);
     end;
 
     local procedure PostRefundJournalLine(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; JournalTemplateName: Code[10]; BalAccountNo: Code[20]; Amount: Decimal; Description: Text; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
@@ -213,61 +232,172 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
                 NpRvVoucherMgt.ArchiveRevokedVoucher(Voucher);
     end;
 
-    local procedure TopUpVoucher(QueueRow: Record "NPR Spfy Legacy Return Queue"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; PostedGiftCardShare: Decimal; ReceiptNoOfThisPosting: Code[20])
+    /// <summary>
+    /// The gift card share Shopify paid back to the card reverses what the card paid, as a corrective credit memo does: the card's initial amount stays and its balance goes back up.
+    /// </summary>
+    local procedure CreditVoucherBack(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; PostedGiftCardShare: Decimal; ReceiptNoOfThisPosting: Code[20])
     var
         Voucher: Record "NPR NpRv Voucher";
-        GLSetup: Record "General Ledger Setup";
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        AmountLCY: Decimal;
+        VoucherShare: Decimal;
     begin
-        // Top up the gift card share that was settled, on the liability account or, when none is set up, on the refund account.
-        if (QueueRow."Voucher No." = '') or (PostedGiftCardShare <= 0) then
+        if (Settlement."Voucher No." = '') or (PostedGiftCardShare <= 0) then
             exit;
-        if not Voucher.Get(QueueRow."Voucher No.") then
-            if not RestoreArchivedVoucher(QueueRow, Voucher) then
-                ErrorVoucherMissing(QueueRow, SalesCrMemoHeader, ReceiptNoOfThisPosting);
-        GLSetup.Get();
-        if SalesCrMemoHeader."Currency Code" = '' then
-            AmountLCY := PostedGiftCardShare
-        else
-            AmountLCY := CurrencyExchangeRate.ExchangeAmtFCYToLCY(SalesCrMemoHeader."Posting Date", SalesCrMemoHeader."Currency Code", PostedGiftCardShare, SalesCrMemoHeader."Currency Factor");
-        AmountLCY := Round(AmountLCY, GLSetup."Amount Rounding Precision");
-        NpRvVoucherMgt.PostTopUpForCreditMemo(Voucher, AmountLCY, SalesCrMemoHeader."Posting Date", SalesCrMemoHeader."No.", CopyStr(QueueRow."Return Name", 1, 50), true);
+        if not Voucher.Get(Settlement."Voucher No.") then
+            if not RestoreArchivedVoucher(Settlement, Voucher) then
+                ErrorVoucherMissing(Settlement, SalesCrMemoHeader, ReceiptNoOfThisPosting);
+        // The card's own share; store credit in the same refund has no voucher. Rows written before the share was recorded give the card the whole liability share.
+        VoucherShare := PostedGiftCardShare;
+        if (Settlement."Voucher Refund Amount" > 0) and (Settlement."Voucher Refund Amount" < VoucherShare) then
+            VoucherShare := Settlement."Voucher Refund Amount";
+        CheckWithinVoucherPayment(Settlement, SalesCrMemoHeader, VoucherShare, Voucher);
+        NpRvVoucherMgt.PostPaymentReversalForCreditMemo(Voucher, VoucherReversalAmountLCY(Settlement, SalesCrMemoHeader, VoucherShare), SalesCrMemoHeader."Posting Date", SalesCrMemoHeader."No.", CopyStr(Settlement."Display Name", 1, 50));
     end;
 
     /// <summary>
-    /// A card spent to zero was archived with its Shopify id; the refund brings it back before the top-up, and the module's unarchive moves the id along.
+    /// What the card gets back in LCY: the share at the rate Shopify booked it in the shop currency when that is the LCY, as the order import booked the card's payment; else at the credit memo's rate.
+    /// </summary>
+    local procedure VoucherReversalAmountLCY(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; VoucherShare: Decimal): Decimal
+    var
+        GLSetup: Record "General Ledger Setup";
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        AmountLCY: Decimal;
+    begin
+        if SalesCrMemoHeader."Currency Code" = '' then
+            exit(VoucherShare);
+        GLSetup.Get();
+        if ShopifyRateKnown(Settlement) then
+            AmountLCY := VoucherShare * Settlement."Voucher Refund Amount (LCY)" / Settlement."Voucher Refund Amount"
+        else
+            AmountLCY := CurrencyExchangeRate.ExchangeAmtFCYToLCY(SalesCrMemoHeader."Posting Date", SalesCrMemoHeader."Currency Code", VoucherShare, SalesCrMemoHeader."Currency Factor");
+        exit(Round(AmountLCY, GLSetup."Amount Rounding Precision"));
+    end;
+
+    local procedure ShopifyRateKnown(Settlement: Record "NPR Spfy Refund Settlement"): Boolean
+    begin
+        exit((Settlement."Voucher Refund Amount" > 0) and (Settlement."Voucher Refund Amount (LCY)" > 0));
+    end;
+
+    /// <summary>
+    /// A reversal may give back only what the card paid on the order's invoices, less what earlier credit memos of the order gave back to it; more would be a top-up in disguise. Compared in the document currency, as the payment lines carry it.
+    /// </summary>
+    local procedure CheckWithinVoucherPayment(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; GiftCardShare: Decimal; Voucher: Record "NPR NpRv Voucher")
+    var
+        TempSalesInvoiceHeader: Record "Sales Invoice Header" temporary;
+        PaymentLine: Record "NPR Magento Payment Line";
+        Currency: Record Currency;
+        GLSetup: Record "General Ledger Setup";
+        Builder: Codeunit "NPR Spfy Refund Doc. Builder";
+        Available: Decimal;
+        Tolerance: Decimal;
+        RefundBeyondVoucherPaymentErr: Label 'Shopify %1 refunds %2 to %3 %4, but the card paid only %5 on the invoices of the order that earlier refunds have not already put back. Crediting more would raise the card beyond what was spent from it, so this Return Order cannot be posted; delete it and handle the refund manually.', Comment = '%1 = Shopify document caption, %2 = gift card share of the refund, %3 = Voucher table caption, %4 = voucher no., %5 = amount the card paid and that is not yet reversed';
+    begin
+        if Builder.CollectOrderInvoices(Settlement."Shopify Store Code", Settlement."Order Id", TempSalesInvoiceHeader) then begin
+            TempSalesInvoiceHeader.FindSet();
+            repeat
+                PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+                PaymentLine.SetRange("Document No.", TempSalesInvoiceHeader."No.");
+                PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
+                PaymentLine.SetRange("Source No.", Voucher."No.");
+                PaymentLine.CalcSums(Amount);
+                Available += PaymentLine.Amount;
+            until TempSalesInvoiceHeader.Next() = 0;
+        end;
+        Available -= ReversedForOrder(Settlement, Voucher."No.");
+        Currency.Initialize(SalesCrMemoHeader."Currency Code");
+        Tolerance := Currency."Amount Rounding Precision";
+        // Earlier reversals are posted in LCY, so converting them back can miss by an LCY rounding unit.
+        if SalesCrMemoHeader."Currency Factor" <> 0 then begin
+            GLSetup.Get();
+            Tolerance += GLSetup."Amount Rounding Precision" * SalesCrMemoHeader."Currency Factor";
+        end;
+        if GiftCardShare - Available > Tolerance then
+            Error(RefundBeyondVoucherPaymentErr, Settlement."Display Name", GiftCardShare, Voucher.TableCaption(), Voucher."No.", Available);
+    end;
+
+    /// <summary>
+    /// What earlier credit memos of the same Shopify order gave back to the card, in their document currency: reversed payments, and top-ups as released builds posted them.
+    /// Only entries that raised the balance count; a credit memo that reverses a sold top-up lowers it. A credit memo without a settlement row, such as a corrective one made by hand, may be this order's, so it counts too.
+    /// </summary>
+    local procedure ReversedForOrder(Settlement: Record "NPR Spfy Refund Settlement"; VoucherNo: Code[20]) Reversed: Decimal
+    var
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        OtherSettlement: Record "NPR Spfy Refund Settlement";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        SourceDocType: Enum "NPR Spfy Legacy Return Source";
+        ShopifyId: Text[30];
+        HasSettlement: Boolean;
+    begin
+        VoucherEntry.SetRange("Voucher No.", VoucherNo);
+        VoucherEntry.SetFilter("Entry Type", '%1|%2', VoucherEntry."Entry Type"::Payment, VoucherEntry."Entry Type"::"Top-up");
+        VoucherEntry.SetRange("Document Type", VoucherEntry."Document Type"::"Credit Memo");
+        VoucherEntry.SetFilter(Amount, '>0');
+        if VoucherEntry.FindSet() then
+            repeat
+                if SalesCrMemoHeader.Get(VoucherEntry."Document No.") then begin
+                    HasSettlement := false;
+                    if SpfyLegacyReturnMgt.GetSourceDocStamp(SalesCrMemoHeader.RecordId(), SourceDocType, ShopifyId) then
+                        HasSettlement := OtherSettlement.Get(Settlement."Shopify Store Code", SourceDocType, ShopifyId);
+                    if not HasSettlement then
+                        Reversed += ReversalInDocumentCurrency(VoucherEntry.Amount, SalesCrMemoHeader, OtherSettlement, false)
+                    else
+                        if OtherSettlement."Order Id" = Settlement."Order Id" then
+                            Reversed += ReversalInDocumentCurrency(VoucherEntry.Amount, SalesCrMemoHeader, OtherSettlement, true);
+                end;
+            until VoucherEntry.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Reads a reversal back at the rate it was posted at: Shopify's when VoucherReversalAmountLCY used it, else the credit memo's. Another rate would be off by the rate difference, not by a rounding unit.
+    /// </summary>
+    local procedure ReversalInDocumentCurrency(AmountLCY: Decimal; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; OtherSettlement: Record "NPR Spfy Refund Settlement"; HasSettlement: Boolean): Decimal
+    begin
+        if SalesCrMemoHeader."Currency Code" = '' then
+            exit(AmountLCY);
+        if HasSettlement then
+            if ShopifyRateKnown(OtherSettlement) then
+                exit(AmountLCY * OtherSettlement."Voucher Refund Amount" / OtherSettlement."Voucher Refund Amount (LCY)");
+        if SalesCrMemoHeader."Currency Factor" <> 0 then
+            exit(AmountLCY * SalesCrMemoHeader."Currency Factor");
+        exit(AmountLCY);
+    end;
+
+    /// <summary>
+    /// A card spent to zero was archived with its Shopify id; the refund brings it back before the reversal, and the module's unarchive moves the id along.
     /// The row carries the voucher's own number, which the archive may hold under a number of its own series.
     /// </summary>
-    local procedure RestoreArchivedVoucher(QueueRow: Record "NPR Spfy Legacy Return Queue"; var Voucher: Record "NPR NpRv Voucher"): Boolean
+    local procedure RestoreArchivedVoucher(Settlement: Record "NPR Spfy Refund Settlement"; var Voucher: Record "NPR NpRv Voucher"): Boolean
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        VoucherDeactivatedErr: Label '%1 %2, which Shopify %3 refunds to, was archived and then deactivated at Shopify, so it cannot be restored for the refund. Handle it manually and dismiss the queue row.', Comment = '%1 = Voucher table caption, %2 = voucher no., %3 = Shopify document caption';
     begin
-        ArchVoucher.SetRange("Arch. No.", QueueRow."Voucher No.");
+        ArchVoucher.SetRange("Arch. No.", Settlement."Voucher No.");
         if not ArchVoucher.FindFirst() then
-            if not ArchVoucher.Get(QueueRow."Voucher No.") then
+            if not ArchVoucher.Get(Settlement."Voucher No.") then
                 exit(false);
         // Deactivation at Shopify is permanent, so a card deactivated after archiving cannot carry the refund.
         if ArchVoucher."Disabled at Shopify" then
-            Error(_VoucherDeactivatedErr, Voucher.TableCaption(), QueueRow."Voucher No.", QueueRow."Return Name");
+            Error(VoucherDeactivatedErr, Voucher.TableCaption(), Settlement."Voucher No.", Settlement."Display Name");
         NpRvVoucherMgt.UnarchiveVoucher(ArchVoucher."No.", false);
-        exit(Voucher.Get(QueueRow."Voucher No."));
+        exit(Voucher.Get(Settlement."Voucher No."));
     end;
 
     /// <summary>
     /// A receipt posted before this transaction stops the draft from being discarded, so the advice depends on whether one exists.
     /// </summary>
-    local procedure ErrorVoucherMissing(QueueRow: Record "NPR Spfy Legacy Return Queue"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ReceiptNoOfThisPosting: Code[20])
+    local procedure ErrorVoucherMissing(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ReceiptNoOfThisPosting: Code[20])
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
         Voucher: Record "NPR NpRv Voucher";
+        VoucherMissingErr: Label '%1 %2, which Shopify %3 refunds to, no longer exists, so the refund cannot be credited back to it. Discard the draft and retry, or handle it manually.', Comment = '%1 = Voucher table caption, %2 = voucher no., %3 = Shopify document caption';
+        VoucherMissingReceivedErr: Label '%1 %2, which Shopify %3 refunds to, no longer exists, so the refund cannot be credited back to it. The goods have already been received as %4, so the draft cannot be discarded; handle it manually.', Comment = '%1 = Voucher table caption, %2 = voucher no., %3 = Shopify document caption, %4 = return receipt no.';
     begin
         ReturnReceiptHeader.SetRange("Return Order No.", SalesCrMemoHeader."Return Order No.");
         ReturnReceiptHeader.SetFilter("No.", '<>%1', ReceiptNoOfThisPosting);
         if ReturnReceiptHeader.FindFirst() then
-            Error(_VoucherMissingReceivedErr, Voucher.TableCaption(), QueueRow."Voucher No.", QueueRow."Return Name", ReturnReceiptHeader."No.");
-        Error(_VoucherMissingErr, Voucher.TableCaption(), QueueRow."Voucher No.", QueueRow."Return Name");
+            Error(VoucherMissingReceivedErr, Voucher.TableCaption(), Settlement."Voucher No.", Settlement."Display Name", ReturnReceiptHeader."No.");
+        Error(VoucherMissingErr, Voucher.TableCaption(), Settlement."Voucher No.", Settlement."Display Name");
     end;
 }

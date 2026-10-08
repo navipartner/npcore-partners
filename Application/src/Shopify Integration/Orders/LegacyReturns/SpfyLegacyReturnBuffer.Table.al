@@ -21,6 +21,13 @@ table 6059917 "NPR Spfy Legacy Return Buffer"
         field(110; "Closed At"; DateTime) { Caption = 'Closed At'; DataClassification = SystemMetadata; }
         field(115; Status; Text[20]) { Caption = 'Status'; DataClassification = SystemMetadata; }
         field(120; "Order Json"; Blob) { Caption = 'Order Json'; DataClassification = SystemMetadata; }
+        field(130; "Source Type"; Enum "NPR Spfy Legacy Return Source") { Caption = 'Source Type'; DataClassification = SystemMetadata; }
+        field(140; "Posting DateTime"; DateTime) { Caption = 'Posting DateTime'; DataClassification = SystemMetadata; }
+        field(150; "Source Created At"; DateTime) { Caption = 'Source Created At'; DataClassification = SystemMetadata; }
+        field(160; "Belongs to Return"; Boolean) { Caption = 'Belongs to Return'; DataClassification = SystemMetadata; }
+        field(170; "Other Refunds Incomplete"; Boolean) { Caption = 'Other Refunds Incomplete'; DataClassification = SystemMetadata; }
+        field(180; "Order Cancelled"; Boolean) { Caption = 'Order Cancelled'; DataClassification = SystemMetadata; }
+        field(190; "Pending Refund Txns"; Integer) { Caption = 'Pending Refund Transactions'; DataClassification = SystemMetadata; }
     }
     keys { key(PK; "Return Id") { Clustered = true; } }
 

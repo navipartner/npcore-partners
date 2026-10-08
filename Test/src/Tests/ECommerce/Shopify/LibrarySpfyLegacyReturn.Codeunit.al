@@ -12,18 +12,25 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         NpEcStore: Record "NPR NpEc Store";
         SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        LibrarySales: Codeunit "Library - Sales";
+        LibraryInventory: Codeunit "Library - Inventory";
+        StoreCodeTok: Label 'SPFYLRSTORE', Locked = true;
+        EcStoreCodeTok: Label 'SPFYLREC', Locked = true;
+        LocationCodeTok: Label 'SPFYLRLOC', Locked = true;
+        ShopifyLocationIdTok: Label '71001', Locked = true;
+        SalespersonTok: Label 'SPFYLRSP', Locked = true;
     begin
-        StoreCode := CopyStr(_StoreCodeTok, 1, MaxStrLen(StoreCode));
-        LocationCode := CopyStr(_LocationCodeTok, 1, MaxStrLen(LocationCode));
+        StoreCode := CopyStr(StoreCodeTok, 1, MaxStrLen(StoreCode));
+        LocationCode := CopyStr(LocationCodeTok, 1, MaxStrLen(LocationCode));
 
         // Once per run: library number series restart at the same number.
         if not _NoSeriesInitialized then begin
-            _LibrarySales.SetReturnOrderNoSeriesInSetup();
-            _LibrarySales.SetPostedNoSeriesInSetup();
+            LibrarySales.SetReturnOrderNoSeriesInSetup();
+            LibrarySales.SetPostedNoSeriesInSetup();
             _NoSeriesInitialized := true;
         end;
-        _LibrarySales.SetStockoutWarning(false);
-        _LibrarySales.SetCreditWarningsToNoWarnings();
+        LibrarySales.SetStockoutWarning(false);
+        LibrarySales.SetCreditWarningsToNoWarnings();
 
         if not SpfyIntegrationSetup.Get() then begin
             SpfyIntegrationSetup.Init();
@@ -36,18 +43,18 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
             SpfyIntegrationSetup."Max Doc Process Retry Count" := 3;
         SpfyIntegrationSetup.Modify();
 
-        if not SalespersonPurchaser.Get(_SalespersonTok) then begin
+        if not SalespersonPurchaser.Get(SalespersonTok) then begin
             SalespersonPurchaser.Init();
-            SalespersonPurchaser.Code := CopyStr(_SalespersonTok, 1, MaxStrLen(SalespersonPurchaser.Code));
+            SalespersonPurchaser.Code := CopyStr(SalespersonTok, 1, MaxStrLen(SalespersonPurchaser.Code));
             SalespersonPurchaser.Insert();
         end;
 
-        _LibrarySales.CreateCustomer(Customer);
+        LibrarySales.CreateCustomer(Customer);
         Customer."E-Mail" := 'anna@npretail.test';
         Customer.Modify();
         CustomerNo := Customer."No.";
 
-        _LibraryInventory.CreateItem(Item);
+        LibraryInventory.CreateItem(Item);
         Sku := Item."No.";
 
         if not Location.Get(LocationCode) then begin
@@ -55,7 +62,7 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
             Location.Code := LocationCode;
             Location.Insert();
         end;
-        _LibraryInventory.UpdateInventoryPostingSetup(Location);
+        LibraryInventory.UpdateInventoryPostingSetup(Location);
 
         if not SpfyStore.Get(StoreCode) then begin
             SpfyStore.Init();
@@ -66,6 +73,7 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         SpfyStore."Shopify Url" := 'https://npr-test.myshopify.com';
         SpfyStore."Sales Return Order Integration" := true;
         SpfyStore."Get Returns Starting From" := CreateDateTime(20260101D, 0T);
+        SpfyStore."Get Refunds Starting From" := 0DT;
         SpfyStore."Return Poll Lookback (Days)" := 30;
         SpfyStore."Post Returns Automatically" := true;
         SpfyStore."Currency Blank for LCY" := true;
@@ -73,14 +81,15 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         SpfyStore."Ret. Gift Card Refund G/L Acc." := CreateSalesGLAccountNo(Item);
         SpfyStore."Ret. Shipping Refund G/L Acc." := CreateSalesGLAccountNo(Item);
         SpfyStore."Return Fee G/L Account No." := CreateSalesGLAccountNo(Item);
+        SpfyStore."Refund Discrepancy G/L Acc." := CreateSalesGLAccountNo(Item);
         SpfyStore.Modify();
 
-        if not NpEcStore.Get(_EcStoreCodeTok) then begin
+        if not NpEcStore.Get(EcStoreCodeTok) then begin
             NpEcStore.Init();
-            NpEcStore.Code := CopyStr(_EcStoreCodeTok, 1, MaxStrLen(NpEcStore.Code));
+            NpEcStore.Code := CopyStr(EcStoreCodeTok, 1, MaxStrLen(NpEcStore.Code));
             NpEcStore.Insert();
         end;
-        NpEcStore."Salesperson/Purchaser Code" := CopyStr(_SalespersonTok, 1, MaxStrLen(NpEcStore."Salesperson/Purchaser Code"));
+        NpEcStore."Salesperson/Purchaser Code" := CopyStr(SalespersonTok, 1, MaxStrLen(NpEcStore."Salesperson/Purchaser Code"));
         NpEcStore."Shopify Store Code" := StoreCode;
         NpEcStore."Shopify Source Name" := 'web';
         NpEcStore."Spfy Customer No." := CustomerNo;
@@ -90,7 +99,7 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         NpEcStore.Validate(LocationCode, LocationCode);
         NpEcStore.Modify();
 
-        CreateLocationLink(StoreCode, LocationCode, CopyStr(_ShopifyLocationIdTok, 1, 30));
+        CreateLocationLink(StoreCode, LocationCode, CopyStr(ShopifyLocationIdTok, 1, 30));
         SpfyIntegrationMgt.SetRereadSetup();
     end;
 
@@ -105,6 +114,60 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         GLAccount."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         GLAccount.Modify();
         exit(GLAccount."No.");
+    end;
+
+    /// <summary>
+    /// The gift card share the settlement row of the queue row's return records, 0 without a row.
+    /// </summary>
+    procedure SettledGiftCardAmount(QueueRow: Record "NPR Spfy NC Return Queue"): Decimal
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+    begin
+        if Settlement.Get(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID") then
+            exit(Settlement."Gift Card Refund Amount");
+        exit(0);
+    end;
+
+    procedure SettledVoucherNo(QueueRow: Record "NPR Spfy NC Return Queue"): Code[20]
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+    begin
+        if Settlement.Get(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID") then
+            exit(Settlement."Voucher No.");
+        exit('');
+    end;
+
+    procedure SettlementExists(QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+    begin
+        exit(Settlement.Get(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID"));
+    end;
+
+    procedure SetSettlement(QueueRow: Record "NPR Spfy NC Return Queue"; GiftCardAmount: Decimal; VoucherNo: Code[20])
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+    begin
+        if not Settlement.Get(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID") then begin
+            Settlement.Init();
+            Settlement."Shopify Store Code" := QueueRow."Shopify Store Code";
+            Settlement."Source Doc. Type" := QueueRow."Source Doc. Type";
+            Settlement."Shopify Id" := QueueRow."Source Doc. ID";
+            Settlement.Insert();
+        end;
+        Settlement."Return Order No." := QueueRow."Sales Header Doc. No.";
+        Settlement."Gift Card Refund Amount" := GiftCardAmount;
+        Settlement."Voucher No." := VoucherNo;
+        Settlement.Modify();
+    end;
+
+    procedure DeleteSettlement(StoreCode: Code[20]; ShopifyId: Text[30])
+    var
+        Settlement: Record "NPR Spfy Refund Settlement";
+    begin
+        Settlement.SetRange("Shopify Store Code", StoreCode);
+        Settlement.SetRange("Shopify Id", ShopifyId);
+        Settlement.DeleteAll();
     end;
 
     procedure GetStore(StoreCode: Code[20]; var ShopifyStore: Record "NPR Spfy Store")
@@ -141,18 +204,24 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     end;
 
     procedure ReturnListResponse(OrderGid: Text; OrderName: Text; ReturnGid: Text; ReturnName: Text; ClosedAt: Text): Text
+    var
+        ReturnListTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[{"node":{"id":"%3","name":"%4","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"%5"}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_ReturnListTok, OrderGid, OrderName, ReturnGid, ReturnName, ClosedAt));
+        exit(StrSubstNo(ReturnListTok, OrderGid, OrderName, ReturnGid, ReturnName, ClosedAt));
     end;
 
     procedure ReturnListResponseWithMoreReturns(OrderGid: Text; ReturnGid: Text): Text
+    var
+        ReturnListMoreReturnsTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[{"node":{"id":"%2","name":"#R1","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"2026-09-20T10:00:00Z"}}],"pageInfo":{"endCursor":"CURSOR1","hasNextPage":true}}}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_ReturnListMoreReturnsTok, OrderGid, ReturnGid));
+        exit(StrSubstNo(ReturnListMoreReturnsTok, OrderGid, ReturnGid));
     end;
 
     procedure OrderReturnsResponseNeverEnding(ReturnGid: Text): Text
+    var
+        OrderReturnsNeverEndingTok: Label '{"data":{"order":{"returns":{"edges":[{"node":{"id":"%1","name":"#R1","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"2026-09-20T10:00:00Z"}}],"pageInfo":{"endCursor":"CURSOR1","hasNextPage":true}}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_OrderReturnsNeverEndingTok, ReturnGid));
+        exit(StrSubstNo(OrderReturnsNeverEndingTok, ReturnGid));
     end;
 
     /// <summary>
@@ -201,16 +270,20 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     end;
 
     procedure ReturnDetailResponse(ReturnId: Text; OrderId: Text; OrderName: Text; Sku: Text; LineItemId: Text; Qty: Integer; NetAmount: Decimal; TaxAmount: Decimal; VatRate: Decimal; LocationId: Text; TransactionsJson: Text; Currency: Text; DispositionsJson: Text; ReturnShippingFeesJson: Text; RefundShippingLinesJson: Text; OrderAdjustmentsJson: Text): Text
+    var
+        ReturnDetailTok: Label '{"data":{"return":{"id":"gid://shopify/Return/%1","name":"%3-R1","status":"CLOSED","closedAt":"2026-09-20T10:00:00Z","exchangeLineItems":{"edges":[]},"order":{"id":"gid://shopify/Order/%2","name":"%3","number":9001,"email":"anna@npretail.test","phone":null,"sourceName":"web","taxesIncluded":false,"currencyCode":"%12","presentmentCurrencyCode":"%12","customer":{"id":"gid://shopify/Customer/501","firstName":"Anna","lastName":"Test","defaultEmailAddress":{"emailAddress":"anna@npretail.test"},"defaultPhoneNumber":null,"defaultAddress":{"phone":null}},"billingAddress":{"firstName":"Anna","lastName":"Test","company":null,"countryCodeV2":"DK","zip":"2100","address1":"Testvej 1","address2":null,"city":"Copenhagen"},"shippingAddress":{"firstName":"Anna","lastName":"Test","company":null,"address1":"Testvej 1","address2":null,"zip":"2100","city":"Copenhagen","countryCodeV2":"DK","phone":null}},"returnShippingFees":%14,"returnLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/ReturnLineItem/1","quantity":%6,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81","lineItem":{"id":"gid://shopify/LineItem/%5","sku":"%4","title":"Test jacket","variant":{"id":"gid://shopify/ProductVariant/1","sku":"%4","barcode":null}}}}}]},"reverseFulfillmentOrders":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"lineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81"},"dispositions":%13}}]}}}]},"refunds":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/Refund/1","transactions":{"pageInfo":{"hasNextPage":false},"edges":[%11]},"refundLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"quantity":%6,"subtotalSet":{"presentmentMoney":{"amount":"%7"}},"totalTaxSet":{"presentmentMoney":{"amount":"%8"}},"lineItem":{"id":"gid://shopify/LineItem/%5","taxLines":[{"ratePercentage":%9}]}}}]},"refundShippingLines":{"pageInfo":{"hasNextPage":false},"edges":[%15]},"orderAdjustments":{"pageInfo":{"hasNextPage":false},"edges":[%16]}}}]}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_ReturnDetailTok, ReturnId, OrderId, OrderName, Sku, LineItemId, Qty, Format(NetAmount, 0, 9), Format(TaxAmount, 0, 9), Format(VatRate, 0, 9), LocationId, TransactionsJson, Currency, DispositionsJson, ReturnShippingFeesJson, RefundShippingLinesJson, OrderAdjustmentsJson));
+        exit(StrSubstNo(ReturnDetailTok, ReturnId, OrderId, OrderName, Sku, LineItemId, Qty, Format(NetAmount, 0, 9), Format(TaxAmount, 0, 9), Format(VatRate, 0, 9), LocationId, TransactionsJson, Currency, DispositionsJson, ReturnShippingFeesJson, RefundShippingLinesJson, OrderAdjustmentsJson));
     end;
 
     /// <summary>
     /// One order adjustment edge as Shopify reports it: a positive amount is withheld from the customer, a negative one is paid beyond the lines.
     /// </summary>
     procedure OrderAdjustmentJson(Amount: Decimal; TaxAmount: Decimal; Reason: Text): Text
+    var
+        OrderAdjustmentTok: Label '{"node":{"amountSet":{"presentmentMoney":{"amount":"%1"}},"taxAmountSet":{"presentmentMoney":{"amount":"%2"}},"reason":"%3"}}', Locked = true;
     begin
-        exit(StrSubstNo(_OrderAdjustmentTok, Format(Amount, 0, 9), Format(TaxAmount, 0, 9), Reason));
+        exit(StrSubstNo(OrderAdjustmentTok, Format(Amount, 0, 9), Format(TaxAmount, 0, 9), Reason));
     end;
 
     /// <summary>
@@ -286,13 +359,17 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     end;
 
     procedure ReturnShippingFeeJson(Amount: Decimal): Text
+    var
+        ReturnShippingFeeTok: Label '[{"amountSet":{"presentmentMoney":{"amount":"%1"}}}]', Locked = true;
     begin
-        exit(StrSubstNo(_ReturnShippingFeeTok, Format(Amount, 0, 9)));
+        exit(StrSubstNo(ReturnShippingFeeTok, Format(Amount, 0, 9)));
     end;
 
     procedure RefundShippingLineJson(SubtotalAmount: Decimal; TaxAmount: Decimal): Text
+    var
+        RefundShippingLineTok: Label '{"node":{"subtotalAmountSet":{"presentmentMoney":{"amount":"%1"}},"taxAmountSet":{"presentmentMoney":{"amount":"%2"}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_RefundShippingLineTok, Format(SubtotalAmount, 0, 9), Format(TaxAmount, 0, 9)));
+        exit(StrSubstNo(RefundShippingLineTok, Format(SubtotalAmount, 0, 9), Format(TaxAmount, 0, 9)));
     end;
 
     procedure CreateVoucherWithGiftCardId(VoucherNo: Code[20]; StoreCode: Code[20]; GiftCardId: Text[30]; var Voucher: Record "NPR NpRv Voucher")
@@ -306,7 +383,7 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         SpfyAssignedIDMgt.AssignShopifyID(Voucher.RecordId(), "NPR Spfy ID Type"::"Entry ID", GiftCardId, false);
     end;
 
-    procedure RunImport(var QueueRow: Record "NPR Spfy Legacy Return Queue"; var MockClient: Codeunit "NPR Spfy Mock GraphQL Client"): Boolean
+    procedure RunImport(var QueueRow: Record "NPR Spfy NC Return Queue"; var MockClient: Codeunit "NPR Spfy Mock GraphQL Client"): Boolean
     var
         SpfyLegacyReturnImport: Codeunit "NPR Spfy Legacy Return Import";
     begin
@@ -319,7 +396,7 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     /// <summary>
     /// Builds an unposted draft and unlinks it from the queue row, like a draft the other engine left behind.
     /// </summary>
-    procedure BuildUnlinkedDraft(var QueueRow: Record "NPR Spfy Legacy Return Queue"; ReturnDetailResponse: Text; var SalesHeader: Record "Sales Header")
+    procedure BuildUnlinkedDraft(var QueueRow: Record "NPR Spfy NC Return Queue"; ReturnDetailResponse: Text; var SalesHeader: Record "Sales Header")
     var
         ShopifyStore: Record "NPR Spfy Store";
         Assert: Codeunit Assert;
@@ -390,24 +467,44 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     end;
 
     procedure InsertPostedInvoiceWithVoucherPayment(InvoiceNo: Code[20]; StoreCode: Code[20]; OrderId: Text[30]; VoucherNo: Code[20])
-    var
-        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        InsertPostedInvoiceWithVoucherPayment(InvoiceNo, StoreCode, OrderId, VoucherNo, 100);
+    end;
+
+    /// <summary>
+    /// A posted invoice of the Shopify order paid with the voucher for the amount, as the order import posts a gift card payment.
+    /// </summary>
+    procedure InsertPostedInvoiceWithVoucherPayment(InvoiceNo: Code[20]; StoreCode: Code[20]; OrderId: Text[30]; VoucherNo: Code[20]; Amount: Decimal)
     begin
         InsertPostedInvoiceWithOrderIds(InvoiceNo, StoreCode, OrderId);
+        AddVoucherPaymentToPostedInvoice(InvoiceNo, VoucherNo, Amount);
+    end;
+
+    procedure AddVoucherPaymentToPostedInvoice(InvoiceNo: Code[20]; VoucherNo: Code[20]; Amount: Decimal)
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LineNo: Integer;
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+        PaymentLine.SetRange("Document No.", InvoiceNo);
+        if PaymentLine.FindLast() then
+            LineNo := PaymentLine."Line No.";
         PaymentLine.Init();
         PaymentLine."Document Table No." := Database::"Sales Invoice Header";
         PaymentLine."Document Type" := Enum::"Sales Document Type".FromInteger(0);
         PaymentLine."Document No." := InvoiceNo;
-        PaymentLine."Line No." := 10000;
+        PaymentLine."Line No." := LineNo + 10000;
         PaymentLine."Payment Type" := PaymentLine."Payment Type"::Voucher;
         PaymentLine."Source No." := VoucherNo;
-        PaymentLine.Amount := 100;
+        PaymentLine.Amount := Amount;
         PaymentLine.Insert();
     end;
 
     procedure MixedDispositionsJson(RestockedLocationId: Text; RejectedLocationId: Text): Text
+    var
+        MixedDispositionsTok: Label '[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%1"},"quantity":1},{"type":"REJECTED","location":{"id":"gid://shopify/Location/%2"},"quantity":1}]', Locked = true;
     begin
-        exit(StrSubstNo(_MixedDispositionsTok, RestockedLocationId, RejectedLocationId));
+        exit(StrSubstNo(MixedDispositionsTok, RestockedLocationId, RejectedLocationId));
     end;
 
     /// <summary>
@@ -415,30 +512,40 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     /// </summary>
     procedure DeleteUnfinishedQueueRows()
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
     begin
         QueueRow.SetFilter(Status, '<>%1', QueueRow.Status::Imported);
         QueueRow.DeleteAll();
     end;
 
-    procedure InsertQueueRow(StoreCode: Code[20]; ReturnId: Text[30]; OrderId: Text[30]; var QueueRow: Record "NPR Spfy Legacy Return Queue")
+    procedure InsertQueueRow(StoreCode: Code[20]; ReturnId: Text[30]; OrderId: Text[30]; var QueueRow: Record "NPR Spfy NC Return Queue")
+    begin
+        InsertQueueRow(StoreCode, QueueRow."Source Doc. Type"::Return, ReturnId, OrderId, '#' + OrderId + '-R1', QueueRow);
+    end;
+
+    /// <summary>
+    /// A New queue row for a Shopify return or refund, replacing one left by an earlier run together with its draft.
+    /// </summary>
+    procedure InsertQueueRow(StoreCode: Code[20]; SourceDocType: Enum "NPR Spfy Legacy Return Source"; ShopifyId: Text[30]; OrderId: Text[30]; SourceDocName: Text; var QueueRow: Record "NPR Spfy NC Return Queue")
     var
         SalesHeader: Record "Sales Header";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         Attempts: Integer;
     begin
-        if QueueRow.Get(StoreCode, ReturnId) then
+        if QueueRow.FindSourceDoc(StoreCode, SourceDocType, ShopifyId) then
             QueueRow.Delete();
         // A draft left by an earlier run would be adopted instead of built; remove it so the test exercises the build.
-        while SpfyLegacyReturnMgt.FindDraftForReturn(StoreCode, ReturnId, SalesHeader) and (Attempts < 5) do begin
+        while SpfyLegacyReturnMgt.FindDraftForReturn(StoreCode, SourceDocType, ShopifyId, SalesHeader) and (Attempts < 5) do begin
             SalesHeader.Delete(true);
             Attempts += 1;
         end;
         QueueRow.Init();
+        QueueRow."Entry No." := 0;
         QueueRow."Shopify Store Code" := StoreCode;
-        QueueRow."Return Id" := ReturnId;
+        QueueRow."Source Doc. Type" := SourceDocType;
+        QueueRow."Source Doc. ID" := ShopifyId;
         QueueRow."Order Id" := OrderId;
-        QueueRow."Return Name" := '#' + OrderId + '-R1';
+        QueueRow."Source Doc. Name" := CopyStr(SourceDocName, 1, MaxStrLen(QueueRow."Source Doc. Name"));
         QueueRow.Status := QueueRow.Status::New;
         QueueRow.Insert(true);
     end;
@@ -607,8 +714,10 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     /// Mock return of Qty NP gift cards from one order line (property _is_giftcard, no SKU), taxes included, refunded GrossAmount in one refund line.
     /// </summary>
     procedure ReturnDetailResponseGiftCard(ReturnId: Text; OrderId: Text; OrderName: Text; LineItemId: Text; Qty: Integer; GrossAmount: Decimal; LocationId: Text; TransactionsJson: Text; Currency: Text): Text
+    var
+        ReturnDetailGiftCardTok: Label '{"data":{"return":{"id":"gid://shopify/Return/%1","name":"%3-R1","status":"CLOSED","closedAt":"2026-09-20T10:00:00Z","exchangeLineItems":{"edges":[]},"order":{"id":"gid://shopify/Order/%2","name":"%3","number":9001,"email":"anna@npretail.test","phone":null,"sourceName":"web","taxesIncluded":true,"currencyCode":"%8","presentmentCurrencyCode":"%8","customer":{"id":"gid://shopify/Customer/501","firstName":"Anna","lastName":"Test","defaultEmailAddress":{"emailAddress":"anna@npretail.test"},"defaultPhoneNumber":null,"defaultAddress":{"phone":null}},"billingAddress":{"firstName":"Anna","lastName":"Test","company":null,"countryCodeV2":"DK","zip":"2100","address1":"Testvej 1","address2":null,"city":"Copenhagen"},"shippingAddress":{"firstName":"Anna","lastName":"Test","company":null,"address1":"Testvej 1","address2":null,"zip":"2100","city":"Copenhagen","countryCodeV2":"DK","phone":null}},"returnShippingFees":[],"returnLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/ReturnLineItem/1","quantity":%5,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81","lineItem":{"id":"gid://shopify/LineItem/%4","sku":null,"title":"NP Gift Card","isGiftCard":false,"customAttributes":[{"key":"_is_giftcard","value":"1"},{"key":"_np_voucher_type","value":"np-giftcard"}],"variant":{"id":"gid://shopify/ProductVariant/2","sku":null,"barcode":null}}}}}]},"reverseFulfillmentOrders":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"lineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81"},"dispositions":[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%9"},"quantity":%5}]}}]}}}]},"refunds":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/Refund/1","transactions":{"pageInfo":{"hasNextPage":false},"edges":[%7]},"refundLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"quantity":%5,"subtotalSet":{"presentmentMoney":{"amount":"%6"}},"totalTaxSet":{"presentmentMoney":{"amount":"0"}},"lineItem":{"id":"gid://shopify/LineItem/%4","taxLines":[{"ratePercentage":0}]}}}]},"refundShippingLines":{"pageInfo":{"hasNextPage":false},"edges":[]},"orderAdjustments":{"pageInfo":{"hasNextPage":false},"edges":[]}}}]}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_ReturnDetailGiftCardTok, ReturnId, OrderId, OrderName, LineItemId, Qty, Format(GrossAmount, 0, 9), TransactionsJson, Currency, LocationId));
+        exit(StrSubstNo(ReturnDetailGiftCardTok, ReturnId, OrderId, OrderName, LineItemId, Qty, Format(GrossAmount, 0, 9), TransactionsJson, Currency, LocationId));
     end;
 
     /// <summary>
@@ -619,13 +728,14 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         ReturnLineEdges: Text;
         ReverseLineEdges: Text;
         Parcel: Integer;
+        GiftCardParcelReturnLineEdgeTok: Label '{"node":{"id":"gid://shopify/ReturnLineItem/%1","quantity":1,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%2","lineItem":{"id":"gid://shopify/LineItem/%3","sku":null,"title":"NP Gift Card","isGiftCard":false,"customAttributes":[{"key":"_is_giftcard","value":"1"},{"key":"_np_voucher_type","value":"np-giftcard"}],"variant":{"id":"gid://shopify/ProductVariant/2","sku":null,"barcode":null}}}}}', Locked = true;
     begin
         for Parcel := 1 to ParcelCount do begin
             if Parcel > 1 then begin
                 ReturnLineEdges += ',';
                 ReverseLineEdges += ',';
             end;
-            ReturnLineEdges += StrSubstNo(_GiftCardParcelReturnLineEdgeTok, Parcel, 80 + Parcel, LineItemId);
+            ReturnLineEdges += StrSubstNo(GiftCardParcelReturnLineEdgeTok, Parcel, 80 + Parcel, LineItemId);
             ReverseLineEdges += StrSubstNo(_ParcelReverseLineEdgeTok, 80 + Parcel, LocationId);
         end;
         exit(StrSubstNo(_ReturnDetailParcelsTok, ReturnId, OrderId, OrderName, LineItemId, Format(GrossAmount, 0, 9), '0', '0', TransactionsJson, Currency, ReturnLineEdges, ReverseLineEdges, ParcelCount));
@@ -649,16 +759,20 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     end;
 
     procedure TwoRestockedDispositionsJson(FirstLocationId: Text; SecondLocationId: Text): Text
+    var
+        TwoRestockedDispositionsTok: Label '[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%1"},"quantity":1},{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%2"},"quantity":1}]', Locked = true;
     begin
-        exit(StrSubstNo(_TwoRestockedDispositionsTok, FirstLocationId, SecondLocationId));
+        exit(StrSubstNo(TwoRestockedDispositionsTok, FirstLocationId, SecondLocationId));
     end;
 
     /// <summary>
     /// A return list page whose orders connection always reports another page with the same cursor.
     /// </summary>
     procedure ReturnListResponseNeverEnding(OrderGid: Text; ReturnGid: Text): Text
+    var
+        ReturnListNeverEndingTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[{"node":{"id":"%2","name":"#R1","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"2026-09-20T10:00:00Z"}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}],"pageInfo":{"endCursor":"CURSOR1","hasNextPage":true}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_ReturnListNeverEndingTok, OrderGid, ReturnGid));
+        exit(StrSubstNo(ReturnListNeverEndingTok, OrderGid, ReturnGid));
     end;
 
     /// <summary>
@@ -694,9 +808,11 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     var
         ReturnLineEdges: Text;
         ReverseLineEdges: Text;
+        ParcelReturnLineEdgeQtyTok: Label '{"node":{"id":"gid://shopify/ReturnLineItem/%1","quantity":%5,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%2","lineItem":{"id":"gid://shopify/LineItem/%3","sku":"%4","title":"Test jacket","variant":{"id":"gid://shopify/ProductVariant/1","sku":"%4","barcode":null}}}}}', Locked = true;
+        ParcelReverseLineEdgeQtyTok: Label '{"node":{"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%1"},"dispositions":[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%2"},"quantity":%3}]}}', Locked = true;
     begin
-        ReturnLineEdges := StrSubstNo(_ParcelReturnLineEdgeQtyTok, 1, 81, LineItemId, Sku, FirstQty) + ',' + StrSubstNo(_ParcelReturnLineEdgeQtyTok, 2, 82, LineItemId, Sku, SecondQty);
-        ReverseLineEdges := StrSubstNo(_ParcelReverseLineEdgeQtyTok, 81, LocationId, FirstQty) + ',' + StrSubstNo(_ParcelReverseLineEdgeQtyTok, 82, LocationId, SecondQty);
+        ReturnLineEdges := StrSubstNo(ParcelReturnLineEdgeQtyTok, 1, 81, LineItemId, Sku, FirstQty) + ',' + StrSubstNo(ParcelReturnLineEdgeQtyTok, 2, 82, LineItemId, Sku, SecondQty);
+        ReverseLineEdges := StrSubstNo(ParcelReverseLineEdgeQtyTok, 81, LocationId, FirstQty) + ',' + StrSubstNo(ParcelReverseLineEdgeQtyTok, 82, LocationId, SecondQty);
         exit(StrSubstNo(_ReturnDetailParcelsTok, ReturnId, OrderId, OrderName, LineItemId, Format(NetAmount, 0, 9), Format(TaxAmount, 0, 9), Format(VatRate, 0, 9), TransactionsJson, Currency, ReturnLineEdges, ReverseLineEdges, FirstQty + SecondQty));
     end;
 
@@ -704,8 +820,10 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     /// A card refund whose shop-currency leg differs from the presentment leg, as on a store selling in another currency.
     /// </summary>
     procedure RefundTxnJsonWithShopMoney(TxnId: Text; Gateway: Text; Amount: Decimal; Currency: Text; ShopAmount: Decimal; ShopCurrency: Text): Text
+    var
+        RefundTxnShopMoneyTok: Label '{"node":{"id":"gid://shopify/OrderTransaction/%1","kind":"REFUND","status":"SUCCESS","gateway":"%2","processedAt":"2026-09-20T10:00:00Z","createdAt":"2026-09-20T10:00:00Z","paymentId":"pay_%1","receiptJson":null,"amountSet":{"presentmentMoney":{"amount":"%3","currencyCode":"%4"},"shopMoney":{"amount":"%5","currencyCode":"%6"}}}}', Locked = true;
     begin
-        exit(StrSubstNo(_RefundTxnShopMoneyTok, TxnId, Gateway, Format(Amount, 0, 9), Currency, Format(ShopAmount, 0, 9), ShopCurrency));
+        exit(StrSubstNo(RefundTxnShopMoneyTok, TxnId, Gateway, Format(Amount, 0, 9), Currency, Format(ShopAmount, 0, 9), ShopCurrency));
     end;
 
     /// <summary>
@@ -724,12 +842,13 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     procedure RefundTxnJson(TxnId: Text; Gateway: Text; Amount: Decimal; Currency: Text; GiftCardId: Text): Text
     var
         Receipt: Text;
+        RefundTxnTok: Label '{"node":{"id":"gid://shopify/OrderTransaction/%1","kind":"REFUND","status":"SUCCESS","gateway":"%2","processedAt":"2026-09-20T10:00:00Z","createdAt":"2026-09-20T10:00:00Z","paymentId":"pay_%1","receiptJson":%5,"paymentDetails":null,"amountSet":{"presentmentMoney":{"amount":"%3","currencyCode":"%4"},"shopMoney":{"amount":"%3","currencyCode":"%4"}}}}', Locked = true;
     begin
         if GiftCardId = '' then
             Receipt := 'null'
         else
             Receipt := '"{\"gift_card_id\":' + GiftCardId + '}"';
-        exit(StrSubstNo(_RefundTxnTok, TxnId, Gateway, Format(Amount, 0, 9), Currency, Receipt));
+        exit(StrSubstNo(RefundTxnTok, TxnId, Gateway, Format(Amount, 0, 9), Currency, Receipt));
     end;
 
     /// <summary>
@@ -741,35 +860,12 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     end;
 
     var
-        _LibrarySales: Codeunit "Library - Sales";
-        _LibraryInventory: Codeunit "Library - Inventory";
         _LibraryERM: Codeunit "Library - ERM";
         _NoSeriesInitialized: Boolean;
-        _StoreCodeTok: Label 'SPFYLRSTORE', Locked = true;
-        _EcStoreCodeTok: Label 'SPFYLREC', Locked = true;
-        _LocationCodeTok: Label 'SPFYLRLOC', Locked = true;
-        _ShopifyLocationIdTok: Label '71001', Locked = true;
-        _SalespersonTok: Label 'SPFYLRSP', Locked = true;
         _VoucherTypeTok: Label 'SPFYLRGC', Locked = true;
         _LibrarySpfyVoucher: Codeunit "NPR Library - Spfy Voucher";
-        _ReturnListTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[{"node":{"id":"%3","name":"%4","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"%5"}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}', Locked = true;
-        _ReturnListMoreReturnsTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[{"node":{"id":"%2","name":"#R1","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"2026-09-20T10:00:00Z"}}],"pageInfo":{"endCursor":"CURSOR1","hasNextPage":true}}}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}', Locked = true;
-        _OrderReturnsNeverEndingTok: Label '{"data":{"order":{"returns":{"edges":[{"node":{"id":"%1","name":"#R1","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"2026-09-20T10:00:00Z"}}],"pageInfo":{"endCursor":"CURSOR1","hasNextPage":true}}}}}', Locked = true;
-        _ReturnDetailTok: Label '{"data":{"return":{"id":"gid://shopify/Return/%1","name":"%3-R1","status":"CLOSED","closedAt":"2026-09-20T10:00:00Z","exchangeLineItems":{"edges":[]},"order":{"id":"gid://shopify/Order/%2","name":"%3","number":9001,"email":"anna@npretail.test","phone":null,"sourceName":"web","taxesIncluded":false,"currencyCode":"%12","presentmentCurrencyCode":"%12","customer":{"id":"gid://shopify/Customer/501","firstName":"Anna","lastName":"Test","defaultEmailAddress":{"emailAddress":"anna@npretail.test"},"defaultPhoneNumber":null,"defaultAddress":{"phone":null}},"billingAddress":{"firstName":"Anna","lastName":"Test","company":null,"countryCodeV2":"DK","zip":"2100","address1":"Testvej 1","address2":null,"city":"Copenhagen"},"shippingAddress":{"firstName":"Anna","lastName":"Test","company":null,"address1":"Testvej 1","address2":null,"zip":"2100","city":"Copenhagen","countryCodeV2":"DK","phone":null}},"returnShippingFees":%14,"returnLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/ReturnLineItem/1","quantity":%6,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81","lineItem":{"id":"gid://shopify/LineItem/%5","sku":"%4","title":"Test jacket","variant":{"id":"gid://shopify/ProductVariant/1","sku":"%4","barcode":null}}}}}]},"reverseFulfillmentOrders":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"lineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81"},"dispositions":%13}}]}}}]},"refunds":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/Refund/1","transactions":{"pageInfo":{"hasNextPage":false},"edges":[%11]},"refundLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"quantity":%6,"subtotalSet":{"presentmentMoney":{"amount":"%7"}},"totalTaxSet":{"presentmentMoney":{"amount":"%8"}},"lineItem":{"id":"gid://shopify/LineItem/%5","taxLines":[{"ratePercentage":%9}]}}}]},"refundShippingLines":{"pageInfo":{"hasNextPage":false},"edges":[%15]},"orderAdjustments":{"pageInfo":{"hasNextPage":false},"edges":[%16]}}}]}}}}', Locked = true;
         _ReturnDetailParcelsTok: Label '{"data":{"return":{"id":"gid://shopify/Return/%1","name":"%3-R1","status":"CLOSED","closedAt":"2026-09-20T10:00:00Z","exchangeLineItems":{"edges":[]},"order":{"id":"gid://shopify/Order/%2","name":"%3","number":9001,"email":"anna@npretail.test","phone":null,"sourceName":"web","taxesIncluded":false,"currencyCode":"%9","presentmentCurrencyCode":"%9","customer":{"id":"gid://shopify/Customer/501","firstName":"Anna","lastName":"Test","defaultEmailAddress":{"emailAddress":"anna@npretail.test"},"defaultPhoneNumber":null,"defaultAddress":{"phone":null}},"billingAddress":{"firstName":"Anna","lastName":"Test","company":null,"countryCodeV2":"DK","zip":"2100","address1":"Testvej 1","address2":null,"city":"Copenhagen"},"shippingAddress":{"firstName":"Anna","lastName":"Test","company":null,"address1":"Testvej 1","address2":null,"zip":"2100","city":"Copenhagen","countryCodeV2":"DK","phone":null}},"returnShippingFees":[],"returnLineItems":{"pageInfo":{"hasNextPage":false},"edges":[%10]},"reverseFulfillmentOrders":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"lineItems":{"pageInfo":{"hasNextPage":false},"edges":[%11]}}}]},"refunds":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/Refund/1","transactions":{"pageInfo":{"hasNextPage":false},"edges":[%8]},"refundLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"quantity":%12,"subtotalSet":{"presentmentMoney":{"amount":"%5"}},"totalTaxSet":{"presentmentMoney":{"amount":"%6"}},"lineItem":{"id":"gid://shopify/LineItem/%4","taxLines":[{"ratePercentage":%7}]}}}]},"refundShippingLines":{"pageInfo":{"hasNextPage":false},"edges":[]},"orderAdjustments":{"pageInfo":{"hasNextPage":false},"edges":[]}}}]}}}}', Locked = true;
         _ParcelReturnLineEdgeTok: Label '{"node":{"id":"gid://shopify/ReturnLineItem/%1","quantity":1,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%2","lineItem":{"id":"gid://shopify/LineItem/%3","sku":"%4","title":"Test jacket","variant":{"id":"gid://shopify/ProductVariant/1","sku":"%4","barcode":null}}}}}', Locked = true;
         _ParcelReverseLineEdgeTok: Label '{"node":{"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%1"},"dispositions":[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%2"},"quantity":1}]}}', Locked = true;
-        _ParcelReturnLineEdgeQtyTok: Label '{"node":{"id":"gid://shopify/ReturnLineItem/%1","quantity":%5,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%2","lineItem":{"id":"gid://shopify/LineItem/%3","sku":"%4","title":"Test jacket","variant":{"id":"gid://shopify/ProductVariant/1","sku":"%4","barcode":null}}}}}', Locked = true;
-        _ParcelReverseLineEdgeQtyTok: Label '{"node":{"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%1"},"dispositions":[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%2"},"quantity":%3}]}}', Locked = true;
-        _GiftCardParcelReturnLineEdgeTok: Label '{"node":{"id":"gid://shopify/ReturnLineItem/%1","quantity":1,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/%2","lineItem":{"id":"gid://shopify/LineItem/%3","sku":null,"title":"NP Gift Card","isGiftCard":false,"customAttributes":[{"key":"_is_giftcard","value":"1"},{"key":"_np_voucher_type","value":"np-giftcard"}],"variant":{"id":"gid://shopify/ProductVariant/2","sku":null,"barcode":null}}}}}', Locked = true;
-        _RefundTxnTok: Label '{"node":{"id":"gid://shopify/OrderTransaction/%1","kind":"REFUND","status":"SUCCESS","gateway":"%2","processedAt":"2026-09-20T10:00:00Z","createdAt":"2026-09-20T10:00:00Z","paymentId":"pay_%1","receiptJson":%5,"paymentDetails":null,"amountSet":{"presentmentMoney":{"amount":"%3","currencyCode":"%4"},"shopMoney":{"amount":"%3","currencyCode":"%4"}}}}', Locked = true;
-        _RefundTxnShopMoneyTok: Label '{"node":{"id":"gid://shopify/OrderTransaction/%1","kind":"REFUND","status":"SUCCESS","gateway":"%2","processedAt":"2026-09-20T10:00:00Z","createdAt":"2026-09-20T10:00:00Z","paymentId":"pay_%1","receiptJson":null,"amountSet":{"presentmentMoney":{"amount":"%3","currencyCode":"%4"},"shopMoney":{"amount":"%5","currencyCode":"%6"}}}}', Locked = true;
         _SingleRestockedDispositionTok: Label '[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%1"},"quantity":%2}]', Locked = true;
-        _ReturnShippingFeeTok: Label '[{"amountSet":{"presentmentMoney":{"amount":"%1"}}}]', Locked = true;
-        _ReturnDetailGiftCardTok: Label '{"data":{"return":{"id":"gid://shopify/Return/%1","name":"%3-R1","status":"CLOSED","closedAt":"2026-09-20T10:00:00Z","exchangeLineItems":{"edges":[]},"order":{"id":"gid://shopify/Order/%2","name":"%3","number":9001,"email":"anna@npretail.test","phone":null,"sourceName":"web","taxesIncluded":true,"currencyCode":"%8","presentmentCurrencyCode":"%8","customer":{"id":"gid://shopify/Customer/501","firstName":"Anna","lastName":"Test","defaultEmailAddress":{"emailAddress":"anna@npretail.test"},"defaultPhoneNumber":null,"defaultAddress":{"phone":null}},"billingAddress":{"firstName":"Anna","lastName":"Test","company":null,"countryCodeV2":"DK","zip":"2100","address1":"Testvej 1","address2":null,"city":"Copenhagen"},"shippingAddress":{"firstName":"Anna","lastName":"Test","company":null,"address1":"Testvej 1","address2":null,"zip":"2100","city":"Copenhagen","countryCodeV2":"DK","phone":null}},"returnShippingFees":[],"returnLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/ReturnLineItem/1","quantity":%5,"restockingFee":null,"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81","lineItem":{"id":"gid://shopify/LineItem/%4","sku":null,"title":"NP Gift Card","isGiftCard":false,"customAttributes":[{"key":"_is_giftcard","value":"1"},{"key":"_np_voucher_type","value":"np-giftcard"}],"variant":{"id":"gid://shopify/ProductVariant/2","sku":null,"barcode":null}}}}}]},"reverseFulfillmentOrders":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"lineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"fulfillmentLineItem":{"id":"gid://shopify/FulfillmentLineItem/81"},"dispositions":[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%9"},"quantity":%5}]}}]}}}]},"refunds":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"id":"gid://shopify/Refund/1","transactions":{"pageInfo":{"hasNextPage":false},"edges":[%7]},"refundLineItems":{"pageInfo":{"hasNextPage":false},"edges":[{"node":{"quantity":%5,"subtotalSet":{"presentmentMoney":{"amount":"%6"}},"totalTaxSet":{"presentmentMoney":{"amount":"0"}},"lineItem":{"id":"gid://shopify/LineItem/%4","taxLines":[{"ratePercentage":0}]}}}]},"refundShippingLines":{"pageInfo":{"hasNextPage":false},"edges":[]},"orderAdjustments":{"pageInfo":{"hasNextPage":false},"edges":[]}}}]}}}}', Locked = true;
-        _RefundShippingLineTok: Label '{"node":{"subtotalAmountSet":{"presentmentMoney":{"amount":"%1"}},"taxAmountSet":{"presentmentMoney":{"amount":"%2"}}}}', Locked = true;
-        _OrderAdjustmentTok: Label '{"node":{"amountSet":{"presentmentMoney":{"amount":"%1"}},"taxAmountSet":{"presentmentMoney":{"amount":"%2"}},"reason":"%3"}}', Locked = true;
-        _MixedDispositionsTok: Label '[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%1"},"quantity":1},{"type":"REJECTED","location":{"id":"gid://shopify/Location/%2"},"quantity":1}]', Locked = true;
-        _TwoRestockedDispositionsTok: Label '[{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%1"},"quantity":1},{"type":"RESTOCKED","location":{"id":"gid://shopify/Location/%2"},"quantity":1}]', Locked = true;
-        _ReturnListNeverEndingTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[{"node":{"id":"%2","name":"#R1","status":"CLOSED","createdAt":"2026-09-19T09:00:00Z","closedAt":"2026-09-20T10:00:00Z"}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}],"pageInfo":{"endCursor":"CURSOR1","hasNextPage":true}}}}', Locked = true;
 }

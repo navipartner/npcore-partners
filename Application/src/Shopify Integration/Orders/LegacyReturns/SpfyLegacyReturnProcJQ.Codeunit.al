@@ -13,11 +13,10 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         _ReportedToSentry: List of [Text];
         _MaxRunDuration: Duration;
         _ClaimStaleBefore: DateTime;
-        _AttemptLostErr: Label 'The last attempt to import Shopify return %1 did not finish and its session was lost. The retry limit of %2 is reached, so the return is not attempted again.', Comment = '%1 = Shopify return name, %2 = retry limit';
 
     internal procedure ProcessQueue(JobQueueEntry: Record "Job Queue Entry")
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
         StartedAt: DateTime;
     begin
@@ -34,12 +33,15 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         ProcessRows(QueueRow, StartedAt, MaxRetryCount(), 0DT);
         QueueRow.SetRange(Status, QueueRow.Status::Processing);
         ProcessRows(QueueRow, StartedAt, 0, _ClaimStaleBefore);
+        // A waiting row is looked at on every run and never counted. It calls Shopify only when BC alone cannot tell whether the wait is over: a pending refund transaction or an order not in BC yet.
+        QueueRow.SetRange(Status, QueueRow.Status::Waiting);
+        ProcessRows(QueueRow, StartedAt, 0, 0DT);
     end;
 
-    local procedure ProcessRows(var QueueRowFilter: Record "NPR Spfy Legacy Return Queue"; StartedAt: DateTime; RetryCountLimit: Integer; StaleBeforeParam: DateTime)
+    local procedure ProcessRows(var QueueRowFilter: Record "NPR Spfy NC Return Queue"; StartedAt: DateTime; RetryCountLimit: Integer; StaleBeforeParam: DateTime)
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
-        TempQueueRow: Record "NPR Spfy Legacy Return Queue" temporary;
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        TempQueueRow: Record "NPR Spfy NC Return Queue" temporary;
     begin
         if CurrentDateTime() - StartedAt > _MaxRunDuration then
             exit;
@@ -54,7 +56,7 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         repeat
             if CurrentDateTime() - StartedAt > _MaxRunDuration then
                 exit;
-            if QueueRow.Get(TempQueueRow."Shopify Store Code", TempQueueRow."Return Id") then
+            if QueueRow.Get(TempQueueRow."Entry No.") then
                 if _SpfyLegacyReturnMgt.MarkImportedIfCreditMemoPosted(QueueRow) then
                     Commit()
                 else
@@ -79,7 +81,7 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
     /// <summary>
     /// The job's own stale rule, so the claim and the pass that selected the row agree; a page action has no job entry and uses the registered interval.
     /// </summary>
-    local procedure IsHeldByAnotherSession(QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    local procedure IsHeldByAnotherSession(QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     begin
         if _ClaimStaleBefore = 0DT then
             exit(_SpfyLegacyReturnMgt.IsBeingProcessed(QueueRow));
@@ -89,11 +91,14 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
     /// <summary>
     /// A stale Processing row counts as a lost attempt; at the retry limit the row ends at Error instead of being picked up forever.
     /// </summary>
-    local procedure CountLostAttempt(var QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    local procedure CountLostAttempt(var QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
+    var
+        SpfyLegacyReturnAPI: Codeunit "NPR Spfy Legacy Return API";
+        AttemptLostErr: Label 'The last attempt to import Shopify %1 did not finish and its session was lost. The retry limit of %2 is reached, so it is not attempted again.', Comment = '%1 = Shopify document caption, %2 = retry limit';
     begin
         // Re-read under a lock: a page action may have claimed the row since the snapshot, and a blind Modify would collide with it.
         QueueRow.LockTable();
-        if not QueueRow.Get(QueueRow."Shopify Store Code", QueueRow."Return Id") then
+        if not QueueRow.Get(QueueRow."Entry No.") then
             exit(false);
         if (QueueRow.Status <> QueueRow.Status::Processing) or (QueueRow."Processed At" >= _ClaimStaleBefore) then
             exit(false);
@@ -102,17 +107,17 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
             QueueRow.Modify();
             exit(true);
         end;
-        QueueRow.Status := QueueRow.Status::Error;
-        QueueRow."Last Error" := CopyStr(StrSubstNo(_AttemptLostErr, QueueRow."Return Name", MaxRetryCount()), 1, MaxStrLen(QueueRow."Last Error"));
+        QueueRow.Validate(Status, QueueRow.Status::Error);
+        QueueRow."Last Error" := CopyStr(StrSubstNo(AttemptLostErr, SpfyLegacyReturnAPI.DocumentCaption(QueueRow."Source Doc. Type", QueueRow."Source Doc. Name", QueueRow."Source Doc. ID"), MaxRetryCount()), 1, MaxStrLen(QueueRow."Last Error"));
         QueueRow."Processed At" := CurrentDateTime();
         QueueRow.Modify();
         exit(false);
     end;
 
     /// <summary>
-    /// Claims and imports the row; false when the row was gone, dismissed, imported or held by another session, so a page action can say so.
+    /// Claims and imports the row; false when the feature was switched on or the row could not be claimed, so a page action can say so.
     /// </summary>
-    internal procedure ProcessRow(var QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    internal procedure ProcessRow(var QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     var
         ErrorText: Text;
         Succeeded: Boolean;
@@ -124,13 +129,13 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         // Claim under a lock: a page action and the job may both have passed their guard, or the row may be gone.
         // Get, not Find: the page hands over its filtered record, and Find would honour a filter the claim moves the row out of.
         QueueRow.LockTable();
-        if not QueueRow.Get(QueueRow."Shopify Store Code", QueueRow."Return Id") then
+        if not QueueRow.Get(QueueRow."Entry No.") then
             exit(false);
-        if QueueRow.Status in [QueueRow.Status::Dismissed, QueueRow.Status::Imported] then
+        if QueueRow.Status in [QueueRow.Status::Dismissed, QueueRow.Status::Imported, QueueRow.Status::"Nothing to Credit"] then
             exit(false);
         if IsHeldByAnotherSession(QueueRow) then
             exit(false);
-        QueueRow.Status := QueueRow.Status::Processing;
+        QueueRow.Validate(Status, QueueRow.Status::Processing);
         QueueRow."Processed At" := CurrentDateTime();
         QueueRow.Modify();
         Commit();
@@ -139,27 +144,31 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         Succeeded := Codeunit.Run(Codeunit::"NPR Spfy Legacy Return Import", QueueRow);
         if not Succeeded then
             ErrorText := GetLastErrorText();
-        if not QueueRow.Get(QueueRow."Shopify Store Code", QueueRow."Return Id") then
+        if not QueueRow.Get(QueueRow."Entry No.") then
             exit(true);
         // An error raised after Sales-Post committed still leaves a posted, settled credit memo; a bug behind it is still reported.
         Posted := _SpfyLegacyReturnMgt.IsCreditMemoPosted(QueueRow);
-        if Succeeded or Posted then begin
-            if not Succeeded then
-                EmitSentryError(QueueRow);
-            if Posted then
-                QueueRow.Status := QueueRow.Status::Imported
-            else
-                QueueRow.Status := QueueRow.Status::"Draft Created";
-            QueueRow."Last Error" := '';
-            // A successful attempt gives a draft posted later by hand a full retry budget again.
+        if Succeeded and (QueueRow.Status in [QueueRow.Status::Waiting, QueueRow.Status::"Nothing to Credit"]) then begin
             QueueRow."Retry Count" := 0;
-        end else begin
-            QueueRow.Status := QueueRow.Status::Error;
-            QueueRow."Retry Count" += 1;
-            QueueRow."Last Error" := CopyStr(ErrorText, 1, MaxStrLen(QueueRow."Last Error"));
-            if QueueRow."Retry Count" >= MaxRetryCount() then
-                EmitSentryError(QueueRow);
-        end;
+            QueueRow."Last Error" := '';
+        end else
+            if Succeeded or Posted then begin
+                if not Succeeded then
+                    EmitSentryError(QueueRow);
+                if Posted then
+                    QueueRow.Validate(Status, QueueRow.Status::Imported)
+                else
+                    QueueRow.Validate(Status, QueueRow.Status::"Draft Created");
+                QueueRow."Last Error" := '';
+                // A successful attempt gives a draft posted later by hand a full retry budget again.
+                QueueRow."Retry Count" := 0;
+            end else begin
+                QueueRow.Validate(Status, QueueRow.Status::Error);
+                QueueRow."Retry Count" += 1;
+                QueueRow."Last Error" := CopyStr(ErrorText, 1, MaxStrLen(QueueRow."Last Error"));
+                if QueueRow."Retry Count" >= MaxRetryCount() then
+                    EmitSentryError(QueueRow);
+            end;
         QueueRow."Processed At" := CurrentDateTime();
         QueueRow.Modify();
         exit(true);
@@ -181,7 +190,7 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         exit(_SpfyLegacyReturnMgt.StaleBefore(JobQueueEntry."No. of Minutes between Runs"));
     end;
 
-    local procedure EmitSentryError(QueueRow: Record "NPR Spfy Legacy Return Queue")
+    local procedure EmitSentryError(QueueRow: Record "NPR Spfy NC Return Queue")
     var
         TransactionNameLbl: Label 'Shopify legacy return import failed: %1', Comment = '%1 = Shopify store code', Locked = true;
         ReportKey: Text;
@@ -193,7 +202,7 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         if _ReportedToSentry.Contains(ReportKey) then
             exit;
         // The key is recorded only after a report, so a harmless failure at the same site never hides a later bug.
-        if _SpfyLegacyReturnMgt.ReportProgrammingBugToSentry(QueueRow."Shopify Store Code", QueueRow."Return Id", StrSubstNo(TransactionNameLbl, QueueRow."Shopify Store Code"), 'bc.shopify.legacyreturn.process.error') then
+        if _SpfyLegacyReturnMgt.ReportProgrammingBugToSentry(QueueRow."Shopify Store Code", QueueRow."Source Doc. ID", StrSubstNo(TransactionNameLbl, QueueRow."Shopify Store Code"), 'bc.shopify.legacyreturn.process.error') then
             _ReportedToSentry.Add(ReportKey);
     end;
 }

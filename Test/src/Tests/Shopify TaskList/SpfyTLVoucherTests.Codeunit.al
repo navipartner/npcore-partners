@@ -1192,6 +1192,58 @@ codeunit 85443 "NPR Spfy TL Voucher Tests"
     end;
 
     [Test]
+    procedure GivenRefundAlreadyCreditedAtShopify_WhenThePaymentReversalSyncs_ThenNoBalanceAdjustmentIsSent()
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        ReversalEntry: Record "NPR NpRv Voucher Entry";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Task Send Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] When a Shopify refund to a gift card is imported as a reversed payment, the balance sync triggered by that entry finds Business Central and Shopify equal and sends no credit or debit, so the refund is not given twice or taken back.
+        Initialize();
+        StoreCode := CreateVoucherStore();
+
+        // [GIVEN] A synced voucher issued with 100 of which 60 was spent, so 40 is left
+        _Lib.CreateVoucherFixture(Voucher, StoreCode, true);
+        InsertVoucherEntry(VoucherEntry, Voucher, false);
+        VoucherEntry."Remaining Amount" := 40;
+        VoucherEntry.Positive := true;
+        VoucherEntry.Open := true;
+        VoucherEntry.Modify(false);
+
+        // [GIVEN] Shopify refunded 30 to the gift card and the import reversed 30 of the payment for the credit memo
+        NpRvVoucherMgt.PostPaymentReversalForCreditMemo(Voucher, 30, WorkDate(), 'SCM-TLV1', 'TLV-R1');
+        ReversalEntry.SetRange("Voucher No.", Voucher."No.");
+        ReversalEntry.SetRange("Entry Type", ReversalEntry."Entry Type"::Payment);
+        ReversalEntry.SetRange(Correction, true);
+        ReversalEntry.FindFirst();
+        RecRef.GetTable(ReversalEntry);
+        TaskEntryNo := EnqueueVoucherTask(StoreCode, RecRef, ReversalEntry.RecordId(), Voucher."No.", "NPR Spfy Task Op"::Modify, CurrentDateTime());
+
+        // [GIVEN] Shopify already holds the 70 the card is worth after its own refund
+        MockClient.AddResponse('GetGiftCard', '{"data":{"giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":70.0,"currencyCode":""},"deactivatedAt":null}}}');
+        MockClient.AddResponse('giftCardCredit', '{"data":{"giftCardCredit":{"giftCardCreditTransaction":{"id":"gid://shopify/GiftCardCreditTransaction/1","amount":{"amount":"30","currencyCode":""},"processedAt":"2026-09-01T15:00:00Z","note":"test","giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":"100","currencyCode":""}}},"userErrors":[]}}}');
+        MockClient.AddResponse('giftCardDebit', '{"data":{"giftCardDebit":{"giftCardDebitTransaction":{"id":"gid://shopify/GiftCardDebitTransaction/1","amount":{"amount":"30","currencyCode":""},"processedAt":"2026-09-01T15:00:00Z","note":"test","giftCard":{"id":"gid://shopify/GiftCard/7001","balance":{"amount":"40","currencyCode":""}}},"userErrors":[]}}}');
+
+        // [WHEN] The voucher sibling runs for the reversal entry
+        GetTask(TaskEntryNo, SpfyTask);
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(SpfyTask);
+
+        // [THEN] The sync read the card's balance at Shopify
+        _Assert.IsTrue(MockClient.CountRequestsContaining('GetGiftCard') > 0, 'The sync must compare against the balance Shopify holds');
+        // [THEN] No balance adjustment is sent
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining('giftCardCredit'), 'A refund Shopify already credited must not be credited again');
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining('giftCardDebit'), 'A refund Shopify already credited must not be taken back');
+    end;
+
+    [Test]
     procedure GivenArchivedSyncedVoucherDisable_WhenVoucherSiblingRunsAgainstMock_ThenArchRowStampedDisabledAtShopify()
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";

@@ -752,14 +752,31 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     [TryFunction]
     internal procedure GetReturnList(var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; QueryFilters: Text)
     var
+        ReturnListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id updatedAt returns(first: 10, query: "status:CLOSED") { edges { node { id name status createdAt closedAt } } pageInfo { endCursor hasNextPage } } } } pageInfo { endCursor hasNextPage } } }', Locked = true;
+    begin
+        GetOrderListPage(ReturnListRequest, HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, QueryFilters);
+    end;
+
+    /// <summary>
+    /// The return list plus each order's refunds, for the legacy engine, which also imports refunds made without a return.
+    /// </summary>
+    [TryFunction]
+    internal procedure GetReturnAndRefundList(var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; QueryFilters: Text)
+    var
+        ReturnAndRefundListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id name updatedAt returns(first: 10, query: "status:CLOSED") { edges { node { id name status createdAt closedAt } } pageInfo { endCursor hasNextPage } } refunds(first: 50) { id createdAt return { id } } } } pageInfo { endCursor hasNextPage } } }', Locked = true;
+    begin
+        GetOrderListPage(ReturnAndRefundListRequest, HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, QueryFilters);
+    end;
+
+    local procedure GetOrderListPage(RequestText: Text; var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; QueryFilters: Text)
+    var
         NcTask: Record "NPR Nc Task";
         ResponseBody: JsonToken;
-        ReturnListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id updatedAt returns(first: 10, query: "status:CLOSED") { edges { node { id name status createdAt closedAt } } pageInfo { endCursor hasNextPage } } } } pageInfo { endCursor hasNextPage } } }', Locked = true;
     begin
         HasNext := false;
         Clear(OrdersArr);
         ClearLastError();
-        CreateRequestForList(NcTask, Cursor, ShopifyStore.Code, ReturnListRequest, QueryFilters);
+        CreateRequestForList(NcTask, Cursor, ShopifyStore.Code, RequestText, QueryFilters);
         if not GetGraphQLClient().ExecuteRequest(NcTask, false, ShopifyResponse) then
             Error(GetLastErrorText());
         Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.orders.pageInfo.endCursor', false);

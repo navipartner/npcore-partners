@@ -2,7 +2,7 @@ page 6150966 "NPR Spfy Legacy Return Queue"
 {
     Caption = 'Shopify Legacy Return Queue';
     PageType = List;
-    SourceTable = "NPR Spfy Legacy Return Queue";
+    SourceTable = "NPR Spfy NC Return Queue";
     UsageCategory = Lists;
     ApplicationArea = NPRShopify;
     Editable = false;
@@ -17,22 +17,24 @@ page 6150966 "NPR Spfy Legacy Return Queue"
         {
             repeater(Rows)
             {
-                field("Shopify Store Code"; Rec."Shopify Store Code") { ToolTip = 'Specifies the Shopify store the return belongs to.'; ApplicationArea = NPRShopify; }
-                field("Return Name"; Rec."Return Name") { ToolTip = 'Specifies the return name shown in Shopify.'; ApplicationArea = NPRShopify; }
-                field("Return Id"; Rec."Return Id") { Caption = 'Shopify Return ID'; ToolTip = 'Specifies the Shopify return ID.'; ApplicationArea = NPRShopify; }
-                field("Order Id"; Rec."Order Id") { ToolTip = 'Specifies the Shopify order id the return belongs to.'; ApplicationArea = NPRShopify; Visible = false; }
-                field(Status; Rec.Status) { ToolTip = 'Specifies where the return is in the import.'; ApplicationArea = NPRShopify; StyleExpr = _StatusStyle; }
-                field("Detected At"; Rec."Detected At") { ToolTip = 'Specifies when the poll first saw the closed return.'; ApplicationArea = NPRShopify; }
-                field("Processed At"; Rec."Processed At") { ToolTip = 'Specifies when the return was last attempted or dismissed.'; ApplicationArea = NPRShopify; }
+                field("Shopify Store Code"; Rec."Shopify Store Code") { ToolTip = 'Specifies the Shopify store the return or refund belongs to.'; ApplicationArea = NPRShopify; }
+                field("Entry No."; Rec."Entry No.") { ToolTip = 'Specifies the number of the queue row.'; ApplicationArea = NPRShopify; Visible = false; }
+                field("Source Doc. Type"; Rec."Source Doc. Type") { ToolTip = 'Specifies whether the row imports a Shopify return or a refund made without a return.'; ApplicationArea = NPRShopify; }
+                field("Source Doc. Name"; Rec."Source Doc. Name") { ToolTip = 'Specifies the return name shown in Shopify, or the order name for a refund made without a return, which has no name of its own.'; ApplicationArea = NPRShopify; }
+                field("Source Doc. ID"; Rec."Source Doc. ID") { ToolTip = 'Specifies the Shopify id of the return or of the refund made without a return.'; ApplicationArea = NPRShopify; }
+                field("Order Id"; Rec."Order Id") { ToolTip = 'Specifies the Shopify order id the return or refund belongs to.'; ApplicationArea = NPRShopify; Visible = false; }
+                field(Status; Rec.Status) { ToolTip = 'Specifies where the return or refund is in the import.'; ApplicationArea = NPRShopify; StyleExpr = _StatusStyle; }
+                field("Detected At"; Rec."Detected At") { ToolTip = 'Specifies when the poll first saw the closed return or the refund.'; ApplicationArea = NPRShopify; }
+                field("Processed At"; Rec."Processed At") { ToolTip = 'Specifies when the return or refund was last attempted or dismissed.'; ApplicationArea = NPRShopify; }
                 field("Retry Count"; Rec."Retry Count") { ToolTip = 'Specifies how many attempts count against the retry limit: failed ones and ones whose session was lost.'; ApplicationArea = NPRShopify; }
                 field("Last Error"; Rec."Last Error") { ToolTip = 'Specifies the error of the last failed attempt.'; ApplicationArea = NPRShopify; }
-                field("Sales Header Doc. No."; Rec."Sales Header Doc. No.") { ToolTip = 'Specifies the Sales Return Order built for the return. The number stays after posting, next to the posted document number.'; ApplicationArea = NPRShopify; }
+                field("Outcome Note"; Rec."Outcome Note") { ToolTip = 'Specifies what the return or refund waits for, or why a refund has nothing to credit.'; ApplicationArea = NPRShopify; }
+                field("Sales Header Doc. No."; Rec."Sales Header Doc. No.") { ToolTip = 'Specifies the Sales Return Order built for the return or refund. The number stays after posting, next to the posted document number.'; ApplicationArea = NPRShopify; }
                 field("Posted Doc. No."; Rec."Posted Doc. No.") { ToolTip = 'Specifies the posted credit memo or return receipt.'; ApplicationArea = NPRShopify; }
                 field("Location Fallback Used"; Rec."Location Fallback Used") { ToolTip = 'Specifies that the restock locations did not agree, so the store default was used.'; ApplicationArea = NPRShopify; }
                 field("Not Restocked"; Rec."Not Restocked") { ToolTip = 'Specifies that Shopify did not restock at least one line.'; ApplicationArea = NPRShopify; }
-                field("Gift Card Refund"; Rec."Gift Card Refund") { ToolTip = 'Specifies that part of the refund went back to a gift card or to Shopify store credit.'; ApplicationArea = NPRShopify; }
-                field("Voucher No."; Rec."Voucher No.") { ToolTip = 'Specifies the retail voucher that is credited for the gift card part of the refund when the return is posted.'; ApplicationArea = NPRShopify; }
-                field("Gift Card Refund Amount"; Rec."Gift Card Refund Amount") { ToolTip = 'Specifies the part of the refund that went back to gift cards or Shopify store credit.'; ApplicationArea = NPRShopify; }
+                field("Refund Gift Card Amount"; Rec."Refund Gift Card Amount") { ToolTip = 'Specifies the part of the refund that went back to gift cards or Shopify store credit.'; ApplicationArea = NPRShopify; }
+                field("Refund Voucher No."; Rec."Refund Voucher No.") { ToolTip = 'Specifies the retail voucher that is credited for the gift card part of the refund when the document is posted.'; ApplicationArea = NPRShopify; }
             }
         }
     }
@@ -45,7 +47,7 @@ page 6150966 "NPR Spfy Legacy Return Queue"
             {
                 Caption = 'Poll Shopify Now';
                 Image = Refresh;
-                ToolTip = 'Look for closed returns in every enabled store now, the same way the scheduled job does.';
+                ToolTip = 'Look for closed returns and for refunds made without a return in every enabled store now, the same way the scheduled job does.';
                 ApplicationArea = NPRShopify;
                 trigger OnAction()
                 var
@@ -61,23 +63,25 @@ page 6150966 "NPR Spfy Legacy Return Queue"
             {
                 Caption = 'Process';
                 Image = Process;
-                ToolTip = 'Import this return now, the same way the scheduled job does.';
+                ToolTip = 'Import this return or refund now, the same way the scheduled job does.';
                 ApplicationArea = NPRShopify;
                 trigger OnAction()
                 var
                     SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
                     SpfyLegacyReturnProcessJQ: Codeunit "NPR Spfy Legacy Return Proc JQ";
+                    SpfyLegacyReturnAPI: Codeunit "NPR Spfy Legacy Return API";
+                    NotClaimedMsg: Label 'Shopify %1 was not processed: another session claimed it a moment ago, or since the list was shown it was dismissed, imported, found to have nothing to credit or deleted.', Comment = '%1 = Shopify document caption';
                 begin
                     SpfyLegacyReturnMgt.ErrorIfEcommerceFeatureEnabled();
                     // Get, not Find: the page's filters would hide a row another session has moved to another status.
-                    Rec.Get(Rec."Shopify Store Code", Rec."Return Id");
+                    Rec.Get(Rec."Entry No.");
                     SpfyLegacyReturnMgt.ErrorIfDismissed(Rec);
                     if not SpfyLegacyReturnMgt.MarkImportedIfCreditMemoPosted(Rec) then begin
                         SpfyLegacyReturnMgt.ErrorIfAlreadyPosted(Rec);
                         SpfyLegacyReturnMgt.ErrorIfReturnsSwitchedOff(Rec."Shopify Store Code");
                         SpfyLegacyReturnMgt.ErrorIfBeingProcessed(Rec);
                         if not SpfyLegacyReturnProcessJQ.ProcessRow(Rec) then
-                            Message(_NotClaimedMsg, Rec."Return Name");
+                            Message(NotClaimedMsg, SpfyLegacyReturnAPI.DocumentCaption(Rec."Source Doc. Type", Rec."Source Doc. Name", Rec."Source Doc. ID"));
                     end;
                     CurrPage.Update(false);
                 end;
@@ -86,16 +90,16 @@ page 6150966 "NPR Spfy Legacy Return Queue"
             {
                 Caption = 'Discard Draft and Retry';
                 Image = Restore;
-                ToolTip = 'Delete the Sales Return Order created for this return and queue it again from the start. This also queues a dismissed return again.';
+                ToolTip = 'Delete the Sales Return Order created for this row and queue it again from the start. This also queues a dismissed row again.';
                 ApplicationArea = NPRShopify;
                 trigger OnAction()
                 var
                     SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
                 begin
                     SpfyLegacyReturnMgt.ErrorIfEcommerceFeatureEnabled();
-                    Rec.Get(Rec."Shopify Store Code", Rec."Return Id");
+                    Rec.Get(Rec."Entry No.");
                     SpfyLegacyReturnMgt.DiscardDraft(Rec);
-                    Rec.Status := Rec.Status::New;
+                    Rec.Validate(Status, Rec.Status::New);
                     Rec."Retry Count" := 0;
                     Rec."Last Error" := '';
                     Rec.Modify();
@@ -106,13 +110,13 @@ page 6150966 "NPR Spfy Legacy Return Queue"
             {
                 Caption = 'Dismiss';
                 Image = Cancel;
-                ToolTip = 'Mark the return as handled outside this import. The row is kept and cannot be deleted, so the return is not queued again; Discard Draft and Retry queues it again.';
+                ToolTip = 'Mark the return or refund as handled outside this import. The row is kept and cannot be deleted, so it is not queued again; Discard Draft and Retry queues it again.';
                 ApplicationArea = NPRShopify;
                 trigger OnAction()
                 var
                     SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
                 begin
-                    Rec.Get(Rec."Shopify Store Code", Rec."Return Id");
+                    Rec.Get(Rec."Entry No.");
                     SpfyLegacyReturnMgt.DismissReturn(Rec);
                     CurrPage.Update(false);
                 end;
@@ -134,22 +138,23 @@ page 6150966 "NPR Spfy Legacy Return Queue"
             {
                 Caption = 'Open Voucher';
                 Image = Voucher;
-                ToolTip = 'Open the retail voucher that is topped up for this return, or its archived copy while the card is still archived.';
+                ToolTip = 'Open the retail voucher this return or refund credits back to, or its archived copy while the card is still archived.';
                 ApplicationArea = NPRShopify;
-                Enabled = Rec."Voucher No." <> '';
+                Enabled = Rec."Refund Voucher No." <> '';
                 trigger OnAction()
                 var
                     Voucher: Record "NPR NpRv Voucher";
                     ArchVoucher: Record "NPR NpRv Arch. Voucher";
                 begin
-                    if Voucher.Get(Rec."Voucher No.") then begin
+                    Rec.CalcFields("Refund Voucher No.");
+                    if Voucher.Get(Rec."Refund Voucher No.") then begin
                         Page.Run(Page::"NPR NpRv Voucher Card", Voucher);
                         exit;
                     end;
                     // A spent card sits in the archive until the posting restores it; the archive may hold it under a number of its own series.
-                    ArchVoucher.SetRange("Arch. No.", Rec."Voucher No.");
+                    ArchVoucher.SetRange("Arch. No.", Rec."Refund Voucher No.");
                     if not ArchVoucher.FindFirst() then
-                        ArchVoucher.Get(Rec."Voucher No.");
+                        ArchVoucher.Get(Rec."Refund Voucher No.");
                     Page.Run(Page::"NPR NpRv Arch. Voucher Card", ArchVoucher);
                 end;
             }
@@ -176,12 +181,15 @@ page 6150966 "NPR Spfy Legacy Return Queue"
                 _StatusStyle := 'Ambiguous';
             Rec.Status::Dismissed:
                 _StatusStyle := 'Subordinate';
+            Rec.Status::Waiting:
+                _StatusStyle := 'StandardAccent';
+            Rec.Status::"Nothing to Credit":
+                _StatusStyle := 'Favorable';
             else
                 _StatusStyle := 'Standard';
         end;
     end;
 
     var
-        _NotClaimedMsg: Label 'Shopify return %1 was not processed: another session claimed it a moment ago, or it was dismissed, imported or deleted since the list was shown.', Comment = '%1 = Shopify return name';
         _StatusStyle: Text;
 }

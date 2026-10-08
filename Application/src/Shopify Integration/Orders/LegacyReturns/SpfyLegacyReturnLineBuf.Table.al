@@ -21,6 +21,10 @@ table 6059923 "NPR Spfy Legacy Return Ln Buf"
         field(120; "VAT %"; Decimal) { Caption = 'VAT %'; DataClassification = SystemMetadata; }
         field(130; "Line Item Json"; Blob) { Caption = 'Line Item Json'; DataClassification = SystemMetadata; }
         field(140; "Gift Card"; Boolean) { Caption = 'Gift Card'; DataClassification = SystemMetadata; }
+        field(150; "Restock Type"; Text[20]) { Caption = 'Restock Type'; DataClassification = SystemMetadata; }
+        field(160; "Ordered Quantity"; Decimal) { Caption = 'Ordered Quantity'; DataClassification = SystemMetadata; }
+        field(170; "Source Created At"; DateTime) { Caption = 'Source Created At'; DataClassification = SystemMetadata; }
+        field(180; "Later Refund"; Boolean) { Caption = 'Later Refund'; DataClassification = SystemMetadata; }
     }
     keys
     {

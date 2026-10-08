@@ -26,6 +26,14 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 ApplicationArea = NPRShopify;
                 ToolTip = 'Specifies the Shopify Return ID assigned to the document.';
             }
+            field("NPR Spfy Refund ID"; _SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Refund ID"))
+            {
+                Caption = 'Shopify Refund ID';
+                Editable = false;
+                Visible = _ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify refund the document credits, when the refund was made without a return.';
+            }
             field("NPR Shopify Store Code"; _SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"))
             {
                 Caption = 'Shopify Store Code';

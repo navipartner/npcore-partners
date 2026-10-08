@@ -83,7 +83,7 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
     /// </summary>
     local procedure RefuseWhileLegacyReturnsPending(Feature: Record "NPR Feature"; UnderLock: Boolean)
     var
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
         SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
         PendingLegacyReturnsErr: Label 'Enabling the %2 feature is not possible because there are unprocessed entries in the %1 that must be handled first.', Comment = '%1 = table caption, %2 = feature description';
     begin
@@ -91,7 +91,7 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
             if SpfyLegacyReturnMgt.FeatureSwitchedOn() then;
         LegacyReturnQueue.SetCurrentKey(Status);
         LegacyReturnQueue.ReadIsolation := IsolationLevel::ReadUncommitted;
-        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::"Draft Created");
+        LegacyReturnQueue.SetFilter(Status, '%1|%2|%3|%4', LegacyReturnQueue.Status::New, LegacyReturnQueue.Status::Processing, LegacyReturnQueue.Status::"Draft Created", LegacyReturnQueue.Status::Waiting);
         if not LegacyReturnQueue.IsEmpty() then
             RaiseError(StrSubstNo(PendingLegacyReturnsErr, LegacyReturnQueue.TableCaption(), Feature.Description));
     end;
@@ -149,13 +149,13 @@ codeunit 6248572 "NPR Spfy Ecommerce Order Exp" implements "NPR Feature Manageme
         ImportEntry: Record "NPR Nc Import Entry";
         ShopifySetup: Record "NPR Spfy Integration Setup";
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
-        LegacyReturnQueue: Record "NPR Spfy Legacy Return Queue";
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
         UserContinued: Boolean;
         ContrinueDisableCarefullyMsg: Label 'There are Orders in the %1 that were processed with errors. Disabling %2 feature may cause those orders in the %1 to remain unprocessed. Do you want to continue?', Comment = '%1= tablecaption;%2 = Feature description';
         ContrinueEnableCarefullyMsg: Label 'There are Orders in the %1 that were processed with errors. Enabling %2 feature may cause those orders in the %1 to remain unprocessed. Do you want to continue?', Comment = '%1= tablecaption;%2 = Feature description';
         PendingEventLogEntriesErr: Label 'Disabling the %1 feature is not possible because there are unprocessed event log entries in Ready status that must be handled first.', Comment = '%1 = Feature description';
         PendingImportEntriesErr: Label 'Enabling the %1 feature is not possible because there are unprocessed import types that must be handled first.', Comment = '%1=Feature description';
-        ContinueEnableWithFailedLegacyReturnsMsg: Label 'There are returns in the %1 that failed or were dismissed. Enabling the %2 feature may leave the failed ones unprocessed and import the dismissed ones again through e-commerce documents, since a return handled by hand carries no document the e-commerce import recognises. Do you want to continue?', Comment = '%1 = Shopify Legacy Return Queue table caption, %2 = feature description';
+        ContinueEnableWithFailedLegacyReturnsMsg: Label 'There are returns or refunds in the %1 that failed or were dismissed. Enabling the %2 feature may leave the failed ones unprocessed and import dismissed returns again through e-commerce documents, since a return handled by hand carries no document the e-commerce import recognises. Do you want to continue?', Comment = '%1 = Shopify Legacy Return Queue table caption, %2 = feature description';
     begin
         If Feature.Enabled then begin
             RefuseWhileLegacyReturnsPending(Feature, false);

@@ -2,35 +2,58 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
 {
     Access = Internal;
 
-    var
-        _AlreadyPostedErr: Label 'Shopify return %1 is already posted as %2 and cannot be processed again.', Comment = '%1 = Shopify return name, %2 = posted document no.';
-        _AlreadyReceivedErr: Label 'Shopify return %1 has been received as %2 but not yet invoiced, so the customer has not been credited. Invoice %3 %4 to raise the credit memo.', Comment = '%1 = Shopify return name, %2 = return receipt no., %3 = Sales Header table caption, %4 = Return Order no.';
-        _PostedDocNotFoundErr: Label 'Posted document %1 could not be found as a %2 or a %3.', Comment = '%1 = document no., %2 = Sales Cr.Memo Header caption, %3 = Return Receipt Header caption';
-        _DraftDocNotFoundErr: Label '%1 %2 could not be found. It may have been deleted or posted outside the queue.', Comment = '%1 = Sales Header table caption, %2 = document no.';
-        _NoDocumentYetErr: Label 'No document has been created for this return yet.';
-        _UnfinishedReturnsErr: Label '%1 %2 still has returns in the %3 that are neither imported nor dismissed. Import, dismiss or delete them before deleting the store.', Comment = '%1 = Shopify Store table caption, %2 = Shopify store code, %3 = Shopify Legacy Return Queue table caption';
-        _EcommerceFeatureOwnsReturnsErr: Label 'The %1 feature is enabled, so returns are imported through e-commerce documents and this action is not available on the %2.', Comment = '%1 = feature description, %2 = Shopify Legacy Return Queue table caption';
-        _ReceivedRowDeleteErr: Label 'Shopify return %1 has been received as %2 but not yet invoiced, so its queue row cannot be deleted: the credit memo that invoices %3 %4 is settled through the row.', Comment = '%1 = Shopify return name, %2 = return receipt no., %3 = Sales Header table caption, %4 = Return Order no.';
-        _InvoicedElsewhereErr: Label 'Shopify return %1 was received as %2, and %3 %4 no longer exists, so the return was invoiced outside this import. Settle the refund by hand and dismiss the queue row.', Comment = '%1 = Shopify return name, %2 = return receipt no., %3 = Sales Header table caption, %4 = Return Order no.';
-        _BeingProcessedErr: Label 'Shopify return %1 is being processed by another session. Wait for it to finish before trying again.', Comment = '%1 = Shopify return name';
-        _ReturnsSwitchedOffErr: Label 'Return import is not enabled for %1 %2: the Shopify integration, the store or its %3 is switched off. Enable it to process this return.', Comment = '%1 = Shopify Store table caption, %2 = store code, %3 = Sales Return Order Integration field caption';
-        _DismissImportedErr: Label 'Shopify return %1 is imported as %2, so there is nothing to dismiss.', Comment = '%1 = Shopify return name, %2 = posted credit memo no.';
-        _DismissedInvoicedElsewhereErr: Label 'Shopify return %1 is dismissed: it was received as %2 and invoiced outside this import, so it cannot be queued again.', Comment = '%1 = Shopify return name, %2 = return receipt no.';
-        _DismissedRowDeleteErr: Label 'Shopify return %1 is dismissed, so its queue row is kept and the return is not queued again. Use Discard Draft and Retry to queue it again.', Comment = '%1 = Shopify return name';
-        _DismissedErr: Label 'Shopify return %1 is dismissed. Use Discard Draft and Retry to queue it again before processing it.', Comment = '%1 = Shopify return name';
-        _DismissWithDocumentErr: Label 'Shopify return %1 still has %2 %3. Discard the draft, or invoice it if the return has been received, before dismissing the return.', Comment = '%1 = Shopify return name, %2 = Sales Header table caption, %3 = Return Order no.';
-
-    internal procedure FindPostedDocumentForReturn(ShopifyStoreCode: Code[20]; ReturnId: Text[30]; var PostedDocNo: Code[20]): Boolean
-    var
-        IsCreditMemo: Boolean;
+    /// <summary>
+    /// The ID type a Shopify return or refund is stamped with on its documents: a return keeps the Entry ID, a refund has a type of its own, since its number may equal a return's.
+    /// </summary>
+    internal procedure SourceDocIdType(SourceDocType: Enum "NPR Spfy Legacy Return Source"): Enum "NPR Spfy ID Type"
     begin
-        exit(FindPostedDocumentForReturn(ShopifyStoreCode, ReturnId, PostedDocNo, IsCreditMemo));
+        if SourceDocType = SourceDocType::Refund then
+            exit("NPR Spfy ID Type"::"Refund ID");
+        exit("NPR Spfy ID Type"::"Entry ID");
     end;
 
     /// <summary>
-    /// Finds a posted credit memo or return receipt carrying the return's marker, credit memo first.
+    /// The Shopify return or refund a document is stamped with: a refund id first, else the Entry ID as a return's.
     /// </summary>
-    internal procedure FindPostedDocumentForReturn(ShopifyStoreCode: Code[20]; ReturnId: Text[30]; var PostedDocNo: Code[20]; var IsCreditMemo: Boolean): Boolean
+    internal procedure GetSourceDocStamp(DocumentRecordId: RecordId; var SourceDocType: Enum "NPR Spfy Legacy Return Source"; var ShopifyId: Text[30]): Boolean
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+    begin
+        ShopifyId := SpfyAssignedIDMgt.GetAssignedShopifyID(DocumentRecordId, SourceDocIdType(SourceDocType::Refund));
+        if ShopifyId <> '' then begin
+            SourceDocType := SourceDocType::Refund;
+            exit(true);
+        end;
+        SourceDocType := SourceDocType::Return;
+        ShopifyId := SpfyAssignedIDMgt.GetAssignedShopifyID(DocumentRecordId, SourceDocIdType(SourceDocType::Return));
+        exit(ShopifyId <> '');
+    end;
+
+    /// <summary>
+    /// The Shopify order line a document line belongs to: its Entry ID, or the line a discount given after the sale credits.
+    /// </summary>
+    internal procedure GetOrderLineItemStamp(DocumentLineRecordId: RecordId): Text[30]
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+        LineItemId: Text[30];
+    begin
+        LineItemId := SpfyAssignedIDMgt.GetAssignedShopifyID(DocumentLineRecordId, "NPR Spfy ID Type"::"Entry ID");
+        if LineItemId = '' then
+            LineItemId := SpfyAssignedIDMgt.GetAssignedShopifyID(DocumentLineRecordId, "NPR Spfy ID Type"::"Post-Sale Disc. Line Item ID");
+        exit(LineItemId);
+    end;
+
+    internal procedure FindPostedDocumentForReturn(ShopifyStoreCode: Code[20]; SourceDocType: Enum "NPR Spfy Legacy Return Source"; ShopifyId: Text[30]; var PostedDocNo: Code[20]): Boolean
+    var
+        IsCreditMemo: Boolean;
+    begin
+        exit(FindPostedDocumentForReturn(ShopifyStoreCode, SourceDocType, ShopifyId, PostedDocNo, IsCreditMemo));
+    end;
+
+    /// <summary>
+    /// Finds a posted credit memo or return receipt stamped with the return or refund, credit memo first.
+    /// </summary>
+    internal procedure FindPostedDocumentForReturn(ShopifyStoreCode: Code[20]; SourceDocType: Enum "NPR Spfy Legacy Return Source"; ShopifyId: Text[30]; var PostedDocNo: Code[20]; var IsCreditMemo: Boolean): Boolean
     var
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -40,13 +63,13 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     begin
         Clear(PostedDocNo);
         IsCreditMemo := false;
-        if ReturnId = '' then
+        if ShopifyId = '' then
             exit(false);
         // Table 114 sorts before 6660, so a credit memo is found first.
         ShopifyAssignedID.SetCurrentKey("Table No.", "Shopify ID Type", "Shopify ID");
         ShopifyAssignedID.SetFilter("Table No.", '%1|%2', Database::"Sales Cr.Memo Header", Database::"Return Receipt Header");
-        ShopifyAssignedID.SetRange("Shopify ID Type", "NPR Spfy ID Type"::"Entry ID");
-        ShopifyAssignedID.SetRange("Shopify ID", ReturnId);
+        ShopifyAssignedID.SetRange("Shopify ID Type", SourceDocIdType(SourceDocType));
+        ShopifyAssignedID.SetRange("Shopify ID", ShopifyId);
         if not ShopifyAssignedID.FindSet() then
             exit(false);
         repeat
@@ -71,15 +94,15 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
         exit(false);
     end;
 
-    internal procedure FindDraftForReturn(ShopifyStoreCode: Code[20]; ReturnId: Text[30]; var SalesHeader: Record "Sales Header"): Boolean
+    internal procedure FindDraftForReturn(ShopifyStoreCode: Code[20]; SourceDocType: Enum "NPR Spfy Legacy Return Source"; ShopifyId: Text[30]; var SalesHeader: Record "Sales Header"): Boolean
     var
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
         RecRef: RecordRef;
     begin
-        if ReturnId = '' then
+        if ShopifyId = '' then
             exit(false);
-        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Header", "NPR Spfy ID Type"::"Entry ID", ReturnId, ShopifyAssignedID);
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Header", SourceDocIdType(SourceDocType), ShopifyId, ShopifyAssignedID);
         if not ShopifyAssignedID.FindSet() then
             exit(false);
         repeat
@@ -94,30 +117,64 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     end;
 
     /// <summary>
-    /// The queue row behind a Return Order, selected by its number and the return id the header carries and confirmed by the store.
+    /// The queue row behind a Return Order, selected by its number and the return or refund the header carries and confirmed by the store.
     /// </summary>
-    internal procedure FindQueueRowBySalesHeader(SalesHeader: Record "Sales Header"; var QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    internal procedure FindQueueRowBySalesHeader(SalesHeader: Record "Sales Header"; var QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     var
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
-        ReturnId: Text[30];
+        SourceDocType: Enum "NPR Spfy Legacy Return Source";
+        ShopifyId: Text[30];
     begin
         if SalesHeader."No." = '' then
             exit(false);
-        ReturnId := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-        if ReturnId = '' then
+        if not GetSourceDocStamp(SalesHeader.RecordId(), SourceDocType, ShopifyId) then
             exit(false);
         QueueRow.Reset();
         QueueRow.SetCurrentKey("Sales Header Doc. No.");
         QueueRow.SetRange("Sales Header Doc. No.", SalesHeader."No.");
-        QueueRow.SetRange("Return Id", ReturnId);
+        QueueRow.SetRange("Source Doc. Type", SourceDocType);
+        QueueRow.SetRange("Source Doc. ID", ShopifyId);
         if not QueueRow.FindFirst() then
             exit(false);
         exit(CarriesReturnIds(SalesHeader.RecordId(), QueueRow));
     end;
 
-    internal procedure ErrorIfAlreadyPosted(QueueRow: Record "NPR Spfy Legacy Return Queue")
+    /// <summary>
+    /// Records the posted document on the queue row inside the posting transaction; settlement is the posting codeunit's.
+    /// </summary>
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', false, false)]
+    local procedure RecordPostedDocumentOnQueueRow(var SalesHeader: Record "Sales Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var ReturnReceiptHeader: Record "Return Receipt Header"; var PreviewMode: Boolean)
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+    begin
+        if PreviewMode then
+            exit;
+        if SalesHeader."Document Type" <> SalesHeader."Document Type"::"Return Order" then
+            exit;
+        if not FindQueueRowBySalesHeader(SalesHeader, QueueRow) then
+            exit;
+        if SalesCrMemoHeader."No." <> '' then begin
+            QueueRow."Posted Doc. No." := SalesCrMemoHeader."No.";
+            QueueRow.Validate(Status, QueueRow.Status::Imported);
+            QueueRow."Last Error" := '';
+        end else
+            if ReturnReceiptHeader."No." <> '' then
+                QueueRow."Posted Doc. No." := ReturnReceiptHeader."No."
+            else
+                exit;
+        QueueRow.Modify();
+    end;
+
+    local procedure RowCaption(QueueRow: Record "NPR Spfy NC Return Queue"): Text[50]
+    var
+        SpfyLegacyReturnAPI: Codeunit "NPR Spfy Legacy Return API";
+    begin
+        exit(SpfyLegacyReturnAPI.DocumentCaption(QueueRow."Source Doc. Type", QueueRow."Source Doc. Name", QueueRow."Source Doc. ID"));
+    end;
+
+    internal procedure ErrorIfAlreadyPosted(QueueRow: Record "NPR Spfy NC Return Queue")
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
+        AlreadyPostedErr: Label 'Shopify %1 is already posted as %2 and cannot be processed again.', Comment = '%1 = Shopify document caption, %2 = posted document no.';
     begin
         if QueueRow."Posted Doc. No." = '' then
             exit;
@@ -125,19 +182,19 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
             if ReturnReceiptHeader.Get(QueueRow."Posted Doc. No.") then
                 if CarriesReturnIds(ReturnReceiptHeader.RecordId(), QueueRow) then
                     ErrorReceivedNotInvoiced(QueueRow, ReturnReceiptHeader);
-        Error(_AlreadyPostedErr, QueueRow."Return Name", QueueRow."Posted Doc. No.");
+        Error(AlreadyPostedErr, RowCaption(QueueRow), QueueRow."Posted Doc. No.");
     end;
 
     /// <summary>
     /// Records a posted credit memo on the row and returns true. A return receipt alone raises the received-but-not-invoiced error.
     /// </summary>
-    internal procedure RecordPostedCreditMemo(var QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    internal procedure RecordPostedCreditMemo(var QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
         PostedDocNo: Code[20];
         IsCreditMemo: Boolean;
     begin
-        if not FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Return Id", PostedDocNo, IsCreditMemo) then
+        if not FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID", PostedDocNo, IsCreditMemo) then
             exit(false);
         if not IsCreditMemo then begin
             ReturnReceiptHeader.Get(PostedDocNo);
@@ -148,16 +205,19 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
         exit(true);
     end;
 
-    local procedure ErrorReceivedNotInvoiced(QueueRow: Record "NPR Spfy Legacy Return Queue"; ReturnReceiptHeader: Record "Return Receipt Header")
+    local procedure ErrorReceivedNotInvoiced(QueueRow: Record "NPR Spfy NC Return Queue"; ReturnReceiptHeader: Record "Return Receipt Header")
     var
         SalesHeader: Record "Sales Header";
+        AlreadyReceivedErr: Label 'Shopify %1 has been received as %2 but not yet invoiced, so the customer has not been credited. Invoice %3 %4 to raise the credit memo.', Comment = '%1 = Shopify document caption, %2 = return receipt no., %3 = Sales Header table caption, %4 = Return Order no.';
+        InvoicedElsewhereErr: Label 'Shopify %1 was received as %2, and %3 %4 no longer exists, so it was invoiced outside this import. Settle the refund by hand and dismiss the queue row.', Comment = '%1 = Shopify document caption, %2 = return receipt no., %3 = Sales Header table caption, %4 = Return Order no.';
+        DismissedInvoicedElsewhereErr: Label 'Shopify %1 is dismissed: it was received as %2 and invoiced outside this import, so it cannot be queued again.', Comment = '%1 = Shopify document caption, %2 = return receipt no.';
     begin
         if not ReturnOrderAwaitsInvoice(ReturnReceiptHeader) then begin
             if QueueRow.Status = QueueRow.Status::Dismissed then
-                Error(_DismissedInvoicedElsewhereErr, QueueRow."Return Name", ReturnReceiptHeader."No.");
-            Error(_InvoicedElsewhereErr, QueueRow."Return Name", ReturnReceiptHeader."No.", SalesHeader.TableCaption(), ReturnReceiptHeader."Return Order No.");
+                Error(DismissedInvoicedElsewhereErr, RowCaption(QueueRow), ReturnReceiptHeader."No.");
+            Error(InvoicedElsewhereErr, RowCaption(QueueRow), ReturnReceiptHeader."No.", SalesHeader.TableCaption(), ReturnReceiptHeader."Return Order No.");
         end;
-        Error(_AlreadyReceivedErr, QueueRow."Return Name", ReturnReceiptHeader."No.", SalesHeader.TableCaption(), ReturnReceiptHeader."Return Order No.");
+        Error(AlreadyReceivedErr, RowCaption(QueueRow), ReturnReceiptHeader."No.", SalesHeader.TableCaption(), ReturnReceiptHeader."Return Order No.");
     end;
 
     /// <summary>
@@ -173,7 +233,7 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     /// <summary>
     /// True when the row's posted document is a credit memo carrying this return's ids; a receipt and a credit memo can share a number.
     /// </summary>
-    internal procedure IsCreditMemoPosted(QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    internal procedure IsCreditMemoPosted(QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     var
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
     begin
@@ -184,40 +244,44 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
         exit(CarriesReturnIds(SalesCrMemoHeader.RecordId(), QueueRow));
     end;
 
-    local procedure CarriesReturnIds(PostedRecordId: RecordId; QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    local procedure CarriesReturnIds(PostedRecordId: RecordId; QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     var
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
     begin
-        if SpfyAssignedIDMgt.GetAssignedShopifyID(PostedRecordId, "NPR Spfy ID Type"::"Entry ID") <> QueueRow."Return Id" then
+        if SpfyAssignedIDMgt.GetAssignedShopifyID(PostedRecordId, SourceDocIdType(QueueRow."Source Doc. Type")) <> QueueRow."Source Doc. ID" then
             exit(false);
         exit(SpfyAssignedIDMgt.GetAssignedShopifyID(PostedRecordId, "NPR Spfy ID Type"::"Store Code") = QueueRow."Shopify Store Code");
     end;
 
     /// <summary>
-    /// Refuses to delete a store that still has unfinished returns in the queue, and removes its imported and dismissed ones, which own no draft.
+    /// Refuses to delete a store that still has unfinished returns in the queue, and removes its finished ones (imported, dismissed, nothing to credit), which own no draft.
     /// </summary>
     internal procedure DeleteQueueRowsOfStore(ShopifyStoreCode: Code[20])
     var
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyStore: Record "NPR Spfy Store";
+        Settlement: Record "NPR Spfy Refund Settlement";
+        UnfinishedReturnsErr: Label '%1 %2 still has returns or refunds in the %3 that are not imported, dismissed or found to have nothing to credit. Import, dismiss or delete them before deleting the store.', Comment = '%1 = Shopify Store table caption, %2 = Shopify store code, %3 = Shopify Legacy Return Queue table caption';
     begin
         // The poll locks the store row before it inserts: a row committed first refuses the delete, a delete committed first leaves the poll no store.
         ShopifyStore.LockTable();
         if ShopifyStore.Get(ShopifyStoreCode) then;
         QueueRow.SetRange("Shopify Store Code", ShopifyStoreCode);
-        QueueRow.SetFilter(Status, '<>%1&<>%2', QueueRow.Status::Imported, QueueRow.Status::Dismissed);
+        QueueRow.SetFilter(Status, '<>%1&<>%2&<>%3', QueueRow.Status::Imported, QueueRow.Status::Dismissed, QueueRow.Status::"Nothing to Credit");
         if not QueueRow.IsEmpty() then
-            Error(_UnfinishedReturnsErr, ShopifyStore.TableCaption(), ShopifyStoreCode, QueueRow.TableCaption());
+            Error(UnfinishedReturnsErr, ShopifyStore.TableCaption(), ShopifyStoreCode, QueueRow.TableCaption());
         QueueRow.SetRange(Status);
         QueueRow.DeleteAll(false);
+        Settlement.SetRange("Shopify Store Code", ShopifyStoreCode);
+        Settlement.DeleteAll();
     end;
 
-    internal procedure MarkImportedIfCreditMemoPosted(var QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    internal procedure MarkImportedIfCreditMemoPosted(var QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     begin
         if not IsCreditMemoPosted(QueueRow) then
             exit(false);
         if (QueueRow.Status <> QueueRow.Status::Imported) or (QueueRow."Last Error" <> '') then begin
-            QueueRow.Status := QueueRow.Status::Imported;
+            QueueRow.Validate(Status, QueueRow.Status::Imported);
             QueueRow."Last Error" := '';
             QueueRow.Modify();
         end;
@@ -242,14 +306,14 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
         exit(Feature.Enabled);
     end;
 
-    internal procedure DiscardDraft(var QueueRow: Record "NPR Spfy Legacy Return Queue")
+    internal procedure DiscardDraft(var QueueRow: Record "NPR Spfy NC Return Queue")
     begin
         // A New row written after the switch would be stranded, so the feature is read under the switch's lock.
         if FeatureSwitchedOn() then
             ErrorIfEcommerceFeatureEnabled();
         // The caller's copy may be stale: a page shows the row as it was, the job may hold it now.
         QueueRow.LockTable();
-        QueueRow.Get(QueueRow."Shopify Store Code", QueueRow."Return Id");
+        QueueRow.Get(QueueRow."Entry No.");
         ErrorIfBeingProcessed(QueueRow);
         ErrorIfAlreadyPosted(QueueRow);
         if RecordPostedCreditMemo(QueueRow) then begin
@@ -263,27 +327,33 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     /// <summary>
     /// Marks a return as handled outside the import: the row stays, so the poll does not queue the return again, and the job leaves it alone.
     /// </summary>
-    internal procedure DismissReturn(var QueueRow: Record "NPR Spfy Legacy Return Queue")
+    internal procedure DismissReturn(var QueueRow: Record "NPR Spfy NC Return Queue")
     var
         SalesHeader: Record "Sales Header";
+        Settlement: Record "NPR Spfy Refund Settlement";
         PostedDocNo: Code[20];
         OpenReturnOrderNo: Code[20];
         IsCreditMemo: Boolean;
+        DismissImportedErr: Label 'Shopify %1 is imported as %2, so there is nothing to dismiss.', Comment = '%1 = Shopify document caption, %2 = posted credit memo no.';
+        DismissWithDocumentErr: Label 'Shopify %1 still has %2 %3. Discard the draft, or invoice it if the goods have been received, before dismissing it.', Comment = '%1 = Shopify document caption, %2 = Sales Header table caption, %3 = Return Order no.';
     begin
         QueueRow.LockTable();
-        QueueRow.Get(QueueRow."Shopify Store Code", QueueRow."Return Id");
+        QueueRow.Get(QueueRow."Entry No.");
         ErrorIfBeingProcessed(QueueRow);
-        if FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Return Id", PostedDocNo, IsCreditMemo) then
+        if FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID", PostedDocNo, IsCreditMemo) then
             if IsCreditMemo then begin
                 QueueRow."Posted Doc. No." := PostedDocNo;
                 MarkImportedIfCreditMemoPosted(QueueRow);
                 Commit();
-                Error(_DismissImportedErr, QueueRow."Return Name", PostedDocNo);
+                Error(DismissImportedErr, RowCaption(QueueRow), PostedDocNo);
             end;
         OpenReturnOrderNo := FindOpenReturnOrderNo(QueueRow);
         if OpenReturnOrderNo <> '' then
-            Error(_DismissWithDocumentErr, QueueRow."Return Name", SalesHeader.TableCaption(), OpenReturnOrderNo);
-        QueueRow.Status := QueueRow.Status::Dismissed;
+            Error(DismissWithDocumentErr, RowCaption(QueueRow), SalesHeader.TableCaption(), OpenReturnOrderNo);
+        // No draft and no credit memo is left, so nothing is settled by the row any more.
+        if Settlement.Get(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID") then
+            Settlement.Delete();
+        QueueRow.Validate(Status, QueueRow.Status::Dismissed);
         QueueRow."Processed At" := CurrentDateTime();
         QueueRow.Modify();
     end;
@@ -291,16 +361,18 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     /// <summary>
     /// A dismissed return is reopened through Discard Draft and Retry only, so Process refuses it.
     /// </summary>
-    internal procedure ErrorIfDismissed(QueueRow: Record "NPR Spfy Legacy Return Queue")
+    internal procedure ErrorIfDismissed(QueueRow: Record "NPR Spfy NC Return Queue")
+    var
+        DismissedErr: Label 'Shopify %1 is dismissed. Use Discard Draft and Retry to queue it again before processing it.', Comment = '%1 = Shopify document caption';
     begin
         if QueueRow.Status = QueueRow.Status::Dismissed then
-            Error(_DismissedErr, QueueRow."Return Name");
+            Error(DismissedErr, RowCaption(QueueRow));
     end;
 
     /// <summary>
     /// The return's open Return Order: the row's draft, a draft carrying its ids, or the order its receipt awaits an invoice for.
     /// </summary>
-    local procedure FindOpenReturnOrderNo(QueueRow: Record "NPR Spfy Legacy Return Queue"): Code[20]
+    local procedure FindOpenReturnOrderNo(QueueRow: Record "NPR Spfy NC Return Queue"): Code[20]
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
         SalesHeader: Record "Sales Header";
@@ -310,9 +382,9 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
         if QueueRow."Sales Header Doc. No." <> '' then
             if SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No.") then
                 exit(SalesHeader."No.");
-        if FindDraftForReturn(QueueRow."Shopify Store Code", QueueRow."Return Id", SalesHeader) then
+        if FindDraftForReturn(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID", SalesHeader) then
             exit(SalesHeader."No.");
-        if FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Return Id", PostedDocNo, IsCreditMemo) then
+        if FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID", PostedDocNo, IsCreditMemo) then
             if not IsCreditMemo then
                 if ReturnReceiptHeader.Get(PostedDocNo) then
                     if ReturnOrderAwaitsInvoice(ReturnReceiptHeader) then
@@ -323,32 +395,35 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     /// <summary>
     /// A deleted row takes its unposted draft with it; a received or dismissed return keeps its row.
     /// </summary>
-    internal procedure OnDeleteQueueRow(var QueueRow: Record "NPR Spfy Legacy Return Queue")
+    internal procedure OnDeleteQueueRow(var QueueRow: Record "NPR Spfy NC Return Queue")
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
         SalesHeader: Record "Sales Header";
         PostedDocNo: Code[20];
         IsCreditMemo: Boolean;
+        ReceivedRowDeleteErr: Label 'Shopify %1 has been received as %2 but not yet invoiced, so its queue row cannot be deleted: the credit memo that invoices %3 %4 is settled through the row.', Comment = '%1 = Shopify document caption, %2 = return receipt no., %3 = Sales Header table caption, %4 = Return Order no.';
+        DismissedRowDeleteErr: Label 'Shopify %1 is dismissed, so its queue row is kept and it is not queued again. Use Discard Draft and Retry to queue it again.', Comment = '%1 = Shopify document caption';
     begin
         ErrorIfBeingProcessed(QueueRow);
         if QueueRow.Status = QueueRow.Status::Dismissed then
-            Error(_DismissedRowDeleteErr, QueueRow."Return Name");
+            Error(DismissedRowDeleteErr, RowCaption(QueueRow));
         if IsCreditMemoPosted(QueueRow) then
             exit;
-        if FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Return Id", PostedDocNo, IsCreditMemo) then begin
+        if FindPostedDocumentForReturn(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID", PostedDocNo, IsCreditMemo) then begin
             if IsCreditMemo then
                 exit;
             if ReturnReceiptHeader.Get(PostedDocNo) then
                 if ReturnOrderAwaitsInvoice(ReturnReceiptHeader) then
-                    Error(_ReceivedRowDeleteErr, QueueRow."Return Name", ReturnReceiptHeader."No.", SalesHeader.TableCaption(), ReturnReceiptHeader."Return Order No.");
+                    Error(ReceivedRowDeleteErr, RowCaption(QueueRow), ReturnReceiptHeader."No.", SalesHeader.TableCaption(), ReturnReceiptHeader."Return Order No.");
         end;
         DeleteDraftDocument(QueueRow);
     end;
 
-    local procedure DeleteDraftDocument(var QueueRow: Record "NPR Spfy Legacy Return Queue")
+    local procedure DeleteDraftDocument(var QueueRow: Record "NPR Spfy NC Return Queue")
     var
         SalesHeader: Record "Sales Header";
         PaymentLine: Record "NPR Magento Payment Line";
+        Settlement: Record "NPR Spfy Refund Settlement";
     begin
         if QueueRow."Sales Header Doc. No." <> '' then begin
             PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
@@ -358,20 +433,22 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
             if SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No.") then
                 SalesHeader.Delete(true);
         end;
+        if Settlement.Get(QueueRow."Shopify Store Code", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID") then
+            Settlement.Delete();
         QueueRow."Sales Header Doc. No." := '';
         QueueRow."Location Fallback Used" := false;
         QueueRow."Not Restocked" := false;
-        QueueRow."Gift Card Refund" := false;
-        QueueRow."Voucher No." := '';
-        QueueRow."Gift Card Refund Amount" := 0;
         QueueRow.Modify();
     end;
 
-    internal procedure OpenRelatedDocument(QueueRow: Record "NPR Spfy Legacy Return Queue")
+    internal procedure OpenRelatedDocument(QueueRow: Record "NPR Spfy NC Return Queue")
     var
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
+        PostedDocNotFoundErr: Label 'Posted document %1 could not be found as a %2 or a %3.', Comment = '%1 = document no., %2 = Sales Cr.Memo Header caption, %3 = Return Receipt Header caption';
+        DraftDocNotFoundErr: Label '%1 %2 could not be found. It may have been deleted or posted outside the queue.', Comment = '%1 = Sales Header table caption, %2 = document no.';
+        NoDocumentYetErr: Label 'No document has been created for this return or refund yet.';
     begin
         if QueueRow."Posted Doc. No." <> '' then begin
             if IsCreditMemoPosted(QueueRow) then begin
@@ -383,16 +460,16 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
                 Page.Run(Page::"Posted Return Receipt", ReturnReceiptHeader);
                 exit;
             end;
-            Error(_PostedDocNotFoundErr, QueueRow."Posted Doc. No.", SalesCrMemoHeader.TableCaption(), ReturnReceiptHeader.TableCaption());
+            Error(PostedDocNotFoundErr, QueueRow."Posted Doc. No.", SalesCrMemoHeader.TableCaption(), ReturnReceiptHeader.TableCaption());
         end;
         if QueueRow."Sales Header Doc. No." <> '' then begin
             if SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No.") then begin
                 Page.Run(Page::"Sales Return Order", SalesHeader);
                 exit;
             end;
-            Error(_DraftDocNotFoundErr, SalesHeader.TableCaption(), QueueRow."Sales Header Doc. No.");
+            Error(DraftDocNotFoundErr, SalesHeader.TableCaption(), QueueRow."Sales Header Doc. No.");
         end;
-        Error(_NoDocumentYetErr);
+        Error(NoDocumentYetErr);
     end;
 
     /// <summary>
@@ -401,28 +478,31 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     internal procedure ErrorIfEcommerceFeatureEnabled()
     var
         Feature: Record "NPR Feature";
-        QueueRow: Record "NPR Spfy Legacy Return Queue";
+        QueueRow: Record "NPR Spfy NC Return Queue";
         ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+        EcommerceFeatureOwnsReturnsErr: Label 'The %1 feature is enabled, so returns and refunds are handled through e-commerce documents and this action is not available on the %2.', Comment = '%1 = feature description, %2 = Shopify Legacy Return Queue table caption';
     begin
         if not ShopifyEcommOrderExp.IsFeatureEnabled() then
             exit;
         Feature.Get(ShopifyEcommOrderExp.GetFeatureId());
-        Error(_EcommerceFeatureOwnsReturnsErr, Feature.Description, QueueRow.TableCaption());
+        Error(EcommerceFeatureOwnsReturnsErr, Feature.Description, QueueRow.TableCaption());
     end;
 
     /// <summary>
     /// Refuses a row another session set to Processing, unless that attempt is old enough to count as dead; the process job applies the same age.
     /// </summary>
-    internal procedure ErrorIfBeingProcessed(QueueRow: Record "NPR Spfy Legacy Return Queue")
+    internal procedure ErrorIfBeingProcessed(QueueRow: Record "NPR Spfy NC Return Queue")
+    var
+        BeingProcessedErr: Label 'Shopify %1 is being processed by another session. Wait for it to finish before trying again.', Comment = '%1 = Shopify document caption';
     begin
         if IsBeingProcessed(QueueRow) then
-            Error(_BeingProcessedErr, QueueRow."Return Name");
+            Error(BeingProcessedErr, RowCaption(QueueRow));
     end;
 
     /// <summary>
     /// True while another session holds the row: Processing and attempted within the stale limit.
     /// </summary>
-    internal procedure IsBeingProcessed(QueueRow: Record "NPR Spfy Legacy Return Queue"): Boolean
+    internal procedure IsBeingProcessed(QueueRow: Record "NPR Spfy NC Return Queue"): Boolean
     begin
         if QueueRow.Status <> QueueRow.Status::Processing then
             exit(false);
@@ -474,9 +554,10 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     internal procedure ErrorIfReturnsSwitchedOff(ShopifyStoreCode: Code[20])
     var
         ShopifyStore: Record "NPR Spfy Store";
+        ReturnsSwitchedOffErr: Label 'Return import is not enabled for %1 %2: the Shopify integration, the store or its %3 is switched off. Enable it to process this return or refund.', Comment = '%1 = Shopify Store table caption, %2 = store code, %3 = Sales Return Order Integration field caption';
     begin
         if ReturnsSwitchedOff(ShopifyStoreCode) then
-            Error(_ReturnsSwitchedOffErr, ShopifyStore.TableCaption(), ShopifyStoreCode, ShopifyStore.FieldCaption("Sales Return Order Integration"));
+            Error(ReturnsSwitchedOffErr, ShopifyStore.TableCaption(), ShopifyStoreCode, ShopifyStore.FieldCaption("Sales Return Order Integration"));
     end;
 
     internal procedure IsGiftCardRefundTxn(var TempRefundTxnBuffer: Record "NPR Spfy Legacy Refund Txn Buf" temporary): Boolean
