@@ -1298,25 +1298,43 @@ codeunit 85260 "NPR Entria Tests"
     [Test]
     procedure CardPaymentImportsExpiryDateAndMaskedCardNumber()
     begin
-        VerifyCardPaymentImport('03/2030', '1111');
+        // [SCENARIO] A card payment with data.expiryDate and data.PANLastDigits imports both onto the payment line.
+        VerifyCardPaymentImport('03/2030', '1111', '');
     end;
 
     [Test]
     procedure CardPaymentImportsWithoutExpiryDate()
     begin
-        VerifyCardPaymentImport('', '1111');
+        // [SCENARIO] A card payment without data.expiryDate imports with a blank Card Expiry Date.
+        VerifyCardPaymentImport('', '1111', '');
     end;
 
     [Test]
     procedure CardPaymentImportsWithoutMaskedCardNumber()
     begin
-        VerifyCardPaymentImport('03/2030', '');
+        // [SCENARIO] A card payment without data.PANLastDigits and data.maskedPAN imports with a blank Masked Card Number.
+        VerifyCardPaymentImport('03/2030', '', '');
     end;
 
     [Test]
     procedure CardPaymentImportsWithoutCardDetails()
     begin
-        VerifyCardPaymentImport('', '');
+        // [SCENARIO] A card payment with no card details imports with a blank Card Expiry Date and Masked Card Number.
+        VerifyCardPaymentImport('', '', '');
+    end;
+
+    [Test]
+    procedure CardPaymentImportsMaskedPANOverLastDigits()
+    begin
+        // [SCENARIO] When data has both maskedPAN and PANLastDigits, Masked Card Number takes data.maskedPAN.
+        VerifyCardPaymentImport('03/2030', '1115', '**** **** **** 1115');
+    end;
+
+    [Test]
+    procedure CardPaymentImportsMaskedPANWithoutLastDigits()
+    begin
+        // [SCENARIO] When data has maskedPAN but no PANLastDigits, Masked Card Number takes data.maskedPAN.
+        VerifyCardPaymentImport('03/2030', '', '**** **** **** 1115');
     end;
 
     [Test]
@@ -4014,7 +4032,7 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.IsTrue(EcomSalesHeader.IsEmpty(), 'No Ecom Sales Header may survive a failed import - a surviving one would be invoiced with no payment at all.');
     end;
 
-    local procedure VerifyCardPaymentImport(ExpiryDate: Text; PANLastDigits: Text)
+    local procedure VerifyCardPaymentImport(ExpiryDate: Text; PANLastDigits: Text; MaskedPAN: Text)
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
@@ -4023,6 +4041,7 @@ codeunit 85260 "NPR Entria Tests"
         DataToken: JsonToken;
         DataObj: JsonObject;
         OrderCreatedAt: DateTime;
+        ExpectedMaskedCardNumber: Text;
     begin
         // [GIVEN] A card payment with recurring tokens and optional card details
         Initialize();
@@ -4038,6 +4057,11 @@ codeunit 85260 "NPR Entria Tests"
             DataObj.Add('expiryDate', ExpiryDate);
         if PANLastDigits <> '' then
             DataObj.Add('PANLastDigits', PANLastDigits);
+        if MaskedPAN <> '' then
+            DataObj.Add('maskedPAN', MaskedPAN);
+        ExpectedMaskedCardNumber := MaskedPAN;
+        if ExpectedMaskedCardNumber = '' then
+            ExpectedMaskedCardNumber := PANLastDigits;
 
         // [WHEN] The order is imported with either, both or neither card detail supplied
         ImportPrebuiltOrder('ZZ-DOC-CARD', OrdersArr);
@@ -4048,7 +4072,8 @@ codeunit 85260 "NPR Entria Tests"
         _Assert.AreEqual(1, EcomSalesPmtLine.Count(), 'The card payment must import as exactly one payment line.');
         EcomSalesPmtLine.FindFirst();
         _Assert.AreEqual(ExpiryDate, EcomSalesPmtLine."Card Expiry Date", 'The card expiry date must match data.expiryDate, or be blank when absent.');
-        _Assert.AreEqual(PANLastDigits, EcomSalesPmtLine."Masked Card Number", 'The masked card number must match data.PANLastDigits, or be blank when absent.');
+        _Assert.AreEqual(ExpectedMaskedCardNumber, EcomSalesPmtLine."Masked Card Number", 'The masked card number must match data.maskedPAN, fall back to data.PANLastDigits, or be blank when both are absent.');
+        _Assert.AreEqual('visa', EcomSalesPmtLine."Card Brand", 'The card brand must match data.paymentMethod.');
 
         // [THEN] Existing payment fields and recurring tokens are preserved in every case
         _Assert.AreEqual(100, EcomSalesPmtLine.Amount, 'The payment amount must be preserved.');

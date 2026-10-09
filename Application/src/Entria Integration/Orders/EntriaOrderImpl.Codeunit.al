@@ -573,11 +573,14 @@ codeunit 6151027 "NPR Entria Order Impl."
                 begin
                     EcomSalesPmtLine."External Payment Method Code" := EcomSalesPmtLine.Description;
                     EcomSalesPmtLine."External Payment Type" := _JsonHelper.GetJText(PaymentToken, 'data.paymentMethod', true);
+                    EcomSalesPmtLine."Card Brand" := CopyStr(EcomSalesPmtLine."External Payment Type", 1, MaxStrLen(EcomSalesPmtLine."Card Brand"));
                     EcomSalesPmtLine."PSP Token" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.recurringToken', MaxStrLen(EcomSalesPmtLine."PSP Token"), false);
                     EcomSalesPmtLine."PAR Token" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.shopperReference', MaxStrLen(EcomSalesPmtLine."PAR Token"), false);
                     EcomSalesPmtLine."Card Expiry Date" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.expiryDate', MaxStrLen(EcomSalesPmtLine."Card Expiry Date"), false);
                     ValidateCardExpiryFormat(PaymentToken, EcomSalesPmtLine."Card Expiry Date");
-                    EcomSalesPmtLine."Masked Card Number" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.PANLastDigits', MaxStrLen(EcomSalesPmtLine."Masked Card Number"), false);
+                    EcomSalesPmtLine."Masked Card Number" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.maskedPAN', MaxStrLen(EcomSalesPmtLine."Masked Card Number"), false);
+                    if EcomSalesPmtLine."Masked Card Number" = '' then
+                        EcomSalesPmtLine."Masked Card Number" := _EcomSalesDocUtils.GetJTextMaxLength(PaymentToken, 'data.PANLastDigits', MaxStrLen(EcomSalesPmtLine."Masked Card Number"), false);
                 end;
             EcomSalesPmtLine."Payment Method Type"::Voucher:
                 EcomSalesPmtLine.Description := CopyStr(EcomSalesPmtLine.Description + ' ' + EcomSalesPmtLine."Payment Reference", 1, MaxStrLen(EcomSalesPmtLine.Description));
