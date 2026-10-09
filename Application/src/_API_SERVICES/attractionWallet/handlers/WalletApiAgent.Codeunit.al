@@ -310,6 +310,7 @@ codeunit 6248331 "NPR WalletApiAgent"
         Ticket: Record "NPR TM Ticket";
         ItemTranslation: Record "Item Translation";
         WalletManager: Codeunit "NPR AttractionWallet";
+        CouponAgent: Codeunit "NPR CouponApiAgent";
         ItemDescription: Text[250];
         EvaluatedAt: DateTime;
     begin
@@ -358,10 +359,9 @@ codeunit 6248331 "NPR WalletApiAgent"
                     ResponseJson.StartObject('membershipDetails').EndObject();
                 end;
 
-                if (WalletAssets.AssetType = WalletAssets.AssetType::COUPON) then begin
-                    // Add coupon details if in future
-                    ResponseJson.StartObject('couponDetails').EndObject();
-                end;
+                if (WalletAssets.AssetType = WalletAssets.AssetType::COUPON) then
+                    if (not CouponAgent.CouponDetailsDTO(WalletAssets.AssetSystemId, WalletAssets.AssetReferenceNumber, 'couponDetails', ResponseJson)) then
+                        ResponseJson.StartObject('couponDetails').EndObject();
 
                 if (WalletAssets.AssetType = WalletAssets.AssetType::VOUCHER) then begin
                     // Add voucher details in future

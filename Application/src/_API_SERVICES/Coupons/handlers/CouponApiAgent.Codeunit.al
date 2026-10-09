@@ -725,6 +725,32 @@ codeunit 6248530 "NPR CouponApiAgent"
         Json.EndObject().EndObject();
     end;
 
+    internal procedure CouponDetailsDTO(CouponId: Guid; ReferenceNo: Text; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder"): Boolean
+    var
+        Coupon: Record "NPR NpDc Coupon";
+        ArchivedCoupon: Record "NPR NpDc Arch. Coupon";
+        LatestVersion: Date;
+    begin
+        LatestVersion := DMY2Date(31, 12, 9999);
+
+        if (Coupon.GetBySystemId(CouponId)) then begin
+            CouponToJson(LatestVersion, Coupon, JsonObjectName, Json);
+            exit(true);
+        end;
+
+        // Archiving inserts a new row without the coupon's SystemId, so an archived coupon is found by its reference.
+        if (ReferenceNo = '') then
+            exit(false);
+
+        ArchivedCoupon.SetCurrentKey("Reference No.");
+        ArchivedCoupon.SetFilter("Reference No.", '=%1', CopyStr(ReferenceNo, 1, MaxStrLen(ArchivedCoupon."Reference No.")));
+        if (not ArchivedCoupon.FindLast()) then
+            exit(false);
+
+        ArchivedCouponToJson(LatestVersion, ArchivedCoupon, JsonObjectName, Json);
+        exit(true);
+    end;
+
     local procedure CouponToJson(VersionDate: Date; Coupon: Record "NPR NpDc Coupon"; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
     begin
         Coupon.CalcFields(Open, "Remaining Quantity", "Issue Date");
