@@ -20,6 +20,7 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         _FulfillmentCreateTok: Label 'fulfillmentCreate(', Locked = true;
         _TransactionCreateTok: Label 'TransactionCreate(', Locked = true;
         _OrderTransactionsTok: Label 'OrderTransactions(', Locked = true;
+        _OrderCreateTok: Label 'orderCreate(', Locked = true;
 
     local procedure Initialize()
     var
@@ -153,6 +154,15 @@ codeunit 85395 "NPR Spfy TL Order Tests"
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
+        POSEntry := InsertPOSEntry(CustomerNo, SaleAmount);
+        if WithPositiveLine then
+            InsertPOSEntrySalesLine(POSEntrySalesLine, POSEntry."Entry No.", '', '', 1)
+        else
+            InsertPOSEntrySalesLine(POSEntrySalesLine, POSEntry."Entry No.", '', '', 0);
+    end;
+
+    local procedure InsertPOSEntry(CustomerNo: Code[20]; SaleAmount: Decimal) POSEntry: Record "NPR POS Entry"
+    begin
         POSEntry.Init();
         POSEntry."Entry No." := NextPOSEntryNo();
         POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
@@ -161,16 +171,52 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         POSEntry."Amount Excl. Tax" := SaleAmount;
         POSEntry."System Entry" := false;
         POSEntry.Insert(false);
+    end;
 
+    local procedure InsertPOSEntrySalesLine(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntryNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal)
+    begin
         POSEntrySalesLine.Init();
-        POSEntrySalesLine."POS Entry No." := POSEntry."Entry No.";
+        POSEntrySalesLine."POS Entry No." := POSEntryNo;
         POSEntrySalesLine."Line No." := 10000;
         POSEntrySalesLine.Type := POSEntrySalesLine.Type::Item;
-        if WithPositiveLine then
-            POSEntrySalesLine.Quantity := 1
-        else
-            POSEntrySalesLine.Quantity := 0;
+        POSEntrySalesLine."No." := ItemNo;
+        POSEntrySalesLine."Variant Code" := VariantCode;
+        POSEntrySalesLine.Quantity := Quantity;
         POSEntrySalesLine.Insert(false);
+    end;
+
+    /// <summary>A synced customer, a POS entry with one item line that can be sent, and the queued task for it. The variant id is assigned so the sibling never looks it up in Shopify.</summary>
+    local procedure CreateSendablePOSEntryTask(StoreCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; var POSEntrySalesLine: Record "NPR POS Entry Sales Line"): BigInteger
+    var
+        Customer: Record Customer;
+        POSEntry: Record "NPR POS Entry";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        RecRef: RecordRef;
+    begin
+        _Lib.CreateCustomerWithLink(Customer, SpfyStoreCustomerLink, StoreCode, true, true);
+        _Lib.AssignEntryID(SpfyStoreCustomerLink.RecordId(), 'C1');
+        _Lib.AssignEntryID(_Lib.VariantLinkRecordId(ItemNo, VariantCode, StoreCode), 'V1');
+        POSEntry := InsertPOSEntry(Customer."No.", 120);
+        InsertPOSEntrySalesLine(POSEntrySalesLine, POSEntry."Entry No.", ItemNo, VariantCode, 1);
+        RecRef.GetTable(POSEntry);
+        exit(EnqueueTask(StoreCode, RecRef, POSEntry.RecordId(), Format(POSEntry."Entry No."), "NPR Spfy Task Op"::Insert, CurrentDateTime()));
+    end;
+
+    local procedure MockOrderCreated(var MockClient: Codeunit "NPR Spfy Mock GraphQL Client")
+    begin
+        MockClient.AddResponse(_OrderCreateTok, '{"data":{"orderCreate":{"userErrors":[],"order":{"id":"gid://shopify/Order/9001"}}}}');
+    end;
+
+    /// <summary>The title of the first line item in the orderCreate request the mock client received.</summary>
+    local procedure SentLineItemTitle(var MockClient: Codeunit "NPR Spfy Mock GraphQL Client"): Text
+    var
+        Request: JsonObject;
+        Title: JsonToken;
+    begin
+        Request.ReadFrom(MockClient.GetRequestContaining(_OrderCreateTok));
+        if not Request.SelectToken('variables.order.lineItems[0].title', Title) then
+            exit('');
+        exit(Title.AsValue().AsText());
     end;
 
     local procedure CreateNpCsDocument(SalesOrderNo: Code[20]) NpCsDocument: Record "NPR NpCs Document"
@@ -935,6 +981,139 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         // [THEN] It errors instead of completing, so it retries once the customer task has landed.
         _Assert.IsTrue(StrPos(RaisedText, _CustomerNotSyncedTok) > 0, StrSubstNo('A POS entry for an unsynced customer must report the missing customer sync, but reported: %1', RaisedText));
         _Assert.AreEqual(0, MockClient.RequestCount(), 'None of the ineligible POS entries may reach Shopify');
+    end;
+
+    [Test]
+    procedure GivenLineWithDescriptions_WhenPOSEntrySiblingRuns_ThenLineItemTitleIsTheLineDescriptions()
+    var
+        Item: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendPOSEntry: Codeunit "NPR Spfy Task Send POS Entry";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A sales line with its own descriptions is sent with those as the line item title, ahead of the item's description.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] An item with a description and a sendable POS entry whose line carries both description fields.
+        _Lib.CreateItem(Item);
+        Item.Description := 'Item description';
+        Item.Modify(false);
+        TaskEntryNo := CreateSendablePOSEntryTask(StoreCode, Item."No.", '', POSEntrySalesLine);
+        POSEntrySalesLine.Description := 'Line description';
+        POSEntrySalesLine."Description 2" := 'Line description 2';
+        POSEntrySalesLine.Modify(false);
+        MockOrderCreated(MockClient);
+
+        // [WHEN] The POS entry sibling runs.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendPOSEntry.SetGraphQLClient(MockClient);
+        SendPOSEntry.Run(SpfyTask);
+
+        // [THEN] The line item title is the two line descriptions joined by a space.
+        _Assert.AreEqual('Line description Line description 2', SentLineItemTitle(MockClient), 'The line descriptions must be the line item title');
+    end;
+
+    [Test]
+    procedure GivenBlankLineDescriptionsAndDescribedVariant_WhenPOSEntrySiblingRuns_ThenLineItemTitleIsTheVariantDescriptions()
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendPOSEntry: Codeunit "NPR Spfy Task Send POS Entry";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A sales line without descriptions for an item variant is sent with the variant's descriptions as the line item title, ahead of the item's description.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] An item with a description, a variant of it with both description fields, and a sendable POS entry whose line has no description.
+        _Lib.CreateItem(Item);
+        Item.Description := 'Item description';
+        Item.Modify(false);
+        _Lib.CreateItemVariant(ItemVariant, Item."No.");
+        ItemVariant.Description := 'Variant description';
+        ItemVariant."Description 2" := 'Blue';
+        ItemVariant.Modify(false);
+        TaskEntryNo := CreateSendablePOSEntryTask(StoreCode, Item."No.", ItemVariant.Code, POSEntrySalesLine);
+        MockOrderCreated(MockClient);
+
+        // [WHEN] The POS entry sibling runs.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendPOSEntry.SetGraphQLClient(MockClient);
+        SendPOSEntry.Run(SpfyTask);
+
+        // [THEN] The line item title is the two variant descriptions joined by a space.
+        _Assert.AreEqual('Variant description Blue', SentLineItemTitle(MockClient), 'The variant descriptions must be the line item title');
+    end;
+
+    [Test]
+    procedure GivenBlankLineAndVariantDescriptions_WhenPOSEntrySiblingRuns_ThenLineItemTitleIsTheItemDescriptions()
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendPOSEntry: Codeunit "NPR Spfy Task Send POS Entry";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A sales line without descriptions for a variant that has none either is sent with the item's descriptions as the line item title.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] An item with both description fields, a variant of it without any, and a sendable POS entry whose line has no description.
+        _Lib.CreateItem(Item);
+        Item.Description := 'Item description';
+        Item."Description 2" := 'Large';
+        Item.Modify(false);
+        _Lib.CreateItemVariant(ItemVariant, Item."No.");
+        TaskEntryNo := CreateSendablePOSEntryTask(StoreCode, Item."No.", ItemVariant.Code, POSEntrySalesLine);
+        MockOrderCreated(MockClient);
+
+        // [WHEN] The POS entry sibling runs.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendPOSEntry.SetGraphQLClient(MockClient);
+        SendPOSEntry.Run(SpfyTask);
+
+        // [THEN] The line item title is the two item descriptions joined by a space.
+        _Assert.AreEqual('Item description Large', SentLineItemTitle(MockClient), 'The item descriptions must be the line item title');
+    end;
+
+    [Test]
+    procedure GivenNoDescriptionAnywhere_WhenPOSEntrySiblingRuns_ThenLineItemTitleIsTheLineTypeAndNumber()
+    var
+        Item: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendPOSEntry: Codeunit "NPR Spfy Task Send POS Entry";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A sales line whose line and item have no description at all is still sent with a title, built from the line type and number, so Shopify does not reject the order.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] An item without descriptions and a sendable POS entry whose line has no description.
+        _Lib.CreateItem(Item);
+        TaskEntryNo := CreateSendablePOSEntryTask(StoreCode, Item."No.", '', POSEntrySalesLine);
+        MockOrderCreated(MockClient);
+
+        // [WHEN] The POS entry sibling runs.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendPOSEntry.SetGraphQLClient(MockClient);
+        SendPOSEntry.Run(SpfyTask);
+
+        // [THEN] The line item title is the line type caption followed by the item number.
+        _Assert.AreEqual(StrSubstNo('%1 %2', Format(POSEntrySalesLine.Type::Item), Item."No."), SentLineItemTitle(MockClient), 'A line without any description must get the type and number as its line item title');
     end;
     #endregion
 }

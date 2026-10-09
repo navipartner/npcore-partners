@@ -84,6 +84,39 @@ codeunit 6248585 "NPR Spfy POS Entry Export Mgt."
         );
     end;
 
+    /// <summary>
+    /// The Shopify line item title. Shopify rejects an order whose line item has a blank title, so a line without a
+    /// description falls back to the item variant, then the item, and last to the line type and number.
+    /// </summary>
+    internal procedure GetLineItemTitle(POSEntrySalesLine: Record "NPR POS Entry Sales Line") Title: Text
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+    begin
+        Title := JoinDescriptions(POSEntrySalesLine.Description, POSEntrySalesLine."Description 2");
+        if Title <> '' then
+            exit;
+        if POSEntrySalesLine.Type = POSEntrySalesLine.Type::Item then begin
+            if POSEntrySalesLine."Variant Code" <> '' then
+                if ItemVariant.Get(POSEntrySalesLine."No.", POSEntrySalesLine."Variant Code") then
+                    Title := JoinDescriptions(ItemVariant.Description, ItemVariant."Description 2");
+            if Title = '' then
+                if Item.Get(POSEntrySalesLine."No.") then
+                    Title := JoinDescriptions(Item.Description, Item."Description 2");
+        end;
+        if Title = '' then
+            Title := JoinDescriptions(Format(POSEntrySalesLine.Type), POSEntrySalesLine."No.");
+    end;
+
+    local procedure JoinDescriptions(Description: Text; Description2: Text): Text
+    begin
+        if Description2 = '' then
+            exit(Description);
+        if Description = '' then
+            exit(Description2);
+        exit(Description + ' ' + Description2);
+    end;
+
     internal procedure SetExportPointerBuffer(var SpfyExportPointerBufferIn: Record "NPR Spfy Export Pointer Buffer")
     begin
         TempSpfyExportPointerBuffer.Copy(SpfyExportPointerBufferIn, true);

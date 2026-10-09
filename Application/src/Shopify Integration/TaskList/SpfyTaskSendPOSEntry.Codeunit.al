@@ -151,6 +151,7 @@ codeunit 6151486 "NPR Spfy Task Send POS Entry"
         CurrExchRate: Record "Currency Exchange Rate";
         TempConsolidatedPOSEntryPaymentLine: Record "NPR POS Entry Payment Line" temporary;
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
         JsonBuilder: Codeunit "NPR Json Builder";
         ShopifyVariantID: Text[30];
         PresentmentMoneyCurrCode: Code[3];
@@ -204,7 +205,7 @@ codeunit 6151486 "NPR Spfy Task Send POS Entry"
                         JsonBuilder.AddProperty('variantId', 'gid://shopify/ProductVariant/' + ShopifyVariantID);
                     JsonBuilder.AddProperty('sku', SpfyItemMgt.GetProductVariantSku(POSEntrySalesLine."No.", POSEntrySalesLine."Variant Code"));
                 end;
-                JsonBuilder.AddProperty('title', GetLineDescription(POSEntrySalesLine));
+                JsonBuilder.AddProperty('title', SpfyPOSEntryExportMgt.GetLineItemTitle(POSEntrySalesLine));
                 JsonBuilder.AddProperty('giftCard', false); //We cannot set this to true (or base it on POSEntrySalesLine.Type::Voucher), because Shopify will create duplicate gift cards
                 JsonBuilder.AddProperty('quantity', ToInt(POSEntrySalesLine.Quantity));  //Shopify expects quantity as integer
 
@@ -323,19 +324,6 @@ codeunit 6151486 "NPR Spfy Task Send POS Entry"
         _GLSetupRetrieved := true;
         if not _GLSetup.Get() then
             _GLSetup.Init();
-    end;
-
-    local procedure GetLineDescription(POSEntrySalesLine: Record "NPR POS Entry Sales Line"): Text
-    var
-        Result: Text;
-    begin
-        Result := POSEntrySalesLine.Description;
-        if POSEntrySalesLine."Description 2" <> '' then begin
-            if Result <> '' then
-                Result += ' ';
-            Result += POSEntrySalesLine."Description 2";
-        end;
-        exit(Result);
     end;
 
     local procedure ToInt(Quantity: Decimal): Integer
