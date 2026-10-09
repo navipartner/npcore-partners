@@ -270,6 +270,8 @@ codeunit 6151183 "NPR Spfy Task Queue"
     end;
 
     internal procedure CompleteSingle(var SpfyTask: Record "NPR Spfy Task"; Success: Boolean; ErrorText: Text)
+    var
+        DispatchFailedLbl: Label 'The task could not be sent to Shopify.';
     begin
         SpfyTask.ReadIsolation(IsolationLevel::UpdLock);
         if not SpfyTask.Get(SpfyTask."Entry No.") then
@@ -285,7 +287,12 @@ codeunit 6151183 "NPR Spfy Task Queue"
             SetCompleted(SpfyTask)
         else begin
             if ErrorText <> '' then
-                WriteResponse(SpfyTask, ErrorText);
+                WriteResponse(SpfyTask, ErrorText)
+            else begin
+                SpfyTask.CalcFields(Response);
+                if not SpfyTask.Response.HasValue() then
+                    WriteResponse(SpfyTask, DispatchFailedLbl);
+            end;
             RecordFailure(SpfyTask, ErrorText);
         end;
         SpfyTask.Modify(true);

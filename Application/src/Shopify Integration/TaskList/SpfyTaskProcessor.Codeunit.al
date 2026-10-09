@@ -381,14 +381,11 @@ codeunit 6151214 "NPR Spfy Task Processor"
     local procedure DispatchSingle(var SpfyTask: Record "NPR Spfy Task")
     var
         ErrorText: Text;
-        DispatchFailedLbl: Label 'The task could not be sent to Shopify.';
     begin
         if SendBoundary().Dispatch(SpfyTask, ErrorText) then begin
             _SpfyTaskQueue.CompleteSingle(SpfyTask, true, '');
             exit;
         end;
-        if ErrorText = '' then
-            ErrorText := DispatchFailedLbl;
         _SpfyTaskQueue.CompleteSingle(SpfyTask, false, ErrorText);
     end;
 

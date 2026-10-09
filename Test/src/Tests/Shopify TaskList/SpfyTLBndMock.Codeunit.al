@@ -9,6 +9,7 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
         _SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
         _OutcomeSucceeds: Dictionary of [BigInteger, Boolean];
         _OutcomeErrors: Dictionary of [BigInteger, Text];
+        _StoredResponses: Dictionary of [BigInteger, Text];
         _DispatchedEntryNos: List of [BigInteger];
         _DispatchTableNos: List of [Integer];
         _DispatchRowCounts: List of [Integer];
@@ -53,6 +54,12 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
         end;
         _OutcomeSucceeds.Add(EntryNo, Succeed);
         _OutcomeErrors.Add(EntryNo, ErrorText);
+    end;
+
+    // Simulates a send that commits Shopify's reply to the task before it reports its outcome, as the senders do on userErrors.
+    procedure QueueStoredResponse(EntryNo: BigInteger; ResponseText: Text)
+    begin
+        _StoredResponses.Set(EntryNo, ResponseText);
     end;
 
     procedure SetWholeCallFailure(ErrorText: Text)
@@ -114,6 +121,7 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
     begin
         Clear(_OutcomeSucceeds);
         Clear(_OutcomeErrors);
+        Clear(_StoredResponses);
         Clear(_DispatchedEntryNos);
         Clear(_DispatchTableNos);
         Clear(_DispatchRowCounts);
@@ -257,7 +265,23 @@ codeunit 85317 "NPR Spfy TL Bnd Mock" implements "NPR Spfy Task Send Boundary"
             ErrorText := _FailureErrorText;
             exit(false);
         end;
+        StoreScriptedResponse(SpfyTask."Entry No.");
         exit(OutcomeFor(SpfyTask."Entry No.", ErrorText));
+    end;
+
+    local procedure StoreScriptedResponse(EntryNo: BigInteger)
+    var
+        SpfyTask: Record "NPR Spfy Task";
+        OStream: OutStream;
+        ResponseText: Text;
+    begin
+        if not _StoredResponses.Get(EntryNo, ResponseText) then
+            exit;
+        SpfyTask.Get(EntryNo);
+        SpfyTask.Response.CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(ResponseText);
+        SpfyTask.Modify();
+        Commit();
     end;
 
     local procedure OutcomeFor(EntryNo: BigInteger; var ErrorText: Text): Boolean

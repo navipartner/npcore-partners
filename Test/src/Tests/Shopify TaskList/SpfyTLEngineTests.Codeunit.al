@@ -1931,6 +1931,84 @@ codeunit 85311 "NPR Spfy TL Engine Tests"
         AssertTask(TaskEntryNo, "NPR Spfy Task State"::Completed, 1, 'A resent task must complete again');
         _Assert.AreEqual(2, _BndMock.DispatchCount(), 'A resend must send the update exactly one more time');
     end;
+
+    [Test]
+    procedure GivenUserErrorsStored_WhenSingleDispatchFailsWithEmptyError_ThenResponseIsKeptThroughQuarantine()
+    var
+        Item: Record Item;
+        SpfyTask: Record "NPR Spfy Task";
+        SentryCapture: Codeunit "NPR Library - Sentry Capture";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        TaskEntryNo: BigInteger;
+        Attempt: Integer;
+        UserErrorTok: Label 'Line items Title can''t be blank', Locked = true;
+        CouldNotBeSentTok: Label 'could not be sent', Locked = true;
+        QuarantineAlertTok: Label 'was quarantined after', Locked = true;
+    begin
+        // [SCENARIO] A single-dispatch task whose send stores a Shopify userErrors reply and fails with an empty error keeps that reply as its response on every retry and after quarantine, and the quarantine alert carries it.
+        Initialize();
+        // [GIVEN] A pending item task whose send stores a userErrors reply and then fails with an empty error, on every attempt.
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateItem(Item);
+        TaskEntryNo := EnqueueItemTask(StoreCode, Item, "NPR Spfy Task Op"::Modify, 0DT, AtDateTime);
+        _BndMock.QueueStoredResponse(TaskEntryNo, '{"data":{"orderCreate":{"userErrors":[{"field":["order","lineItems"],"message":"Line items Title can''t be blank"}],"order":null}}}');
+        _BndMock.QueueOutcome(TaskEntryNo, false, '');
+
+        // [WHEN] The task is processed once.
+        GetTask(TaskEntryNo, SpfyTask);
+        _SpfyTaskProcessor.ProcessTaskManually(SpfyTask, false);
+
+        // [THEN] The task is retryable and its response is the stored Shopify reply, not the fallback label.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Pending, 1, 'A first failed attempt must leave the task retryable');
+        _Assert.IsTrue(StrPos(ResponseText(TaskEntryNo), UserErrorTok) > 0, StrSubstNo('After the first attempt the response must keep the stored Shopify reply containing ''%1'' but was: %2', UserErrorTok, ResponseText(TaskEntryNo)));
+        _Assert.AreEqual(0, StrPos(ResponseText(TaskEntryNo), CouldNotBeSentTok), StrSubstNo('After the first attempt the response must not contain ''%1'' when the send stored a reply, but was: %2', CouldNotBeSentTok, ResponseText(TaskEntryNo)));
+
+        // [WHEN] The task is processed until its attempts are used up.
+        SentryCapture.Start();
+        for Attempt := 2 to _SpfyTaskQueue.AttemptCap() do begin
+            GetTask(TaskEntryNo, SpfyTask);
+            _SpfyTaskProcessor.ProcessTaskManually(SpfyTask, false);
+        end;
+        SentryCapture.Stop();
+
+        // [THEN] The task is quarantined and its response is still the stored Shopify reply.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Quarantined, _SpfyTaskQueue.AttemptCap(), 'A task that failed every attempt must be quarantined');
+        _Assert.IsTrue(StrPos(ResponseText(TaskEntryNo), UserErrorTok) > 0, StrSubstNo('After quarantine the response must keep the stored Shopify reply containing ''%1'' but was: %2', UserErrorTok, ResponseText(TaskEntryNo)));
+
+        // [THEN] The quarantine alert sent to Sentry carries the stored Shopify reply.
+        _Assert.IsTrue(SentryCapture.Contains(QuarantineAlertTok), 'The last failed attempt must send a quarantine alert to Sentry');
+        _Assert.IsTrue(SentryCapture.Contains(UserErrorTok), StrSubstNo('The quarantine alert must carry the stored Shopify reply containing ''%1''', UserErrorTok));
+    end;
+
+    [Test]
+    procedure GivenNoStoredResponse_WhenSingleDispatchFailsWithEmptyError_ThenFallbackLabelIsWritten()
+    var
+        Item: Record Item;
+        SpfyTask: Record "NPR Spfy Task";
+        StoreCode: Code[20];
+        AtDateTime: DateTime;
+        TaskEntryNo: BigInteger;
+        CouldNotBeSentToShopifyTok: Label 'could not be sent to Shopify', Locked = true;
+    begin
+        // [SCENARIO] A single-dispatch task whose send fails with an empty error and stores no response gets the fallback label as its response.
+        Initialize();
+        // [GIVEN] A pending item task whose send fails with an empty error and stores nothing.
+        AtDateTime := CurrentDateTime();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateItem(Item);
+        TaskEntryNo := EnqueueItemTask(StoreCode, Item, "NPR Spfy Task Op"::Modify, 0DT, AtDateTime);
+        _BndMock.QueueOutcome(TaskEntryNo, false, '');
+
+        // [WHEN] The task is processed once.
+        GetTask(TaskEntryNo, SpfyTask);
+        _SpfyTaskProcessor.ProcessTaskManually(SpfyTask, false);
+
+        // [THEN] The task is retryable and its response carries the fallback label.
+        AssertTask(TaskEntryNo, "NPR Spfy Task State"::Pending, 1, 'A first failed attempt must leave the task retryable');
+        _Assert.IsTrue(StrPos(ResponseText(TaskEntryNo), CouldNotBeSentToShopifyTok) > 0, StrSubstNo('A send that fails with an empty error and stores nothing must leave a response containing ''%1'' but it was: %2', CouldNotBeSentToShopifyTok, ResponseText(TaskEntryNo)));
+    end;
     #endregion
 
     #region Manual
