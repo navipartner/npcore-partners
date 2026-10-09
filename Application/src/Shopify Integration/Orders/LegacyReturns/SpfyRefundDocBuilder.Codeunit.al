@@ -257,7 +257,8 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
     end;
 
     /// <summary>
-    /// An order BC never invoiced: not imported yet when BC has no Sales Order for it, or never to be invoiced when its Sales Order has nothing left to post or Shopify cancelled it, so BC received nothing for it.
+    /// An order BC never invoiced: not imported yet when BC has no Sales Order for it, or never to be invoiced when Shopify cancelled it, or when its Sales Order has nothing left to post and Shopify shipped nothing, so BC received nothing for it.
+    /// A fulfilled order is shipped and invoiced by the order import whatever was refunded since, so its refund waits for the invoice even while the Sales Order shows nothing to post.
     /// </summary>
     local procedure OrderNeverInvoiced(ShopifyStoreCode: Code[20]; DisplayName: Text[50]; var TempReturnBuffer: Record "NPR Spfy Legacy Return Buffer" temporary; var Outcome: Enum "NPR Spfy Refund Build Outcome"; var OutcomeMessage: Text): Boolean
     var
@@ -265,14 +266,20 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
         SalesHeader: Record "Sales Header";
         WaitingForOrderImportMsg: Label 'Waiting until Business Central has invoiced Shopify order %1, which has no %2 or %3 here yet; %4 is imported then. If the order is never imported here, dismiss it.', Comment = '%1 = Shopify order name, %2 = Sales Header table caption, %3 = Sales Invoice Header table caption, %4 = Shopify document caption';
         NothingLeftNeverInvoicedMsg: Label 'Business Central never invoiced Shopify order %1, and its %2 %3 has nothing left to ship or invoice, so Business Central never received money for it and %4 has nothing to credit.', Comment = '%1 = Shopify order name, %2 = Sales Header table caption, %3 = Sales Order no., %4 = Shopify document caption';
+        WaitingForFulfilledOrderMsg: Label 'Waiting until Business Central has invoiced Shopify order %1: Shopify has shipped it, but its %2 %3 has nothing to ship or invoice yet. Shopify %4 is imported once the order is invoiced. If %3 cannot be posted, correct it; if the order is never invoiced here, dismiss this row.', Comment = '%1 = Shopify order name, %2 = Sales Header table caption, %3 = Sales Order no., %4 = Shopify document caption';
         CancelledNeverInvoicedMsg: Label 'Shopify order %1 was cancelled before Business Central invoiced any of it, so Business Central never received money for it and %2 has nothing to credit.', Comment = '%1 = Shopify order name, %2 = Shopify document caption';
     begin
         if CollectOrderInvoices(ShopifyStoreCode, TempReturnBuffer."Order Id", TempSalesInvoiceHeader) then
             exit(false);
         // OrderStillOpen ran first, so a Sales Order found here has nothing left to post.
         if FindSalesOrder(ShopifyStoreCode, TempReturnBuffer."Order Id", false, SalesHeader) then begin
-            Outcome := Outcome::"Nothing to Credit";
-            OutcomeMessage := StrSubstNo(NothingLeftNeverInvoicedMsg, TempReturnBuffer."Order Name", SalesHeader.TableCaption(), SalesHeader."No.", DisplayName);
+            if TempReturnBuffer."Order Fulfilled" and not TempReturnBuffer."Order Cancelled" then begin
+                Outcome := Outcome::Waiting;
+                OutcomeMessage := StrSubstNo(WaitingForFulfilledOrderMsg, TempReturnBuffer."Order Name", SalesHeader.TableCaption(), SalesHeader."No.", DisplayName);
+            end else begin
+                Outcome := Outcome::"Nothing to Credit";
+                OutcomeMessage := StrSubstNo(NothingLeftNeverInvoicedMsg, TempReturnBuffer."Order Name", SalesHeader.TableCaption(), SalesHeader."No.", DisplayName);
+            end;
         end else
             if TempReturnBuffer."Order Cancelled" then begin
                 Outcome := Outcome::"Nothing to Credit";
@@ -1354,11 +1361,22 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
     /// </summary>
     internal procedure OtherDraftSettlesOrderInvoice(ShopifyStoreCode: Code[20]; OrderId: Text[30]; SourceDocType: Enum "NPR Spfy Legacy Return Source"; ShopifyId: Text[30]; DisplayName: Text[50]; LockEntries: Boolean; var WaitingMessage: Text): Boolean
     var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        OtherSalesHeader: Record "Sales Header";
+        InvoiceNo: Code[20];
+        WaitingForOtherDraftMsg: Label 'Waiting until %1 %2, which settles the unpaid %3 %4 of the same Shopify order, is posted or deleted; Shopify %5 is imported then.', Comment = '%1 = document type (Return Order or Credit Memo), %2 = document no., %3 = Sales Invoice Header table caption, %4 = invoice no., %5 = Shopify document caption';
+    begin
+        if not FindOtherDraftSettlingOrderInvoice(ShopifyStoreCode, OrderId, SourceDocType, ShopifyId, LockEntries, OtherSalesHeader, InvoiceNo) then
+            exit(false);
+        WaitingMessage := StrSubstNo(WaitingForOtherDraftMsg, OtherSalesHeader."Document Type", OtherSalesHeader."No.", SalesInvoiceHeader.TableCaption(), InvoiceNo, DisplayName);
+        exit(true);
+    end;
+
+    local procedure FindOtherDraftSettlingOrderInvoice(ShopifyStoreCode: Code[20]; OrderId: Text[30]; SourceDocType: Enum "NPR Spfy Legacy Return Source"; ShopifyId: Text[30]; LockEntries: Boolean; var OtherSalesHeader: Record "Sales Header"; var InvoiceNo: Code[20]): Boolean
+    var
         TempSalesInvoiceHeader: Record "Sales Invoice Header" temporary;
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        OtherSalesHeader: Record "Sales Header";
-        WaitingForOtherDraftMsg: Label 'Waiting until %1 %2, which settles the unpaid %3 %4 of the same Shopify order, is posted or deleted; Shopify %5 is imported then.', Comment = '%1 = document type (Return Order or Credit Memo), %2 = document no., %3 = Sales Invoice Header table caption, %4 = invoice no., %5 = Shopify document caption';
     begin
         if not CollectOrderInvoices(ShopifyStoreCode, OrderId, TempSalesInvoiceHeader) then
             exit(false);
@@ -1378,12 +1396,34 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
                 if OtherSalesHeader.FindSet() then
                     repeat
                         if _SpfyAssignedIDMgt.GetAssignedShopifyID(OtherSalesHeader.RecordId(), _SpfyLegacyReturnMgt.SourceDocIdType(SourceDocType)) <> ShopifyId then begin
-                            WaitingMessage := StrSubstNo(WaitingForOtherDraftMsg, OtherSalesHeader."Document Type", OtherSalesHeader."No.", TempSalesInvoiceHeader.TableCaption(), TempSalesInvoiceHeader."No.", DisplayName);
+                            InvoiceNo := TempSalesInvoiceHeader."No.";
                             exit(true);
                         end;
                     until OtherSalesHeader.Next() = 0;
             end;
         until TempSalesInvoiceHeader.Next() = 0;
+        exit(false);
+    end;
+
+    /// <summary>
+    /// The document a row's note names, found by the same checks as the import: for a waiting row a Sales Order with something left to post or another draft settling the order's unpaid invoice;
+    /// for a waiting row or one with nothing to credit, a Sales Order with nothing to post while the order has no invoice. False when the note names no document here, as when the row waits on Shopify.
+    /// </summary>
+    internal procedure FindDocumentNamedInNote(ShopifyStoreCode: Code[20]; OrderId: Text[30]; SourceDocType: Enum "NPR Spfy Legacy Return Source"; ShopifyId: Text[30]; RowWaits: Boolean; var SalesHeader: Record "Sales Header"): Boolean
+    var
+        TempSalesInvoiceHeader: Record "Sales Invoice Header" temporary;
+        InvoiceNo: Code[20];
+    begin
+        if RowWaits then begin
+            if SourceDocType = SourceDocType::Refund then
+                if FindSalesOrder(ShopifyStoreCode, OrderId, true, SalesHeader) then
+                    exit(true);
+            if FindOtherDraftSettlingOrderInvoice(ShopifyStoreCode, OrderId, SourceDocType, ShopifyId, false, SalesHeader, InvoiceNo) then
+                exit(true);
+        end;
+        if SourceDocType = SourceDocType::Refund then
+            if not CollectOrderInvoices(ShopifyStoreCode, OrderId, TempSalesInvoiceHeader) then
+                exit(FindSalesOrder(ShopifyStoreCode, OrderId, false, SalesHeader));
         exit(false);
     end;
 

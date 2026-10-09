@@ -73,7 +73,7 @@ codeunit 6151148 "NPR Spfy Legacy Return API"
         ShopifyStore: Record "NPR Spfy Store";
         Response: JsonToken;
         RefundNotFoundErr: Label 'Shopify did not return any data for refund %1 of %2 %3.', Comment = '%1 = Shopify refund id, %2 = Shopify Store table caption, %3 = Shopify store code';
-        RefundDetailRequest: Label 'query GetRefund($OrderId: ID!) { refund(id: $OrderId) { id createdAt processedAt return { id } order { id name number cancelledAt email phone sourceName taxesIncluded currencyCode presentmentCurrencyCode lineItems(first: 100) { pageInfo { hasNextPage } edges { node { id quantity originalUnitPriceSet { presentmentMoney { amount } } discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } taxLines { ratePercentage } } } } customer { id firstName lastName defaultEmailAddress { emailAddress } defaultPhoneNumber { phoneNumber } defaultAddress { phone } } billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 phone } } refundLineItems(first: 100) { pageInfo { hasNextPage } edges { node { quantity restockType restocked location { id } subtotalSet { presentmentMoney { amount } } totalTaxSet { presentmentMoney { amount } } lineItem { id quantity sku title isGiftCard customAttributes { key value } variant { id sku barcode } taxLines { ratePercentage } } } } } refundShippingLines(first: 20) { pageInfo { hasNextPage } edges { node { subtotalAmountSet { presentmentMoney { amount } } taxAmountSet { presentmentMoney { amount } } } } } orderAdjustments(first: 50) { pageInfo { hasNextPage } edges { node { amountSet { presentmentMoney { amount } } taxAmountSet { presentmentMoney { amount } } reason } } } transactions(first: 50) { pageInfo { hasNextPage } edges { node { id kind status gateway processedAt createdAt paymentId receiptJson paymentDetails { ... on CardPaymentDetails { company } } amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } } } } } }', Locked = true;
+        RefundDetailRequest: Label 'query GetRefund($OrderId: ID!) { refund(id: $OrderId) { id createdAt processedAt return { id } order { id name number cancelledAt fulfillments(first: 50) { status } email phone sourceName taxesIncluded currencyCode presentmentCurrencyCode lineItems(first: 100) { pageInfo { hasNextPage } edges { node { id quantity originalUnitPriceSet { presentmentMoney { amount } } discountAllocations { allocatedAmountSet { presentmentMoney { amount } } } taxLines { ratePercentage } } } } customer { id firstName lastName defaultEmailAddress { emailAddress } defaultPhoneNumber { phoneNumber } defaultAddress { phone } } billingAddress { firstName lastName company countryCodeV2 zip address1 address2 city } shippingAddress { firstName lastName company address1 address2 zip city countryCodeV2 phone } } refundLineItems(first: 100) { pageInfo { hasNextPage } edges { node { quantity restockType restocked location { id } subtotalSet { presentmentMoney { amount } } totalTaxSet { presentmentMoney { amount } } lineItem { id quantity sku title isGiftCard customAttributes { key value } variant { id sku barcode } taxLines { ratePercentage } } } } } refundShippingLines(first: 20) { pageInfo { hasNextPage } edges { node { subtotalAmountSet { presentmentMoney { amount } } taxAmountSet { presentmentMoney { amount } } } } } orderAdjustments(first: 50) { pageInfo { hasNextPage } edges { node { amountSet { presentmentMoney { amount } } taxAmountSet { presentmentMoney { amount } } reason } } } transactions(first: 50) { pageInfo { hasNextPage } edges { node { id kind status gateway processedAt createdAt paymentId receiptJson paymentDetails { ... on CardPaymentDetails { company } } amountSet { presentmentMoney { amount currencyCode } shopMoney { amount currencyCode } } } } } } }', Locked = true;
     begin
         Response := RunQuery(ShopifyStoreCode, RefundDetailRequest, StrSubstNo(_RefundGidTok, RefundId));
         ParseRefundDetail(ShopifyStoreCode, RefundId, Response, TempReturnBuffer, TempLineBuffer, TempRefundTxnBuffer);
@@ -262,6 +262,7 @@ codeunit 6151148 "NPR Spfy Legacy Return API"
         OrderToken := _JsonHelper.GetJsonToken(RefundToken, 'order');
         ReadOrderBlock(OrderToken, TempReturnBuffer, TaxesIncluded);
         TempReturnBuffer."Order Cancelled" := _JsonHelper.GetJDT(OrderToken, 'cancelledAt', false) <> 0DT;
+        TempReturnBuffer."Order Fulfilled" := HasSuccessfulFulfillment(OrderToken);
         TempReturnBuffer."Return Name" := TempReturnBuffer."Order Name";
         TempReturnBuffer."Shipping Refund Amount" := SumShippingOfRefund(DocId, RefundToken);
         SplitAdjustments(SumAdjustmentsOfRefund(DocId, RefundToken, TaxesIncluded), TempReturnBuffer."Fee Amount", TempReturnBuffer."Refund Beyond Lines Amount");
@@ -311,6 +312,24 @@ codeunit 6151148 "NPR Spfy Legacy Return API"
             TempLineBuffer."Unit Price" := Round(TempLineBuffer."Line Amount" / TempLineBuffer.Quantity, 0.01, '>');
             TempLineBuffer.Insert();
         end;
+    end;
+
+    /// <summary>
+    /// Shopify shipped something on the order, which the order import ships and invoices however much was refunded since.
+    /// </summary>
+    local procedure HasSuccessfulFulfillment(OrderToken: JsonToken): Boolean
+    var
+        FulfillmentsToken: JsonToken;
+        Fulfillment: JsonToken;
+    begin
+        if not OrderToken.SelectToken('fulfillments', FulfillmentsToken) then
+            exit(false);
+        if not FulfillmentsToken.IsArray() then
+            exit(false);
+        foreach Fulfillment in FulfillmentsToken.AsArray() do
+            if _JsonHelper.GetJText(Fulfillment, 'status', false).ToUpper() = 'SUCCESS' then
+                exit(true);
+        exit(false);
     end;
 
     local procedure CheckRefundNotTruncated(DocId: Text[30]; RefundToken: JsonToken)

@@ -28,6 +28,7 @@ table 6059917 "NPR Spfy Legacy Return Buffer"
         field(170; "Other Refunds Incomplete"; Boolean) { Caption = 'Other Refunds Incomplete'; DataClassification = SystemMetadata; }
         field(180; "Order Cancelled"; Boolean) { Caption = 'Order Cancelled'; DataClassification = SystemMetadata; }
         field(190; "Pending Refund Txns"; Integer) { Caption = 'Pending Refund Transactions'; DataClassification = SystemMetadata; }
+        field(3; "Order Fulfilled"; Boolean) { Caption = 'Order Fulfilled'; DataClassification = SystemMetadata; }
     }
     keys { key(PK; "Return Id") { Clustered = true; } }
 

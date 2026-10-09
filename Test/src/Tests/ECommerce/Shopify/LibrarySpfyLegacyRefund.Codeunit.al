@@ -115,6 +115,19 @@ codeunit 85511 "NPR Library Spfy Legacy Refund"
     end;
 
     /// <summary>
+    /// The refund's order as Shopify shows it once something was shipped: one cancelled and one successful fulfillment.
+    /// </summary>
+    procedure OfFulfilledOrder(RefundDetailJson: Text): Text
+    begin
+        exit(WithOrderFulfillments(RefundDetailJson, '{"status":"CANCELLED"},{"status":"SUCCESS"}'));
+    end;
+
+    procedure WithOrderFulfillments(RefundDetailJson: Text; FulfillmentsJson: Text): Text
+    begin
+        exit(RefundDetailJson.Replace('"number":9001,', '"number":9001,"fulfillments":[' + FulfillmentsJson + '],'));
+    end;
+
+    /// <summary>
     /// A refund time one minute from now, so invoices a test posts first count as made before the refund.
     /// </summary>
     procedure RefundTimeAfterNow(): Text

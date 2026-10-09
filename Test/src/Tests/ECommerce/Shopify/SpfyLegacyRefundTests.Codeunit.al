@@ -714,6 +714,27 @@ codeunit 85510 "NPR Spfy Legacy Refund Tests"
     end;
 
     [Test]
+    procedure RefundApi_ParseDetail_OrderWithOnlyCancelledFulfillments_IsNotFulfilled()
+    var
+        TempReturnBuffer: Record "NPR Spfy Legacy Return Buffer" temporary;
+        TempLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary;
+        TempRefundTxnBuffer: Record "NPR Spfy Legacy Refund Txn Buf" temporary;
+        SpfyLegacyReturnAPI: Codeunit "NPR Spfy Legacy Return API";
+        Response: JsonToken;
+    begin
+        // [SCENARIO] An order whose fulfillments were all cancelled is not taken for a shipped order, so a refund of it can still end with nothing to credit.
+        // [GIVEN] A refund detail whose order has two cancelled fulfillments and none that succeeded
+        Response.ReadFrom(_Lib.WithOrderFulfillments(_Lib.RefundDetailResponse('2350093', '2350003', '#2350003', '2026-09-22T08:00:00Z', true, '', '', _ReturnLib.OrderAdjustmentJson(-10, 0, 'REFUND_DISCREPANCY'), _ReturnLib.RefundTxnJson('2350083', 'bogus', 10, _ReturnLib.Lcy(), '')), '{"status":"CANCELLED"},{"status":"CANCELLED"}'));
+
+        // [WHEN] The detail is parsed
+        SpfyLegacyReturnAPI.ParseRefundDetail('SPFYLRSTORE', '2350093', Response, TempReturnBuffer, TempLineBuffer, TempRefundTxnBuffer);
+
+        // [THEN] The order is not marked fulfilled
+        _Assert.IsTrue(TempReturnBuffer.Get('2350093'), 'The refund header is parsed.');
+        _Assert.IsFalse(TempReturnBuffer."Order Fulfilled", 'Only a successful fulfillment means Shopify shipped the order.');
+    end;
+
+    [Test]
     procedure Posting_AmountOnlyRefund_PostsSettlesAndBooksTheDiscrepancy()
     var
         ShopifyStore: Record "NPR Spfy Store";
@@ -4508,12 +4529,12 @@ codeunit 85510 "NPR Spfy Legacy Refund Tests"
         LocationCode: Code[10];
         Succeeded: Boolean;
     begin
-        // [SCENARIO] A refund of an order whose Sales Order has nothing left to ship or invoice and was never invoiced has nothing to credit, naming the Sales Order, because Business Central will never receive money for it.
+        // [SCENARIO] A refund of an order whose Sales Order has nothing left to ship or invoice and was never invoiced, and that Shopify never shipped, has nothing to credit, naming the Sales Order, because Business Central will never receive money for it.
         // [GIVEN] A legacy-path store and a Sales Order of the Shopify order cut to nothing, with no invoice
         _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
         _Lib.CreateShopifyOrderWithNothingToPost(StoreCode, CustomerNo, Sku, '2302802', SalesOrder);
 
-        // [GIVEN] A queued refund of 30 on that order, which Shopify did not cancel
+        // [GIVEN] A queued refund of 30 on that order, which Shopify neither shipped nor cancelled
         _Lib.InsertRefundQueueRow(StoreCode, '2302892', '2302802', '#2302802', QueueRow);
         MockClient.AddResponse('GetRefund', _Lib.RefundDetailResponse('2302892', '2302802', '#2302802', _Lib.RefundTimeAfterNow(), true, '', '', _ReturnLib.OrderAdjustmentJson(-30, 0, 'REFUND_DISCREPANCY'), _ReturnLib.RefundTxnJson('2302882', 'bogus', 30, _ReturnLib.Lcy(), '')));
 
@@ -4526,6 +4547,511 @@ codeunit 85510 "NPR Spfy Legacy Refund Tests"
         _Assert.AreEqual(QueueRow.Status::"Nothing to Credit", QueueRow.Status, 'A Sales Order with nothing left and no invoice will never be invoiced: ' + QueueRow."Outcome Note");
         _Assert.IsTrue(StrPos(QueueRow."Outcome Note", SalesOrder."No.") > 0, 'The note must name the Sales Order: ' + QueueRow."Outcome Note");
         _Lib.AssertNoReturnOrder(CustomerNo);
+    end;
+
+    [Test]
+    procedure Import_RefundOfAShippedOrderWhoseSalesOrderShowsNothingToPost_Waits()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesOrder: Record "Sales Header";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A refund of an order Shopify has shipped waits while its Sales Order shows nothing to ship or invoice and no invoice exists, naming the Sales Order, because the order import still has to invoice what was shipped.
+        // [GIVEN] A legacy-path store and a Sales Order of the Shopify order with nothing to post, with no invoice
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.CreateShopifyOrderWithNothingToPost(StoreCode, CustomerNo, Sku, '2350001', SalesOrder);
+
+        // [GIVEN] A queued shipping refund of 29 on that order, which Shopify has shipped
+        _Lib.InsertRefundQueueRow(StoreCode, '2350091', '2350001', '#2350001', QueueRow);
+        MockClient.AddResponse('GetRefund', _Lib.OfFulfilledOrder(_Lib.RefundDetailResponse('2350091', '2350001', '#2350001', _Lib.RefundTimeAfterNow(), true, '', _ReturnLib.RefundShippingLineJson(23.20, 5.80), '', _ReturnLib.RefundTxnJson('2350081', 'bogus', 29, _ReturnLib.Lcy(), ''))));
+
+        // [WHEN] The import runs
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The row waits with a note naming the Sales Order, without a retry counted, and no Return Order exists
+        _Assert.IsTrue(Succeeded, 'Waiting is not an error: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2350091');
+        _Assert.AreEqual(QueueRow.Status::Waiting, QueueRow.Status, 'A shipped order is still to be invoiced, so its refund must wait: ' + QueueRow."Outcome Note");
+        _Assert.IsTrue(StrPos(QueueRow."Outcome Note", SalesOrder."No.") > 0, 'The note must name the Sales Order: ' + QueueRow."Outcome Note");
+        _Assert.AreEqual(0, QueueRow."Retry Count", 'Waiting costs no retry.');
+        _Lib.AssertNoReturnOrder(CustomerNo);
+    end;
+
+    [Test]
+    procedure Import_RefundOfAShippedThenCancelledOrderWithNothingToPost_HasNothingToCredit()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesOrder: Record "Sales Header";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A refund of an order Shopify shipped and then cancelled has nothing to credit while its Sales Order has nothing to post and no invoice exists, because the order import never invoices a cancelled order.
+        // [GIVEN] A legacy-path store and a Sales Order of the Shopify order with nothing to post, with no invoice
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.CreateShopifyOrderWithNothingToPost(StoreCode, CustomerNo, Sku, '2350002', SalesOrder);
+
+        // [GIVEN] A queued refund of 30 on that order, which Shopify shipped and then cancelled
+        _Lib.InsertRefundQueueRow(StoreCode, '2350092', '2350002', '#2350002', QueueRow);
+        MockClient.AddResponse('GetRefund', _Lib.OfCancelledOrder(_Lib.OfFulfilledOrder(_Lib.RefundDetailResponse('2350092', '2350002', '#2350002', _Lib.RefundTimeAfterNow(), true, '', '', _ReturnLib.OrderAdjustmentJson(-30, 0, 'REFUND_DISCREPANCY'), _ReturnLib.RefundTxnJson('2350082', 'bogus', 30, _ReturnLib.Lcy(), '')))));
+
+        // [WHEN] The import runs
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The row ends Nothing to Credit with a note naming the Sales Order, and no Return Order exists
+        _Assert.IsTrue(Succeeded, 'Nothing to credit is not an error: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2350092');
+        _Assert.AreEqual(QueueRow.Status::"Nothing to Credit", QueueRow.Status, 'A cancelled order is never invoiced, shipped or not: ' + QueueRow."Outcome Note");
+        _Assert.IsTrue(StrPos(QueueRow."Outcome Note", SalesOrder."No.") > 0, 'The note must name the Sales Order: ' + QueueRow."Outcome Note");
+        _Lib.AssertNoReturnOrder(CustomerNo);
+    end;
+
+    [Test]
+    [HandlerFunctions('SalesOrderPageHandler')]
+    procedure QueuePage_OpenDocumentOnARowWaitingForTheOrderInvoice_OpensTheSalesOrder()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesOrder: Record "Sales Header";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+    begin
+        // [SCENARIO] Open Document on a refund that waits for its shipped order to be invoiced opens the Sales Order its note names.
+        // [GIVEN] A legacy-path store and a Sales Order of the Shopify order with nothing to post, with no invoice
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.CreateShopifyOrderWithNothingToPost(StoreCode, CustomerNo, Sku, '2350004', SalesOrder);
+
+        // [GIVEN] A shipping refund of 29 on that order, which Shopify has shipped, imported and waiting
+        _Lib.InsertRefundQueueRow(StoreCode, '2350094', '2350004', '#2350004', QueueRow);
+        MockClient.AddResponse('GetRefund', _Lib.OfFulfilledOrder(_Lib.RefundDetailResponse('2350094', '2350004', '#2350004', _Lib.RefundTimeAfterNow(), true, '', _ReturnLib.RefundShippingLineJson(23.20, 5.80), '', _ReturnLib.RefundTxnJson('2350084', 'bogus', 29, _ReturnLib.Lcy(), ''))));
+        _Assert.IsTrue(_ReturnLib.RunImport(QueueRow, MockClient), 'Precondition: the import runs: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2350094');
+        _Assert.AreEqual(QueueRow.Status::Waiting, QueueRow.Status, 'Precondition: the row waits.');
+        Clear(_CapturedMessage);
+
+        // [WHEN] Open Document is run on the row
+        SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] The Sales Order opens
+        _Assert.AreEqual(SalesOrder."No.", _CapturedMessage, 'Open Document must open the Sales Order the row waits for.');
+    end;
+
+    [Test]
+    [HandlerFunctions('SalesReturnOrderPageHandler')]
+    procedure QueuePage_OpenDocumentOnARowWaitingForAnotherDraft_OpensThatDraft()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherDraft: Record "Sales Header";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        ShipmentNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] Open Document on a refund that waits for another draft settling the order's unpaid invoice opens that draft.
+        // [GIVEN] A legacy-path store and an order invoiced without a payment
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        InvoiceNo := _Lib.PostShopifyOrderUnpaid(StoreCode, CustomerNo, Sku, LocationCode, '2350005', '2350705', 1, 50, ShipmentNo);
+
+        // [GIVEN] Another Return Order applied to that invoice
+        OtherDraft.Init();
+        OtherDraft."Document Type" := OtherDraft."Document Type"::"Return Order";
+        OtherDraft."No." := 'RO2350005';
+        OtherDraft."Sell-to Customer No." := CustomerNo;
+        OtherDraft."Bill-to Customer No." := CustomerNo;
+        OtherDraft."Applies-to Doc. Type" := OtherDraft."Applies-to Doc. Type"::Invoice;
+        OtherDraft."Applies-to Doc. No." := InvoiceNo;
+        OtherDraft.Insert();
+
+        // [GIVEN] A refund row of the same order waiting for it, its note naming the Return Order
+        _Lib.InsertRefundQueueRow(StoreCode, '2350095', '2350005', '#2350005', QueueRow);
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow."Outcome Note" := 'Waiting until Return Order RO2350005, which settles the unpaid Sales Invoice Header ' + InvoiceNo + ' of the same Shopify order, is posted or deleted; Shopify refund 2350095 of order #2350005 is imported then.';
+        QueueRow.Modify();
+        Clear(_CapturedMessage);
+
+        // [WHEN] Open Document is run on the row
+        SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] The other Return Order opens
+        _Assert.AreEqual(OtherDraft."No.", _CapturedMessage, 'Open Document must open the draft the row waits for.');
+    end;
+
+    [Test]
+    procedure QueuePage_OpenDocumentOnARowWaitingOnShopify_SaysNoDocumentHoldsItBack()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        ShipmentNo: Code[20];
+    begin
+        // [SCENARIO] Open Document on a refund that waits on Shopify, with no document in Business Central to wait for, says so and points to the row's note.
+        // [GIVEN] A legacy-path store and an order invoiced and paid
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.PostShopifyOrder(StoreCode, CustomerNo, Sku, LocationCode, '2350006', '2350706', 1, 100, ShipmentNo);
+
+        // [GIVEN] A refund row of that order waiting, as one with a pending transaction does
+        _Lib.InsertRefundQueueRow(StoreCode, '2350096', '2350006', '#2350006', QueueRow);
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow.Modify();
+
+        // [WHEN] Open Document is run on the row
+        asserterror SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] The error says no document in Business Central holds the row back and names the note
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'No document in Business Central holds') > 0, 'The error must say no document holds the row back: ' + GetLastErrorText());
+        _Assert.IsTrue(StrPos(GetLastErrorText(), QueueRow.FieldCaption("Outcome Note")) > 0, 'The error must name the note: ' + GetLastErrorText());
+    end;
+
+    [Test]
+    [HandlerFunctions('SalesCreditMemoPageHandler')]
+    procedure QueuePage_OpenDocumentOnARowWaitingForACreditMemo_OpensTheCreditMemo()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherDraft: Record "Sales Header";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        ShipmentNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] Open Document on a refund that waits for a Credit Memo settling the order's unpaid invoice opens that Credit Memo.
+        // [GIVEN] A legacy-path store and an order invoiced without a payment, with a Credit Memo applied to that invoice
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        InvoiceNo := _Lib.PostShopifyOrderUnpaid(StoreCode, CustomerNo, Sku, LocationCode, '2350011', '2350711', 1, 50, ShipmentNo);
+        OtherDraft.Init();
+        OtherDraft."Document Type" := OtherDraft."Document Type"::"Credit Memo";
+        OtherDraft."No." := 'CM2350011';
+        OtherDraft."Sell-to Customer No." := CustomerNo;
+        OtherDraft."Bill-to Customer No." := CustomerNo;
+        OtherDraft."Applies-to Doc. Type" := OtherDraft."Applies-to Doc. Type"::Invoice;
+        OtherDraft."Applies-to Doc. No." := InvoiceNo;
+        OtherDraft.Insert();
+
+        // [GIVEN] A refund row of the same order waiting for it, its note naming the Credit Memo
+        _Lib.InsertRefundQueueRow(StoreCode, '2350101', '2350011', '#2350011', QueueRow);
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow."Outcome Note" := 'Waiting until Credit Memo CM2350011, which settles the unpaid Sales Invoice Header ' + InvoiceNo + ' of the same Shopify order, is posted or deleted; Shopify refund 2350101 of order #2350011 is imported then.';
+        QueueRow.Modify();
+        Clear(_CapturedMessage);
+
+        // [WHEN] Open Document is run on the row
+        SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] The Credit Memo opens
+        _Assert.AreEqual(OtherDraft."No.", _CapturedMessage, 'Open Document must open the Credit Memo the row waits for.');
+    end;
+
+    [Test]
+    procedure QueuePage_OpenDocumentOnARowWhoseNoteNamesAnotherNumber_OpensNothing()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherDraft: Record "Sales Header";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        ShipmentNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] Open Document opens a document only when the row's note names its number as a whole word: Return Order RO235001 is not the RO2350012 the note names.
+        // [GIVEN] A legacy-path store and an order invoiced without a payment, with Return Order RO235001 applied to that invoice
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        InvoiceNo := _Lib.PostShopifyOrderUnpaid(StoreCode, CustomerNo, Sku, LocationCode, '2350010', '2350710', 1, 50, ShipmentNo);
+        OtherDraft.Init();
+        OtherDraft."Document Type" := OtherDraft."Document Type"::"Return Order";
+        OtherDraft."No." := 'RO235001';
+        OtherDraft."Sell-to Customer No." := CustomerNo;
+        OtherDraft."Bill-to Customer No." := CustomerNo;
+        OtherDraft."Applies-to Doc. Type" := OtherDraft."Applies-to Doc. Type"::Invoice;
+        OtherDraft."Applies-to Doc. No." := InvoiceNo;
+        OtherDraft.Insert();
+
+        // [GIVEN] A refund row of the same order waiting, its note naming Return Order RO2350012
+        _Lib.InsertRefundQueueRow(StoreCode, '2350100', '2350010', '#2350010', QueueRow);
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow."Outcome Note" := 'Waiting until Return Order RO2350012, which settles the unpaid Sales Invoice Header ' + InvoiceNo + ' of the same Shopify order, is posted or deleted; Shopify refund 2350100 of order #2350010 is imported then.';
+        QueueRow.Modify();
+
+        // [WHEN] Open Document is run on the row
+        asserterror SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] No document is opened; the error says no document in Business Central holds the row back
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'No document in Business Central holds') > 0, 'A document whose number is only part of the named one must not open: ' + GetLastErrorText());
+    end;
+
+    [Test]
+    procedure QueuePage_OpenDocumentOnARowWaitingForAPendingTransaction_OpensNotTheOpenSalesOrder()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesOrder: Record "Sales Header";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+    begin
+        // [SCENARIO] Open Document on a refund whose note says it waits for a pending transaction at Shopify does not open the order's open Sales Order, which the note does not name.
+        // [GIVEN] A legacy-path store and an open Sales Order of the Shopify order with something left to post
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.CreateOpenShopifyOrder(StoreCode, CustomerNo, Sku, '2350009', SalesOrder);
+
+        // [GIVEN] A refund row of that order waiting for a pending refund transaction
+        _Lib.InsertRefundQueueRow(StoreCode, '2350099', '2350009', '#2350009', QueueRow);
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow."Outcome Note" := 'Waiting until Shopify completes the pending refund transaction of Shopify refund 2350099 of order #2350009.';
+        QueueRow.Modify();
+
+        // [WHEN] Open Document is run on the row
+        asserterror SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] No document is opened; the error says no document in Business Central holds the row back
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'No document in Business Central holds') > 0, 'The Sales Order the note does not name must not open: ' + GetLastErrorText());
+    end;
+
+    [Test]
+    procedure QueuePage_OpenDocumentOnANothingToCreditRow_OpensNoUnrelatedDraft()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        OtherDraft: Record "Sales Header";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        ShipmentNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] Open Document on a refund that has nothing to credit does not open a draft its note never named, such as another Return Order applied to the order's unpaid invoice later.
+        // [GIVEN] A legacy-path store and an order invoiced without a payment, with another Return Order applied to that invoice
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        InvoiceNo := _Lib.PostShopifyOrderUnpaid(StoreCode, CustomerNo, Sku, LocationCode, '2350008', '2350708', 1, 50, ShipmentNo);
+        OtherDraft.Init();
+        OtherDraft."Document Type" := OtherDraft."Document Type"::"Return Order";
+        OtherDraft."No." := 'RO2350008';
+        OtherDraft."Sell-to Customer No." := CustomerNo;
+        OtherDraft."Bill-to Customer No." := CustomerNo;
+        OtherDraft."Applies-to Doc. Type" := OtherDraft."Applies-to Doc. Type"::Invoice;
+        OtherDraft."Applies-to Doc. No." := InvoiceNo;
+        OtherDraft.Insert();
+
+        // [GIVEN] A refund row of the same order that ended with nothing to credit
+        _Lib.InsertRefundQueueRow(StoreCode, '2350098', '2350008', '#2350008', QueueRow);
+        QueueRow.Status := QueueRow.Status::"Nothing to Credit";
+        QueueRow.Modify();
+
+        // [WHEN] Open Document is run on the row
+        asserterror SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] No document is opened and the row is said to have none
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'Nothing is credited') > 0, 'A row with nothing to credit must not open a draft its note does not name: ' + GetLastErrorText());
+    end;
+
+    [Test]
+    [HandlerFunctions('SalesOrderPageHandler')]
+    procedure QueuePage_OpenDocumentOnARowWaitingForTheOpenSalesOrderOfAnInvoicedOrder_OpensIt()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesOrder: Record "Sales Header";
+        ItemB: Record Item;
+        LibraryInventory: Codeunit "Library - Inventory";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+    begin
+        // [SCENARIO] Open Document on a refund that waits for the order's open Sales Order opens it, also when part of the order is already invoiced.
+        // [GIVEN] A legacy-path store and an order with line A invoiced and line B still open on its Sales Order
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        LibraryInventory.CreateItem(ItemB);
+        _Lib.PostShopifyOrderFirstLineOnly(StoreCode, CustomerNo, LocationCode, '2350015', Sku, '2350715', ItemB."No.", '2350795', 125, SalesOrder);
+
+        // [GIVEN] A refund row of that order whose note says it waits for that Sales Order
+        _Lib.InsertRefundQueueRow(StoreCode, '2350115', '2350015', '#2350015', QueueRow);
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow."Outcome Note" := 'Waiting until Business Central has invoiced Shopify order #2350015 (Sales Header ' + SalesOrder."No." + '); this refund is imported then.';
+        QueueRow.Modify();
+        Clear(_CapturedMessage);
+
+        // [WHEN] Open Document is run on the row
+        SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] The Sales Order opens
+        _Assert.AreEqual(SalesOrder."No.", _CapturedMessage, 'Open Document must open the open Sales Order the row waits for.');
+    end;
+
+    [Test]
+    [HandlerFunctions('SalesOrderPageHandler')]
+    procedure QueuePage_OpenDocumentOnANothingToCreditRow_OpensTheSalesOrderItsNoteNames()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesOrder: Record "Sales Header";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+    begin
+        // [SCENARIO] Open Document on a refund with nothing to credit opens the Sales Order with nothing to post that its note names.
+        // [GIVEN] A legacy-path store and a Sales Order of the Shopify order with nothing to post, with no invoice
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.CreateShopifyOrderWithNothingToPost(StoreCode, CustomerNo, Sku, '2350016', SalesOrder);
+
+        // [GIVEN] A refund row of that order with nothing to credit, whose note names that Sales Order
+        _Lib.InsertRefundQueueRow(StoreCode, '2350116', '2350016', '#2350016', QueueRow);
+        QueueRow.Status := QueueRow.Status::"Nothing to Credit";
+        QueueRow."Outcome Note" := 'Business Central never invoiced Shopify order #2350016, and its Sales Header ' + SalesOrder."No." + ' has nothing left to ship or invoice, so Business Central never received money for it and Shopify refund 2350116 of order #2350016 has nothing to credit.';
+        QueueRow.Modify();
+        Clear(_CapturedMessage);
+
+        // [WHEN] Open Document is run on the row
+        SpfyLegacyReturnMgt.OpenRelatedDocument(QueueRow);
+
+        // [THEN] The Sales Order opens
+        _Assert.AreEqual(SalesOrder."No.", _CapturedMessage, 'Open Document must open the Sales Order the note names.');
+    end;
+
+    [Test]
+    [HandlerFunctions('SalesReturnOrderPageHandler')]
+    procedure QueuePage_OpenDocumentOnARowTheJobMovedOnSinceThePageReadIt_OpensItsDraft()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        RowAsThePageShowsIt: Record "NPR Spfy NC Return Queue";
+        ReturnOrder: Record "Sales Header";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+    begin
+        // [SCENARIO] Open Document acts on the row as it is now, not as the page last read it: a row the job built a draft for since opens that draft.
+        // [GIVEN] A refund row the page shows as waiting for a pending transaction
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.InsertRefundQueueRow(StoreCode, '2350117', '2350017', '#2350017', QueueRow);
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow."Outcome Note" := 'Waiting until Shopify completes 1 pending refund transaction(s) of Shopify refund 2350117 of order #2350017; it is imported then.';
+        QueueRow.Modify();
+        RowAsThePageShowsIt := QueueRow;
+
+        // [GIVEN] The job has since built the Return Order and recorded it on the row
+        _Lib.CreateStampedReturnOrder(StoreCode, CustomerNo, Sku, LocationCode, '2350117', 100, ReturnOrder);
+        QueueRow.Status := QueueRow.Status::"Draft Created";
+        QueueRow."Sales Header Doc. No." := ReturnOrder."No.";
+        QueueRow."Outcome Note" := '';
+        QueueRow.Modify();
+        Clear(_CapturedMessage);
+
+        // [WHEN] Open Document is run on the row the page still shows
+        SpfyLegacyReturnMgt.OpenRelatedDocument(RowAsThePageShowsIt);
+
+        // [THEN] The Return Order opens
+        _Assert.AreEqual(ReturnOrder."No.", _CapturedMessage, 'Open Document must open the draft the row has now.');
+    end;
+
+    [Test]
+    [HandlerFunctions('CaptureMessage')]
+    procedure QueuePage_DrillDownOnTheOutcomeNote_ShowsTheWholeNote()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        QueuePage: TestPage "NPR Spfy Legacy Return Queue";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        LongNote: Text;
+    begin
+        // [SCENARIO] Choosing a row's outcome note on the queue page shows the whole note, which the column cuts off.
+        // [GIVEN] A refund row whose outcome note is longer than the column shows
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.InsertRefundQueueRow(StoreCode, '2350097', '2350007', '#2350007', QueueRow);
+        LongNote := 'Waiting until Business Central has invoiced Shopify order #2350007: Shopify has shipped it, but its Sales Header SO2350007 has nothing to ship or invoice yet. Shopify refund 2350097 of order #2350007 is imported once the order is invoiced. If SO2350007 cannot be posted, correct it; if the order is never invoiced here, dismiss this row.';
+        QueueRow.Status := QueueRow.Status::Waiting;
+        QueueRow."Outcome Note" := CopyStr(LongNote, 1, MaxStrLen(QueueRow."Outcome Note"));
+        QueueRow.Modify();
+        Clear(_CapturedMessage);
+        QueuePage.OpenView();
+        QueuePage.GoToRecord(QueueRow);
+
+        // [WHEN] The outcome note is drilled down on
+        QueuePage."Outcome Note".Drilldown();
+
+        // [THEN] The whole note is shown
+        QueuePage.Close();
+        _Assert.AreEqual(LongNote, _CapturedMessage, 'The whole outcome note must be shown.');
+    end;
+
+    [Test]
+    [HandlerFunctions('CaptureMessage')]
+    procedure QueuePage_DrillDownOnTheLastError_ShowsTheWholeError()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        QueuePage: TestPage "NPR Spfy Legacy Return Queue";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        LongError: Text;
+    begin
+        // [SCENARIO] Choosing a row's last error on the queue page shows the whole error, not the row's outcome note.
+        // [GIVEN] A refund row whose last error is longer than the column shows, and which has no outcome note
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        _Lib.InsertRefundQueueRow(StoreCode, '2350114', '2350014', '#2350014', QueueRow);
+        LongError := 'Shopify refund 2350114 of order #2350014 refunds 250 to Voucher SPFYLRV2350014, but the card paid only 200 on the invoices of the order that earlier refunds have not already put back. Crediting more would raise the card beyond what was spent from it, so this Return Order cannot be posted; delete it and handle the refund manually.';
+        QueueRow.Status := QueueRow.Status::Error;
+        QueueRow."Last Error" := CopyStr(LongError, 1, MaxStrLen(QueueRow."Last Error"));
+        QueueRow."Outcome Note" := '';
+        QueueRow.Modify();
+        Clear(_CapturedMessage);
+        QueuePage.OpenView();
+        QueuePage.GoToRecord(QueueRow);
+
+        // [WHEN] The last error is drilled down on
+        QueuePage."Last Error".Drilldown();
+
+        // [THEN] The whole error is shown
+        QueuePage.Close();
+        _Assert.AreEqual(LongError, _CapturedMessage, 'The whole last error must be shown.');
+    end;
+
+    [PageHandler]
+    procedure SalesOrderPageHandler(var SalesOrder: TestPage "Sales Order")
+    begin
+        _CapturedMessage := SalesOrder."No.".Value();
+        SalesOrder.Close();
+    end;
+
+    [PageHandler]
+    procedure SalesCreditMemoPageHandler(var SalesCreditMemo: TestPage "Sales Credit Memo")
+    begin
+        _CapturedMessage := SalesCreditMemo."No.".Value();
+        SalesCreditMemo.Close();
+    end;
+
+    [PageHandler]
+    procedure SalesReturnOrderPageHandler(var SalesReturnOrder: TestPage "Sales Return Order")
+    begin
+        _CapturedMessage := SalesReturnOrder."No.".Value();
+        SalesReturnOrder.Close();
     end;
 
     [Test]

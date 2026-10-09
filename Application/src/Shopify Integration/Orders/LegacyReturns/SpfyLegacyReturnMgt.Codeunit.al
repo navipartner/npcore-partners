@@ -441,15 +441,23 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
         QueueRow.Modify();
     end;
 
+    /// <summary>
+    /// Opens the posted credit memo or return receipt, the Sales Return Order, or, for a row that waits or has nothing to credit, the document its note names.
+    /// </summary>
     internal procedure OpenRelatedDocument(QueueRow: Record "NPR Spfy NC Return Queue")
     var
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
+        SpfyRefundDocBuilder: Codeunit "NPR Spfy Refund Doc. Builder";
         PostedDocNotFoundErr: Label 'Posted document %1 could not be found as a %2 or a %3.', Comment = '%1 = document no., %2 = Sales Cr.Memo Header caption, %3 = Return Receipt Header caption';
         DraftDocNotFoundErr: Label '%1 %2 could not be found. It may have been deleted or posted outside the queue.', Comment = '%1 = Sales Header table caption, %2 = document no.';
         NoDocumentYetErr: Label 'No document has been created for this return or refund yet.';
+        NoDocumentHoldsItBackErr: Label 'No document in Business Central holds this return or refund back now; its %1 says what it waits for.', Comment = '%1 = Outcome Note field caption';
+        NothingCreditedErr: Label 'Nothing is credited for this return or refund, so it has no document of its own; its %1 says why.', Comment = '%1 = Outcome Note field caption';
     begin
+        // The page's row may be older than what the job has written since.
+        QueueRow.Get(QueueRow."Entry No.");
         if QueueRow."Posted Doc. No." <> '' then begin
             if IsCreditMemoPosted(QueueRow) then begin
                 SalesCrMemoHeader.Get(QueueRow."Posted Doc. No.");
@@ -464,12 +472,69 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
         end;
         if QueueRow."Sales Header Doc. No." <> '' then begin
             if SalesHeader.Get(SalesHeader."Document Type"::"Return Order", QueueRow."Sales Header Doc. No.") then begin
-                Page.Run(Page::"Sales Return Order", SalesHeader);
+                OpenSalesDocument(SalesHeader);
                 exit;
             end;
             Error(DraftDocNotFoundErr, SalesHeader.TableCaption(), QueueRow."Sales Header Doc. No.");
         end;
+        // Only a document the note names: the note says why the row stopped, and other documents of the order may have appeared since.
+        if QueueRow.Status in [QueueRow.Status::Waiting, QueueRow.Status::"Nothing to Credit"] then
+            if SpfyRefundDocBuilder.FindDocumentNamedInNote(QueueRow."Shopify Store Code", QueueRow."Order Id", QueueRow."Source Doc. Type", QueueRow."Source Doc. ID", QueueRow.Status = QueueRow.Status::Waiting, SalesHeader) then
+                if NoteNamesDocument(QueueRow."Outcome Note", SalesHeader."No.") then begin
+                    OpenSalesDocument(SalesHeader);
+                    exit;
+                end;
+        if QueueRow.Status = QueueRow.Status::Waiting then
+            Error(NoDocumentHoldsItBackErr, QueueRow.FieldCaption("Outcome Note"));
+        if QueueRow.Status = QueueRow.Status::"Nothing to Credit" then
+            Error(NothingCreditedErr, QueueRow.FieldCaption("Outcome Note"));
         Error(NoDocumentYetErr);
+    end;
+
+    /// <summary>
+    /// True when the note carries the document number as a word of its own, so SO1 does not match a note naming SO10.
+    /// </summary>
+    local procedure NoteNamesDocument(Note: Text; DocumentNo: Code[20]): Boolean
+    var
+        Rest: Text;
+        Before: Text;
+        Pos: Integer;
+    begin
+        if DocumentNo = '' then
+            exit(false);
+        Rest := Note;
+        Pos := StrPos(Rest, DocumentNo);
+        while Pos > 0 do begin
+            Before := '';
+            if Pos > 1 then
+                Before := CopyStr(Rest, Pos - 1, 1);
+            if not (IsAlphanumeric(Before) or IsAlphanumeric(CopyStr(Rest, Pos + StrLen(DocumentNo), 1))) then
+                exit(true);
+            Rest := CopyStr(Rest, Pos + 1);
+            Pos := StrPos(Rest, DocumentNo);
+        end;
+        exit(false);
+    end;
+
+    local procedure IsAlphanumeric(Character: Text): Boolean
+    begin
+        exit((Character <> '') and (DelChr(Character, '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') = ''));
+    end;
+
+    local procedure OpenSalesDocument(SalesHeaderParam: Record "Sales Header")
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        // A fresh record, so the page is not limited by the filters the lookup left on it.
+        SalesHeader.Get(SalesHeaderParam."Document Type", SalesHeaderParam."No.");
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                Page.Run(Page::"Sales Order", SalesHeader);
+            SalesHeader."Document Type"::"Credit Memo":
+                Page.Run(Page::"Sales Credit Memo", SalesHeader);
+            else
+                Page.Run(Page::"Sales Return Order", SalesHeader);
+        end;
     end;
 
     /// <summary>

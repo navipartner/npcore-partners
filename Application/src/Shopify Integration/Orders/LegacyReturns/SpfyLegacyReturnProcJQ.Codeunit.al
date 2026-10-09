@@ -33,7 +33,7 @@ codeunit 6151172 "NPR Spfy Legacy Return Proc JQ"
         ProcessRows(QueueRow, StartedAt, MaxRetryCount(), 0DT);
         QueueRow.SetRange(Status, QueueRow.Status::Processing);
         ProcessRows(QueueRow, StartedAt, 0, _ClaimStaleBefore);
-        // A waiting row is looked at on every run and never counted. It calls Shopify only when BC alone cannot tell whether the wait is over: a pending refund transaction or an order not in BC yet.
+        // A waiting row is looked at on every run and never counted. It calls Shopify only when BC alone cannot tell whether the wait is over: a pending refund transaction, an order not in BC yet, or an order without an invoice whose Sales Order has nothing to post, which waits only if Shopify shipped it.
         QueueRow.SetRange(Status, QueueRow.Status::Waiting);
         ProcessRows(QueueRow, StartedAt, 0, 0DT);
     end;

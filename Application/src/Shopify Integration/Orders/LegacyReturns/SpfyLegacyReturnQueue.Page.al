@@ -27,8 +27,26 @@ page 6150966 "NPR Spfy Legacy Return Queue"
                 field("Detected At"; Rec."Detected At") { ToolTip = 'Specifies when the poll first saw the closed return or the refund.'; ApplicationArea = NPRShopify; }
                 field("Processed At"; Rec."Processed At") { ToolTip = 'Specifies when the return or refund was last attempted or dismissed.'; ApplicationArea = NPRShopify; }
                 field("Retry Count"; Rec."Retry Count") { ToolTip = 'Specifies how many attempts count against the retry limit: failed ones and ones whose session was lost.'; ApplicationArea = NPRShopify; }
-                field("Last Error"; Rec."Last Error") { ToolTip = 'Specifies the error of the last failed attempt.'; ApplicationArea = NPRShopify; }
-                field("Outcome Note"; Rec."Outcome Note") { ToolTip = 'Specifies what the return or refund waits for, or why a refund has nothing to credit.'; ApplicationArea = NPRShopify; }
+                field("Last Error"; Rec."Last Error")
+                {
+                    ToolTip = 'Specifies the error of the last failed attempt. Choose the value to read all of it.';
+                    ApplicationArea = NPRShopify;
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowFullText(Rec."Last Error");
+                    end;
+                }
+                field("Outcome Note"; Rec."Outcome Note")
+                {
+                    ToolTip = 'Specifies what the return or refund waits for, or why a refund has nothing to credit. Choose the value to read all of it.';
+                    ApplicationArea = NPRShopify;
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowFullText(Rec."Outcome Note");
+                    end;
+                }
                 field("Sales Header Doc. No."; Rec."Sales Header Doc. No.") { ToolTip = 'Specifies the Sales Return Order built for the return or refund. The number stays after posting, next to the posted document number.'; ApplicationArea = NPRShopify; }
                 field("Posted Doc. No."; Rec."Posted Doc. No.") { ToolTip = 'Specifies the posted credit memo or return receipt.'; ApplicationArea = NPRShopify; }
                 field("Location Fallback Used"; Rec."Location Fallback Used") { ToolTip = 'Specifies that the restock locations did not agree, so the store default was used.'; ApplicationArea = NPRShopify; }
@@ -125,7 +143,7 @@ page 6150966 "NPR Spfy Legacy Return Queue"
             {
                 Caption = 'Open Document';
                 Image = Document;
-                ToolTip = 'Open the Sales Return Order, or the posted credit memo or return receipt once posted.';
+                ToolTip = 'Open the Sales Return Order, or the posted credit memo or return receipt once posted. For a row that waits or has nothing to credit, open the Sales Order or credit document its note names.';
                 ApplicationArea = NPRShopify;
                 trigger OnAction()
                 var
@@ -188,6 +206,14 @@ page 6150966 "NPR Spfy Legacy Return Queue"
             else
                 _StatusStyle := 'Standard';
         end;
+    end;
+
+    local procedure ShowFullText(FullText: Text)
+    var
+        FullTextTok: Label '%1', Locked = true;
+    begin
+        if FullText <> '' then
+            Message(FullTextTok, FullText);
     end;
 
     var
