@@ -480,17 +480,9 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     end;
 
     local procedure CreateAddressFields(ShippingProviderDocumentAddress1: Text; ShippingProviderDocumentAddress2: Text; var ShipmondoAddress1: Text; var ShipmondoAddress2: Text)
-    var
-        FullAddress: Text;
     begin
-        FullAddress := ShippingProviderDocumentAddress1;
-        if ShippingProviderDocumentAddress2 <> '' then
-            FullAddress += ' ' + ShippingProviderDocumentAddress2;
-        FullAddress := DelChr(FullAddress, '=', '.');
-
-        ShipmondoAddress1 := CopyStr(FullAddress, 1, 32);
-        if StrLen(FullAddress) > 32 then
-            ShipmondoAddress2 := CopyStr(FullAddress, 33);
+        ShipmondoAddress1 := CopyStr(DelChr(ShippingProviderDocumentAddress1, '=', '.'), 1, 32);
+        ShipmondoAddress2 := CopyStr(DelChr(ShippingProviderDocumentAddress2, '=', '.'), 1, 32);
     end;
 
     local procedure PrintJob(ShipmentDocument: Record "NPR Shipping Provider Document") output: Text;
