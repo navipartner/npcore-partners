@@ -16,8 +16,10 @@
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        PaymentLine: Record "NPR Magento Payment Line";
         AdyenSetup: Record "NPR PG Adyen Setup";
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        AdyenAsyncPayProcesFeature: Codeunit "NPR AdyenAsyncPmtProcesFeature";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
@@ -27,6 +29,7 @@
         Reference: Text;
         ResponseTxt: Text;
         ResponseJson: Text;
+        AsyncEligible: Boolean;
     begin
         AdyenSetup.Get(Request."Payment Gateway Code");
         Url := AdyenSetup.GetAPIBaseUrl() + 'capture';
@@ -39,6 +42,7 @@
                     Reference := SalesHeader."No.";
                     if SalesHeader."NPR External Order No." <> '' then
                         Reference := SalesHeader."NPR External Order No.";
+                    AsyncEligible := SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice];
                 end;
             DATABASE::"Sales Invoice Header":
                 begin
@@ -47,6 +51,7 @@
                     Reference := SalesInvHeader."No.";
                     if SalesInvHeader."NPR External Order No." <> '' then
                         Reference := SalesInvHeader."NPR External Order No.";
+                    AsyncEligible := true;
                 end;
             DATABASE::"NPR Ecom Sales Header":
                 begin
@@ -59,6 +64,13 @@
                 end;
             else
                 Error(WrongTableSuppliedErr, Request."Document Table No.", StrSubstNo('%1, %2', Database::"Sales Header", Database::"Sales Invoice Header"));
+        end;
+
+        if AsyncEligible then begin
+            PaymentLine.SetLoadFields("NPR Inc Ecom Sale Id", "NPR Inc Ecom Sales Pmt Line Id");
+            if PaymentLine.GetBySystemId(Request."Payment Line System Id") then
+                if (not IsNullGuid(PaymentLine."NPR Inc Ecom Sale Id")) or (not IsNullGuid(PaymentLine."NPR Inc Ecom Sales Pmt Line Id")) then
+                    AsyncEligible := false;
         end;
 
         if CurrencyCode = '' then begin
@@ -90,6 +102,13 @@
         if ResponseTxt <> '[capture-received]' then
             Error(ResponseTxt);
 
+        // Only Sales Invoice Header and Sales Header Order/Invoice captures go async; lines that came from an ecommerce document stay synchronous.
+        if AdyenAsyncPayProcesFeature.IsFeatureEnabled() and AsyncEligible then begin
+            Response."Reported Operation Status" := Response."Reported Operation Status"::Pending;
+            Response."Async Processing" := true;
+            if JsonO.Get('pspReference', JsonT) then
+                Response."Response Operation Id" := CopyStr(JsonT.AsValue().AsText(), 1, MaxStrLen(Response."Response Operation Id"));
+        end;
         Response."Response Success" := true;
     end;
 

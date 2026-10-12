@@ -57,6 +57,27 @@
                     end;
                 }
 
+                field(RecentCaptureFailures; GetFieldValueFromBackgroundTaskResultSet('RecentCaptureFailedWebhooks'))
+                {
+                    ApplicationArea = NPRRetail;
+                    Visible = _AsyncCaptureEnabled;
+                    Caption = 'Capture Failed Webhooks - Last 7 Days';
+                    ToolTip = 'Specifies the number of NP Pay CAPTURE_FAILED webhooks received in the last seven days, including duplicate notifications. This is recent failure history, not a count of unresolved payments. Choose the cue to open the webhook requests.';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    Style = Unfavorable;
+                    StyleExpr = _RecentCaptureFailuresExist;
+
+                    trigger OnDrillDown()
+                    var
+                        AdyenWebhook: Record "NPR Adyen Webhook";
+                        AdyenManagement: Codeunit "NPR Adyen Management";
+                    begin
+                        AdyenManagement.SetRecentCaptureFailureFilter(AdyenWebhook, CurrentDateTime());
+                        Page.RunModal(Page::"NPR Adyen Webhooks", AdyenWebhook);
+                        CurrPage.Update(false);
+                    end;
+                }
                 field("Failed imports in the import list"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed imports"))))
                 {
                     Caption = 'Failed Imports in the Import List';
@@ -259,6 +280,7 @@
     trigger OnOpenPage()
     var
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
+        AsyncFeature: Codeunit "NPR AdyenAsyncPmtProcesFeature";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -266,6 +288,7 @@
             Rec.Insert();
         end;
 
+        _AsyncCaptureEnabled := AsyncFeature.IsFeatureEnabled();
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
     end;
 
@@ -279,6 +302,7 @@
         BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
     begin
         BackgrndTaskMgt.CopyTaskResults(Results, BackgroundTaskResults);
+        _RecentCaptureFailuresExist := GetFieldValueFromBackgroundTaskResultSet('RecentCaptureFailedWebhooks') > 0;
     end;
 
     trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
@@ -314,4 +338,6 @@
     var
         BackgroundTaskResults: Dictionary of [Text, Text];
         BackgroundTaskId: Integer;
+        _RecentCaptureFailuresExist: Boolean;
+        _AsyncCaptureEnabled: Boolean;
 }

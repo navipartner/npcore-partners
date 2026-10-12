@@ -330,6 +330,18 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         if not Confirm(RunDayShiftQst, true) then
             Error('');
     end;
+
+    internal procedure DeleteMonitoredJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
+    var
+        ManagedByAppJobQueue: Record "NPR Managed By App Job Queue";
+    begin
+        if ManagedByAppJobQueue.Get(JobQueueEntry.ID) then
+            ManagedByAppJobQueue.Delete();
+        RemoveMonitoredJobQueueEntry(JobQueueEntry);
+
+        JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+        JobQueueEntry.Delete(true);
+    end;
 #if not (BC17 or BC18 or BC19)
     var
         _IsNPJobErr: Label 'Job Queue Entry ''%1 %2 %3'' is a NaviPartner protected job and cannot be added manually. It will be automatically added to the list of monitored jobs the next time the job queue refresher runs.';

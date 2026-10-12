@@ -188,6 +188,11 @@
             PaymentLine2.Posted := false;
             PaymentLine2."Last Amount" := 0;
             PaymentLine2."Posting Date" := ToSalesHeader."Posting Date";
+            // Capture webhooks and the reset action skip credit documents, so an inherited in-flight capture would never clear.
+            if IsCaptureInFlight(PaymentLine) then begin
+                PaymentLine2."Capture Requested" := false;
+                PaymentLine2."Charge ID" := '';
+            end;
             PaymentLine2.Insert(true);
             if not BalanceLineFound then
                 case PaymentLine."Payment Type" of
@@ -593,6 +598,7 @@
 #IF NOT BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #ENDIF
+        LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
         OutstandingAmt: Decimal;
         PaymentAmt: Decimal;
         PointsPaymentAmount: Decimal;
@@ -653,6 +659,9 @@
 #if not BC17
                 SpfyAssignedIDMgt.CopyAssignedShopifyID(PaymentLine.RecordId(), PaymentLine2.RecordId(), "NPR Spfy ID Type"::"Entry ID");
 #endif
+                // The open capture log follows the posted copy, so it survives a later delete of the order.
+                if IsCaptureInFlight(PaymentLine) then
+                    LogMgt.MoveOpenCaptureLog(PaymentLine.SystemId, PaymentLine2.SystemId);
 
                 OutstandingAmt := TotalAmountInclVAT - PaymentAmt;
                 if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt + RefundPaymentsAmount) then begin
@@ -993,6 +1002,9 @@
         if PaymentLine."Date Captured" <> 0D then
             exit;
 
+        if IsCaptureInFlight(PaymentLine) then
+            exit;
+
         if PaymentLine.Amount = 0 then begin
             PaymentLine."Date Captured" := Today();
             PaymentLine.Modify(true);
@@ -1075,6 +1087,34 @@
                 PaymentLine2 := PaymentLine;
                 CapturePaymentLine(PaymentLine2);
             until PaymentLine.Next() = 0;
+    end;
+
+    /// <summary>
+    /// True when an Adyen capture was requested and the provider has not confirmed or rejected it yet.
+    /// Other gateways, such as Shopify, also use Capture Requested but re-check status by capturing again, so they never count as in flight.
+    /// </summary>
+    internal procedure IsCaptureInFlight(PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+    begin
+        if not PaymentLine."Capture Requested" then
+            exit(false);
+        if PaymentLine."Date Captured" <> 0D then
+            exit(false);
+
+        PaymentGateway.SetLoadFields("Integration Type");
+        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
+            exit(false);
+        exit(PaymentGateway."Integration Type" = PaymentGateway."Integration Type"::Adyen);
+    end;
+
+    /// <summary>
+    /// Marks the line captured after an asynchronous capture confirmation and saves it.
+    /// </summary>
+    internal procedure MarkPaymentLineCaptured(var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        PaymentLine."Date Captured" := Today();
+        PaymentLine.Modify(true);
     end;
     #endregion
 
@@ -1190,6 +1230,8 @@
         if PaymentLine."Payment Gateway Code" = '' then
             exit;
         if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
+            exit;
+        if IsCaptureInFlight(PaymentLine) then
             exit;
 
         if PaymentLine.Amount = 0 then begin

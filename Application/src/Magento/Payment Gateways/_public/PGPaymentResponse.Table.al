@@ -33,6 +33,11 @@ table 6059836 "NPR PG Payment Response"
         {
             DataClassification = CustomerContent;
         }
+        // Optional field
+        field(40; "Async Processing"; Boolean)
+        {
+            DataClassification = SystemMetadata;
+        }
     }
 
     /// <summary>

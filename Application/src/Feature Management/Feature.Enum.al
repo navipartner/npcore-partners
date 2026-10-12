@@ -215,4 +215,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'Pay by Link Notifications via NP Email';
         Implementation = "NPR Feature Management" = "NPR PayByLinkNPEmailFeature";
     }
+    value(320; "Async Adyen Payment Processing")
+    {
+        Caption = 'Asynchronous Adyen Payment Processing';
+        Implementation = "NPR Feature Management" = "NPR AdyenAsyncPmtProcesFeature";
+    }
 }

@@ -265,6 +265,20 @@ page 6184531 "NPR Adyen Setup"
                     ToolTip = 'Running this action will open Webhook Setup List.';
                     RunObject = Page "NPR Adyen Webhook Setup List";
                 }
+                action(ConfigureAsyncPmtProcessJQ)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Configure Asynchronous Payment Processing Job Queue';
+                    Image = NewToDo;
+                    ToolTip = 'Creates the recurring Job Queue Entry that processes CAPTURE / CAPTURE_FAILED webhooks.';
+                    Visible = _ShowAsyncPageAction;
+                    trigger OnAction()
+                    var
+                        AdyenAsyncPayProcessJQ: Codeunit "NPR Adyen Async Pay ProcessJQ";
+                    begin
+                        AdyenAsyncPayProcessJQ.ScheduleJobQueue();
+                    end;
+                }
                 action("Open Merchant Account Setup")
                 {
                     ApplicationArea = NPRRetail;
@@ -343,6 +357,7 @@ page 6184531 "NPR Adyen Setup"
     trigger OnOpenPage()
     var
         EnvironmentInformation: Codeunit "Environment Information";
+        AdyenAsyncPayProcesFeature: Codeunit "NPR AdyenAsyncPmtProcesFeature";
         AdyenSetupInit: Record "NPR Adyen Setup";
         PayByLinkNPEmailFeature: Codeunit "NPR PayByLinkNPEmailFeature";
     begin
@@ -374,6 +389,7 @@ page 6184531 "NPR Adyen Setup"
             if not _AdyenManagement.TestApiKey(Rec."Environment Type") then
                 ShowError(GetLastErrorText());
         end;
+        _ShowAsyncPageAction := AdyenAsyncPayProcesFeature.IsFeatureEnabled();
     end;
 
     local procedure ShowError(ErrorText: Text)
@@ -392,4 +408,5 @@ page 6184531 "NPR Adyen Setup"
         _PayByLinkNPEmailEnabled: Boolean;
         _APIManagementSecretKey: Text;
         _APIDownloadReportSecretKey: Text;
+        _ShowAsyncPageAction: Boolean;
 }

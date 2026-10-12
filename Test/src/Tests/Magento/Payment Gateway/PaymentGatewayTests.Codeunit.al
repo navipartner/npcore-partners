@@ -503,10 +503,124 @@ codeunit 85123 "NPR Payment Gateway Tests"
     end;
     #endregion
 
+    #region Async capture in flight
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CapturePaymentLine_SkipsAdyenLineWithCaptureInFlight()
+    var
+        SalesHeader: Record "Sales Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        GatewayCode: Code[10];
+    begin
+        // [SCENARIO] An Adyen line whose capture was requested and not yet confirmed is not captured again
+        Initialize();
+
+        // [GIVEN] An Adyen payment line on a sales order with a capture in flight
+        GatewayCode := _LibPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::Adyen);
+        _LibSales.CreateSalesOrder(SalesHeader);
+        _LibPaymentGateway.CreatePaymentLineForSalesHeader(SalesHeader, GatewayCode, PaymentLine);
+        MarkCaptureInFlight(PaymentLine);
+        Commit();
+
+        // [WHEN] The payment line is captured
+        MagentoPmtMgt.CapturePaymentLine(PaymentLine);
+
+        // [THEN] No capture was attempted and the line still waits for the provider
+        AssertCaptureNotAttempted(PaymentLine);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CaptureSalesHeader_SkipsAdyenLineWithCaptureInFlight()
+    var
+        SalesHeader: Record "Sales Header";
+        AdyenPaymentLine: Record "NPR Magento Payment Line";
+        CIPaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        AdyenGatewayCode: Code[10];
+        CIGatewayCode: Code[10];
+    begin
+        // [SCENARIO] Capturing a sales header skips the Adyen line in flight and still captures the other lines
+        Initialize();
+
+        // [GIVEN] A sales order with an Adyen line in flight and a line on another gateway
+        AdyenGatewayCode := _LibPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::Adyen);
+        CIGatewayCode := _LibPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::"CI Test Integration");
+        _LibSales.CreateSalesOrder(SalesHeader);
+        _LibPaymentGateway.CreatePaymentLineForSalesHeader(SalesHeader, AdyenGatewayCode, AdyenPaymentLine);
+        AdyenPaymentLine.Rename(AdyenPaymentLine."Document Table No.", AdyenPaymentLine."Document Type", AdyenPaymentLine."Document No.", 10000);
+        MarkCaptureInFlight(AdyenPaymentLine);
+        _LibPaymentGateway.CreatePaymentLineForSalesHeader(SalesHeader, CIGatewayCode, CIPaymentLine);
+        Commit();
+
+        // [WHEN] The sales header is captured
+        MagentoPmtMgt.CaptureSalesHeader(SalesHeader);
+
+        // [THEN] The other gateway line was captured
+        _Assert.AreEqual(true, _TestIntegration.GetDidCapture(), 'The line on the other gateway should have been captured');
+        _Assert.AreEqual(CIPaymentLine."No.", UpperCase(_TestIntegration.GetLastTransactionId()), 'Capture was called for a different line than the one on the other gateway');
+        CIPaymentLine.Find();
+        _Assert.AreEqual(Today(), CIPaymentLine."Date Captured", 'The line on the other gateway should have been marked as captured today');
+
+        // [THEN] The Adyen line in flight was not captured again
+        AssertCaptureNotAttempted(AdyenPaymentLine);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CapturePaymentLine_NonAdyenLineWithCaptureRequested_IsStillCaptured()
+    var
+        SalesHeader: Record "Sales Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        GatewayCode: Code[10];
+    begin
+        // [SCENARIO] Capture Requested on a non-Adyen line does not block capture, because other gateways re-check status by capturing again
+        Initialize();
+
+        // [GIVEN] A payment line on a non-Adyen gateway with Capture Requested set
+        GatewayCode := _LibPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::"CI Test Integration");
+        _LibSales.CreateSalesOrder(SalesHeader);
+        _LibPaymentGateway.CreatePaymentLineForSalesHeader(SalesHeader, GatewayCode, PaymentLine);
+        PaymentLine."Capture Requested" := true;
+        PaymentLine.Modify();
+        Commit();
+
+        // [WHEN] The payment line is captured
+        MagentoPmtMgt.CapturePaymentLine(PaymentLine);
+
+        // [THEN] The gateway was called and the line is captured today
+        _Assert.AreEqual(true, _TestIntegration.GetDidCapture(), 'Integration was not called to capture a non-Adyen line with Capture Requested set');
+        PaymentLine.Find();
+        _Assert.AreEqual(Today(), PaymentLine."Date Captured", 'Payment should have been registered with today as capture date');
+    end;
+    #endregion
+
     #region Aux functionality
     local procedure Initialize()
     begin
         _TestIntegration.Reset();
+    end;
+
+    local procedure MarkCaptureInFlight(var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        PaymentLine."Capture Requested" := true;
+        PaymentLine."Charge ID" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(PaymentLine."Charge ID"));
+        PaymentLine."Date Captured" := 0D;
+        PaymentLine.Modify();
+    end;
+
+    local procedure AssertCaptureNotAttempted(PaymentLine: Record "NPR Magento Payment Line")
+    var
+        InteractionLog: Record "NPR PG Interaction Log Entry";
+    begin
+        InteractionLog.SetRange("Payment Line System Id", PaymentLine.SystemId);
+        _Assert.AreEqual(true, InteractionLog.IsEmpty(), 'No payment gateway interaction should have been logged for the Adyen line in flight');
+
+        PaymentLine.Find();
+        _Assert.AreEqual(0D, PaymentLine."Date Captured", 'The Adyen line in flight should not have been marked as captured');
+        _Assert.AreEqual(true, PaymentLine."Capture Requested", 'The Adyen line in flight should still have Capture Requested set');
     end;
     #endregion
 }

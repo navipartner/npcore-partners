@@ -64,6 +64,9 @@ table 6151473 "NPR PG Interaction Log Entry"
         key(Key1; "Entry No.")
         {
         }
+        key(Key2; "Payment Line System Id", "Interaction Type", "In Progress")
+        {
+        }
     }
 }
 

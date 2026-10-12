@@ -52,6 +52,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
     var
         JobQueueEntry: Record "Job Queue Entry";
         EcomJobManagement: Codeunit "NPR Ecom Job Management";
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
         UpgradeStep := UpgradeStepName;
         if HasUpgradeTag() then
@@ -62,7 +63,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
 
         if not EcomDocsExist then begin
             if JobQueueEntry.FindFirst() then
-                DeleteMonitoredJobQueueEntry(JobQueueEntry);
+                MonitoredJQMgt.DeleteMonitoredJobQueueEntry(JobQueueEntry);
         end else begin
             if not JobQueueEntry.FindFirst() then
                 EcomJobManagement.ScheduleJobQueue(CodeunitId, JQDescription, JobQueueEntry)
@@ -82,19 +83,6 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
     begin
         JQRefreshSetup.GetSetup();
         MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(false, true, JobQueueEntry);
-    end;
-
-    local procedure DeleteMonitoredJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
-    var
-        ManagedByAppJobQueue: Record "NPR Managed By App Job Queue";
-        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
-    begin
-        if ManagedByAppJobQueue.Get(JobQueueEntry.ID) then
-            ManagedByAppJobQueue.Delete();
-        MonitoredJQMgt.RemoveMonitoredJobQueueEntry(JobQueueEntry);
-
-        JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-        JobQueueEntry.Delete(true);
     end;
 
     local procedure CheckIfEcomDocsExist(): Boolean

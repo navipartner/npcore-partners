@@ -8,6 +8,8 @@
 
     local procedure Calculate()
     var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        AsyncFeature: Codeunit "NPR AdyenAsyncPmtProcesFeature";
         RetailSalesCue: Record "NPR Retail Sales Cue";
         Result: Dictionary of [Text, Text];
     begin
@@ -49,6 +51,8 @@
         Result.Add(Format(RetailSalesCue.FieldNo("Entria Order Imports Error")), Format(RetailSalesCue."Entria Order Imports Error", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Entria Order Imports Skipped")), Format(RetailSalesCue."Entria Order Imports Skipped", 0, 9));
 #endif
+        if AsyncFeature.IsFeatureEnabled() then
+            Result.Add('RecentCaptureFailedWebhooks', Format(AdyenManagement.GetRecentCaptureFailureCount(), 0, 9));
         Page.SetBackgroundTaskResult(Result);
     end;
 }

@@ -210,10 +210,20 @@
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                     ConfirmManagement: Codeunit "Confirm Management";
                 begin
+                    if not Rec.Find() then
+                        exit;
+                    if MagentoPmtMgt.IsCaptureInFlight(Rec) then begin
+                        Message(CaptureInProgressMsg);
+                        exit;
+                    end;
+
                     if Rec."Date Captured" <> 0D then begin
                         if not Confirm(CapturePaymentAgainQst, false) then
                             exit;
                         Rec."Date Captured" := 0D;
+                        // An Adyen line keeps Capture Requested after an async capture; clear it so the line does not look in flight.
+                        if MagentoPmtMgt.IsCaptureInFlight(Rec) then
+                            Rec."Capture Requested" := false;
                         CurrPage.Update(true);
                     end else
                         if not ConfirmManagement.GetResponseOrDefault(CapturePaymentQst, true) then
@@ -274,6 +284,12 @@
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                     ConfirmManagement: Codeunit "Confirm Management";
                 begin
+                    if not Rec.Find() then
+                        exit;
+                    if MagentoPmtMgt.IsCaptureInFlight(Rec) then begin
+                        Message(CaptureInProgressMsg);
+                        exit;
+                    end;
                     Rec.TestField("Date Captured", 0D);
                     if Rec."Date Canceled" <> 0D then begin
                         if not Confirm(CancelPaymentAgainQst, false) then
@@ -286,6 +302,24 @@
 
                     PaymentLine := Rec;
                     MagentoPmtMgt.CancelPaymentLine(PaymentLine);
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Reset Capture Request")
+            {
+                Caption = 'Reset Capture Request';
+                Image = ResetStatus;
+                Visible = _ResetCaptureVisible;
+                ToolTip = 'Releases an Adyen capture request that has not been confirmed or rejected within 24 hours. Check the capture in the Adyen Customer Area first.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    AdyenTryWebhookProcess: Codeunit "NPR Adyen Try Webhook Process";
+                begin
+                    if not Rec.Find() then
+                        exit;
+                    AdyenTryWebhookProcess.RunResetCaptureRequest(Rec, CurrentDateTime());
                     CurrPage.Update(false);
                 end;
             }
@@ -501,6 +535,7 @@
 #endif
         CapturePaymentAgainQst: Label 'Payment has already been Captured\Capture Again?';
         CapturePaymentQst: Label 'Do you want to capture the payment?';
+        CaptureInProgressMsg: Label 'A capture of this payment is already in progress. Wait until the payment provider confirms or rejects it.';
         CaptureEnabled: Boolean;
         RefundEnabled: Boolean;
         RefundPaymentAgainQst: Label 'Payment has already been Refunded\Refund Again?';
@@ -512,6 +547,7 @@
         SkipPostingQst: Label 'Do you want to set Skip Posting?';
         CancelPayByLinkQst: Label 'Do you want to cancel the Pay by Link ?';
         ResetPostingErrQst: Label 'Do you want to reset posting errors?';
+        _ResetCaptureVisible: Boolean;
 
     local procedure SetGatewayEnabled()
     var
@@ -519,6 +555,7 @@
     begin
         CaptureEnabled := false;
         RefundEnabled := false;
+        _ResetCaptureVisible := false;
 
         if Rec."Payment Gateway Code" = '' then
             exit;
@@ -528,5 +565,6 @@
 
         CaptureEnabled := PaymentGateway."Enable Capture";
         RefundEnabled := PaymentGateway."Enable Refund";
+        _ResetCaptureVisible := CaptureEnabled and (PaymentGateway."Integration Type" = PaymentGateway."Integration Type"::Adyen);
     end;
 }

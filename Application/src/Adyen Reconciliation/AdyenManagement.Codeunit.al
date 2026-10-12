@@ -240,7 +240,6 @@ codeunit 6184796 "NPR Adyen Management"
     internal procedure ImportWebhooks(pageNumber: Integer; MerchantAccount: Text[80])
     var
         WebhookSetup: Record "NPR Adyen Webhook Setup";
-        WebhookType: Enum "NPR Adyen Webhook Type";
         GetAllWebhooksEndpoint: Label '/merchants/%1/webhooks', Locked = true;
         RequestUrl: Text;
         ResponseText: Text;
@@ -250,10 +249,7 @@ codeunit 6184796 "NPR Adyen Management"
         PagesTotal: Integer;
         WebhooksArray: JsonArray;
         WebhookObject: JsonObject;
-        EventCodeArray: JsonArray;
-        EventCodeToken: JsonToken;
         i: Integer;
-        TypeIndex: Integer;
         WebhookTypeName: Text;
         WebhookURL: Text;
     begin
@@ -300,36 +296,7 @@ codeunit 6184796 "NPR Adyen Management"
                         if WebhookSetup.IsEmpty() then begin
                             WebhookSetup.Init();
                             WebhookSetup."Primary Key" := 0;
-                            WebhookSetup.ID := CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(WebhookSetup.ID));
-                            WebhookObject.Get('type', JsonToken);
-                            WebhookTypeName := JsonToken.AsValue().AsText();
-                            TypeIndex := WebhookType.Names().IndexOf(WebhookTypeName);
-                            if TypeIndex > 0 then begin
-                                WebhookSetup.Type := Enum::"NPR Adyen Webhook Type".FromInteger(WebhookType.Ordinals().Get(TypeIndex));
-                                WebhookSetup."Web Service URL" := CopyStr(WebhookURL, 1, MaxStrLen(WebhookSetup."Web Service URL"));
-                                if WebhookObject.Get('description', JsonToken) then
-                                    WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup.Description));
-                                if WebhookObject.Get('username', JsonToken) then
-                                    if JsonToken.AsValue().AsText() <> '' then begin
-                                        WebhookSetup."Web Service Security" := WebhookSetup."Web Service Security"::"Basic authentication";
-                                        WebhookSetup."Web Service User" := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Web Service User"));
-                                    end;
-                                WebhookObject.Get('active', JsonToken);
-                                WebhookSetup.Active := JsonToken.AsValue().AsBoolean();
-                                WebhookSetup."Merchant Account" := MerchantAccount;
-                                if WebhookSetup.Type = WebhookSetup.Type::standard then begin
-                                    if WebhookObject.Get('additionalSettings', JsonToken) then begin
-                                        if JsonToken.AsObject().Get('includeEventCodes', JsonToken) then begin
-                                            if JsonToken.IsArray() then begin
-                                                EventCodeArray := JsonToken.AsArray();
-                                                foreach EventCodeToken in EventCodeArray do
-                                                    WebhookSetup."Include Events Filter" += CopyStr(EventCodeToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Include Events Filter")) + '|';
-                                                if WebhookSetup."Include Events Filter".Contains('|') then
-                                                    WebhookSetup."Include Events Filter" := DelChr(WebhookSetup."Include Events Filter", '>', '|');
-                                            end;
-                                        end;
-                                    end;
-                                end;
+                            if MapWebhook(WebhookObject, WebhookURL, MerchantAccount, WebhookSetup, WebhookTypeName) then begin
                                 WebhookSetup.Insert();
                                 _ImportedWebhooks += 1;
                                 Commit();
@@ -347,6 +314,215 @@ codeunit 6184796 "NPR Adyen Management"
         end;
         if pageNumber = 0 then
             LogSkippedWebhookTypesToSentry(MerchantAccount);
+    end;
+
+    [NonDebuggable]
+    local procedure MapWebhook(WebhookObject: JsonObject; WebhookURL: Text; MerchantAccount: Text[80]; var WebhookSetup: Record "NPR Adyen Webhook Setup"; var WebhookTypeName: Text): Boolean
+    var
+        WebhookType: Enum "NPR Adyen Webhook Type";
+        JsonToken: JsonToken;
+        EventCodeArray: JsonArray;
+        EventCodeToken: JsonToken;
+        TypeIndex: Integer;
+    begin
+        WebhookObject.Get('id', JsonToken);
+        WebhookSetup.ID := CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(WebhookSetup.ID));
+        WebhookObject.Get('type', JsonToken);
+        WebhookTypeName := JsonToken.AsValue().AsText();
+        TypeIndex := WebhookType.Names().IndexOf(WebhookTypeName);
+        if TypeIndex = 0 then
+            exit(false);
+
+        WebhookSetup.Type := Enum::"NPR Adyen Webhook Type".FromInteger(WebhookType.Ordinals().Get(TypeIndex));
+        WebhookSetup."Web Service URL" := CopyStr(WebhookURL, 1, MaxStrLen(WebhookSetup."Web Service URL"));
+        if WebhookObject.Get('description', JsonToken) then
+            WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup.Description));
+        if WebhookObject.Get('username', JsonToken) then
+            if JsonToken.AsValue().AsText() <> '' then begin
+                WebhookSetup."Web Service Security" := WebhookSetup."Web Service Security"::"Basic authentication";
+                WebhookSetup."Web Service User" := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Web Service User"));
+            end;
+        WebhookObject.Get('active', JsonToken);
+        WebhookSetup.Active := JsonToken.AsValue().AsBoolean();
+        WebhookSetup."Merchant Account" := MerchantAccount;
+        if WebhookSetup.Type = WebhookSetup.Type::standard then begin
+            if WebhookObject.Get('additionalSettings', JsonToken) then begin
+                if JsonToken.AsObject().Get('includeEventCodes', JsonToken) then begin
+                    if JsonToken.IsArray() then begin
+                        EventCodeArray := JsonToken.AsArray();
+                        foreach EventCodeToken in EventCodeArray do
+                            WebhookSetup."Include Events Filter" += CopyStr(EventCodeToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Include Events Filter")) + '|';
+                        if WebhookSetup."Include Events Filter".Contains('|') then
+                            WebhookSetup."Include Events Filter" := DelChr(WebhookSetup."Include Events Filter", '>', '|');
+                    end;
+                end;
+            end;
+        end;
+        exit(true);
+    end;
+
+    /// <summary>
+    /// Reads the merchant's webhooks from Adyen into the temporary buffer, keeping only those that belong to this environment.
+    /// Returns false when the webhooks cannot be read. Never prompts, so on-prem it returns false without credentials.
+    /// </summary>
+    internal procedure GetCurrentEnvironmentWebhooks(MerchantAccount: Text[80]; var TempWebhookSetup: Record "NPR Adyen Webhook Setup" temporary): Boolean
+    begin
+        exit(CollectCurrentEnvironmentWebhooks(MerchantAccount, false, '', '', '', TempWebhookSetup));
+    end;
+
+    /// <summary>
+    /// Same as the overload without credentials, but matches on-prem webhooks against the URL composed from the credentials the caller already collected.
+    /// </summary>
+    [NonDebuggable]
+    internal procedure GetCurrentEnvironmentWebhooks(MerchantAccount: Text[80]; UserNameParam: Text[100]; PasswordParam: Text[100]; BaseUrlParam: Text; var TempWebhookSetup: Record "NPR Adyen Webhook Setup" temporary): Boolean
+    begin
+        exit(CollectCurrentEnvironmentWebhooks(MerchantAccount, true, UserNameParam, PasswordParam, BaseUrlParam, TempWebhookSetup));
+    end;
+
+    [NonDebuggable]
+    local procedure CollectCurrentEnvironmentWebhooks(MerchantAccount: Text[80]; UseSuppliedOnPremInput: Boolean; UserNameParam: Text[100]; PasswordParam: Text[100]; BaseUrlParam: Text; var TempWebhookSetup: Record "NPR Adyen Webhook Setup" temporary): Boolean
+    var
+        TempBlankWebhookSetup: Record "NPR Adyen Webhook Setup" temporary;
+        EnvironmentInformation: Codeunit "Environment Information";
+        GetAllWebhooksEndpoint: Label '/merchants/%1/webhooks', Locked = true;
+        FirstPageUrl: Text;
+        RequestUrl: Text;
+        ExpectedUrl: Text;
+        JsonToken: JsonToken;
+        WebhooksArray: JsonArray;
+        IsSaaS: Boolean;
+        PagesTotal: Integer;
+        PageNumber: Integer;
+        LastPrimaryKey: Integer;
+    begin
+        TempWebhookSetup.Reset();
+        TempWebhookSetup.DeleteAll();
+
+        if not InitiateAdyenManagement() then
+            exit(false);
+
+        IsSaaS := EnvironmentInformation.IsSaaSInfrastructure();
+        if not IsSaaS then begin
+            if (not UseSuppliedOnPremInput) or (UserNameParam = '') or (PasswordParam = '') then
+                exit(false);
+            ExpectedUrl := ComposeAFWebServiceURL(TempBlankWebhookSetup, true, UserNameParam, PasswordParam, BaseUrlParam);
+        end;
+
+        FirstPageUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetAllWebhooksEndpoint, MerchantAccount) + '?pageSize=100';
+        PagesTotal := 1;
+        while PageNumber < PagesTotal do begin
+            PageNumber += 1;
+            RequestUrl := FirstPageUrl;
+            if PageNumber > 1 then
+                RequestUrl += '&pageNumber=' + Format(PageNumber);
+
+            if not ReadWebhooksPage(RequestUrl, PagesTotal, WebhooksArray) then begin
+                TempWebhookSetup.DeleteAll();
+                exit(false);
+            end;
+            if PagesTotal = 0 then
+                exit(true);
+
+            // An item that cannot be mapped is skipped, so enabling falls back to creating a webhook.
+            foreach JsonToken in WebhooksArray do
+                if JsonToken.IsObject() then
+                    if TryAddCurrentEnvironmentWebhook(JsonToken.AsObject(), MerchantAccount, IsSaaS, ExpectedUrl, LastPrimaryKey, TempWebhookSetup) then;
+        end;
+        exit(true);
+    end;
+
+    [NonDebuggable]
+    local procedure ReadWebhooksPage(RequestUrl: Text; var PagesTotal: Integer; var WebhooksArray: JsonArray): Boolean
+    var
+        ResponseText: Text;
+        JsonToken: JsonToken;
+        JsonObject: JsonObject;
+    begin
+        if not TryGetAdyenResponse(RequestUrl, ResponseText) then
+            exit(false);
+        if not JsonToken.ReadFrom(ResponseText) then
+            exit(false);
+        if not JsonToken.IsObject() then
+            exit(false);
+        JsonObject := JsonToken.AsObject();
+        if not JsonObject.Get('pagesTotal', JsonToken) then
+            exit(false);
+        if not JsonToken.IsValue() then
+            exit(false);
+        if JsonToken.AsValue().IsNull() then
+            exit(false);
+        PagesTotal := JsonToken.AsValue().AsInteger();
+        if PagesTotal = 0 then
+            exit(true);
+        if not JsonObject.Get('data', JsonToken) then
+            exit(false);
+        if not JsonToken.IsArray() then
+            exit(false);
+        WebhooksArray := JsonToken.AsArray();
+        exit(true);
+    end;
+
+    [TryFunction]
+    [NonDebuggable]
+    local procedure TryAddCurrentEnvironmentWebhook(WebhookObject: JsonObject; MerchantAccount: Text[80]; IsSaaS: Boolean; ExpectedUrl: Text; var LastPrimaryKey: Integer; var TempWebhookSetup: Record "NPR Adyen Webhook Setup" temporary)
+    var
+        JsonToken: JsonToken;
+        WebhookURL: Text;
+        WebhookId: Code[80];
+        WebhookTypeName: Text;
+    begin
+        if WebhookObject.Get('url', JsonToken) then
+            WebhookURL := JsonToken.AsValue().AsText();
+        if not WebhookObject.Get('id', JsonToken) then
+            exit;
+        WebhookId := CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(TempWebhookSetup.ID));
+
+        if not IsOwnEnvironmentWebhook(WebhookURL, WebhookId, IsSaaS, ExpectedUrl) then
+            exit;
+
+        TempWebhookSetup.Init();
+        LastPrimaryKey += 1;
+        TempWebhookSetup."Primary Key" := LastPrimaryKey;
+        if MapWebhook(WebhookObject, WebhookURL, MerchantAccount, TempWebhookSetup, WebhookTypeName) then
+            TempWebhookSetup.Insert();
+    end;
+
+    [TryFunction]
+    [NonDebuggable]
+    local procedure TryGetAdyenResponse(RequestUrl: Text; var ResponseText: Text)
+    begin
+        ResponseText := CreateAdyenHttpRequest('', RequestUrl, Enum::"Http Request Type"::GET);
+    end;
+
+    /// <summary>
+    /// True when the Adyen URL is exactly the expected URL followed by this webhook's own webhookRef.
+    /// </summary>
+    [NonDebuggable]
+    internal procedure MatchesWebhookUrl(AdyenUrl: Text; WebhookId: Text; ExpectedUrlWithoutRef: Text): Boolean
+    begin
+        if (WebhookId = '') or (ExpectedUrlWithoutRef = '') then
+            exit(false);
+        exit(AdyenUrl = ExpectedUrlWithoutRef + '&webhookRef=' + WebhookId);
+    end;
+
+    /// <summary>
+    /// True when the Adyen URL belongs to this environment. On SaaS it must end with the webhook's own webhookRef and
+    /// name this tenant, environment and company. Otherwise it must match the expected URL exactly.
+    /// </summary>
+    [NonDebuggable]
+    internal procedure IsOwnEnvironmentWebhook(AdyenUrl: Text; WebhookId: Text; IsSaaS: Boolean; ExpectedUrlWithoutRef: Text): Boolean
+    begin
+        if IsSaaS then
+            exit(HasOwnWebhookRef(AdyenUrl, WebhookId) and IsWebhookForCurrentEnvironment(AdyenUrl));
+        exit(MatchesWebhookUrl(AdyenUrl, WebhookId, ExpectedUrlWithoutRef));
+    end;
+
+    [NonDebuggable]
+    local procedure HasOwnWebhookRef(AdyenUrl: Text; WebhookId: Text): Boolean
+    begin
+        if WebhookId = '' then
+            exit(false);
+        exit(AdyenUrl.EndsWith('&webhookRef=' + WebhookId));
     end;
 
     local procedure IsWebhookForCurrentEnvironment(WebServiceURL: Text): Boolean
@@ -705,8 +881,30 @@ codeunit 6184796 "NPR Adyen Management"
         Rec.Modify(Rec.ID <> '');
     end;
 
+    /// <summary>
+    /// Suggests the web service URL using on-prem credentials the caller already collected, so no second prompt is shown.
+    /// </summary>
     [NonDebuggable]
-    internal procedure BuildAFWebServiceURL(Rec: Record "NPR Adyen Webhook Setup") WebServiceURL: Text
+    internal procedure SuggestAFWebServiceURL(var Rec: Record "NPR Adyen Webhook Setup"; UserNameParam: Text[100]; PasswordParam: Text[100]; BaseUrlParam: Text)
+    var
+        NewWebServiceURL: Text;
+    begin
+        NewWebServiceURL := ComposeAFWebServiceURL(Rec, true, UserNameParam, PasswordParam, BaseUrlParam);
+        if NewWebServiceURL = '' then
+            exit;
+
+        Rec."Web Service URL" := CopyStr(NewWebServiceURL, 1, MaxStrLen(Rec."Web Service URL"));
+        Rec.Modify(Rec.ID <> '');
+    end;
+
+    [NonDebuggable]
+    internal procedure BuildAFWebServiceURL(Rec: Record "NPR Adyen Webhook Setup"): Text
+    begin
+        exit(ComposeAFWebServiceURL(Rec, false, '', '', ''));
+    end;
+
+    [NonDebuggable]
+    local procedure ComposeAFWebServiceURL(Rec: Record "NPR Adyen Webhook Setup"; UseSuppliedOnPremInput: Boolean; UserNameParam: Text[100]; PasswordParam: Text[100]; BaseUrlParam: Text) WebServiceURL: Text
     var
         EnvironmentInformation: Codeunit "Environment Information";
         AzureADTenant: Codeunit "Azure AD Tenant";
@@ -726,8 +924,13 @@ codeunit 6184796 "NPR Adyen Management"
         if not EnvironmentInformation.IsSaaSInfrastructure() then begin
             ModeTxt := 'onprem';
 
-            if not PromptOnPremWebhookInput(UserNameInput, PasswordInput, BaseUrl) then
-                exit('');
+            if UseSuppliedOnPremInput then begin
+                UserNameInput := UserNameParam;
+                PasswordInput := PasswordParam;
+                BaseUrl := BaseUrlParam;
+            end else
+                if not PromptOnPremWebhookInput(UserNameInput, PasswordInput, BaseUrl) then
+                    exit('');
 
             TypeHelper.UrlEncode(BaseUrl);
 
@@ -858,6 +1061,20 @@ codeunit 6184796 "NPR Adyen Management"
             else
                 exit('Standard');
         end;
+    end;
+
+    internal procedure GetRecentCaptureFailureCount(): Integer
+    var
+        AdyenWebhook: Record "NPR Adyen Webhook";
+    begin
+        SetRecentCaptureFailureFilter(AdyenWebhook, CurrentDateTime());
+        exit(AdyenWebhook.Count());
+    end;
+
+    internal procedure SetRecentCaptureFailureFilter(var AdyenWebhook: Record "NPR Adyen Webhook"; ReferenceDateTime: DateTime)
+    begin
+        AdyenWebhook.SetRange("Event Code", AdyenWebhook."Event Code"::CAPTURE_FAILED);
+        AdyenWebhook.SetRange(SystemCreatedAt, ReferenceDateTime - 7 * 24 * 60 * 60 * 1000, ReferenceDateTime);
     end;
 
     internal procedure CreateGeneralLog(LogType: Enum "NPR Adyen Webhook Log Type"; Success: Boolean; Description: Text; RequestEntryNo: Integer)

@@ -94,8 +94,36 @@ page 6184551 "NPR Adyen Webhook Setup List"
                             Message(WebhookImportFail);
                 end;
             }
+            group(CreateWebhooks)
+            {
+                Caption = 'Create Webhooks';
+                Image = SetupList;
+
+                action(CreateCaptureWebhooks)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Create Capture Webhooks';
+                    Image = NewItem;
+                    Visible = _ShowAsyncPageAction;
+                    ToolTip = 'Creates the CAPTURE and CAPTURE_FAILED webhook on every Merchant Account configured in NP Pay, or adopts an existing one.';
+                    trigger OnAction()
+                    var
+                        AsyncAdyenPayProcessing: Codeunit "NPR Async Adyen Pmt Processing";
+                    begin
+                        AsyncAdyenPayProcessing.EnsureCaptureWebhooks();
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        AdyenAsyncPayProcesFeature: Codeunit "NPR AdyenAsyncPmtProcesFeature";
+    begin
+        _ShowAsyncPageAction := AdyenAsyncPayProcesFeature.IsFeatureEnabled();
+    end;
 
     trigger OnDeleteRecord(): Boolean
     var
@@ -126,4 +154,7 @@ page 6184551 "NPR Adyen Webhook Setup List"
 
         ImportedWebhooks := AdyenManagement.GetImportedWebhooksAmount();
     end;
+
+    var
+        _ShowAsyncPageAction: Boolean;
 }

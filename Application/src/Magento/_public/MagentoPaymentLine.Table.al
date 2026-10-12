@@ -340,6 +340,9 @@
         key(Key4; "Document Table No.", "Document Type", "Document No.", "Points Payment")
         {
         }
+        key(Key5; "Charge Id")
+        {
+        }
     }
 
     var
