@@ -914,6 +914,7 @@
         SourceCode := SourceCodeSetup.Sales;
 
         GenJnlLine.Init();
+        GenJnlLine."Journal Template Name" := GetInvoiceJnlTemplateName(SalesInvHeader);
         GenJnlLine."Posting Date" := PaymentLine."Posting Date";
         GenJnlLine."Document Date" := PaymentLine."Posting Date";
         GenJnlLine.Description := PaymentLine.Description;
@@ -954,6 +955,26 @@
         GenJnlLine."Shortcut Dimension 1 Code" := SalesInvHeader."Shortcut Dimension 1 Code";
         GenJnlLine."Shortcut Dimension 2 Code" := SalesInvHeader."Shortcut Dimension 2 Code";
         GenJnlLine."Dimension Set ID" := SalesInvHeader."Dimension Set ID";
+    end;
+
+    local procedure GetInvoiceJnlTemplateName(SalesInvHeader: Record "Sales Invoice Header"): Code[10]
+    var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        GLSetup: Record "General Ledger Setup";
+        SalesSetup: Record "Sales & Receivables Setup";
+    begin
+        GLSetup.Get();
+        if not GLSetup."Journal Templ. Name Mandatory" then
+            exit('');
+
+        CustLedgerEntry.SetLoadFields("Journal Templ. Name");
+        if CustLedgerEntry.Get(SalesInvHeader."Cust. Ledger Entry No.") then
+            if CustLedgerEntry."Journal Templ. Name" <> '' then
+                exit(CustLedgerEntry."Journal Templ. Name");
+
+        SalesSetup.Get();
+        SalesSetup.TestField("S. Invoice Template Name");
+        exit(SalesSetup."S. Invoice Template Name");
     end;
 
 
