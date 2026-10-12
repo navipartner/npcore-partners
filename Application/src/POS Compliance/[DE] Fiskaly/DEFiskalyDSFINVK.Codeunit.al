@@ -329,7 +329,6 @@
     var
         POSLines: Record "NPR POS Entry Sales Line";
         VatMapper: Record "NPR VAT Post. Group Mapper";
-        AmountsPerVatIdList: JsonArray;
         TransactionLine: JsonObject;
         TransactionLineBusinessCase: JsonObject;
         TransactionLineItem: JsonObject;
@@ -345,9 +344,8 @@
             Clear(TransactionLineBusinessCase);
             Clear(TransactionLineItem);
             Clear(TransactionLine);
-            AmountsPerVatIdList.Add(CreateAmountsPerVatIdJson(VatMapper."DSFINVK ID", POSLines."Amount Incl. VAT (LCY)", POSLines."Amount Excl. VAT (LCY)", (POSLines."Amount Incl. VAT (LCY)" - POSLines."Amount Excl. VAT (LCY)")));
             TransactionLineBusinessCase.Add('type', 'Umsatz');
-            TransactionLineBusinessCase.Add('amounts_per_vat_id', AmountsPerVatIdList);
+            TransactionLineBusinessCase.Add('amounts_per_vat_id', CreateLineAmountsPerVatId(VatMapper."DSFINVK ID", POSLines));
             TransactionLineItem.Add('number', POSLines."No.");
             TransactionLineItem.Add('quantity', Format(POSLines.Quantity, 0, '<Precision,2:26><Standard Format,3>'));
             TransactionLineItem.Add('price_per_unit', Format(POSLines."Unit Price", 0, '<Precision,2:26><Standard Format,4>'));
@@ -363,6 +361,11 @@
             TransactionLine.Add('item', TransactionLineItem);
             TransactionLines.Add(TransactionLine);
         until POSLines.Next() = 0;
+    end;
+
+    local procedure CreateLineAmountsPerVatId(VatId: Integer; POSLine: Record "NPR POS Entry Sales Line") LineAmountsPerVatId: JsonArray
+    begin
+        LineAmountsPerVatId.Add(CreateAmountsPerVatIdJson(VatId, POSLine."Amount Incl. VAT (LCY)", POSLine."Amount Excl. VAT (LCY)", POSLine."Amount Incl. VAT (LCY)" - POSLine."Amount Excl. VAT (LCY)"));
     end;
 
     local procedure InsertTempPaymentLine(DeAuditLog: Record "NPR DE POS Audit Log Aux. Info"; var PaymentLine: Record "NPR POS Entry Payment Line")
