@@ -6,12 +6,14 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
         SaleLinePOS: Record "NPR POS Sale Line";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempSaleLinePOSToDelete: Record "NPR POS Sale Line" temporary;
+        TempLotSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSActMergSimlLinesEvents: Codeunit "NPR POSActMergSimlLinesEvents";
         NoLinesErr: Label 'No adequate sale lines are available in the current sale';
         CollapseNotSupportedMsg: Label 'Collapse is not supported for the Items: %1';
         NotCollapsedItems: text;
         CollapseSupported: Boolean;
+        LotQty: Decimal;
     begin
         SaleLinePOS.SetCurrentKey("No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -34,6 +36,8 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             SaleLinePOS.SetRange("Unit Price", SaleLinePOS."Unit Price");
             SaleLinePOS.SetRange("Unit of Measure Code", SaleLinePOS."Unit of Measure Code");
             SaleLinePOS.SetRange("Discount %", SaleLinePOS."Discount %");
+            SaleLinePOS.SetRange("Lot No.", SaleLinePOS."Lot No.");
+            SaleLinePOS.SetRange("Serial No.", SaleLinePOS."Serial No.");
             SaleLinePOS.SetRange("Manual Item Sales Price", false);
             SaleLinePOS.SetRange("Coupon Applied", false);
 
@@ -54,7 +58,6 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
 
                     while SaleLinePOS.Next() > 0 do begin
                         TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
-                        TempSaleLinePOS.Validate(Quantity);
 
                         TempSaleLinePOSToDelete := SaleLinePOS;
                         TempSaleLinePOSToDelete.Insert();
@@ -69,6 +72,8 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             SaleLinePOS.SetRange("Unit Price");
             SaleLinePOS.SetRange("Unit of Measure Code");
             SaleLinePOS.SetRange("Discount %");
+            SaleLinePOS.SetRange("Lot No.");
+            SaleLinePOS.SetRange("Serial No.");
 
             POSActMergSimlLinesEvents.OnAfterFindLinesToCollapse(SalePOS, SaleLinePOS);
         until SaleLinePOS.Next() = 0;
@@ -82,6 +87,29 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
 
         DeleteLines(TempSaleLinePOSToDelete);
 
+        // Validate only after the delete and before InsertLine commits, so an error rolls back the delete.
+        TempLotSaleLinePOS.Copy(TempSaleLinePOS, true);
+        repeat
+            if TempSaleLinePOS."Lot No." <> '' then begin
+                // InsertLine commits each group, so a lot split over several groups must pass the stock check for its total first.
+                TempLotSaleLinePOS.SetRange("No.", TempSaleLinePOS."No.");
+                TempLotSaleLinePOS.SetRange("Variant Code", TempSaleLinePOS."Variant Code");
+                TempLotSaleLinePOS.SetRange("Lot No.", TempSaleLinePOS."Lot No.");
+                if TempLotSaleLinePOS.Count() > 1 then begin
+                    TempLotSaleLinePOS.CalcSums(Quantity);
+                    LotQty := TempLotSaleLinePOS.Quantity;
+                    if LotQty > 0 then begin
+                        TempLotSaleLinePOS := TempSaleLinePOS;
+                        TempLotSaleLinePOS.Quantity := LotQty;
+                        TempLotSaleLinePOS.LotNoValidate();
+                    end;
+                end;
+            end;
+            TempSaleLinePOS.Validate(Quantity);
+            TempSaleLinePOS.Modify();
+        until TempSaleLinePOS.Next() = 0;
+
+        TempSaleLinePOS.FindSet();
         repeat
             SaleLinePOS := TempSaleLinePOS;
             POSSaleLine.SetUseLinePriceVATParams(true);
