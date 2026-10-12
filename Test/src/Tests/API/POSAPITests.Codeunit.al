@@ -2789,6 +2789,138 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_ProductTypeQrFoodOrder_RegistersQrBillingEvents()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        KitchenRequest: JsonObject;
+        SaleId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] A QR food order also sends kitchenRequest, but productType bills it as a QR order instead of a kiosk order
+        InitializeRestaurant();
+
+        // [GIVEN] A paid sale
+        SaleId := CreateGuid();
+        CreatePaidSale(SaleId);
+
+        // [WHEN] Complete with productType qr-food-order and a kitchenRequest
+        KitchenRequest.Add('seatingCode', _Seating.Code);
+        Body.Add('kitchenRequest', KitchenRequest);
+        Body.Add('productType', 'qr-food-order');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed');
+
+        // [THEN] QR billing events are registered
+        AssertSelfServiceBillingEvents(
+            Response,
+            Enum::"NPR Billing Event Type"::HOSPITALITY_QR_ORDERS_COUNT,
+            Enum::"NPR Billing Event Type"::HOSPITALITY_QR_ORDERS_AMOUNT_LCY);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_ProductTypeSelfServiceFoodOrder_WithoutKitchenRequest_RegistersHospitalityBillingEvents()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        SaleId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] productType decides the billing event type on its own, without kitchenRequest
+        Initialize();
+
+        // [GIVEN] A paid sale
+        SaleId := CreateGuid();
+        CreatePaidSale(SaleId);
+
+        // [WHEN] Complete with productType self-service-food-order and no kitchenRequest
+        Body.Add('productType', 'self-service-food-order');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed');
+
+        // [THEN] Kiosk (hospitality self-service) billing events are registered
+        AssertSelfServiceBillingEvents(
+            Response,
+            Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_COUNT,
+            Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_AMOUNT_LCY);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_ProductTypeNull_CompletesSaleWithRetailBillingEvents()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        NullValue: JsonValue;
+        SaleId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] A null productType must not block completing a paid sale; billing falls back to the old rule
+        Initialize();
+
+        // [GIVEN] A paid sale
+        SaleId := CreateGuid();
+        CreatePaidSale(SaleId);
+
+        // [WHEN] Complete with productType null and no kitchenRequest
+        NullValue.SetValueToNull();
+        Body.Add('productType', NullValue);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed');
+
+        // [THEN] Retail billing events are registered, as without productType
+        AssertSelfServiceBillingEvents(
+            Response,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_ProductTypeRetailSelfService_WithKitchenRequest_RegistersRetailBillingEvents()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        KitchenRequest: JsonObject;
+        SaleId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        // [SCENARIO] productType retail-self-service decides billing even when a kitchenRequest is sent
+        InitializeRestaurant();
+
+        // [GIVEN] A paid sale
+        SaleId := CreateGuid();
+        CreatePaidSale(SaleId);
+
+        // [WHEN] Complete with productType retail-self-service and a kitchenRequest
+        KitchenRequest.Add('seatingCode', _Seating.Code);
+        Body.Add('kitchenRequest', KitchenRequest);
+        Body.Add('productType', 'retail-self-service');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed');
+
+        // [THEN] Retail billing events are registered
+        AssertSelfServiceBillingEvents(
+            Response,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT,
+            Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSale_DuplicateId_ShouldFail()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
@@ -4592,6 +4724,53 @@ codeunit 85157 "NPR POS API Tests"
 
         GeneralLedgerSetup.Get();
         Assert.AreEqual(GeneralLedgerSetup."LCY Code", CurrencyToken.AsValue().AsText(), 'Amount billing event currency should match LCY');
+    end;
+
+    local procedure CreatePaidSale(SaleId: Guid)
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        Clear(Body);
+        Body.Add('paymentMethodCode', _CashPaymentMethod.Code);
+        Body.Add('paymentType', 'Cash');
+        Body.Add('amount', _Item."Unit Price");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create payment line should succeed');
+    end;
+
+    local procedure AssertSelfServiceBillingEvents(CompleteResponse: JsonObject; CountEventType: Enum "NPR Billing Event Type"; AmountEventType: Enum "NPR Billing Event Type")
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+    begin
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(CompleteResponse);
+        Assert.IsTrue(ResponseBody.Get('entryNo', JToken), 'Response should contain entryNo');
+        POSEntry.Get(JToken.AsValue().AsInteger());
+        POSEntrySalesLine.SetCurrentKey("POS Entry No.", "Line No.");
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        Assert.IsTrue(POSEntrySalesLine.FindFirst(), 'POS Entry sales line should be created');
+
+        AssertBillingEvent(POSEntry.SystemId, CountEventType, 1);
+        AssertAmountBillingEvent(POSEntrySalesLine.SystemId, AmountEventType, POSEntry."Amount Incl. Tax & Round");
     end;
 
     local procedure AssertBillingEventNotRegistered(EventId: Guid)

@@ -259,7 +259,9 @@ codeunit 6248632 "NPR API POS Sale"
         POSSale: Codeunit "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         KitchenOrder: JsonToken;
-        IsHospitalitySelfServiceOrder: Boolean;
+        HasKitchenRequest: Boolean;
+        ProductType: Text;
+        ProductTypeToken: JsonToken;
     begin
         Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
 
@@ -282,15 +284,19 @@ codeunit 6248632 "NPR API POS Sale"
         if Request.BodyJson().IsObject then begin
             if Request.BodyJson().AsObject().Get('kitchenRequest', KitchenOrder) then begin
                 CreateKitchenOrder(KitchenOrder.AsObject());
-                IsHospitalitySelfServiceOrder := true;
+                HasKitchenRequest := true;
             end;
+            if Request.BodyJson().AsObject().Get('productType', ProductTypeToken) then
+                if ProductTypeToken.IsValue() then
+                    if not (ProductTypeToken.AsValue().IsNull() or ProductTypeToken.AsValue().IsUndefined()) then
+                        ProductType := ProductTypeToken.AsValue().AsText();
         end;
 
         if not POSSale.TryEndSale(POSSession, false) then
             exit(Response.RespondBadRequest('Sale failed to complete. Ensure payments add up to full or higher than sales total.'));
 
         POSSale.GetLastSalePOSEntry(POSEntry);
-        RegisterSelfServiceBillingEvents(POSEntry, IsHospitalitySelfServiceOrder);
+        RegisterSelfServiceBillingEvents(POSEntry, ProductType, HasKitchenRequest);
         exit(Response.RespondCreated(POSEntryAsJson(POSEntry)));
     end;
 
@@ -492,7 +498,7 @@ codeunit 6248632 "NPR API POS Sale"
         Json.EndObject();
     end;
 
-    local procedure RegisterSelfServiceBillingEvents(POSEntry: Record "NPR POS Entry"; IsHospitalitySelfServiceOrder: Boolean)
+    local procedure RegisterSelfServiceBillingEvents(POSEntry: Record "NPR POS Entry"; ProductType: Text; HasKitchenRequest: Boolean)
     var
         BillingClient: Codeunit "NPR Event Billing Client";
         Sentry: Codeunit "NPR Sentry";
@@ -505,12 +511,30 @@ codeunit 6248632 "NPR API POS Sale"
         POSEntrySalesLine.SetCurrentKey("POS Entry No.", "Line No.");
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
 
-        if IsHospitalitySelfServiceOrder then begin
-            CountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_COUNT;
-            AmountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_AMOUNT_LCY;
-        end else begin
-            CountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT;
-            AmountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY;
+        case ProductType of
+            'qr-food-order':
+                begin
+                    CountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_QR_ORDERS_COUNT;
+                    AmountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_QR_ORDERS_AMOUNT_LCY;
+                end;
+            'self-service-food-order':
+                begin
+                    CountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_COUNT;
+                    AmountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_AMOUNT_LCY;
+                end;
+            'retail-self-service':
+                begin
+                    CountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT;
+                    AmountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY;
+                end;
+            else
+                if HasKitchenRequest then begin
+                    CountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_COUNT;
+                    AmountEventType := Enum::"NPR Billing Event Type"::HOSPITALITY_SELFSERVICE_ORDERS_AMOUNT_LCY;
+                end else begin
+                    CountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_COUNT;
+                    AmountEventType := Enum::"NPR Billing Event Type"::RETAIL_SELFSERVICE_ORDERS_AMOUNT_LCY;
+                end;
         end;
 
         BillingClient.RegisterEvent(POSEntry.SystemId, CountEventType, 1);
