@@ -61,7 +61,8 @@ codeunit 85518 "NPR Spfy Cust Change Tests"
 
         // [THEN] No new approval request was created and the only one is approved
         _Assert.AreEqual(0, OpenApprovalEntryCount(Customer.RecordId()), 'Applying the approved value must not send the change for approval again');
-        ApprovalEntry.SetRange(Status);
+        ApprovalEntry.Reset();
+        ApprovalEntry.SetRange("Record ID to Approve", Customer.RecordId());
         _Assert.AreEqual(1, ApprovalEntry.Count(), 'Exactly one approval entry must exist for the customer');
         ApprovalEntry.FindFirst();
         _Assert.AreEqual(ApprovalEntry.Status::Approved, ApprovalEntry.Status, 'The approval entry must be approved');
