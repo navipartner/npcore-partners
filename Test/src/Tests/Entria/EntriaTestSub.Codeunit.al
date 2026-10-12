@@ -64,13 +64,18 @@ codeunit 85261 "NPR Entria TestSub"
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', false, false)]
     local procedure CaptureAfterItemModify(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
+    var
+        xItem: Record Item;
+        ItemBeforeImage: Codeunit "NPR Item Before Image";
     begin
         _OnAfterCalled := true;
         _OnAfterCallCount += 1;
         _OnAfterRecPrice := Rec."Unit Price";
-        _OnAfterXRecPrice := xRec."Unit Price";
-        _OnAfterXRecNo := xRec."No.";
-        _OnAfterXRecLoaded := xRec.AreFieldsLoaded("Unit Price");
+        // The production subscriber takes the old values from the before-image helper, so the mirror does the same.
+        ItemBeforeImage.GetBeforeImage(Rec, xRec, xItem);
+        _OnAfterXRecPrice := xItem."Unit Price";
+        _OnAfterXRecNo := xItem."No.";
+        _OnAfterXRecLoaded := xItem.AreFieldsLoaded("Unit Price");
         _OnAfterRecEntriaProduct := Rec."NPR Entria Product";
     end;
 }

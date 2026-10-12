@@ -6,8 +6,10 @@ codeunit 6151028 "NPR Entria Webhook Subscr."
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', false, false)]
     local procedure OnItemModified(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
+        xItem: Record Item;
         EntriaIntegrWebhooks: Codeunit "NPR Entria Integr. Webhooks";
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+        ItemBeforeImage: Codeunit "NPR Item Before Image";
     begin
         if Rec.IsTemporary() then
             exit;
@@ -15,9 +17,11 @@ codeunit 6151028 "NPR Entria Webhook Subscr."
             exit;
         if not Rec.AreFieldsLoaded("Unit Price") then
             exit;
-        if not xRec.AreFieldsLoaded("Unit Price") then
+        // The on-disk row, not xRec: for a code-driven Modify xRec already carries the new price.
+        ItemBeforeImage.GetBeforeImage(Rec, xRec, xItem);
+        if not xItem.AreFieldsLoaded("Unit Price") then
             exit;
-        if Rec."Unit Price" = xRec."Unit Price" then
+        if Rec."Unit Price" = xItem."Unit Price" then
             exit;
         if not EntriaIntegrationMgt.HasEnabledStore() then
             exit;

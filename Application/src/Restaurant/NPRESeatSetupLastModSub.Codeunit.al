@@ -2,6 +2,11 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
 {
     Access = Internal;
 
+    // The modify subscribers compare Rec with the row still on disk, not xRec: for a code-driven Modify xRec already carries
+    // the values being written, and xRec is shared with every later subscriber. Modify, delete and rename stamp the
+    // restaurant before the row is written and a move stamps both restaurants in code order, so those lock in one order;
+    // inserts still stamp after the row.
+
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", 'OnAfterInsertEvent', '', false, false)]
 #else
@@ -19,37 +24,25 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
 #else
     [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", OnBeforeModifyEvent, '', false, false)]
 #endif
-    local procedure SeatingLocationRefreshxRec(var Rec: Record "NPR NPRE Seating Location"; var xRec: Record "NPR NPRE Seating Location")
+    local procedure SeatingLocationOnBeforeModify(var Rec: Record "NPR NPRE Seating Location")
+    var
+        CurrentSeatingLocation: Record "NPR NPRE Seating Location";
     begin
         if Rec.IsTemporary() then
             exit;
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        xRec.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        if not xRec.Find() then
-            Clear(xRec);
+        CurrentSeatingLocation.ReadIsolation := IsolationLevel::ReadCommitted;
+        CurrentSeatingLocation.SetLoadFields("Restaurant Code");
+        if not CurrentSeatingLocation.Get(Rec.Code) then
+            Clear(CurrentSeatingLocation);
+        UpdateRestaurantsSeatingLastModified(Rec."Restaurant Code", CurrentSeatingLocation."Restaurant Code");
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", 'OnBeforeRenameEvent', '', false, false)]
 #else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", OnAfterModifyEvent, '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", OnBeforeRenameEvent, '', false, false)]
 #endif
-    local procedure SeatingLocationOnAfterModify(var Rec: Record "NPR NPRE Seating Location"; var xRec: Record "NPR NPRE Seating Location")
-    begin
-        if Rec.IsTemporary() then
-            exit;
-        UpdateRestaurantSeatingLastModified(Rec."Restaurant Code");
-        if Rec."Restaurant Code" <> xRec."Restaurant Code" then
-            UpdateRestaurantSeatingLastModified(xRec."Restaurant Code");
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", 'OnAfterRenameEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", OnAfterRenameEvent, '', false, false)]
-#endif
-    local procedure SeatingLocationOnAfterRename(var Rec: Record "NPR NPRE Seating Location")
+    local procedure SeatingLocationOnBeforeRename(var Rec: Record "NPR NPRE Seating Location")
     begin
         if Rec.IsTemporary() then
             exit;
@@ -57,11 +50,11 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", 'OnBeforeDeleteEvent', '', false, false)]
 #else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", OnAfterDeleteEvent, '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating Location", OnBeforeDeleteEvent, '', false, false)]
 #endif
-    local procedure SeatingLocationOnAfterDelete(var Rec: Record "NPR NPRE Seating Location")
+    local procedure SeatingLocationOnBeforeDelete(var Rec: Record "NPR NPRE Seating Location")
     begin
         if Rec.IsTemporary() then
             exit;
@@ -85,39 +78,26 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
 #else
     [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", OnBeforeModifyEvent, '', false, false)]
 #endif
-    local procedure SeatingRefreshxRec(var Rec: Record "NPR NPRE Seating"; var xRec: Record "NPR NPRE Seating")
+    local procedure SeatingOnBeforeModify(var Rec: Record "NPR NPRE Seating")
+    var
+        CurrentSeating: Record "NPR NPRE Seating";
     begin
         if Rec.IsTemporary() then
             exit;
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        xRec.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        if not xRec.Find() then
-            Clear(xRec);
+        CurrentSeating.ReadIsolation := IsolationLevel::ReadCommitted;
+        if not CurrentSeating.Get(Rec.Code) then
+            exit;
+        if not HasSeatingSetupChanged(Rec, CurrentSeating) then
+            exit;
+        UpdateRestaurantsSeatingLastModified(Rec.GetSeatingRestaurant(), CurrentSeating.GetSeatingRestaurant());
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", 'OnBeforeRenameEvent', '', false, false)]
 #else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", OnAfterModifyEvent, '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", OnBeforeRenameEvent, '', false, false)]
 #endif
-    local procedure SeatingOnAfterModify(var Rec: Record "NPR NPRE Seating"; var xRec: Record "NPR NPRE Seating")
-    begin
-        if Rec.IsTemporary() then
-            exit;
-        if not HasSeatingSetupChanged(Rec, xRec) then
-            exit;
-        UpdateRestaurantSeatingLastModified(Rec.GetSeatingRestaurant());
-        if Rec."Seating Location" <> xRec."Seating Location" then
-            UpdateRestaurantSeatingLastModified(xRec.GetSeatingRestaurant());
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", 'OnAfterRenameEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", OnAfterRenameEvent, '', false, false)]
-#endif
-    local procedure SeatingOnAfterRename(var Rec: Record "NPR NPRE Seating")
+    local procedure SeatingOnBeforeRename(var Rec: Record "NPR NPRE Seating")
     begin
         if Rec.IsTemporary() then
             exit;
@@ -125,11 +105,11 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", 'OnBeforeDeleteEvent', '', false, false)]
 #else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", OnAfterDeleteEvent, '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Seating", OnBeforeDeleteEvent, '', false, false)]
 #endif
-    local procedure SeatingOnAfterDelete(var Rec: Record "NPR NPRE Seating")
+    local procedure SeatingOnBeforeDelete(var Rec: Record "NPR NPRE Seating")
     begin
         if Rec.IsTemporary() then
             exit;
@@ -158,23 +138,9 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
 #else
     [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", OnBeforeModifyEvent, '', false, false)]
 #endif
-    local procedure LocationLayoutRefreshxRec(var Rec: Record "NPR NPRE Location Layout"; var xRec: Record "NPR NPRE Location Layout")
-    begin
-        if Rec.IsTemporary() then
-            exit;
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        xRec.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        if not xRec.Find() then
-            Clear(xRec);
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", 'OnAfterModifyEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", OnAfterModifyEvent, '', false, false)]
-#endif
-    local procedure LocationLayoutOnAfterModify(var Rec: Record "NPR NPRE Location Layout"; var xRec: Record "NPR NPRE Location Layout")
+    local procedure LocationLayoutOnBeforeModify(var Rec: Record "NPR NPRE Location Layout")
+    var
+        CurrentLocationLayout: Record "NPR NPRE Location Layout";
     begin
         if Rec.IsTemporary() then
             exit;
@@ -186,17 +152,36 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
         // would need a blob comparison it does not do. Until something demonstrates such a gate is both correct and
         // worth the reads, bump unconditionally: an extra reload costs a refresh nobody notices, while a missed one
         // leaves a rearranged floor plan on screen, which is the gap these subscribers exist to close.
-        UpdateRestaurantSeatingLastModified(GetLayoutRestaurant(Rec."Seating Location"));
-        if Rec."Seating Location" <> xRec."Seating Location" then
-            UpdateRestaurantSeatingLastModified(GetLayoutRestaurant(xRec."Seating Location"));
+        CurrentLocationLayout.ReadIsolation := IsolationLevel::ReadCommitted;
+        CurrentLocationLayout.SetLoadFields("Seating Location");
+        if not CurrentLocationLayout.Get(Rec.Code) then
+            Clear(CurrentLocationLayout);
+        UpdateRestaurantsSeatingLastModified(GetLayoutRestaurant(Rec."Seating Location"), GetLayoutRestaurant(CurrentLocationLayout."Seating Location"));
+    end;
+
+    // Stamps the restaurant a row joins and the one it leaves. The two are taken in code order so that two sessions moving
+    // rows in opposite directions lock the restaurants in the same order; a blank or repeated code is stamped once.
+    local procedure UpdateRestaurantsSeatingLastModified(RestaurantCode1: Code[20]; RestaurantCode2: Code[20])
+    begin
+        if RestaurantCode1 = RestaurantCode2 then begin
+            UpdateRestaurantSeatingLastModified(RestaurantCode1);
+            exit;
+        end;
+        if RestaurantCode1 < RestaurantCode2 then begin
+            UpdateRestaurantSeatingLastModified(RestaurantCode1);
+            UpdateRestaurantSeatingLastModified(RestaurantCode2);
+        end else begin
+            UpdateRestaurantSeatingLastModified(RestaurantCode2);
+            UpdateRestaurantSeatingLastModified(RestaurantCode1);
+        end;
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", 'OnAfterRenameEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", 'OnBeforeRenameEvent', '', false, false)]
 #else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", OnAfterRenameEvent, '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", OnBeforeRenameEvent, '', false, false)]
 #endif
-    local procedure LocationLayoutOnAfterRename(var Rec: Record "NPR NPRE Location Layout")
+    local procedure LocationLayoutOnBeforeRename(var Rec: Record "NPR NPRE Location Layout")
     begin
         if Rec.IsTemporary() then
             exit;
@@ -204,11 +189,11 @@ codeunit 6150973 "NPR NPRE Seat.Setup LastModSub"
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", 'OnBeforeDeleteEvent', '', false, false)]
 #else
-    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", OnAfterDeleteEvent, '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NPRE Location Layout", OnBeforeDeleteEvent, '', false, false)]
 #endif
-    local procedure LocationLayoutOnAfterDelete(var Rec: Record "NPR NPRE Location Layout")
+    local procedure LocationLayoutOnBeforeDelete(var Rec: Record "NPR NPRE Location Layout")
     begin
         if Rec.IsTemporary() then
             exit;

@@ -566,6 +566,8 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, false)]
     local procedure ItemOnAfterModifyEvent(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
+        xItem: Record Item;
+        ItemBeforeImage: Codeunit "NPR Item Before Image";
         VrtCheck: Codeunit "NPR Variety Check";
     begin
         if Rec.IsTemporary then
@@ -574,10 +576,12 @@
         if not Rec.AreFieldsLoaded(Rec."NPR Variety 1", Rec."NPR Variety 2", Rec."NPR Variety 3", Rec."NPR Variety 4",
             Rec."NPR Variety 1 Table", Rec."NPR Variety 2 Table", Rec."NPR Variety 3 Table", Rec."NPR Variety 4 Table") then
             exit;
-        if not xRec.AreFieldsLoaded(xRec."NPR Variety 1", xRec."NPR Variety 2", xRec."NPR Variety 3", xRec."NPR Variety 4",
-            xRec."NPR Variety 1 Table", xRec."NPR Variety 2 Table", xRec."NPR Variety 3 Table", xRec."NPR Variety 4 Table") then
+        // The on-disk row, not xRec: for a code-driven Modify xRec already carries the new varieties.
+        ItemBeforeImage.GetBeforeImage(Rec, xRec, xItem);
+        if not xItem.AreFieldsLoaded(xItem."NPR Variety 1", xItem."NPR Variety 2", xItem."NPR Variety 3", xItem."NPR Variety 4",
+            xItem."NPR Variety 1 Table", xItem."NPR Variety 2 Table", xItem."NPR Variety 3 Table", xItem."NPR Variety 4 Table") then
             exit;
-        VrtCheck.ChangeItemVariety(Rec, xRec);
+        VrtCheck.ChangeItemVariety(Rec, xItem);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Variety Matrix", 'OnOpenPageEvent', '', false, false)]

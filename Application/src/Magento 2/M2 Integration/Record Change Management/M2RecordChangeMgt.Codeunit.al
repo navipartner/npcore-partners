@@ -6,16 +6,20 @@ codeunit 6150976 "NPR M2 Record Change Mgt."
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
     local procedure HandleItemChange(var Rec: Record Item; var xRec: Record Item)
     var
+        xItem: Record Item;
         RecordChangeLog: Record "NPR M2 Record Change Log";
+        ItemBeforeImage: Codeunit "NPR Item Before Image";
     begin
         if (Rec.IsTemporary()) then
             exit;
 
         if not Rec.AreFieldsLoaded(Rec."NPR Magento Item") then
             exit;
-        if not xRec.AreFieldsLoaded(xRec."NPR Magento Item") then
+        // The on-disk row, not xRec: for a code-driven Modify xRec already carries the new flag.
+        ItemBeforeImage.GetBeforeImage(Rec, xRec, xItem);
+        if not xItem.AreFieldsLoaded(xItem."NPR Magento Item") then
             exit;
-        if (Rec."NPR Magento Item" = xRec."NPR Magento Item") then
+        if (Rec."NPR Magento Item" = xItem."NPR Magento Item") then
             exit;
 
         case Rec."NPR Magento Item" of

@@ -664,8 +664,15 @@ tableextension 6014427 "NPR Item" extends Item
     end;
 
     trigger OnAfterModify()
+    var
+        xItem: Record Item;
+        ItemBeforeImage: Codeunit "NPR Item Before Image";
     begin
-        UpdateVendorItemRef(Rec, xRec);
+        if Rec.IsTemporary() then
+            exit;
+        // The on-disk row, not xRec: for a code-driven Modify xRec already carries the new vendor.
+        ItemBeforeImage.GetBeforeImage(Rec, xRec, xItem);
+        UpdateVendorItemRef(Rec, xItem);
     end;
 
     trigger OnBeforeDelete()

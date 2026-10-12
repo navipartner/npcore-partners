@@ -9,19 +9,23 @@
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
     local procedure ItemOnAfterModifyEvent(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
+        xItem: Record Item;
         SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
+        ItemBeforeImage: Codeunit "NPR Item Before Image";
     begin
         if not RunTrigger then
             exit;
         if not Rec.AreFieldsLoaded(Rec."Unit Cost", Rec."Last Direct Cost", Rec."Unit Price", Rec."Standard Cost", Rec."Item Category Code") then
             exit;
-        if not xRec.AreFieldsLoaded(xRec."Unit Cost", xRec."Last Direct Cost", xRec."Unit Price", xRec."Standard Cost", xRec."Item Category Code") then
+        // The on-disk row, not xRec: for a code-driven Modify xRec already carries the new values.
+        ItemBeforeImage.GetBeforeImage(Rec, xRec, xItem);
+        if not xItem.AreFieldsLoaded(xItem."Unit Cost", xItem."Last Direct Cost", xItem."Unit Price", xItem."Standard Cost", xItem."Item Category Code") then
             exit;
-        if (Rec."Unit Cost" = xRec."Unit Cost") and
-           (Rec."Last Direct Cost" = xRec."Last Direct Cost") and
-           (Rec."Unit Price" = xRec."Unit Price") and
-           (Rec."Standard Cost" = xRec."Standard Cost") and
-           (Rec."Item Category Code" = xRec."Item Category Code") then
+        if (Rec."Unit Cost" = xItem."Unit Cost") and
+           (Rec."Last Direct Cost" = xItem."Last Direct Cost") and
+           (Rec."Unit Price" = xItem."Unit Price") and
+           (Rec."Standard Cost" = xItem."Standard Cost") and
+           (Rec."Item Category Code" = xItem."Item Category Code") then
             exit;
         UpdateSalesPricesForStaff(Rec, SalesPriceMaintSetup, false);
     end;

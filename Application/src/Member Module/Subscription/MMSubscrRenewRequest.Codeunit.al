@@ -235,13 +235,14 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
 #else
     [EventSubscriber(ObjectType::Table, Database::"NPR MM Subscr. Payment Request", OnBeforeModifyEvent, '', false, false)]
 #endif
-    local procedure RefreshxRec(var Rec: Record "NPR MM Subscr. Payment Request"; var xRec: Record "NPR MM Subscr. Payment Request")
+    local procedure RememberOldStatus(var Rec: Record "NPR MM Subscr. Payment Request")
+    var
+        SubsPayReqOldStatus: Codeunit "NPR MM Subs PayReq Old Status";
     begin
         if Rec.IsTemporary() then
             exit;
-
-        if not xRec.Find() then
-            Clear(xRec);
+        // The on-disk status is kept aside for the after-modify subscriber. xRec is not touched: see the holder codeunit.
+        SubsPayReqOldStatus.Remember(Rec);
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
@@ -255,15 +256,21 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         xSubscriptionRequest: Record "NPR MM Subscr. Request";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        SubsPayReqOldStatus: Codeunit "NPR MM Subs PayReq Old Status";
+        OldStatus: Enum "NPR MM Payment Request Status";
         ProcessingStatusErrorLbl: Label 'Subscription request %1 has already been processed.', Comment = '%1 - subscription request no.';
     begin
         if Rec.IsTemporary() then
             exit;
 
+        // Always consumed, even when nothing follows, so a status is never left behind for a later modify.
+        if not SubsPayReqOldStatus.Take(Rec."Entry No.", OldStatus) then
+            exit;
+
         if not RunTrigger then
             exit;
 
-        if Rec.Status in [xRec.Status, Rec.Status::New] then
+        if Rec.Status in [OldStatus, Rec.Status::New] then
             exit;
 
         SubscriptionRequest.Get(Rec."Subscr. Request Entry No.");

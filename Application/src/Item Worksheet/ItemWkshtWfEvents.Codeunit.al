@@ -37,15 +37,19 @@ codeunit 6060053 "NPR Item Wksht. Wf Events"
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
     local procedure RunWorkflowOnAfterModifyItemStatus(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
+        xItem: Record Item;
+        ItemBeforeImage: Codeunit "NPR Item Before Image";
         WorkflowManagement: Codeunit "Workflow Management";
     begin
         if not Rec.AreFieldsLoaded(Rec."NPR Item Status") then
             exit;
-        if not xRec.AreFieldsLoaded(xRec."NPR Item Status") then
+        // The on-disk row, not xRec: for a code-driven Modify xRec already carries the new status.
+        ItemBeforeImage.GetBeforeImage(Rec, xRec, xItem);
+        if not xItem.AreFieldsLoaded(xItem."NPR Item Status") then
             exit;
-        if Rec."NPR Item Status" = xRec."NPR Item Status" then
+        if Rec."NPR Item Status" = xItem."NPR Item Status" then
             exit;
-        WorkflowManagement.HandleEventWithxRec(ItemStatusChanged(), Rec, xRec);
+        WorkflowManagement.HandleEventWithxRec(ItemStatusChanged(), Rec, xItem);
     end;
 }
 

@@ -6,6 +6,9 @@ codeunit 6060009 "NPR POS Layout Archive Mgt."
     var
         POSLayoutArchive: Record "NPR POS Layout Archive";
     begin
+        // Callers hand over rows read without the blob, and TransferFields would archive it empty.
+        if POSLayout."Frontend Properties".HasValue() then
+            POSLayout.CalcFields("Frontend Properties");
         InitializeArchivedVersion(POSLayoutArchive, POSLayout);
         FinishArchivedVersion(POSLayoutArchive, POSLayout);
     end;
@@ -84,21 +87,26 @@ codeunit 6060009 "NPR POS Layout Archive Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Layout", 'OnBeforeModifyEvent', '', false, false)]
-    local procedure BackupCurrentVersionOfPOSLayoutBeforeModify(var Rec: Record "NPR POS Layout"; var xRec: Record "NPR POS Layout")
+    local procedure BackupCurrentVersionOfPOSLayoutBeforeModify(var Rec: Record "NPR POS Layout")
     var
+        CurrentPOSLayout: Record "NPR POS Layout";
         LayoutChanged: Boolean;
     begin
         if Rec.IsTemporary() then
             exit;
-        if not xRec.Find() then
+        // The version to archive is the row still on disk. xRec is shared with every subscriber after us and is not ours to
+        // replace: for a code-driven Modify the platform hands subscribers an xRec that already carries the values being
+        // written.
+        CurrentPOSLayout.ReadIsolation := IsolationLevel::ReadCommitted;
+        if not CurrentPOSLayout.Get(Rec.Code) then
             exit;
 
-        LayoutChanged := Format(xRec) <> Format(Rec);
+        LayoutChanged := Format(CurrentPOSLayout) <> Format(Rec);
         if not LayoutChanged then
-            LayoutChanged := xRec.GetLayout(true) <> Rec.GetLayout(false);
+            LayoutChanged := CurrentPOSLayout.GetLayout(true) <> Rec.GetLayout(false);
         if not LayoutChanged then
             exit;
-        CreateArchivedVersion(xRec);
+        CreateArchivedVersion(CurrentPOSLayout);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Layout", 'OnBeforeDeleteEvent', '', false, false)]

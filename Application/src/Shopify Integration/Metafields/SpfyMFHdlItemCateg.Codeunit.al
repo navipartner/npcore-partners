@@ -503,39 +503,29 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
 #else
     [EventSubscriber(ObjectType::Table, Database::Item, OnBeforeModifyEvent, '', false, false)]
 #endif
-    local procedure RefreshxRec(var Rec: Record Item; var xRec: Record Item)
-    begin
-        if Rec.IsTemporary() then
-            exit;
-
-#if not (BC18 or BC19 or BC20 or BC21)
-        xRec.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        if not xRec.Find() then
-            Clear(xRec);
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::Item, OnAfterModifyEvent, '', false, false)]
-#endif
-    local procedure RecalcItemCategoryMetafieldValueOnItemModify(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
+    local procedure RecalcItemCategoryMetafieldValueOnItemModify(var Rec: Record Item)
     var
+        CurrentItem: Record Item;
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
     begin
         if Rec.IsTemporary() then
             exit;
-        if not Rec.AreFieldsLoaded(Rec."Item Category Code") then
-            exit;
-        if not xRec.AreFieldsLoaded(xRec."Item Category Code") then
-            exit;
-        if Rec."Item Category Code" = xRec."Item Category Code" then
-            exit;
         SpfyStoreItemLink.SetRange(Type, SpfyStoreItemLink.Type::Item);
         SpfyStoreItemLink.SetRange("Item No.", Rec."No.");
-        if not SpfyStoreItemLink.FindSet() then
+        if SpfyStoreItemLink.IsEmpty() then
             exit;
+
+        // The row still on disk is the before-image. xRec is shared with every subscriber after us and is not ours to replace:
+        // for a code-driven Modify the platform hands subscribers an xRec that already carries the values being written, and
+        // Microsoft's workflow rules rely on that.
+        CurrentItem.ReadIsolation := IsolationLevel::ReadCommitted;
+        CurrentItem.SetLoadFields("Item Category Code");
+        if not CurrentItem.Get(Rec."No.") then
+            exit;
+        if Rec."Item Category Code" = CurrentItem."Item Category Code" then
+            exit;
+
+        SpfyStoreItemLink.FindSet();
         repeat
             ProcessItemCategoryChange(Rec, SpfyStoreItemLink."Shopify Store Code", Rec."Item Category Code" = '');
         until SpfyStoreItemLink.Next() = 0;
