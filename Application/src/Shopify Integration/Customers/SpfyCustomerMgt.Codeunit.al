@@ -354,28 +354,35 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
 #else
     [EventSubscriber(ObjectType::Table, Database::Customer, OnBeforeModifyEvent, '', false, false)]
 #endif
-    local procedure RefreshxRec(var Rec: Record Customer; var xRec: Record Customer)
+    local procedure RememberCustomerBeforeModify(var Rec: Record Customer)
+    var
+        CurrentCustomer: Record Customer;
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyCustomerBeforeImage: Codeunit "NPR Spfy Customer Before Image";
     begin
         if Rec.IsTemporary() then
             exit;
 
-#if not (BC18 or BC19 or BC20 or BC21)
-        xRec.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        xRec.SetLoadFields();
-        if not xRec.Get(Rec."No.") then
-            Clear(xRec);
+        SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
+        SpfyStoreCustomerLink.SetRange("No.", Rec."No.");
+        if SpfyStoreCustomerLink.IsEmpty() then
+            exit;
+
+        // Kept aside, not put into xRec: Microsoft's record-changed workflow rules rely on the platform's xRec.
+        // Read in full: the image is compared after the write, when reading a field it had not loaded would fetch the new value.
+        CurrentCustomer.ReadIsolation := IsolationLevel::ReadCommitted;
+        if CurrentCustomer.Get(Rec."No.") then
+            SpfyCustomerBeforeImage.Remember(CurrentCustomer);
     end;
 
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterModifyEvent', '', false, false)]
-#else
     [EventSubscriber(ObjectType::Table, Database::Customer, OnAfterModifyEvent, '', false, false)]
-#endif
-    local procedure Customer_OnAfterModifyEvent_PropagateToLink(var Rec: Record Customer; var xRec: Record Customer; RunTrigger: Boolean)
+    local procedure PropagateCustomerChangesToLinks(var Rec: Record Customer)
     var
+        BeforeImage: Record Customer;
+        WrittenCustomer: Record Customer;
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
-        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+        SpfyCustomerBeforeImage: Codeunit "NPR Spfy Customer Before Image";
+        SpfyTaskSendCustomers: Codeunit "NPR Spfy Task Send Customers";
         xParsedFirstName: Text[100];
         xParsedLastName: Text[100];
         NewParsedFirstName: Text[100];
@@ -388,20 +395,29 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
     begin
         if Rec.IsTemporary() then
             exit;
+        if not SpfyCustomerBeforeImage.Take(Rec."No.", BeforeImage) then
+            exit;
 
-        NameChanged := (Rec.Name <> xRec.Name) or (Rec."Name 2" <> xRec."Name 2");
-        EmailChanged := Rec."E-Mail" <> xRec."E-Mail";
-        PhoneChanged := Rec."Phone No." <> xRec."Phone No.";
+        // The links are written after the customer so that their own subscribers read the customer as saved. The new values come
+        // from the written row, so a partial Rec is never asked for fields it did not load.
+        WrittenCustomer.ReadIsolation := IsolationLevel::ReadCommitted;
+        WrittenCustomer.SetLoadFields(Name, "Name 2", "E-Mail", "Phone No.", Address, "Address 2", City, County, "Post Code", "Country/Region Code");
+        if not WrittenCustomer.Get(Rec."No.") then
+            exit;
+
+        NameChanged := (WrittenCustomer.Name <> BeforeImage.Name) or (WrittenCustomer."Name 2" <> BeforeImage."Name 2");
+        EmailChanged := WrittenCustomer."E-Mail" <> BeforeImage."E-Mail";
+        PhoneChanged := WrittenCustomer."Phone No." <> BeforeImage."Phone No.";
         AddressChanged :=
-            (Rec.Address <> xRec.Address) or (Rec."Address 2" <> xRec."Address 2") or
-            (Rec.City <> xRec.City) or (Rec.County <> xRec.County) or
-            (Rec."Post Code" <> xRec."Post Code") or (Rec."Country/Region Code" <> xRec."Country/Region Code");
+            (WrittenCustomer.Address <> BeforeImage.Address) or (WrittenCustomer."Address 2" <> BeforeImage."Address 2") or
+            (WrittenCustomer.City <> BeforeImage.City) or (WrittenCustomer.County <> BeforeImage.County) or
+            (WrittenCustomer."Post Code" <> BeforeImage."Post Code") or (WrittenCustomer."Country/Region Code" <> BeforeImage."Country/Region Code");
         if not (NameChanged or EmailChanged or PhoneChanged or AddressChanged) then
             exit;
 
         if NameChanged then begin
-            SpfySendCustomers.GetParsedNames(xRec, xParsedFirstName, xParsedLastName);
-            SpfySendCustomers.GetParsedNames(Rec, NewParsedFirstName, NewParsedLastName);
+            SpfyTaskSendCustomers.GetParsedNames(BeforeImage, xParsedFirstName, xParsedLastName);
+            SpfyTaskSendCustomers.GetParsedNames(WrittenCustomer, NewParsedFirstName, NewParsedLastName);
         end;
 
         SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
@@ -419,29 +435,29 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
                     LinkChanged := true;
                 end;
             if EmailChanged then
-                if SpfyStoreCustomerLink."E-Mail" in ['', xRec."E-Mail"] then begin
-                    SpfyStoreCustomerLink."E-Mail" := Rec."E-Mail";
+                if SpfyStoreCustomerLink."E-Mail" in ['', BeforeImage."E-Mail"] then begin
+                    SpfyStoreCustomerLink."E-Mail" := WrittenCustomer."E-Mail";
                     LinkChanged := true;
                 end;
             if PhoneChanged then
-                if SpfyStoreCustomerLink."Phone No." in ['', xRec."Phone No."] then begin
-                    SpfyStoreCustomerLink."Phone No." := Rec."Phone No.";
+                if SpfyStoreCustomerLink."Phone No." in ['', BeforeImage."Phone No."] then begin
+                    SpfyStoreCustomerLink."Phone No." := WrittenCustomer."Phone No.";
                     LinkChanged := true;
                 end;
             if AddressChanged then
-                if (SpfyStoreCustomerLink.Address in ['', xRec.Address]) and
-                   (SpfyStoreCustomerLink."Address 2" in ['', xRec."Address 2"]) and
-                   (SpfyStoreCustomerLink.City in ['', xRec.City]) and
-                   (SpfyStoreCustomerLink.County in ['', xRec.County]) and
-                   (SpfyStoreCustomerLink."Post Code" in ['', xRec."Post Code"]) and
-                   (SpfyStoreCustomerLink."Country/Region Code" in ['', xRec."Country/Region Code"])
+                if (SpfyStoreCustomerLink.Address in ['', BeforeImage.Address]) and
+                   (SpfyStoreCustomerLink."Address 2" in ['', BeforeImage."Address 2"]) and
+                   (SpfyStoreCustomerLink.City in ['', BeforeImage.City]) and
+                   (SpfyStoreCustomerLink.County in ['', BeforeImage.County]) and
+                   (SpfyStoreCustomerLink."Post Code" in ['', BeforeImage."Post Code"]) and
+                   (SpfyStoreCustomerLink."Country/Region Code" in ['', BeforeImage."Country/Region Code"])
                 then begin
-                    SpfyStoreCustomerLink.Address := Rec.Address;
-                    SpfyStoreCustomerLink."Address 2" := Rec."Address 2";
-                    SpfyStoreCustomerLink.City := Rec.City;
-                    SpfyStoreCustomerLink.County := Rec.County;
-                    SpfyStoreCustomerLink."Post Code" := Rec."Post Code";
-                    SpfyStoreCustomerLink."Country/Region Code" := Rec."Country/Region Code";
+                    SpfyStoreCustomerLink.Address := WrittenCustomer.Address;
+                    SpfyStoreCustomerLink."Address 2" := WrittenCustomer."Address 2";
+                    SpfyStoreCustomerLink.City := WrittenCustomer.City;
+                    SpfyStoreCustomerLink.County := WrittenCustomer.County;
+                    SpfyStoreCustomerLink."Post Code" := WrittenCustomer."Post Code";
+                    SpfyStoreCustomerLink."Country/Region Code" := WrittenCustomer."Country/Region Code";
                     SpfyStoreCustomerLink."Address Updated in BC" := true;
                     LinkChanged := true;
                 end;

@@ -60,6 +60,8 @@
     local procedure InsertCustomer(Element: XmlElement; var Customer: Record Customer)
     var
         TempCustomer: Record Customer temporary;
+        xCustomer: Record Customer;
+        CustContactUpdate: Codeunit "NPR Cust. Contact Update";
     begin
         Evaluate(TempCustomer."No.", NpXmlDomMgt.GetXmlText(Element, 'no', 0, false), 9);
         Evaluate(TempCustomer.Name, NpXmlDomMgt.GetXmlText(Element, 'name', 0, false), 9);
@@ -96,6 +98,7 @@
             Customer."No." := TempCustomer."No.";
             Customer.Insert(true);
         end;
+        xCustomer := Customer;
         Customer.Validate("No.", TempCustomer."No.");
         Customer.Validate(Name, TempCustomer.Name);
         Customer.Validate("Search Name", TempCustomer."Search Name");
@@ -126,6 +129,7 @@
         Customer.Validate("Prices Including VAT", TempCustomer."Prices Including VAT");
 
         Customer.Modify(true);
+        CustContactUpdate.UpdateContactIfChanged(Customer, xCustomer);
     end;
 }
 

@@ -104,7 +104,9 @@
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         CustTemplate: Record "Customer Templ.";
+        xCustomer: Record Customer;
         ConfigTemplateMgt: Codeunit "Config. Template Management";
+        CustContactUpdate: Codeunit "NPR Cust. Contact Update";
         RecRef: RecordRef;
         ExternalCustomerNo: Text;
         TaxClass: Text;
@@ -150,6 +152,7 @@
             end;
         end;
         PrevCust := Format(Customer);
+        xCustomer := Customer;
 
         ConfigTemplateCode := MagentoMgt.GetCustConfigTemplate(TaxClass, Customer);
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
@@ -178,6 +181,7 @@
             exit;
 
         Customer.Modify(true);
+        CustContactUpdate.UpdateContactIfChanged(Customer, xCustomer);
     end;
 
     local procedure InsertPaymentLinePaymentRefund(XmlElement: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)

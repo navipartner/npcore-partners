@@ -713,6 +713,8 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
     local procedure ApplyLinkToCustomerIfMatching(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; xSpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
     var
         Customer: Record Customer;
+        xCustomer: Record Customer;
+        CustContactUpdate: Codeunit "NPR Cust. Contact Update";
         DataLogMgt: Codeunit "NPR Data Log Management";
         CustomerFirstName: Text[100];
         CustomerLastName: Text[100];
@@ -725,6 +727,7 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         //   - the Customer card still matches the link's pre-pull value (no BC-side drift).
         if not Customer.Get(SpfyStoreCustomerLink."No.") then
             exit;
+        xCustomer := Customer;
 
         GetParsedNames(Customer, CustomerFirstName, CustomerLastName);
         if (xSpfyStoreCustomerLink."First Name" = '') and (xSpfyStoreCustomerLink."Last Name" = '') then begin
@@ -798,6 +801,7 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         if CustomerChanged then begin
             DataLogMgt.DisableDataLog(true);
             Customer.Modify(true);
+            CustContactUpdate.UpdateContactIfChanged(Customer, xCustomer);
             DataLogMgt.DisableDataLog(false);
         end;
     end;

@@ -218,7 +218,9 @@
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
+        xCustomer: Record Customer;
         ConfigTemplateMgt: Codeunit "Config. Template Management";
+        CustContactUpdate: Codeunit "NPR Cust. Contact Update";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         RecRef: RecordRef;
         StoreCode: Code[20];
@@ -246,6 +248,7 @@
             exit;
 
         PrevRec := Format(Customer);
+        xCustomer := Customer;
         ConfigTemplateCode := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false), 1, MaxStrLen(ConfigTemplateHeader.Code));
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
             RecRef.GetTable(Customer);
@@ -268,8 +271,10 @@
         Customer."Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true), 1, MaxStrLen(Customer."Phone No."));
         Customer."E-Mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true), 1, MaxStrLen(Customer."E-Mail"));
 
-        if PrevRec <> Format(Customer) then
+        if PrevRec <> Format(Customer) then begin
             Customer.Modify(true);
+            CustContactUpdate.UpdateContactIfChanged(Customer, xCustomer);
+        end;
     end;
 
     local procedure UpdateSalesHeader(Element: XmlElement; var SalesHeader: Record "Sales Header")
