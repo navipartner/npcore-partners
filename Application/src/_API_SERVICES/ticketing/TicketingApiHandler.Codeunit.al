@@ -37,6 +37,7 @@ codeunit 6185082 "NPR TicketingApiHandler"
         Reservation: Codeunit "NPR TicketingReservationAgent";
         Import: Codeunit "NPR TicketingImportAgent";
         Reports: Codeunit "NPR TicketingReportAgent";
+        Reschedule: Codeunit "NPR TicketingRescheduleAgent";
     begin
         case _ApiFunction of
             _ApiFunction::CAPACITY_SEARCH:
@@ -88,6 +89,10 @@ codeunit 6185082 "NPR TicketingApiHandler"
                 _Response := Reservation.ConfirmReservation(_Request);
             _ApiFunction::GET_RESERVATION_TICKETS:
                 _Response := Reservation.GetReservationTickets(_Request);
+
+            // Reschedule
+            _ApiFunction::RESCHEDULE_FIND:
+                _Response := Reschedule.FindReservation(_Request);
 
             // Import
             _ApiFunction::IMPORT_TICKET:

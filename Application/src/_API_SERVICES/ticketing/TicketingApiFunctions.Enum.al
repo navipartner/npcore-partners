@@ -126,6 +126,13 @@ enum 6059815 "NPR TicketingApiFunctions"
     }
     #endregion
 
+    #region Reschedule
+    value(500; RESCHEDULE_FIND)
+    {
+        Caption = 'Reschedule find';
+    }
+    #endregion
+
 
 
 }

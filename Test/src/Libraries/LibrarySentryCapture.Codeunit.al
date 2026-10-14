@@ -33,6 +33,17 @@ codeunit 85494 "NPR Library - Sentry Capture"
         exit(false);
     end;
 
+    procedure Count(Needle: Text; SecondNeedle: Text): Integer
+    var
+        Payload: Text;
+        Matches: Integer;
+    begin
+        foreach Payload in _Payloads do
+            if Payload.Contains(Needle) and Payload.Contains(SecondNeedle) then
+                Matches += 1;
+        exit(Matches);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sentry Transaction", 'OnBeforeSendSentryPayload', '', false, false)]
     local procedure CapturePayload(PayloadJson: Text; var Handled: Boolean)
     begin

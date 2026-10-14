@@ -1427,80 +1427,8 @@
     end;
 
     procedure IsRescheduleAllowed(ExternalTicketNumber: Text[30]; ExtAdmSchEntryNo: Integer; ReferenceDateTime: DateTime): Boolean
-    var
-        Ticket: Record "NPR TM Ticket";
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        ResponseMessage: Text;
-        ResponseCode: Integer;
     begin
-        Ticket.SetCurrentKey("External Ticket No.");
-        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
-        Ticket.SetFilter(Blocked, '=%1', false);
-        if (not Ticket.FindFirst()) then
-            exit(false);
-
-        if (DT2Date(ReferenceDateTime) > Ticket."Valid To Date") then
-            exit(false);
-
-        if ExtAdmSchEntryNo = 0 then
-            exit(true);
-
-        AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
-        AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmSchEntryNo);
-        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-        if (not AdmissionScheduleEntry.FindFirst()) then
-            exit(false);
-
-        if (not TicketAdmissionBOM.Get(Ticket."Item No.", Ticket."Variant Code", AdmissionScheduleEntry."Admission Code")) then
-            exit(false);
-
-        case TicketAdmissionBOM."Reschedule Policy" of
-
-            TicketAdmissionBOM."Reschedule Policy"::NOT_ALLOWED:
-                exit(false);
-            TicketAdmissionBOM."Reschedule Policy"::UNTIL_USED: // admitted or expired
-                begin
-                    TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
-                    TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-                    TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
-                    if (not TicketAccessEntry.FindFirst()) then
-                        exit(false); // can not be rescheduled
-
-                    if (TicketAccessEntry."Access Date" <> 0D) then
-                        exit(false); // ticket admission was admitted and can not be rescheduled.
-
-                    exit(not IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2DATE(ReferenceDateTime), DT2TIME(ReferenceDateTime), ResponseMessage, ResponseCode));
-                end;
-            TicketAdmissionBOM."Reschedule Policy"::CUTOFF_HOUR:
-                begin
-                    TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
-                    TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-                    TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
-                    if (not TicketAccessEntry.FindFirst()) then
-                        exit(false); // can not be rescheduled
-
-                    if (TicketAccessEntry."Access Date" <> 0D) then
-                        exit(false); // ticket admission was admitted and can not be rescheduled.
-
-                    ReferenceDateTime += TicketAdmissionBOM."Reschedule Cut-Off (Hours)" * 60 * 60 * 1000;
-                    exit(not IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2DATE(ReferenceDateTime), DT2TIME(ReferenceDateTime), ResponseMessage, ResponseCode));
-                end;
-            TicketAdmissionBOM."Reschedule Policy"::UNTIL_ADMITTED:
-                begin
-                    TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
-                    TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-                    TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
-                    if (not TicketAccessEntry.FindFirst()) then
-                        exit(false); // can not be rescheduled
-
-                    exit(TicketAccessEntry."Access Date" = 0D); // ticket admission was not admitted and can be rescheduled.
-                end;
-        end;
-
-        exit(false);
-
+        exit(GetRescheduleRefusal(ExternalTicketNumber, ExtAdmSchEntryNo, ReferenceDateTime) = Enum::"NPR TM Reschedule Refusal"::NONE);
     end;
 
     // Messages are written for the cashier on a first shift: the slot as it is displayed, the time that actually
@@ -1542,6 +1470,125 @@
 
         exit(false); // not expired
 
+    end;
+
+    internal procedure GetRescheduleRefusal(ExternalTicketNumber: Text[30]; ExtAdmSchEntryNo: Integer; ReferenceDateTime: DateTime): Enum "NPR TM Reschedule Refusal"
+    var
+        Ticket: Record "NPR TM Ticket";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        ResponseMessage: Text;
+        ResponseCode: Integer;
+    begin
+        Ticket.SetCurrentKey("External Ticket No.");
+        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
+        if (not Ticket.FindFirst()) then
+            exit(Enum::"NPR TM Reschedule Refusal"::NOT_RESOLVABLE);
+
+        if (Ticket.Blocked) then
+            exit(Enum::"NPR TM Reschedule Refusal"::TICKET_BLOCKED);
+
+        if (DT2Date(ReferenceDateTime) > Ticket."Valid To Date") then
+            exit(Enum::"NPR TM Reschedule Refusal"::TICKET_EXPIRED);
+
+        if (ExtAdmSchEntryNo = 0) then
+            exit(Enum::"NPR TM Reschedule Refusal"::NONE);
+
+        AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmSchEntryNo);
+        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (not AdmissionScheduleEntry.FindFirst()) then
+            exit(Enum::"NPR TM Reschedule Refusal"::SLOT_CANCELLED);
+
+        if (not TicketAdmissionBOM.Get(Ticket."Item No.", Ticket."Variant Code", AdmissionScheduleEntry."Admission Code")) then
+            exit(Enum::"NPR TM Reschedule Refusal"::NOT_CONFIGURED);
+
+        case TicketAdmissionBOM."Reschedule Policy" of
+            TicketAdmissionBOM."Reschedule Policy"::NOT_ALLOWED:
+                exit(Enum::"NPR TM Reschedule Refusal"::NOT_ALLOWED);
+            TicketAdmissionBOM."Reschedule Policy"::UNTIL_USED:
+                begin
+                    if (not FindTicketAccessEntry(Ticket."No.", AdmissionScheduleEntry."Admission Code", TicketAccessEntry)) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::NOT_RESOLVABLE);
+                    if (TicketAccessEntry."Access Date" <> 0D) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::ALREADY_ADMITTED);
+                    if (IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2Date(ReferenceDateTime), DT2Time(ReferenceDateTime), ResponseMessage, ResponseCode)) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::SLOT_PASSED);
+                    exit(Enum::"NPR TM Reschedule Refusal"::NONE);
+                end;
+            TicketAdmissionBOM."Reschedule Policy"::CUTOFF_HOUR:
+                begin
+                    if (not FindTicketAccessEntry(Ticket."No.", AdmissionScheduleEntry."Admission Code", TicketAccessEntry)) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::NOT_RESOLVABLE);
+                    if (TicketAccessEntry."Access Date" <> 0D) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::ALREADY_ADMITTED);
+                    ReferenceDateTime += TicketAdmissionBOM."Reschedule Cut-Off (Hours)" * 60 * 60 * 1000;
+                    if (IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2Date(ReferenceDateTime), DT2Time(ReferenceDateTime), ResponseMessage, ResponseCode)) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::CUTOFF_PASSED);
+                    exit(Enum::"NPR TM Reschedule Refusal"::NONE);
+                end;
+            TicketAdmissionBOM."Reschedule Policy"::UNTIL_ADMITTED:
+                begin
+                    if (not FindTicketAccessEntry(Ticket."No.", AdmissionScheduleEntry."Admission Code", TicketAccessEntry)) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::NOT_RESOLVABLE);
+                    if (TicketAccessEntry."Access Date" <> 0D) then
+                        exit(Enum::"NPR TM Reschedule Refusal"::ALREADY_ADMITTED);
+                    exit(Enum::"NPR TM Reschedule Refusal"::NONE);
+                end;
+        end;
+
+        exit(Enum::"NPR TM Reschedule Refusal"::NOT_RESOLVABLE);
+    end;
+
+    local procedure FindTicketAccessEntry(TicketNo: Code[20]; AdmissionCode: Code[20]; var TicketAccessEntry: Record "NPR TM Ticket Access Entry"): Boolean
+    begin
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
+        TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        exit(TicketAccessEntry.FindFirst());
+    end;
+
+    internal procedure IsWithinScheduleSalesWindow(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketBOM: Record "NPR TM Ticket Admission BOM"; ReferenceDate: Date; ReferenceTime: Time; var ReasonCode: Enum "NPR TM Sch. Block Sales Reason"): Boolean
+    begin
+        if (not TicketBOM."Enforce Schedule Sales Limits") then
+            exit(true);
+
+        if (AdmissionScheduleEntry."Sales From Date" <> 0D) then begin
+            if (AdmissionScheduleEntry."Sales From Date" > ReferenceDate) then begin
+                ReasonCode := ReasonCode::AdmissionSaleHasNotStartedDate;
+                exit(false);
+            end;
+            if (AdmissionScheduleEntry."Sales From Date" = ReferenceDate) then
+                if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then begin
+                    ReasonCode := ReasonCode::AdmissionSaleHasNotStartedTime;
+                    exit(false);
+                end;
+        end;
+        if ((AdmissionScheduleEntry."Sales From Date" = 0D) and (AdmissionScheduleEntry."Sales From Time" <> 0T)) then
+            if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then begin
+                ReasonCode := ReasonCode::AdmissionSaleHasNotStartedTime;
+                exit(false);
+            end;
+
+        if (AdmissionScheduleEntry."Sales Until Date" <> 0D) then begin
+            if (ReferenceDate > AdmissionScheduleEntry."Sales Until Date") then begin
+                ReasonCode := ReasonCode::AdmissionSalesHasEndedDate;
+                exit(false);
+            end;
+            if (ReferenceDate = AdmissionScheduleEntry."Sales Until Date") then
+                if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then begin
+                    ReasonCode := ReasonCode::AdmissionSalesHasEndedTime;
+                    exit(false);
+                end;
+        end;
+        if ((AdmissionScheduleEntry."Sales Until Date" = 0D) and (AdmissionScheduleEntry."Sales Until Time" <> 0T)) then
+            if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then begin
+                ReasonCode := ReasonCode::AdmissionSalesHasEndedTime;
+                exit(false);
+            end;
+
+        exit(true);
     end;
 
     internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; ListOfAdmissionCodes: Dictionary of [Code[20], Boolean])
@@ -3676,42 +3723,8 @@
         end;
 
         // Verify the general window of sales
-        if (TicketBOM."Enforce Schedule Sales Limits") then begin
-            if (AdmissionScheduleEntry."Sales From Date" <> 0D) then begin
-                if (AdmissionScheduleEntry."Sales From Date" > ReferenceDate) then begin
-                    ReasonCode := ReasonCode::AdmissionSaleHasNotStartedDate;
-                    exit(false);
-                end;
-                if (AdmissionScheduleEntry."Sales From Date" = ReferenceDate) then
-                    if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then begin
-                        ReasonCode := ReasonCode::AdmissionSaleHasNotStartedTime;
-                        exit(false);
-                    end;
-            end;
-            if ((AdmissionScheduleEntry."Sales From Date" = 0D) and (AdmissionScheduleEntry."Sales From Time" <> 0T)) then
-                if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then begin
-                    ReasonCode := ReasonCode::AdmissionSaleHasNotStartedTime;
-                    exit(false);
-                end;
-
-            if (AdmissionScheduleEntry."Sales Until Date" <> 0D) then begin
-                if (ReferenceDate > AdmissionScheduleEntry."Sales Until Date") then begin
-                    ReasonCode := ReasonCode::AdmissionSalesHasEndedDate;
-                    exit(false);
-                end;
-                if (ReferenceDate = AdmissionScheduleEntry."Sales Until Date") then
-                    if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then begin
-                        ReasonCode := ReasonCode::AdmissionSalesHasEndedTime;
-                        exit(false);
-                    end;
-            end;
-            if ((AdmissionScheduleEntry."Sales Until Date" = 0D) and (AdmissionScheduleEntry."Sales Until Time" <> 0T)) then
-                if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then begin
-                    ReasonCode := ReasonCode::AdmissionSalesHasEndedTime;
-                    exit(false);
-                end;
-
-        end;
+        if (not IsWithinScheduleSalesWindow(AdmissionScheduleEntry, TicketBOM, ReferenceDate, ReferenceTime, ReasonCode)) then
+            exit(false);
 
         if (AdmissionScheduleEntry."Event Arrival From Time" = 0T) then
             AdmissionScheduleEntry."Event Arrival From Time" := AdmissionScheduleEntry."Admission Start Time";
@@ -3928,6 +3941,187 @@
         exit(true);
     end;
 
+    internal procedure CalculateReservationCapacityUsed(CapacityControl: Option; var AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Integer
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        case CapacityControl of
+            Admission."Capacity Control"::NONE:
+                exit(0);
+            Admission."Capacity Control"::SALES:
+                begin
+                    AdmissionScheduleEntry.CalcFields("Open Reservations (All)");
+                    exit(AdmissionScheduleEntry."Open Reservations (All)");
+                end;
+            Admission."Capacity Control"::ADMITTED,
+            Admission."Capacity Control"::FULL,
+            Admission."Capacity Control"::SEATING:
+                begin
+                    AdmissionScheduleEntry.CalcFields("Open Reservations", "Open Admitted");
+                    exit(AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations");
+                end;
+            else
+                Error(UNSUPPORTED_VALIDATION_METHOD);
+        end;
+    end;
+
+    internal procedure CalculateRemainingCapacityForMove(ItemNo: Code[20]; VariantCode: Code[10]; NewScheduleEntry: Record "NPR TM Admis. Schedule Entry"; CurrentScheduleEntry: Record "NPR TM Admis. Schedule Entry"; FreedPlaces: Integer; PendingDeltas: Dictionary of [Integer, Integer]; var GroupUsageCache: Dictionary of [Text, Integer]; var Remaining: Integer): Boolean
+    var
+        Admission: Record "NPR TM Admission";
+        GroupSetup: Record "NPR TM Concurrent Admis. Setup";
+        Bounded: Boolean;
+        MaxCapacity: Integer;
+        CapacityControl: Option;
+        Used: Integer;
+        GroupUsed: Integer;
+        GroupMax: Integer;
+        Factor: Integer;
+    begin
+        Bounded := false;
+        Admission.Get(NewScheduleEntry."Admission Code");
+
+        if (GetAdmissionCapacity(NewScheduleEntry."Admission Code", NewScheduleEntry."Schedule Code", NewScheduleEntry."Entry No.", MaxCapacity, CapacityControl)) then
+            if (CapacityControl = Admission."Capacity Control"::SALES) then begin
+                GetTicketCapacity(ItemNo, VariantCode, NewScheduleEntry."Admission Code", NewScheduleEntry."Schedule Code", NewScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
+                Used := CalculateCurrentCapacity(Admission."Capacity Control"::SALES, NewScheduleEntry."Entry No.") + PendingDelta(PendingDeltas, NewScheduleEntry."Entry No.");
+                Bound(Bounded, Remaining, MaxCapacity - Used);
+
+                if (GroupCapacityForMove(NewScheduleEntry, GroupUsageCache, GroupSetup, GroupUsed, GroupMax)) then begin
+                    Factor := PlacesCountedBy(GroupSetup."Capacity Control", Admission.Type);
+                    if (Factor = 0) then begin
+                        // The move adds no counted demand, but ValidateTicketAdmissionCapacityExceeded still refuses a group already over its limit.
+                        if (GroupUsed > GroupMax) then
+                            Bound(Bounded, Remaining, 0);
+                    end else begin
+                        GroupUsed += PendingDeltasInGroup(PendingDeltas, GroupSetup, NewScheduleEntry);
+                        if (CurrentSlotCountedByGroup(CurrentScheduleEntry, GroupSetup, NewScheduleEntry)) then
+                            GroupUsed -= FreedPlaces;
+                        Bound(Bounded, Remaining, GroupMax - GroupUsed);
+                    end;
+                end;
+            end;
+
+        if (Admission.Type = Admission.Type::OCCASION) then begin
+            GetTicketCapacity(ItemNo, VariantCode, NewScheduleEntry."Admission Code", NewScheduleEntry."Schedule Code", NewScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
+            if (CapacityControl <> Admission."Capacity Control"::NONE) then begin
+                Used := CalculateReservationCapacityUsed(CapacityControl, NewScheduleEntry) + PendingDelta(PendingDeltas, NewScheduleEntry."Entry No.");
+                Bound(Bounded, Remaining, MaxCapacity - Used);
+            end;
+        end;
+
+        exit(Bounded);
+    end;
+
+    // The cache holds the raw group usage, so freed places and pending deltas never enter it.
+    local procedure GroupCapacityForMove(NewScheduleEntry: Record "NPR TM Admis. Schedule Entry"; var GroupUsageCache: Dictionary of [Text, Integer]; var GroupSetup: Record "NPR TM Concurrent Admis. Setup"; var GroupUsed: Integer; var GroupMax: Integer): Boolean
+    var
+        AdmissionSchedule: Record "NPR TM Admis. Schedule Lines";
+        CacheKey: Text;
+    begin
+        if (not AdmissionSchedule.Get(NewScheduleEntry."Admission Code", NewScheduleEntry."Schedule Code")) then
+            exit(false);
+        if (not GroupSetup.Get(AdmissionSchedule."Concurrency Code")) then
+            exit(false);
+        CacheKey := GroupSetup.Code + '|' + NewScheduleEntry."Admission Code" + '|' + Format(NewScheduleEntry."Admission Start Date", 0, 9);
+        if (GroupSetup."Concurrency Type" = GroupSetup."Concurrency Type"::SCHEDULE) then
+            CacheKey += '|' + NewScheduleEntry."Schedule Code";
+        if (GroupUsageCache.Get(CacheKey, GroupUsed)) then begin
+            GroupMax := GroupSetup."Total Capacity";
+            exit(true);
+        end;
+        if (not CalculateConcurrentCapacity(NewScheduleEntry."Admission Code", NewScheduleEntry."Schedule Code", NewScheduleEntry."Admission Start Date", GroupUsed, GroupMax)) then
+            exit(false);
+        GroupUsageCache.Add(CacheKey, GroupUsed);
+        exit(true);
+    end;
+
+    local procedure Bound(var Bounded: Boolean; var Remaining: Integer; Candidate: Integer)
+    begin
+        if (Candidate < 0) then
+            Candidate := 0;
+        if ((not Bounded) or (Candidate < Remaining)) then
+            Remaining := Candidate;
+        Bounded := true;
+    end;
+
+    local procedure PendingDelta(PendingDeltas: Dictionary of [Integer, Integer]; ScheduleEntryNo: Integer): Integer
+    begin
+        if (PendingDeltas.ContainsKey(ScheduleEntryNo)) then
+            exit(PendingDeltas.Get(ScheduleEntryNo));
+        exit(0);
+    end;
+
+    local procedure PlacesCountedBy(CapacityControl: Option; AdmissionType: Option): Integer
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        case CapacityControl of
+            Admission."Capacity Control"::SALES:
+                exit(1);
+            Admission."Capacity Control"::FULL:
+                if (AdmissionType = Admission.Type::OCCASION) then
+                    exit(1)
+                else
+                    exit(0);
+            else
+                exit(0);
+        end;
+    end;
+
+    local procedure IsLastEntryOfLineOnDate(ScheduleEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date): Boolean
+    var
+        LastEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        LastEntry.SetFilter("Admission Code", '=%1', ScheduleEntry."Admission Code");
+        LastEntry.SetFilter("Schedule Code", '=%1', ScheduleEntry."Schedule Code");
+        LastEntry.SetFilter(Cancelled, '=%1', false);
+        LastEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
+        if (not LastEntry.FindLast()) then
+            exit(false);
+        exit(LastEntry."Entry No." = ScheduleEntry."Entry No.");
+    end;
+
+    local procedure IsScheduleLineInGroup(AdmissionCode: Code[20]; ScheduleCode: Code[20]; GroupSetup: Record "NPR TM Concurrent Admis. Setup"; NewScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Boolean
+    var
+        AdmissionSchedule: Record "NPR TM Admis. Schedule Lines";
+    begin
+        if (not AdmissionSchedule.Get(AdmissionCode, ScheduleCode)) then
+            exit(false);
+        if (AdmissionSchedule."Concurrency Code" <> GroupSetup.Code) then
+            exit(false);
+        case GroupSetup."Concurrency Type" of
+            GroupSetup."Concurrency Type"::ADMISSION:
+                exit(AdmissionCode = NewScheduleEntry."Admission Code");
+            GroupSetup."Concurrency Type"::SCHEDULE:
+                exit(ScheduleCode = NewScheduleEntry."Schedule Code");
+        end;
+        exit(true);
+    end;
+
+    local procedure CurrentSlotCountedByGroup(CurrentScheduleEntry: Record "NPR TM Admis. Schedule Entry"; GroupSetup: Record "NPR TM Concurrent Admis. Setup"; NewScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Boolean
+    begin
+        if (CurrentScheduleEntry."Entry No." = 0) then
+            exit(false);
+        if (CurrentScheduleEntry."Admission Start Date" <> NewScheduleEntry."Admission Start Date") then
+            exit(false);
+        if (not IsScheduleLineInGroup(CurrentScheduleEntry."Admission Code", CurrentScheduleEntry."Schedule Code", GroupSetup, NewScheduleEntry)) then
+            exit(false);
+        exit(IsLastEntryOfLineOnDate(CurrentScheduleEntry, NewScheduleEntry."Admission Start Date"));
+    end;
+
+    local procedure PendingDeltasInGroup(PendingDeltas: Dictionary of [Integer, Integer]; GroupSetup: Record "NPR TM Concurrent Admis. Setup"; NewScheduleEntry: Record "NPR TM Admis. Schedule Entry") Total: Integer
+    var
+        PendingEntry: Record "NPR TM Admis. Schedule Entry";
+        EntryNo: Integer;
+    begin
+        foreach EntryNo in PendingDeltas.Keys() do
+            if (PendingEntry.Get(EntryNo)) then
+                if (PendingEntry."Admission Start Date" = NewScheduleEntry."Admission Start Date") then
+                    if (IsScheduleLineInGroup(PendingEntry."Admission Code", PendingEntry."Schedule Code", GroupSetup, NewScheduleEntry)) then
+                        if (IsLastEntryOfLineOnDate(PendingEntry, NewScheduleEntry."Admission Start Date")) then
+                            Total += PendingDeltas.Get(EntryNo);
+    end;
+
     local procedure ValidateAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDateTime: DateTime)
     var
         ErrorMessage: Text;
@@ -4108,32 +4302,9 @@
 
         AdmissionText."Capacity Control" := CapacityControl;
 
-        case CapacityControl of
-            Admission."Capacity Control"::NONE:
-                exit;
-
-            Admission."Capacity Control"::SALES:
-                begin
-                    AdmissionScheduleEntry.CalcFields("Open Reservations (All)");
-                    AdmittedCount := AdmissionScheduleEntry."Open Reservations (All)";
-                end;
-
-            Admission."Capacity Control"::ADMITTED, // Admitted and Full mode are the same when it comes to reservations
-            Admission."Capacity Control"::FULL:
-                begin
-                    AdmissionScheduleEntry.CalcFields("Open Reservations", "Open Admitted");
-                    AdmittedCount := AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations";
-                end;
-
-            Admission."Capacity Control"::SEATING:
-                begin
-                    AdmissionScheduleEntry.CalcFields("Open Reservations", "Open Admitted");
-                    AdmittedCount := AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations";
-                end;
-
-            else
-                Error(UNSUPPORTED_VALIDATION_METHOD);
-        end;
+        if (CapacityControl = Admission."Capacity Control"::NONE) then
+            exit;
+        AdmittedCount := CalculateReservationCapacityUsed(CapacityControl, AdmissionScheduleEntry);
 
         if (AdmittedCount = 0) then
             Error(UNEXPECTED, AdmissionScheduleEntry.TableCaption(), Admission."Admission Code", AdmittedCount, SHOULD_NOT_BE_ZERO, 0, 0);
