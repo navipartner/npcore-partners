@@ -43,6 +43,10 @@ enum 6014669 "NPR TM Reschedule Refusal"
     {
         Caption = 'SLOT_PASSED', Locked = true;
     }
+    value(85; LINE_NOT_CHANGEABLE)
+    {
+        Caption = 'LINE_NOT_CHANGEABLE', Locked = true;
+    }
     value(90; NOT_RESOLVABLE)
     {
         Caption = 'NOT_RESOLVABLE', Locked = true;

@@ -3987,13 +3987,13 @@
                 Bound(Bounded, Remaining, MaxCapacity - Used);
 
                 if (GroupCapacityForMove(NewScheduleEntry, GroupUsageCache, GroupSetup, GroupUsed, GroupMax)) then begin
+                    GroupUsed += PendingDeltasInGroup(PendingDeltas, GroupSetup, NewScheduleEntry);
                     Factor := PlacesCountedBy(GroupSetup."Capacity Control", Admission.Type);
                     if (Factor = 0) then begin
                         // The move adds no counted demand, but ValidateTicketAdmissionCapacityExceeded still refuses a group already over its limit.
                         if (GroupUsed > GroupMax) then
                             Bound(Bounded, Remaining, 0);
                     end else begin
-                        GroupUsed += PendingDeltasInGroup(PendingDeltas, GroupSetup, NewScheduleEntry);
                         if (CurrentSlotCountedByGroup(CurrentScheduleEntry, GroupSetup, NewScheduleEntry)) then
                             GroupUsed -= FreedPlaces;
                         Bound(Bounded, Remaining, GroupMax - GroupUsed);
@@ -4112,6 +4112,7 @@
     local procedure PendingDeltasInGroup(PendingDeltas: Dictionary of [Integer, Integer]; GroupSetup: Record "NPR TM Concurrent Admis. Setup"; NewScheduleEntry: Record "NPR TM Admis. Schedule Entry") Total: Integer
     var
         PendingEntry: Record "NPR TM Admis. Schedule Entry";
+        PendingAdmission: Record "NPR TM Admission";
         EntryNo: Integer;
     begin
         foreach EntryNo in PendingDeltas.Keys() do
@@ -4119,7 +4120,8 @@
                 if (PendingEntry."Admission Start Date" = NewScheduleEntry."Admission Start Date") then
                     if (IsScheduleLineInGroup(PendingEntry."Admission Code", PendingEntry."Schedule Code", GroupSetup, NewScheduleEntry)) then
                         if (IsLastEntryOfLineOnDate(PendingEntry, NewScheduleEntry."Admission Start Date")) then
-                            Total += PendingDeltas.Get(EntryNo);
+                            if (PendingAdmission.Get(PendingEntry."Admission Code")) then
+                                Total += PendingDeltas.Get(EntryNo) * PlacesCountedBy(GroupSetup."Capacity Control", PendingAdmission.Type);
     end;
 
     local procedure ValidateAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDateTime: DateTime)

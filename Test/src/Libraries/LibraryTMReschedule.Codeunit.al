@@ -9,6 +9,12 @@ codeunit 85500 "NPR Library - TM Reschedule"
         _EventDate: Date;
         _Token: Text[100];
         _SlotEntryNos: List of [Integer];
+        _MarkedRequestEntryNo: Integer;
+        _MarkedAccessDetailEntryNo: Integer;
+        _MarkedNotificationEntryNo: Integer;
+        _TempSnapshotRows: Record "NPR TM Ticket Reservation Req." temporary;
+        _TempSnapshotTickets: Record "NPR TM Ticket" temporary;
+        _TempSnapshotEntries: Record "NPR TM Det. Ticket AccessEntry" temporary;
         TicketNotFoundTxt: Label 'The combination of ticket number and pin code is not valid.', Locked = true;
         TokenNotFoundTxt: Label 'The combination of reservation token and pin code is not valid.', Locked = true;
         InternalErrorTxt: Label 'An internal error occurred. The request was logged.', Locked = true;
@@ -19,21 +25,50 @@ codeunit 85500 "NPR Library - TM Reschedule"
         ReservationPathTok: Label '/ticket/reservation', Locked = true;
         ConfirmPathTok: Label '/ticket/reservation/%1/confirm', Locked = true;
         FindPathTok: Label '/ticket/reschedule/find', Locked = true;
+        ChangePathTok: Label '/ticket/reschedule/change', Locked = true;
+        InvalidReferenceTxt: Label '[RSC020] Line %1, admission %2: the line, the admission or the slot is not valid for this reservation now. Call find again.', Locked = true;
+        NotAllowedTxt: Label '[RSC021] Line %1, admission %2: the admission cannot be rescheduled now (%3).', Locked = true;
+        NoAdmissionCanMoveTxt: Label '[RSF010] No admission of this reservation can be rescheduled now. Reasons: %1.', Locked = true;
+        NoTimeSlotTxt: Label '[RSF011] No admission of this reservation has a time slot that can be rescheduled.', Locked = true;
+        CapacityExceededTxt: Label '[RSC022] Line %1, admission %2: the slot does not have capacity for the line.', Locked = true;
+        ChangesNothingTxt: Label '[RSC023] Line %1 changes no admission.', Locked = true;
+        BusyTxt: Label '[RSC024] The reservation is being changed by another request. Call find again.', Locked = true;
+        ETicketTypeTok: Label 'RESCHEDULE-TEST', Locked = true;
+        NpPassBaseUrlTok: Label 'https://np-pass.invalid/api/v1', Locked = true;
+        NpPassApiTok: Label '/passes/%1/%2', Locked = true;
+        NpPassTokenTok: Label 'reschedule-test-token', Locked = true;
         ResponseDescriptionTok: Label 'HTTP %1, body %2', Locked = true;
+        ChangedLineContextTok: Label '%1, reservationLines[%2]', Locked = true;
+        ChangedAdmissionContextTok: Label '%1, reservationLines[%2], admission %3', Locked = true;
+        TicketContextTok: Label '%1, ticket %2, admission %3', Locked = true;
+        TicketRowContextTok: Label '%1, ticket %2', Locked = true;
         LineContextTok: Label '%1, line with externalLineReference %2', Locked = true;
         AdmissionContextTok: Label '%1, line with externalLineReference %2, admission %3', Locked = true;
         EventDaySlotsErr: Label 'Setup: admission %1 must have exactly three open slots on %2.', Locked = true;
         ReservationSetupErr: Label 'Setup: POST /ticket/reservation must succeed. Response body: %1', Locked = true;
         ConfirmSetupErr: Label 'Setup: confirming reservation %1 must succeed. Response body: %2', Locked = true;
         ChangeSetupErr: Label 'Setup: moving the line of ticket %1 to another slot through the SOAP change must succeed: %2', Locked = true;
+        AbandonedChangeSetupErr: Label 'Setup: the back-office change request for the line of ticket %1 must be registered: %2', Locked = true;
+        ReservationEntryMissingErr: Label 'Setup: ticket %1 has no open reservation entry for admission %2.', Locked = true;
+        ReplanSetupErr: Label 'Setup: the back-office replan of ticket %1, admission %2, to slot %3 must succeed.', Locked = true;
         PrimaryRowMissingErr: Label 'Setup: token %1 has no primary request row for line reference %2.', Locked = true;
         TokenRowsMissingErr: Label 'Setup: token %1 has no request rows.', Locked = true;
         TicketMissingErr: Label 'Setup: line reference %1 of token %2 has no ticket at position %3.', Locked = true;
         TicketNumberMissingErr: Label 'Setup: no ticket has the external ticket number %1.', Locked = true;
-        StatusErr: Label '%1: expected HTTP %2 from POST /ticket/reschedule/find. Got %3', Locked = true;
+        AccessEntryMissingErr: Label 'Setup: ticket %1 has no access entry for admission %2.', Locked = true;
+        InitialEntryMissingErr: Label 'Ticket %1 has no initial entry with a quantity for admission %2.', Locked = true;
+        RefundSetupErr: Label 'Setup: the POS refund request for ticket %1 must be registered.', Locked = true;
+        LineRevokeContextTxt: Label 'RevokeLine(%1)', Locked = true;
+        CurrentRowRevokeSetupErr: Label '%1: Setup: the revoke request of the Ticket Request page for ticket %2 on the current row of its line must be registered.', Locked = true;
+        LineTicketsLeftErr: Label '%1: Setup: no ticket may point at the primary row of line reference %2 of token %3 any more.', Locked = true;
+        NoScheduleRowErr: Label '%1: Setup: the request row of admission %2, which has no schedule, must hold no slot.', Locked = true;
+        MutexSetupErr: Label 'Setup: the reservation mutex for token %1 must be free before the test holds it.', Locked = true;
+        ETicketSetupErr: Label 'Setup: the e-ticket of ticket %1 must be created: %2', Locked = true;
+        StatusErr: Label '%1: expected HTTP %2. Got %3', Locked = true;
         ErrorCodeErr: Label '%1: expected error code %2. Got %3', Locked = true;
         ErrorMessageErr: Label '%1: expected the error message to be exactly "%2".', Locked = true;
         MessageNamesPropertyErr: Label '%1: expected the error message to name the property %2. Message: %3', Locked = true;
+        MessageNamesLineErr: Label '%1: expected the error message to name the line %2. Message: %3', Locked = true;
         PropertyMissingErr: Label '%1: expected the property %2 in %3', Locked = true;
         PropertyTypeErr: Label '%1: expected the property %2 to be a JSON %3. Value: %4', Locked = true;
         LineMissingErr: Label '%1: expected a reservation line with externalLineReference %2 in %3', Locked = true;
@@ -52,6 +87,43 @@ codeunit 85500 "NPR Library - TM Reschedule"
         RemainingNullErr: Label '%1: remainingCapacity of slot %2 must be JSON null because no capacity check bounds the line.', Locked = true;
         SlotDateErr: Label '%1: %2 of slot %3 must be %4.', Locked = true;
         BodyLeakErr: Label '%1: the response body must not contain the %2 (%3).', Locked = true;
+        BodyKeysErr: Label '%1: the response body must hold reservationLines and nothing else. Body: %2', Locked = true;
+        ChangedLineMissingErr: Label '%1: expected an entry at position %2 of reservationLines in %3', Locked = true;
+        NewSystemIdErr: Label '%1: systemId must be a new GUID, not the systemId %2 of the line before the change. Got %3', Locked = true;
+        AdmissionCountOfLineErr: Label '%1: expected %2 entries in admissions.', Locked = true;
+        TicketSlotErr: Label '%1: the ticket must stand on slot %2.', Locked = true;
+        TicketRowErr: Label '%1: the ticket must point at the request row with systemId %2.', Locked = true;
+        TicketRowMissingErr: Label '%1: the request row the ticket points at does not exist.', Locked = true;
+        NewInitialEntryErr: Label '%1: the move must write a new initial entry instead of reusing the old one.', Locked = true;
+        NewInitialSlotErr: Label '%1: the new initial entry must be on slot %2.', Locked = true;
+        PaymentLinkErr: Label '%1: the new initial entry must keep the payment link (closed by entry %2) of the old initial entry.', Locked = true;
+        OldInitialOpenErr: Label '%1: the old initial entry must be closed.', Locked = true;
+        ReversalMissingErr: Label '%1: the old initial entry must be closed by a reversal entry, but entry %2 does not exist.', Locked = true;
+        ReversalQuantityErr: Label '%1: the reversal must hold quantity %2.', Locked = true;
+        ReversalSlotErr: Label '%1: the reversal must be on the old slot %2.', Locked = true;
+        ChangeRowMissingErr: Label '%1: no request row has the systemId %2 returned by the change.', Locked = true;
+        ChangeRowValueErr: Label '%1: the primary row of the change must have %2 %3.', Locked = true;
+        ChangeRowCountErr: Label '%1: the change token must hold %2 rows for the line, one per admission.', Locked = true;
+        ChangeRowStatusErr: Label '%1: every row of the change must be CONFIRMED, none left REGISTERED.', Locked = true;
+        ChangeRowParentErr: Label '%1: every row of the change must supersede request row %2.', Locked = true;
+        ConfirmedChangeRowMissingErr: Label '%1: the change must hold a CONFIRMED CHANGE row for admission %2.', Locked = true;
+        ChangeRowSlotErr: Label '%1: the CONFIRMED CHANGE row of admission %2 must hold slot %3.', Locked = true;
+        ChangeRowScheduledTimeErr: Label '%1: the CONFIRMED CHANGE row of admission %2 must hold the start of slot %3 as its scheduled time.', Locked = true;
+        ScheduledTimeTok: Label '%1 - %2', Locked = true;
+        RowGoneErr: Label '%1: request row %2 must still exist.', Locked = true;
+        RowChangedErr: Label '%1: %2 of request row %3 must be unchanged.', Locked = true;
+        RowSupersededErr: Label '%1: no request row may supersede request row %2, so its line did not change.', Locked = true;
+        RegisteredRowLeftErr: Label '%1: no REGISTERED request row may supersede request row %2.', Locked = true;
+        RequestRowWrittenErr: Label '%1: no ticket reservation request row may be written, so no line moves.', Locked = true;
+        AccessDetailWrittenErr: Label '%1: no detailed ticket access entry may be written, so no ticket moves.', Locked = true;
+        NotificationWrittenErr: Label '%1: no ticket notification entry may be written.', Locked = true;
+        ETicketUpdateNotSentErr: Label '%1: ticket %2 must have an e-ticket update notification entry with status SENT.', Locked = true;
+        MutexLeftErr: Label '%1: the reservation mutex of token %2 must not be left behind.', Locked = true;
+        SnapshotLineMissingErr: Label 'The snapshot holds no line with line reference %1 of token %2.', Locked = true;
+        SnapshotTicketMissingErr: Label 'The snapshot holds no ticket at position %1 of the line with line reference %2.', Locked = true;
+        SnapshotEntryMissingErr: Label 'The snapshot holds no initial entry of ticket %1 for admission %2.', Locked = true;
+        InitialEntryChangedErr: Label '%1: the ticket must still stand on its initial entry %2.', Locked = true;
+        ValidityChangedErr: Label '%1: %2 of the ticket must be unchanged.', Locked = true;
 
     #region Scenario
 
@@ -197,6 +269,131 @@ codeunit 85500 "NPR Library - TM Reschedule"
         TicketType.Get(Item."NPR Ticket Type");
         TicketType."Admission Registration" := TicketType."Admission Registration"::GROUP;
         TicketType.Modify();
+    end;
+
+    // Tickets issued afterwards hold Quantity places of the scenario admission per ticket unit.
+    procedure SetBomQuantity(Quantity: Integer)
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+    begin
+        GetBom(TicketBom);
+        TicketBom.Quantity := Quantity;
+        TicketBom.Modify();
+    end;
+
+    // Another ticket item of the scenario's ticket type whose only admission is the scenario admission, under the reschedule policy of the scenario.
+    procedure CreateItemOnAdmission(BomQuantity: Integer) ItemNo: Code[20]
+    var
+        Item: Record Item;
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        LibraryTicketModule: Codeunit "NPR Library - Ticket Module";
+    begin
+        Item.Get(_ItemNo);
+        ItemNo := LibraryTicketModule.CreateItem('', Item."NPR Ticket Type", Item."Unit Price");
+        LibraryTicketModule.CreateTicketBOM(ItemNo, '', _AdmissionCode, '', BomQuantity, true, '<+7D>', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        TicketBom.Get(ItemNo, '', _AdmissionCode);
+        TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::UNTIL_USED;
+        TicketBom.Modify();
+    end;
+
+    // A further admission of the scenario item, under the reschedule policy of the scenario.
+    procedure AddAdmission(AdmissionCode: Code[20]; IsDefault: Boolean)
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        LibraryTicketModule: Codeunit "NPR Library - Ticket Module";
+    begin
+        LibraryTicketModule.CreateTicketBOM(_ItemNo, '', AdmissionCode, '', 1, IsDefault, '<+7D>', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        TicketBom.Get(_ItemNo, '', AdmissionCode);
+        TicketBom."Reschedule Policy" := TicketBom."Reschedule Policy"::UNTIL_USED;
+        TicketBom.Modify();
+    end;
+
+    // An admission with Default Schedule NONE, so its tickets hold it without a slot.
+    procedure AddAdmissionWithoutSchedule() AdmissionCode: Code[20]
+    var
+        Admission: Record "NPR TM Admission";
+        LibraryTicketModule: Codeunit "NPR Library - Ticket Module";
+    begin
+        AdmissionCode := LibraryTicketModule.CreateAdmissionCode(LibraryTicketModule.GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::NONE, '', '');
+        AddAdmission(AdmissionCode, false);
+    end;
+
+    procedure DeleteAdmissionSetupLine(AdmissionCode: Code[20])
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+    begin
+        TicketBom.Get(_ItemNo, '', AdmissionCode);
+        TicketBom.Delete();
+    end;
+
+    procedure ClearDefaultAdmission()
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+    begin
+        GetBom(TicketBom);
+        TicketBom.Default := false;
+        TicketBom.Modify();
+    end;
+
+    procedure UseLocationAdmission()
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        Admission.Get(_AdmissionCode);
+        Admission.Type := Admission.Type::LOCATION;
+        Admission.Modify();
+    end;
+
+    // The scenario admission is published as e-ticket, NP Pass is set up at an address that never resolves,
+    // and every ticket of the current reservation holds an e-ticket NP Pass already received.
+    procedure IssueETickets()
+    var
+        Item: Record Item;
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        TempCreatedNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        ReasonText: Text;
+    begin
+        TicketSetup.Get();
+        TicketSetup."NP-Pass Server Base URL" := NpPassBaseUrlTok;
+        TicketSetup."NP-Pass API" := NpPassApiTok;
+        TicketSetup."NP-Pass Token" := NpPassTokenTok;
+        TicketSetup.Modify();
+
+        Item.Get(_ItemNo);
+        TicketType.Get(Item."NPR Ticket Type");
+        TicketType."eTicket Type Code" := ETicketTypeTok;
+        TicketType."eTicket Activated" := true;
+        TicketType.Modify();
+        GetBom(TicketBom);
+        TicketBom.Validate("Publish As eTicket", true);
+        TicketBom.Modify();
+
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', _Token);
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+        TicketReservationRequest.FindSet();
+        repeat
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            Ticket.FindSet();
+            repeat
+                _Assert.IsTrue(TicketRequestManager.CreateETicketNotificationEntry(Ticket, TempCreatedNotificationEntry, CopyStr(NotificationAddress(), 1, 100), false, true, ReasonText),
+                    StrSubstNo(ETicketSetupErr, Ticket."External Ticket No.", ReasonText));
+            until (Ticket.Next() = 0);
+        until (TicketReservationRequest.Next() = 0);
+
+        TempCreatedNotificationEntry.Reset();
+        TempCreatedNotificationEntry.FindSet();
+        repeat
+            NotificationEntry.Get(TempCreatedNotificationEntry."Entry No.");
+            NotificationEntry."Notification Send Status" := NotificationEntry."Notification Send Status"::SENT;
+            NotificationEntry.Modify();
+        until (TempCreatedNotificationEntry.Next() = 0);
     end;
 
     local procedure GetBom(var TicketBom: Record "NPR TM Ticket Admission BOM")
@@ -378,6 +575,17 @@ codeunit 85500 "NPR Library - TM Reschedule"
         ScheduleEntry.Modify();
     end;
 
+    procedure SetSlotNotifyThreshold(SlotIndex: Integer; NotifyAtRemainingQuantity: Integer)
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+    begin
+        GetSlot(SlotIndex, ScheduleEntry);
+        ScheduleLine.Get(_AdmissionCode, ScheduleEntry."Schedule Code");
+        ScheduleLine."Notify At Remaining Qty." := NotifyAtRemainingQuantity;
+        ScheduleLine.Modify();
+    end;
+
     procedure RemoveSlotCapacityControl(SlotIndex: Integer)
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -399,16 +607,36 @@ codeunit 85500 "NPR Library - TM Reschedule"
     procedure AddSlotsToSalesConcurrencyGroup(FirstSlotIndex: Integer; SecondSlotIndex: Integer; TotalCapacity: Integer; ConcurrencyType: Option NA,ADMISSION,SCHEDULE,CONCURRENCY_CODE)
     var
         GroupSetup: Record "NPR TM Concurrent Admis. Setup";
+        ConcurrencyCode: Code[20];
+    begin
+        ConcurrencyCode := CreateConcurrencyGroup(TotalCapacity, GroupSetup."Capacity Control"::SALES, ConcurrencyType);
+        JoinConcurrencyGroup(FirstSlotIndex, ConcurrencyCode);
+        JoinConcurrencyGroup(SecondSlotIndex, ConcurrencyCode);
+    end;
+
+    procedure CreateConcurrencyGroup(TotalCapacity: Integer; CapacityControl: Option NA,SALES,ADMITTED,FULL,SEATING; ConcurrencyType: Option NA,ADMISSION,SCHEDULE,CONCURRENCY_CODE): Code[20]
+    var
+        GroupSetup: Record "NPR TM Concurrent Admis. Setup";
         LibraryTicketModule: Codeunit "NPR Library - Ticket Module";
     begin
         GroupSetup.Init();
         GroupSetup.Code := LibraryTicketModule.GenerateCode20();
         GroupSetup."Total Capacity" := TotalCapacity;
-        GroupSetup."Capacity Control" := GroupSetup."Capacity Control"::SALES;
+        GroupSetup."Capacity Control" := CapacityControl;
         GroupSetup."Concurrency Type" := ConcurrencyType;
         GroupSetup.Insert();
-        JoinConcurrencyGroup(FirstSlotIndex, GroupSetup.Code);
-        JoinConcurrencyGroup(SecondSlotIndex, GroupSetup.Code);
+        exit(GroupSetup.Code);
+    end;
+
+    // The places the Sales capacity check counts on the slot: the quantity of the initial entries on it.
+    procedure PlacesSoldOnSlot(SlotIndex: Integer): Integer
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Admission: Record "NPR TM Admission";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        GetSlot(SlotIndex, ScheduleEntry);
+        exit(TicketManagement.CalculateCurrentCapacity(Admission."Capacity Control"::SALES, ScheduleEntry."Entry No."));
     end;
 
     procedure GroupPlacesInUseOnEventDate(SlotIndex: Integer): Integer
@@ -423,7 +651,7 @@ codeunit 85500 "NPR Library - TM Reschedule"
         exit(PlacesInUse);
     end;
 
-    local procedure JoinConcurrencyGroup(SlotIndex: Integer; ConcurrencyCode: Code[20])
+    procedure JoinConcurrencyGroup(SlotIndex: Integer; ConcurrencyCode: Code[20])
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
@@ -477,6 +705,203 @@ codeunit 85500 "NPR Library - TM Reschedule"
         ConfirmReservation(PostReservation(Lines));
     end;
 
+    // One group ticket holds all the places of the sale, so a large sale costs a single ticket.
+    procedure SellPlacesOnOneTicket(SlotIndex: Integer; Quantity: Integer)
+    var
+        Item: Record Item;
+        TicketType: Record "NPR TM Ticket Type";
+        PreviousRegistration: Option;
+    begin
+        Item.Get(_ItemNo);
+        TicketType.Get(Item."NPR Ticket Type");
+        PreviousRegistration := TicketType."Admission Registration";
+        TicketType."Admission Registration" := TicketType."Admission Registration"::GROUP;
+        TicketType.Modify();
+        SellPlaces(SlotIndex, Quantity);
+        TicketType.Get(Item."NPR Ticket Type");
+        TicketType."Admission Registration" := PreviousRegistration;
+        TicketType.Modify();
+    end;
+
+    // ValidateTicketArrival refuses an arrival while the slot lies ahead, so the open admitted entries of the sold tickets are written directly.
+    procedure RecordAdmittedPlaces(SlotIndex: Integer; Quantity: Integer)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        Lines: JsonArray;
+        SaleToken: Text[100];
+    begin
+        AddReserveLineTo(Lines, _ItemNo, Quantity, _AdmissionCode, SlotNo(SlotIndex));
+        SaleToken := PostReservation(Lines);
+        ConfirmReservation(SaleToken);
+        GetPrimaryRow(SaleToken, 1, TicketReservationRequest);
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+        Ticket.FindSet();
+        repeat
+            GetAccessEntry(Ticket."No.", _AdmissionCode, TicketAccessEntry);
+            DetTicketAccessEntry.Init();
+            DetTicketAccessEntry."Entry No." := 0;
+            DetTicketAccessEntry."Ticket No." := Ticket."No.";
+            DetTicketAccessEntry."Ticket Access Entry No." := TicketAccessEntry."Entry No.";
+            DetTicketAccessEntry.Type := DetTicketAccessEntry.Type::ADMITTED;
+            DetTicketAccessEntry."External Adm. Sch. Entry No." := SlotNo(SlotIndex);
+            DetTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
+            DetTicketAccessEntry.Open := true;
+            DetTicketAccessEntry.Insert();
+        until (Ticket.Next() = 0);
+    end;
+
+    // A line of two places of the scenario item and a line of one place of the other item, on the early slots, confirmed.
+    // A second admission of the scenario item is reserved on the given slot when its code is given.
+    procedure CreateReservationWithOtherItemLine(SecondAdmissionCode: Code[20]; SecondSlotNo: Integer; var OtherItem: Codeunit "NPR Library - TM Reschedule")
+    var
+        Lines: JsonArray;
+    begin
+        AddReserveLineTo(Lines, _ItemNo, 2, _AdmissionCode, SlotNo(1));
+        if (SecondAdmissionCode <> '') then
+            AddAdmissionToLastReserveLine(Lines, SecondAdmissionCode, SecondSlotNo);
+        AddReserveLineTo(Lines, OtherItem.GetItemNo(), 1, OtherItem.GetAdmissionCode(), OtherItem.SlotNo(1));
+        CreateReservation(Lines);
+        ConfirmReservation(_Token);
+    end;
+
+    // A confirmed line of one place of the scenario item whose only admission, its default, has no schedule, so the request row holds no slot.
+    procedure CreateOneLineReservationWithoutSchedule(Context: Text)
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Lines: JsonArray;
+        AdmissionCode: Code[20];
+    begin
+        AdmissionCode := AddAdmissionWithoutSchedule();
+        DeleteAdmissionSetupLine();
+        TicketBom.Get(_ItemNo, '', AdmissionCode);
+        TicketBom.Default := true;
+        TicketBom.Modify();
+        AddReserveLineTo(Lines, _ItemNo, 1, AdmissionCode, 0);
+        CreateReservation(Lines);
+        ConfirmReservation(_Token);
+        GetPrimaryRow(_Token, 1, TicketReservationRequest);
+        _Assert.AreEqual(0, TicketReservationRequest."External Adm. Sch. Entry No.", StrSubstNo(NoScheduleRowErr, Context, AdmissionCode));
+    end;
+
+    // A refund the POS registered for the ticket and has not confirmed yet; the amount 0 keeps the prepaid refund prompts away.
+    procedure CreateRefundRequest(TicketNumber: Text) RefundToken: Text[100]
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        RefundAmount: Decimal;
+    begin
+        GetTicket(TicketNumber, Ticket);
+        _Assert.IsTrue(TicketRequestManager.POS_CreateRevokeRequest(RefundToken, Ticket."No.", '', 0, RefundAmount), StrSubstNo(RefundSetupErr, TicketNumber));
+    end;
+
+    procedure CarryOutRefundRequest(RefundToken: Text[100])
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+    begin
+        TicketRequestManager.RevokeReservationTokenRequest(RefundToken, false);
+    end;
+
+    // What the Revoke action of the Ticket Request page does to the line's primary row: its tickets revoked and blocked, the row set to CANCELED.
+    procedure RevokeLine(LineReference: Integer)
+    begin
+        RevokeCurrentLineRow(TicketNo(LineReference, 1), StrSubstNo(LineRevokeContextTxt, LineReference));
+    end;
+
+    // The line's primary row set to CANCELED without a revoke, so its tickets stay unblocked.
+    procedure CancelLineRow(LineReference: Integer)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        GetPrimaryRow(_Token, LineReference, TicketReservationRequest);
+        TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CANCELED;
+        TicketReservationRequest.Modify();
+    end;
+
+    // What the Revoke action of the Ticket Request page does to the row the ticket points at, the change row once its line moved: its tickets revoked and blocked, the row set to CANCELED.
+    procedure RevokeCurrentLineRow(TicketNumber: Text; Context: Text)
+    var
+        Ticket: Record "NPR TM Ticket";
+        RowTicket: Record "NPR TM Ticket";
+        CurrentRow: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        RevokeToken: Text[100];
+        AmountToReverse: Decimal;
+    begin
+        GetTicket(TicketNumber, Ticket);
+        RevokeToken := TicketRequestManager.GetNewToken();
+        RowTicket.SetCurrentKey("Ticket Reservation Entry No.");
+        RowTicket.SetFilter("Ticket Reservation Entry No.", '=%1', Ticket."Ticket Reservation Entry No.");
+        RowTicket.FindSet();
+        repeat
+            AmountToReverse := 0;
+            _Assert.IsTrue(TicketRequestManager.POS_CreateRevokeRequest(RevokeToken, RowTicket."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse), StrSubstNo(CurrentRowRevokeSetupErr, Context, RowTicket."External Ticket No."));
+        until (RowTicket.Next() = 0);
+        TicketRequestManager.RevokeReservationTokenRequest(RevokeToken, false);
+        CurrentRow.Get(Ticket."Ticket Reservation Entry No.");
+        CurrentRow."Request Status" := CurrentRow."Request Status"::CANCELED;
+        CurrentRow.Modify();
+    end;
+
+    // What the legacy XML web service leaves for a line the guest opted into the waiting list for: its primary row WAITINGLIST and no ticket pointing at it.
+    procedure PutLineOnWaitingListWithoutTickets(LineReference: Integer; Context: Text)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        GetPrimaryRow(_Token, LineReference, TicketReservationRequest);
+        TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::WAITINGLIST;
+        TicketReservationRequest.Modify();
+        DeleteLineTickets(LineReference, Context);
+    end;
+
+    // Every ticket that points at the line's primary row is deleted; the row keeps its status.
+    procedure DeleteLineTickets(LineReference: Integer; Context: Text)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        GetPrimaryRow(_Token, LineReference, TicketReservationRequest);
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+        if (not Ticket.IsEmpty()) then
+            Ticket.DeleteAll();
+        _Assert.AreEqual(0, TicketCount(LineReference), StrSubstNo(LineTicketsLeftErr, Context, LineReference, _Token));
+    end;
+
+    // What the expiry job does to a token it expires: the rows stay, set to EXPIRED.
+    procedure ExpireRequest(Token: Text[100])
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+    begin
+        TicketRequestManager.DeleteReservationRequestV2(Token, false);
+    end;
+
+    // What the expiry job does to an expired token on a later run: the rows are removed.
+    procedure RemoveExpiredRequest(Token: Text[100])
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+    begin
+        TicketRequestManager.DeleteReservationRequestV2(Token, true);
+    end;
+
+    procedure HoldReservationMutex()
+    var
+        RequestMutex: Record "NPR TM TicketRequestMutex";
+    begin
+        _Assert.IsTrue(RequestMutex.Acquire(_Token, SessionId()), StrSubstNo(MutexSetupErr, _Token));
+    end;
+
+    procedure IsReservationMutexHeld(): Boolean
+    var
+        RequestMutex: Record "NPR TM TicketRequestMutex";
+    begin
+        exit(RequestMutex.Get(_Token));
+    end;
+
     // Moves the scenario admission of the ticket's line through the existing SOAP change and returns the token of the change rows; other admissions keep their slot.
     procedure MoveLineToSlot(TicketNumber: Text; SlotIndex: Integer) ChangeToken: Text[100]
     var
@@ -496,6 +921,39 @@ codeunit 85500 "NPR Library - TM Reschedule"
         until (TempCurrentRequest.Next() = 0);
         _Assert.IsTrue(TicketXmlApi.ConfirmChangeTicketReservation(ChangeToken, TempCurrentRequest, TempTargetRequest, TempReservationResponse, ResponseMessage),
             StrSubstNo(ChangeSetupErr, TicketNumber, ResponseMessage));
+    end;
+
+    // What the back-office change page leaves behind when the user aborts it: the change request of the ticket's line, REGISTERED and never confirmed.
+    procedure CreateAbandonedChangeRequest(TicketNumber: Text) ChangeToken: Text[100]
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        ResponseMessage: Text;
+    begin
+        GetTicket(TicketNumber, Ticket);
+        TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
+        _Assert.IsTrue(TicketRequestManager.CreateChangeRequest(Ticket."External Ticket No.", TicketReservationRequest."Authorization Code", ChangeToken, ResponseMessage),
+            StrSubstNo(AbandonedChangeSetupErr, TicketNumber, ResponseMessage));
+    end;
+
+    // What the back-office replan page does to the ticket's admission: its open reservation and its initial entry move to the slot, its request rows stay.
+    procedure ReplanTicketAdmission(TicketNumber: Text; AdmissionCode: Code[20]; NewSlotNo: Integer)
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
+    begin
+        GetTicket(TicketNumber, Ticket);
+        GetAccessEntry(Ticket."No.", AdmissionCode, TicketAccessEntry);
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+        DetTicketAccessEntry.SetFilter(Open, '=%1', true);
+        _Assert.IsTrue(DetTicketAccessEntry.FindLast(), StrSubstNo(ReservationEntryMissingErr, TicketNumber, AdmissionCode));
+        _Assert.IsTrue(TicketManagement.ReplanReservation(DetTicketAccessEntry."Entry No.", NewSlotNo, true), StrSubstNo(ReplanSetupErr, TicketNumber, AdmissionCode, NewSlotNo));
+        CapacityWebHook.EmitTouchedEntries();
     end;
 
     // Registers the SOAP change request for the ticket's line without confirming it, and returns the token of the change rows.
@@ -580,6 +1038,15 @@ codeunit 85500 "NPR Library - TM Reschedule"
         Ticket.Modify();
     end;
 
+    procedure UnblockTicket(TicketNumber: Text)
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        GetTicket(TicketNumber, Ticket);
+        Ticket.Blocked := false;
+        Ticket.Modify();
+    end;
+
     procedure SetTicketValidity(ValidFromDate: Date; ValidToDate: Date)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -608,6 +1075,20 @@ codeunit 85500 "NPR Library - TM Reschedule"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', _Token);
         _Assert.IsTrue(TicketReservationRequest.FindFirst(), StrSubstNo(TokenRowsMissingErr, _Token));
         exit(TicketReservationRequest."Authorization Code");
+    end;
+
+    procedure WrongPin(): Text
+    var
+        PinCode: Text;
+        LastCharacter: Char;
+    begin
+        PinCode := GetPin();
+        LastCharacter := PinCode[StrLen(PinCode)];
+        if (LastCharacter = '9') then
+            LastCharacter := '0'
+        else
+            LastCharacter := LastCharacter + 1;
+        exit(CopyStr(PinCode, 1, StrLen(PinCode) - 1) + Format(LastCharacter));
     end;
 
     procedure TicketNo(LineReference: Integer; Position: Integer): Text
@@ -650,6 +1131,11 @@ codeunit 85500 "NPR Library - TM Reschedule"
     begin
         GetPrimaryRow(Token, LineReference, TicketReservationRequest);
         exit(TicketReservationRequest.SystemId);
+    end;
+
+    procedure GetLineRow(LineReference: Integer; var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    begin
+        GetPrimaryRow(_Token, LineReference, TicketReservationRequest);
     end;
 
     // Assembled at run time so the source holds no literal address (AA0240).
@@ -759,6 +1245,14 @@ codeunit 85500 "NPR Library - TM Reschedule"
         _Assert.IsTrue(Ticket.FindFirst(), StrSubstNo(TicketNumberMissingErr, TicketNumber));
     end;
 
+    local procedure GetAccessEntry(InternalTicketNo: Code[20]; AdmissionCode: Code[20]; var TicketAccessEntry: Record "NPR TM Ticket Access Entry")
+    begin
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', InternalTicketNo);
+        TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        _Assert.IsTrue(TicketAccessEntry.FindFirst(), StrSubstNo(AccessEntryMissingErr, InternalTicketNo, AdmissionCode));
+    end;
+
     #endregion
 
     #region Find calls
@@ -802,6 +1296,71 @@ codeunit 85500 "NPR Library - TM Reschedule"
         Headers: Dictionary of [Text, Text];
     begin
         exit(LibraryAPI.CallApi('POST', FindPathTok, Body, QueryParameters, Headers));
+    end;
+
+    #endregion
+
+    #region Change calls
+
+    procedure AddChangeLine(var Lines: JsonArray; LineId: Guid; AdmissionCode: Code[20]; ScheduleId: Integer)
+    begin
+        AddRawChangeLine(Lines, ApiGuidText(LineId), ChangeAdmission(AdmissionCode, ScheduleId));
+    end;
+
+    procedure AddRawChangeLine(var Lines: JsonArray; SystemIdText: Text; Admission: JsonObject)
+    var
+        Line: JsonObject;
+        Admissions: JsonArray;
+    begin
+        Admissions.Add(Admission);
+        Line.Add('systemId', SystemIdText);
+        Line.Add('admissions', Admissions);
+        Lines.Add(Line);
+    end;
+
+    procedure AddAdmissionToLastChangeLine(var Lines: JsonArray; AdmissionCode: Code[20]; ScheduleId: Integer)
+    var
+        LineToken: JsonToken;
+        AdmissionsToken: JsonToken;
+    begin
+        Lines.Get(Lines.Count() - 1, LineToken);
+        LineToken.AsObject().Get('admissions', AdmissionsToken);
+        AdmissionsToken.AsArray().Add(ChangeAdmission(AdmissionCode, ScheduleId));
+    end;
+
+    procedure ChangeAdmission(AdmissionCode: Text; ScheduleId: Integer) Admission: JsonObject
+    begin
+        Admission.Add('admissionCode', AdmissionCode);
+        Admission.Add('scheduleNumber', ScheduleId);
+    end;
+
+    procedure ChangeBody(ReservationToken: Text; PinCode: Text; Lines: JsonArray) Body: JsonObject
+    begin
+        Body.Add('reservationToken', ReservationToken);
+        Body.Add('pinCode', PinCode);
+        Body.Add('reservationLines', Lines);
+    end;
+
+    procedure Change(Lines: JsonArray): JsonObject
+    begin
+        exit(CallChange(ChangeBody(_Token, GetPin(), Lines)));
+    end;
+
+    procedure ChangeLine(LineId: Guid; AdmissionCode: Code[20]; ScheduleId: Integer): JsonObject
+    var
+        Lines: JsonArray;
+    begin
+        AddChangeLine(Lines, LineId, AdmissionCode, ScheduleId);
+        exit(Change(Lines));
+    end;
+
+    procedure CallChange(Body: JsonObject): JsonObject
+    var
+        LibraryAPI: Codeunit "NPR Library - NPRetail API";
+        QueryParameters: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        exit(LibraryAPI.CallApi('POST', ChangePathTok, Body, QueryParameters, Headers));
     end;
 
     #endregion
@@ -852,6 +1411,17 @@ codeunit 85500 "NPR Library - TM Reschedule"
     begin
         ActualMessage := AssertErrorResponse(Response, 400, 'generic_error', Context);
         _Assert.AreEqual(Format(InternalErrorTxt), ActualMessage, StrSubstNo(ErrorMessageErr, Context, InternalErrorTxt));
+    end;
+
+    // Reasons is the list of reason codes as the message lists them, for example 'ALREADY_ADMITTED, NOT_ALLOWED'.
+    procedure AssertNoAdmissionCanMove(Response: JsonObject; Reasons: Text; Context: Text)
+    begin
+        AssertExactError(Response, 400, 'reschedule_not_allowed', StrSubstNo(NoAdmissionCanMoveTxt, Reasons), Context);
+    end;
+
+    procedure AssertNoTimeSlotToReschedule(Response: JsonObject; Context: Text)
+    begin
+        AssertExactError(Response, 400, 'reschedule_not_allowed', NoTimeSlotTxt, Context);
     end;
 
     procedure AssertReservationToken(Response: JsonObject; ExpectedToken: Text; Context: Text)
@@ -986,6 +1556,534 @@ codeunit 85500 "NPR Library - TM Reschedule"
         LibraryAPI.GetResponseBody(Response).WriteTo(BodyText);
         _Assert.IsFalse(LowerCase(BodyText).Contains(LowerCase(Value)), StrSubstNo(BodyLeakErr, Context, WhatItIs, Value));
     end;
+
+    procedure ResponseBodyText(Response: JsonObject) BodyText: Text
+    var
+        LibraryAPI: Codeunit "NPR Library - NPRetail API";
+    begin
+        LibraryAPI.GetResponseBody(Response).WriteTo(BodyText);
+    end;
+
+    procedure AssertAdmissionCount(Response: JsonObject; LineReference: Integer; ExpectedCount: Integer; Context: Text)
+    var
+        LineContext: Text;
+    begin
+        LineContext := StrSubstNo(LineContextTok, Context, LineReference);
+        _Assert.AreEqual(ExpectedCount, ArrayProperty(LineObject(Response, LineReference, Context), 'admissions', LineContext).Count(), StrSubstNo(AdmissionCountOfLineErr, LineContext, ExpectedCount));
+    end;
+
+    procedure AssertAdmissionAllowed(Response: JsonObject; LineReference: Integer; AdmissionCode: Code[20]; ExpectedAllowed: Boolean; Context: Text)
+    var
+        AdmissionContext: Text;
+    begin
+        AdmissionContext := StrSubstNo(AdmissionContextTok, Context, LineReference, AdmissionCode);
+        _Assert.AreEqual(ExpectedAllowed, BooleanProperty(AdmissionObject(LineObject(Response, LineReference, Context), AdmissionCode, AdmissionContext), 'rescheduleAllowed', AdmissionContext), StrSubstNo(AllowedErr, AdmissionContext, ExpectedAllowed));
+    end;
+
+    #endregion
+
+    #region Change response assertions
+
+    procedure AssertBodyHoldsOnlyReservationLines(Response: JsonObject; Context: Text)
+    var
+        LibraryAPI: Codeunit "NPR Library - NPRetail API";
+        Body: JsonObject;
+        BodyText: Text;
+    begin
+        Body := LibraryAPI.GetResponseBody(Response);
+        Body.WriteTo(BodyText);
+        _Assert.AreEqual(1, Body.Keys().Count(), StrSubstNo(BodyKeysErr, Context, BodyText));
+        _Assert.IsTrue(Body.Contains('reservationLines'), StrSubstNo(BodyKeysErr, Context, BodyText));
+    end;
+
+    procedure AssertChangedLineCount(Response: JsonObject; ExpectedCount: Integer; Context: Text)
+    begin
+        _Assert.AreEqual(ExpectedCount, ChangedLines(Response, Context).Count(), StrSubstNo(LineCountErr, Context, ExpectedCount));
+    end;
+
+    // Position counts from 1 in request order. Returns the new systemId of the line.
+    procedure AssertChangedLine(Response: JsonObject; Position: Integer; FormerSystemId: Guid; ExpectedQuantity: Integer; Context: Text) NewSystemId: Guid
+    var
+        Line: JsonObject;
+        LineContext: Text;
+        SystemIdText: Text;
+    begin
+        LineContext := StrSubstNo(ChangedLineContextTok, Context, Position - 1);
+        Line := ChangedLineObject(Response, Position, Context);
+        SystemIdText := TextProperty(Line, 'systemId', LineContext);
+        _Assert.IsTrue(Evaluate(NewSystemId, SystemIdText), StrSubstNo(NewSystemIdErr, LineContext, ApiGuidText(FormerSystemId), SystemIdText));
+        _Assert.AreNotEqual(ApiGuidText(FormerSystemId), ApiGuidText(NewSystemId), StrSubstNo(NewSystemIdErr, LineContext, ApiGuidText(FormerSystemId), SystemIdText));
+        _Assert.AreEqual(Format(_ItemNo), TextProperty(Line, 'itemNumber', LineContext), StrSubstNo(LineValueErr, LineContext, 'itemNumber'));
+        _Assert.AreEqual('', TextProperty(Line, 'variantCode', LineContext), StrSubstNo(LineValueErr, LineContext, 'variantCode'));
+        _Assert.AreEqual(ExpectedQuantity, IntegerProperty(Line, 'quantity', LineContext), StrSubstNo(LineValueErr, LineContext, 'quantity'));
+    end;
+
+    procedure AssertChangedAdmissionCount(Response: JsonObject; Position: Integer; ExpectedCount: Integer; Context: Text)
+    var
+        LineContext: Text;
+    begin
+        LineContext := StrSubstNo(ChangedLineContextTok, Context, Position - 1);
+        _Assert.AreEqual(ExpectedCount, ArrayProperty(ChangedLineObject(Response, Position, Context), 'admissions', LineContext).Count(), StrSubstNo(AdmissionCountOfLineErr, LineContext, ExpectedCount));
+    end;
+
+    // The admission carries the resulting slot with the dates and times of its schedule entry.
+    procedure AssertChangedAdmission(Response: JsonObject; Position: Integer; AdmissionCode: Code[20]; ExpectedScheduleId: Integer; Context: Text)
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Admission: JsonObject;
+        AdmissionContext: Text;
+    begin
+        AdmissionContext := StrSubstNo(ChangedAdmissionContextTok, Context, Position - 1, AdmissionCode);
+        Admission := AdmissionObject(ChangedLineObject(Response, Position, Context), AdmissionCode, AdmissionContext);
+        _Assert.AreEqual(ExpectedScheduleId, IntegerProperty(Admission, 'scheduleNumber', AdmissionContext), StrSubstNo(CurrentScheduleErr, AdmissionContext, ExpectedScheduleId));
+        ScheduleEntry.SetRange("External Schedule Entry No.", ExpectedScheduleId);
+        ScheduleEntry.SetRange(Cancelled, false);
+        ScheduleEntry.FindLast();
+        _Assert.AreEqual(Format(ScheduleEntry."Admission Start Date", 0, 9), TextProperty(Admission, 'startDate', AdmissionContext), StrSubstNo(SlotDateErr, AdmissionContext, 'startDate', ExpectedScheduleId, ScheduleEntry."Admission Start Date"));
+        _Assert.AreEqual(Format(ScheduleEntry."Admission End Date", 0, 9), TextProperty(Admission, 'endDate', AdmissionContext), StrSubstNo(SlotDateErr, AdmissionContext, 'endDate', ExpectedScheduleId, ScheduleEntry."Admission End Date"));
+        AssertSlotTimes(Admission, ExpectedScheduleId, AdmissionContext);
+    end;
+
+    procedure AssertInvalidReference(Response: JsonObject; LineId: Guid; AdmissionCode: Code[20]; Context: Text)
+    begin
+        AssertExactError(Response, 400, 'invalid_reference', StrSubstNo(InvalidReferenceTxt, ApiGuidText(LineId), AdmissionCode), Context);
+    end;
+
+    procedure AssertNotAllowed(Response: JsonObject; LineId: Guid; AdmissionCode: Code[20]; ReasonCode: Text; Context: Text)
+    begin
+        AssertExactError(Response, 400, 'reschedule_not_allowed', StrSubstNo(NotAllowedTxt, ApiGuidText(LineId), AdmissionCode, ReasonCode), Context);
+    end;
+
+    // The refusal code and the line it names, without the rest of the message text.
+    procedure AssertNotAllowedNamingLine(Response: JsonObject; LineId: Guid; Context: Text)
+    var
+        ActualMessage: Text;
+    begin
+        ActualMessage := AssertErrorResponse(Response, 400, 'reschedule_not_allowed', Context);
+        _Assert.IsTrue(ActualMessage.Contains(ApiGuidText(LineId)), StrSubstNo(MessageNamesLineErr, Context, ApiGuidText(LineId), ActualMessage));
+    end;
+
+    procedure AssertCapacityExceeded(Response: JsonObject; LineId: Guid; AdmissionCode: Code[20]; Context: Text)
+    begin
+        AssertExactError(Response, 400, 'capacity_exceeded', StrSubstNo(CapacityExceededTxt, ApiGuidText(LineId), AdmissionCode), Context);
+    end;
+
+    procedure AssertChangesNothing(Response: JsonObject; LineId: Guid; Context: Text)
+    begin
+        AssertExactError(Response, 400, 'invalid_input', StrSubstNo(ChangesNothingTxt, ApiGuidText(LineId)), Context);
+    end;
+
+    procedure AssertBusy(Response: JsonObject; Context: Text)
+    begin
+        AssertExactError(Response, 400, 'invalid_reference', BusyTxt, Context);
+    end;
+
+    local procedure AssertExactError(Response: JsonObject; ExpectedStatus: Integer; ExpectedCode: Text; ExpectedMessage: Text; Context: Text)
+    begin
+        _Assert.AreEqual(ExpectedMessage, AssertErrorResponse(Response, ExpectedStatus, ExpectedCode, Context), StrSubstNo(ErrorMessageErr, Context, ExpectedMessage));
+    end;
+
+    local procedure ChangedLines(Response: JsonObject; Context: Text): JsonArray
+    var
+        LibraryAPI: Codeunit "NPR Library - NPRetail API";
+    begin
+        exit(ArrayProperty(LibraryAPI.GetResponseBody(Response), 'reservationLines', Context));
+    end;
+
+    local procedure ChangedLineObject(Response: JsonObject; Position: Integer; Context: Text): JsonObject
+    var
+        Lines: JsonArray;
+        LineToken: JsonToken;
+        LinesText: Text;
+    begin
+        Lines := ChangedLines(Response, Context);
+        if (Lines.Get(Position - 1, LineToken)) then
+            exit(ObjectValue(LineToken, 'reservationLines[]', Context));
+        Lines.WriteTo(LinesText);
+        _Assert.Fail(StrSubstNo(ChangedLineMissingErr, Context, Position - 1, LinesText));
+    end;
+
+    // The format the API writes a systemId in: lower case, no braces.
+    local procedure ApiGuidText(Value: Guid): Text
+    begin
+        exit(NormalizedGuid(Format(Value)));
+    end;
+
+    #endregion
+
+    #region Stored state
+
+    // The slot the ticket stands on for the admission, read the way the change request reads it.
+    procedure CurrentSlotOfTicket(TicketNumber: Text; AdmissionCode: Code[20]) CurrentSlot: Integer
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        GetTicket(TicketNumber, Ticket);
+        GetAccessEntry(Ticket."No.", AdmissionCode, TicketAccessEntry);
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        if (DetTicketAccessEntry.FindLast()) then
+            CurrentSlot := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+        if (DetTicketAccessEntry.FindLast()) then
+            CurrentSlot := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+    end;
+
+    procedure AssertTicketOnSlot(TicketNumber: Text; AdmissionCode: Code[20]; ExpectedSlotNo: Integer; Context: Text)
+    begin
+        _Assert.AreEqual(ExpectedSlotNo, CurrentSlotOfTicket(TicketNumber, AdmissionCode), StrSubstNo(TicketSlotErr, StrSubstNo(TicketContextTok, Context, TicketNumber, AdmissionCode), ExpectedSlotNo));
+    end;
+
+    procedure AssertTicketOnRow(TicketNumber: Text; ExpectedRowSystemId: Guid; Context: Text)
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRowContext: Text;
+    begin
+        TicketRowContext := StrSubstNo(TicketRowContextTok, Context, TicketNumber);
+        GetTicket(TicketNumber, Ticket);
+        _Assert.IsTrue(TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No."), StrSubstNo(TicketRowMissingErr, TicketRowContext));
+        _Assert.AreEqual(ApiGuidText(ExpectedRowSystemId), ApiGuidText(TicketReservationRequest.SystemId), StrSubstNo(TicketRowErr, TicketRowContext, ApiGuidText(ExpectedRowSystemId)));
+    end;
+
+    procedure GetInitialEntry(TicketNumber: Text; AdmissionCode: Code[20]; var DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+    begin
+        GetTicket(TicketNumber, Ticket);
+        GetAccessEntry(Ticket."No.", AdmissionCode, TicketAccessEntry);
+        DetTicketAccessEntry.Reset();
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+        _Assert.IsTrue(DetTicketAccessEntry.FindLast(), StrSubstNo(InitialEntryMissingErr, TicketNumber, AdmissionCode));
+    end;
+
+    // The stored result of the move of one ticket's admission: a new initial entry on the new slot that keeps the payment link,
+    // and the old initial entry closed by a reversal of its quantity on the old slot.
+    procedure AssertTicketMoved(TicketNumber: Text; AdmissionCode: Code[20]; OldInitialEntry: Record "NPR TM Det. Ticket AccessEntry"; NewSlotNo: Integer; Context: Text)
+    var
+        NewInitialEntry: Record "NPR TM Det. Ticket AccessEntry";
+        ClosedInitialEntry: Record "NPR TM Det. Ticket AccessEntry";
+        ReversalEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketContext: Text;
+    begin
+        TicketContext := StrSubstNo(TicketContextTok, Context, TicketNumber, AdmissionCode);
+        GetInitialEntry(TicketNumber, AdmissionCode, NewInitialEntry);
+        _Assert.AreNotEqual(OldInitialEntry."Entry No.", NewInitialEntry."Entry No.", StrSubstNo(NewInitialEntryErr, TicketContext));
+        _Assert.AreEqual(NewSlotNo, NewInitialEntry."External Adm. Sch. Entry No.", StrSubstNo(NewInitialSlotErr, TicketContext, NewSlotNo));
+        _Assert.AreEqual(OldInitialEntry."Closed By Entry No.", NewInitialEntry."Closed By Entry No.", StrSubstNo(PaymentLinkErr, TicketContext, OldInitialEntry."Closed By Entry No."));
+        _Assert.IsTrue(ClosedInitialEntry.Get(OldInitialEntry."Entry No."), StrSubstNo(ReversalMissingErr, TicketContext, OldInitialEntry."Entry No."));
+        _Assert.IsFalse(ClosedInitialEntry.Open, StrSubstNo(OldInitialOpenErr, TicketContext));
+        _Assert.IsTrue(ReversalEntry.Get(ClosedInitialEntry."Closed By Entry No."), StrSubstNo(ReversalMissingErr, TicketContext, ClosedInitialEntry."Closed By Entry No."));
+        _Assert.AreEqual(-OldInitialEntry.Quantity, ReversalEntry.Quantity, StrSubstNo(ReversalQuantityErr, TicketContext, -OldInitialEntry.Quantity));
+        _Assert.AreEqual(OldInitialEntry."External Adm. Sch. Entry No.", ReversalEntry."External Adm. Sch. Entry No.", StrSubstNo(ReversalSlotErr, TicketContext, OldInitialEntry."External Adm. Sch. Entry No."));
+    end;
+
+    // The rows of the change: its primary row carries the returned systemId and supersedes the line's former row,
+    // one CONFIRMED row per admission, and the pin, address and holder name of the former row.
+    procedure AssertChangeRows(NewSystemId: Guid; FormerRow: Record "NPR TM Ticket Reservation Req."; ExpectedAdmissionCount: Integer; Context: Text)
+    var
+        PrimaryChangeRow: Record "NPR TM Ticket Reservation Req.";
+        ChangeRow: Record "NPR TM Ticket Reservation Req.";
+    begin
+        _Assert.IsTrue(PrimaryChangeRow.GetBySystemId(NewSystemId), StrSubstNo(ChangeRowMissingErr, Context, ApiGuidText(NewSystemId)));
+        _Assert.IsTrue(PrimaryChangeRow."Entry Type" = PrimaryChangeRow."Entry Type"::CHANGE, StrSubstNo(ChangeRowValueErr, Context, PrimaryChangeRow.FieldCaption("Entry Type"), 'CHANGE'));
+        _Assert.IsTrue(PrimaryChangeRow."Primary Request Line", StrSubstNo(ChangeRowValueErr, Context, PrimaryChangeRow.FieldCaption("Primary Request Line"), true));
+        _Assert.AreEqual(FormerRow."Entry No.", PrimaryChangeRow."Superseeds Entry No.", StrSubstNo(ChangeRowValueErr, Context, PrimaryChangeRow.FieldCaption("Superseeds Entry No."), FormerRow."Entry No."));
+        _Assert.AreEqual(FormerRow."Authorization Code", PrimaryChangeRow."Authorization Code", StrSubstNo(ChangeRowValueErr, Context, PrimaryChangeRow.FieldCaption("Authorization Code"), 'of the former row'));
+        _Assert.AreEqual(FormerRow."Notification Address", PrimaryChangeRow."Notification Address", StrSubstNo(ChangeRowValueErr, Context, PrimaryChangeRow.FieldCaption("Notification Address"), 'of the former row'));
+        _Assert.AreEqual(FormerRow.TicketHolderName, PrimaryChangeRow.TicketHolderName, StrSubstNo(ChangeRowValueErr, Context, PrimaryChangeRow.FieldCaption(TicketHolderName), 'of the former row'));
+
+        ChangeRow.SetFilter("Session Token ID", '=%1', PrimaryChangeRow."Session Token ID");
+        ChangeRow.SetFilter("Ext. Line Reference No.", '=%1', PrimaryChangeRow."Ext. Line Reference No.");
+        _Assert.AreEqual(ExpectedAdmissionCount, ChangeRow.Count(), StrSubstNo(ChangeRowCountErr, Context, ExpectedAdmissionCount));
+        ChangeRow.SetFilter("Request Status", '<>%1', ChangeRow."Request Status"::CONFIRMED);
+        _Assert.IsTrue(ChangeRow.IsEmpty(), StrSubstNo(ChangeRowStatusErr, Context));
+        ChangeRow.SetRange("Request Status");
+        ChangeRow.SetFilter("Superseeds Entry No.", '<>%1', FormerRow."Entry No.");
+        _Assert.IsTrue(ChangeRow.IsEmpty(), StrSubstNo(ChangeRowParentErr, Context, FormerRow."Entry No."));
+    end;
+
+    // The CONFIRMED CHANGE row of the admission among the rows of the change holds the slot and, as its scheduled time, the start of that slot.
+    procedure AssertChangeRowOnSlot(NewSystemId: Guid; AdmissionCode: Code[20]; ExpectedSlotNo: Integer; Context: Text)
+    var
+        PrimaryChangeRow: Record "NPR TM Ticket Reservation Req.";
+        ChangeRow: Record "NPR TM Ticket Reservation Req.";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        _Assert.IsTrue(PrimaryChangeRow.GetBySystemId(NewSystemId), StrSubstNo(ChangeRowMissingErr, Context, ApiGuidText(NewSystemId)));
+        ChangeRow.SetFilter("Session Token ID", '=%1', PrimaryChangeRow."Session Token ID");
+        ChangeRow.SetFilter("Ext. Line Reference No.", '=%1', PrimaryChangeRow."Ext. Line Reference No.");
+        ChangeRow.SetFilter("Admission Code", '=%1', AdmissionCode);
+        ChangeRow.SetFilter("Entry Type", '=%1', ChangeRow."Entry Type"::CHANGE);
+        ChangeRow.SetFilter("Request Status", '=%1', ChangeRow."Request Status"::CONFIRMED);
+        _Assert.IsTrue(ChangeRow.FindFirst(), StrSubstNo(ConfirmedChangeRowMissingErr, Context, AdmissionCode));
+        _Assert.AreEqual(ExpectedSlotNo, ChangeRow."External Adm. Sch. Entry No.", StrSubstNo(ChangeRowSlotErr, Context, AdmissionCode, ExpectedSlotNo));
+        ScheduleEntry.SetRange("External Schedule Entry No.", ExpectedSlotNo);
+        ScheduleEntry.SetRange(Cancelled, false);
+        ScheduleEntry.FindLast();
+        _Assert.AreEqual(StrSubstNo(ScheduledTimeTok, ScheduleEntry."Admission Start Date", ScheduleEntry."Admission Start Time"), ChangeRow."Scheduled Time Description",
+            StrSubstNo(ChangeRowScheduledTimeErr, Context, AdmissionCode, ExpectedSlotNo));
+    end;
+
+    procedure AssertRowUnchanged(RowBefore: Record "NPR TM Ticket Reservation Req."; Context: Text)
+    var
+        RowNow: Record "NPR TM Ticket Reservation Req.";
+    begin
+        _Assert.IsTrue(RowNow.Get(RowBefore."Entry No."), StrSubstNo(RowGoneErr, Context, RowBefore."Entry No."));
+        _Assert.AreEqual(RowBefore."Session Token ID", RowNow."Session Token ID", StrSubstNo(RowChangedErr, Context, RowNow.FieldCaption("Session Token ID"), RowBefore."Entry No."));
+        _Assert.IsTrue(RowBefore."Request Status" = RowNow."Request Status", StrSubstNo(RowChangedErr, Context, RowNow.FieldCaption("Request Status"), RowBefore."Entry No."));
+        _Assert.IsTrue(RowBefore."Entry Type" = RowNow."Entry Type", StrSubstNo(RowChangedErr, Context, RowNow.FieldCaption("Entry Type"), RowBefore."Entry No."));
+        _Assert.AreEqual(RowBefore."External Adm. Sch. Entry No.", RowNow."External Adm. Sch. Entry No.", StrSubstNo(RowChangedErr, Context, RowNow.FieldCaption("External Adm. Sch. Entry No."), RowBefore."Entry No."));
+        _Assert.AreEqual(RowBefore."Primary Request Line", RowNow."Primary Request Line", StrSubstNo(RowChangedErr, Context, RowNow.FieldCaption("Primary Request Line"), RowBefore."Entry No."));
+        _Assert.AreEqual(RowBefore."Superseeds Entry No.", RowNow."Superseeds Entry No.", StrSubstNo(RowChangedErr, Context, RowNow.FieldCaption("Superseeds Entry No."), RowBefore."Entry No."));
+    end;
+
+    procedure AssertNotSuperseded(Row: Record "NPR TM Ticket Reservation Req."; Context: Text)
+    var
+        ChildRow: Record "NPR TM Ticket Reservation Req.";
+    begin
+        ChildRow.SetCurrentKey("Superseeds Entry No.");
+        ChildRow.SetFilter("Superseeds Entry No.", '=%1', Row."Entry No.");
+        _Assert.IsTrue(ChildRow.IsEmpty(), StrSubstNo(RowSupersededErr, Context, Row."Entry No."));
+    end;
+
+    procedure AssertNoRegisteredRowSuperseding(Row: Record "NPR TM Ticket Reservation Req."; Context: Text)
+    var
+        ChildRow: Record "NPR TM Ticket Reservation Req.";
+    begin
+        ChildRow.SetCurrentKey("Superseeds Entry No.");
+        ChildRow.SetFilter("Superseeds Entry No.", '=%1', Row."Entry No.");
+        ChildRow.SetFilter("Request Status", '=%1', ChildRow."Request Status"::REGISTERED);
+        _Assert.IsTrue(ChildRow.IsEmpty(), StrSubstNo(RegisteredRowLeftErr, Context, Row."Entry No."));
+    end;
+
+    procedure SnapshotTokenRows(Token: Text[100]; var TempRows: Record "NPR TM Ticket Reservation Req." temporary)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        _Assert.IsTrue(TicketReservationRequest.FindSet(), StrSubstNo(TokenRowsMissingErr, Token));
+        repeat
+            TempRows := TicketReservationRequest;
+            TempRows.Insert();
+        until (TicketReservationRequest.Next() = 0);
+    end;
+
+    procedure AssertRowsUnchanged(var TempRows: Record "NPR TM Ticket Reservation Req." temporary; Context: Text)
+    begin
+        TempRows.Reset();
+        TempRows.FindSet();
+        repeat
+            AssertRowUnchanged(TempRows, Context);
+        until (TempRows.Next() = 0);
+    end;
+
+    // Remembers every line of the current reservation as it stands before a change: its primary row, its tickets,
+    // and the initial entry each ticket stands on per admission.
+    procedure SnapshotLines()
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        _TempSnapshotRows.Reset();
+        _TempSnapshotRows.DeleteAll();
+        _TempSnapshotTickets.Reset();
+        _TempSnapshotTickets.DeleteAll();
+        _TempSnapshotEntries.Reset();
+        _TempSnapshotEntries.DeleteAll();
+
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', _Token);
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+        TicketReservationRequest.FindSet();
+        repeat
+            _TempSnapshotRows := TicketReservationRequest;
+            _TempSnapshotRows.Insert();
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            if (Ticket.FindSet()) then
+                repeat
+                    _TempSnapshotTickets := Ticket;
+                    _TempSnapshotTickets.Insert();
+                    TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                    if (TicketAccessEntry.FindSet()) then
+                        repeat
+                            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+                            DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+                            if (DetTicketAccessEntry.FindLast()) then begin
+                                _TempSnapshotEntries := DetTicketAccessEntry;
+                                _TempSnapshotEntries.Insert();
+                            end;
+                        until (TicketAccessEntry.Next() = 0);
+                until (Ticket.Next() = 0);
+        until (TicketReservationRequest.Next() = 0);
+    end;
+
+    procedure GetSnapshotRow(LineReference: Integer; var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    begin
+        _TempSnapshotRows.Reset();
+        _TempSnapshotRows.SetFilter("Ext. Line Reference No.", '=%1', LineReference);
+        _Assert.IsTrue(_TempSnapshotRows.FindFirst(), StrSubstNo(SnapshotLineMissingErr, LineReference, _Token));
+        TicketReservationRequest := _TempSnapshotRows;
+    end;
+
+    // The ticket numbers of a line as they were at the snapshot, also after a change moved the tickets to another row.
+    procedure SnapshotTicketNo(LineReference: Integer; Position: Integer): Text
+    var
+        FormerRow: Record "NPR TM Ticket Reservation Req.";
+        Counter: Integer;
+    begin
+        GetSnapshotRow(LineReference, FormerRow);
+        _TempSnapshotTickets.Reset();
+        _TempSnapshotTickets.SetFilter("Ticket Reservation Entry No.", '=%1', FormerRow."Entry No.");
+        if (_TempSnapshotTickets.FindSet()) then
+            repeat
+                Counter += 1;
+                if (Counter = Position) then
+                    exit(_TempSnapshotTickets."External Ticket No.");
+            until (_TempSnapshotTickets.Next() = 0);
+        _Assert.Fail(StrSubstNo(SnapshotTicketMissingErr, Position, LineReference));
+    end;
+
+    // The full stored result of the first change of a line, the result line at the given position of the response included:
+    // a new systemId on CHANGE rows that supersede the unchanged former row, every ticket relinked to it with its validity
+    // unchanged, and the admission moved for every ticket with a reversal on the old slot.
+    procedure AssertLineMoved(Response: JsonObject; Position: Integer; LineReference: Integer; AdmissionCode: Code[20]; NewSlotNo: Integer; Context: Text) NewSystemId: Guid
+    var
+        FormerRow: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        OldInitialEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketContext: Text;
+    begin
+        GetSnapshotRow(LineReference, FormerRow);
+        NewSystemId := AssertChangedLine(Response, Position, FormerRow.SystemId, FormerRow.Quantity, Context);
+        AssertChangedAdmission(Response, Position, AdmissionCode, NewSlotNo, Context);
+        AssertRowUnchanged(FormerRow, Context);
+
+        _TempSnapshotTickets.Reset();
+        _TempSnapshotTickets.SetFilter("Ticket Reservation Entry No.", '=%1', FormerRow."Entry No.");
+        _TempSnapshotTickets.FindSet();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', _TempSnapshotTickets."No.");
+        AssertChangeRows(NewSystemId, FormerRow, TicketAccessEntry.Count(), Context);
+        repeat
+            TicketContext := StrSubstNo(TicketRowContextTok, Context, _TempSnapshotTickets."External Ticket No.");
+            AssertTicketOnRow(_TempSnapshotTickets."External Ticket No.", NewSystemId, Context);
+            GetSnapshotEntry(_TempSnapshotTickets."No.", AdmissionCode, OldInitialEntry);
+            AssertTicketMoved(_TempSnapshotTickets."External Ticket No.", AdmissionCode, OldInitialEntry, NewSlotNo, Context);
+            Ticket.Get(_TempSnapshotTickets."No.");
+            _Assert.AreEqual(_TempSnapshotTickets."Valid From Date", Ticket."Valid From Date", StrSubstNo(ValidityChangedErr, TicketContext, Ticket.FieldCaption("Valid From Date")));
+            _Assert.AreEqual(_TempSnapshotTickets."Valid To Date", Ticket."Valid To Date", StrSubstNo(ValidityChangedErr, TicketContext, Ticket.FieldCaption("Valid To Date")));
+        until (_TempSnapshotTickets.Next() = 0);
+    end;
+
+    // The line kept its row, nothing supersedes it, and its tickets still point at it and stand on the initial entries of the snapshot.
+    procedure AssertLineUntouched(LineReference: Integer; Context: Text)
+    var
+        FormerRow: Record "NPR TM Ticket Reservation Req.";
+        CurrentInitialEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketContext: Text;
+    begin
+        GetSnapshotRow(LineReference, FormerRow);
+        AssertRowUnchanged(FormerRow, Context);
+        AssertNotSuperseded(FormerRow, Context);
+        _TempSnapshotTickets.Reset();
+        _TempSnapshotTickets.SetFilter("Ticket Reservation Entry No.", '=%1', FormerRow."Entry No.");
+        _TempSnapshotTickets.FindSet();
+        repeat
+            AssertTicketOnRow(_TempSnapshotTickets."External Ticket No.", FormerRow.SystemId, Context);
+            _TempSnapshotEntries.Reset();
+            _TempSnapshotEntries.SetFilter("Ticket No.", '=%1', _TempSnapshotTickets."No.");
+            _TempSnapshotEntries.FindSet();
+            repeat
+                TicketContext := StrSubstNo(TicketRowContextTok, Context, _TempSnapshotTickets."External Ticket No.");
+                CurrentInitialEntry.Reset();
+                CurrentInitialEntry.SetFilter("Ticket Access Entry No.", '=%1', _TempSnapshotEntries."Ticket Access Entry No.");
+                CurrentInitialEntry.SetFilter(Type, '=%1', CurrentInitialEntry.Type::INITIAL_ENTRY);
+                CurrentInitialEntry.SetFilter(Quantity, '>%1', 0);
+                if (not CurrentInitialEntry.FindLast()) then
+                    Clear(CurrentInitialEntry);
+                _Assert.AreEqual(_TempSnapshotEntries."Entry No.", CurrentInitialEntry."Entry No.", StrSubstNo(InitialEntryChangedErr, TicketContext, _TempSnapshotEntries."Entry No."));
+            until (_TempSnapshotEntries.Next() = 0);
+        until (_TempSnapshotTickets.Next() = 0);
+    end;
+
+    // Every ticket the line held at the snapshot stands on the slot for the admission.
+    procedure AssertLineOnSlot(LineReference: Integer; AdmissionCode: Code[20]; ExpectedSlotNo: Integer; Context: Text)
+    var
+        FormerRow: Record "NPR TM Ticket Reservation Req.";
+    begin
+        GetSnapshotRow(LineReference, FormerRow);
+        _TempSnapshotTickets.Reset();
+        _TempSnapshotTickets.SetFilter("Ticket Reservation Entry No.", '=%1', FormerRow."Entry No.");
+        _TempSnapshotTickets.FindSet();
+        repeat
+            AssertTicketOnSlot(_TempSnapshotTickets."External Ticket No.", AdmissionCode, ExpectedSlotNo, Context);
+        until (_TempSnapshotTickets.Next() = 0);
+    end;
+
+    local procedure GetSnapshotEntry(InternalTicketNo: Code[20]; AdmissionCode: Code[20]; var DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
+    var
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+    begin
+        GetAccessEntry(InternalTicketNo, AdmissionCode, TicketAccessEntry);
+        _TempSnapshotEntries.Reset();
+        _TempSnapshotEntries.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        _Assert.IsTrue(_TempSnapshotEntries.FindFirst(), StrSubstNo(SnapshotEntryMissingErr, InternalTicketNo, AdmissionCode));
+        DetTicketAccessEntry := _TempSnapshotEntries;
+    end;
+
+    // Remembers the newest request row, detailed access entry and notification entry, so a later check can prove nothing was stored.
+    procedure MarkStoredState()
+    begin
+        _MarkedRequestEntryNo := LastRequestEntryNo();
+        _MarkedAccessDetailEntryNo := LastAccessDetailEntryNo();
+        _MarkedNotificationEntryNo := LastNotificationEntryNo();
+    end;
+
+    procedure AssertNothingStoredSinceMark(Context: Text)
+    begin
+        _Assert.AreEqual(_MarkedRequestEntryNo, LastRequestEntryNo(), StrSubstNo(RequestRowWrittenErr, Context));
+        _Assert.AreEqual(_MarkedAccessDetailEntryNo, LastAccessDetailEntryNo(), StrSubstNo(AccessDetailWrittenErr, Context));
+        _Assert.AreEqual(_MarkedNotificationEntryNo, LastNotificationEntryNo(), StrSubstNo(NotificationWrittenErr, Context));
+    end;
+
+    procedure AssertNoMutexLeft(Context: Text)
+    begin
+        _Assert.IsFalse(IsReservationMutexHeld(), StrSubstNo(MutexLeftErr, Context, _Token));
+    end;
+
+    procedure AssertETicketUpdateSent(TicketNumber: Text; Context: Text)
+    var
+        Ticket: Record "NPR TM Ticket";
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+    begin
+        GetTicket(TicketNumber, Ticket);
+        NotificationEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        NotificationEntry.SetFilter("Notification Trigger", '=%1', NotificationEntry."Notification Trigger"::ETICKET_UPDATE);
+        NotificationEntry.SetFilter("Notification Send Status", '=%1', NotificationEntry."Notification Send Status"::SENT);
+        _Assert.IsFalse(NotificationEntry.IsEmpty(), StrSubstNo(ETicketUpdateNotSentErr, Context, TicketNumber));
+    end;
+
+    procedure LastNotificationEntryNo(): Integer
+    var
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+    begin
+        if (NotificationEntry.FindLast()) then
+            exit(NotificationEntry."Entry No.");
+    end;
+
+    #endregion
+
+    #region Response reading
 
     local procedure AssertErrorResponse(Response: JsonObject; ExpectedStatus: Integer; ExpectedCode: Text; Context: Text): Text
     var

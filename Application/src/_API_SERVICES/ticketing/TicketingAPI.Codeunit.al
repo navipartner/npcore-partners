@@ -48,6 +48,9 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Match('POST', '/ticket/reschedule/find')) then
             exit(Handle(_ApiFunction::RESCHEDULE_FIND, Request));
 
+        if (Request.Match('POST', '/ticket/reschedule/change')) then
+            exit(Handle(_ApiFunction::RESCHEDULE_CHANGE, Request));
+
         if (Request.Match('POST', '/ticket/import')) then
             exit(Handle(_ApiFunction::IMPORT_TICKET, Request));
 

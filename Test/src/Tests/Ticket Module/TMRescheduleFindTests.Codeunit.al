@@ -1,4 +1,4 @@
-codeunit 85501 "NPR TM Reschedule Tests"
+codeunit 85501 "NPR TM Reschedule Find Tests"
 {
     Subtype = Test;
 
@@ -350,13 +350,84 @@ codeunit 85501 "NPR TM Reschedule Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure GivenPolicyNotAllowed_WhenFind_ThenUniformNotFound()
+    procedure GivenFirstLineRevoked_WhenFindByOtherLine_ThenRevokedLineBlockedAndOtherLineMovable()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A reservation whose first line was revoked on the Ticket Request page is still found through its other line: the revoked line cannot move, reason TICKET_BLOCKED, and the other line is offered the middle and late slots.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose first line was revoked on the Ticket Request page, which blocked its tickets and set its primary row to CANCELED
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        Lib.RevokeLine(1);
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line cannot move, reason TICKET_BLOCKED, no slot offered; the second line offers the middle and late slots
+        Lib.AssertStatus(Response, 200, 'F4.a: Find by the second line after the first line was revoked');
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), false, 'TICKET_BLOCKED', '', 'F4.a: Find by the second line after the first line was revoked');
+        Lib.AssertAdmission(Response, 2, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3)), 'F4.a: Find by the second line after the first line was revoked');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenFirstLineCancelledWithoutRevoke_WhenFindByOtherLine_ThenLineNotChangeableAndOtherLineMovable()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A reservation whose first line has a CANCELED primary row and unblocked tickets is still found through its other line: the cancelled line cannot move, reason LINE_NOT_CHANGEABLE, and the other line is offered the middle and late slots.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose primary row of the first line was set to CANCELED without a revoke, so its tickets are not blocked
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        Lib.CancelLineRow(1);
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line cannot move, reason LINE_NOT_CHANGEABLE, no slot offered; the second line offers the middle and late slots
+        Lib.AssertStatus(Response, 200, 'F4.b: Find by the second line after the primary row of the first line was set to CANCELED');
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'F4.b: Find by the second line after the primary row of the first line was set to CANCELED');
+        Lib.AssertAdmission(Response, 2, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3)), 'F4.b: Find by the second line after the primary row of the first line was set to CANCELED');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenBothLinesCancelled_WhenFind_ThenUniformNotFound()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A reservation without a CONFIRMED primary row is refused with the uniform not-found error, even though its tickets are not blocked.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose primary rows of both lines were set to CANCELED without a revoke
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        Lib.CancelLineRow(1);
+        Lib.CancelLineRow(2);
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 404 resource_not_found with the ticket number message
+        Lib.AssertUniformNotFound(Response, Lib.TicketNotFoundMessage(), 'F4.c: Find when the primary rows of both lines are CANCELED');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenPolicyNotAllowed_WhenFind_ThenNotAllowed()
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Lib: Codeunit "NPR Library - TM Reschedule";
         Response: JsonObject;
     begin
-        // [SCENARIO] A reservation where no admission can move because the policy is Not Allowed is refused with the uniform not-found error.
+        // [SCENARIO] A reservation where no admission can move because the policy is Not Allowed is refused as not allowed, with the reason NOT_ALLOWED in the message.
         Initialize();
 
         // [GIVEN] A confirmed two-line reservation whose item has the reschedule policy Not Allowed
@@ -367,18 +438,18 @@ codeunit 85501 "NPR TM Reschedule Tests"
         // [WHEN] The guest calls find with the first ticket and the pin
         Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
 
-        // [THEN] HTTP 404 resource_not_found with the ticket number message
-        Lib.AssertUniformNotFound(Response, Lib.TicketNotFoundMessage(), 'S3.e: Find when the policy does not allow a move');
+        // [THEN] HTTP 400 reschedule_not_allowed with the message that no admission can move, reason NOT_ALLOWED
+        Lib.AssertNoAdmissionCanMove(Response, 'NOT_ALLOWED', 'F6: S3.e: Find when the policy does not allow a move');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure GivenTicketsValidUntilYesterday_WhenFind_ThenUniformNotFound()
+    procedure GivenTicketsValidUntilYesterday_WhenFind_ThenNotAllowed()
     var
         Lib: Codeunit "NPR Library - TM Reschedule";
         Response: JsonObject;
     begin
-        // [SCENARIO] A reservation whose tickets' validity ended before the reference date is refused with the uniform not-found error.
+        // [SCENARIO] A reservation whose tickets' validity ended before the reference date is refused as not allowed, with the reason TICKET_EXPIRED in the message.
         Initialize();
 
         // [GIVEN] A confirmed two-line reservation whose tickets were valid until yesterday
@@ -389,8 +460,83 @@ codeunit 85501 "NPR TM Reschedule Tests"
         // [WHEN] The guest calls find with the first ticket and the pin
         Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
 
+        // [THEN] HTTP 400 reschedule_not_allowed with the message that no admission can move, reason TICKET_EXPIRED
+        Lib.AssertNoAdmissionCanMove(Response, 'TICKET_EXPIRED', 'F6: S3.f: Find when every ticket has expired');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenPolicyNotAllowedOnBothLines_WhenFindByToken_ThenReasonListedOnce()
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] Find by the token of a reservation whose two lines cannot move for the same reason is refused as not allowed and lists that reason once.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation whose item has the reschedule policy Not Allowed
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        Lib.SetPolicy(TicketBom."Reschedule Policy"::NOT_ALLOWED, 0);
+
+        // [WHEN] The guest calls find with the original token and the pin
+        Response := Lib.FindByToken(Lib.GetToken(), Lib.GetPin());
+
+        // [THEN] HTTP 400 reschedule_not_allowed with the message that no admission can move, reason NOT_ALLOWED listed once
+        Lib.AssertNoAdmissionCanMove(Response, 'NOT_ALLOWED', 'F6.b: Find by token when the policy of both lines does not allow a move');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenFirstLineAdmittedAndSecondNotAllowed_WhenFind_ThenReasonsInLineOrder()
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        OtherItem: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] Find on a reservation whose first line has an admitted ticket and whose second line, of another item, has policy Not Allowed is refused as not allowed and lists both reasons in line order.
+        Initialize();
+
+        // [GIVEN] A confirmed reservation of a line of two places of the scenario item, under Until Admitted or Expired, and a line of one place of another item with policy Not Allowed, both on their early slots; the first ticket of the first line admitted
+        OtherItem.CreateEventScenario();
+        Lib.CreateEventScenario();
+        Lib.CreateReservationWithOtherItemLine('', 0, OtherItem);
+        OtherItem.SetPolicy(TicketBom."Reschedule Policy"::NOT_ALLOWED, 0);
+        Lib.MarkAdmitted(Lib.TicketNo(1, 1));
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 400 reschedule_not_allowed with the message that no admission can move, reasons ALREADY_ADMITTED and NOT_ALLOWED in line order
+        Lib.AssertNoAdmissionCanMove(Response, 'ALREADY_ADMITTED, NOT_ALLOWED', 'F6.c: Find when the first line has an admitted ticket and the second line is Not Allowed');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenNoAdmissionCanMoveAndWrongPin_WhenFind_ThenUniformNotFound()
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        OtherItem: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] Find on a reservation where no admission can move gets the uniform not-found error when the pin is wrong, so the reasons are never shown without the right pin.
+        Initialize();
+
+        // [GIVEN] A confirmed reservation of a line of two places of the scenario item, under Until Admitted or Expired, and a line of one place of another item with policy Not Allowed, both on their early slots; the first ticket of the first line admitted
+        OtherItem.CreateEventScenario();
+        Lib.CreateEventScenario();
+        Lib.CreateReservationWithOtherItemLine('', 0, OtherItem);
+        OtherItem.SetPolicy(TicketBom."Reschedule Policy"::NOT_ALLOWED, 0);
+        Lib.MarkAdmitted(Lib.TicketNo(1, 1));
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin with its last character changed
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.WrongPin());
+
         // [THEN] HTTP 404 resource_not_found with the ticket number message
-        Lib.AssertUniformNotFound(Response, Lib.TicketNotFoundMessage(), 'S3.f: Find when every ticket has expired');
+        Lib.AssertUniformNotFound(Response, Lib.TicketNotFoundMessage(), 'F6.d: Find with a wrong pin when no admission of the reservation can move');
     end;
 
     [Test]
@@ -450,6 +596,203 @@ codeunit 85501 "NPR TM Reschedule Tests"
         // [THEN] HTTP 200 with the reservation of the original token
         Lib.AssertStatus(Response, 200, 'S3.k, S10.j: Find with the right pin after six wrong pins and six finds without pinCode');
         Lib.AssertReservationToken(Response, Lib.GetToken(), 'S3.k, S10.j: Find with the right pin after six wrong pins and six finds without pinCode');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenFirstChangeSupersededBySecond_WhenFindWithFirstChangeToken_ThenCurrentState()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Assert: Codeunit Assert;
+        FirstChangeTokenResponse: JsonObject;
+        TicketResponse: JsonObject;
+        FirstTicket: Text;
+        PinCode: Text;
+        FirstChangeToken: Text[100];
+        SecondChangeToken: Text[100];
+    begin
+        // [SCENARIO] The token of a change that a later change of the same line superseded still finds the reservation in its current state: under the original token, with the line on the row and slot of the later change.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose first line was moved to the middle slot and then to the late slot through two SOAP changes
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        FirstTicket := Lib.TicketNo(1, 1);
+        FirstChangeToken := Lib.MoveLineToSlot(FirstTicket, 2);
+        SecondChangeToken := Lib.MoveLineToSlot(FirstTicket, 3);
+        PinCode := Lib.GetPin();
+
+        // [WHEN] The guest calls find with the token of the first change and the pin, and with the first ticket and the pin
+        FirstChangeTokenResponse := Lib.FindByToken(FirstChangeToken, PinCode);
+        TicketResponse := Lib.FindByTicketNumber(FirstTicket, PinCode);
+
+        // [THEN] HTTP 200 with the original token and both lines, the first line on the row of the second change with the late slot as current slot
+        Lib.AssertStatus(FirstChangeTokenResponse, 200, 'S2.d: Find by the token of the first of two changes of the first line');
+        Lib.AssertReservationToken(FirstChangeTokenResponse, Lib.GetToken(), 'S2.d: Find by the token of the first of two changes of the first line');
+        Lib.AssertLineCount(FirstChangeTokenResponse, 2, 'S2.d: Find by the token of the first of two changes of the first line');
+        Lib.AssertMovableLine(FirstChangeTokenResponse, 1, FirstTicket, 2, Lib.LineSystemId(SecondChangeToken, 1), Lib.SlotNo(3), Lib.SlotIds(Lib.SlotNo(1), Lib.SlotNo(2)), 'S2.d: Find by the token of the first of two changes of the first line');
+
+        // [THEN] The body equals the body of the find by the first ticket after the second change
+        Assert.AreEqual(Lib.ResponseBodyText(TicketResponse), Lib.ResponseBodyText(FirstChangeTokenResponse), 'S2.d: Find by the token of the first change must answer with the body of the find by a ticket after the second change.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenMovedLineRevokedOnItsChangeRow_WhenFindByOtherLine_ThenMovedLineTicketBlockedAndOtherLineMovable()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+        FirstTicket: Text;
+        ChangeToken: Text[100];
+    begin
+        // [SCENARIO] Find by the other line returns a reservation whose moved first line had its change row revoked on the Ticket Request page, with the moved line on its change row and refused with reason TICKET_BLOCKED, and the other line offered the middle and late slots.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose first line was moved to the middle slot through the SOAP change, and whose change row was then revoked on the Ticket Request page, which blocked both its tickets and set the change row to CANCELED
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        FirstTicket := Lib.TicketNo(1, 1);
+        ChangeToken := Lib.MoveLineToSlot(FirstTicket, 2);
+        Lib.RevokeCurrentLineRow(FirstTicket, 'KF1.a: Find by the second line after the change row of the moved first line was revoked');
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200 with both lines, the first line on its change row
+        Lib.AssertStatus(Response, 200, 'KF1.a: Find by the second line after the change row of the moved first line was revoked');
+        Lib.AssertLineCount(Response, 2, 'KF1.a: Find by the second line after the change row of the moved first line was revoked');
+        Lib.AssertLineSystemId(Response, 1, Lib.LineSystemId(ChangeToken, 1), 'KF1.a: Find by the second line after the change row of the moved first line was revoked');
+
+        // [THEN] The first line cannot move, reason TICKET_BLOCKED, no slot offered; the second line offers the middle and late slots
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), false, 'TICKET_BLOCKED', '', 'KF1.a: Find by the second line after the change row of the moved first line was revoked');
+        Lib.AssertAdmission(Response, 2, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3)), 'KF1.a: Find by the second line after the change row of the moved first line was revoked');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenMovedLineRevokedAndUnblocked_WhenFindByOtherLine_ThenMovedLineNotChangeable()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+        FirstTicket: Text;
+        SecondTicket: Text;
+    begin
+        // [SCENARIO] A moved line whose change row was revoked still cannot move once both its tickets are unblocked again, reason LINE_NOT_CHANGEABLE, while the other line is offered the middle and late slots.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose first line was moved to the middle slot through the SOAP change and whose change row was then revoked on the Ticket Request page; both tickets of the first line then unblocked
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        FirstTicket := Lib.TicketNo(1, 1);
+        SecondTicket := Lib.TicketNo(1, 2);
+        Lib.MoveLineToSlot(FirstTicket, 2);
+        Lib.RevokeCurrentLineRow(FirstTicket, 'KF1.b: Find by the second line after the revoked change row of the moved first line got both tickets unblocked');
+        Lib.UnblockTicket(FirstTicket);
+        Lib.UnblockTicket(SecondTicket);
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line cannot move, reason LINE_NOT_CHANGEABLE, no slot offered; the second line offers the middle and late slots
+        Lib.AssertStatus(Response, 200, 'KF1.b: Find by the second line after the revoked change row of the moved first line got both tickets unblocked');
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'KF1.b: Find by the second line after the revoked change row of the moved first line got both tickets unblocked');
+        Lib.AssertAdmission(Response, 2, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3)), 'KF1.b: Find by the second line after the revoked change row of the moved first line got both tickets unblocked');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenWaitingListLineWithoutTickets_WhenFindByOtherLine_ThenOnlyOtherLineIsReturned()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A line whose primary row is on the waiting list and holds no ticket is left out of find, so find by the other line returns only that line, offered the middle and late slots.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose first line became a waiting-list line, with its primary row set to WAITINGLIST and both its tickets deleted
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        Lib.PutLineOnWaitingListWithoutTickets(1, 'KF3.a: Find by the second line when the first line is on the waiting list without tickets');
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200 with exactly one line, the second line, which offers the middle and late slots
+        Lib.AssertStatus(Response, 200, 'KF3.a: Find by the second line when the first line is on the waiting list without tickets');
+        Lib.AssertLineCount(Response, 1, 'KF3.a: Find by the second line when the first line is on the waiting list without tickets');
+        Lib.AssertAdmission(Response, 2, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3)), 'KF3.a: Find by the second line when the first line is on the waiting list without tickets');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenConfirmedLineWithoutTickets_WhenFindByOtherLine_ThenInternalErrorLoggedAsProgrammingBug()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        SentryCapture: Codeunit "NPR Library - Sentry Capture";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A line whose CONFIRMED primary row holds no ticket is an internal inconsistency, so find answers with the fixed internal error and logs one programming-bug event that names the row without a ticket.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose first line keeps its CONFIRMED primary row while both its tickets are deleted
+        Lib.CreateEventScenario();
+        Lib.CreateTwoLineReservation(1, 1);
+        Lib.DeleteLineTickets(1, 'KF3.b: Find by the second line when the CONFIRMED primary row of the first line holds no ticket');
+        SentryCapture.Start();
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+        SentryCapture.Stop();
+
+        // [THEN] HTTP 400 generic_error with the message "An internal error occurred. The request was logged."
+        Lib.AssertInternalError(Response, 'KF3.b: Find by the second line when the CONFIRMED primary row of the first line holds no ticket');
+
+        // [THEN] Exactly one Sentry event holds the text "no ticket points at request row", and it is marked as a programming bug
+        Assert.AreEqual(1, SentryCapture.Count('no ticket points at request row', 'no ticket points at request row'), 'KF3.b: Find on a CONFIRMED line without tickets must log exactly one Sentry event with the text "no ticket points at request row".');
+        Assert.AreEqual(1, SentryCapture.Count('no ticket points at request row', 'This is a programming bug'), 'KF3.b: The Sentry event with the text "no ticket points at request row" must be marked as a programming bug.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenOnlyAdmissionWithoutSchedule_WhenFind_ThenNoTimeSlotToReschedule()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A confirmed reservation whose only admission has no schedule has no time slot to move, so find with the right pin is refused as not allowed with the message that no admission has a time slot that can be rescheduled.
+        Initialize();
+
+        // [GIVEN] The scenario item with its only admission replaced by a default admission without a schedule, and a confirmed reservation of one line of one place whose request row holds no slot
+        Lib.CreateEventScenario();
+        Lib.CreateOneLineReservationWithoutSchedule('KF5.a: Find with the right pin on a reservation whose only admission has no schedule');
+
+        // [WHEN] The guest calls find with the ticket of the line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 400 reschedule_not_allowed with the message "[RSF011] No admission of this reservation has a time slot that can be rescheduled."
+        Lib.AssertNoTimeSlotToReschedule(Response, 'KF5.a: Find with the right pin on a reservation whose only admission has no schedule');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenOnlyAdmissionWithoutScheduleAndWrongPin_WhenFind_ThenUniformNotFound()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Response: JsonObject;
+    begin
+        // [SCENARIO] Find on a reservation whose only admission has no schedule gets the uniform not-found error when the pin is wrong, so the refusal is never shown without the right pin.
+        Initialize();
+
+        // [GIVEN] The scenario item with its only admission replaced by a default admission without a schedule, and a confirmed reservation of one line of one place whose request row holds no slot
+        Lib.CreateEventScenario();
+        Lib.CreateOneLineReservationWithoutSchedule('KF5.b: Find with a wrong pin on a reservation whose only admission has no schedule');
+
+        // [WHEN] The guest calls find with the ticket of the line and the pin with its last character changed
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.WrongPin());
+
+        // [THEN] HTTP 404 resource_not_found with the ticket number message
+        Lib.AssertUniformNotFound(Response, Lib.TicketNotFoundMessage(), 'KF5.b: Find with a wrong pin on a reservation whose only admission has no schedule');
     end;
     #endregion
 
@@ -991,12 +1334,12 @@ codeunit 85501 "NPR TM Reschedule Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure GivenEveryLineAmbiguous_WhenFind_ThenUniformNotFound()
+    procedure GivenEveryLineAmbiguous_WhenFind_ThenNotAllowed()
     var
         Lib: Codeunit "NPR Library - TM Reschedule";
         Response: JsonObject;
     begin
-        // [SCENARIO] A reservation whose every line is ambiguous has nothing that can move and gets the uniform not-found error.
+        // [SCENARIO] A reservation whose every line is ambiguous has nothing that can move and is refused as not allowed, with the reason LINE_AMBIGUOUS in the message.
         Initialize();
 
         // [GIVEN] A confirmed two-line reservation whose two lines were rewritten to share line reference 0 with a single primary row
@@ -1007,8 +1350,8 @@ codeunit 85501 "NPR TM Reschedule Tests"
         // [WHEN] The guest calls find with a ticket of the shared entry and the pin
         Response := Lib.FindByTicketNumber(Lib.TicketNo(0, 1), Lib.GetPin());
 
-        // [THEN] HTTP 404 resource_not_found with the ticket number message
-        Lib.AssertUniformNotFound(Response, Lib.TicketNotFoundMessage(), 'S19.c: Find on a reservation whose every line is ambiguous');
+        // [THEN] HTTP 400 reschedule_not_allowed with the message that no admission can move, reason LINE_AMBIGUOUS
+        Lib.AssertNoAdmissionCanMove(Response, 'LINE_AMBIGUOUS', 'F6: S19.c: Find on a reservation whose every line is ambiguous');
     end;
 
     [Test]
@@ -1047,6 +1390,179 @@ codeunit 85501 "NPR TM Reschedule Tests"
         // [THEN] Nothing was written, so no new request row and no new detailed ticket access entry exist
         Assert.AreEqual(RequestEntryNoBefore, Lib.LastRequestEntryNo(), 'S16.a: Find must not write any ticket reservation request row.');
         Assert.AreEqual(AccessDetailEntryNoBefore, Lib.LastAccessDetailEntryNo(), 'S16.a: Find must not write any detailed ticket access entry.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenRefundRequestOnTheLine_WhenFind_ThenLineNotChangeable()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        RegisteredRefundResponse: JsonObject;
+        CarriedOutRefundResponse: JsonObject;
+        ExpiredRefundResponse: JsonObject;
+        RemovedRefundResponse: JsonObject;
+        OneLineResponse: JsonObject;
+        Lines: JsonArray;
+        RefundedTicket: Text;
+        OtherLineTicket: Text;
+        OtherSlots: Text;
+        RefundToken: Text[100];
+    begin
+        // [SCENARIO] A refund request of any status for a ticket of the line stops the whole line from moving with reason LINE_NOT_CHANGEABLE while the other line stays movable; the line moves again once the expiry job removed an expired refund request; and a reservation whose only line has a refund in progress is refused as not allowed with the reason LINE_NOT_CHANGEABLE.
+        Initialize();
+
+        // [GIVEN] A confirmed two-line reservation on the early slot whose first ticket has a refund request that the POS registered and has not confirmed
+        Lib.CreateEventScenario();
+        OtherSlots := Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3));
+        Lib.CreateTwoLineReservation(1, 1);
+        Lib.CreateRefundRequest(Lib.TicketNo(1, 1));
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        RegisteredRefundResponse := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line cannot move, reason LINE_NOT_CHANGEABLE, no slot offered; the second line offers the middle and late slots
+        Lib.AssertStatus(RegisteredRefundResponse, 200, 'S4.o: Find with a refund request in progress for the first ticket');
+        Lib.AssertAdmission(RegisteredRefundResponse, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'S4.o: Find with a refund request in progress for the first ticket');
+        Lib.AssertAdmission(RegisteredRefundResponse, 2, Lib.GetAdmissionCode(), true, '', OtherSlots, 'S4.o: Find with a refund request in progress for the first ticket');
+
+        // [GIVEN] A second confirmed two-line reservation whose first ticket was refunded, which blocked it, and was unblocked afterwards
+        Lib.CreateTwoLineReservation(1, 1);
+        RefundedTicket := Lib.TicketNo(1, 1);
+        RefundToken := Lib.CreateRefundRequest(RefundedTicket);
+        Lib.CarryOutRefundRequest(RefundToken);
+        Lib.UnblockTicket(RefundedTicket);
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        CarriedOutRefundResponse := Lib.FindByTicketNumber(Lib.TicketNo(2, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line cannot move, reason LINE_NOT_CHANGEABLE, no slot offered; the second line offers the middle and late slots
+        Lib.AssertStatus(CarriedOutRefundResponse, 200, 'S4.r: Find with a carried-out refund of the first ticket, unblocked later');
+        Lib.AssertAdmission(CarriedOutRefundResponse, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'S4.r: Find with a carried-out refund of the first ticket, unblocked later');
+        Lib.AssertAdmission(CarriedOutRefundResponse, 2, Lib.GetAdmissionCode(), true, '', OtherSlots, 'S4.r: Find with a carried-out refund of the first ticket, unblocked later');
+
+        // [GIVEN] A third confirmed two-line reservation whose first ticket has a refund request that the expiry job set to EXPIRED and has not removed yet
+        Lib.CreateTwoLineReservation(1, 1);
+        OtherLineTicket := Lib.TicketNo(2, 1);
+        RefundToken := Lib.CreateRefundRequest(Lib.TicketNo(1, 1));
+        Lib.ExpireRequest(RefundToken);
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin
+        ExpiredRefundResponse := Lib.FindByTicketNumber(OtherLineTicket, Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line cannot move, reason LINE_NOT_CHANGEABLE, no slot offered; the second line offers the middle and late slots
+        Lib.AssertStatus(ExpiredRefundResponse, 200, 'S4.t: Find with an expired refund request for the first ticket');
+        Lib.AssertAdmission(ExpiredRefundResponse, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'S4.t: Find with an expired refund request for the first ticket');
+        Lib.AssertAdmission(ExpiredRefundResponse, 2, Lib.GetAdmissionCode(), true, '', OtherSlots, 'S4.t: Find with an expired refund request for the first ticket');
+
+        // [GIVEN] The expiry job then removed the expired refund request
+        Lib.RemoveExpiredRequest(RefundToken);
+
+        // [WHEN] The guest calls find with the ticket of the second line and the pin again
+        RemovedRefundResponse := Lib.FindByTicketNumber(OtherLineTicket, Lib.GetPin());
+
+        // [THEN] The first line can move again and offers the middle and late slots
+        Lib.AssertStatus(RemovedRefundResponse, 200, 'S4.t: Find after the expiry job removed the expired refund request');
+        Lib.AssertAdmission(RemovedRefundResponse, 1, Lib.GetAdmissionCode(), true, '', OtherSlots, 'S4.t: Find after the expiry job removed the expired refund request');
+
+        // [GIVEN] A confirmed reservation of a single line of one place whose ticket has a refund request that the POS registered and has not confirmed
+        Lib.AddReserveLineTo(Lines, Lib.GetItemNo(), 1, Lib.GetAdmissionCode(), Lib.SlotNo(1));
+        Lib.CreateReservation(Lines);
+        Lib.ConfirmReservation(Lib.GetToken());
+        Lib.CreateRefundRequest(Lib.TicketNo(1, 1));
+
+        // [WHEN] The guest calls find with that ticket and the pin
+        OneLineResponse := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 400 reschedule_not_allowed with the message that no admission can move, reason LINE_NOT_CHANGEABLE
+        Lib.AssertNoAdmissionCanMove(OneLineResponse, 'LINE_NOT_CHANGEABLE', 'F6: S3.l: Find on a one-line reservation whose only ticket has a refund request in progress');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenLineThatStepOneCannotCopy_WhenFind_ThenLineNotChangeable()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        SecondAdmission: Codeunit "NPR Library - TM Reschedule";
+        OtherItem: Codeunit "NPR Library - TM Reschedule";
+        SentryCapture: Codeunit "NPR Library - Sentry Capture";
+        Assert: Codeunit Assert;
+        CancelledSlotResponse: JsonObject;
+        DeletedSetupResponse: JsonObject;
+        NoScheduleResponse: JsonObject;
+        NoDefaultResponse: JsonObject;
+        OtherItemSlots: Text;
+    begin
+        // [SCENARIO] A line whose tickets hold an admission that cannot be copied into a change request (current slot cancelled, admission setup line deleted, no schedule), or whose item has no default admission, reports LINE_NOT_CHANGEABLE on every admission that no earlier rule refuses, while the line of another item stays movable and no programming bug is logged.
+        Initialize();
+
+        // [GIVEN] Another item on its own admission, which every reservation below holds as its second line of one place
+        OtherItem.CreateEventScenario();
+        OtherItemSlots := OtherItem.SlotIds(OtherItem.SlotNo(2), OtherItem.SlotNo(3));
+
+        // [GIVEN] An item with a second, non-default admission; a confirmed reservation of a line of two places of it on the early slots of both admissions and a line of the other item; the current slot of the second admission then cancelled
+        Lib.CreateEventScenario();
+        SecondAdmission.CreateEventScenario();
+        Lib.AddAdmission(SecondAdmission.GetAdmissionCode(), false);
+        Lib.CreateReservationWithOtherItemLine(SecondAdmission.GetAdmissionCode(), SecondAdmission.SlotNo(1), OtherItem);
+        SecondAdmission.CancelSlot(1);
+        SentryCapture.Start();
+
+        // [WHEN] The guest calls find with the first ticket of the first line and the pin
+        CancelledSlotResponse := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+        SentryCapture.Stop();
+
+        // [THEN] HTTP 200; the first admission LINE_NOT_CHANGEABLE and the second SLOT_CANCELLED, no slot for either; the second line offers its middle and late slots; no programming-bug event
+        Lib.AssertStatus(CancelledSlotResponse, 200, 'S4.n: Find with the current slot of the second admission cancelled');
+        Lib.AssertAdmission(CancelledSlotResponse, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'S4.n: Find with the current slot of the second admission cancelled');
+        Lib.AssertAdmission(CancelledSlotResponse, 1, SecondAdmission.GetAdmissionCode(), false, 'SLOT_CANCELLED', '', 'S4.n: Find with the current slot of the second admission cancelled');
+        Lib.AssertAdmission(CancelledSlotResponse, 2, OtherItem.GetAdmissionCode(), true, '', OtherItemSlots, 'S4.n: Find with the current slot of the second admission cancelled');
+        Assert.AreEqual(0, SentryCapture.Count('This is a programming bug', 'This is a programming bug'), 'S4.n: Find with a cancelled slot of a second admission must not log any Sentry event marked as a programming bug.');
+
+        // [GIVEN] A fresh item with a second admission, a confirmed reservation as above, and the admission setup line of the second admission then deleted
+        Lib.CreateEventScenario();
+        SecondAdmission.CreateEventScenario();
+        Lib.AddAdmission(SecondAdmission.GetAdmissionCode(), false);
+        Lib.CreateReservationWithOtherItemLine(SecondAdmission.GetAdmissionCode(), SecondAdmission.SlotNo(1), OtherItem);
+        Lib.DeleteAdmissionSetupLine(SecondAdmission.GetAdmissionCode());
+        SentryCapture.Start();
+
+        // [WHEN] The guest calls find with the first ticket of the first line and the pin
+        DeletedSetupResponse := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+        SentryCapture.Stop();
+
+        // [THEN] HTTP 200; the first admission LINE_NOT_CHANGEABLE and the second NOT_CONFIGURED, no slot for either; the second line offers its middle and late slots; no programming-bug event
+        Lib.AssertStatus(DeletedSetupResponse, 200, 'S4.p: Find with the admission setup line of the second admission deleted');
+        Lib.AssertAdmission(DeletedSetupResponse, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'S4.p: Find with the admission setup line of the second admission deleted');
+        Lib.AssertAdmission(DeletedSetupResponse, 1, SecondAdmission.GetAdmissionCode(), false, 'NOT_CONFIGURED', '', 'S4.p: Find with the admission setup line of the second admission deleted');
+        Lib.AssertAdmission(DeletedSetupResponse, 2, OtherItem.GetAdmissionCode(), true, '', OtherItemSlots, 'S4.p: Find with the admission setup line of the second admission deleted');
+        Assert.AreEqual(0, SentryCapture.Count('This is a programming bug', 'This is a programming bug'), 'S4.p: Find with a deleted admission setup line of a second admission must not log any Sentry event marked as a programming bug.');
+
+        // [GIVEN] A fresh item with a second admission that has no schedule, and a confirmed reservation of a line of two places of it on the early slot and a line of the other item
+        Lib.CreateEventScenario();
+        Lib.AddAdmissionWithoutSchedule();
+        Lib.CreateReservationWithOtherItemLine('', 0, OtherItem);
+
+        // [WHEN] The guest calls find with the first ticket of the first line and the pin
+        NoScheduleResponse := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line lists only its scheduled admission, LINE_NOT_CHANGEABLE, no slot; the second line offers its middle and late slots
+        Lib.AssertStatus(NoScheduleResponse, 200, 'S4.q: Find with a second admission without a schedule');
+        Lib.AssertAdmissionCount(NoScheduleResponse, 1, 1, 'S4.q: Find with a second admission without a schedule');
+        Lib.AssertAdmission(NoScheduleResponse, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'S4.q: Find with a second admission without a schedule');
+        Lib.AssertAdmission(NoScheduleResponse, 2, OtherItem.GetAdmissionCode(), true, '', OtherItemSlots, 'S4.q: Find with a second admission without a schedule');
+
+        // [GIVEN] A fresh item, a confirmed reservation of a line of two places of it on the early slot and a line of the other item, and the default flag of the item's only admission cleared afterwards
+        Lib.CreateEventScenario();
+        Lib.CreateReservationWithOtherItemLine('', 0, OtherItem);
+        Lib.ClearDefaultAdmission();
+
+        // [WHEN] The guest calls find with the first ticket of the first line and the pin
+        NoDefaultResponse := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200; the first line cannot move, reason LINE_NOT_CHANGEABLE, no slot; the second line offers its middle and late slots
+        Lib.AssertStatus(NoDefaultResponse, 200, 'S4.s: Find with no default admission in the item''s ticket setup');
+        Lib.AssertAdmission(NoDefaultResponse, 1, Lib.GetAdmissionCode(), false, 'LINE_NOT_CHANGEABLE', '', 'S4.s: Find with no default admission in the item''s ticket setup');
+        Lib.AssertAdmission(NoDefaultResponse, 2, OtherItem.GetAdmissionCode(), true, '', OtherItemSlots, 'S4.s: Find with no default admission in the item''s ticket setup');
     end;
     #endregion
 
@@ -1208,6 +1724,132 @@ codeunit 85501 "NPR TM Reschedule Tests"
 
         // [THEN] The middle slot reports remaining capacity 2
         Lib.AssertSlotCapacity(Response, 1, Lib.SlotNo(2), 2, 'S5.j: Find with two places left on the middle slot');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenTicketOfTwoPlacesAndOnePlaceLeft_WhenFind_ThenSlotIsNotOffered()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Assert: Codeunit Assert;
+        Lines: JsonArray;
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A line of one ticket that holds 2 places needs 2 places on the new slot, so a Sales slot of capacity 11 with 10 places sold, which has 1 place left, is not offered.
+        Initialize();
+
+        // [GIVEN] The scenario item with 2 places per ticket; a confirmed reservation of one line of one ticket on the early slot; 5 tickets sold on the middle slot by another sale; the middle slot under Sales control with capacity 11
+        Lib.CreateEventScenario();
+        Lib.SetBomQuantity(2);
+        Lib.AddReserveLineTo(Lines, Lib.GetItemNo(), 1, Lib.GetAdmissionCode(), Lib.SlotNo(1));
+        Lib.CreateReservation(Lines);
+        Lib.ConfirmReservation(Lib.GetToken());
+        Lib.SellPlaces(2, 5);
+        Lib.SetSlotSalesCapacity(2, 11);
+        Assert.AreEqual(10, Lib.PlacesSoldOnSlot(2), 'F2.a: Setup: the middle slot must count 10 places sold, 2 per ticket.');
+
+        // [WHEN] The guest calls find with the ticket of the line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200 and the line offers only the late slot
+        Lib.AssertStatus(Response, 200, 'F2.a: Find for a ticket of 2 places with 1 place left on the middle slot');
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(3)), 'F2.a: Find for a ticket of 2 places with 1 place left on the middle slot');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenTicketOfTwoPlacesAndTwoPlacesLeft_WhenFind_ThenOfferedWithTwo()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Assert: Codeunit Assert;
+        Lines: JsonArray;
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A line of one ticket that holds 2 places fits a Sales slot of capacity 10 with 8 places sold, which is offered with remaining capacity 2.
+        Initialize();
+
+        // [GIVEN] The scenario item with 2 places per ticket; a confirmed reservation of one line of one ticket on the early slot; 4 tickets sold on the middle slot by another sale; the middle slot under Sales control with capacity 10
+        Lib.CreateEventScenario();
+        Lib.SetBomQuantity(2);
+        Lib.AddReserveLineTo(Lines, Lib.GetItemNo(), 1, Lib.GetAdmissionCode(), Lib.SlotNo(1));
+        Lib.CreateReservation(Lines);
+        Lib.ConfirmReservation(Lib.GetToken());
+        Lib.SellPlaces(2, 4);
+        Lib.SetSlotSalesCapacity(2, 10);
+        Assert.AreEqual(8, Lib.PlacesSoldOnSlot(2), 'F2.b: Setup: the middle slot must count 8 places sold, 2 per ticket.');
+
+        // [WHEN] The guest calls find with the ticket of the line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200, the line offers the middle and late slots, and the middle slot reports remaining capacity 2
+        Lib.AssertStatus(Response, 200, 'F2.b: Find for a ticket of 2 places with 2 places left on the middle slot');
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3)), 'F2.b: Find for a ticket of 2 places with 2 places left on the middle slot');
+        Lib.AssertSlotCapacity(Response, 1, Lib.SlotNo(2), 2, 'F2.b: Find for a ticket of 2 places with 2 places left on the middle slot');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenTicketOfTwoPlacesInFullSalesGroup_WhenFind_ThenItsTwoPlacesCountAsFree()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Assert: Codeunit Assert;
+        Lines: JsonArray;
+        Response: JsonObject;
+    begin
+        // [SCENARIO] In a Sales concurrency group of limit 10 with 10 places in use on the event day, the 2 places a line of one ticket holds on its own slot count as free, so the other slot of the group is offered with remaining capacity 2.
+        Initialize();
+
+        // [GIVEN] The scenario item with 2 places per ticket; a confirmed reservation of one line of one ticket on the early slot; the middle slot under Sales control with capacity 1000 and 4 tickets sold on it by another sale; the early and middle slots in one concurrency group by concurrency code with Sales control and limit 10
+        Lib.CreateEventScenario();
+        Lib.SetBomQuantity(2);
+        Lib.AddReserveLineTo(Lines, Lib.GetItemNo(), 1, Lib.GetAdmissionCode(), Lib.SlotNo(1));
+        Lib.CreateReservation(Lines);
+        Lib.ConfirmReservation(Lib.GetToken());
+        Lib.SetSlotSalesCapacity(2, 1000);
+        Lib.SellPlaces(2, 4);
+        Lib.AddSlotsToSalesConcurrencyGroup(1, 2, 10);
+        Assert.AreEqual(10, Lib.GroupPlacesInUseOnEventDate(2), 'F2.c: Setup: the concurrency group must count 10 places in use on the event day, 2 of them the line''s own on the early slot.');
+
+        // [WHEN] The guest calls find with the ticket of the line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200, the line offers the middle and late slots, and the middle slot reports remaining capacity 2
+        Lib.AssertStatus(Response, 200, 'F2.c: Find for a ticket of 2 places in a Sales group with 10 of 10 places in use');
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(2), Lib.SlotNo(3)), 'F2.c: Find for a ticket of 2 places in a Sales group with 10 of 10 places in use');
+        Lib.AssertSlotCapacity(Response, 1, Lib.SlotNo(2), 2, 'F2.c: Find for a ticket of 2 places in a Sales group with 10 of 10 places in use');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenGroupTicketOfSixPlacesAndFiveLeft_WhenFind_ThenSlotIsNotOffered()
+    var
+        Lib: Codeunit "NPR Library - TM Reschedule";
+        Assert: Codeunit Assert;
+        Lines: JsonArray;
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A group line of quantity 3 whose ticket holds 2 places per unit needs 6 places on the new slot, so a Sales slot of capacity 10 with 5 places sold is not offered, while the line still reports quantity 3.
+        Initialize();
+
+        // [GIVEN] 5 places of the scenario item sold on the middle slot at 1 place per ticket; the scenario item then switched to group registration at 2 places per ticket unit; a confirmed reservation of one line of quantity 3 on the early slot, issued as one ticket; the middle slot under Sales control with capacity 10
+        Lib.CreateEventScenario();
+        Lib.SellPlaces(2, 5);
+        Lib.SetBomQuantity(2);
+        Lib.UseGroupRegistration();
+        Lib.AddReserveLineTo(Lines, Lib.GetItemNo(), 3, Lib.GetAdmissionCode(), Lib.SlotNo(1));
+        Lib.CreateReservation(Lines);
+        Lib.ConfirmReservation(Lib.GetToken());
+        Assert.AreEqual(1, Lib.TicketCount(1), 'F2.d: Setup: group registration must issue one ticket for the whole line of quantity 3.');
+        Lib.SetSlotSalesCapacity(2, 10);
+        Assert.AreEqual(5, Lib.PlacesSoldOnSlot(2), 'F2.d: Setup: the middle slot must count 5 places sold.');
+
+        // [WHEN] The guest calls find with the single ticket of the group line and the pin
+        Response := Lib.FindByTicketNumber(Lib.TicketNo(1, 1), Lib.GetPin());
+
+        // [THEN] HTTP 200, the line reports quantity 3 and offers only the late slot
+        Lib.AssertStatus(Response, 200, 'F2.d: Find for a group ticket of 6 places with 5 places left on the middle slot');
+        Lib.AssertLineQuantity(Response, 1, 3, 'F2.d: Find for a group ticket of 6 places with 5 places left on the middle slot');
+        Lib.AssertAdmission(Response, 1, Lib.GetAdmissionCode(), true, '', Lib.SlotIds(Lib.SlotNo(3)), 'F2.d: Find for a group ticket of 6 places with 5 places left on the middle slot');
     end;
 
     [Test]

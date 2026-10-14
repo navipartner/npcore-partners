@@ -93,6 +93,8 @@ codeunit 6185082 "NPR TicketingApiHandler"
             // Reschedule
             _ApiFunction::RESCHEDULE_FIND:
                 _Response := Reschedule.FindReservation(_Request);
+            _ApiFunction::RESCHEDULE_CHANGE:
+                _Response := Reschedule.ChangeReservation(_Request);
 
             // Import
             _ApiFunction::IMPORT_TICKET:

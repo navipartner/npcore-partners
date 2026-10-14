@@ -1400,29 +1400,10 @@
 
     procedure ConfirmChangeRequest(Token: Text[100]);
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        DateTimeLbl: Label '%1 - %2', Locked = true;
         CapacityWebHook: Codeunit "NPR TM CapacityWebHook";
     begin
 
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.FindSet();
-        repeat
-            TicketReservationRequest."Request Status Date Time" := CurrentDateTime();
-            TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
-            TicketReservationRequest."Admission Created" := (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
-            TicketReservationRequest."Scheduled Time Description" := '';
-            if (TicketReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
-                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
-                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                if (AdmissionScheduleEntry.FindLast()) then
-                    TicketReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
-            end;
-            TicketReservationRequest.Modify();
-
-        until (TicketReservationRequest.Next() = 0);
+        MarkChangeRequestConfirmed(Token);
 
         OnAfterConfirmTicketChangeRequestPublisher(Token);
         CapacityWebHook.EmitTouchedEntries();
@@ -1458,6 +1439,43 @@
         OnAfterConfirmTicketChangeRequestPublisher(Token);
         CapacityWebHook.EmitTouchedEntries();
 
+    end;
+
+    internal procedure MarkChangeRequestsConfirmed(Tokens: List of [Text[100]])
+    var
+        Token: Text[100];
+    begin
+        foreach Token in Tokens do
+            MarkChangeRequestConfirmed(Token);
+    end;
+
+    local procedure MarkChangeRequestConfirmed(Token: Text[100])
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        DateTimeLbl: Label '%1 - %2', Locked = true;
+    begin
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.FindSet();
+        repeat
+            TicketReservationRequest."Request Status Date Time" := CurrentDateTime();
+            TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
+            TicketReservationRequest."Admission Created" := (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+            TicketReservationRequest."Scheduled Time Description" := '';
+            if (TicketReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
+                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                if (AdmissionScheduleEntry.FindLast()) then
+                    TicketReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+            end;
+            TicketReservationRequest.Modify();
+        until (TicketReservationRequest.Next() = 0);
+    end;
+
+    internal procedure PublishChangeRequestConfirmed(Token: Text[100])
+    begin
+        OnAfterConfirmTicketChangeRequestPublisher(Token);
     end;
 
     procedure DeleteReservationTokenRequest(Token: Text[100])
@@ -2196,7 +2214,6 @@
         TicketChangeRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         Admission: Record "NPR TM Admission";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -2292,15 +2309,7 @@
                     TicketChangeRequest."Primary Request Line" := TicketBom.Default;
                     TicketChangeRequest."Admission Description" := Admission.Description;
 
-                    DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-                    DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-                    DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
-                    if (DetTicketAccessEntry.FindLast()) then
-                        TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
-
-                    DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
-                    if (DetTicketAccessEntry.FindLast()) then
-                        TicketChangeRequest."External Adm. Sch. Entry No." := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+                    ReadCurrentSlot(TicketAccessEntry."Entry No.", IsolationLevel::Default, TicketChangeRequest."External Adm. Sch. Entry No.");
 
                     AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketChangeRequest."External Adm. Sch. Entry No.");
                     AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
@@ -2317,6 +2326,22 @@
 
         exit(true);
 
+    end;
+
+    internal procedure ReadCurrentSlot(TicketAccessEntryNo: Integer; ReadIsolationParam: IsolationLevel; var Slot: Integer)
+    var
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        DetTicketAccessEntry.ReadIsolation := ReadIsolationParam;
+        DetTicketAccessEntry.SetLoadFields("External Adm. Sch. Entry No.");
+        DetTicketAccessEntry.SetRange("Ticket Access Entry No.", TicketAccessEntryNo);
+        DetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+        DetTicketAccessEntry.SetRange(Type, DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        if (DetTicketAccessEntry.FindLast()) then
+            Slot := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+        DetTicketAccessEntry.SetRange(Type, DetTicketAccessEntry.Type::RESERVATION);
+        if (DetTicketAccessEntry.FindLast()) then
+            Slot := DetTicketAccessEntry."External Adm. Sch. Entry No.";
     end;
 
 
