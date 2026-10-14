@@ -64,5 +64,9 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'Hospitality QR Orders Amount LCY', Locked = true;
     }
+    value(15; TICKETS_SOLD_COUNT)
+    {
+        Caption = 'Tickets Sold Count', Locked = true;
+    }
 }
 #endif

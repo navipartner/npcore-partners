@@ -66,6 +66,7 @@ codeunit 85497 "NPR Mock Customer Metric" implements "NPR ICustomer Metric"
     procedure Calculate(var MetricSync: Record "NPR Customer Metric Sync"; var Metadata: JsonObject): Decimal
     var
         OverlappingMetricSync: Record "NPR Customer Metric Sync";
+        OpenEntry: Record "NPR Customer Metric Open Entry";
     begin
         _CalculateCount += 1;
         if (_FailWith <> '') and ((_FailOnDate = 0D) or (_FailOnDate = MetricSync."Business Date")) then
@@ -74,6 +75,10 @@ codeunit 85497 "NPR Mock Customer Metric" implements "NPR ICustomer Metric"
             OverlappingMetricSync.Metric := MetricSync.Metric;
             OverlappingMetricSync."Business Date" := MetricSync."Business Date";
             OverlappingMetricSync.Insert();
+            Commit();
+            OpenEntry.Metric := MetricSync.Metric;
+            OpenEntry."Entry No." := 1;
+            OpenEntry.Insert();
         end;
         MetricSync."Last Entry No." := _LastEntryNo;
         if _MetadataKey <> '' then

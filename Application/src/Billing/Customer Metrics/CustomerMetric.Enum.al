@@ -13,4 +13,9 @@ enum 6014660 "NPR Customer Metric" implements "NPR ICustomer Metric"
         Caption = 'G/L Revenue';
         Implementation = "NPR ICustomer Metric" = "NPR GL Revenue Metric";
     }
+    value(3; TicketsSold)
+    {
+        Caption = 'Tickets Sold';
+        Implementation = "NPR ICustomer Metric" = "NPR Tickets Sold Metric";
+    }
 }

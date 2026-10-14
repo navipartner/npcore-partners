@@ -58,11 +58,15 @@ codeunit 6151251 "NPR Customer Metrics JQ"
 
     internal procedure TrySendMetric(Metric: Enum "NPR Customer Metric"; MetricImplementation: Interface "NPR ICustomer Metric"; Sender: Interface "NPR ICustomer Metric Sender"; BusinessDate: Date; var ErrorText: Text): Boolean
     var
+        MetricSync: Record "NPR Customer Metric Sync";
         MetricRunner: Codeunit "NPR Customer Metric Runner";
     begin
         ErrorText := '';
         MetricRunner.Initialize(Metric, MetricImplementation, Sender, BusinessDate);
         if MetricRunner.Run() then
+            exit(true);
+        // A run that lost the business date to an overlapping run fails on purpose, and the date is sent
+        if MetricSync.Get(Metric, BusinessDate) then
             exit(true);
 
         ErrorText := GetLastErrorText();

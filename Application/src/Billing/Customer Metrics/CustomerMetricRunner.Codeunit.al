@@ -16,6 +16,7 @@ codeunit 6151257 "NPR Customer Metric Runner"
         Metadata: JsonObject;
         Quantity: Decimal;
         BusinessDateKeyTok: Label 'business_date', Locked = true;
+        SentByOverlappingRunErr: Label 'An overlapping run already sent %1 for business date %2.', Comment = '%1 = customer metric, %2 = business date';
     begin
         if MetricSync.Get(_Metric, _BusinessDate) then
             exit;
@@ -27,7 +28,8 @@ codeunit 6151257 "NPR Customer Metric Runner"
         Metadata.Add(BusinessDateKeyTok, Format(_BusinessDate, 0, 9));
 
         if not MetricSync.Insert() then
-            exit;
+            // Rolls back what the calculation changed, such as a delta metric's remembered entries, since only the run that sent the date may keep its changes
+            Error(SentByOverlappingRunErr, _Metric, _BusinessDate);
         _Sender.RegisterEvent(MetricSync.SystemId, _MetricImplementation.GetEventType(), Quantity, Metadata);
     end;
 

@@ -1,8 +1,6 @@
 codeunit 6151256 "NPR GL Revenue Metric" implements "NPR ICustomer Metric"
 {
     Access = Internal;
-    Permissions =
-        TableData "NPR Customer Metric Sync" = R;
 
     procedure GetEventType(): Enum "NPR Billing Event Type"
     begin
@@ -53,17 +51,10 @@ codeunit 6151256 "NPR GL Revenue Metric" implements "NPR ICustomer Metric"
 
     local procedure LastSentEntryNo(MetricSync: Record "NPR Customer Metric Sync"): Integer
     var
-        SentMetricSync: Record "NPR Customer Metric Sync";
+        SentEntryNo: Integer;
     begin
-        SentMetricSync.ReadIsolation := IsolationLevel::UpdLock;
-        SentMetricSync.SetCurrentKey(Metric, "Last Entry No.");
-        SentMetricSync.SetRange(Metric, MetricSync.Metric);
-        SentMetricSync.SetLoadFields("Last Entry No.");
-        if SentMetricSync.FindLast() then begin
-            // The locked read waits for an overlapping run to commit, but then returns the row it waited on, so it is repeated to see the position that run stored
-            SentMetricSync.FindLast();
-            exit(SentMetricSync."Last Entry No.");
-        end;
+        if MetricSync.FindLastSentEntryNo(SentEntryNo) then
+            exit(SentEntryNo);
         // The first event starts at the business date instead of covering the whole history
         exit(LastEntryNoRegisteredBefore(CreateDateTime(MetricSync."Business Date", 0T)));
     end;

@@ -116,15 +116,18 @@ codeunit 85496 "NPR Customer Metrics Tests"
     end;
 
     [Test]
-    procedure TrySendMetric_OverlappingRunSentTheDate_EndsWithoutSending()
+    procedure TrySendMetric_OverlappingRunSentTheDate_RollsBackWithoutSending()
     var
         MetricSync: Record "NPR Customer Metric Sync";
+        OpenEntry: Record "NPR Customer Metric Open Entry";
         MockMetric: Codeunit "NPR Mock Customer Metric";
         MockSender: Codeunit "NPR Mock Cust. Metric Sender";
         CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
         BusinessDate: Date;
         ErrorText: Text;
     begin
+        OpenEntry.SetRange(Metric, Enum::"NPR Customer Metric"::ActivePOSUnits7D);
+        OpenEntry.DeleteAll();
         BusinessDate := PrepareBusinessDate(31);
         MockMetric.SetValue(2, '', '');
         MockMetric.SimulateOverlappingRun();
@@ -133,6 +136,7 @@ codeunit 85496 "NPR Customer Metrics Tests"
 
         _Assert.AreEqual(0, MockSender.EventCount(), 'Only the run that stored the sync row may send the event');
         _Assert.IsTrue(MetricSync.Get(Enum::"NPR Customer Metric"::ActivePOSUnits7D, BusinessDate), 'The sync row of the other run must be kept');
+        _Assert.IsTrue(OpenEntry.IsEmpty(), 'What the losing run changed must be rolled back, or a delta metric could count its entries twice or lose them');
     end;
 
     [Test]
@@ -290,6 +294,16 @@ codeunit 85496 "NPR Customer Metrics Tests"
         CustomerMetric := Enum::"NPR Customer Metric"::GLRevenue;
         _Assert.AreEqual(Enum::"NPR Billing Event Type"::GL_REVENUE_AMOUNT_LCY.AsInteger(), CustomerMetric.GetEventType().AsInteger(), 'G/L Revenue must be sent as GL_REVENUE_AMOUNT_LCY');
         _Assert.IsTrue(CustomerMetric.IsDelta(), 'G/L Revenue is a delta, so missed dates must not be caught up');
+    end;
+
+    [Test]
+    procedure CustomerMetric_TicketsSold_IsADeltaSentAsTicketsSoldCount()
+    var
+        CustomerMetric: Interface "NPR ICustomer Metric";
+    begin
+        CustomerMetric := Enum::"NPR Customer Metric"::TicketsSold;
+        _Assert.AreEqual(Enum::"NPR Billing Event Type"::TICKETS_SOLD_COUNT.AsInteger(), CustomerMetric.GetEventType().AsInteger(), 'Tickets Sold must be sent as TICKETS_SOLD_COUNT');
+        _Assert.IsTrue(CustomerMetric.IsDelta(), 'Tickets Sold is a delta, so missed dates must not be caught up');
     end;
 
     [Test]
@@ -552,6 +566,252 @@ codeunit 85496 "NPR Customer Metrics Tests"
 
     #endregion
 
+    #region [Tickets sold]
+
+    [Test]
+    procedure TicketsSold_CountsTicketsOfConfirmedNewSalesOnly()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        ItemNo: Code[20];
+        LastEntryNo: Integer;
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        ItemNo := CreateTicketItem(false);
+
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CONFIRMED, 3, TicketRequest."Entry Type"::PRIMARY, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::RESERVED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CONFIRMED, 3, TicketRequest."Entry Type"::PRIMARY, false);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CANCELED, 4, TicketRequest."Entry Type"::PRIMARY, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::EXPIRED, 5, TicketRequest."Entry Type"::PRIMARY, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::WAITINGLIST, 6, TicketRequest."Entry Type"::PRIMARY, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CONFIRMED, 7, TicketRequest."Entry Type"::CHANGE, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CONFIRMED, -1, TicketRequest."Entry Type"::PRIMARY, true);
+        LastEntryNo := InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CANCELED, 1, TicketRequest."Entry Type"::REVOKE, true);
+
+        _Assert.AreEqual(5, CountTicketsSold(MetricSync), 'Only confirmed or reserved primary lines of new sales may count, without changes, returns or revokes');
+        _Assert.AreEqual(LastEntryNo, MetricSync."Last Entry No.", 'The sync row must keep the last request, so the next event starts after it');
+        _Assert.AreEqual(1, OpenTicketRequestCount(), 'Only the expired request can still be reserved again, so only it is remembered');
+    end;
+
+    [Test]
+    procedure TicketsSold_GroupTicketCountsAsOneTicket()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+
+        InsertTicketRequest(CreateTicketItem(true), TicketRequest."Request Status"::CONFIRMED, 5, TicketRequest."Entry Type"::PRIMARY, true);
+        InsertTicketRequest(CreateTicketItem(false), TicketRequest."Request Status"::CONFIRMED, 5, TicketRequest."Entry Type"::PRIMARY, true);
+
+        _Assert.AreEqual(6, CountTicketsSold(MetricSync), 'A group ticket for 5 persons is one ticket, 5 individual tickets are 5');
+    end;
+
+    [Test]
+    procedure TicketsSold_UnconfirmedRequestIsCountedByTheRunAfterItsConfirmation()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        ItemNo: Code[20];
+        UnconfirmedEntryNo: Integer;
+        LastEntryNo: Integer;
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        ItemNo := CreateTicketItem(false);
+        UnconfirmedEntryNo := InsertTicketRequest(ItemNo, TicketRequest."Request Status"::REGISTERED, 1, TicketRequest."Entry Type"::PRIMARY, true);
+        LastEntryNo := InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CONFIRMED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+
+        _Assert.AreEqual(2, CountTicketsSold(MetricSync), 'A confirmed sale must not wait for an unconfirmed request before it');
+        _Assert.AreEqual(LastEntryNo, MetricSync."Last Entry No.", 'The position must move past the unconfirmed request');
+        _Assert.AreEqual(1, OpenTicketRequestCount(), 'The unconfirmed request must be remembered');
+
+        MetricSync.Insert();
+        InitTicketsSoldSync(MetricSync, Today() + 1);
+
+        _Assert.AreEqual(0, CountTicketsSold(MetricSync), 'A run before the confirmation has nothing to count');
+        _Assert.AreEqual(1, OpenTicketRequestCount(), 'A request that is still unconfirmed must stay remembered');
+
+        MetricSync.Insert();
+        ConfirmTicketRequest(UnconfirmedEntryNo);
+        InitTicketsSoldSync(MetricSync, Today() + 2);
+
+        _Assert.AreEqual(1, CountTicketsSold(MetricSync), 'The next run must count the request confirmed since the last run');
+        _Assert.AreEqual(0, OpenTicketRequestCount(), 'A counted request must be forgotten, so it is never counted again');
+    end;
+
+    [Test]
+    procedure TicketsSold_ExpiredRequestStillOpenAfterTheFollowPeriodIsForgotten()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketsSoldMetric: Codeunit "NPR Tickets Sold Metric";
+        UnconfirmedEntryNo: Integer;
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        UnconfirmedEntryNo := InsertTicketRequest(CreateTicketItem(false), TicketRequest."Request Status"::REGISTERED, 1, TicketRequest."Entry Type"::PRIMARY, true);
+        SetTicketRequestExpiry(UnconfirmedEntryNo, CurrentDateTime() - 60000);
+        CountTicketsSold(MetricSync);
+        MetricSync.Insert();
+        InitTicketsSoldSync(MetricSync, Today() + 1);
+
+        TicketsSoldMetric.CountTicketsSold(MetricSync, CurrentDateTime() + 60000, CurrentDateTime() + 60000);
+
+        _Assert.AreEqual(0, OpenTicketRequestCount(), 'An expired request that is still unconfirmed after the follow period must be forgotten');
+        MetricSync.Insert();
+        ConfirmTicketRequest(UnconfirmedEntryNo);
+        InitTicketsSoldSync(MetricSync, Today() + 2);
+        _Assert.AreEqual(0, CountTicketsSold(MetricSync), 'A forgotten request is not counted when it is confirmed later');
+    end;
+
+    [Test]
+    procedure TicketsSold_RequestIsFollowedAfterTheFollowPeriodUntilItExpires()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketsSoldMetric: Codeunit "NPR Tickets Sold Metric";
+        UnconfirmedEntryNo: Integer;
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        UnconfirmedEntryNo := InsertTicketRequest(CreateTicketItem(false), TicketRequest."Request Status"::REGISTERED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+        SetTicketRequestExpiry(UnconfirmedEntryNo, CreateDateTime(CalcDate('<+10Y>', Today()), Time()));
+
+        _Assert.AreEqual(0, TicketsSoldMetric.CountTicketsSold(MetricSync, CurrentDateTime() + 60000, CurrentDateTime() + 60000), 'An unconfirmed request is not sold');
+        _Assert.AreEqual(1, OpenTicketRequestCount(), 'A request older than the follow period must be remembered while it has not expired');
+
+        MetricSync.Insert();
+        ConfirmTicketRequest(UnconfirmedEntryNo);
+        InitTicketsSoldSync(MetricSync, Today() + 1);
+
+        _Assert.AreEqual(2, TicketsSoldMetric.CountTicketsSold(MetricSync, CurrentDateTime() + 60000, CurrentDateTime() + 60000), 'A request confirmed after the follow period must be counted, although its confirmation cleared the expiry');
+        _Assert.AreEqual(0, OpenTicketRequestCount(), 'A counted request must be forgotten, so it is never counted again');
+    end;
+
+    [Test]
+    procedure TicketsSold_DeletedRequestIsForgotten()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        TicketRequest.Get(InsertTicketRequest(CreateTicketItem(false), TicketRequest."Request Status"::EXPIRED, 2, TicketRequest."Entry Type"::PRIMARY, true));
+        CountTicketsSold(MetricSync);
+        _Assert.AreEqual(1, OpenTicketRequestCount(), 'An expired request that the expiry sweep has not deleted yet must be remembered');
+        MetricSync.Insert();
+        TicketRequest.Delete();
+        InitTicketsSoldSync(MetricSync, Today() + 1);
+
+        _Assert.AreEqual(0, CountTicketsSold(MetricSync), 'A deleted request is not sold');
+        _Assert.AreEqual(0, OpenTicketRequestCount(), 'A request deleted by the expiry sweep must be forgotten');
+    end;
+
+    [Test]
+    procedure TicketsSold_POSLineWithoutTimeSlotIsCountedOnceItIsSold()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        ItemNo: Code[20];
+        POSLineEntryNo: Integer;
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        ItemNo := CreateTicketItem(false);
+        POSLineEntryNo := InsertTicketRequest(ItemNo, TicketRequest."Request Status"::WIP, 3, TicketRequest."Entry Type"::PRIMARY, false);
+        TicketRequest.Get(POSLineEntryNo);
+        TicketRequest."Receipt No." := 'POS-1';
+        TicketRequest.Modify();
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CONFIRMED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+
+        _Assert.AreEqual(2, CountTicketsSold(MetricSync), 'The POS line waiting for its time slot is not sold yet');
+        _Assert.AreEqual(1, OpenTicketRequestCount(), 'A POS line has no primary flag until its time slot is chosen, but must be remembered');
+
+        MetricSync.Insert();
+        TicketRequest.Get(POSLineEntryNo);
+        TicketRequest."Primary Request Line" := true;
+        TicketRequest."Request Status" := TicketRequest."Request Status"::CONFIRMED;
+        TicketRequest.Modify();
+        InitTicketsSoldSync(MetricSync, Today() + 1);
+
+        _Assert.AreEqual(3, CountTicketsSold(MetricSync), 'The POS line must be counted once it becomes the primary line and is sold');
+    end;
+
+    [Test]
+    procedure TicketsSold_ExpiredRequestReservedAgainIsCountedOnceSold()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        ExpiredEntryNo: Integer;
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        ExpiredEntryNo := InsertTicketRequest(CreateTicketItem(false), TicketRequest."Request Status"::EXPIRED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+
+        _Assert.AreEqual(0, CountTicketsSold(MetricSync), 'An expired request is not sold');
+        _Assert.AreEqual(1, OpenTicketRequestCount(), 'An expired request that the expiry sweep has not deleted yet can be reserved again, so it must be remembered');
+
+        MetricSync.Insert();
+        ConfirmTicketRequest(ExpiredEntryNo);
+        InitTicketsSoldSync(MetricSync, Today() + 1);
+
+        _Assert.AreEqual(2, CountTicketsSold(MetricSync), 'The request must be counted once it is reserved again and confirmed');
+    end;
+
+    [Test]
+    procedure TicketsSold_RefundRescheduleOrFailedLineIsNotRemembered()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        ItemNo: Code[20];
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        ItemNo := CreateTicketItem(false);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::REGISTERED, 1, TicketRequest."Entry Type"::REVOKE, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::WIP, 1, TicketRequest."Entry Type"::CHANGE, true);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::REGISTERED, 1, TicketRequest."Entry Type"::PRIMARY, false);
+        InsertTicketRequest(ItemNo, TicketRequest."Request Status"::CONFIRMED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+
+        _Assert.AreEqual(2, CountTicketsSold(MetricSync), 'Only the confirmed sale counts');
+        _Assert.AreEqual(0, OpenTicketRequestCount(), 'A refund, a reschedule or a line left by a failed issue can never become a sale, so it must not be remembered');
+    end;
+
+    [Test]
+    procedure TicketsSold_RequestsInsertedTooRecentlyWaitForTheNextRun()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        SentMetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketsSoldMetric: Codeunit "NPR Tickets Sold Metric";
+        SentEntryNo: Integer;
+    begin
+        StartTicketsSoldAfterLastRequest(MetricSync);
+        SentMetricSync.SetRange(Metric, Enum::"NPR Customer Metric"::TicketsSold);
+        SentMetricSync.FindFirst();
+        SentEntryNo := SentMetricSync."Last Entry No.";
+        InsertTicketRequest(CreateTicketItem(false), TicketRequest."Request Status"::CONFIRMED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+
+        _Assert.AreEqual(0, TicketsSoldMetric.CountTicketsSold(MetricSync, CurrentDateTime() - 60000, CurrentDateTime() - 60000), 'A request inserted after the cut-off may still be uncommitted, so it must wait for the next run');
+        _Assert.AreEqual(SentEntryNo, MetricSync."Last Entry No.", 'The position must not move past requests inserted after the cut-off');
+    end;
+
+    [Test]
+    procedure TicketsSold_FirstEventStartsAtTheBusinessDate()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Baseline: Decimal;
+    begin
+        DeleteTicketsSoldSyncRows();
+        InitTicketsSoldSync(MetricSync, Today());
+        Baseline := CountTicketsSold(MetricSync);
+        DeleteOpenTicketRequests();
+
+        InsertTicketRequest(CreateTicketItem(false), TicketRequest."Request Status"::CONFIRMED, 2, TicketRequest."Entry Type"::PRIMARY, true);
+
+        _Assert.AreEqual(Baseline + 2, CountTicketsSold(MetricSync), 'The first event must count the requests created since the start of the business date');
+        InitTicketsSoldSync(MetricSync, Today() + 1);
+        _Assert.AreEqual(0, CountTicketsSold(MetricSync), 'The first event must not count requests created before the business date');
+    end;
+
+    #endregion
+
     #region [Helpers]
 
     local procedure PrepareBusinessDate(Offset: Integer) BusinessDate: Date
@@ -693,6 +953,114 @@ codeunit 85496 "NPR Customer Metrics Tests"
         GLEntry: Record "G/L Entry";
     begin
         exit(CopyStr(_LibraryUtility.GenerateRandomCode(GLEntry.FieldNo("Business Unit Code"), Database::"G/L Entry"), 1, MaxStrLen(GLEntry."Business Unit Code")));
+    end;
+
+    local procedure CountTicketsSold(var MetricSync: Record "NPR Customer Metric Sync"): Integer
+    var
+        TicketsSoldMetric: Codeunit "NPR Tickets Sold Metric";
+    begin
+        exit(TicketsSoldMetric.CountTicketsSold(MetricSync, CurrentDateTime() + 60000, CurrentDateTime() - 60000));
+    end;
+
+    local procedure StartTicketsSoldAfterLastRequest(var MetricSync: Record "NPR Customer Metric Sync")
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        SentMetricSync: Record "NPR Customer Metric Sync";
+    begin
+        DeleteTicketsSoldSyncRows();
+        TicketRequest.SetLoadFields("Entry No.");
+        if TicketRequest.FindLast() then;
+        InitTicketsSoldSync(SentMetricSync, Today() - 1);
+        SentMetricSync."Last Entry No." := TicketRequest."Entry No.";
+        SentMetricSync.Insert();
+        InitTicketsSoldSync(MetricSync, Today());
+    end;
+
+    local procedure InitTicketsSoldSync(var MetricSync: Record "NPR Customer Metric Sync"; BusinessDate: Date)
+    begin
+        MetricSync.Init();
+        MetricSync.Metric := Enum::"NPR Customer Metric"::TicketsSold;
+        MetricSync."Business Date" := BusinessDate;
+    end;
+
+    local procedure DeleteTicketsSoldSyncRows()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+    begin
+        MetricSync.SetRange(Metric, Enum::"NPR Customer Metric"::TicketsSold);
+        MetricSync.DeleteAll();
+        DeleteOpenTicketRequests();
+    end;
+
+    local procedure DeleteOpenTicketRequests()
+    var
+        OpenEntry: Record "NPR Customer Metric Open Entry";
+    begin
+        OpenEntry.SetRange(Metric, Enum::"NPR Customer Metric"::TicketsSold);
+        OpenEntry.DeleteAll();
+    end;
+
+    local procedure OpenTicketRequestCount(): Integer
+    var
+        OpenEntry: Record "NPR Customer Metric Open Entry";
+    begin
+        OpenEntry.SetRange(Metric, Enum::"NPR Customer Metric"::TicketsSold);
+        exit(OpenEntry.Count());
+    end;
+
+    local procedure ConfirmTicketRequest(EntryNo: Integer)
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketRequest.Get(EntryNo);
+        TicketRequest."Request Status" := TicketRequest."Request Status"::CONFIRMED;
+        TicketRequest."Expires Date Time" := CreateDateTime(0D, 0T);
+        TicketRequest.Modify();
+    end;
+
+    local procedure SetTicketRequestExpiry(EntryNo: Integer; ExpiresDateTime: DateTime)
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketRequest.Get(EntryNo);
+        TicketRequest."Expires Date Time" := ExpiresDateTime;
+        TicketRequest.Modify();
+    end;
+
+    local procedure CreateTicketItem(GroupTicket: Boolean): Code[20]
+    var
+        Item: Record Item;
+        TicketType: Record "NPR TM Ticket Type";
+    begin
+        TicketType.Init();
+        TicketType.Code := CopyStr(_LibraryUtility.GenerateRandomCode(TicketType.FieldNo(Code), Database::"NPR TM Ticket Type"), 1, MaxStrLen(TicketType.Code));
+        TicketType."Is Ticket" := true;
+        if GroupTicket then
+            TicketType."Admission Registration" := TicketType."Admission Registration"::GROUP
+        else
+            TicketType."Admission Registration" := TicketType."Admission Registration"::INDIVIDUAL;
+        TicketType.Insert();
+        Item.Init();
+        Item."No." := CopyStr(_LibraryUtility.GenerateRandomCode(Item.FieldNo("No."), Database::Item), 1, MaxStrLen(Item."No."));
+        Item."NPR Ticket Type" := TicketType.Code;
+        Item.Insert();
+        exit(Item."No.");
+    end;
+
+    local procedure InsertTicketRequest(ItemNo: Code[20]; RequestStatus: Option; Quantity: Integer; EntryType: Option; PrimaryRequestLine: Boolean): Integer
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketRequest.Init();
+        TicketRequest."Entry No." := 0;
+        TicketRequest."Item No." := ItemNo;
+        TicketRequest."Request Status" := RequestStatus;
+        TicketRequest.Quantity := Quantity;
+        TicketRequest."Entry Type" := EntryType;
+        TicketRequest."Revoke Ticket Request" := EntryType = TicketRequest."Entry Type"::REVOKE;
+        TicketRequest."Primary Request Line" := PrimaryRequestLine;
+        TicketRequest.Insert();
+        exit(TicketRequest."Entry No.");
     end;
 
     local procedure NewStoreCode(): Code[10]
