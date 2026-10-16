@@ -27,12 +27,23 @@ table 6060006 "NPR MM AzureMemberRegSetup"
             trigger OnValidate()
             var
                 AzureMemberRegistration: Codeunit "NPR MM AzureMemberRegistration";
+                CFMemberRegistration: Codeunit "NPR MM CFMemberRegistration";
             begin
-                if ((not XRec.Enabled) and (Rec.Enabled)) then begin
-                    Rec.TestField(QueueName);
-                    Rec.TestField(AzureStorageAccountName);
-                    AzureMemberRegistration.CheckIfStorageAccountQueueExist(Rec.AzureStorageAccountName, Rec.QueueName)
-                end;
+                if ((not XRec.Enabled) and (Rec.Enabled)) then
+                    case Rec.Provider of
+                        Rec.Provider::Azure:
+                            begin
+                                Rec.TestField(QueueName);
+                                Rec.TestField(AzureStorageAccountName);
+                                AzureMemberRegistration.CheckIfStorageAccountQueueExist(Rec.AzureStorageAccountName, Rec.QueueName);
+                            end;
+                        Rec.Provider::Cloudflare:
+                            begin
+                                Rec.TestField(QueueName);
+                                Rec.TestField(CFWorkerBaseUrl);
+                                CFMemberRegistration.ValidateWorker(Rec);
+                            end;
+                    end;
             end;
         }
         field(30; MemberRegistrationUrl; Text[100])
@@ -62,7 +73,7 @@ table 6060006 "NPR MM AzureMemberRegSetup"
 
         field(60; QueueName; Text[64])
         {
-            Caption = 'Queue Name';
+            Caption = 'Partition Key';
             DataClassification = CustomerContent;
         }
 
@@ -102,6 +113,24 @@ table 6060006 "NPR MM AzureMemberRegSetup"
         {
             Caption = 'Allow Anonymous Wallet';
             DataClassification = CustomerContent;
+        }
+        field(85; Provider; Enum "NPR MM RegistrationProvider")
+        {
+            Caption = 'Provider';
+            DataClassification = CustomerContent;
+        }
+        field(100; CFWorkerBaseUrl; Text[100])
+        {
+            Caption = 'Cloudflare Worker Base Url';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                CFMemberRegistration: Codeunit "NPR MM CFMemberRegistration";
+            begin
+                if (Rec.CFWorkerBaseUrl <> '') then
+                    CFMemberRegistration.ValidateWorkerBaseUrl(Rec.CFWorkerBaseUrl);
+            end;
         }
     }
 

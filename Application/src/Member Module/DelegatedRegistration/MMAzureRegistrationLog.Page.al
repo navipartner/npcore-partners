@@ -3,7 +3,7 @@ page 6151141 "NPR MM AzureRegistrationLog"
     PageType = List;
     UsageCategory = None;
     SourceTable = "NPR MM AzureMemberUpdateLog";
-    Caption = 'Azure Registration Log';
+    Caption = 'Member Registration Log';
     Extensible = false;
 
     layout
@@ -72,6 +72,16 @@ page 6151141 "NPR MM AzureRegistrationLog"
                 {
                     ApplicationArea = NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Image Response Message field.';
+                }
+                field(SignupCompleted; Rec.SignupCompleted)
+                {
+                    ApplicationArea = NPRMembershipAdvanced;
+                    ToolTip = 'Specifies whether a pushed signup was applied to the member through this link. Further pushes for the link are rejected until a new link is issued.';
+                }
+                field(SignupId; Rec.SignupId)
+                {
+                    ApplicationArea = NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the id of the pushed signup that completed this link. A repeated push with the same id is answered as a success without updating the member again.';
                 }
 
             }

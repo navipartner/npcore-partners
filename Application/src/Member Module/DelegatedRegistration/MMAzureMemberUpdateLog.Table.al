@@ -66,6 +66,16 @@ table 6060015 "NPR MM AzureMemberUpdateLog"
             Caption = 'Image Response Message';
             DataClassification = CustomerContent;
         }
+        field(110; SignupCompleted; Boolean)
+        {
+            Caption = 'Signup Completed';
+            DataClassification = CustomerContent;
+        }
+        field(120; SignupId; Text[64])
+        {
+            Caption = 'Signup Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

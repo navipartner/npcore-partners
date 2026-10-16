@@ -122,7 +122,7 @@
                     AzureMemberRegistration.SetFilter(Enabled, '=%1', true);
                     AzureSetupCount := AzureMemberRegistration.Count();
                     if (AzureSetupCount > 0) then
-                        ForceIncludeAzureSetup := Confirm('Force include the Azure Member Registration information? Else it will be determined by original membership sales item.', false);
+                        ForceIncludeAzureSetup := Confirm('Force include the Member Registration Setup information? Else it will be determined by original membership sales item.', false);
 
                     if (ForceIncludeAzureSetup) and (AzureSetupCount = 1) then
                         AzureMemberRegistration.FindFirst();

@@ -167,7 +167,7 @@
 
         field(110; AzureMemberRegSetupCode; Code[10])
         {
-            Caption = 'Azure Member Registration Setup Code.';
+            Caption = 'Member Registration Setup Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR MM AzureMemberRegSetup";
         }

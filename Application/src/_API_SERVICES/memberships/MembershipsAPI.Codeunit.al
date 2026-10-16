@@ -153,6 +153,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('POST', '/membership/member/:memberId/attributes')) then
             exit(Handle(_ApiFunction::SET_MEMBER_ATTRIBUTE_VALUES, Request));
 
+        if (Request.Match('POST', '/membership/signup/:dataSubjectId')) then
+            exit(Handle(_ApiFunction::PROCESS_MEMBER_SIGNUP, Request));
+
 
         if (Request.Match('POST', '/membership/card/:cardId/block')) then
             exit(Handle(_ApiFunction::BLOCK_CARD, Request));

@@ -132,7 +132,7 @@
                 }
                 field(AzureMemberRegSetupCode; Rec.AzureMemberRegSetupCode)
                 {
-                    ToolTip = 'Specifies the value of the Azure Member Registration Setup Code used for having a delegated member registration process.';
+                    ToolTip = 'Specifies the Member Registration Setup Code used for having a delegated member registration process.';
                     ApplicationArea = NPRMembershipAdvanced;
                 }
             }

@@ -41,6 +41,7 @@ codeunit 6185122 "NPR MembershipApiHandler"
         MembershipAttributesAgent: Codeunit "NPR MembershipAttributesAgent";
         LoyaltyApiAgent: Codeunit "NPR LoyaltyApiAgent";
         MembershipListAgent: Codeunit "NPR MembershipListAgent";
+        MemberSignupApiAgent: Codeunit "NPR MemberSignupApiAgent";
     begin
         case _ApiFunction of
 
@@ -113,6 +114,9 @@ codeunit 6185122 "NPR MembershipApiHandler"
 
             _ApiFunction::ADD_MEMBER_NOTE:
                 _Response := MemberApiAgent.AddMemberNote(_Request);
+
+            _ApiFunction::PROCESS_MEMBER_SIGNUP:
+                _Response := MemberSignupApiAgent.ProcessSignup(_Request);
 
             _ApiFunction::LIST_MEMBER_ATTRIBUTES:
                 _Response := MembershipAttributesAgent.ListMemberAttributes(_Request);

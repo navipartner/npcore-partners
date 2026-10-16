@@ -3,10 +3,11 @@ page 6151112 "NPR MM AzureMemberRegList"
     PageType = List;
     ApplicationArea = NPRMembershipAdvanced;
     UsageCategory = Administration;
+    AdditionalSearchTerms = 'Azure Member Registration Setup';
     SourceTable = "NPR MM AzureMemberRegSetup";
     CardPageId = "NPR MM AzureMemberRegSetup";
     Editable = false;
-    Caption = 'Azure Member Registration Setup';
+    Caption = 'Member Registration Setup';
     Extensible = false;
 
     layout

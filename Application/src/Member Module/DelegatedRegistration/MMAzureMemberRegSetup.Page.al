@@ -3,7 +3,7 @@ page 6151109 "NPR MM AzureMemberRegSetup"
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR MM AzureMemberRegSetup";
-    Caption = 'Azure Member Registration Setup';
+    Caption = 'Member Registration Setup';
     Extensible = false;
 
     layout
@@ -29,11 +29,29 @@ page 6151109 "NPR MM AzureMemberRegSetup"
                     ApplicationArea = NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Enabled field.';
                 }
+                field(Provider; Rec.Provider)
+                {
+                    ApplicationArea = NPRMembershipAdvanced;
+                    ToolTip = 'Specifies which cloud provider the delegated member registration integrates with.';
+                    Editable = not Rec.Enabled;
+
+                    trigger OnValidate()
+                    begin
+                        SetProviderVisibility();
+                    end;
+                }
+                field(QueueName; Rec.QueueName)
+                {
+                    ApplicationArea = NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the key that identifies this setup towards the registration provider. It is sent as PartitionKey in the signup link. For Cloudflare, enter the slug of the company''s member signup instance from the customer portal. For Azure, it is also the name of the storage queue.';
+                    Editable = not Rec.Enabled;
+                }
             }
 
             group(AzureSetup)
             {
                 Caption = 'Azure';
+                Visible = _IsAzureProvider;
 
                 field(AzureStorageAccountName; Rec.AzureStorageAccountName)
                 {
@@ -41,10 +59,16 @@ page 6151109 "NPR MM AzureMemberRegSetup"
                     ToolTip = 'Specifies the value of the Azure Storage Account Name field.';
                     Editable = not Rec.Enabled;
                 }
-                field(QueueName; Rec.QueueName)
+            }
+            group(CloudflareSetup)
+            {
+                Caption = 'Cloudflare';
+                Visible = _IsCloudflareProvider;
+
+                field(CFWorkerBaseUrl; Rec.CFWorkerBaseUrl)
                 {
                     ApplicationArea = NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the value of the Partition Key field that identifies this instance. Should be formatted as {GUID}-{Company Alias} or similar.';
+                    ToolTip = 'Specifies the base url of the member signup Worker used to register signup links and to fetch and delete member images.';
                     Editable = not Rec.Enabled;
                 }
             }
@@ -65,12 +89,12 @@ page 6151109 "NPR MM AzureMemberRegSetup"
                 field(EmailTemplate; Rec.EmailTemplate)
                 {
                     ApplicationArea = NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the E-Mail Template Code to be used with Azure member registration.';
+                    ToolTip = 'Specifies the E-Mail Template Code to be used with delegated member registration.';
                 }
                 field(SMSTemplate; Rec.SMSTemplate)
                 {
                     ApplicationArea = NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the SMS Template Code to be used with Azure member registration.';
+                    ToolTip = 'Specifies the SMS Template Code to be used with delegated member registration.';
                 }
                 field(AllowAnonymousWallet; Rec.AllowAnonymousWallet)
                 {
@@ -82,6 +106,7 @@ page 6151109 "NPR MM AzureMemberRegSetup"
             group(Processing)
             {
                 Caption = 'Queue Processing';
+                Visible = _IsAzureProvider;
 
                 field(EnableDequeuing; Rec.EnableDequeuing)
                 {
@@ -109,10 +134,11 @@ page 6151109 "NPR MM AzureMemberRegSetup"
             group(setup)
             {
                 Caption = 'Setup';
+                Visible = _IsAzureProvider;
                 action(CreateAzureQueue)
                 {
                     Caption = 'Create Azure Queue';
-                    ToolTip = 'Creates a queue with name as Queue Name in the specified Storage Account';
+                    ToolTip = 'Creates a queue named as the Partition Key in the specified Storage Account';
                     ApplicationArea = NPRMembershipAdvanced;
                     Image = AddAction;
 
@@ -149,8 +175,9 @@ page 6151109 "NPR MM AzureMemberRegSetup"
             }
             action(CheckAzureQueue)
             {
+                Visible = _IsAzureProvider;
                 Caption = 'Validate Azure Queue';
-                ToolTip = 'Checks if a queue with same name as Queue Name exists in the specified Storage Account';
+                ToolTip = 'Checks if a queue named as the Partition Key exists in the specified Storage Account';
                 ApplicationArea = NPRMembershipAdvanced;
                 Image = TaskQualityMeasure;
 
@@ -169,6 +196,7 @@ page 6151109 "NPR MM AzureMemberRegSetup"
             }
             action(CheckAzureBlob)
             {
+                Visible = _IsAzureProvider;
                 Caption = 'Validate Azure Blob';
                 ToolTip = 'Checks if image operations for this this Storage Account works.';
                 ApplicationArea = NPRMembershipAdvanced;
@@ -184,8 +212,29 @@ page 6151109 "NPR MM AzureMemberRegSetup"
                     Message(BlobOperations, Rec.AzureStorageAccountName);
                 end;
             }
+            action(ValidateCloudflareWorker)
+            {
+                Caption = 'Validate Cloudflare Worker';
+                ToolTip = 'Checks that the member signup Worker is reachable and accepts the signup API key and the image token.';
+                ApplicationArea = NPRMembershipAdvanced;
+                Image = TaskQualityMeasure;
+                Visible = _IsCloudflareProvider;
+
+                trigger OnAction();
+                var
+                    CFMemberRegistration: Codeunit "NPR MM CFMemberRegistration";
+                    WorkerValidated: Label 'Ok, the Worker at %1 accepted the signup API key and the image token.';
+                begin
+                    Rec.TestField(CFWorkerBaseUrl);
+                    if (not CFMemberRegistration.ValidateWorker(Rec)) then
+                        Error(GetLastErrorText());
+
+                    Message(WorkerValidated, Rec.CFWorkerBaseUrl);
+                end;
+            }
             action(ProcessAzureQueue)
             {
+                Visible = _IsAzureProvider;
                 Caption = 'Process Azure Queue';
                 ToolTip = 'Process queue manually and import member updates';
                 ApplicationArea = NPRMembershipAdvanced;
@@ -217,7 +266,7 @@ page 6151109 "NPR MM AzureMemberRegSetup"
             action(AzureLog)
             {
                 Caption = 'View Import Log';
-                ToolTip = 'View the Azure interaction log.';
+                ToolTip = 'View the member registration log.';
                 ApplicationArea = NPRMembershipAdvanced;
                 Image = ImportLog;
 
@@ -226,4 +275,19 @@ page 6151109 "NPR MM AzureMemberRegSetup"
         }
 
     }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        SetProviderVisibility();
+    end;
+
+    local procedure SetProviderVisibility()
+    begin
+        _IsAzureProvider := (Rec.Provider = Rec.Provider::Azure);
+        _IsCloudflareProvider := (Rec.Provider = Rec.Provider::Cloudflare);
+    end;
+
+    var
+        _IsAzureProvider: Boolean;
+        _IsCloudflareProvider: Boolean;
 }

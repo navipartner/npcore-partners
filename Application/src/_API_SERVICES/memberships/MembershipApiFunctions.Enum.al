@@ -120,6 +120,11 @@ enum 6059827 "NPR MembershipApiFunctions"
         Caption = 'Add member note';
     }
 
+    value(310; PROCESS_MEMBER_SIGNUP)
+    {
+        Caption = 'Process pushed member signup';
+    }
+
     value(320; GET_CARD_USING_ID)
     {
         Caption = 'Get card using card id';

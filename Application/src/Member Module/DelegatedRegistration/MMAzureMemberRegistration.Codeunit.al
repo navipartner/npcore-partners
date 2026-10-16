@@ -14,6 +14,7 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
     begin
         AzureRegistrationSetup.SetFilter(Enabled, '=%1', true);
         AzureRegistrationSetup.SetFilter(EnableDequeuing, '=%1', true);
+        AzureRegistrationSetup.SetFilter(Provider, '=%1', AzureRegistrationSetup.Provider::Azure);
         if (AzureRegistrationSetup.FindSet()) then begin
             repeat
                 repeat
@@ -46,6 +47,9 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
             exit;
 
         if (not AzureRegistrationSetup.Enabled) then
+            exit;
+
+        if (AzureRegistrationSetup.Provider <> AzureRegistrationSetup.Provider::Azure) then
             exit;
 
         AzureRegistrationSetup.TestField(EnableDequeuing);
@@ -86,9 +90,10 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
     end;
 
 #pragma warning disable AA0150 // Suppress warning about not changing the var declared parameter
-    local procedure UpdateReceiveAzureLog(DataSubjectId: Text[64]; MemberJson: JsonObject; HaveImage: Boolean; var ImageB64: Text; ResponseReason: Text)
+    internal procedure UpdateReceiveAzureLog(DataSubjectId: Text[64]; MemberJson: JsonObject; HaveImage: Boolean; var ImageB64: Text; ResponseReason: Text)
     var
         JToken: JsonToken;
+        TokenJToken: JsonToken;
         SignUpJson: JsonObject;
         AzureLog: Record "NPR MM AzureMemberUpdateLog";
     begin
@@ -103,11 +108,12 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         if (not MemberJson.Get('su', JToken)) then begin
             AzureLog.RegistrationMethod := AzureLog.RegistrationMethod::UNKNOWN;
         end else begin
+            SignUpJson := JToken.AsObject();
             if (not SignUpJson.Get('pv', JToken)) then begin
                 AzureLog.RegistrationMethod := AzureLog.RegistrationMethod::UNKNOWN;
             end else begin
-                if (SignUpJson.Get('tn', JToken)) then
-                    AzureLog.Token := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(AzureLog.Token));
+                if (SignUpJson.Get('tn', TokenJToken)) then
+                    AzureLog.Token := CopyStr(TokenJToken.AsValue().AsText(), 1, MaxStrLen(AzureLog.Token));
 
                 case (LowerCase(JToken.AsValue().AsText())) of
                     'email':
@@ -313,10 +319,19 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
     internal procedure CreateMemberSignUpReference(AzureRegistrationSetupCode: Code[10]; DataSubjectId: Text[64]): Boolean
     var
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        CFMemberRegistration: Codeunit "NPR MM CFMemberRegistration";
     begin
         AzureRegistrationSetup.Get(AzureRegistrationSetupCode);
         if (not AzureRegistrationSetup.Enabled) then
             exit(false);
+
+        if (AzureRegistrationSetup.Provider = AzureRegistrationSetup.Provider::Cloudflare) then begin
+            if (not GuiAllowed()) then
+                exit(CFMemberRegistration.CreateSignupReference(AzureRegistrationSetup, DataSubjectId));
+
+            CFMemberRegistration.CreateSignupReference(AzureRegistrationSetup, DataSubjectId);
+            exit(true);
+        end;
 
         if (not GuiAllowed()) then
             exit(CreateMemberSignUpReference(AzureRegistrationSetup.AzureStorageAccountName, AzureRegistrationSetup.QueueName, DataSubjectId));
