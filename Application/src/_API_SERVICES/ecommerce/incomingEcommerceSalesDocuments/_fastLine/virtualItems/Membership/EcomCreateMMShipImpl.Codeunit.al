@@ -575,20 +575,26 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
     local procedure ValidateMemberDataForDirectCreation(EcomSalesLine: Record "NPR Ecom Sales Line"; MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MembershipSetup: Record "NPR MM Membership Setup")
     var
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         MemberBirthdayRequiredErr: Label 'Member birthday is required for membership %1 due to configured age constraints (SKU: %2).', Comment = '%1=Membership Code;%2=Item No.';
         MemberAgeConstraintErr: Label 'Member does not meet the age requirement for membership %1.', Comment = '%1=Membership Code';
     begin
-        if MembershipSetup."Enable Age Verification" and (EcomSalesLine."Member Birthday" = 0D) then
-            Error(MemberBirthdayRequiredErr, MembershipSalesSetup."Membership Code", EcomSalesLine."No.");
+        // The membership is already issued. A later re-validation (sales-doc gate) can run on a later WorkDate, so the birthday and age checks must not run again.
+        if EcomSalesLine."Virtual Item Process Status" = EcomSalesLine."Virtual Item Process Status"::Processed then
+            exit;
 
-        if MembershipSalesSetup."Age Constraint Type" = MembershipSalesSetup."Age Constraint Type"::NA then
+        if not MembershipSetup."Enable Age Verification" then
             exit;
 
         if EcomSalesLine."Member Birthday" = 0D then
             Error(MemberBirthdayRequiredErr, MembershipSalesSetup."Membership Code", EcomSalesLine."No.");
 
-        if not MembershipMgtInternal.CheckAgeConstraint(EcomSalesLine."Member Birthday", EcomSalesLine."Member Birthday", MembershipSetup."Validate Age Against", MembershipSalesSetup."Age Constraint Type", MembershipSalesSetup."Age Constraint (Years)") then
+        if MembershipSalesSetup."Age Constraint Type" = MembershipSalesSetup."Age Constraint Type"::NA then
+            exit;
+
+        TempMemberInfoCapture."Document Date" := EcomSalesLine."Membership Activation Date";
+        if not MembershipMgtInternal.CheckAgeConstraint(MembershipMgtInternal.GetMembershipAgeConstraintDate(MembershipSalesSetup, TempMemberInfoCapture), EcomSalesLine."Member Birthday", MembershipSetup."Validate Age Against", MembershipSalesSetup."Age Constraint Type", MembershipSalesSetup."Age Constraint (Years)") then
             Error(MemberAgeConstraintErr, MembershipSalesSetup."Membership Code");
     end;
 

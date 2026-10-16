@@ -611,6 +611,21 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
             MembershipSalesSetup.Modify();
         end;
 
+        _MemberModuleLib.SetupMembership_Simple(MemberCommunity.Code, 'T-ECOM-AGE', '', 'Ecom Age Check Membership');
+        MembershipSetup.Get('T-ECOM-AGE');
+        MembershipSetup."Membership Type" := MembershipSetup."Membership Type"::INDIVIDUAL;
+        MembershipSetup."Membership Member Cardinality" := 1;
+        MembershipSetup.Modify();
+
+        _MemberModuleLib.CreateItem('T-ECOM-AGE-ITEM', '', 'Ecom Age Check Membership Item', 100);
+        _MemberModuleLib.SetupSimpleMembershipSalesItem('T-ECOM-AGE-ITEM', 'T-ECOM-AGE');
+
+        MembershipSalesSetup.SetRange("Membership Code", 'T-ECOM-AGE');
+        if MembershipSalesSetup.FindFirst() then begin
+            MembershipSalesSetup.Blocked := false;
+            MembershipSalesSetup.Modify();
+        end;
+
         _IsInitialized := true;
     end;
 
@@ -1985,6 +2000,331 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         // [THEN] The precondition still bites
         asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
         _Assert.ExpectedError('is blocked');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_AgeVerificationOff_IgnoresAgeConstraint()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] With age verification off, the item's age constraint is not checked.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification off, item requires an age greater than 2 years
+        SetAgeVerification(false, MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSalesSetup."Age Constraint Type"::GT, 2);
+        // [GIVEN] A member born on 12 December 2024
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(12, 12, 2024), DMY2Date(13, 10, 2026));
+
+        // [WHEN] The line is validated
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+
+        // [THEN] No error is raised
+        WorkDate(OriginalWorkDate);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_OlderThanRequired_GT_Passes()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] A member older than the minimum age passes a "greater than" constraint checked on the sales date.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on against the sales date, item requires an age greater than 2 years
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSalesSetup."Age Constraint Type"::GT, 2);
+        // [GIVEN] A member born on 12 December 1991
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(12, 12, 1991), DMY2Date(13, 10, 2026));
+
+        // [WHEN] The line is validated
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+
+        // [THEN] No error is raised
+        WorkDate(OriginalWorkDate);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_TooOld_LT_Errors()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] A member older than the maximum age fails a "less than" constraint checked on the period start.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on against the period start, item requires an age less than 2 years
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::PERIODBEGIN_YMD, MembershipSalesSetup."Age Constraint Type"::LT, 2);
+        // [GIVEN] A member born on 12 December 1991
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(12, 12, 1991), DMY2Date(13, 10, 2026));
+        Commit();
+
+        // [WHEN] The line is validated
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        WorkDate(OriginalWorkDate);
+
+        // [THEN] The age requirement error is raised
+        _Assert.ExpectedError('Member does not meet the age requirement for membership T-ECOM-AGE');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_YoungEnough_LT_Passes()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] A member younger than the maximum age passes a "less than" constraint checked on the period start.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on against the period start, item requires an age less than 2 years
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::PERIODBEGIN_YMD, MembershipSalesSetup."Age Constraint Type"::LT, 2);
+        // [GIVEN] A member born on 12 December 2024
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(12, 12, 2024), DMY2Date(13, 10, 2026));
+
+        // [WHEN] The line is validated
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+
+        // [THEN] No error is raised
+        WorkDate(OriginalWorkDate);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_TooYoung_GT_Errors()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] A member younger than the minimum age fails a "greater than" constraint checked on the sales date.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on against the sales date, item requires an age greater than 2 years
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSalesSetup."Age Constraint Type"::GT, 2);
+        // [GIVEN] A member born on 12 December 2024
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(12, 12, 2024), DMY2Date(13, 10, 2026));
+        Commit();
+
+        // [WHEN] The line is validated
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        WorkDate(OriginalWorkDate);
+
+        // [THEN] The age requirement error is raised
+        _Assert.ExpectedError('Member does not meet the age requirement for membership T-ECOM-AGE');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_AgeVerificationOff_NoBirthday_Passes()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] With age verification off, a missing birthday is accepted even when the item has an age constraint.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification off, item requires an age greater than 2 years
+        SetAgeVerification(false, MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSalesSetup."Age Constraint Type"::GT, 2);
+        // [GIVEN] A member without a birthday
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, 0D, DMY2Date(13, 10, 2026));
+
+        // [WHEN] The line is validated
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+
+        // [THEN] No error is raised
+        WorkDate(OriginalWorkDate);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_PeriodEndReference_UsesValidUntilDate()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] Age checked against the period end uses the membership's valid-until date.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on against the period end, item requires an age less than 2 years
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::PERIODEND_YMD, MembershipSalesSetup."Age Constraint Type"::LT, 2);
+        // [GIVEN] A member born on 1 January 2025
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(1, 1, 2025), DMY2Date(13, 10, 2026));
+        Commit();
+
+        // [WHEN] The line is validated
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        WorkDate(OriginalWorkDate);
+
+        // [THEN] The age requirement error is raised
+        _Assert.ExpectedError('Member does not meet the age requirement for membership T-ECOM-AGE');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_AgeVerificationOn_NoBirthday_Errors()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] With age verification on, a missing birthday is rejected even when the item has no age constraint.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on, item has no age constraint
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSalesSetup."Age Constraint Type"::NA, 0);
+        // [GIVEN] A member without a birthday
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, 0D, DMY2Date(13, 10, 2026));
+        Commit();
+
+        // [WHEN] The line is validated
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        WorkDate(OriginalWorkDate);
+
+        // [THEN] The birthday required error is raised
+        _Assert.ExpectedError('Member birthday is required for membership T-ECOM-AGE');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_NoActivationDate_UsesWorkDate()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] An order without an activation date is checked against the work date.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on against the sales date, item requires an age less than 5 years
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSalesSetup."Age Constraint Type"::LT, 5);
+        // [GIVEN] A member born on 1 June 2017 and a line without an activation date
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(1, 6, 2017), 0D);
+
+        // [WHEN] The line is validated
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+
+        // [THEN] No error is raised, because the member is younger than 5 on the work date
+        WorkDate(OriginalWorkDate);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDirectCreation_ProcessedLine_SkipsAgeRecheck()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] A line whose membership is already issued is not re-checked for age on a later work date.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(DMY2Date(1, 1, 2020));
+
+        // [GIVEN] Age verification on against the sales date, item requires an age less than 18 years
+        SetAgeVerification(true, MembershipSetup."Validate Age Against"::SALESDATE_YMD, MembershipSalesSetup."Age Constraint Type"::LT, 18);
+        // [GIVEN] A member born on 2 January 2002, who is 17 on the work date
+        CreateAgeCheckLine(EcomSalesHeader, EcomSalesLine, DMY2Date(2, 1, 2002), 0D);
+        // [GIVEN] The line passes validation on the work date
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        Commit();
+
+        // [GIVEN] One day later the member is 18, so an unprocessed line fails validation
+        WorkDate(DMY2Date(2, 1, 2020));
+        asserterror EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+        _Assert.ExpectedError('Member does not meet the age requirement for membership T-ECOM-AGE');
+
+        // [GIVEN] The membership for the line is issued
+        EcomSalesLine."Virtual Item Process Status" := EcomSalesLine."Virtual Item Process Status"::Processed;
+        EcomSalesLine.Modify();
+
+        // [WHEN] The line is validated again on the later work date
+        EcomCreateMMShipImpl.ValidateMembershipOperation(EcomSalesLine, EcomSalesHeader);
+
+        // [THEN] No error is raised, because the age check is skipped for a processed line
+        WorkDate(OriginalWorkDate);
+    end;
+
+    local procedure SetAgeVerification(Enable: Boolean; ValidateAgainst: Option SALESDATE_Y,PERIODBEGIN_Y,PERIODEND_Y,SALESDATE_YM,PERIODBEGIN_YM,PERIODEND_YM,SALESDATE_YMD,PERIODBEGIN_YMD,PERIODEND_YMD; ConstraintType: Option NA,LT,LTE,GT,GTE,E; Years: Integer)
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+    begin
+        MembershipSetup.Get('T-ECOM-AGE');
+        MembershipSetup."Enable Age Verification" := Enable;
+        MembershipSetup."Validate Age Against" := ValidateAgainst;
+        MembershipSetup.Modify();
+
+        MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, 'T-ECOM-AGE-ITEM');
+        MembershipSalesSetup."Age Constraint Type" := ConstraintType;
+        MembershipSalesSetup."Age Constraint (Years)" := Years;
+        MembershipSalesSetup.Modify();
+    end;
+
+    local procedure CreateAgeCheckLine(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line"; Birthday: Date; ActivationDate: Date)
+    begin
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedCreateMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-ECOM-AGE-ITEM', 1, 100);
+        EcomSalesLine."Membership Activation Date" := ActivationDate;
+        EcomSalesLine."Member Birthday" := Birthday;
+        EcomSalesLine.Modify();
     end;
 
     local procedure CreateCapturedPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PaymentAmount: Decimal)
