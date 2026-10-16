@@ -304,13 +304,15 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberInfoCapture."Import Entry Document ID" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(MemberInfoCapture."Import Entry Document ID"));
         MemberInfoCapture.Insert();
 
-        UpdateMemberInfoCaptureFromLine(MemberInfoCapture, EcomSalesLine);
+        UpdateMemberInfoCaptureFromLine(MemberInfoCapture, EcomSalesLine, EcomSalesHeader);
         SetNotificationMethod(MemberInfoCapture);
         MemberInfoCapture.AllowMergeOnConflict := true;
         MemberInfoCapture.SuppressPersonalData := true;
+        GetMembershipSaleSetup(MembershipSalesSetup, GetItemNoAsCode20(EcomSalesLine));
+        if MemberInfoCapture.PreferredLanguageCode = '' then
+            MemberInfoCapture.PreferredLanguageCode := GetFallbackMemberLanguageCode(MembershipSalesSetup, MemberInfoCapture);
         MemberInfoCapture.Modify();
 
-        GetMembershipSaleSetup(MembershipSalesSetup, GetItemNoAsCode20(EcomSalesLine));
         MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
@@ -321,6 +323,58 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
 
         if CaptureForWriteback then
             IssuedMembership := Membership;
+    end;
+
+    local procedure GetOrderMemberLanguageCode(EcomSalesHeader: Record "NPR Ecom Sales Header"): Code[10]
+    var
+        MMLanguage: Record "NPR MM Language";
+    begin
+        if EcomSalesHeader."Language Code" = '' then
+            exit('');
+        if not MMLanguage.Get(EcomSalesHeader."Language Code") then
+            exit('');
+        exit(EcomSalesHeader."Language Code");
+    end;
+
+    local procedure GetFallbackMemberLanguageCode(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture"): Code[10]
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Community: Record "NPR MM Member Community";
+        Member: Record "NPR MM Member";
+        PresetMember: Record "NPR MM Member";
+        MMLanguage: Record "NPR MM Language";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        if not MembershipSetup.Get(MembershipSalesSetup."Membership Code") then
+            exit('');
+        if MembershipSetup."Member Information" <> MembershipSetup."Member Information"::NAMED then
+            exit('');
+        if not Community.Get(MembershipSetup."Community Code") then
+            exit('');
+
+        // Only REUSE and MERGE_MEMBER communities look up an existing member here. CONFIRM and ERROR communities use the community default.
+        if Community."Create Member UI Violation" in [Community."Create Member UI Violation"::REUSE, Community."Create Member UI Violation"::MERGE_MEMBER] then begin
+            Member.SetLoadFields(PreferredLanguageCode);
+            // The shortcut mirrors the headless MERGE_MEMBER case, where AddNamedMember keeps the preset member.
+            // The lookup after it only reads and does not call CheckMemberUniqueId.
+            // The FOREIGN context, the guardian branch and the OnCheckMemberUniqueIdViolation event are not mirrored.
+            if (Community."Create Member UI Violation" = Community."Create Member UI Violation"::MERGE_MEMBER) and (MemberInfoCapture."Member Entry No" <> 0) and (not GuiAllowed()) then
+                if Member.Get(MemberInfoCapture."Member Entry No") then
+                    exit(Member.PreferredLanguageCode);
+            MembershipManagement.SetMemberUniqueIdFilter(Community, MemberInfoCapture, Member);
+            Member.ReadIsolation := IsolationLevel::ReadUncommitted;
+            if Member.FindFirst() then
+                exit(Member.PreferredLanguageCode);
+            if MemberInfoCapture."Member Entry No" <> 0 then begin
+                PresetMember.SetLoadFields(PreferredLanguageCode);
+                if PresetMember.Get(MemberInfoCapture."Member Entry No") then
+                    exit(PresetMember.PreferredLanguageCode);
+            end;
+        end;
+
+        if MMLanguage.Get(Community.MemberDefaultLanguageCode) then
+            exit(Community.MemberDefaultLanguageCode);
+        exit('');
     end;
 
     internal procedure ProcessMembershipAlteration(EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header") DidAlterThisRound: Boolean
@@ -393,7 +447,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
     end;
 
-    local procedure UpdateMemberInfoCaptureFromLine(var MemberInfoCapture: Record "NPR MM Member Info Capture"; EcomSalesLine: Record "NPR Ecom Sales Line")
+    local procedure UpdateMemberInfoCaptureFromLine(var MemberInfoCapture: Record "NPR MM Member Info Capture"; EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         MemberApiAgent: Codeunit "NPR MemberApiAgent";
     begin
@@ -415,6 +469,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberInfoCapture."GDPR Approval" := MemberApiAgent.DecodeGdprConsent(EcomSalesLine."Member GDPR Approval");
         MemberInfoCapture."Document Date" := EcomSalesLine."Membership Activation Date";
 #pragma warning restore AA0139
+        MemberInfoCapture.PreferredLanguageCode := GetOrderMemberLanguageCode(EcomSalesHeader);
         _EcomVirtualItemEvents.OnAfterUpdateMemberInfoCaptureFromLine(MemberInfoCapture);
     end;
 

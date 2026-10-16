@@ -2071,5 +2071,626 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         exit(10000);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_NewMember_GetsOrderLanguage()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] A member created from an ecom order gets the order language as its preferred language.
+        Initialize();
+
+        // [GIVEN] Member language 'ZZA' and an order in 'ZZA' that creates a new membership
+        EnsureMemberLanguage('ZZA');
+        CreateCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 'ZZA', NewUniqueEmail());
+        Commit();
+
+        // [GIVEN] The community has no default member language
+        GetCommunity('T-ECOM', SavedCommunity);
+        _Assert.AreEqual('', SavedCommunity.MemberDefaultLanguageCode, 'Precondition: the community default member language must be blank. An earlier test leaked it.');
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::NONE, SavedCommunity."Create Member UI Violation", '');
+
+        // [WHEN] The membership line is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        MemberLanguageCode := GetMemberLanguage(GetLineMemberEntryNo(EcomSalesLine));
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] The new member's preferred language is the order language
+        _Assert.AreEqual('ZZA', MemberLanguageCode, 'The new member must get the order language.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_WithoutConfirm_NewMemberGetsOrderLanguage()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] Creating the membership sets the order language on the new member by itself, before any Confirm step runs.
+        Initialize();
+
+        // [GIVEN] Member language 'ZZA' and an order in 'ZZA' that creates a new membership
+        EnsureMemberLanguage('ZZA');
+        CreateCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 'ZZA', NewUniqueEmail());
+        Commit();
+
+        // [GIVEN] The community has no default member language
+        GetCommunity('T-ECOM', SavedCommunity);
+        _Assert.AreEqual('', SavedCommunity.MemberDefaultLanguageCode, 'Precondition: the community default member language must be blank. An earlier test leaked it.');
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::NONE, SavedCommunity."Create Member UI Violation", '');
+
+        // [WHEN] Only CreateMembership runs, without ConfirmAllMembershipsForLine
+        EcomCreateMMShipImpl.CreateMembership(EcomSalesLine, EcomSalesHeader);
+        MemberLanguageCode := GetMemberLanguage(GetLineMemberEntryNo(EcomSalesLine));
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] The new member already has the order language
+        _Assert.AreEqual('ZZA', MemberLanguageCode, 'CreateMembership must set the order language on the new member.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_ReusedMember_OrderLanguageOverwrites()
+    var
+        EcomSalesHeader1: Record "NPR Ecom Sales Header";
+        EcomSalesLine1: Record "NPR Ecom Sales Line";
+        EcomSalesHeader2: Record "NPR Ecom Sales Header";
+        EcomSalesLine2: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberEmail: Text[80];
+        FirstMemberEntryNo: Integer;
+        SecondMemberEntryNo: Integer;
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] When a later order reuses an existing member, the later order's language replaces the member's language.
+        Initialize();
+
+        // [GIVEN] Two orders for the same member email: order 1 in 'ZZA', order 2 in 'ZZB'
+        EnsureMemberLanguage('ZZA');
+        EnsureMemberLanguage('ZZB');
+        MemberEmail := NewUniqueEmail();
+        CreateCreateMembershipOrder(EcomSalesHeader1, EcomSalesLine1, 'ZZA', MemberEmail);
+        CreateCreateMembershipOrder(EcomSalesHeader2, EcomSalesLine2, 'ZZB', MemberEmail);
+        Commit();
+
+        // [GIVEN] The community reuses members by email and has no default member language
+        GetCommunity('T-ECOM', SavedCommunity);
+        _Assert.AreEqual('', SavedCommunity.MemberDefaultLanguageCode, 'Precondition: the community default member language must be blank. An earlier test leaked it.');
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::EMAIL, SavedCommunity."Create Member UI Violation"::REUSE, '');
+
+        // [GIVEN] Order 1 creates the member
+        EcomCreateMMShipImpl.Process(EcomSalesLine1);
+        FirstMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine1);
+
+        // [WHEN] Order 2 is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine2);
+        SecondMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine2);
+        MemberLanguageCode := GetMemberLanguage(FirstMemberEntryNo);
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] Order 2 reused the member and wrote its language
+        _Assert.AreEqual(FirstMemberEntryNo, SecondMemberEntryNo, 'Order 2 must reuse the member created by order 1.');
+        _Assert.AreEqual('ZZB', MemberLanguageCode, 'The reused member must get the language of the later order.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_ReusedMember_BlankOrderLanguageKeepsExisting()
+    var
+        EcomSalesHeader1: Record "NPR Ecom Sales Header";
+        EcomSalesLine1: Record "NPR Ecom Sales Line";
+        EcomSalesHeader2: Record "NPR Ecom Sales Header";
+        EcomSalesLine2: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberEmail: Text[80];
+        FirstMemberEntryNo: Integer;
+        SecondMemberEntryNo: Integer;
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] An order without a language does not wipe the language of a reused member, and the community default does not replace it either.
+        Initialize();
+
+        // [GIVEN] Two orders without a language for the same member email
+        EnsureMemberLanguage('ZZA');
+        EnsureMemberLanguage('ZZC');
+        MemberEmail := NewUniqueEmail();
+        CreateCreateMembershipOrder(EcomSalesHeader1, EcomSalesLine1, '', MemberEmail);
+        CreateCreateMembershipOrder(EcomSalesHeader2, EcomSalesLine2, '', MemberEmail);
+        Commit();
+
+        // [GIVEN] The community reuses members by email and has default member language 'ZZC'
+        GetCommunity('T-ECOM', SavedCommunity);
+        _Assert.AreEqual('', SavedCommunity.MemberDefaultLanguageCode, 'Precondition: the community default member language must be blank. An earlier test leaked it.');
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::EMAIL, SavedCommunity."Create Member UI Violation"::REUSE, 'ZZC');
+
+        // [GIVEN] Order 1 creates the member, and the member's language is then set to 'ZZA'
+        EcomCreateMMShipImpl.Process(EcomSalesLine1);
+        FirstMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine1);
+        _Assert.AreEqual('ZZC', GetMemberLanguage(FirstMemberEntryNo), 'A new member under REUSE must get the community default member language.');
+        SetMemberLanguage(FirstMemberEntryNo, 'ZZA');
+
+        // [WHEN] Order 2 is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine2);
+        SecondMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine2);
+        MemberLanguageCode := GetMemberLanguage(FirstMemberEntryNo);
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] Order 2 reused the member and kept its language
+        _Assert.AreEqual(FirstMemberEntryNo, SecondMemberEntryNo, 'Order 2 must reuse the member created by order 1.');
+        _Assert.AreEqual('ZZA', MemberLanguageCode, 'An order without a language must keep the reused member''s language, not wipe it or apply the community default.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_ReusedMember_UnknownOrderLanguageKeepsExisting()
+    var
+        EcomSalesHeader1: Record "NPR Ecom Sales Header";
+        EcomSalesLine1: Record "NPR Ecom Sales Line";
+        EcomSalesHeader2: Record "NPR Ecom Sales Header";
+        EcomSalesLine2: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberEmail: Text[80];
+        FirstMemberEntryNo: Integer;
+        SecondMemberEntryNo: Integer;
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] An order language that is not set up as a member language is ignored, so a reused member keeps its language.
+        Initialize();
+
+        // [GIVEN] Language 'ZZX' exists but is not a member language
+        EnsureMemberLanguage('ZZA');
+        EnsureLanguage('ZZX');
+        AssertNotMemberLanguage('ZZX');
+
+        // [GIVEN] Order 1 without a language and order 2 in 'ZZX', for the same member email
+        MemberEmail := NewUniqueEmail();
+        CreateCreateMembershipOrder(EcomSalesHeader1, EcomSalesLine1, '', MemberEmail);
+        CreateCreateMembershipOrder(EcomSalesHeader2, EcomSalesLine2, 'ZZX', MemberEmail);
+        Commit();
+
+        // [GIVEN] The community reuses members by email and has no default member language
+        GetCommunity('T-ECOM', SavedCommunity);
+        _Assert.AreEqual('', SavedCommunity.MemberDefaultLanguageCode, 'Precondition: the community default member language must be blank. An earlier test leaked it.');
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::EMAIL, SavedCommunity."Create Member UI Violation"::REUSE, '');
+
+        // [GIVEN] Order 1 creates the member, and the member's language is then set to 'ZZA'
+        EcomCreateMMShipImpl.Process(EcomSalesLine1);
+        FirstMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine1);
+        SetMemberLanguage(FirstMemberEntryNo, 'ZZA');
+
+        // [WHEN] Order 2 is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine2);
+        SecondMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine2);
+        MemberLanguageCode := GetMemberLanguage(FirstMemberEntryNo);
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] Order 2 reused the member and kept its language
+        _Assert.AreEqual(FirstMemberEntryNo, SecondMemberEntryNo, 'Order 2 must reuse the member created by order 1.');
+        _Assert.AreEqual('ZZA', MemberLanguageCode, 'An order language that is not a member language must not change the reused member''s language.');
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmYesHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RenewMembership_OrderLanguageDoesNotChangeMembers()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        LibraryMemberGDPR: Codeunit "NPR Library - Member GDPR";
+        MembershipEntryNo: Integer;
+        MemberEntryNoA: Integer;
+        MemberEntryNoB: Integer;
+        LanguageCodeA: Code[10];
+        LanguageCodeB: Code[10];
+        ValidUntilBefore: Date;
+        ValidUntilAfter: Date;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] A renew order does not change member language, as on POS and in auto-renew.
+        Initialize();
+
+        // [GIVEN] A membership with active members A and B in 'ZZA'
+        EnsureMemberLanguage('ZZA');
+        EnsureMemberLanguage('ZZB');
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        MemberEntryNoA := CreateMemberWithLanguage('ZZA');
+        LibraryMemberGDPR.AddMemberRole(Membership."Entry No.", MemberEntryNoA);
+        MemberEntryNoB := CreateMemberWithLanguage('ZZA');
+        LibraryMemberGDPR.AddMemberRole(Membership."Entry No.", MemberEntryNoB);
+
+        // [GIVEN] A renew order in 'ZZB' for that membership
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::RENEW);
+        if not AlterationSetup.FindFirst() then
+            Error('Renew alteration setup for T-ECOM not found — check Initialize().');
+
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader."Language Code" := 'ZZB';
+        EcomSalesHeader.Modify();
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::RenewMembership, 1, 100);
+        ValidUntilBefore := LastMembershipEntryValidUntil(Membership);
+        Commit();
+
+        // [GIVEN] The community has no default member language
+        GetCommunity('T-ECOM', SavedCommunity);
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity", SavedCommunity."Create Member UI Violation", '');
+
+        // [WHEN] The renew line is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        ValidUntilAfter := LastMembershipEntryValidUntil(Membership);
+        LanguageCodeA := GetMemberLanguage(MemberEntryNoA);
+        LanguageCodeB := GetMemberLanguage(MemberEntryNoB);
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] The renew ran
+        _Assert.IsTrue(ValidUntilAfter > ValidUntilBefore, 'Membership Valid Until must advance after Renew.');
+
+        // [THEN] Members A and B keep their language
+        _Assert.AreEqual('ZZA', LanguageCodeA, 'A renew order must not change the language of member A.');
+        _Assert.AreEqual('ZZA', LanguageCodeB, 'A renew order must not change the language of member B.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmMembership_DoesNotChangeMemberLanguage()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MembershipEntryNo: Integer;
+        MemberEntryNo: Integer;
+        MemberLanguageCode: Code[10];
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] Confirming a pre-created membership from an ecom order does not change the language of its existing member.
+        // Confirm applies neither the order language nor the community default.
+        Initialize();
+
+        // [GIVEN] A membership pre-created via the membership API, with one active member in 'ZZA'
+        EnsureMemberLanguage('ZZA');
+        EnsureMemberLanguage('ZZB');
+        EnsureMemberLanguage('ZZC');
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-320100', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+
+        _MemberModuleLib.SetRandomMemberInfoData(MemberInfoCapture);
+        MemberInfoCapture.PreferredLanguageCode := 'ZZA';
+        _Assert.IsTrue(_MemberApiLib.AddMembershipMember(Membership, MemberInfoCapture, MemberEntryNo, ResponseMessage), ResponseMessage);
+        _Assert.AreEqual('ZZA', GetMemberLanguage(MemberEntryNo), 'Precondition: the member must start in ''ZZA''.');
+
+        // [GIVEN] An ecom order in 'ZZB' with a membership line carrying the membership token
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Language Code" := 'ZZB';
+        EcomSalesHeader.Modify();
+        _LibEcommerce.CreateCapturedMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-320100', Membership);
+        Commit();
+
+        // [GIVEN] The community has default member language 'ZZC'
+        SavedCommunity.Get(Membership."Community Code");
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity", SavedCommunity."Create Member UI Violation", 'ZZC');
+
+        // [WHEN] The membership line is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        MemberLanguageCode := GetMemberLanguage(MemberEntryNo);
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] The confirm ran
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.FindFirst();
+        _Assert.AreEqual(EcomSalesHeader."External No.", MembershipEntry."Document No.", 'MembershipEntry."Document No." must match EcomSalesHeader."External No."');
+
+        // [THEN] The member keeps 'ZZA'
+        _Assert.AreEqual('ZZA', MemberLanguageCode, 'Confirming a membership must not change the language of its existing member.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_NewMember_NoOrderLanguage_GetsCommunityDefault()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] A new member from an order without a language gets the community default member language.
+        Initialize();
+
+        // [GIVEN] An order without a language that creates a new membership
+        EnsureMemberLanguage('ZZC');
+        CreateCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, '', NewUniqueEmail());
+        Commit();
+
+        // [GIVEN] The community has default member language 'ZZC'
+        GetCommunity('T-ECOM', SavedCommunity);
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::NONE, SavedCommunity."Create Member UI Violation", 'ZZC');
+
+        // [WHEN] The membership line is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        MemberLanguageCode := GetMemberLanguage(GetLineMemberEntryNo(EcomSalesLine));
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] The new member gets the community default
+        _Assert.AreEqual('ZZC', MemberLanguageCode, 'A new member from an order without a language must get the community default member language.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_NewMember_UnknownOrderLanguage_GetsCommunityDefault()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] A new member from an order whose language is not a member language gets the community default member language.
+        Initialize();
+
+        // [GIVEN] Language 'ZZX' exists but is not a member language
+        EnsureMemberLanguage('ZZC');
+        EnsureLanguage('ZZX');
+        AssertNotMemberLanguage('ZZX');
+
+        // [GIVEN] An order in 'ZZX' that creates a new membership
+        CreateCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 'ZZX', NewUniqueEmail());
+        Commit();
+
+        // [GIVEN] The community has default member language 'ZZC'
+        GetCommunity('T-ECOM', SavedCommunity);
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::NONE, SavedCommunity."Create Member UI Violation", 'ZZC');
+
+        // [WHEN] The membership line is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        MemberLanguageCode := GetMemberLanguage(GetLineMemberEntryNo(EcomSalesLine));
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] The new member gets the community default
+        _Assert.AreEqual('ZZC', MemberLanguageCode, 'A new member from an order with an unknown language must get the community default member language.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_NewMember_InvalidCommunityDefault_StaysBlank()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] A community default that is not a member language is not given to a new member.
+        // Passes even without the fallback; it guards the MMLanguage.Get check in GetFallbackMemberLanguageCode.
+        Initialize();
+
+        // [GIVEN] Language 'ZZX' exists but is not a member language
+        EnsureLanguage('ZZX');
+        AssertNotMemberLanguage('ZZX');
+
+        // [GIVEN] An order without a language that creates a new membership
+        CreateCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, '', NewUniqueEmail());
+        Commit();
+
+        // [GIVEN] The community has default member language 'ZZX'
+        GetCommunity('T-ECOM', SavedCommunity);
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::NONE, SavedCommunity."Create Member UI Violation", 'ZZX');
+
+        // [WHEN] The membership line is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        MemberLanguageCode := GetMemberLanguage(GetLineMemberEntryNo(EcomSalesLine));
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] The new member has no language
+        _Assert.AreEqual('', MemberLanguageCode, 'A community default that is not a member language must not be given to a new member.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_ReusedMember_Merge_BlankOrderLanguageKeepsExisting()
+    var
+        EcomSalesHeader1: Record "NPR Ecom Sales Header";
+        EcomSalesLine1: Record "NPR Ecom Sales Line";
+        EcomSalesHeader2: Record "NPR Ecom Sales Header";
+        EcomSalesLine2: Record "NPR Ecom Sales Line";
+        SavedCommunity: Record "NPR MM Member Community";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        MemberEmail: Text[80];
+        FirstMemberEntryNo: Integer;
+        SecondMemberEntryNo: Integer;
+        MemberLanguageCode: Code[10];
+    begin
+        // [SCENARIO] Under MERGE_MEMBER, an order without a language keeps the conflicting member's language and does not apply the community default.
+        // Guard only: it also passes before the preset member fix.
+        Initialize();
+
+        // [GIVEN] Two orders without a language for the same member email
+        EnsureMemberLanguage('ZZA');
+        EnsureMemberLanguage('ZZC');
+        MemberEmail := NewUniqueEmail();
+        CreateCreateMembershipOrder(EcomSalesHeader1, EcomSalesLine1, '', MemberEmail);
+        CreateCreateMembershipOrder(EcomSalesHeader2, EcomSalesLine2, '', MemberEmail);
+        Commit();
+
+        // [GIVEN] The community merges members by email and has default member language 'ZZC'
+        GetCommunity('T-ECOM', SavedCommunity);
+        _Assert.AreEqual('', SavedCommunity.MemberDefaultLanguageCode, 'Precondition: the community default member language must be blank. An earlier test leaked it.');
+        SetCommunity(SavedCommunity.Code, SavedCommunity."Member Unique Identity"::EMAIL, SavedCommunity."Create Member UI Violation"::MERGE_MEMBER, 'ZZC');
+
+        // [GIVEN] Order 1 creates the member, and the member's language is then set to 'ZZA'
+        EcomCreateMMShipImpl.Process(EcomSalesLine1);
+        FirstMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine1);
+        _Assert.AreEqual('ZZC', GetMemberLanguage(FirstMemberEntryNo), 'A new member under MERGE_MEMBER must get the community default member language.');
+        SetMemberLanguage(FirstMemberEntryNo, 'ZZA');
+
+        // [WHEN] Order 2 is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine2);
+        SecondMemberEntryNo := GetLineMemberEntryNo(EcomSalesLine2);
+        MemberLanguageCode := GetMemberLanguage(FirstMemberEntryNo);
+        RestoreCommunity(SavedCommunity);
+        Commit();
+
+        // [THEN] Order 2 used the conflicting member and kept its language
+        _Assert.AreEqual(FirstMemberEntryNo, SecondMemberEntryNo, 'Order 2 must use the member created by order 1.');
+        _Assert.AreEqual('ZZA', MemberLanguageCode, 'An order without a language must keep the conflicting member''s language under MERGE_MEMBER, not wipe it or apply the community default.');
+    end;
+
+    local procedure EnsureLanguage(LanguageCode: Code[10])
+    var
+        Language: Record Language;
+    begin
+        if Language.Get(LanguageCode) then
+            exit;
+        Language.Init();
+        Language.Code := LanguageCode;
+        Language.Insert();
+    end;
+
+    local procedure EnsureMemberLanguage(LanguageCode: Code[10])
+    var
+        MMLanguage: Record "NPR MM Language";
+    begin
+        EnsureLanguage(LanguageCode);
+        if MMLanguage.Get(LanguageCode) then
+            exit;
+        MMLanguage.Init();
+        MMLanguage.LanguageCode := LanguageCode;
+        MMLanguage.Insert();
+    end;
+
+    local procedure AssertNotMemberLanguage(LanguageCode: Code[10])
+    var
+        MMLanguage: Record "NPR MM Language";
+    begin
+        _Assert.IsFalse(MMLanguage.Get(LanguageCode), StrSubstNo('Precondition: ''%1'' must not be a member language.', LanguageCode));
+    end;
+
+    local procedure NewUniqueEmail() UniqueEmail: Text[80]
+    begin
+#pragma warning disable AA0139
+        UniqueEmail := CopyStr(DelChr(Format(CreateGuid()), '=', '{}') + '@test.example.com', 1, MaxStrLen(UniqueEmail));
+#pragma warning restore AA0139
+    end;
+
+    local procedure CreateCreateMembershipOrder(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line"; LanguageCode: Code[10]; MemberEmail: Text[80])
+    begin
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader."Language Code" := LanguageCode;
+        EcomSalesHeader.Modify();
+
+        _LibEcommerce.CreateCapturedMembershipLineNoToken(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM');
+        EcomSalesLine."Member First Name" := 'Jane';
+        EcomSalesLine."Member Last Name" := 'Doe';
+#pragma warning disable AA0139
+        EcomSalesLine."Member Email" := MemberEmail;
+#pragma warning restore AA0139
+        EcomSalesLine.Modify();
+    end;
+
+    local procedure CreateMemberWithLanguage(LanguageCode: Code[10]): Integer
+    var
+        Member: Record "NPR MM Member";
+    begin
+        Member.Init();
+        Member."First Name" := 'Test';
+        Member.PreferredLanguageCode := LanguageCode;
+        Member.Insert(true);
+        exit(Member."Entry No.");
+    end;
+
+    local procedure SetMemberLanguage(MemberEntryNo: Integer; LanguageCode: Code[10])
+    var
+        Member: Record "NPR MM Member";
+    begin
+        Member.Get(MemberEntryNo);
+        Member.PreferredLanguageCode := LanguageCode;
+        Member.Modify();
+    end;
+
+    local procedure GetMemberLanguage(MemberEntryNo: Integer): Code[10]
+    var
+        Member: Record "NPR MM Member";
+    begin
+        Member.Get(MemberEntryNo);
+        exit(Member.PreferredLanguageCode);
+    end;
+
+    local procedure GetLineMemberEntryNo(EcomSalesLine: Record "NPR Ecom Sales Line"): Integer
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        _Assert.IsTrue(Membership.GetBySystemId(EcomSalesLine."Membership Id"), 'The line must point at the created membership.');
+        MembershipRole.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipRole.SetFilter("Member Entry No.", '<>%1', 0);
+        _Assert.IsTrue(MembershipRole.FindFirst(), 'The created membership must have a member.');
+        exit(MembershipRole."Member Entry No.");
+    end;
+
+    local procedure GetCommunity(MembershipCode: Code[20]; var Community: Record "NPR MM Member Community")
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        MembershipSetup.Get(MembershipCode);
+        Community.Get(MembershipSetup."Community Code");
+    end;
+
+    local procedure SetCommunity(CommunityCode: Code[20]; UniqueIdentity: Enum "NPR MM Member Unique Identity"; UIViolation: Option ERROR,CONFIRM,REUSE,MERGE_MEMBER; DefaultLanguageCode: Code[10])
+    var
+        Community: Record "NPR MM Member Community";
+    begin
+        Community.Get(CommunityCode);
+        Community."Member Unique Identity" := UniqueIdentity;
+        Community."Create Member UI Violation" := UIViolation;
+        Community."Member Logon Credentials" := Community."Member Logon Credentials"::NA;
+        Community.MemberDefaultLanguageCode := DefaultLanguageCode;
+        Community.Modify();
+    end;
+
+    local procedure RestoreCommunity(SavedCommunity: Record "NPR MM Member Community")
+    var
+        Community: Record "NPR MM Member Community";
+    begin
+        Community.Get(SavedCommunity.Code);
+        Community."Member Unique Identity" := SavedCommunity."Member Unique Identity";
+        Community."Create Member UI Violation" := SavedCommunity."Create Member UI Violation";
+        Community."Member Logon Credentials" := SavedCommunity."Member Logon Credentials";
+        Community.MemberDefaultLanguageCode := SavedCommunity.MemberDefaultLanguageCode;
+        Community.Modify();
+    end;
+
 }
 #endif
