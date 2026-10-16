@@ -325,6 +325,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             exit;
         end;
         PaymentLine.TestField(Amount);
+        SpfyPaymentGatewayHdlr.CheckCaptureWithinDocumentTotal(PaymentLine);
         PaymentLine.TestField("Payment Gateway Code");
         if not SpfyPaymentGateway.Get(PaymentLine."Payment Gateway Code") then
             SpfyPaymentGateway.Init();
@@ -490,6 +491,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
     internal procedure UpdatePmtLines(NcTask: Record "NPR Nc Task"; OrderTransactions: JsonArray; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer")
     var
+        DocPaymentLine: Record "NPR Magento Payment Line";
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentLine2: Record "NPR Magento Payment Line";
         PaymentLineParam: Record "NPR Magento Payment Line";
@@ -501,8 +503,14 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         IStream: InStream;
         Transaction: JsonToken;
         DisplayReference: Code[50];
+        CapturedAuthorizations: Dictionary of [Text, Decimal];
+        OpenAuthorizations: Dictionary of [Text, Decimal];
+        DocumentTotal: Decimal;
+        TransactionAmountLeft: Decimal;
+        Pass: Integer;
         AlreadyAssigned: Boolean;
         GiftCardTransaction: Boolean;
+        HasPaymentLine: Boolean;
     begin
         if SpfyTransactionBuffer.IsEmpty() then
             exit;
@@ -512,12 +520,11 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             Database::"Sales Header":
                 begin
                     RecRef.SetTable(SalesHeader);
-                    SalesHeader.CalcFields("Amount Including VAT");
                     PaymentLineParam."Document Type" := SalesHeader."Document Type";
                     PaymentLineParam."Document No." := SalesHeader."No.";
                     PaymentLineParam."Posting Date" := SalesHeader."Posting Date";
                     PaymentLineParam."External Reference No." := SalesHeader."NPR External Order No.";
-                    PaymentLineParam.Amount := SalesHeader."Amount Including VAT";
+                    PaymentLineParam.Amount := SpfyPaymentGatewayHdlr.AmountNotInvoiced(SalesHeader);
                     DisplayReference := GetDisplayReference(SalesHeader."External Document No.", SalesHeader."NPR External Order No.", PaymentLineParam."External Reference No.");
                 end;
 
@@ -542,56 +549,89 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine := PaymentLineParam;
         PaymentLine.SetRecFilter();
         PaymentLine.SetRange("Line No.");
+        DocPaymentLine.CopyFilters(PaymentLine);
+        DocPaymentLine.SetRange("Points Payment", false);
+        DocumentTotal := PaymentLineParam.Amount;
+        SpfyPaymentGatewayHdlr.CollectOpenAuthorizations(SpfyTransactionBuffer, OrderTransactions, PaymentLineParam."Document Table No.", PaymentLineParam."Document No.", OpenAuthorizations, CapturedAuthorizations);
+        SpfyPaymentGatewayHdlr.CapUncapturedLinesToAuthorizations(DocPaymentLine, OpenAuthorizations);
 
-        SpfyTransactionBuffer.FindSet();
-        repeat
-            AlreadyAssigned := false;
-            SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Magento Payment Line", "NPR Spfy ID Type"::"Entry ID", SpfyTransactionBuffer."Transaction ID", ShopifyAssignedID);
-            if ShopifyAssignedID.FindSet() then
+        // Lines of fully refunded transactions go first, so the next passes size against what stays on the document. Money Shopify has
+        // already taken (gift cards, sales, captured authorizations) then goes on the document before the authorizations it still holds open.
+        for Pass := 1 to 3 do begin
+            if Pass = 1 then
+                SpfyTransactionBuffer.SetFilter("Amount (PCY)", '<=0')
+            else
+                SpfyTransactionBuffer.SetFilter("Amount (PCY)", '>0');
+            if SpfyTransactionBuffer.FindSet() then
                 repeat
-                    if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
-                        RecRef.SetTable(PaymentLine2);
-                        AlreadyAssigned :=
-                            (PaymentLine2."Document Table No." = PaymentLineParam."Document Table No.") and
-                            ((PaymentLine2."Document Type" = PaymentLineParam."Document Type") or (PaymentLineParam."Document Table No." = Database::"Sales Invoice Header")) and
-                            (PaymentLine2."Document No." = PaymentLineParam."Document No.");
-                        if AlreadyAssigned then
-                            PaymentLine := PaymentLine2;
+                    if (Pass = 1) or ((Pass = 3) = OpenAuthorizations.ContainsKey(SpfyTransactionBuffer."Transaction ID")) then begin
+                        AlreadyAssigned := false;
+                        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Magento Payment Line", "NPR Spfy ID Type"::"Entry ID", SpfyTransactionBuffer."Transaction ID", ShopifyAssignedID);
+                        if ShopifyAssignedID.FindSet() then
+                            repeat
+                                if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
+                                    RecRef.SetTable(PaymentLine2);
+                                    AlreadyAssigned :=
+                                        (PaymentLine2."Document Table No." = PaymentLineParam."Document Table No.") and
+                                        ((PaymentLine2."Document Type" = PaymentLineParam."Document Type") or (PaymentLineParam."Document Table No." = Database::"Sales Invoice Header")) and
+                                        (PaymentLine2."Document No." = PaymentLineParam."Document No.");
+                                    if AlreadyAssigned then
+                                        PaymentLine := PaymentLine2;
+                                end;
+                            until (ShopifyAssignedID.Next() = 0) or AlreadyAssigned;
+
+                        if SpfyTransactionBuffer."Amount (PCY)" <= 0 then begin
+                            // A posted line's money is already booked; a refund after posting goes through a credit memo, not by removing the line.
+                            if AlreadyAssigned and not PaymentLine.Posted then
+                                PaymentLine.Delete(true);
+                        end else begin
+                            SpfyTransactionBuffer.CalcFields("Transaction Json");
+                            SpfyTransactionBuffer."Transaction Json".CreateInStream(IStream, TextEncoding::UTF8);
+                            Transaction.ReadFrom(IStream);
+
+                            HasPaymentLine := AlreadyAssigned;
+                            if not AlreadyAssigned then begin
+                                // A new line gets no more than the payment lines already on the document leave of its total, and no more than the transaction
+                                // has left after its refunds and after what the order's other invoices already took from it.
+                                DocPaymentLine.CalcSums(Amount);
+                                PaymentLineParam.Amount := DocumentTotal - DocPaymentLine.Amount;
+                                // Money Shopify has already taken may use the room of open authorization lines, which are cut to fit afterwards.
+                                if Pass = 2 then
+                                    PaymentLineParam.Amount += SpfyPaymentGatewayHdlr.AmountOnOpenAuthorizationLines(DocPaymentLine, OpenAuthorizations);
+                                // An authorization's limit counts what Shopify still holds unsettled or, once captured, what it captured.
+                                if not OpenAuthorizations.Get(SpfyTransactionBuffer."Transaction ID", TransactionAmountLeft) then
+                                    if not CapturedAuthorizations.Get(SpfyTransactionBuffer."Transaction ID", TransactionAmountLeft) then
+                                        TransactionAmountLeft := SpfyPaymentGatewayHdlr.AmountLeftAfterOtherInvoices(SpfyTransactionBuffer, OrderTransactions, PaymentLineParam."Document Table No.", PaymentLineParam."Document No.");
+                                if PaymentLineParam.Amount > TransactionAmountLeft then
+                                    PaymentLineParam.Amount := TransactionAmountLeft;
+                                if PaymentLineParam.Amount > 0 then begin
+                                    if not PaymentLine.FindLast() then
+                                        PaymentLine."Line No." := 0;
+
+                                    GiftCardTransaction := false;
+                                    if IsSaleTransaction(SpfyTransactionBuffer.Kind) then
+                                        GiftCardTransaction := AddGiftCardPaymentLine(Transaction, PaymentLineParam, PaymentLine);
+                                    if not GiftCardTransaction then begin
+                                        InitCreditCardPaymentLine(Transaction, PaymentLineParam, PaymentLine, DisplayReference);
+                                        PaymentLine."No." := SpfyTransactionBuffer."Transaction ID";
+                                        PaymentLine.Insert(true);
+                                    end;
+                                    SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", SpfyTransactionBuffer."Transaction ID", false);
+                                    HasPaymentLine := true;
+                                end;
+                            end;
+
+                            if HasPaymentLine then begin
+                                if PaymentLine."Posting Date" = 0D then
+                                    PaymentLine."Posting Date" := PaymentLineParam."Posting Date";
+                                SetPmtLineAsCaptured(Transaction, OrderTransactions, SpfyTransactionBuffer.Kind, SpfyTransactionBuffer."Transaction ID", PaymentLine);
+                            end;
+                        end;
                     end;
-                until (ShopifyAssignedID.Next() = 0) or AlreadyAssigned;
-
-            if SpfyTransactionBuffer."Amount (PCY)" <= 0 then begin
-                if AlreadyAssigned then
-                    PaymentLine.Delete(true);
-            end else begin
-                SpfyTransactionBuffer.CalcFields("Transaction Json");
-                SpfyTransactionBuffer."Transaction Json".CreateInStream(IStream, TextEncoding::UTF8);
-                Transaction.ReadFrom(IStream);
-
-                if not AlreadyAssigned then begin
-                    if not PaymentLine.FindLast() then
-                        PaymentLine."Line No." := 0;
-
-                    GiftCardTransaction := false;
-                    if IsSaleTransaction(SpfyTransactionBuffer.Kind) then
-                        GiftCardTransaction := AddGiftCardPaymentLine(Transaction, PaymentLineParam, PaymentLine);
-                    if not GiftCardTransaction then begin
-                        InitCreditCardPaymentLine(Transaction, PaymentLineParam, PaymentLine, DisplayReference);
-                        PaymentLine."No." := SpfyTransactionBuffer."Transaction ID";
-                        PaymentLine.Insert(true);
-                    end;
-                    SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", SpfyTransactionBuffer."Transaction ID", false);
-                end;
-
-                if PaymentLine."Posting Date" = 0D then
-                    PaymentLine."Posting Date" := PaymentLineParam."Posting Date";
-                SetPmtLineAsCaptured(Transaction, OrderTransactions, SpfyTransactionBuffer.Kind, SpfyTransactionBuffer."Transaction ID", PaymentLine);
-
-                PaymentLineParam.Amount := PaymentLineParam.Amount - PaymentLine.Amount;
-                if PaymentLineParam.Amount <= 0 then
-                    exit;
-            end;
-        until SpfyTransactionBuffer.Next() = 0;
+                until SpfyTransactionBuffer.Next() = 0;
+        end;
+        SpfyTransactionBuffer.Reset();
+        SpfyPaymentGatewayHdlr.FitUncapturedLinesToDocumentTotal(DocPaymentLine, DocumentTotal, PaymentLineParam."Document Table No.", OpenAuthorizations);
     end;
 
     internal procedure UpdatePmtLinesIfNeededAndScheduleCapture(NcTask: Record "NPR Nc Task"; ScheduleCapture: Boolean; StopOnRequestError: Boolean) Success: Boolean

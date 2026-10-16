@@ -120,6 +120,7 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         SalesInvHeader.Init();
         SalesInvHeader."No." := _Lib.NextCode('PI', MaxStrLen(SalesInvHeader."No."));
         SalesInvHeader.Insert(false);
+        InsertInvoiceLine(SalesInvHeader."No.", 500);
 
         PaymentLine.Init();
         PaymentLine."Document Table No." := Database::"Sales Invoice Header";
@@ -131,6 +132,22 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         PaymentLine."Date Captured" := 0D;
         PaymentLine.Insert(false);
         _Lib.AssignEntryID(PaymentLine.RecordId(), '777');
+    end;
+
+    /// <summary>
+    /// A posted invoice line, so the invoice has the total the capture is checked against.
+    /// </summary>
+    local procedure InsertInvoiceLine(InvoiceNo: Code[20]; AmountInclVAT: Decimal)
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+    begin
+        SalesInvoiceLine.Init();
+        SalesInvoiceLine."Document No." := InvoiceNo;
+        SalesInvoiceLine."Line No." := 10000;
+        SalesInvoiceLine.Quantity := 1;
+        SalesInvoiceLine.Amount := AmountInclVAT;
+        SalesInvoiceLine."Amount Including VAT" := AmountInclVAT;
+        SalesInvoiceLine.Insert(false);
     end;
 
     local procedure ShopifyGatewayCode(): Code[10]
@@ -800,6 +817,7 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         SalesInvHeader."No." := _Lib.NextCode('PI', MaxStrLen(SalesInvHeader."No."));
         SalesInvHeader."Order No." := SalesOrderNo;
         SalesInvHeader.Insert(false);
+        InsertInvoiceLine(SalesInvHeader."No.", 500);
         InvoicePaymentLine.Init();
         InvoicePaymentLine."Document Table No." := Database::"Sales Invoice Header";
         InvoicePaymentLine."Document Type" := Enum::"Sales Document Type".FromInteger(0);
@@ -862,6 +880,51 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         _Assert.IsFalse(PaymentLine."Capture Requested", 'A succeeded capture must not leave the line marked as only requested');
         _Assert.AreEqual(0, PendingTaskCountForRecord(Database::"NPR Magento Payment Line", PaymentLine.RecordId()), 'A succeeded capture must not re-enqueue a follow-up for the payment line');
         _Assert.AreEqual(0, NcTaskCount(), 'A succeeded capture must not create a legacy queue row');
+    end;
+
+    [Test]
+    procedure GivenCardLineTheVoucherAlreadyCovers_WhenCaptureSiblingRuns_ThenRefusedWithoutCaptureRequest()
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        VoucherPaymentLine: Record "NPR Magento Payment Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        CapturePayment: Codeunit "NPR Spfy Task Capture Payment";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A card line on an invoice that a voucher line already pays in full is refused at capture, and Shopify is never asked to capture it.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] An invoice of 500 carrying a card line of 500 and a voucher line of 500, and a claimed capture task for the card line.
+        CreateInvoiceWithPaymentLine(SalesInvHeader, PaymentLine, ShopifyGatewayCode());
+        VoucherPaymentLine.Init();
+        VoucherPaymentLine."Document Table No." := Database::"Sales Invoice Header";
+        VoucherPaymentLine."Document Type" := Enum::"Sales Document Type".FromInteger(0);
+        VoucherPaymentLine."Document No." := SalesInvHeader."No.";
+        VoucherPaymentLine."Line No." := 20000;
+        VoucherPaymentLine."Payment Type" := VoucherPaymentLine."Payment Type"::Voucher;
+        VoucherPaymentLine.Amount := 500;
+        VoucherPaymentLine.Insert(false);
+        RecRef.GetTable(PaymentLine);
+        TaskEntryNo := EnqueueTask(StoreCode, RecRef, PaymentLine.RecordId(), '5501', "NPR Spfy Task Op"::Insert, CurrentDateTime());
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.IsTrue(_SpfyTaskQueue.ClaimSingle(SpfyTask), 'The stage-2 task must be claimable');
+        MockOrderTransactionsEmpty(MockClient);
+        MockCaptureStatus(MockClient, 'SUCCESS');
+
+        // [WHEN] The capture sibling runs.
+        CapturePayment.SetGraphQLClient(MockClient);
+        asserterror CapturePayment.Run(SpfyTask);
+
+        // [THEN] The capture is refused because nothing is left to pay on the invoice.
+        _Assert.ExpectedError('The payment has not been captured.');
+
+        // [THEN] No capture request reached Shopify.
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining(_TransactionCreateTok), 'A refused capture must never send the capture mutation');
     end;
     #endregion
 
