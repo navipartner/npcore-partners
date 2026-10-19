@@ -74,6 +74,11 @@
                     ToolTip = 'Specifies until when the card will be valid.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("NP Passes Link Sent At"; Rec."NP Passes Link Sent At")
+                {
+                    ToolTip = 'Specifies when the NP Passes wallet link for this card was last sent. Blank cards receive no pass updates.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
 
                 field("External Membership No."; Rec."External Membership No.")
                 {

@@ -1079,11 +1079,7 @@
             if (not UpdateMemberImage(MemberRole."Member Entry No.", ImageB64)) then
                 exit(false);
 
-        if (MemberRole."Wallet Pass Id" <> '') then
-            EntryNo := MemberNotification.CreateUpdateWalletNotification(MemberRole."Membership Entry No.", MemberRole."Member Entry No.", 0, Today());
-
-        if (MemberRole."Wallet Pass Id" = '') then
-            EntryNo := MemberNotification.CreateWalletSendNotification(MemberRole."Membership Entry No.", MemberRole."Member Entry No.", 0, Today());
+        EntryNo := MemberNotification.CreateWalletSendOrUpdateNotification(MemberRole."Membership Entry No.", MemberRole."Member Entry No.", Today());
 
         if (MembershipNotification.Get(EntryNo)) then
             if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
@@ -1911,12 +1907,15 @@
     internal procedure BlockMemberCard(CardEntryNo: Integer; Block: Boolean)
     var
         MemberCard: Record "NPR MM Member Card";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
     begin
 
         if (MemberCard.Get(CardEntryNo)) then begin
             if (MemberCard.Blocked <> Block) then begin
                 MemberCard.Validate(Blocked, Block);
                 MemberCard.Modify();
+
+                NPPassesAdapter.NotifyCard(MemberCard);
             end;
         end;
     end;
@@ -4727,7 +4726,9 @@
         RecRef: RecordRef;
         MemberNotification: Codeunit "NPR MM Member Notification";
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        NPPassesFacade: Codeunit "NPR NP Passes Facade";
         Item: Record Item;
+        NpPassesSignalsUpdates: Boolean;
     begin
 
         MembershipLedgerEntry."Membership Entry No." := MembershipEntryNo;
@@ -4834,10 +4835,13 @@
                 ; // The create notification is created when first member is added.
 
             end else begin
+                // NP Passes types are signalled from OnMembershipChangeEvent instead.
+                NpPassesSignalsUpdates := NPPassesFacade.IsConfigured() and (MembershipSetup."NP Passes Layout Handle" <> '');
+
                 MembershipRole.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
                 MembershipRole.SetFilter(Blocked, '=%1', false);
                 MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
-                if (not MembershipRole.IsEmpty()) then begin
+                if (not MembershipRole.IsEmpty()) and (not NpPassesSignalsUpdates) then begin
 
                     if (MembershipLedgerEntry."Valid From Date" >= Today()) then
                         MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, MembershipLedgerEntry."Valid From Date");
@@ -4847,12 +4851,13 @@
 
                 end;
 
+                // NP Passes types get the link in the welcome and renewal success mails, not as a wallet mail.
                 MembershipRole.SetFilter("Wallet Pass Id", '=%1', '');
-                if (not MembershipRole.IsEmpty()) then begin
+                if (not MembershipRole.IsEmpty()) and (MembershipSetup."NP Passes Layout Handle" = '') then begin
 
                     MemberNotification.CreateWalletSendNotification(Membership."Entry No.", 0, 0, Today());
 
-                    if (MembershipLedgerEntry."Valid From Date" > Today()) then
+                    if (MembershipLedgerEntry."Valid From Date" > Today()) and (not NpPassesSignalsUpdates) then
                         MemberNotification.CreateUpdateWalletNotification(Membership."Entry No.", 0, 0, MembershipLedgerEntry."Valid From Date");
 
                 end;
@@ -4876,6 +4881,7 @@
         MemberCard: Record "NPR MM Member Card";
         MembershipSetup: Record "NPR MM Membership Setup";
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
     begin
 
         Membership.Get(MembershipEntryNo);
@@ -4897,6 +4903,8 @@
             MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
             MemberCard.ModifyAll("Valid Until", MembershipEntry."Valid Until Date");
         end;
+
+        NPPassesAdapter.NotifyMembership(MembershipEntryNo);
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
         _MembershipWebhooks.TriggerMembershipActivatedWebhookCall(Membership.SystemId, MembershipEntry.SystemId);
@@ -6388,12 +6396,15 @@
     local procedure OnMembershipChangeEvent(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
     begin
 
         if (Membership.Get(MembershipEntryNo)) then begin
             Membership."Modified At" := CurrentDateTime();
             Membership.Modify(true);
         end;
+
+        NPPassesAdapter.NotifyMembership(MembershipEntryNo);
     end;
 
     internal procedure GetMembershipFromUserPassword(UserLogonId: Code[80]; Password: Text[80]) MembershipEntryNo: Integer

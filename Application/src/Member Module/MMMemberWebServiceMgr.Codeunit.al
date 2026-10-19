@@ -1097,13 +1097,30 @@
         NotificationEntryNo := MemberNotification.CreateWalletWithoutSendingNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", Today);
 
         if (NotificationEntryNo = 0) then
-            Error('eMemberCard is missing setup.');
+            if not NpPassesHandledWalletUpdate(MemberInfoCapture."Membership Entry No.", MemberCard) then
+                Error('eMemberCard is missing setup.');
 
         if (MembershipNotification.Get(NotificationEntryNo)) then
             MemberNotification.HandleMembershipNotification(MembershipNotification);
 
         exit(true);
 
+    end;
+
+    local procedure NpPassesHandledWalletUpdate(MembershipEntryNo: Integer; MemberCard: Record "NPR MM Member Card"): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        NPPassesFacade: Codeunit "NPR NP Passes Facade";
+    begin
+        // Only a card that already has an NP pass was updated through the webhook; anything else is missing setup.
+        if (MemberCard."NP Passes Link Sent At" = 0DT) then
+            exit(false);
+        if (not Membership.Get(MembershipEntryNo)) then
+            exit(false);
+        if (not MembershipSetup.Get(Membership."Membership Code")) then
+            exit(false);
+        exit((MembershipSetup."NP Passes Layout Handle" <> '') and NPPassesFacade.IsConfigured());
     end;
 
     local procedure InsertCreateMembership(CreateMembershipRequest: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")

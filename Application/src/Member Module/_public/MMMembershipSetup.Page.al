@@ -294,6 +294,11 @@
                     ToolTip = 'Specifies the value of the Enable NP Pass Integration field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("NP Passes Layout Label"; Rec."NP Passes Layout Label")
+                {
+                    ToolTip = 'Specifies the NP Passes design for this membership type. Empty means the legacy pass server is used. Requires Enable NP Pass Integration. Run Update All Wallets to push a changed design to passes already issued.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Enable Age Verification"; Rec."Enable Age Verification")
                 {
                     Visible = false;
@@ -558,12 +563,15 @@
         Summary: ARRAY[10] OF Integer;
         MaxToCreate: Integer;
         RemainingToCreate: Integer;
+        IsNPPassesType: Boolean;
     begin
 
+        IsNPPassesType := IsNPPassesMembershipType(MembershipCode);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MembershipRole.SetFilter("Membership Code", '=%1', MembershipCode);
-        MembershipRole.SetFilter("Wallet Pass Id", '=%1', '');
-        MissingWalletCount := MembershipRole.Count();
+        if (not IsNPPassesType) then
+            MembershipRole.SetFilter("Wallet Pass Id", '=%1', '');
+        MissingWalletCount := CountRolesByWallet(MembershipRole, IsNPPassesType, false);
 
         if (not Confirm(CONFIRM_MSG, true, MissingWalletCount, MembershipCode)) then
             Error('');
@@ -607,7 +615,9 @@
 
             repeat
 
-                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", Today(), false)) then begin
+                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", Today(), false)) and
+                   (not RoleHasWallet(MembershipRole, IsNPPassesType))
+                then begin
                     EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, Today());
 
                     if (MembershipNotification.Get(EntryNo)) then begin
@@ -658,12 +668,15 @@
         Window: Dialog;
         ProgressBase: Integer;
         ProgressIndex: Integer;
+        IsNPPassesType: Boolean;
     begin
 
+        IsNPPassesType := IsNPPassesMembershipType(Rec.Code);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MembershipRole.SetFilter("Membership Code", '=%1', Rec.Code);
-        MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
-        UpdateWalletCount := MembershipRole.Count();
+        if (not IsNPPassesType) then
+            MembershipRole.SetFilter("Wallet Pass Id", '<>%1', '');
+        UpdateWalletCount := CountRolesByWallet(MembershipRole, IsNPPassesType, true);
 
         if (not Confirm(UPDATE_MSG, true, UpdateWalletCount)) then
             Error('');
@@ -677,7 +690,9 @@
 
             repeat
 
-                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", Today(), false)) then begin
+                if (MembershipManagement.IsMembershipActive(MembershipRole."Membership Entry No.", Today(), false)) and
+                   RoleHasWallet(MembershipRole, IsNPPassesType)
+                then begin
                     EntryNo := MemberNotification.CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, Today());
 
                     if (MembershipNotification.Get(EntryNo)) then begin
@@ -699,6 +714,41 @@
             Window.Close();
 
         end;
+    end;
+
+    // NP Passes types track passes on the card (NP Passes Link Sent At); the role's Wallet Pass Id is the legacy server's.
+    local procedure IsNPPassesMembershipType(MembershipCode: Code[20]): Boolean
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        MembershipSetup.SetLoadFields("NP Passes Layout Handle");
+        if (not MembershipSetup.Get(MembershipCode)) then
+            exit(false);
+        exit(MembershipSetup."NP Passes Layout Handle" <> '');
+    end;
+
+    local procedure RoleHasWallet(MembershipRole: Record "NPR MM Membership Role"; IsNPPassesType: Boolean): Boolean
+    var
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
+    begin
+        if (IsNPPassesType) then
+            exit(NPPassesAdapter.HasNPPass(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No."));
+        exit(MembershipRole."Wallet Pass Id" <> '');
+    end;
+
+    local procedure CountRolesByWallet(var MembershipRole: Record "NPR MM Membership Role"; IsNPPassesType: Boolean; WithWallet: Boolean) RoleCount: Integer
+    var
+        Role: Record "NPR MM Membership Role";
+    begin
+        if (not IsNPPassesType) then
+            exit(MembershipRole.Count());
+
+        Role.CopyFilters(MembershipRole);
+        if (Role.FindSet()) then
+            repeat
+                if (RoleHasWallet(Role, true) = WithWallet) then
+                    RoleCount += 1;
+            until (Role.Next() = 0);
     end;
 
     local procedure InitMembershipCustomerPendingUpdate(): Boolean

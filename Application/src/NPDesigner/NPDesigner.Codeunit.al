@@ -4,42 +4,51 @@ codeunit 6248190 "NPR NPDesigner"
     internal procedure LookupDesignLayouts(Type: Text; LookupCaption: Text; var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
     var
         TemporaryNPDesignerTemplates: Record "NPR NPDesignerTemplates" temporary;
-        SelectDesignLayouts: Page "NPR NPDesignerTemplateList";
     begin
-
         GetDesignerTemplates(Type, TemporaryNPDesignerTemplates);
-        if (TemporaryNPDesignerTemplates.FindFirst()) then;
-        if (TemporaryNPDesignerTemplates.Get(NPDesignerTemplateId)) then;
-
-        SelectDesignLayouts.SetData(TemporaryNPDesignerTemplates);
-        SelectDesignLayouts.SetCaption(StrSubstNo('%1 - %2', Type, LookupCaption));
-        SelectDesignLayouts.LookupMode(true);
-        if (SelectDesignLayouts.RunModal() <> Action::LookupOK) then
-            exit;
-
-        SelectDesignLayouts.GetRecord(TemporaryNPDesignerTemplates);
-        NPDesignerTemplateId := TemporaryNPDesignerTemplates.ExternalId;
-        NPDesignerTemplateLabel := CopyStr(TemporaryNPDesignerTemplates.Description, 1, MaxStrLen(NPDesignerTemplateLabel));
+        SelectDesignLayout(Type, LookupCaption, NPDesignerTemplateId, NPDesignerTemplateLabel, TemporaryNPDesignerTemplates);
     end;
 
     internal procedure ValidateDesignLayouts(Type: Text; var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
     var
         TemporaryNPDesignerTemplates: Record "NPR NPDesignerTemplates" temporary;
-        NotFound: Label 'Design Layout %1 not found';
     begin
-
         if (NPDesignerTemplateLabel = '') then begin
             NPDesignerTemplateId := '';
             exit;
         end;
-
         GetDesignerTemplates(Type, TemporaryNPDesignerTemplates);
-        TemporaryNPDesignerTemplates.SetFilter(Description, '%1', '@' + NPDesignerTemplateLabel + '*');
-        if (not TemporaryNPDesignerTemplates.FindFirst()) then
+        FindDesignLayout(NPDesignerTemplateId, NPDesignerTemplateLabel, TemporaryNPDesignerTemplates);
+    end;
+
+    internal procedure SelectDesignLayout(Type: Text; LookupCaption: Text; var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80]; var DesignerTemplates: Record "NPR NPDesignerTemplates" temporary)
+    var
+        SelectDesignLayouts: Page "NPR NPDesignerTemplateList";
+    begin
+        if (DesignerTemplates.FindFirst()) then;
+        if (DesignerTemplates.Get(NPDesignerTemplateId)) then;
+
+        SelectDesignLayouts.SetData(DesignerTemplates);
+        SelectDesignLayouts.SetCaption(StrSubstNo('%1 - %2', Type, LookupCaption));
+        SelectDesignLayouts.LookupMode(true);
+        if (SelectDesignLayouts.RunModal() <> Action::LookupOK) then
+            exit;
+
+        SelectDesignLayouts.GetRecord(DesignerTemplates);
+        NPDesignerTemplateId := DesignerTemplates.ExternalId;
+        NPDesignerTemplateLabel := CopyStr(DesignerTemplates.Description, 1, MaxStrLen(NPDesignerTemplateLabel));
+    end;
+
+    internal procedure FindDesignLayout(var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80]; var DesignerTemplates: Record "NPR NPDesignerTemplates" temporary)
+    var
+        NotFound: Label 'Design Layout %1 not found';
+    begin
+        DesignerTemplates.SetFilter(Description, '%1', '@' + NPDesignerTemplateLabel + '*');
+        if (not DesignerTemplates.FindFirst()) then
             Error(NotFound, NPDesignerTemplateLabel);
 
-        NPDesignerTemplateId := TemporaryNPDesignerTemplates.ExternalId;
-        NPDesignerTemplateLabel := CopyStr(TemporaryNPDesignerTemplates.Description, 1, MaxStrLen(NPDesignerTemplateLabel));
+        NPDesignerTemplateId := DesignerTemplates.ExternalId;
+        NPDesignerTemplateLabel := CopyStr(DesignerTemplates.Description, 1, MaxStrLen(NPDesignerTemplateLabel));
     end;
 
     #region Manifest Management
@@ -353,17 +362,38 @@ codeunit 6248190 "NPR NPDesigner"
     internal procedure GetDesignerTemplates(Type: Text; var DesignerTemplates: Record "NPR NPDesignerTemplates" temporary)
     var
         NoTemplatesFound: Label 'Could not retrieve design layouts from NP Designer: %1';
-        Layouts: JsonObject;
-        DesignLayouts: JsonArray;
-        Result, Design, Designs : JsonToken;
+        Result: JsonToken;
     begin
-
         ClearLastError();
         if (not DesignerTemplateApi(Type, Result)) then begin
             Message(NoTemplatesFound, GetLastErrorText);
             exit;
         end;
 
+        PopulateTemplatesFromResult(Result, DesignerTemplates);
+    end;
+
+    internal procedure GetDesignerTemplates(Source: Text; Type: Text; ApiUrl: Text; ApiToken: SecretText; var DesignerTemplates: Record "NPR NPDesignerTemplates" temporary): Boolean
+    var
+        NoExternalTemplatesFound: Label 'Could not retrieve design layouts: %1';
+        Result: JsonToken;
+    begin
+        ClearLastError();
+        if (not DesignerTemplateApiExternal(ApiUrl, ApiToken, Source, Type, Result)) then begin
+            Message(NoExternalTemplatesFound, GetLastErrorText);
+            exit(false);
+        end;
+
+        PopulateTemplatesFromResult(Result, DesignerTemplates);
+        exit(true);
+    end;
+
+    local procedure PopulateTemplatesFromResult(Result: JsonToken; var DesignerTemplates: Record "NPR NPDesignerTemplates" temporary)
+    var
+        Layouts: JsonObject;
+        DesignLayouts: JsonArray;
+        Design, Designs : JsonToken;
+    begin
         if (Result.IsObject()) then begin
             Layouts := Result.AsObject();
             Layouts.Get('designs', Designs);
@@ -379,29 +409,36 @@ codeunit 6248190 "NPR NPDesigner"
             DesignerTemplates.Description := CopyStr(AsText(Design, 'label'), 1, MaxStrLen(DesignerTemplates.Description));
             DesignerTemplates.Insert(true);
         end;
-
     end;
 
     [TryFunction]
     [NonDebuggable]
     local procedure DesignerTemplateApi(Type: Text; Result: JsonToken)
     var
+        Setup: Record "NPR NPDesignerSetup";
+    begin
+        Setup.Get();
+        Setup.TestField(DesignerURL);
+        Setup.TestField(ApiAuthorization);
+        DesignerTemplateApiExternal(Setup.DesignerURL, Setup.ApiAuthorization, 'designer', Type, Result);
+    end;
+
+    [TryFunction]
+    [NonDebuggable]
+    local procedure DesignerTemplateApiExternal(ApiUrl: Text; ApiToken: SecretText; Source: Text; Type: Text; Result: JsonToken)
+    var
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
         Headers: HttpHeaders;
         Response: Text;
-        Setup: Record "NPR NPDesignerSetup";
     begin
         Clear(Response);
-        Setup.Get();
-        Setup.TestField(DesignerURL);
-        Setup.TestField(ApiAuthorization);
 
-        HttpWebRequest.SetRequestUri(StrSubstNo('%1?type=%2', Setup.DesignerURL, CopyStr(Type, 1, 50)));
+        HttpWebRequest.SetRequestUri(StrSubstNo('%1?source=%2&type=%3', ApiUrl, CopyStr(Source, 1, 20), CopyStr(Type, 1, 50)));
         HttpWebRequest.Method('GET');
         HttpWebRequest.GetHeaders(Headers);
-        Headers.Add('Authorization', StrSubstNo('Bearer %1', Setup.ApiAuthorization));
+        Headers.Add('Authorization', SecretStrSubstNo('Bearer %1', ApiToken));
 
         Client.Timeout := 60000;
         Client.Send(HttpWebRequest, HttpWebResponse);

@@ -124,6 +124,7 @@ codeunit 6248223 "NPR MemberCardApiAgent"
     var
         MemberCard: Record "NPR MM Member Card";
         ResponseJson: Codeunit "NPR JSON Builder";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
 
         BodyJson: JsonObject;
         jToken: JsonToken;
@@ -144,8 +145,10 @@ codeunit 6248223 "NPR MemberCardApiAgent"
         if (BodyJson.Get('pinCode', jToken)) then
             MemberCard."Pin Code" := CopyStr(jToken.AsValue().AsText(), 1, MaxStrLen(MemberCard."Pin Code"));
 
-        if (Format(MemberCard) <> CardAsText) then
+        if (Format(MemberCard) <> CardAsText) then begin
             MemberCard.Modify();
+            NPPassesAdapter.NotifyCard(MemberCard);
+        end;
 
         ResponseJson.StartObject()
             .AddObject(StartMemberCardDTO(ResponseJson, MemberCard, false, false))
@@ -157,19 +160,46 @@ codeunit 6248223 "NPR MemberCardApiAgent"
     internal procedure SendToWallet(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
         ResponseJson: Codeunit "NPR JSON Builder";
         MemberNotification: Codeunit "NPR MM Member Notification";
         MembershipNotification: Record "NPR MM Membership Notific.";
         MembershipNotificationEntry: Record "NPR MM Member Notific. Entry";
+        NPPassesFacade: Codeunit "NPR NP Passes Facade";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
         NotificationEntryNo: Integer;
+        LandingLink: Text;
     begin
         if (not GetByCardId(Request, 3, MemberCard)) then
             exit(Response.RespondBadRequest('Card not found'));
 
         NotificationEntryNo := MemberNotification.CreateWalletWithoutSendingNotification(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", Today());
 
-        if (NotificationEntryNo = 0) then
+        if (NotificationEntryNo = 0) then begin
+            if Membership.Get(MemberCard."Membership Entry No.") and
+               MembershipSetup.Get(Membership."Membership Code") and
+               (MembershipSetup."NP Passes Layout Handle" <> '') and
+               NPPassesFacade.IsConfigured()
+            then begin
+                if (not NPPassesAdapter.CanIssuePassLink(MemberCard)) then
+                    exit(Response.RespondBadRequest('A wallet pass can only be issued for a card that is not blocked, not temporary and still valid.'));
+                LandingLink := NPPassesAdapter.IssueLandingLink(MemberCard, MembershipSetup."NP Passes Layout Handle");
+                if (LandingLink <> '') then begin
+                    ResponseJson.StartObject()
+                        .AddProperty('cardId', Format(MemberCard.SystemId, 0, 4).ToLower())
+                        .AddProperty('notificationSent', false)
+                        .AddProperty('email', '')
+                        .AddProperty('phoneNo', '')
+                        .AddProperty('landingUrl', LandingLink)
+                        .AddProperty('androidUrl', LandingLink)
+                        .AddProperty('iosUrl', LandingLink)
+                        .EndObject();
+                    exit(Response.RespondOK(ResponseJson.Build()));
+                end;
+            end;
             exit(Response.RespondBadRequest('eMemberCard is missing setup, notification not created.'));
+        end;
 
         if (not MembershipNotification.Get(NotificationEntryNo)) then
             exit(Response.RespondBadRequest('eMemberCard is missing setup, notification not created.'));
@@ -332,6 +362,8 @@ codeunit 6248223 "NPR MemberCardApiAgent"
     var
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
         Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        PassDesignHandle: Text[40];
     begin
         if (not IncludeMembership) then
             exit(ResponseJson);
@@ -339,8 +371,14 @@ codeunit 6248223 "NPR MemberCardApiAgent"
         if (not Membership.Get(MembershipEntryNo)) then
             exit(ResponseJson);
 
+        MembershipSetup.SetLoadFields("NP Passes Layout Handle");
+        if (MembershipSetup.Get(Membership."Membership Code")) then
+            PassDesignHandle := MembershipSetup."NP Passes Layout Handle";
+
+        // NP Passes renders the pass with this design, so a link always shows the type's current design.
         ResponseJson.StartObject('membership')
             .AddObject(MembershipApiAgent.MembershipDTO(ResponseJson, Membership))
+            .AddProperty('passDesignHandle', PassDesignHandle)
             .EndObject();
 
         exit(ResponseJson);

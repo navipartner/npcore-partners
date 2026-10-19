@@ -347,6 +347,51 @@
             Caption = 'Enable NP Pass Integration';
             DataClassification = CustomerContent;
         }
+        field(410; "NP Passes Layout Handle"; Text[40])
+        {
+            Caption = 'NP Passes Layout Handle';
+            DataClassification = CustomerContent;
+        }
+        field(411; "NP Passes Layout Label"; Text[80])
+        {
+            Caption = 'NP Passes Design Layout';
+            DataClassification = CustomerContent;
+
+            trigger OnLookup()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+                NPPassesSetup: Record "NPR NP Passes Setup";
+                Templates: Record "NPR NPDesignerTemplates" temporary;
+                SecretMissingErr: Label '%1 must be configured in %2 before looking up designs.', Comment = '%1 = Signing Secret field caption, %2 = NP Passes Setup table caption';
+            begin
+                NPPassesSetup.Get();
+                if not NPPassesSetup.HasSigningSecret() then
+                    Error(SecretMissingErr, NPPassesSetup.FieldCaption("Signing Secret Key"), NPPassesSetup.TableCaption());
+                if not Designer.GetDesignerTemplates('passes', 'membership', NPPassesSetup.GetDesignListUrl(), NPPassesSetup.GetSigningSecret(), Templates) then
+                    exit;
+                Designer.SelectDesignLayout('membership', Rec.FieldCaption("NP Passes Layout Label"), Rec."NP Passes Layout Handle", Rec."NP Passes Layout Label", Templates);
+            end;
+
+            trigger OnValidate()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+                NPPassesSetup: Record "NPR NP Passes Setup";
+                Templates: Record "NPR NPDesignerTemplates" temporary;
+                SecretMissingErr: Label '%1 must be configured in %2 before validating designs.', Comment = '%1 = Signing Secret field caption, %2 = NP Passes Setup table caption';
+                FetchFailedErr: Label 'Could not connect to design service. Verify that %1 and %2 are configured correctly in %3.', Comment = '%1 = Design List URL field caption, %2 = Signing Secret field caption, %3 = NP Passes Setup table caption';
+            begin
+                if (Rec."NP Passes Layout Label" = '') then begin
+                    Rec."NP Passes Layout Handle" := '';
+                    exit;
+                end;
+                NPPassesSetup.Get();
+                if not NPPassesSetup.HasSigningSecret() then
+                    Error(SecretMissingErr, NPPassesSetup.FieldCaption("Signing Secret Key"), NPPassesSetup.TableCaption());
+                if not Designer.GetDesignerTemplates('passes', 'membership', NPPassesSetup.GetDesignListUrl(), NPPassesSetup.GetSigningSecret(), Templates) then
+                    Error(FetchFailedErr, NPPassesSetup.FieldCaption("Design List URL"), NPPassesSetup.FieldCaption("Signing Secret Key"), NPPassesSetup.TableCaption());
+                Designer.FindDesignLayout(Rec."NP Passes Layout Handle", Rec."NP Passes Layout Label", Templates);
+            end;
+        }
         field(500; "GDPR Mode"; Option)
         {
             Caption = 'GDPR Mode';

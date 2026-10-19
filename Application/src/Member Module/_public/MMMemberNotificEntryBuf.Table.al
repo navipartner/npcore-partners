@@ -365,7 +365,7 @@ table 6151238 "NPR MMMemberNotificEntryBuf"
             DataClassification = CustomerContent;
             Description = '';
         }
-        field(422; "Wallet Pass Landing URL"; Text[200])
+        field(422; "Wallet Pass Landing URL"; Text[500])
         {
             Caption = 'Wallet Pass Combine URL';
             DataClassification = CustomerContent;

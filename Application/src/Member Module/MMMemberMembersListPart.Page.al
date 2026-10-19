@@ -163,11 +163,7 @@
                     CurrPage.SetSelectionFilter(MembershipRole);
                     if (MembershipRole.FindSet()) then begin
                         repeat
-                            if (MembershipRole."Wallet Pass Id" <> '') then
-                                EntryNo := MemberNotification.CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
-
-                            if (MembershipRole."Wallet Pass Id" = '') then
-                                EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
+                            EntryNo := MemberNotification.CreateWalletSendOrUpdateNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", Today());
 
                             if (MembershipNotification.Get(EntryNo)) then
                                 if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then

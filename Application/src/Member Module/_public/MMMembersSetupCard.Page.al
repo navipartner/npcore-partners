@@ -330,6 +330,11 @@
                     ToolTip = 'Specifies the value of the Enable NP Pass Integration field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("NP Passes Layout Label"; Rec."NP Passes Layout Label")
+                {
+                    ToolTip = 'Specifies the NP Passes design for this membership type. Empty means the legacy pass server is used. Requires Enable NP Pass Integration. Run Update All Wallets to push a changed design to passes already issued.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
             group("On Membercard Swipe")
             {

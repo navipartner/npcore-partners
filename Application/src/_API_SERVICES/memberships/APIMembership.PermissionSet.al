@@ -6,6 +6,7 @@ permissionset 6014415 "NPR API Membership"
     Caption = 'NPR API - Memberships';
     IncludedPermissionSets = "NPR API Core";
     Permissions =
-        Codeunit "NPR MM MembershipWebHooks" = X;
+        Codeunit "NPR MM MembershipWebHooks" = X,
+        Codeunit "NPR NP Passes WebHooks" = X;
 }
 #endif

@@ -24,10 +24,13 @@ codeunit 6248286 "NPR MM Update Customer Pending"
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         Membership: Record "NPR MM Membership";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
+        MembershipCodeChanged: Boolean;
     begin
         Membership.SetLoadFields("Membership Code");
         if (Membership.Get(PendingCustomerUpdate.MembershipEntryNo)) then
             if ((Membership."Membership Code" <> PendingCustomerUpdate.MembershipCode) and (PendingCustomerUpdate.MembershipCode <> '')) then begin
+                MembershipCodeChanged := true;
                 Membership."Membership Code" := PendingCustomerUpdate.MembershipCode;
                 Membership.Modify();
             end;
@@ -39,6 +42,9 @@ codeunit 6248286 "NPR MM Update Customer Pending"
                 RecRef.SetTable(Customer);
                 Customer.Modify(true);
             end;
+
+        if (MembershipCodeChanged) then
+            NPPassesAdapter.NotifyMembership(PendingCustomerUpdate.MembershipEntryNo);
 
         PendingCustomerUpdate."Update Processed" := true;
         PendingCustomerUpdate.Modify();

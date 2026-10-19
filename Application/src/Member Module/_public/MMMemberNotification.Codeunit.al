@@ -619,6 +619,19 @@
         end;
     end;
 
+    // WALLET_UPDATE only refreshes the pass. WALLET_CREATE exists to deliver the link, so without one it stays FAILED;
+    // other messages (welcome, coupon) still go out without the link.
+    local procedure SendsMessage(MemberNotificationEntry: Record "NPR MM Member Notific. Entry"; NpPassIssued: Boolean): Boolean
+    begin
+        case MemberNotificationEntry."Notification Trigger" of
+            MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE:
+                exit(false);
+            MemberNotificationEntry."Notification Trigger"::WALLET_CREATE:
+                exit(NpPassIssued);
+        end;
+        exit(true);
+    end;
+
     local procedure NotifyRecipients(MembershipNotification: Record "NPR MM Membership Notific.")
     var
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
@@ -626,6 +639,7 @@
         ResponseMessage: Text;
         SendStatus: Option;
         AzureUpdateOrAzureSkip: Boolean;
+        NpPassIssued: Boolean;
     begin
 
         MemberNotificationEntry.SetFilter("Notification Entry No.", '=%1', MembershipNotification."Entry No.");
@@ -638,6 +652,8 @@
 
                 MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
 
+                ResponseMessage := '';
+                NpPassIssued := true;
                 SendStatus := MemberNotificationEntry2."Notification Send Status"::FAILED;
                 MemberNotificationEntry2."Notification Send Status" := SendStatus;
                 MemberNotificationEntry2."Notification Sent At" := CurrentDateTime();
@@ -654,21 +670,22 @@
 
                     MemberNotificationEntry2."Notification Method"::WALLET:
                         begin
-                            CreateNpPass(MemberNotificationEntry2);
+                            NpPassIssued := CreateNpPass(MemberNotificationEntry2);
                             MemberNotificationEntry2.Modify();
-                            SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                            if (NpPassIssued) then
+                                SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                         end;
 
                     MemberNotificationEntry2."Notification Method"::EMAIL:
                         begin
                             if (MemberNotificationEntry2."Include NP Pass") then begin
-                                CreateNpPass(MemberNotificationEntry2);
+                                NpPassIssued := CreateNpPass(MemberNotificationEntry2);
                                 MemberNotificationEntry2.Modify();
-                                if (MemberNotificationEntry2."Notification Trigger" = MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
+                                if (NpPassIssued and (MemberNotificationEntry2."Notification Trigger" = MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE)) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
 
-                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then begin
+                            if (SendsMessage(MemberNotificationEntry2, NpPassIssued)) then begin
                                 AzureUpdateOrAzureSkip := SendDataSubjectIdToAzure(MemberNotificationEntry2);
                                 if ((AzureUpdateOrAzureSkip) and (SendMail(MemberNotificationEntry2, ResponseMessage))) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
@@ -678,13 +695,13 @@
                     MemberNotificationEntry2."Notification Method"::SMS:
                         begin
                             if (MemberNotificationEntry2."Include NP Pass") then begin
-                                CreateNpPass(MemberNotificationEntry2);
+                                NpPassIssued := CreateNpPass(MemberNotificationEntry2);
                                 MemberNotificationEntry2.Modify();
-                                if (MemberNotificationEntry2."Notification Trigger" = MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
+                                if (NpPassIssued and (MemberNotificationEntry2."Notification Trigger" = MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE)) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
 
-                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then begin
+                            if (SendsMessage(MemberNotificationEntry2, NpPassIssued)) then begin
                                 AzureUpdateOrAzureSkip := SendDataSubjectIdToAzure(MemberNotificationEntry2);
                                 if ((AzureUpdateOrAzureSkip) and (SendSMS(MemberNotificationEntry2, ResponseMessage))) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
@@ -694,15 +711,22 @@
                     MemberNotificationEntry2."Notification Method"::MANUAL:
                         begin
                             if (MemberNotificationEntry2."Include NP Pass") then
-                                CreateNpPass(MemberNotificationEntry2);
+                                NpPassIssued := CreateNpPass(MemberNotificationEntry2);
                             SendDataSubjectIdToAzure(MemberNotificationEntry2);
-                            SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                            if (NpPassIssued) then
+                                SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                         end;
 
                     else
                         Error(NOT_IMPLEMENTED, MemberNotificationEntry2.FieldCaption("Notification Method"), MemberNotificationEntry2."Notification Method");
                 end;
 
+                // Keep both the NP Passes reason (set by CreateNpPass) and a send error, so neither hides the other.
+                if (not NpPassIssued) and (SendStatus <> MemberNotificationEntry2."Notification Send Status"::SENT) then
+                    if (ResponseMessage = '') then
+                        ResponseMessage := MemberNotificationEntry2."Failed With Message"
+                    else
+                        ResponseMessage := MemberNotificationEntry2."Failed With Message" + ' ' + ResponseMessage;
                 MemberNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(MemberNotificationEntry2."Failed With Message"));
                 MemberNotificationEntry2."Notification Send Status" := SendStatus;
                 MemberNotificationEntry2.Modify();
@@ -1175,6 +1199,7 @@
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
         MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
+        MembershipNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
         MembershipNotification.Insert();
     end;
 
@@ -1461,18 +1486,42 @@
 
     end;
 
-    local procedure CreateNpPass(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry")
+    // False only when an NP Passes type could not get a link; the caller marks the entry FAILED.
+    local procedure CreateNpPass(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry"): Boolean
     var
         PassData: Text;
         RecRef: RecordRef;
         MemberNotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        NPPassesFacade: Codeunit "NPR NP Passes Facade";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
         IStream: InStream;
         templateText: Text;
+        NPPassesSetup: Record "NPR NP Passes Setup";
+        MemberCard: Record "NPR MM Member Card";
+        NpPassesNoCardLbl: Label 'NP Passes could not issue a wallet pass link: no active, permanent %1 was found for the member.', Comment = '%1 = Member Card table caption';
+        NpPassesNotConfiguredLbl: Label 'NP Passes could not issue a wallet pass link: %1 is not enabled or has no %2.', Comment = '%1 = NP Passes Setup table caption, %2 = Base URL field caption';
+        NpPassesNoSecretLbl: Label 'NP Passes could not issue a wallet pass link: no %1 is entered in %2.', Comment = '%1 = Signing Secret field caption, %2 = NP Passes Setup table caption';
     begin
+        if (NPPassesAdapter.TryIssuePassLink(MemberNotificationEntry)) then
+            exit(true);
+
+        // A type with a layout handle never falls back to the legacy pass server, configured or not.
+        if (MembershipSetup.Get(MemberNotificationEntry."Membership Code")) and (MembershipSetup."NP Passes Layout Handle" <> '') then begin
+            case true of
+                not NPPassesFacade.IsConfigured():
+                    MemberNotificationEntry."Failed With Message" := CopyStr(StrSubstNo(NpPassesNotConfiguredLbl, NPPassesSetup.TableCaption(), NPPassesSetup.FieldCaption("Base URL")), 1, MaxStrLen(MemberNotificationEntry."Failed With Message"));
+                not NPPassesFacade.HasSigningSecret():
+                    MemberNotificationEntry."Failed With Message" := CopyStr(StrSubstNo(NpPassesNoSecretLbl, NPPassesSetup.FieldCaption("Signing Secret Key"), NPPassesSetup.TableCaption()), 1, MaxStrLen(MemberNotificationEntry."Failed With Message"));
+                else
+                    MemberNotificationEntry."Failed With Message" := CopyStr(StrSubstNo(NpPassesNoCardLbl, MemberCard.TableCaption()), 1, MaxStrLen(MemberNotificationEntry."Failed With Message"));
+            end;
+            exit(false);
+        end;
 
         MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code");
         if (not MemberNotificationSetup."Include NP Pass") then
-            exit;
+            exit(true);
 
         RecRef.GetTable(MemberNotificationEntry);
 
@@ -1494,6 +1543,7 @@
             MemberNotificationEntry."Failed With Message" := CopyStr(GetLastErrorText(), 1, MaxStrLen(MemberNotificationEntry."Failed With Message"));
         end;
 
+        exit(true); // legacy: notification is sent even if the pass failed
     end;
 
     local procedure CreatePass(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry"; PassData: Text): Boolean
@@ -1886,19 +1936,51 @@
         exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE, MembershipNotification."Notification Method Source"::MEMBER, DateToSendNotification));
     end;
 
+    /// <summary>
+    /// Sends the wallet link to a member without a pass, or updates the pass of a member who has one. NP Passes types
+    /// decide by the member's cards (NP Passes Link Sent At); legacy types by the role's Wallet Pass Id.
+    /// </summary>
+    internal procedure CreateWalletSendOrUpdateNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; DateToSendNotification: Date): Integer
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
+        HasPass: Boolean;
+    begin
+        if (NPPassesAdapter.UsesNPPasses(MembershipEntryNo)) then
+            HasPass := NPPassesAdapter.HasNPPass(MembershipEntryNo, MemberEntryNo)
+        else
+            if (MembershipRole.Get(MembershipEntryNo, MemberEntryNo)) then
+                HasPass := MembershipRole."Wallet Pass Id" <> '';
+
+        if (HasPass) then
+            exit(CreateUpdateWalletNotification(MembershipEntryNo, MemberEntryNo, 0, DateToSendNotification));
+        exit(CreateWalletSendNotification(MembershipEntryNo, MemberEntryNo, 0, DateToSendNotification));
+    end;
+
     internal procedure CreateWalletWithoutSendingNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
     var
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipNotification: Record "NPR MM Membership Notific.";
+        MemberCard: Record "NPR MM Member Card";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
         NotificationTriggerType: Enum "NPR MM NotificationTrigger";
     begin
 
         NotificationTriggerType := NotificationSetup.Type::WALLET_CREATE;
 
-        if (MembershipRole.Get(MembershipEntryNo, MemberEntryNo)) then
-            if (MembershipRole."Wallet Pass Id" <> '') then
-                NotificationTriggerType := NotificationSetup.Type::WALLET_UPDATE;
+        if (NPPassesAdapter.UsesNPPasses(MembershipEntryNo)) then begin
+            // The requested card decides: a replacement card or a legacy holder's card has no link yet.
+            if (MemberCard.Get(MemberCardEntryNo)) then begin
+                if (MemberCard."NP Passes Link Sent At" <> 0DT) then
+                    NotificationTriggerType := NotificationSetup.Type::WALLET_UPDATE;
+            end else
+                if (NPPassesAdapter.HasNPPass(MembershipEntryNo, MemberEntryNo)) then
+                    NotificationTriggerType := NotificationSetup.Type::WALLET_UPDATE;
+        end else
+            if (MembershipRole.Get(MembershipEntryNo, MemberEntryNo)) then
+                if (MembershipRole."Wallet Pass Id" <> '') then
+                    NotificationTriggerType := NotificationSetup.Type::WALLET_UPDATE;
 
         exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationTriggerType, MembershipNotification."Notification Method Source"::EXTERNAL, DateToSendNotification));
 
@@ -1910,6 +1992,9 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
+        MemberCard: Record "NPR MM Member Card";
+        NPPassesFacade: Codeunit "NPR NP Passes Facade";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
     begin
 
         if (not Membership.Get(MembershipEntryNo)) then
@@ -1920,6 +2005,20 @@
 
         if (not MembershipSetup."Enable NP Pass Integration") then
             exit(0);
+
+        // NP Passes types: updates go out as the webhook, not as a notification entry.
+        if (NotificationTriggerType = NotificationTriggerType::WALLET_UPDATE) and (MembershipSetup."NP Passes Layout Handle" <> '') then
+            if (NPPassesFacade.IsConfigured()) then begin
+                case true of
+                    (MemberCardEntryNo <> 0) and MemberCard.Get(MemberCardEntryNo):
+                        NPPassesAdapter.NotifyCard(MemberCard);
+                    (MemberEntryNo <> 0):
+                        NPPassesAdapter.NotifyRole(MembershipEntryNo, MemberEntryNo);
+                    else
+                        NPPassesAdapter.NotifyMembership(MembershipEntryNo);
+                end;
+                exit(0);
+            end;
 
         NotificationSetup.SetFilter(Type, '=%1', NotificationTriggerType);
         if (NotificationSetup.IsEmpty()) then

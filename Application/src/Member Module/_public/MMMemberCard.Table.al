@@ -113,6 +113,13 @@
             OptionCaption = 'Internal,External';
             OptionMembers = INTERNAL,EXTERNAL;
         }
+        field(41; "NP Passes Link Sent At"; DateTime)
+        {
+            // Blank = no pass offered; only stamped cards get update signals.
+            Caption = 'NP Passes Link Sent At';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
         field(100; "External Member No."; Code[20])
         {
             CalcFormula = Lookup("NPR MM Member"."External Member No." WHERE("Entry No." = FIELD("Member Entry No.")));

@@ -345,6 +345,7 @@
 #pragma warning restore
         MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
         MemberChangeLogMgt: Codeunit "NPR MM Member Change Log Mgt";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
     begin
 
         Member.Get(MemberEntryNo);
@@ -393,6 +394,8 @@
 
         if (MemberMedia.IsFeatureEnabled()) then
             MemberMedia.UnlinkMemberImage(Member.SystemId);
+
+        NPPassesAdapter.NotifyMember(MemberEntryNo);
     end;
 
     local procedure DoAnonymizeRole(var MembershipRole: Record "NPR MM Membership Role")
@@ -423,6 +426,7 @@
     var
         Membership: Record "NPR MM Membership";
         MembershipEvents: Codeunit "NPR MM Membership Events";
+        NPPassesAdapter: Codeunit "NPR MM NP Passes Adapter";
     begin
 
         Membership.Get(MembershipEntryNo);
@@ -444,6 +448,8 @@
         Membership."Blocked By" := GetUserId();
         Membership."Block Reason" := Membership."Block Reason"::ANONYMIZED;
         Membership.Modify(true); // This will cause a customer sync.
+
+        NPPassesAdapter.NotifyMembership(MembershipEntryNo);
     end;
 
     local procedure ValidateAnonymizeMemberRole(MembershipEntryNo: Integer; MemberEntryNo: Integer; AgreementCheck: Boolean; var ReasonText: Text): Boolean
