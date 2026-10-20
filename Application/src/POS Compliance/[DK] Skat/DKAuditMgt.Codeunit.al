@@ -59,6 +59,19 @@ codeunit 6184669 "NPR DK Audit Mgt."
     begin
         ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        DKPOSPaymMethMapping: Record "NPR DK POS Paym. Meth. Mapping";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if DKPOSPaymMethMapping.Get(Rec.Code) then
+            DKPOSPaymMethMapping.Delete(true);
+    end;
     #endregion
 
     #region Subscribers - POS Audit Logging

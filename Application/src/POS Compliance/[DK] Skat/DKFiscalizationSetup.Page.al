@@ -82,6 +82,17 @@ page 6151325 "NPR DK Fiscalization Setup"
                 end;
             }
         }
+        area(Navigation)
+        {
+            action(POSPaymentMethodMapping)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'POS Payment Method Mapping';
+                Image = Payment;
+                RunObject = page "NPR DK POS Paym. Meth. Mapping";
+                ToolTip = 'Specifies which means of payment each POS Payment Method is reported as in the SAF-T Cash Register file.';
+            }
+        }
     }
 
     trigger OnOpenPage()

@@ -138,9 +138,12 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
         // ExportPeriods (optional)
         ExportSalespersons();
         ExportItems();
-        // ExportBasics (optional)
+        AddBasicsNode();
 
         ExportLocations(POSStore, SAFTExportLine, true, true);
+
+        ExportRegisteredArticles();
+        ExportRegisteredBasics();
 
         SAFTXMLHelper.FinalizeXMLNode();
     end;
@@ -406,29 +409,140 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
         Item: Record Item;
         ExportingItemsTxt: Label 'Exporting Items to articles XML element...';
     begin
-        if not Item.FindSet() then
-            exit;
-
         SAFTXMLHelper.AddNewXMLNode('articles', '');
+        _ArticlesXMLNode := SAFTXMLHelper.GetCurrXMLNode();
 
-        if GuiAllowed() then begin
-            Window.Update(1, ExportingItemsTxt);
-            TotalRecNo := Item.Count();
+        Item.SetLoadFields(Description, "Description 2");
+        if Item.FindSet() then begin
+            if GuiAllowed() then begin
+                Window.Update(1, ExportingItemsTxt);
+                TotalRecNo := Item.Count();
+            end;
+
+            repeat
+                CheckGuiAllowedAndUpdateWindow();
+                ExportArticle(Item."No.", DT2Date(Item.SystemCreatedAt), CombineWithSpace(Item.Description, Item."Description 2", 0));
+            until Item.Next() = 0;
         end;
 
-        repeat
-            CheckGuiAllowedAndUpdateWindow();
+        SAFTXMLHelper.FinalizeXMLNode();
+    end;
 
-            SAFTXMLHelper.AddNewXMLNode('article', '');
+    local procedure ExportArticle(ArtID: Text; DateOfEntry: Date; ArtDesc: Text)
+    begin
+        SAFTXMLHelper.AddNewXMLNode('article', '');
 
-            SAFTXMLHelper.AppendXMLNode('artID', Item."No.");
-            SAFTXMLHelper.AppendXMLNode('dateOfEntry', FormatDate(DT2Date(Item.SystemCreatedAt)));
-            SAFTXMLHelper.AppendXMLNode('artDesc', CombineWithSpace(Item.Description, Item."Description 2", 0));
-
-            SAFTXMLHelper.FinalizeXMLNode();
-        until Item.Next() = 0;
+        SAFTXMLHelper.AppendXMLNode('artID', ArtID);
+        SAFTXMLHelper.AppendXMLNode('dateOfEntry', FormatDate(DateOfEntry));
+        SAFTXMLHelper.AppendXMLNode('artDesc', ArtDesc);
 
         SAFTXMLHelper.FinalizeXMLNode();
+    end;
+
+    local procedure AddBasicsNode()
+    begin
+        SAFTXMLHelper.AddNewXMLNode('basics', '');
+        _BasicsXMLNode := SAFTXMLHelper.GetCurrXMLNode();
+        SAFTXMLHelper.FinalizeXMLNode();
+    end;
+
+    local procedure GetArtID(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"): Text
+    var
+        Prefix: Text;
+    begin
+        case POSEntrySalesLine.Type of
+            POSEntrySalesLine.Type::Item:
+                exit(POSEntrySalesLine."No.");
+            POSEntrySalesLine.Type::"G/L Account":
+                Prefix := 'GL';
+            POSEntrySalesLine.Type::Customer:
+                Prefix := 'CUST';
+            POSEntrySalesLine.Type::Voucher:
+                Prefix := 'VOUCHER';
+            POSEntrySalesLine.Type::Payout:
+                Prefix := 'PAYOUT';
+            else
+                Prefix := 'ROUNDING';
+        end;
+
+        if POSEntrySalesLine."No." = '' then
+            exit(Prefix);
+        exit(Prefix + '-' + POSEntrySalesLine."No.");
+    end;
+
+    local procedure RegisterArticle(ArtID: Text; var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; FirstSoldOn: Date)
+    var
+        Item: Record Item;
+    begin
+        if ArtID = '' then
+            exit;
+        if _RegisteredArticles.ContainsKey(ArtID) then begin
+            if FirstSoldOn < _RegisteredArticleDates.Get(ArtID) then
+                _RegisteredArticleDates.Set(ArtID, FirstSoldOn);
+            exit;
+        end;
+        if POSEntrySalesLine.Type = POSEntrySalesLine.Type::Item then begin
+            if not _ExistingItems.ContainsKey(POSEntrySalesLine."No.") then begin
+                Item.SetLoadFields("No.");
+                _ExistingItems.Add(POSEntrySalesLine."No.", Item.Get(POSEntrySalesLine."No."));
+            end;
+            if _ExistingItems.Get(POSEntrySalesLine."No.") then
+                exit;
+        end;
+
+        if POSEntrySalesLine.Description <> '' then
+            _RegisteredArticles.Add(ArtID, POSEntrySalesLine.Description)
+        else
+            _RegisteredArticles.Add(ArtID, ArtID);
+        _RegisteredArticleDates.Add(ArtID, FirstSoldOn);
+    end;
+
+    local procedure ExportRegisteredArticles()
+    var
+        ArtID: Text;
+    begin
+        SAFTXMLHelper.ReopenXMLNode(_ArticlesXMLNode);
+        foreach ArtID in _RegisteredArticles.Keys() do
+            ExportArticle(ArtID, _RegisteredArticleDates.Get(ArtID), _RegisteredArticles.Get(ArtID));
+        SAFTXMLHelper.FinalizeXMLNode();
+
+        if not _ArticlesXMLNode.HasElements() then
+            _ArticlesXMLNode.Remove();
+    end;
+
+    local procedure RegisterBasic(BasicID: Text; BasicType: Text; PredefinedBasicID: Text; BasicDesc: Text)
+    begin
+        if _BasicIDs.Contains(BasicID) then
+            exit;
+
+        _BasicIDs.Add(BasicID);
+        _BasicTypes.Add(BasicID, BasicType);
+        _BasicPredefinedIDs.Add(BasicID, PredefinedBasicID);
+        if BasicDesc <> '' then
+            _BasicDescs.Add(BasicID, BasicDesc)
+        else
+            _BasicDescs.Add(BasicID, BasicID);
+    end;
+
+    local procedure ExportRegisteredBasics()
+    var
+        BasicID: Text;
+    begin
+        SAFTXMLHelper.ReopenXMLNode(_BasicsXMLNode);
+        foreach BasicID in _BasicIDs do begin
+            SAFTXMLHelper.AddNewXMLNode('basic', '');
+
+            SAFTXMLHelper.AppendXMLNode('basicType', _BasicTypes.Get(BasicID));
+            SAFTXMLHelper.AppendXMLNode('basicID', BasicID);
+            SAFTXMLHelper.AppendXMLNode('predefinedBasicID', _BasicPredefinedIDs.Get(BasicID));
+            SAFTXMLHelper.AppendXMLNode('basicDesc', _BasicDescs.Get(BasicID));
+
+            SAFTXMLHelper.FinalizeXMLNode();
+        end;
+        SAFTXMLHelper.FinalizeXMLNode();
+
+        if not _BasicsXMLNode.HasElements() then
+            _BasicsXMLNode.Remove();
     end;
 
     local procedure ExportLocations(var POSStore: Record "NPR POS Store"; SAFTExportLine: Record "NPR DK SAF-T Cash Export Line"; IncludeTransactions: Boolean; IncludeEvents: Boolean)
@@ -436,9 +550,11 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
+        SigningPOSAuditLog: Record "NPR POS Audit Log";
         TempPOSUnit: Record "NPR POS Unit" temporary;
         InStream: InStream;
         ExportLocationsMsg: Label 'Generating POS Stores XML element with transactions and events...';
+        IsSigned: Boolean;
         Signature: Text;
     begin
         if GuiAllowed() then
@@ -523,6 +639,7 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
 
                                     SAFTXMLHelper.AppendXMLNode('nr', Format(POSEntry."Entry No."));
                                     SAFTXMLHelper.AppendXMLNode('transID', POSEntry."Fiscal No.");
+                                    SAFTXMLHelper.AppendXMLNode('transType', GetTransactionType(POSEntry));
                                     SAFTXMLHelper.AppendXMLNode('transAmntIn', FormatAmount(POSEntry."Amount Incl. Tax"));
                                     SAFTXMLHelper.AppendXMLNode('transAmntEx', FormatAmount(POSEntry."Amount Excl. Tax"));
 
@@ -531,16 +648,23 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
                                     else
                                         SAFTXMLHelper.AppendXMLNode('amntTp', 'D');
 
+                                    SAFTXMLHelper.AppendXMLNode('empID', POSEntry."Salesperson Code");
                                     SAFTXMLHelper.AppendXMLNode('transDate', FormatDate(POSEntry."Entry Date"));
                                     SAFTXMLHelper.AppendXMLNode('transTime', Format(POSEntry."Starting Time", 0, 9));
 
-                                    POSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
-                                    if POSAuditLog.FindFirst() then begin
+                                    ExportTransactionLines(POSEntry);
+                                    ExportRounding(POSEntry);
+                                    ExportPayments(POSEntry);
+
+                                    SigningPOSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
+                                    SigningPOSAuditLog.SetRange("Action Type", SigningPOSAuditLog."Action Type"::DIRECT_SALE_END);
+                                    IsSigned := SigningPOSAuditLog.FindFirst();
+                                    if IsSigned then begin
                                         Clear(InStream);
                                         Clear(Signature);
-                                        POSAuditLog.CalcFields("Electronic Signature");
-                                        if POSAuditLog."Electronic Signature".HasValue() then begin
-                                            POSAuditLog."Electronic Signature".CreateInStream(InStream);
+                                        SigningPOSAuditLog.CalcFields("Electronic Signature");
+                                        if SigningPOSAuditLog."Electronic Signature".HasValue() then begin
+                                            SigningPOSAuditLog."Electronic Signature".CreateInStream(InStream);
                                             while (not InStream.EOS) do
                                                 InStream.Read(Signature);
                                         end;
@@ -548,6 +672,12 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
                                     end;
 
                                     SAFTXMLHelper.AppendXMLNode('keyVersion', '1');
+
+                                    if IsSigned then
+                                        SAFTXMLHelper.AppendXMLNode('certificateData', GetCertificateData(SigningPOSAuditLog."Certificate Thumbprint"));
+
+                                    SAFTXMLHelper.AppendXMLNode('voidTransaction', 'false');
+                                    SAFTXMLHelper.AppendXMLNode('trainingID', 'false');
 
                                     SAFTXMLHelper.FinalizeXMLNode();
                                 until POSEntry.Next() = 0;
@@ -560,6 +690,360 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
                 end;
             end;
         until POSStore.Next() = 0;
+    end;
+
+    local procedure GetTransactionType(POSEntry: Record "NPR POS Entry"): Text
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        HasReturns: Boolean;
+        HasSales: Boolean;
+        CashSaleIDTok: Label 'TRANS-CASHSALE', Locked = true;
+        CashSaleTxt: Label 'Cash sale', Locked = true;
+        CashSaleAndReturnIDTok: Label 'TRANS-SALERETURN', Locked = true;
+        CashSaleAndReturnTxt: Label 'Cash sale and return', Locked = true;
+        CreditSaleAndReturnIDTok: Label 'TRANS-CREDITSALERETURN', Locked = true;
+        CreditSaleAndReturnTxt: Label 'Credit sale and return', Locked = true;
+        CreditSaleIDTok: Label 'TRANS-CREDITSALE', Locked = true;
+        CreditSaleTxt: Label 'Credit sale', Locked = true;
+        InPaymentIDTok: Label 'TRANS-INPAYMENT', Locked = true;
+        InPaymentTxt: Label 'In payment', Locked = true;
+        OutPaymentIDTok: Label 'TRANS-OUTPAYMENT', Locked = true;
+        OutPaymentTxt: Label 'Out payment', Locked = true;
+        ReceivingPaymentIDTok: Label 'TRANS-RECEIVEPAYMENT', Locked = true;
+        ReceivingPaymentTxt: Label 'Receiving payment', Locked = true;
+        ReturnPaymentIDTok: Label 'TRANS-RETURN', Locked = true;
+        ReturnPaymentTxt: Label 'Return payment', Locked = true;
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetFilter(Quantity, '>0');
+        HasSales := not POSEntrySalesLine.IsEmpty();
+        POSEntrySalesLine.SetFilter(Quantity, '<0');
+        HasReturns := not POSEntrySalesLine.IsEmpty();
+
+        if POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale" then begin
+            if HasSales and HasReturns then begin
+                RegisterBasic(CreditSaleAndReturnIDTok, '11', '11017', CreditSaleAndReturnTxt);
+                exit(CreditSaleAndReturnIDTok);
+            end;
+            RegisterBasic(CreditSaleIDTok, '11', '11002', CreditSaleTxt);
+            exit(CreditSaleIDTok);
+        end;
+
+        if not (HasSales or HasReturns) then begin
+            POSEntrySalesLine.SetRange(Quantity);
+            POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Customer);
+            if not POSEntrySalesLine.IsEmpty() then begin
+                RegisterBasic(ReceivingPaymentIDTok, '11', '11005', ReceivingPaymentTxt);
+                exit(ReceivingPaymentIDTok);
+            end;
+
+            POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::"G/L Account", POSEntrySalesLine.Type::Payout);
+            if not POSEntrySalesLine.IsEmpty() then begin
+                if POSEntry."Amount Incl. Tax" < 0 then begin
+                    RegisterBasic(OutPaymentIDTok, '11', '11010', OutPaymentTxt);
+                    exit(OutPaymentIDTok);
+                end;
+                RegisterBasic(InPaymentIDTok, '11', '11011', InPaymentTxt);
+                exit(InPaymentIDTok);
+            end;
+
+            HasReturns := POSEntry."Amount Incl. Tax" < 0;
+        end;
+
+        case true of
+            HasSales and HasReturns:
+                begin
+                    RegisterBasic(CashSaleAndReturnIDTok, '11', '11016', CashSaleAndReturnTxt);
+                    exit(CashSaleAndReturnIDTok);
+                end;
+            HasReturns:
+                begin
+                    RegisterBasic(ReturnPaymentIDTok, '11', '11006', ReturnPaymentTxt);
+                    exit(ReturnPaymentIDTok);
+                end;
+        end;
+
+        RegisterBasic(CashSaleIDTok, '11', '11001', CashSaleTxt);
+        exit(CashSaleIDTok);
+    end;
+
+    local procedure ExportTransactionLines(POSEntry: Record "NPR POS Entry")
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        AmountType: Text;
+        ArtID: Text;
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetFilter(Type, '<>%1&<>%2', POSEntrySalesLine.Type::Comment, POSEntrySalesLine.Type::Rounding);
+        POSEntrySalesLine.SetLoadFields("No.", Quantity, Description, "VAT %", "Amount Incl. VAT (LCY)", "Amount Excl. VAT (LCY)");
+        if not POSEntrySalesLine.FindSet() then
+            exit;
+
+        repeat
+            if POSEntrySalesLine."Amount Incl. VAT (LCY)" < 0 then
+                AmountType := 'D'
+            else
+                AmountType := 'C';
+            ArtID := GetArtID(POSEntrySalesLine);
+
+            SAFTXMLHelper.AddNewXMLNode('ctLine', '');
+
+            SAFTXMLHelper.AppendXMLNode('nr', Format(POSEntry."Entry No."));
+            SAFTXMLHelper.AppendXMLNode('lineID', Format(POSEntrySalesLine."Line No."));
+            SAFTXMLHelper.AppendXMLNode('lineType', GetLineType(POSEntrySalesLine));
+            SAFTXMLHelper.AppendXMLNode('artID', ArtID);
+            SAFTXMLHelper.AppendXMLNode('qnt', Format(Abs(POSEntrySalesLine.Quantity), 0, 9));
+            SAFTXMLHelper.AppendXMLNode('lineAmntIn', FormatAmount(Abs(POSEntrySalesLine."Amount Incl. VAT (LCY)")));
+            SAFTXMLHelper.AppendXMLNode('lineAmntEx', FormatAmount(Abs(POSEntrySalesLine."Amount Excl. VAT (LCY)")));
+            SAFTXMLHelper.AppendXMLNode('amntTp', AmountType);
+            SAFTXMLHelper.AppendXMLNode('cashTransLineDescr', POSEntrySalesLine.Description);
+
+            SAFTXMLHelper.AddNewXMLNode('vat', '');
+            SAFTXMLHelper.AppendXMLNode('vatPerc', Format(POSEntrySalesLine."VAT %", 0, 9));
+            SAFTXMLHelper.AppendXMLNode('vatAmnt', FormatAmount(Abs(POSEntrySalesLine."Amount Incl. VAT (LCY)" - POSEntrySalesLine."Amount Excl. VAT (LCY)")));
+            SAFTXMLHelper.AppendXMLNode('vatAmntTp', AmountType);
+            SAFTXMLHelper.AppendXMLNode('vatBasAmnt', FormatAmount(Abs(POSEntrySalesLine."Amount Excl. VAT (LCY)")));
+            SAFTXMLHelper.FinalizeXMLNode();
+
+            SAFTXMLHelper.FinalizeXMLNode();
+
+            RegisterArticle(ArtID, POSEntrySalesLine, POSEntry."Entry Date");
+        until POSEntrySalesLine.Next() = 0;
+    end;
+
+    local procedure GetLineType(POSEntrySalesLine: Record "NPR POS Entry Sales Line"): Text
+    var
+        CustomerIDTok: Label 'LINE-CUSTOMER', Locked = true;
+        CustomerTxt: Label 'Customer payment or deposit', Locked = true;
+        GLAccountIDTok: Label 'LINE-GLACCOUNT', Locked = true;
+        GLAccountTxt: Label 'G/L account', Locked = true;
+        PayoutIDTok: Label 'LINE-PAYOUT', Locked = true;
+        PayoutTxt: Label 'Payout', Locked = true;
+        ReturnIDTok: Label 'LINE-RETURN', Locked = true;
+        ReturnTxt: Label 'Returned item', Locked = true;
+        RoundingIDTok: Label 'LINE-ROUNDING', Locked = true;
+        RoundingTxt: Label 'Rounding', Locked = true;
+        SaleIDTok: Label 'LINE-SALE', Locked = true;
+        SaleTxt: Label 'Sold item', Locked = true;
+        VoucherIDTok: Label 'LINE-VOUCHER', Locked = true;
+        VoucherTxt: Label 'Voucher', Locked = true;
+    begin
+        case POSEntrySalesLine.Type of
+            POSEntrySalesLine.Type::Item:
+                begin
+                    if POSEntrySalesLine.Quantity < 0 then begin
+                        RegisterBasic(ReturnIDTok, '05', '', ReturnTxt);
+                        exit(ReturnIDTok);
+                    end;
+                    RegisterBasic(SaleIDTok, '05', '', SaleTxt);
+                    exit(SaleIDTok);
+                end;
+            POSEntrySalesLine.Type::"G/L Account":
+                begin
+                    RegisterBasic(GLAccountIDTok, '05', '', GLAccountTxt);
+                    exit(GLAccountIDTok);
+                end;
+            POSEntrySalesLine.Type::Customer:
+                begin
+                    RegisterBasic(CustomerIDTok, '05', '', CustomerTxt);
+                    exit(CustomerIDTok);
+                end;
+            POSEntrySalesLine.Type::Voucher:
+                begin
+                    RegisterBasic(VoucherIDTok, '05', '', VoucherTxt);
+                    exit(VoucherIDTok);
+                end;
+            POSEntrySalesLine.Type::Payout:
+                begin
+                    RegisterBasic(PayoutIDTok, '05', '', PayoutTxt);
+                    exit(PayoutIDTok);
+                end;
+        end;
+
+        RegisterBasic(RoundingIDTok, '05', '', RoundingTxt);
+        exit(RoundingIDTok);
+    end;
+
+    local procedure ExportRounding(POSEntry: Record "NPR POS Entry")
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Rounding);
+        POSEntrySalesLine.CalcSums("Amount Incl. VAT (LCY)");
+        if POSEntrySalesLine."Amount Incl. VAT (LCY)" = 0 then
+            exit;
+
+        SAFTXMLHelper.AddNewXMLNode('rounding', '');
+        SAFTXMLHelper.AppendXMLNode('roundingAmnt', FormatAmount(POSEntrySalesLine."Amount Incl. VAT (LCY)"));
+        SAFTXMLHelper.FinalizeXMLNode();
+    end;
+
+    local procedure ExportPayments(POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
+        if not POSEntryPaymentLine.FindSet() then
+            exit;
+
+        repeat
+            RegisterPaymentType(POSEntryPaymentLine."POS Payment Method Code");
+
+            SAFTXMLHelper.AddNewXMLNode('payment', '');
+
+            SAFTXMLHelper.AppendXMLNode('paymentType', POSEntryPaymentLine."POS Payment Method Code");
+            SAFTXMLHelper.AppendXMLNode('paidAmnt', FormatAmount(POSEntryPaymentLine."Amount (LCY)"));
+            SAFTXMLHelper.AppendXMLNode('empID', POSEntry."Salesperson Code");
+            if _BasicPredefinedIDs.Get(POSEntryPaymentLine."POS Payment Method Code") in ['12002', '12003', '12011'] then
+                SAFTXMLHelper.AppendXMLNode('paymentRefID', GetEFTTransactionID(POSEntry, POSEntryPaymentLine));
+
+            SAFTXMLHelper.FinalizeXMLNode();
+        until POSEntryPaymentLine.Next() = 0;
+    end;
+
+    local procedure RegisterPaymentType(POSPaymentMethodCode: Code[10])
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        BasicDesc: Text;
+    begin
+        if _BasicIDs.Contains(POSPaymentMethodCode) then
+            exit;
+
+        if not POSPaymentMethod.Get(POSPaymentMethodCode) then
+            Clear(POSPaymentMethod);
+        BasicDesc := POSPaymentMethod.Description;
+        if BasicDesc = '' then
+            BasicDesc := POSPaymentMethodCode;
+        RegisterBasic(POSPaymentMethodCode, '12', GetPredefinedPaymentID(GetSAFTPaymentType(POSPaymentMethod, POSPaymentMethodCode)), BasicDesc);
+    end;
+
+    local procedure GetSAFTPaymentType(POSPaymentMethod: Record "NPR POS Payment Method"; POSPaymentMethodCode: Code[10]): Enum "NPR DK SAF-T Payment Type"
+    var
+        DKPOSPaymMethMapping: Record "NPR DK POS Paym. Meth. Mapping";
+    begin
+        if DKPOSPaymMethMapping.Get(POSPaymentMethodCode) then
+            if DKPOSPaymMethMapping."SAF-T Payment Type" <> DKPOSPaymMethMapping."SAF-T Payment Type"::" " then
+                exit(DKPOSPaymMethMapping."SAF-T Payment Type");
+
+        if POSPaymentMethod.Code = '' then
+            exit(Enum::"NPR DK SAF-T Payment Type"::Other);
+
+        case POSPaymentMethod."Processing Type" of
+            POSPaymentMethod."Processing Type"::CASH:
+                exit(Enum::"NPR DK SAF-T Payment Type"::Cash);
+            POSPaymentMethod."Processing Type"::VOUCHER,
+            POSPaymentMethod."Processing Type"::"FOREIGN VOUCHER":
+                exit(Enum::"NPR DK SAF-T Payment Type"::"Gift Token");
+            POSPaymentMethod."Processing Type"::CHECK:
+                exit(Enum::"NPR DK SAF-T Payment Type"::Check);
+            POSPaymentMethod."Processing Type"::EFT:
+                exit(Enum::"NPR DK SAF-T Payment Type"::"Credit Card");
+        end;
+
+        exit(Enum::"NPR DK SAF-T Payment Type"::Other);
+    end;
+
+    local procedure GetPredefinedPaymentID(SAFTPaymentType: Enum "NPR DK SAF-T Payment Type"): Text
+    begin
+        case SAFTPaymentType of
+            SAFTPaymentType::Cash:
+                exit('12001');
+            SAFTPaymentType::"Debit Card":
+                exit('12002');
+            SAFTPaymentType::"Credit Card":
+                exit('12003');
+            SAFTPaymentType::"Bank Account":
+                exit('12004');
+            SAFTPaymentType::"Gift Token":
+                exit('12005');
+            SAFTPaymentType::"Customer Card":
+                exit('12006');
+            SAFTPaymentType::Loyalty:
+                exit('12007');
+            SAFTPaymentType::"Bottle Deposit":
+                exit('12008');
+            SAFTPaymentType::Check:
+                exit('12009');
+            SAFTPaymentType::"Credit Note":
+                exit('12010');
+            SAFTPaymentType::"Mobile Phone App":
+                exit('12011');
+        end;
+
+        exit('12999');
+    end;
+
+    internal procedure IsPaymentReferenceRequired(POSPaymentMethodCode: Code[10]): Boolean
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        if not POSPaymentMethod.Get(POSPaymentMethodCode) then
+            Clear(POSPaymentMethod);
+        exit(GetPredefinedPaymentID(GetSAFTPaymentType(POSPaymentMethod, POSPaymentMethodCode)) in ['12002', '12003', '12011']);
+    end;
+
+    internal procedure GetEFTTransactionID(POSEntry: Record "NPR POS Entry"; POSEntryPaymentLine: Record "NPR POS Entry Payment Line"): Text
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Document No.");
+        EFTTransactionRequest.SetRange("Sales Line No.", POSEntryPaymentLine."Line No.");
+        EFTTransactionRequest.SetRange("Register No.", POSEntry."POS Unit No.");
+        EFTTransactionRequest.SetRange(Successful, true);
+        EFTTransactionRequest.SetLoadFields("External Transaction ID", "Reference Number Output", "Authorisation Number");
+        if not EFTTransactionRequest.FindLast() then
+            exit('');
+
+        if EFTTransactionRequest."External Transaction ID" <> '' then
+            exit(EFTTransactionRequest."External Transaction ID");
+        if EFTTransactionRequest."Reference Number Output" <> '' then
+            exit(EFTTransactionRequest."Reference Number Output");
+        exit(EFTTransactionRequest."Authorisation Number");
+    end;
+
+    local procedure GetCertificateData(CertificateThumbprint: Text): Text
+    var
+        DKFiscalizationSetup: Record "NPR DK Fiscalization Setup";
+        X509Certificate2: Codeunit X509Certificate2;
+        InStr: InStream;
+        Base64Cert: Text;
+        RawCertData: Text;
+        Password: SecretText;
+        Position: Integer;
+        LF: Text[1];
+    begin
+        if not _CertificateDataLoaded then begin
+            _CertificateDataLoaded := true;
+            DKFiscalizationSetup.SetAutoCalcFields("Signing Certificate");
+            if not DKFiscalizationSetup.Get() then
+                exit('');
+            if not DKFiscalizationSetup."Signing Certificate".HasValue() then
+                exit('');
+
+            DKFiscalizationSetup."Signing Certificate".CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.ReadText(Base64Cert);
+            Password := DKFiscalizationSetup."Signing Certificate Password";
+            RawCertData := Base64Cert;
+            X509Certificate2.VerifyCertificate(RawCertData, Password, Enum::"X509 Content Type"::Cert);
+
+            LF[1] := 10;
+            _CertificateData := '-----BEGIN CERTIFICATE-----' + LF;
+            Position := 1;
+            while Position <= StrLen(RawCertData) do begin
+                _CertificateData += CopyStr(RawCertData, Position, 64) + LF;
+                Position += 64;
+            end;
+            _CertificateData += '-----END CERTIFICATE-----';
+            _CertificateThumbprint := DKFiscalizationSetup."Signing Certificate Thumbprint";
+        end;
+
+        if CertificateThumbprint <> _CertificateThumbprint then
+            exit('');
+        exit(_CertificateData);
     end;
 
     local procedure FinalizeExport(var SAFTExportLine: Record "NPR DK SAF-T Cash Export Line"; SAFTExportHeader: Record "NPR DK SAF-T Cash Exp. Header")
@@ -641,4 +1125,16 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
         Window: Dialog;
         RecNo: Integer;
         TotalRecNo: Integer;
+        _ArticlesXMLNode: XmlElement;
+        _BasicsXMLNode: XmlElement;
+        _RegisteredArticles: Dictionary of [Text, Text];
+        _RegisteredArticleDates: Dictionary of [Text, Date];
+        _ExistingItems: Dictionary of [Code[20], Boolean];
+        _BasicIDs: List of [Text];
+        _BasicTypes: Dictionary of [Text, Text];
+        _BasicPredefinedIDs: Dictionary of [Text, Text];
+        _BasicDescs: Dictionary of [Text, Text];
+        _CertificateDataLoaded: Boolean;
+        _CertificateData: Text;
+        _CertificateThumbprint: Text;
 }

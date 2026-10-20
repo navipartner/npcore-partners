@@ -37,7 +37,6 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
     var
         NewXMLElement: XmlElement;
     begin
-        PrepareNodeTextForXML(NodeText);
         InsertXMLNode(NewXMLElement, Name, NodeText);
         Depth += 1;
         CurrXMLElement[Depth] := NewXMLElement;
@@ -47,7 +46,6 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
     var
         NewXMLElement: XmlElement;
     begin
-        PrepareNodeTextForXML(NodeText);
         if NodeText = '' then
             exit;
         InsertXMLNode(NewXMLElement, Name, NodeText);
@@ -57,7 +55,6 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
     var
         NewXMLElement: XmlElement;
     begin
-        PrepareNodeTextForXML(NodeText);
         if NodeText = '' then
             exit;
 
@@ -71,6 +68,17 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
         SavedXMLElement := CurrXMLElement[Depth];
     end;
 
+    internal procedure GetCurrXMLNode(): XmlElement
+    begin
+        exit(CurrXMLElement[Depth]);
+    end;
+
+    internal procedure ReopenXMLNode(XMLNode: XmlElement)
+    begin
+        Depth += 1;
+        CurrXMLElement[Depth] := XMLNode;
+    end;
+
     internal procedure FinalizeXMLNode()
     var
         IncorrectXMLStructureErr: Label 'Incorrect XML structure';
@@ -82,7 +90,6 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
 
     local procedure InsertXMLNode(var NewXMLElement: XmlElement; Name: Text; NodeText: Text)
     begin
-        PrepareNodeTextForXML(NodeText);
         NewXMLElement := XmlElement.Create(Name, NamespaceFullName, NodeText);
         if (not CurrXMLElement[Depth].Add(NewXMLElement)) then
             Error(InsertElementErr, NodeText);
@@ -109,27 +116,4 @@ codeunit 6184674 "NPR DK SAF-T XML Helper"
     begin
         exit(Format(CreatedDateTime, 0, '<Year4><Month,2><Day,2><Hours24,2><Filler Character,0><Minutes,2><Seconds,2>'));
     end;
-
-    local procedure PrepareNodeTextForXML(var RawXmlText: Text)
-    var
-        XMLDOMManagement: Codeunit "XML DOM Management";
-    begin
-#if BC17
-        ClearUTF8BOMSymbols(RawXmlText);
-#endif
-        RawXmlText := XMLDOMManagement.XMLEscape(RawXmlText);
-    end;
-
-#if BC17
-    local procedure ClearUTF8BOMSymbols(var XmlText: Text)
-    var
-        UTF8Encoding: DotNet UTF8Encoding;
-        ByteOrderMarkUtf8: Text;
-    begin
-        UTF8Encoding := UTF8Encoding.UTF8Encoding();
-        ByteOrderMarkUtf8 := UTF8Encoding.GetString(UTF8Encoding.GetPreamble());
-        if StrPos(XmlText, ByteOrderMarkUtf8) = 1 then
-            XmlText := DelStr(XmlText, 1, StrLen(ByteOrderMarkUtf8));
-    end;
-#endif
 }

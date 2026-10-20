@@ -243,6 +243,9 @@ codeunit 6184672 "NPR DK SAF-T Cash Export Mgt."
             exit(false);
         end;
 
+        if not ConfirmSKATValidationWarnings(SAFTExportHeader, SAFTExportCheck) then
+            exit(false);
+
         if SAFTExportHeader.Status = SAFTExportHeader.Status::"In Progress" then
             if HandleConfirm(StrSubstNo('%1%2', ExportIsInProgressMsg, CancelExportIsInProgressQst)) then
                 RemoveExportLines(SAFTExportHeader)
@@ -362,6 +365,30 @@ codeunit 6184672 "NPR DK SAF-T Cash Export Mgt."
     begin
         SAFTExportHeader.Get(LegacyMultipleFilesError.RecordId);
         Codeunit.Run(Codeunit::"NPR DK SAF-T Cash Export Mgt.", SAFTExportHeader);
+    end;
+
+    local procedure ConfirmSKATValidationWarnings(SAFTExportHeader: Record "NPR DK SAF-T Cash Exp. Header"; var SAFTExportCheck: Codeunit "NPR DK SAF-T Cash Export Check"): Boolean
+    var
+        TypeHelper: Codeunit "Type Helper";
+        Warnings: List of [Text];
+        WarningList: Text;
+        WarningNo: Integer;
+        MaxListedWarnings: Integer;
+        ExportWithWarningsQst: Label 'The SAF-T file will not pass SKAT''s validation:%1%2%1Do you want to export it anyway?', Comment = '%1 = line break, %2 = list of problems';
+        MoreWarningsLbl: Label '...and %1 more.', Comment = '%1 = number of problems not listed';
+    begin
+        SAFTExportCheck.GetSKATValidationWarnings(SAFTExportHeader, Warnings);
+        if Warnings.Count() = 0 then
+            exit(true);
+
+        MaxListedWarnings := 10;
+        for WarningNo := 1 to Warnings.Count() do
+            if WarningNo <= MaxListedWarnings then
+                WarningList += Warnings.Get(WarningNo) + TypeHelper.LFSeparator();
+        if Warnings.Count() > MaxListedWarnings then
+            WarningList += StrSubstNo(MoreWarningsLbl, Warnings.Count() - MaxListedWarnings) + TypeHelper.LFSeparator();
+
+        exit(HandleConfirm(StrSubstNo(ExportWithWarningsQst, TypeHelper.LFSeparator(), WarningList)));
     end;
 
     local procedure HandleConfirm(ConfirmText: Text): Boolean
