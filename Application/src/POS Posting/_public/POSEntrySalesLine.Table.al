@@ -705,6 +705,7 @@
         key(Key7; "Item Entry No.", "Serial No.")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

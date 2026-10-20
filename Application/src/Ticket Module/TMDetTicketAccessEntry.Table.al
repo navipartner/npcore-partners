@@ -117,6 +117,7 @@
         key(Key7; AdmittedDate, AdmittedTime)
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

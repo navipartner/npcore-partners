@@ -295,6 +295,7 @@
         {
         }
 
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

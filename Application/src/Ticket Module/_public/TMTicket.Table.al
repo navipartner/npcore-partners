@@ -215,6 +215,7 @@
 
         key(key8; "Document Date")
         { }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

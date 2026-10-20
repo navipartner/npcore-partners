@@ -375,6 +375,7 @@
         key(Key2; "Document No.", "Line No.")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

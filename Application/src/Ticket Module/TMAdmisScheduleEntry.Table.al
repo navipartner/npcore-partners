@@ -265,6 +265,7 @@
         key(Key4; "Admission Start Date", "Admission Start Time")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

@@ -552,6 +552,7 @@ table 6151258 "NPR Ecom Sales Header"
         }
         key(CouponProcessing; "Document Type", "Creation Status", "Coupons Exist", "Capture Processing Status", "Coupon Processing Status", "Bucket Id") { }
         key(WalletProcessing; "Document Type", "Creation Status", "Attraction Wallets Exist", "Capture Processing Status", "Attr. Wallet Processing Status", "Bucket Id") { }
+        key(RowVersion; SystemRowVersion) { }
     }
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
     trigger OnDelete()

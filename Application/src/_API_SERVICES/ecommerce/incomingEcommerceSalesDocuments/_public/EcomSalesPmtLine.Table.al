@@ -166,5 +166,6 @@ table 6151260 "NPR Ecom Sales Pmt. Line"
         key(Key3; "Document Entry No.", "Points Payment")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 }

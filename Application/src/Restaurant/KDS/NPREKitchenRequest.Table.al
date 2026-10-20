@@ -300,6 +300,7 @@
             IncludedFields = "Production Status", "Serving Step", "Line Type", "No.", "Variant Code", Description, "Unit of Measure Code";
         }
         key(Key4; "Parent Request No.", "Line Status") { }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     trigger OnDelete()

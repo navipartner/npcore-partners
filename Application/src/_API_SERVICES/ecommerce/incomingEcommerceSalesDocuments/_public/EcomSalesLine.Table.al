@@ -337,6 +337,7 @@ table 6151259 "NPR Ecom Sales Line"
         }
         key(WalletProcessing; "Document Entry No.", "Is Attraction Wallet", "Attr. Wallet Processing Status") { }
         key(BundleLines; "Document Entry No.", "Parent Ext. Line ID", "External Line ID", "Is Attraction Wallet", Subtype, "Virtual Item Process Status") { }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     internal procedure IsVirtualItem(): Boolean

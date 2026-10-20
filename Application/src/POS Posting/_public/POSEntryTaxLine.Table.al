@@ -229,6 +229,7 @@
         key(Key3; "Tax Area Code for Key", "Tax Group Code", "Tax Type", "Calculation Order")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

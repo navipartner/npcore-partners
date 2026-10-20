@@ -198,6 +198,7 @@
         {
 
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

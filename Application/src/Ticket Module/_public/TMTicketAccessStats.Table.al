@@ -179,6 +179,7 @@
         key(Key3; "Highest Access Entry No.")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups

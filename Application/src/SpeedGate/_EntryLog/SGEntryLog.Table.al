@@ -149,6 +149,7 @@ table 6150987 "NPR SGEntryLog"
         key(Key5; AdmittedReferenceNo)
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
 

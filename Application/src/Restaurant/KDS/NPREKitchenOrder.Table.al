@@ -101,6 +101,7 @@
         {
             IncludedFields = "On Hold", "Created Date-Time";
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     trigger OnDelete()

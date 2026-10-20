@@ -318,6 +318,7 @@
         key(Key1; "Item No.", "Variant Code", "Admission Code")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     local procedure UpdateItemDescription()

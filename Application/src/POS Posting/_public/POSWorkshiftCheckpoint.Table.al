@@ -528,6 +528,7 @@
         key(Key4; "POS Entry No.")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups
