@@ -203,6 +203,7 @@ table 6150776 "NPR TM DeferRevenueRequest"
         key(Key3; TicketNo, AdmissionCode)
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
 }

@@ -203,6 +203,7 @@
         key(Key1; "Code")
         {
         }
+        key(RowVersion; SystemRowVersion) { }
     }
 
     fieldgroups
