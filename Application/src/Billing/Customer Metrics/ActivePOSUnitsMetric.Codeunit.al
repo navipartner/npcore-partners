@@ -1,4 +1,4 @@
-codeunit 6151258 "NPR Active POS Units Metric" implements "NPR ICustomer Metric"
+codeunit 6151258 "NPR Active POS Units Metric" implements "NPR ICustomer Date Metric"
 {
     Access = Internal;
 

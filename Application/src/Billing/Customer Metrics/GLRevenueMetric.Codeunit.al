@@ -1,4 +1,4 @@
-codeunit 6151256 "NPR GL Revenue Metric" implements "NPR ICustomer Metric"
+codeunit 6151256 "NPR GL Revenue Metric" implements "NPR ICustomer Date Metric"
 {
     Access = Internal;
 

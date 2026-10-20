@@ -68,5 +68,9 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'Tickets Sold Count', Locked = true;
     }
+    value(16; POS_ZREPORT_REVENUE_AMOUNT_LCY)
+    {
+        Caption = 'POS Z-Report Revenue Amount LCY', Locked = true;
+    }
 }
 #endif

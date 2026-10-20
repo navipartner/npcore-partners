@@ -1,5 +1,5 @@
 /// <summary>
-/// The row's SystemId is the event ID of the metric sent for the business date.
+/// For a date metric, the row's SystemId is the event ID of the value sent for the business date.
 /// </summary>
 table 6059943 "NPR Customer Metric Sync"
 {
@@ -21,7 +21,7 @@ table 6059943 "NPR Customer Metric Sync"
             DataClassification = CustomerContent;
         }
         /// <summary>
-        /// For a delta metric, the last source entry the event covers.
+        /// For a delta metric, the last source entry that the next run continues after.
         /// </summary>
         field(3; "Last Entry No."; Integer)
         {

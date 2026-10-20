@@ -1,4 +1,4 @@
-codeunit 85497 "NPR Mock Customer Metric" implements "NPR ICustomer Metric"
+codeunit 85497 "NPR Mock Customer Metric" implements "NPR ICustomer Date Metric"
 {
     Access = Internal;
 

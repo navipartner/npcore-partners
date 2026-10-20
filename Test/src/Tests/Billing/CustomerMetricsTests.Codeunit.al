@@ -329,6 +329,28 @@ codeunit 85496 "NPR Customer Metrics Tests"
     end;
 
     [Test]
+    procedure SendMetric_EveryMetricRunsWithoutAnErrorInTheJobLoop()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        Metric: Enum "NPR Customer Metric";
+        Ordinal: Integer;
+        Yesterday: Date;
+        FailedMetrics: Text;
+    begin
+        Yesterday := PrepareBusinessDate(61);
+
+        foreach Ordinal in Enum::"NPR Customer Metric".Ordinals() do begin
+            Metric := Enum::"NPR Customer Metric".FromInteger(Ordinal);
+            CustomerMetricsJQ.SendMetric(Metric, Metric, MockSender, Yesterday, FailedMetrics);
+            _Assert.IsTrue(MetricSync.Get(Metric, Yesterday), 'Customer metric ' + Format(Metric) + ' must store its business date');
+        end;
+
+        _Assert.AreEqual('', FailedMetrics, 'Every customer metric must run through the job''s loop without an error');
+    end;
+
+    [Test]
     procedure TrySendMetric_StoresTheSyncRowAsTheMetricLeftIt()
     var
         MetricSync: Record "NPR Customer Metric Sync";
@@ -812,6 +834,353 @@ codeunit 85496 "NPR Customer Metrics Tests"
 
     #endregion
 
+    #region [POS Z-report revenue]
+
+    [Test]
+    procedure CustomerMetric_ZReportRevenue_IsAnEntryMetricSentAsPOSZReportRevenueAmountLCY()
+    var
+        CustomerMetric: Interface "NPR ICustomer Metric";
+    begin
+        CustomerMetric := Enum::"NPR Customer Metric"::ZReportRevenue;
+        _Assert.AreEqual(Enum::"NPR Billing Event Type"::POS_ZREPORT_REVENUE_AMOUNT_LCY.AsInteger(), CustomerMetric.GetEventType().AsInteger(), 'POS Z-Report Revenue must be sent as POS_ZREPORT_REVENUE_AMOUNT_LCY');
+        _Assert.IsTrue(CustomerMetric.IsDelta(), 'POS Z-Report Revenue covers everything since its previous run, so missed dates must not be caught up');
+        _Assert.IsTrue(CustomerMetric is "NPR ICustomer Entry Metric", 'POS Z-Report Revenue sends one event per Z-report');
+    end;
+
+    [Test]
+    procedure CustomerMetric_EveryMetricIsADateOrAnEntryMetric()
+    var
+        CustomerMetric: Interface "NPR ICustomer Metric";
+        Ordinal: Integer;
+    begin
+        foreach Ordinal in Enum::"NPR Customer Metric".Ordinals() do begin
+            CustomerMetric := Enum::"NPR Customer Metric".FromInteger(Ordinal);
+            _Assert.IsTrue((CustomerMetric is "NPR ICustomer Date Metric") or (CustomerMetric is "NPR ICustomer Entry Metric"), 'Customer metric ' + Format(Ordinal) + ' must be a date metric or an entry metric, or the runner cannot send it');
+        end;
+    end;
+
+    [Test]
+    procedure TrySendMetric_EntryMetric_SendsAnEventPerEntryAndNoneForTheBusinessDate()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        CustomerMetric: Enum "NPR Customer Metric";
+        StoreCode: Code[10];
+        ZReportId: Guid;
+        BusinessDate: Date;
+        ErrorText: Text;
+    begin
+        StoreCode := NewStoreCode();
+        ZReportId := InsertClosedZReport(CreatePOSUnit(StoreCode), StoreCode, Today(), 25);
+        BusinessDate := PrepareBusinessDate(51);
+        CustomerMetric := Enum::"NPR Customer Metric"::ZReportRevenue;
+
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(CustomerMetric, CustomerMetric, MockSender, BusinessDate, ErrorText), 'Sending the metric should succeed: ' + ErrorText);
+
+        _Assert.IsTrue(MetricSync.Get(CustomerMetric, BusinessDate), 'The sync row must be stored, so the business date is not run again');
+        _Assert.AreEqual(1, MockSender.EventCountFor(ZReportId), 'The closed Z-report must be sent under its own SystemId');
+        _Assert.AreEqual(0, MockSender.EventCountFor(MetricSync.SystemId), 'An entry metric sends no event for the business date');
+    end;
+
+    [Test]
+    procedure TrySendMetric_EntryMetric_StoresThePositionTheMetricSet()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MockEntryMetric: Codeunit "NPR Mock Cust. Entry Metric";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        EventId: Guid;
+        BusinessDate: Date;
+        ErrorText: Text;
+    begin
+        BusinessDate := PrepareBusinessDate(71);
+        EventId := CreateGuid();
+        MockEntryMetric.SetEvent(EventId, 3);
+        MockEntryMetric.SetLastEntryNo(42);
+
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(Enum::"NPR Customer Metric"::ZReportRevenue, MockEntryMetric, MockSender, BusinessDate, ErrorText), 'Sending the metric should succeed: ' + ErrorText);
+
+        MetricSync.Get(Enum::"NPR Customer Metric"::ZReportRevenue, BusinessDate);
+        _Assert.AreEqual(42, MetricSync."Last Entry No.", 'The sync row must keep the position the entry metric set, or the next run would send the whole history again');
+        _Assert.AreEqual(1, MockSender.EventCountFor(EventId), 'The entry metric''s event must be sent');
+    end;
+
+    [Test]
+    procedure TrySendMetric_EntryMetric_OverlappingRunSentTheDate_RollsBackItsQueuedEvents()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        BillingQueueEntry: Record "NPR Billing Queue Entry";
+        MockEntryMetric: Codeunit "NPR Mock Cust. Entry Metric";
+        CustomerMetricSender: Codeunit "NPR Customer Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        EventId: Guid;
+        BusinessDate: Date;
+        ErrorText: Text;
+        QueuedCount: Integer;
+    begin
+        BusinessDate := PrepareBusinessDate(72);
+        EventId := CreateGuid();
+        MockEntryMetric.SetEvent(EventId, 3);
+        MockEntryMetric.SetLastEntryNo(42);
+        MockEntryMetric.SimulateOverlappingRun();
+
+        // The real sender, because the rollback undoes only database writes and the mock sender would keep the event
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(Enum::"NPR Customer Metric"::ZReportRevenue, MockEntryMetric, CustomerMetricSender, BusinessDate, ErrorText), 'The run that loses the race must end without an error: ' + ErrorText);
+
+        BillingQueueEntry.SetRange("Event ID", EventId);
+        QueuedCount := BillingQueueEntry.Count();
+        // Removed before the assert, so a failing test does not leave a committed event for the billing sender
+        BillingQueueEntry.DeleteAll();
+        Commit();
+        _Assert.AreEqual(0, QueuedCount, 'The events the losing run queued must be rolled back, because the billing client''s duplicate check cannot see the other run''s uncommitted events');
+        MetricSync.Get(Enum::"NPR Customer Metric"::ZReportRevenue, BusinessDate);
+        _Assert.AreEqual(0, MetricSync."Last Entry No.", 'The sync row of the run that won must be kept as it stored it');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_SendsAClosedZReportWithItsTurnoverDateUnitAndStore()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        EventType: Enum "NPR Billing Event Type";
+        Metadata: JsonObject;
+        ZReportId: Guid;
+        Quantity: Decimal;
+        StoreCode: Code[10];
+        POSUnitNo: Code[10];
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        POSUnitNo := CreatePOSUnit(NewStoreCode());
+        StoreCode := NewStoreCode();
+        ZReportId := InsertClosedZReport(POSUnitNo, StoreCode, Today() - 3, 1234.56);
+
+        RegisterZReports(MetricSync, MockSender);
+
+        _Assert.AreEqual(1, MockSender.EventCount(), 'Exactly the one closed Z-report must be sent');
+        _Assert.AreEqual(1, MockSender.EventCountFor(ZReportId), 'The event ID must be the Z-report''s SystemId, so a later run that finds it again does not queue it twice');
+        MockSender.GetEventFor(ZReportId, EventType, Quantity, Metadata);
+        _Assert.AreEqual(Enum::"NPR Billing Event Type"::POS_ZREPORT_REVENUE_AMOUNT_LCY.AsInteger(), EventType.AsInteger(), 'The event must carry the metric''s event type');
+        _Assert.AreEqual(1234.56, Quantity, 'The event must carry the Net Turnover (LCY) of the Z-report');
+        _Assert.AreEqual(Format(Today() - 3, 0, 9), GetMetadataText(Metadata, _BusinessDateKeyTok), 'The business date must be the date of the Z-report''s balancing entry');
+        _Assert.AreEqual(POSUnitNo, GetMetadataText(Metadata, 'pos_unit_no'), 'The event must carry the POS unit of the Z-report');
+        _Assert.AreEqual(StoreCode, GetMetadataText(Metadata, 'pos_store_code'), 'The store must be the one of the balancing entry, not the unit''s current store');
+        GeneralLedgerSetup.Get();
+        _Assert.AreEqual(GeneralLedgerSetup."LCY Code", GetMetadataText(Metadata, 'currency'), 'The event must carry the local currency code');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_SendsTheNetTurnoverAsStoredIncludingNegativeAndZero()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        EventType: Enum "NPR Billing Event Type";
+        Metadata: JsonObject;
+        NegativeId: Guid;
+        ZeroId: Guid;
+        Quantity: Decimal;
+        StoreCode: Code[10];
+        POSUnitNo: Code[10];
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        StoreCode := NewStoreCode();
+        POSUnitNo := CreatePOSUnit(StoreCode);
+        NegativeId := InsertClosedZReport(POSUnitNo, StoreCode, Today(), -350.25);
+        ZeroId := InsertClosedZReport(POSUnitNo, StoreCode, Today(), 0);
+
+        RegisterZReports(MetricSync, MockSender);
+
+        MockSender.GetEventFor(NegativeId, EventType, Quantity, Metadata);
+        _Assert.AreEqual(-350.25, Quantity, 'A Z-report with more returns than sales must reduce the revenue');
+        _Assert.AreEqual(1, MockSender.EventCountFor(ZeroId), 'A Z-report without revenue is still a closed Z-report and must be sent');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_SendsOnlyClosedZReportsWithABalancingEntry()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        StoreCode: Code[10];
+        POSUnitNo: Code[10];
+        ClosedZReportId: Guid;
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        StoreCode := NewStoreCode();
+        POSUnitNo := CreatePOSUnit(StoreCode);
+        InsertOpenZReport(Checkpoint, POSUnitNo, StoreCode, 10);
+        InsertCheckpoint(POSUnitNo, Checkpoint.Type::XREPORT, 20);
+        Checkpoint.Get(InsertCheckpoint(POSUnitNo, Checkpoint.Type::WORKSHIFT_CLOSE, 30));
+        CloseCheckpoint(Checkpoint, StoreCode, Today());
+        Checkpoint.Get(InsertCheckpoint(POSUnitNo, Checkpoint.Type::PREPORT, 40));
+        CloseCheckpoint(Checkpoint, StoreCode, Today());
+        Checkpoint.Get(InsertCheckpoint(POSUnitNo, Checkpoint.Type::ZREPORT, 0));
+        Checkpoint.Open := false;
+        Checkpoint.Modify();
+        Checkpoint.Get(InsertCheckpoint(POSUnitNo, Checkpoint.Type::ZREPORT, 50));
+        Checkpoint.Open := false;
+        Checkpoint."POS Entry No." := -1;
+        Checkpoint.Modify();
+        ClosedZReportId := InsertClosedZReport(POSUnitNo, StoreCode, Today(), 60);
+
+        RegisterZReports(MetricSync, MockSender);
+
+        _Assert.AreEqual(1, MockSender.EventCount(), 'Only the closed Z-report with a balancing entry may be sent, not open Z-reports, X-reports, workshift closes of slave units, period reports, placeholder Z-reports or a Z-report whose balancing entry is missing');
+        _Assert.AreEqual(1, MockSender.EventCountFor(ClosedZReportId), 'The closed Z-report with a balancing entry must be sent');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_ZReportClosedAfterARunIsSentByTheNextRun()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        NextRunSender: Codeunit "NPR Mock Cust. Metric Sender";
+        StoreCode: Code[10];
+        LaterZReportId: Guid;
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        StoreCode := NewStoreCode();
+        InsertOpenZReport(Checkpoint, CreatePOSUnit(StoreCode), StoreCode, 75);
+        LaterZReportId := InsertClosedZReport(Checkpoint."POS Unit No.", StoreCode, Today(), 5);
+
+        RegisterZReports(MetricSync, MockSender);
+        _Assert.AreEqual(1, MockSender.EventCountFor(LaterZReportId), 'A Z-report closed before the run must be sent');
+        _Assert.AreEqual(0, MockSender.EventCountFor(Checkpoint.SystemId), 'A Z-report that is still open must not be sent');
+
+        MetricSync.Insert();
+        CloseCheckpoint(Checkpoint, StoreCode, Today() + 1);
+        InitZReportRevenueSync(MetricSync, Today() + 1);
+        RegisterZReports(MetricSync, NextRunSender);
+        _Assert.AreEqual(1, NextRunSender.EventCountFor(Checkpoint.SystemId), 'The next run must send the Z-report closed since the previous run, although a later Z-report was already sent');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_PositionMovesOnlyPastZReportsInsertedAWeekBeforeTheBusinessDate()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        PreviousPosition: Integer;
+        OpenEntryNo: Integer;
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        PreviousPosition := LastCheckpointEntryNo();
+        OpenEntryNo := InsertCheckpoint(CreatePOSUnit(NewStoreCode()), Checkpoint.Type::ZREPORT, 80);
+
+        InitZReportRevenueSync(MetricSync, Today() + 6);
+        RegisterZReports(MetricSync, MockSender);
+        _Assert.AreEqual(PreviousPosition, MetricSync."Last Entry No.", 'The position must not move past a Z-report inserted 6 days before the business date, so later runs check it again');
+
+        InitZReportRevenueSync(MetricSync, Today() + 7);
+        RegisterZReports(MetricSync, MockSender);
+        _Assert.AreEqual(OpenEntryNo, MetricSync."Last Entry No.", 'The position must move past the Z-reports inserted a week before the business date');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_ZReportClosedAfterThePositionPassedItIsNotSent()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        LaterSender: Codeunit "NPR Mock Cust. Metric Sender";
+        StoreCode: Code[10];
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        StoreCode := NewStoreCode();
+        Checkpoint.Get(InsertCheckpoint(CreatePOSUnit(StoreCode), Checkpoint.Type::ZREPORT, 90));
+        InitZReportRevenueSync(MetricSync, Today() + 7);
+        RegisterZReports(MetricSync, MockSender);
+        MetricSync.Insert();
+
+        CloseCheckpoint(Checkpoint, StoreCode, Today() + 8);
+        InitZReportRevenueSync(MetricSync, Today() + 8);
+        RegisterZReports(MetricSync, LaterSender);
+
+        _Assert.AreEqual(0, LaterSender.EventCountFor(Checkpoint.SystemId), 'A Z-report closed after the position passed it, more than a week after it was inserted, is not sent');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_RunAfterAnOutageStartsAtThePreviousPosition()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        StoreCode: Code[10];
+        ZReportId: Guid;
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        StoreCode := NewStoreCode();
+        ZReportId := InsertClosedZReport(CreatePOSUnit(StoreCode), StoreCode, Today(), 95);
+        InitZReportRevenueSync(MetricSync, Today() + 20);
+
+        RegisterZReports(MetricSync, MockSender);
+
+        _Assert.AreEqual(1, MockSender.EventCountFor(ZReportId), 'A run after missed nights must check everything after the previous run''s position, so nothing is lost');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_FirstRunStartsAtTheBusinessDate()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        SameDaySender: Codeunit "NPR Mock Cust. Metric Sender";
+        FirstRunSender: Codeunit "NPR Mock Cust. Metric Sender";
+        LaterRunSender: Codeunit "NPR Mock Cust. Metric Sender";
+        ZReportId: Guid;
+        StoreCode: Code[10];
+    begin
+        DeleteZReportRevenueSyncRows();
+        StoreCode := NewStoreCode();
+        ZReportId := InsertClosedZReport(CreatePOSUnit(StoreCode), StoreCode, Today(), 70);
+
+        InitZReportRevenueSync(MetricSync, Today());
+        RegisterZReports(MetricSync, SameDaySender);
+        _Assert.AreEqual(1, SameDaySender.EventCountFor(ZReportId), 'The first run must send the Z-reports inserted since the start of its business date');
+
+        InitZReportRevenueSync(MetricSync, Today() + 1);
+        RegisterZReports(MetricSync, FirstRunSender);
+        _Assert.AreEqual(0, FirstRunSender.EventCountFor(ZReportId), 'The first run must not send Z-reports inserted before its business date');
+
+        MetricSync.Insert();
+        InitZReportRevenueSync(MetricSync, Today() + 2);
+        RegisterZReports(MetricSync, LaterRunSender);
+        _Assert.AreEqual(0, LaterRunSender.EventCountFor(ZReportId), 'Later runs must not go back before the first run''s position, so a new install does not send history');
+    end;
+
+    [Test]
+    procedure ZReportRevenue_ZReportCheckedAgainOrClosedAgainIsQueuedOnce()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+        BillingQueueEntry: Record "NPR Billing Queue Entry";
+        CustomerMetricSender: Codeunit "NPR Customer Metric Sender";
+        Metadata: JsonObject;
+        StoreCode: Code[10];
+    begin
+        StartZReportRevenueAfterLastCheckpoint(MetricSync);
+        StoreCode := NewStoreCode();
+        Checkpoint.Get(InsertCheckpoint(CreatePOSUnit(StoreCode), Checkpoint.Type::ZREPORT, 50));
+        CloseCheckpoint(Checkpoint, StoreCode, Today());
+
+        // The real sender is called directly instead of through TrySendMetric, so the test events are rolled back instead of committed and sent
+        RegisterZReports(MetricSync, CustomerMetricSender);
+        MetricSync.Insert();
+        // A retried end of day closes the same Z-report again with a new balancing entry
+        CloseCheckpoint(Checkpoint, NewStoreCode(), Today() + 1);
+        InitZReportRevenueSync(MetricSync, Today() + 1);
+        RegisterZReports(MetricSync, CustomerMetricSender);
+
+        BillingQueueEntry.SetRange("Event ID", Checkpoint.SystemId);
+        _Assert.AreEqual(1, BillingQueueEntry.Count(), 'A Z-report that later runs check again, also after it was closed again, must be queued only once');
+        BillingQueueEntry.FindFirst();
+        _Assert.AreEqual(Enum::"NPR Billing Event Type"::POS_ZREPORT_REVENUE_AMOUNT_LCY.AsInteger(), BillingQueueEntry."Feature ID", 'The queued event must carry the metric''s event type');
+        _Assert.AreEqual(50, BillingQueueEntry.Quantity, 'The queued event must carry the Net Turnover (LCY)');
+        Metadata.ReadFrom(BillingQueueEntry.GetMetadata());
+        _Assert.AreEqual(Format(Today(), 0, 9), GetMetadataText(Metadata, _BusinessDateKeyTok), 'The first registration must stay, with the date of the first close');
+    end;
+
+    #endregion
+
     #region [Helpers]
 
     local procedure PrepareBusinessDate(Offset: Integer) BusinessDate: Date
@@ -1121,6 +1490,96 @@ codeunit 85496 "NPR Customer Metrics Tests"
         POSEntry."System Entry" := SystemEntry;
         POSEntry."Entry Date" := EntryDate;
         POSEntry.Insert();
+    end;
+
+    local procedure RegisterZReports(var MetricSync: Record "NPR Customer Metric Sync"; Sender: Interface "NPR ICustomer Metric Sender")
+    var
+        ZReportRevenueMetric: Codeunit "NPR Z-Report Revenue Metric";
+    begin
+        ZReportRevenueMetric.RegisterEvents(MetricSync, Sender);
+    end;
+
+    local procedure StartZReportRevenueAfterLastCheckpoint(var MetricSync: Record "NPR Customer Metric Sync")
+    var
+        SentMetricSync: Record "NPR Customer Metric Sync";
+    begin
+        DeleteZReportRevenueSyncRows();
+        InitZReportRevenueSync(SentMetricSync, Today() - 1);
+        SentMetricSync."Last Entry No." := LastCheckpointEntryNo();
+        SentMetricSync.Insert();
+        InitZReportRevenueSync(MetricSync, Today());
+    end;
+
+    local procedure InitZReportRevenueSync(var MetricSync: Record "NPR Customer Metric Sync"; BusinessDate: Date)
+    begin
+        MetricSync.Init();
+        MetricSync.Metric := Enum::"NPR Customer Metric"::ZReportRevenue;
+        MetricSync."Business Date" := BusinessDate;
+    end;
+
+    local procedure DeleteZReportRevenueSyncRows()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+    begin
+        MetricSync.SetRange(Metric, Enum::"NPR Customer Metric"::ZReportRevenue);
+        MetricSync.DeleteAll();
+    end;
+
+    local procedure InsertClosedZReport(POSUnitNo: Code[10]; StoreCode: Code[10]; ZReportDate: Date; NetTurnover: Decimal): Guid
+    var
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+    begin
+        Checkpoint.Get(InsertCheckpoint(POSUnitNo, Checkpoint.Type::ZREPORT, NetTurnover));
+        CloseCheckpoint(Checkpoint, StoreCode, ZReportDate);
+        exit(Checkpoint.SystemId);
+    end;
+
+    local procedure InsertOpenZReport(var Checkpoint: Record "NPR POS Workshift Checkpoint"; POSUnitNo: Code[10]; StoreCode: Code[10]; NetTurnover: Decimal)
+    begin
+        // With a balancing entry, so only the Open filter can leave it out
+        Checkpoint.Get(InsertCheckpoint(POSUnitNo, Checkpoint.Type::ZREPORT, NetTurnover));
+        CloseCheckpoint(Checkpoint, StoreCode, Today());
+        Checkpoint.Open := true;
+        Checkpoint.Modify();
+    end;
+
+    local procedure InsertCheckpoint(POSUnitNo: Code[10]; CheckpointType: Option; NetTurnover: Decimal): Integer
+    var
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+    begin
+        Checkpoint.Init();
+        Checkpoint."Entry No." := 0;
+        Checkpoint."POS Unit No." := POSUnitNo;
+        Checkpoint.Type := CheckpointType;
+        Checkpoint.Open := true;
+        Checkpoint."Created At" := CurrentDateTime();
+        Checkpoint."Net Turnover (LCY)" := NetTurnover;
+        Checkpoint.Insert();
+        exit(Checkpoint."Entry No.");
+    end;
+
+    local procedure CloseCheckpoint(var Checkpoint: Record "NPR POS Workshift Checkpoint"; StoreCode: Code[10]; ZReportDate: Date)
+    var
+        BalancingEntry: Record "NPR POS Entry";
+    begin
+        BalancingEntry.Init();
+        BalancingEntry."Entry No." := 0;
+        BalancingEntry."POS Store Code" := StoreCode;
+        BalancingEntry."POS Unit No." := Checkpoint."POS Unit No.";
+        BalancingEntry."Entry Type" := BalancingEntry."Entry Type"::Balancing;
+        BalancingEntry."Entry Date" := ZReportDate;
+        BalancingEntry.Insert();
+        Checkpoint."POS Entry No." := BalancingEntry."Entry No.";
+        Checkpoint.Open := false;
+        Checkpoint.Modify();
+    end;
+
+    local procedure LastCheckpointEntryNo(): Integer
+    var
+        Checkpoint: Record "NPR POS Workshift Checkpoint";
+    begin
+        if Checkpoint.FindLast() then
+            exit(Checkpoint."Entry No.");
     end;
 
     #endregion

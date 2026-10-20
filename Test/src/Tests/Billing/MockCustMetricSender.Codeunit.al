@@ -27,6 +27,22 @@ codeunit 85498 "NPR Mock Cust. Metric Sender" implements "NPR ICustomer Metric S
         Metadata.ReadFrom(_Metadata.Get(Index));
     end;
 
+    procedure EventCountFor(EventId: Guid) Count: Integer
+    var
+        SentEventId: Guid;
+    begin
+        foreach SentEventId in _EventIds do
+            if SentEventId = EventId then
+                Count += 1;
+    end;
+
+    procedure GetEventFor(EventId: Guid; var EventType: Enum "NPR Billing Event Type"; var Quantity: Decimal; var Metadata: JsonObject)
+    var
+        SentEventId: Guid;
+    begin
+        GetEvent(_EventIds.IndexOf(EventId), SentEventId, EventType, Quantity, Metadata);
+    end;
+
     procedure RegisterEvent(EventId: Guid; EventType: Enum "NPR Billing Event Type"; Quantity: Decimal; Metadata: JsonObject)
     var
         MetadataText: Text;

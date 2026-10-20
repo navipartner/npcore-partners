@@ -1,4 +1,4 @@
-codeunit 6151348 "NPR Tickets Sold Metric" implements "NPR ICustomer Metric"
+codeunit 6151348 "NPR Tickets Sold Metric" implements "NPR ICustomer Date Metric"
 {
     Access = Internal;
     Permissions =
