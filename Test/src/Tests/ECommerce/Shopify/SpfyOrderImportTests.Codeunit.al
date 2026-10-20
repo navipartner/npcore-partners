@@ -1533,6 +1533,211 @@ codeunit 85389 "NPR Spfy Order Import Tests"
     end;
 
     [Test]
+    procedure UpdateSalesLines_RemovedLineOnTheOrder_IsSizedToZero()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] When the Ecommerce path updates a Sales Order, a line Shopify refunded before shipping is sized to nothing instead of keeping its quantity.
+        // [GIVEN] A Sales Order with one line for Shopify order line 936300000701
+        StoreCode := 'SPFYREM1';
+        ShopifyId := '936300000700';
+        OrderLineId := '936300000701';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine(OrderLineId, 100, SalesHeader, SalesLine);
+
+        // [WHEN] The order comes back with that line refunded before it shipped
+        OrderResponse := LibrarySpfyImport.WrapOrderText(ShopifyId, '[' + LibrarySpfyImport.RemovedLineNodeText(OrderLineId, SalesLine."No.", 100, 1, false) + ']', '[]');
+        SpfyEcomSalesDocImport.UpdateSalesLinesFromJson(SalesHeader, OrderResponse, LogEntry);
+
+        // [THEN] The line keeps no quantity
+        SalesLine.Find();
+        Expected := 0;
+        _Assert.AreEqual(Expected, SalesLine.Quantity, 'A line refunded before shipping must not keep its quantity.');
+    end;
+
+    [Test]
+    procedure UpdateSalesLines_RemovedLineNotOnTheOrder_IsNotAdded()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        CountLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        StoreCode: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] When the Ecommerce path updates a Sales Order, a line Shopify refunded before shipping that the Sales Order never had is not added.
+        // [GIVEN] A Sales Order with one line
+        StoreCode := 'SPFYREM2';
+        ShopifyId := '936300000800';
+        OrderLineId := '936300000801';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine(OrderLineId, 100, SalesHeader, SalesLine);
+
+        // [WHEN] The order comes back with that line and a second one refunded before it shipped
+        OrderResponse := LibrarySpfyImport.WrapOrderText(ShopifyId,
+            '[' + LibrarySpfyImport.ItemLineNodeText(OrderLineId, SalesLine."No.", 100, 1, '[]') + ',' +
+            LibrarySpfyImport.RemovedLineNodeText('936300000802', SalesLine."No.", 100, 1, false) + ']', '[]');
+        SpfyEcomSalesDocImport.UpdateSalesLinesFromJson(SalesHeader, OrderResponse, LogEntry);
+
+        // [THEN] The Sales Order still has one line
+        CountLine.SetRange("Document Type", SalesHeader."Document Type");
+        CountLine.SetRange("Document No.", SalesHeader."No.");
+        _Assert.AreEqual(1, CountLine.Count(), 'A refunded line that is not on the order must not be added.');
+    end;
+
+    [Test]
+    procedure UpdateSalesLines_RemovedGiftCardLine_KeepsItsQuantity()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        ItemLine: Record "Sales Line";
+        GiftCardLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] When the Ecommerce path updates a Sales Order, a gift card line Shopify refunded before fulfilling it keeps the quantity Business Central has and does not fail the update, as virtual lines do on this path.
+        // [GIVEN] A Sales Order with a gift card line that carries a voucher line
+        StoreCode := 'SPFYREM3';
+        ShopifyId := '936300000900';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300000901', 100, SalesHeader, ItemLine);
+        AddGiftCardLineWithVoucherLine(StoreCode, SalesHeader, '936300000902', GiftCardLine);
+
+        // [WHEN] The order comes back with the gift card refunded before it was fulfilled
+        OrderResponse := LibrarySpfyImport.WrapOrderText(ShopifyId, '[' + LibrarySpfyImport.RemovedLineNodeText('936300000902', '', 50, 1, true) + ']', '[]');
+        SpfyEcomSalesDocImport.UpdateSalesLinesFromJson(SalesHeader, OrderResponse, LogEntry);
+
+        // [THEN] The gift card line keeps its quantity
+        GiftCardLine.Find();
+        Expected := 1;
+        _Assert.AreEqual(Expected, GiftCardLine.Quantity, 'A virtual line keeps the quantity Business Central has.');
+    end;
+
+    [Test]
+    procedure UpdateSalesLines_RemovedLineWithADiscount_IsSizedToZero()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] When the Ecommerce path updates a Sales Order, a discounted line Shopify refunded before shipping is sized to nothing and carries no discount, without an error.
+        // [GIVEN] A Sales Order with one line for Shopify order line 936300001001
+        StoreCode := 'SPFYREM4';
+        ShopifyId := '936300001000';
+        OrderLineId := '936300001001';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine(OrderLineId, 100, SalesHeader, SalesLine);
+
+        // [WHEN] The order comes back with that line refunded, its unit reported as non-fulfillable and a discount of 20 still allocated
+        OrderResponse := LibrarySpfyImport.WrapOrderText(ShopifyId, '[' + LibrarySpfyImport.RemovedLineNodeText(OrderLineId, SalesLine."No.", 100, 1, false, 1, 20) + ']', '[]');
+        SpfyEcomSalesDocImport.UpdateSalesLinesFromJson(SalesHeader, OrderResponse, LogEntry);
+
+        // [THEN] The line has no quantity and no discount
+        SalesLine.Find();
+        Expected := 0;
+        _Assert.AreEqual(Expected, SalesLine.Quantity, 'A line refunded before shipping must not keep its quantity.');
+        _Assert.AreEqual(Expected, SalesLine."Line Discount Amount", 'A line without quantity must not carry a discount.');
+    end;
+
+    [Test]
+    procedure UpdateSalesLines_RemovedVirtualLinePartlyFulfilled_KeepsItsQuantity()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        TicketLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] When the Ecommerce path updates a Sales Order, a virtual line with one unit fulfilled that Shopify then refunded in full keeps the quantity Business Central has and does not fail the update.
+        // [GIVEN] A Sales Order with a ticket line of quantity 2
+        StoreCode := 'SPFYREM5';
+        ShopifyId := '936300001100';
+        OrderLineId := '936300001101';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine(OrderLineId, 100, SalesHeader, TicketLine);
+        LibrarySpfyImport.MakeItemATicketItem(TicketLine."No.");
+        TicketLine.Validate(Quantity, 2);
+        TicketLine.Modify(true);
+
+        // [WHEN] The order comes back with the line refunded in full and a fulfillment of one unit
+        OrderResponse := LibrarySpfyImport.BuildUpdateOrderJsonWithLine(ShopifyId, OrderLineId, LibrarySpfyImport.RemovedLineNodeText(OrderLineId, TicketLine."No.", 100, 2, false, 2, 0), 100, 1);
+        SpfyEcomSalesDocImport.UpdateSalesLinesFromJson(SalesHeader, OrderResponse, LogEntry);
+
+        // [THEN] The ticket line keeps its quantity
+        TicketLine.Find();
+        Expected := 2;
+        _Assert.AreEqual(Expected, TicketLine.Quantity, 'A virtual line keeps the quantity Business Central has.');
+    end;
+
+    [Test]
+    procedure UpdateSalesLines_RemovedLineThatShipped_IsSizedToWhatShipped()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] When the Ecommerce path updates a Sales Order, a line that shipped and was then refunded in Shopify is sized to the shipped unit and set to ship.
+        // [GIVEN] A Sales Order with one line for Shopify order line 936300001201
+        StoreCode := 'SPFYREM6';
+        ShopifyId := '936300001200';
+        OrderLineId := '936300001201';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine(OrderLineId, 100, SalesHeader, SalesLine);
+
+        // [WHEN] The order comes back with that line refunded and a fulfillment of one unit
+        OrderResponse := LibrarySpfyImport.BuildUpdateOrderJsonWithLine(ShopifyId, OrderLineId, LibrarySpfyImport.RemovedLineNodeText(OrderLineId, SalesLine."No.", 100, 1, false, 1, 0), 100, 1);
+        SpfyEcomSalesDocImport.UpdateSalesLinesFromJson(SalesHeader, OrderResponse, LogEntry);
+
+        // [THEN] The line is sized to the shipped unit and is set to ship it
+        SalesLine.Find();
+        Expected := 1;
+        _Assert.AreEqual(Expected, SalesLine.Quantity, 'The line must keep the unit that shipped.');
+        _Assert.AreEqual(Expected, SalesLine."Qty. to Ship", 'The shipped unit must be set to ship.');
+    end;
+
+    [Test]
     procedure UpdateSalesLines_ExistingLineWithoutFulfillment_DoesNotError()
     var
         LogEntry: Record "NPR Spfy Event Log Entry";
@@ -4209,6 +4414,332 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         _Assert.ExpectedError('917000000701');
         _Assert.ExpectedError(EcomSalesLine.FieldCaption("Member Birthday"));
         _Assert.ExpectedError('10/12/1815');
+    end;
+
+    #endregion
+
+    #region Legacy Post step sizing
+
+    [Test]
+    procedure LegacyPostStep_LineRefundedBeforeShipping_IsSizedToZero()
+    var
+        SalesHeader: Record "Sales Header";
+        RefundedLine: Record "Sales Line";
+        ShippedLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a line Shopify refunded before it shipped is sized to nothing on the Sales Order, while the shipped line is still shipped.
+        // [GIVEN] A store and a Sales Order with line A, which Shopify refunded unshipped, and line B, which Shopify shipped
+        StoreCode := 'SPFYLEG1';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300000101', 100, SalesHeader, RefundedLine);
+        LibrarySpfyImport.AddShopifyLineToSalesOrder(SalesHeader, '936300000102', 100, 1, ShippedLine);
+
+        // [GIVEN] The closed order as Shopify sends it: A with nothing left to fulfil, B fulfilled
+        Order := LibrarySpfyImport.LegacyOrderJson('936300000100',
+            LibrarySpfyImport.LegacyOrderLineText('936300000101', RefundedLine."No.", 100, 1, 0, '', false) + ',' +
+            LibrarySpfyImport.LegacyOrderLineText('936300000102', ShippedLine."No.", 100, 1, 0, 'fulfilled', false),
+            LibrarySpfyImport.LegacyFulfillmentText('936300000102', 1));
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] Line A keeps no quantity
+        RefundedLine.Find();
+        Expected := 0;
+        _Assert.AreEqual(Expected, RefundedLine.Quantity, 'A line refunded before shipping must not keep its quantity.');
+        // [THEN] Line A has nothing outstanding
+        _Assert.AreEqual(Expected, RefundedLine."Outstanding Quantity", 'A line refunded before shipping must have nothing outstanding.');
+        // [THEN] Line B ships its fulfilled unit
+        ShippedLine.Find();
+        Expected := 1;
+        _Assert.AreEqual(Expected, ShippedLine."Qty. to Ship", 'The fulfilled line must still be shipped.');
+    end;
+
+    [Test]
+    procedure LegacyPostStep_PartlyShippedLineWithTheRestRefunded_ShipsTheShippedUnits()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a line Shopify shipped in part and refunded for the rest is sized to the shipped units, and those units are shipped.
+        // [GIVEN] A store and a Sales Order line of 2 units
+        StoreCode := 'SPFYLEG2';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300000201', 100, SalesHeader, SalesLine);
+        SalesLine.Validate(Quantity, 2);
+        SalesLine.Modify(true);
+
+        // [GIVEN] Shopify fulfilled 1 unit and refunded the other: status partial, nothing left to fulfil
+        Order := LibrarySpfyImport.LegacyOrderJson('936300000200',
+            LibrarySpfyImport.LegacyOrderLineText('936300000201', SalesLine."No.", 100, 2, 0, 'partial', false),
+            LibrarySpfyImport.LegacyFulfillmentText('936300000201', 1));
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] The line is sized to the shipped unit
+        SalesLine.Find();
+        Expected := 1;
+        _Assert.AreEqual(Expected, SalesLine.Quantity, 'The line must keep only the unit Shopify shipped.');
+        // [THEN] That unit is shipped
+        _Assert.AreEqual(Expected, SalesLine."Qty. to Ship", 'The unit Shopify shipped must be shipped.');
+    end;
+
+    [Test]
+    procedure LegacyPostStep_LineShippedThenRefunded_KeepsItsShippedUnits()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a line Shopify shipped and then refunded keeps its shipped units although current_quantity is 0.
+        // [GIVEN] A store and a Sales Order line of 1 unit
+        StoreCode := 'SPFYLEG9';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300001501', 100, SalesHeader, SalesLine);
+
+        // [GIVEN] Shopify fulfilled the unit and refunded it afterwards: current_quantity 0
+        Order := LibrarySpfyImport.LegacyOrderJson('936300001500',
+            LibrarySpfyImport.LegacyOrderLineWithCurrentQtyText('936300001501', SalesLine."No.", 100, 1, 0, 'fulfilled', false, 0),
+            LibrarySpfyImport.LegacyFulfillmentText('936300001501', 1));
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] The line keeps the shipped unit
+        SalesLine.Find();
+        Expected := 1;
+        _Assert.AreEqual(Expected, SalesLine.Quantity, 'The cap must not go below what Shopify fulfilled.');
+        // [THEN] That unit is shipped
+        _Assert.AreEqual(Expected, SalesLine."Qty. to Ship", 'The unit Shopify shipped must be shipped.');
+    end;
+
+    [Test]
+    procedure LegacyPostStep_RefundedLineNotOnTheOrder_IsNotCreated()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        CountLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a line Shopify refunded before it shipped that is not on the Sales Order is not created.
+        // [GIVEN] A store and a Sales Order with one line still to ship
+        StoreCode := 'SPFYLEG3';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300000301', 100, SalesHeader, SalesLine);
+
+        // [GIVEN] The order also holds a second line, refunded before it shipped, that the Sales Order never got
+        Order := LibrarySpfyImport.LegacyOrderJson('936300000300',
+            LibrarySpfyImport.LegacyOrderLineText('936300000301', SalesLine."No.", 100, 1, 1, '', false) + ',' +
+            LibrarySpfyImport.LegacyOrderLineText('936300000302', SalesLine."No.", 100, 1, 0, '', false),
+            '');
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] The Sales Order still has one line
+        CountLine.SetRange("Document Type", SalesHeader."Document Type");
+        CountLine.SetRange("Document No.", SalesHeader."No.");
+        _Assert.AreEqual(1, CountLine.Count(), 'A refunded line that is not on the order must not be created.');
+    end;
+
+    [Test]
+    procedure LegacyPostStep_ShippedLineRefundedUnfulfilled_KeepsItsShippedQuantity()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySales: Codeunit "Library - Sales";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a line Business Central already shipped that Shopify refunded without a fulfillment keeps its shipped quantity instead of failing the import.
+        // [GIVEN] A store and a Sales Order line Business Central already shipped
+        StoreCode := 'SPFYLEG4';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300000401', 100, SalesHeader, SalesLine);
+        LibrarySales.PostSalesDocument(SalesHeader, true, false);
+        SalesHeader.Find();
+
+        // [GIVEN] Shopify refunded the line with nothing fulfilled
+        Order := LibrarySpfyImport.LegacyOrderJson('936300000400',
+            LibrarySpfyImport.LegacyOrderLineText('936300000401', SalesLine."No.", 100, 1, 0, '', false),
+            '');
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] The line keeps the quantity Business Central shipped
+        SalesLine.Find();
+        Expected := 1;
+        _Assert.AreEqual(Expected, SalesLine.Quantity, 'A shipped line must not be sized below its shipped quantity.');
+    end;
+
+    [Test]
+    procedure LegacyPostStep_SkippedLineInAnOpenFulfillment_KeepsItsQuantity()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a line whose units sit in an open fulfillment is not sized down, because the goods are still in transit.
+        // [GIVEN] A store and a Sales Order line of 1 unit
+        StoreCode := 'SPFYLEG5';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300000501', 100, SalesHeader, SalesLine);
+
+        // [GIVEN] Shopify has nothing left to fulfil on the line because its unit is in an open fulfillment
+        Order := LibrarySpfyImport.LegacyOrderJson('936300000500',
+            LibrarySpfyImport.LegacyOrderLineText('936300000501', SalesLine."No.", 100, 1, 0, '', false),
+            LibrarySpfyImport.LegacyFulfillmentWithStatusText('936300000501', 1, 'open'));
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] The line keeps its quantity
+        SalesLine.Find();
+        Expected := 1;
+        _Assert.AreEqual(Expected, SalesLine.Quantity, 'A line in an open fulfillment must keep its quantity.');
+    end;
+
+    [Test]
+    procedure LegacyPostStep_GiftCardLineRefundedBeforeFulfillment_DropsItsVoucherLine()
+    var
+        SalesHeader: Record "Sales Header";
+        ItemLine: Record "Sales Line";
+        GiftCardLine: Record "Sales Line";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        Expected: Decimal;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a gift card line Shopify refunded before fulfilling it is sized to nothing and loses the voucher line it would have issued.
+        // [GIVEN] A store selling gift cards and a Sales Order with a gift card line that carries an unposted voucher line
+        StoreCode := 'SPFYLEG7';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300001301', 100, SalesHeader, ItemLine);
+        AddGiftCardLineWithVoucherLine(StoreCode, SalesHeader, '936300001302', GiftCardLine);
+
+        // [GIVEN] Shopify refunded the gift card with nothing fulfilled
+        Order := LibrarySpfyImport.LegacyOrderJson('936300001300',
+            LibrarySpfyImport.LegacyOrderLineText('936300001302', '', 50, 1, 0, '', true),
+            '');
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] The gift card line keeps no quantity
+        GiftCardLine.Find();
+        Expected := 0;
+        _Assert.AreEqual(Expected, GiftCardLine.Quantity, 'A gift card refunded before fulfillment must not keep its quantity.');
+        // [THEN] No unposted voucher line is left on it
+        FilterUnpostedVoucherLines(GiftCardLine, NpRvSalesLine);
+        _Assert.IsTrue(NpRvSalesLine.IsEmpty(), 'A gift card line with no quantity must not keep a voucher line to issue.');
+    end;
+
+    [Test]
+    procedure LegacyPostStep_ShippedGiftCardLine_KeepsItsVoucherLine()
+    var
+        SalesHeader: Record "Sales Header";
+        ItemLine: Record "Sales Line";
+        GiftCardLine: Record "Sales Line";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        Order: JsonToken;
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] In the legacy Post step, a gift card line Shopify fulfilled keeps its unposted voucher line, because the voucher is still to be issued when the line is invoiced.
+        // [GIVEN] A store selling gift cards and a Sales Order with a gift card line that carries an unposted voucher line
+        StoreCode := 'SPFYLEG6';
+        LibrarySpfyImport.CreateStore(StoreCode);
+        LibrarySpfyImport.SetupSalesOrderWithShopifyLine('936300000601', 100, SalesHeader, ItemLine);
+        AddGiftCardLineWithVoucherLine(StoreCode, SalesHeader, '936300000602', GiftCardLine);
+
+        // [GIVEN] Shopify fulfilled the gift card
+        Order := LibrarySpfyImport.LegacyOrderJson('936300000600',
+            LibrarySpfyImport.LegacyOrderLineText('936300000602', '', 50, 1, 0, 'fulfilled', true),
+            '{"status":"success","line_items":[{"id":936300000602,"fulfillment_status":"fulfilled","quantity":1}],' +
+            '"receipt":{"gift_cards":[{"line_item_id":936300000602,"id":"936300000699","masked_code":"**** **** **** 1234"}]}}');
+
+        // [WHEN] The Post step updates the lines
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+
+        // [THEN] The gift card line still has a voucher line to issue
+        GiftCardLine.Find();
+        FilterUnpostedVoucherLines(GiftCardLine, NpRvSalesLine);
+        _Assert.IsFalse(NpRvSalesLine.IsEmpty(), 'A fulfilled gift card line must keep its voucher line.');
+    end;
+
+    local procedure AddGiftCardLineWithVoucherLine(StoreCode: Code[20]; SalesHeader: Record "Sales Header"; OrderLineId: Text[30]; var GiftCardLine: Record "Sales Line")
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        LibraryERM: Codeunit "Library - ERM";
+        LibrarySales: Codeunit "Library - Sales";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        VoucherType.Init();
+        VoucherType.Code := CopyStr('GC' + StoreCode, 1, MaxStrLen(VoucherType.Code));
+        VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
+        VoucherType."No. Series" := LibraryERM.CreateNoSeriesCode('GC');
+        VoucherType."Arch. No. Series" := LibraryERM.CreateNoSeriesCode('GCA');
+        VoucherType."Reference No. Type" := VoucherType."Reference No. Type"::Pattern;
+        VoucherType."Reference No. Pattern" := '18[N][S][N*2]';
+        if not VoucherType.Insert() then
+            VoucherType.Modify();
+        ShopifyStore.Get(StoreCode);
+        ShopifyStore."Voucher Type (Sold at Shopify)" := VoucherType.Code;
+        ShopifyStore.Modify();
+
+        LibrarySales.CreateSalesLine(GiftCardLine, SalesHeader, GiftCardLine.Type::"G/L Account", VoucherType."Account No.", 1);
+        GiftCardLine.Validate("Unit Price", 50);
+        GiftCardLine.Modify(true);
+        SpfyAssignedIDMgt.AssignShopifyID(GiftCardLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", OrderLineId, false);
+
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."Document Type" := GiftCardLine."Document Type";
+        NpRvSalesLine."Document No." := GiftCardLine."Document No.";
+        NpRvSalesLine."Document Line No." := GiftCardLine."Line No.";
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
+        NpRvSalesLine.Insert();
+    end;
+
+    local procedure FilterUnpostedVoucherLines(SalesLine: Record "Sales Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    begin
+        NpRvSalesLine.SetRange("Document Type", SalesLine."Document Type");
+        NpRvSalesLine.SetRange("Document No.", SalesLine."Document No.");
+        NpRvSalesLine.SetRange("Document Line No.", SalesLine."Line No.");
+        NpRvSalesLine.SetRange(Posted, false);
     end;
 
     #endregion

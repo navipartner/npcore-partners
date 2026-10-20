@@ -1177,7 +1177,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         CalculateFulfillments(Order, TempFulfillmentLineBuffer, TempFulfillmEntryDetailBuffer);
         if Order.SelectToken('line_items', OrderLines) and OrderLines.IsArray() then
             foreach OrderLine in OrderLines.AsArray() do
-                if not SkipLine(OrderLine) then
+                if MustUpsertLine(SalesHeader, Order, OrderLine) then
                     UpsertSalesLine(ShopifyStoreCode, OrderLine, TempFulfillmentLineBuffer, TempFulfillmEntryDetailBuffer, SalesHeader, ForPosting, LastLineNo);
 
         if Order.SelectToken('shipping_lines', OrderLines) and OrderLines.IsArray() then
@@ -1338,6 +1338,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 #pragma warning restore AA0139
             end;
             Qty := JsonHelper.GetJDecimal(OrderLine, 'fulfillable_quantity', true) + FulfillmentLineBuffer."Fulfilled Quantity";
+            if Qty < SalesLine."Quantity Shipped" then
+                Qty := SalesLine."Quantity Shipped";
             if SalesLine.Quantity <> Qty then
                 SalesLine.Validate(Quantity, Qty);
             case true of
@@ -1360,6 +1362,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 SetRetailVoucher(SalesHeader, SalesLine, IsNPGiftCard, VoucherType, PropertyDict, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
                 FulfillmEntryDetailBuffer.Reset();
             end;
+            // Refunded before it shipped: no voucher is left to issue from this line.
+            if IsGiftCard and ExistingLineFound and (SalesLine.Quantity = 0) then
+                DeleteUnpostedVoucherLines(SalesLine);
         end;
         if Format(xSalesLine) <> Format(SalesLine) then
             SalesLine.Modify(true);
@@ -1596,12 +1601,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfySuspendVouchRefVal: Codeunit "NPR Spfy Suspend Vouch.Ref.Val";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
-        NpRvSalesLine.SetRange("Document Type", SalesLine."Document Type");
-        NpRvSalesLine.SetRange("Document No.", SalesLine."Document No.");
-        NpRvSalesLine.SetRange("Document Line No.", SalesLine."Line No.");
-        NpRvSalesLine.SetRange(Posted, false);
-        if not NpRvSalesLine.IsEmpty() then
-            NpRvSalesLine.DeleteAll(true);
+        DeleteUnpostedVoucherLines(SalesLine);
 
         if not (FulfillmentLineBuffer."Gift Card" or IsNpGiftCard) then
             exit;
@@ -1638,6 +1638,18 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
             NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
         until FulfillmEntryDetailBuffer.Next() = 0;
+    end;
+
+    local procedure DeleteUnpostedVoucherLines(SalesLine: Record "Sales Line")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        NpRvSalesLine.SetRange("Document Type", SalesLine."Document Type");
+        NpRvSalesLine.SetRange("Document No.", SalesLine."Document No.");
+        NpRvSalesLine.SetRange("Document Line No.", SalesLine."Line No.");
+        NpRvSalesLine.SetRange(Posted, false);
+        if not NpRvSalesLine.IsEmpty() then
+            NpRvSalesLine.DeleteAll(true);
     end;
 
     local procedure OrderLineIsGiftCard(OrderLine: JsonToken; PropertyDict: Dictionary of [Text, Text]; var IsNPGiftCard: Boolean): Boolean
@@ -1920,6 +1932,42 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 (LowerCase(JsonHelper.GetJText(OrderLine, 'fulfillment_status', false)) <> FulfilledTok) and
                 (JsonHelper.GetJDecimal(OrderLine, 'fulfillable_quantity', true) = 0);
         exit(Skip);
+    end;
+
+    local procedure MustUpsertLine(SalesHeader: Record "Sales Header"; Order: JsonToken; OrderLine: JsonToken): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        OrderLineID: Text[30];
+    begin
+        if not SkipLine(OrderLine) then
+            exit(true);
+        OrderLineID := GetOrderID(OrderLine);
+        // Units in an open or pending fulfillment are in transit, not refunded: leave the line alone.
+        if LineHasFulfillmentInFlight(Order, OrderLineID) then
+            exit(false);
+        // A skipped line already on the order is still sized from Shopify, or it keeps a quantity nobody will ship.
+        exit(FindExistingSalesLine(SalesHeader."Document Type", OrderLineID, SalesLine));
+    end;
+
+    local procedure LineHasFulfillmentInFlight(Order: JsonToken; OrderLineID: Text[30]): Boolean
+    var
+        Fulfillment: JsonToken;
+        FulfillmentLine: JsonToken;
+        FulfillmentLines: JsonToken;
+        Fulfillments: JsonToken;
+        FulfillmentStatus: Text;
+    begin
+        if not (Order.SelectToken('fulfillments', Fulfillments) and Fulfillments.IsArray()) then
+            exit(false);
+        foreach Fulfillment in Fulfillments.AsArray() do begin
+            FulfillmentStatus := LowerCase(JsonHelper.GetJText(Fulfillment, 'status', false));
+            if (FulfillmentStatus = 'open') or (FulfillmentStatus = 'pending') then
+                if Fulfillment.SelectToken('line_items', FulfillmentLines) and FulfillmentLines.IsArray() then
+                    foreach FulfillmentLine in FulfillmentLines.AsArray() do
+                        if JsonHelper.GetJText(FulfillmentLine, 'id', false) = OrderLineID then
+                            exit(true);
+        end;
+        exit(false);
     end;
 
     procedure PostOrder(var SalesHeader: Record "Sales Header"): Boolean

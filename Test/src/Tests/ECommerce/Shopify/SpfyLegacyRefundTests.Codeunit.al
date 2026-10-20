@@ -5958,6 +5958,51 @@ codeunit 85510 "NPR Spfy Legacy Refund Tests"
         _Assert.AreEqual('', SpfyAssignedIDMgt.GetAssignedShopifyID(SalesCrMemoHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 'A refund''s credit memo carries no return id.');
     end;
 
+    [Test]
+    procedure OrderImport_PostStepWithALineRefundedBeforeShipping_LeavesNoRefundWaiting()
+    var
+        SalesHeader: Record "Sales Header";
+        ItemB: Record Item;
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        SpfyRefundDocBuilder: Codeunit "NPR Spfy Refund Doc. Builder";
+        Order: JsonToken;
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+        WaitingMessage: Text;
+        StillOpen: Boolean;
+    begin
+        // [SCENARIO] Once the legacy Post step has posted an order whose other line Shopify refunded before shipping, refunds of that order no longer wait on its Sales Order.
+        // [GIVEN] A legacy-path store
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+
+        // [GIVEN] An open Sales Order with line A and line B, as the Create step left it
+        LibraryInventory.CreateItem(ItemB);
+        _Lib.CreateOpenShopifyOrderTwoLines(StoreCode, CustomerNo, LocationCode, '2363001', Sku, '2363101', ItemB."No.", '2363102', 125, SalesHeader);
+
+        // [GIVEN] Shopify shipped line A and refunded line B before it shipped
+        Order := LibrarySpfyImport.LegacyOrderJson('2363001',
+            LibrarySpfyImport.LegacyOrderLineText('2363101', Sku, 125, 1, 0, 'fulfilled', false) + ',' +
+            LibrarySpfyImport.LegacyOrderLineText('2363102', ItemB."No.", 125, 1, 0, '', false),
+            LibrarySpfyImport.LegacyFulfillmentText('2363101', 1));
+
+        // [WHEN] The Post step updates the lines and posts the order
+        SpfyOrderMgt.UpsertSalesLines(StoreCode, Order, SalesHeader, true);
+        SpfyOrderMgt.PostOrder(SalesHeader);
+
+        // [THEN] No refund of the order waits on its Sales Order
+        StillOpen := SpfyRefundDocBuilder.OrderStillOpen(StoreCode, '2363001', '#2363001', WaitingMessage);
+        _Assert.IsFalse(StillOpen, 'No refund may wait on this order: ' + WaitingMessage);
+
+        // Cleanup: posting committed, so remove what is left of the order.
+        if SalesHeader.Find() then
+            SalesHeader.Delete(true);
+        Commit();
+    end;
+
     local procedure LineWithoutOrderLineJson(): Text
     begin
         exit('{"node":{"quantity":1,"restockType":"NO_RESTOCK","restocked":false,"location":null,"subtotalSet":{"presentmentMoney":{"amount":"5"}},"totalTaxSet":{"presentmentMoney":{"amount":"0"}},"lineItem":null}}');

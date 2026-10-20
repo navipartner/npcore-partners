@@ -461,6 +461,36 @@ codeunit 85465 "NPR Library Spfy Import"
             '}}');
     end;
 
+    /// <summary>A line Shopify refunded before fulfilling it: ordered once, nothing current, nothing left to fulfil.</summary>
+    procedure RemovedLineNodeText(LineId: Text; Sku: Code[20]; UnitPrice: Decimal; OrderedQty: Integer; IsGiftCard: Boolean): Text
+    begin
+        exit(RemovedLineNodeText(LineId, Sku, UnitPrice, OrderedQty, IsGiftCard, 0, 0));
+    end;
+
+    /// <summary>As Shopify reports a refunded line: the refunded units are nonFulfillableQuantity, which the discount proration reads.</summary>
+    procedure RemovedLineNodeText(LineId: Text; Sku: Code[20]; UnitPrice: Decimal; OrderedQty: Integer; IsGiftCard: Boolean; NonFulfillableQty: Integer; DiscountAmount: Decimal): Text
+    var
+        Amount: Text;
+        DiscountAlloc: Text;
+    begin
+        DiscountAlloc := '[]';
+        if DiscountAmount <> 0 then
+            DiscountAlloc := '[{"allocatedAmountSet":{"presentmentMoney":{"amount":"' + Format(DiscountAmount, 0, 9) + '"}}}]';
+        Amount := Format(UnitPrice, 0, 9);
+        exit(
+            '{"node":{' +
+            '"id":"gid://shopify/LineItem/' + LineId + '",' +
+            '"sku":"' + Sku + '",' +
+            '"title":"Item","variantTitle":null,' +
+            '"quantity":' + Format(OrderedQty) + ',"unfulfilledQuantity":0,"currentQuantity":0,"nonFulfillableQuantity":' + Format(NonFulfillableQty) + ',' +
+            '"isGiftCard":' + Format(IsGiftCard, 0, 9) + ',' +
+            '"product":{"id":"gid://shopify/Product/1","productType":"snowboard"},' +
+            '"variant":{"price":"' + Amount + '"},' +
+            '"originalUnitPriceSet":{"presentmentMoney":{"amount":"' + Amount + '"}},' +
+            '"taxLines":[],"discountAllocations":' + DiscountAlloc +
+            '}}');
+    end;
+
     /// <summary>Wraps line-item and shipping-line array texts into a unified order JSON (data.order).</summary>
     procedure WrapOrderText(ShopifyId: Text; LineItemsArrText: Text; ShippingLinesArrText: Text) OrderResponse: JsonToken
     var
@@ -653,6 +683,12 @@ codeunit 85465 "NPR Library Spfy Import"
 
     /// <summary>Order JSON for the update path: one line + a SUCCESS fulfillment for the given order line id.</summary>
     procedure BuildUpdateOrderJson(ShopifyId: Text; OrderLineId: Text[30]; Sku: Code[20]; UnitPrice: Decimal; FulfilledQty: Integer) OrderResponse: JsonToken
+    begin
+        OrderResponse := BuildUpdateOrderJsonWithLine(ShopifyId, OrderLineId, ItemLineNodeText(OrderLineId, Sku, UnitPrice, FulfilledQty, '[]'), UnitPrice, FulfilledQty);
+    end;
+
+    /// <summary>Same as BuildUpdateOrderJson, with the line node given by the caller (for example a removed line that still has a fulfillment).</summary>
+    procedure BuildUpdateOrderJsonWithLine(ShopifyId: Text; OrderLineId: Text[30]; LineNodeText: Text; UnitPrice: Decimal; FulfilledQty: Integer) OrderResponse: JsonToken
     var
         Json: JsonToken;
         Builder: TextBuilder;
@@ -666,7 +702,7 @@ codeunit 85465 "NPR Library Spfy Import"
         Builder.Append('"id":"gid://shopify/Order/' + ShopifyId + '",');
         Builder.Append('"name":"#' + ShopifyId + '",');
         Builder.Append('"sourceName":"' + SourceNameTok + '","number":1001,"taxesIncluded":false,');
-        Builder.Append('"lineItems":[' + ItemLineNodeText(OrderLineId, Sku, UnitPrice, FulfilledQty, '[]') + '],');
+        Builder.Append('"lineItems":[' + LineNodeText + '],');
         Builder.Append('"fulfillments":[{"id":"gid://shopify/Fulfillment/1","status":"SUCCESS","displayStatus":"FULFILLED",');
         Builder.Append('"createdAt":"2026-06-23T11:58:31Z","updatedAt":"2026-06-23T11:58:32Z",');
         Builder.Append('"orderId":"gid://shopify/Order/' + ShopifyId + '","email":"buyer@test.com",');
@@ -677,6 +713,77 @@ codeunit 85465 "NPR Library Spfy Import"
         if not Json.ReadFrom(Builder.ToText()) then
             Error(InvalidErr);
         OrderResponse := Json;
+    end;
+
+    /// <summary>One order line the way the legacy REST order import receives it. An empty FulfillmentStatus is sent as
+    /// null, as Shopify does for a line with nothing fulfilled. The line carries no current_quantity.</summary>
+    procedure LegacyOrderLineText(LineId: Text; Sku: Code[20]; UnitPrice: Decimal; Qty: Integer; FulfillableQty: Integer; FulfillmentStatus: Text; IsGiftCard: Boolean): Text
+    begin
+        exit(LegacyOrderLineJson(LineId, Sku, UnitPrice, Qty, FulfillableQty, FulfillmentStatus, IsGiftCard, ''));
+    end;
+
+    /// <summary>As LegacyOrderLineText, with the current_quantity Shopify reports: the units still on the order, refunded units excluded.</summary>
+    procedure LegacyOrderLineWithCurrentQtyText(LineId: Text; Sku: Code[20]; UnitPrice: Decimal; Qty: Integer; FulfillableQty: Integer; FulfillmentStatus: Text; IsGiftCard: Boolean; CurrentQty: Integer): Text
+    begin
+        exit(LegacyOrderLineJson(LineId, Sku, UnitPrice, Qty, FulfillableQty, FulfillmentStatus, IsGiftCard, '"current_quantity":' + Format(CurrentQty) + ','));
+    end;
+
+    local procedure LegacyOrderLineJson(LineId: Text; Sku: Code[20]; UnitPrice: Decimal; Qty: Integer; FulfillableQty: Integer; FulfillmentStatus: Text; IsGiftCard: Boolean; CurrentQtyProperty: Text): Text
+    var
+        StatusText: Text;
+    begin
+        if FulfillmentStatus = '' then
+            StatusText := 'null'
+        else
+            StatusText := '"' + FulfillmentStatus + '"';
+        exit(
+            '{"id":' + LineId + ',' +
+            '"sku":"' + Sku + '",' +
+            '"title":"Item","variant_title":null,"name":"Item",' +
+            '"quantity":' + Format(Qty) + ',"fulfillable_quantity":' + Format(FulfillableQty) + ',' +
+            CurrentQtyProperty +
+            '"fulfillment_status":' + StatusText + ',' +
+            '"gift_card":' + Format(IsGiftCard, 0, 9) + ',' +
+            '"price_set":{"presentment_money":{"amount":"' + Format(UnitPrice, 0, 9) + '"}},' +
+            '"discount_allocations":[],"properties":[]}');
+    end;
+
+    /// <summary>A successful fulfillment of Qty units of one order line, legacy REST shape.</summary>
+    procedure LegacyFulfillmentText(LineId: Text; Qty: Integer): Text
+    begin
+        exit(LegacyFulfillmentWithStatusText(LineId, Qty, 'success'));
+    end;
+
+    /// <summary>A fulfillment of Qty units of one order line in the given status, legacy REST shape.</summary>
+    procedure LegacyFulfillmentWithStatusText(LineId: Text; Qty: Integer; Status: Text): Text
+    begin
+        exit('{"status":"' + Status + '","line_items":[{"id":' + LineId + ',"fulfillment_status":"fulfilled","quantity":' + Format(Qty) + '}]}');
+    end;
+
+    /// <summary>Wraps legacy order lines and fulfillments into the order the legacy order import reads.</summary>
+    procedure LegacyOrderJson(OrderId: Text; LineItemsText: Text; FulfillmentsText: Text) Order: JsonToken
+    var
+        InvalidErr: Label 'Built legacy order JSON is not valid.', Locked = true;
+    begin
+        if not Order.ReadFrom('{"id":' + OrderId + ',"line_items":[' + LineItemsText + '],"fulfillments":[' + FulfillmentsText + '],"shipping_lines":[]}') then
+            Error(InvalidErr);
+    end;
+
+    /// <summary>Adds an item line carrying a Shopify order line id to a Sales Order made by SetupSalesOrderWithShopifyLine.</summary>
+    procedure AddShopifyLineToSalesOrder(SalesHeader: Record "Sales Header"; OrderLineId: Text[30]; UnitPrice: Decimal; Qty: Decimal; var SalesLine: Record "Sales Line")
+    var
+        Item: Record Item;
+        LibrarySales: Codeunit "Library - Sales";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryEcom: Codeunit "NPR Library - E-Commerce";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        LibraryInventory.CreateItem(Item);
+        LibraryEcom.IncreaseItemInventoryOnLocation(Item."No.", 100, SalesHeader."Location Code");
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", Qty);
+        SalesLine.Validate("Unit Price", UnitPrice);
+        SalesLine.Modify(true);
+        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", OrderLineId, false);
     end;
 
     /// <summary>Removes the log entries of one Shopify document. For tests that have to call Commit() - processing

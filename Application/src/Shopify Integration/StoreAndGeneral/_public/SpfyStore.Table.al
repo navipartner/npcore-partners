@@ -271,6 +271,7 @@ table 6150810 "NPR Spfy Store"
 
             trigger OnValidate()
             begin
+                ConfirmRefundsMayWait("Post on Completion" <> xRec."Post on Completion");
                 if not "Post on Completion" then
                     "Delete After Final Post" := false;
             end;
@@ -338,6 +339,7 @@ table 6150810 "NPR Spfy Store"
             begin
                 if "Sales Return Order Integration" then
                     TestField("Get Returns Starting From");
+                ConfirmRefundsMayWait("Sales Return Order Integration" <> xRec."Sales Return Order Integration");
                 Modify();
                 if ShopifyEcommOrderExp.IsFeatureEnabled() then
                     SpfyEcomSalesDocPrcssr.SetupJobQueues()
@@ -731,6 +733,25 @@ table 6150810 "NPR Spfy Store"
             SpfyScheduleDetectionJQ.EnsureChangeDetectionJobScheduled();
         end else
             _SpfyDataLogSubscrMgt.CreateDataLogSetup(IntegrationArea);
+    end;
+
+    local procedure ConfirmRefundsMayWait(SettingChanged: Boolean)
+    var
+        LegacyReturnQueue: Record "NPR Spfy NC Return Queue";
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+        RefundsMayWaitQst: Label '%1 is off while %2 is on. The order import never updates a Sales Order after creating it then, so a line Shopify refunds before it ships stays on the Sales Order, and every refund of that order waits in the %3 until someone reduces or deletes that line by hand.\Do you want to continue?', Comment = '%1 = Post on Completion field caption, %2 = Sales Return Order Integration field caption, %3 = Shopify Legacy Return Queue table caption';
+    begin
+        if not SettingChanged then
+            exit;
+        if "Post on Completion" or not "Sales Return Order Integration" then
+            exit;
+        // Without a UI (API, configuration package, job) there is no one to answer, and those writes must keep working.
+        if not GuiAllowed() then
+            exit;
+        if ShopifyEcommOrderExp.IsFeatureEnabled() then
+            exit;
+        if not Confirm(RefundsMayWaitQst, false, FieldCaption("Post on Completion"), FieldCaption("Sales Return Order Integration"), LegacyReturnQueue.TableCaption()) then
+            Error('');
     end;
 
     trigger OnRename()

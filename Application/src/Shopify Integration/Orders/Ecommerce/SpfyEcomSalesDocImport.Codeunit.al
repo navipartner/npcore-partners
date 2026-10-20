@@ -774,10 +774,11 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
         foreach SalesLineJsonToken in SalesLinesJsonToken.AsArray() do begin
             SalesLineJsonToken.SelectToken('node', LineToken);
-            if not IsProductRemoved(LineToken) then
-                if ApplyToSalesDocument then
-                    ProcessSaleLine(LineToken, SalesHeader, LogEntry, SalesLineByOrderLineIds, TempPreparedFulfillmentBuffer, FulfillmentCache, IsCreatePath)
-                else
+            if ApplyToSalesDocument then begin
+                if not IsRemovedLineToSkip(LineToken, SalesLineByOrderLineIds) then
+                    ProcessSaleLine(LineToken, SalesHeader, LogEntry, SalesLineByOrderLineIds, TempPreparedFulfillmentBuffer, FulfillmentCache, IsCreatePath);
+            end else
+                if not IsProductRemoved(LineToken) then
                     ProcessEcommerceSalesLine(LineToken, EcomSalesHeader, LogEntry, FulfillmentCache);
         end;
     end;
@@ -1146,6 +1147,21 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if not Handled then
             Skip := _SpfyAPIOrderHelper.LineIsNoLongerOnOrder(SalesLineJsonToken);
         exit(Skip);
+    end;
+
+    local procedure IsRemovedLineToSkip(LineToken: JsonToken; var SalesLineByOrderLineIds: Dictionary of [Text[30], RecordId]): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        OrderLineId: Text[30];
+    begin
+        if not IsProductRemoved(LineToken) then
+            exit(false);
+        // A removed line already on the Sales Order is still sized from Shopify, or it keeps a quantity nobody will ship.
+        // Virtual lines are left as Business Central has them, as before.
+        OrderLineId := CopyStr(OrderMgt.GetNumericId(JsonHelper.GetJText(LineToken, 'id', true)), 1, MaxStrLen(OrderLineId));
+        if not GetSalesLineByOrderLineId(SalesLineByOrderLineIds, OrderLineId, SalesLine) then
+            exit(true);
+        exit(IsVirtualItemSalesLine(SalesLine));
     end;
 
     local procedure InsertEcommerceSalesLine(SalesLineJsonToken: JsonToken; EcomSalesHeader: Record "NPR Ecom Sales Header"; LogEntry: Record "NPR Spfy Event Log Entry"; LineType: Enum "NPR Ecom Sales Line Type"; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
@@ -1660,6 +1676,9 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
     internal procedure CalcProratedLineDiscount(OrderLine: JsonToken; LineQty: Decimal; OriginalOrderQty: Decimal) LineDiscountAmount: Decimal
     begin
+        // A line without quantity carries no discount.
+        if LineQty = 0 then
+            exit(0);
         LineDiscountAmount := CalcLineDiscountAmount(OrderLine);
         if (LineDiscountAmount = 0) or (OriginalOrderQty = 0) or (LineQty >= OriginalOrderQty) then
             exit;

@@ -367,31 +367,16 @@ codeunit 85511 "NPR Library Spfy Legacy Refund"
     procedure PostShopifyOrderTwoLines(StoreCode: Code[20]; CustomerNo: Code[20]; LocationCode: Code[10]; OrderId: Text[30]; SkuA: Code[20]; LineItemIdA: Text[30]; SkuB: Code[20]; LineItemIdB: Text[30]; UnitPrice: Decimal)
     var
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
         LibrarySales: Codeunit "Library - Sales";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
     begin
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CustomerNo);
-        SalesHeader.Validate("Location Code", LocationCode);
-        SalesHeader.Validate("Prices Including VAT", true);
-        SalesHeader.Modify(true);
-        SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID", OrderId, false);
-        SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code", StoreCode, false);
-        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, SkuA, 1);
-        SalesLine.Validate("Unit Price", UnitPrice);
-        SalesLine.Modify(true);
-        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", LineItemIdA, false);
-        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, SkuB, 1);
-        SalesLine.Validate("Unit Price", UnitPrice);
-        SalesLine.Modify(true);
-        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", LineItemIdB, false);
+        CreateOpenShopifyOrderTwoLines(StoreCode, CustomerNo, LocationCode, OrderId, SkuA, LineItemIdA, SkuB, LineItemIdB, UnitPrice, SalesHeader);
         PayInvoice(StoreCode, LibrarySales.PostSalesDocument(SalesHeader, true, true));
     end;
 
     /// <summary>
-    /// Posts line A of a two-line order and keeps line B open, as the legacy import posts a partly fulfilled order; the Sales Order stays.
+    /// As the order import's Create step leaves a two-line order: Entry IDs on header and lines, nothing posted yet.
     /// </summary>
-    procedure PostShopifyOrderFirstLineOnly(StoreCode: Code[20]; CustomerNo: Code[20]; LocationCode: Code[10]; OrderId: Text[30]; SkuA: Code[20]; LineItemIdA: Text[30]; SkuB: Code[20]; LineItemIdB: Text[30]; UnitPrice: Decimal; var SalesHeader: Record "Sales Header")
+    procedure CreateOpenShopifyOrderTwoLines(StoreCode: Code[20]; CustomerNo: Code[20]; LocationCode: Code[10]; OrderId: Text[30]; SkuA: Code[20]; LineItemIdA: Text[30]; SkuB: Code[20]; LineItemIdB: Text[30]; UnitPrice: Decimal; var SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
         LibrarySales: Codeunit "Library - Sales";
@@ -409,10 +394,25 @@ codeunit 85511 "NPR Library Spfy Legacy Refund"
         SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", LineItemIdA, false);
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, SkuB, 1);
         SalesLine.Validate("Unit Price", UnitPrice);
+        SalesLine.Modify(true);
+        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", LineItemIdB, false);
+    end;
+
+    /// <summary>
+    /// Posts line A of a two-line order and keeps line B open, as the legacy import posts a partly fulfilled order; the Sales Order stays.
+    /// </summary>
+    procedure PostShopifyOrderFirstLineOnly(StoreCode: Code[20]; CustomerNo: Code[20]; LocationCode: Code[10]; OrderId: Text[30]; SkuA: Code[20]; LineItemIdA: Text[30]; SkuB: Code[20]; LineItemIdB: Text[30]; UnitPrice: Decimal; var SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        LibrarySales: Codeunit "Library - Sales";
+    begin
+        CreateOpenShopifyOrderTwoLines(StoreCode, CustomerNo, LocationCode, OrderId, SkuA, LineItemIdA, SkuB, LineItemIdB, UnitPrice, SalesHeader);
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.FindLast();
         SalesLine.Validate("Qty. to Ship", 0);
         SalesLine.Validate("Qty. to Invoice", 0);
         SalesLine.Modify(true);
-        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", LineItemIdB, false);
         PayInvoice(StoreCode, LibrarySales.PostSalesDocument(SalesHeader, true, true));
         SalesHeader.Find();
     end;

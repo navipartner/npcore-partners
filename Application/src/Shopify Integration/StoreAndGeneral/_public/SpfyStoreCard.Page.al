@@ -308,7 +308,7 @@ page 6184704 "NPR Spfy Store Card"
                 }
                 field("Post on Completion"; Rec."Post on Completion")
                 {
-                    ToolTip = 'Specifies whether the system should automatically post the sales order in Business Central when the associated Shopify order is marked as closed in Shopify.';
+                    ToolTip = 'Specifies whether the system should automatically post the sales order in Business Central when the associated Shopify order is marked as closed in Shopify. If this is off while sales returns are imported, a line Shopify refunds before it ships stays on the sales order, and refunds of that order wait until someone reduces or deletes that line.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;

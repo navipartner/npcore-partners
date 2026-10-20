@@ -2964,6 +2964,140 @@ codeunit 85483 "NPR Spfy Legacy Return Tests"
     end;
 
     [Test]
+    [HandlerFunctions('AcceptConfirm')]
+    procedure PostOnCompletion_SwitchedOffWhileReturnsAreOn_WarnsAndKeepsTheChange()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        // [SCENARIO] Switching Post on Completion off on a legacy-path store that imports returns warns that refunds can wait, and keeps the change when confirmed.
+        // [GIVEN] The feature is off and a store with Post on Completion and returns on
+        CreateStoreForRefundWarning('SPFY2363A', true, true, ShopifyStore);
+
+        Clear(_CapturedMessage);
+        // [WHEN] Post on Completion is switched off and the warning is confirmed
+        ShopifyStore.Validate("Post on Completion", false);
+        ShopifyStore.Modify();
+
+        // [THEN] The warning explains that refunds wait
+        _Assert.IsTrue(StrPos(_CapturedMessage, 'until someone reduces or deletes that line by hand') > 0, 'The warning must explain that refunds wait: ' + _CapturedMessage);
+        // [THEN] The change sticks
+        ShopifyStore.Get('SPFY2363A');
+        _Assert.IsFalse(ShopifyStore."Post on Completion", 'A confirmed change must stick.');
+    end;
+
+    [Test]
+    [HandlerFunctions('DeclineConfirm')]
+    procedure PostOnCompletion_SwitchedOffAndDeclined_StaysOn()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        // [SCENARIO] Declining the warning when switching Post on Completion off leaves it on.
+        // [GIVEN] The feature is off and a store with Post on Completion and returns on
+        CreateStoreForRefundWarning('SPFY2363B', true, true, ShopifyStore);
+
+        // [WHEN] Post on Completion is switched off and the warning is declined
+        asserterror ShopifyStore.Validate("Post on Completion", false);
+
+        // [THEN] The setting stays on
+        ShopifyStore.Get('SPFY2363B');
+        _Assert.IsTrue(ShopifyStore."Post on Completion", 'A declined change must not stick.');
+    end;
+
+    [Test]
+    [HandlerFunctions('DeclineConfirm')]
+    procedure Returns_SwitchedOnWhilePostOnCompletionIsOff_DeclinedStaysOff()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        // [SCENARIO] Switching returns on for a legacy-path store with Post on Completion off warns that refunds can wait, and declining leaves returns off.
+        // [GIVEN] The feature is off and a store with Post on Completion off, returns off and a return starting date
+        CreateStoreForRefundWarning('SPFY2363C', false, false, ShopifyStore);
+
+        Clear(_CapturedMessage);
+        // [WHEN] Returns are switched on and the warning is declined
+        asserterror ShopifyStore.Validate("Sales Return Order Integration", true);
+
+        // [THEN] The warning explains that refunds wait
+        _Assert.IsTrue(StrPos(_CapturedMessage, 'until someone reduces or deletes that line by hand') > 0, 'The warning must explain that refunds wait: ' + _CapturedMessage);
+        // [THEN] Returns stay off
+        ShopifyStore.Get('SPFY2363C');
+        _Assert.IsFalse(ShopifyStore."Sales Return Order Integration", 'A declined change must not stick.');
+    end;
+
+    [Test]
+    procedure PostOnCompletion_SwitchedOffWhileReturnsAreOff_DoesNotWarn()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        // [SCENARIO] Switching Post on Completion off on a store that does not import returns does not warn.
+        // [GIVEN] The feature is off and a store with Post on Completion on and returns off
+        CreateStoreForRefundWarning('SPFY2363D', true, false, ShopifyStore);
+
+        // [WHEN] Post on Completion is switched off
+        ShopifyStore.Validate("Post on Completion", false);
+
+        // [THEN] No warning was raised (an unhandled confirm fails the test) and the value changed
+        _Assert.IsFalse(ShopifyStore."Post on Completion", 'The change must apply without a warning.');
+    end;
+
+    [Test]
+    procedure PostOnCompletion_ValidatedToTheSameValue_DoesNotWarn()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        // [SCENARIO] Validating Post on Completion to the value it already has does not warn again, as when a whole store record is written back.
+        // [GIVEN] The feature is off and a store already in the warned combination
+        CreateStoreForRefundWarning('SPFY2363E', false, true, ShopifyStore);
+
+        // [WHEN] Post on Completion is validated to off again
+        ShopifyStore.Validate("Post on Completion", false);
+
+        // [THEN] No warning was raised (an unhandled confirm fails the test)
+        _Assert.IsFalse(ShopifyStore."Post on Completion", 'The value must be unchanged.');
+    end;
+
+    [Test]
+    procedure PostOnCompletion_SwitchedOffWithTheEcommerceFeatureOn_DoesNotWarn()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        Feature: Record "NPR Feature";
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+    begin
+        // [SCENARIO] With the Shopify Ecommerce Order Experience on, refunds do not go through the legacy refund wait, so switching Post on Completion off does not warn.
+        // [GIVEN] A store with Post on Completion and returns on
+        CreateStoreForRefundWarning('SPFY2363F', true, true, ShopifyStore);
+        // [GIVEN] The feature is on, set directly so its own enabling checks do not run
+        Feature.Get(ShopifyEcommOrderExp.GetFeatureId());
+        Feature.Enabled := true;
+        Feature.Modify();
+
+        // [WHEN] Post on Completion is switched off
+        ShopifyStore.Validate("Post on Completion", false);
+
+        // [THEN] No warning was raised (an unhandled confirm fails the test)
+        _Assert.IsFalse(ShopifyStore."Post on Completion", 'The change must apply without a warning.');
+
+        // Cleanup: the feature row outlives the test in a shared database.
+        Feature.Enabled := false;
+        Feature.Modify();
+    end;
+
+    local procedure CreateStoreForRefundWarning(StoreCode: Code[20]; PostOnCompletion: Boolean; ReturnsOn: Boolean; var ShopifyStore: Record "NPR Spfy Store")
+    var
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        ShopifyEcommOrderExp: Codeunit "NPR Spfy Ecommerce Order Exp";
+    begin
+        ShopifyEcommOrderExp.SetFeatureEnabled(false);
+        LibrarySpfyImport.CreateStore(StoreCode);
+        ShopifyStore.Get(StoreCode);
+        ShopifyStore."Post on Completion" := PostOnCompletion;
+        ShopifyStore."Sales Return Order Integration" := ReturnsOn;
+        ShopifyStore."Get Returns Starting From" := CreateDateTime(20260101D, 0T);
+        ShopifyStore.Modify();
+        Commit(); // a declined warning raises an error that rolls the transaction back, so the fixture must be committed to be read back
+    end;
+
+    [Test]
     procedure StoreDeleted_LastReturnStore_RemovesTheLegacyReturnJobs()
     var
         ShopifyStore: Record "NPR Spfy Store";
