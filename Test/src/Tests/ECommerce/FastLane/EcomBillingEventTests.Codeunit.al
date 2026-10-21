@@ -843,7 +843,7 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
     end;
 
     [Test]
-    procedure Matrix_MixedVoucher_AutoPostFailsButFastLaneCapturedVoucher()
+    procedure Matrix_MixedVoucher_FastLaneCapturedVoucherIsBilledByTheWave()
     var
         EcomBillingEvent: Record "NPR Ecom Billing Event";
         OrderEvent: Record "NPR Ecom Billing Event";
@@ -851,12 +851,9 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
         EcomBillingMgt: Codeunit "NPR Ecom Billing Mgt.";
     begin
         // [SCENARIO] Mixed VI + goods, voucher tender. The fast lane fires because VI exists and captures the voucher
-        //            tender pre-post. Auto-post attempts partial posting (VI lines only) but
-        //            CheckIfTotalPaymentWhenVoucherInUse raises "Partial posting is not allowed when vouchers are in
-        //            use". EcomSalesDocPost.Run swallows that error via Codeunit.Run at EcomSalesDocImplV2:1484, the
-        //            sales order is left unposted, and the posting-time subscriber never fires. Billing was already
-        //            registered by the fast-lane wave BEFORE the failed auto-post attempt: billing follows capture,
-        //            not posting outcome.
+        //            tender pre-post, and that wave registers the billing before the auto-post of the VI lines runs.
+        //            Billing follows capture, not the posting outcome: whether the partial auto-post succeeds or
+        //            fails, a later posting hook reads delta = 0 (see Matrix_MixedCard_PartialGoodsPostingsBillNothingAdditional).
 
         // [GIVEN] A mixed Entria order tendered on voucher at 100 whose fast lane captured the whole voucher pre-post
         Initialize();
@@ -866,19 +863,18 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
         PlantPaymentLine(EcomSalesHeader, 100, 100);
         PlantOrderEvent(OrderEvent, EcomSalesHeader);
 
-        // [WHEN] The fast-lane wave runs - the failed auto-post that follows in production never gets to run
-        //        RegisterCapturedAmount again, so this one call models the whole billing story for the order
+        // [WHEN] The fast-lane wave runs
         EcomBillingMgt.RegisterCapturedAmount(EcomSalesHeader);
 
         // [THEN] Exactly one amount event was queued for the voucher tender - billing followed what was captured, not
         //        the later posting outcome
         FindSingleEventOfType(EcomBillingEvent, 'ZZ-BILL-MIXVCH', Enum::"NPR Billing Event Type"::ECOM_ENTRIA_ORDERS_AMOUNT_SHOP);
         _Assert.AreEqual(100, EcomBillingEvent.Amount,
-            'The fast-lane wave must bill what was captured - CheckIfTotalPaymentWhenVoucherInUse failing auto-post afterwards must not roll billing back, because the voucher was really captured.');
+            'The fast-lane wave must bill what was captured, whatever the auto-post afterwards does, because the voucher was really captured.');
         AssertEventIsQueued(EcomBillingEvent,
-            'The captured voucher must be queued for billing - even when the following auto-post attempt fails, because the voucher was really redeemed.');
+            'The captured voucher must be queued for billing, whatever the auto-post afterwards does, because the voucher was really redeemed.');
         _Assert.AreEqual(1, CountAmountEvents('ZZ-BILL-MIXVCH'),
-            'The total AMOUNT_SHOP event count for the order must be one - the posting hook never fires when auto-post is swallowed by Codeunit.Run, and no other path may bill the same sale a second time.');
+            'The total AMOUNT_SHOP event count for the order must be one - no other path may bill the same sale a second time.');
     end;
 
     [Test]

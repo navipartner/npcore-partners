@@ -36,13 +36,14 @@
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         TotalAmtInclVat: Decimal;
         ReturnAmount: Decimal;
         AmountUsedByPreviousVouchers: Decimal;
         AmountNeededFromThisVoucher: Decimal;
     begin
         SalesHeader.CalcFields("NPR Magento Payment Amount");
-        TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
+        TotalAmtInclVat := NpRvSalesDocMgt.GetAmountToInvoiceInclVat(SalesHeader);
         if not FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
             ReturnAmount := SalesHeader."NPR Magento Payment Amount" - TotalAmtInclVat;
             if ReturnAmount <= 0 then
@@ -73,6 +74,22 @@
             MagentoPaymentLine.Amount -= ReturnAmount;
             MagentoPaymentLine.Modify(true);
         end;
+
+        KeepReservationInStep(NpRvSalesLine, MagentoPaymentLine, SalesHeader);
+    end;
+
+    /// <summary>
+    /// The voucher stays reserved for what the order still pays with it, so a payment cut here frees the rest of the voucher.
+    /// </summary>
+    local procedure KeepReservationInStep(var NpRvSalesLine: Record "NPR NpRv Sales Line"; MagentoPaymentLine: Record "NPR Magento Payment Line"; SalesHeader: Record "Sales Header")
+    var
+        ReservationLCY: Decimal;
+    begin
+        ReservationLCY := MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor");
+        if NpRvSalesLine.Amount = ReservationLCY then
+            exit;
+        NpRvSalesLine.Amount := ReservationLCY;
+        NpRvSalesLine.Modify();
     end;
 
     local procedure GetVoucherAmountBeforeLine(SalesHeader: Record "Sales Header"; CurrentLineNo: Integer): Decimal
@@ -168,18 +185,6 @@
     internal procedure ModuleCode(): Code[20]
     begin
         exit('PARTIAL');
-    end;
-
-    local procedure GetTotalAmtInclVat(SalesHeader: Record "Sales Header"): Decimal
-    var
-        TempSalesLine: Record "Sales Line" temporary;
-        TempVATAmountLine: Record "VAT Amount Line" temporary;
-        SalesPost: Codeunit "Sales-Post";
-    begin
-        SalesPost.GetSalesLines(SalesHeader, TempSalesLine, 0);
-        TempSalesLine.CalcVATAmountLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
-        TempSalesLine.UpdateVATOnLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
-        exit(TempVATAmountLine.GetTotalAmountInclVAT());
     end;
 
     #Region V3

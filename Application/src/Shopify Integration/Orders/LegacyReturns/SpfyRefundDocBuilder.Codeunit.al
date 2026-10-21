@@ -1690,8 +1690,8 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
         VoucherCount := 0;
         if not CollectOrderInvoices(ShopifyStoreCode, OrderId, TempSalesInvoiceHeader) then
             exit(false);
-        // Exactly one voucher across the order's invoices, or none: never guess between cards. Partial invoicing keeps the payment lines on one invoice.
-        // Count vouchers, not lines: a card charged in two transactions has a payment line for each.
+        // Exactly one voucher across the order's invoices, or none: never guess between cards.
+        // Count vouchers, not lines: a card charged in two transactions has a payment line for each, and partial invoices each carry their share of the same card.
         TempSalesInvoiceHeader.FindSet();
         repeat
             PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");

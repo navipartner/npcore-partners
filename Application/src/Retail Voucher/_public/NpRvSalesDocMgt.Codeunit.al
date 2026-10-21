@@ -148,6 +148,7 @@
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
         NpRvModulePaymentDefault: Codeunit "NPR NpRv Module Pay.: Default";
+        NpRvModulePaymentPartial: Codeunit "NPR NpRv Module Pay. - Partial";
         Handled: Boolean;
     begin
         NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
@@ -155,7 +156,11 @@
         if Handled then
             exit;
 
-        NpRvModulePaymentDefault.ApplyPaymentSalesDoc(NpRvVoucherType, SalesHeader, NpRvSalesLine);
+        // A module declared through OnSupportsPartialPayment gets the partial handling, which never issues a return voucher.
+        if NpRvVoucherType.SupportsPartialPayment() then
+            NpRvModulePaymentPartial.ApplyPaymentSalesDoc(NpRvVoucherType, SalesHeader, NpRvSalesLine)
+        else
+            NpRvModulePaymentDefault.ApplyPaymentSalesDoc(NpRvVoucherType, SalesHeader, NpRvSalesLine);
     end;
 
     local procedure PrepareToReverseVoucherPayments(SalesHeader: Record "Sales Header")
@@ -355,7 +360,7 @@
         until NpRvSalesLine.Next() = 0;
 
         if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
-            TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
+            TotalAmtInclVat := GetAmountToInvoiceInclVat(SalesHeader);
             VoucherAmount := MagentoPmtMgt.GetNetVoucherAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
 
             MagentoPaymentLine.Reset();
@@ -421,15 +426,10 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
-        MagentoPmtMngt: Codeunit "NPR Magento Pmt. Mgt.";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        HasPoints: Boolean;
-        PointsPaymentAmount: Decimal;
-        TotalAmtInclVat: Decimal;
         VoucherQty: Decimal;
         VoucherUnitPrice: Decimal;
         SalesHeaderMagentoPaymentAmount: Decimal;
-        OrderAmtLowerThanPmtAmtErr: Label 'Order Amount %1 is lower than Payment Amount %2.\Issue Return Voucher on remaining amount.';
     begin
         if not SalesHeader.Invoice then
             exit;
@@ -505,17 +505,24 @@
             exit;
         CheckVoucherAvailableAmounts(NpRvSalesLine, SalesHeader);
 
-        TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
+        CheckPaymentsWithinAmountToInvoice(SalesHeader, SalesHeaderMagentoPaymentAmount);
+    end;
 
-        HasPoints := MagentoPmtMngt.HasMagentoPaymentPoints(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
-        if HasPoints then
-            PointsPaymentAmount := MagentoPmtMngt.GetPointsPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+    /// <summary>
+    /// Stops posting when the order's payments exceed what is left to invoice on it, points payments included.
+    /// </summary>
+    internal procedure CheckPaymentsWithinAmountToInvoice(SalesHeader: Record "Sales Header"; PaymentAmount: Decimal)
+    var
+        MagentoPmtMngt: Codeunit "NPR Magento Pmt. Mgt.";
+        TotalAmtInclVat: Decimal;
+        OrderAmtLowerThanPmtAmtErr: Label 'Order Amount %1 is lower than Payment Amount %2.\Issue Return Voucher on remaining amount.';
+    begin
+        TotalAmtInclVat := GetAmountToInvoiceInclVat(SalesHeader);
+        if MagentoPmtMngt.HasMagentoPaymentPoints(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+            TotalAmtInclVat += MagentoPmtMngt.GetPointsPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
 
-        if PointsPaymentAmount <> 0 then
-            TotalAmtInclVat += PointsPaymentAmount;
-
-        if TotalAmtInclVat < SalesHeaderMagentoPaymentAmount then
-            Error(OrderAmtLowerThanPmtAmtErr, TotalAmtInclVat, SalesHeaderMagentoPaymentAmount);
+        if TotalAmtInclVat < PaymentAmount then
+            Error(OrderAmtLowerThanPmtAmtErr, TotalAmtInclVat, PaymentAmount);
     end;
 
     local procedure CheckVoucherActiveAndAvailableAmountIsSufficient(VoucherNo: Code[20]; VoucherReferenceNo: Text[50]; TransactionAmount: Decimal; TransactionCurrencyCode: Code[10]; TransactionAmountLCY: Decimal)
@@ -557,22 +564,25 @@
     begin
         NpRvSalesLine.FindSet();
         repeat
-            NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
-            NpRvVoucher.TestField("Reference No.", NpRvSalesLine."Reference No.");
-
             MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
-            if MagentoPaymentLine."Posting Date" = 0D then
-                MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
-            PaymentAmountLCY := MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor", Precalculated);
+            // A voucher that pays nothing on this document holds no reservation and may since have been used up elsewhere.
+            if MagentoPaymentLine.Amount <> 0 then begin
+                NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
+                NpRvVoucher.TestField("Reference No.", NpRvSalesLine."Reference No.");
 
-            AmountValidated := NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY);
-            if not AmountValidated and not Precalculated then
-                AmountValidated := Abs(AvailableAmountLCY - PaymentAmountLCY) <= NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference(); //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
-            if not AmountValidated then
-                if IsLCY(SalesHeader."Currency Code") then
-                    Error(PmtAmtHigherThanRemAmtErr, MagentoPaymentLine.Amount, AvailableAmountLCY, NpRvVoucher."Reference No.")
-                else
-                    Error(PmtAmtHigherThanRemAmtCurrErr, MagentoPaymentLine.Amount, AdjustCurrencyCode(SalesHeader."Currency Code"), PaymentAmountLCY, AvailableAmountLCY, AdjustCurrencyCode(''), NpRvVoucher."Reference No.");
+                if MagentoPaymentLine."Posting Date" = 0D then
+                    MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
+                PaymentAmountLCY := MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor", Precalculated);
+
+                AmountValidated := NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, PaymentAmountLCY, AvailableAmountLCY);
+                if not AmountValidated and not Precalculated then
+                    AmountValidated := Abs(AvailableAmountLCY - PaymentAmountLCY) <= NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference(); //Allow small rounding difference when the LCY voucher payment amount is calculated from the transaction FCY amount
+                if not AmountValidated then
+                    if IsLCY(SalesHeader."Currency Code") then
+                        Error(PmtAmtHigherThanRemAmtErr, MagentoPaymentLine.Amount, AvailableAmountLCY, NpRvVoucher."Reference No.")
+                    else
+                        Error(PmtAmtHigherThanRemAmtCurrErr, MagentoPaymentLine.Amount, AdjustCurrencyCode(SalesHeader."Currency Code"), PaymentAmountLCY, AvailableAmountLCY, AdjustCurrencyCode(''), NpRvVoucher."Reference No.");
+            end;
         until NpRvSalesLine.Next() = 0;
     end;
 
@@ -635,11 +645,37 @@
             exit;
 
         IssueNewVouchers(SalesHeader);
-        if not SalesHeader.IsCreditDocType() or SalesHeader.Correction then
+        // Invoices redeem their voucher payments in PostInvoiceVoucherPayments, once the payment lines are split.
+        if SalesHeader.IsCreditDocType() and SalesHeader.Correction then
             PostVoucherPayments(SalesHeader);
 
         NpRvSalesLine.ModifyAll("Posting No.", '');
         NpRvSalesLine.ModifyAll("Sale Date", 0D);
+    end;
+
+    /// <summary>
+    /// Redeems each voucher of the order for its share of the posted invoice. Called once the invoice has its share of every payment line.
+    /// </summary>
+    internal procedure PostInvoiceVoucherPayments(var SalesHeader: Record "Sales Header"; PostedInvoiceNo: Code[20])
+    var
+        InvoicePaymentLine: Record "NPR Magento Payment Line";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        NpRvSalesLine.SetCurrentKey("Document Source", "Document Type", "Document No.", "Document Line No.");
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+        NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        NpRvSalesLine.SetRange("Document No.", SalesHeader."No.");
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.SetRange(Posted, false);
+        if NpRvSalesLine.FindSet() then
+            repeat
+                // A voucher with no share in this invoice is not redeemed and stays reserved for the next one.
+                if InvoicePaymentLine.Get(Database::"Sales Invoice Header", Enum::"Sales Document Type".FromInteger(0), PostedInvoiceNo, NpRvSalesLine."Document Line No.") then begin
+                    NpRvSalesLine."Posting No." := PostedInvoiceNo;
+                    NpRvVoucherMgt.PostPayment(NpRvSalesLine, InvoicePaymentLine, SalesHeader."Currency Code", SalesHeader."Currency Factor");
+                end;
+            until NpRvSalesLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, false)]
@@ -1840,6 +1876,28 @@
         TempSalesLine.CalcVATAmountLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
         TempSalesLine.UpdateVATOnLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
         exit(TempVATAmountLine.GetTotalAmountInclVAT());
+    end;
+
+    /// <summary>
+    /// What is left to invoice on the document, including VAT: the whole order less every invoice already posted from it.
+    /// The payment lines of a partly invoiced order only hold what is left, so they are measured against this, not the whole order.
+    /// </summary>
+    internal procedure GetAmountToInvoiceInclVat(SalesHeader: Record "Sales Header") Amount: Decimal
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+    begin
+        Amount := GetTotalAmtInclVat(SalesHeader);
+        if SalesHeader."Document Type" <> SalesHeader."Document Type"::Order then
+            exit;
+
+        SalesInvHeader.SetCurrentKey("Order No.");
+        SalesInvHeader.SetRange("Order No.", SalesHeader."No.");
+        SalesInvHeader.SetLoadFields("Order No.");
+        SalesInvHeader.SetAutoCalcFields("Amount Including VAT");
+        if SalesInvHeader.FindSet() then
+            repeat
+                Amount -= SalesInvHeader."Amount Including VAT";
+            until SalesInvHeader.Next() = 0;
     end;
 
     local procedure FindVoucherTypes(var TempNpRvVoucherType: Record "NPR NpRv Voucher Type" temporary)

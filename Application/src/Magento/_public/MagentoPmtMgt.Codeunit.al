@@ -588,18 +588,13 @@
     local procedure InsertPaymentLines(var SalesHeader: Record "Sales Header")
     var
         PaymentLine: Record "NPR Magento Payment Line";
-        PaymentLine2: Record "NPR Magento Payment Line";
         NoSeriesLine: Record "No. Series Line";
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         NoSeriesMgt: Codeunit "No. Series";
 #ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
 #ENDIF
-#IF NOT BC17
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-#ENDIF
-        LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
-        OutstandingAmt: Decimal;
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         PaymentAmt: Decimal;
         PointsPaymentAmount: Decimal;
         TotalAmountInclVAT: Decimal;
@@ -608,6 +603,8 @@
         HasVouchers: Boolean;
         HasPoints: Boolean;
         HasPaymentsAndRefunds: Boolean;
+        SplitVouchers: Boolean;
+        StopWhenCovered: Boolean;
     begin
         if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
             exit;
@@ -638,8 +635,37 @@
             DocNo := NoSeriesLine."Last No. Used";
         end;
 
+        // Vouchers that cannot keep a remainder are moved whole, so the document must be posted in full (see CheckIfTotalPaymentWhenVoucherInUse).
+        if HasVouchers then
+            SplitVouchers := VoucherPaymentsAllowPartialPosting(SalesHeader);
+        StopWhenCovered := not HasPaymentsAndRefunds and (SplitVouchers or not HasVouchers);
+
         PaymentAmt := 0;
         PaymentLine.SetFilter(Amount, '<>%1', 0);
+        if SplitVouchers then begin
+            // Vouchers pay for the invoice first. Card and PSP payments cover the rest.
+            PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
+            MovePaymentLinesToInvoice(PaymentLine, SalesHeader, DocNo, TotalAmountInclVAT, RefundPaymentsAmount, true, StopWhenCovered, PaymentAmt);
+            PaymentLine.SetFilter("Payment Type", '<>%1', PaymentLine."Payment Type"::Voucher);
+        end;
+        MovePaymentLinesToInvoice(PaymentLine, SalesHeader, DocNo, TotalAmountInclVAT, RefundPaymentsAmount, SplitVouchers, StopWhenCovered, PaymentAmt);
+
+        // Each voucher is redeemed for its share of this invoice only, so this must run after the split.
+        NpRvSalesDocMgt.PostInvoiceVoucherPayments(SalesHeader, DocNo);
+    end;
+
+    local procedure MovePaymentLinesToInvoice(var PaymentLine: Record "NPR Magento Payment Line"; SalesHeader: Record "Sales Header"; DocNo: Code[20]; TotalAmountInclVAT: Decimal; RefundPaymentsAmount: Decimal; SplitVouchers: Boolean; StopWhenCovered: Boolean; var PaymentAmt: Decimal)
+    var
+        PaymentLine2: Record "NPR Magento Payment Line";
+#IF NOT BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#ENDIF
+        LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
+        OutstandingAmt: Decimal;
+        SplitLine: Boolean;
+    begin
+        if StopWhenCovered and (PaymentAmt = TotalAmountInclVAT) then
+            exit;
         if PaymentLine.FindSet(true) then
             repeat
                 if not LastPostingDocExists(PaymentLine) then begin
@@ -664,7 +690,10 @@
                     LogMgt.MoveOpenCaptureLog(PaymentLine.SystemId, PaymentLine2.SystemId);
 
                 OutstandingAmt := TotalAmountInclVAT - PaymentAmt;
-                if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt + RefundPaymentsAmount) then begin
+                SplitLine := PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method";
+                if SplitVouchers and (PaymentLine."Payment Type" = PaymentLine."Payment Type"::Voucher) then
+                    SplitLine := true;
+                if SplitLine and (PaymentLine.Amount > OutstandingAmt + RefundPaymentsAmount) then begin
                     PaymentLine2.Amount := OutstandingAmt + RefundPaymentsAmount;
                     PaymentLine2."Requested Amount" := PaymentLine2.Amount;
 #if not BC17
@@ -694,7 +723,7 @@
                 PaymentLine.Modify();
 
                 PaymentAmt += PaymentLine2.Amount;
-            until (PaymentLine.Next() = 0) or ((PaymentAmt = TotalAmountInclVAT) and not (HasVouchers or HasPaymentsAndRefunds)); // we don't allow partial processing when there are vouchers or a mix of payments and refunds
+            until (PaymentLine.Next() = 0) or (StopWhenCovered and (PaymentAmt = TotalAmountInclVAT));
     end;
 
     local procedure PositiveOrZero(AmountIn: Decimal): Decimal
@@ -1255,6 +1284,7 @@
 
     local procedure CheckIfTotalPaymentWhenVoucherInUse(var SalesHeader: Record "Sales Header"; MagentoPaymentAmount: Decimal; CurrPaymentAmount: Decimal)
     var
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         HasVouchers: Boolean;
         TotalAmountErrorLbl: Label 'Partial posting is not allowed when vouchers are in use. Current payment amount: %1, total payment amount: %2.', Comment = '%1 - the payment amount that is being posted. %2 - total payment amount in the magento lines.';
     begin
@@ -1265,7 +1295,65 @@
         if MagentoPaymentAmount <= CurrPaymentAmount then
             exit;
 
+        // Partial posting only covers payments the rest of the order still needs; anything above that is an overpayment.
+        if VoucherPaymentsAllowPartialPosting(SalesHeader) then begin
+            NpRvSalesDocMgt.CheckPaymentsWithinAmountToInvoice(SalesHeader, MagentoPaymentAmount);
+            exit;
+        end;
+
         Error(TotalAmountErrorLbl, CurrPaymentAmount, MagentoPaymentAmount);
+    end;
+
+    /// <summary>
+    /// True when every voucher the order still has to redeem supports partial payment, so each invoice can redeem its own share and keep the rest reserved.
+    /// </summary>
+    local procedure VoucherPaymentsAllowPartialPosting(SalesHeader: Record "Sales Header"): Boolean
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice]) then
+            exit(false);
+
+        SetVoucherPaymentLineFilters(PaymentLine, Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        PaymentLine.SetFilter(Amount, '<>%1', 0);
+        PaymentLine.SetLoadFields(Amount, "Source Table No.", "Source No.");
+        if PaymentLine.FindSet() then
+            repeat
+                if PaymentLine.Amount < 0 then
+                    exit(false);
+                // A voucher the capture already redeemed has nothing left to redeem, so its line is split like a captured card line.
+                if not VoucherPaymentAlreadyRedeemed(PaymentLine) then begin
+                    if PaymentLine."Source Table No." <> Database::"NPR NpRv Voucher" then
+                        exit(false);
+                    Voucher.SetLoadFields("Voucher Type");
+                    if not Voucher.Get(PaymentLine."Source No.") then
+                        exit(false);
+                    VoucherType.SetLoadFields("Apply Payment Module");
+                    if not VoucherType.Get(Voucher."Voucher Type") then
+                        exit(false);
+                    if not VoucherType.SupportsPartialPayment() then
+                        exit(false);
+                end;
+            until PaymentLine.Next() = 0;
+        exit(true);
+    end;
+
+    local procedure VoucherPaymentAlreadyRedeemed(PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        NpRvSalesLine.SetCurrentKey("Document Source", "Document Type", "Document No.", "Document Line No.");
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+        NpRvSalesLine.SetRange("Document Type", PaymentLine."Document Type");
+        NpRvSalesLine.SetRange("Document No.", PaymentLine."Document No.");
+        NpRvSalesLine.SetRange("Document Line No.", PaymentLine."Line No.");
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        if NpRvSalesLine.IsEmpty() then
+            exit(false);
+        NpRvSalesLine.SetRange(Posted, false);
+        exit(NpRvSalesLine.IsEmpty());
     end;
 
     local procedure CheckIfTotalPaymentWhenPointsInUse(var SalesHeader: Record "Sales Header"; MagentoPaymentAmount: Decimal; CurrPaymentAmount: Decimal)

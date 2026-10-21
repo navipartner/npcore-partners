@@ -508,6 +508,17 @@
             end;
     end;
 
+    local procedure KeepRetailVoucherSalesLineReserved(NpRvSalesLineId: Guid; RemainingReservationLCY: Decimal)
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        if not NpRvSalesLine.Get(NpRvSalesLineId) then
+            exit;
+        NpRvSalesLine.Amount := RemainingReservationLCY;
+        NpRvSalesLine."Posting No." := '';
+        NpRvSalesLine.Modify();
+    end;
+
     internal procedure GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine: Record "NPR NpRv Sales Line"; var VoucherQty: Decimal; var VoucherUnitPrice: Decimal): Boolean
     var
         SalesHeader: Record "Sales Header";
@@ -667,7 +678,7 @@
         OnBeforeInsertPaymentVoucherEntry(VoucherEntry, CarrierSalesLine);
         VoucherEntry.Insert();
 
-        FinalizePostedVoucherPayment(VoucherEntry, Voucher, CarrierSalesLine);
+        FinalizePostedVoucherPayment(VoucherEntry, Voucher, CarrierSalesLine, 0);
     end;
 
     local procedure PostIssueForeignVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -799,6 +810,8 @@
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
         VoucherPaymentAmountLCY: Decimal;
+        RemainingReservationLCY: Decimal;
+        ReservationLineId: Guid;
     begin
         Voucher.Get(NpRvSalesLine."Voucher No.");
 
@@ -816,7 +829,12 @@
             VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
         VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
 
-        VoucherPaymentAmountLCY := CalcVoucherPaymentAmountLCY(Voucher, MagentoPaymentLine, DocumentCurrencyCode, DocumentCurrencyFactor);
+        ReservationLineId := NpRvSalesLine."Reservation Line Id";
+        if IsNullGuid(ReservationLineId) then
+            ReservationLineId := MagentoPaymentLine.SystemId;
+        RemainingReservationLCY := CalcOrderPaymentRemainderLCY(NpRvSalesLine, MagentoPaymentLine, DocumentCurrencyCode, DocumentCurrencyFactor);
+        // Only a payment that leaves nothing reserved on the order absorbs a rounding difference.
+        VoucherPaymentAmountLCY := CalcVoucherPaymentAmountLCY(Voucher, MagentoPaymentLine, ReservationLineId, RemainingReservationLCY = 0, DocumentCurrencyCode, DocumentCurrencyFactor);
         if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
             VoucherEntry.Amount := VoucherPaymentAmountLCY
         else
@@ -834,25 +852,43 @@
         VoucherEntry."Reservation Line Id" := NpRvSalesLine."Reservation Line Id";
         VoucherEntry.Insert();
 
-        FinalizePostedVoucherPayment(VoucherEntry, Voucher, NpRvSalesLine);
+        FinalizePostedVoucherPayment(VoucherEntry, Voucher, NpRvSalesLine, RemainingReservationLCY);
     end;
 
-    local procedure CalcVoucherPaymentAmountLCY(Voucher: Record "NPR NpRv Voucher"; MagentoPaymentLine: Record "NPR Magento Payment Line"; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal): Decimal
+    local procedure CalcVoucherPaymentAmountLCY(Voucher: Record "NPR NpRv Voucher"; MagentoPaymentLine: Record "NPR Magento Payment Line"; ReservationLineId: Guid; AbsorbRoundingDifference: Boolean; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal): Decimal
     var
         AvailableAmountLCY: Decimal;
         VoucherPaymentAmountLCY: Decimal;
         Precalculated: Boolean;
     begin
         VoucherPaymentAmountLCY := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor, Precalculated);
-        if not Precalculated then begin
-            ValidateAmount(Voucher, MagentoPaymentLine.SystemId, VoucherPaymentAmountLCY, AvailableAmountLCY);
+        if AbsorbRoundingDifference and not Precalculated then begin
+            ValidateAmount(Voucher, ReservationLineId, VoucherPaymentAmountLCY, AvailableAmountLCY);
             if Abs(AvailableAmountLCY - VoucherPaymentAmountLCY) <= AllowedCurrencyConversionRoundingDifference() then
                 VoucherPaymentAmountLCY := AvailableAmountLCY; // In case of rounding differences, take the available amount as the payment amount to avoid leaving small open amounts on the voucher
         end;
         exit(VoucherPaymentAmountLCY);
     end;
 
-    local procedure FinalizePostedVoucherPayment(var VoucherEntry: Record "NPR NpRv Voucher Entry"; var Voucher: Record "NPR NpRv Voucher"; NpRvSalesLine: Record "NPR NpRv Sales Line")
+    /// <summary>
+    /// What a partial invoice leaves of the order's voucher payment line, in LCY. It stays reserved on the voucher for the order's next invoice.
+    /// </summary>
+    local procedure CalcOrderPaymentRemainderLCY(NpRvSalesLine: Record "NPR NpRv Sales Line"; PostedPaymentLine: Record "NPR Magento Payment Line"; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal): Decimal
+    var
+        OrderPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        if PostedPaymentLine."Document Table No." <> Database::"Sales Invoice Header" then
+            exit(0);
+        if NpRvSalesLine."Document Source" <> NpRvSalesLine."Document Source"::"Payment Line" then
+            exit(0);
+        if not OrderPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
+            exit(0);
+        if OrderPaymentLine.Amount <= 0 then
+            exit(0);
+        exit(OrderPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor));
+    end;
+
+    local procedure FinalizePostedVoucherPayment(var VoucherEntry: Record "NPR NpRv Voucher Entry"; var Voucher: Record "NPR NpRv Voucher"; NpRvSalesLine: Record "NPR NpRv Sales Line"; RemainingReservationLCY: Decimal)
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
     var
         VoucherWebhook: Codeunit "NPR Retail Voucher Webhooks";
@@ -866,7 +902,10 @@
 #endif
         ApplyEntry(VoucherEntry);
         ArchiveClosedVoucher(Voucher);
-        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
+        if RemainingReservationLCY > 0 then
+            KeepRetailVoucherSalesLineReserved(NpRvSalesLine.Id, RemainingReservationLCY)
+        else
+            MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
     end;
 
     internal procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line"; SaleLinePOS: Record "NPR POS Sale Line"; DocumentLineNo: Integer)
@@ -945,7 +984,7 @@
                 ExchangeRateDate := WorkDate();
             CurrencyFactor := CurrencyExchangeRate.ExchangeRate(ExchangeRateDate, CurrencyCode);
         end;
-        VoucherPaymentAmountLCY := CalcVoucherPaymentAmountLCY(Voucher, MagentoPaymentLine, CurrencyCode, CurrencyFactor);
+        VoucherPaymentAmountLCY := CalcVoucherPaymentAmountLCY(Voucher, MagentoPaymentLine, MagentoPaymentLine.SystemId, true, CurrencyCode, CurrencyFactor);
         if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
             VoucherEntry.Amount := VoucherPaymentAmountLCY
         else
@@ -962,7 +1001,7 @@
         VoucherEntry."Reservation Line Id" := NpRvSalesLine."Reservation Line Id";
         VoucherEntry.Insert();
 
-        FinalizePostedVoucherPayment(VoucherEntry, Voucher, NpRvSalesLine);
+        FinalizePostedVoucherPayment(VoucherEntry, Voucher, NpRvSalesLine, 0);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
         EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(MagentoPaymentLine);
 #endif

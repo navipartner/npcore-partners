@@ -138,4 +138,13 @@
     procedure OnAfterSendSalesDocVoucherSelection(var VoucherEntry: Record "NPR NpRv Voucher Entry"; var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20]; SalesCrMemoNo: Code[20])
     begin
     end;
+
+    /// <summary>
+    /// Lets an apply payment module other than PARTIAL and SHOPIFY declare that its vouchers can pay part of a sales order and keep the rest reserved, so the order can be invoiced in several partial invoices.
+    /// Vouchers of such a module get the PARTIAL module's sales document handling, which never issues a return voucher for the unused amount.
+    /// </summary>
+    [IntegrationEvent(false, false)]
+    internal procedure OnSupportsPartialPayment(VoucherType: Record "NPR NpRv Voucher Type"; var SupportsPartialPayment: Boolean)
+    begin
+    end;
 }

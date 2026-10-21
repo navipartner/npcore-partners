@@ -376,6 +376,21 @@
         End;
     end;
 
+    /// <summary>
+    /// True when the apply payment module lets a voucher pay part of a sales document and keeps the rest on the voucher, instead of issuing a return voucher for it.
+    /// Other modules can declare it through the OnSupportsPartialPayment event of "NPR NpRv Module Mgt.".
+    /// </summary>
+    internal procedure SupportsPartialPayment() Supported: Boolean
+    var
+        ModulePayPartial: Codeunit "NPR NpRv Module Pay. - Partial";
+        ModulePayShopify: Codeunit "NPR NpRv Module Pay. - Shopify";
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+    begin
+        if Rec."Apply Payment Module" in [ModulePayPartial.ModuleCode(), ModulePayShopify.ModuleCode()] then
+            exit(true);
+        NpRvModuleMgt.OnSupportsPartialPayment(Rec, Supported);
+    end;
+
 #if not BC17
     internal procedure GetStoreCode(): Code[20]
     var
