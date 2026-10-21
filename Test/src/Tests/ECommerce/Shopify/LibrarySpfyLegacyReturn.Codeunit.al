@@ -593,6 +593,14 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     /// Inserts a posted NP gift card sale as the order import leaves it: one G/L line carrying the Shopify line id and one untouched voucher per unit.
     /// </summary>
     procedure InsertPostedGiftCardSale(InvoiceNo: Code[20]; StoreCode: Code[20]; OrderId: Text[30]; LineItemId: Text[30]; GLAccountNo: Code[20]; Qty: Integer; UnitPrice: Decimal; var VoucherNos: List of [Code[20]])
+    begin
+        InsertPostedGiftCardSale(InvoiceNo, StoreCode, OrderId, LineItemId, GLAccountNo, Qty, UnitPrice, false, VoucherNos);
+    end;
+
+    /// <summary>
+    /// As InsertPostedGiftCardSale, with the vouchers' type set to Spfy Auto-Fulfill as given: the order import invoices such cards before Shopify fulfils them.
+    /// </summary>
+    procedure InsertPostedGiftCardSale(InvoiceNo: Code[20]; StoreCode: Code[20]; OrderId: Text[30]; LineItemId: Text[30]; GLAccountNo: Code[20]; Qty: Integer; UnitPrice: Decimal; AutoFulfill: Boolean; var VoucherNos: List of [Code[20]])
     var
         GLAccount: Record "G/L Account";
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -608,6 +616,7 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
         _LibrarySpfyVoucher.CreateVoucherType(CopyStr(_VoucherTypeTok, 1, 20), StoreCode, VoucherType);
         VoucherType."Account No." := GLAccountNo;
         VoucherType."Allow Top-up" := true;
+        VoucherType."Spfy Auto-Fulfill" := AutoFulfill;
         VoucherType.Modify();
 
         if SalesInvoiceHeader.Get(InvoiceNo) then begin

@@ -1548,6 +1548,393 @@ codeunit 85510 "NPR Spfy Legacy Refund Tests"
     end;
 
     [Test]
+    procedure Posting_AutoFulfilledGiftCardCancelledInShopify_CreditsTheSaleAccountAndArchivesTheVoucher()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] An NP gift card Business Central invoiced at order creation, refunded while Shopify still shows its line unfulfilled, is credited on the account of its sale and its voucher is archived.
+        // [GIVEN] A legacy-path store and an invoice that sold one 100 Auto-Fulfill gift card on line 2449701 and issued an untouched voucher
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244901', StoreCode, '2449001', '2449701', GLAccountNo, 1, 100, true, VoucherNos);
+
+        // [GIVEN] A queued refund cancelling that card, 100 to the card
+        _Lib.InsertRefundQueueRow(StoreCode, '2449901', '2449001', '#2449001', QueueRow);
+        MockClient.AddResponse('GetRefund', _Lib.RefundDetailResponse('2449901', '2449001', '#2449001', _Lib.RefundTimeAfterNow(), true, _Lib.GiftCardRefundLineJsonOrdered('2449701', 1, 1, 'CANCEL', 100, false), '', '', _ReturnLib.RefundTxnJson('2449801', 'bogus', 100, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449001', _Lib.RefundListItemJson('2449901', '2026-09-20T10:00:00Z', '')));
+
+        // [WHEN] The import runs with automatic posting
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The credit memo credits 100 on the sale account
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449901');
+        _ReturnLib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange("No.", GLAccountNo);
+        _Assert.IsTrue(SalesCrMemoLine.FindFirst(), 'The gift card line must be credited on the account of its sale.');
+        _Assert.AreEqual(100, SalesCrMemoLine."Amount Including VAT", 'The gift card line credits what Shopify refunded.');
+
+        // [THEN] The voucher is archived
+        _Assert.IsFalse(Voucher.Get(VoucherNos.Get(1)), 'The voucher of the refunded card must be archived.');
+    end;
+
+    [Test]
+    procedure Posting_OrderCancelledAfterItsGiftCardWasInvoiced_CreditsOnlyTheGiftCard()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] Cancelling a Shopify order whose NP gift card Business Central already invoiced credits the card and revokes its voucher, while the goods never invoiced are left out.
+        // [GIVEN] A legacy-path store and an invoice that sold one 100 Auto-Fulfill gift card on line 2449702 of order 2449002, whose goods line 2449712 was never invoiced
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244902', StoreCode, '2449002', '2449702', GLAccountNo, 1, 100, true, VoucherNos);
+
+        // [GIVEN] A queued refund of the cancelled order cancelling the card and the goods, 110 to the card
+        _Lib.InsertRefundQueueRow(StoreCode, '2449902', '2449002', '#2449002', QueueRow);
+        MockClient.AddResponse('GetRefund', _Lib.OfCancelledOrder(_Lib.RefundDetailResponse('2449902', '2449002', '#2449002', _Lib.RefundTimeAfterNow(), true,
+            _Lib.GiftCardRefundLineJsonOrdered('2449702', 1, 1, 'CANCEL', 100, false) + ',' + _Lib.RefundLineJson('2449712', Sku, 1, 'CANCEL', '71001', 10, 0, 0), '', '',
+            _ReturnLib.RefundTxnJson('2449802', 'bogus', 110, _ReturnLib.Lcy(), ''))));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449002', _Lib.RefundListItemJson('2449902', '2026-09-20T10:00:00Z', '')));
+
+        // [WHEN] The import runs with automatic posting
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The credit memo credits only the 100 gift card on the sale account
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449902');
+        _ReturnLib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange("No.", GLAccountNo);
+        _Assert.IsTrue(SalesCrMemoLine.FindFirst(), 'The gift card line must be credited on the account of its sale.');
+        _Assert.AreEqual(100, SalesCrMemoLine."Amount Including VAT", 'The gift card line credits what Shopify refunded for it.');
+        SalesCrMemoLine.SetRange("No.");
+        SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
+        _Assert.IsTrue(SalesCrMemoLine.IsEmpty(), 'The goods never invoiced must not be credited.');
+
+        // [THEN] The voucher is archived
+        _Assert.IsFalse(Voucher.Get(VoucherNos.Get(1)), 'The voucher of the refunded card must be archived.');
+    end;
+
+    [Test]
+    procedure Posting_GiftCardsCancelledBeyondTheUnitsLeftOffTheInvoices_CreditsOnlyTheInvoicedCard()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] Cancelled gift cards first take the units left off the invoices, and only the cards Business Central invoiced are credited.
+        // [GIVEN] A legacy-path store and Auto-Fulfill gift card line 2449703 ordered twice, of which an invoice sold one 50 card and issued an untouched voucher
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244903', StoreCode, '2449003', '2449703', GLAccountNo, 1, 50, true, VoucherNos);
+
+        // [GIVEN] A queued refund cancelling both cards, 100 to the card
+        _Lib.InsertRefundQueueRow(StoreCode, '2449903', '2449003', '#2449003', QueueRow);
+        MockClient.AddResponse('GetRefund', _Lib.RefundDetailResponse('2449903', '2449003', '#2449003', _Lib.RefundTimeAfterNow(), true, _Lib.GiftCardRefundLineJsonOrdered('2449703', 2, 2, 'CANCEL', 100, false), '', '', _ReturnLib.RefundTxnJson('2449803', 'bogus', 100, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449003', _Lib.RefundListItemJson('2449903', '2026-09-20T10:00:00Z', '')));
+
+        // [WHEN] The import runs with automatic posting
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The credit memo credits one card of 50 on the sale account
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449903');
+        _ReturnLib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange("No.", GLAccountNo);
+        _Assert.IsTrue(SalesCrMemoLine.FindFirst(), 'The invoiced gift card must be credited on the account of its sale.');
+        _Assert.AreEqual(1, SalesCrMemoLine.Quantity, 'Only the invoiced card is credited.');
+        _Assert.AreEqual(50, SalesCrMemoLine."Amount Including VAT", 'The invoiced card credits its share of the refund.');
+
+        // [THEN] Its voucher is archived
+        _Assert.IsFalse(Voucher.Get(VoucherNos.Get(1)), 'The voucher of the credited card must be archived.');
+    end;
+
+    [Test]
+    procedure Posting_LaterGiftCardCancelAfterAnEarlierCancelTookTheUnitLeftOff_CreditsTheInvoicedCard()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] When an earlier refund's cancel already took the gift card left off the invoices, a later refund cancelling another card credits the invoiced card.
+        // [GIVEN] A legacy-path store and Auto-Fulfill gift card line 2449705 ordered twice, of which an invoice sold one 50 card and issued an untouched voucher
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244905', StoreCode, '2449005', '2449705', GLAccountNo, 1, 50, true, VoucherNos);
+
+        // [GIVEN] An earlier refund cancelling one card, and a queued later refund cancelling the other, 50 to the card each
+        _Lib.InsertRefundQueueRow(StoreCode, '2449906', '2449005', '#2449005', QueueRow);
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449905', _Lib.RefundDetailResponse('2449905', '2449005', '#2449005', '2026-09-01T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449705', 1, 2, 'CANCEL', 50, false), '', '', _ReturnLib.RefundTxnJson('2449805', 'bogus', 50, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449906', _Lib.RefundDetailResponse('2449906', '2449005', '#2449005', '2026-09-02T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449705', 1, 2, 'CANCEL', 50, false), '', '', _ReturnLib.RefundTxnJson('2449806', 'bogus', 50, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449005', _Lib.RefundListItemJson('2449905', '2026-09-01T10:00:00Z', '') + ',' + _Lib.RefundListItemJson('2449906', '2026-09-02T10:00:00Z', '')));
+
+        // [WHEN] The import of the later refund runs with automatic posting
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The credit memo credits the invoiced card of 50 on the sale account
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449906');
+        _ReturnLib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange("No.", GLAccountNo);
+        _Assert.IsTrue(SalesCrMemoLine.FindFirst(), 'The invoiced gift card must be credited on the account of its sale.');
+        _Assert.AreEqual(50, SalesCrMemoLine."Amount Including VAT", 'The later refund credits the invoiced card.');
+
+        // [THEN] Its voucher is archived
+        _Assert.IsFalse(Voucher.Get(VoucherNos.Get(1)), 'The voucher of the credited card must be archived.');
+    end;
+
+    [Test]
+    procedure Posting_GiftCardsCancelledAfterAnEarlierNoRestockRefundTookTheUnitLeftOff_CreditsBothInvoicedCards()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        VoucherNo: Code[20];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] A refund without restock that came before the order was invoiced keeps the gift card left off the invoices, so a later refund cancelling the two invoiced cards credits both.
+        // [GIVEN] A legacy-path store and Auto-Fulfill gift card line 2449706 ordered three times, of which an invoice sold two 50 cards and issued two untouched vouchers
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244906', StoreCode, '2449006', '2449706', GLAccountNo, 2, 50, true, VoucherNos);
+
+        // [GIVEN] An earlier refund of one card without restock, and a queued later refund cancelling two cards, 100 to the card
+        _Lib.InsertRefundQueueRow(StoreCode, '2449908', '2449006', '#2449006', QueueRow);
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449907', _Lib.RefundDetailResponse('2449907', '2449006', '#2449006', '2026-09-01T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449706', 1, 3, 'NO_RESTOCK', 50, false), '', '', _ReturnLib.RefundTxnJson('2449807', 'bogus', 50, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449908', _Lib.RefundDetailResponse('2449908', '2449006', '#2449006', '2026-09-02T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449706', 2, 3, 'CANCEL', 100, false), '', '', _ReturnLib.RefundTxnJson('2449808', 'bogus', 100, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449006', _Lib.RefundListItemJson('2449907', '2026-09-01T10:00:00Z', '') + ',' + _Lib.RefundListItemJson('2449908', '2026-09-02T10:00:00Z', '')));
+
+        // [WHEN] The import of the later refund runs with automatic posting
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The credit memo credits both invoiced cards, 100, on the sale account
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449908');
+        _ReturnLib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange("No.", GLAccountNo);
+        _Assert.IsTrue(SalesCrMemoLine.FindFirst(), 'The invoiced gift cards must be credited on the account of their sale.');
+        _Assert.AreEqual(2, SalesCrMemoLine.Quantity, 'Both cancelled cards were invoiced and are credited.');
+        _Assert.AreEqual(100, SalesCrMemoLine."Amount Including VAT", 'The later refund credits both cards.');
+
+        // [THEN] Both vouchers are archived
+        foreach VoucherNo in VoucherNos do
+            _Assert.IsFalse(Voucher.Get(VoucherNo), 'Voucher ' + VoucherNo + ' must be archived.');
+    end;
+
+    [Test]
+    procedure Import_AutoFulfilledGiftCardCancelledWithItsVoucherUsed_IsRefusedNamingTheInvoice()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] Cancelling an invoiced NP gift card whose voucher was partly spent is refused naming the invoice that sold it, and nothing is built.
+        // [GIVEN] A legacy-path store and an invoice that sold one 100 Auto-Fulfill gift card on line 2449704, its voucher spent by 10
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244904', StoreCode, '2449004', '2449704', GLAccountNo, 1, 100, true, VoucherNos);
+        _ReturnLib.UseVoucherAmount(VoucherNos.Get(1), 10);
+
+        // [GIVEN] A queued refund cancelling that card
+        _Lib.InsertRefundQueueRow(StoreCode, '2449904', '2449004', '#2449004', QueueRow);
+        MockClient.AddResponse('GetRefund', _Lib.RefundDetailResponse('2449904', '2449004', '#2449004', _Lib.RefundTimeAfterNow(), true, _Lib.GiftCardRefundLineJsonOrdered('2449704', 1, 1, 'CANCEL', 100, false), '', '', _ReturnLib.RefundTxnJson('2449804', 'bogus', 100, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449004', _Lib.RefundListItemJson('2449904', '2026-09-20T10:00:00Z', '')));
+
+        // [WHEN] The import runs
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] It is refused naming the invoice, and no Return Order exists
+        _Assert.IsFalse(Succeeded, 'A used card must be refused.');
+        _Assert.IsTrue(StrPos(GetLastErrorText(), 'SI-244904') > 0, 'The error must name the invoice: ' + GetLastErrorText());
+        _Lib.AssertNoReturnOrder(CustomerNo);
+    end;
+
+    [Test]
+    procedure Posting_GiftCardWithoutAutoFulfillRefundedBeforeALaterCancel_CreditsTheInvoicedCard()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] For an NP gift card without Auto-Fulfill a cancel still means the card was never invoiced, so a later cancel takes the card left off the invoices and an older refund without restock credits the invoiced card.
+        // [GIVEN] A legacy-path store and gift card line 2449707 without Auto-Fulfill ordered twice, of which an invoice sold the one 10 card Shopify fulfilled and issued an untouched voucher
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244907', StoreCode, '2449007', '2449707', GLAccountNo, 1, 10, false, VoucherNos);
+
+        // [GIVEN] A queued older refund of one card without restock, and a later refund cancelling the other, 10 to the card each
+        _Lib.InsertRefundQueueRow(StoreCode, '2449909', '2449007', '#2449007', QueueRow);
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449909', _Lib.RefundDetailResponse('2449909', '2449007', '#2449007', '2026-09-01T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449707', 1, 2, 'NO_RESTOCK', 10, false), '', '', _ReturnLib.RefundTxnJson('2449809', 'bogus', 10, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449910', _Lib.RefundDetailResponse('2449910', '2449007', '#2449007', '2026-09-02T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449707', 1, 2, 'CANCEL', 10, false), '', '', _ReturnLib.RefundTxnJson('2449810', 'bogus', 10, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449007', _Lib.RefundListItemJson('2449909', '2026-09-01T10:00:00Z', '') + ',' + _Lib.RefundListItemJson('2449910', '2026-09-02T10:00:00Z', '')));
+
+        // [WHEN] The import of the older refund runs with automatic posting
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The credit memo credits the invoiced card of 10 on the sale account
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449909');
+        _ReturnLib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange("No.", GLAccountNo);
+        _Assert.IsTrue(SalesCrMemoLine.FindFirst(), 'The invoiced gift card must be credited on the account of its sale.');
+        _Assert.AreEqual(10, SalesCrMemoLine."Amount Including VAT", 'The older refund credits the invoiced card.');
+
+        // [THEN] Its voucher is archived
+        _Assert.IsFalse(Voucher.Get(VoucherNos.Get(1)), 'The voucher of the credited card must be archived.');
+    end;
+
+    [Test]
+    procedure Posting_ShopifyGiftCardRefundedBeforeALaterCancel_CreditsTheInvoicedCardWhateverTheVoucherType()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] The order import never auto-fulfils a Shopify gift card, so even with an Auto-Fulfill voucher type a later cancel takes the card left off the invoices and an older refund without restock credits the invoiced card.
+        // [GIVEN] A legacy-path store and Shopify gift card line 2449708 ordered twice, of which an invoice sold the one 10 card Shopify fulfilled and issued an untouched voucher of an Auto-Fulfill type
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244908', StoreCode, '2449008', '2449708', GLAccountNo, 1, 10, true, VoucherNos);
+
+        // [GIVEN] A queued older refund of one card without restock, and a later refund cancelling the other, 10 to the card each
+        _Lib.InsertRefundQueueRow(StoreCode, '2449911', '2449008', '#2449008', QueueRow);
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449911', _Lib.RefundDetailResponse('2449911', '2449008', '#2449008', '2026-09-01T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449708', 1, 2, 'NO_RESTOCK', 10, true), '', '', _ReturnLib.RefundTxnJson('2449811', 'bogus', 10, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449912', _Lib.RefundDetailResponse('2449912', '2449008', '#2449008', '2026-09-02T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449708', 1, 2, 'CANCEL', 10, true), '', '', _ReturnLib.RefundTxnJson('2449812', 'bogus', 10, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449008', _Lib.RefundListItemJson('2449911', '2026-09-01T10:00:00Z', '') + ',' + _Lib.RefundListItemJson('2449912', '2026-09-02T10:00:00Z', '')));
+
+        // [WHEN] The import of the older refund runs with automatic posting
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The credit memo credits the invoiced card of 10 on the sale account
+        _Assert.IsTrue(Succeeded, 'Import and posting must succeed: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449911');
+        _ReturnLib.GetCreditMemoForReturnOrder(QueueRow."Sales Header Doc. No.", SalesCrMemoHeader);
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange("No.", GLAccountNo);
+        _Assert.IsTrue(SalesCrMemoLine.FindFirst(), 'The invoiced gift card must be credited on the account of its sale.');
+        _Assert.AreEqual(10, SalesCrMemoLine."Amount Including VAT", 'The older refund credits the invoiced card.');
+
+        // [THEN] Its voucher is archived
+        _Assert.IsFalse(Voucher.Get(VoucherNos.Get(1)), 'The voucher of the credited card must be archived.');
+    end;
+
+    [Test]
+    procedure Import_EarlierOfTwoAutoFulfilledGiftCardCancelsWithOneCardLeftOff_HasNothingToCredit()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        VoucherNos: List of [Code[20]];
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        GLAccountNo: Code[20];
+        LocationCode: Code[10];
+        Succeeded: Boolean;
+    begin
+        // [SCENARIO] Of two refunds each cancelling one card of an Auto-Fulfill gift card line with one card left off the invoices, the older refund takes that card and has nothing to credit, whatever the later refund holds.
+        // [GIVEN] A legacy-path store and Auto-Fulfill gift card line 2449709 ordered twice, of which an invoice sold one 50 card and issued an untouched voucher
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        GLAccountNo := _ReturnLib.CreateSalesGLAccountNo(Sku);
+        _ReturnLib.InsertPostedGiftCardSale('SI-244909', StoreCode, '2449009', '2449709', GLAccountNo, 1, 50, true, VoucherNos);
+
+        // [GIVEN] A queued older refund cancelling one card, and a later refund cancelling the other, 50 to the card each
+        _Lib.InsertRefundQueueRow(StoreCode, '2449913', '2449009', '#2449009', QueueRow);
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449913', _Lib.RefundDetailResponse('2449913', '2449009', '#2449009', '2026-09-01T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449709', 1, 2, 'CANCEL', 50, false), '', '', _ReturnLib.RefundTxnJson('2449813', 'bogus', 50, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetRefund', 'gid://shopify/Refund/2449914', _Lib.RefundDetailResponse('2449914', '2449009', '#2449009', '2026-09-02T10:00:00Z', true, _Lib.GiftCardRefundLineJsonOrdered('2449709', 1, 2, 'CANCEL', 50, false), '', '', _ReturnLib.RefundTxnJson('2449814', 'bogus', 50, _ReturnLib.Lcy(), '')));
+        MockClient.AddResponse('GetOrderRefunds', _Lib.OrderRefundsResponse('2449009', _Lib.RefundListItemJson('2449913', '2026-09-01T10:00:00Z', '') + ',' + _Lib.RefundListItemJson('2449914', '2026-09-02T10:00:00Z', '')));
+
+        // [WHEN] The import of the older refund runs
+        Succeeded := _ReturnLib.RunImport(QueueRow, MockClient);
+
+        // [THEN] The older refund has nothing to credit and no Return Order exists
+        _Assert.IsTrue(Succeeded, 'The older cancel takes the card left off the invoices: ' + GetLastErrorText());
+        QueueRow.FindSourceDoc(StoreCode, QueueRow."Source Doc. Type"::Refund, '2449913');
+        _Assert.AreEqual(QueueRow.Status::"Nothing to Credit", QueueRow.Status, 'The older refund takes the card left off the invoices.');
+        _Lib.AssertNoReturnOrder(CustomerNo);
+
+        // [THEN] The voucher of the invoiced card stays untouched for the later refund
+        _Assert.IsTrue(Voucher.Get(VoucherNos.Get(1)), 'The voucher of the invoiced card must stay for the later refund.');
+    end;
+
+    [Test]
     procedure Posting_RefundToAGiftCard_CreditsTheVoucherBack()
     var
         QueueRow: Record "NPR Spfy NC Return Queue";

@@ -84,14 +84,22 @@ codeunit 85511 "NPR Library Spfy Legacy Refund"
     end;
 
     procedure GiftCardRefundLineJson(LineItemId: Text; Qty: Integer; Gross: Decimal; ShopifyNative: Boolean): Text
+    begin
+        exit(GiftCardRefundLineJsonOrdered(LineItemId, Qty, Qty, 'NO_RESTOCK', Gross, ShopifyNative));
+    end;
+
+    /// <summary>
+    /// A gift card refund line of the given restock type whose order line was ordered OrderedQty times in Shopify.
+    /// </summary>
+    procedure GiftCardRefundLineJsonOrdered(LineItemId: Text; Qty: Integer; OrderedQty: Integer; RestockType: Text; Gross: Decimal; ShopifyNative: Boolean): Text
     var
         Attributes: Text;
-        GiftCardRefundLineTok: Label '{"node":{"quantity":%1,"restockType":"NO_RESTOCK","restocked":false,"location":null,"subtotalSet":{"presentmentMoney":{"amount":"%2"}},"totalTaxSet":{"presentmentMoney":{"amount":"0"}},"lineItem":{"id":"gid://shopify/LineItem/%3","quantity":%6,"sku":null,"title":"Gift Card","isGiftCard":%4,"customAttributes":%5,"variant":{"id":"gid://shopify/ProductVariant/2","sku":null,"barcode":null},"taxLines":[{"ratePercentage":0}]}}}', Locked = true;
+        GiftCardRefundLineTok: Label '{"node":{"quantity":%1,"restockType":"%7","restocked":false,"location":null,"subtotalSet":{"presentmentMoney":{"amount":"%2"}},"totalTaxSet":{"presentmentMoney":{"amount":"0"}},"lineItem":{"id":"gid://shopify/LineItem/%3","quantity":%6,"sku":null,"title":"Gift Card","isGiftCard":%4,"customAttributes":%5,"variant":{"id":"gid://shopify/ProductVariant/2","sku":null,"barcode":null},"taxLines":[{"ratePercentage":0}]}}}', Locked = true;
     begin
         Attributes := '[{"key":"_is_giftcard","value":"1"}]';
         if ShopifyNative then
             Attributes := '[]';
-        exit(StrSubstNo(GiftCardRefundLineTok, Qty, Format(Gross, 0, 9), LineItemId, Format(ShopifyNative, 0, 9), Attributes, Qty));
+        exit(StrSubstNo(GiftCardRefundLineTok, Qty, Format(Gross, 0, 9), LineItemId, Format(ShopifyNative, 0, 9), Attributes, OrderedQty, RestockType));
     end;
 
     /// <summary>

@@ -518,7 +518,7 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
             InvoicedQuantity := 0;
             if Invoiced.ContainsKey(LineItemId) then
                 InvoicedQuantity := Invoiced.Get(LineItemId);
-            DroppedAmount += AllocateLineItem(DisplayName, TempReturnBuffer."Order Name", LineItemId, InvoicedQuantity, TempReturnBuffer."Other Refunds Incomplete", RoundingPrecision, TempLineBuffer, TempOtherLineBuffer);
+            DroppedAmount += AllocateLineItem(ShopifyStoreCode, DisplayName, TempReturnBuffer."Order Name", LineItemId, InvoicedQuantity, TempReturnBuffer."Other Refunds Incomplete", RoundingPrecision, TempLineBuffer, TempOtherLineBuffer);
         end;
         TempLineBuffer.Reset();
         TempLineBuffer.SetRange(Quantity, 0);
@@ -528,8 +528,9 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
 
     /// <summary>
     /// Dropped units never shipped, so across the order's refunds they go to CANCEL, then NO_RESTOCK, then LEGACY_RESTOCK, then the rest, oldest refund first within a kind.
+    /// Gift cards follow the same rule, as BC invoices them only once Shopify fulfils them; auto-fulfilled NP gift cards are the exception.
     /// </summary>
-    local procedure AllocateLineItem(DisplayName: Text[50]; OrderName: Text; LineItemId: Text; InvoicedQuantity: Decimal; OtherRefundsIncomplete: Boolean; RoundingPrecision: Decimal; var TempLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary; var TempOtherLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary) DroppedAmount: Decimal
+    local procedure AllocateLineItem(ShopifyStoreCode: Code[20]; DisplayName: Text[50]; OrderName: Text; LineItemId: Text; InvoicedQuantity: Decimal; OtherRefundsIncomplete: Boolean; RoundingPrecision: Decimal; var TempLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary; var TempOtherLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary) DroppedAmount: Decimal
     var
         Dropped: Decimal;
         CancelQuantity: Decimal;
@@ -548,6 +549,9 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
             Dropped := 0;
         if (Dropped > 0) and OtherRefundsIncomplete then
             Error(OtherRefundsIncompleteErr, DisplayName, OrderName);
+        if TempLineBuffer."Gift Card" then
+            if IsAutoFulfilledGiftCard(ShopifyStoreCode, TempLineBuffer) then
+                exit(AllocateGiftCardLineItem(LineItemId, Dropped, RoundingPrecision, TempLineBuffer, TempOtherLineBuffer));
         OwnCancelQuantity := SumOfKind(TempLineBuffer, LineItemId, 1, false, false);
         EarlierCancelQuantity := SumOfKind(TempOtherLineBuffer, LineItemId, 1, true, false);
         // Cancels take the dropped units oldest first; this refund is refused only when its own no longer fit.
@@ -573,6 +577,61 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
             if Kind > 1 then
                 Remaining -= SmallerOf(Remaining, SumOfKind(TempOtherLineBuffer, LineItemId, Kind, true, true));
         end;
+        TempLineBuffer.Reset();
+    end;
+
+    /// <summary>
+    /// The order import invoices an NP gift card whose voucher type has Auto-Fulfill before Shopify fulfils it, so a cancel does not show that it was left off the invoices.
+    /// The sale's vouchers carry the type it was sold under; without a posted sale nothing was invoiced and either rule drops every card.
+    /// </summary>
+    local procedure IsAutoFulfilledGiftCard(ShopifyStoreCode: Code[20]; var TempLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary): Boolean
+    var
+        TempSalesInvoiceLine: Record "Sales Invoice Line" temporary;
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        JsonHelper: Codeunit "NPR Json Helper";
+        LineItemToken: JsonToken;
+    begin
+        // The order import never auto-fulfils a Shopify gift card, whatever its voucher type.
+        TempLineBuffer.GetLineItemJson(LineItemToken);
+        if JsonHelper.GetJBoolean(LineItemToken, 'isGiftCard', false) then
+            exit(false);
+        if not FindPostedGiftCardSaleLines(ShopifyStoreCode, TempLineBuffer."Order Line Item Id", TempSalesInvoiceLine) then
+            exit(false);
+        VoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.", "Document Line No.");
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Issue Voucher");
+        VoucherEntry.SetRange("Document Type", VoucherEntry."Document Type"::Invoice);
+        TempSalesInvoiceLine.FindSet();
+        repeat
+            VoucherEntry.SetRange("Document No.", TempSalesInvoiceLine."Document No.");
+            VoucherEntry.SetRange("Document Line No.", TempSalesInvoiceLine."Line No.");
+            if VoucherEntry.FindFirst() then
+                if VoucherType.Get(VoucherEntry."Voucher Type") then
+                    exit(VoucherType."Spfy Auto-Fulfill");
+        until TempSalesInvoiceLine.Next() = 0;
+        exit(false);
+    end;
+
+    /// <summary>
+    /// For an auto-fulfilled NP gift card a cancel does not show that the card was left off the invoices.
+    /// The first import invoices every card still fulfillable, so the dropped cards are the ones refunded before it, which are the oldest refunds whatever their restock type; a later refund never takes a card an older one already took, and the rest are credited.
+    /// </summary>
+    local procedure AllocateGiftCardLineItem(LineItemId: Text; Dropped: Decimal; RoundingPrecision: Decimal; var TempLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary; var TempOtherLineBuffer: Record "NPR Spfy Legacy Return Ln Buf" temporary) DroppedAmount: Decimal
+    var
+        Remaining: Decimal;
+    begin
+        TempOtherLineBuffer.Reset();
+        TempOtherLineBuffer.SetRange("Order Line Item Id", LineItemId);
+        TempOtherLineBuffer.SetRange("Later Refund", false);
+        TempOtherLineBuffer.CalcSums(Quantity);
+        Remaining := Dropped - SmallerOf(Dropped, TempOtherLineBuffer.Quantity);
+        TempOtherLineBuffer.Reset();
+        TempLineBuffer.Reset();
+        TempLineBuffer.SetRange("Order Line Item Id", LineItemId);
+        if TempLineBuffer.FindSet() then
+            repeat
+                DroppedAmount += DropFromLine(TempLineBuffer, Remaining, RoundingPrecision);
+            until TempLineBuffer.Next() = 0;
         TempLineBuffer.Reset();
     end;
 
