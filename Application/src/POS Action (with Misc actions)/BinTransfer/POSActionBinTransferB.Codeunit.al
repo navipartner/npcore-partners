@@ -177,6 +177,8 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         WorkshiftCheckpoint.Type := WorkshiftCheckpoint.Type::TRANSFER;
         WorkshiftCheckpoint.Modify();
         PaymentBinCheckpointHdlr.CreatePosEntryBinCheckpoint(PosUnit."No.", BinNo, WorkshiftCheckpoint."Entry No.", PmtBinCheckpoint.Type::TRANSFER);
+        if TransferDirection = TransferDirection::TransferIn then
+            AddZeroAmountCountingLines(PosUnit."No.", BinNo, WorkshiftCheckpoint."Entry No.");
 
         POSUnit.GetProfile(EndOfDayProfile);
         Response.Add('cashCount', GetCashCount(EndOfDayProfile, POSUnit."No.", WorkshiftCheckpoint."Entry No.", TransferDirection));
@@ -187,6 +189,21 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             Response.Add('allowPrestagedTransfersOnly', EndOfDayProfile."Bin Transfer: Require Journal");
             Response.Add('prestagedTransfers', GetBinTransferJnlLines(EndOfDayProfile, PosUnit."No.", BinNo, WorkshiftCheckpoint."Entry No."));
         end;
+    end;
+
+    local procedure AddZeroAmountCountingLines(POSUnitNo: Code[10]; BinNo: Code[10]; CheckpointEntryNo: Integer)
+    var
+        PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        PaymentMethod: Record "NPR POS Payment Method";
+        PaymentBinCheckpointHdlr: Codeunit "NPR POS Payment Bin Checkpoint";
+    begin
+        PaymentMethod.SetFilter("Include In Counting", '<>%1', PaymentMethod."Include In Counting"::NO);
+        if not PaymentMethod.FindSet() then
+            exit;
+        repeat
+            if (PaymentMethod."Include In Counting" <> PaymentMethod."Include In Counting"::VIRTUAL) or (PaymentMethod."Bin for Virtual-Count" = '') then
+                PaymentBinCheckpointHdlr.AddBinCountingCheckpoint_PE(BinNo, POSUnitNo, PaymentMethod.Code, CheckpointEntryNo, PmtBinCheckpoint.Type::TRANSFER, true);
+        until PaymentMethod.Next() = 0;
     end;
 
     local procedure GetCashCount(EndOfDayProfile: Record "NPR POS End of Day Profile"; POSUnitNo: Code[10]; CheckpointEntryNo: Integer; TransferDirection: Option "",TransferOut,TransferIn) CashCount: JsonObject
