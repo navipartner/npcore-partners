@@ -3,6 +3,7 @@ codeunit 85389 "NPR Spfy Order Import Tests"
 {
     // [Feature] Shopify order import
     Subtype = Test;
+    EventSubscriberInstance = Manual;
     TestPermissions = Disabled;
 
     var
@@ -1867,6 +1868,361 @@ codeunit 85389 "NPR Spfy Order Import Tests"
     end;
 
     [Test]
+    procedure ClosedEntry_UpdatePath_NothingToPost_KeepsSalesOrder()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderImportTests: Codeunit "NPR Spfy Order Import Tests";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        SalesOrderNo: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+        Expected: Decimal;
+    begin
+        // [SCENARIO] An order already imported as a sales order is closed in Shopify without being fulfilled. Nothing
+        // can be posted, so the sales order has to stay, even with "Delete After Final Post" on.
+        ShopifyId := '926000000001';
+        OrderLineId := '926000000101';
+        PrepareStoreThatDeletesAfterFinalPost(ShopifyId, StoreCode, Sku);
+        BindSubscription(SpfyOrderImportTests);
+
+        // [GIVEN] the open order was imported and created a sales order
+        SalesOrderNo := ImportOpenOrder(StoreCode, ShopifyId, OrderLineId, Sku, EcomSalesHeader);
+
+        // [GIVEN] the closed entry of the same order, with no fulfillments
+        InsertReplayableOrderEntry(ClosedEntry, StoreCode, ShopifyId, OrderLineId, Sku, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime() - 1000);
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] the closed entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
+
+        // [THEN] the entry completed, the sales order is still there and the Ecommerce document is still Created
+        AssertEntryProcessedWithoutError(ClosedEntry."Entry No.");
+        _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo), 'A closed order that posted nothing must keep its sales order.');
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(EcomSalesHeader."Creation Status"::Created, EcomSalesHeader."Creation Status", 'The Ecommerce document must stay Created when its sales order is kept.');
+
+        // [THEN] and nothing on it is set to ship, because Shopify reported no fulfillment
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        _Assert.IsTrue(SalesLine.FindFirst(), 'The kept sales order must still have its item line.');
+        Expected := 0;
+        _Assert.AreEqual(Expected, SalesLine."Qty. to Ship", 'An unfulfilled line must have nothing to ship.');
+
+        UnbindSubscription(SpfyOrderImportTests);
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+    end;
+
+    [Test]
+    procedure ClosedEntry_FirstImportClosed_NothingToPost_KeepsSalesOrder()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderImportTests: Codeunit "NPR Spfy Order Import Tests";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] The first entry seen for an order is already Closed and nothing on it was fulfilled. The import
+        // creates the sales order and has nothing to post, so the sales order has to stay, even with
+        // "Delete After Final Post" on.
+        ShopifyId := '926000000002';
+        OrderLineId := '926000000102';
+        PrepareStoreThatDeletesAfterFinalPost(ShopifyId, StoreCode, Sku);
+        BindSubscription(SpfyOrderImportTests);
+
+        // [GIVEN] a closed entry with no fulfillments, and no earlier entry for the order
+        InsertReplayableOrderEntry(ClosedEntry, StoreCode, ShopifyId, OrderLineId, Sku, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime() - 1000);
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] the closed entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
+
+        // [THEN] the entry completed, the sales order it created is still there and the Ecommerce document is Created
+        AssertEntryProcessedWithoutError(ClosedEntry."Entry No.");
+        FindEcomOrder(ShopifyId, EcomSalesHeader);
+        _Assert.AreNotEqual('', EcomSalesHeader."Created Doc No.", 'The import must have created a sales order.');
+        _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::Order, EcomSalesHeader."Created Doc No."), 'A closed order that posted nothing must keep its sales order.');
+        _Assert.AreEqual(EcomSalesHeader."Creation Status"::Created, EcomSalesHeader."Creation Status", 'The Ecommerce document must stay Created when its sales order is kept.');
+
+        UnbindSubscription(SpfyOrderImportTests);
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+    end;
+
+    [Test]
+    procedure ClosedEntry_PartiallyInvoiced_NothingMoreToPost_KeepsSalesOrder()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderImportTests: Codeunit "NPR Spfy Order Import Tests";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        SalesOrderNo: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+        Expected: Decimal;
+    begin
+        // [SCENARIO] Part of an order was already invoiced (for example its virtual items) when Shopify closes it,
+        // and nothing more was fulfilled. The run posts nothing, so the rest of the sales order has to stay and the
+        // Ecommerce document must keep pointing at an existing sales order.
+        ShopifyId := '926000000003';
+        OrderLineId := '926000000103';
+        PrepareStoreThatDeletesAfterFinalPost(ShopifyId, StoreCode, Sku);
+        BindSubscription(SpfyOrderImportTests);
+
+        // [GIVEN] the open order was imported and created a sales order
+        SalesOrderNo := ImportOpenOrder(StoreCode, ShopifyId, OrderLineId, Sku, EcomSalesHeader);
+
+        // [GIVEN] the Ecommerce document is partially invoiced
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        EcomSalesHeader."Posting Status" := EcomSalesHeader."Posting Status"::"Partially Invoiced";
+        EcomSalesHeader.Modify();
+        Commit();
+
+        // [GIVEN] the closed entry of the same order, with no fulfillments
+        InsertReplayableOrderEntry(ClosedEntry, StoreCode, ShopifyId, OrderLineId, Sku, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime() - 1000);
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] the closed entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
+
+        // [THEN] the entry completed, the sales order is still there and the Ecommerce document is still Created
+        AssertEntryProcessedWithoutError(ClosedEntry."Entry No.");
+        _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo), 'A partially invoiced order that posted nothing more must keep its sales order.');
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(EcomSalesHeader."Creation Status"::Created, EcomSalesHeader."Creation Status", 'The Ecommerce document must stay Created when its sales order is kept.');
+
+        // [THEN] and nothing on it is set to ship, because Shopify reported no fulfillment
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        _Assert.IsTrue(SalesLine.FindFirst(), 'The kept sales order must still have its item line.');
+        Expected := 0;
+        _Assert.AreEqual(Expected, SalesLine."Qty. to Ship", 'An unfulfilled line must have nothing to ship.');
+
+        UnbindSubscription(SpfyOrderImportTests);
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+    end;
+
+    [Test]
+    procedure ClosedEntry_UpdatePath_PartialPost_DeletesRemainder()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        ItemB: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibrarySales: Codeunit "Library - Sales";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderImportTests: Codeunit "NPR Spfy Order Import Tests";
+        StoreCode: Code[20];
+        SkuA: Code[20];
+        SkuB: Code[20];
+        SalesOrderNo: Code[20];
+        ShopifyId: Text[30];
+        LineIdA: Text[30];
+        LineIdB: Text[30];
+        Expected: Decimal;
+    begin
+        // [SCENARIO] A two-line order already imported as a sales order is closed in Shopify with only line A
+        // fulfilled. Line A is posted, and with "Delete After Final Post" on, the rest of the sales order is deleted.
+        ShopifyId := '926000000004';
+        LineIdA := '926000000104';
+        LineIdB := '926000000204';
+        LibrarySpfyImport.CleanupCommittedPostedOrderIds(ShopifyId);
+        PrepareStoreThatDeletesAfterFinalPost(ShopifyId, StoreCode, SkuA);
+        LibraryInventory.CreateItem(ItemB);
+        SkuB := ItemB."No.";
+        LibraryECommerce.IncreaseItemInventoryOnLocation(SkuA, 10, 'SPFYLOC');
+        SalesReceivablesSetup.Get();
+        if (SalesReceivablesSetup."Posted Invoice Nos." = '') or (SalesReceivablesSetup."Posted Shipment Nos." = '') then
+            LibrarySales.SetPostedNoSeriesInSetup();
+        BindSubscription(SpfyOrderImportTests);
+
+        // [GIVEN] the open order with two unfulfilled lines was imported and created a sales order
+        SalesOrderNo := ImportOpenOrder(StoreCode, ShopifyId, LibrarySpfyImport.BuildReplayableTwoLineOrderJson(ShopifyId, LineIdA, SkuA, LineIdB, SkuB, false), EcomSalesHeader);
+        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+        SalesLine.SetRange("Document No.", SalesOrderNo);
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        _Assert.AreEqual(2, SalesLine.Count(), 'The open entry must have created both item lines.');
+
+        // [GIVEN] the closed entry of the same order, with line A fulfilled and line B not
+        InsertOrderEntryWithData(ClosedEntry, StoreCode, ShopifyId, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime() - 1000, LibrarySpfyImport.BuildReplayableTwoLineOrderJson(ShopifyId, LineIdA, SkuA, LineIdB, SkuB, true));
+        // The posting date comes from it, so keep it on the work date.
+        ClosedEntry."Closed Date-Time" := CreateDateTime(WorkDate(), 120000T);
+        ClosedEntry.Modify();
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] the closed entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
+
+        // [THEN] the entry completed without an error
+        ClosedEntry.Get(ClosedEntry."Entry No.");
+        _Assert.AreEqual('', ClosedEntry."Last Error Message", 'The closed entry must not fail.');
+        AssertEntryProcessedWithoutError(ClosedEntry."Entry No.");
+
+        // [THEN] one invoice was posted from the sales order, carrying only line A
+        SalesInvoiceHeader.SetRange("Order No.", SalesOrderNo);
+        _Assert.AreEqual(1, SalesInvoiceHeader.Count(), 'The fulfilled line must have been invoiced once.');
+        SalesInvoiceHeader.FindFirst();
+        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
+        SalesInvoiceLine.SetFilter(Quantity, '<>0');
+        _Assert.AreEqual(1, SalesInvoiceLine.Count(), 'Only the fulfilled line must be invoiced.');
+        SalesInvoiceLine.FindFirst();
+        _Assert.AreEqual(SkuA, SalesInvoiceLine."No.", 'The invoiced line must be the fulfilled one.');
+        Expected := 1;
+        _Assert.AreEqual(Expected, SalesInvoiceLine.Quantity, 'The fulfilled quantity must be invoiced.');
+        // Posting can carry the unfulfilled line onto the invoice with zero quantity.
+        SalesInvoiceLine.SetRange(Quantity);
+        SalesInvoiceLine.SetRange("No.", SkuB);
+        if SalesInvoiceLine.FindFirst() then begin
+            Expected := 0;
+            _Assert.AreEqual(Expected, SalesInvoiceLine.Quantity, 'The unfulfilled line must not be invoiced.');
+        end;
+
+        // [THEN] the sales order with the unfulfilled remainder is deleted, and the Ecommerce document stays Created
+        _Assert.IsFalse(SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo), 'A closed order that posted something must delete the rest of its sales order.');
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(EcomSalesHeader."Creation Status"::Created, EcomSalesHeader."Creation Status", 'The Ecommerce document must stay Created.');
+
+        UnbindSubscription(SpfyOrderImportTests);
+        LibrarySpfyImport.CleanupCommittedPostedOrderIds(ShopifyId);
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+    end;
+
+    /// <summary>Removes what an earlier run of the same test committed, then sets up the simple item order store
+    /// with "Delete After Final Post" on.</summary>
+    local procedure PrepareStoreThatDeletesAfterFinalPost(ShopifyId: Text[30]; var StoreCode: Code[20]; var Sku: Code[20])
+    var
+        SpfyStore: Record "NPR Spfy Store";
+        NpEcStore: Record "NPR NpEc Store";
+        Customer: Record Customer;
+        Item: Record Item;
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        LibrarySales: Codeunit "Library - Sales";
+        LibraryInventory: Codeunit "Library - Inventory";
+        ItemNo: Code[20];
+    begin
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+        LibrarySpfyImport.SetupSimpleItemOrder(StoreCode, Sku, ItemNo);
+
+        // The import builds a real sales order, so the tests use library master data with complete posting setup,
+        // as the legacy return tests do.
+        LibrarySales.SetStockoutWarning(false);
+        LibrarySales.SetCreditWarningsToNoWarnings();
+        LibrarySales.CreateCustomer(Customer);
+        LibraryInventory.CreateItem(Item);
+        Sku := Item."No.";
+        NpEcStore.SetRange("Shopify Store Code", StoreCode);
+        NpEcStore.FindFirst();
+        NpEcStore."Spfy Customer No." := Customer."No.";
+        NpEcStore.Modify();
+
+        SpfyStore.Get(StoreCode);
+        SpfyStore."Delete After Final Post" := true;
+        SpfyStore.Modify();
+    end;
+
+    /// <summary>Processes an open entry for the order and checks that it created the sales order the closed entry
+    /// is then run against. Returns the sales order no.</summary>
+    local procedure ImportOpenOrder(StoreCode: Code[20]; ShopifyId: Text[30]; OrderLineId: Text[30]; Sku: Code[20]; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Code[20]
+    var
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+    begin
+        exit(ImportOpenOrder(StoreCode, ShopifyId, LibrarySpfyImport.BuildReplayableItemOrderJson(ShopifyId, OrderLineId, Sku, 0), EcomSalesHeader));
+    end;
+
+    local procedure ImportOpenOrder(StoreCode: Code[20]; ShopifyId: Text[30]; OrderJson: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Code[20]
+    var
+        OpenEntry: Record "NPR Spfy Event Log Entry";
+        SalesHeader: Record "Sales Header";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+    begin
+        InsertOrderEntryWithData(OpenEntry, StoreCode, ShopifyId, "NPR SpfyAPIDocumentStatus"::Open, CurrentDateTime() - 2000, OrderJson);
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+        SpfyEventLogDocProcessr.ProcessLogEntries(OpenEntry);
+
+        AssertEntryProcessedWithoutError(OpenEntry."Entry No.");
+        FindEcomOrder(ShopifyId, EcomSalesHeader);
+        _Assert.AreEqual(EcomSalesHeader."Creation Status"::Created, EcomSalesHeader."Creation Status", 'The open entry must have created the sales order.');
+        _Assert.AreNotEqual('', EcomSalesHeader."Created Doc No.", 'The open entry must have created the sales order.');
+        _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::Order, EcomSalesHeader."Created Doc No."), 'The sales order the open entry created must exist.');
+        exit(SalesHeader."No.");
+    end;
+
+    local procedure InsertReplayableOrderEntry(var LogEntry: Record "NPR Spfy Event Log Entry"; StoreCode: Code[20]; ShopifyId: Text[30]; OrderLineId: Text[30]; Sku: Code[20]; DocStatus: Enum "NPR SpfyAPIDocumentStatus"; EventDateTime: DateTime)
+    var
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+    begin
+        // A zero-value order needs no payment lines, and the subscribers below skip them because the test store has no payment mapping.
+        InsertOrderEntryWithData(LogEntry, StoreCode, ShopifyId, DocStatus, EventDateTime, LibrarySpfyImport.BuildReplayableItemOrderJson(ShopifyId, OrderLineId, Sku, 0));
+    end;
+
+    local procedure InsertOrderEntryWithData(var LogEntry: Record "NPR Spfy Event Log Entry"; StoreCode: Code[20]; ShopifyId: Text[30]; DocStatus: Enum "NPR SpfyAPIDocumentStatus"; EventDateTime: DateTime; OrderJson: JsonToken)
+    var
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+    begin
+        LibrarySpfyImport.InsertOrderLogEntry(LogEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, DocStatus, EventDateTime);
+        // The importer sets the posting date of a closed order from it.
+        if DocStatus = DocStatus::Closed then
+            LogEntry."Closed Date-Time" := EventDateTime;
+        LibrarySpfyImport.WriteOrderDataBlob(LogEntry, OrderJson);
+        LogEntry.SetRecFilter();
+    end;
+
+    local procedure FindEcomOrder(ShopifyId: Text[30]; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        EcomSalesHeader.Reset();
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("External No.", ShopifyId);
+        _Assert.IsTrue(EcomSalesHeader.FindFirst(), 'The import must have created an Ecommerce document.');
+    end;
+
+    local procedure AssertEntryProcessedWithoutError(EntryNo: BigInteger)
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+    begin
+        LogEntry.Get(EntryNo);
+        _Assert.AreEqual(LogEntry."Processing Status"::Processed, LogEntry."Processing Status", 'The entry must end as Processed.');
+        _Assert.IsFalse(LogEntry.Postponed, 'The entry must not be postponed.');
+        _Assert.AreEqual('', LogEntry."Last Error Message", 'The entry must not carry an error.');
+    end;
+
+    // The test store has no payment mapping or gateway, and these tests are about the sales order, not its payments.
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Spfy Integration Events", 'OnBeforeInsertEcommerceSalesPaymentLines', '', false, false)]
+    local procedure SkipEcommercePaymentLines(ShopifyStoreCode: Code[20]; OrderJsonToken: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header"; var Handled: Boolean)
+    begin
+        Handled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Spfy Integration Events", 'OnBeforeUpdatePaymentLines', '', false, false)]
+    local procedure SkipPaymentLineUpdate(ShopifyStoreCode: Code[20]; PaymentLinesJsonToken: JsonToken; var SalesHeader: Record "Sales Header"; var Handled: Boolean)
+    begin
+        Handled := true;
+    end;
+
+    [Test]
     procedure VirtualItems_CaptureDisabledAndNotCapturedExternally_Refused()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -2783,8 +3139,8 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         // [SCENARIO] Two separate status filters decide the same thing on the fetch path: one picks the fulfillments
         // whose line items are worth paging, the other (inside the cache) picks the fulfillments whose quantities
         // count. They have to agree. If the first ever said no where the second says yes, the cache would be asked for
-        // lines that were never fetched: every line would read as unfulfilled, nothing would be left to post, and with
-        // "Delete After Final Posting" on the document would be deleted anyway while the entry is marked Processed.
+        // lines that were never fetched: every line would read as unfulfilled, nothing would be left to post, and the
+        // closed order would stay unposted while its entry is marked Processed.
         SuccessLineId := '930000000001';
         CancelledLineId := '930000000002';
         SuccessFulfilments := SingleFulfilmentFixture('9301', SuccessLineId, 'SUCCESS');
@@ -2837,8 +3193,9 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         // for a freshly closed order) from Shopify not answering at all - and it can only do so with the overload that
         // requires the value while accepting zero. With the plain required overload every order without a fulfillment
         // would fail; with an optional one a missing count silently reads as zero, the guard never fires, the cache
-        // stays empty, nothing is left to post and the document is deleted anyway when
-        // "Delete After Final Posting" is on. The fetch itself is HTTP-bound and cannot be driven from a test, so this
+        // stays empty and the item lines have nothing to post. The closed order is left unposted while its entry is
+        // marked Processed, or only its shipping fee is posted and the rest is deleted when "Delete After Final Post"
+        // is on. The fetch itself is HTTP-bound and cannot be driven from a test, so this
         // pins the one thing about it that can be: the contract the guard rests on.
         ZeroCount := ParseJson('{"data":{"order":{"fulfillmentsCount":{"count":0}}}}');
         MissingCount := ParseJson('{"data":{"order":{}}}');

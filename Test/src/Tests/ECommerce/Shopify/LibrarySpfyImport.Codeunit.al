@@ -254,6 +254,12 @@ codeunit 85465 "NPR Library Spfy Import"
 
     /// <summary>One item line node (the {"node":{...}} element of data.order.lineItems).</summary>
     procedure ItemLineNodeText(LineId: Text; Sku: Code[20]; UnitPrice: Decimal; Qty: Integer; DiscountAllocText: Text): Text
+    begin
+        exit(ItemLineNodeText(LineId, Sku, UnitPrice, Qty, Qty, DiscountAllocText));
+    end;
+
+    /// <summary>Same line, with the unfulfilled quantity passed in.</summary>
+    procedure ItemLineNodeText(LineId: Text; Sku: Code[20]; UnitPrice: Decimal; Qty: Integer; UnfulfilledQty: Integer; DiscountAllocText: Text): Text
     var
         Amount: Text;
     begin
@@ -263,7 +269,7 @@ codeunit 85465 "NPR Library Spfy Import"
             '"id":"gid://shopify/LineItem/' + LineId + '",' +
             '"sku":"' + Sku + '",' +
             '"title":"Item","variantTitle":null,' +
-            '"quantity":' + Format(Qty) + ',"unfulfilledQuantity":' + Format(Qty) + ',"currentQuantity":' + Format(Qty) + ',"nonFulfillableQuantity":0,' +
+            '"quantity":' + Format(Qty) + ',"unfulfilledQuantity":' + Format(UnfulfilledQty) + ',"currentQuantity":' + Format(Qty) + ',"nonFulfillableQuantity":0,' +
             '"isGiftCard":false,' +
             '"product":{"id":"gid://shopify/Product/1","productType":"snowboard"},' +
             '"variant":{"price":"' + Amount + '"},' +
@@ -547,6 +553,12 @@ codeunit 85465 "NPR Library Spfy Import"
 
     /// <summary>Simple item order including a successful AUTHORIZATION transaction (so the live-fetch guards pass on replay).</summary>
     procedure BuildReplayableItemOrderJson(ShopifyId: Text; Sku: Code[20]; UnitPrice: Decimal) OrderResponse: JsonToken
+    begin
+        exit(BuildReplayableItemOrderJson(ShopifyId, '1', Sku, UnitPrice));
+    end;
+
+    /// <summary>Same order, with the order line id passed in.</summary>
+    procedure BuildReplayableItemOrderJson(ShopifyId: Text; OrderLineId: Text; Sku: Code[20]; UnitPrice: Decimal) OrderResponse: JsonToken
     var
         Json: JsonToken;
         Builder: TextBuilder;
@@ -563,10 +575,49 @@ codeunit 85465 "NPR Library Spfy Import"
         Builder.Append('"billingAddress":{"firstName":"Test","lastName":"Buyer","company":null,"countryCodeV2":"US","zip":"10001","address1":"1 Test St","address2":null,"city":"New York"},');
         Builder.Append('"shippingAddress":{"firstName":"Test","lastName":"Buyer","company":null,"countryCodeV2":"US","zip":"10001","address1":"1 Test St","address2":null,"city":"New York"},');
         Builder.Append('"customer":{"firstName":"Test","lastName":"Buyer","defaultAddress":{"phone":null}},');
-        Builder.Append('"lineItems":[' + ItemLineNodeText('1', Sku, UnitPrice, 1, '[]') + '],');
+        Builder.Append('"lineItems":[' + ItemLineNodeText(OrderLineId, Sku, UnitPrice, 1, '[]') + '],');
         Builder.Append('"shippingLines":[],');
         Builder.Append('"transactions":[{"id":"gid://shopify/OrderTransaction/1","kind":"AUTHORIZATION","status":"SUCCESS",');
         Builder.Append('"amountSet":{"presentmentMoney":{"amount":"' + Amount + '","currencyCode":"USD"},"shopMoney":{"amount":"' + Amount + '","currencyCode":"USD"}}}]');
+        Builder.Append('}}}');
+        if not Json.ReadFrom(Builder.ToText()) then
+            Error(InvalidErr);
+        OrderResponse := Json;
+    end;
+
+    /// <summary>Replayable zero-price order with two item lines of quantity 1. With FulfillLineA, line A carries one
+    /// SUCCESS fulfillment and line B stays unfulfilled; without it, the order has no fulfillments.</summary>
+    procedure BuildReplayableTwoLineOrderJson(ShopifyId: Text; LineIdA: Text; SkuA: Code[20]; LineIdB: Text; SkuB: Code[20]; FulfillLineA: Boolean) OrderResponse: JsonToken
+    var
+        Json: JsonToken;
+        Builder: TextBuilder;
+        UnfulfilledQtyA: Integer;
+        InvalidErr: Label 'Built order JSON is not valid.', Locked = true;
+    begin
+        UnfulfilledQtyA := 1;
+        if FulfillLineA then
+            UnfulfilledQtyA := 0;
+        Builder.Append('{"data":{"order":{');
+        Builder.Append('"id":"gid://shopify/Order/' + ShopifyId + '",');
+        Builder.Append('"name":"#' + ShopifyId + '",');
+        Builder.Append('"sourceName":"' + SourceNameTok + '",');
+        Builder.Append('"number":1001,');
+        Builder.Append('"taxesIncluded":false,');
+        Builder.Append('"billingAddress":{"firstName":"Test","lastName":"Buyer","company":null,"countryCodeV2":"US","zip":"10001","address1":"1 Test St","address2":null,"city":"New York"},');
+        Builder.Append('"shippingAddress":{"firstName":"Test","lastName":"Buyer","company":null,"countryCodeV2":"US","zip":"10001","address1":"1 Test St","address2":null,"city":"New York"},');
+        Builder.Append('"customer":{"firstName":"Test","lastName":"Buyer","defaultAddress":{"phone":null}},');
+        Builder.Append('"lineItems":[' + ItemLineNodeText(LineIdA, SkuA, 0, 1, UnfulfilledQtyA, '[]') + ',' + ItemLineNodeText(LineIdB, SkuB, 0, 1, 1, '[]') + '],');
+        if FulfillLineA then begin
+            Builder.Append('"fulfillments":[{"id":"gid://shopify/Fulfillment/1","status":"SUCCESS","displayStatus":"FULFILLED",');
+            Builder.Append('"createdAt":"2026-06-23T11:58:31Z","updatedAt":"2026-06-23T11:58:32Z",');
+            Builder.Append('"orderId":"gid://shopify/Order/' + ShopifyId + '","email":"buyer@test.com",');
+            Builder.Append('"fulfillmentLineItems":[{"cursor":"a","node":{"id":"gid://shopify/FulfillmentLineItem/1","quantity":1,');
+            Builder.Append('"lineItem":{"id":"gid://shopify/LineItem/' + LineIdA + '","currentQuantity":1,"variant":{"price":"0"},"unfulfilledQuantity":0,"nonFulfillableQuantity":0,"isGiftCard":false,"originalUnitPriceSet":{"presentmentMoney":{"amount":"0"}}}}}]}],');
+        end else
+            Builder.Append('"fulfillments":[],');
+        Builder.Append('"shippingLines":[],');
+        Builder.Append('"transactions":[{"id":"gid://shopify/OrderTransaction/1","kind":"AUTHORIZATION","status":"SUCCESS",');
+        Builder.Append('"amountSet":{"presentmentMoney":{"amount":"0","currencyCode":"USD"},"shopMoney":{"amount":"0","currencyCode":"USD"}}}]');
         Builder.Append('}}}');
         if not Json.ReadFrom(Builder.ToText()) then
             Error(InvalidErr);
@@ -809,6 +860,43 @@ codeunit 85465 "NPR Library Spfy Import"
             EcomSalesHeader.DeleteAll();
         if SpfyStore.Get(StoreCode) then
             SpfyStore.Delete();
+        Commit();
+    end;
+
+    /// <summary>CleanupCommittedLogEntries for the SetupSimpleItemOrder store, after first deleting every sales
+    /// document that carries the Shopify order id. For tests where processing commits a sales order of its own.
+    /// It removes the store as well, so call it before SetupSimpleItemOrder.</summary>
+    procedure CleanupCommittedSimpleItemOrder(ShopifyId: Text[30])
+    var
+        SalesHeader: Record "Sales Header";
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SalesHeaderIds: List of [RecordId];
+        SalesHeaderId: RecordId;
+    begin
+        // Collected first: deleting a sales header also deletes its assigned ids, which are the rows being read here.
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Header", "NPR Spfy ID Type"::"Entry ID", ShopifyId, ShopifyAssignedID);
+        if ShopifyAssignedID.FindSet() then
+            repeat
+                SalesHeaderIds.Add(ShopifyAssignedID."BC Record ID");
+            until ShopifyAssignedID.Next() = 0;
+        foreach SalesHeaderId in SalesHeaderIds do
+            if SalesHeader.Get(SalesHeaderId) then
+                SalesHeader.Delete(true);
+        CleanupCommittedLogEntries(CopyStr(StoreCodeTok, 1, 20), ShopifyId);
+    end;
+
+    /// <summary>Unlinks the posted invoices and shipments an earlier run committed for the Shopify order id, so a
+    /// rerun is not marked processed because a posted document already exists. The posted documents stay.</summary>
+    procedure CleanupCommittedPostedOrderIds(ShopifyId: Text[30])
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Invoice Header", "NPR Spfy ID Type"::"Entry ID", ShopifyId, ShopifyAssignedID);
+        ShopifyAssignedID.DeleteAll();
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Shipment Header", "NPR Spfy ID Type"::"Entry ID", ShopifyId, ShopifyAssignedID);
+        ShopifyAssignedID.DeleteAll();
         Commit();
     end;
 

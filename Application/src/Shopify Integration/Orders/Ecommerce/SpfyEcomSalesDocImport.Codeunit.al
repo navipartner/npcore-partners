@@ -2010,6 +2010,8 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     end;
 
     local procedure PostAndDeleteDocument(var LogEntry: Record "NPR Spfy Event Log Entry"; var SalesHeader: Record "Sales Header")
+    var
+        Posted: Boolean;
     begin
         if LogEntry.Postponed then
             exit;
@@ -2019,7 +2021,15 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
                 Commit();
                 if not PostSalesDocument(SalesHeader) then
                     Error(GetLastErrorText());
+                Posted := true;
             end;
+
+        if LogEntry."Document Type" = LogEntry."Document Type"::Order then begin
+            if not Posted then
+                exit;
+            if not SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then
+                exit;
+        end;
 
         if SpfyIntegrationMgt.DeleteAfterFinalPosting(LogEntry."Store Code") then begin
             Commit();

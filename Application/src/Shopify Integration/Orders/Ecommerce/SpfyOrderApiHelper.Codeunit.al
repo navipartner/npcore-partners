@@ -569,8 +569,9 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
         // "fulfillments" is a plain list with a "first" truncation argument, not a paginated connection, so there is no
         // hasNextPage to detect a short result. Compare against the order's own count instead - and require the count,
         // allowing only zero, because that is what separates the two cases above. A silenced guard leaves an empty
-        // cache, which makes every line look unfulfilled, zeroes the quantities to post, and then deletes the document
-        // anyway when "Delete After Final Posting" is on.
+        // cache, which makes every line look unfulfilled and zeroes the item quantities to post. The closed order is
+        // then left unposted while its entry is marked Processed, or, if it has a shipping fee, only the fee is posted
+        // and the rest of the order is deleted when "Delete After Final Post" is on.
         CheckFulfilmentsNotTruncated(ResponseBody, FulfilmentArr, OrderGID);
         if FulfilmentArr.Count() = 0 then
             exit;
