@@ -20,6 +20,12 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
                 exit(GetBarcode(Request));
             Request.Match('GET', '/inventory/itemtranslation'):
                 exit(GetTranslation(Request));
+            Request.Match('GET', '/inventory/variety'):
+                exit(GetVariety(Request));
+            Request.Match('GET', '/inventory/varietytable'):
+                exit(GetVarietyTable(Request));
+            Request.Match('GET', '/inventory/varietyvalue'):
+                exit(GetVarietyValue(Request));
         end;
     end;
 
@@ -30,6 +36,7 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         JsonBuilder: Codeunit "NPR Json Builder";
         ItemId: Text;
         WithAttributes: Boolean;
+        WithVariants: Boolean;
         EntriaEnabled: Boolean;
     begin
         ItemId := Request.Paths().Get(3);
@@ -41,8 +48,11 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         if (Request.QueryParams().ContainsKey('withAttributes')) then
             WithAttributes := (Request.QueryParams().Get('withAttributes').ToLower() = 'true');
 
+        if (Request.QueryParams().ContainsKey('withVariants')) then
+            WithVariants := (Request.QueryParams().Get('withVariants').ToLower() = 'true');
+
         EntriaEnabled := EntriaIntegrationMgt.HasEnabledStore();
-        exit(Response.RespondOK(ItemToJson(JsonBuilder, Item, WithAttributes, true, EntriaEnabled).Build()));
+        exit(Response.RespondOK(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, true, EntriaEnabled).Build()));
     end;
 
     procedure ListItems(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -60,13 +70,18 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         DataFound: Boolean;
         MoreRecords: Boolean;
         WithAttributes: Boolean;
+        WithVariants: Boolean;
         Sync: Boolean;
         EntriaEnabled: Boolean;
+        WithVariantsSyncErr: Label 'withVariants cannot be combined with sync=true. Use /inventory/itemvariant with sync=true to keep variants up to date.', Locked = true;
     begin
         Parameters := Request.QueryParams();
 
         if (Parameters.ContainsKey('withAttributes')) then
             WithAttributes := (Parameters.Get('withAttributes').ToLower() = 'true');
+
+        if (Parameters.ContainsKey('withVariants')) then
+            WithVariants := (Parameters.Get('withVariants').ToLower() = 'true');
 
         if Parameters.ContainsKey('itemCode') then
             Item.SetRange("No.", Parameters.Get('itemCode'));
@@ -75,8 +90,12 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
 
         if (Parameters.ContainsKey('pageSize')) then
             Evaluate(Limit, Parameters.Get('pageSize'));
-        if (Limit < 1) or (Limit > 20000) then
-            Limit := 20000;
+        if WithVariants then begin
+            if (Limit < 1) or (Limit > 1000) then
+                Limit := 1000;
+        end else
+            if (Limit < 1) or (Limit > 20000) then
+                Limit := 20000;
 
         if (Parameters.ContainsKey('pageKey')) then begin
             Request.ApplyPageKey(Parameters.Get('pageKey'), RecRef);
@@ -95,6 +114,9 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
             end;
         end;
 
+        if WithVariants and Sync then
+            exit(Response.RespondBadRequest(WithVariantsSyncErr));
+
         RecRef.SetTable(Item);
         Item.ReadIsolation := IsolationLevel::ReadCommitted;
 
@@ -108,7 +130,7 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         EntriaEnabled := EntriaIntegrationMgt.HasEnabledStore();
         if DataFound then
             repeat
-                JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, false, Sync, EntriaEnabled));
+                JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, false, Sync, EntriaEnabled));
                 EntryCount += 1;
                 if (EntryCount = Limit) then begin
                     RecRef.GetTable(Item);
@@ -127,12 +149,12 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         exit(Response.RespondOK(JsonObject));
     end;
 
-    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; WithVariants: Boolean; SingleItem: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
     begin
-        exit(ItemToJson(JsonBuilder, Item, WithAttributes, SingleItem, true, EntriaEnabled));
+        exit(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, SingleItem, true, EntriaEnabled));
     end;
 
-    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean; Sync: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; WithVariants: Boolean; SingleItem: Boolean; Sync: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
     begin
         JsonBuilder.StartObject().AddProperty('id', Format(Item.SystemId, 0, 4).ToLower())
                                  .AddProperty('code', Item."No.")
@@ -144,7 +166,17 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
                                  .AddProperty('vatProdPostingGroup', Item."VAT Prod. Posting Group")
                                  .AddProperty('unitPrice', Item."Unit Price")
                                  .AddProperty('vendorNo', Item."Vendor No.")
-                                 .AddProperty('vendorItemNo', Item."Vendor Item No.");
+                                 .AddProperty('vendorItemNo', Item."Vendor Item No.")
+                                 .AddProperty('variety1', Item."NPR Variety 1")
+                                 .AddProperty('variety1Table', Item."NPR Variety 1 Table")
+                                 .AddProperty('variety2', Item."NPR Variety 2")
+                                 .AddProperty('variety2Table', Item."NPR Variety 2 Table")
+                                 .AddProperty('variety3', Item."NPR Variety 3")
+                                 .AddProperty('variety3Table', Item."NPR Variety 3 Table")
+                                 .AddProperty('variety4', Item."NPR Variety 4")
+                                 .AddProperty('variety4Table', Item."NPR Variety 4 Table")
+                                 .AddProperty('varietyGroup', Item."NPR Variety Group")
+                                 .AddProperty('crossVarietyNo', CrossVarietyNoName(Item."NPR Cross Variety No."));
 
         if EntriaEnabled then
             JsonBuilder.AddProperty('entriaProduct', Item."NPR Entria Product");
@@ -161,7 +193,57 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
             JsonBuilder.EndObject();
         end;
 
+        if WithVariants then begin
+            JsonBuilder.StartArray('variants');
+            JsonBuilder.AddArray(AddItemVariants(JsonBuilder, Item."No."));
+            JsonBuilder.EndArray();
+        end;
+
         JsonBuilder.EndObject();
+        exit(JsonBuilder);
+    end;
+
+    local procedure CrossVarietyNoName(CrossVarietyNo: Integer): Text
+    var
+        Item: Record Item;
+        RecRef: RecordRef;
+    begin
+        RecRef.Open(Database::Item);
+        exit(RecRef.Field(Item.FieldNo("NPR Cross Variety No.")).GetEnumValueNameFromOrdinalValue(CrossVarietyNo));
+    end;
+
+    local procedure AddItemVariants(var JsonBuilder: Codeunit "NPR Json Builder"; ItemNo: Code[20]): Codeunit "NPR Json Builder"
+    var
+        ItemVariant: Record "Item Variant";
+    begin
+        ItemVariant.SetRange("Item No.", ItemNo);
+        ItemVariant.SetLoadFields(Description, "Description 2", Blocked,
+            "NPR Variety 1", "NPR Variety 1 Table", "NPR Variety 1 Value",
+            "NPR Variety 2", "NPR Variety 2 Table", "NPR Variety 2 Value",
+            "NPR Variety 3", "NPR Variety 3 Table", "NPR Variety 3 Value",
+            "NPR Variety 4", "NPR Variety 4 Table", "NPR Variety 4 Value");
+        ItemVariant.ReadIsolation := IsolationLevel::ReadCommitted;
+        if ItemVariant.FindSet() then
+            repeat
+                JsonBuilder.StartObject().AddProperty('id', Format(ItemVariant.SystemId, 0, 4).ToLower())
+                                         .AddProperty('variantCode', ItemVariant.Code)
+                                         .AddProperty('description', ItemVariant.Description)
+                                         .AddProperty('description2', ItemVariant."Description 2")
+                                         .AddProperty('blocked', ItemVariant.Blocked)
+                                         .AddProperty('variety1', ItemVariant."NPR Variety 1")
+                                         .AddProperty('variety1Table', ItemVariant."NPR Variety 1 Table")
+                                         .AddProperty('variety1Value', ItemVariant."NPR Variety 1 Value")
+                                         .AddProperty('variety2', ItemVariant."NPR Variety 2")
+                                         .AddProperty('variety2Table', ItemVariant."NPR Variety 2 Table")
+                                         .AddProperty('variety2Value', ItemVariant."NPR Variety 2 Value")
+                                         .AddProperty('variety3', ItemVariant."NPR Variety 3")
+                                         .AddProperty('variety3Table', ItemVariant."NPR Variety 3 Table")
+                                         .AddProperty('variety3Value', ItemVariant."NPR Variety 3 Value")
+                                         .AddProperty('variety4', ItemVariant."NPR Variety 4")
+                                         .AddProperty('variety4Table', ItemVariant."NPR Variety 4 Table")
+                                         .AddProperty('variety4Value', ItemVariant."NPR Variety 4 Value")
+                                         .EndObject();
+            until ItemVariant.Next() = 0;
         exit(JsonBuilder);
     end;
 
@@ -246,6 +328,19 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         Fields.Add(ItemVariant.FieldNo("Item No."), 'itemCode');
         Fields.Add(ItemVariant.FieldNo(Description), 'description');
         Fields.Add(ItemVariant.FieldNo("Description 2"), 'description2');
+        Fields.Add(ItemVariant.FieldNo(Blocked), 'blocked');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 1"), 'variety1');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 1 Table"), 'variety1Table');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 1 Value"), 'variety1Value');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 2"), 'variety2');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 2 Table"), 'variety2Table');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 2 Value"), 'variety2Value');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 3"), 'variety3');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 3 Table"), 'variety3Table');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 3 Value"), 'variety3Value');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 4"), 'variety4');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 4 Table"), 'variety4Table');
+        Fields.Add(ItemVariant.FieldNo("NPR Variety 4 Value"), 'variety4Value');
 
         exit(Response.RespondOK(Request.GetData(ItemVariant, Fields)));
     end;
@@ -317,6 +412,73 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         Fields.Add(ItemTranslation.FieldNo("Description 2"), 'description2');
 
         exit(Response.RespondOK(Request.GetData(ItemTranslation, Fields)));
+    end;
+
+    local procedure GetVariety(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Variety: Record "NPR Variety";
+        Fields: Dictionary of [Integer, Text];
+    begin
+        if Request.QueryParams().ContainsKey('code') then begin
+            Variety.SetFilter(Code, '=%1', Request.QueryParams().Get('code'));
+        end;
+
+        Fields.Add(Variety.FieldNo(Code), 'code');
+        Fields.Add(Variety.FieldNo(Description), 'description');
+        Fields.Add(Variety.FieldNo("Use in Variant Description"), 'useInVariantDescription');
+        Fields.Add(Variety.FieldNo("Pre tag In Variant Description"), 'preTagInVariantDescription');
+        Fields.Add(Variety.FieldNo("Use Description field"), 'useDescriptionField');
+
+        exit(Response.RespondOK(Request.GetData(Variety, Fields)));
+    end;
+
+    local procedure GetVarietyTable(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        VarietyTable: Record "NPR Variety Table";
+        Fields: Dictionary of [Integer, Text];
+    begin
+        if Request.QueryParams().ContainsKey('type') then begin
+            VarietyTable.SetFilter(Type, '=%1', Request.QueryParams().Get('type'));
+        end;
+        if Request.QueryParams().ContainsKey('code') then begin
+            VarietyTable.SetFilter(Code, '=%1', Request.QueryParams().Get('code'));
+        end;
+
+        Fields.Add(VarietyTable.FieldNo(Type), 'type');
+        Fields.Add(VarietyTable.FieldNo(Code), 'code');
+        Fields.Add(VarietyTable.FieldNo(Description), 'description');
+        Fields.Add(VarietyTable.FieldNo("Use in Variant Description"), 'useInVariantDescription');
+        Fields.Add(VarietyTable.FieldNo("Pre tag In Variant Description"), 'preTagInVariantDescription');
+        Fields.Add(VarietyTable.FieldNo("Use Description field"), 'useDescriptionField');
+        Fields.Add(VarietyTable.FieldNo("Is Copy"), 'isCopy');
+        Fields.Add(VarietyTable.FieldNo("Copy from"), 'copyFrom');
+        Fields.Add(VarietyTable.FieldNo("Lock Table"), 'lockTable');
+
+        exit(Response.RespondOK(Request.GetData(VarietyTable, Fields)));
+    end;
+
+    local procedure GetVarietyValue(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        VarietyValue: Record "NPR Variety Value";
+        Fields: Dictionary of [Integer, Text];
+    begin
+        if Request.QueryParams().ContainsKey('type') then begin
+            VarietyValue.SetFilter(Type, '=%1', Request.QueryParams().Get('type'));
+        end;
+        if Request.QueryParams().ContainsKey('table') then begin
+            VarietyValue.SetFilter("Table", '=%1', Request.QueryParams().Get('table'));
+        end;
+        if Request.QueryParams().ContainsKey('value') then begin
+            VarietyValue.SetFilter(Value, '=%1', Request.QueryParams().Get('value'));
+        end;
+
+        Fields.Add(VarietyValue.FieldNo(Type), 'type');
+        Fields.Add(VarietyValue.FieldNo("Table"), 'table');
+        Fields.Add(VarietyValue.FieldNo(Value), 'value');
+        Fields.Add(VarietyValue.FieldNo("Sort Order"), 'sortOrder');
+        Fields.Add(VarietyValue.FieldNo(Description), 'description');
+
+        exit(Response.RespondOK(Request.GetData(VarietyValue, Fields)));
     end;
 }
 #endif
