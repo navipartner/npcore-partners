@@ -5,37 +5,66 @@
     procedure CreateDSFINVKDocument(var DSFINVKJson: JsonObject; DSFINVKClosing: Record "NPR DSFINVK Closing")
     var
         DETSSClient: Record "NPR DE POS Unit Aux. Info";
+        POSEntry: Record "NPR POS Entry";
         FirstFiscalNo: Text;
         LastFiscalNo: Text;
     begin
         DETSSClient.Get(DSFINVKClosing."POS Unit No.");
-        FillTransactionData(DSFINVKClosing."Closing Date", FirstFiscalNo, LastFiscalNo);
+        SetClosingScope(POSEntry, DSFINVKClosing);
+        FillTransactionData(POSEntry, FirstFiscalNo, LastFiscalNo);
 
-        DSFINVKJson.Add('head', GetHeader(FirstFiscalNo, LastFiscalNo));
+        DSFINVKJson.Add('head', GetHeader(DSFINVKClosing."Closing Date", FirstFiscalNo, LastFiscalNo));
         DSFINVKJson.Add('client_id', Format(DETSSClient.SystemId, 0, 4));
         DSFINVKJson.Add('cash_point_closing_export_id', DSFINVKClosing."DSFINVK Closing No.");
         DSFINVKJson.Add('cash_statement', CreateCashStatement());
-        DSFINVKJson.Add('transactions', CreateTransactions(DSFINVKClosing."Closing Date"));
+        DSFINVKJson.Add('transactions', CreateTransactions(POSEntry));
     end;
 
-    local procedure GetHeader(FirstFiscalNo: Text; LastFiscalNo: Text) HeadJson: JsonObject
+    local procedure GetHeader(BusinessDate: Date; FirstFiscalNo: Text; LastFiscalNo: Text) HeadJson: JsonObject
     begin
+        HeadJson.Add('business_date', Format(BusinessDate, 0, 9));
         HeadJson.Add('first_transaction_export_id', FirstFiscalNo);
         HeadJson.Add('last_transaction_export_id', LastFiscalNo);
         HeadJson.Add('export_creation_date', GetUnixTime(CurrentDateTime));
     end;
 
-    local procedure FillTransactionData(WorkShiftDate: Date; var FirstFiscalNo: Text; var LastFiscalNo: Text)
-    var
-        POSEntry: Record "NPR POS Entry";
-        DeAuditLog: Record "NPR DE POS Audit Log Aux. Info";
-        DeAuditError: Label 'There is DE Audit Aux Log with error, No.: %1', Comment = '%1 - DE POS Unit No.';
+    local procedure SetClosingScope(var POSEntry: Record "NPR POS Entry"; DSFINVKClosing: Record "NPR DSFINVK Closing")
     begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         POSEntry.ReadIsolation := IsolationLevel::ReadCommitted;
 #endif
-        POSEntry.SetRange("Entry Date", WorkShiftDate);
-        POSEntry.FindSet();
+        //A Cash Point Closing belongs to one cash register and covers every transaction since that register's previous closing
+        POSEntry.SetRange("POS Unit No.", DSFINVKClosing."POS Unit No.");
+        if DSFINVKClosing."POS Entry No." = 0 then begin
+            //No Z-report balancing entry to bound the closing, so it covers its business day
+            POSEntry.SetRange("Entry Date", DSFINVKClosing."Closing Date");
+            exit;
+        end;
+        POSEntry.SetRange("Entry No.", GetPreviousZReportEntryNo(DSFINVKClosing) + 1, DSFINVKClosing."POS Entry No.");
+    end;
+
+    local procedure GetPreviousZReportEntryNo(DSFINVKClosing: Record "NPR DSFINVK Closing"): Integer
+    var
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+    begin
+        //A Z-report that was started and cancelled leaves an open checkpoint without a balancing entry, so it is not a closing
+        POSWorkshiftCheckpoint.SetCurrentKey("POS Entry No.");
+        POSWorkshiftCheckpoint.SetLoadFields("POS Entry No.");
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", DSFINVKClosing."POS Unit No.");
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetRange("POS Entry No.", 1, DSFINVKClosing."POS Entry No." - 1);
+        if POSWorkshiftCheckpoint.FindLast() then
+            exit(POSWorkshiftCheckpoint."POS Entry No.");
+    end;
+
+    local procedure FillTransactionData(var POSEntry: Record "NPR POS Entry"; var FirstFiscalNo: Text; var LastFiscalNo: Text)
+    var
+        DeAuditLog: Record "NPR DE POS Audit Log Aux. Info";
+        DeAuditError: Label 'There is DE Audit Aux Log with error, No.: %1', Comment = '%1 - DE POS Unit No.';
+    begin
+        if not POSEntry.FindSet() then
+            exit;
         repeat
             if DeAuditLog.Get(POSEntry."Entry No.") then begin
                 if DeAuditLog."Has Error" then
@@ -82,18 +111,14 @@
         CashStatement.Add('payment', CreatePayment());
     end;
 
-    local procedure CreateTransactions(WorkShiftDate: Date) Transactions: JsonArray
+    local procedure CreateTransactions(var POSEntry: Record "NPR POS Entry") Transactions: JsonArray
     var
-        POSEntry: Record "NPR POS Entry";
         DeAuditLog: Record "NPR DE POS Audit Log Aux. Info";
         Security: JsonObject;
         Transaction: JsonObject;
     begin
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        POSEntry.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        POSEntry.SetRange("Entry Date", WorkShiftDate);
-        POSEntry.FindSet();
+        if not POSEntry.FindSet() then
+            exit;
         repeat
             if DeAuditLog.Get(POSEntry."Entry No.") then begin
                 Clear(Security);

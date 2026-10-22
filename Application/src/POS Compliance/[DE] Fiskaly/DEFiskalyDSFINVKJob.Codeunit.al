@@ -27,26 +27,40 @@
 
     local procedure SendParameterStringData(ParameterString: Text)
     var
+        POSEntry: Record "NPR POS Entry";
+        ClosingDate: Date;
+        PosUnit: Code[10];
+    begin
+        PosUnit := CopyStr(ParameterString.Split(';').Get(1), 1, MaxStrLen(PosUnit));
+        Evaluate(ClosingDate, ParameterString.Split(';').Get(2));
+
+        POSEntry.ReadIsolation := IsolationLevel::ReadCommitted;
+        POSEntry.SetLoadFields("Entry No.");
+        POSEntry.SetRange("POS Unit No.", PosUnit);
+        POSEntry.SetRange("Entry Date", ClosingDate);
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
+        if POSEntry.FindSet() then
+            repeat
+                if IsZReportEntry(POSEntry."Entry No.") then begin
+                    SendClosing(PosUnit, ClosingDate, POSEntry."Entry No.");
+                    Commit();
+                end;
+            until POSEntry.Next() = 0;
+    end;
+
+    local procedure SendClosing(PosUnit: Code[10]; ClosingDate: Date; ZReportEntryNo: Integer)
+    var
         ConnectionParameters: Record "NPR DE Audit Setup";
         DSFINVKClosing: Record "NPR DSFINVK Closing";
-        POSEntry: Record "NPR POS Entry";
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         DSFINVKMng: Codeunit "NPR DE Fiskaly DSFINVK";
-        ClosingDate: Date;
         DSFINVKJson: JsonObject;
         DSFINVKResponseJson: JsonToken;
-        PosUnit: Code[10];
     begin
-        PosUnit := CopyStr(ParameterString, 1, StrPos(ParameterString, ';'));
-        Evaluate(ClosingDate, CopyStr(ParameterString, (StrPos(ParameterString, ';') + 1), StrLen(ParameterString)));
-
-        DSFINVKClosing.Reset();
         DSFINVKClosing.SetRange("POS Unit No.", PosUnit);
-        DSFINVKClosing.SetRange("Closing Date", ClosingDate);
+        DSFINVKClosing.SetRange("POS Entry No.", ZReportEntryNo);
         if not DSFINVKClosing.FindFirst() then begin
-            GetPOSEntryForDSFINVKClosing(POSEntry, PosUnit, ClosingDate);
-
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
             DSFINVKClosing.ReadIsolation := IsolationLevel::UpdLock;
 #else
@@ -54,9 +68,9 @@
 #endif
             DSFINVKClosing.Init();
             DSFINVKClosing."DSFINVK Closing No." := GetNextClosingNo(PosUnit);
-            DSFINVKClosing."POS Unit No." := POSEntry."POS Unit No.";
-            DSFINVKClosing."POS Entry No." := POSEntry."Entry No.";
-            DSFINVKClosing."Closing Date" := WorkDate();
+            DSFINVKClosing."POS Unit No." := PosUnit;
+            DSFINVKClosing."POS Entry No." := ZReportEntryNo;
+            DSFINVKClosing."Closing Date" := ClosingDate;
             DSFINVKClosing.Insert();
         end
         else
@@ -195,18 +209,13 @@
             NextClosingId := 1;
     end;
 
-    local procedure GetPOSEntryForDSFINVKClosing(var POSEntry: Record "NPR POS Entry"; PosUnit: Code[10]; ClosingDate: Date)
+    local procedure IsZReportEntry(POSEntryNo: Integer): Boolean
+    var
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        POSEntry.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        POSEntry.SetLoadFields("POS Unit No.", "Entry No.");
-        POSEntry.SetRange("POS Unit No.", PosUnit);
-        POSEntry.SetRange("Entry Date", ClosingDate);
-        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
-
-        if not POSEntry.FindFirst() then
-            exit;
+        POSWorkshiftCheckpoint.SetRange("POS Entry No.", POSEntryNo);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+        exit(not POSWorkshiftCheckpoint.IsEmpty());
     end;
 
     procedure GetClosingState(DSFINVKResponseJson: JsonToken): Enum "NPR DSFINVK State"

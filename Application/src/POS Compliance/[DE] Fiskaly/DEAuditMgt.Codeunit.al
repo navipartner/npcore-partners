@@ -518,6 +518,7 @@
     var
         ConnectionParameters: Record "NPR DE Audit Setup";
         DSFINVKClosing: Record "NPR DSFINVK Closing";
+        POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
@@ -542,9 +543,13 @@
         if not (POSWorkshifCheckpoint.Type = POSWorkshifCheckpoint.Type::ZREPORT) then
             exit;
 
+        POSEntry.SetLoadFields("Entry Date");
+        if not POSEntry.Get(PosEntryNo) then
+            exit;
+
         DSFINVKClosing.Reset();
         DSFINVKClosing.SetRange("POS Unit No.", UnitNo);
-        DSFINVKClosing.SetRange("Closing Date", WorkDate());
+        DSFINVKClosing.SetRange("POS Entry No.", PosEntryNo);
         if not DSFINVKClosing.FindFirst() then begin
             DSFINVKClosing.LockTable();
             DSFINVKClosing.Reset();
@@ -558,7 +563,7 @@
             DSFINVKClosing."DSFINVK Closing No." := NextClosingId;
             DSFINVKClosing."POS Unit No." := UnitNo;
             DSFINVKClosing."POS Entry No." := PosEntryNo;
-            DSFINVKClosing."Closing Date" := WorkDate();
+            DSFINVKClosing."Closing Date" := POSEntry."Entry Date";
             DSFINVKClosing.Insert();
 
             Commit();
