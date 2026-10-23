@@ -99,13 +99,15 @@ codeunit 6151498 "NPR ConfigCat API"
 
     local procedure ParseResponseToFeatureFlagTemp(ResponseText: Text; var TempNPRFeatureFlag: Record "NPR Feature Flag" temporary)
     var
-        JsonResponse: Codeunit "JSON Management";
-        JsonProperty: Codeunit "JSON Management";
+        ResponseJson: JsonObject;
+        FlagToken: JsonToken;
         PropertyName: Text;
-        PropertyValueJsonText: Text;
         ValueText: Text;
         VariationID: Text;
         NotTemporaryTableErrorLbl: Label 'The provided parameter must be a temporary table.';
+        NotValidJsonErrorLbl: Label 'The ConfigCat response is not valid JSON. This is a programming bug.', Locked = true;
+        NoFeatureFlagsErrorLbl: Label 'The ConfigCat response contains no feature flags. This is a programming bug.', Locked = true;
+        NotFlagObjectErrorLbl: Label 'The ConfigCat response entry ''%1'' is not a feature flag object. This is a programming bug.', Locked = true, Comment = '%1 = feature flag name';
     begin
         if not TempNPRFeatureFlag.IsTemporary then
             Error(NotTemporaryTableErrorLbl);
@@ -114,15 +116,16 @@ codeunit 6151498 "NPR ConfigCat API"
         if not TempNPRFeatureFlag.IsEmpty then
             TempNPRFeatureFlag.DeleteAll();
 
-        JsonResponse.InitializeFromString(ResponseText);
+        if not ResponseJson.ReadFrom(ResponseText) then
+            Error(NotValidJsonErrorLbl);
 
-        JsonResponse.ReadProperties();
-        while JsonResponse.GetNextProperty(PropertyName, PropertyValueJsonText) do begin
+        foreach PropertyName in ResponseJson.Keys() do begin
+            ResponseJson.Get(PropertyName, FlagToken);
+            if not FlagToken.IsObject() then
+                Error(NotFlagObjectErrorLbl, PropertyName);
 
-            Clear(JsonProperty);
-            JsonProperty.InitializeFromString(PropertyValueJsonText);
-            JsonProperty.GetStringPropertyValueByName('value', ValueText);
-            JsonProperty.GetStringPropertyValueByName('variationId', VariationID);
+            ValueText := GetPropertyValueAsText(FlagToken.AsObject(), 'value');
+            VariationID := GetPropertyValueAsText(FlagToken.AsObject(), 'variationId');
 
             TempNPRFeatureFlag.Init();
 #pragma warning disable AA0139
@@ -132,6 +135,22 @@ codeunit 6151498 "NPR ConfigCat API"
 #pragma warning restore AA0139
             TempNPRFeatureFlag.Insert();
         end;
+
+        if TempNPRFeatureFlag.IsEmpty then
+            Error(NoFeatureFlagsErrorLbl);
+    end;
+
+    local procedure GetPropertyValueAsText(FlagJson: JsonObject; PropertyName: Text): Text
+    var
+        PropertyToken: JsonToken;
+    begin
+        if not FlagJson.Get(PropertyName, PropertyToken) then
+            exit('');
+        if not PropertyToken.IsValue() then
+            exit('');
+        if PropertyToken.AsValue().IsNull() then
+            exit('');
+        exit(PropertyToken.AsValue().AsText());
     end;
 
 
